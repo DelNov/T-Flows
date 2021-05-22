@@ -175,7 +175,7 @@
       call Initialize_Variables(Flow(d), turb(d), Vof(d), swarm(d), Sol(d))
     end if
 
-    if(Vof(d) % model .eq. VOLUME_OF_FLUID) then
+    if(Flow(d) % with_interface) then
       if (read_backup(d))  then
         Flow % piso_status = .false.
       end if
@@ -217,7 +217,7 @@
   call Control_Mod_Backup_Save_Interval  (backup % interval, verbose=.true.)
   call Control_Mod_Results_Save_Interval (result % interval, verbose=.true.)
   call Control_Mod_Save_Initial_Condition(result % initial,  verbose=.true.)
-  if(Vof(d) % model .eq. LAGRANGIAN_PARTICLES) then
+  if(Flow(d) % with_particles) then
     call Control_Mod_Swarm_Save_Interval(prsi, verbose=.true.)
   end if
 
@@ -282,13 +282,13 @@
       call Turb_Mod_Init(turb(d))
 
       ! Interface tracking
-      if(Vof(d) % model .eq. VOLUME_OF_FLUID) then
+      if(Flow(d) % with_interface) then
         call Vof(d) % Main_Vof(Flow(d), turb(d), Sol(d), curr_dt)
         call Vof(d) % Update_Physical_Properties()
       end if
 
       ! Lagrangian particle tracking
-      if(Vof(d) % model .eq. LAGRANGIAN_PARTICLES) then
+      if(Flow(d) % with_particles) then
         call User_Mod_Insert_Particles(Flow(d), turb(d), Vof(d),  &
                                        swarm(d), curr_dt, time)
       end if
@@ -395,7 +395,7 @@
       call Bulk_Mod_Adjust_P_Drops(Flow(d) % bulk, Flow(d) % dt)
 
       ! Lagrangian particle tracking
-      if(Vof(d) % model .eq. LAGRANGIAN_PARTICLES) then
+      if(Flow(d) % with_particles) then
         if(curr_dt >= first_dt_p) then
           call Swarm_Mod_Advance_Particles(swarm(d), curr_dt,  &
                                            n_stat_p, first_dt_p)

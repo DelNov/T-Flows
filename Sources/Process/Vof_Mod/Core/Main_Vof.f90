@@ -12,7 +12,7 @@
   integer, intent(in)         :: curr_dt     ! time step
 !==============================================================================!
 
-  if(Vof % model .eq. VOLUME_OF_FLUID) then
+  if(Flow % with_interface) then
 
     !----------------------------------!
     !   Created a front or a surface   !

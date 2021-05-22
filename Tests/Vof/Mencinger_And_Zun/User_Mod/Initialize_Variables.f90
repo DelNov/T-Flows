@@ -48,14 +48,12 @@ include '../User_Mod/Vof_Interface_Box.f90'
 
   ! Initialize front
   if(Vof % track_front) then
-    call Front_Mod_Place_At_Var_Value(Vof % front,  &
-                                      Vof % fun,    &
-                                      Sol,           &
-                                      0.5,           &
-                                      .true.)  ! don't print messages
-    call Front_Mod_Calculate_Curvatures_From_Elems(Vof % front)
-    call Front_Mod_Print_Statistics               (Vof % front)
-    call Front_Mod_Save(Vof % front, 0)
+    call Vof % Front % Place_At_Var_Value(Vof % fun,  &
+                                          Sol,        &
+                                          0.5,        &
+                                          .true.)  ! don't print messages
+    call Vof % Front % Print_Front_Statistics()
+    call Vof % Front % Save_Front(0)
   end if
 
   ! Initialize velocities (depends on phase definition)

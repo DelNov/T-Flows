@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Multiphase(val, verbose)
+  subroutine Control_Mod_Solver_For_Vof(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_MULTIPHASE', 'cg',  &
+  call Control_Mod_Read_Char_Item('SOLVER_FOR_VOF', 'cg',  &
                                    val, verbose)
   call To_Upper_Case(val)
 

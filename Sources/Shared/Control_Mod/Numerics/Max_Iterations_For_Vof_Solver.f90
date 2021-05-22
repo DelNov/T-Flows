@@ -1,15 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Multiphase_Model(val, verbose)
-!------------------------------------------------------------------------------!
-!   Reading multiphase model from the control file.                            !
+  subroutine Control_Mod_Max_Iterations_For_Vof_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: val
+  integer           :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('MULTIPHASE_MODEL', 'none', val, verbose)
-  call To_Upper_Case(val)
+  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_VOF_SOLVER',  &
+                                  val, val, verbose)
 
   end subroutine

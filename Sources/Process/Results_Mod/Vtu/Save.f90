@@ -528,7 +528,7 @@
     !---------------------!
     !   Volume fraction   !
     !---------------------!
-    if(Vof % model .eq. VOLUME_OF_FLUID) then
+    if(Flow % with_interface) then
       call Save_Scalar_Real("VofSharp [1]", plot_inside,            &
                             Vof % fun % n(c_f:c_l),                 &
                             f8, f9, data_offset, run)
@@ -558,7 +558,7 @@
     !---------------------------------------!
     !   Number of impacts and reflections   !
     !---------------------------------------!
-    if(Vof % model .eq. LAGRANGIAN_PARTICLES .and. .not. plot_inside) then
+    if(Flow % with_particles .and. .not. plot_inside) then
       call Save_Scalar_Real("ParticlesReflected", plot_inside,  &
                             swarm % n_reflected(c_f:c_l),       &
                             f8, f9, data_offset, run)

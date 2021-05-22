@@ -97,7 +97,7 @@
   !   In case of vof simulations, treat surface tension like pressure   !
   !   The most elegat way to do it - just bundle them up in one array   !
   !---------------------------------------------------------------------!
-  if(Vof % model .eq. VOLUME_OF_FLUID .and.  &
+  if(Flow % with_interface .and.  &
      Vof % surface_tension > TINY) then
 
     ! Surface tension gradients

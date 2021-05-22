@@ -108,6 +108,12 @@
     ! Bulk velocities, pressure drops, etc.
     type(Bulk_Type) :: bulk
 
+    !------------------------------------------!
+    !   Associated with multiphase situation   !
+    !------------------------------------------!
+    logical :: with_particles
+    logical :: with_interface
+
     !--------------------------!
     !   Numerical parameters   !
     !--------------------------!

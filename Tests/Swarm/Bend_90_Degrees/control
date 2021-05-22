@@ -41,7 +41,7 @@
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL                    lagrangian_particles
+ PARTICLE_TRACKING                               yes
 # SWARM_SUBGRID_SCALE_MODEL           brownian_fukagata
  SWARM_DIAMETER                                    2.5e-5
  SWARM_DENSITY                                  1000.0

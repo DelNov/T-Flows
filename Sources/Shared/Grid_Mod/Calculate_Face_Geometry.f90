@@ -66,8 +66,8 @@
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
   if(this_proc < 2 .and. Grid % n_shadows > 0) then
-    print '(a,f9.3)', '# Minimum distance stored in shadow faces: ', min_d
-    print '(a,f9.3)', '# Maximum distance stored in shadow faces: ', max_d
+    print '(a,f9.3)', ' # Minimum distance stored in shadow faces: ', min_d
+    print '(a,f9.3)', ' # Maximum distance stored in shadow faces: ', max_d
   end if
 
   !---------------------------------------------------------!

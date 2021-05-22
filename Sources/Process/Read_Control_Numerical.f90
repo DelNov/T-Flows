@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Numerical(flow, turb, Vof)
+  subroutine Read_Control_Numerical(Flow, turb, Vof)
 !------------------------------------------------------------------------------!
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: flow
+  type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
 !----------------------------------[Locals]------------------------------------!
@@ -24,7 +24,7 @@
 !==============================================================================!
 
   ! Take alias
-  Grid => flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !------------------------------------------!
   !   Pressure velocity coupling algorithm   !
@@ -32,37 +32,37 @@
 
   ! Basic algorithm for pressure-velocity coupling (SIMPLE, PISO)
   call Control_Mod_Pressure_Momentum_Coupling(name, .true.)
-  flow % p_m_coupling = Numerics_Mod_Pressure_Momentum_Coupling_Code(name)
+  Flow % p_m_coupling = Numerics_Mod_Pressure_Momentum_Coupling_Code(name)
 
-  if( flow % p_m_coupling .eq. PISO) then
-    call Control_Mod_Number_Of_Piso_Corrections(flow % n_piso_corrections)
-    flow % piso_status = .false.
+  if( Flow % p_m_coupling .eq. PISO) then
+    call Control_Mod_Number_Of_Piso_Corrections(Flow % n_piso_corrections)
+    Flow % piso_status = .false.
   end if
 
   ! Improvements to Rhie and Chow method (Choi, Gu)
-  call Control_Mod_Choi_Correction(flow % choi_correction, .false.)
-  call Control_Mod_Gu_Correction  (flow % gu_correction,   .false.)
+  call Control_Mod_Choi_Correction(Flow % choi_correction, .false.)
+  call Control_Mod_Gu_Correction  (Flow % gu_correction,   .false.)
 
   !----------------------------------!
   !   Gradient computation methods   !
   !----------------------------------!
 
   ! Tolerance and max iterations for computation of gradients with Gauss method
-  call Control_Mod_Tolerance_For_Gauss_Gradients(flow % gauss_tol, .false.)
-  flow % gauss_miter = 10
-  call Control_Mod_Max_Gauss_Gradients_Iterations(flow % gauss_miter,  &
+  call Control_Mod_Tolerance_For_Gauss_Gradients(Flow % gauss_tol, .false.)
+  Flow % gauss_miter = 10
+  call Control_Mod_Max_Gauss_Gradients_Iterations(Flow % gauss_miter,  &
                                                   .false.)
-  flow % least_miter =  4
-  call Control_Mod_Max_Least_Squares_Gradients_Iterations(flow % least_miter,  &
+  Flow % least_miter =  4
+  call Control_Mod_Max_Least_Squares_Gradients_Iterations(Flow % least_miter,  &
                                                           .false.)
 
   !-------------------------!
   !   Related to momentum   !
   !-------------------------!
   do i = 1, 3
-    if(i .eq. 1) ui => flow % u
-    if(i .eq. 2) ui => flow % v
-    if(i .eq. 3) ui => flow % w
+    if(i .eq. 1) ui => Flow % u
+    if(i .eq. 2) ui => Flow % v
+    if(i .eq. 3) ui => Flow % w
     ui % urf    = 0.8
     ui % mniter = 5
     call Control_Mod_Advection_Scheme_For_Momentum            (name)
@@ -81,49 +81,49 @@
   !-------------------------!
   !   Related to pressure   !
   !-------------------------!
-  flow % pp % mniter = 40
-  call Control_Mod_Tolerance_For_Pressure_Solver      (flow % pp % tol)
-  call Control_Mod_Preconditioner_For_System_Matrix   (flow % pp % precond)
-  call Control_Mod_Max_Iterations_For_Pressure_Solver (flow % pp % mniter)
-  call Control_Mod_Simple_Underrelaxation_For_Pressure(flow % pp % urf)
+  Flow % pp % mniter = 40
+  call Control_Mod_Tolerance_For_Pressure_Solver      (Flow % pp % tol)
+  call Control_Mod_Preconditioner_For_System_Matrix   (Flow % pp % precond)
+  call Control_Mod_Max_Iterations_For_Pressure_Solver (Flow % pp % mniter)
+  call Control_Mod_Simple_Underrelaxation_For_Pressure(Flow % pp % urf)
   call Control_Mod_Gradient_Method_For_Pressure              (name)
-  flow % p  % grad_method = Numerics_Mod_Gradient_Method_Code(name)
-  flow % pp % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+  Flow % p  % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+  Flow % pp % grad_method = Numerics_Mod_Gradient_Method_Code(name)
 
   !------------------------------!
   !   Related to heat transfer   !
   !------------------------------!
-  if(flow % heat_transfer) then
-    flow % t % urf    = 0.7
-    flow % t % mniter = 5
+  if(Flow % heat_transfer) then
+    Flow % t % urf    = 0.7
+    Flow % t % mniter = 5
     call Control_Mod_Advection_Scheme_For_Energy                    (name)
-    flow % t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+    Flow % t % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                        (name)
-    flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Energy  (flow % t % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Energy(flow % t % urf)
-    call Control_Mod_Tolerance_For_Energy_Solver      (flow % t % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix (flow % t % precond)
-    call Control_Mod_Max_Iterations_For_Energy_Solver (flow % t % mniter)
+    Flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+    call Control_Mod_Blending_Coefficient_For_Energy  (Flow % t % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Energy(Flow % t % urf)
+    call Control_Mod_Tolerance_For_Energy_Solver      (Flow % t % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix (Flow % t % precond)
+    call Control_Mod_Max_Iterations_For_Energy_Solver (Flow % t % mniter)
     call Control_Mod_Gradient_Method_For_Energy               (name)
-    flow % t % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+    Flow % t % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end if
 
   !--------------------------------!
-  !   Related to multiphase flow   !
+  !   Related to multiphase Flow   !
   !--------------------------------!
-  if(Vof % model .eq. VOLUME_OF_FLUID) then
+  if(Flow % with_interface) then
     Vof % fun % urf    = 0.7
     Vof % fun % mniter = 5
-    call Control_Mod_Advection_Scheme_For_Multiphase                 (name)
+    call Control_Mod_Advection_Scheme_For_Vof                        (name)
     Vof % fun % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                         (name)
     Vof % fun % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control_Mod_Blending_Coefficient_For_Multiphase  (Vof % fun % blend)
-    call Control_Mod_Simple_Underrelaxation_For_Multiphase(Vof % fun % urf)
-    call Control_Mod_Tolerance_For_Multiphase_Solver      (Vof % fun % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix     (Vof % fun % precond)
-    call Control_Mod_Max_Iterations_For_Multiphase_Solver (Vof % fun % mniter)
+    call Control_Mod_Blending_Coefficient_For_Vof    (Vof % fun % blend)
+    call Control_Mod_Simple_Underrelaxation_For_Vof  (Vof % fun % urf)
+    call Control_Mod_Tolerance_For_Vof_Solver        (Vof % fun % tol)
+    call Control_Mod_Preconditioner_For_System_Matrix(Vof % fun % precond)
+    call Control_Mod_Max_Iterations_For_Vof_Solver   (Vof % fun % mniter)
     ! Max Courant number and Max substep cycles
     call Control_Mod_Max_Courant_Vof       (Vof % courant_max_param)
     call Control_Mod_Max_Substep_Cycles_Vof(Vof % n_sub_param)
@@ -131,15 +131,15 @@
     call Control_Mod_Max_Smoothing_Cycles_Curvature_Vof(Vof % n_conv_curv)
     call Control_Mod_Max_Smoothing_Cycles_Normal_Vof   (Vof % n_conv_norm)
     call Control_Mod_Skewness_Correction_Vof           (Vof % skew_corr)
-    call Control_Mod_Gradient_Method_For_Multiphase            (name)
+    call Control_Mod_Gradient_Method_For_Vof                   (name)
     Vof % fun % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end if
 
   !--------------------------------!
   !   Related to passive scalars   !
   !--------------------------------!
-  do sc = 1, flow % n_scalars
-    phi => flow % scalar(sc)
+  do sc = 1, Flow % n_scalars
+    phi => Flow % scalar(sc)
     phi % urf    = 0.7
     phi % mniter = 5
     call Control_Mod_Advection_Scheme_For_Scalars              (name)

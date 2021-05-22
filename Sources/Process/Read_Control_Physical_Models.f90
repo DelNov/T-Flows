@@ -104,6 +104,31 @@
 
   end select
 
+  !---------------------------------------------------------!
+  !   Turbulence model variant for Reynolds stress models   !
+  !---------------------------------------------------------!
+  if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+     turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    call Control_Mod_Turbulence_Model_Variant(name, .true.)
+    if     (name .eq. 'NONE') then
+      turb % model_variant = NO_TURBULENCE_MODEL
+    else if(name .eq. 'STABILIZED') then
+      turb % model_variant = STABILIZED
+    else
+      if(this_proc < 2) then
+        print *, '# ERROR!  Unknown turbulence model variant: ', trim(name)
+        print *, '# Exiting!'
+      end if
+      call Comm_Mod_End
+    end if
+  end if
+
+  !----------------------------!
+  !   Rough or smooth walls?   !
+  !----------------------------!
+  call Control_Mod_Rough_Walls(turb % rough_walls, .true.)
+
+
   ! Does the user want to gather statistics?
   call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS',               &
                                  0, n_times, .false.)
@@ -129,27 +154,6 @@
 
     turb % statistics = .true.
   end if
-
-  !------------------------------!
-  !   Turbulence model variant   !
-  !------------------------------!
-  call Control_Mod_Turbulence_Model_Variant(name, .true.)
-  if     (name .eq. 'NONE') then
-    turb % model_variant = NO_TURBULENCE_MODEL
-  else if(name .eq. 'STABILIZED') then
-    turb % model_variant = STABILIZED
-  else
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown turbulence model variant: ', trim(name)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
-  end if
-
-  !----------------------------!
-  !   Rough or smooth walls?   !
-  !----------------------------!
-  call Control_Mod_Rough_Walls(turb % rough_walls, .true.)
 
   !-------------------------------!
   !   Turbulent heat flux model   !
@@ -239,34 +243,27 @@
   !-----------------------!
   call Control_Mod_Number_Of_Scalars(Flow % n_scalars, verbose = .true.)
 
-  !-------------------------------!
-  !                               !
-  !   Related to Multiphase Flow  !
-  !                               !
-  !-------------------------------!
-  call Control_Mod_Multiphase_Model(name, .true.)
+  !-----------------------------------!
+  !                                   !
+  !   Related to interface tracking   !
+  !                                   !
+  !-----------------------------------!
+  call Control_Mod_Interface_Tracking(Flow % with_interface, .true.)
 
-  if(name .eq. 'VOLUME_OF_FLUID' ) then
-    Vof % model = VOLUME_OF_FLUID
-  else if(name .eq. 'LAGRANGIAN_PARTICLES' ) then
-    Vof % model = LAGRANGIAN_PARTICLES
-  else if(name .eq. 'EULER_EULER' ) then
-    Vof % model = EULER_EULER
-  else
-    Vof % model = NO_MULTIPHASE_MODEL
+  if(Flow % with_interface) then
+    call Control_Mod_Track_Front  (Vof % track_front,   .true.)
+    call Control_Mod_Track_Surface(Vof % track_surface, .true.)
+    call Control_Mod_Mass_Transfer(Flow % mass_transfer)
   end if
-
-  call Control_Mod_Track_Front  (Vof % track_front,   .true.)
-  call Control_Mod_Track_Surface(Vof % track_surface, .true.)
-
-  call Control_Mod_Mass_Transfer(Flow % mass_transfer)
 
   !-----------------------!
   !                       !
   !   Particle tracking   !
   !                       !
   !-----------------------!
-  if(Vof % model .eq. LAGRANGIAN_PARTICLES) then
+  call Control_Mod_Interface_Tracking(Flow % with_particles, .true.)
+
+  if(Flow % with_particles) then
 
     call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
     call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)

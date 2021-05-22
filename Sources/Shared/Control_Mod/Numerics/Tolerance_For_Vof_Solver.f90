@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Simple_Underrelaxation_For_Multiphase(val, verbose)
+  subroutine Control_Mod_Tolerance_For_Vof_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_MULTIPHASE',  &
-                                   0.5, val, verbose)
+  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_VOF_SOLVER',  &
+                                   1.0e-6, val, verbose)
 
   end subroutine

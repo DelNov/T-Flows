@@ -4,9 +4,9 @@
  PROBLEM_NAME     rod_tet_dual
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS    4000
- RESULTS_SAVE_INTERVAL    10
- BACKUP_SAVE_INTERVAL    100
+NUMBER_OF_TIME_STEPS    3600
+ RESULTS_SAVE_INTERVAL    30
+ BACKUP_SAVE_INTERVAL    600
  TIME_STEP               0.003
 
 #-------------------
@@ -32,13 +32,13 @@ NUMBER_OF_TIME_STEPS    4000
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL   lagrangian_particles
+ PARTICLE_TRACKING                          yes
  SWARM_DIAMETER                               5.0e-04
  SWARM_DENSITY                                1.0e+03
  NUMBER_OF_SWARM_SUB_STEPS                   12
  NUMBER_OF_PARTICLES                        256
  SWARM_COEFFICIENT_OF_RESTITUTION             1.00
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    200
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    300
 
 #----------------------
 # Numerical parameters

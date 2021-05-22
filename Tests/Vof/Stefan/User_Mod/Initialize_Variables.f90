@@ -89,8 +89,8 @@ include '../User_Mod/Vof_Interface_Box.f90'
         ! MINI_3 Flow % t % o(c) = 110.0 - Grid % xc(c) * 4000.0
         ! MINI_4 Flow % t % n(c) = 110.0 - Grid % xc(c) * 10000.0
         ! MINI_4 Flow % t % o(c) = 110.0 - Grid % xc(c) * 10000.0
-        Flow % t % n(c) = 110.0 - Grid % xc(c) * 20000.0
-        Flow % t % o(c) = 110.0 - Grid % xc(c) * 20000.0
+        Flow % t % n(c) = 110.0 - Grid % xc(c) * 40000.0
+        Flow % t % o(c) = 110.0 - Grid % xc(c) * 40000.0
       end if
     end if
   end do

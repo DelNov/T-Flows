@@ -71,5 +71,3 @@ TURBULENCE_MODEL none
     TYPE                inflow
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
-#LOAD_BACKUP_NAME cavity-ts000001.backup
-MULTIPHASE_MODEL none

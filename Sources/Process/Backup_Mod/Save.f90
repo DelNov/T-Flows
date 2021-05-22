@@ -123,7 +123,7 @@
   !  Multiphase  !
   !              !
   !--------------!
-  if(Vof % model .eq. VOLUME_OF_FLUID) then
+  if(Fld % with_interface) then
     call Backup_Mod_Write_Variable(fh, d, vc, 'vof_fun', Vof % fun)
   end if
 
@@ -328,7 +328,7 @@
   !   Swarm (of particles)   !
   !                          !
   !--------------------------!
-  if(Vof % model .eq. LAGRANGIAN_PARTICLES) then
+  if(Fld % with_particles) then
     call Backup_Mod_Write_Swarm(fh, d, vc, swr)
     call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'n_deposited',      &
                                     swr % n_deposited)

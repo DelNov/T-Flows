@@ -426,7 +426,7 @@
   if(this_proc  < 2) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Volume inflow           : ', bulk % vol_in
-      if (Vof % model .eq. VOLUME_OF_FLUID) then
+      if(Flow % with_interface) then
         ! Needs to be corrected
         print '(a29,es12.5)', ' # Average inflow velocity : ',  &
           bulk % vol_in / area

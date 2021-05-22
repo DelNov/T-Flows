@@ -25,8 +25,8 @@
   class(Vof_Type),   target :: Vof
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
-  type(Grid_Type),   pointer :: grid
+  type(Field_Type),  pointer :: Flow
+  type(Grid_Type),   pointer :: Grid
   type(Face_Type),   pointer :: v_flux
   type(Var_Type),    pointer :: col
   type(Matrix_Type), pointer :: A
@@ -39,49 +39,49 @@
   real                       :: px_f, py_f, pz_f
 !==============================================================================!
 
-  ! Don't use this if vof is not engaged ...
-  if(.not. Vof % model .eq. VOLUME_OF_FLUID) return
-
   ! ... or if surface tension is neglected
   if(Vof % surface_tension < TINY) return
 
   ! Take aliases
-  grid   => Vof % pnt_grid
-  flow   => Vof % pnt_flow
+  Grid   => Vof % pnt_grid
+  Flow   => Vof % pnt_flow
   col    => Vof % fun
-  v_flux => flow % v_flux
+  v_flux => Flow % v_flux
   A      => Sol % A
   M      => Sol % M
   sigma  =  Vof % surface_tension
-  nb     =  grid % n_bnd_cells
-  nc     =  grid % n_cells
+  nb     =  Grid % n_bnd_cells
+  nc     =  Grid % n_cells
   ! Don't do what you once did in the line which follows this comment,
   ! it is plain silly as the smoothed (convoluted) variant of the vof
   ! function is used just for estimation of normals and curvatures.
   ! col    => Vof % smooth
 
+  ! If vof is not engaged, get out of here, no need to hang around
+  if(.not. Flow % with_interface) return
+
   !--------------------------------------!
-  !   Store grid % vol(c) / M % sav(c)   !
+  !   Store Grid % vol(c) / M % sav(c)   !
   !--------------------------------------!
   ! Units here: m^3 s / kg
   ! Remember:  M   is big in liquid, small in gas
   ! meaaning:  v_m is big in gas, small in liquid
-  do c = 1, grid % n_cells
-    v_m(c) = grid % vol(c) / M % sav(c)
+  do c = 1, Grid % n_cells
+    v_m(c) = Grid % vol(c) / M % sav(c)
   end do
 
   ! Store cell forces due to surface tension -> this is analogue to dp / dx
   ! Unit: N/m * 1/m * 1/m = N/m^3
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     pst_x(c) = sigma * Vof % curv(c) * col % x(c)
     pst_y(c) = sigma * Vof % curv(c) * col % y(c)
     pst_z(c) = sigma * Vof % curv(c) * col % z(c)
   end do
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
-    fs = grid % f(s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+    fs = Grid % f(s)
 
     if(c2 > 0) then
 
@@ -89,13 +89,13 @@
       ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
       px_f = (       fs  * (pst_x(c1)*v_m(c1))    &
               + (1.0-fs) * (pst_x(c2)*v_m(c2)) )  &
-            * grid % dx(s)
+            * Grid % dx(s)
       py_f = (       fs  * (pst_y(c1)*v_m(c1))    &
               + (1.0-fs) * (pst_y(c2)*v_m(c2)) )  &
-            * grid % dy(s)
+            * Grid % dy(s)
       pz_f = (       fs  * (pst_z(c1)*v_m(c1))    &
               + (1.0-fs) * (pst_z(c2)*v_m(c2)) )  &
-            * grid % dz(s)
+            * Grid % dz(s)
 
       ! Calculate coeficients for the pressure matrix
       ! Units: m * m^3 s / kg = m^4 s / kg

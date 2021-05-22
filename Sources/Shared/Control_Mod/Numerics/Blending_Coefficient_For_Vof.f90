@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Blending_Coefficient_For_Multiphase(val, verbose)
+  subroutine Control_Mod_Blending_Coefficient_For_Vof(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('BLENDING_COEFFICIENT_FOR_MULTIPHASE',  &
+  call Control_Mod_Read_Real_Item('BLENDING_COEFFICIENT_FOR_VOF',  &
                                   1.0, val, verbose)
 
   end subroutine

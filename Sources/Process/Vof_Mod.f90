@@ -70,12 +70,9 @@
     ! Averaging
     integer, allocatable :: avg_cells(:,:)
 
-    ! Triangulate the front or surface
-    logical :: track_front
-    logical :: track_surface
-
-    ! Variable holding the multiphase model
-    integer :: model
+    ! Mesh the front or surface
+    logical :: track_front    ! simple but ugly
+    logical :: track_surface  ! complicated but beautiful
 
     contains
 
@@ -116,18 +113,6 @@
       procedure :: Update_Physical_Properties
 
   end type
-
-  !--------------------------------------------------------!
-  !   Parameters and variables defining multiphase model   !
-  !--------------------------------------------------------!
-
-  ! Parameters describing multiphase model choice
-  ! (Prime numbers starting from 40000)
-  integer, parameter :: NO_MULTIPHASE_MODEL   = 50021
-  integer, parameter :: VOLUME_OF_FLUID       = 50023
-  integer, parameter :: LAGRANGIAN_PARTICLES  = 50033
-  integer, parameter :: EULER_EULER           = 50047
-  integer, parameter :: FRONT_TRACKING        = 50051
 
   contains
 

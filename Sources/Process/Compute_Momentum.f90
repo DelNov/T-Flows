@@ -311,7 +311,7 @@
     !   (Note: they are treated like pressure everywhere in the      !
     !    discretized form, meaning separater from other forces)      !
     !----------------------------------------------------------------!
-    if(Vof % model .eq. VOLUME_OF_FLUID) then
+    if(Flow % with_interface) then
       call Vof % Surface_Tension_Force(i)
       do c = 1, Grid % n_cells
         b(c) = b(c) + st_i(c) * Grid % vol(c)

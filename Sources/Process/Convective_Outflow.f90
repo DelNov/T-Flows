@@ -40,22 +40,9 @@
 
   call Flow % Calculate_Fluxes(v_flux % n)
 
-  !----------------------------------------------------------!
-  !   Compute velocity gradients, taking jump into account   !
-  !----------------------------------------------------------!
-
-  !   ! If there is a jump in velocities, call specialized gradient calculation
-  !   if(Vof % model .eq. VOLUME_OF_FLUID .and. Flow % mass_transfer) then
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, Flow % u)
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, Flow % v)
-  !     call Multiphase_Mod_Vof_Grad_Variable_With_Jump(Vof, Flow % w)
-  ! 
-  !   ! No jumps, call usual routines
-  !   else
-  !     call Flow % Grad_Variable(Flow % u)
-  !     call Flow % Grad_Variable(Flow % v)
-  !     call Flow % Grad_Variable(Flow % w)
-  !   end if
+  !--------------------------------!
+  !   Compute velocity gradients   !
+  !--------------------------------!
   call Flow % Grad_Variable(Flow % u)
   call Flow % Grad_Variable(Flow % v)
   call Flow % Grad_Variable(Flow % w)

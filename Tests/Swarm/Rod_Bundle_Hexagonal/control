@@ -32,7 +32,7 @@ NUMBER_OF_TIME_STEPS   10000
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL   lagrangian_particles
+ PARTICLE_TRACKING                          yes
  SWARM_DIAMETER                               5.0e-04
  SWARM_DENSITY                                1.0e+03
  NUMBER_OF_SWARM_SUB_STEPS                   12

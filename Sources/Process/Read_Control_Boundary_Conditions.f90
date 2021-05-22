@@ -227,7 +227,7 @@
             end if
 
             ! Volume of fluid -> still to be worked around
-            if (Vof % model .eq. VOLUME_OF_FLUID) then
+            if (Flow % with_interface) then
               i = Key_Ind('VOF', keys, nks)
               if(i > 0) fun % bnd_cond_type(c) = bc_type_tag
               i = Key_Ind('VOF_C_ANG', keys, nks)
@@ -269,7 +269,7 @@
             end if
 
             ! Multiphase Flow
-            if (Vof % model .eq. VOLUME_OF_FLUID) then
+            if (Flow % with_interface) then
               i = Key_Ind('VOF', keys, nks)
               if(i > 0) fun % b(c) = vals(i)
               i = Key_Ind('VOF_C_ANG', keys, nks)
@@ -828,7 +828,7 @@
       t % n(c) = t % b(c)
     end if
 
-    if (Vof % model .eq. VOLUME_OF_FLUID) then
+    if (Flow % with_interface) then
       fun % n(c) = fun % b(c)
     end if
 

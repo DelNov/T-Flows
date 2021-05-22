@@ -51,7 +51,7 @@
 
   if(update .ne. 'MOMENTUM'   .and.  &
      update .ne. 'TURBULENCE' .and.  &
-     update .ne. 'MULTIPHASE' .and.  &
+     update .ne. 'VOF'        .and.  &
      update .ne. 'ENERGY'     .and.  &
      update .ne. 'SCALARS'    .and.  &
      update .ne. 'ALL') then
@@ -96,8 +96,8 @@
   !   Multiphase   !
   !                !
   !----------------!
-  if( (update .eq. 'MULTIPHASE' .or. update .eq. 'ALL') .and.  &
-      Vof % model .eq. VOLUME_OF_FLUID ) then
+  if( (update .eq. 'VOF' .or. update .eq. 'ALL') .and.  &
+      Flow % with_interface ) then
 
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)

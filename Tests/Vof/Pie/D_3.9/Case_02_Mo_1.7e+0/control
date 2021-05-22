@@ -1,9 +1,9 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME      pie
- HEAT_TRANSFER     no
- MULTIPHASE_MODEL  volume_of_fluid
+ PROBLEM_NAME        pie
+ HEAT_TRANSFER       no
+ INTERFACE_TRACKING  yes
 
 # Try to reach 1.2 seconds
  NUMBER_OF_TIME_STEPS    4000
@@ -48,7 +48,7 @@
 
  TIME_INTEGRATION_SCHEME          linear
  ADVECTION_SCHEME_FOR_MOMENTUM    quick
- ADVECTION_SCHEME_FOR_MULTIPHASE  cicsam
+ ADVECTION_SCHEME_FOR_VOF         cicsam
 
 #------------------------
 # Linear solver settings
@@ -57,7 +57,7 @@
  TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-03
  TOLERANCE_FOR_PRESSURE_SOLVER         1.e-06
  TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-03
- TOLERANCE_FOR_MULTIPHASE_SOLVER       1.e-03
+ TOLERANCE_FOR_VOF_SOLVER              1.e-03
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  360
  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER   12
 

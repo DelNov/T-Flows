@@ -4,8 +4,8 @@
  PROBLEM_NAME     cylinder
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS     600
- RESULTS_SAVE_INTERVAL    60
+NUMBER_OF_TIME_STEPS    3600
+ RESULTS_SAVE_INTERVAL     1
  BACKUP_SAVE_INTERVAL    300
  TIME_STEP               0.1
 
@@ -31,9 +31,9 @@ NUMBER_OF_TIME_STEPS     600
 #----------------
 # Swarm related
 #----------------
- MULTIPHASE_MODEL   lagrangian_particles
- SWARM_DIAMETER                               1.8e-03
- SWARM_DENSITY                                1.0e+03
+ PARTICLE_TRACKING                          yes
+ SWARM_DIAMETER                               1.8e-3
+ SWARM_DENSITY                                1.0e+3
  NUMBER_OF_SWARM_SUB_STEPS                   12
  NUMBER_OF_PARTICLES                         64
  SWARM_COEFFICIENT_OF_RESTITUTION             1.00
