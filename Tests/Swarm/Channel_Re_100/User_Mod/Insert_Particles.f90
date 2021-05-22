@@ -37,13 +37,13 @@
         y = dy * 0.5 + (j-1) * dy
         z = dz * 0.5 + (k-1) * dz
 
-        swarm % particle(i) % x_n = x
-        swarm % particle(i) % y_n = y
-        swarm % particle(i) % z_n = z
+        swarm % Particle(i) % x_n = x
+        swarm % Particle(i) % y_n = y
+        swarm % Particle(i) % z_n = z
 
-        ! Searching for the closest cell and node to place the moved particle
-        call Swarm_Mod_Find_Nearest_Cell(swarm, i, n_parts_in_buffers)
-        call Swarm_Mod_Find_Nearest_Node(swarm, i)
+        ! Searching for the closest cell and node to place the moved Particle
+        call swarm % Particle(i) % Find_Nearest_Cell(n_parts_in_buffers)
+        call swarm % Particle(i) % Find_Nearest_Node()
       end do
     end do
 
