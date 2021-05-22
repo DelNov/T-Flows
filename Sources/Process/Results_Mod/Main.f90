@@ -52,8 +52,12 @@
       call Results_Mod_Save_Swarm(swarm(d), curr_dt)
 
       if(Flow(d) % with_interface) then
-        call Results_Mod_Save_Front(Vof(d) % Front, curr_dt)
-        call Results_Mod_Save_Surf(Vof(d) % surf, curr_dt)
+        if(Vof(d) % track_front) then
+          call Results_Mod_Save_Front(Vof(d) % Front, curr_dt)
+        end if
+        if(Vof(d) % track_surface) then
+          call Results_Mod_Save_Surf(Vof(d) % surf, curr_dt)
+        end if
       end if
 
       ! Write results in user-customized format

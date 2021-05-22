@@ -241,8 +241,6 @@
                             plot_inside=.true., domain=d)
       call Results_Mod_Save(Flow(d), turb(d), Vof(d), swarm(d), first_dt,  &
                             plot_inside=.false., domain=d)
-      call Results_Mod_Save_Front(Vof(d) % Front, curr_dt)
-      call Results_Mod_Save_Surf(Vof(d) % Surf, curr_dt)
     end do
   end if
 
