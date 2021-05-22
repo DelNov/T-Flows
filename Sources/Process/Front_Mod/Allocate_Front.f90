@@ -8,7 +8,7 @@
   class(Front_Type), target :: Front
   type(Field_Type),  target :: Flow
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: nb, nc, nf
 !==============================================================================!
 
@@ -17,10 +17,10 @@
   Front % pnt_grid => Flow % pnt_grid
 
   ! Take aliases
-  grid => Flow % pnt_grid
-  nb   =  grid % n_bnd_cells
-  nc   =  grid % n_cells
-  nf   =  grid % n_faces
+  Grid => Flow % pnt_grid
+  nb   =  Grid % n_bnd_cells
+  nc   =  Grid % n_cells
+  nf   =  Grid % n_faces
 
   ! Allocate memory
   allocate(Front % elem(MAX_SURFACE_ELEMENTS))
