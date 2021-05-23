@@ -1,11 +1,12 @@
 !==============================================================================!
-  logical function Results_Mod_Time_To_Save(n)
+  logical function Time_To_Save(Results, curr_dt)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n  ! current time step
+  class(Results_Type) :: Results
+  integer             :: curr_dt  ! current time step
 !==============================================================================!
 
-  Results_Mod_Time_To_Save = mod(n, result % interval) .eq. 0
+  Time_To_Save = mod(curr_dt, Results % interval) .eq. 0
 
   end function

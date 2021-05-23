@@ -7,7 +7,6 @@
   use Domain_Mod
   use Smooths_Mod
   use Refines_Mod
-  use Save_Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -78,7 +77,6 @@
                        Grid % n_faces,      &
                        Grid % n_shadows,    &
                        Grid % n_bnd_cells)
-
   call Grid % Save_Dim(0)
 
   !-----------------------------------------------------!
@@ -86,14 +84,11 @@
   !-----------------------------------------------------!
 
   ! Create output in vtu format
-  call Save_Vtu_Cells(Grid, 0,         &
-                      Grid % n_nodes,  &
-                      Grid % n_cells)
-  call Save_Vtu_Faces(Grid)
-  call Save_Vtu_Faces(Grid, plot_shadows=.true.)
-
-  ! Try to save in CGNS format, it might work
-  call Save_Cgns_Cells(Grid, 0) 
+  call Grid % Save_Vtu_Cells(0,               &
+                             Grid % n_nodes,  &
+                             Grid % n_cells)
+  call Grid % Save_Vtu_Faces()
+  call Grid % Save_Vtu_Faces(plot_shadows=.true.)
 
   ! Save the 1d probe (good for the channel flow)
   call Probe_1d_Nodes(Grid)

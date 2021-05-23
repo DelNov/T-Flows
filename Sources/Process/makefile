@@ -8,7 +8,7 @@
 #   Variable definitions
 #--------------------------
 
-# Fortran compiler ("gnu", "intel" or "portland")
+# Fortran compiler ("gnu", "intel" or "nvidia")
 FORTRAN = gnu
 
 # Debugging ("yes" or "no")
@@ -16,11 +16,6 @@ DEBUG = no
 
 # Compile for MPI ("yes" or "no")
 MPI = no
-
-# Link with CGNS ("yes" or "no")
-CGNS = no
-# MPI implementation used in parallel CGNS lib ("openmpi" or "mpich")
-CGNS_MPI = openmpi
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -41,9 +36,8 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <MPI=yes/no>       )
-$(info #        <FCOMP=gfortran/ifort/pgf90/mpif90/...>                        )
-$(info #        <CGNS=yes/no> <CGNS_MPI=openmpi/mpich>                         )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=yes/no> <MPI=yes/no>         )
+$(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/...>                    )
 $(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
 $(info #                                                                       )
 $(info # Examples:                                                             )
@@ -51,7 +45,6 @@ $(info #   make                        - sequential version with gnu compiler  )
 $(info #   make MPI=yes                - MPI version with gnu compiler         )
 $(info #   make MPI=yes FCOMP=compiler - MPI version with custom compiler      )
 $(info #   make FORTRAN=intel MPI=yes  - MPI version with intel compiler       )
-$(info #   make MPI=yes CGNS=yes       - MPI version with CGNS/HDF5 support    )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -101,10 +94,10 @@ ifeq ($(FORTRAN), intel)
   OPT_LINK = $(OPT_COMP)
 endif
 
-# Fortran == portland
-ifeq ($(FORTRAN), portland)
+# Fortran == nvidia
+ifeq ($(FORTRAN), nvidia)
   ifeq ($(FCOMP),)
-    FC = pgfortran
+    FC = nvfortran
   else
     FC = $(FCOMP)
   endif
@@ -124,31 +117,6 @@ ifeq ($(MPI), yes)
     FC = $(FCOMP)
   endif
 endif
-
-# If compiling with CGNS, add path to include directory
-ifeq ($(CGNS), yes)
-  ifeq ($(MPI), yes)
-    ifeq ($(CGNS_MPI), openmpi)
-      VALUE = $(shell echo Using CGNS library built on OpenMPI MPI implementation)
-      DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Include
-      CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Openmpi/Lib/libcgns.a \
-                    ../Libraries/Hdf5_Par_Openmpi/Lib/libhdf5.a -ldl
-    endif
-    ifeq ($(CGNS_MPI), mpich)
-      VALUE = $(shell echo Using CGNS library built on MPICH MPI implementation)
-      DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Include
-      CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Par_Mpich/Lib/libcgns.a \
-                    ../Libraries/Hdf5_Par_Mpich/Lib/libhdf5.a -ldl
-    endif
-  else
-    VALUE = $(shell echo Using CGNS library built sequentially)
-    DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
-    CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
-                  ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
-  endif
-  $(info $(VALUE))
-endif
-OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
 # METIS library
 METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
@@ -250,19 +218,8 @@ SRC_MOD += User_Mod.f90
 # Backup_Mod should come close to the end because it uses all other modules
 SRC_MOD += Backup_Mod.f90
 
-# Results_Mod - conditional VTU/CGNS support
-ifeq ($(CGNS), no)
-  SRC_MOD += Save_Grid_Mod_Vtu.f90  \
-             Results_Mod_Vtu.f90
-else
-  ifeq ($(MPI), yes)
-    SRC_MOD += Cgns_Mod_Par.f90
-  else
-    SRC_MOD += Cgns_Mod_Seq.f90
-  endif
-  SRC_MOD += Save_Grid_Mod_Cgns.f90  \
-             Results_Mod_Cgns.f90
-endif
+# Results_Mod must be last.
+SRC_MOD += Results_Mod.f90
 
 #---------------
 #   Functions
@@ -347,8 +304,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ)
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB)  \
-                              $(METIS_LIB)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
 #--------------------------------------------------------------------
 #   Explicit dependencies for modules

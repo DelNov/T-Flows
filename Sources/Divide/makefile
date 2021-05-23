@@ -8,7 +8,7 @@
 #   Variable definitions
 #--------------------------
 
-# Fortran compiler ("gnu", "intel" or "portland")
+# Fortran compiler ("gnu", "intel" or "nvidia")
 FORTRAN = gnu
 
 # Debugging ("yes" or "no")
@@ -29,12 +29,12 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no>                    )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=yes/no>                      )
 $(info #                                                                       )
 $(info # Examples:                                                             )
-$(info #   make                 - compile with gnu compiler                    )
-$(info #   make FORTAN=portland - compile with intel compiler                  )
-$(info #   make DEBUG=yes       - compile with gnu compiler in debug mode      )
+$(info #   make               - compile with gnu compiler                      )
+$(info #   make FORTAN=nvidia - compile with intel compiler                    )
+$(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -76,9 +76,9 @@ ifeq ($(FORTRAN), intel)
   OPT_LINK = $(OPT_COMP)
 endif 
 
-# Fortran == portland
-ifeq ($(FORTRAN), portland)
-  FC = pgfortran
+# Fortran == nvidia
+ifeq ($(FORTRAN), nvidia)
+  FC = nvfortran
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
   else
@@ -113,8 +113,7 @@ SRC_MOD = Const_Mod.f90          \
           Metis_Options_Mod.f90  \
           Boundary_Mod.f90       \
           Sort_Mod.f90           \
-          Grid_Mod.f90           \
-          Save_Grid_Mod_Vtu.f90
+          Grid_Mod.f90
 
 #---------------
 #   Functions

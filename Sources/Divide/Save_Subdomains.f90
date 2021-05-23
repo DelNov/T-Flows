@@ -9,8 +9,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use File_Mod
   use Grid_Mod
-  use Sort_Mod       ! it's a collection of subroutines, no need for "only"
-  use Save_Grid_Mod
+  use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -342,10 +341,9 @@
 
     call Grid % Save_Dim(sub)
 
-    call Save_Vtu_Cells(Grid,       &
-                        sub,        &
-                        nn_sub,     &
-                        nc_sub)
+    call Grid % Save_Vtu_Cells(sub,     &
+                               nn_sub,  &
+                               nc_sub)
 
   end do   ! through subdomains
 

@@ -3,7 +3,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
-  use Save_Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -143,11 +142,11 @@
     !-----------------------------------------------------!
 
     ! Create output in vtu format
-    call Save_Vtu_Cells(Grid(g), 0,         &
-                        Grid(g) % n_nodes,  &
-                        Grid(g) % n_cells)
-    call Save_Vtu_Faces(Grid(g))
-    call Save_Vtu_Faces(Grid(g), plot_shadows=.true.)
+    call Grid(g) % Save_Vtu_Cells(0,                  &
+                                  Grid(g) % n_nodes,  &
+                                  Grid(g) % n_cells)
+    call Grid(g) % Save_Vtu_Faces()
+    call Grid(g) % Save_Vtu_Faces(plot_shadows=.true.)
 
     ! Create 1D file (used for channel or pipe flow)
     call Probe_1d_Nodes(Grid(g))

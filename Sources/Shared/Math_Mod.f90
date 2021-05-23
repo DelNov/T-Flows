@@ -12,6 +12,21 @@
   ! Default precision for "Approx_Real" and "Smaller_Real" functions
   real, parameter :: DEFAULT_TOLERANCE = NANO
 
+  !---------------!
+  !   Math type   !
+  !---------------!
+  type Math_Type
+
+    contains
+
+  end type
+
+  !--------------------------------------!
+  !   Create one instance of Math type   !
+  !     for all other modules to use     !
+  !--------------------------------------!
+  type(Math_Type) :: Math
+
   contains
 
   include 'Math_Mod/Approx_Real.f90'

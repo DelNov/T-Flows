@@ -100,8 +100,9 @@
 
     call Comm_Mod_Wait
 
-    call Save_Vtu_Faces(Grid(d))
-    call Save_Vtu_Faces(Grid(d), plot_shadows=.true.)
+    ! The following two calls are just to see if buffers look sane
+    call Grid(d) % Save_Vtu_Faces()
+    call Grid(d) % Save_Vtu_Faces(plot_shadows=.true.)
   end do
 
   ! Out of domain loop - go back to root
@@ -215,8 +216,8 @@
 
   call Control_Mod_Switch_To_Root()
   call Control_Mod_Backup_Save_Interval  (backup % interval, verbose=.true.)
-  call Control_Mod_Results_Save_Interval (result % interval, verbose=.true.)
-  call Control_Mod_Save_Initial_Condition(result % initial,  verbose=.true.)
+  call Control_Mod_Results_Save_Interval (Results % interval, verbose=.true.)
+  call Control_Mod_Save_Initial_Condition(Results % initial,  verbose=.true.)
   if(Flow(d) % with_particles) then
     call Control_Mod_Swarm_Save_Interval(prsi, verbose=.true.)
   end if
@@ -235,12 +236,12 @@
   ! It will save results in .vtk or .cgns file format,
   ! depending on how the code was compiled
   ! First calls saves inside, second only the boundary cells
-  if(result % initial) then
+  if(Results % initial) then
     do d = 1, n_dom
-      call Results_Mod_Save(Flow(d), turb(d), Vof(d), swarm(d), first_dt,  &
-                            plot_inside=.true., domain=d)
-      call Results_Mod_Save(Flow(d), turb(d), Vof(d), swarm(d), first_dt,  &
-                            plot_inside=.false., domain=d)
+      call Results % Save_Results(Flow(d), turb(d), Vof(d), swarm(d),  &
+                          first_dt, plot_inside=.true., domain=d)
+      call Results % Save_Results(Flow(d), turb(d), Vof(d), swarm(d),  &
+                          first_dt, plot_inside=.false., domain=d)
     end do
   end if
 
@@ -408,8 +409,8 @@
     !----------------------!
     !   Save the results   !
     !----------------------!
-    call Results_Mod_Main(curr_dt, last_dt, time, n_dom,  &
-                          Flow, turb, Vof, swarm, exit_now)
+    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
+                                Flow, turb, Vof, swarm, exit_now)
 
     ! Ran more than a set wall clock time limit
     if(Info_Mod_Time_To_Exit() .or. exit_now) then

@@ -8,14 +8,11 @@
 #   Variable definitions
 #--------------------------
 
-# Fortran compiler ("gnu", "intel" or "portland")
+# Fortran compiler ("gnu", "intel" or "nvidia")
 FORTRAN = gnu
 
 # Debugging ("yes" or "no")
 DEBUG = no
-
-# Link with CGNS ("yes" or "no")
-CGNS = no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -32,13 +29,12 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/portland> <DEBUG=yes/no> <CGNS=yes/no>      )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=yes/no>                      )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make              - compile with gnu compiler                       )
 $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
-$(info #   make CGNS=yes     - compile with gnu compiler and CGNS support      )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -80,9 +76,9 @@ ifeq ($(FORTRAN), intel)
   OPT_LINK = $(OPT_COMP)
 endif 
 
-# Fortran == portland
-ifeq ($(FORTRAN), portland)
-  FC = pgfortran
+# Fortran == nvidia
+ifeq ($(FORTRAN), nvidia)
+  FC = nvfortran
   ifeq ($(DEBUG),yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
   else
@@ -90,14 +86,6 @@ ifeq ($(FORTRAN), portland)
   endif
   OPT_LINK = $(OPT_COMP)
 endif 
-
-# If compiling with CGNS, add path to include directory
-ifeq ($(CGNS), yes)
-  DIR_CGNS_H  = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Include
-  CGNS_LIB    = ../Libraries/Cgnslib_3.2.1_Linux_64_Hdf5_Seq/Lib/libcgns.a \
-                ../Libraries/Hdf5_Seq/Lib/libhdf5.a -ldl
-endif
-OPT_COMP += $(addprefix -I, $(DIR_CGNS_H))
 
 # METIS library
 METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
@@ -155,16 +143,6 @@ SRC_FUN += Calculate_Geometry.f90  \
            Main_Gen.f90            \
            Print_Grid_Statistics.f90
 
-#-------------------------------------------
-#   Conditional inclusion of CGNS support
-#-------------------------------------------
-ifeq ($(CGNS), no)
-  SRC_MOD += Save_Grid_Mod_Vtu.f90
-else
-  SRC_MOD += Cgns_Mod_Seq.f90
-  SRC_MOD += Save_Grid_Mod_Cgns.f90
-endif
-
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions  
 #----------------------------------------------------------------------
@@ -205,8 +183,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ) 
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
-	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(CGNS_LIB)  \
-                              $(METIS_LIB)
+	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
 #--------------------------------------------------------------------
 #   Explicit dependencies for modules
