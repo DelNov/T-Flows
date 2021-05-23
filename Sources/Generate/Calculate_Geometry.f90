@@ -336,11 +336,11 @@
       do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
         j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
 
-        Grid % vol(c1) = Grid % vol(c1)                                    &
-          + Math_Mod_Tet_Volume(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
-                                xt(i_nod),    yt(i_nod),    zt(i_nod),     &
-                                xt(j_nod),    yt(j_nod),    zt(j_nod),     &
-                                x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
+        Grid % vol(c1) = Grid % vol(c1)                                  &
+          + Math % Tet_Volume(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
+                              xt(i_nod),    yt(i_nod),    zt(i_nod),     &
+                              xt(j_nod),    yt(j_nod),    zt(j_nod),     &
+                              x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
       end do  ! i_nod
 
       ! Second cell
@@ -351,11 +351,11 @@
         do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
           j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
 
-          Grid % vol(c2) = Grid % vol(c2)                                    &
-            - Math_Mod_Tet_Volume(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
-                                  xt(i_nod),    yt(i_nod),    zt(i_nod),     &
-                                  xt(j_nod),    yt(j_nod),    zt(j_nod),     &
-                                  x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
+          Grid % vol(c2) = Grid % vol(c2)                                  &
+            - Math % Tet_Volume(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
+                                xt(i_nod),    yt(i_nod),    zt(i_nod),     &
+                                xt(j_nod),    yt(j_nod),    zt(j_nod),     &
+                                x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
         end do  ! i_nod
       end if
 

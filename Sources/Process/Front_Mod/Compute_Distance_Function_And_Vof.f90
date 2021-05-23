@@ -83,8 +83,8 @@
         yc = grid % yc(c)
         zc = grid % zc(c)
 
-        dist = Math_Mod_Distance(xc, yc, zc, xs, ys, zs)  &
-                                 - 1.0 / Front % elem(e) % curv
+        dist = Math % Distance(xc, yc, zc, xs, ys, zs)  &
+             - 1.0 / Front % elem(e) % curv
 
         if(abs(dist) < abs(phi_c(c))) then
           phi_c(c) = dist
@@ -104,7 +104,7 @@
   !----------------------------------------------------------------------!
   do c = 1, nc
     cell_dist % n(c) = phi_c(c)
-    if( Math_Mod_Approx_Real(phi_c(c), MEGA) ) then
+    if( Math % Approx_Real(phi_c(c), MEGA) ) then
       if(vof % n(c) < 0.5) then
         cell_dist % n(c) = min_d
       else

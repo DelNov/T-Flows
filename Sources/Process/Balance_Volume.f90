@@ -170,7 +170,7 @@
   !   Nothing comes from real outflows, no point in   !
   !   scaling with "fac", just add bulk corrections   !
   !---------------------------------------------------!
-  if(Math_Mod_Approx_Real(vol_outflow, 0.0, tol=FEMTO)) then
+  if(Math % Approx_Real(vol_outflow, 0.0, tol=FEMTO)) then
 
     bulk % vol_out = 0.0
     do s = 1, Grid % n_faces

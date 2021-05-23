@@ -67,7 +67,7 @@
   do c = 1, nc
     do i_nod = 1, Grid % cells_n_nodes(c)
       n = Grid % cells_n(i_nod, c)
-      if(Math_Mod_Approx_Real(phi_n(n), 0.5)) then
+      if(Math % Approx_Real(phi_n(n), 0.5)) then
         if(phi % n(c) < phi % o(c)) then
           phi_n(n) = 0.5 - MILI
         else

@@ -58,17 +58,17 @@
     n_vert = 1
     new_n(1) = n_vert
     do v = 2, nv
-      if(.not. Math_Mod_Approx_Real(xv(v), xv(v-1), NANO)) then
+      if(.not. Math % Approx_Real(xv(v), xv(v-1), NANO)) then
         n_vert = n_vert + 1
 
       ! xi(v) .eq. xi(v-1)
       else
-        if(.not. Math_Mod_Approx_Real(yv(v), yv(v-1), NANO)) then
+        if(.not. Math % Approx_Real(yv(v), yv(v-1), NANO)) then
           n_vert = n_vert + 1
 
         ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
         else
-          if(.not. Math_Mod_Approx_Real(zv(v), zv(v-1), NANO)) then
+          if(.not. Math % Approx_Real(zv(v), zv(v-1), NANO)) then
             n_vert = n_vert + 1
           end if
         end if

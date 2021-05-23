@@ -25,14 +25,14 @@
   !   xc1  = Grid % xc(c1)
   !   yc1  = Grid % yc(c1)
   !   zc1  = Grid % zc(c1)
-  !   dsc1 = Math_Mod_Distance(xc1, yc1, zc1,   &
+  !   dsc1 = Math % Distance(xc1, yc1, zc1,   &
   !                            Grid % xf(s), Grid % yf(s), Grid % zf(s))
   !
   !   ! Second cell (pls. check if xsi=xc on the boundary)
   !   xc2  = Grid % xc(c2) + Grid % dx(s)
   !   yc2  = Grid % yc(c2) + Grid % dy(s)
   !   zc2  = Grid % zc(c2) + Grid % dz(s)
-  !   dsc2 = Math_Mod_Distance(xc2, yc2, zc2,   &
+  !   dsc2 = Math % Distance(xc2, yc2, zc2,   &
   !                            Grid % xf(s), Grid % yf(s), Grid % zf(s))
   !
   !   ! Interpolation factor
@@ -95,8 +95,8 @@
 
     ! Interpolation factor
     ! (Equation 2.19 in Denner's thesis)
-    dsc1 = Math_Mod_Distance(xc1, yc1, zc1, xi, yi, zi)
-    dsc2 = Math_Mod_Distance(xc2, yc2, zc2, xi, yi, zi)
+    dsc1 = Math % Distance(xc1, yc1, zc1, xi, yi, zi)
+    dsc2 = Math % Distance(xc2, yc2, zc2, xi, yi, zi)
 
     Grid % f(s) = dsc2 / (dsc1 + dsc2)
 

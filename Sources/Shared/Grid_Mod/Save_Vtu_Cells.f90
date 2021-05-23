@@ -270,10 +270,10 @@
             if(Grid % faces_s(s) .ne. 0) then    ! face has a shadow, if it ...
               s1 = s                             ! ... is closer, plot that!
               s2 = Grid % faces_s(s)
-              dist1 = Math_Mod_Distance(                            &
+              dist1 = Math % Distance(                              &
                       Grid % xc(c),  Grid % yc(c),  Grid % zc(c),   &
                       Grid % xf(s1), Grid % yf(s1), Grid % zf(s1))
-              dist2 = Math_Mod_Distance(                            &
+              dist2 = Math % Distance(                              &
                       Grid % xc(c),  Grid % yc(c),  Grid % zc(c),   &
                       Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
               if(dist1 < dist2) s = s1

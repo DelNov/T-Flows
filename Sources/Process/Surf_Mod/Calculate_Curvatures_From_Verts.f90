@@ -88,7 +88,7 @@
       b(2) = b(2) - rho * x;  b(3) = b(3) - rho * y;  b(4) = b(4) - rho * z
     end do
 
-    call Math_Mod_Gaussian_Elimination(4, a, b, phi, invertible)
+    call Math % Gaussian_Elimination(4, a, b, phi, invertible)
 
     ! If vertices are not co-planar
     if(invertible) then

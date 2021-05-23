@@ -50,8 +50,8 @@
       phi_c1 = phi % n(c1)
       phi_c2 = phi % n(c2)
 
-      if(Math_Mod_Approx_Real(phi_c1, 0.5)) phi_c1 = phi_c1 - MICRO
-      if(Math_Mod_Approx_Real(phi_c2, 0.5)) phi_c2 = phi_c2 - MICRO
+      if(Math % Approx_Real(phi_c1, 0.5)) phi_c1 = phi_c1 - MICRO
+      if(Math % Approx_Real(phi_c2, 0.5)) phi_c2 = phi_c2 - MICRO
 
       !---------------------------------------!
       !   If face crosses the "phi_e" value   !
@@ -105,7 +105,7 @@
                 vec_j(1) = Front % Vert(j) % x_n - xs
                 vec_j(2) = Front % Vert(j) % y_n - ys
                 vec_j(3) = Front % Vert(j) % z_n - zs
-                vec_ixj = Math_Mod_Cross_Product(vec_i, vec_j)
+                vec_ixj = Math % Cross_Product(vec_i, vec_j)
                 if( dot_product(vec_ixj(1:3), (/lx,ly,lz/)) < 0.0 ) goto 1
               end do  ! i_ver
 

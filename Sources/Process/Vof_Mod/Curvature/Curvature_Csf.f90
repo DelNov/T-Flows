@@ -75,8 +75,8 @@
           v2(1) = Vof % nx(c1)
           v2(2) = Vof % ny(c1)
           v2(3) = Vof % nz(c1)
-          v3 = Math_Mod_Cross_Product(v1, v2)
-          v4 = Math_Mod_Cross_Product(v3, v1)
+          v3 = Math % Cross_Product(v1, v2)
+          v4 = Math % Cross_Product(v3, v1)
 
           ! Projection on v4
           norm_grad = sqrt(v4(1)**2 + v4(2)**2 + v4(3)**2)

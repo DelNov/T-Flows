@@ -30,10 +30,10 @@
 
       sh = Grid % faces_s(s)        ! take the shadow face
       if(sh > 0) then
-        dist_s  = Math_Mod_Distance(                                &
+        dist_s  = Math % Distance(                                  &
                        Grid % xc(c),  Grid % yc(c),  Grid % zc(c),  &
                        Grid % xf(s),  Grid % yf(s),  Grid % zf(s))
-        dist_sh = Math_Mod_Distance(                                &
+        dist_sh = Math % Distance(                                  &
                        Grid % xc(c),  Grid % yc(c),  Grid % zc(c),  &
                        Grid % xf(sh), Grid % yf(sh), Grid % zf(sh))
         if(dist_sh < dist_s) then

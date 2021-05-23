@@ -1,5 +1,5 @@
 !==============================================================================!
-  logical function Math_Mod_Smaller_Real(a, b, tol)
+  logical function Smaller_Real(Math, a, b, tol)
 !------------------------------------------------------------------------------!
 !   Returns .true. if a is approximatelly smaller than "b", .false. otherwise. !
 !                                                                              !
@@ -8,8 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real           :: a, b
-  real, optional :: tol
+  class(Math_Type) :: Math
+  real             :: a, b
+  real, optional   :: tol
 !-----------------------------------[Locals]-----------------------------------!
   real :: tolerance
 !==============================================================================!
@@ -21,9 +22,9 @@
   end if
 
   if( a < b - tolerance ) then
-    Math_Mod_Smaller_Real = .true.
+    Smaller_Real = .true.
   else
-    Math_Mod_Smaller_Real = .false.
+    Smaller_Real = .false.
   end if
 
   end function

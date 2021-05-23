@@ -18,11 +18,10 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Math_Mod/Distance.f90
 #-- ./Math_Mod/Harmonic_Mean.f90
 #-- ./Math_Mod/Smaller_Real.f90
-#-- ./Math_Mod/Invert_3x3.f90
 #-- ./Math_Mod/Approx_String.f90
 #-- ./Math_Mod/Gaussian_Elimination.f90
-#-- ./Math_Mod/Tri_Area_Z.f90
 #-- ./Math_Mod/Rotate_Vector.f90
+#-- ./Math_Mod/Invert_3x3_Matrix.f90
 #-- ./Math_Mod/Cross_Product.f90
 #-- ./Math_Mod/Distance_Squared.f90
 #-- ./Math_Mod/Tet_Volume.f90

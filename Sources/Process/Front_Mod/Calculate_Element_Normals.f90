@@ -49,7 +49,7 @@
       b(2) = Vert(v2) % y_n - elem(e) % ye
       b(3) = Vert(v2) % z_n - elem(e) % ze
 
-      tri_v = Math_Mod_Cross_Product(a, b)
+      tri_v = Math % Cross_Product(a, b)
 
       ! Magnitude of the cross product (twice the area)
       area_x2 = sqrt(tri_v(1)**2 + tri_v(2)**2 + tri_v(3)**2)

@@ -231,11 +231,11 @@
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Math_Mod_Approx_Real(Grid % dx(c1), 0.0, small) )  &
+      if( Math % Approx_Real(Grid % dx(c1), 0.0, small) )  &
         Grid % xc(c1) = 0.75 * Grid % xc(c1) + 0.25 * Grid % xc(c2)
-      if( Math_Mod_Approx_Real(Grid % dy(c1), 0.0, small) )  &
+      if( Math % Approx_Real(Grid % dy(c1), 0.0, small) )  &
         Grid % yc(c1) = 0.75 * Grid % yc(c1) + 0.25 * Grid % yc(c2)
-      if( Math_Mod_Approx_Real(Grid % dz(c1), 0.0, small) )  &
+      if( Math % Approx_Real(Grid % dz(c1), 0.0, small) )  &
         Grid % zc(c1) = 0.75 * Grid % zc(c1) + 0.25 * Grid % zc(c2)
     end if
   end do ! through faces
@@ -314,7 +314,7 @@
       end if
     end do
     v(1:3) = v(1:3) / cnt_per;  v(1:3) = v(1:3) / norm2(v(1:3))
-    k(1:3) = Math_Mod_Cross_Product(v(1:3), (/1.,0.,0./))
+    k(1:3) = Math % Cross_Product(v(1:3), (/1.,0.,0./))
     theta  = acos(dot_product      (v(1:3), (/1.,0.,0./)))
     print '(A)',       ' #====================================================='
     print '(A,3F7.3)', ' # Periodic direction vector: ', v(1:3)
@@ -333,7 +333,7 @@
           v_o(1) = Grid % xf(s)
           v_o(2) = Grid % yf(s)
           v_o(3) = Grid % zf(s)
-          v_r(1:3) = Math_Mod_Rotate_Vector(v_o(1:3), k(1:3), theta)
+          v_r(1:3) = Math % Rotate_Vector(v_o(1:3), k(1:3), theta)
           cnt_per = cnt_per + 1
           b_coor(cnt_per) = v_r(1)*big**2 + v_r(2)*big + v_r(3)
           b_face(cnt_per) = s

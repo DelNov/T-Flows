@@ -78,7 +78,7 @@
             z2 = Grid % zn(n2) + Grid % dz(s2)
 
             ! Nodes are matching, add cells to each other's list
-            if(Math_Mod_Distance_Squared(x1, y1, z1, x2, y2, z2) < PICO) then
+            if(Math % Distance_Squared(x1, y1, z1, x2, y2, z2) < PICO) then
 
               ! Gather list of cells for both nodes and make a unique sore
               nc1 = Grid % nodes_n_cells(n1)  ! number of cells arund node 1

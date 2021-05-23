@@ -42,9 +42,9 @@
   cnt = 1
   Grid % new_n(Grid % old_n(1)) = cnt
   do n = 2, Grid % n_nodes
-    if( .not. (Math_Mod_Approx_Real(xn(n), xn(n-1)) .and.  &
-               Math_Mod_Approx_Real(yn(n), yn(n-1)) .and.  &
-               Math_Mod_Approx_Real(zn(n), zn(n-1))) ) then
+    if( .not. (Math % Approx_Real(xn(n), xn(n-1)) .and.  &
+               Math % Approx_Real(yn(n), yn(n-1)) .and.  &
+               Math % Approx_Real(zn(n), zn(n-1))) ) then
       cnt = cnt + 1
     end if
     Grid % new_n(Grid % old_n(n)) = cnt

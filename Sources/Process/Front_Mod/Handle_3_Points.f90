@@ -45,7 +45,7 @@
   b(2) = Vert(ver(3)) % y_n - Vert(ver(1)) % y_n
   b(3) = Vert(ver(3)) % z_n - Vert(ver(1)) % z_n
 
-  tri_p = Math_Mod_Cross_Product(a, b)
+  tri_p = Math % Cross_Product(a, b)
 
   if(dot_product(surf_v, tri_p) < 0.0) then
     call Swap_Int(elem(ne) % v(2),  &

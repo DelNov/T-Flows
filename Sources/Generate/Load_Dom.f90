@@ -146,8 +146,8 @@
       zt(n) = dom % points(dom % blocks(b) % corners(n)) % z
     end do
 
-    if(Math_Mod_Tet_Volume( xt(2),yt(2),zt(2), xt(5),yt(5),zt(5),  &
-                            xt(3),yt(3),zt(3), xt(1),yt(1),zt(1) )  < 0) then
+    if(Math % Tet_Volume( xt(2),yt(2),zt(2), xt(5),yt(5),zt(5),  &
+                          xt(3),yt(3),zt(3), xt(1),yt(1),zt(1) )  < 0) then
       dom % blocks(b) % corners(0)=-1            !  It's nor properly oriented
       call Swap_Int(dom % blocks(b) % corners(2),  &
                     dom % blocks(b) % corners(3))

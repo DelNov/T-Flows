@@ -77,14 +77,14 @@
         do c2 = Grid % bnd_cond % color_s_cell( wall_colors(b) ),  &
                 Grid % bnd_cond % color_e_cell( wall_colors(b) ),  &
                 -1
-          Grid % wall_dist(c1) =  &
-            min(Grid % wall_dist(c1),                     &
-                Math_Mod_Distance_Squared(Grid % xc(c1),  &
-                                          Grid % yc(c1),  &
-                                          Grid % zc(c1),  &
-                                          Grid % xc(c2),  &
-                                          Grid % yc(c2),  &
-                                          Grid % zc(c2)))
+          Grid % wall_dist(c1) =                        &
+            min(Grid % wall_dist(c1),                   &
+                Math % Distance_Squared(Grid % xc(c1),  &
+                                        Grid % yc(c1),  &
+                                        Grid % zc(c1),  &
+                                        Grid % xc(c2),  &
+                                        Grid % yc(c2),  &
+                                        Grid % zc(c2)))
         end do
       end do
     end do

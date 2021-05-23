@@ -22,20 +22,20 @@
   j = n
 
   do
-    do while ( Math_Mod_Smaller_Real(a1(i),x1)  .or.   &
-               Math_Mod_Approx_Real (a1(i),x1)  .and.  &
-               Math_Mod_Smaller_Real(a2(i),x2)  .or.   &
-               Math_Mod_Approx_Real (a1(i),x1)  .and.  &
-               Math_Mod_Approx_Real (a2(i),x2)  .and.  &
-               Math_Mod_Smaller_Real(a3(i),x3)  )
+    do while ( Math % Smaller_Real(a1(i),x1)  .or.   &
+               Math % Approx_Real (a1(i),x1)  .and.  &
+               Math % Smaller_Real(a2(i),x2)  .or.   &
+               Math % Approx_Real (a1(i),x1)  .and.  &
+               Math % Approx_Real (a2(i),x2)  .and.  &
+               Math % Smaller_Real(a3(i),x3)  )
       i = i + 1
     end do
-    do while ( Math_Mod_Smaller_Real(x1,a1(j))  .or.   &
-               Math_Mod_Approx_Real (x1,a1(j))  .and.  &
-               Math_Mod_Smaller_Real(x2,a2(j))  .or.   &
-               Math_Mod_Approx_Real (x1,a1(j))  .and.  &
-               Math_Mod_Approx_Real (x2,a2(j))  .and.  &
-               Math_Mod_Smaller_Real(x3,a3(j))  )
+    do while ( Math % Smaller_Real(x1,a1(j))  .or.   &
+               Math % Approx_Real (x1,a1(j))  .and.  &
+               Math % Smaller_Real(x2,a2(j))  .or.   &
+               Math % Approx_Real (x1,a1(j))  .and.  &
+               Math % Approx_Real (x2,a2(j))  .and.  &
+               Math % Smaller_Real(x3,a3(j))  )
       j = j - 1
     end do
     if(i >= j) exit

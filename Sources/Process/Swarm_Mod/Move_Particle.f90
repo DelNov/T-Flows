@@ -245,8 +245,8 @@
   Part % z_n = Part % z_n + Part % w * swarm % dt
 
   ! Calculating particle displacement
-  dsp = Math_Mod_Distance_Squared(Part % x_n, Part % y_n, Part % z_n, &
-                                  Part % x_o, Part % y_o, Part % z_o)
+  dsp = Math % Distance_Squared(Part % x_n, Part % y_n, Part % z_n, &
+                                Part % x_o, Part % y_o, Part % z_o)
 
   ! Calculate cfl number for the particle (this is kind of approximate)
   dx = abs(Grid % xn(n) - Grid % xc(c)) * 2.0

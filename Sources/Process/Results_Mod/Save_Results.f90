@@ -362,10 +362,10 @@
               if(Grid % faces_s(s) .ne. 0) then  ! face has a shadow, if it ...
                 s1 = s                           ! ... is closer, plot that!
                 s2 = Grid % faces_s(s)
-                dist1 = Math_Mod_Distance(                            &
+                dist1 = Math % Distance(                              &
                         Grid % xc(c1), Grid % yc(c1), Grid % zc(c1),  &
                         Grid % xf(s1), Grid % yf(s1), Grid % zf(s1))
-                dist2 = Math_Mod_Distance(                            &
+                dist2 = Math % Distance(                              &
                         Grid % xc(c1), Grid % yc(c1), Grid % zc(c1),  &
                         Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
                 if(dist1 < dist2) s = s1
@@ -438,8 +438,8 @@
     !---------------!
     !   Potential   !
     !---------------!
-    call Results % Save_Scalar_Real("Potential [1]", plot_inside,  &
-                                    Flow % pot % n(c_f:c_l),       &
+    call Results % Save_Scalar_Real("Potential [m^2/s]", plot_inside,  &
+                                    Flow % pot % n(c_f:c_l),           &
                                     f8, f9, data_offset, run)
 
     !--------------------------------------!
@@ -637,67 +637,67 @@
       do c1 = c_f, c_l
         v2_calc(c1) = turb % kin % n(c1) * turb % zeta % n(c1)
       end do
-      call Results % Save_Scalar_Real("TurbulentQuantityV2",       &
-                                      plot_inside,                 &
-                                      v2_calc (c_f:c_l),           &
+      call Results % Save_Scalar_Real("TurbulentQuantityV2 [m^2/s^2]",    &
+                                      plot_inside,                        &
+                                      v2_calc (c_f:c_l),                  &
                                       f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("TurbulentQuantityZeta",     &
-                                      plot_inside,                 &
-                                      turb % zeta % n(c_f:c_l),    &
+      call Results % Save_Scalar_Real("TurbulentQuantityZeta [1]",        &
+                                      plot_inside,                        &
+                                      turb % zeta % n(c_f:c_l),           &
                                       f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("TurbulentQuantityF22",      &
-                                      plot_inside,                 &
-                                      turb % f22  % n(c_f:c_l),    &
+      call Results % Save_Scalar_Real("TurbulentQuantityF22 [1]",         &
+                                      plot_inside,                        &
+                                      turb % f22  % n(c_f:c_l),           &
                                       f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Scalar_Real("TurbulentQuantityT2",     &
-                                      plot_inside,                 &
-                                        turb % t2 % n(c_f:c_l),    &
+        call Results % Save_Scalar_Real("TurbulentQuantityT2 [K^2]",      &
+                                        plot_inside,                      &
+                                        turb % t2 % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulentT2Production",   &
-                                      plot_inside,                 &
-                                        turb % p_t2(c_f:c_l),      &
+        call Results % Save_Scalar_Real("TurbulentT2Production [K^2/s]",  &
+                                        plot_inside,                      &
+                                        turb % p_t2(c_f:c_l),             &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulentHeatFluxX",      &
-                                      plot_inside,                 &
-                                        turb % ut % n(c_f:c_l),    &
+        call Results % Save_Scalar_Real("TurbulentHeatFluxX [K m/s]",     &
+                                        plot_inside,                      &
+                                        turb % ut % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulentHeatFluxY",      &
-                                      plot_inside,                 &
-                                        turb % vt % n(c_f:c_l),    &
+        call Results % Save_Scalar_Real("TurbulentHeatFluxY [K m/s]",     &
+                                        plot_inside,                      &
+                                        turb % vt % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulentHeatFluxZ",      &
-                                      plot_inside,                 &
-                                        turb % wt % n(c_f:c_l),    &
+        call Results % Save_Scalar_Real("TurbulentHeatFluxZ [K m/s]",     &
+                                        plot_inside,                      &
+                                        turb % wt % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulenQuantityAlphaL",  &
-                                        plot_inside,               &
-                                        turb % alpha_l(c_f:c_l),   &
+        call Results % Save_Scalar_Real("TurbulenQuantityAlphaL",         &
+                                        plot_inside,                      &
+                                        turb % alpha_l(c_f:c_l),          &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulenQuantityAlphaU",  &
-                                        plot_inside,               &
-                                        turb % alpha_u(c_f:c_l),   &
+        call Results % Save_Scalar_Real("TurbulenQuantityAlphaU",         &
+                                        plot_inside,                      &
+                                        turb % alpha_u(c_f:c_l),          &
                                         f8, f9, data_offset, run)
       end if
     end if
 
     if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Results % Save_Scalar_Real("TurbulentQuantityF22",    &
-                                      plot_inside,               &
-                                      turb % f22 % n(c_f:c_l),   &
+      call Results % Save_Scalar_Real("TurbulentQuantityF22 [1]",  &
+                                      plot_inside,                 &
+                                      turb % f22 % n(c_f:c_l),     &
                                       f8, f9, data_offset, run)
     end if
 
     ! Save vis and vis_t
     if(turb % model .eq. DES_SPALART .or.  &
        turb % model .eq. SPALART_ALLMARAS) then
-      call Results % Save_Scalar_Real("TurbulentViscosity",      &
-                                      plot_inside,               &
-                                      turb % vis % n(c_f:c_l),   &
+      call Results % Save_Scalar_Real("TurbulentViscosity [Pa s]",  &
+                                      plot_inside,                  &
+                                      turb % vis % n(c_f:c_l),      &
                                       f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("VorticityMagnitude [1/s]",  &
-                                      plot_inside,                 &
-                                      Flow % vort(c_f:c_l),        &
+      call Results % Save_Scalar_Real("VorticityMagnitude [1/s]",   &
+                                      plot_inside,                  &
+                                      Flow % vort(c_f:c_l),         &
                                       f8, f9, data_offset, run)
     end if
     kin_vis_t(:) = 0.0
@@ -738,17 +738,17 @@
                                       turb % vw % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Scalar_Real("TurbulentHeatFluxX",        &
-                                      plot_inside,                   &
-                                        turb % ut % n(c_f:c_l),      &
+        call Results % Save_Scalar_Real("TurbulentHeatFluxX [K m/s]",  &
+                                        plot_inside,                   &
+                                        turb % ut % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulentHeatFluxY",        &
-                                      plot_inside,                   &
-                                        turb % vt % n(c_f:c_l),      &
+        call Results % Save_Scalar_Real("TurbulentHeatFluxY [K m/s]",  &
+                                        plot_inside,                   &
+                                        turb % vt % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("TurbulentHeatFluxZ",        &
-                                      plot_inside,                   &
-                                        turb % wt % n(c_f:c_l),      &
+        call Results % Save_Scalar_Real("TurbulentHeatFluxZ [K m/s]",  &
+                                        plot_inside,                   &
+                                        turb % wt % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
       end if
     end if
@@ -814,21 +814,21 @@
           vt_save(c1) = turb % vt_res(c1) - turb % v_mean(c1)*turb % t_mean(c1)
           wt_save(c1) = turb % wt_res(c1) - turb % w_mean(c1)*turb % t_mean(c1)
         end do
-        call Results % Save_Scalar_Real("MeanTurbulentQuantityT2",     &
-                                        plot_inside,                   &
-                                        t2_save(c_f:c_l),              &
+        call Results % Save_Scalar_Real("MeanTurbulentQuantityT2 [K^2]",     &
+                                        plot_inside,                         &
+                                        t2_save(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("MeanTurbulentHeatFluxX",      &
-                                        plot_inside,                   &
-                                        ut_save(c_f:c_l),              &
+        call Results % Save_Scalar_Real("MeanTurbulentHeatFluxX [K m/s]",    &
+                                        plot_inside,                         &
+                                        ut_save(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("MeanTurbulentHeatFluxY",      &
-                                        plot_inside,                   &
-                                        vt_save(c_f:c_l),              &
+        call Results % Save_Scalar_Real("MeanTurbulentHeatFluxY [K m/s]",    &
+                                        plot_inside,                         &
+                                        vt_save(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("MeanTurbulentHeatFluxZ",      &
-                                        plot_inside,                   &
-                                        wt_save(c_f:c_l),              &
+        call Results % Save_Scalar_Real("MeanTurbulentHeatFluxZ [K m/s]",    &
+                                        plot_inside,                         &
+                                        wt_save(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
       end if
 

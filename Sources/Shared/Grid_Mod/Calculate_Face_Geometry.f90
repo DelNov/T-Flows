@@ -83,22 +83,22 @@
       sh = Grid % faces_s(s)
 
       if( abs(Grid % dx(s)) > NANO                     .and.   &
-          Math_Mod_Approx_Real(abs(Grid % dy(s)), 0.0) .and.   &
-          Math_Mod_Approx_Real(abs(Grid % dz(s)), 0.0) ) then
+          Math % Approx_Real(abs(Grid % dy(s)), 0.0)   .and.   &
+          Math % Approx_Real(abs(Grid % dz(s)), 0.0) ) then
         if(Grid % xc(c2) > Grid % xc(c1))                      &
           Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 1
       end if
 
       if( abs(Grid % dy(s)) > NANO                     .and.   &
-          Math_Mod_Approx_Real(abs(Grid % dx(s)), 0.0) .and.   &
-          Math_Mod_Approx_Real(abs(Grid % dz(s)), 0.0) ) then
+          Math % Approx_Real(abs(Grid % dx(s)), 0.0)   .and.   &
+          Math % Approx_Real(abs(Grid % dz(s)), 0.0) ) then
         if(Grid % yc(c2) > Grid % yc(c1))                      &
           Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 2
       end if
 
       if( abs(Grid % dz(s)) > NANO                     .and.   &
-          Math_Mod_Approx_Real(abs(Grid % dx(s)), 0.0) .and.   &
-          Math_Mod_Approx_Real(abs(Grid % dy(s)), 0.0) ) then
+          Math % Approx_Real(abs(Grid % dx(s)), 0.0)   .and.   &
+          Math % Approx_Real(abs(Grid % dy(s)), 0.0) ) then
         if(Grid % zc(c2) > Grid % zc(c1))                      &
           Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 3
       end if

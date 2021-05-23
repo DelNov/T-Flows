@@ -61,8 +61,8 @@
           t_x_2 = Flow % t % x(c2)
 
           ! WRITE DOWN STEFAN'S SOLUTION
-          IF(MATH_MOD_APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
-             MATH_MOD_APPROX_REAL(GRID % ZS(S), 0.0)) THEN
+          IF(MATH % APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
+             MATH % APPROX_REAL(GRID % ZS(S), 0.0)) THEN
             WRITE(400, '(99(es12.4))')                                  &
               T_X_1,                                                    &
               T_X_1 * COND_1,                                           &

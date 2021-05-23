@@ -38,7 +38,7 @@
   do s = 1, ns
     c = side(s) % c
     d = side(s) % d
-    side(s) % length = Math_Mod_Distance(                 &
+    side(s) % length = Math % Distance(                   &
             Vert(c) % x_n, Vert(c) % y_n, Vert(c) % z_n,  &
             Vert(d) % x_n, Vert(d) % y_n, Vert(d) % z_n)
   end do

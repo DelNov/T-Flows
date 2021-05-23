@@ -42,19 +42,19 @@
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'X') then
-        if( Math_Mod_Approx_Real(grid % xn(n), zp(p)) ) go to 1
+        if( Math % Approx_Real(grid % xn(n), zp(p)) ) go to 1
       else if(answer .eq. 'Y') then
-        if( Math_Mod_Approx_Real(grid % yn(n), zp(p)) ) go to 1
+        if( Math % Approx_Real(grid % yn(n), zp(p)) ) go to 1
       else if(answer .eq. 'Z') then
-        if( Math_Mod_Approx_Real(grid % zn(n), zp(p)) ) go to 1
+        if( Math % Approx_Real(grid % zn(n), zp(p)) ) go to 1
       else if(answer .eq. 'RX') then
-        if( Math_Mod_Approx_Real( sqrt(grid % zn(n)**2 +   &
+        if( Math % Approx_Real( sqrt(grid % zn(n)**2 +   &
                                        grid % yn(n)**2), zp(p)) ) go to 1
       else if(answer .eq. 'RY') then
-        if( Math_Mod_Approx_Real( sqrt(grid % xn(n)**2 +   &
+        if( Math % Approx_Real( sqrt(grid % xn(n)**2 +   &
                                        grid % zn(n)**2), zp(p)) ) go to 1
       else if(answer .eq. 'RZ') then
-        if( Math_Mod_Approx_Real( sqrt(grid % xn(n)**2 +   &
+        if( Math % Approx_Real( sqrt(grid % xn(n)**2 +   &
                                        grid % yn(n)**2), zp(p)) ) go to 1
       end if
     end do

@@ -1,13 +1,15 @@
 !==============================================================================!
-  real function Math_Mod_Tet_Volume(xa, ya, za,  &
-                                    xb, yb, zb,  &
-                                    xc, yc, zc,  &
-                                    xd, yd, zd)
+  real function Tet_Volume(Math,        &
+                           xa, ya, za,  &
+                           xb, yb, zb,  &
+                           xc, yc, zc,  &
+                           xd, yd, zd)
 !------------------------------------------------------------------------------!
 !   Returns the volume of tethraedra spanned with nodes "a", "b", "c" and "d". !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Math_Type) :: Math
   real, intent(in) :: xa, ya, za, xb, yb, zb, xc, yc, zc, xd, yd, zd
 !==============================================================================!
 !                                                                              !
@@ -23,9 +25,9 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  Math_Mod_Tet_Volume = ( ( (yb-ya)*(zc-za) - (yc-ya)*(zb-za) ) * (xd-xa) +    &
-                          ( (xc-xa)*(zb-za) - (xb-xa)*(zc-za) ) * (yd-ya) +    &
-                          ( (xb-xa)*(yc-ya) - (xc-xa)*(yb-ya) ) * (zd-za) )    &
-                      / 6.0
+  Tet_Volume = ( ( (yb-ya)*(zc-za) - (yc-ya)*(zb-za) ) * (xd-xa) +    &
+                 ( (xc-xa)*(zb-za) - (xb-xa)*(zc-za) ) * (yd-ya) +    &
+                 ( (xb-xa)*(yc-ya) - (xc-xa)*(yb-ya) ) * (zd-za) )    &
+             / 6.0
 
   end function

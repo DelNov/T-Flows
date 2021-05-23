@@ -22,14 +22,14 @@
   j = n
 
   do
-    do while ( Math_Mod_Smaller_Real(a1(i),x1)  .or.   &
-               Math_Mod_Approx_Real (a1(i),x1)  .and.  &
-               Math_Mod_Smaller_Real(a2(i),x2) )
+    do while ( Math % Smaller_Real(a1(i),x1)  .or.   &
+               Math % Approx_Real (a1(i),x1)  .and.  &
+               Math % Smaller_Real(a2(i),x2) )
       i = i + 1
     end do
-    do while ( Math_Mod_Smaller_Real(x1,a1(j))  .or.   &
-               Math_Mod_Approx_Real (x1,a1(j))  .and.  &
-               Math_Mod_Smaller_Real(x2,a2(j)) )
+    do while ( Math % Smaller_Real(x1,a1(j))  .or.   &
+               Math % Approx_Real (x1,a1(j))  .and.  &
+               Math % Smaller_Real(x2,a2(j)) )
       j = j - 1
     end do
     if(i >= j) exit

@@ -101,7 +101,7 @@
   angles(1:nn,1:nn) = 0.0
   do i = 1, nn
     do j = i + 1, nn
-      prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
+      prod(1:3) = Math % Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
       prod_mag = min(norm2(prod(1:3)), 1.0-MILI)
       angles(i,j) = asin(prod_mag) * 57.2957795131
       if(angles(i,j) > MILI) then
@@ -114,7 +114,7 @@
 
   ! Find maximum angle, that one wil be relevant for the sense od normal
   max_loc = maxloc(angles(1:nn,1:nn));  i = max_loc(1);  j = max_loc(2)
-  sense(:) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
+  sense(:) = Math % Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
 
   ! Multiply each with each selectivelly, taking into account only bigger
   ! angles, and taking care to correct the signs in proper sense.
@@ -125,7 +125,7 @@
     do j = i + 1, nn
       if(angles(i,j) > criter) then  ! take only reasonalby big angles
         cnt = cnt + 1                ! one more sample
-        prod(1:3) = Math_Mod_Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
+        prod(1:3) = Math % Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
         if(dot_product(prod(1:3), sense(1:3)) < 0) then  ! correct the sign ...
           prod(1:3) = -prod(1:3)                         ! ... if needed
         end if
@@ -142,11 +142,11 @@
   !------------------------------------------------!
 
   ! Define x-axis in the plane
-  x_p(1:3) = Math_Mod_Cross_Product(normal_p(1:3), rp_3d(1:3, 1))
+  x_p(1:3) = Math % Cross_Product(normal_p(1:3), rp_3d(1:3, 1))
   x_p(1:3) = -x_p(1:3) / norm2(x_p(1:3))
 
   ! Define y-axis in the plane
-  y_p(1:3) = Math_Mod_Cross_Product(normal_p(1:3), x_p(1:3))
+  y_p(1:3) = Math % Cross_Product(normal_p(1:3), x_p(1:3))
   y_p(1:3) = y_p(1:3) / norm2(y_p(1:3))
 
   ! Project relative points to the plane's coordinate system

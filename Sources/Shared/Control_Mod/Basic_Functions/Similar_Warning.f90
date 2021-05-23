@@ -31,7 +31,7 @@
   !   This item is not in the list of similar   !
   !        ones, print a warning message        !
   !---------------------------------------------!
-  if( Math_Mod_Approx_String(keyword, item, 1) ) then
+  if( Math % Approx_String(keyword, item, 1) ) then
 
     ! Print a warning message
     if(this_proc < 2) then

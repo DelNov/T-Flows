@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Initialize(Monitor, grid, restart, domain)
+  subroutine Initialize(Monitor, Grid, restart, domain)
 !------------------------------------------------------------------------------!
 !   This is to read the control file and set up Monitoring points.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Monitor_Type)     :: Monitor
-  type(Grid_Type), target :: grid
+  type(Grid_Type), target :: Grid
   logical                 :: restart
   integer,       optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
@@ -18,7 +18,7 @@
   real              :: xyz(3), def(3)
 !==============================================================================!
 
-  Monitor % pnt_grid => grid
+  Monitor % pnt_grid => Grid
 
   ! Read number of Monitoring points from control file
   call Control_Mod_Read_Int_Item('NUMBER_OF_MONITORING_POINTS', 0, &
@@ -63,13 +63,13 @@
 
     min_dist(m) = HUGE
 
-    do c = 1, grid % n_cells
-      curr_dist = Math_Mod_Distance( Monitor % x(m),  &
-                                     Monitor % y(m),  &
-                                     Monitor % z(m),  &
-                                     grid % xc(c),    &
-                                     grid % yc(c),    &
-                                     grid % zc(c))
+    do c = 1, Grid % n_cells
+      curr_dist = Math % Distance( Monitor % x(m),  &
+                                   Monitor % y(m),  &
+                                   Monitor % z(m),  &
+                                   Grid % xc(c),    &
+                                   Grid % yc(c),    &
+                                   Grid % zc(c))
       ! Current distance is smaller than the stored one 
       if(curr_dist < min_dist(m)) then
         Monitor % cell(m) = c
@@ -108,9 +108,9 @@
 
       write(Monitor % file_unit(m), '(a24, 3f16.6)')   &
             '# Monitoring point:',                     &
-            grid % xc( Monitor % cell(m) ),            &
-            grid % yc( Monitor % cell(m) ),            &
-            grid % zc( Monitor % cell(m) )
+            Grid % xc( Monitor % cell(m) ),            &
+            Grid % yc( Monitor % cell(m) ),            &
+            Grid % zc( Monitor % cell(m) )
 
     end if
 

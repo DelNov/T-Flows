@@ -36,10 +36,10 @@
 
         if( .not. side(s) % boundary ) then
 
-          dist_ab = Math_Mod_Distance(                       &
+          dist_ab = Math % Distance(                         &
                Vert(a) % x_n, Vert(a) % y_n, Vert(a) % z_n,  &
                Vert(b) % x_n, Vert(b) % y_n, Vert(b) % z_n)
-          dist_cd = Math_Mod_Distance(                       &
+          dist_cd = Math % Distance(                         &
                Vert(c) % x_n, Vert(c) % y_n, Vert(c) % z_n,  &
                Vert(d) % x_n, Vert(d) % y_n, Vert(d) % z_n)
 

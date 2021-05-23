@@ -55,8 +55,8 @@
     v_41(2) = Vert(ver(4)) % y_n - Vert(ver(1)) % y_n
     v_41(3) = Vert(ver(4)) % z_n - Vert(ver(1)) % z_n
 
-    tri_p_123 = Math_Mod_Cross_Product(v_21, v_31)
-    tri_p_134 = Math_Mod_Cross_Product(v_31, v_41)
+    tri_p_123 = Math % Cross_Product(v_21, v_31)
+    tri_p_134 = Math % Cross_Product(v_31, v_41)
 
     if(dot_product(surf_v, tri_p_123) > 0.0 .and.  &
        dot_product(surf_v, tri_p_134) > 0.0) then

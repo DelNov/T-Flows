@@ -33,7 +33,7 @@
     old_distance = HUGE
     do k = 1, Grid % n_cells
       if(Grid % cell_near_wall(k)) then
-        new_distance = Math_Mod_Distance(                                  &
+        new_distance = Math % Distance(                                    &
                                 Grid % xc(k), Grid % yc(k), Grid % zc(k),  &
                                 Grid % xc(c), Grid % yc(c), Grid % zc(c))
         if(new_distance <= old_distance) then

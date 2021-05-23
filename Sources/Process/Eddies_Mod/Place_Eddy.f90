@@ -52,12 +52,12 @@
   min_dist = HUGE
   do oe = 1, eddies % n_eddies
     if(oe .ne. e) then
-      min_dist = min(min_dist, Math_Mod_Distance(eddies % eddy(e)  % x,  &
-                                                 eddies % eddy(e)  % y,  &
-                                                 eddies % eddy(e)  % z,  &
-                                                 eddies % eddy(oe) % x,  &
-                                                 eddies % eddy(oe) % y,  &
-                                                 eddies % eddy(oe) % z))
+      min_dist = min(min_dist, Math % Distance(eddies % eddy(e)  % x,  &
+                                               eddies % eddy(e)  % y,  &
+                                               eddies % eddy(e)  % z,  &
+                                               eddies % eddy(oe) % x,  &
+                                               eddies % eddy(oe) % y,  &
+                                               eddies % eddy(oe) % z))
     end if
   end do
   if(min_dist < TWO_THIRDS * eddies % max_radius) then

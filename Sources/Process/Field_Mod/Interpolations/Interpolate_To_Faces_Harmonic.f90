@@ -26,7 +26,7 @@
     c2  = grid % faces_c(2, s)
 
     if(c2 > 0) then
-      phi_f(s) = Math_Mod_Harmonic_Mean(phi_c(c1), phi_c(c2))
+      phi_f(s) = Math % Harmonic_Mean(phi_c(c1), phi_c(c2))
     else
       phi_f(s) = phi_c(c1)
     end if
