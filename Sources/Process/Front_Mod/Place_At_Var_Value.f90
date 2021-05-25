@@ -227,7 +227,7 @@
   !-----------------------------------------------!
   n_verts_in_buffers = 0
   do v = 1, nv
-    call Front % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+    call Front % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers, locally=.true.)
     call Front % Vert(v) % Find_Nearest_Node()
   end do
 
