@@ -14,30 +14,11 @@
 
   if(Flow % with_interface) then
 
-    !----------------------------------!
-    !   Created a front or a surface   !
-    !----------------------------------!
-    if(Vof % track_front) then
-      call Vof % Front % Place_At_Var_Value(Vof % fun,  &
-                                            Sol,        &
-                                            0.5,        &
-                                            .true.)  ! don't print messages
-      call Vof % Front % Print_Front_Statistics()
-!     call Vof % Front % Save_Front(curr_dt)
-    end if
-
-    !----------------------!
-    !   Create a surface   !
-    !----------------------!
-    if(Vof % track_surface) then
-      call Surf_Mod_Place_At_Var_Value(Vof % Surf,  &
-                                       Vof % fun,   &
-                                       Sol,         &
-                                       0.5,         &
-                                       .true.)  ! don't print messages
-      call Vof % Surf % Calculate_Curvatures_From_Elems()
-      call Vof % Surf % Print_Front_Statistics()
-    end if
+    !-----------------!
+    !                 !
+    !   Compute vof   !
+    !                 !
+    !-----------------!
 
     !--------------------------------!
     !   Advance vof function (fun)   !
@@ -59,6 +40,37 @@
     !    (Maybe redundant since it is called from Main_Pro too.)    !
     !---------------------------------------------------------------!
     call Vof % Update_Physical_Properties()
+
+    !-------------------------------!
+    !                               !
+    !   Create front or a surface   !
+    !                               !
+    !-------------------------------!
+
+    !---------------------!
+    !   Created a front   !
+    !---------------------!
+    if(Vof % track_front) then
+      call Vof % Front % Place_At_Var_Value(Vof % fun,  &
+                                            Sol,        &
+                                            0.5,        &
+                                            .true.)  ! don't print messages
+      call Vof % Front % Print_Front_Statistics()
+!     call Vof % Front % Save_Front(curr_dt)
+    end if
+
+    !----------------------!
+    !   Create a surface   !
+    !----------------------!
+    if(Vof % track_surface) then
+      call Surf_Mod_Place_At_Var_Value(Vof % Surf,  &
+                                       Vof % fun,   &
+                                       Sol,         &
+                                       0.5,         &
+                                       .true.)  ! don't print messages
+      call Vof % Surf % Calculate_Curvatures_From_Elems()
+      call Vof % Surf % Print_Front_Statistics()
+    end if
 
   end if
 
