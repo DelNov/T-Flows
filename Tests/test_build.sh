@@ -256,26 +256,47 @@ ALL_TURBULENCE_MODELS=( \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
                        )
-ALL_MULTIPHASE_MODELS=( \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "none" \
-                       "lagrangian_particles" \
-                       "lagrangian_particles" \
-                       "volume_of_fluid" \
-                       "none" \
-                       "none" \
-                       "none" \
+ALL_INTERFACE_TRACKING=( \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "yes" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       )
+ALL_PARTICLE_TRACKING=( \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "yes" \
+                       "yes" \
+                       "no" \
+                       "no" \
+                       "no" \
+                       "no" \
                        )
 DONE_PROCESS_TESTS=0
 
@@ -1266,8 +1287,9 @@ function process_compilation_tests {
 function process_full_length_test {
   # $1 = dir with test
   # $2 = turbulence model
-  # $3 = multiphase model
-  # $4 = dir with results
+  # $3 = interface tracking (yes or no)
+  # $4 = particle tracking (yes or no)
+  # $5 = dir with results
 
   echo "  ->" $1
 
@@ -1330,8 +1352,12 @@ function process_full_length_test {
       "TURBULENCE_MODEL "$2"" \
       control."$i"
     replace_line_with_first_occurence_in_file \
-      "MULTIPHASE_MODEL" \
-      "MULTIPHASE_MODEL "$3"" \
+      "INTERFACE_TRACKING" \
+      "INTERFACE_TRACKING "$3"" \
+      control."$i"
+    replace_line_with_first_occurence_in_file \
+      "PARTICLE_TRACKING" \
+      "PARTICLE_TRACKING "$4"" \
       control."$i"
   done
 
@@ -1354,7 +1380,7 @@ function process_full_length_test {
     -gt 0 ]; then
 
     # Extract essential data from produced .dat files
-    last_results_plus_dat_file=$(realpath --relative-to="$4" \
+    last_results_plus_dat_file=$(realpath --relative-to="$5" \
       $(ls -tr1 "$name_in_div"-res-plus-ts??????.dat | tail -n1))
 
     elog "Results are:"
@@ -1364,7 +1390,7 @@ function process_full_length_test {
     # Launching matplotlib scripts only in interacive mode
     if [ $MODE == "interactive" ]; then
       launch_matplotlib \
-        "$4" \
+        "$5" \
         readme_python_matplotlib_script \
         "$last_results_plus_dat_file" \
         "result_plus_"$2""
@@ -1389,7 +1415,8 @@ function process_full_length_tests {
   for i in ${!ALL_PROCESS_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
     TURB_MOD="${ALL_TURBULENCE_MODELS[$i]}"
-    MULT_MOD="${ALL_MULTIPHASE_MODELS[$i]}"
+    INTE_MOD="${ALL_INTERFACE_TRACKING[$i]}"
+    PART_MOD="${ALL_PARTICLE_TRACKING[$i]}"
     #MASS_DENSITY=$(get_value_next_to_keyword "MASS_DENSITY" \
     #  "${ALL_PROCESS_TESTS[$i]}""/control")
     #DYNAMIC_VISCOSITY=$(get_value_next_to_keyword "DYNAMIC_VISCOSITY" \
@@ -1406,7 +1433,8 @@ function process_full_length_tests {
     process_full_length_test \
       "$TEST_DIR/$CASE_DIR" \
       "$TURB_MOD" \
-      "$MULT_MOD" \
+      "$INTE_MOD" \
+      "$PART_MOD" \
       "$TEST_DIR/$CASE_DIR/Results"
   done
 }
