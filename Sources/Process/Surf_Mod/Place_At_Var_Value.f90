@@ -178,9 +178,9 @@
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Surf % Find_Sides(verbose)
-  call Surf % Find_Surf_Elements(verbose)
-  call Surf % Check_Elements(verbose)
+  call Surf % Find_Sides(verbose)          ! Front calls the same here
+  call Surf % Find_Surf_Elements(verbose)  ! Front calls Find_Front_Elements
+  call Surf % Check_Elements(verbose)      ! Front calls the same here
 
   !--------------------------------!
   !   Find nearest cell and node   !
