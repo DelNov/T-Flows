@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Place_At_Var_Value(Front, phi, Sol, phi_e, verbose)
+  subroutine Place_Surf_At_Value(Surf, phi, Sol, phi_e, verbose)
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value phi_e                          !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Surf_Type),  target :: Surf
   type(Var_Type),    target :: phi
   type(Solver_Type), target :: Sol   ! needed for smoothing
   real                      :: phi_e
@@ -24,58 +24,32 @@
   type(Elem_Type),   pointer :: elem(:)
   type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
-  integer                    :: nv_tot, ne_tot
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
-  integer                    :: v, n_vert, n_verts_in_buffers, i_nod
+  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, nn
+  integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3), dist
 !------------------------------------------------------------------------------!
-  include 'Front_Mod/Edge_Numbering.f90'
+  include 'Surf_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
-  call Cpu_Timer % Start('Creating_Front_From_Vof_Function')
+  call Cpu_Timer % Start('Creating_Surface_From_Vof_Function')
 
   ! Take aliases
-  Grid => Front % pnt_grid
-  Flow => Front % pnt_flow
-  nv   => Front % n_verts
-  ne   => Front % n_elems
-  Vert => Front % Vert
-  elem => Front % elem
+  Grid => Surf % pnt_grid
+  Flow => Surf % pnt_flow
+  nv   => Surf % n_verts
+  ne   => Surf % n_elems
+  Vert => Surf % Vert
+  elem => Surf % elem
   A    => Sol % A
   nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
   nn   =  Grid % n_nodes
 
-  call Front % Initialize_Front()
+  call Surf % Initialize_Surf()
   call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
-
-! call Grid % Save_Debug_Vtu('phi_c',               &
-!                            scalar_cell=phi % n,   &
-!                            scalar_name='phi_c')
-!
-! call Grid % Save_Debug_Vtu('phi_n',             &
-!                            scalar_node=phi_n,   &
-!                            scalar_name='phi_n')
-
-  !-----------------------------------------------!
-  !   This is a bit ad-hoc - if some points are   !
-  !    "exactly" 0.5, change them a little bit    !
-  !-----------------------------------------------!
-  do c = 1, nc
-    do i_nod = 1, Grid % cells_n_nodes(c)
-      n = Grid % cells_n(i_nod, c)
-      if(Math % Approx_Real(phi_n(n), 0.5)) then
-        if(phi % n(c) < phi % o(c)) then
-          phi_n(n) = 0.5 - MILI
-        else
-          phi_n(n) = 0.5 + MILI
-        end if
-      end if
-    end do
-  end do
 
   !-----------------------------!
   !   Smooth the VOF function   !
@@ -98,7 +72,7 @@
         phi_cen(c2) = phi_cen(c2) + A % fc(s)
       end if
     end do
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = 1, Grid % n_cells
       phi_c(c) = 0.1 * phi_c(c) + 0.9 * phi_src(c) / phi_cen(c)
     end do
   end do
@@ -118,7 +92,7 @@
   !   Browse through all cells in search of surface vertices   !
   !                                                            !
   !------------------------------------------------------------!
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = 1, Grid % n_cells
 
     n_vert = 0
 
@@ -169,40 +143,28 @@
     !---------------------------------!
     !   Some points have been found   !
     !---------------------------------!
-    if(n_vert > 2) then
+    if(n_vert > 0) then
 
       ! Surface vector
       surf_v(1) = phi % x(c)
       surf_v(2) = phi % y(c)
       surf_v(3) = phi % z(c)
 
-      ! If valid elements were formed (last parameter: enforce_triangles)
-      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v, .false.)
-      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v, .false.)
-      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v, .false.)
-      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v, .false.)
+      ! If valid elements were formed (last argument: enforce_triangles)
+      if(n_vert .eq. 3) call Surf % Handle_3_Points(surf_v, .true.)
+      if(n_vert .eq. 4) call Surf % Handle_4_Points(surf_v, .true.)
+      if(n_vert .eq. 5) call Surf % Handle_5_Points(surf_v, .true.)
+      if(n_vert .eq. 6) call Surf % Handle_6_Points(surf_v, .true.)
       if(n_vert .eq. 7) then
         print *, '# ERROR: seven vertices in an intersection!'
         stop
-
       end if
-
-      ! Store at which cell the surface resides
-      elem(ne) % cell = c
-
     end if
 
   end do
-
   if(verbose) then
-    ne_tot = ne
-    nv_tot = nv
-    call Comm_Mod_Global_Sum_Int(ne_tot)
-    call Comm_Mod_Global_Sum_Int(nv_tot)
-    if(this_proc < 2) then
-      print '(a40,i8)', ' # Cummulative number of elements found:', ne_tot
-      print '(a40,i8)', ' # Cummulative number of vertices found:', nv_tot
-    end if
+    print '(a40,i8)', ' # Cummulative number of elements found:', ne
+    print '(a40,i8)', ' # Cummulative number of vertices found:', nv
   end if
 
   !-----------------------!
@@ -210,51 +172,76 @@
   !   Compress vertices   !
   !                       !
   !-----------------------!
-  call Front % Compress_Vertices(verbose)
+  call Surf % Compress_Vertices(verbose)
 
   !---------------------------------!
   !                                 !
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Front % Find_Sides(verbose)           ! Surf calls the same here
-  call Front % Find_Front_Elements(verbose)  ! Surf calls Find_Surf_Elements
-  call Front % Check_Elements(verbose)       ! Surf calls the same here
+  call Surf % Find_Sides(verbose)          ! Front calls the same here
+  call Surf % Find_Surf_Elements(verbose)  ! Front calls Find_Front_Elements
+  call Surf % Check_Elements(verbose)      ! Front calls the same here
 
-  !-----------------------------------------------!
-  !   It used to find the nearest cell and node   !
-  !   (But I deleted, I hope it was not needed)   !
-  !-----------------------------------------------!
+  !--------------------------------!
+  !   Find nearest cell and node   !
+  !--------------------------------!
   n_verts_in_buffers = 0
   do v = 1, nv
-    call Front % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers, locally=.true.)
-    call Front % Vert(v) % Find_Nearest_Node()
+    call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+    call Surf % Vert(v) % Find_Nearest_Node()
   end do
 
-  !--------------------------------------!
-  !                                      !
-  !   Calculate geometrical quantities   !
-  !                                      !
-  !--------------------------------------!
+  !-------------------------------!
+  !                               !
+  !   Calculate element normals   !
+  !                               !
+  !-------------------------------!
+  call Surf % Calculate_Element_Centroids()
+  call Surf % Calculate_Element_Normals(phi)
+
+  do j = 1, 3
+    call Surf % Relax_Topology()
+    call Surf % Smooth(phi, phi_e)
+  end do
+
+  !-> ! From this point ...
+  !-> do v = 1, nv
+  !->   dist = norm2( (/Surf % Vert(v) % x_n,  &
+  !->                   Surf % Vert(v) % y_n,  &
+  !->                   Surf % Vert(v) % z_n/) )
+  !->   Surf % Vert(v) % x_n = Surf % Vert(v) % x_n * 0.25 / dist
+  !->   Surf % Vert(v) % y_n = Surf % Vert(v) % y_n * 0.25 / dist
+  !->   Surf % Vert(v) % z_n = Surf % Vert(v) % z_n * 0.25 / dist
+  !-> end do
+  !-> n_verts_in_buffers = 0
+  !-> do v = 1, nv
+  !->   call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+  !->   call Surf % Vert(v) % Find_Nearest_Node()
+  !-> end do
+  !-> ! ... down to here is just for development
 
   ! Element geometry has changed, recompute geometrical quantities
-  call Front % Find_Vertex_Elements()
-  call Front % Calculate_Element_Centroids()
-  call Front % Calculate_Element_Normals(phi)
+  call Surf % Find_Vertex_Elements()
+  call Surf % Calculate_Element_Centroids()
+  call Surf % Calculate_Element_Normals(phi)
 
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)
 
-  !-----------------------------------------------------------------!
-  !                                                                 !
-  !    Find cells at elements and intersect faces with elements     !
-  !   (This is needed only for mass transfer problems with front)   !
-  !                                                                 !
-  !-----------------------------------------------------------------!
-  call Front % Mark_Cells_And_Faces(phi)
-
-  call Cpu_Timer % Stop('Creating_Front_From_Vof_Function')
+  call Cpu_Timer % Stop('Creating_Surface_From_Vof_Function')
 
   return
+
+  ! The rest is still experimental
+  call Surf % Refine(4)
+  do j = 1, 3
+    call Surf % Relax_Topology()
+    call Surf % Smooth(phi, phi_e)
+  end do
+  do j = 1, 3
+    call Surf % Relax_Geometry()
+    call Surf % Smooth(phi, phi_e)
+  end do
 
   end subroutine
