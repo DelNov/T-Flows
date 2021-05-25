@@ -34,6 +34,8 @@
   include 'Surf_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
+  call Cpu_Timer % Start('Creating_Surface_From_Vof_Function')
+
   ! Take aliases
   Grid => Surf % pnt_grid
   Flow => Surf % pnt_flow
@@ -225,6 +227,8 @@
 
   ! Restore the true values of phi
   phi % n(:) = phi_o(:)
+
+  call Cpu_Timer % Stop('Creating_Surface_From_Vof_Function')
 
   return
 
