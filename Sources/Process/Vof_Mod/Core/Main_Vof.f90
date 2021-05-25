@@ -48,23 +48,23 @@
     !-------------------------------!
 
     !---------------------!
-    !   Created a front   ! (why not passing smooth variant here?)
+    !   Created a front   !
     !---------------------!
     if(Vof % track_front) then
-      call Vof % Front % Place_Front_At_Value(Vof % fun,  &
-                                              Sol,        &
-                                              0.5,        &
+      call Vof % Front % Place_Front_At_Value(Vof % fun,     &
+                                              Vof % smooth,  &
+                                              0.5,           &
                                               .true.)  ! don't print messages
       call Vof % Front % Print_Front_Statistics()
     end if
 
     !----------------------!
-    !   Create a surface   ! (why not passing smooth variant here?)
+    !   Create a surface   !
     !----------------------!
     if(Vof % track_surface) then
-      call Vof % Surf % Place_Surf_At_Value(Vof % fun,   &
-                                            Sol,         &
-                                            0.5,         &
+      call Vof % Surf % Place_Surf_At_Value(Vof % fun,     &
+                                            Vof % smooth,  &
+                                            0.5,           &
                                             .true.)  ! don't print messages
 !     call Vof % Surf % Calculate_Curvatures_From_Elems()
       call Vof % Surf % Print_Front_Statistics()
