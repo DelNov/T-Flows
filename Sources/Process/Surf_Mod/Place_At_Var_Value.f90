@@ -48,6 +48,7 @@
   nc   =  Grid % n_cells
   nn   =  Grid % n_nodes
 
+  call Surf % Initialize_Surf()
   call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
 
   !-----------------------------!

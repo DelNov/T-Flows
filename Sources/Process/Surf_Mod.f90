@@ -32,6 +32,7 @@
       procedure :: Calculate_Curvatures_From_Verts
       procedure :: Find_Boundaries
       procedure :: Find_Surf_Elements
+      procedure :: Initialize_Surf
       procedure :: Refine
       procedure :: Relax_Geometry
       procedure :: Relax_Topology
@@ -55,6 +56,7 @@
   include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Surf_Elements.f90'
+  include 'Surf_Mod/Initialize_Surf.f90'
   include 'Surf_Mod/Place_At_Var_Value.f90'
   include 'Surf_Mod/Refine.f90'
   include 'Surf_Mod/Relax_Geometry.f90'

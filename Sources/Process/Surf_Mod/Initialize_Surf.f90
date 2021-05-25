@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Initialize_Front(Front)
+  subroutine Initialize_Surf(Surf)
 !------------------------------------------------------------------------------!
 !   Surface genesis                                                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Surf_Type), target :: Surf
 !----------------------------------[Locals]------------------------------------!
   integer :: v, e, s
 !==============================================================================!
@@ -14,32 +14,32 @@
   !   Initialize all elements   !
   !-----------------------------!
   do e = 1, MAX_SURFACE_ELEMENTS
-    call Front % elem(e) % Initialize_Elem()
+    call Surf % elem(e) % Initialize_Elem()
   end do
-  Front % n_elems = 0
+  Surf % n_elems = 0
 
   !-----------------------------!
   !   Initialize all vertices   !
   !-----------------------------!
   do v = 1, MAX_SURFACE_VERTICES
-    call Front % Vert(v) % Initialize_Vert(Front % pnt_grid)
+    call Surf % Vert(v) % Initialize_Vert(Surf % pnt_grid)
   end do
-  Front % n_verts = 0
+  Surf % n_verts = 0
 
   !--------------------------!
   !   Initialize all sides   !
   !--------------------------!
   do s = 1, MAX_SURFACE_ELEMENTS * 3
-    Front % side(s) % a        = 0
-    Front % side(s) % b        = 0
-    Front % side(s) % c        = 0
-    Front % side(s) % d        = 0
-    Front % side(s) % ei       = 0
-    Front % side(s) % ea       = 0
-    Front % side(s) % eb       = 0
-    Front % side(s) % length   = 0.0
-    Front % side(s) % boundary = .false.
+    Surf % side(s) % a        = 0
+    Surf % side(s) % b        = 0
+    Surf % side(s) % c        = 0
+    Surf % side(s) % d        = 0
+    Surf % side(s) % ei       = 0
+    Surf % side(s) % ea       = 0
+    Surf % side(s) % eb       = 0
+    Surf % side(s) % length   = 0.0
+    Surf % side(s) % boundary = .false.
   end do
-  Front % n_sides = 0
+  Surf % n_sides = 0
 
   end subroutine
