@@ -9,7 +9,7 @@
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
   integer                  :: e, v, n_vert, i_ver, j_ver, nv_tot
   real,    allocatable     :: xv(:), yv(:), zv(:)
@@ -20,13 +20,13 @@
   nv   => Front % n_verts
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
+  Elem => Front % Elem
 
   ! Check sanity of the elements so far
   do e = 1, ne
-    do i_ver = 1, elem(e) % nv-1
-      do j_ver = i_ver+1, elem(e) % nv
-        if(elem(e) % v(i_ver) .eq. elem(e) % v(j_ver)) then
+    do i_ver = 1, Elem(e) % nv-1
+      do j_ver = i_ver+1, Elem(e) % nv
+        if(Elem(e) % v(i_ver) .eq. Elem(e) % v(j_ver)) then
           print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
           print '(a,i6,a)', ' # element ', e, ' has some duplicate vertices'
           stop
@@ -95,8 +95,8 @@
     call Sort % Int_Carry_Int(ni, new_n)
 
     do e = 1, ne
-      do i_ver = 1, elem(e) % nv
-        elem(e) % v(i_ver) = new_n(elem(e) % v(i_ver))
+      do i_ver = 1, Elem(e) % nv
+        Elem(e) % v(i_ver) = new_n(Elem(e) % v(i_ver))
       end do
     end do
   end if
@@ -111,9 +111,9 @@
 
   ! Check sanity of the elements in the end
   do e = 1, ne
-    do i_ver = 1, elem(e) % nv-1
-      do j_ver = i_ver+1, elem(e) % nv
-        if(elem(e) % v(i_ver) .eq. elem(e) % v(j_ver)) then
+    do i_ver = 1, Elem(e) % nv-1
+      do j_ver = i_ver+1, Elem(e) % nv
+        if(Elem(e) % v(i_ver) .eq. Elem(e) % v(j_ver)) then
           print '(a)',      ' # ERROR in the end of Compress_Vertices'
           print '(a,i6,a)', ' # element ', e, ' has some duplicate vertices'
           stop

@@ -21,7 +21,7 @@
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: Vert(:)
-  type(Elem_Type),   pointer :: elem(:)
+  type(Elem_Type),   pointer :: Elem(:)
   type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
   integer                    :: nv_tot, ne_tot
@@ -43,7 +43,7 @@
   nv   => Front % n_verts
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
+  Elem => Front % Elem
   A    => Sol % A
   nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
@@ -188,7 +188,7 @@
       end if
 
       ! Store at which cell the surface resides
-      elem(ne) % cell = c
+      Elem(ne) % cell = c
 
     end if
 

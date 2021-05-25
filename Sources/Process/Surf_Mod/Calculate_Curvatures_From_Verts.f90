@@ -51,10 +51,10 @@
   !      them to elements surrounding them       !
   !----------------------------------------------!
 
-  Surf % elem(1:Surf % n_elems) % curv = 0.0
-  Surf % elem(1:Surf % n_elems) % xc   = 0.0
-  Surf % elem(1:Surf % n_elems) % yc   = 0.0
-  Surf % elem(1:Surf % n_elems) % zc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % curv = 0.0
+  Surf % Elem(1:Surf % n_elems) % xc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % yc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % zc   = 0.0
 
   do v = 1, Surf % n_verts
 
@@ -117,13 +117,13 @@
   !----------------------------------------------------------------------!
   !   Interpolate normals at elems from values in surrounding vertices   !
   !----------------------------------------------------------------------!
-  Surf % elem(1:Surf % n_elems) % curv = 0.
+  Surf % Elem(1:Surf % n_elems) % curv = 0.
   do e = 1, Surf % n_elems
 
-    i = Surf % elem(e) % v(1)
-    j = Surf % elem(e) % v(2)
-    k = Surf % elem(e) % v(3)
-    Surf % elem(e) % curv = ONE_THIRD * (  Surf % Vert(i) % curv  &
+    i = Surf % Elem(e) % v(1)
+    j = Surf % Elem(e) % v(2)
+    k = Surf % Elem(e) % v(3)
+    Surf % Elem(e) % curv = ONE_THIRD * (  Surf % Vert(i) % curv  &
                                          + Surf % Vert(j) % curv  &
                                          + Surf % Vert(k) % curv )
   end do

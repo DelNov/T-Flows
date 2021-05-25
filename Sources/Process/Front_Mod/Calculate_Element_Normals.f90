@@ -9,7 +9,7 @@
   type(Var_Type),    target :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
   integer                  :: c, e, j, v1, v2, i_ver
   real                     :: surf_v(3)
@@ -20,57 +20,57 @@
   nv   => Front % n_verts
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
+  Elem => Front % Elem
 
   !---------------------------------!
   !   Browse through all elements   !
   !---------------------------------!
   do e = 1, ne
 
-    elem(e) % area = 0.0
-    elem(e) % sx   = 0.0
-    elem(e) % sy   = 0.0
-    elem(e) % sz   = 0.0
+    Elem(e) % area = 0.0
+    Elem(e) % sx   = 0.0
+    Elem(e) % sy   = 0.0
+    Elem(e) % sz   = 0.0
 
-    do i_ver = 1, elem(e) % nv
+    do i_ver = 1, Elem(e) % nv
 
-      v1 = elem(e) % v(i_ver)
-      if(i_ver < elem(e) % nv) then
-        v2 = elem(e) % v(i_ver + 1)
+      v1 = Elem(e) % v(i_ver)
+      if(i_ver < Elem(e) % nv) then
+        v2 = Elem(e) % v(i_ver + 1)
       else
-        v2 = elem(e) % v(1)
+        v2 = Elem(e) % v(1)
       end if
 
-      a(1) = Vert(v1) % x_n - elem(e) % xe
-      a(2) = Vert(v1) % y_n - elem(e) % ye
-      a(3) = Vert(v1) % z_n - elem(e) % ze
+      a(1) = Vert(v1) % x_n - Elem(e) % xe
+      a(2) = Vert(v1) % y_n - Elem(e) % ye
+      a(3) = Vert(v1) % z_n - Elem(e) % ze
 
-      b(1) = Vert(v2) % x_n - elem(e) % xe
-      b(2) = Vert(v2) % y_n - elem(e) % ye
-      b(3) = Vert(v2) % z_n - elem(e) % ze
+      b(1) = Vert(v2) % x_n - Elem(e) % xe
+      b(2) = Vert(v2) % y_n - Elem(e) % ye
+      b(3) = Vert(v2) % z_n - Elem(e) % ze
 
       tri_v = Math % Cross_Product(a, b)
 
       ! Magnitude of the cross product (twice the area)
       area_x2 = sqrt(tri_v(1)**2 + tri_v(2)**2 + tri_v(3)**2)
 
-      elem(e) % sx = elem(e) % sx + tri_v(1) * 0.5
-      elem(e) % sy = elem(e) % sy + tri_v(2) * 0.5
-      elem(e) % sz = elem(e) % sz + tri_v(3) * 0.5
+      Elem(e) % sx = Elem(e) % sx + tri_v(1) * 0.5
+      Elem(e) % sy = Elem(e) % sy + tri_v(2) * 0.5
+      Elem(e) % sz = Elem(e) % sz + tri_v(3) * 0.5
 
-      elem(e) % area = elem(e) % area + area_x2 * 0.5
+      Elem(e) % area = Elem(e) % area + area_x2 * 0.5
 
     end do
 
     ! Compute normals
-    elem(e) % nx = elem(e) % sx / elem(e) % area
-    elem(e) % ny = elem(e) % sy / elem(e) % area
-    elem(e) % nz = elem(e) % sz / elem(e) % area
+    Elem(e) % nx = Elem(e) % sx / Elem(e) % area
+    Elem(e) % ny = Elem(e) % sy / Elem(e) % area
+    Elem(e) % nz = Elem(e) % sz / Elem(e) % area
 
     do j = 1, 3
 
       ! Take the closest cell
-      c = Vert(elem(e) % v(j)) % cell
+      c = Vert(Elem(e) % v(j)) % cell
 
       ! Surface vector
       surf_v(1) = phi % x(c)

@@ -32,7 +32,7 @@
     !-----------!
     Front % cell_at_elem(:) = 0  ! not at surface
     do e = 1, Front % n_elems
-      Front % cell_at_elem(Front % elem(e) % cell) = e
+      Front % cell_at_elem(Front % Elem(e) % cell) = e
     end do
 
     !-----------!
@@ -71,21 +71,21 @@
           ! Cell c contains surface
           e = Front % cell_at_elem(c)
           if(e .ne. 0) then
-            nx = Front % elem(e) % nx
-            ny = Front % elem(e) % ny
-            nz = Front % elem(e) % nz
+            nx = Front % Elem(e) % nx
+            ny = Front % Elem(e) % ny
+            nz = Front % Elem(e) % nz
 
             ! If cell contains surface and angle is not bigger than asin(15)
             if( (lx*nx + ly*ny + lz*nz)/l > 0.258819 ) then
 
-              nx = Front % elem(e) % nx
-              ny = Front % elem(e) % ny
-              nz = Front % elem(e) % nz
+              nx = Front % Elem(e) % nx
+              ny = Front % Elem(e) % ny
+              nz = Front % Elem(e) % nz
 
               ! Distance from c1 to intersection
-              dsc1 = (  (Front % elem(e) % xe - grid % xc(c1)) * nx     &
-                      + (Front % elem(e) % ye - grid % yc(c1)) * ny     &
-                      + (Front % elem(e) % ze - grid % zc(c1)) * nz  )  &
+              dsc1 = (  (Front % Elem(e) % xe - grid % xc(c1)) * nx     &
+                      + (Front % Elem(e) % ye - grid % yc(c1)) * ny     &
+                      + (Front % Elem(e) % ze - grid % zc(c1)) * nz  )  &
                    / (lx * nx + ly * ny + lz * nz)
 
               ! Intersection point
@@ -94,11 +94,11 @@
               zs = grid % zc(c1) + dsc1 * lz
 
               ! Check if the intersection point is at the element
-              do i_ver = 1, Front % elem(e) % nv
+              do i_ver = 1, Front % Elem(e) % nv
                 j_ver = i_ver + 1
-                if(j_ver > Front % elem(e) % nv) j_ver = 1
-                i = Front % elem(e) % v(i_ver)
-                j = Front % elem(e) % v(j_ver)
+                if(j_ver > Front % Elem(e) % nv) j_ver = 1
+                i = Front % Elem(e) % v(i_ver)
+                j = Front % Elem(e) % v(j_ver)
                 vec_i(1) = Front % Vert(i) % x_n - xs
                 vec_i(2) = Front % Vert(i) % y_n - ys
                 vec_i(3) = Front % Vert(i) % z_n - zs

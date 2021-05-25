@@ -16,7 +16,7 @@
   Surf % pnt_grid => Flow % pnt_grid
 
   ! Allocate memory
-  allocate(Surf % elem(MAX_SURFACE_ELEMENTS))
+  allocate(Surf % Elem(MAX_SURFACE_ELEMENTS))
   allocate(Surf % Vert(MAX_SURFACE_VERTICES))
   allocate(Surf % side(MAX_SURFACE_ELEMENTS * 3))
 

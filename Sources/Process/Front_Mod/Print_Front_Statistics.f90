@@ -6,7 +6,7 @@
   class(Front_Type),  target :: Front
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   type(Side_Type), pointer :: side(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: nv_tot, item, i, j, k, c, d, e, s, v, si, sj, sk
@@ -27,7 +27,7 @@
   ne   => Front % n_elems
   Vert => Front % Vert
   side => Front % side
-  elem => Front % elem
+  Elem => Front % Elem
 
   nv_tot = nv
   call Comm_Mod_Global_Sum_Int(nv_tot)
@@ -49,9 +49,9 @@
   max_rat = -HUGE
   min_rat = +HUGE
   do e = 1, ne
-    si = elem(e) % s(1)
-    sj = elem(e) % s(2)
-    sk = elem(e) % s(3)
+    si = Elem(e) % s(1)
+    sj = Elem(e) % s(2)
+    sk = Elem(e) % s(3)
     max_l = max(side(si) % length, side(sj) % length, side(sk) % length)
     min_l = min(side(si) % length, side(sj) % length, side(sk) % length)
     max_rat = max(max_rat, max_l/min_l)
@@ -65,7 +65,7 @@
   !------------------------!
   tot_area = 0.0
   do e = 1, ne
-    tot_area = tot_area + elem(e) % area
+    tot_area = tot_area + Elem(e) % area
   end do
   call Comm_Mod_Global_Sum_Real(tot_area)
 
@@ -99,8 +99,8 @@
   call Comm_Mod_Global_Max_Real(max_l)
   call Comm_Mod_Global_Min_Real(min_l)
 
-  max_a = maxval(elem(1:ne) % area)
-  min_a = minval(elem(1:ne) % area)
+  max_a = maxval(Elem(1:ne) % area)
+  min_a = minval(Elem(1:ne) % area)
   call Comm_Mod_Global_Max_Real(max_a)
   call Comm_Mod_Global_Min_Real(min_a)
 

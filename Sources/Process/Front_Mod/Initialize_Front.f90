@@ -14,7 +14,7 @@
   !   Initialize all elements   !
   !-----------------------------!
   do e = 1, MAX_SURFACE_ELEMENTS
-    call Front % elem(e) % Initialize_Elem()
+    call Front % Elem(e) % Initialize_Elem()
   end do
   Front % n_elems = 0
 

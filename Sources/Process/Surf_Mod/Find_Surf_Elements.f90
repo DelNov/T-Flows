@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, i, j, k, c, d, s, n_side
@@ -26,7 +26,7 @@
   ne   => Surf % n_elems
   Vert => Surf % Vert
   side => Surf % side
-  elem => Surf % elem
+  Elem => Surf % Elem
 
   !-------------------------------!
   !   Find elements' neighbours   !
@@ -39,66 +39,66 @@
 
     ! Element a
     if(ea > 0) then
-      if(elem(ea) % v(2) .eq. c .and. elem(ea) % v(3) .eq. d  .or. &
-         elem(ea) % v(3) .eq. c .and. elem(ea) % v(2) .eq. d) then
-        elem(ea) % ns = elem(ea) % ns + 1
-        elem(ea) % s(1) = s
+      if(Elem(ea) % v(2) .eq. c .and. Elem(ea) % v(3) .eq. d  .or. &
+         Elem(ea) % v(3) .eq. c .and. Elem(ea) % v(2) .eq. d) then
+        Elem(ea) % ns = Elem(ea) % ns + 1
+        Elem(ea) % s(1) = s
         if(eb .gt. 0) then
-          elem(ea) % nne = elem(ea) % nne + 1
-          elem(ea) % e(1) = eb
+          Elem(ea) % nne = Elem(ea) % nne + 1
+          Elem(ea) % e(1) = eb
         end if
       end if
 
-      if(elem(ea) % v(1) .eq. c .and. elem(ea) % v(3) .eq. d  .or. &
-         elem(ea) % v(3) .eq. c .and. elem(ea) % v(1) .eq. d) then
-        elem(ea) % ns = elem(ea) % ns + 1
-        elem(ea) % s(2) = s
+      if(Elem(ea) % v(1) .eq. c .and. Elem(ea) % v(3) .eq. d  .or. &
+         Elem(ea) % v(3) .eq. c .and. Elem(ea) % v(1) .eq. d) then
+        Elem(ea) % ns = Elem(ea) % ns + 1
+        Elem(ea) % s(2) = s
         if(eb .gt. 0) then
-          elem(ea) % nne = elem(ea) % nne + 1
-          elem(ea) % e(2) = eb
+          Elem(ea) % nne = Elem(ea) % nne + 1
+          Elem(ea) % e(2) = eb
         end if
       end if
 
-      if(elem(ea) % v(1) .eq. c .and. elem(ea) % v(2) .eq. d  .or. &
-         elem(ea) % v(2) .eq. c .and. elem(ea) % v(1) .eq. d) then
-        elem(ea) % ns = elem(ea) % ns + 1
-        elem(ea) % s(3) = s
+      if(Elem(ea) % v(1) .eq. c .and. Elem(ea) % v(2) .eq. d  .or. &
+         Elem(ea) % v(2) .eq. c .and. Elem(ea) % v(1) .eq. d) then
+        Elem(ea) % ns = Elem(ea) % ns + 1
+        Elem(ea) % s(3) = s
         if(eb .gt. 0) then
-          elem(ea) % nne = elem(ea) % nne + 1
-          elem(ea) % e(3) = eb
+          Elem(ea) % nne = Elem(ea) % nne + 1
+          Elem(ea) % e(3) = eb
         end if
       end if
     end if  ! ea > 0
 
     ! Element b
     if(eb > 0) then
-      if(elem(eb) % v(2) .eq. c .and. elem(eb) % v(3) .eq. d  .or. &
-         elem(eb) % v(3) .eq. c .and. elem(eb) % v(2) .eq. d) then
-        elem(eb) % ns = elem(eb) % ns + 1
-        elem(eb) % s(1) = s
+      if(Elem(eb) % v(2) .eq. c .and. Elem(eb) % v(3) .eq. d  .or. &
+         Elem(eb) % v(3) .eq. c .and. Elem(eb) % v(2) .eq. d) then
+        Elem(eb) % ns = Elem(eb) % ns + 1
+        Elem(eb) % s(1) = s
         if(ea .gt. 0) then
-          elem(eb) % nne = elem(eb) % nne + 1
-          elem(eb) % e(1) = ea
+          Elem(eb) % nne = Elem(eb) % nne + 1
+          Elem(eb) % e(1) = ea
         end if
       end if
 
-      if(elem(eb) % v(1) .eq. c .and. elem(eb) % v(3) .eq. d  .or. &
-         elem(eb) % v(3) .eq. c .and. elem(eb) % v(1) .eq. d) then
-        elem(eb) % ns = elem(eb) % ns + 1
-        elem(eb) % s(2) = s
+      if(Elem(eb) % v(1) .eq. c .and. Elem(eb) % v(3) .eq. d  .or. &
+         Elem(eb) % v(3) .eq. c .and. Elem(eb) % v(1) .eq. d) then
+        Elem(eb) % ns = Elem(eb) % ns + 1
+        Elem(eb) % s(2) = s
         if(ea .gt. 0) then
-          elem(eb) % nne = elem(eb) % nne + 1
-          elem(eb) % e(2) = ea
+          Elem(eb) % nne = Elem(eb) % nne + 1
+          Elem(eb) % e(2) = ea
         end if
       end if
 
-      if(elem(eb) % v(1) .eq. c .and. elem(eb) % v(2) .eq. d  .or. &
-         elem(eb) % v(2) .eq. c .and. elem(eb) % v(1) .eq. d) then
-        elem(eb) % ns = elem(eb) % ns + 1
-        elem(eb) % s(3) = s
+      if(Elem(eb) % v(1) .eq. c .and. Elem(eb) % v(2) .eq. d  .or. &
+         Elem(eb) % v(2) .eq. c .and. Elem(eb) % v(1) .eq. d) then
+        Elem(eb) % ns = Elem(eb) % ns + 1
+        Elem(eb) % s(3) = s
         if(ea .gt. 0) then
-          elem(eb) % nne = elem(eb) % nne + 1
-          elem(eb) % e(3) = ea
+          Elem(eb) % nne = Elem(eb) % nne + 1
+          Elem(eb) % e(3) = ea
         end if
       end if
     end if
@@ -110,13 +110,13 @@
     sum_ijk = 0
     sum_cd  = 0
 
-    do i_ver = 1, elem(e) % nv
-      sum_ijk = sum_ijk + elem(e) % v(i_ver)
+    do i_ver = 1, Elem(e) % nv
+      sum_ijk = sum_ijk + Elem(e) % v(i_ver)
     end do
 
-    do i_s = 1, elem(e) % ns
-      sum_cd = sum_cd + side(elem(e) % s(i_s)) % c  &
-                      + side(elem(e) % s(i_s)) % d
+    do i_s = 1, Elem(e) % ns
+      sum_cd = sum_cd + side(Elem(e) % s(i_s)) % c  &
+                      + side(Elem(e) % s(i_s)) % d
     end do
 
     if( sum_cd / sum_ijk .ne. 2 ) then

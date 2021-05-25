@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
@@ -26,20 +26,20 @@
   ne   => Front % n_elems
   Vert => Front % Vert
   side => Front % side
-  elem => Front % elem
+  Elem => Front % Elem
 
   !----------------------------!
   !   Put all sides together   !
   !----------------------------!
   n_side = 0  ! initialize side coutner
   do e = 1, ne
-    do i_ver = 1, elem(e) % nv
+    do i_ver = 1, Elem(e) % nv
       j_ver = i_ver + 1
-      if(j_ver > elem(e) % nv) j_ver = 1
+      if(j_ver > Elem(e) % nv) j_ver = 1
 
       ! Get first and second vertex
-      v1 = elem(e) % v(i_ver)
-      v2 = elem(e) % v(j_ver)
+      v1 = Elem(e) % v(i_ver)
+      v2 = Elem(e) % v(j_ver)
 
       n_side = n_side + 1
       side(n_side) % c  = v1
@@ -109,16 +109,16 @@
         ! Tedious but (hopefully) correct way to find eb and ea
         do ss = s, s+1
 
-          do i_ver = 1, elem(ei(ss)) % nv
+          do i_ver = 1, Elem(ei(ss)) % nv
             j_ver = i_ver + 1
-            if(j_ver > elem(ei(ss)) % nv) j_ver = 1
+            if(j_ver > Elem(ei(ss)) % nv) j_ver = 1
             k_ver = j_ver + 1
-            if(k_ver > elem(ei(ss)) % nv) k_ver = 1
+            if(k_ver > Elem(ei(ss)) % nv) k_ver = 1
 
             ! Get first, second and thrid vertex
-            v1 = elem(ei(ss)) % v(i_ver)
-            v2 = elem(ei(ss)) % v(j_ver)
-            v3 = elem(ei(ss)) % v(k_ver)
+            v1 = Elem(ei(ss)) % v(i_ver)
+            v2 = Elem(ei(ss)) % v(j_ver)
+            v3 = Elem(ei(ss)) % v(k_ver)
 
             ! Check ea
             if(v1 .eq. c .and. v2 .eq. d) then
@@ -153,16 +153,16 @@
         ! Tedious but (hopefully) correct way to find eb and ea
         ss = s
 
-        do i_ver = 1, elem(ei(ss)) % nv
+        do i_ver = 1, Elem(ei(ss)) % nv
           j_ver = i_ver + 1
-          if(j_ver > elem(ei(ss)) % nv) j_ver = 1
+          if(j_ver > Elem(ei(ss)) % nv) j_ver = 1
           k_ver = j_ver + 1
-          if(k_ver > elem(ei(ss)) % nv) k_ver = 1
+          if(k_ver > Elem(ei(ss)) % nv) k_ver = 1
 
           ! Get first and second vertex
-          v1 = elem(ei(ss)) % v(i_ver)
-          v2 = elem(ei(ss)) % v(j_ver)
-          v3 = elem(ei(ss)) % v(k_ver)
+          v1 = Elem(ei(ss)) % v(i_ver)
+          v2 = Elem(ei(ss)) % v(j_ver)
+          v3 = Elem(ei(ss)) % v(k_ver)
 
           ! Check ea
           if(v1 .eq. c .and. v2 .eq. d) then

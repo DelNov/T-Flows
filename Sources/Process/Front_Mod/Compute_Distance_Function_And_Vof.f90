@@ -72,9 +72,9 @@
       e  = Front % Vert(v) % e(i_ele)
 
       ! Center of the sphere
-      xs = Front % elem(e) % xc
-      ys = Front % elem(e) % yc
-      zs = Front % elem(e) % zc
+      xs = Front % Elem(e) % xc
+      ys = Front % Elem(e) % yc
+      zs = Front % Elem(e) % zc
 
       do i_cel = 1, c_cnt
         c = cell_list(i_cel)
@@ -84,7 +84,7 @@
         zc = grid % zc(c)
 
         dist = Math % Distance(xc, yc, zc, xs, ys, zs)  &
-             - 1.0 / Front % elem(e) % curv
+             - 1.0 / Front % Elem(e) % curv
 
         if(abs(dist) < abs(phi_c(c))) then
           phi_c(c) = dist

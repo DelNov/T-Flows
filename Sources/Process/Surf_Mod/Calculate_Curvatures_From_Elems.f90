@@ -53,8 +53,8 @@
   allocate(elem_n_verts(Surf % n_elems))
   elem_n_verts(:) = 0
   do e = 1, Surf % n_elems
-    do i_ver = 1, Surf % elem(e) % nv
-      v = Surf % elem(e) % v(i_ver)
+    do i_ver = 1, Surf % Elem(e) % nv
+      v = Surf % Elem(e) % v(i_ver)
       elem_n_verts(e) = elem_n_verts(e) + Surf % Vert(v) % nnv
     end do
   end do
@@ -65,8 +65,8 @@
 
   elem_n_verts(:) = 0
   do e = 1, Surf % n_elems
-    do i_ver = 1, Surf % elem(e) % nv
-      v = Surf % elem(e) % v(i_ver)
+    do i_ver = 1, Surf % Elem(e) % nv
+      v = Surf % Elem(e) % v(i_ver)
       do j_ver = 1, Surf % Vert(v) % nnv
         elem_n_verts(e) = elem_n_verts(e) + 1;
         elem_v(elem_n_verts(e), e) = vert_v(j_ver, v)
@@ -84,10 +84,10 @@
   !        and second neighbouring nodes        !
   !---------------------------------------------!
 
-  Surf % elem(1:Surf % n_elems) % curv = 0.0
-  Surf % elem(1:Surf % n_elems) % xc   = 0.0
-  Surf % elem(1:Surf % n_elems) % yc   = 0.0
-  Surf % elem(1:Surf % n_elems) % zc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % curv = 0.0
+  Surf % Elem(1:Surf % n_elems) % xc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % yc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % zc   = 0.0
 
   do e = 1, Surf % n_elems
 
@@ -137,16 +137,16 @@
       rho = PETA                   ! some big number
     end if
 
-    Surf % elem(e) % curv = 1.0 / rho
-    Surf % elem(e) % xc   = x
-    Surf % elem(e) % yc   = y
-    Surf % elem(e) % zc   = z
+    Surf % Elem(e) % curv = 1.0 / rho
+    Surf % Elem(e) % xc   = x
+    Surf % Elem(e) % yc   = y
+    Surf % Elem(e) % zc   = z
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
   ! do e = 1, Surf % n_elems
-  !   rho = rho + Surf % elem(e) % curv
+  !   rho = rho + Surf % Elem(e) % curv
   ! end do
   ! rho = rho / Surf % n_elems
   ! print *, 'average curvature = ', rho
@@ -157,10 +157,10 @@
   Surf % Vert(1:Surf % n_verts) % curv = 0.
   do e = 1, Surf % n_elems
 
-    do i_ver = 1, Surf % elem(e) % nv
-      v = Surf % elem(e) % v(i_ver)
+    do i_ver = 1, Surf % Elem(e) % nv
+      v = Surf % Elem(e) % v(i_ver)
       Surf % Vert(v) % curv = Surf % Vert(v) % curv  &
-                      + Surf % elem(e) % curv/real(Surf % Vert(v) % nne)
+                      + Surf % Elem(e) % curv/real(Surf % Vert(v) % nne)
     end do
   end do
 

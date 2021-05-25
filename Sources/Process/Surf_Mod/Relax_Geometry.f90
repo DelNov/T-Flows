@@ -7,7 +7,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: a, b, c, d, s, t
   real                     :: dist_ab, dist_cd
@@ -19,7 +19,7 @@
   ne   => Surf % n_elems
   Vert => Surf % Vert
   side => Surf % side
-  elem => Surf % elem
+  Elem => Surf % Elem
 
   call Surf % Find_Boundaries()
 

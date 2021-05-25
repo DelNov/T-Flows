@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: cnt_one, cnt_two
   integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
@@ -26,7 +26,7 @@
   ne   => Front % n_elems
   Vert => Front % Vert
   side => Front % side
-  elem => Front % elem
+  Elem => Front % Elem
 
   !-------------------------------!
   !   Find elements' neighbours   !
@@ -40,24 +40,24 @@
     ! Element a
     if(ea > 0) then
 
-      do i_ver = 1, elem(ea) % nv
+      do i_ver = 1, Elem(ea) % nv
 
         ! Get first and second vertex
-        v1 = elem(ea) % v(i_ver)
-        if(i_ver < elem(ea) % nv) then
-          v2 = elem(ea) % v(i_ver+1)
+        v1 = Elem(ea) % v(i_ver)
+        if(i_ver < Elem(ea) % nv) then
+          v2 = Elem(ea) % v(i_ver+1)
         else
-          v2 = elem(ea) % v(1)
+          v2 = Elem(ea) % v(1)
         end if
 
         ! Check if nodes match
         if(v1 .eq. c .and. v2 .eq. d  .or. &
            v2 .eq. c .and. v1 .eq. d) then
-          elem(ea) % ns  = elem(ea) % ns  + 1
-          elem(ea) % s(elem(ea) % ns)  = s
+          Elem(ea) % ns  = Elem(ea) % ns  + 1
+          Elem(ea) % s(Elem(ea) % ns)  = s
           if(eb .gt. 0) then
-            elem(ea) % nne = elem(ea) % nne + 1
-            elem(ea) % e(elem(ea) % nne) = eb
+            Elem(ea) % nne = Elem(ea) % nne + 1
+            Elem(ea) % e(Elem(ea) % nne) = eb
           end if
         end if
       end do
@@ -67,24 +67,24 @@
     ! Element b
     if(eb > 0) then
 
-      do i_ver = 1, elem(eb) % nv
+      do i_ver = 1, Elem(eb) % nv
 
         ! Get first and second vertex
-        v1 = elem(eb) % v(i_ver)
-        if(i_ver < elem(eb) % nv) then
-          v2 = elem(eb) % v(i_ver+1)
+        v1 = Elem(eb) % v(i_ver)
+        if(i_ver < Elem(eb) % nv) then
+          v2 = Elem(eb) % v(i_ver+1)
         else
-          v2 = elem(eb) % v(1)
+          v2 = Elem(eb) % v(1)
         end if
 
         ! Check if nodes match
         if(v1 .eq. c .and. v2 .eq. d  .or. &
            v2 .eq. c .and. v1 .eq. d) then
-          elem(eb) % ns  = elem(eb) % ns  + 1
-          elem(eb) % s(elem(eb) % ns)  = s
+          Elem(eb) % ns  = Elem(eb) % ns  + 1
+          Elem(eb) % s(Elem(eb) % ns)  = s
           if(ea .gt. 0) then
-            elem(eb) % nne = elem(eb) % nne + 1
-            elem(eb) % e(elem(eb) % nne) = ea
+            Elem(eb) % nne = Elem(eb) % nne + 1
+            Elem(eb) % e(Elem(eb) % nne) = ea
           end if
         end if
       end do

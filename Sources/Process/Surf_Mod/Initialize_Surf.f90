@@ -14,7 +14,7 @@
   !   Initialize all elements   !
   !-----------------------------!
   do e = 1, MAX_SURFACE_ELEMENTS
-    call Surf % elem(e) % Initialize_Elem()
+    call Surf % Elem(e) % Initialize_Elem()
   end do
   Surf % n_elems = 0
 

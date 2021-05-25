@@ -9,7 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   type(Side_Type), pointer :: side(:)
   integer                  :: it_smooth, s, v, e, c
   integer                  :: n_verts_in_buffers
@@ -24,7 +24,7 @@
   ne   => Surf % n_elems
   ns   => Surf % n_sides
   Vert => Surf % Vert
-  elem => Surf % elem
+  Elem => Surf % Elem
   side => Surf % side
   Grid => Surf % pnt_grid
 
@@ -33,9 +33,9 @@
   !-----------------------------------------------------------!
   Vert(1:nv) % nne = 0
   do e = 1, ne
-    Vert(elem(e) % v(1)) % nne = Vert(elem(e) % v(1)) % nne + 1
-    Vert(elem(e) % v(2)) % nne = Vert(elem(e) % v(2)) % nne + 1
-    Vert(elem(e) % v(3)) % nne = Vert(elem(e) % v(3)) % nne + 1
+    Vert(Elem(e) % v(1)) % nne = Vert(Elem(e) % v(1)) % nne + 1
+    Vert(Elem(e) % v(2)) % nne = Vert(Elem(e) % v(2)) % nne + 1
+    Vert(Elem(e) % v(3)) % nne = Vert(Elem(e) % v(3)) % nne + 1
   end do
 
   call Surf % Find_Boundaries()

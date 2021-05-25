@@ -10,7 +10,7 @@
   logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
   integer                  :: ver(5), loop
   real                     :: v_21(3), v_31(3), v_41(3), v_51(3)
@@ -22,7 +22,7 @@
   nv   => Front % n_verts
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
+  Elem => Front % Elem
 
   permutations = reshape((/ &
     0, 1, 2, 3, 4,  &
@@ -98,31 +98,31 @@
 
     ! One new element with five vertices
     ne = ne + 1
-    elem(ne) % nv = 5
-    elem(ne) % v(1:5) = ver(1:5)
+    Elem(ne) % nv = 5
+    Elem(ne) % v(1:5) = ver(1:5)
 
   else  ! only triangles are allowed
 
     ! One new element with three vertices
     ne = ne + 1
-    elem(ne) % nv = 3
-    elem(ne) % v(1) = ver(1)
-    elem(ne) % v(2) = ver(2)
-    elem(ne) % v(3) = ver(3)
+    Elem(ne) % nv = 3
+    Elem(ne) % v(1) = ver(1)
+    Elem(ne) % v(2) = ver(2)
+    Elem(ne) % v(3) = ver(3)
 
     ! Second new element with three vertices
     ne = ne + 1
-    elem(ne) % nv = 3
-    elem(ne) % v(1) = ver(1)
-    elem(ne) % v(2) = ver(3)
-    elem(ne) % v(3) = ver(4)
+    Elem(ne) % nv = 3
+    Elem(ne) % v(1) = ver(1)
+    Elem(ne) % v(2) = ver(3)
+    Elem(ne) % v(3) = ver(4)
 
     ! Third new element with three vertices
     ne = ne + 1
-    elem(ne) % nv = 3
-    elem(ne) % v(1) = ver(1)
-    elem(ne) % v(2) = ver(4)
-    elem(ne) % v(3) = ver(5)
+    Elem(ne) % nv = 3
+    Elem(ne) % v(1) = ver(1)
+    Elem(ne) % v(2) = ver(4)
+    Elem(ne) % v(3) = ver(5)
 
   end if
 

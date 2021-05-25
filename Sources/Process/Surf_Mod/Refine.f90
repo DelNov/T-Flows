@@ -9,7 +9,7 @@
   integer                  :: n_biggest  ! number of biggest elements for ref.
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
   real,    allocatable     :: areas(:)
   integer, allocatable     :: elems(:)
@@ -20,14 +20,14 @@
   nv   => Surf % n_verts
   ne   => Surf % n_elems
   Vert => Surf % Vert
-  elem => Surf % elem
+  Elem => Surf % Elem
 
   allocate(areas(ne));  areas(:) = 0.0
   allocate(elems(ne));  elems(:) = 0
 
   do e = 1, ne
     elems(e) = e
-    areas(e) = elem(e) % area
+    areas(e) = Elem(e) % area
   end do
 
   ! Sort all elements by their areas

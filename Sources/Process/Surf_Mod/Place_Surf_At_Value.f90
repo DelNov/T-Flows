@@ -21,7 +21,7 @@
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: Vert(:)
-  type(Elem_Type),   pointer :: elem(:)
+  type(Elem_Type),   pointer :: Elem(:)
   type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
@@ -42,7 +42,7 @@
   nv   => Surf % n_verts
   ne   => Surf % n_elems
   Vert => Surf % Vert
-  elem => Surf % elem
+  Elem => Surf % Elem
   A    => Sol % A
   nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
