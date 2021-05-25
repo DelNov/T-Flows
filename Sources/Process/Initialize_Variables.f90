@@ -308,8 +308,10 @@
         end if
 
         if(turb % model .eq. K_EPS) then
-          vals(0) = kin_def; kin % n(c) = vals(Key_Ind('KIN', keys, nks))
-          vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
+          vals(0) = kin_def;
+          kin % n(c) = max(0.01, vals(Key_Ind('KIN', keys, nks)))
+          vals(0) = eps_def;
+          eps % n(c) = max(0.001, vals(Key_Ind('EPS', keys, nks)))
           kin % o(c)  = kin % n(c)
           kin % oo(c) = kin % n(c)
           eps % o(c)  = eps % n(c)
