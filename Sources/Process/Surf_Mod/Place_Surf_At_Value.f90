@@ -18,14 +18,13 @@
   type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: Vert(:)
   type(Elem_Type),   pointer :: Elem(:)
-  type(Matrix_Type), pointer :: A
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, nn
+  integer                    :: c, j, n1, n2, nb, nc, nn
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3), dist
+  real                       :: surf_v(3)
 !------------------------------------------------------------------------------!
   include 'Surf_Mod/Edge_Numbering.f90'
 !==============================================================================!

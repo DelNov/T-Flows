@@ -11,16 +11,15 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
-  real, dimension(4,4)  :: a
-  real, dimension(4)    :: b
-  real, dimension(4)    :: phi
-  integer, dimension(4) :: node
-  integer, allocatable  :: elem_n_verts(:)
-  integer, allocatable  :: vert_v(:,:)
-  integer, allocatable  :: elem_v(:,:)
-  integer               :: v, i, j, k, i_ver, j_ver, e, c, d, s, max_nnv
-  logical               :: invertible
-  real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
+  real, dimension(4,4) :: a
+  real, dimension(4)   :: b
+  real, dimension(4)   :: phi
+  integer, allocatable :: elem_n_verts(:)
+  integer, allocatable :: vert_v(:,:)
+  integer, allocatable :: elem_v(:,:)
+  integer              :: v, i_ver, j_ver, e, c, d, s, max_nnv
+  logical              :: invertible
+  real                 :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
@@ -94,11 +93,11 @@
     a(:,:) = 0
     b(:)   = 0
 
-    do k = 1, elem_n_verts(e)
+    do i_ver = 1, elem_n_verts(e)
 
-      x = Surf % Vert( elem_v(k,e) ) % x_n
-      y = Surf % Vert( elem_v(k,e) ) % y_n
-      z = Surf % Vert( elem_v(k,e) ) % z_n
+      x = Surf % Vert( elem_v(i_ver, e) ) % x_n
+      y = Surf % Vert( elem_v(i_ver, e) ) % y_n
+      z = Surf % Vert( elem_v(i_ver, e) ) % z_n
 
       x2 = x * x;  y2 = y * y;  z2 = z * z
       xy = x * y;  xz = x * z;  yz = y * z

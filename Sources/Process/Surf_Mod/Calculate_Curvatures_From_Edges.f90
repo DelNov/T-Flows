@@ -14,7 +14,7 @@
   real, dimension(4)    :: b
   real, dimension(4)    :: phi
   integer, dimension(4) :: Vert
-  integer               :: i, j, k, e, c, s
+  integer               :: i, j, k, e, s
   logical               :: invertible
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!

@@ -10,14 +10,13 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
 !-----------------------------------[Locals]-----------------------------------!
-  real, dimension(4,4)  :: a
-  real, dimension(4)    :: b
-  real, dimension(4)    :: phi
-  integer, dimension(4) :: node
-  integer, allocatable  :: vert_v(:,:)
-  integer               :: v, i, j, k, e, c, d, s, max_nnv
-  logical               :: invertible
-  real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
+  real, dimension(4,4) :: a
+  real, dimension(4)   :: b
+  real, dimension(4)   :: phi
+  integer, allocatable :: vert_v(:,:)
+  integer              :: v, i, j, k, e, c, d, s, max_nnv
+  logical              :: invertible
+  real                 :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
 
   ! Work out number of vertices around each vertex
