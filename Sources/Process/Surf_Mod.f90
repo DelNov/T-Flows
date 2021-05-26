@@ -32,6 +32,7 @@
       procedure :: Calculate_Curvatures_From_Verts
       procedure :: Find_Boundaries
       procedure :: Find_Surf_Elements
+      procedure :: Improve_Mesh_Quality
       procedure :: Initialize_Surf
       procedure :: Place_Surf_At_Value
       procedure :: Refine
@@ -57,6 +58,7 @@
   include 'Surf_Mod/Calculate_Curvatures_From_Verts.f90'
   include 'Surf_Mod/Find_Boundaries.f90'
   include 'Surf_Mod/Find_Surf_Elements.f90'
+  include 'Surf_Mod/Improve_Mesh_Quality.f90'
   include 'Surf_Mod/Initialize_Surf.f90'
   include 'Surf_Mod/Place_Surf_At_Value.f90'
   include 'Surf_Mod/Refine.f90'
