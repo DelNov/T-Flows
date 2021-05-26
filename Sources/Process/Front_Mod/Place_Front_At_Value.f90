@@ -207,8 +207,6 @@
   !   Calculate geometrical quantities   !
   !                                      !
   !--------------------------------------!
-
-  ! Element geometry has changed, recompute geometrical quantities
   call Front % Find_Vertex_Elements()
   call Front % Calculate_Element_Centroids()
   call Front % Calculate_Element_Normals(smooth)
