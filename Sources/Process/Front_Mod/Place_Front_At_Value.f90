@@ -21,11 +21,11 @@
   integer,           pointer :: nv, ne
   integer                    :: nv_tot, ne_tot
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
+  integer                    :: c, j, n1, n2, nb, nc, n, nn
   integer                    :: v, n_vert, n_verts_in_buffers, i_nod
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3), dist
+  real                       :: surf_v(3)
 !------------------------------------------------------------------------------!
   include 'Front_Mod/Edge_Numbering.f90'
 !==============================================================================!
@@ -188,9 +188,9 @@
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Front % Find_Sides(verbose)           ! Surf calls the same here
-  call Front % Find_Front_Elements(verbose)  ! Surf calls Find_Surf_Elements
-  call Front % Check_Elements(verbose)       ! Surf calls the same here
+  call Front % Find_Sides(verbose)      ! Surf calls the same here
+  call Front % Find_Front_Elements()    ! Surf calls Find_Surf_Elements
+  call Front % Check_Elements(verbose)  ! Surf calls the same here
 
   !-----------------------------------------------!
   !   It used to find the nearest cell and node   !

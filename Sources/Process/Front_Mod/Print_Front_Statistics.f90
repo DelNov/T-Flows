@@ -9,11 +9,10 @@
   type(Elem_Type), pointer :: Elem(:)
   type(Side_Type), pointer :: side(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: nv_tot, item, i, j, k, c, d, e, s, v, si, sj, sk
+  integer                  :: nv_tot, item, c, d, e, s, v, si, sj, sk
   integer                  :: nne_s, nne_e
   integer                  :: n_elems_tot, n_verts_tot, n_sides_tot
   real, allocatable        :: nne(:)
-  real                     :: a(3), b(3), tri_v(3)
   real                     :: max_rat, min_rat, max_l, min_l
   real                     :: min_a, max_a, tot_area
   character(len=160)       :: line

@@ -1,23 +1,17 @@
 !==============================================================================!
-  subroutine Find_Front_Elements(Front, verbose)
+  subroutine Find_Front_Elements(Front)
 !------------------------------------------------------------------------------!
 !   Finds connectivity for sides and elements                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
-  logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: cnt_one, cnt_two
-  integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
-  integer                  :: ss, sum_ijk, sum_cd, i_ver, j_ver, k_ver
-  integer                  :: i_s, v1, v2, v3
-  integer                  :: ne_tot, ns_tot, cnt_one_tot, cnt_two_tot
-  integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
+  integer                  :: eb, ea, c, d, s, i_ver, v1, v2
 !==============================================================================!
 
   ! Take aliases

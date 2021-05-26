@@ -12,12 +12,7 @@
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
-  integer                  :: cnt_one, cnt_two
-  integer                  :: e, eb, ea, c, d, c1, c2, d1, d2, s, n_side
-  integer                  :: ss, sum_ijk, sum_cd, i_ver, j_ver, k_ver
-  integer                  :: i_s, v1, v2, v3
-  integer                  :: ne_tot, ns_tot, cnt_one_tot, cnt_two_tot
-  integer, allocatable     :: ci(:), di(:), ei(:), ni(:)
+  integer                  :: e, sum_ijk, sum_cd, i_ver, i_s
 !==============================================================================!
 
   ! Take aliases
