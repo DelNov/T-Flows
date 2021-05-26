@@ -8,7 +8,7 @@
   class(Front_Type), target :: Front
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: ne
   integer                  :: e, i_ver
 !==============================================================================!
@@ -16,26 +16,26 @@
   ! Take aliases
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
+  Elem => Front % Elem
 
   !---------------------------------!
   !   Browse through all elements   !
   !---------------------------------!
   do e = 1, ne
 
-    elem(e) % xe = 0.0
-    elem(e) % ye = 0.0
-    elem(e) % ze = 0.0
+    Elem(e) % xe = 0.0
+    Elem(e) % ye = 0.0
+    Elem(e) % ze = 0.0
 
-    do i_ver = 1, elem(e) % nv
-      elem(e) % xe = elem(e) % xe + Vert(elem(e) % v(i_ver)) % x_n
-      elem(e) % ye = elem(e) % ye + Vert(elem(e) % v(i_ver)) % y_n
-      elem(e) % ze = elem(e) % ze + Vert(elem(e) % v(i_ver)) % z_n
+    do i_ver = 1, Elem(e) % nv
+      Elem(e) % xe = Elem(e) % xe + Vert(Elem(e) % v(i_ver)) % x_n
+      Elem(e) % ye = Elem(e) % ye + Vert(Elem(e) % v(i_ver)) % y_n
+      Elem(e) % ze = Elem(e) % ze + Vert(Elem(e) % v(i_ver)) % z_n
     end do
 
-    elem(e) % xe = elem(e) % xe / real(elem(e) % nv)
-    elem(e) % ye = elem(e) % ye / real(elem(e) % nv)
-    elem(e) % ze = elem(e) % ze / real(elem(e) % nv)
+    Elem(e) % xe = Elem(e) % xe / real(Elem(e) % nv)
+    Elem(e) % ye = Elem(e) % ye / real(Elem(e) % nv)
+    Elem(e) % ze = Elem(e) % ze / real(Elem(e) % nv)
 
   end do
 

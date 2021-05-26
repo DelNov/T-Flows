@@ -23,7 +23,7 @@
   nf   =  Grid % n_faces
 
   ! Allocate memory
-  allocate(Front % elem(MAX_SURFACE_ELEMENTS))
+  allocate(Front % Elem(MAX_SURFACE_ELEMENTS))
   allocate(Front % Vert(MAX_SURFACE_VERTICES))
   allocate(Front % side(MAX_SURFACE_ELEMENTS * 3))
 

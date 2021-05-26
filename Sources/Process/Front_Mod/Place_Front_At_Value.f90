@@ -1,36 +1,31 @@
 !==============================================================================!
-  subroutine Place_At_Var_Value(Front, phi, Sol, phi_e, verbose)
+  subroutine Place_Front_At_Value(Front, sharp, smooth, phi_e, verbose)
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value phi_e                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_n   => r_node_01,  &  ! value at the static Grid nodes
-                      phi_c   => r_cell_01,  &  ! cell values of phi
-                      phi_o   => r_cell_02,  &  ! original values of phi
-                      phi_cen => r_cell_03,  &
-                      phi_src => r_cell_04
+  use Work_Mod, only: phi_n => r_node_01  ! value at the static Grid nodes
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
-  type(Var_Type),    target :: phi
-  type(Solver_Type), target :: Sol   ! needed for smoothing
+  type(Var_Type),    target :: sharp
+  type(Var_Type),    target :: smooth
   real                      :: phi_e
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: Vert(:)
-  type(Elem_Type),   pointer :: elem(:)
-  type(Matrix_Type), pointer :: A
+  type(Elem_Type),   pointer :: Elem(:)
   integer,           pointer :: nv, ne
   integer                    :: nv_tot, ne_tot
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, n, nn
+  integer                    :: c, j, n1, n2, nb, nc, n, nn
   integer                    :: v, n_vert, n_verts_in_buffers, i_nod
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3), dist
+  real                       :: surf_v(3)
 !------------------------------------------------------------------------------!
   include 'Front_Mod/Edge_Numbering.f90'
 !==============================================================================!
@@ -43,14 +38,13 @@
   nv   => Front % n_verts
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
-  A    => Sol % A
+  Elem => Front % Elem
   nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
   nn   =  Grid % n_nodes
 
   call Front % Initialize_Front()
-  call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
+  call Flow % Interpolate_Cells_To_Nodes(sharp % n, phi_n(1:nn))
 
 ! call Grid % Save_Debug_Vtu('phi_c',               &
 !                            scalar_cell=phi % n,   &
@@ -68,7 +62,7 @@
     do i_nod = 1, Grid % cells_n_nodes(c)
       n = Grid % cells_n(i_nod, c)
       if(Math % Approx_Real(phi_n(n), 0.5)) then
-        if(phi % n(c) < phi % o(c)) then
+        if(sharp % n(c) < sharp % o(c)) then
           phi_n(n) = 0.5 - MILI
         else
           phi_n(n) = 0.5 + MILI
@@ -77,34 +71,11 @@
     end do
   end do
 
-  !-----------------------------!
-  !   Smooth the VOF function   !
-  !-----------------------------!
-
-  ! Copy the values from phi % n to local variable
-  phi_o(-nb:nc) = phi % n(-nb:nc)
-  phi_c(-nb:nc) = phi % n(-nb:nc)
-
-  do run = 1, 16
-    phi_src(:) = 0.0
-    phi_cen(:) = 0.0
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 > 0) then
-        phi_src(c1) = phi_src(c1) + A % fc(s) * phi_c(c2)
-        phi_cen(c1) = phi_cen(c1) + A % fc(s)
-        phi_src(c2) = phi_src(c2) + A % fc(s) * phi_c(c1)
-        phi_cen(c2) = phi_cen(c2) + A % fc(s)
-      end if
-    end do
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
-      phi_c(c) = 0.1 * phi_c(c) + 0.9 * phi_src(c) / phi_cen(c)
-    end do
-  end do
-
-  phi % n(:) = phi_c(:)
-  call Flow % Grad_Variable(phi)
+  !---------------------------------------------!
+  !   Take gradients from the smooth function   !
+  !   These might be already computed - check   !
+  !---------------------------------------------!
+  call Flow % Grad_Variable(smooth)
 
   allocate(n_cells_v(Grid % n_cells))
   n_cells_v(:) = 0
@@ -172,9 +143,9 @@
     if(n_vert > 2) then
 
       ! Surface vector
-      surf_v(1) = phi % x(c)
-      surf_v(2) = phi % y(c)
-      surf_v(3) = phi % z(c)
+      surf_v(1) = smooth % x(c)
+      surf_v(2) = smooth % y(c)
+      surf_v(3) = smooth % z(c)
 
       ! If valid elements were formed (last parameter: enforce_triangles)
       if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v, .false.)
@@ -188,7 +159,7 @@
       end if
 
       ! Store at which cell the surface resides
-      elem(ne) % cell = c
+      Elem(ne) % cell = c
 
     end if
 
@@ -217,9 +188,9 @@
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Front % Find_Sides(verbose)
-  call Front % Find_Front_Elements(verbose)
-  call Front % Check_Elements(verbose)
+  call Front % Find_Sides(verbose)      ! Surf calls the same here
+  call Front % Find_Front_Elements()    ! Surf calls Find_Surf_Elements
+  call Front % Check_Elements(verbose)  ! Surf calls the same here
 
   !-----------------------------------------------!
   !   It used to find the nearest cell and node   !
@@ -227,7 +198,7 @@
   !-----------------------------------------------!
   n_verts_in_buffers = 0
   do v = 1, nv
-    call Front % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
+    call Front % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers, locally=.true.)
     call Front % Vert(v) % Find_Nearest_Node()
   end do
 
@@ -236,14 +207,9 @@
   !   Calculate geometrical quantities   !
   !                                      !
   !--------------------------------------!
-
-  ! Element geometry has changed, recompute geometrical quantities
   call Front % Find_Vertex_Elements()
   call Front % Calculate_Element_Centroids()
-  call Front % Calculate_Element_Normals(phi)
-
-  ! Restore the true values of phi
-  phi % n(:) = phi_o(:)
+  call Front % Calculate_Element_Normals(smooth)
 
   !-----------------------------------------------------------------!
   !                                                                 !
@@ -251,7 +217,7 @@
   !   (This is needed only for mass transfer problems with front)   !
   !                                                                 !
   !-----------------------------------------------------------------!
-  call Front % Mark_Cells_And_Faces(phi)
+  call Front % Mark_Cells_And_Faces(sharp)
 
   call Cpu_Timer % Stop('Creating_Front_From_Vof_Function')
 

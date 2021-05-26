@@ -1,35 +1,30 @@
 !==============================================================================!
-  subroutine Surf_Mod_Place_At_Var_Value(Surf, phi, Sol, phi_e, verbose)
+  subroutine Place_Surf_At_Value(Surf, sharp, smooth, phi_e, verbose)
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value phi_e                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_n   => r_node_01,  &  ! value at the static Grid nodes
-                      phi_c   => r_cell_01,  &  ! cell values of phi
-                      phi_o   => r_cell_02,  &  ! original values of phi
-                      phi_cen => r_cell_03,  &
-                      phi_src => r_cell_04
+  use Work_Mod, only: phi_n => r_node_01  ! value at the static Grid nodes
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Surf_Type),   target :: Surf
-  type(Var_Type),    target :: phi
-  type(Solver_Type), target :: Sol   ! needed for smoothing
+  class(Surf_Type),  target :: Surf
+  type(Var_Type),    target :: sharp
+  type(Var_Type),    target :: smooth
   real                      :: phi_e
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
   type(Vert_Type),   pointer :: Vert(:)
-  type(Elem_Type),   pointer :: elem(:)
-  type(Matrix_Type), pointer :: A
+  type(Elem_Type),   pointer :: Elem(:)
   integer,           pointer :: nv, ne
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, c1, c2, s, j, n1, n2, run, nb, nc, nn
+  integer                    :: c, j, n1, n2, nb, nc, nn
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3), dist
+  real                       :: surf_v(3)
 !------------------------------------------------------------------------------!
   include 'Surf_Mod/Edge_Numbering.f90'
 !==============================================================================!
@@ -42,42 +37,19 @@
   nv   => Surf % n_verts
   ne   => Surf % n_elems
   Vert => Surf % Vert
-  elem => Surf % elem
-  A    => Sol % A
+  Elem => Surf % Elem
   nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
   nn   =  Grid % n_nodes
 
-  call Flow % Interpolate_Cells_To_Nodes(phi % n, phi_n(1:nn))
+  call Surf % Initialize_Surf()
+  call Flow % Interpolate_Cells_To_Nodes(sharp % n, phi_n(1:nn))
 
-  !-----------------------------!
-  !   Smooth the VOF function   !
-  !-----------------------------!
-
-  ! Copy the values from phi % n to local variable
-  phi_o(-nb:nc) = phi % n(-nb:nc)
-  phi_c(-nb:nc) = phi % n(-nb:nc)
-
-  do run = 1, 16
-    phi_src(:) = 0.0
-    phi_cen(:) = 0.0
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 > 0) then
-        phi_src(c1) = phi_src(c1) + A % fc(s) * phi_c(c2)
-        phi_cen(c1) = phi_cen(c1) + A % fc(s)
-        phi_src(c2) = phi_src(c2) + A % fc(s) * phi_c(c1)
-        phi_cen(c2) = phi_cen(c2) + A % fc(s)
-      end if
-    end do
-    do c = 1, Grid % n_cells
-      phi_c(c) = 0.1 * phi_c(c) + 0.9 * phi_src(c) / phi_cen(c)
-    end do
-  end do
-
-  phi % n(:) = phi_c(:)
-  call Flow % Grad_Variable(phi)
+  !---------------------------------------------!
+  !   Take gradients from the smooth function   !
+  !   These might be already computed - check   !
+  !---------------------------------------------!
+  call Flow % Grad_Variable(smooth)
 
   allocate(n_cells_v(Grid % n_cells))
   n_cells_v(:) = 0
@@ -145,9 +117,9 @@
     if(n_vert > 0) then
 
       ! Surface vector
-      surf_v(1) = phi % x(c)
-      surf_v(2) = phi % y(c)
-      surf_v(3) = phi % z(c)
+      surf_v(1) = smooth % x(c)
+      surf_v(2) = smooth % y(c)
+      surf_v(3) = smooth % z(c)
 
       ! If valid elements were formed (last argument: enforce_triangles)
       if(n_vert .eq. 3) call Surf % Handle_3_Points(surf_v, .true.)
@@ -178,9 +150,9 @@
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Surf % Find_Sides(verbose)
-  call Surf % Find_Surf_Elements(verbose)
-  call Surf % Check_Elements(verbose)
+  call Surf % Find_Sides(verbose)          ! Front calls the same here
+  call Surf % Find_Surf_Elements(verbose)  ! Front calls Find_Front_Elements
+  call Surf % Check_Elements(verbose)      ! Front calls the same here
 
   !--------------------------------!
   !   Find nearest cell and node   !
@@ -191,56 +163,17 @@
     call Surf % Vert(v) % Find_Nearest_Node()
   end do
 
-  !-------------------------------!
-  !                               !
-  !   Calculate element normals   !
-  !                               !
-  !-------------------------------!
-  call Surf % Calculate_Element_Centroids()
-  call Surf % Calculate_Element_Normals(phi)
-
-  do j = 1, 3
-    call Surf % Relax_Topology()
-    call Surf % Smooth(phi, phi_e)
-  end do
-
-  !-> ! From this point ...
-  !-> do v = 1, nv
-  !->   dist = norm2( (/Surf % Vert(v) % x_n,  &
-  !->                   Surf % Vert(v) % y_n,  &
-  !->                   Surf % Vert(v) % z_n/) )
-  !->   Surf % Vert(v) % x_n = Surf % Vert(v) % x_n * 0.25 / dist
-  !->   Surf % Vert(v) % y_n = Surf % Vert(v) % y_n * 0.25 / dist
-  !->   Surf % Vert(v) % z_n = Surf % Vert(v) % z_n * 0.25 / dist
-  !-> end do
-  !-> n_verts_in_buffers = 0
-  !-> do v = 1, nv
-  !->   call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
-  !->   call Surf % Vert(v) % Find_Nearest_Node()
-  !-> end do
-  !-> ! ... down to here is just for development
-
-  ! Element geometry has changed, recompute geometrical quantities
+  !--------------------------------------!
+  !                                      !
+  !   Calculate geometrical quantities   !
+  !                                      !
+  !--------------------------------------!
   call Surf % Find_Vertex_Elements()
   call Surf % Calculate_Element_Centroids()
-  call Surf % Calculate_Element_Normals(phi)
-
-  ! Restore the true values of phi
-  phi % n(:) = phi_o(:)
+  call Surf % Calculate_Element_Normals(smooth)
 
   call Cpu_Timer % Stop('Creating_Surface_From_Vof_Function')
 
   return
-
-  ! The rest is still experimental
-  call Surf % Refine(4)
-  do j = 1, 3
-    call Surf % Relax_Topology()
-    call Surf % Smooth(phi, phi_e)
-  end do
-  do j = 1, 3
-    call Surf % Relax_Geometry()
-    call Surf % Smooth(phi, phi_e)
-  end do
 
   end subroutine

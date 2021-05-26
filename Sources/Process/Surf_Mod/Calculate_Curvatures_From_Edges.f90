@@ -14,7 +14,7 @@
   real, dimension(4)    :: b
   real, dimension(4)    :: phi
   integer, dimension(4) :: Vert
-  integer               :: i, j, k, e, c, s
+  integer               :: i, j, k, e, s
   logical               :: invertible
   real                  :: x, y, z, x2, y2, z2, xy, xz, yz, rho
 !==============================================================================!
@@ -24,10 +24,10 @@
   !      them to elements surrounding them       !
   !----------------------------------------------!
 
-  Surf % elem(1:Surf % n_elems) % curv = 0.0
-  Surf % elem(1:Surf % n_elems) % xc   = 0.0
-  Surf % elem(1:Surf % n_elems) % yc   = 0.0
-  Surf % elem(1:Surf % n_elems) % zc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % curv = 0.0
+  Surf % Elem(1:Surf % n_elems) % xc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % yc   = 0.0
+  Surf % Elem(1:Surf % n_elems) % zc   = 0.0
 
   do s = 1, Surf % n_sides
     Vert(1) = Surf % side(s) % a
@@ -79,30 +79,30 @@
       rho = PETA  ! some big number
     end if
 
-    Surf % elem(Surf % side(s) % ea) % curv =  &
-    Surf % elem(Surf % side(s) % ea) % curv + 1.0 / rho * ONE_THIRD
-    Surf % elem(Surf % side(s) % eb) % curv =  &
-    Surf % elem(Surf % side(s) % eb) % curv + 1.0 / rho * ONE_THIRD
+    Surf % Elem(Surf % side(s) % ea) % curv =  &
+    Surf % Elem(Surf % side(s) % ea) % curv + 1.0 / rho * ONE_THIRD
+    Surf % Elem(Surf % side(s) % eb) % curv =  &
+    Surf % Elem(Surf % side(s) % eb) % curv + 1.0 / rho * ONE_THIRD
 
     ! This looks kind of crude
-    Surf % elem(Surf % side(s) % ea) % xc =  &
-    Surf % elem(Surf % side(s) % ea) % xc + x * ONE_THIRD
-    Surf % elem(Surf % side(s) % ea) % yc =  &
-    Surf % elem(Surf % side(s) % ea) % yc + y * ONE_THIRD
-    Surf % elem(Surf % side(s) % ea) % zc =  &
-    Surf % elem(Surf % side(s) % ea) % zc + z * ONE_THIRD
-    Surf % elem(Surf % side(s) % eb) % xc =  &
-    Surf % elem(Surf % side(s) % eb) % xc + x * ONE_THIRD
-    Surf % elem(Surf % side(s) % eb) % yc =  &
-    Surf % elem(Surf % side(s) % eb) % yc + y * ONE_THIRD
-    Surf % elem(Surf % side(s) % eb) % zc =  &
-    Surf % elem(Surf % side(s) % eb) % zc + z * ONE_THIRD
+    Surf % Elem(Surf % side(s) % ea) % xc =  &
+    Surf % Elem(Surf % side(s) % ea) % xc + x * ONE_THIRD
+    Surf % Elem(Surf % side(s) % ea) % yc =  &
+    Surf % Elem(Surf % side(s) % ea) % yc + y * ONE_THIRD
+    Surf % Elem(Surf % side(s) % ea) % zc =  &
+    Surf % Elem(Surf % side(s) % ea) % zc + z * ONE_THIRD
+    Surf % Elem(Surf % side(s) % eb) % xc =  &
+    Surf % Elem(Surf % side(s) % eb) % xc + x * ONE_THIRD
+    Surf % Elem(Surf % side(s) % eb) % yc =  &
+    Surf % Elem(Surf % side(s) % eb) % yc + y * ONE_THIRD
+    Surf % Elem(Surf % side(s) % eb) % zc =  &
+    Surf % Elem(Surf % side(s) % eb) % zc + z * ONE_THIRD
   end do
 
   ! Compute average curvature (for debugging)
   ! rho = 0
   ! do e = 1, Surf % n_elems
-  !   rho = rho + Surf % elem(e) % curv
+  !   rho = rho + Surf % Elem(e) % curv
   ! end do
   ! rho = rho / Surf % n_elems
   ! print *, 'average curvature = ', rho
@@ -113,15 +113,15 @@
   Surf % Vert(1:Surf % n_verts) % curv = 0.
   do e = 1, Surf % n_elems
 
-    i = Surf % elem(e) % v(1)
-    j = Surf % elem(e) % v(2)
-    k = Surf % elem(e) % v(3)
+    i = Surf % Elem(e) % v(1)
+    j = Surf % Elem(e) % v(2)
+    k = Surf % Elem(e) % v(3)
     Surf % Vert(i) % curv = Surf % Vert(i) % curv  &
-                          + Surf % elem(e) % curv / real(Surf % Vert(i) % nne)
+                          + Surf % Elem(e) % curv / real(Surf % Vert(i) % nne)
     Surf % Vert(j) % curv = Surf % Vert(j) % curv  &
-                          + Surf % elem(e) % curv / real(Surf % Vert(j) % nne)
+                          + Surf % Elem(e) % curv / real(Surf % Vert(j) % nne)
     Surf % Vert(k) % curv = Surf % Vert(k) % curv  &
-                          + Surf % elem(e) % curv / real(Surf % Vert(k) % nne)
+                          + Surf % Elem(e) % curv / real(Surf % Vert(k) % nne)
   end do
 
   end subroutine

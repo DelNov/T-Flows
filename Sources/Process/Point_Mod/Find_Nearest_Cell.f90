@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Find_Nearest_Cell(Point, n_parts_in_buffers)
+  subroutine Find_Nearest_Cell(Point, n_parts_in_buffers, locally)
 !------------------------------------------------------------------------------!
 !   Finds a cell closest to the point                                          !
 !------------------------------------------------------------------------------!
@@ -7,10 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Point_Type), target :: Point
   integer                   :: n_parts_in_buffers
+  logical, optional         :: locally             ! only in your subdomain?
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: c, i_cel    ! cell, local cell
   integer                  :: cc, cb      ! closest cell and bnd. cell
+  logical                  :: local
   real                     :: xc, yc, zc  ! cell center coordinates
   real                     :: d_sq        ! distance squared
   real                     :: min_dc      ! minimum distance cell
@@ -21,6 +23,9 @@
 
   ! Take aliases
   Grid => Point % pnt_grid
+
+  local = .false.
+  if(present(locally)) local = locally
 
   ! Initialize cc and cb to zero (important)
   cc = 0
@@ -127,7 +132,7 @@
 
     Point % cell = cc
     min_dc_glob = min_dc
-    if(n_proc > 1) then
+    if(n_proc > 1 .and. .not. local) then
       call Comm_Mod_Global_Min_Real(min_dc_glob)
     end if
 
@@ -170,7 +175,7 @@
     !   Check if point is in this processor   !
     !-----------------------------------------!
     min_db_glob = min_db
-    if(n_proc > 1) then
+    if(n_proc > 1 .and. .not. local) then
       call Comm_Mod_Global_Min_Real(min_db_glob)
     end if
 

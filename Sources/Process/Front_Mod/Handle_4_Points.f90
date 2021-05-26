@@ -10,7 +10,7 @@
   logical                   :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
   integer                  :: ver(4), loop
   real                     :: v_21(3), v_31(3), v_41(3)
@@ -22,7 +22,7 @@
   nv   => Front % n_verts
   ne   => Front % n_elems
   Vert => Front % Vert
-  elem => Front % elem
+  Elem => Front % Elem
 
   permutations = reshape((/ &
     0, 1, 2, 3,  &
@@ -73,24 +73,24 @@
 
     ! One new element with four vertices
     ne = ne + 1
-    elem(ne) % nv = 4
-    elem(ne) % v(1:4) = ver(1:4)
+    Elem(ne) % nv = 4
+    Elem(ne) % v(1:4) = ver(1:4)
 
   else  ! only triangles allows
 
     ! One new element with three vertices
     ne = ne + 1
-    elem(ne) % nv = 3
-    elem(ne) % v(1) = ver(1)
-    elem(ne) % v(2) = ver(2)
-    elem(ne) % v(3) = ver(3)
+    Elem(ne) % nv = 3
+    Elem(ne) % v(1) = ver(1)
+    Elem(ne) % v(2) = ver(2)
+    Elem(ne) % v(3) = ver(3)
 
     ! Second new element with three vertices
     ne = ne + 1
-    elem(ne) % nv = 3
-    elem(ne) % v(1) = ver(1)
-    elem(ne) % v(2) = ver(3)
-    elem(ne) % v(3) = ver(4)
+    Elem(ne) % nv = 3
+    Elem(ne) % v(1) = ver(1)
+    Elem(ne) % v(2) = ver(3)
+    Elem(ne) % v(3) = ver(4)
 
   end if
 

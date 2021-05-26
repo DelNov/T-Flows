@@ -9,7 +9,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ns, ne
   integer                  :: s
 !==============================================================================!
@@ -20,7 +20,7 @@
   ne   => Surf % n_elems
   Vert => Surf % Vert
   side => Surf % side
-  elem => Surf % elem
+  Elem => Surf % Elem
 
   ! First find boundary sides
   side(1:ns) % boundary = .false.

@@ -19,7 +19,7 @@
   !-----------------------------!
   !   Deallocate all elements   !
   !-----------------------------!
-  deallocate(Surf % elem)
+  deallocate(Surf % Elem)
   Surf % n_elems = 0
 
   !-----------------------------!

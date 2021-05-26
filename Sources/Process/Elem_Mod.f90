@@ -26,6 +26,13 @@
     real    :: area
     real    :: curv
 
+    contains
+      procedure :: Initialize_Elem
+
   end type
+
+  contains
+
+  include 'Elem_Mod/Initialize_Elem.f90'
 
   end module

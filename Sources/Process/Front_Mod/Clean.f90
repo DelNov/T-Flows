@@ -11,7 +11,7 @@
   !-----------------------------!
   !   Deallocate all elements   !
   !-----------------------------!
-  deallocate(Front % elem)
+  deallocate(Front % Elem)
   Front % n_elems = 0
 
   !-----------------------------!
