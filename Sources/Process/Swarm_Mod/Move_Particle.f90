@@ -46,17 +46,14 @@
   fb_y => Part  % fb_y
   fb_z => Part  % fb_z
 
-  ! Characteristic viscosity (needs to be discussed yet)
-  ! (You can read it from the control file:
-  ! call Control_Mod_Dynamic_Viscosity   (visc_const)
-  ! call Control_Mod_Mass_Density        (dens_const)
-  ! The way it is implemented now it could be different in every processor)
-  visc_const = maxval(Flow % viscosity(:))
-  dens_const = maxval(Flow % density(:))
-
+  ! Take aliases for closest node, vell and boundary cell
   n  = Part % node      ! index of the closest node for cfl calculation
   c  = Part % cell      ! index of the closest cell for interpolation
   c2 = Part % bnd_cell  ! index of the closest boundary cell for reflection
+
+  ! Characteristic viscosity and density (needs to be discussed yet)
+  visc_const = Flow % viscosity(c)
+  dens_const = Flow % density(c)
 
   ! Vector which connects particle position and cell centre
   rx = Part % x_n - Grid % xc(c)

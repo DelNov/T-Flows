@@ -54,12 +54,12 @@
   t_c_y = 0.0
   t_c_z = 0.0
 
-  ! Characteristic velocity and density
-  visc_const = maxval(Flow % viscosity(:))
-  dens_const = maxval(Flow % density(:))
-
   ! Nearest cell center to particle
   c = Part % cell
+
+  ! Characteristic velocity and density (needs to be discussed)
+  visc_const = Flow % viscosity(c)
+  dens_const = Flow % density(c)
 
   ! Particle relaxation time (in this swarm)
   ! this needs to be calculated for the Grid once/ts and not for all
