@@ -15,8 +15,8 @@ PI = Acos(-1);
 D   =   1.0;     // cylinder diameter
 P   =   1.25;    // pitch
 H   =   D * PI;  // cylinder height
-N_C = 120;       // number of cells in circumferential direction
-N_H = 120;       // number of cells in z direction (height)
+N_C = 180;       // number of cells in circumferential direction
+N_H = 180;       // number of cells in z direction (height)
 
 // Computed parameters
 delta = D * PI / N_C;
@@ -55,6 +55,7 @@ Line  (8) = {7, 8};
 //------------
 Curve Loop(1) = {1, 5, 2, 6, 3, 7, 4, 8};
 Plane Surface(1) = {1};
+Recombine Surface(1);
 
 //-----------
 // Volume(s)
