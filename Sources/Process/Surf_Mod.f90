@@ -26,6 +26,7 @@
 
     contains
 
+      procedure :: Advance_Vertices
       procedure :: Allocate_Surf
       procedure :: Calculate_Curvatures_From_Edges
       procedure :: Calculate_Curvatures_From_Elems
@@ -50,7 +51,7 @@
 
   contains
 
-! include 'Surf_Mod/Advance_Vertices.f90'
+  include 'Surf_Mod/Advance_Vertices.f90'
   include 'Surf_Mod/Allocate_Surf.f90'
   include 'Surf_Mod/Clean.f90'
   include 'Surf_Mod/Calculate_Curvatures_From_Edges.f90'
@@ -70,6 +71,5 @@
 ! include 'Surf_Mod/Bounce_Particle.f90'
 ! include 'Surf_Mod/Check_Periodicity.f90'
 ! include 'Surf_Mod/Exchange_Particles.f90'
-! include 'Surf_Mod/Move_Particle.f90'
 
   end module
