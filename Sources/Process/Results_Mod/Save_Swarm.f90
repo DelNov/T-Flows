@@ -14,6 +14,7 @@
   type(Particle_Type), pointer :: part
   integer                      :: k, fu
   character(SL)                :: name_out
+  integer                      :: n_remaining_particles
 !-----------------------------[Local parameters]-------------------------------!
   character(len= 0)  :: IN_0 = ''           ! indentation levels
   character(len= 2)  :: IN_1 = '  '
@@ -33,6 +34,24 @@
   !    therefore it has to be refreshed     !
   !-----------------------------------------!
   call Swarm_Mod_Exchange_Particles(swarm)
+
+  !-------------------------------!
+  !   Count remaining particles   !
+  !-------------------------------!
+  n_remaining_particles = 0
+  do k = 1, swarm % n_particles
+    part => swarm % particle(k)
+    if(.not. part % escaped) then
+      n_remaining_particles = n_remaining_particles + 1
+    end if
+  end do
+
+  if(n_remaining_particles .eq. 0) then
+    if(this_proc < 2) then
+      print *, '# No particles remaining in the domain, nothing to save!'
+    end if
+    return
+  end if
 
   !----------------------------!
   !                            !
@@ -60,7 +79,7 @@
     write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
 
     write(fu,'(a,a,i0.0,a)')   &
-                IN_2, '<Piece NumberOfPoints="', swarm % n_particles,  &
+                IN_2, '<Piece NumberOfPoints="', n_remaining_particles,  &
                            '" NumberOfCells="0">'
 
     !-----------------------!
@@ -73,8 +92,10 @@
                             '="3" format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
+      if(.not. part % escaped) then
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
                   IN_5, part % x_n, part % y_n, part % z_n
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
     write(fu,'(a,a)') IN_3, '</Points>'
@@ -92,7 +113,10 @@
     write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' // &
                             'format="ascii">'
     do k = 1, swarm % n_particles
-      write(fu,'(a,i9)') IN_5, k
+      part => swarm % particle(k)
+      if(.not. part % escaped) then
+        write(fu,'(a,i9)') IN_5, k
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -103,7 +127,9 @@
                             'format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,i9)') IN_5, grid % comm % cell_glo(part % cell)
+      if(.not. part % escaped) then
+        write(fu,'(a,i9)') IN_5, grid % comm % cell_glo(part % cell)
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -114,7 +140,9 @@
                             'Name="ClosestBndCell" format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,i9)') IN_5, grid % comm % cell_glo(part % bnd_cell)
+      if(.not. part % escaped) then
+        write(fu,'(a,i9)') IN_5, grid % comm % cell_glo(part % bnd_cell)
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -125,8 +153,10 @@
                             ' NumberOfComponents="3" format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                         &
-                 IN_5, part % u, part % v, part % w
+      if(.not. part % escaped) then
+        write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                       &
+                   IN_5, part % u, part % v, part % w
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -138,8 +168,10 @@
                             ' format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-                 IN_5, sqrt(part % u**2 + part % v**2 + part % w**2)
+      if(.not. part % escaped) then
+        write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
+                   IN_5, sqrt(part % u**2 + part % v**2 + part % w**2)
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -151,7 +183,9 @@
                             ' format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)') IN_5, part % d
+      if(.not. part % escaped) then
+        write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)') IN_5, part % d
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -162,7 +196,9 @@
                             'format="ascii">'
     do k = 1, swarm % n_particles
       part => swarm % particle(k)
-      write(fu,'(a,i9)') IN_5, part % proc
+      if(.not. part % escaped) then
+        write(fu,'(a,i9)') IN_5, part % proc
+      end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
