@@ -540,8 +540,6 @@ function launch_process {
   # $1 - seq/par
   # $2 - number of threads
 
-  echo "  ->" $1
-
   if [ -z "${1+xxx}" ]; then 
     elog "Argument seq/par is not specified"
     exit 1
@@ -580,6 +578,7 @@ function generate_tests {
   elog "#   Running Generate tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Generate tests"
 
   clean_compile $GENE_DIR no # dir MPI
 
@@ -641,6 +640,7 @@ function convert_tests {
   elog "#   Running Convert tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Convert tests"
 
   clean_compile $CONV_DIR no # dir MPI
 
@@ -662,6 +662,7 @@ function divide_tests {
   elog "#   Running Divide tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Divide tests"
 
   clean_compile $DIVI_DIR no # dir MPI
 
@@ -905,6 +906,7 @@ function process_backup_tests {
   elog "#   Running Processor backup tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Processor backup tests"
 
   elog ""
   elog "#======================================================================"
@@ -1161,6 +1163,7 @@ function process_save_exit_now_tests {
   elog "#   Running Processor save_now and exit_now tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Processor save_now and exit_now tests"
 
   for CASE_DIR in ${ALL_SAVE_EXIT_NOW_TESTS[@]}; do
     process_save_exit_now_test \
@@ -1275,6 +1278,7 @@ function process_compilation_tests {
   elog "#   Running Processor compilation tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Processor compilation tests"
 
   for CASE_DIR in ${ALL_COMPILE_TESTS[@]}; do
     process_compilation_test $CASE_DIR
@@ -1411,6 +1415,7 @@ function process_full_length_tests {
   elog "#   Running Processor full simulation tests"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Processor full simulation tests"
 
   for i in ${!ALL_PROCESS_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_TESTS[$i]}"
@@ -1529,6 +1534,7 @@ function process_accuracy_tests {
   elog "#   Running Processor accuracy test check"
   elog "#"
   elog "#----------------------------------------------------------------------"
+  echo "#   Running Processor accuracy test check"
 
   for i in ${!ALL_PROCESS_ACCURACY_TESTS[@]}; do
     CASE_DIR="${ALL_PROCESS_ACCURACY_TESTS[$i]}"

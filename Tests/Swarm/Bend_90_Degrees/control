@@ -6,7 +6,7 @@
 
  NUMBER_OF_TIME_STEPS     6000
 
- RESULTS_SAVE_INTERVAL      60
+ RESULTS_SAVE_INTERVAL      10
  BACKUP_SAVE_INTERVAL     2000
 
  TIME_STEP                  0.00005
@@ -61,7 +61,7 @@
  TIME_INTEGRATION_SCHEME  linear
 
 # ADVECTION_SCHEME_FOR_MOMENTUM    upwind
- ADVECTION_SCHEME_FOR_MOMENTUM    central
+ ADVECTION_SCHEME_FOR_MOMENTUM     minmod
 
 #------------------------
 # Linear solver settings
