@@ -23,6 +23,7 @@
   !-----------------------------!
   do v = 1, MAX_SURFACE_VERTICES
     call Surf % Vert(v) % Initialize_Vert(Surf % pnt_grid)
+    Surf % Vert(v) % trapped = .true.
   end do
   Surf % n_verts = 0
 

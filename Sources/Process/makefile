@@ -197,6 +197,7 @@ SRC_MOD += Point_Mod.f90       \
            Elem_Mod.f90        \
            Side_Mod.f90        \
            Front_Mod.f90       \
+           Surf_Mod.f90        \
            Matrix_Mod.f90      \
            Vector_Mod.f90      \
            Solver_Mod.f90      \
@@ -207,10 +208,9 @@ SRC_MOD += Point_Mod.f90       \
            Eddies_Mod.f90      \
            Monitor_Mod.f90     \
            Turb_Mod.f90        \
+           Vof_Mod.f90         \
            Particle_Mod.f90    \
-           Swarm_Mod.f90       \
-           Surf_Mod.f90        \
-           Vof_Mod.f90
+           Swarm_Mod.f90
 
 # User_Mod should come before Results_Mod
 SRC_MOD += User_Mod.f90

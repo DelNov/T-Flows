@@ -17,11 +17,6 @@
   Vert % y_o = 0.0
   Vert % z_o = 0.0
 
-  ! Vertex's new velocity (if ever needed)
-  Vert % u_n = 0.0
-  Vert % v_n = 0.0
-  Vert % w_n = 0.0
-
   ! I forgot what these were, something for smoothing, I think
   Vert % sumx = 0.0
   Vert % sumy = 0.0
@@ -35,10 +30,11 @@
   ! The closest cell, node, boundary cell and face
   Vert % bnd_face = 0
 
-  ! Vertex departure from domain
-  Vert % escaped = .false.
-
   ! Curvature at the vertex
   Vert % curv = 0.0
+
+  Vert % deposited = .false. ! deposited on a wall (particles)
+  Vert % escaped   = .false. ! escaped from computational domain
+  Vert % trapped   = .false. ! trapped on a surface
 
   end subroutine

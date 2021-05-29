@@ -6,6 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Particle_Mod
   use Turb_Mod
+  use Vof_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -23,6 +24,7 @@
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
     type(Turb_Type),  pointer :: pnt_turb  ! turb field for which it is defined
+    type(Vof_Type),   pointer :: pnt_vof   ! vof, for three-phase situations
 
     integer                          :: n_particles = 0
     type(Particle_Type), allocatable :: Particle(:)
@@ -54,6 +56,7 @@
     real, allocatable :: n_reflected(:)
     real, allocatable :: n_deposited(:)
     real, allocatable :: n_escaped(:)
+    integer           :: n_trapped
 
     ! Particle statistics
     logical :: statistics
@@ -85,8 +88,17 @@
     ! (Keyword "parameter: not allowed inside a type
     ! declaration. One might think of making a function)
     integer :: N_I_VARS =  6
-    integer :: N_L_VARS =  2
-    integer :: N_R_VARS = 12
+    integer :: N_L_VARS =  3
+    integer :: N_R_VARS = 15
+
+    contains
+      procedure          :: Allocate_Swarm
+      procedure, private :: Bounce_Particle
+      procedure, private :: Move_Particle
+      procedure, private :: Move_Trapped
+      procedure, private :: Particle_Forces
+      procedure, private :: Trap_Particle
+
   end type
 
   !---------------------!
@@ -101,17 +113,19 @@
 
   ! Member procedures sorted alphabetically
   include 'Swarm_Mod/Advance_Particles.f90'
-  include 'Swarm_Mod/Allocate.f90'
+  include 'Swarm_Mod/Allocate_Swarm.f90'
   include 'Swarm_Mod/Bounce_Particle.f90'
   include 'Swarm_Mod/Calculate_Mean.f90'
   include 'Swarm_Mod/Check_Periodicity.f90'
   include 'Swarm_Mod/Exchange_Particles.f90'
   include 'Swarm_Mod/Grad_Modeled_Flow.f90'
   include 'Swarm_Mod/Move_Particle.f90'
+  include 'Swarm_Mod/Move_Trapped.f90'
   include 'Swarm_Mod/Particle_Forces.f90'
   include 'Swarm_Mod/Particle_Time_Scale.f90'
   include 'Swarm_Mod/Print_Statistics.f90'
   include 'Swarm_Mod/Sgs_Discrete_Random_Walk.f90'
   include 'Swarm_Mod/Sgs_Fukagata.f90'
+  include 'Swarm_Mod/Trap_Particle.f90'
 
   end module

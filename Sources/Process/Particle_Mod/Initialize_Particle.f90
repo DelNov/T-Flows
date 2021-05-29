@@ -53,6 +53,7 @@
   ! ... on the result of the call to Find_Nearest_Cell)
   Particle % deposited = .false.
   Particle % escaped   = .false.
+  Particle % trapped   = .false.
 
   ! Set some processor number to particle
   Particle % proc = min(1, n_proc)

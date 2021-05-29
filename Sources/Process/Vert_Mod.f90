@@ -19,11 +19,7 @@
     real :: y_o
     real :: z_o
 
-    ! Vertex's new velocity (if ever needed)
-    real :: u_n
-    real :: v_n
-    real :: w_n
-
+    ! Needed in smoothing
     real :: sumx, sumy, sumz
 
     integer :: nne       ! number of neighbouring elements
@@ -34,11 +30,13 @@
     ! The closest cell, node, boundary cell and face
     integer :: bnd_face
 
-    ! Vertex departure from domain
-    logical :: escaped
-
     ! Curvature at the vertex
     real :: curv
+
+    ! Needed for children, really
+    logical :: deposited  ! deposited on a wall (particles)
+    logical :: escaped    ! escaped from computational domain
+    logical :: trapped    ! trapped on a surface
 
     contains
       procedure :: Initialize_Vert

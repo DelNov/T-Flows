@@ -25,7 +25,7 @@
   real    :: zeta1, zeta2, zeta3        ! random numbers (0,1)
   real    :: sigma1, sigma2, sigma3     ! Gaussian random numbers
   real    :: c_o, c_mu                  ! model constants
-  real    :: visc_const, dens_const     ! C/c viscosity
+  real    :: visc_fluid, dens_fluid     ! C/c viscosity
   real    :: t_i_x, t_i_y, t_i_z        ! eddy life time
   real    :: t_e_x, t_e_y, t_e_z        ! instantaneoys eddy life time
   real    :: l_e_x, l_e_y, l_e_z        ! turbulent eddy length
@@ -58,13 +58,16 @@
   c = Part % cell
 
   ! Characteristic velocity and density (needs to be discussed)
-  visc_const = Flow % viscosity(c)
-  dens_const = Flow % density(c)
+  visc_fluid = Flow % viscosity(c)
+  dens_fluid = Flow % density(c)
+
+  ! Store it for saving
+  Part % dens_fluid = dens_fluid
 
   ! Particle relaxation time (in this swarm)
   ! this needs to be calculated for the Grid once/ts and not for all
   ! ...particles
-  swarm % tau = swarm % density * (swarm % diameter **2) / 18.0 / visc_const
+  swarm % tau = swarm % density * (swarm % diameter **2) / 18.0 / visc_fluid
 
   ! Mean life time of the turbulent eddy
   t_i_x = 1.0 / (6.0 * c_mu * abs(turb % eps % x(c)))
@@ -98,11 +101,11 @@
 
   ! Particle time scale
   tau_p_x = (4.0 * swarm % density * swarm % diameter)      &
-          / (3.0 * dens_const * Part % rel_u_mod * cd)
+          / (3.0 * dens_fluid * Part % rel_u_mod * cd)
   tau_p_y = (4.0 * swarm % density * swarm % diameter)      &
-          / (3.0 * dens_const * Part % rel_v_mod * cd)
+          / (3.0 * dens_fluid * Part % rel_v_mod * cd)
   tau_p_z = (4.0 * swarm % density * swarm % diameter)      &
-          / (3.0 * dens_const * Part % rel_w_mod * cd)
+          / (3.0 * dens_fluid * Part % rel_w_mod * cd)
 
   l1 = tau_p_x * Part % rel_u_mod
   l2 = tau_p_y * Part % rel_v_mod

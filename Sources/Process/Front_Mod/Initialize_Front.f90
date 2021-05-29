@@ -23,6 +23,7 @@
   !-----------------------------!
   do v = 1, MAX_SURFACE_VERTICES
     call Front % Vert(v) % Initialize_Vert(Front % pnt_grid)
+    Front % Vert(v) % trapped = .true.
   end do
   Front % n_verts = 0
 

@@ -24,6 +24,7 @@
   if(n_proc > 1) then
 
     swarm % i_work(:) = 0
+    swarm % l_work(:) = .false.
     swarm % r_work(:) = 0.0
 
     do k = 1, swarm % n_particles
@@ -44,6 +45,11 @@
         swarm % i_work(i + 5) = Grid % comm % cell_glo(Part % cell)
         swarm % i_work(i + 6) = Grid % comm % node_glo(Part % node)
 
+        i = (k-1) * swarm % N_L_VARS
+        swarm % l_work(i + 1) = Part % deposited
+        swarm % l_work(i + 2) = Part % escaped
+        swarm % l_work(i + 3) = Part % trapped
+
         i = (k-1) * swarm % N_R_VARS
         swarm % r_work(i +  1) = Part % x_n
         swarm % r_work(i +  2) = Part % y_n
@@ -56,6 +62,10 @@
         swarm % r_work(i +  9) = Part % w
         swarm % r_work(i + 10) = Part % d
         swarm % r_work(i + 11) = Part % cfl
+        swarm % r_work(i + 12) = Part % smooth_n
+        swarm % r_work(i + 13) = Part % smooth_o
+        swarm % r_work(i + 14) = Part % density
+        swarm % r_work(i + 15) = Part % dens_fluid
       end if
 
     end do    ! through particles
@@ -66,6 +76,9 @@
     call Comm_Mod_Global_Sum_Int_Array (                   &
                   swarm % n_particles * swarm % N_I_VARS,  &
                   swarm % i_work)
+    call Comm_Mod_Global_Lor_Log_Array (                   &
+                  swarm % n_particles * swarm % N_L_VARS,  &
+                  swarm % l_work)
     call Comm_Mod_Global_Sum_Real_Array(                   &
                   swarm % n_particles * swarm % N_R_VARS,  &
                   swarm % r_work)
@@ -121,19 +134,27 @@
         Part % proc = Part % buff
       end if
 
-      i = (k-1) * swarm % N_R_VARS
+      i = (k-1) * swarm % N_L_VARS
+      Part % deposited = swarm % l_work(i + 1)
+      Part % escaped   = swarm % l_work(i + 2)
+      Part % trapped   = swarm % l_work(i + 3)
 
-      Part % x_n = swarm % r_work(i +  1)
-      Part % y_n = swarm % r_work(i +  2)
-      Part % z_n = swarm % r_work(i +  3)
-      Part % x_o = swarm % r_work(i +  4)
-      Part % y_o = swarm % r_work(i +  5)
-      Part % z_o = swarm % r_work(i +  6)
-      Part % u   = swarm % r_work(i +  7)
-      Part % v   = swarm % r_work(i +  8)
-      Part % w   = swarm % r_work(i +  9)
-      Part % d   = swarm % r_work(i + 10)
-      Part % cfl = swarm % r_work(i + 11)
+      i = (k-1) * swarm % N_R_VARS
+      Part % x_n        = swarm % r_work(i +  1)
+      Part % y_n        = swarm % r_work(i +  2)
+      Part % z_n        = swarm % r_work(i +  3)
+      Part % x_o        = swarm % r_work(i +  4)
+      Part % y_o        = swarm % r_work(i +  5)
+      Part % z_o        = swarm % r_work(i +  6)
+      Part % u          = swarm % r_work(i +  7)
+      Part % v          = swarm % r_work(i +  8)
+      Part % w          = swarm % r_work(i +  9)
+      Part % d          = swarm % r_work(i + 10)
+      Part % cfl        = swarm % r_work(i + 11)
+      Part % smooth_n   = swarm % r_work(i + 12)
+      Part % smooth_o   = swarm % r_work(i + 13)
+      Part % density    = swarm % r_work(i + 14)
+      Part % dens_fluid = swarm % r_work(i + 15)
     end do
 
     !-------------------------------------------------------!

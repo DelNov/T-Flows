@@ -4,7 +4,7 @@
 !   Particle module used in Lagrangian particle tracking                       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Point_Mod
+  use Vert_Mod
   use Field_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -13,15 +13,10 @@
   !-------------------!
   !   Particle type   !
   !-------------------!
-  type, extends(Point_Type) :: Particle_Type
+  type, extends(Vert_Type) :: Particle_Type
 
     ! Flow field for which the particle is defined
     type(Field_Type), pointer :: pnt_flow
-
-    ! Particle's old coordinates.  (New ones are in the parent.)
-    real :: x_o
-    real :: y_o
-    real :: z_o
 
     ! Particle's velocity
     real :: u
@@ -30,6 +25,9 @@
 
     ! Particle's density
     real :: density
+
+    ! Density of surrounding fluid
+    real :: dens_fluid
 
     ! Particle's diameter
     real :: d
@@ -68,10 +66,9 @@
     real :: fd_x, fd_y, fd_z  ! drag force
     real :: fb_x, fb_y, fb_z  ! buoyant force
 
-    ! Particle deposition and departure from domain
-    ! (Should these be in the parent?  Time will tell.)
-    logical :: deposited
-    logical :: escaped
+    ! New and old value of smoothed vof
+    real :: smooth_n
+    real :: smooth_o
 
     contains
       procedure :: Initialize_Particle
