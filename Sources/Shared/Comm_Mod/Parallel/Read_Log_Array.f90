@@ -20,8 +20,8 @@
   ! Set it at position disp (same as in Write counterpart)
   call Mpi_File_Set_View(fh,             &
                          disp,           &
-                         MPI_LOGICAL,    &
-                         MPI_LOGICAL,    &
+                         MPI_LOGICAL8,   &
+                         MPI_LOGICAL8,   &
                          'native',       &
                          MPI_INFO_NULL,  &
                          error)
@@ -30,7 +30,7 @@
   call Mpi_File_Read(fh,                 &
                      arr(1),             &
                      length,             &
-                     MPI_LOGICAL,        &
+                     MPI_LOGICAL8,       &
                      MPI_STATUS_IGNORE,  &
                      error)
 
