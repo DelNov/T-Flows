@@ -181,4 +181,21 @@
 
   end if  ! closest node is (not) known
 
+  !------------------------------!
+  !                              !
+  !   Check if the particle is   !
+  !    really inside the cell    !
+  !     (Didn't really work)     !
+  !                              !
+  !------------------------------!
+  ! if(Point % proc .eq. this_proc                        &
+  !    .and. .not. Grid % Is_Point_In_Cell(Point % cell,  &
+  !                                        Point % x_n,   &
+  !                                        Point % y_n,   &
+  !                                        Point % z_n)) then
+  !   ! Mark it as -1, like invalid
+  !   Point % cell     = -1
+  !   Point % bnd_cell =  0
+  ! end if
+
   end subroutine
