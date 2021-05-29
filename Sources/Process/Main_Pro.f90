@@ -131,10 +131,10 @@
   !----------------------------------------------------------!
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
-    call Flow(d) % Allocate_Field(Grid(d))
+    call Flow(d)  % Allocate_Field(Grid(d))
     call Turb_Mod_Allocate(turb(d), Flow(d))
-    call Vof(d) % Allocate_Vof(Flow(d))
-    call Swarm_Mod_Allocate(Swarm(d), Flow(d), turb(d), Vof(d))
+    call Vof(d)   % Allocate_Vof(Flow(d))
+    call Swarm(d) % Allocate_Swarm(Flow(d), turb(d), Vof(d))
 
     ! Read time step from root
     call Control_Mod_Switch_To_Root()
