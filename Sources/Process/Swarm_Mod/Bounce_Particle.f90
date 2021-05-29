@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Bounce_Particle(swarm, k)
+  subroutine Bounce_Particle(Swarm, k)
 !------------------------------------------------------------------------------!
 !   Interpolates velocity at the particle's position                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: swarm
-  integer, intent(in)      :: k      ! particle number
+  class(Swarm_Type), target :: Swarm
+  integer, intent(in)       :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part
@@ -23,8 +23,8 @@
 !==============================================================================!
 
   ! Take aliases
-  Grid      => swarm % pnt_grid
-  Part      => swarm % particle(k)
+  Grid      => Swarm % pnt_grid
+  Part      => Swarm % particle(k)
   deposited => Part  % deposited
   escaped   => Part  % escaped
 
@@ -83,12 +83,12 @@
       do bs = 1, 16
 
         ! Move the particle back
-        part_x_n = Part % x_n - swarm % dt * Part % u * real(bs)
-        part_y_n = Part % y_n - swarm % dt * Part % v * real(bs)
-        part_z_n = Part % z_n - swarm % dt * Part % w * real(bs)
-        part_x_o = Part % x_o - swarm % dt * Part % u * real(bs)
-        part_y_o = Part % y_o - swarm % dt * Part % v * real(bs)
-        part_z_o = Part % z_o - swarm % dt * Part % w * real(bs)
+        part_x_n = Part % x_n - Swarm % dt * Part % u * real(bs)
+        part_y_n = Part % y_n - Swarm % dt * Part % v * real(bs)
+        part_z_n = Part % z_n - Swarm % dt * Part % w * real(bs)
+        part_x_o = Part % x_o - Swarm % dt * Part % u * real(bs)
+        part_y_o = Part % y_o - Swarm % dt * Part % v * real(bs)
+        part_z_o = Part % z_o - Swarm % dt * Part % w * real(bs)
 
         ! Vector connecting particle with boundary face center; new and old
         vec_new_face_dot_n = (part_x_n - Grid % xf(s)) * nx  &
@@ -173,10 +173,10 @@
          Grid % Bnd_Cond_Type( c2) == WALLFL) then
 
         ! Trap condition (deposition) >>> narrowed the tolerance  <<<
-        if(swarm % rst <= TINY .or. abs(vel_dot_n) <= MILI) then
+        if(Swarm % rst <= TINY .or. abs(vel_dot_n) <= MILI) then
 
           deposited = .true.
-          swarm % n_deposited(c2) = swarm % n_deposited(c2) + 1
+          Swarm % n_deposited(c2) = Swarm % n_deposited(c2) + 1
 
           print '(a,i6,a,1pe11.3,1pe11.3,1pe11.3)',  &
                 ' # Particle ', k, ' deposited at  : ', xi, yi, zi
@@ -202,21 +202,21 @@
           w_ref = Part % w - 2.0 * nz * vel_dot_n
 
           ! Set particle velocity to simply be the reflected (with restitution)
-          Part % u = u_ref * swarm % rst
-          Part % v = v_ref * swarm % rst
-          Part % w = w_ref * swarm % rst
+          Part % u = u_ref * Swarm % rst
+          Part % v = v_ref * Swarm % rst
+          Part % w = w_ref * Swarm % rst
 
           ! Place particle in reflected position
-          Part % x_n = xi + Part % u * swarm % dt * dsc_n
-          Part % y_n = yi + Part % v * swarm % dt * dsc_n
-          Part % z_n = zi + Part % w * swarm % dt * dsc_n
+          Part % x_n = xi + Part % u * Swarm % dt * dsc_n
+          Part % y_n = yi + Part % v * Swarm % dt * dsc_n
+          Part % z_n = zi + Part % w * Swarm % dt * dsc_n
 
-          Part % x_o = xi - Part % u * swarm % dt * dsc_o
-          Part % y_o = yi - Part % v * swarm % dt * dsc_o
-          Part % z_o = zi - Part % w * swarm % dt * dsc_o
+          Part % x_o = xi - Part % u * Swarm % dt * dsc_o
+          Part % y_o = yi - Part % v * Swarm % dt * dsc_o
+          Part % z_o = zi - Part % w * Swarm % dt * dsc_o
 
           ! Increasing the number of particle reflections
-          swarm % n_reflected(c2) = swarm % n_reflected(c2) + 1
+          Swarm % n_reflected(c2) = Swarm % n_reflected(c2) + 1
 
           ! Debug: write(this_proc*1000+k, '(a,2i7, 5(e12.4))')       &
           ! Debug:                         'time, part bounced at ',  &
@@ -234,7 +234,7 @@
          Grid % Bnd_Cond_Type( c2) == PRESSURE .or.  &
          Grid % Bnd_Cond_Type( c2) == CONVECT) then
         escaped = .true.
-        swarm % n_escaped(c2) = swarm % n_escaped(c2) + 1
+        Swarm % n_escaped(c2) = Swarm % n_escaped(c2) + 1
       end if  ! it is an outflow
 
     end if  ! crossed a boundary cell

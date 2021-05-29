@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Move_Particle(swarm, k)
+  subroutine Move_Particle(Swarm, k)
 !------------------------------------------------------------------------------!
 !   Updates particle velocity and position                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: swarm
-  integer                  :: k      ! particle number
+  class(Swarm_Type), target :: Swarm
+  integer, intent(in)       :: k      ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: Grid
@@ -23,8 +23,8 @@
   real                         :: k1, k2, k3, k4    ! Runge-Kutta increments
   real                         :: part_vel          ! relative velocity 
   real                         :: gravity           ! gravity magnitude
-  real                         :: visc_const        ! characteristic viscosity
-  real                         :: dens_const        ! characteristic density
+  real                         :: visc_fluid        ! characteristic viscosity
+  real                         :: dens_fluid        ! characteristic density
   real                         :: f_fx, f_fy, f_fz  ! Brownian force components
   real                         :: fd_p              ! particle damping funct.
   real                         :: v2_mod_xc, v2_mod_yc, v2_mod_zc
@@ -32,16 +32,16 @@
 !==============================================================================!
 
   ! Take aliases for Flow
-  Flow => swarm % pnt_flow
-  Grid => swarm % pnt_grid
-  turb => swarm % pnt_turb
+  Flow => Swarm % pnt_flow
+  Grid => Swarm % pnt_grid
+  turb => Swarm % pnt_turb
   call Flow % Alias_Momentum(u, v, w)
 
   ! Take aliases for turb
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
-  ! Take aliases for swarm
-  Part => swarm % particle(k)
+  ! Take aliases for Swarm
+  Part => Swarm % particle(k)
   fb_x => Part  % fb_x
   fb_y => Part  % fb_y
   fb_z => Part  % fb_z
@@ -52,8 +52,11 @@
   c2 = Part % bnd_cell  ! index of the closest boundary cell for reflection
 
   ! Characteristic viscosity and density (needs to be discussed yet)
-  visc_const = Flow % viscosity(c)
-  dens_const = Flow % density(c)
+  visc_fluid = Flow % viscosity(c)
+  dens_fluid = Flow % density(c)
+
+  ! Store fluid density for saving
+  Part % dens_fluid = dens_fluid
 
   ! Vector which connects particle position and cell centre
   rx = Part % x_n - Grid % xc(c)
@@ -92,12 +95,12 @@
   if(turb % model .eq. HYBRID_LES_RANS) then
 
     ! Modeled quantity "zeta" at particle location
-    v2_mod_xc = swarm % v2_mod_x(c) * rx
-    v2_mod_yc = swarm % v2_mod_y(c) * ry
-    v2_mod_zc = swarm % v2_mod_z(c) * rz
+    v2_mod_xc = Swarm % v2_mod_x(c) * rx
+    v2_mod_yc = Swarm % v2_mod_y(c) * ry
+    v2_mod_zc = Swarm % v2_mod_z(c) * rz
 
     ! Modeled wall-normal velocity component at particle location
-    w_mod = swarm % v2_mod(c)  &
+    w_mod = Swarm % v2_mod(c)  &
           + abs(v2_mod_xc)     &
           + abs(v2_mod_yc)     &
           + abs(v2_mod_zc)
@@ -105,12 +108,12 @@
 !    ! Simpler version of the modeled quantities'
 !    !   ad-hoc (No interpolation) "safer side"
 !    if(turb % y_plus(c) > 35.0) then
-!      w_mod = swarm % v2_mod(c) * fd_p
+!      w_mod = Swarm % v2_mod(c) * fd_p
 !    else 
-!      w_mod = swarm % v2_mod(c)
+!      w_mod = Swarm % v2_mod(c)
 !    end if 
 
-    if(swarm % subgrid_scale_model .eq. DISCRETE_RANDOM_WALK) then
+    if(Swarm % subgrid_scale_model .eq. DISCRETE_RANDOM_WALK) then
 
       ! Relative velocity components between particle and fluid
       Part % rel_u_mod = abs(Part % u - turb % u_mean(c))
@@ -124,13 +127,13 @@
       part_vel = sqrt(Part % u **2 + Part % v **2 + Part % w **2)
 
       ! Compute Reynolds number for calculating Cd
-      Part % re = dens_const * Part % d * abs(flow_vel - part_vel) / visc_const
+      Part % re = dens_fluid * Part % d * abs(flow_vel - part_vel) / visc_fluid
 
       ! Compute the drag factor f
       Part % f = 1.0 + 0.15 *(Part % re ** 0.687)
 
       ! Add stochasticity by SEIM model (for modeled tubulent quantities)
-      call Swarm_Mod_Sgs_Discrete_Random_Walk(swarm, k, rx, ry, rz)
+      call Swarm_Mod_Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
 
       ! Adding the stochastic part from the Random Walk model (SEIM)
       up = up + Part % u_drw
@@ -155,7 +158,7 @@
   part_vel = sqrt(Part % u **2 + Part % v **2 + Part % w **2)
 
   ! Particle relaxation time
-  Part % tau = Part % density * (Part % d **2) / 18.0 / visc_const
+  Part % tau = Part % density * (Part % d **2) / 18.0 / visc_fluid
 
   ! Particle terminal speed 
   gravity = sqrt(grav_x**2 + grav_y**2 + grav_z**2)
@@ -170,7 +173,7 @@
                         + Part % rel_w ** 2)
 
   ! Compute Reynolds number for calculating Cd
-  Part % re = dens_const * Part % d * abs(flow_vel - part_vel) / visc_const
+  Part % re = dens_fluid * Part % d * abs(flow_vel - part_vel) / visc_fluid
 
   ! Compute the drag factor f
   Part % f = 1.0 + 0.15 *(Part % re ** 0.687)
@@ -185,16 +188,16 @@
   !----------------------------!
   !   Compute buoyancy force   !
   !----------------------------!
-  fb_x = (1.0 - dens_const / Part % density) * grav_x
-  fb_y = (1.0 - dens_const / Part % density) * grav_y
-  fb_z = (1.0 - dens_const / Part % density) * grav_z
+  fb_x = (1.0 - dens_fluid / Part % density) * grav_x
+  fb_y = (1.0 - dens_fluid / Part % density) * grav_y
+  fb_z = (1.0 - dens_fluid / Part % density) * grav_z
 
   !------------------------!
   !   Fukagata SGS model   !
   !------------------------!
-  f_fx = swarm % f_fuka_x(c)
-  f_fy = swarm % f_fuka_y(c)
-  f_fz = swarm % f_fuka_z(c)
+  f_fx = Swarm % f_fuka_x(c)
+  f_fy = Swarm % f_fuka_y(c)
+  f_fz = Swarm % f_fuka_z(c)
 
   ! In the following we're accounting for only drag force & buoyancy force
   ! Attention: sign should be given to the gravity vector in the control file.
@@ -203,43 +206,43 @@
   !   Updating x-velocity   !
   !-------------------------!
   k1 = (Part % f * (up -  Part % u) / Part % tau) + fb_x + f_fx
-  k2 = (Part % f * (up - (Part % u + (k1*swarm % dt)*0.5)) / Part % tau)
-  k3 = (Part % f * (up - (Part % u + (k2*swarm % dt)*0.5)) / Part % tau)
-  k4 = (Part % f * (up - (Part % u +  k3*swarm % dt))      / Part % tau)
+  k2 = (Part % f * (up - (Part % u + (k1*Swarm % dt)*0.5)) / Part % tau)
+  k3 = (Part % f * (up - (Part % u + (k2*Swarm % dt)*0.5)) / Part % tau)
+  k4 = (Part % f * (up - (Part % u +  k3*Swarm % dt))      / Part % tau)
 
   ! X-velocity calculation
-  Part % u = Part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
+  Part % u = Part % u + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*Swarm % dt
 
   !-------------------------!
   !   Updating y-velocity   !
   !-------------------------!
   k1 = (Part % f * (vp -  Part % v) / Part % tau) + fb_y + f_fy
-  k2 = (Part % f * (vp - (Part % v + (k1*swarm % dt)*0.5)) / Part % tau)
-  k3 = (Part % f * (vp - (Part % v + (k2*swarm % dt)*0.5)) / Part % tau)
-  k4 = (Part % f * (vp - (Part % v +  k3*swarm % dt))      / Part % tau)
+  k2 = (Part % f * (vp - (Part % v + (k1*Swarm % dt)*0.5)) / Part % tau)
+  k3 = (Part % f * (vp - (Part % v + (k2*Swarm % dt)*0.5)) / Part % tau)
+  k4 = (Part % f * (vp - (Part % v +  k3*Swarm % dt))      / Part % tau)
 
   ! Y-velocity calculation
-  Part % v = Part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
+  Part % v = Part % v + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*Swarm % dt
 
   !-------------------------!
   !   Updating z-velocity   !
   !-------------------------!
   k1 = (Part % f * (wp -  Part % w) / Part % tau) + fb_z + f_fz
-  k2 = (Part % f * (wp - (Part % w + (k1*swarm % dt)*0.5)) / Part % tau)
-  k3 = (Part % f * (wp - (Part % w + (k2*swarm % dt)*0.5)) / Part % tau)
-  k4 = (Part % f * (wp - (Part % w +  k3*swarm % dt))      / Part % tau)
+  k2 = (Part % f * (wp - (Part % w + (k1*Swarm % dt)*0.5)) / Part % tau)
+  k3 = (Part % f * (wp - (Part % w + (k2*Swarm % dt)*0.5)) / Part % tau)
+  k4 = (Part % f * (wp - (Part % w +  k3*Swarm % dt))      / Part % tau)
 
   ! Z-velocity calculation
-  Part % w = Part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*swarm % dt
+  Part % w = Part % w + (ONE_SIXTH) * (k1 + 2.0*(k2+k3) + k4)*Swarm % dt
 
   !------------------------------------------------------------------!
   !   Compute the new position of particle with 1st order explicit   !
   !------------------------------------------------------------------!
 
   ! Update the particle position after reflection
-  Part % x_n = Part % x_n + Part % u * swarm % dt
-  Part % y_n = Part % y_n + Part % v * swarm % dt
-  Part % z_n = Part % z_n + Part % w * swarm % dt
+  Part % x_n = Part % x_n + Part % u * Swarm % dt
+  Part % y_n = Part % y_n + Part % v * Swarm % dt
+  Part % z_n = Part % z_n + Part % w * Swarm % dt
 
   ! Calculating particle displacement
   dsp = Math % Distance_Squared(Part % x_n, Part % y_n, Part % z_n, &
@@ -250,15 +253,15 @@
   dy = abs(Grid % yn(n) - Grid % yc(c)) * 2.0
   dz = abs(Grid % zn(n) - Grid % zc(c)) * 2.0
 
-  Part % cfl = max(abs(Part % u * swarm % dt) / dx,  &
-                   abs(Part % v * swarm % dt) / dy,  &
-                   abs(Part % w * swarm % dt) / dz)
+  Part % cfl = max(abs(Part % u * Swarm % dt) / dx,  &
+                   abs(Part % v * Swarm % dt) / dy,  &
+                   abs(Part % w * Swarm % dt) / dz)
 
   ! Particle stokes number
   ! St = tau_p/tau_f || tau_p = (rho_P*d_p^2)/18 mu || tau_f = nu/u_tau^2
   ! Should be done in a generic way by calling the friction velocity here...
   ! ... the used value used here is case_specific (Re_tau=590).
-  Part % st = swarm % density * (0.017046**2)       &
-            * (Part % d)**2 / 18.0 / visc_const**2
+  Part % st = Swarm % density * (0.017046**2)       &
+            * (Part % d)**2 / 18.0 / visc_fluid**2
 
   end subroutine

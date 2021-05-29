@@ -1,24 +1,24 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Particle_Forces(swarm, k)
+  subroutine Particle_Forces(Swarm, k)
 !------------------------------------------------------------------------------!
 !   Computes the forces exerted on the particle                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: swarm
-  integer                  :: k     ! particle number
+  class(Swarm_Type), target :: Swarm
+  integer, intent(in)       :: k     ! particle number
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Particle_Type), pointer :: Part
   real                         :: cd          ! drag coefficient
   real                         :: part_vol    ! particle volume
   real                         :: part_area   ! particle area
-  real                         :: dens_const  ! characteristic density 
+  real                         :: dens_fluid  ! characteristic density 
 !==============================================================================!
 
   ! Take aliases
-  Flow => swarm % pnt_flow
-  Part => swarm % particle(k)
+  Flow => Swarm % pnt_flow
+  Part => Swarm % particle(k)
 
   ! Particle surface area (assuming spherical shape)
   part_area =  PI * (Part % d ** 2)
@@ -37,7 +37,10 @@
   ! ...will be deducted from the total force.
 
   ! Characteristic density (needs to be discussed):
-  dens_const = Flow % density(Part % cell)
+  dens_fluid = Flow % density(Part % cell)
+
+  ! Store it for future saving
+  Part % dens_fluid = dens_fluid
 
   ! Compute drag coefficient
   if (Part % re .ge. 1000.0) then
@@ -49,8 +52,8 @@
   !-------------------------------------------------------------------!
   !   Compute the drag force (acting in particle counter direction)   !
   !-------------------------------------------------------------------!
-  Part % fd_x = .5 * cd * dens_const * part_area * Part % rel_vel * Part % rel_u
-  Part % fd_y = .5 * cd * dens_const * part_area * Part % rel_vel * Part % rel_v
-  Part % fd_z = .5 * cd * dens_const * part_area * Part % rel_vel * Part % rel_w
+  Part % fd_x = .5 * cd * dens_fluid * part_area * Part % rel_vel * Part % rel_u
+  Part % fd_y = .5 * cd * dens_fluid * part_area * Part % rel_vel * Part % rel_v
+  Part % fd_z = .5 * cd * dens_fluid * part_area * Part % rel_vel * Part % rel_w
 
   end subroutine
