@@ -47,14 +47,14 @@
     !                               !
     !-------------------------------!
 
-    !---------------------!
-    !   Created a front   !
-    !---------------------!
+    !--------------------!
+    !   Create a front   !
+    !--------------------!
     if(Vof % track_front) then
       call Vof % Front % Place_Front_At_Value(Vof % fun,     &
                                               Vof % smooth,  &
                                               0.5,           &
-                                              .true.)  ! don't print messages
+                                              .false.)  ! don't print messages
       call Vof % Front % Print_Front_Statistics()
     end if
 
@@ -68,7 +68,7 @@
                                             .true.)  ! don't print messages
       call Vof % Surf % Improve_Mesh_Quality(Vof % smooth,  &
                                              0.5,           &
-                                            .true.)  ! don't print messages
+                                            .true.)  ! print messages
 !     call Vof % Surf % Calculate_Curvatures_From_Elems()
       call Vof % Surf % Print_Front_Statistics()
     end if
