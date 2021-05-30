@@ -123,7 +123,6 @@ $(DIR_OBJECT)/Read_Control_Physical_Properties.o:\
 $(DIR_OBJECT)/Vof_Mod.o \
 Vof_Mod/*/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
-Swarm_Mod/Move_Trapped.OK \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
@@ -211,7 +210,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-- ./Front_Mod/Mark_Cells_And_Faces.f90
-#-- ./LOG.f90
 #-- ./Eddies_Mod.f90
 $(DIR_OBJECT)/Eddies_Mod.o:\
 $(DIR_OBJECT)/Math_Mod.o \
@@ -528,7 +526,6 @@ User_Mod/*.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
-Swarm_Mod/Move_Trapped.OK \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
@@ -635,7 +632,6 @@ Vof_Mod/*/*.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
-Swarm_Mod/Move_Trapped.OK \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/*.f90 \
@@ -792,7 +788,6 @@ $(DIR_OBJECT)/Vof_Mod.o \
 Vof_Mod/*/*.f90 \
 User_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
-Swarm_Mod/Move_Trapped.OK \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Interface_Mod.o \
 Interface_Mod/*.f90 
@@ -813,7 +808,6 @@ $(DIR_OBJECT)/Vof_Mod.o \
 Vof_Mod/*/*.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
-Swarm_Mod/Move_Trapped.OK \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Particle_Mod.o \
 Particle_Mod/*.f90 
