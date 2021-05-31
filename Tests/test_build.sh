@@ -79,6 +79,7 @@ MULTDOM_MEMBRANE_DIR=Rans/Membrane
 VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
 SWARM_ROD_BUNDLE_POLYHEDRAL_DIR=Swarm/Rod_Bundle_Polyhedral
+SWARM_VOF_THREE_PHASE_DIR=Swarm/Three_Phase_Flow
 
 LES_CHANNEL_180_LONG_DIR=Les/Channel_Re_Tau_180/Long_Domain
 LES_CHANNEL_180_PERIODIC_DIR=Les/Channel_Re_Tau_180/Periodic_Domain
@@ -117,6 +118,7 @@ ALL_COMPILE_TESTS=( \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
+                   "$SWARM_VOF_THREE_PHASE_DIR" \
                    "$LES_CHANNEL_180_LONG_DIR" \
                    "$LES_CHANNEL_180_PERIODIC_DIR" \
                    "$LES_PIPE_DIR" \
@@ -146,6 +148,7 @@ ALL_GENERATE_TESTS=( \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$MULTDOM_BACKSTEP_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
+                    "$SWARM_VOF_THREE_PHASE_DIR" \
                     "$LES_CHANNEL_180_LONG_DIR" \
                     "$LES_CHANNEL_180_PERIODIC_DIR" \
                     "$LES_RB_109_DIR" \
@@ -197,6 +200,7 @@ ALL_DIVIDE_TESTS=( \
                   "$SWARM_PERIODIC_CYL_DIR" \
                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                   "$VOF_RISING_BUBBLE_DIR" \
+                  "$SWARM_VOF_THREE_PHASE_DIR" \
                   "$LES_CHANNEL_180_LONG_DIR" \
                   "$LES_CHANNEL_180_PERIODIC_DIR" \
                   "$LES_PIPE_DIR" \
@@ -231,6 +235,7 @@ ALL_PROCESS_TESTS=( \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
+                   "$SWARM_VOF_THREE_PHASE_DIR" \
                    "$LES_PIPE_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
@@ -248,6 +253,7 @@ ALL_TURBULENCE_MODELS=( \
                        "k_eps_zeta_f" \
                        "rsm_hanjalic_jakirlic" \
                        "k_eps_zeta_f" \
+                       "none" \
                        "none" \
                        "none" \
                        "none" \
@@ -273,6 +279,7 @@ ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "no" \
                        "yes" \
+                       "yes" \
                        "no" \
                        "no" \
                        "no" \
@@ -294,6 +301,7 @@ ALL_PARTICLE_TRACKING=( \
                        "yes" \
                        "yes" \
                        "no" \
+                       "yes" \
                        "no" \
                        "no" \
                        "no" \
