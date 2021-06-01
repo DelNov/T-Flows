@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Improve_Mesh_Quality(Surf, smooth, phi_e, verbose)
+  subroutine Improve_Mesh_Quality(Surf, smooth, verbose)
 !------------------------------------------------------------------------------!
 !   Improves the mesh quality for the surface                                  !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,6 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type),  target :: Surf
   type(Var_Type),    target :: smooth
-  real, intent(in)          :: phi_e
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   integer :: j
@@ -22,7 +21,7 @@
   !--------------------------------------!
   do j = 1, 3
     call Surf % Relax_Topology()
-    call Surf % Smooth(smooth, phi_e)
+    call Surf % Smooth(smooth)
   end do
 
   !-> ! From this point ...
@@ -52,11 +51,11 @@
   call Surf % Refine(4)
   do j = 1, 3
     call Surf % Relax_Topology()
-    call Surf % Smooth(smooth, phi_e)
+    call Surf % Smooth(smooth)
   end do
   do j = 1, 3
     call Surf % Relax_Geometry()
-    call Surf % Smooth(smooth, phi_e)
+    call Surf % Smooth(smooth)
   end do
 
   end subroutine

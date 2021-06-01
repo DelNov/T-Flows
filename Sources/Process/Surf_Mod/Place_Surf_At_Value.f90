@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Place_Surf_At_Value(Surf, sharp, smooth, phi_e, verbose)
+  subroutine Place_Surf_At_Value(Surf, sharp, smooth, verbose)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value phi_e                          !
+!   Places surface where variable phi has value 0.5                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: phi_n => r_node_01  ! value at the static Grid nodes
@@ -11,7 +11,6 @@
   class(Surf_Type),  target :: Surf
   type(Var_Type),    target :: sharp
   type(Var_Type),    target :: smooth
-  real                      :: phi_e
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -84,7 +83,7 @@
       phi2 = phi_n(n2)
 
       ! There is a vertex between these two edges
-      if( ((phi2-phi_e) * (phi_e-phi1)) >= MICRO ) then
+      if( ((phi2 - 0.5) * (0.5 - phi1)) >= MICRO ) then
         n_cells_v(c) = n_cells_v(c) + 1
 
         nv = nv + 1
@@ -99,7 +98,7 @@
         yn2 = Grid % yn(n2)
         zn2 = Grid % zn(n2)
 
-        w1 = abs(phi2-phi_e) / abs(phi2-phi1)
+        w1 = abs(phi2 - 0.5) / abs(phi2 - phi1)
         w2 = 1.0 - w1
 
         ! All vertices have to be stored

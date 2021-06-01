@@ -1,11 +1,10 @@
 !==============================================================================!
-  subroutine Smooth(Surf, phi, phi_e)
+  subroutine Smooth(Surf, phi)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
   type(Var_Type),   target :: phi
-  real                     :: phi_e
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: Vert(:)
@@ -117,7 +116,7 @@
                            + dy * phi % y(c)  &
                            + dz * phi % z(c)
 
-        dm = (phi_e - phi_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
+        dm = (0.5 - phi_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
 
         dx = dm * nx
         dy = dm * ny
