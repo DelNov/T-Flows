@@ -36,12 +36,12 @@
       procedure :: Improve_Mesh_Quality
       procedure :: Initialize_Surf
       procedure :: Place_Surf_At_Value
-      procedure :: Refine
-      procedure :: Relax_Geometry
-      procedure :: Relax_Topology
-      procedure :: Split_Element
-      procedure :: Swap_Side
-      procedure :: Smooth
+      procedure, private :: Refine
+      procedure, private :: Relax_Geometry
+      procedure, private :: Relax_Topology
+      procedure, private :: Smooth_Surf
+      procedure, private :: Split_Element
+      procedure, private :: Swap_Side
 
   end type
 
@@ -65,9 +65,9 @@
   include 'Surf_Mod/Refine.f90'
   include 'Surf_Mod/Relax_Geometry.f90'
   include 'Surf_Mod/Relax_Topology.f90'
+  include 'Surf_Mod/Smooth_Surf.f90'
   include 'Surf_Mod/Split_Element.f90'
   include 'Surf_Mod/Swap_Side.f90'
-  include 'Surf_Mod/Smooth.f90'
 ! include 'Surf_Mod/Bounce_Particle.f90'
 ! include 'Surf_Mod/Check_Periodicity.f90'
 ! include 'Surf_Mod/Exchange_Particles.f90'

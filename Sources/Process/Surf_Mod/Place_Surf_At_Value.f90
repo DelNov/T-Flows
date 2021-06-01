@@ -162,6 +162,27 @@
     call Surf % Vert(v) % Find_Nearest_Node()
   end do
 
+  !--------------------------------------------!
+  !   Store the value of the smooth function   !
+  !      and its gradients in the vertex       !
+  !--------------------------------------------!
+  do v = 1, nv
+    c = Surf % Vert(v) % cell  ! get nearest cell
+    Surf % Vert(v) % smooth   = smooth % n(c)
+    Surf % Vert(v) % smooth_x = smooth % x(c)
+    Surf % Vert(v) % smooth_y = smooth % y(c)
+    Surf % Vert(v) % smooth_z = smooth % z(c)
+    IF(V .EQ. 108) THEN
+      PRINT *, 'NEAREST CELL: ', C
+      print *, smooth % x(c),  &
+               smooth % y(c),  &
+               smooth % z(c)
+      print *, Surf % Vert(v) % smooth_x,  &
+               Surf % Vert(v) % smooth_y,  &
+               Surf % Vert(v) % smooth_z
+    END IF
+  end do
+
   !--------------------------------------!
   !                                      !
   !   Calculate geometrical quantities   !

@@ -21,7 +21,7 @@
   !--------------------------------------!
   do j = 1, 3
     call Surf % Relax_Topology()
-    call Surf % Smooth(smooth)
+    call Surf % Smooth_Surf(smooth)
   end do
 
   !-> ! From this point ...
@@ -47,15 +47,15 @@
 
   return
 
-  ! The rest is still experimental
-  call Surf % Refine(4)
-  do j = 1, 3
-    call Surf % Relax_Topology()
-    call Surf % Smooth(smooth)
-  end do
-  do j = 1, 3
-    call Surf % Relax_Geometry()
-    call Surf % Smooth(smooth)
-  end do
+  !-> ! The rest is still experimental
+  !-> call Surf % Refine(4)
+  !-> do j = 1, 3
+  !->   call Surf % Relax_Topology()
+  !->   call Surf % Smooth(smooth)
+  !-> end do
+  !-> do j = 1, 3
+  !->   call Surf % Relax_Geometry()
+  !->   call Surf % Smooth(smooth)
+  !-> end do
 
   end subroutine

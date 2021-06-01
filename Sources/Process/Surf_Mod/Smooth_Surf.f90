@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine Smooth(Surf, phi)
+  subroutine Smooth_Surf(Surf, smooth)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
-  type(Var_Type),   target :: phi
+  type(Var_Type),   target :: smooth
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: Vert(:)
@@ -79,6 +79,11 @@
         Vert(v) % z_n = Vert(v) % sumz / Vert(v) % nne
         call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
         call Surf % Vert(v) % Find_Nearest_Node()
+        c = Vert(v) % cell
+        Surf % Vert(v) % smooth   = smooth % n(c)
+        Surf % Vert(v) % smooth_x = smooth % x(c)
+        Surf % Vert(v) % smooth_y = smooth % y(c)
+        Surf % Vert(v) % smooth_z = smooth % z(c)
       end if
 
     end do
@@ -103,20 +108,24 @@
         zc = Grid % zc(c)
 
         ! Surface normal
-        phi_m = sqrt(phi % x(c)**2 + phi % y(c)**2 + phi % z(c)**2)
-        nx = phi % x(c) / phi_m
-        ny = phi % y(c) / phi_m
-        nz = phi % z(c) / phi_m
+        phi_m = sqrt(  Vert(v) % smooth_x**2  &
+                     + Vert(v) % smooth_y**2  &
+                     + Vert(v) % smooth_z**2)
+        nx = Vert(v) % smooth_x / phi_m
+        ny = Vert(v) % smooth_y / phi_m
+        nz = Vert(v) % smooth_z / phi_m
 
         ! Value at current vertex position
         dx = Vert(v) % x_n - xc
         dy = Vert(v) % y_n - yc
         dz = Vert(v) % z_n - zc
-        phi_v = phi % n(c) + dx * phi % x(c)  &
-                           + dy * phi % y(c)  &
-                           + dz * phi % z(c)
+        phi_v = Vert(v) % smooth + dx * Vert(v) % smooth_x  &
+                                 + dy * Vert(v) % smooth_y  &
+                                 + dz * Vert(v) % smooth_z
 
-        dm = (0.5 - phi_v) / (phi % x(c)*nx + phi % y(c)*ny + phi % z(c)*nz)
+        dm = (0.5 - phi_v) / (  Vert(v) % smooth_x*nx  &
+                              + Vert(v) % smooth_y*ny  &
+                              + Vert(v) % smooth_z*nz)
 
         dx = dm * nx
         dy = dm * ny
@@ -130,12 +139,20 @@
         dx = Vert(v) % x_n - xc
         dy = Vert(v) % y_n - yc
         dz = Vert(v) % z_n - zc
-        phi_v = phi % n(c) + dx * phi % x(c)  &
-                           + dy * phi % y(c)  &
-                           + dz * phi % z(c)
+        phi_v = Vert(v) % smooth + dx * Vert(v) % smooth_x  &
+                                 + dy * Vert(v) % smooth_y  &
+                                 + dz * Vert(v) % smooth_z
 
         call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
         call Surf % Vert(v) % Find_Nearest_Node()
+        c = Vert(v) % cell
+        Surf % Vert(v) % smooth   = smooth % n(c)
+        Surf % Vert(v) % smooth_x = smooth % x(c)
+        Surf % Vert(v) % smooth_y = smooth % y(c)
+        Surf % Vert(v) % smooth_z = smooth % z(c)
+        IF(V .EQ. 108) THEN
+          PRINT *, 'NEAREST CELL 2: ', VERT(V) % CELL
+        END IF
 
       end if  ! if vertex is on a boundary
 

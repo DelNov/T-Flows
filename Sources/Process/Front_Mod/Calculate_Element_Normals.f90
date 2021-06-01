@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Calculate_Element_Normals(Front, phi)
+  subroutine Calculate_Element_Normals(Front)
 !------------------------------------------------------------------------------!
 !   Calculates element normals                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
-  type(Var_Type),    target :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)
@@ -73,9 +72,9 @@
       c = Vert(Elem(e) % v(j)) % cell
 
       ! Surface vector
-      surf_v(1) = phi % x(c)
-      surf_v(2) = phi % y(c)
-      surf_v(3) = phi % z(c)
+      surf_v(1) = Vert(Elem(e) % v(j)) % smooth_x
+      surf_v(2) = Vert(Elem(e) % v(j)) % smooth_y
+      surf_v(3) = Vert(Elem(e) % v(j)) % smooth_z
 
       if(dot_product(surf_v, tri_v) < 0.0) then
         print *, '# Error, element ', e, 'is not properly oriented!'

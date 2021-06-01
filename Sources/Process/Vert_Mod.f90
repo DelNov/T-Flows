@@ -38,6 +38,8 @@
     logical :: escaped    ! escaped from computational domain
     logical :: trapped    ! trapped on a surface
 
+    real :: smooth, smooth_x, smooth_y, smooth_z
+
     contains
       procedure :: Initialize_Vert
 
