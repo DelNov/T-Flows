@@ -13,6 +13,9 @@
   Surf % pnt_flow => Flow
   Surf % pnt_grid => Flow % pnt_grid
 
+  ! Surf shares surface mesh among processors
+  Surf % mesh_divided = .false.
+
   ! Allocate memory
   allocate(Surf % Elem(MAX_SURFACE_ELEMENTS))
   allocate(Surf % Vert(MAX_SURFACE_VERTICES))

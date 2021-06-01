@@ -35,6 +35,10 @@
     type(Elem_Type), allocatable :: elem(:)
     type(Side_Type), allocatable :: side(:)
 
+    ! Is the mesh divided among processors (like in Front_Type)
+    ! or is it shared among all of them (like in Surf_Type)
+    logical :: mesh_divided
+
     ! Front to static Grid connectivity
     integer, allocatable :: cell_at_elem(:)
     integer, allocatable :: face_at_elem(:,:)

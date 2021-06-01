@@ -16,11 +16,8 @@
   Front % pnt_flow => Flow
   Front % pnt_grid => Flow % pnt_grid
 
-  ! Take aliases
-  Grid => Flow % pnt_grid
-  nb   =  Grid % n_bnd_cells
-  nc   =  Grid % n_cells
-  nf   =  Grid % n_faces
+  ! Front divides the surface mesh among processors
+  Front % mesh_divided = .true.
 
   ! Allocate memory
   allocate(Front % Elem(MAX_SURFACE_ELEMENTS))
@@ -28,6 +25,11 @@
   allocate(Front % side(MAX_SURFACE_ELEMENTS * 3))
 
   if(Flow % mass_transfer) then
+    Grid => Flow % pnt_grid
+    nb   =  Grid % n_bnd_cells
+    nc   =  Grid % n_cells
+    nf   =  Grid % n_faces
+
     allocate(Front % cell_at_elem(-nb:nc)); Front % cell_at_elem(-nb:nc) = 0
     allocate(Front % face_at_elem(  2,nf)); Front % face_at_elem(  :, :) = 0
   end if
