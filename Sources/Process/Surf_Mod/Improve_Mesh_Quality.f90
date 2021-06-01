@@ -43,7 +43,7 @@
   ! Element geometry has changed, recompute geometrical quantities
   call Surf % Find_Vertex_Elements()
   call Surf % Calculate_Element_Centroids()
-  call Surf % Calculate_Element_Normals(smooth)
+  call Surf % Calculate_Element_Normals()
 
   return
 

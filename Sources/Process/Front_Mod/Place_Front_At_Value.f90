@@ -208,7 +208,7 @@
   !--------------------------------------!
   call Front % Find_Vertex_Elements()
   call Front % Calculate_Element_Centroids()
-  call Front % Calculate_Element_Normals(smooth)
+  call Front % Calculate_Element_Normals()
 
   !-----------------------------------------------------------------!
   !                                                                 !

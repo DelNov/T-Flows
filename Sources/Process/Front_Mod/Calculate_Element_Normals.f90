@@ -10,7 +10,7 @@
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: c, e, j, v1, v2, i_ver
+  integer                  :: e, j, v1, v2, i_ver
   real                     :: surf_v(3)
   real                     :: a(3), b(3), tri_v(3), area_x2
 !==============================================================================!
@@ -67,9 +67,6 @@
     Elem(e) % nz = Elem(e) % sz / Elem(e) % area
 
     do j = 1, 3
-
-      ! Take the closest cell
-      c = Vert(Elem(e) % v(j)) % cell
 
       ! Surface vector
       surf_v(1) = Vert(Elem(e) % v(j)) % smooth_x

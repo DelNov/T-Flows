@@ -150,9 +150,6 @@
         Surf % Vert(v) % smooth_x = smooth % x(c)
         Surf % Vert(v) % smooth_y = smooth % y(c)
         Surf % Vert(v) % smooth_z = smooth % z(c)
-        IF(V .EQ. 108) THEN
-          PRINT *, 'NEAREST CELL 2: ', VERT(V) % CELL
-        END IF
 
       end if  ! if vertex is on a boundary
 

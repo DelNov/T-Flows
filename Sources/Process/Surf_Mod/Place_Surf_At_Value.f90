@@ -172,15 +172,6 @@
     Surf % Vert(v) % smooth_x = smooth % x(c)
     Surf % Vert(v) % smooth_y = smooth % y(c)
     Surf % Vert(v) % smooth_z = smooth % z(c)
-    IF(V .EQ. 108) THEN
-      PRINT *, 'NEAREST CELL: ', C
-      print *, smooth % x(c),  &
-               smooth % y(c),  &
-               smooth % z(c)
-      print *, Surf % Vert(v) % smooth_x,  &
-               Surf % Vert(v) % smooth_y,  &
-               Surf % Vert(v) % smooth_z
-    END IF
   end do
 
   !--------------------------------------!
@@ -190,7 +181,7 @@
   !--------------------------------------!
   call Surf % Find_Vertex_Elements()
   call Surf % Calculate_Element_Centroids()
-  call Surf % Calculate_Element_Normals(smooth)
+  call Surf % Calculate_Element_Normals()
 
   call Cpu_Timer % Stop('Creating_Surface_From_Vof_Function')
 

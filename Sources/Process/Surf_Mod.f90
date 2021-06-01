@@ -45,6 +45,7 @@
 
   end type
 
+  ! These are still not used
   integer, allocatable :: i_work(:)
   logical, allocatable :: l_work(:)
   real,    allocatable :: r_work(:)

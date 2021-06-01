@@ -38,6 +38,8 @@
     logical :: escaped    ! escaped from computational domain
     logical :: trapped    ! trapped on a surface
 
+    ! Store values of the smoothed vof and
+    ! its gradients from the nearest cells
     real :: smooth, smooth_x, smooth_y, smooth_z
 
     contains
