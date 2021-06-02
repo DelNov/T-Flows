@@ -12,8 +12,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, i_nod, j_nod
   real    :: xf(MAX_FACES_N_NODES), yf(MAX_FACES_N_NODES), zf(MAX_FACES_N_NODES)
-  real    :: x_cell_1, y_cell_1, z_cell_1, dv_1
-  real    :: x_cell_2, y_cell_2, z_cell_2, dv_2
+  real    :: x_cell_1, y_cell_1, z_cell_1
+  real    :: x_cell_2, y_cell_2, z_cell_2
 !==============================================================================!
 
   ! (Re)initialize cell volumes

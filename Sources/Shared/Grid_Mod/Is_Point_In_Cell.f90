@@ -10,7 +10,6 @@
   real,    intent(in)      :: xp, yp, zp
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, i_fac, cnt_in
-  integer :: inside_c(MAX_CELLS_N_FACES)
   real    :: nx, ny, nz, xf, yf, zf, dot_prod
 !==============================================================================!
 
