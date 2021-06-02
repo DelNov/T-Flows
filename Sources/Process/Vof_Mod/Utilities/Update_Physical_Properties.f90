@@ -10,7 +10,7 @@
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: col
-  integer                   :: c, s, c1, c2
+  integer                   :: c
 !==============================================================================!
 
   ! Take aliases

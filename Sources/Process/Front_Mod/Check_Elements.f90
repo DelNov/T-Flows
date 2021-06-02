@@ -1,25 +1,20 @@
 !==============================================================================!
-  subroutine Check_Elements(Front, verbose)
+  subroutine Check_Elements(Front)
 !------------------------------------------------------------------------------!
 !   Finds connectivity for sides and elements                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
-  logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: Elem(:)
-  integer,         pointer :: nv, ns, ne
+  integer,         pointer :: ne
   integer                  :: e, sum_ijk, sum_cd, i_ver, i_s
 !==============================================================================!
 
   ! Take aliases
-  nv   => Front % n_verts
-  ns   => Front % n_sides
   ne   => Front % n_elems
-  Vert => Front % Vert
   side => Front % side
   Elem => Front % Elem
 

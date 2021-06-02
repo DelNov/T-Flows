@@ -26,7 +26,7 @@
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w
   type(Face_Type), pointer :: v_flux
-  integer                  :: s, e, c, c1, c2
+  integer                  :: s, c1, c2
   real                     :: fac, area_in, area_out
   real                     :: vol_outflow, area_outflow
 !==============================================================================!

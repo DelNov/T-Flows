@@ -11,19 +11,19 @@
   real                      :: phi_c( -Flow % pnt_grid % n_bnd_cells:  &
                                        Flow % pnt_grid % n_cells)
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
-  integer                  :: s, c, c1, c2
+  type(Grid_Type), pointer :: Grid
+  integer                  :: s, c1, c2
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Refresh buffers for gradient components was here, but it is not needed
 
   ! Perform harmonic average on all faces
-  do s = 1, grid % n_faces
-    c1  = grid % faces_c(1, s)
-    c2  = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces
+    c1  = Grid % faces_c(1, s)
+    c2  = Grid % faces_c(2, s)
 
     if(c2 > 0) then
       phi_f(s) = Math % Harmonic_Mean(phi_c(c1), phi_c(c2))

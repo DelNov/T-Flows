@@ -29,12 +29,9 @@
     do corr_steps = 1, Flow % n_piso_corrections
       Flow % i_corr = corr_steps
 
-      ! All velocity components one after another
       call Compute_Momentum(Flow, turb, Vof, Sol, ini)
-
       call Compute_Pressure(Flow, Vof, Sol, ini)
-
-      call Correct_Velocity(Flow, turb, Vof, Sol, ini)
+      call Correct_Velocity(Flow, Vof, Sol, ini)
     end do
 
     Flow % piso_status = .false.

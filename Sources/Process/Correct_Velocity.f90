@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(Flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
@@ -22,8 +21,8 @@
   type(Matrix_Type), pointer :: A               ! pressure matrix
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  integer                    :: c, c1, c2, s, i_fac
-  real                       :: cfl_t, pe_t, dens_f, visc_f, dt, wght
+  integer                    :: c, c1, c2, s
+  real                       :: cfl_t, pe_t, dens_f, visc_f, dt
 !==============================================================================!
 
   call Cpu_Timer % Start('Correct_Velocity')

@@ -35,7 +35,7 @@
   real                       :: a12, fs
   real                       :: u_fo, v_fo, w_fo
   real                       :: stens_source
-  real                       :: factor2, correction, k_f, sigma
+  real                       :: k_f, sigma
   real                       :: px_f, py_f, pz_f
 !==============================================================================!
 

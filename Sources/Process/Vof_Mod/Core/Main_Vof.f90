@@ -64,8 +64,7 @@
       call Vof % Surf % Place_Surf_At_Value(Vof % fun,     &
                                             Vof % smooth,  &
                                             .true.)  ! don't print messages
-      call Vof % Surf % Improve_Mesh_Quality(Vof % smooth,  &
-                                            .true.)  ! print messages
+      call Vof % Surf % Improve_Mesh_Quality(Vof % smooth)
 !     call Vof % Surf % Calculate_Curvatures_From_Elems()
       call Vof % Surf % Print_Front_Statistics()
     end if

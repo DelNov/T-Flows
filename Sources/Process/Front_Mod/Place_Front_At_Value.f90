@@ -147,7 +147,7 @@
       surf_v(3) = smooth % z(c)
 
       ! If valid elements were formed (last parameter: enforce_triangles)
-      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v, .false.)
+      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v)
       if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v, .false.)
       if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v, .false.)
       if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v, .false.)
@@ -187,9 +187,9 @@
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Front % Find_Sides(verbose)      ! Surf calls the same here
-  call Front % Find_Front_Elements()    ! Surf calls Find_Surf_Elements
-  call Front % Check_Elements(verbose)  ! Surf calls the same here
+  call Front % Find_Sides(verbose)    ! Surf calls the same here
+  call Front % Find_Front_Elements()  ! Surf calls Find_Surf_Elements
+  call Front % Check_Elements()       ! Surf calls the same here
 
   !-----------------------------------------------!
   !   It used to find the nearest cell and node   !

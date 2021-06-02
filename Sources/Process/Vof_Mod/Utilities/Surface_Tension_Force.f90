@@ -48,11 +48,8 @@
   type(Field_Type),  pointer :: flow
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: col
-  type(Face_Type),   pointer :: v_flux
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
-  integer                    :: s, c, c1, c2
-  real                       :: fs
-  real                       :: u_f, v_f, w_f
+  integer                    :: c
 !==============================================================================!
 
   ! Get out of here if surface tension is neglected
@@ -65,7 +62,6 @@
   surf_fx => Vof % surf_fx
   surf_fy => Vof % surf_fy
   surf_fz => Vof % surf_fz
-  v_flux  => flow % v_flux
   ! Don't do what you once did in the line which follows this comment,
   ! it is plain silly as the smoothed (convoluted) variant of the vof
   ! function is used just for estimation of normals and curvatures.

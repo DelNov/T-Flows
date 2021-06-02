@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Find_Surf_Elements(Surf, verbose)
+  subroutine Find_Surf_Elements(Surf)
 !------------------------------------------------------------------------------!
 !   Compresses sides' list                                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type), target :: Surf
-  logical                  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)

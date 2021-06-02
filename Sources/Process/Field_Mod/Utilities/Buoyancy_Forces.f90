@@ -23,7 +23,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: t
-  integer                    :: c, c1, c2, s, c1g, c2g
+  integer                    :: c, c1, c2, s
   real                       :: xic1, xic2, temp_f
   real,              pointer :: grav_i
   real, contiguous,  pointer :: xic(:), xif(:), si(:), dxi(:)

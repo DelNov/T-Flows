@@ -327,7 +327,7 @@
         call Compute_Pressure(Flow(d), Vof(d), Sol(d), curr_dt, ini)
 
         call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
-        call Correct_Velocity(Flow(d), turb(d), Vof(d), Sol(d), curr_dt, ini)
+        call Correct_Velocity(Flow(d), Vof(d), Sol(d), curr_dt, ini)
 
         call Piso_Algorithm(Flow(d), turb(d), Vof(d), Sol(d), ini)
 

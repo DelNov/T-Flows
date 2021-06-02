@@ -23,7 +23,6 @@
   type(Grid_Type), pointer :: Grid
   integer                  :: s, c, c1, c2
   integer                  :: i_fac, c1_prim, c2_prim, s_prim
-  real                     :: res
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: YES = 1
   integer, parameter :: NO  = YES-1

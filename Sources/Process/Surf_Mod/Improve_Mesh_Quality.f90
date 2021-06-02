@@ -1,16 +1,12 @@
 !==============================================================================!
-  subroutine Improve_Mesh_Quality(Surf, smooth, verbose)
+  subroutine Improve_Mesh_Quality(Surf, smooth)
 !------------------------------------------------------------------------------!
 !   Improves the mesh quality for the surface                                  !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_n => r_node_01  ! value at the static Grid nodes
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type),  target :: Surf
-  type(Var_Type),    target :: smooth
-  logical                   :: verbose
+  class(Surf_Type), target :: Surf
+  type(Var_Type),   target :: smooth
 !-----------------------------------[Locals]-----------------------------------!
   integer :: j
 !==============================================================================!
@@ -44,8 +40,6 @@
   call Surf % Find_Vertex_Elements()
   call Surf % Calculate_Element_Centroids()
   call Surf % Calculate_Element_Normals()
-
-  return
 
   !-> ! The rest is still experimental
   !-> call Surf % Refine(4)
