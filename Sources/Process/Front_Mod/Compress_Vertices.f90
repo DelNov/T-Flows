@@ -104,7 +104,9 @@
   ! Store compressed number of vertices
   nv     = n_vert
   nv_tot = n_vert
-  call Comm_Mod_Global_Sum_Int(nv_tot)
+  if(Front % mesh_divided) then
+    call Comm_Mod_Global_Sum_Int(nv_tot)
+  end if
   if(verbose .and. this_proc < 2) then
     print '(a40,i8)', ' # Compressed number of vertices:       ', nv_tot
   end if

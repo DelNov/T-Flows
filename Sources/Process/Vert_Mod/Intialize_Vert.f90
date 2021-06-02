@@ -37,4 +37,13 @@
   Vert % escaped   = .false. ! escaped from computational domain
   Vert % trapped   = .false. ! trapped on a surface
 
+  Vert % smooth   = 0.0
+  Vert % smooth_x = 0.0
+  Vert % smooth_y = 0.0
+  Vert % smooth_z = 0.0
+
+  Vert % cell_x = 0.0
+  Vert % cell_y = 0.0
+  Vert % cell_z = 0.0
+
   end subroutine

@@ -62,7 +62,7 @@
   !   Browse through all cells in search of surface vertices   !
   !                                                            !
   !------------------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
 
     n_vert = 0
 
@@ -121,7 +121,7 @@
       surf_v(3) = smooth % z(c)
 
       ! If valid elements were formed (last argument: enforce_triangles)
-      if(n_vert .eq. 3) call Surf % Handle_3_Points(surf_v, .true.)
+      if(n_vert .eq. 3) call Surf % Handle_3_Points(surf_v)
       if(n_vert .eq. 4) call Surf % Handle_4_Points(surf_v, .true.)
       if(n_vert .eq. 5) call Surf % Handle_5_Points(surf_v, .true.)
       if(n_vert .eq. 6) call Surf % Handle_6_Points(surf_v, .true.)
@@ -132,9 +132,16 @@
     end if
 
   end do
-  if(verbose) then
-    print '(a40,i8)', ' # Cummulative number of elements found:', ne
-    print '(a40,i8)', ' # Cummulative number of vertices found:', nv
+
+  !-----------------------------------------------------------------------!
+  !                                                                       !
+  !   At this point, each processor has its own vertices and some of      !
+  !   them are, of course, duplicate.  Elements, on the other hand,       !
+  !   should be unique since buffer cells are avoided in the loop above   !
+  !                                                                       !
+  !-----------------------------------------------------------------------!
+  if(n_proc > 1) then
+    call Surf % Distribute_Mesh(verbose)
   end if
 
   !-----------------------!
@@ -149,9 +156,9 @@
   !   Find and check connectivity   !
   !                                 !
   !---------------------------------!
-  call Surf % Find_Sides(verbose)          ! Front calls the same here
-  call Surf % Find_Surf_Elements(verbose)  ! Front calls Find_Front_Elements
-  call Surf % Check_Elements(verbose)      ! Front calls the same here
+  call Surf % Find_Sides(verbose)   ! Front calls the same here
+  call Surf % Find_Surf_Elements()  ! Front calls Find_Front_Elements
+  call Surf % Check_Elements()      ! Front calls the same here
 
   !--------------------------------!
   !   Find nearest cell and node   !
@@ -166,13 +173,7 @@
   !   Store the value of the smooth function   !
   !      and its gradients in the vertex       !
   !--------------------------------------------!
-  do v = 1, nv
-    c = Surf % Vert(v) % cell  ! get nearest cell
-    Surf % Vert(v) % smooth   = smooth % n(c)
-    Surf % Vert(v) % smooth_x = smooth % x(c)
-    Surf % Vert(v) % smooth_y = smooth % y(c)
-    Surf % Vert(v) % smooth_z = smooth % z(c)
-  end do
+  call Surf % Distribute_Smooth(smooth)
 
   !--------------------------------------!
   !                                      !

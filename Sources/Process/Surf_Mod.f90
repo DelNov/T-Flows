@@ -18,11 +18,8 @@
     logical, allocatable :: cell_has_vertex(:)
 
     ! Working arrays, buffers for parallel version
-    ! (Keyword "parameter: not allowed inside a type
-    ! declaration. One might think of making a function)
-    integer :: N_I_VARS = 3
-    integer :: N_L_VARS = 2
-    integer :: N_R_VARS = 8
+    integer, allocatable :: buff_i(:), buff_j(:), buff_k(:), buff_n(:)
+    real,    allocatable :: buff_x(:), buff_y(:), buff_z(:), buff_v(:)
 
     contains
 
@@ -36,6 +33,9 @@
       procedure :: Improve_Mesh_Quality
       procedure :: Initialize_Surf
       procedure :: Place_Surf_At_Value
+      procedure, private :: Distribute_Mesh
+      procedure, private :: Distribute_Smooth
+      procedure, private :: Distribute_Cell_Coords
       procedure, private :: Refine
       procedure, private :: Relax_Geometry
       procedure, private :: Relax_Topology
@@ -44,11 +44,6 @@
       procedure, private :: Swap_Side
 
   end type
-
-  ! These are still not used
-  integer, allocatable :: i_work(:)
-  logical, allocatable :: l_work(:)
-  real,    allocatable :: r_work(:)
 
   contains
 
@@ -63,6 +58,9 @@
   include 'Surf_Mod/Improve_Mesh_Quality.f90'
   include 'Surf_Mod/Initialize_Surf.f90'
   include 'Surf_Mod/Place_Surf_At_Value.f90'
+  include 'Surf_Mod/Distribute_Mesh.f90'
+  include 'Surf_Mod/Distribute_Smooth.f90'
+  include 'Surf_Mod/Distribute_Cell_Coords.f90'
   include 'Surf_Mod/Refine.f90'
   include 'Surf_Mod/Relax_Geometry.f90'
   include 'Surf_Mod/Relax_Topology.f90'
@@ -71,6 +69,5 @@
   include 'Surf_Mod/Swap_Side.f90'
 ! include 'Surf_Mod/Bounce_Particle.f90'
 ! include 'Surf_Mod/Check_Periodicity.f90'
-! include 'Surf_Mod/Exchange_Particles.f90'
 
   end module

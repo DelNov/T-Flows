@@ -50,8 +50,10 @@
   if(verbose) then
     ne_tot = ne
     ns_tot = n_side
-    call Comm_Mod_Global_Sum_Int(ne_tot)
-    call Comm_Mod_Global_Sum_Int(ns_tot)
+    if(Front % mesh_divided) then
+      call Comm_Mod_Global_Sum_Int(ne_tot)
+      call Comm_Mod_Global_Sum_Int(ns_tot)
+    end if
     if(this_proc < 2) then
       print '(a40,i8)', ' # Number of elements:                  ', ne_tot
       print '(a40,i8)', ' # Tentative number of sides:           ', ns_tot
@@ -193,9 +195,11 @@
     ns_tot = ns
     cnt_two_tot = cnt_two
     cnt_one_tot = cnt_one
-    call Comm_Mod_Global_Sum_Int(ns_tot)
-    call Comm_Mod_Global_Sum_Int(cnt_two_tot)
-    call Comm_Mod_Global_Sum_Int(cnt_one_tot)
+    if(Front % mesh_divided) then
+      call Comm_Mod_Global_Sum_Int(ns_tot)
+      call Comm_Mod_Global_Sum_Int(cnt_two_tot)
+      call Comm_Mod_Global_Sum_Int(cnt_one_tot)
+    end if
 
     if(this_proc < 2) then
       print '(a40,i8)', ' # Compressed number of sides:          ', ns_tot

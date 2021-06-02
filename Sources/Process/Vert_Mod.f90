@@ -42,6 +42,9 @@
     ! its gradients from the nearest cells
     real :: smooth, smooth_x, smooth_y, smooth_z
 
+    ! Store closest cell coordinates
+    real :: cell_x, cell_y, cell_z
+
     contains
       procedure :: Initialize_Vert
 

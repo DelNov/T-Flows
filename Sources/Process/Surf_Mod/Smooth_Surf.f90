@@ -10,9 +10,9 @@
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)
   type(Side_Type), pointer :: side(:)
+  integer,         pointer :: nv, ne, ns
   integer                  :: it_smooth, s, v, e, c
   integer                  :: n_verts_in_buffers
-  integer,         pointer :: nv, ne, ns
   real                     :: xc, yc, zc
   real                     :: nx, ny, nz, phi_m, dx, dy, dz, dm
   real                     :: phi_v
@@ -69,6 +69,7 @@
     end do
 
     ! Move the vertices to their new positions
+    n_verts_in_buffers = 0
     do v = 1, nv
 
       ! This is how I check if vertex is on a boundary.  Maybe there
@@ -79,14 +80,13 @@
         Vert(v) % z_n = Vert(v) % sumz / Vert(v) % nne
         call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
         call Surf % Vert(v) % Find_Nearest_Node()
-        c = Vert(v) % cell
-        Surf % Vert(v) % smooth   = smooth % n(c)
-        Surf % Vert(v) % smooth_x = smooth % x(c)
-        Surf % Vert(v) % smooth_y = smooth % y(c)
-        Surf % Vert(v) % smooth_z = smooth % z(c)
       end if
 
     end do
+
+    ! Re-distribute "smooth" after moving the vertices
+    call Surf % Distribute_Smooth(smooth)
+    call Surf % Distribute_Cell_Coords()
 
     ! Re-initalize the sums
     Vert(1:nv) % sumx = 0.0
@@ -94,6 +94,7 @@
     Vert(1:nv) % sumz = 0.0
 
     ! Correct vertex position
+    n_verts_in_buffers = 0
     do v = 1, nv
 
       ! This is how I check if vertex is on a boundary.  Maybe there
@@ -103,9 +104,9 @@
         c = Vert(v) % cell
 
         ! Cell coordinates
-        xc = Grid % xc(c)
-        yc = Grid % yc(c)
-        zc = Grid % zc(c)
+        xc = Vert(v) % cell_x
+        yc = Vert(v) % cell_y
+        zc = Vert(v) % cell_z
 
         ! Surface normal
         phi_m = sqrt(  Vert(v) % smooth_x**2  &
@@ -145,15 +146,14 @@
 
         call Surf % Vert(v) % Find_Nearest_Cell(n_verts_in_buffers)
         call Surf % Vert(v) % Find_Nearest_Node()
-        c = Vert(v) % cell
-        Surf % Vert(v) % smooth   = smooth % n(c)
-        Surf % Vert(v) % smooth_x = smooth % x(c)
-        Surf % Vert(v) % smooth_y = smooth % y(c)
-        Surf % Vert(v) % smooth_z = smooth % z(c)
 
       end if  ! if vertex is on a boundary
 
     end do
+
+    ! Re-distribute "smooth" after moving the vertices
+    call Surf % Distribute_Smooth(smooth)
+    call Surf % Distribute_Cell_Coords()
 
   end do  ! smoothing iterations
 

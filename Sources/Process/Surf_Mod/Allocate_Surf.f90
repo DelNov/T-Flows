@@ -26,11 +26,15 @@
   allocate(Surf % cell_has_vertex(Surf % pnt_grid % n_cells))
   Surf % cell_has_vertex(:) = .false.
 
-  ! Allocate memory for working arrays
-  ! (Not used yet, will be used in parallel version)
-  ! allocate(i_work(Surf % n_verts * Surf % N_I_VARS))
-  ! allocate(l_work(Surf % n_verts * Surf % N_L_VARS))
-  ! allocate(r_work(Surf % n_verts * Surf % N_R_VARS))
+  ! Allocate memory for buffers
+  allocate(Surf % buff_x(MAX_SURFACE_VERTICES));  Surf % buff_x(:) = 0.0
+  allocate(Surf % buff_y(MAX_SURFACE_VERTICES));  Surf % buff_y(:) = 0.0
+  allocate(Surf % buff_z(MAX_SURFACE_VERTICES));  Surf % buff_z(:) = 0.0
+  allocate(Surf % buff_v(MAX_SURFACE_VERTICES));  Surf % buff_v(:) = 0.0
+  allocate(Surf % buff_i(MAX_SURFACE_ELEMENTS));  Surf % buff_i(:) = 0
+  allocate(Surf % buff_j(MAX_SURFACE_ELEMENTS));  Surf % buff_j(:) = 0
+  allocate(Surf % buff_k(MAX_SURFACE_ELEMENTS));  Surf % buff_k(:) = 0
+  allocate(Surf % buff_n(MAX_SURFACE_ELEMENTS));  Surf % buff_n(:) = 0
 
   ! Initialize surf's local variables
   call Surf % Initialize_Surf()

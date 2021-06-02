@@ -29,7 +29,9 @@
   Elem => Front % Elem
 
   nv_tot = nv
-  call Comm_Mod_Global_Sum_Int(nv_tot)
+  if(Front % mesh_divided) then
+    call Comm_Mod_Global_Sum_Int(nv_tot)
+  end if
 
   !--------------------------!
   !   Compute side lengths   !
@@ -66,7 +68,9 @@
   do e = 1, ne
     tot_area = tot_area + Elem(e) % area
   end do
-  call Comm_Mod_Global_Sum_Real(tot_area)
+  if(Front % mesh_divided) then
+    call Comm_Mod_Global_Sum_Real(tot_area)
+  end if
 
   !--------------------------------!
   !   Count number of neighbours   !
@@ -79,9 +83,11 @@
   do v = 1, nv
     nne(Vert(v) % nne) = nne(Vert(v) % nne) + 1.0
   end do
-  do item = nne_s, nne_e
-    call Comm_Mod_Global_Sum_Real(nne(item))
-  end do
+  if(Front % mesh_divided) then
+    do item = nne_s, nne_e
+      call Comm_Mod_Global_Sum_Real(nne(item))
+    end do
+  end if
 
   !------------------------------------------!
   !   Work out values for parellel version   !
@@ -89,9 +95,11 @@
   n_elems_tot = Front % n_elems
   n_verts_tot = Front % n_verts
   n_sides_tot = Front % n_sides
-  call Comm_Mod_Global_Sum_Int(n_elems_tot)
-  call Comm_Mod_Global_Sum_Int(n_verts_tot)
-  call Comm_Mod_Global_Sum_Int(n_sides_tot)
+  if(Front % mesh_divided) then
+    call Comm_Mod_Global_Sum_Int(n_elems_tot)
+    call Comm_Mod_Global_Sum_Int(n_verts_tot)
+    call Comm_Mod_Global_Sum_Int(n_sides_tot)
+  end if
 
   max_l = maxval(side(1:ns) % length)
   min_l = minval(side(1:ns) % length)
