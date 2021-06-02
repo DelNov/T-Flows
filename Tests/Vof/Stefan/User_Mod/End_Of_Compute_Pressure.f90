@@ -25,8 +25,8 @@
   do c = 1, Grid % n_cells
 
     ! Find relevant cell
-    if( Math_Mod_Approx_Real(Grid % yc(c), 0.0) .and.  &
-        Math_Mod_Approx_Real(Grid % zc(c), 0.0) ) then
+    if( Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
+        Math % Approx_Real(Grid % zc(c), 0.0) ) then
       x_ref = Grid % xc(c)
       p_ref  = p  % n(c)
       pp_ref = pp % n(c)
@@ -34,7 +34,7 @@
       ! Browse through all other cells and homogenize the values
       do d = 1, Grid % n_cells
         if(d .ne. c) then
-          if(Math_Mod_Approx_Real(Grid % xc(d), x_ref)) then
+          if(Math % Approx_Real(Grid % xc(d), x_ref)) then
             p  % n(d) = p_ref
             pp % n(d) = pp_ref
           end if

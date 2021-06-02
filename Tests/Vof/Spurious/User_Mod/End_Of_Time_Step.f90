@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm, n,    &
+  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, Swarm, n,    &
                                        n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function computes position of contact line and high of droplet        !
@@ -14,13 +14,13 @@
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n         ! time step
   integer, intent(in)      :: n_stat_t
   integer, intent(in)      :: n_stat_p
   real,    intent(in)      :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
   integer                  :: s, c, c1, c2, last_cell, fu, n_tot_cells, c_dist
   real                     :: pos_mcl, h_drop !position mcl, droplet height
@@ -36,7 +36,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   fun  => Vof % fun
 
   epsloc = epsilon(epsloc)
@@ -50,15 +50,15 @@
 
   ! Find max and min vfractions, to limit pressure calculation:
 
-  min_vfrac = minval(fun % n(1:grid % n_cells - grid % comm % n_buff_cells))
-  max_vfrac = maxval(fun % n(1:grid % n_cells - grid % comm % n_buff_cells))
+  min_vfrac = minval(fun % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
+  max_vfrac = maxval(fun % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
 
   call Comm_Mod_Global_Min_Real(min_vfrac)
   call Comm_Mod_Global_Max_Real(max_vfrac)
 
-  n_tot_cells = grid % n_cells - grid % comm % n_buff_cells
+  n_tot_cells = Grid % n_cells - Grid % comm % n_buff_cells
 
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
     u_res = sqrt( Flow % u % n(c) ** 2       &
                 + Flow % v % n(c) ** 2       &
                 + Flow % w % n(c) ** 2)
@@ -66,16 +66,16 @@
     u_rms = u_rms + u_res ** 2.0
 
     if (abs(max_vfrac - fun % n(c)) < epsloc) then
-      a_in = a_in + grid % vol(c)
-      p_in = p_in + Flow % p % n(c) * grid % vol(c)
+      a_in = a_in + Grid % vol(c)
+      p_in = p_in + Flow % p % n(c) * Grid % vol(c)
     end if
 
     if (abs(fun % n(c)) < min_vfrac + epsloc) then
-      a_out = a_out + grid % vol(c)
-      p_out = p_out + Flow % p % n(c) * grid % vol(c)
+      a_out = a_out + Grid % vol(c)
+      p_out = p_out + Flow % p % n(c) * Grid % vol(c)
     end if
 
-    a_vof = a_vof + grid % vol(c) * fun % n(c)
+    a_vof = a_vof + Grid % vol(c) * fun % n(c)
 
   end do
 
@@ -85,11 +85,11 @@
   call Comm_Mod_Global_Sum_Real(u_rms)
   u_rms = sqrt(1.0 / real(n_tot_cells) * u_rms)
 
-  u_max = maxval(sum_v1(1:grid % n_cells - grid % comm % n_buff_cells))
+  u_max = maxval(sum_v1(1:Grid % n_cells - Grid % comm % n_buff_cells))
   call Comm_Mod_Global_Max_Real(u_max)
 
-  p_max = maxval(Flow % p % n(1:grid % n_cells - grid % comm % n_buff_cells))
-  p_min = minval(Flow % p % n(1:grid % n_cells - grid % comm % n_buff_cells))
+  p_max = maxval(Flow % p % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
+  p_min = minval(Flow % p % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
   call Comm_Mod_Global_Max_Real(p_max)
   call Comm_Mod_Global_Min_Real(p_min)
 
@@ -116,16 +116,16 @@
   !! For normals for curvature
   !if(this_proc <= 2) then
   !  dist_n = 0
-  !  do c = 1, grid % n_cells
+  !  do c = 1, Grid % n_cells
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
-  !      x0 = (/1.0, grid % yc(c), 1.0/)
-  !      x1 = (/grid % xc(c), grid % yc(c), grid % zc(c)/)
+  !      x0 = (/1.0, Grid % yc(c), 1.0/)
+  !      x1 = (/Grid % xc(c), Grid % yc(c), Grid % zc(c)/)
   !      x2 = x1 + 10.0 * (/Vof % fc_x(c), Vof % fc_y(c), Vof % fc_z(c)/) &
   !                       / norm2((/Vof % fc_x(c),   &
   !                                 Vof % fc_y(c),   &
   !                                 Vof % fc_z(c)/))
-  !      dist_ck(c) = norm2( Math_Mod_Cross_Product(x0 - x1, x0 - x2)    &
+  !      dist_ck(c) = norm2( Math % Cross_Product(x0 - x1, x0 - x2)    &
   !                        / norm2(x2-x1) )
 
   !      dist_n(c) = 1
@@ -134,9 +134,9 @@
 
   !  call File % Open_For_Writing_Ascii('dist_centk.dat', fu)
 
-  !  do c = 1, grid % n_cells
+  !  do c = 1, Grid % n_cells
   !    if(dist_n(c) == 1) then
-  !      write(fu,'(4(2X,E16.10E2))') grid % xc(c), grid % yc(c), grid % zc(c), &
+  !      write(fu,'(4(2X,E16.10E2))') Grid % xc(c), Grid % yc(c), Grid % zc(c), &
   !                                   dist_ck(c)
   !    end if
   !  end do
@@ -146,18 +146,18 @@
   !! Calculate distance to center of cylinder
   !! For normals for normals
   !  dist_n = 0
-  !  do c = 1, grid % n_cells
+  !  do c = 1, Grid % n_cells
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
-  !      x0 = (/1.0, grid % yc(c), 1.0/)
-  !      x1 = (/grid % xc(c), grid % yc(c), grid % zc(c)/)
+  !      x0 = (/1.0, Grid % yc(c), 1.0/)
+  !      x1 = (/Grid % xc(c), Grid % yc(c), Grid % zc(c)/)
 
   !      x2 = x1 + 10.0 * (/Vof % fs_x(c), Vof % fs_y(c), Vof % fs_z(c)/) &
   !                       / norm2((/Vof % fs_x(c),   &
   !                                 Vof % fs_y(c),   &
   !                                 Vof % fs_z(c)/))
 
-  !      dist_cn(c) = norm2( Math_Mod_Cross_Product(x0 - x1, x0 - x2)    &
+  !      dist_cn(c) = norm2( Math % Cross_Product(x0 - x1, x0 - x2)    &
   !                        / norm2(x2-x1) )
   !      dist_n(c) = 1
   !    end if
@@ -165,9 +165,9 @@
 
   !  call File % Open_For_Writing_Ascii('dist_centn.dat', fu)
 
-  !  do c = 1, grid % n_cells
+  !  do c = 1, Grid % n_cells
   !    if(dist_n(c) == 1) then
-  !      write(fu,'(4(2X,E16.10E2))') grid % xc(c), grid % yc(c), grid % zc(c), &
+  !      write(fu,'(4(2X,E16.10E2))') Grid % xc(c), Grid % yc(c), Grid % zc(c), &
   !                                   dist_cn(c)
   !    end if
   !  end do

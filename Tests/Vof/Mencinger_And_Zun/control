@@ -9,7 +9,7 @@
  TIME_INTEGRATION_SCHEME      parabolic
 
  CHOI_CORRECTION    yes
- GU_CORRECTION       no
+ GU_CORRECTION      yes
 # 6000 time steps seems to be enough to reach a steady state with dt=  0.1
 #  600 time steps seems to be enough to reach a steady state with dt=  1
 #  200 time steps seems to be enough to reach a steady state with dt= 10

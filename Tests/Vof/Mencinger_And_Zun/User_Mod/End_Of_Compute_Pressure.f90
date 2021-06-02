@@ -11,7 +11,7 @@
   integer, intent(in)       :: curr_dt  ! current time step
   integer, intent(in)       :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: p, pp
   type(Matrix_Type), pointer :: a
   real, contiguous,  pointer :: b(:)
@@ -20,7 +20,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   p    => Flow % p
   pp   => Flow % pp
   a    => Sol  % a
@@ -33,11 +33,11 @@
   write(99, '(a)') '# compute_pressure: 1:x, 2:p, 3:pp, 4:p%x, 5:pp%x ' //  &
                    ' 4:density  5:diag  6:b'
 
-  do c = 1, grid % n_cells
-    if(Math_Mod_Approx_Real(grid % yc(c), 0.0) .and.  &
-       Math_Mod_Approx_Real(grid % zc(c), 0.0)) then
+  do c = 1, Grid % n_cells
+    if(Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
+       Math % Approx_Real(Grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &
-        grid % xc(c), p % n(c), pp % n(c), p % x(c), pp % x(c),  &
+        Grid % xc(c), p % n(c), pp % n(c), p % x(c), pp % x(c),  &
         Flow % density(c), a % val(a % dia(c)), b(c)
     end if
   end do

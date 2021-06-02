@@ -48,12 +48,11 @@ include '../User_Mod/Vof_Interface_Box.f90'
 
   ! Initialize front
   if(Vof % track_front) then
-    call Vof % Front % Place_At_Var_Value(Vof % fun,  &
-                                          Sol,        &
-                                          0.5,        &
-                                          .true.)  ! don't print messages
+    call Vof % Front % Place_Front_At_Value(Vof % fun,     &
+                                            Vof % smooth,  &
+                                            .true.)  ! don't print messages
     call Vof % Front % Print_Front_Statistics()
-    call Vof % Front % Save_Front(0)
+    call Vof % Front % Save_Front_Debug(0)
   end if
 
   ! Initialize velocities (depends on phase definition)

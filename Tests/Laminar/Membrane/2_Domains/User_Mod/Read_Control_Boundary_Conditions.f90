@@ -410,17 +410,17 @@
                 i = Key_Ind('Z', keys, nks); prof(m,0) = 0.0;  z = prof(m,i)
 
                 if(keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
-                  dist = Math_Mod_Distance(                         &
+                  dist = Math % Distance(                           &
                                   y,            z,            0.0,  &
                                   Grid % yc(c), Grid % zc(c), 0.0)
 
                 else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Z') then
-                  dist = Math_Mod_Distance(                         &
+                  dist = Math % Distance(                           &
                                   x,            z,            0.0,  &
                                   Grid % xc(c), Grid % zc(c), 0.0)
 
                 else if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y') then
-                  dist = Math_Mod_Distance(                         &
+                  dist = Math % Distance(                           &
                                   x,            y,            0.0,  &
                                   Grid % xc(c), Grid % yc(c), 0.0)
 

@@ -13,7 +13,7 @@
   integer, intent(in)       :: curr_dt  ! current time step
   integer, intent(in)       :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: grid
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, p
   type(Matrix_Type), pointer :: m
   integer                    :: c
@@ -22,7 +22,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   p    => Flow % p
   m    => Sol  % m
@@ -33,13 +33,13 @@
   open(99, file=file_name)
   write(99, '(a)') '#  User_Mod_End_Of_Compute_Momentum '         //  &
                    ' 1:x  2:u  3:rho, 4:dp/dx*dv,  5:diag(matrix),  6:b'
-  do c = 1, grid % n_cells
-    if(Math_Mod_Approx_Real(grid % yc(c), 0.0) .and.  &
-       Math_Mod_Approx_Real(grid % zc(c), 0.0)) then
+  do c = 1, Grid % n_cells
+    if(Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
+       Math % Approx_Real(Grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &
-        grid % xc(c), u % n(c), Flow % density(c), p % x(c) * grid % vol(c),  &
-        m % val(m % dia(c)), Flow % fx(c) - p % x(c) * grid % vol(c),  &
-        grid % vol(c)
+        Grid % xc(c), u % n(c), Flow % density(c), p % x(c) * Grid % vol(c),  &
+        m % val(m % dia(c)), Flow % fx(c) - p % x(c) * Grid % vol(c),  &
+        Grid % vol(c)
     end if
   end do
 

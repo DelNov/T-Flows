@@ -6,7 +6,7 @@ include '../User_Mod/Intersection_Line_Face.f90'
 include '../User_Mod/Interpolate_From_Nodes.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
-  type(Swarm_Type),  target :: swarm
+  type(Swarm_Type),  target :: Swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
@@ -122,8 +122,8 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
     glo_dist = p_dist(i_probe)
     call Comm_Mod_Global_Min_Real(glo_dist)
 
-    if(.not. Math_Mod_Approx_Real( glo_dist,    &
-                                   p_dist(i_probe), epsloc)) then
+    if(.not. Math % Approx_Real( glo_dist,    &
+                                 p_dist(i_probe), epsloc)) then
       nod_probe(i_probe) = -1
       p_dist(i_probe) = HUGE
     end if

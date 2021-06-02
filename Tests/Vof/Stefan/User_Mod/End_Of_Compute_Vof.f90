@@ -25,15 +25,15 @@
   do c = 1, Grid % n_cells
 
     ! Find relevant cell
-    if( Math_Mod_Approx_Real(Grid % yc(c), 0.0) .and.  &
-        Math_Mod_Approx_Real(Grid % zc(c), 0.0) ) then
+    if( Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
+        Math % Approx_Real(Grid % zc(c), 0.0) ) then
       x_ref = Grid % xc(c)
       f_ref = fun % n(c)
 
       ! Browse through all other cells and homogenize the values
       do d = 1, Grid % n_cells
         if(d .ne. c) then
-          if(Math_Mod_Approx_Real(Grid % xc(d), x_ref)) then
+          if(Math % Approx_Real(Grid % xc(d), x_ref)) then
             fun % n(d) = f_ref
           end if
         end if
