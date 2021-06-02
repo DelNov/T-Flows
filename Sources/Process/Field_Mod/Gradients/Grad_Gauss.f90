@@ -19,47 +19,47 @@
   real                      :: phi_z( -Flow % pnt_grid % n_bnd_cells:  &
                                        Flow % pnt_grid % n_cells)
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: s, c1, c2, c
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !-----------------------------------------------!
   !   Update gradients from the values at faces   !
   !-----------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     phi_x(c) = 0.0
     phi_y(c) = 0.0
     phi_z(c) = 0.0
   end do
 
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 > 0) then
-      phi_x(c1) = phi_x(c1) - phi_f(s) * grid % sx(s)
-      phi_y(c1) = phi_y(c1) - phi_f(s) * grid % sy(s)
-      phi_z(c1) = phi_z(c1) - phi_f(s) * grid % sz(s)
+      phi_x(c1) = phi_x(c1) - phi_f(s) * Grid % sx(s)
+      phi_y(c1) = phi_y(c1) - phi_f(s) * Grid % sy(s)
+      phi_z(c1) = phi_z(c1) - phi_f(s) * Grid % sz(s)
 
-      phi_x(c2) = phi_x(c2) + phi_f(s) * grid % sx(s)
-      phi_y(c2) = phi_y(c2) + phi_f(s) * grid % sy(s)
-      phi_z(c2) = phi_z(c2) + phi_f(s) * grid % sz(s)
+      phi_x(c2) = phi_x(c2) + phi_f(s) * Grid % sx(s)
+      phi_y(c2) = phi_y(c2) + phi_f(s) * Grid % sy(s)
+      phi_z(c2) = phi_z(c2) + phi_f(s) * Grid % sz(s)
     else
-      phi_x(c1) = phi_x(c1) - phi_f(s) * grid % sx(s)
-      phi_y(c1) = phi_y(c1) - phi_f(s) * grid % sy(s)
-      phi_z(c1) = phi_z(c1) - phi_f(s) * grid % sz(s)
+      phi_x(c1) = phi_x(c1) - phi_f(s) * Grid % sx(s)
+      phi_y(c1) = phi_y(c1) - phi_f(s) * Grid % sy(s)
+      phi_z(c1) = phi_z(c1) - phi_f(s) * Grid % sz(s)
     end if
 
   end do
 
-  do c = 1, grid % n_cells
-    phi_x(c) = -phi_x(c) / grid % vol(c)
-    phi_y(c) = -phi_y(c) / grid % vol(c)
-    phi_z(c) = -phi_z(c) / grid % vol(c)
+  do c = 1, Grid % n_cells
+    phi_x(c) = -phi_x(c) / Grid % vol(c)
+    phi_y(c) = -phi_y(c) / Grid % vol(c)
+    phi_z(c) = -phi_z(c) / Grid % vol(c)
   end do
 
   end subroutine
