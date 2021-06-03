@@ -20,17 +20,18 @@
     !                 !
     !-----------------!
 
-    !--------------------------------!
-    !   Advance vof function (fun)   !
-    !--------------------------------!
+    !------------------------------------!
+    !   Advance vof function (fun) and   !
+    !    re-create its smooth variant    !
+    !------------------------------------!
     call Vof % Compute_Vof(Sol, Flow % dt, curr_dt)
+    call Vof % Smooth_For_Curvature_Csf()
 
     !------------------------------------------------!
     !   Prepare smooth variant of the vof function   !
     !    for computation of normals and curvature    !
     !------------------------------------------------!
     if(Vof % surface_tension > TINY) then
-      call Vof % Smooth_For_Curvature_Csf()
       call Vof % Curvature_Csf()
     end if
 
