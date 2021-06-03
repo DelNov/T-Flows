@@ -60,14 +60,20 @@
 
     if(dot_product(surf_v, tri_p_123) > 0.0 .and.  &
        dot_product(surf_v, tri_p_134) > 0.0) then
-      exit
+      goto 1
     end if
 
   end do
 
+  print *, '# ERROR: Failed to find a good permutation in Handle_4_Points!'
+  print *, '# This error is critical.  Exiting!'
+  call Comm_Mod_End
+  stop
+
   !--------------------------------------------------------------------!
   !   You've found a permutation which works, store new elements now   !
   !--------------------------------------------------------------------!
+1 continue
 
   if(.not. enforce_triangles) then
 
