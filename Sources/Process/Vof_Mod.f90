@@ -96,7 +96,7 @@
       !------------------------------------------!
       procedure, private :: Curvature_Csf
       procedure, private :: Smooth_Curvature
-      procedure, private :: Smooth_For_Curvature_Csf
+      procedure          :: Smooth_For_Curvature_Csf
       procedure, private :: Smooth_Scalar
 
       !----------------------------------------------!
