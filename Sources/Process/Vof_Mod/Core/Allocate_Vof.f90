@@ -8,7 +8,7 @@
   class(Vof_Type),  target :: Vof
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: nb, nc, nf
 !==============================================================================!
 
@@ -17,13 +17,13 @@
   Vof % pnt_grid => Flow % pnt_grid
 
   ! Take aliases
-  grid => Flow % pnt_grid
-  nb   =  grid % n_bnd_cells
-  nc   =  grid % n_cells
-  nf   =  grid % n_faces
+  Grid => Flow % pnt_grid
+  nb   =  Grid % n_bnd_cells
+  nc   =  Grid % n_cells
+  nf   =  Grid % n_faces
 
-  call Var_Mod_Allocate_Solution(Vof % fun,    grid, 'VOF', '')
-  call Var_Mod_Allocate_New_Only(Vof % smooth, grid, 'SMO')
+  call Var_Mod_Allocate_Solution(Vof % fun,    Grid, 'VOF', '')
+  call Var_Mod_Allocate_New_Only(Vof % smooth, Grid, 'SMO')
 
   ! Surface curvature
   allocate(Vof % curv(-nb:nc));  Vof % curv(-nb:nc) = 0.0
@@ -46,7 +46,7 @@
   if(Flow % mass_transfer) then
     allocate(Vof % qci  (-nb:nc)); Vof % qci  (-nb:nc) = 0.0
     allocate(Vof % m_dot(-nb:nc)); Vof % m_dot(-nb:nc) = 0.0
-    call Var_Mod_Allocate_New_Only(Vof % var, grid, 'PHV')
+    call Var_Mod_Allocate_New_Only(Vof % var, Grid, 'PHV')
   end if
 
   if(Vof % track_front) then
