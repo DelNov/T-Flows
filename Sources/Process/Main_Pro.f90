@@ -282,6 +282,7 @@
 
       ! Interface tracking
       if(Flow(d) % with_interface) then
+        call Update_Boundary_Values(Flow(d), turb(d), Vof(d), 'VOF')
         call Vof(d) % Main_Vof(Flow(d), turb(d), Sol(d), curr_dt)
         call Vof(d) % Update_Physical_Properties()
       end if

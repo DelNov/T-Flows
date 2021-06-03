@@ -23,7 +23,6 @@
     !--------------------------------!
     !   Advance vof function (fun)   !
     !--------------------------------!
-    call Update_Boundary_Values(Flow, turb, Vof, 'VOF')
     call Vof % Compute_Vof(Sol, Flow % dt, curr_dt)
 
     !------------------------------------------------!
