@@ -182,8 +182,8 @@
 
   ! Calculate position
   start_time =   0.6766                           ! starting time        [s]
-  final_time =   5.6766                           ! final time           [s]
-  n_dt       =  50                                ! number of time steps [1]
+  final_time =   9.6766                           ! final time           [s]
+  n_dt       = 100                                ! number of time steps [1]
   dt         =  (final_time - start_time) / n_dt  ! time step            [s]
 
   ! Final interface position
@@ -211,9 +211,9 @@
       call Temperature_Distribution(xi_main, n, time, ipos, final_pos)
     end if
 
-    write(11, '(2es15.7)') time, ipos
+    write(11, '(2es15.7)') time - start_time, ipos
     if(n > 0) then
-      write(12, '(2es15.7)') time - dt*0.5, (ipos-opos)/dt
+      write(12, '(2es15.7)') time - dt*0.5 - start_time, (ipos-opos)/dt
     end if
     opos = ipos
   end do
