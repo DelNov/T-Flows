@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Compute_Vof(Vof, Sol, curr_dt)
 !------------------------------------------------------------------------------!
-!   This was really needed to stabilize the Stefan ptoblem.                    !
+!   This function is called at the end of Compute_Vof function.                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -37,11 +37,6 @@ include '../User_Mod/Vof_Interface_Box.f90'
   ! Box
   call Vof_Initialization_Box(Vof)
 
-  WRITE(319,*) 'CELL VALUES IN USER_MOD_INITIALIZE AFTER Vof_Initialization_Box'
-  DO C = 1, GRID % N_CELLS
-    WRITE(319,*) C, GRID % XC(C), fun % n(c), fun % o(c), fun % oo(c)
-  END DO
-
   ! Naive way to update bounary values
   do s = 1, Grid % n_bnd_cells
     c1 = Grid % faces_c(1, s)
@@ -57,8 +52,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
     call Vof % Front % Place_Front_At_Value(Vof % fun,     &
                                             Vof % smooth,  &
                                             .true.)  ! don't print messages
-    call Vof % Front % Print_Front_Statistics         ()
-    call Vof % Front % Save_Front_Debug               (0)
+    call Vof % Front % Print_Front_Statistics()
   end if
 
   ! Initialize velocities (depends on phase definition)
@@ -89,8 +83,8 @@ include '../User_Mod/Vof_Interface_Box.f90'
         ! MINI_3 Flow % t % o(c) = 110.0 - Grid % xc(c) * 4000.0
         ! MINI_4 Flow % t % n(c) = 110.0 - Grid % xc(c) * 10000.0
         ! MINI_4 Flow % t % o(c) = 110.0 - Grid % xc(c) * 10000.0
-        Flow % t % n(c) = 110.0 - Grid % xc(c) * 40000.0
-        Flow % t % o(c) = 110.0 - Grid % xc(c) * 40000.0
+        Flow % t % n(c) = 110.0 - Grid % xc(c) * 20000.0
+        Flow % t % o(c) = 110.0 - Grid % xc(c) * 20000.0
       end if
     end if
   end do
@@ -101,10 +95,5 @@ include '../User_Mod/Vof_Interface_Box.f90'
   ! Set old values to be the same as new ones
   fun % o (:) = fun % n(:)
   fun % oo(:) = fun % o(:)
-
-  WRITE(320,*) 'CELL VALUES IN USER_MOD_INITIALIZE'
-  DO C = 1, GRID % N_CELLS
-    WRITE(320,*) C, GRID % XC(C), fun % n(c), fun % o(c), fun % oo(c)
-  END DO
 
   end subroutine
