@@ -14,21 +14,15 @@
   type(Grid_Type),   pointer :: grid
   type(Var_Type),    pointer :: u, v, w, p
   type(Matrix_Type), pointer :: M
-  integer                    :: c
+  integer                    :: c, s, c1, c2
 !==============================================================================!
 
   ! Take aliases
   grid => Flow % pnt_grid
   u    => Flow % u
-  v    => Flow % u
-  w    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
   p    => Flow % p
   M    => Sol % M
-
-!@  ! Nullify v and w velocity components
-!@  do c = -Grid % n_bnd_cells, Grid % n_cells
-!@    v % n(c) = 0
-!@    w % n(c) = 0
-!@  end do
 
   end subroutine
