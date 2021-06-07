@@ -59,7 +59,6 @@
     ! Heat from phase change and index of saturated cells
     real,    allocatable :: qci(:)
     real,    allocatable :: m_dot(:)         ! [kg/m^2 s]
-    real                 :: add_mass_in, add_mass_out, vol_flux_avg
     type(Var_Type)       :: var
 
     ! User define parameters for vof function (fun)
