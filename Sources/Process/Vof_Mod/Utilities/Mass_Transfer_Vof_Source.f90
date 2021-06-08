@@ -13,6 +13,7 @@
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: Flow
   integer                   :: c, e, g, l, s, c1, c2, i_ele
+  integer, save             :: last = 0
   real                      :: t_x_1, t_x_2, cond_1, cond_2
 !==============================================================================!
 
@@ -63,7 +64,11 @@
           ! WRITE DOWN STEFAN'S SOLUTION
           IF(MATH % APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
              MATH % APPROX_REAL(GRID % ZS(S), 0.0)) THEN
+
+            ! WRITE POSITION OF THE FRONT
+            LAST = LAST + 1
             WRITE(400, '(99(es12.4))')                                  &
+              LAST * FLOW % DT,                                         &
               T_X_1,                                                    &
               T_X_1 * COND_1,                                           &
               T_X_1 * COND_1 / 2.26E+6,                                 &
@@ -72,6 +77,7 @@
               VOF % FRONT % ELEM(E) % XE
           END IF
 
+          ! Unit: K/m * W/(m K) * kg/J = kg / (m^2 s)
           if(Vof % Front % cell_at_elem(c1) .ne. 0) then
             Vof % m_dot(c1) = -t_x_1 * cond_1 / 2.26e+6
           end if
@@ -83,6 +89,7 @@
         end if
       end do
     end if
+
   end do
 
   !-------------------!
@@ -101,7 +108,8 @@
     if(e .ne. 0) then
       b(c) = b(c)                                                    &
            + Vof % m_dot(c) * (l-g) * Vof % Front % elem(e) % area   &
-           / Vof % phase_dens(l)
+           * (1.0/Vof % phase_dens(l))
+!          * (1.0/Vof % phase_dens(g) - 1.0/Vof % phase_dens(l))
     end if
   end do
 

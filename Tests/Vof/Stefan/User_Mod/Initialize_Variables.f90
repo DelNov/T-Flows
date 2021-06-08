@@ -63,8 +63,8 @@ include '../User_Mod/Vof_Interface_Box.f90'
 !     Flow % u % n(c) =   0.05
 !     Flow % u % o(c) =   0.05
       if(Flow % heat_transfer) then
-        Flow % t % n(c) = 100.0
-        Flow % t % o(c) = 100.0
+        Flow % t % n(c) = 0.1
+        Flow % t % o(c) = 0.1
       end if
 
     ! Inside the vapor
@@ -83,8 +83,8 @@ include '../User_Mod/Vof_Interface_Box.f90'
         ! MINI_3 Flow % t % o(c) = 110.0 - Grid % xc(c) * 4000.0
         ! MINI_4 Flow % t % n(c) = 110.0 - Grid % xc(c) * 10000.0
         ! MINI_4 Flow % t % o(c) = 110.0 - Grid % xc(c) * 10000.0
-        Flow % t % n(c) = 110.0 - Grid % xc(c) * 20000.0
-        Flow % t % o(c) = 110.0 - Grid % xc(c) * 20000.0
+        Flow % t % n(c) = 10.1 - Grid % xc(c) * 20000.0
+        Flow % t % o(c) = 10.1 - Grid % xc(c) * 20000.0
       end if
     end if
   end do
