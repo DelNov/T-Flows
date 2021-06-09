@@ -39,8 +39,8 @@
     ! of the phase for "which you are solving".  And you are solving for
     ! the one which is defined as one (not zero) in the system
     if(e .ne. 0) then
-      b(c) = b(c)                                                    &
-           + Vof % m_dot(c) * (l-g) * Vof % Front % elem(e) % area   &
+      b(c) = b(c)                       &
+           + Vof % m_dot(c) * (l-g)     &
            * (1.0/Vof % phase_dens(l))
 !          * (1.0/Vof % phase_dens(g) - 1.0/Vof % phase_dens(l))
     end if

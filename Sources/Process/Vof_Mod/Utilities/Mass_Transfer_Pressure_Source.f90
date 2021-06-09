@@ -27,9 +27,9 @@
     e = Vof % Front % cell_at_elem(c)  ! front element
     if(e .ne. 0) then
 
-      ! Unit: kg/(m^2 s) * m^2 * m^3/kg = m^3/s
-      b(c) = b(c)                                           &
-           + Vof % m_dot(c) * Vof % Front % elem(e) % area  &
+      ! Unit: kg/s * m^3/kg = m^3/s
+      b(c) = b(c)                       &
+           + Vof % m_dot(c)             &
            * (1.0/Vof % phase_dens(g))
 
     end if

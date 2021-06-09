@@ -44,9 +44,8 @@
   allocate(Vof % surf_fz(-nb:nc));  Vof % surf_fz(-nb:nc) = 0.0
 
   if(Flow % mass_transfer) then
-    allocate(Vof % qci  (-nb:nc)); Vof % qci  (-nb:nc) = 0.0
-    allocate(Vof % m_dot(-nb:nc)); Vof % m_dot(-nb:nc) = 0.0
-    call Var_Mod_Allocate_New_Only(Vof % var, Grid, 'PHV')
+    allocate(Vof % q_int(2,nf));    Vof % q_int(1:2,1:nf) = 0.0
+    allocate(Vof % m_dot(-nb:nc));  Vof % m_dot(-nb:nc)   = 0.0
   end if
 
   if(Vof % track_front) then

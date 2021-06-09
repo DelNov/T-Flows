@@ -57,9 +57,8 @@
     real :: t_sat, latent_heat  ! [K, J/kg]
 
     ! Heat from phase change and index of saturated cells
-    real,    allocatable :: qci(:)
-    real,    allocatable :: m_dot(:)         ! [kg/m^2 s]
-    type(Var_Type)       :: var
+    real, allocatable :: q_int(:,:)
+    real, allocatable :: m_dot(:)         ! [kg/s]
 
     ! User define parameters for vof function (fun)
     real    :: courant_max_param
@@ -124,7 +123,6 @@
   include 'Vof_Mod/Core/Compute_Vof.f90'
   include 'Vof_Mod/Core/Discretize.f90'
   include 'Vof_Mod/Core/Correct_Beta.f90'
-! include 'Vof_Mod/Core/Find_Upstream_Phi.f90'
   include 'Vof_Mod/Core/Max_Courant_Number.f90'
   include 'Vof_Mod/Core/Predict_Beta.f90'
   include 'Vof_Mod/Core/Solve_System.f90'
@@ -150,7 +148,6 @@
   include 'Vof_Mod/Utilities/Mass_Transfer_Estimate.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90'
-! include 'Vof_Mod/Utilities/Pressure_Correction.f90'
   include 'Vof_Mod/Utilities/Surface_Tension_Force.f90'
   include 'Vof_Mod/Utilities/Update_Physical_Properties.f90'
 
