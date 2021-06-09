@@ -83,7 +83,7 @@
       procedure, private :: Compute_Vof
       procedure, private :: Discretize
       procedure, private :: Correct_Beta
-      procedure, private :: Find_Upstream_Phi
+!     procedure, private :: Find_Upstream_Phi
       procedure, private :: Max_Courant_Number
       procedure, private :: Predict_Beta
       procedure, private :: Solve_System
@@ -106,6 +106,7 @@
       procedure :: Grad_Component_No_Refresh_With_Front
       procedure :: Grad_Variable_With_Front
       procedure :: Mass_Transfer_Added_Volume
+      procedure :: Mass_Transfer_Estimate
       procedure :: Mass_Transfer_Pressure_Source
       procedure :: Mass_Transfer_Vof_Source
       procedure :: Surface_Tension_Force
@@ -123,7 +124,7 @@
   include 'Vof_Mod/Core/Compute_Vof.f90'
   include 'Vof_Mod/Core/Discretize.f90'
   include 'Vof_Mod/Core/Correct_Beta.f90'
-  include 'Vof_Mod/Core/Find_Upstream_Phi.f90'
+! include 'Vof_Mod/Core/Find_Upstream_Phi.f90'
   include 'Vof_Mod/Core/Max_Courant_Number.f90'
   include 'Vof_Mod/Core/Predict_Beta.f90'
   include 'Vof_Mod/Core/Solve_System.f90'
@@ -146,9 +147,10 @@
   include 'Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90'
   include 'Vof_Mod/Utilities/Grad_Variable_With_Front.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90'
+  include 'Vof_Mod/Utilities/Mass_Transfer_Estimate.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90'
   include 'Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90'
-  include 'Vof_Mod/Utilities/Pressure_Correction.f90'
+! include 'Vof_Mod/Utilities/Pressure_Correction.f90'
   include 'Vof_Mod/Utilities/Surface_Tension_Force.f90'
   include 'Vof_Mod/Utilities/Update_Physical_Properties.f90'
 

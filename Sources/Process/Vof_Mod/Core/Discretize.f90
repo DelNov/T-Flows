@@ -150,6 +150,7 @@
   !--------------------------------!
   !   Source due to phase change   !
   !--------------------------------!
+  call Vof % Mass_Transfer_Estimate()
   call Vof % Mass_Transfer_Vof_Source(b)
 
   end subroutine
