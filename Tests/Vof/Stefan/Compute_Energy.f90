@@ -193,8 +193,6 @@
 
         f_ex_1 = 0.0
         f_ex_2 = 0.0
-        f_im_1 = 0.0
-        f_im_2 = 0.0
         do i_ele = 1, 2
           e = Vof % Front % face_at_elem(i_ele, s)
           if(e .ne. 0) then
@@ -203,8 +201,8 @@
             if(Vof % fun % n(c1) < 0.5) cond_1 = Vof % phase_cond(2)
             if(Vof % fun % n(c2) > 0.5) cond_2 = Vof % phase_cond(1)
 
-            a12 = a % fc(s) * cond_1
-            a21 = a % fc(s) * cond_2
+            a12 = 0.0 ! a % fc(s) * cond_1
+            a21 = 0.0 ! a % fc(s) * cond_2
 
             ! Heat flux from the saturated front
             f_ex_1 = f_ex_1 + cond_1                              &
@@ -217,12 +215,10 @@
                       + t % y(c2) * Vof % Front % elem(e) % sy   &
                       + t % z(c2) * Vof % Front % elem(e) % sz)
 
-            f_im_1 = f_im_1 + (t % n(c2) - t % n(c1)) * a12
-            f_im_2 = f_im_2 + (t % n(c2) - t % n(c1)) * a21
           end if
         end do
-        heat_int(c1) = heat_int(c1) + f_ex_1 - f_im_1
-        heat_int(c2) = heat_int(c2) - f_ex_2 + f_im_2
+        heat_int(c1) = heat_int(c1) + f_ex_1
+        heat_int(c2) = heat_int(c2) - f_ex_2
       end if
     end if
 
