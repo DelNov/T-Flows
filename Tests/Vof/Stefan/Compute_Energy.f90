@@ -31,7 +31,7 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2, e, i_ele
   real                       :: a12, a21, con_eff
-  real                       :: f_ex_1, f_ex_2, f_im_1, f_im_2, cond_1, cond_2
+  real                       :: f_ex, f_im
   real                       :: tx_f, ty_f, tz_f, t_stress, dt
 !------------------------------------------------------------------------------!
 !
@@ -99,10 +99,10 @@
   if(.not. Flow % mass_transfer) then
     call Flow % Grad_Variable(t)
 
-  ! If mass transfer, compute gradients with saturation temperature
+  ! If mass transfer, estimate the mass transfer due to heat fluxes,
+  ! which also compute gradients with saturation temperature at interface
   else
-    call Vof % Calculate_Grad_Matrix_With_Front()
-    call Vof % Grad_Variable_With_Front(t, Vof % t_sat)
+    call Vof % Mass_Transfer_Estimate()
     heat_int(:) = 0.0
   end if
 
@@ -148,18 +148,16 @@
     ! Total (exact) diffusion flux
     ! This is last term in equation 2.33 in Denner's thesis because:
     ! Grid % sx (T-Flows) == n_f * A_f (Denner)
-    f_ex_1 = con_eff * (   tx_f * Grid % sx(s)   &
-                         + ty_f * Grid % sy(s)   &
-                         + tz_f * Grid % sz(s))
-    f_ex_2 = f_ex_1
+    f_ex = con_eff * (   tx_f * Grid % sx(s)   &
+                       + ty_f * Grid % sy(s)   &
+                       + tz_f * Grid % sz(s))
 
     ! Implicit part of the diffusion flux, treated by linear system
     ! This is also term in equation 2.33 in Denner's thesis because:
     ! A % fc * Grid % dx (T-Flows) == alpha_f * s_f * A_f (Denner)
-    f_im_1 = con_eff * A % fc(s) * (   tx_f * Grid % dx(s)    &
-                                     + ty_f * Grid % dy(s)    &
-                                     + tz_f * Grid % dz(s) )
-    f_im_2 = f_im_1
+    f_im = con_eff * A % fc(s) * (   tx_f * Grid % dx(s)    &
+                                   + ty_f * Grid % dy(s)    &
+                                   + tz_f * Grid % dz(s) )
 
 !@#    ! Cross diffusion part
 !@#    t % c(c1) = t % c(c1) + f_ex - f_im
@@ -191,34 +189,21 @@
 
       if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
 
-        f_ex_1 = 0.0
-        f_ex_2 = 0.0
-        do i_ele = 1, 2
-          e = Vof % Front % face_at_elem(i_ele, s)
-          if(e .ne. 0) then
-            cond_1 = Vof % phase_cond(1)
-            cond_2 = Vof % phase_cond(2)
-            if(Vof % fun % n(c1) < 0.5) cond_1 = Vof % phase_cond(2)
-            if(Vof % fun % n(c2) > 0.5) cond_2 = Vof % phase_cond(1)
+        ! Nullify neighborig coefficients at the front ...
+        a12 = 0.0
+        a21 = 0.0
 
-            a12 = 0.0 ! a % fc(s) * cond_1
-            a21 = 0.0 ! a % fc(s) * cond_2
+        ! ... and add heat sources due to mass transfer insted
+        heat_int(c1) = heat_int(c1) + Vof % q_int(1,s)
+        heat_int(c2) = heat_int(c2) - Vof % q_int(2,s)
 
-            ! Heat flux from the saturated front
-            f_ex_1 = f_ex_1 + cond_1                              &
-                   * (  t % x(c1) * Vof % Front % elem(e) % sx   &
-                      + t % y(c1) * Vof % Front % elem(e) % sy   &
-                      + t % z(c1) * Vof % Front % elem(e) % sz)
+        ! WRITE DOWN STEFAN'S SOLUTION
+        IF(INI .EQ. 1                            .AND.  &
+           MATH % APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
+           MATH % APPROX_REAL(GRID % ZS(S), 0.0)) THEN
+          WRITE(300, '(99(es12.4))') CURR_DT * FLOW % DT, GRID % XS(S)
+        END IF
 
-            f_ex_2 = f_ex_2 + cond_2                              &
-                   * (  t % x(c2) * Vof % Front % elem(e) % sx   &
-                      + t % y(c2) * Vof % Front % elem(e) % sy   &
-                      + t % z(c2) * Vof % Front % elem(e) % sz)
-
-          end if
-        end do
-        heat_int(c1) = heat_int(c1) + f_ex_1
-        heat_int(c2) = heat_int(c2) - f_ex_2
       end if
     end if
 
