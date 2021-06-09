@@ -13,11 +13,13 @@
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
-  integer                  :: s
+  integer                  :: s, fu
 !==============================================================================!
 
   ! Take aliases
   Grid => Flow % pnt_grid
+
+  call File % Append_For_Writing_Ascii('stefans_solution.dat', fu)
 
   do s = 1, Grid % n_faces
 
@@ -27,11 +29,13 @@
       if(ini .eq. 1                            .and.  &
          Math % Approx_Real(grid % ys(s), 0.0) .and.  &
          Math % Approx_Real(grid % zs(s), 0.0)) then
-        write(400, '(99(es12.4))') curr_dt * Flow % dt, Grid % xs(s)
+        write(fu,  '(99(es12.4))') curr_dt * Flow % dt, Grid % xs(s)
       end if
 
     end if
 
   end do
+
+  close(fu)
 
   end subroutine
