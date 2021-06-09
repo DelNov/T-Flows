@@ -12,7 +12,6 @@
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: Flow
   integer                   :: e, g, l, s, c1, c2, i_ele
-  integer, save             :: last = 0
   real                      :: cond_1, cond_2
 !==============================================================================!
 
@@ -35,7 +34,6 @@
   !------------------------------------------------!
   call Vof % Calculate_Grad_Matrix_With_Front()
   call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
-  call Flow % Calculate_Grad_Matrix()
 
   !----------------------------------------!
   !   Compute heat flux at the interface   !
@@ -71,23 +69,6 @@
               + cond_2 * (  Flow % t % x(c2) * Vof % Front % elem(e) % sx   &
                           + Flow % t % y(c2) * Vof % Front % elem(e) % sy   &
                           + Flow % t % z(c2) * Vof % Front % elem(e) % sz)
-
-          ! WRITE DOWN STEFAN'S SOLUTION
-          IF(MATH % APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
-             MATH % APPROX_REAL(GRID % ZS(S), 0.0)) THEN
-
-            ! WRITE POSITION OF THE FRONT
-            LAST = LAST + 1
-            WRITE(400, '(99(es12.4))')                          &
-              LAST * FLOW % DT,                                 &
-              VOF % FRONT % ELEM(E) % XE,                       &
-              FLOW % T % X(C1),                                 &
-              FLOW % T % X(C1) * COND_1,                        &
-              FLOW % T % X(C1) * COND_1 / 2.26E+6,              &
-              FLOW % T % X(C1) * COND_1 / 2.26E+6               &
-                               * (  1.0/VOF % PHASE_DENS(G)     &
-                                  - 1.0/VOF % PHASE_DENS(L) )
-          END IF
 
         end if  ! e .ne. 0
       end do    ! i_ele
