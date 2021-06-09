@@ -29,7 +29,7 @@
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
-  integer                    :: c, s, c1, c2, e, i_ele
+  integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff
   real                       :: f_ex, f_im
   real                       :: tx_f, ty_f, tz_f, t_stress, dt
@@ -196,13 +196,6 @@
         ! ... and add heat sources due to mass transfer insted
         heat_int(c1) = heat_int(c1) + Vof % q_int(1,s)
         heat_int(c2) = heat_int(c2) - Vof % q_int(2,s)
-
-        ! WRITE DOWN STEFAN'S SOLUTION
-        IF(INI .EQ. 1                            .AND.  &
-           MATH % APPROX_REAL(GRID % YS(S), 0.0) .AND.  &
-           MATH % APPROX_REAL(GRID % ZS(S), 0.0)) THEN
-          WRITE(300, '(99(es12.4))') CURR_DT * FLOW % DT, GRID % XS(S)
-        END IF
 
       end if
     end if
