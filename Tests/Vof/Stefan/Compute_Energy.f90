@@ -1,4 +1,4 @@
-!==============================================================================!
+!=ON DISK======================================================================!
   subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
@@ -6,13 +6,14 @@
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
   use Work_Mod, only: cap_dens => r_cell_01,  &
-                      heat_int => r_cell_02
+                      q_int    => r_cell_02,  &
+                      q_turb   => r_cell_03      ! turbulent heat fluxes
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
 !   Main_Pro                (allocates Work_Mod)                               !
 !     |                                                                        |
-!     +----> Compute_Energy (safe to use r_cell_01)                            !
+!     +----> Compute_Energy (safe to use r_cell_01..02)                        !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -31,8 +32,7 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff
-  real                       :: f_ex, f_im
-  real                       :: tx_f, ty_f, tz_f, t_stress, dt
+  real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, dt
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -87,6 +87,11 @@
   A % val(:) = 0.0
   b      (:) = 0.0
 
+  ! Initialize turbulent heat fluxes (used with RSM models)
+  ! and fluxes coming from interfaces (cases with boiling)
+  q_turb(:) = 0.0
+  q_int (:) = 0.0
+
   ! Old values (o and oo)
   if(ini .eq. 1) then
     do c = 1, Grid % n_cells
@@ -103,7 +108,6 @@
   ! which also compute gradients with saturation temperature at interface
   else
     call Vof % Mass_Transfer_Estimate()
-    heat_int(:) = 0.0
   end if
 
   ! Compute helping variable
@@ -159,17 +163,6 @@
                                    + ty_f * Grid % dy(s)    &
                                    + tz_f * Grid % dz(s) )
 
-!@#    ! Cross diffusion part
-!@#    t % c(c1) = t % c(c1) + f_ex - f_im
-!@#    if(c2 > 0) then
-!@#      t % c(c2) = t % c(c2) - f_ex + f_im
-!@#    end if
-!@#
-!@#    ! Put the influence of turbulent heat fluxes explicitly in the system
-!@#    b(c1) = b(c1) + t_stress
-!@#    if(c2 > 0) then
-!@#      b(c2) = b(c2) - t_stress
-!@#   end if
 
     !------------------------------------------------------!
     !                                                      !
@@ -184,24 +177,36 @@
     a21 = a21 + max(v_flux % n(s), 0.0)  &
                  * Flow % capacity(c2) * Flow % density(c2)  ! Flow: 2 -> 1
 
-    ! In case of mass transfer, use gradients from each phase
+    !-----------------------------------------------------!
+    !   In case of mass transfer, detach the two phases   !
+    !      and add heat transferred to the interface      !
+    !-----------------------------------------------------!
     if(Flow % mass_transfer) then
-
       if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
-
-        ! Nullify neighborig coefficients at the front ...
-        a12 = 0.0
-        a21 = 0.0
-
-        ! ... and add heat sources due to mass transfer insted
-        heat_int(c1) = heat_int(c1) + Vof % q_int(1,s)
-        heat_int(c2) = heat_int(c2) - Vof % q_int(2,s)
-
+        a12  = 0.0
+        a21  = 0.0
+        f_ex = 0.0  ! included in q_int
+        f_im = 0.0  ! phases are detached
+        q_int(c1) = q_int(c1) + Vof % q_int(1,s)
+        q_int(c2) = q_int(c2) - Vof % q_int(2,s)
       end if
     end if
 
+    ! Cross diffusion part
+    t % c(c1) = t % c(c1) + f_ex - f_im
+    if(c2 > 0) then
+      t % c(c2) = t % c(c2) - f_ex + f_im
+    end if
 
-    ! Fill the system matrix
+    ! Put the influence of turbulent heat fluxes explicitly in the system
+    q_turb(c1) = q_turb(c1) + t_stress
+    if(c2 > 0) then
+      q_turb(c2) = q_turb(c2) - t_stress
+    end if
+
+    !----------------------------!
+    !   Fill the system matrix   !
+    !----------------------------!
     if(c2 > 0) then
       A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
       A % val(A % dia(c2))  = A % val(A % dia(c2)) + a21
@@ -223,7 +228,10 @@
 
   end do  ! through sides
 
-  ! Cross diffusion terms are treated explicity
+  !----------------------------------------------!
+  !   Explicitly treated diffusion heat fluxes   !
+  !   cross diffusion, and heat from interface   !
+  !----------------------------------------------!
   do c = 1, Grid % n_cells
     if(t % c(c) >= 0) then
       b(c)  = b(c) + t % c(c)
@@ -231,16 +239,17 @@
       A % val(A % dia(c)) = A % val(A % dia(c))  &
                           - t % c(c) / (t % n(c) + MICRO)
     end if
+    b(c) = b(c) + q_turb(c)
   end do
 
   ! Heat from the interface
   if(Flow % mass_transfer) then
     do c = 1, Grid % n_cells
-      if(heat_int(c) >= 0) then
-        b(c) = b(c) + heat_int(c)
+      if(q_int(c) >= 0) then
+        b(c) = b(c) + q_int(c)
       else
         a % val(a % dia(c)) = a % val(a % dia(c))  &
-                            - heat_int(c) / (t % n(c) + FEMTO)
+                            - q_int(c) / (t % n(c) + FEMTO)
       end if
     end do
   end if
@@ -252,10 +261,12 @@
   !--------------------!
   do c = -Grid % n_bnd_cells, Grid % n_cells
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
-    if(Vof % fun % n(c) > 0.5) then
-      cap_dens(c) = Vof % phase_capa(1) * Vof % phase_dens(1)
-    else if(Vof % fun % n(c) < 0.5) then
-      cap_dens(c) = Vof % phase_capa(2) * Vof % phase_dens(2)
+    if(Flow % mass_transfer) then
+      if(Vof % fun % n(c) > 0.5) then
+        cap_dens(c) = Vof % phase_capa(1) * Vof % phase_dens(1)
+      else if(Vof % fun % n(c) < 0.5) then
+        cap_dens(c) = Vof % phase_capa(2) * Vof % phase_dens(2)
+      end if
     end if
   end do
   call Numerics_Mod_Inertial_Term(t, cap_dens, A, b, dt)
