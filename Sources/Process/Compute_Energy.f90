@@ -1,4 +1,4 @@
-!=ON DISK======================================================================!
+!==============================================================================!
   subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
@@ -31,8 +31,8 @@
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
-  real                       :: a12, a21, con_eff
-  real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, dt
+  real                       :: a12, a21, con_eff, dt
+  real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, q_exp
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -233,26 +233,16 @@
   !   cross diffusion, and heat from interface   !
   !----------------------------------------------!
   do c = 1, Grid % n_cells
-    if(t % c(c) >= 0) then
-      b(c)  = b(c) + t % c(c)
-    else
-      A % val(A % dia(c)) = A % val(A % dia(c))  &
-                          - t % c(c) / (t % n(c) + MICRO)
-    end if
-    b(c) = b(c) + q_turb(c)
-  end do
 
-  ! Heat from the interface
-  if(Flow % mass_transfer) then
-    do c = 1, Grid % n_cells
-      if(q_int(c) >= 0) then
-        b(c) = b(c) + q_int(c)
-      else
-        a % val(a % dia(c)) = a % val(a % dia(c))  &
-                            - q_int(c) / (t % n(c) + FEMTO)
-      end if
-    end do
-  end if
+    ! Total explicit heat flux
+    q_exp = t % c(c) + q_turb(c) + q_int(c)
+
+    if(q_exp >= 0) then
+      b(c)  = b(c) + q_exp
+    else
+      A % val(A % dia(c)) = A % val(A % dia(c)) - q_exp / (t % n(c) + MICRO)
+    end if
+  end do
 
   !--------------------!
   !                    !
