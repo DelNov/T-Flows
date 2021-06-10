@@ -14,10 +14,10 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow  => Vof % pnt_flow
-  Grid  => Flow % pnt_grid
-  col   => Vof % fun
-  ! col   => Vof % smooth
+  Flow => Vof  % pnt_flow
+  Grid => Flow % pnt_grid
+  col  => Vof % fun
+  ! col  => Vof % smooth
 
   ! Density and viscosity in cells
   do c = -Grid % n_bnd_cells, Grid % n_cells
