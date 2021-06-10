@@ -1,4 +1,4 @@
-!==============================================================================!
+!=ON DISK======================================================================!
   subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
@@ -137,6 +137,12 @@
     c2 = Grid % faces_c(2,s)
 
     call Turb_Mod_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
+    if(Flow % mass_transfer) then
+      if(Vof % fun % n(c1) < 0.5 .and.  &
+         Vof % fun % n(c2) < 0.5) con_eff = Vof % phase_cond(2)
+      if(Vof % fun % n(c1) > 0.5 .and.  &
+         Vof % fun % n(c2) > 0.5) con_eff = Vof % phase_cond(1)
+    end if
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
     tx_f = Grid % fw(s) * t % x(c1) + (1.0-Grid % fw(s)) * t % x(c2)
@@ -157,17 +163,6 @@
                                    + ty_f * Grid % dy(s)    &
                                    + tz_f * Grid % dz(s) )
 
-    ! Cross diffusion part
-    t % c(c1) = t % c(c1) + f_ex - f_im
-    if(c2 > 0) then
-      t % c(c2) = t % c(c2) - f_ex + f_im
-    end if
-
-    ! Put the influence of turbulent heat fluxes explicitly in the system
-    q_turb(c1) = q_turb(c1) + t_stress
-    if(c2 > 0) then
-      q_turb(c2) = q_turb(c2) - t_stress
-    end if
 
     !------------------------------------------------------!
     !                                                      !
@@ -188,11 +183,25 @@
     !-----------------------------------------------------!
     if(Flow % mass_transfer) then
       if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
-        a12 = 0.0
-        a21 = 0.0
+        a12  = 0.0
+        a21  = 0.0
+        f_ex = 0.0  ! included in q_int
+        f_im = 0.0  ! phases are detached
         q_int(c1) = q_int(c1) + Vof % q_int(1,s)
         q_int(c2) = q_int(c2) - Vof % q_int(2,s)
       end if
+    end if
+
+    ! Cross diffusion part
+    t % c(c1) = t % c(c1) + f_ex - f_im
+    if(c2 > 0) then
+      t % c(c2) = t % c(c2) - f_ex + f_im
+    end if
+
+    ! Put the influence of turbulent heat fluxes explicitly in the system
+    q_turb(c1) = q_turb(c1) + t_stress
+    if(c2 > 0) then
+      q_turb(c2) = q_turb(c2) - t_stress
     end if
 
     !----------------------------!
@@ -233,6 +242,18 @@
     b(c) = b(c) + q_turb(c)
   end do
 
+  ! Heat from the interface
+  if(Flow % mass_transfer) then
+    do c = 1, Grid % n_cells
+      if(q_int(c) >= 0) then
+        b(c) = b(c) + q_int(c)
+      else
+        a % val(a % dia(c)) = a % val(a % dia(c))  &
+                            - q_int(c) / (t % n(c) + FEMTO)
+      end if
+    end do
+  end if
+
   !--------------------!
   !                    !
   !   Inertial terms   !
@@ -240,6 +261,13 @@
   !--------------------!
   do c = -Grid % n_bnd_cells, Grid % n_cells
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
+    if(Flow % mass_transfer) then
+      if(Vof % fun % n(c) > 0.5) then
+        cap_dens(c) = Vof % phase_capa(1) * Vof % phase_dens(1)
+      else if(Vof % fun % n(c) < 0.5) then
+        cap_dens(c) = Vof % phase_capa(2) * Vof % phase_dens(2)
+      end if
+    end if
   end do
   call Numerics_Mod_Inertial_Term(t, cap_dens, A, b, dt)
 
