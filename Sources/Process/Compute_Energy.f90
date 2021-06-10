@@ -5,13 +5,14 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: cap_dens => r_cell_01
+  use Work_Mod, only: cap_dens => r_cell_01,  &
+                      heat_int => r_cell_02
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
 !   Main_Pro                (allocates Work_Mod)                               !
 !     |                                                                        |
-!     +----> Compute_Energy (safe to use r_cell_01)                            !
+!     +----> Compute_Energy (safe to use r_cell_01..02)                        !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -30,8 +31,7 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff
-  real                       :: f_ex, f_im, tx_f, ty_f, tz_f
-  real                       :: t_stress, dt
+  real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, dt
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -95,7 +95,15 @@
   end if
 
   ! Gradients
-  call Flow % Grad_Variable(t)
+  if(.not. Flow % mass_transfer) then
+    call Flow % Grad_Variable(t)
+
+  ! If mass transfer, estimate the mass transfer due to heat fluxes,
+  ! which also compute gradients with saturation temperature at interface
+  else
+    call Vof % Mass_Transfer_Estimate()
+    heat_int(:) = 0.0
+  end if
 
   ! Compute helping variable
   do c = -Grid % n_bnd_cells, Grid % n_cells
@@ -169,7 +177,22 @@
     a21 = a21 + max(v_flux % n(s), 0.0)  &
                  * Flow % capacity(c2) * Flow % density(c2)  ! Flow: 2 -> 1
 
-    ! Fill the system matrix
+    !-----------------------------------------------------!
+    !   In case of mass transfer, detach the two phases   !
+    !      and add heat transferred to the interface      !
+    !-----------------------------------------------------!
+    if(Flow % mass_transfer) then
+      if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+        a12 = 0.0
+        a21 = 0.0
+        heat_int(c1) = heat_int(c1) + Vof % q_int(1,s)
+        heat_int(c2) = heat_int(c2) - Vof % q_int(2,s)
+      end if
+    end if
+
+    !----------------------------!
+    !   Fill the system matrix   !
+    !----------------------------!
     if(c2 > 0) then
       A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
       A % val(A % dia(c2))  = A % val(A % dia(c2)) + a21
@@ -191,7 +214,10 @@
 
   end do  ! through sides
 
-  ! Cross diffusion terms are treated explicity
+  !----------------------------------------------!
+  !   Explicitly treated diffusion heat fluxes   !
+  !   cross diffusion, and heat from interface   !
+  !----------------------------------------------!
   do c = 1, Grid % n_cells
     if(t % c(c) >= 0) then
       b(c)  = b(c) + t % c(c)
@@ -242,7 +268,15 @@
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
 
-  call Flow % Grad_Variable(t)
+  ! Gradients
+  if(.not. Flow % mass_transfer) then
+    call Flow % Grad_Variable(t)
+
+  ! If mass transfer, compute gradients with saturation temperature
+  else
+    call Vof % Grad_Variable_With_Front(t, Vof % t_sat)
+    call Flow % Calculate_Grad_Matrix()
+  end if
 
   ! User function
   call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
