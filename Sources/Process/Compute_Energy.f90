@@ -6,7 +6,8 @@
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
   use Work_Mod, only: cap_dens => r_cell_01,  &
-                      heat_int => r_cell_02
+                      q_int    => r_cell_02,  &
+                      q_turb   => r_cell_03      ! turbulent heat fluxes
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -86,6 +87,11 @@
   A % val(:) = 0.0
   b      (:) = 0.0
 
+  ! Initialize turbulent heat fluxes (used with RSM models)
+  ! and fluxes coming from interfaces (cases with boiling)
+  q_turb(:) = 0.0
+  q_int (:) = 0.0
+
   ! Old values (o and oo)
   if(ini .eq. 1) then
     do c = 1, Grid % n_cells
@@ -102,7 +108,6 @@
   ! which also compute gradients with saturation temperature at interface
   else
     call Vof % Mass_Transfer_Estimate()
-    heat_int(:) = 0.0
   end if
 
   ! Compute helping variable
@@ -159,9 +164,9 @@
     end if
 
     ! Put the influence of turbulent heat fluxes explicitly in the system
-    b(c1) = b(c1) + t_stress
+    q_turb(c1) = q_turb(c1) + t_stress
     if(c2 > 0) then
-      b(c2) = b(c2) - t_stress
+      q_turb(c2) = q_turb(c2) - t_stress
     end if
 
     !------------------------------------------------------!
@@ -185,8 +190,8 @@
       if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
         a12 = 0.0
         a21 = 0.0
-        heat_int(c1) = heat_int(c1) + Vof % q_int(1,s)
-        heat_int(c2) = heat_int(c2) - Vof % q_int(2,s)
+        q_int(c1) = q_int(c1) + Vof % q_int(1,s)
+        q_int(c2) = q_int(c2) - Vof % q_int(2,s)
       end if
     end if
 
@@ -225,6 +230,7 @@
       A % val(A % dia(c)) = A % val(A % dia(c))  &
                           - t % c(c) / (t % n(c) + MICRO)
     end if
+    b(c) = b(c) + q_turb(c)
   end do
 
   !--------------------!
