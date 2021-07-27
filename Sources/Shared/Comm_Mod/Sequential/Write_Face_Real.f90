@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Write_Face_Real(Comm, fh, array, disp)
 !------------------------------------------------------------------------------!
-!   Sequential version of writing a "distributed" face-based array.            !
+!   Sequential version of writing a "distributed" face-based array             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,7 +15,7 @@
 
   ! Write "distributed" face data
   do s = 1, Comm % nf_tot
-    write(9) array(s)
+    write(fh) array(s)
   end do
 
   disp = disp + Comm % nf_tot * SIZE_REAL

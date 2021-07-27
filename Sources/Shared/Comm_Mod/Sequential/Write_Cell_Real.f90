@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Write_Cell_Real(Comm, fh, array, disp)
 !------------------------------------------------------------------------------!
-!   Sequential version of writing a "distributed" cell-based array.            !
+!   Sequential version of writing a "distributed" cell-based array             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,7 +15,7 @@
 
   ! Write "distributed" cell data 
   do c = 1, Comm % nc_tot
-    write(9) array(c)
+    write(fh) array(c)
   end do
 
   disp = disp + Comm % nc_tot * SIZE_REAL

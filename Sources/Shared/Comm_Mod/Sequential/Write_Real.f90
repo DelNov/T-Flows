@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Write_Real(Comm, fh, num, disp)
 !------------------------------------------------------------------------------!
-!   Write single real number for sequential runs.                              !
+!   Write single real number for sequential runs                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -11,7 +11,7 @@
   integer          :: disp  ! displacement in bytes
 !==============================================================================!
 
-  write(9) num
+  write(fh) num
 
   disp = disp + SIZE_REAL
 

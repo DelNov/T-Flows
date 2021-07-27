@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Write_Text(Comm, fh, text_out, disp)
 !------------------------------------------------------------------------------!
-!   Write string array for sequential runs.                                    !
+!   Write string array for sequential runs                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,7 +15,7 @@
 
   leng = len(text_out)
 
-  write(9) text_out
+  write(fh) text_out
 
   disp = disp + leng
 

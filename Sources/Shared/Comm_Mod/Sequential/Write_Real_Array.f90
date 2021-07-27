@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Write_Real_Array(Comm, fh, arr, disp)
 !------------------------------------------------------------------------------!
-!   Write real array for sequential runs.                                      !
+!   Write real array for sequential runs                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,7 +16,7 @@
   ! Get array's length
   length = size(arr)
 
-  write(9) arr(1:length)
+  write(fh) arr(1:length)
 
   disp = disp + SIZE_REAL * length
 

@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Write_Bnd_Real(Comm, fh, array, disp)
 !------------------------------------------------------------------------------!
-!   Sequential version of writing a "distributed" boundary-cell-based array.   !
+!   Sequential version of writing a "distributed" boundary-cell-based array    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,7 +15,7 @@
 
   ! Write "distributed" boundary cell data 
   do c = 1, Comm % nb_tot
-    write(9) array(c)
+    write(fh) array(c)
   end do
 
   disp = disp + Comm % nb_tot * SIZE_REAL
