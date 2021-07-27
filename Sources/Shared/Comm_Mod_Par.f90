@@ -77,6 +77,7 @@
       procedure :: Open_File_Write
       procedure :: Read_Int
       procedure :: Read_Int_Array
+      procedure :: Read_Log
       procedure :: Read_Log_Array
       procedure :: Read_Bnd_Real
       procedure :: Read_Cell_Real
@@ -86,6 +87,7 @@
       procedure :: Read_Text
       procedure :: Write_Int
       procedure :: Write_Int_Array
+      procedure :: Write_Log
       procedure :: Write_Log_Array
       procedure :: Write_Bnd_Real
       procedure :: Write_Cell_Real
@@ -132,6 +134,7 @@
   include 'Comm_Mod/Parallel/Open_File_Write.f90'
   include 'Comm_Mod/Parallel/Read_Int.f90'
   include 'Comm_Mod/Parallel/Read_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Read_Log.f90'
   include 'Comm_Mod/Parallel/Read_Log_Array.f90'
   include 'Comm_Mod/Parallel/Read_Bnd_Real.f90'
   include 'Comm_Mod/Parallel/Read_Cell_Real.f90'
@@ -141,6 +144,7 @@
   include 'Comm_Mod/Parallel/Read_Text.f90'
   include 'Comm_Mod/Parallel/Write_Int.f90'
   include 'Comm_Mod/Parallel/Write_Int_Array.f90'
+  include 'Comm_Mod/Parallel/Write_Log.f90'
   include 'Comm_Mod/Parallel/Write_Log_Array.f90'
   include 'Comm_Mod/Parallel/Write_Bnd_Real.f90'
   include 'Comm_Mod/Parallel/Write_Cell_Real.f90'

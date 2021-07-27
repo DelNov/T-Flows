@@ -134,6 +134,17 @@
   call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_oo',  &
                                  Fld % v_flux % oo, correct_sign = .true.)
 
+  !----------------------------------!
+  !   Does it have pressure outlet   !
+  !----------------------------------!
+  ! Update on July 17, 2021: I have some reservations about this part, since
+  ! there was another bug fix when computing fluxes in the meanwhile (check:
+  ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
+  ! bug when loading backup file (also check "Compute_Pressure" as well as
+  ! "Initialize_Variables" procedures)
+  call Backup_Mod_Read_Log(Comm, fh, d, vc, 'has_pressure_outlet',  &
+                           Fld % has_pressure_outlet)
+
   !--------------!
   !              !
   !   Etnhalpy   !
