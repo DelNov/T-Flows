@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(Fld, swr, tur, Vof, time, time_step, domain)
+  subroutine Backup_Mod_Save(Fld, Swr, tur, Vof, time, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Fld
-  type(Swarm_Type),  target :: swr
+  type(Swarm_Type),  target :: Swr
   type(Turb_Type),   target :: tur
   type(Vof_Type),    target :: Vof
   real                      :: time            ! time of simulation
@@ -329,11 +329,11 @@
   !                          !
   !--------------------------!
   if(Fld % with_particles) then
-    call Backup_Mod_Write_Swarm(fh, d, vc, swr)
+    call Backup_Mod_Write_Swarm(fh, d, vc, Swr)
     call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'n_deposited',      &
-                                    swr % n_deposited)
+                                    Swr % n_deposited)
     call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'n_reflected',      &
-                                    swr % n_reflected)
+                                    Swr % n_reflected)
   end if
 
   !-----------------!
