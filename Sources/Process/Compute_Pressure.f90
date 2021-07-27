@@ -186,6 +186,12 @@
   ! surrounding them are the same after exchanging the buffers.  In order
   ! to fix it, the balancing procedure which follows is introduced.
   ! However, the fix should not be applied if domain has pressure outlet.
+  !
+  ! Update on July 17, 2021: I have some reservations about this part, since
+  ! there was another bug fix when computing fluxes in the meanwhile (check:
+  ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
+  ! bug when loading backup file (also check "Initialize_Variables" and 
+  ! "Backup_Mod/Load and Backup_Mod/Save" procedures)
   if( .not. Flow % has_pressure_outlet) then
     if(total_cells .eq. 0) then  ! wasn't set yet
       total_cells = Grid % n_cells - Grid % comm % n_buff_cells

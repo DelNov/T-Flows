@@ -1,7 +1,11 @@
 !==============================================================================!
-  subroutine Initialize_Variables(Flow, turb, Vof, swarm, Sol)
+  subroutine Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
+!                                                                              !
+!   It is important to remember that this procedure is called only if backup   !
+!   file wasn't read.  Hence, if you initialize something here which should    !
+!   be kept after restart, it should be stored in backup file.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -22,7 +26,7 @@
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type)           :: Vof
-  type(Swarm_Type)         :: swarm
+  type(Swarm_Type)         :: Swarm
   type(Solver_Type)        :: Sol
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
@@ -359,7 +363,7 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
+  call User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 
   !--------------------------------!
   !      Calculate the inflow      !
@@ -416,7 +420,14 @@
   call Comm_Mod_Global_Sum_Real(bulk % vol_in)
   call Comm_Mod_Global_Sum_Real(area)
 
-  ! This parameter, has_pressure_outlet, is used in Compute_Pressure
+  !----------------------------------------------------------------------!
+  !   This parameter, has_pressure_outlet, is used in Compute_Pressure   !
+  !----------------------------------------------------------------------!
+  ! Update on July 17, 2021: I have some reservations about this part, since
+  ! there was another bug fix when computing fluxes in the meanwhile (check:
+  ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
+  ! bug when loading backup file (also check "Compute_Pressure" as well as
+  ! "Backup_Mod/Load and Backup_Mod/Save" procedures)
   Flow % has_pressure_outlet = .false.
   if(n_pressure > 0) then
     Flow % has_pressure_outlet = .true.
