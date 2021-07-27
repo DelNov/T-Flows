@@ -8,14 +8,14 @@
   class(Field_Type) :: Flow
   integer           :: c
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: s, i_fac
   real                     :: dx_c, dy_c, dz_c
   real                     :: jac, g_inv(6)
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !-------------------------------------------!
   !   Initialize gradient matrices for cell   !
@@ -25,12 +25,12 @@
   !--------------------------------------!
   !   Form gradient matrices for cells   !
   !--------------------------------------!
-  do i_fac = 1, grid % cells_n_faces(c)
-    s = grid % cells_f(i_fac, c)
+  do i_fac = 1, Grid % cells_n_faces(c)
+    s = Grid % cells_f(i_fac, c)
 
-    dx_c = grid % dx(s)
-    dy_c = grid % dy(s)
-    dz_c = grid % dz(s)
+    dx_c = Grid % dx(s)
+    dy_c = Grid % dy(s)
+    dz_c = Grid % dz(s)
 
     Flow % grad_c2c(1,c)=Flow % grad_c2c(1,c) + dx_c**2    ! 1,1
     Flow % grad_c2c(2,c)=Flow % grad_c2c(2,c) + dy_c**2    ! 2,2

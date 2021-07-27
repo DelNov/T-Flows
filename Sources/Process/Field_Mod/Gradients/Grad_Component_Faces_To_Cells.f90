@@ -19,7 +19,7 @@
   real,    intent(out)      :: phii( -Flow % pnt_grid % n_bnd_cells  &
                                      :Flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: s, c1, c2
   real                     :: dphi1, dphi2
   real                     :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
@@ -30,27 +30,27 @@
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Refresh buffers
-  call Grid_Mod_Exchange_Cells_Real(grid, phic)
+  call Grid_Mod_Exchange_Cells_Real(Grid, phic)
 
   ! Initialize gradients
-  phii(1:grid % n_cells) = 0.
+  phii(1:Grid % n_cells) = 0.
 
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     dphi1 = phif(s) - phic(c1)
     dphi2 = phif(s) - phic(c2)
 
-    dx_c1 = grid % xf(s) - grid % xc(c1)
-    dy_c1 = grid % yf(s) - grid % yc(c1)
-    dz_c1 = grid % zf(s) - grid % zc(c1)
-    dx_c2 = grid % xf(s) - grid % xc(c2)
-    dy_c2 = grid % yf(s) - grid % yc(c2)
-    dz_c2 = grid % zf(s) - grid % zc(c2)
+    dx_c1 = Grid % xf(s) - Grid % xc(c1)
+    dy_c1 = Grid % yf(s) - Grid % yc(c1)
+    dz_c1 = Grid % zf(s) - Grid % zc(c1)
+    dx_c2 = Grid % xf(s) - Grid % xc(c2)
+    dy_c2 = Grid % yf(s) - Grid % yc(c2)
+    dz_c2 = Grid % zf(s) - Grid % zc(c2)
 
     ! On the boundaries
     if(c2 < 0) then
@@ -76,6 +76,6 @@
     end if
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, phii)
+  call Grid_Mod_Exchange_Cells_Real(Grid, phii)
 
   end subroutine

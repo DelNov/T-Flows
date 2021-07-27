@@ -15,27 +15,27 @@
   real, intent(in)   :: var_node(1:Flow % pnt_grid % n_nodes)
   real, intent(out)  :: var_face(1:Flow % pnt_grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n, s, i_nod
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Interpolate from all nodes to faces
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
     var_face(s) = 0.0
 
     ! Loop on nodes
-    do i_nod = 1, abs(grid % faces_n_nodes(s))
+    do i_nod = 1, abs(Grid % faces_n_nodes(s))
 
-      n = grid % faces_n(i_nod, s)
+      n = Grid % faces_n(i_nod, s)
       var_face(s) = var_face(s) + var_node(n)
 
     end do
 
-    var_face(s) = var_face(s) / real(grid % faces_n_nodes(s))
+    var_face(s) = var_face(s) / real(Grid % faces_n_nodes(s))
 
   end do
 

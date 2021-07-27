@@ -13,7 +13,7 @@
   real,    intent(out)      :: phii( -Flow % pnt_grid % n_bnd_cells  &
                                      :Flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n, c, i_nod
   real                     :: dx, dy, dz, dphi
 !-----------------------------[Local parameters]-------------------------------!
@@ -23,23 +23,23 @@
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Do not refresh buffers and nodal values because
   ! curvature at the walls are imposed outside
 
   ! Initialize gradients
-  phii(1:grid % n_cells) = 0.
+  phii(1:Grid % n_cells) = 0.
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Browse through cell's nodes
-    do i_nod = 1, abs(grid % cells_n_nodes(c))
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
 
-     n  = grid % cells_n(i_nod, c)
-     dx = grid % xn(n) - grid % xc(c)
-     dy = grid % yn(n) - grid % yc(c)
-     dz = grid % zn(n) - grid % zc(c)
+     n  = Grid % cells_n(i_nod, c)
+     dx = Grid % xn(n) - Grid % xc(c)
+     dy = Grid % yn(n) - Grid % yc(c)
+     dz = Grid % zn(n) - Grid % zc(c)
 
      dphi = phin(n) - phic(c)
 
@@ -51,6 +51,6 @@
 
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, phii)
+  call Grid_Mod_Exchange_Cells_Real(Grid, phii)
 
   end subroutine

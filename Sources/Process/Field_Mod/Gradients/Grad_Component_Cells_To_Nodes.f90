@@ -12,7 +12,7 @@
   integer, intent(in)       :: i
   real,    intent(out)      :: phii(1:Flow % pnt_grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n, c, i_cel
   real                     :: dx, dy, dz, dphi
 !-----------------------------[Local parameters]-------------------------------!
@@ -22,23 +22,23 @@
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Do not refresh buffers and nodal values because
   ! curvature at the walls are imposed outside
 
   ! Initialize gradients at nodes
-  phii(1:grid % n_nodes) = 0.
+  phii(1:Grid % n_nodes) = 0.
 
-  do n = 1, grid % n_nodes
+  do n = 1, Grid % n_nodes
 
     ! Browse through cell's nodes
-    do i_cel = 1, grid % nodes_n_cells(n)
+    do i_cel = 1, Grid % nodes_n_cells(n)
 
-      c  = grid % nodes_c(i_cel, n)
-      dx = grid % xc(c) - grid % xn(n)
-      dy = grid % yc(c) - grid % yn(n)
-      dz = grid % zc(c) - grid % zn(n)
+      c  = Grid % nodes_c(i_cel, n)
+      dx = Grid % xc(c) - Grid % xn(n)
+      dy = Grid % yc(c) - Grid % yn(n)
+      dz = Grid % zc(c) - Grid % zn(n)
 
       dphi = phic(c) - phin(n)
 

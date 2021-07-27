@@ -7,19 +7,19 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type) :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: c, i_nod, n
   real                     :: dx, dy, dz
   real                     :: jac, g_inv(6)
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
   !--------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     Flow % grad_n2c(1,c) = 0.0
     Flow % grad_n2c(2,c) = 0.0
     Flow % grad_n2c(3,c) = 0.0
@@ -31,14 +31,14 @@
   !-----------------------------------------------!
   !   Compute the gradient matrix for all nodes   !
   !-----------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Browse through cell's nodes
-    do i_nod = 1, abs(grid % cells_n_nodes(c))
-      n  = grid % cells_n(i_nod, c)
-      dx = grid % xn(n) - grid % xc(c)
-      dy = grid % yn(n) - grid % yc(c)
-      dz = grid % zn(n) - grid % zc(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
+      n  = Grid % cells_n(i_nod, c)
+      dx = Grid % xn(n) - Grid % xc(c)
+      dy = Grid % yn(n) - Grid % yc(c)
+      dz = Grid % zn(n) - Grid % zc(c)
 
       Flow % grad_n2c(1,c) = Flow % grad_n2c(1,c) + dx * dx    ! 1,1
       Flow % grad_n2c(2,c) = Flow % grad_n2c(2,c) + dy * dy    ! 2,2
@@ -53,7 +53,7 @@
   !--------------------------------!
   !   Find the inverse of matrix   !
   !--------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     jac = Flow % grad_n2c(1,c) * Flow % grad_n2c(2,c) * Flow % grad_n2c(3,c)  &
         - Flow % grad_n2c(1,c) * Flow % grad_n2c(6,c) * Flow % grad_n2c(6,c)  &
         - Flow % grad_n2c(4,c) * Flow % grad_n2c(4,c) * Flow % grad_n2c(3,c)  &

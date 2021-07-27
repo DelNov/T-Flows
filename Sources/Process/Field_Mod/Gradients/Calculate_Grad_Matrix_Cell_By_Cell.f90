@@ -9,19 +9,19 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type) :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: c, s, i_fac
   real                     :: dx_c, dy_c, dz_c
   real                     :: jac, g_inv(6)
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !-----------------------------------------------!
   !   Calculate gradient matrices for all cells   !
   !-----------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     call Flow % Calculate_Grad_Matrix_For_Cell(c)
   end do
 

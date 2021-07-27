@@ -12,19 +12,19 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type) :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: c, c1, c2, s
   real                     :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
   real                     :: jac, g_inv(6)
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
   !--------------------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     Flow % grad_f2c(1,c) = 0.0
     Flow % grad_f2c(2,c) = 0.0
     Flow % grad_f2c(3,c) = 0.0
@@ -36,16 +36,16 @@
   !----------------------------------------------------------------------!
   !   Compute the gradient matrix for all cells browsing through faces   !
   !----------------------------------------------------------------------!
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
-    dx_c1 = grid % xf(s) - grid % xc(c1)
-    dy_c1 = grid % yf(s) - grid % yc(c1)
-    dz_c1 = grid % zf(s) - grid % zc(c1)
-    dx_c2 = grid % xf(s) - grid % xc(c2)
-    dy_c2 = grid % yf(s) - grid % yc(c2)
-    dz_c2 = grid % zf(s) - grid % zc(c2)
+    dx_c1 = Grid % xf(s) - Grid % xc(c1)
+    dy_c1 = Grid % yf(s) - Grid % yc(c1)
+    dz_c1 = Grid % zf(s) - Grid % zc(c1)
+    dx_c2 = Grid % xf(s) - Grid % xc(c2)
+    dy_c2 = Grid % yf(s) - Grid % yc(c2)
+    dz_c2 = Grid % zf(s) - Grid % zc(c2)
 
     Flow % grad_f2c(1,c1)=Flow % grad_f2c(1,c1) + dx_c1*dx_c1    ! 1,1
     Flow % grad_f2c(2,c1)=Flow % grad_f2c(2,c1) + dy_c1*dy_c1    ! 2,2
@@ -67,7 +67,7 @@
   !--------------------------------!
   !   Find the inverse of matrix   !
   !--------------------------------!
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     jac = Flow % grad_f2c(1,c) * Flow % grad_f2c(2,c) * Flow % grad_f2c(3,c)  &
         - Flow % grad_f2c(1,c) * Flow % grad_f2c(6,c) * Flow % grad_f2c(6,c)  &
         - Flow % grad_f2c(4,c) * Flow % grad_f2c(4,c) * Flow % grad_f2c(3,c)  &

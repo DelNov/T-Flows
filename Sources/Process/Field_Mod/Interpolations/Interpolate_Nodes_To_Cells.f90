@@ -10,29 +10,29 @@
   real, intent(out) :: var_cell( -Flow % pnt_grid % n_bnd_cells  &
                                  :Flow % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n, c, i_nod
 !==============================================================================!
 
   ! Take alias
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Interpolate from all nodes to cells
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     var_cell(c) = 0.0
 
     ! Loop on nodes
-    do i_nod = 1, abs(grid % cells_n_nodes(c))
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
 
-      n = grid % cells_n(i_nod, c)
+      n = Grid % cells_n(i_nod, c)
       var_cell(c) = var_cell(c)  &
-                  + grid % weight_n2c(i_nod, c) * var_node(n)
+                  + Grid % weight_n2c(i_nod, c) * var_node(n)
 
     end do
 
   end do
 
-  call Grid_Mod_Exchange_Cells_Real(grid, var_cell)
+  call Grid_Mod_Exchange_Cells_Real(Grid, var_cell)
 
   end subroutine
