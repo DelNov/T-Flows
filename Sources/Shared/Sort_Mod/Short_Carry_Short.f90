@@ -1,7 +1,7 @@
 !==============================================================================!
   recursive subroutine Short_Carry_Short(Sort, a, b)
 !------------------------------------------------------------------------------!
-!   Quick sort one real array and carry an integer arral along                 !
+!   Quick sort one short array and carry a short array along                   !
 !                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
   integer(SP)      :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP) :: x
-  integer     :: i, j, n
+  integer(SP) :: i, j, n
 !==============================================================================!
 
   n = size(a, 1)
