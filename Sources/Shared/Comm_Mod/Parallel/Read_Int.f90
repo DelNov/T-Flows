@@ -10,7 +10,7 @@
   integer          :: num   ! number to read
   integer          :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Set it at position disp (same as in Write counterpart)

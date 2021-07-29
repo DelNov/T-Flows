@@ -10,7 +10,7 @@
   logical          :: var   ! variable to write out
   integer          :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Set it at position disp (same as in Read counterpart)

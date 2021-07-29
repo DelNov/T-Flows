@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Read_Face_Real(Comm, fh, array, disp)
 !------------------------------------------------------------------------------!
-!   Read distributed face-based array.                                         !
+!   Read distributed face-based array.  (Not used any more.)                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -10,7 +10,7 @@
   real             :: array(:)
   integer          :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Set view for distributed face data

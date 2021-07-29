@@ -10,7 +10,7 @@
   real             :: array(:)
   integer          :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Set view for distributed cell data 

@@ -10,7 +10,7 @@
   real             :: num   ! number to write out
   integer          :: disp  ! diplacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Set it at position disp (same as in Write counterpart)

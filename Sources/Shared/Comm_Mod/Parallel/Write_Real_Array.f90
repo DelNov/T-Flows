@@ -11,7 +11,7 @@
   integer              :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Get array's length

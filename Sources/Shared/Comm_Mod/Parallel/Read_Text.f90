@@ -10,7 +10,8 @@
   character        :: text_in*(*)  ! text to write out
   integer          :: disp         ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: leng, error
+  integer :: leng
+  integer :: error = 0
 !==============================================================================!
 
   leng = len(text_in)

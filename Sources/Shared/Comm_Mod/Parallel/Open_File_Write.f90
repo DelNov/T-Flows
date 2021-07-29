@@ -9,7 +9,7 @@
   integer          :: fh             ! file handle
   character        :: file_name*(*)  ! file name
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 
   ! Open file with MPI
