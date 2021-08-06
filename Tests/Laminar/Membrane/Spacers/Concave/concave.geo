@@ -96,8 +96,8 @@ Recursive Delete {Volume{3};}
 // Cut domains further to be able to make a hex mesh
 //---------------------------------------------------
 
-Translate {0, 0,-0.75} {Duplicata{Point{48}; Point{53}; Point{43};Point{49};}}
-Translate {0, 0, 0.75} {Duplicata{Point{46}; Point{45}; Point{55};Point{56};}}
+Translate {0, 0,-H/2} {Duplicata{Point{48}; Point{53}; Point{43};Point{49};}}
+Translate {0, 0, H/2} {Duplicata{Point{46}; Point{45}; Point{55};Point{56};}}
 
 Line(133) = {48, 73}; Line(134) = {53, 74};
 Line(135) = {43, 75}; Line(136) = {49, 76};
