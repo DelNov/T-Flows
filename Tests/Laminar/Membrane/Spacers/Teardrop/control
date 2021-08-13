@@ -8,6 +8,8 @@
   NUMBER_OF_TIME_STEPS    1200
   RESULTS_SAVE_INTERVAL     12
 
+  LOAD_BACKUP_NAME    teardrop-ts001080.backup
+
 #-----------------
 # Physical models
 #-----------------
@@ -18,24 +20,31 @@
 
  TURBULENCE_MODEL       none
 
- PRESSURE_DROPS     30.0  30.0   0.0
-# MASS_FLOW_RATES    0.1    0.0    0.0
+ POINT_FOR_MONITORING_PLANES    0.0125  0.0125  0.075
+ PRESSURE_DROPS                30.0    30.0     0.0
+ MASS_FLOW_RATES                0.025   0.025   0.0
+
+#------------------
+# Numerical models
+#------------------
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER  240
+ MAX_ITERATIONS_FOR_MOMENTUM_SOLVER   20
 
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION    bottom
-    TYPE                wall
-    VARIABLES           u     v     w     t
-    VALUES              0.0   0.0   0.0   10
+ BOUNDARY_CONDITION    bottom
+   TYPE                wall
+   VARIABLES           u     v     w     t
+   VALUES              0.0   0.0   0.0   10
 
-  BOUNDARY_CONDITION    top
-    TYPE                wall
-    VARIABLES           u     v     w     t
-    VALUES              0.0   0.0   0.0   20
+ BOUNDARY_CONDITION    top
+   TYPE                wall
+   VARIABLES           u     v     w     t
+   VALUES              0.0   0.0   0.0   20
 
-  BOUNDARY_CONDITION    spacer_walls
-    TYPE                wall
-    VARIABLES           u     v     w     q
-    VALUES              0.0   0.0   0.0   0.0
+ BOUNDARY_CONDITION    spacer_walls
+   TYPE                wall
+   VARIABLES           u     v     w     q
+   VALUES              0.0   0.0   0.0   0.0
 
