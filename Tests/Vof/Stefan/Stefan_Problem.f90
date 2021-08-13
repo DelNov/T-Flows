@@ -58,7 +58,8 @@
 
   rhs = CP_V * (T_WALL - T_SAT) / (sqrt(PI) * L)
 
-  print '(a, es15.7)', '# rhs = ', rhs
+  print '(a, es15.7)', '# Initial rhs = ', rhs
+  print '(a)',         '#  Left value,    Right value,   Left residual, Right residual'
 
   ! Set initial values of moving boundary
   xm_l = xi_l
@@ -110,10 +111,12 @@
   real    :: ipos  ! interface position
   real    :: fpos  ! final position
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: i
-  real          :: cpos, opos, tcur, told
-  character(32) :: fname = 'temperature_distribution_XXX.dat'
-  character(29) :: gname = 'temperature_gradients_XXX.dat'
+  integer            :: i
+  real               :: cpos, opos, tcur, told
+  character(32)      :: fname = 'temperature_distribution_XXX.dat'
+  character(29)      :: gname = 'temperature_gradients_XXX.dat'
+  integer, parameter :: TD = 13  ! temperature distribution
+  integer, parameter :: TG = 14  ! temperature gradients
 !==============================================================================!
 
   write(fname(26:28), '(i3.3)') n
@@ -121,8 +124,8 @@
 
   print '(a,a)', '# Creating file: ', fname
   print '(a,a)', '# Creating file: ', gname
-  open(file=fname, unit=13)
-  open(file=gname, unit=14)
+  open(file=fname, unit=TD)
+  open(file=gname, unit=TG)
 
   do i = 0, 100
 
@@ -136,11 +139,11 @@
     else
       tcur = T_SAT
     end if
-    write(13,*)  cpos, tcur
+    write(TD,*)  cpos, tcur
 
     ! Store temperature gradients
     if(i > 0) then
-      write(14,*)  (cpos+opos)*0.5, (tcur-told)/(cpos-opos)
+      write(TG,*)  (cpos+opos)*0.5, (tcur-told)/(cpos-opos)
     end if
 
     ! Store previous position
@@ -148,8 +151,8 @@
     told = tcur
   end do
 
-  close(13)
-  close(14)
+  close(TD)
+  close(TG)
 
   end subroutine
 
@@ -163,12 +166,14 @@
 !----------------------------------[Calling]-----------------------------------!
   real :: Xi
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: n, n_dt
-  integer       :: i
-  real          :: xi_main
-  real          :: ipos, opos, final_pos, dt, start_time, final_time, time
-  character(22) :: fname = 'interface_position.dat'
-  character(22) :: gname = 'interface_velocity.dat'
+  integer            :: n, n_dt
+  integer            :: i
+  real               :: xi_main
+  real               :: ipos, opos, final_pos, dt, start_time, final_time, time
+  character(22)      :: fname = 'interface_position.dat'
+  character(22)      :: gname = 'interface_velocity.dat'
+  integer, parameter :: IP = 11  ! interface position
+  integer, parameter :: IV = 12  ! interface velocity
 !==============================================================================!
 
   print '(a)', '#============================================'
@@ -194,11 +199,11 @@
 
   print '(a,a)', '# Creating file: ', fname
   print '(a,a)', '# Creating file: ', gname
-  open(file=fname, unit=11)
-  open(file=gname, unit=12)
+  open(file=fname, unit=IP)
+  open(file=gname, unit=IV)
 
-  write(11, '(a)')  '# Time [s]       Position [m]'
-  write(12, '(a)')  '# Time [s]       Velocity [m/s]'
+  write(IP, '(a)')  '# Time [s]       Position [m]'
+  write(IV, '(a)')  '# Time [s]       Velocity [m/s]'
   opos = 0.0                                     ! old position
   do n = 0, n_dt
 
@@ -211,14 +216,14 @@
       call Temperature_Distribution(xi_main, n, time, ipos, final_pos)
     end if
 
-    write(11, '(2es15.7)') time - start_time, ipos
+    write(IP, '(2es15.7)') time - start_time, ipos
     if(n > 0) then
-      write(12, '(2es15.7)') time - dt*0.5 - start_time, (ipos-opos)/dt
+      write(IV, '(2es15.7)') time - dt*0.5 - start_time, (ipos-opos)/dt
     end if
     opos = ipos
   end do
 
-  close(11)
-  close(12)
+  close(IP)
+  close(IV)
 
   end program
