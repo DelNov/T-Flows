@@ -52,7 +52,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
                                             Vof % smooth,  &
                                             .true.)  ! don't print messages
     call Vof % Front % Print_Front_Statistics()
-    call Vof % Front % Save_Front_Debug(0)
+    ! call Vof % Front % Save_Front_Debug(0)
   end if
 
   ! Initialize velocities (depends on phase definition)
