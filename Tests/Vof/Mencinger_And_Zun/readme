@@ -69,3 +69,10 @@ from under-relaxed momentum matrix, Majundar method is needed!
 I have also implemented Choi's method and seems to be working fine (not as
 impressive as Majumdar, but works) and comparison with and without it can be
 seen in graphs 05..06*.agr.
+
+---------------------------------------------------------------------------------
+
+Update on August 12, 2021.  It seems that only intervention in Main_Pro.f90
+is needed to make this case work.  In current revision 
+d276f4a7c87cebf6c43696e074b7b50643355ccc it is in lines: 283-288.
+
