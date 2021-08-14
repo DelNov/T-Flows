@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 50, &
+  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 12, &
                                   val, verbose)
 
   end subroutine

@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('BACKUP_SAVE_INTERVAL', 100, &
+  call Control_Mod_Read_Int_Item('BACKUP_SAVE_INTERVAL', 120, &
                                   val, verbose)
 
   end subroutine
