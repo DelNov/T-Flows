@@ -13,7 +13,7 @@
 # Saving intervals
 #------------------
  RESULTS_SAVE_INTERVAL    60
- BACKUP_SAVE_INTERVAL   1200
+ BACKUP_SAVE_INTERVAL    120
 
  # LOAD_BACKUP_NAME  jet-ts000120.backup
 
@@ -73,6 +73,8 @@
  TOLERANCE_FOR_TURBULENCE_SOLVER    1.e-5
  TOLERANCE_FOR_ENERGY_SOLVER        1.e-7
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER   120
 
 #--------------------
 # Initial conditions
