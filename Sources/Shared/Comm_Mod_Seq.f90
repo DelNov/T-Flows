@@ -46,7 +46,12 @@
     ! Single precision coud not be avoided here :-(
     integer(SP), allocatable :: cell_map(:)
     integer(SP), allocatable :: bnd_cell_map(:)
-    integer(SP), allocatable :: face_map(:)
+
+    ! Face maps.  They are not used in MPI calls, can be integers
+    integer, allocatable :: face_map_uni_glo(:)  ! unique entries only
+    integer, allocatable :: face_map_uni_loc(:)  ! unique entries only
+    integer, allocatable :: face_map_dup_glo(:)  ! duplicate entries too
+    integer, allocatable :: face_map_dup_loc(:)  ! duplicate entries too
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_sub   ! number of cells in subdomain
@@ -67,7 +72,6 @@
 
     integer, private :: cell_map_type
     integer, private :: bnd_cell_map_type
-    integer, private :: face_map_type
 
     contains
 
@@ -81,7 +85,6 @@
       procedure :: Read_Log_Array
       procedure :: Read_Bnd_Real
       procedure :: Read_Cell_Real
-      procedure :: Read_Face_Real
       procedure :: Read_Real
       procedure :: Read_Real_Array
       procedure :: Read_Text
@@ -91,7 +94,6 @@
       procedure :: Write_Log_Array
       procedure :: Write_Bnd_Real
       procedure :: Write_Cell_Real
-      procedure :: Write_Face_Real
       procedure :: Write_Real
       procedure :: Write_Real_Array
       procedure :: Write_Text
@@ -138,7 +140,6 @@
   include 'Comm_Mod/Sequential/Read_Log_Array.f90'
   include 'Comm_Mod/Sequential/Read_Bnd_Real.f90'
   include 'Comm_Mod/Sequential/Read_Cell_Real.f90'
-  include 'Comm_Mod/Sequential/Read_Face_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real.f90'
   include 'Comm_Mod/Sequential/Read_Real_Array.f90'
   include 'Comm_Mod/Sequential/Read_Text.f90'
@@ -148,7 +149,6 @@
   include 'Comm_Mod/Sequential/Write_Log_Array.f90'
   include 'Comm_Mod/Sequential/Write_Bnd_Real.f90'
   include 'Comm_Mod/Sequential/Write_Cell_Real.f90'
-  include 'Comm_Mod/Sequential/Write_Face_Real.f90'
   include 'Comm_Mod/Sequential/Write_Real.f90'
   include 'Comm_Mod/Sequential/Write_Real_Array.f90'
   include 'Comm_Mod/Sequential/Write_Text.f90'

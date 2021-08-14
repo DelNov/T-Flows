@@ -14,9 +14,10 @@
                                            ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
-  character(len=80)        :: vn
+  character(SL)            :: vn
   integer                  :: vs, disp_loop, cnt_loop, nf
-  integer                  :: s, c1, c2, cg1, cg2
+  integer                  :: s, c1, c2, c1g, c2g, cnt, i_sid, sg
+  real                     :: buffer
 !==============================================================================!
 
   ! Take alias
@@ -35,29 +36,36 @@
     cnt_loop = cnt_loop + 1
 
     call Comm % Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm % Read_Int (fh, vs, disp_loop)  ! variable size  
+    call Comm % Read_Int (fh, vs, disp_loop)  ! variable size
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm % Read_Face_Real(fh, array(1:Comm % nf_sub), disp_loop)
-      disp = disp_loop
 
-      ! Correct the signs of fluxes  (Remember, they are defined
-      ! defined to be positive from cg1 to cg2; and cg2 > cg1)
-      if(present(correct_sign)) then
-        if(correct_sign) then
-          do s = 1, Grid % n_faces
-            c1  = Grid % faces_c(1,s)
-            c2  = Grid % faces_c(2,s)
-            cg1 = Grid % Comm % cell_glo(c1)
-            cg2 = Grid % Comm % cell_glo(c2)
-            if(cg2 > 0 .and. cg2 < cg1) then
-              array(s) = -array(s)
-            end if
-          end do
+      i_sid = 1                 ! local side counter
+      do sg = 1, Comm % nf_tot  ! global side loop
+
+        ! The global value is read by all processors
+        call Comm % Read_Real(fh, buffer, disp_loop)
+
+        ! If you didn't go beyond local face map ...
+        ! ... check if this global side is present in this processor
+        if(i_sid .le. Grid % n_faces) then
+          if(Comm % face_map_dup_glo(i_sid) .eq. sg) then
+            s = Comm % face_map_dup_loc(i_sid)  ! get the local face number
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+            c1g = Grid % Comm % cell_glo(c1)
+            c2g = Grid % Comm % cell_glo(c2)
+            array(s) = buffer
+            if(c2g > 0 .and. c2g < c1g) array(s) = -buffer
+            i_sid = i_sid + 1
+          end if
         end if
-      end if
+
+      end do
+
+      disp = disp_loop
 
       return
 
@@ -70,6 +78,8 @@
     if(cnt_loop >= vc) goto 1
 
   end do
+
+  return
 
 1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
                              'Setting the values to 0.0!'

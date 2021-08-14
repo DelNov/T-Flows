@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Comm_Type) :: Comm
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer :: error = 0
 !==============================================================================!
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
 !   functions than T-Flows.  In cases a subdomain has no physical boundary     !
@@ -36,14 +36,5 @@
                                      Comm % bnd_cell_map_type,  &  ! new type
                                      error)                        ! int. error
   call Mpi_Type_Commit(Comm % bnd_cell_map_type, error)
-
-  ! Create new type for faces
-  call Mpi_Type_Create_Indexed_Block(Comm % nf_sub,         &  ! length of map
-                                     1,                     &  ! block size
-                                     Comm % face_map,       &  ! displacements
-                                     MPI_DOUBLE,            &  ! old data type
-                                     Comm % face_map_type,  &  ! new data type
-                                     error)                    ! integer error
-  call Mpi_Type_Commit(Comm % face_map_type, error)
 
   end subroutine

@@ -16,29 +16,14 @@
   type(Comm_Type), pointer :: Comm
   character(len=80)        :: vn
   integer                  :: vs  ! variable size
-  integer                  :: s, c1, c2, cg1, cg2
+  integer                  :: s, c1, c2, cg1, cg2, sg, i_sid, error
+  real                     :: buffer
 !==============================================================================!
 
   ! Take alias
   Comm => Grid % Comm
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
-
-  ! Correct the signs of fluxes  (Remember, they are defined
-  ! defined to be positive from cg1 to cg2; and cg2 > cg1)
-  if(present(correct_sign)) then
-    if(correct_sign) then
-      do s = 1, Grid % n_faces
-        c1  = Grid % faces_c(1,s)
-        c2  = Grid % faces_c(2,s)
-        cg1 = Grid % Comm % cell_glo(c1)
-        cg2 = Grid % Comm % cell_glo(c2)
-        if(cg2 > 0 .and. cg2 < cg1) then
-          array(s) = -array(s)
-        end if
-      end do
-    end if
-  end if
 
   ! Increase variable count
   vc = vc + 1
@@ -50,22 +35,21 @@
   vs = (Comm % nf_tot) * SIZE_REAL
   call Comm % Write_Int (fh, vs, disp)
 
-  call Comm % Write_Face_Real(fh, array(1:Comm % nf_sub), disp)
+  i_sid = 1
+  do sg = 1, Comm % nf_tot
+    buffer = 0.0
 
-  ! Correct the signs of fluxes  (Remember, they are defined
-  ! defined to be positive from cg1 to cg2; and cg2 > cg1)
-  if(present(correct_sign)) then
-    if(correct_sign) then
-      do s = 1, Grid % n_faces
-        c1  = Grid % faces_c(1,s)
-        c2  = Grid % faces_c(2,s)
-        cg1 = Grid % Comm % cell_glo(c1)
-        cg2 = Grid % Comm % cell_glo(c2)
-        if(cg2 > 0 .and. cg2 < cg1) then
-          array(s) = -array(s)
-        end if
-      end do
+    ! If you didn't go beyond local face map ...
+    ! ... check if this global side is present in this processor
+    if(i_sid .le. Comm % nf_sub) then
+      if(Comm % face_map_uni_glo(i_sid) .eq. sg) then
+        s = Comm % face_map_uni_loc(i_sid)  ! get the local face number
+        buffer = array(s)
+        i_sid = i_sid + 1
+      end if
     end if
-  end if
+    call Comm_Mod_Global_Sum_Real(buffer)     ! distribute the value
+    call Comm % Write_Real(fh, buffer, disp)  ! write the same value from all
+  end do
 
   end subroutine
