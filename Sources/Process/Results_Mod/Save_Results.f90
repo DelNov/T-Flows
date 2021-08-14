@@ -60,6 +60,8 @@
   ! Take aliases
   Grid => Flow % pnt_grid
 
+  if(.not. plot_inside .and. .not. Results % boundary) return
+
   !------------------------------------------------!
   !   Mark the beginnings and end of cell ranges   !
   !------------------------------------------------!

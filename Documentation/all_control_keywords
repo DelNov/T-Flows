@@ -3,16 +3,17 @@
 ------------------------------------------------------------------------------------------------------------------------
   KEYWORD                                  |   default value               |   other possible values
 ------------------------------------------------------------------------------------------------------------------------
-  BACKUP_SAVE_INTERVAL                     |       100                     |   any integer > 0
+  BACKUP_SAVE_INTERVAL                     |       120                     |   any integer > 0
   LOAD_BACKUP_NAME                         |         skip                  |   name of existing backup file
   NUMBER_OF_MONITORING_POINTS              |         0                     |   any integer >= 0
     MONITORING_POINT_001                   |         0.0,  0.0,  0.0       |   any triplet of real numbers ...
     ...                                    |         ...                   |   ... specifying coordinates ...
     MONITORING_POINT_00X                   |         0.0,  0.0,  0.0       |   ... inside the grid/domain
   PROBLEM_NAME                             |         unknown               |   any string, usually the grid name
-  RESULTS_SAVE_INTERVAL                    |        60                     |   any integer > 0
+  RESULTS_SAVE_INTERVAL                    |        12                     |   any integer > 0
   SAVE_BACKUP_NAME                         |         skip                  |   name of backup file you want to create
   SAVE_INITIAL_CONDITION                   |         yes                   |   no
+  SAVE_RESULTS_AT_BOUNDARIES               |         yes                   |   no
   SWARM_SAVE_INTERVAL                      |        60                     |   any integer > 0
   WALL_TIME_MAX_HOURS                      |       168.0                   |   any number
 ========================================================================================================================

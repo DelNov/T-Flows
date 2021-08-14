@@ -19,6 +19,7 @@
 
     integer :: interval  ! result save interval
     logical :: initial   ! save intial condition or not
+    logical :: boundary  ! save results at boundaries or not
 
     contains
       procedure :: Main_Results

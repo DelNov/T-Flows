@@ -218,6 +218,7 @@
   call Control_Mod_Backup_Save_Interval  (backup % interval, verbose=.true.)
   call Control_Mod_Results_Save_Interval (Results % interval, verbose=.true.)
   call Control_Mod_Save_Initial_Condition(Results % initial,  verbose=.true.)
+  call Control_Mod_Save_Results_At_Boundaries(Results % boundary)
   if(Flow(d) % with_particles) then
     call Control_Mod_Swarm_Save_Interval(prsi, verbose=.true.)
   end if
