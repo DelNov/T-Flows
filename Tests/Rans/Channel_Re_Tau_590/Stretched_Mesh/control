@@ -7,7 +7,7 @@
  HEAT_TRANSFER           yes
 
  PRESSURE_DROPS         0.0036  0.0  0.0
- MASS_FLOW_RATES        1.16    0.0  0.0
+ MASS_FLOW_RATES        0.2    0.0  0.0
 
 #---------------
 # Time stepping
@@ -33,14 +33,20 @@
 
  POINT_FOR_MONITORING_PLANES    0.5  0.5  0.514
 
-#-----------------
-# Physical models
-#-----------------
+#----------------------------------------
+# Fluid properties
+# Dry air at 27oC in SI units
+#----------------------------------------
 
- MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.4080e-4
- DYNAMIC_VISCOSITY      1.0e-4
- HEAT_CAPACITY          1.0
+ MASS_DENSITY           1.177
+ DYNAMIC_VISCOSITY      1.846e-5
+
+ THERMAL_CONDUCTIVITY   2.6240e-2
+ HEAT_CAPACITY          1000.0 
+
+#----------------------------------------
+# Physical models
+#----------------------------------------
 
  TURBULENCE_MODEL       k_eps_zeta_f
 
@@ -57,8 +63,8 @@
 
  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
- ADVECTION_SCHEME_FOR_ENERGY      superbee
+ ADVECTION_SCHEME_FOR_MOMENTUM    smart
+ ADVECTION_SCHEME_FOR_ENERGY      smart
  ADVECTION_SCHEME_FOR_TURBULENCE  smart
 
  MIN_SIMPLE_ITERATIONS                           3
@@ -84,12 +90,12 @@
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    lower_face
-    TYPE                wall
-    VARIABLES           u     v     w     q     kin   eps      zeta  f22
-    VALUES              0.0   0.0   0.0   0.1   0.0   1.0e-3   0.0   0.0
+    TYPE                wall_flux
+    VARIABLES           u     v     w     q       kin   eps      zeta  f22
+    VALUES              0.0   0.0   0.0   1.0   0.0   1.0e-3   0.0   0.0
 
   BOUNDARY_CONDITION    upper_face
     TYPE                symmetry
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u     v     w     t     
+    VALUES              0.0   0.0   0.0   20.0  
 
