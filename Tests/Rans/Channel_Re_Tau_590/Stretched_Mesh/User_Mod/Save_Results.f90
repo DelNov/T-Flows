@@ -138,11 +138,13 @@
         v_p   (i) = v_p(i) + v % n(c)
         w_p   (i) = w_p(i) + w % n(c)
 
-        kin_p   (i) = kin_p   (i) + kin % n(c)
-        eps_p   (i) = eps_p   (i) + eps % n(c)
-        uw_p    (i) = uw_p    (i) + turb % vis_t(c) * (u % z(c) + w % x(c))
-        vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
-        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
+        if(turb % model .ne. NO_TURBULENCE_MODEL) then
+          kin_p   (i) = kin_p   (i) + kin % n(c)
+          eps_p   (i) = eps_p   (i) + eps % n(c)
+          uw_p    (i) = uw_p    (i) + turb % vis_t(c) * (u % z(c) + w % x(c))
+          vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
+          y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
+        end if
 
         if(turb % model .eq. K_EPS_ZETA_F) then
           f22_p (i) = f22_p (i) + f22  % n(c)
@@ -151,9 +153,11 @@
 
         if(Flow % heat_transfer) then
           t_p (i) = t_p (i) + t  % n(c)
-          ut_p(i) = ut_p(i) + ut % n(c)
-          vt_p(i) = vt_p(i) + vt % n(c)
-          wt_p(i) = wt_p(i) + wt % n(c)
+          if(turb % model .ne. NO_TURBULENCE_MODEL) then
+            ut_p(i) = ut_p(i) + ut % n(c)
+            vt_p(i) = vt_p(i) + vt % n(c)
+            wt_p(i) = wt_p(i) + wt % n(c)
+          end if
         end if
         n_count(i) = n_count(i) + 1
       end if
@@ -290,6 +294,8 @@
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
+    write(i,'(a1,(a12,e12.6))')  &
+    '#', 'density  = ', dens_const 
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'Ubulk    = ', ubulk 
     write(i,'(a1,(a12,e12.6))')  &
