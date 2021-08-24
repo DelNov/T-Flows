@@ -115,7 +115,7 @@
   end function
 
 !==============================================================================!
-  subroutine Temperature_Distribution(beta, n, tim, ipos, fpos)
+  subroutine Temperature_Distribution(beta, n, tim, ipos, fpos, nc)
 !------------------------------------------------------------------------------!
 !   Equation (52) from M. Irfan, M. Muradoglu (2017)                           !
 !   Note that equation (32) from Rajkotwala et al. (2019) has an error         !
@@ -130,9 +130,10 @@
   real    :: tim   ! current time
   real    :: ipos  ! interface position
   real    :: fpos  ! final position
+  integer :: nc    ! number of "cells"
 !-----------------------------------[Locals]-----------------------------------!
   integer            :: i
-  real               :: cpos, opos, tcur, told
+  real               :: cpos, dpos, opos, tcur, told
   character(32)      :: fname = 'temperature_distribution_XXX.dat'
   character(29)      :: gname = 'temperature_gradients_XXX.dat'
   integer, parameter :: TD = 13  ! temperature distribution
@@ -148,10 +149,12 @@
   open(file=fname, unit=TD)
   open(file=gname, unit=TG)
 
-  do i = 0, 1000
+  dpos = fpos / nc   ! this is like dx
 
-    ! Calculate new position
-    cpos = 1.5 * fpos * real(i)/1000.0  ! cpos will range from 0 to 4.8 * fpos
+  do i = 0, nc-1
+
+    ! Calculate new position emulating a cell center
+    cpos = dpos/2.0 + dpos*i
 
     ! Store temperatures
     if(cpos > ipos) then
@@ -199,8 +202,9 @@
   real               :: start_time, final_time, time
   character(22)      :: fname = 'interface_position.dat'
   character(22)      :: gname = 'interface_velocity.dat'
-  integer, parameter :: IP = 11  ! interface position
-  integer, parameter :: IV = 12  ! interface velocity
+  integer, parameter :: IP = 11     ! interface position
+  integer, parameter :: IV = 12     ! interface velocity
+  real,    parameter :: L  =  8e-3  ! length of the domain
 !==============================================================================!
 
   print '(a)', '#============================='
@@ -222,8 +226,9 @@
   start_pos = 2.0 * beta_main * sqrt(ALPHA_G * start_time)
   final_pos = 2.0 * beta_main * sqrt(ALPHA_G * final_time)
   print '(a)', '#=============================================='
-  print '(a,es15.7)', '# Start interface position is: ', start_pos
-  print '(a,es15.7)', '# Final interface position is: ', final_pos
+  print '(a,es15.7)', '# Start interface position: ', start_pos
+  print '(a,es15.7)', '# Final interface position: ', final_pos
+  print '(a,es15.7)', '# Length of the domain:     ', L
   print '(a)', '#----------------------------------------------'
 
   print '(a,a)', '# Creating file: ', fname
@@ -242,7 +247,7 @@
 
     ! Save temperature distribution
     if(mod(n,10) .eq. 0) then
-      call Temperature_Distribution(beta_main, n, time, ipos, final_pos)
+      call Temperature_Distribution(beta_main, n, time, ipos, L, 100)
     end if
 
     write(IP, '(2es15.7)') time, ipos
