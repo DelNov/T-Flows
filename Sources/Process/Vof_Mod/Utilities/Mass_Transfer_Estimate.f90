@@ -76,13 +76,15 @@
       ! Accumulate sources in the cells surroundig the face
       ! Unit: W * kg/J = kg / s
       if(Vof % Front % cell_at_elem(c1) .ne. 0) then
-        Vof % m_dot(c1) = Vof % m_dot(c1)  &
-                        - Vof % q_int(1,s) / 2.26e+6
+        Vof % m_dot(c1) =  Vof % m_dot(c1)                       &
+                        + (Vof % q_int(2,s) - Vof % q_int(1,s))  &
+                        / 2.26e+6
       end if
 
       if(Vof % Front % cell_at_elem(c2) .ne. 0) then
-        Vof % m_dot(c2) = Vof % m_dot(c2)  &
-                        - Vof % q_int(1,s) / 2.26e+6
+        Vof % m_dot(c2) =  Vof % m_dot(c2)                       &
+                        + (Vof % q_int(2,s) - Vof % q_int(1,s))  &
+                        / 2.26e+6
       end if
 
     end if      ! face is at the front
