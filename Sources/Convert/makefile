@@ -147,6 +147,7 @@ SRC_FUN += Allocate_Memory.f90       \
            Find_Parents.f90          \
            Grid_Topology.f90         \
            Guess_Format.f90          \
+           Insert_Buildings.f90      \
            Load_Fluent.f90           \
            Load_Gambit.f90           \
            Load_Gmsh.f90             \
@@ -157,6 +158,7 @@ SRC_FUN += Allocate_Memory.f90       \
            N_Sharp_Corners.f90       \
            N_Sharp_Edges.f90         \
            Sort_Face_Nodes.f90       \
+           Triangle_Area_Z.f90       \
            Main_Con.f90
 
 #----------------------------------------------------------------------

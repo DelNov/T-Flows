@@ -8,9 +8,11 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid(2)        ! grid to be converted and its dual
   character(SL)   :: answer
+  character(SL)   :: app_up
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
   integer         :: l, p, g, n_grids
+  logical         :: city
 !==============================================================================!
 
   ! Open with a logo
@@ -40,6 +42,12 @@
 
   Grid(1) % name = problem_name(1)
   call To_Upper_Case(Grid(1) % name)
+  city = .false.
+  if(l > 10) then
+    app_up = problem_name(1)(l-7:l-4)
+    call To_Upper_Case(app_up)
+    if(app_up .eq. 'CITY') city = .true.
+  end if
 
   !----------------------------------------!
   !                                        !
@@ -55,6 +63,11 @@
   if(file_format .eq. 'GMSH') then
     call Load_Gmsh(Grid(1), file_name)
     call Find_Parents(Grid(1))
+  end if
+
+  ! Sort cells in height first thing after reading	    
+  if(city) then
+    call Insert_Buildings(grid)
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
