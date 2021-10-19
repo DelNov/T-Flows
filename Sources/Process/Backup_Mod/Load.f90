@@ -125,14 +125,8 @@
   call Fld % Grad_Pressure(Fld % pp)
 
   !-------------------!
-  !   Volume fluxes   !
+  !   Volume fluxes   ! -> don't use for the time being, too much trouble
   !-------------------!
-  call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_n',  &
-                                 Fld % v_flux % n, correct_sign = .true.)
-  call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_o',  &
-                                 Fld % v_flux % o, correct_sign = .true.)
-  call Backup_Mod_Read_Face_Real(Grid, fh, d, vc, 'face_flux_oo',  &
-                                 Fld % v_flux % oo, correct_sign = .true.)
 
   !----------------------------------!
   !   Does it have pressure outlet   !
@@ -221,7 +215,6 @@
     end if
 
   end if
-
 
   !----------------------------!
   !   Reynolds stress models   !
