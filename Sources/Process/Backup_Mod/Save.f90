@@ -100,14 +100,8 @@
   call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'press_corr', Fld % pp % n)
 
   !-------------------!
-  !   Volume fluxes   !
+  !   Volume fluxes   ! -> don't use for the time being, too much trouble
   !-------------------!
-  call Backup_Mod_Write_Face_Real(Grid, fh, d, vc, 'face_flux_n',  &
-                                  Fld % v_flux % n, correct_sign = .true.)
-  call Backup_Mod_Write_Face_Real(Grid, fh, d, vc, 'face_flux_o',  &
-                                  Fld % v_flux % o, correct_sign = .true.)
-  call Backup_Mod_Write_Face_Real(Grid, fh, d, vc, 'face_flux_oo',  &
-                                  Fld % v_flux % oo, correct_sign = .true.)
 
   !----------------------------------!
   !   Does it have pressure outlet   !
