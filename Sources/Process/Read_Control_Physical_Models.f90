@@ -145,6 +145,7 @@
      turb % model .eq. DES_SPALART             .or.  &
      turb % model .eq. HYBRID_LES_PRANDTL      .or.  &
      turb % model .eq. HYBRID_LES_RANS         .or.  &
+     turb % model .eq. K_EPS_ZETA_F            .or.  &
      n_times > n_stat) then  ! last line covers unsteady RANS models
 
     if(this_proc < 2) then
