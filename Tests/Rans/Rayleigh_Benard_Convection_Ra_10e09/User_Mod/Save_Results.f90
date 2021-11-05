@@ -31,6 +31,7 @@
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
+  type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: kin, eps, zeta, f, ut, vt, wt, t2
 !==============================================================================!
 
@@ -40,6 +41,7 @@
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
+  call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt) 
   call Turb_Mod_Alias_T2          (turb, t2) 
 
@@ -49,21 +51,22 @@
   t_diff =  t_hot - t_cold
 
   call Flow % Grad_Variable(t)
+  call Flow % Grad_Variable(Flow % u)
+  call Flow % Grad_Variable(Flow % v)
+  call Flow % Grad_Variable(Flow % w)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
   call File % Set_Name(res_name,            &
-                       time_step = n,       &
+                       time_step = ts,      &
                        appendix  = '-res',  &
                        extension = '.dat')
   call File % Set_Name(res_name_plus,            &
-                       time_step = n,            &
+                       time_step = ts,           &
                        appendix  = '-res-plus',  &
                        extension = '.dat')
-
-!  call Grad_Mod_For_Phi(Grid, t % n, 3, phi_z, .true.)
 
   !------------------!
   !   Read 1d file   !
@@ -127,6 +130,9 @@
     allocate(ut_mod(n_prob));   ut_mod = 0.0
     allocate(vt_mod(n_prob));   vt_mod = 0.0
     allocate(wt_mod(n_prob));   wt_mod = 0.0
+    allocate(var_1(n_prob));    var_1  = 0.0
+    allocate(var_2(n_prob));    var_2  = 0.0
+    allocate(var_3(n_prob));    var_3  = 0.0
   end if
 
   !-------------------------!
@@ -157,8 +163,8 @@
         kin_mod_p(i) = kin_mod_p(i) + turb % kin_mean(c)
 
         if(Flow % heat_transfer) then
-          t_p(i)  = t_p(i)  + (turb % t_mean(c) - t_cold)/t_diff
-          t2_p(i) = t2_p(i) + turb % t2_mean(c)  &
+          t_p(i)  = t_p(i)  + turb % t_mean(c) 
+          t2_p(i) = t2_p(i) + turb % t2_res(c)  &
                             - turb % t_mean(c) * turb % t_mean(c)
           t2_mod_p(i) = t2_mod_p(i) + turb % t2_mean(c)
           ut_p(i) = ut_p(i) + turb % ut_res(c)  &
@@ -167,9 +173,11 @@
                             - turb % v_mean(c) * turb % t_mean(c)
           wt_p(i) = wt_p(i) + turb % wt_res(c)  &
                             - turb % w_mean(c) * turb % t_mean(c)
-          ut_mod(i) = ut_mod(i) + turb % ut_res(c)
-          vt_mod(i) = vt_mod(i) + turb % vt_res(c)
-          wt_mod(i) = wt_mod(i) + turb % wt_res(c)
+
+          ut_mod(i) = ut_mod(i) + turb % ut_mean(c)
+          vt_mod(i) = vt_mod(i) + turb % vt_mean(c)
+          wt_mod(i) = wt_mod(i) + turb % wt_mean(c)
+
         end if
         n_count(i) = n_count(i) + 1
       end if
@@ -243,10 +251,10 @@
 
   if(Flow % heat_transfer) then
     if(this_proc < 2) then
-      write(3,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
-               tz_p(1) / (t_hot - t_cold)
-      write(*,'(a1,(a12, f12.6))')'#', ' Nu number = ',  &
-               0.05*(t_hot-ti_p(1)+ti_p(n_prob-1)-t_cold) / wall_p(1)
+      write(*,'(a1,(a12, f12.6))')'#', ' Nu1 number = ',  &
+               -tz_p(1) / (t_hot - t_cold)
+      write(*,'(a1,(a12, f12.6))')'#', ' Nu2 number = ',  &
+               (0.5/15.0)*(t_hot-ti_p(1)+ti_p(n_prob-1)-t_cold) / wall_p(1)
     end if
   end if
 
@@ -256,35 +264,21 @@
                               ' kin'                   //  &  !  7
                               ' t, ut, vt, wt'                !  8 - 11
 
-  do i = 1, n_prob-1
-    t_p (i) = (t_p(i) - t_cold) / t_diff           ! t % n(c)
-    t2_p(i) = t2_p(i) / (t_diff*t_diff)            ! ut % n(c)
-    t2_mod_p(i) = t2_mod_p(i) / (t_diff*t_diff)    ! ut % n(c)
-  end do
-
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
-      write(3,'(21es15.5e3)') wall_p(i),                  &  !  1
-                              tz_p(i),                    &  !  2
-                              (ti_p(i) - t_cold)/t_diff,  &  !  3
-                              w_p(i),                     &  !  4
-                              kin_p(i),                   &  !  5
-                              kin_mod_p(i),               &  !  6
-                              (kin_p(i) + kin_mod_p(i)),  &  !  7
-                              uw_p(i),                    &  !  8
-                              (t_p(i) - t_cold)/t_diff,   &  !  9
-                              t2_p(i),                    &  ! 10
-                              t2_mod_p(i),                &  ! 11
-                              (t2_p(i)+t2_mod_p(i)),      &  ! 12
-                              ut_p(i),                    &  ! 13
-                              vt_p(i),                    &  ! 14
-                              wt_p(i),                    &  ! 15
-                              ut_mod(i),                  &  ! 16
-                              vt_mod(i),                  &  ! 17
-                              wt_mod(i),                  &  ! 18
-                              ut_p(i) + ut_mod(i),        &  ! 19
-                              vt_p(i) + vt_mod(i),        &  ! 20
-                              wt_p(i) + wt_mod(i)            ! 21
+      write(3,'(12es15.5e3)') wall_p(i),                     &  !  1
+                              (ti_p(i) - t_cold)/t_diff,     &  !  2
+                              (t_p(i)  - t_cold)/t_diff,     &  !  3
+                              kin_p(i),                      &  !  4
+                              kin_mod_p(i),                  &  !  5
+                              (kin_p(i) + kin_mod_p(i)),     &  !  6
+                              t2_p(i) / (t_diff*t_diff),     &  !  7
+                              t2_mod_p(i) / (t_diff*t_diff), &  !  8 
+                              (t2_p(i)+t2_mod_p(i))          &
+                              / (t_diff*t_diff),             &  !  9
+                              wt_p(i),                       &  ! 10
+                              wt_mod(i),                     &  ! 11
+                              wt_p(i) + wt_mod(i)               ! 12
     end if
   end do
 
