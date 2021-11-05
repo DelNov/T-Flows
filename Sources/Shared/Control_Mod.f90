@@ -94,6 +94,7 @@
     include 'Control_Mod/Physics/Turbulent_Prandtl_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Schmidt_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90'
+    include 'Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90'
     include 'Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90'
 
     ! Other environmental conditions
