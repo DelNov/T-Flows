@@ -79,10 +79,10 @@
       end if
 
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * Grid % vol(c))
-             A % val(A % dia(c)) = A % val(A % dia(c))         &
-                                 + max(0.0,-turb % g_buoy(c)   &
-                                 * Grid % vol(c)               &
-                                 / (kin % n(c) + TINY))
+      A % val(A % dia(c)) = A % val(A % dia(c))         &
+                          + max(0.0,-turb % g_buoy(c)   &
+                          * Grid % vol(c)               &
+                          / (kin % n(c) + TINY))
     end do
   end if
 
@@ -197,10 +197,13 @@
           qz = t % q(c2) * nz
 
           ut_log_law = - turb % con_w(c1)  &
+                     / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
           vt_log_law = - turb % con_w(c1)  &
+                     / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * ny
           wt_log_law = - turb % con_w(c1)  &
+                     / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nz
 
           ut % n(c1) = ut % n(c1) * exp(-1.0 * ebf)  &
@@ -214,8 +217,8 @@
             t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
-          g_buoy_wall = Flow % beta*abs(grav_x + grav_y + grav_z)  &
-                      * sqrt(abs(t % q(c2))                        &
+          g_buoy_wall = Flow % density(c1) * Flow % beta*abs(grav_x + grav_y + grav_z)  &
+                      * sqrt(abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1)))    &
                       * c_mu_theta5                                &
                       * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
