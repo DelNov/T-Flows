@@ -47,7 +47,7 @@
 
   ! Set some constants
   t_cold =  5.0
-  t_hot  = 15.0
+  t_hot  = 20.0
   t_diff =  t_hot - t_cold
 
   call Flow % Grad_Variable(t)
