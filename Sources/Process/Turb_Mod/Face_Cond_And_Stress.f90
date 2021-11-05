@@ -13,7 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
-  type(Var_Type),   pointer :: t
+  type(Var_Type),   pointer :: t, t2
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c1, c2
   real                      :: pr_t1, pr_t2, pr_tf, con_mol, con_turb
@@ -27,6 +27,7 @@
   t    => Flow % t
 
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
+  call Turb_Mod_Alias_T2         (turb, t2)
 
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
@@ -70,7 +71,7 @@
   !-----------------------------------!
   !   Update effective conductivity   !
   !-----------------------------------!
-  con_eff = con_mol + con_turb
+  con_eff = con_mol + con_turb 
 
   ! Effective conductivity at walls
   if(turb % model .eq. K_EPS        .or.  &
@@ -87,9 +88,9 @@
   !---------------------------!
   !   Turbulent heat fluxes   !
   !---------------------------!
-  t_stress = 0.0
-  if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-     turb % model .eq. RSM_MANCEAU_HANJALIC) then
+
+  if(turb % heat_flux_model .eq. GGDH .or. &
+     turb % heat_flux_model .eq. AFM) then 
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
     tx_f = Grid % fw(s) * t % x(c1) + (1.0-Grid % fw(s)) * t % x(c2)
@@ -107,6 +108,7 @@
                 +  (1.0-Grid % fw(s)) * vt % n(c2) * cap_dens_c2)
     wt_cap_dens =  (    Grid % fw(s)  * wt % n(c1) * cap_dens_c1    &
                 +  (1.0-Grid % fw(s)) * wt % n(c2) * cap_dens_c2)
+
     t_stress = - (  ut_cap_dens * Grid % sx(s)                      &
                   + vt_cap_dens * Grid % sy(s)                      &
                   + wt_cap_dens * Grid % sz(s) )                    &
@@ -114,6 +116,13 @@
                                  + ty_f * Grid % sy(s)              &
                                  + tz_f * Grid % sz(s)) )
 
+    if(Grid % cell_near_wall(c1).or.Grid % cell_near_wall(c2)) then
+      if( turb % y_plus(c1) > 11.0 .or. turb % y_plus(c2) > 11.0 ) then
+ 
+        t_stress = 0.0
+  
+      end if
+    end if
   end if  ! if models are of RSM type
 
   end subroutine
