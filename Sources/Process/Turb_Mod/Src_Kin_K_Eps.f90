@@ -16,15 +16,17 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
-  type(Var_Type),    pointer :: u, v, w
-  type(Var_Type),    pointer :: kin, eps, ut, vt, wt
+  type(Var_Type),    pointer :: u, v, w, t
+  type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: u_tan, u_tau
   real                       :: kin_vis  ! [m^2/s]
   real                       :: p_kin_int, p_kin_wf
-  real                       :: z_o
+  real                       :: z_o, ebf
+  real                       :: ut_log_law, vt_log_law, wt_log_law
+  real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -43,9 +45,11 @@
   Flow => turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
+  call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Sol % Alias_Solver        (A, b)
+  call Turb_Mod_Alias_T2          (turb, t2)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
@@ -129,6 +133,51 @@
               + (turb % p_kin(c1) - turb % vis_t(c1) * Flow % shear(c1)**2)  &
               * Grid % vol(c1)
 
+        ! Implementation of wall function for buoyancy-driven flows
+        if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
+
+          nx = Grid % sx(s) / Grid % s(s)
+          ny = Grid % sy(s) / Grid % s(s)
+          nz = Grid % sz(s) / Grid % s(s)
+          qx = t % q(c2) * nx
+          qy = t % q(c2) * ny
+          qz = t % q(c2) * nz
+
+          ut_log_law = - turb % con_w(c1)  &
+                     / (Flow % density(c1) * Flow % capacity(c1))   &   
+                     * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
+          vt_log_law = - turb % con_w(c1)  &
+                     / (Flow % density(c1) * Flow % capacity(c1))   &   
+                     * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * ny
+          wt_log_law = - turb % con_w(c1)  &
+                     / (Flow % density(c1) * Flow % capacity(c1))   &   
+                     * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nz
+
+          ut % n(c1) = ut % n(c1) * exp(-1.0 * ebf)  &
+                     + ut_log_law * exp(-1.0 / ebf)
+          vt % n(c1) = vt % n(c1) * exp(-1.0 * ebf)  &
+                     + vt_log_law * exp(-1.0 / ebf)
+          wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
+                     + wt_log_law * exp(-1.0 / ebf)
+
+          if(Grid % Bnd_Cond_Type(c2) .eq. WALL)             &
+            t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
+                      / Grid % wall_dist(c1)
+
+          g_buoy_wall = Flow % density(c1) * Flow % beta*abs(grav_x + grav_y + grav_z)  &
+                      * sqrt(abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1)))    &   
+                      * c_mu_theta5                                &
+                      * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+
+          ! Clean up b(c) from old values of g_buoy
+          b(c1)      = b(c1) - turb % g_buoy(c1) * Grid % vol(c1)
+          turb % g_buoy(c1) = turb % g_buoy(c1) * exp(-1.0 * ebf) &
+                            + g_buoy_wall * exp(-1.0 / ebf)
+
+          ! Add new values of g_buoy based on wall function approach
+          b(c1)      = b(c1) + turb % g_buoy(c1) * Grid % vol(c1)
+
+        end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
       end if    ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
     end if      ! c2 < 0
   end do
