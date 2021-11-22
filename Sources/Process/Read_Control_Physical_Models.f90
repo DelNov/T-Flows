@@ -132,20 +132,20 @@
   ! Does the user want to gather statistics?
   call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS',               &
                                  0, n_times, .false.)
-  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_STATISTICS',  &
+  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
                                  HUGE_INT, n_stat, .false.)
 
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
   !-------------------------------------------------------------------!
-  if(turb % model .eq. LES_SMAGORINSKY         .or.  &
-     turb % model .eq. LES_DYNAMIC             .or.  &
-     turb % model .eq. LES_WALE                .or.  &
-     turb % model .eq. DNS                     .or.  &
-     turb % model .eq. DES_SPALART             .or.  &
-     turb % model .eq. HYBRID_LES_PRANDTL      .or.  &
-     turb % model .eq. HYBRID_LES_RANS         .or.  &
-     turb % model .eq. K_EPS_ZETA_F            .or.  &
+  if((turb % model .eq. LES_SMAGORINSKY         .or.   &
+      turb % model .eq. LES_DYNAMIC             .or.   &
+      turb % model .eq. LES_WALE                .or.   &
+      turb % model .eq. DNS                     .or.   &
+      turb % model .eq. DES_SPALART             .or.   &
+      turb % model .eq. HYBRID_LES_PRANDTL      .or.   &
+      turb % model .eq. HYBRID_LES_RANS         .or.   &
+      turb % model .eq. K_EPS_ZETA_F)           .and.  &
      n_times > n_stat) then  ! last line covers unsteady RANS models
 
     if(this_proc < 2) then
