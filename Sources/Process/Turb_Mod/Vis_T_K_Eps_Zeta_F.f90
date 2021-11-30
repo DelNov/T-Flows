@@ -127,8 +127,8 @@
           turb % con_w(c1) =    turb % y_plus(c1)                           &
                               * Flow % viscosity(c1)                        &
                               * Flow % capacity(c1)                         &
-                      / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)         &
-                         + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+                      / ( turb % y_plus(c1) * pr * exp(-1.0 * ebf)          &
+                         + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY )
         end if
 
         if(Flow % n_scalars > 0) then
@@ -139,7 +139,7 @@
               / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))
           turb % diff_w(c1) =  turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
-              / (  turb % y_plus(c1) * sc * exp(-1.0 * ebf)       &
+              / (turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
