@@ -18,6 +18,7 @@
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: kin_vis, p_t2_wall, ebf, u_tau
+  real                       :: ut_sgdh, vt_sgdh, wt_sgdh
 !==============================================================================!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -52,15 +53,21 @@
   ! Production source:
   do c = 1, Grid % n_cells
 
-    turb % p_t2(c) = - 2.0 * (  ut % n(c) * t % x(c)   &
-                              + vt % n(c) * t % y(c)   &
-                              + wt % n(c) * t % z(c))
+    pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
+    ut_sgdh = - turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+    vt_sgdh = - turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+    wt_sgdh = - turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+
+    turb % p_t2(c) = - 2.0 * Flow % density(c)       &
+                           * (  ut_sgdh * t % x(c)   &
+                           +    vt_sgdh * t % y(c)   &
+                           +    wt_sgdh * t % z(c))  
 
     b(c) = b(c) + turb % p_t2(c) * Grid % vol(c)
 
-   ! Negative contribution
-   A % val(A % dia(c)) = A % val(A % dia(c)) +  &
-         2.0 * Flow % density(c)  * eps % n(c)  &
+  ! Negative contribution
+    A % val(A % dia(c)) = A % val(A % dia(c)) +  &
+         2.0 * Flow % density(c) * eps % n(c)  &
              / (kin % n(c) + TINY) * Grid % vol(c)
 
   end do
@@ -89,8 +96,10 @@
         t % q(c2) = abs(turb % con_w(c1)*(t % n(c1) &
                     - t % n(c2))/Grid % wall_dist(c1))
 
-        p_t2_wall  = t % q(c2)*c_mu_theta5*sqrt(abs(t2 % n(c1))) &
-                     /(kappa_theta*c_mu25*Grid % wall_dist(c1))
+        p_t2_wall  = Flow % density(c1)                                        &
+                     * abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1))) &
+                     * c_mu_theta5*sqrt(abs(t2 % n(c1))) &
+                     / (kappa_theta*c_mu25*Grid % wall_dist(c1))
 
         b(c1) = b(c1) - turb % p_t2(c1) * Grid % vol(c1)
 
@@ -100,7 +109,7 @@
           turb % p_t2(c1) = (  turb % p_t2(c1) * exp(-1.0 * ebf)  &
                              + p_t2_wall * exp(-1.0/ebf))
         end if
-
+       
         b(c1) = b(c1) + turb % p_t2(c1) * Grid % vol(c1)
 
         t2 % n(c2) = 0.0
@@ -108,7 +117,6 @@
       end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
     end if    ! c2 < 0
   end do
-
 
   end subroutine
 
