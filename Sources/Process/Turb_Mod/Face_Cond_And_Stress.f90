@@ -123,6 +123,10 @@
   
       end if
     end if
+  else
+
+    t_stress = 0.0
+
   end if  ! if models are of RSM type
 
   end subroutine
