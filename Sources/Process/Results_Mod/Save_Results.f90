@@ -702,11 +702,28 @@
                                       Flow % vort(c_f:c_l),         &
                                       f8, f9, data_offset, run)
     end if
+
     kin_vis_t(:) = 0.0
     if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+       turb % model .ne. HYBRID_LES_RANS     .and.  & 
        turb % model .ne. DNS) then
       kin_vis_t(c_f:c_l) = turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
       call Results % Save_Scalar_Real("EddyOverMolecularViscosity [1]",  &
+                                      plot_inside,                       &
+                                      kin_vis_t(c_f:c_l),                &
+                                      f8, f9, data_offset, run)
+    end if
+
+    if(turb % model .eq. HYBRID_LES_RANS) then
+      kin_vis_t(:) = 0.0
+      kin_vis_t(c_f:c_l) = turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      call Results % Save_Scalar_Real("RANSEddyOverMolecularViscosity [1]",  &
+                                      plot_inside,                       &
+                                      kin_vis_t(c_f:c_l),                &
+                                      f8, f9, data_offset, run)
+      kin_vis_t(:) = 0.0
+      kin_vis_t(c_f:c_l) = turb % vis_t_sgs(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      call Results % Save_Scalar_Real("SGSEddyOverMolecularViscosity [1]",  &
                                       plot_inside,                       &
                                       kin_vis_t(c_f:c_l),                &
                                       f8, f9, data_offset, run)
