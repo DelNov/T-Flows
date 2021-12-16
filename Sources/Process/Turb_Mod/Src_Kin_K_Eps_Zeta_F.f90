@@ -159,7 +159,7 @@
 
         p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
-        turb % p_kin(c1) = p_kin_wf
+        turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int + exp(-1.0 / ebf) * p_kin_wf
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
