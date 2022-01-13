@@ -26,6 +26,8 @@
   Grid => turb % pnt_grid
   phi  => Flow % scalar(sc)
 
+  phi_stress = 0.0 
+
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
 
