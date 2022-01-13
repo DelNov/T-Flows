@@ -11,6 +11,7 @@
   type(Grid_Type), pointer :: Grid
   integer                  :: c1, c2
   real                     :: u_tot_sq, u_nor_sq, u_nor
+  real                     :: u_wall_tot_sq, u_wall_nor_sq, u_wall_nor
 !==============================================================================!
 
   ! Take aliases
@@ -32,8 +33,18 @@
          / Grid % s(s)
   u_nor_sq = u_nor**2
 
+  u_wall_tot_sq = Flow % u % n(c2) * Flow % u % n(c2)  &
+                + Flow % v % n(c2) * Flow % v % n(c2)  &
+                + Flow % w % n(c2) * Flow % w % n(c2)
+  u_wall_nor  = ( Flow % u % n(c2) * Grid % sx(s)     &
+                + Flow % v % n(c2) * Grid % sy(s)     &
+                + Flow % w % n(c2) * Grid % sz(s) )   &
+                / Grid % s(s)
+  u_wall_nor_sq = u_wall_nor**2
+
   if( u_tot_sq  > u_nor_sq) then
-    U_Tan = sqrt(u_tot_sq - u_nor_sq)
+    U_Tan = abs(sqrt(u_tot_sq - u_nor_sq) &
+               - sqrt(u_wall_tot_sq - u_wall_nor_sq))
   else
     U_Tan = TINY
   end if
