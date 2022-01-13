@@ -26,6 +26,8 @@
   Grid => turb % pnt_grid
   t    => Flow % t
 
+  t_stress = 0.0 
+
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Turb_Mod_Alias_T2         (turb, t2)
 
@@ -123,10 +125,6 @@
   
       end if
     end if
-  else
-
-    t_stress = 0.0
-
-  end if  ! if models are of RSM type
+  end if  ! if turb % heat_flux_model is not SGDH
 
   end subroutine
