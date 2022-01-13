@@ -17,7 +17,8 @@
                       q1 => r_cell_13,  &
                       q2 => r_cell_14,  &
                       r1 => r_cell_15,  &
-                      r2 => r_cell_16
+                      r2 => r_cell_16,  &
+                      fn => r_cell_17
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -29,7 +30,7 @@
 !     |        |                                                               !
 !     +----> Compute_Scalar   (uses r_cell_01..06)                             !
 !              |                                                               !
-!              +----> Bicg    (safe to use r_cell_11..16)                      !
+!              +----> Bicg    (safe to use r_cell_11..17)                      !
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
@@ -39,7 +40,7 @@
 !              |       |                                                       !
 !              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
 !                      |                                                       !
-!                      +----> Bicg              (safe to use r_cell_11..16)    !
+!                      +----> Bicg              (safe to use r_cell_11..17)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -68,6 +69,17 @@
   nb = A % pnt_grid % n_bnd_cells
 
   res = 0.0
+
+  !--------------------------!
+  !   Normalize the system   !
+  !--------------------------!
+  do i = 1, nt
+    fn(i) = 1.0 / A % val(A % dia(i))
+    do j = A % row(i), A % row(i+1)-1
+      A % val(j) = A % val(j) * fn(i)
+    end do
+    b(i) = b(i) * fn(i)
+  end do
 
   !---------------------!
   !   Preconditioning   !
@@ -194,6 +206,16 @@
   !                                  !
   !----------------------------------!
 1 continue
+
+  !-----------------------------!
+  !   De-normalize the system   !
+  !-----------------------------!
+  do i = 1, nt
+    do j = A % row(i), A % row(i+1)-1
+      A % val(j) = A % val(j) / fn(i)
+    end do
+    b(i) = b(i) / fn(i)
+  end do
 
   !-------------------------------------------!
   !   Refresh the solution vector's buffers   !
