@@ -138,6 +138,14 @@
       allocate(turb % id_zone(-nb:nc)); turb % id_zone =  0.0
     end if
 
+    ! Reynolds stresses
+    call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
+    call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
+    call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
+    call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
+    call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
+    call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
+
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
       call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
@@ -146,13 +154,6 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
-      ! Reynolds stresses
-      call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
-      call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
-      call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
-      call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
-      call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
-      call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
     end if ! Flow % heat_transfer
 
     !  Wall difussivity for user scalar
