@@ -129,8 +129,8 @@
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
 
           ! According to Toparlar et al. 2019 paper
-          ! CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions
+          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
+          ! temperature inlet profile consistent with wall functions"
 
           if(turb % rough_walls) beta = 0.0         
 
@@ -149,8 +149,8 @@
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
 
           ! According to Toparlar et al. 2019 paper
-          ! CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions
+          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
+          ! temperature inlet profile consistent with wall functions"
 
           if(turb % rough_walls) beta = 0.0         
 
