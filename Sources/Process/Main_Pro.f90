@@ -248,6 +248,16 @@
 
   do curr_dt = first_dt + 1, last_dt
 
+    ! Good time to call user function for beginning of simulation
+    if(curr_dt .eq. first_dt + 1) then
+      do d = 1, n_dom
+        call User_Mod_Beginning_Of_Simulation(Flow(d), turb(d),  &
+                                              Vof(d), Swarm(d),  &
+                                              curr_dt, time)
+      end do
+    end if
+
+
     !------------------------------------!
     !   Preparations for new time step   !
     !------------------------------------!
