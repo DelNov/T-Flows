@@ -18,7 +18,7 @@
                       q2 => r_cell_14,  &
                       r1 => r_cell_15,  &
                       r2 => r_cell_16,  &
-                      fn => r_cell_17
+                      fn => r_cell_17 
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -30,7 +30,7 @@
 !     |        |                                                               !
 !     +----> Compute_Scalar   (uses r_cell_01..06)                             !
 !              |                                                               !
-!              +----> Bicg    (safe to use r_cell_11..17)                      !
+!              +----> Bicg    (safe to use r_cell_11..16)                      !
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
@@ -40,7 +40,7 @@
 !              |       |                                                       !
 !              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
 !                      |                                                       !
-!                      +----> Bicg              (safe to use r_cell_11..17)    !
+!                      +----> Bicg              (safe to use r_cell_11..16)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -157,8 +157,8 @@
     !   q = A   p   !
     !   q~= A^T p~  !  don't have A^T
     !---------------!
-    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p1(-nb:ni))
-    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p2(-nb:ni))
+    call A % pnt_grid % Exchange_Cells_Real(p1(-nb:ni))
+    call A % pnt_grid % Exchange_Cells_Real(p2(-nb:ni))
     do i = 1, ni
       q1(i) = 0.0
       q2(i) = 0.0
@@ -207,6 +207,11 @@
   !----------------------------------!
 1 continue
 
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+
   !-----------------------------!
   !   De-normalize the system   !
   !-----------------------------!
@@ -216,11 +221,6 @@
     end do
     b(i) = b(i) / fn(i)
   end do
-
-  !-------------------------------------------!
-  !   Refresh the solution vector's buffers   !
-  !-------------------------------------------!
-  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
 
   fin_res = res
   niter   = iter

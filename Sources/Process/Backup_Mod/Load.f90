@@ -141,11 +141,23 @@
 
   !--------------!
   !              !
-  !   Etnhalpy   !
+  !   Enthalpy   !
   !              !
   !--------------!
   if(Fld % heat_transfer) then
     call Backup_Mod_Read_Variable(fh, d, vc, 'temp', Fld, Fld % t)
+  end if
+
+  !--------------!
+  !              !
+  !   Roughness  !
+  !              !
+  !--------------!
+  if(tur % rough_walls) then
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'id_zone',  &
+                                   tur % id_zone)
+    call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc,'z_o_f',    &
+                                   tur % z_o_f)
   end if
 
   !--------------!

@@ -138,23 +138,13 @@
 
         b(c1) = b(c1) - v_flux % n(s)
 
-      else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.   &
+      else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
               Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
 
         v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
                         + v % n(c2) * Grid % sy(s)     &
                         + w % n(c2) * Grid % sz(s) )
-
-        b(c1) = b(c1) - v_flux % n(s)
-
-        a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
-        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-
-      else if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-
-        v_flux % n(s) = ( u % n(c1) * Grid % sx(s)     &
-                        + v % n(c1) * Grid % sy(s)     &
-                        + w % n(c1) * Grid % sz(s) )
 
         b(c1) = b(c1) - v_flux % n(s)
 

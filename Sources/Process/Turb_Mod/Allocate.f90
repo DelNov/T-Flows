@@ -30,6 +30,21 @@
   allocate(turb % h_w  (-nb:nc));  turb % h_w   = 0.
 
   allocate(turb % tau_wall(-nb:nc));  turb % tau_wall = 0.
+  allocate(turb % y_plus  (-nb:nc));  turb % y_plus   = 0.
+
+  ! Hydraulic roughness given by formula
+  if(turb % rough_walls) then
+    allocate(turb % z_o_f  (-nb:nc)); turb % z_o_f   = -1.0
+    allocate(turb % id_zone(-nb:nc)); turb % id_zone =  0.0
+  end if
+
+  !  Wall difussivity for user scalar
+  if(Flow % n_scalars > 0) then
+    allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.
+    allocate(turb % uc    (-nb:nc));  turb % uc = 0.
+    allocate(turb % vc    (-nb:nc));  turb % vc = 0.
+    allocate(turb % wc    (-nb:nc));  turb % wc = 0.
+  end if
 
   !-----------------!
   !   K-eps model   !
@@ -44,7 +59,6 @@
     allocate(turb % vis_t (-nb:nc));  turb % vis_t  = 0.
     allocate(turb % vis_w (-nb:nc));  turb % vis_w  = 0.  ! wall visc
     allocate(turb % p_kin (-nb:nc));  turb % p_kin  = 0.
-    allocate(turb % y_plus(-nb:nc));  turb % y_plus = 0.
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
@@ -62,11 +76,6 @@
       call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
       call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
     end if ! Flow % heat_transfer
-
-    !  Wall difussivity for user scalar
-    if(Flow % n_scalars > 0) then            
-      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
-    end if
 
     ! Turbulent statistics; if needed
     if(turb % statistics) then
@@ -130,12 +139,15 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
-    ! Hydraulic roughness given by formula
-    if(turb % rough_walls) then
-      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
-    end if
+
+    ! Reynolds stresses
+    call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
+    call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
+    call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
+    call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
+    call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
+    call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
@@ -145,19 +157,7 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
 
-      ! Reynolds stresses
-      call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
-      call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
-      call Var_Mod_Allocate_New_Only(turb % ww, Grid, 'WW')
-      call Var_Mod_Allocate_New_Only(turb % uv, Grid, 'UV')
-      call Var_Mod_Allocate_New_Only(turb % uw, Grid, 'UW')
-      call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
     end if ! Flow % heat_transfer
-
-    !  Wall difussivity for user scalar
-    if(Flow % n_scalars > 0) then            
-      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
-    end if
 
     if(turb % statistics) then
 
@@ -218,7 +218,6 @@
     allocate(turb % vis_t  (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w  (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin  (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus (-nb:nc));  turb % y_plus  = 0.
 
     ! Reynolds stresses
     call Var_Mod_Allocate_Solution(turb % uu, Grid, 'UU', '')
@@ -290,6 +289,10 @@
 
     end if ! RSM_MANCEAU_HANJALIC
 
+    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
+      allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
+    end if
+
   end if ! RSM_MANCEAU_HANJALIC & RSM_HANJALIC_JAKIRLIC
 
   !----------------------!
@@ -306,7 +309,6 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
@@ -364,7 +366,6 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
@@ -412,7 +413,7 @@
 
     allocate(turb % nearest_wall_cell(-nb:nc))
     turb % nearest_wall_cell = 0
- 
+
     ! Dynamic Smagorinsky constant for particle SGS models
     allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
@@ -422,7 +423,6 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
@@ -475,7 +475,6 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_New_Only(turb % ut, Grid, 'UT')
@@ -528,7 +527,6 @@
     allocate(turb % vis_t   (-nb:nc));  turb % vis_t   = 0.
     allocate(turb % vis_w   (-nb:nc));  turb % vis_w   = 0.  ! wall visc
     allocate(turb % p_kin   (-nb:nc));  turb % p_kin   = 0.
-    allocate(turb % y_plus  (-nb:nc));  turb % y_plus  = 0.
 
     if(Flow % heat_transfer) then
 
@@ -631,12 +629,6 @@
     allocate(turb % alpha_l  (-nb:nc));  turb % alpha_l   = 0.
     allocate(turb % alpha_u  (-nb:nc));  turb % alpha_u   = 0.
     allocate(turb % p_kin    (-nb:nc));  turb % p_kin     = 0.
-    allocate(turb % y_plus   (-nb:nc));  turb % y_plus    = 0.
-
-    ! Hydraulic roughness given by formula
-    if(turb % rough_walls) then
-      allocate(turb % z_o_f(-nb:nc));  turb % z_o_f = -1.0
-    end if
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
@@ -645,7 +637,9 @@
       call Var_Mod_Allocate_New_Only(turb % wt, Grid, 'WT')
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
+    end if
 
+    if(Flow % n_scalars > 0.or.Flow % heat_transfer) then
       ! Reynolds stresses
       call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
       call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')
@@ -655,10 +649,6 @@
       call Var_Mod_Allocate_New_Only(turb % vw, Grid, 'VW')
     end if ! Flow % heat_transfer
 
-    !  Wall difussivity for user scalar
-    if(Flow % n_scalars > 0) then            
-      allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
-    end if
 
 
     if(turb % statistics) then

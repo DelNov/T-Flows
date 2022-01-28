@@ -65,8 +65,9 @@
     real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 
-    ! Mean passive scalars
+    ! Mean passive scalars and scalar turbulent fluxes
     real, allocatable :: scalar_mean(:,:)
+    real, allocatable :: uc(:), vc(:), wc(:)
 
     ! Non-dimensional distance
     real, allocatable :: y_plus(:)
@@ -118,12 +119,16 @@
     ! For LES you need to know nearest wall cell
     integer, allocatable :: nearest_wall_cell(:)
 
+    ! I.D. of different zones for roughness interpolation
+    real, allocatable :: id_zone(:)
+
     ! Variable holding the turbulence model; its variant and statistics
     integer :: model
     integer :: model_variant   ! STABILIZED or NONE
     integer :: wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
     logical :: statistics
     integer :: heat_flux_model
+    integer :: scalar_flux_model
     integer :: hybrid_les_rans_switch
 
   end type
@@ -198,9 +203,11 @@
 
   include 'Turb_Mod/Calculate_Deltas.f90'
   include 'Turb_Mod/Calculate_Heat_Flux.f90'
+  include 'Turb_Mod/Calculate_Scalar_Flux.f90'
   include 'Turb_Mod/Calculate_Mean.f90'
   include 'Turb_Mod/Calculate_Stress.f90'
   include 'Turb_Mod/Face_Cond_And_Stress.f90'
+  include 'Turb_Mod/Face_Diff_and_Stress.f90'
   include 'Turb_Mod/Face_Stress.f90'
   include 'Turb_Mod/Face_Vis.f90'
   include 'Turb_Mod/Substract_Face_Stress.f90'

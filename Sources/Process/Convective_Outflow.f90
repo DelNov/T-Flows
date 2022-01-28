@@ -85,8 +85,7 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
+  if(turb % model .eq. K_EPS) then
 
     call Flow % Grad_Variable(kin)
     call Flow % Grad_Variable(eps)

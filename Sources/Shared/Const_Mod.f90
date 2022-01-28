@@ -10,6 +10,7 @@
   integer, parameter :: VL =   4  ! variable name length
   integer, parameter :: SL =  80  ! standard string length
   integer, parameter :: DL = 160  ! double string length
+  integer, parameter :: QL = 320  ! quadruple string length
 
   ! Double and single precision constants definitions
   integer, parameter :: DP =  8  ! double precisions for real and integer

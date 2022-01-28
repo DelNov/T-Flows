@@ -297,6 +297,11 @@
       fi(c) = fi(c) + cell_fi(c) * Grid % vol(c)
     end do
 
+    !----------------------------------------!
+    !   All other terms defined by the user  !
+    !----------------------------------------!
+    call User_Mod_Force(Flow, ui, M, fi)
+
     !-----------------------------------------------------------!
     !   Copy forces from current component to right hand side   !
     !   (Note: pressure gradients are not with other forces.    !
@@ -317,11 +322,6 @@
         b(c) = b(c) + st_i(c) * Grid % vol(c)
       end do
     end if
-
-    !----------------------------------------!
-    !   All other terms defined by the user  !
-    !----------------------------------------!
-    call User_Mod_Force(Flow, ui, M, fi)
 
     !------------------------------------------------!
     !   Save the coefficients from the discretized   !

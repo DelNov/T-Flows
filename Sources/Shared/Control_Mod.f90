@@ -86,6 +86,7 @@
     include 'Control_Mod/Physics/Volume_Expansion_Coefficient.f90'
 
     ! Turbulence
+    include 'Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90'
     include 'Control_Mod/Physics/Roughness_Coefficient.f90'
     include 'Control_Mod/Physics/Rough_Walls.f90'
     include 'Control_Mod/Physics/Smagorinsky_Constant.f90'
@@ -94,7 +95,7 @@
     include 'Control_Mod/Physics/Turbulent_Prandtl_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Schmidt_Number.f90'
     include 'Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90'
-    include 'Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90'
+    include 'Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90'
 
     ! Other environmental conditions
     include 'Control_Mod/Physics/Angular_Velocity_Vector.f90'

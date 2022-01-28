@@ -17,7 +17,7 @@
   character(SL) :: fmtd
 !==============================================================================!
 !   A comment is each line which begins with "!", "#", "$", "%" or "*".        !
-!   Input line must not exceed DL characters in length (defined in Const_Mod)  !
+!   Input line must not exceed QL characters in length (defined in Const_Mod)  !
 !------------------------------------------------------------------------------!
 
   ! If present, assumed the end of file has not been reached
@@ -34,11 +34,11 @@
   inquire(unit=un, formatted=fmtd)
 1 continue
   if(fmtd .eq. 'YES') then
-    write(format(3:5), '(i3.3)') DL
+    write(format(3:5), '(i3.3)') QL
     read(un, format, end=2) line % whole
   else
     line % whole = ''
-    do i = 1, DL
+    do i = 1, QL
       read(un, end=2) byte
       if(byte .eq. 10) exit
       if(byte .ne. 13) line % whole(i:i) = char(byte)
@@ -82,7 +82,7 @@
     line % n_tokens = 1
     line % s(1)=1
   end if
-  do i=1,DL-2
+  do i=1,QL-2
     if( line % whole(i:  i  ) <  '!' .and.  &
         line % whole(i+1:i+1) >= '!') then
       line % n_tokens = line % n_tokens + 1

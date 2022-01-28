@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgs(Sol, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Cgs(Sol, A, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CGS Method.           !
 !------------------------------------------------------------------------------!
@@ -30,9 +30,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Solver_Type), target :: Sol
+  type(Matrix_Type)          :: A
   real                       :: x(-Sol % pnt_grid % n_bnd_cells :  &
                                    Sol % pnt_grid % n_cells)
-  real                       :: b( Sol % pnt_grid % n_cells)  ! [A]{x}={b}
+  real                       :: b( Sol % pnt_grid % n_cells)
   character(SL)              :: prec     ! preconditioner
   integer                    :: miter    ! maximum and actual ...
   integer                    :: niter    ! ... number of iterations
@@ -40,7 +41,6 @@
   real                       :: fin_res  ! final residual
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: A
   type(Matrix_Type), pointer :: D
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
@@ -48,7 +48,6 @@
 !==============================================================================!
 
   ! Take some aliases
-  A => Sol % A
   D => Sol % D
   nt = A % pnt_grid % n_cells
   ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
@@ -137,7 +136,7 @@
     !--------------!
     !   v2 = Ap2   !
     !--------------!
-    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p2(-nb:ni))
+    call A % pnt_grid % Exchange_Cells_Real(p2(-nb:ni))
     do i = 1, ni
       v2(i) = 0.0
       do j = A % row(i), A % row(i+1)-1
@@ -173,7 +172,7 @@
     !---------------!
     !   q2 = A p1   !
     !---------------!
-    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p1(-nb:ni))
+    call A % pnt_grid % Exchange_Cells_Real(p1(-nb:ni))
     do i = 1, ni
       q2(i) = 0.0
       do j = A % row(i), A % row(i+1)-1
@@ -209,6 +208,11 @@
   !----------------------------------!
 1 continue
 
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+
   !-----------------------------!
   !   De-normalize the system   !
   !-----------------------------!
@@ -218,12 +222,6 @@
     end do
     b(i) = b(i) / fn(i)
   end do
-
-  !-------------------------------------------!
-  !   Refresh the solution vector's buffers   !
-  !-------------------------------------------!
-  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
-
   fin_res = res
   niter   = iter
 

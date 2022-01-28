@@ -159,14 +159,14 @@
   call Numerics_Mod_Under_Relax(phi, a, b)
 
   ! Call linear solver to solve the equations
-  call Sol % Cg(A,              &
-                phi % n,        &
-                b,              &
-                phi % precond,  &
-                phi % mniter,   &
-                phi % eniter,   &
-                phi % tol,      &
-                phi % res)
+  call Sol % BiCG(A,              &
+                  phi % n,        &
+                  b,              &
+                  phi % precond,  &
+                  phi % mniter,   &
+                  phi % eniter,   &
+                  phi % tol,      &
+                  phi % res)
 
   ! Print info on the screen
   if(turb % model .eq. K_EPS_ZETA_F) then

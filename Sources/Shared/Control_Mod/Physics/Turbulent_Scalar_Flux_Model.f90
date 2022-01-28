@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Advection_Scheme_For_Energy(scheme_name, verbose)
+  subroutine Control_Mod_Turbulent_Scalar_Flux_Model(val, verbose)
 !------------------------------------------------------------------------------!
-!   Reading turbulence model from the control file.                            !
+!   Reading turbulent heat flux model from the control file.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: scheme_name
+  character(SL)     :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('ADVECTION_SCHEME_FOR_ENERGY', 'smart',  &
-                                   scheme_name, verbose)
-  call To_Upper_Case(scheme_name)
+  call Control_Mod_Read_Char_Item('TURBULENT_SCALAR_FLUX_MODEL', 'SGDH',  &
+                                   val, verbose)
+  call To_Upper_Case(val)
 
   end subroutine

@@ -35,14 +35,14 @@
   ! Variables for phase I
   integer           :: cnt, fu, v
   real              :: x_min, x_max, y_min, y_max, z_min, z_max, area
-  character(len=80) :: name_in
+  character(len=SL) :: name_in
   type(Ground_Type) :: ground
 
   ! Variables for phase II (in addition to exisiting ones)
   integer              :: n, f
   real                 :: area_1, area_2, area_3, z, z_scale, z_from_top
   integer, allocatable :: ground_cell(:)
-  character(len=80)    :: bc_name
+  character(len=SL)    :: bc_name
 
   ! Variables for phase III (in addition to exisiting ones)
   logical :: cells_in_columns
@@ -62,7 +62,10 @@
   integer              :: n_hor_layers, ni
   logical, allocatable :: cell_in_building(:)
   logical, allocatable :: node_on_building(:)
+  integer, allocatable :: cell_in_chimney(:)
+  integer, allocatable :: node_on_chimney(:)
   logical              :: buildings_exist
+  integer              :: n_chimneys, chimney
   real                 :: height               ! building height
 
   ! Variables for phase VI (in addition to exisiting ones)
@@ -169,7 +172,7 @@
     z_min = min(Grid % zn(n), z_min)
     z_max = max(Grid % zn(n), z_max)
   end do
-  print '(a38,2f8.4)', '# Minimum and maximum z coordinate:  ', z_min, z_max
+  print '(a38,2f12.4)', '# Minimum and maximum z coordinate:  ', z_min, z_max
 
   !----------------------------------------------!
   !   For each node, find corresponding ground   !
@@ -409,6 +412,36 @@
     end do
   end do
 
+  !----------------------------!
+  !   Find cells in chimneys   !
+  !----------------------------!
+  n_chimneys = 0
+  allocate(cell_in_chimney(Grid % n_cells))
+  cell_in_chimney(:) = 0
+  do bc = 1, Grid % n_bnd_cond
+    bc_name = trim(Grid % bnd_cond % name(bc))
+    call To_Upper_Case(bc_name)
+    if(bc_name(1:7) .eq. 'CHIMNEY') then
+
+      read(bc_name(9:11), *)  height
+      read(bc_name(13:15), *) chimney
+
+      n_chimneys = n_chimneys + 1
+
+      do c = 1, Grid % n_cells
+        do dir = 1, 6
+          if(Grid % cells_bnd_color(dir, c) .eq. bc) then
+            do cu = c, c + n_hor_layers - 1
+              if(Grid % zc(cu) - height >= Grid % zc(c)) exit
+              cell_in_chimney(cu) = chimney  ! mark cell as in this chimney
+            end do
+          end if
+        end do
+      end do
+
+    end if
+  end do
+
   ! Count the number of cells in buildings (this is for checking only)
   cnt = 0
   do c = 1, Grid % n_cells
@@ -430,13 +463,27 @@
     end if
   end do
 
+  !----------------------------!
+  !   Mark nodes on chimneys   !
+  !----------------------------!
+  allocate(node_on_chimney(Grid % n_nodes))
+  node_on_chimney(:) = 0
+  do c = 1, Grid % n_cells
+    if(cell_in_chimney(c) > 0) then
+      do ni = 1, Grid % cells_n_nodes(c)  ! mark node as on chimney
+        n = Grid % cells_n(ni, c)
+        node_on_chimney(n) = cell_in_chimney(c)
+      end do
+    end if
+  end do
+
   !-----------------------------------------------------------!
   !                                                           !
   !   Phase VI: Manage boundary condition names and numbers   !
   !                                                           !
   !-----------------------------------------------------------!
 
-  ! Find ground b.c. number
+  ! Find ground b.c. number (only used to eliminate BUILDING_000)
   do bc = 1, Grid % n_bnd_cond
     bc_name = trim(Grid % bnd_cond % name(bc))
     call To_Upper_Case(bc_name)
@@ -524,7 +571,8 @@
   new_c(:) = 0
   cnt      = 0
   do c = 1, Grid % n_cells
-    if(.not. cell_in_building(c)) then
+    if(.not. cell_in_building(c)            &
+       .and. cell_in_chimney(c) == 0) then
       cnt = cnt + 1
       new_c(c) = cnt
     end if
@@ -552,11 +600,11 @@
   deallocate(old_c   )
   deallocate(criteria)
 
-  !-------------------------------------------!
-  !                                           !
-  !   Phase VIII: Insert new boundary faces   !
-  !                                           !
-  !-------------------------------------------!
+  !-------------------------------------------------------------------------!
+  !                                                                         !
+  !   Phase VIII: Insert new boundary faces on building and chimney walls   !
+  !                                                                         !
+  !-------------------------------------------------------------------------!
   if(buildings_exist) then
 
     do c = 1, Grid % n_cells
@@ -594,7 +642,7 @@
               if( node_on_building(f_nod(1)) .and.  &
                   node_on_building(f_nod(2)) .and.  &
                   node_on_building(f_nod(3)) ) then
-               Grid % cells_bnd_color(dir, c) = 1
+                Grid % cells_bnd_color(dir, c) = 1
               end if
             end if
           end if
@@ -603,5 +651,59 @@
     end do
 
   end if
+
+  do bc = 1, Grid % n_bnd_cond
+    bc_name = trim(Grid % bnd_cond % name(bc))
+    call To_Upper_Case(bc_name)
+    if(bc_name(1:7) .eq. 'CHIMNEY') then
+
+      read(bc_name(13:15), *) chimney  ! this is, in essence, building number
+
+      do c = 1, Grid % n_cells
+
+        if(Grid % cells_n_nodes(c) .eq. 4) fn = tet
+        if(Grid % cells_n_nodes(c) .eq. 5) fn = pyr
+        if(Grid % cells_n_nodes(c) .eq. 6) fn = wed
+        if(Grid % cells_n_nodes(c) .eq. 8) fn = hex
+
+        do dir = 1, 6
+          if(Grid % cells_bnd_color(dir, c) .eq. 0) then
+
+            n_f_nod    = 0
+            f_nod(1:4) = -1
+
+            ! Fill up face nodes
+            do ni = 1, 4
+              if(fn(dir, ni) > 0) then
+                f_nod(ni) = Grid % cells_n(fn(dir, ni), c)
+                n_f_nod   = n_f_nod + 1
+              end if
+            end do
+
+            if( n_f_nod > 0 ) then
+
+              ! Qadrilateral face
+              if(f_nod(4) > 0) then
+                if( node_on_chimney(f_nod(1)) .eq. chimney .and.  &
+                    node_on_chimney(f_nod(2)) .eq. chimney .and.  &
+                    node_on_chimney(f_nod(3)) .eq. chimney .and.  &
+                    node_on_chimney(f_nod(4)) .eq. chimney ) then
+                  Grid % cells_bnd_color(dir, c) = bc
+                end if
+              else
+                if( node_on_chimney(f_nod(1)) .eq. chimney .and.  &
+                    node_on_chimney(f_nod(2)) .eq. chimney .and.  &
+                    node_on_chimney(f_nod(3)) .eq. chimney ) then
+                  Grid % cells_bnd_color(dir, c) = bc
+                end if
+              end if
+            end if
+          end if
+        end do
+      end do
+
+    end if
+
+  end do  ! chimney
 
   end subroutine

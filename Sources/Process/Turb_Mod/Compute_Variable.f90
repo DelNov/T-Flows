@@ -158,30 +158,14 @@
       A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
     else if(c2 < 0) then
 
-      ! All modeled turbulent quantities except t2(!) are zero at the wall
-      ! or specified otherwise in the control file
-      if(phi % name .ne. 'T2') then
-
-        ! Outflow is not included because it was causing problems
-        if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. PRESSURE).or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL) ) then
-          A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-          b(c1) = b(c1) + a12 * phi % n(c2)
-        end if
-
-      ! For t2; fix the value at all these boundary condition types,
-      ! but not WALLFL!!!
-      else
-        if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. PRESSURE).or.   &
-           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-          A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-          b(c1) = b(c1) + a12 * phi % n(c2)
-        end if
+      ! Outflow is not included because it was causing problems
+      if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.   &
+         (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.   &
+         (Grid % Bnd_Cond_Type(c2) .eq. PRESSURE).or.   &
+         (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.   &
+         (Grid % Bnd_Cond_Type(c2) .eq. WALLFL) ) then
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+        b(c1) = b(c1) + a12 * phi % n(c2)
       end if
 
     end if  ! if c2 < 0
@@ -259,6 +243,13 @@
   if(phi % name .eq. 'ZETA') then
     do c = 1, Grid % n_cells
       phi % n(c) = min(phi % n(c), 1.8)
+    end do
+  end if
+
+  ! Set the lower limit of epsilon 
+  if(phi % name .eq. 'EPS'.and.turb % model == HYBRID_LES_RANS) then
+    do c = 1, Grid % n_cells
+      phi % n(c) = max(phi % n(c), 1.0e-10)
     end do
   end if
 

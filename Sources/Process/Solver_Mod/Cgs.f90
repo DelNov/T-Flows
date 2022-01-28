@@ -21,7 +21,8 @@
                       u1         => r_cell_08,  &
                       u2         => r_cell_09,  &
                       v2         => r_cell_10,  &
-                      u1_plus_q1 => r_cell_11
+                      u1_plus_q1 => r_cell_11,  &
+                      fn         => r_cell_12
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined, but this         !
 !   procedure is never called, so it doesn't make much sense to do it.         !
@@ -53,6 +54,17 @@
   nb = A % pnt_grid % n_bnd_cells
 
   res = 0.0
+
+  !--------------------------!
+  !   Normalize the system   !
+  !--------------------------!
+  do i = 1, nt
+    fn(i) = 1.0 / A % val(A % dia(i))
+    do j = A % row(i), A % row(i+1)-1
+      A % val(j) = A % val(j) * fn(i)
+    end do
+    b(i) = b(i) * fn(i)
+  end do
 
   !---------------------!
   !   Preconditioning   !
@@ -201,6 +213,15 @@
   !-------------------------------------------!
   call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
 
+  !-----------------------------!
+  !   De-normalize the system   !
+  !-----------------------------!
+  do i = 1, nt
+    do j = A % row(i), A % row(i+1)-1
+      A % val(j) = A % val(j) / fn(i)
+    end do
+    b(i) = b(i) / fn(i)
+  end do
   fin_res = res
   niter   = iter
 

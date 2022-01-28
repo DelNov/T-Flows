@@ -137,6 +137,7 @@
     c2 = Grid % faces_c(2,s)
 
     call Turb_Mod_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
+    
     if(Flow % mass_transfer) then
       if(Vof % fun % n(c1) < 0.5 .and.  &
          Vof % fun % n(c2) < 0.5) con_eff = Vof % phase_cond(2)

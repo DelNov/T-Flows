@@ -52,7 +52,7 @@
 
   if( turb % model .eq. K_EPS_ZETA_F     .or.  &
       turb % model .eq. HYBRID_LES_RANS  .or.  &
-      turb % model .eq. K_EPS) then 
+      turb % model .eq. K_EPS) then
     if(c2 < 0) then
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
