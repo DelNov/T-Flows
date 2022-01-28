@@ -22,6 +22,7 @@
   include 'User_Mod/Beginning_Of_Compute_Scalar.f90'
   include 'User_Mod/Beginning_Of_Correct_Velocity.f90'
   include 'User_Mod/Beginning_Of_Iteration.f90'
+  include 'User_Mod/Beginning_Of_Simulation.f90'
   include 'User_Mod/Beginning_Of_Time_Step.f90'
   include 'User_Mod/Calculate_Mean.f90'
   include 'User_Mod/End_Of_Compute_Energy.f90'
@@ -40,6 +41,6 @@
   include 'User_Mod/Save_Swarm.f90'
   include 'User_Mod/Source.f90'
 
-  end module 
+  end module
 
 
