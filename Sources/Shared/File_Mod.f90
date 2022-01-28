@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MAX_TOKENS = DL / 2
+  integer, parameter :: MAX_TOKENS = QL / 2
   integer, parameter :: MAX_ITEMS  = 2048
 !==============================================================================!
 
@@ -18,7 +18,7 @@
   !   Tokenizer type   !
   !--------------------!
   type Tokenizer_Type
-    character(DL) :: whole               ! whole string
+    character(QL) :: whole               ! whole string
     character(SL) :: tokens(MAX_TOKENS)  ! tokens
     integer       :: n_tokens            ! number of tokens
     integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
