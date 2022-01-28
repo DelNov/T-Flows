@@ -35,9 +35,9 @@
   !-----------------------------------------!
   call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
-  !---------------------------------------------------------!
-  ! By default turbulent heat flux is caalculated by SGDH
-  !---------------------------------------------------------!
+  !-----------------------------------------------------------!
+  !   By default turbulent heat flux is caalculated by SGDH   !
+  !-----------------------------------------------------------!
 
   do c = 1, Grid % n_cells
     pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
@@ -73,32 +73,35 @@
     call Flow % Grad_Variable(Flow % u)
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
-    
+
     do k = 1, 2
       do c = 1, Grid % n_cells
-        ut % n(c) = -c_theta * turb % t_scale(c) * ((uu % n(c) * t % x(c)  +  &
-                                                         uv % n(c) * t % y(c)  +  &
-                                                         uw % n(c) * t % z(c)) +  &
-                                                    0.6*(ut % n(c) * u % x(c)  +  &
-                                                         vt % n(c) * u % y(c)  +  &
-                                                         wt % n(c) * u % z(c)) +  &
-                                             0.2*Flow % beta*grav_x*t2 % n(c)) 
+        ut % n(c) = -c_theta * turb % t_scale(c)          &
+                  * ((  uu % n(c) * t % x(c)              &
+                      + uv % n(c) * t % y(c)              &
+                      + uw % n(c) * t % z(c))             &
+                      + 0.6 * (  ut % n(c) * u % x(c)     &
+                               + vt % n(c) * u % y(c)     &
+                               + wt % n(c) * u % z(c))    &
+                      + 0.2*Flow % beta*grav_x*t2 % n(c))
 
-        vt % n(c) = -c_theta * turb % t_scale(c) * ((uv % n(c) * t % x(c)  +  &
-                                                         vv % n(c) * t % y(c)  +  &
-                                                         vw % n(c) * t % z(c)) +  &
-                                                    0.6*(ut % n(c) * v % x(c)  +  &
-                                                         vt % n(c) * v % y(c)  +  &
-                                                         wt % n(c) * v % z(c)) +  &
-                                             0.2*Flow % beta*grav_y*t2 % n(c)) 
+        vt % n(c) = -c_theta * turb % t_scale(c)          &
+                  * ((  uv % n(c) * t % x(c)              &
+                      + vv % n(c) * t % y(c)              &
+                      + vw % n(c) * t % z(c))             &
+                      + 0.6 * (  ut % n(c) * v % x(c)     &
+                               + vt % n(c) * v % y(c)     &
+                               + wt % n(c) * v % z(c))    &
+                      + 0.2*Flow % beta*grav_y*t2 % n(c))
 
-        wt % n(c) = -c_theta * turb % t_scale(c) * ((uw % n(c) * t % x(c)  +  &
-                                                         vw % n(c) * t % y(c)  +  &
-                                                         ww % n(c) * t % z(c)) +  &
-                                                    0.6*(ut % n(c) * w % x(c)  +  &
-                                                         vt % n(c) * w % y(c)  +  &
-                                                         wt % n(c) * w % z(c)) +  &
-                                             0.2*Flow % beta*grav_z*t2 % n(c)) 
+        wt % n(c) = -c_theta * turb % t_scale(c)          &
+                  * ((  uw % n(c) * t % x(c)              &
+                      + vw % n(c) * t % y(c)              &
+                      + ww % n(c) * t % z(c))             &
+                      + 0.6 * (  ut % n(c) * w % x(c)     &
+                               + vt % n(c) * w % y(c)     &
+                               + wt % n(c) * w % z(c))    &
+                      + 0.2*Flow % beta*grav_z*t2 % n(c))
       end do
     end do
   end if
@@ -125,15 +128,18 @@
 
           ebf = Turb_Mod_Ebf_Momentum(turb, c1)
 
-          ut_log_law = - turb % con_w(c1)  &
-                    / (Flow % density(c1) * Flow % capacity(c1))   &
-                    * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
-          vt_log_law = - turb % con_w(c1)  &
-                    / (Flow % density(c1) * Flow % capacity(c1))   &
-                    * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * ny 
-          wt_log_law = - turb % con_w(c1)  &
-                    / (Flow % density(c1) * Flow % capacity(c1))   &
-                    * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nz
+          ut_log_law = - turb % con_w(c1)                             &
+                    / (Flow % density(c1) * Flow % capacity(c1))      &
+                    * (t % n(c2) - t % n(c1)) / Grid % wall_dist(c1)  &
+                    * nx
+          vt_log_law = - turb % con_w(c1)                             &
+                    / (Flow % density(c1) * Flow % capacity(c1))      &
+                    * (t % n(c2) - t % n(c1)) / Grid % wall_dist(c1)  &
+                    * ny
+          wt_log_law = - turb % con_w(c1)                             &
+                    / (Flow % density(c1) * Flow % capacity(c1))      &
+                    * (t % n(c2) - t % n(c1)) / Grid % wall_dist(c1)  &
+                    * nz
 
           ut % n(c1) = ut % n(c1) * exp(-1.0 * ebf)  &
                      + ut_log_law * exp(-1.0 / ebf)
@@ -141,9 +147,9 @@
                      + vt_log_law * exp(-1.0 / ebf)
           wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
                      + wt_log_law * exp(-1.0 / ebf)
-        end if 
-      end if 
+        end if
+      end if
     end do
-  end if 
+  end if
 
   end subroutine

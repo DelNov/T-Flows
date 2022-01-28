@@ -39,11 +39,11 @@
   end if
 
   !  Wall difussivity for user scalar
-  if(Flow % n_scalars > 0) then            
-    allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.  
-    allocate(turb % uc(-nb:nc));  turb % uc = 0.  
-    allocate(turb % vc(-nb:nc));  turb % vc = 0.  
-    allocate(turb % wc(-nb:nc));  turb % wc = 0.  
+  if(Flow % n_scalars > 0) then
+    allocate(turb % diff_w(-nb:nc));  turb % diff_w = 0.
+    allocate(turb % uc    (-nb:nc));  turb % uc = 0.
+    allocate(turb % vc    (-nb:nc));  turb % vc = 0.
+    allocate(turb % wc    (-nb:nc));  turb % wc = 0.
   end if
 
   !-----------------!
@@ -291,7 +291,7 @@
 
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
       allocate(turb % g_buoy(-nb:nc));  turb % g_buoy = 0.
-    end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
+    end if
 
   end if ! RSM_MANCEAU_HANJALIC & RSM_HANJALIC_JAKIRLIC
 
@@ -413,7 +413,7 @@
 
     allocate(turb % nearest_wall_cell(-nb:nc))
     turb % nearest_wall_cell = 0
- 
+
     ! Dynamic Smagorinsky constant for particle SGS models
     allocate(turb % c_dyn(-nb:nc));  turb % c_dyn = 0.
 
@@ -638,8 +638,8 @@
       allocate(turb % con_w(-nb:nc));  turb % con_w = 0.  ! wall cond
       allocate(turb % p_t2 (-nb:nc));  turb % p_t2  = 0.
     end if
- 
-    if(Flow % n_scalars > 0.or.Flow % heat_transfer) then            
+
+    if(Flow % n_scalars > 0.or.Flow % heat_transfer) then
       ! Reynolds stresses
       call Var_Mod_Allocate_New_Only(turb % uu, Grid, 'UU')
       call Var_Mod_Allocate_New_Only(turb % vv, Grid, 'VV')

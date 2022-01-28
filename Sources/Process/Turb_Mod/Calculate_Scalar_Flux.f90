@@ -25,7 +25,7 @@
   phi  => Flow % scalar(sc)
   call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
   call Flow % Alias_Momentum     (u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f) 
+  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
 
   ! Check if these are already computed somewhere, ...
   ! ... maybe this call is not needed
@@ -76,32 +76,32 @@
     call Flow % Grad_Variable(Flow % w)
     do k = 1, 3
       do c = 1, Grid % n_cells
-    
-        uc_new = -c_theta * turb % t_scale(c) * ((uu % n(c) * phi % x(c)  +  &
-                                                        uv % n(c) * phi % y(c)  +  &
-                                                        uw % n(c) * phi % z(c)) +  &
-                                                0.6*(turb % uc(c) * u % x(c)    +  &
-                                                     turb % vc(c) * u % y(c)    +  &
-                                                     turb % wc(c) * u % z(c)))
+
+        uc_new = -c_theta * turb % t_scale(c) * ((  uu % n(c) * phi % x(c)    &
+                                                  + uv % n(c) * phi % y(c)    &
+                                                  + uw % n(c) * phi % z(c))   &
+                                        + 0.6*(  turb % uc(c) * u % x(c)      &
+                                               + turb % vc(c) * u % y(c)      &
+                                               + turb % wc(c) * u % z(c)))
 
 
-        vc_new = -c_theta * turb % t_scale(c) * ((uv % n(c) * phi % x(c)  +  &
-                                                        vv % n(c) * phi % y(c)  +  &
-                                                        vw % n(c) * phi % z(c)) +  &
-                                                0.6*(turb % uc(c) * v % x(c)    +  &
-                                                     turb % vc(c) * v % y(c)    +  &
-                                                     turb % wc(c) * v % z(c)))
+        vc_new = -c_theta * turb % t_scale(c) * ((  uv % n(c) * phi % x(c)    &
+                                                  + vv % n(c) * phi % y(c)    &
+                                                  + vw % n(c) * phi % z(c))   &
+                                        + 0.6*(  turb % uc(c) * v % x(c)      &
+                                               + turb % vc(c) * v % y(c)      &
+                                               + turb % wc(c) * v % z(c)))
 
-        wc_new = -c_theta * turb % t_scale(c) * ((uw % n(c) * phi % x(c)  +  &
-                                                        vw % n(c) * phi % y(c)  +  &
-                                                        ww % n(c) * phi % z(c)) +  &
-                                                0.6*(turb % uc(c) * w % x(c)    +  &
-                                                     turb % vc(c) * w % y(c)    +  &
-                                                     turb % wc(c) * w % z(c))) 
+        wc_new = -c_theta * turb % t_scale(c) * ((  uw % n(c) * phi % x(c)    &
+                                                  + vw % n(c) * phi % y(c)    &
+                                                  + ww % n(c) * phi % z(c))   &
+                                        + 0.6*(  turb % uc(c) * w % x(c)      &
+                                               + turb % vc(c) * w % y(c)      &
+                                               + turb % wc(c) * w % z(c)))
 
-        turb % uc(c) = turb % uc(c) * 0.7 + uc_new * 0.3 
-        turb % vc(c) = turb % vc(c) * 0.7 + vc_new * 0.3 
-        turb % wc(c) = turb % wc(c) * 0.7 + wc_new * 0.3 
+        turb % uc(c) = turb % uc(c) * 0.7 + uc_new * 0.3
+        turb % vc(c) = turb % vc(c) * 0.7 + vc_new * 0.3
+        turb % wc(c) = turb % wc(c) * 0.7 + wc_new * 0.3
 
       end do
     end do
@@ -131,7 +131,7 @@
                     * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * nx
           vc_log_law = - turb % diff_w(c1)  &
                     / Flow % density(c1)    &
-                    * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * ny 
+                    * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * ny
           wc_log_law = - turb % diff_w(c1)  &
                     / Flow % density(c1)    &
                     * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * nz
@@ -142,9 +142,9 @@
                            + vc_log_law * exp(-1.0 / ebf)
           turb % wc(c1) = turb % wc(c1) * exp(-1.0 * ebf)  &
                            + wc_log_law * exp(-1.0 / ebf)
-        end if 
-      end if 
+        end if
+      end if
     end do
-  end if 
+  end if
 
   end subroutine
