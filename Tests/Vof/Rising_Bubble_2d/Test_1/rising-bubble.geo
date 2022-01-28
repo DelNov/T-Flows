@@ -1,1 +1,1 @@
-../rising-bubble.gmsh
+../rising-bubble.geo
