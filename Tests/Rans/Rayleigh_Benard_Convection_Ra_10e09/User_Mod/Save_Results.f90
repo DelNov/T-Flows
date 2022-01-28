@@ -130,9 +130,6 @@
     allocate(ut_mod(n_prob));   ut_mod = 0.0
     allocate(vt_mod(n_prob));   vt_mod = 0.0
     allocate(wt_mod(n_prob));   wt_mod = 0.0
-    allocate(var_1(n_prob));    var_1  = 0.0
-    allocate(var_2(n_prob));    var_2  = 0.0
-    allocate(var_3(n_prob));    var_3  = 0.0
   end if
 
   !-------------------------!
