@@ -389,7 +389,7 @@
               ! For scalars
               do sc = 1, Flow % n_scalars
                 i = Key_Ind(scalar(sc) % name, keys, nks)
-                if(i > 0) then 
+                if(i > 0) then
                   scalar(sc) % bnd_cond_type(c) = bc_type_tag
                 end if
                 i = Key_Ind(scalar(sc) % flux_name, keys, nks)
@@ -682,7 +682,7 @@
                     i = Key_Ind(scalar(sc) % name, keys, nks)
                     if(i > 0) then
                       scalar(sc) % b(c)=wi*prof(m,i)+(1.-wi)*prof(m+1,i)
-                      scalar(sc) % bnd_cond_type(c) = bc_type_tag  
+                      scalar(sc) % bnd_cond_type(c) = bc_type_tag
                     end if
                     i = Key_Ind(scalar(sc) % flux_name, keys, nks)
                     if(i > 0) then

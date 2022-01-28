@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: q_turb => r_cell_04   
+  use Work_Mod, only: q_turb => r_cell_04
 
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
@@ -66,8 +66,8 @@
   A % val(:) = 0.0
   b      (:) = 0.0
 
-  ! Initialize turbulent scalar fluxes 
-  ! and fluxes coming from interfaces 
+  ! Initialize turbulent scalar fluxes
+  ! and fluxes coming from interfaces
   q_turb(:) = 0.0
 
   !-------------------------------------!
@@ -112,10 +112,10 @@
 
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    
+
     call Turb_Mod_Face_Diff_And_Stress(turb, dif_eff, phi_stress, s, sc)
 
-    ! Gradients on the cell face 
+    ! Gradients on the cell face
     phix_f = Grid % fw(s)*phi % x(c1) + (1.0-Grid % fw(s))*phi % x(c2)
     phiy_f = Grid % fw(s)*phi % y(c1) + (1.0-Grid % fw(s))*phi % y(c2)
     phiz_f = Grid % fw(s)*phi % z(c1) + (1.0-Grid % fw(s))*phi % z(c2)
@@ -126,14 +126,12 @@
                        + phiz_f * Grid % sz(s))
 
     ! Implicit diffusive flux
-    f_im = dif_eff  * A % fc(s)           &
-          * (  phix_f * Grid % dx(s)      &
-             + phiy_f * Grid % dy(s)      &
-             + phiz_f * Grid % dz(s) )
+    f_im = dif_eff  * A % fc(s)          &
+         * (  phix_f * Grid % dx(s)      &
+            + phiy_f * Grid % dy(s)      &
+            + phiz_f * Grid % dz(s) )
 
- 
     ! Calculate the coefficients for the sysytem matrix
-
     a12 = dif_eff * A % fc(s)
     a21 = dif_eff * A % fc(s)
 
@@ -168,7 +166,7 @@
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * phi % n(c2)
 
-      ! In case of wallflux 
+      ! In case of wallflux
       else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
         b(c1) = b(c1) + Grid % s(s) * phi % q(c2)
       end if
@@ -184,7 +182,7 @@
   do c = 1, Grid % n_cells
 
     ! Total explicit heat flux
-    q_exp = phi % c(c) + q_turb(c) 
+    q_exp = phi % c(c) + q_turb(c)
 
     if(q_exp >= 0) then
       b(c)  = b(c) + q_exp
