@@ -119,7 +119,7 @@
     ! For LES you need to know nearest wall cell
     integer, allocatable :: nearest_wall_cell(:)
 
-    ! id of different zones for roughness interpolation
+    ! I.D. of different zones for roughness interpolation
     real, allocatable :: id_zone(:)
 
     ! Variable holding the turbulence model; its variant and statistics
