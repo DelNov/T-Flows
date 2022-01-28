@@ -26,7 +26,7 @@
   Grid => turb % pnt_grid
   phi  => Flow % scalar(sc)
 
-  phi_stress = 0.0 
+  phi_stress = 0.0
 
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
@@ -34,8 +34,8 @@
   !------------------------------------------------------!
   !   Molecular diffusivity (without turbulent parts)    !
   !------------------------------------------------------!
-  dif_mol  = Flow % diffusivity 
-             
+  dif_mol  = Flow % diffusivity
+
   dif_turb = 0.0
 
   !-----------------------------------------------------------------!
@@ -56,7 +56,7 @@
   !-----------------------------------!
   !   Update effective diffusivity    !
   !-----------------------------------!
-  dif_eff = dif_mol + dif_turb 
+  dif_eff = dif_mol + dif_turb
 
   ! Effective diffusivity at walls
   if(turb % model .eq. K_EPS        .or.  &
@@ -75,7 +75,7 @@
   !---------------------------!
 
   if(turb % scalar_flux_model .eq. GGDH .or. &
-     turb % scalar_flux_model .eq. AFM) then 
+     turb % scalar_flux_model .eq. AFM) then
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
     phix_f = Grid % fw(s) * phi % x(c1) + (1.0-Grid % fw(s)) * phi % x(c2)
@@ -97,15 +97,15 @@
                   - (dif_turb * (  phix_f * Grid % sx(s)              &
                                  + phiy_f * Grid % sy(s)              &
                                  + phiz_f * Grid % sz(s)) )
-  
+
     if(Grid % cell_near_wall(c1).or.Grid % cell_near_wall(c2)) then
       if( turb % y_plus(c1) > 11.0 .or. turb % y_plus(c2) > 11.0 ) then
- 
+
         phi_stress = 0.0
-  
+
       end if
     end if
-    
-  end if  ! if model is AFM of GGDH 
+
+  end if  ! if model is AFM of GGDH
 
   end subroutine

@@ -49,7 +49,7 @@
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Sol % Alias_Solver        (A, b)
-  call Turb_Mod_Alias_T2          (turb, t2)
+  call Turb_Mod_Alias_T2         (turb, t2)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
@@ -144,13 +144,13 @@
           qz = t % q(c2) * nz
 
           ut_log_law = - turb % con_w(c1)  &
-                     / (Flow % density(c1) * Flow % capacity(c1))   &   
+                     / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
           vt_log_law = - turb % con_w(c1)  &
-                     / (Flow % density(c1) * Flow % capacity(c1))   &   
+                     / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * ny
           wt_log_law = - turb % con_w(c1)  &
-                     / (Flow % density(c1) * Flow % capacity(c1))   &   
+                     / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nz
 
           ut % n(c1) = ut % n(c1) * exp(-1.0 * ebf)  &
@@ -160,13 +160,15 @@
           wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
                      + wt_log_law * exp(-1.0 / ebf)
 
-          if(Grid % Bnd_Cond_Type(c2) .eq. WALL)             &
+          if(Grid % Bnd_Cond_Type(c2) .eq. WALL)                    &
             t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
-          g_buoy_wall = Flow % density(c1) * Flow % beta*abs(grav_x + grav_y + grav_z)  &
-                      * sqrt(abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1)))    &   
-                      * c_mu_theta5                                &
+          g_buoy_wall = Flow % density(c1)                                    &
+                      * Flow % beta * abs(grav_x + grav_y + grav_z)           &
+                      * sqrt(abs(  t % q(c2)                                  &
+                                 / (Flow % density(c1)*Flow % capacity(c1)))  &
+                      * c_mu_theta5                                           &
                       * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           ! Clean up b(c) from old values of g_buoy

@@ -113,9 +113,9 @@
           end if
 
           if(turb % y_plus(c1) < 11.3 ) then
-            ebf = 0.00001 
+            ebf = 0.00001
           end if
-         
+
           turb % vis_w(c1) =    turb % y_plus(c1) * Flow % viscosity(c1)  &
                            / (  turb % y_plus(c1) * exp(-1.0 * ebf)       &
                               + u_plus * exp(-1.0/ebf) + TINY)
@@ -129,13 +129,13 @@
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
 
           ! According to Toparlar et al. 2019 paper
-          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions"
+          ! "CFD simulation of the near-neutral atmospheric boundary layer:
+          ! New temperature inlet profile consistent with wall functions"
 
-          if(turb % rough_walls) beta = 0.0         
+          if(turb % rough_walls) beta = 0.0
 
           ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
-          
+
           turb % con_w(c1) =    turb % y_plus(c1)                           &
                               * Flow % viscosity(c1)                        &
                               * Flow % capacity(c1)                         &
@@ -149,10 +149,10 @@
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
 
           ! According to Toparlar et al. 2019 paper
-          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions"
+          ! "CFD simulation of the near-neutral atmospheric boundary layer:
+          ! New temperature inlet profile consistent with wall functions"
 
-          if(turb % rough_walls) beta = 0.0         
+          if(turb % rough_walls) beta = 0.0
 
           ebf = 0.01 * (sc * turb % y_plus(c1)**4                 &
               / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))

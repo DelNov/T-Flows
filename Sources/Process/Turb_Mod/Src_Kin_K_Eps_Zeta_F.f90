@@ -33,7 +33,7 @@
   real                       :: u_tan, u_tau
   real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d, l_rans_v
   real                       :: kin_vis
-  real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v 
+  real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
 !==============================================================================!
@@ -159,7 +159,8 @@
 
         p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
 
-        turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int + exp(-1.0 / ebf) * p_kin_wf
+        turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int   &
+                         + exp(-1.0 / ebf) * p_kin_wf
 
         if(turb % rough_walls) then
           z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
@@ -217,10 +218,12 @@
             t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
-          g_buoy_wall = Flow % density(c1) * Flow % beta*abs(grav_x + grav_y + grav_z)  &
-                      * sqrt(abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1)))    &
-                      * c_mu_theta5                                &
-                      * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+          g_buoy_wall = Flow % density(c1)  &
+                      * Flow % beta * abs(grav_x + grav_y + grav_z)           &
+                      * sqrt(abs(  t % q(c2)                                  &
+                                 / (Flow % density(c1)*Flow % capacity(c1)))  &
+                             * c_mu_theta5                                    &
+                             * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - turb % g_buoy(c1) * Grid % vol(c1)

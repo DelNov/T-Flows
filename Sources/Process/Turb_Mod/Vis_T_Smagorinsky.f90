@@ -12,7 +12,7 @@
   type(Turb_Type), target :: turb
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
-  real :: U_Plus_Rough_Walls 
+  real :: U_Plus_Rough_Walls
   real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
@@ -46,7 +46,7 @@
 
       ! if(nearest_wall_cell(c) .ne. 0) is needed for parallel version
       ! since the subdomains which do not "touch" wall
-      ! has nearest_wall_cell(c) = 0. 
+      ! has nearest_wall_cell(c) = 0.
       if(turb % nearest_wall_cell(c) .ne. 0) then
         u_f = sqrt( Flow % viscosity(c)                                &
                     * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
@@ -55,7 +55,7 @@
                    / (Grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
         turb % y_plus(c) = Grid % wall_dist(c) * u_f / Flow % viscosity(c)
         cs = c_smag * (1.0 - exp(-turb % y_plus(c) / 25.0))
-      else  
+      else
         cs = c_smag
       end if
       turb % vis_t(c) = Flow % density(c)  &
@@ -84,9 +84,9 @@
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, Grid % n_cells
-      nc2 = - Flow % beta * (  grav_x * t % x(c)   &   
-                             + grav_y * t % y(c)   &   
-                             + grav_z * t % z(c))  
+      nc2 = - Flow % beta * (  grav_x * t % x(c)   &
+                             + grav_y * t % y(c)   &
+                             + grav_z * t % z(c))
       turb % vis_t(c) = turb % vis_t(c)            &
              * max(1 - 2.5 * nc2 / (Flow % shear(c) + TINY), 0.0)
     end do
@@ -108,7 +108,7 @@
   !----------------------------------+----------!
   !   The procedure below should be activated   !
   !   only if wall function approach is used.   !
-  !----------------.----------------------------! 
+  !----------------.----------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
@@ -142,7 +142,7 @@
 
           if(turb % rough_walls) then
             z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-            z_o = max(Grid % wall_dist(c1)   &   
+            z_o = max(Grid % wall_dist(c1)   &
                 / (e_log * max(turb % y_plus(c1),1.0)), z_o)
 
             turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
@@ -150,7 +150,7 @@
                                                    Grid % wall_dist(c1),  &
                                                    nu)
             u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
-          end if 
+          end if
 
 
           ! This one is effective viscosity
@@ -163,7 +163,7 @@
         end if
 
         if(Flow % heat_transfer) then
-          u_plus = u_tan / u_tau_l 
+          u_plus = u_tan / u_tau_l
 
 
           pr_t = Turb_Mod_Prandtl_Number(turb, c1)
@@ -176,11 +176,11 @@
           ! temperature inlet profile consistent with wall functions"
 
           if(turb % rough_walls) then
-            beta = 0.0    
+            beta = 0.0
             u_plus = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
           end if
 
-          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr) 
+          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
           turb % con_w(c1) =    turb % y_plus(c1)                         &
                               * Flow % viscosity(c1)                      &
                               * Flow % capacity(c1)                       &
@@ -189,8 +189,8 @@
         end if
 
         if(Flow % n_scalars > 0) then
-          u_plus = u_tan / u_tau_l 
- 
+          u_plus = u_tan / u_tau_l
+
           sc   = Flow % Schmidt_Number(c1)          ! laminar Schmidt number
           beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                   &
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
@@ -200,7 +200,7 @@
           ! temperature inlet profile consistent with wall functions"
 
           if(turb % rough_walls) then
-            beta = 0.0    
+            beta = 0.0
             u_plus = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
           end if
 

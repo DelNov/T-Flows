@@ -61,7 +61,7 @@
     turb % p_t2(c) = - 2.0 * Flow % density(c)       &
                            * (  ut_sgdh * t % x(c)   &
                            +    vt_sgdh * t % y(c)   &
-                           +    wt_sgdh * t % z(c))  
+                           +    wt_sgdh * t % z(c))
 
     b(c) = b(c) + turb % p_t2(c) * Grid % vol(c)
 
@@ -109,7 +109,7 @@
           turb % p_t2(c1) = (  turb % p_t2(c1) * exp(-1.0 * ebf)  &
                              + p_t2_wall * exp(-1.0/ebf))
         end if
-       
+
         b(c1) = b(c1) + turb % p_t2(c1) * Grid % vol(c1)
 
         t2 % n(c2) = 0.0

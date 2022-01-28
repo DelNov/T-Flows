@@ -44,7 +44,7 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
 
-  if(turb % model .eq. K_EPS_ZETA_F) then 
+  if(turb % model .eq. K_EPS_ZETA_F) then
 
     do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n

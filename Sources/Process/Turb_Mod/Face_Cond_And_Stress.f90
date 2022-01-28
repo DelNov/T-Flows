@@ -26,7 +26,7 @@
   Grid => turb % pnt_grid
   t    => Flow % t
 
-  t_stress = 0.0 
+  t_stress = 0.0
 
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
   call Turb_Mod_Alias_T2         (turb, t2)
@@ -73,7 +73,7 @@
   !-----------------------------------!
   !   Update effective conductivity   !
   !-----------------------------------!
-  con_eff = con_mol + con_turb 
+  con_eff = con_mol + con_turb
 
   ! Effective conductivity at walls
   if(turb % model .eq. K_EPS        .or.  &
@@ -92,7 +92,7 @@
   !---------------------------!
 
   if(turb % heat_flux_model .eq. GGDH .or. &
-     turb % heat_flux_model .eq. AFM) then 
+     turb % heat_flux_model .eq. AFM) then
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
     tx_f = Grid % fw(s) * t % x(c1) + (1.0-Grid % fw(s)) * t % x(c2)
@@ -120,9 +120,9 @@
 
     if(Grid % cell_near_wall(c1).or.Grid % cell_near_wall(c2)) then
       if( turb % y_plus(c1) > 11.0 .or. turb % y_plus(c2) > 11.0 ) then
- 
+
         t_stress = 0.0
-  
+
       end if
     end if
   end if  ! if turb % heat_flux_model is not SGDH
