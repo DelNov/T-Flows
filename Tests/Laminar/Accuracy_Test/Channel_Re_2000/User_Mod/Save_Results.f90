@@ -50,7 +50,7 @@
     stop
   end if
 
-  call File % Open_For_Writing_Ascii(coord_name, fu)
+  call File % Open_For_Reading_Ascii(coord_name, fu)
 
   ! Write the number of searching intervals
   call File % Read_Line(fu)
