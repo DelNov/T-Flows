@@ -1510,8 +1510,7 @@ function process_accuracy_test {
     if ls "$name_in_div"-res-ts??????.dat 1> /dev/null 2>&1; then
 
       # extract essential data from produced .dat files
-      last_results_dat_file=\
-        $(ls -tr1 "$name_in_div"-res-ts??????.dat | tail -n1)
+      last_results_dat_file=$(ls -1 "$name_in_div"-res-ts??????.dat | tail -1)
 
       # Store this file with result
       nNy=$(printf "%06d" $((Ny-1)))
