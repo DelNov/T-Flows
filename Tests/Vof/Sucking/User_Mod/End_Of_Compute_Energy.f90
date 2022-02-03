@@ -14,12 +14,17 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: s, fu
+  logical, save            :: first_entry = .true.
 !==============================================================================!
 
   ! Take aliases
   Grid => Flow % pnt_grid
 
-  call File % Append_For_Writing_Ascii('sucking_solution.dat', fu)
+  if(first_entry) then
+    call File % Open_For_Writing_Ascii('sucking_solution.dat', fu)
+  else
+    call File % Append_For_Writing_Ascii('sucking_solution.dat', fu)
+  end if
 
   do s = 1, Grid % n_faces
 
@@ -35,6 +40,8 @@
     end if
 
   end do
+
+  first_entry = .false.
 
   close(fu)
 

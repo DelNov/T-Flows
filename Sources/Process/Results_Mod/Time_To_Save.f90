@@ -7,6 +7,8 @@
   integer             :: curr_dt  ! current time step
 !==============================================================================!
 
-  Time_To_Save = mod(curr_dt, Results % interval) .eq. 0
+  Time_To_Save = mod(curr_dt, Results % interval) .eq. 0  &
+                 .or.                                     &
+                 curr_dt .eq. 0 .and. Results % initial
 
   end function

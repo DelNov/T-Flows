@@ -234,18 +234,15 @@
     end do
   end if
 
-  ! It will save results in .vtk or .cgns file format,
-  ! depending on how the code was compiled
-  ! First calls saves inside, second only the boundary cells
-  if(Results % initial) then
-    do d = 1, n_dom
-      call Results % Save_Results(Flow(d), turb(d), Vof(d), Swarm(d),  &
-                          first_dt, plot_inside=.true., domain=d)
-      call Results % Save_Results(Flow(d), turb(d), Vof(d), Swarm(d),  &
-                          first_dt, plot_inside=.false., domain=d)
-    end do
-  end if
+  !--------------------------!
+  !   Save initial results   !
+  !--------------------------!
+  call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
+                              Flow, turb, Vof, Swarm, exit_now)
 
+  !-------------------------------------!
+  !   The time loop really begins now   !
+  !-------------------------------------!
   do curr_dt = first_dt + 1, last_dt
 
     ! Good time to call user function for beginning of simulation

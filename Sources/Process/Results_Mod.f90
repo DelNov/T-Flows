@@ -23,15 +23,15 @@
 
     contains
       procedure :: Main_Results
-      procedure :: Save_Results
-      procedure :: Save_Front
-      procedure :: Save_Swarm
-      procedure :: Save_Surf
-      procedure :: Time_To_Save
 
+      procedure, private :: Save_Results
       procedure, private :: Save_Scalar_Int
       procedure, private :: Save_Scalar_Real
+      procedure, private :: Save_Front
+      procedure, private :: Save_Surf
+      procedure, private :: Save_Swarm
       procedure, private :: Save_Vector_Real
+      procedure, private :: Time_To_Save
 
   end type
 
