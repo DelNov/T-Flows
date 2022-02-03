@@ -8,16 +8,16 @@
   class(Front_Type), target :: Front
   type(Var_Type),    target :: phi
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
+  type(Field_Type), pointer :: Flow
+  type(Grid_Type),  pointer :: Grid
   integer                   :: c, c1, c2, i_cel, e, s
   integer                   :: i_ver, j_ver, i, j, n_fac, n_int
-  real                      :: nx, ny, nz, l, lx, ly, lz, dsc1, phi_c1, phi_c2
+  real                      :: nx, ny, nz, l, lx, ly, lz, dsc, phi_c1, phi_c2
   real                      :: vec_i(3), vec_j(3), vec_ixj(3), xs, ys, zs
 !==============================================================================!
 
   ! Take aliases
-  flow  => Front % pnt_flow
+  Flow  => Front % pnt_flow
   grid  => Front % pnt_grid
 
   !------------------------------------------!
@@ -25,7 +25,7 @@
   !   Mark cells and find faces at surface   !
   !                                          !
   !------------------------------------------!
-  if(flow % mass_transfer) then
+  if(Flow % mass_transfer) then
 
     !-----------!
     !   Cells   !
@@ -40,12 +40,12 @@
     !-----------!
     n_fac = 0
     Front % face_at_elem(:,:) = 0  ! not at surface
-    grid % xs(:) = 0.0
-    grid % ys(:) = 0.0
-    grid % zs(:) = 0.0
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    Grid % xs(:) = 0.0
+    Grid % ys(:) = 0.0
+    Grid % zs(:) = 0.0
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       phi_c1 = phi % n(c1)
       phi_c2 = phi % n(c2)
@@ -59,14 +59,14 @@
       if( (phi_c1 - 0.5) * (phi_c2 - 0.5) < 0 ) then
 
         ! Vector connecting cell centers c1 and c2
-        lx = grid % dx(s)
-        ly = grid % dy(s)
-        lz = grid % dz(s)
+        lx = Grid % dx(s)
+        ly = Grid % dy(s)
+        lz = Grid % dz(s)
         l  = sqrt(lx**2 + ly**2 + lz**2)
 
         n_int = 0
         do i_cel = 1, 2
-          c = grid % faces_c(i_cel, s)
+          c = Grid % faces_c(i_cel, s)
 
           ! Cell c contains surface
           e = Front % cell_at_elem(c)
@@ -83,15 +83,20 @@
               nz = Front % Elem(e) % nz
 
               ! Distance from c1 to intersection
-              dsc1 = (  (Front % Elem(e) % xe - grid % xc(c1)) * nx     &
-                      + (Front % Elem(e) % ye - grid % yc(c1)) * ny     &
-                      + (Front % Elem(e) % ze - grid % zc(c1)) * nz  )  &
-                   / (lx * nx + ly * ny + lz * nz)
+              dsc = (  (Front % Elem(e) % xe - Grid % xc(c1)) * nx     &
+                     + (Front % Elem(e) % ye - Grid % yc(c1)) * ny     &
+                     + (Front % Elem(e) % ze - Grid % zc(c1)) * nz  )  &
+                  / (lx * nx + ly * ny + lz * nz)
+
+              ! Limit the distance to intersection to avoid ...
+              ! ... too big gradients for variables with front
+              dsc = max(0.05, dsc)
+              dsc = min(0.95, dsc)
 
               ! Intersection point
-              xs = grid % xc(c1) + dsc1 * lx
-              ys = grid % yc(c1) + dsc1 * ly
-              zs = grid % zc(c1) + dsc1 * lz
+              xs = Grid % xc(c1) + dsc * lx
+              ys = Grid % yc(c1) + dsc * ly
+              zs = Grid % zc(c1) + dsc * lz
 
               ! Check if the intersection point is at the element
               do i_ver = 1, Front % Elem(e) % nv
@@ -110,9 +115,9 @@
               end do  ! i_ver
 
               n_int = n_int + 1
-              grid % xs(s) = xs
-              grid % ys(s) = ys
-              grid % zs(s) = zs
+              Grid % xs(s) = xs
+              Grid % ys(s) = ys
+              Grid % zs(s) = zs
 
   1           continue
 
