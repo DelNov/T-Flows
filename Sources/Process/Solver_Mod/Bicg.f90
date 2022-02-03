@@ -30,7 +30,7 @@
 !     |        |                                                               !
 !     +----> Compute_Scalar   (uses r_cell_01..06)                             !
 !              |                                                               !
-!              +----> Bicg    (safe to use r_cell_11..16)                      !
+!              +----> Bicg    (safe to use r_cell_11..17)                      !
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
@@ -40,7 +40,7 @@
 !              |       |                                                       !
 !              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
 !                      |                                                       !
-!                      +----> Bicg              (safe to use r_cell_11..16)    !
+!                      +----> Bicg              (safe to use r_cell_11..17)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
