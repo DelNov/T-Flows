@@ -23,7 +23,7 @@
 !     |                                                                        !
 !     +----> Compute_Pressure        (does not use Work_Mod)                   !
 !              |                                                               !
-!              +----> Solver_Mod_Cg  (safe to use r_cell_07..12)               !
+!              +----> Solver_Mod_Cg  (safe to use r_cell_01..04)               !
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
@@ -39,7 +39,7 @@
   type(Matrix_Type)          :: A
   real                       :: x(-Sol % pnt_grid % n_bnd_cells :  &
                                    Sol % pnt_grid % n_cells)
-  real                       :: b( Sol % pnt_grid % n_cells)  ! [A]{x}={b}
+  real                       :: b( Sol % pnt_grid % n_cells)
   character(SL)              :: prec     ! preconditioner
   integer                    :: miter    ! maximum and actual ...
   integer                    :: niter    ! ... number of iterations
@@ -141,7 +141,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Grid_Mod_Exchange_Cells_Real(A % pnt_grid, p1(-nb:ni))
+    call A % pnt_grid % Exchange_Cells_Real(p1(-nb:ni))
     do i = 1, ni
       q1(i) = 0.0
       do j = A % row(i), A % row(i+1)-1
@@ -186,6 +186,11 @@
   !----------------------------------!
 1 continue
 
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+
   !-----------------------------!
   !   De-normalize the system   !
   !-----------------------------!
@@ -195,11 +200,6 @@
     end do
     b(i) = b(i) / fn(i)
   end do
-
-  !-------------------------------------------!
-  !   Refresh the solution vector's buffers   !
-  !-------------------------------------------!
-  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
 
   fin_res = res
   niter   = iter
