@@ -24,11 +24,11 @@
 !                                                                              !
 !   Main_Pro                  (allocates Work_Mod)                             !
 !     |                                                                        !
-!     +----> Compute_Energy   (uses r_cell_01)                                 !
+!     +----> Compute_Energy   (uses r_cell_01..03)                             !
 !     |        |                                                               !
 !     +----> Compute_Momentum (does not use Work_Mod)                          !
 !     |        |                                                               !
-!     +----> Compute_Scalar   (uses r_cell_01..06)                             !
+!     +----> Compute_Scalar   (uses r_cell_04)                                 !
 !              |                                                               !
 !              +----> Bicg    (safe to use r_cell_11..17)                      !
 !                                                                              !

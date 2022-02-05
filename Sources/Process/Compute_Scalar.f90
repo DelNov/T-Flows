@@ -6,13 +6,12 @@
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
   use Work_Mod, only: q_turb => r_cell_04
-
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
 !   Main_Pro                (allocates Work_Mod)                               !
-!     |                                                                        |
-!     +----> Compute_Scalar (safe to use r_cell_04..06)
+!     |                                                                        !
+!     +----> Compute_Scalar (safe to use r_cell_04)                            !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
