@@ -73,7 +73,9 @@
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
   call Sol % Alias_Solver         (A, b)
 
-  ! Initialize matrix and right hand side
+  ! Initialize advection and cross diffusion sources, matrix and right hand side
+  phi % a(:) = 0.0
+  phi % c(:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 

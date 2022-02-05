@@ -13,7 +13,7 @@
 !                                                                              !
 !   Main_Pro                (allocates Work_Mod)                               !
 !     |                                                                        |
-!     +----> Compute_Energy (safe to use r_cell_01..02)                        !
+!     +----> Compute_Energy (safe to use r_cell_01..03)                        !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -83,7 +83,9 @@
   ! User function
   call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 
-  ! Initialize matrix and right hand side
+  ! Initialize advection and cross diffusion sources, matrix and right hand side
+  t % a  (:) = 0.0
+  t % c  (:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 

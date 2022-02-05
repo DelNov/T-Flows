@@ -156,11 +156,13 @@
       st_i     => Vof % surf_fz
     end if
 
-    ! Initialize matrix and right hand side
+    ! Initialize advection, cross diffusion, forces, matrix and right hand side
+    ui % a (:) = 0.0
+    ui % c (:) = 0.0
     fi     (:) = 0.0  ! all "internal" forces acting on this component
+    f_stress   = 0.0  ! this is presumably not needed
     M % val(:) = 0.0
     b      (:) = 0.0
-    f_stress   = 0.0
 
     ! Calculate velocity magnitude for normalization
     vel_max = MICRO

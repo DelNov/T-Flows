@@ -61,7 +61,9 @@
   call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
-  ! Initialize matrix and right hand side
+  ! Initialize advection and cross diffusion sources, matrix and right hand side
+  phi % a(:) = 0.0
+  phi % c(:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 
