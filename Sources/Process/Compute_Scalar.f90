@@ -6,13 +6,12 @@
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
   use Work_Mod, only: q_turb => r_cell_04
-
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
 !   Main_Pro                (allocates Work_Mod)                               !
-!     |                                                                        |
-!     +----> Compute_Scalar (safe to use r_cell_04..06)
+!     |                                                                        !
+!     +----> Compute_Scalar (safe to use r_cell_04)                            !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -62,7 +61,9 @@
   call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
-  ! Initialize matrix and right hand side
+  ! Initialize advection and cross diffusion sources, matrix and right hand side
+  phi % a(:) = 0.0
+  phi % c(:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 

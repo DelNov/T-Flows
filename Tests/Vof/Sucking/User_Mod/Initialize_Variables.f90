@@ -1,7 +1,3 @@
-include '../User_Mod/Check_Inside_Box.f90'
-include '../User_Mod/Vof_Initialization_Box.f90'
-include '../User_Mod/Vof_Interface_Box.f90'
-
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, sol)
 !------------------------------------------------------------------------------!
@@ -19,7 +15,8 @@ include '../User_Mod/Vof_Interface_Box.f90'
   type(Var_Type),   pointer :: fun, t
   real,             pointer :: dt
   real                      :: xc, tc
-  integer                   :: c, c1, c2, s, l, fu
+  integer                   :: c, c1, c2, s, l, fu, nc
+  character(SL)             :: hash
 !==============================================================================!
 
   ! Take aliases
@@ -35,8 +32,24 @@ include '../User_Mod/Vof_Interface_Box.f90'
   ! Initialize the whole domain as 0.0
   fun % n(:) = 0.0
 
-  ! Box
-  call Vof_Initialization_Box(Vof)
+  ! Initialize temperatures and VOF from file
+  call File % Open_For_Reading_Ascii("temperature_distribution_000.exa", fu)
+  read(fu, *) hash, nc
+  do l = 1, nc
+    read(fu, *) xc, tc
+    do c = 1, Grid % n_cells
+      if(Math % Approx_Real(Grid % xc(c), xc)) then
+        Flow % t % n(c) = tc
+        Flow % t % o(c) = tc
+        if(tc < 10.0+MICRO) then
+          fun % n(c) = 0.0
+        else
+          fun % n(c) = 1.0
+        end if
+      end if
+    end do
+  end do
+  close(fu)
 
   ! Naive way to update bounary values
   do s = 1, Grid % n_bnd_cells
@@ -47,6 +60,13 @@ include '../User_Mod/Vof_Interface_Box.f90'
     end if
   end do
 
+  ! Update buffer values
+  call Grid % Exchange_Cells_Real(fun % n)
+
+  ! Set old values to be the same as new ones
+  fun % o (:) = fun % n(:)
+  fun % oo(:) = fun % o(:)
+
   ! Initialize front
   if(Vof % track_front) then
     call Vof % Smooth_For_Curvature_Csf()
@@ -55,26 +75,5 @@ include '../User_Mod/Vof_Interface_Box.f90'
                                             .true.)  ! don't print messages
     call Vof % Front % Print_Front_Statistics()
   end if
-
-  ! Initialize temperatures from file
-
-  call File % Open_For_Reading_Ascii("temperature_distribution_000.dat", fu)
-  do l = 1, 100
-    read(fu, *) xc, tc
-    do c = 1, Grid % n_cells
-      if(Math % Approx_Real(Grid % xc(c), xc)) then
-        Flow % t % n(c) = tc
-        Flow % t % o(c) = tc
-      end if
-    end do
-  end do
-  close(fu)
-
-  ! Update buffer values
-  call Grid % Exchange_Cells_Real(fun % n)
-
-  ! Set old values to be the same as new ones
-  fun % o (:) = fun % n(:)
-  fun % oo(:) = fun % o(:)
 
   end subroutine

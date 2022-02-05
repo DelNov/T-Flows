@@ -49,7 +49,9 @@
   call Flow % Alias_Momentum(u, v, w)
   call Sol % Alias_Solver      (A, b)
 
-  ! Initialize matrix and right hand side
+  ! Initialize advection and cross diffusion sources, matrix and right hand side
+  phi % a(:) = 0.0
+  phi % c(:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 

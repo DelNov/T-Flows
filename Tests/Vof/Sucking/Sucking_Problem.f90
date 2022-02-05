@@ -83,7 +83,7 @@
   xm_r = beta_r
 
   ! Start iterations
-  do i = 1, 200
+  do i = 1, 333
 
     rhs_l = Transc(xm_l)
     rhs_r = Transc(xm_r)
@@ -134,8 +134,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer            :: i
   real               :: cpos, dpos, opos, tcur, told
-  character(32)      :: fname = 'temperature_distribution_XXX.dat'
-  character(29)      :: gname = 'temperature_gradients_XXX.dat'
+  character(32)      :: fname = 'temperature_distribution_XXX.exa'
+  character(29)      :: gname = 'temperature_gradients_XXX.exa'
   integer, parameter :: TD = 13  ! temperature distribution
   integer, parameter :: TG = 14  ! temperature gradients
 !==============================================================================!
@@ -148,6 +148,9 @@
   print '(a,a)', '# Creating file: ', gname
   open(file=fname, unit=TD)
   open(file=gname, unit=TG)
+
+  write(TD,*) '#', nc
+  write(TG,*) '#', nc
 
   dpos = fpos / nc   ! this is like dx
 
@@ -195,17 +198,27 @@
 !----------------------------------[Calling]-----------------------------------!
   real :: Beta
 !-----------------------------------[Locals]-----------------------------------!
-  integer            :: n, n_dt
+  integer            :: n, n_dt, n_cells
   integer            :: i
   real               :: beta_main
   real               :: ipos, opos, start_pos, final_pos, dt
   real               :: start_time, final_time, time
-  character(22)      :: fname = 'interface_position.dat'
-  character(22)      :: gname = 'interface_velocity.dat'
+  character(22)      :: fname = 'interface_position.exa'
+  character(22)      :: gname = 'interface_velocity.exa'
+  character(32)      :: arg
   integer, parameter :: IP = 11     ! interface position
   integer, parameter :: IV = 12     ! interface velocity
   real,    parameter :: L  =  8e-3  ! length of the domain
 !==============================================================================!
+
+  ! Check command line arguments
+  if(command_argument_count() .ne. 2) then
+    print *, 'Correct usage:'
+    print *, './Sucking problem <number_of_cells> <number_of_time_steps>'
+    stop
+  end if
+  call get_command_argument(1, arg);  read(arg,*) n_cells
+  call get_command_argument(2, arg);  read(arg,*) n_dt
 
   print '(a)', '#============================='
   print '(a)', '#'
@@ -219,7 +232,6 @@
   ! Calculate position
   start_time =   0.1                              ! starting time        [s]
   final_time =   0.6                              ! final time           [s]
-  n_dt       = 100                                ! number of time steps [1]
   dt         =  (final_time - start_time) / n_dt  ! time step            [s]
 
   ! Final interface position
@@ -247,7 +259,7 @@
 
     ! Save temperature distribution
     if(mod(n,10) .eq. 0) then
-      call Temperature_Distribution(beta_main, n, time, ipos, L, 100)
+      call Temperature_Distribution(beta_main, n, time, ipos, L, n_cells)
     end if
 
     write(IP, '(2es15.7)') time, ipos
