@@ -43,7 +43,7 @@
     xic     => Grid % xc;
     xif     => Grid % xf;
     si      => Grid % sx;
-    grav_i  => grav_x
+    grav_i  => Flow % grav_x
   else if(i .eq. 2) then
     cell_fi => Flow % cell_fy;
     face_fi => Flow % face_fy;
@@ -51,7 +51,7 @@
     xic     => Grid % yc;
     xif     => Grid % yf;
     si      => Grid % sy;
-    grav_i  => grav_y
+    grav_i  => Flow % grav_y
   else if(i .eq. 3) then
     cell_fi => Flow % cell_fz;
     face_fi => Flow % face_fz;
@@ -59,7 +59,7 @@
     xic     => Grid % zc;
     xif     => Grid % zf;
     si      => Grid % sz;
-    grav_i  => grav_z
+    grav_i  => Flow % grav_z
   end if
 
   face_fi(:) = 0.0

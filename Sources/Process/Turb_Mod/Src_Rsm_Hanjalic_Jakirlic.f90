@@ -378,9 +378,9 @@
     v11 = 0.0
     v22 = 0.0
     v33 = 0.0
-    v12 = 0.5*(u % y(c)-v % x(c)) - omega_z
-    v13 = 0.5*(u % z(c)-w % x(c)) + omega_y
-    v23 = 0.5*(v % z(c)-w % y(c)) - omega_x
+    v12 = 0.5*(u % y(c)-v % x(c)) - Flow % omega_z
+    v13 = 0.5*(u % z(c)-w % x(c)) + Flow % omega_y
+    v23 = 0.5*(v % z(c)-w % y(c)) - Flow % omega_x
 
     aa2 = (a11**2)+(a22**2)+(a33**2)+2*((a12**2)+(a13**2)+(a23**2))
 
@@ -459,53 +459,53 @@
                  / (2.5 * max(eps % n(c), TINY) * Grid % wall_dist(c)),  &
                  1.4)
 
-    p11 = - 2.0*(  uu % n(c) * u % x(c)      &
-                 + uv % n(c) * u % y(c)      &
-                 + uw % n(c) * u % z(c))     &
-          - 2.0 * omega_y * 2.0 * uw % n(c)  &
-          + 2.0 * omega_z * 2.0 * uv % n(c) 
+    p11 = - 2.0*(  uu % n(c) * u % x(c)             &
+                 + uv % n(c) * u % y(c)             &
+                 + uw % n(c) * u % z(c))            &
+          - 2.0 * Flow % omega_y * 2.0 * uw % n(c)  &
+          + 2.0 * Flow % omega_z * 2.0 * uv % n(c)
 
-    p22 = - 2.0*(  uv % n(c) * v % x(c)      &
-                 + vv % n(c) * v % y(c)      &
-                 + vw % n(c) * v % z(c))     &
-          + 2.0 * omega_x * 2.0 * vw % n(c)  &
-          - 2.0 * omega_z * 2.0 * uw % n(c) 
+    p22 = - 2.0*(  uv % n(c) * v % x(c)             &
+                 + vv % n(c) * v % y(c)             &
+                 + vw % n(c) * v % z(c))            &
+          + 2.0 * Flow % omega_x * 2.0 * vw % n(c)  &
+          - 2.0 * Flow % omega_z * 2.0 * uw % n(c)
 
-    p33 = - 2.0*(  uw % n(c) * w % x(c)      &
-                 + vw % n(c) * w % y(c)      &
-                 + ww % n(c) * w % z(c))     &
-          - 2.0 * omega_x * 2.0 * vw % n(c)  &
-          + 2.0 * omega_y * 2.0 * uw % n(c) 
+    p33 = - 2.0*(  uw % n(c) * w % x(c)             &
+                 + vw % n(c) * w % y(c)             &
+                 + ww % n(c) * w % z(c))            &
+          - 2.0 * Flow % omega_x * 2.0 * vw % n(c)  &
+          + 2.0 * Flow % omega_y * 2.0 * uw % n(c) 
 
-    p12 = -(  uu % n(c) * v % x(c)       &
-            + uv % n(c) * v % y(c)       &
-            + uw % n(c) * v % z(c)       &
-            + uv % n(c) * u % x(c)       &
-            + vv % n(c) * u % y(c)       &
-            + vw % n(c) * u % z(c))      &
-            + 2.0 * omega_x * uw % n(c)  &
-            - 2.0 * omega_y * vw % n(c)  &
-            + 2.0 * omega_z * (vv % n(c) - uu % n(c)) 
+    p12 = -(  uu % n(c) * v % x(c)              &
+            + uv % n(c) * v % y(c)              &
+            + uw % n(c) * v % z(c)              &
+            + uv % n(c) * u % x(c)              &
+            + vv % n(c) * u % y(c)              &
+            + vw % n(c) * u % z(c))             &
+            + 2.0 * Flow % omega_x * uw % n(c)  &
+            - 2.0 * Flow % omega_y * vw % n(c)  &
+            + 2.0 * Flow % omega_z * (vv % n(c) - uu % n(c))
 
-    p13 = -(  uw % n(c)*u % x(c)                       &
-            + vw % n(c)*u % y(c)                       &
-            + ww % n(c)*u % z(c)                       &
-            + uu % n(c)*w % x(c)                       &
-            + uv % n(c)*w % y(c)                       &
-            + uw % n(c)*w % z(c))                      &
-            - 2.0 * omega_x * uv % n(c)                &
-            - 2.0 * omega_y * (ww % n(c) - uu % n(c))  &
-            + 2.0 * omega_z * vw % n(c) 
+    p13 = -(  uw % n(c)*u % x(c)                              &
+            + vw % n(c)*u % y(c)                              &
+            + ww % n(c)*u % z(c)                              &
+            + uu % n(c)*w % x(c)                              &
+            + uv % n(c)*w % y(c)                              &
+            + uw % n(c)*w % z(c))                             &
+            - 2.0 * Flow % omega_x * uv % n(c)                &
+            - 2.0 * Flow % omega_y * (ww % n(c) - uu % n(c))  &
+            + 2.0 * Flow % omega_z * vw % n(c)
 
-    p23 = -(  uv % n(c) * w % x(c)                     &
-            + vv % n(c) * w % y(c)                     &
-            + vw % n(c) * w % z(c)                     &
-            + uw % n(c) * v % x(c)                     &
-            + vw % n(c) * v % y(c)                     &
-            + ww % n(c) * v % z(c))                    &
-            - 2.0 * omega_x * (vw % n(c) - ww % n(c))  &
-            + 2.0 * omega_y * uv % n(c)                &
-            - 2.0 * omega_z * uw % n(c) 
+    p23 = -(  uv % n(c) * w % x(c)                            &
+            + vv % n(c) * w % y(c)                            &
+            + vw % n(c) * w % z(c)                            &
+            + uw % n(c) * v % x(c)                            &
+            + vw % n(c) * v % y(c)                            &
+            + ww % n(c) * v % z(c))                           &
+            - 2.0 * Flow % omega_x * (vw % n(c) - ww % n(c))  &
+            + 2.0 * Flow % omega_y * uv % n(c)                &
+            - 2.0 * Flow % omega_z * uw % n(c)
 
     var1_11 = -cc1*eps%n(c)*a11 
     var1_22 = -cc1*eps%n(c)*a22 

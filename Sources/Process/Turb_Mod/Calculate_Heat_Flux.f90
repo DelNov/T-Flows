@@ -83,7 +83,7 @@
                       + 0.6 * (  ut % n(c) * u % x(c)     &
                                + vt % n(c) * u % y(c)     &
                                + wt % n(c) * u % z(c))    &
-                      + 0.2*Flow % beta*grav_x*t2 % n(c))
+                      + 0.2*Flow % beta * Flow % grav_x * t2 % n(c))
 
         vt % n(c) = -c_theta * turb % t_scale(c)          &
                   * ((  uv % n(c) * t % x(c)              &
@@ -92,7 +92,7 @@
                       + 0.6 * (  ut % n(c) * v % x(c)     &
                                + vt % n(c) * v % y(c)     &
                                + wt % n(c) * v % z(c))    &
-                      + 0.2*Flow % beta*grav_y*t2 % n(c))
+                      + 0.2*Flow % beta * Flow % grav_y * t2 % n(c))
 
         wt % n(c) = -c_theta * turb % t_scale(c)          &
                   * ((  uw % n(c) * t % x(c)              &
@@ -101,7 +101,7 @@
                       + 0.6 * (  ut % n(c) * w % x(c)     &
                                + vt % n(c) * w % y(c)     &
                                + wt % n(c) * w % z(c))    &
-                      + 0.2*Flow % beta*grav_z*t2 % n(c))
+                      + 0.2*Flow % beta * Flow % grav_z * t2 % n(c))
       end do
     end do
   end if

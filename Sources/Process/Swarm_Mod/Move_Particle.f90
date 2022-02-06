@@ -161,7 +161,7 @@
   Part % tau = Part % density * (Part % d **2) / 18.0 / visc_fluid
 
   ! Particle terminal speed 
-  gravity = sqrt(grav_x**2 + grav_y**2 + grav_z**2)
+  gravity = sqrt(Flow % grav_x**2 + Flow % grav_y**2 + Flow % grav_z**2)
   Part % vel_t = Part % tau * gravity
 
   ! Compute particle relative vel. in y-dir for buoyant force calculation
@@ -188,9 +188,9 @@
   !----------------------------!
   !   Compute buoyancy force   !
   !----------------------------!
-  fb_x = (1.0 - dens_fluid / Part % density) * grav_x
-  fb_y = (1.0 - dens_fluid / Part % density) * grav_y
-  fb_z = (1.0 - dens_fluid / Part % density) * grav_z
+  fb_x = (1.0 - dens_fluid / Part % density) * Flow % grav_x
+  fb_y = (1.0 - dens_fluid / Part % density) * Flow % grav_y
+  fb_z = (1.0 - dens_fluid / Part % density) * Flow % grav_z
 
   !------------------------!
   !   Fukagata SGS model   !

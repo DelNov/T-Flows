@@ -68,11 +68,11 @@
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, Grid % n_cells
-      turb % g_buoy(c) = -Flow % beta             &
-                         * (grav_x * ut % n(c)    &
-                          + grav_y * vt % n(c)    &
-                          + grav_z * wt % n(c))   &
-                          * Flow % density(c)
+      turb % g_buoy(c) = -Flow % beta                    &
+                       * (  Flow % grav_x * ut % n(c)    &
+                          + Flow % grav_y * vt % n(c)    &
+                          + Flow % grav_z * wt % n(c))   &
+                        * Flow % density(c)
 
       if(turb % g_buoy(c) + turb % p_kin(c) < 0.0) then
         turb % g_buoy(c) = 0.0
@@ -218,8 +218,10 @@
             t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
-          g_buoy_wall = Flow % density(c1)  &
-                      * Flow % beta * abs(grav_x + grav_y + grav_z)           &
+          g_buoy_wall = Flow % density(c1)                                    &
+                      * Flow % beta * abs(  Flow % grav_x                     &
+                                          + Flow % grav_y                     &
+                                          + Flow % grav_z)                    &
                       * sqrt(abs(  t % q(c2)                                  &
                                  / (Flow % density(c1)*Flow % capacity(c1)))  &
                              * c_mu_theta5                                    &
