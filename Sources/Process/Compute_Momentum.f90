@@ -127,7 +127,7 @@
       p_i  => p % x;      uj_i => uj % x;     uk_i => uk % x
       fi       => Flow % fx
       cell_fi  => Flow % cell_fx
-      grav_i   =  grav_x
+      grav_i   =  Flow % grav_x
       p_drop_i =  bulk % p_drop_x
       st_i     => Vof % surf_fx
     end if
@@ -139,7 +139,7 @@
       p_i  => p % y;      uj_i => uj % y;     uk_i => uk % y
       fi       => Flow % fy
       cell_fi  => Flow % cell_fy
-      grav_i   =  grav_y
+      grav_i   =  Flow % grav_y
       p_drop_i =  bulk % p_drop_y
       st_i     => Vof % surf_fy
     end if
@@ -151,7 +151,7 @@
       p_i  => p % z;      uj_i => uj % z;     uk_i => uk % z
       fi       => Flow % fz
       cell_fi  => Flow % cell_fz
-      grav_i   =  grav_z
+      grav_i   =  Flow % grav_z
       p_drop_i =  bulk % p_drop_z
       st_i     => Vof % surf_fz
     end if

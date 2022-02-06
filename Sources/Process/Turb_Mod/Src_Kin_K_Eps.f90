@@ -63,10 +63,10 @@
          Flow % density(c) * eps % n(c)/(kin % n(c) + TINY) * Grid % vol(c)
 
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-      turb % g_buoy(c) = -Flow % beta           &
-                       * (grav_x * ut % n(c) +  &
-                          grav_y * vt % n(c) +  &
-                          grav_z * wt % n(c))   &
+      turb % g_buoy(c) = -Flow % beta                   &
+                       * (  Flow % grav_x * ut % n(c)   &
+                          + Flow % grav_y * vt % n(c)   &
+                          + Flow % grav_z * wt % n(c))  &
                        * Flow % density(c)
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))        &
@@ -165,7 +165,9 @@
                       / Grid % wall_dist(c1)
 
           g_buoy_wall = Flow % density(c1)                                    &
-                      * Flow % beta * abs(grav_x + grav_y + grav_z)           &
+                      * Flow % beta * abs(  Flow % grav_x                     &
+                                          + Flow % grav_y                     &
+                                          + Flow % grav_z)                    &
                       * sqrt(abs(  t % q(c2)                                  &
                                  / (Flow % density(c1)*Flow % capacity(c1)))  &
                       * c_mu_theta5                                           &

@@ -21,10 +21,10 @@
 ------------------------------------------------------------------------------------------------------------------------
   KEYWORD                                  |   default value               |   other possible values
 ------------------------------------------------------------------------------------------------------------------------
-  ADVECTION_SCHEME_FOR_ENERGY              |         upwind                |   any of the listed in next two lines:
-  ADVECTION_SCHEME_FOR_MOMENTUM            |         upwind                |   central, luds, quick, smart, gamma,
-  ADVECTION_SCHEME_FOR_SCALARS             |         upwind                |   minmod, blended, superbee, avl_smart
-  ADVECTION_SCHEME_FOR_TURBULENCE          |         upwind                !   any of the listed in the above two lines
+  ADVECTION_SCHEME_FOR_ENERGY              |         smart                 |   any of the listed in next two lines:
+  ADVECTION_SCHEME_FOR_MOMENTUM            |         smart                 |   central, luds, quick, smart, gamma,
+  ADVECTION_SCHEME_FOR_SCALARS             |         smart                 |   minmod, blended, superbee, avl_smart
+  ADVECTION_SCHEME_FOR_TURBULENCE          |         smart                 !   any of the listed in the above two lines
   ADVECTION_SCHEME_FOR_VOF                 |         upwind                |   cicsam, stacs
   BLENDING_COEFFICIENT_FOR_ENERGY          |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_MOMENTUM        |         1.0                   |   from 0.0 to 1.0

@@ -80,12 +80,12 @@
     v11 = 0.0
     v22 = 0.0
     v33 = 0.0
-    v12 =  0.5*(u % y(c)-v % x(c)) - omega_z
-    v21 = -0.5*(u % y(c)-v % x(c)) + omega_z
-    v13 =  0.5*(u % z(c)-w % x(c)) + omega_y
-    v31 = -0.5*(u % z(c)-w % x(c)) - omega_y
-    v23 =  0.5*(v % z(c)-w % y(c)) - omega_x
-    v32 = -0.5*(v % z(c)-w % y(c)) + omega_x
+    v12 =  0.5*(u % y(c)-v % x(c)) - Flow % omega_z
+    v21 = -0.5*(u % y(c)-v % x(c)) + Flow % omega_z
+    v13 =  0.5*(u % z(c)-w % x(c)) + Flow % omega_y
+    v31 = -0.5*(u % z(c)-w % x(c)) - Flow % omega_y
+    v23 =  0.5*(v % z(c)-w % y(c)) - Flow % omega_x
+    v32 = -0.5*(v % z(c)-w % y(c)) + Flow % omega_x
 
     b_mn_b_mn = b11*b11 + b22*b22 + b33*b33 + 2.0*(b12*b12+b13*b13+b23*b23)
     b_lk_s_lk = b11*s11 + b22*s22 + b33*s33 + 2.0*(b12*s12+b13*s13+b23*s23)
@@ -111,11 +111,11 @@
                                     -2.0/3.0 * b_lk_s_lk)                &
                 +  g5 * kin % n(c)*( 2.0*(b11*v11 + b12*v12 + b13*v13))
 
-      prod = - 2.0 * (  uu % n(c) * u % x(c)    &
-                      + uv % n(c) * u % y(c)    &
-                      + uw % n(c) * u % z(c))   &
-             - 2.0 * omega_y * 2.0 * uw % n(c)  &
-             + 2.0 * omega_z * 2.0 * uv % n(c)
+      prod = - 2.0 * (  uu % n(c) * u % x(c)           &
+                      + uv % n(c) * u % y(c)           &
+                      + uw % n(c) * u % z(c))          &
+             - 2.0 * Flow % omega_y * 2.0 * uw % n(c)  &
+             + 2.0 * Flow % omega_z * 2.0 * uv % n(c)
 
       diss_wall = uu % n(c) / kin % n(c) * eps % n(c) 
       diss_hom  = 2.0/3.0 * eps % n(c)
@@ -149,11 +149,11 @@
                                      -2.0/3.0 * b_lk_s_lk)               &
                 +  g5 * kin % n(c) *( 2.0*(b21*v21 + b22*v22 + b23*v23))
 
-      prod = - 2.0 * (  uv % n(c) * v % x(c)    &
-                      + vv % n(c) * v % y(c)    &
-                      + vw % n(c) * v % z(c))   &
-             + 2.0 * omega_x * 2.0 *vw % n(c)   &
-             - 2.0 * omega_z * 2.0 *uw % n(c)
+      prod = - 2.0 * (  uv % n(c) * v % x(c)           &
+                      + vv % n(c) * v % y(c)           &
+                      + vw % n(c) * v % z(c))          &
+             + 2.0 * Flow % omega_x * 2.0 *vw % n(c)   &
+             - 2.0 * Flow % omega_z * 2.0 *uw % n(c)
 
 
       phi_tot = (1.0-f22 % n(c)**2) * phi_wall  &
@@ -191,11 +191,11 @@
                                      -2.0/3.0 * b_lk_s_lk)               &
                 +  g5 * kin % n(c) *( 2.0*(b31*v31 + b32*v32 + b33*v33))
 
-      prod = - 2.0 * (  uw % n(c) * w % x(c)    &
-                      + vw % n(c) * w % y(c)    &
-                      + ww % n(c) * w % z(c))   &
-             - 2.0 * omega_x * 2.0 * vw % n(c)  &
-             + 2.0 * omega_y * 2.0 * uw % n(c)
+      prod = - 2.0 * (  uw % n(c) * w % x(c)           &
+                      + vw % n(c) * w % y(c)           &
+                      + ww % n(c) * w % z(c))          &
+             - 2.0 * Flow % omega_x * 2.0 * vw % n(c)  &
+             + 2.0 * Flow % omega_y * 2.0 * uw % n(c)
 
       phi_tot = (1.0-f22 % n(c)**2) * phi_wall  &
               +      f22 % n(c)**2  * phi_hom
@@ -234,14 +234,14 @@
               +  g5*kin % n(c)*(  b11*v21 + b12*v22 + b13*v23    &
                                 + b21*v11 + b22*v12 + b23*v13)
  
-      prod = -(  uu % n(c) * v % x(c)                    &
-               + uw % n(c) * v % z(c)                    &
-               + uv % n(c) *(v % y(c) + u % x(c))        &
-               + vv % n(c) * u % y(c)                    &
-               + vw % n(c) * u % z(c))                   &
-               + 2.0 * omega_x * uw % n(c)               &
-               - 2.0 * omega_y * vw % n(c)               &
-               + 2.0 * omega_z* (vv % n(c) - uu % n(c))
+      prod = -(  uu % n(c) * v % x(c)                           &
+               + uw % n(c) * v % z(c)                           &
+               + uv % n(c) *(v % y(c) + u % x(c))               &
+               + vv % n(c) * u % y(c)                           &
+               + vw % n(c) * u % z(c))                          &
+               + 2.0 * Flow % omega_x * uw % n(c)               &
+               - 2.0 * Flow % omega_y * vw % n(c)               &
+               + 2.0 * Flow % omega_z* (vv % n(c) - uu % n(c))
 
       phi_tot = (1.0-f22 % n(c)**2) * phi_wall  &
               +      f22 % n(c)**2  * phi_hom
@@ -278,14 +278,14 @@
               +  g5*kin % n(c)*(  b11*v31 + b12*v32 + b13*v33    &
                                 + b31*v11 + b32*v12 + b33*v13)
 
-      prod = -(  uu % n(c) * w % x(c)                    &
-               + uv % n(c) * w % y(c)                    &
-               + uw % n(c) *(w % z(c) + u % x(c))        &
-               + vw % n(c) * u % y(c)                    &
-               + ww % n(c) * u % z(c))                   &
-               - 2.0 * omega_x * uv % n(c)               &
-               - 2.0 * omega_y *(ww % n(c) - uu % n(c))  &
-               + 2.0 * omega_z * vw % n(c)
+      prod = -(  uu % n(c) * w % x(c)                           &
+               + uv % n(c) * w % y(c)                           &
+               + uw % n(c) *(w % z(c) + u % x(c))               &
+               + vw % n(c) * u % y(c)                           &
+               + ww % n(c) * u % z(c))                          &
+               - 2.0 * Flow % omega_x * uv % n(c)               &
+               - 2.0 * Flow % omega_y *(ww % n(c) - uu % n(c))  &
+               + 2.0 * Flow % omega_z * vw % n(c)
 
       phi_tot = (1.0-f22 % n(c)**2) * phi_wall  &
                    + f22 % n(c)**2  * phi_hom
@@ -322,14 +322,14 @@
               +  g5*kin % n(c)*(  b21*v31 + b22*v32 + b23*v33    &
                                 + b31*v21 + b32*v22 + b33*v23)
 
-      prod = -(  uv % n(c) * w % x(c)                    &
-               + vv % n(c) * w % y(c)                    &
-               + vw % n(c) *(w % z(c) + v % y(c))        &
-               + uw % n(c) * v % x(c)                    &
-               + ww % n(c) * v % z(c))                   &
-               - 2.0 * omega_x *(vw % n(c) - ww % n(c))  &
-               + 2.0 * omega_y * uv % n(c)               &
-               - 2.0 * omega_z * uw % n(c)
+      prod = -(  uv % n(c) * w % x(c)                           &
+               + vv % n(c) * w % y(c)                           &
+               + vw % n(c) *(w % z(c) + v % y(c))               &
+               + uw % n(c) * v % x(c)                           &
+               + ww % n(c) * v % z(c))                          &
+               - 2.0 * Flow % omega_x *(vw % n(c) - ww % n(c))  &
+               + 2.0 * Flow % omega_y * uv % n(c)               &
+               - 2.0 * Flow % omega_z * uw % n(c)
 
       phi_tot = (1.0-f22 % n(c)**2) * phi_wall  &
               +      f22 % n(c)**2  * phi_hom

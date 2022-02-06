@@ -84,9 +84,9 @@
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, Grid % n_cells
-      nc2 = - Flow % beta * (  grav_x * t % x(c)   &
-                             + grav_y * t % y(c)   &
-                             + grav_z * t % z(c))
+      nc2 = - Flow % beta * (  Flow % grav_x * t % x(c)   &
+                             + Flow % grav_y * t % y(c)   &
+                             + Flow % grav_z * t % z(c))
       turb % vis_t(c) = turb % vis_t(c)            &
              * max(1 - 2.5 * nc2 / (Flow % shear(c) + TINY), 0.0)
     end do

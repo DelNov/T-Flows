@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod,      only: HUGE_INT
   use Comm_Mod
-  use Field_Mod,      only: Field_Type, grav_x, grav_y, grav_z
+  use Field_Mod,      only: Field_Type
   use Bulk_Mod,       only: Bulk_Type
   use Turb_Mod
   use Vof_Mod
@@ -34,10 +34,10 @@
   !                                           !
   !-------------------------------------------!
   call Control_Mod_Heat_Transfer(Flow % heat_transfer, verbose = .true.)
-  call Control_Mod_Gravitational_Vector(grav_x,  &
-                                        grav_y,  &
-                                        grav_z, .true.)
-  call Control_Mod_Buoyancy                    (name,   .true.)
+  call Control_Mod_Gravitational_Vector(Flow % grav_x,  &
+                                        Flow % grav_y,  &
+                                        Flow % grav_z, .true.)
+  call Control_Mod_Buoyancy(name, .true.)
   select case(name)
     case('NONE')
       Flow % buoyancy = NO_BUOYANCY

@@ -157,6 +157,12 @@
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy
 
+    ! Gravity must be part of field for conjugate heat transfer models
+    real :: grav_x, grav_y, grav_z
+
+    ! Angular velocity
+    real :: omega_x, omega_y, omega_z!, omega
+
     contains
 
       !------------------------!
@@ -211,12 +217,6 @@
       procedure :: U_Tan
 
   end type
-
-  ! Angular velocity
-  real :: omega_x, omega_y, omega_z, omega
-
-  ! Gravity
-  real, target :: grav_x, grav_y, grav_z
 
   ! Parameters for type of buoyancy
   integer, parameter :: NO_BUOYANCY      = 60013
