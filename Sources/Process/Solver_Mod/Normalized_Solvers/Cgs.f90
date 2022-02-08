@@ -21,8 +21,7 @@
                       u1         => r_cell_08,  &
                       u2         => r_cell_09,  &
                       v2         => r_cell_10,  &
-                      u1_plus_q1 => r_cell_11,  &
-                      fn         => r_cell_12
+                      u1_plus_q1 => r_cell_11
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined, but this         !
 !   procedure is never called, so it doesn't make much sense to do it.         !
@@ -45,6 +44,8 @@
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter
+  real                       :: sum_a, fn
+  integer                    :: sum_n
 !==============================================================================!
 
   ! Take some aliases
@@ -58,12 +59,21 @@
   !--------------------------!
   !   Normalize the system   !
   !--------------------------!
+  sum_a = 0.0
+  sum_n = 0
+  do i = 1, ni
+    sum_a = sum_a + A % val(A % dia(i))
+    sum_n = sum_n + 1
+  end do
+  call Comm_Mod_Global_Sum_Real(sum_a)
+  call Comm_Mod_Global_Sum_Int (sum_n)  ! this is stored somewhere, check
+  sum_a = sum_a / sum_n
+  fn = 1.0 / sum_a
   do i = 1, nt
-    fn(i) = 1.0 / A % val(A % dia(i))
     do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) * fn(i)
+      A % val(j) = A % val(j) * fn
     end do
-    b(i) = b(i) * fn(i)
+    b(i) = b(i) * fn
   end do
 
   !---------------------!
@@ -97,7 +107,7 @@
   res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
 
   if(res < tol) then
-    iter=0
+    iter = 0
     goto 1
   end if
 
@@ -197,9 +207,9 @@
 
     if(res < tol) goto 1
 
-    rho_old=rho
+    rho_old = rho
 
-  end do                ! iter
+  end do  ! iter
 
   !----------------------------------!
   !                                  !
@@ -218,10 +228,11 @@
   !-----------------------------!
   do i = 1, nt
     do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) / fn(i)
+      A % val(j) = A % val(j) / fn
     end do
-    b(i) = b(i) / fn(i)
+    b(i) = b(i) / fn
   end do
+
   fin_res = res
   niter   = iter
 

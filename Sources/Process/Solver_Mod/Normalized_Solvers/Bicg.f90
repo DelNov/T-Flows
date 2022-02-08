@@ -17,8 +17,7 @@
                       q1 => r_cell_13,  &
                       q2 => r_cell_14,  &
                       r1 => r_cell_15,  &
-                      r2 => r_cell_16,  &
-                      fn => r_cell_17 
+                      r2 => r_cell_16
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -40,7 +39,7 @@
 !              |       |                                                       !
 !              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
 !                      |                                                       !
-!                      +----> Bicg              (safe to use r_cell_11..17)    !
+!                      +----> Bicg              (safe to use r_cell_11..16)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -60,6 +59,8 @@
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter
+  real                       :: sum_a, fn
+  integer                    :: sum_n
 !==============================================================================!
 
   ! Take some aliases
@@ -73,12 +74,21 @@
   !--------------------------!
   !   Normalize the system   !
   !--------------------------!
+  sum_a = 0.0
+  sum_n = 0
+  do i = 1, ni
+    sum_a = sum_a + A % val(A % dia(i))
+    sum_n = sum_n + 1
+  end do
+  call Comm_Mod_Global_Sum_Real(sum_a)
+  call Comm_Mod_Global_Sum_Int (sum_n)  ! this is stored somewhere, check
+  sum_a = sum_a / sum_n
+  fn = 1.0 / sum_a
   do i = 1, nt
-    fn(i) = 1.0 / A % val(A % dia(i))
     do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) * fn(i)
+      A % val(j) = A % val(j) * fn
     end do
-    b(i) = b(i) * fn(i)
+    b(i) = b(i) * fn
   end do
 
   !---------------------!
@@ -198,7 +208,7 @@
 
     rho_old = rho
 
-  end do ! iter
+  end do  ! iter
 
   !----------------------------------!
   !                                  !
@@ -217,9 +227,9 @@
   !-----------------------------!
   do i = 1, nt
     do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) / fn(i)
+      A % val(j) = A % val(j) / fn
     end do
-    b(i) = b(i) / fn(i)
+    b(i) = b(i) / fn
   end do
 
   fin_res = res
