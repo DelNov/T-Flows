@@ -14,8 +14,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: p1 => r_cell_01,  &
                       q1 => r_cell_02,  &
-                      r1 => r_cell_03,  &
-                      fn => r_cell_04
+                      r1 => r_cell_03
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -23,7 +22,7 @@
 !     |                                                                        !
 !     +----> Compute_Pressure        (does not use Work_Mod)                   !
 !              |                                                               !
-!              +----> Solver_Mod_Cg  (safe to use r_cell_01..04)               !
+!              +----> Cg             (safe to use r_cell_01..03)               !
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
@@ -31,7 +30,7 @@
 !              |                                                               !
 !              +---> Turb_Mod_Compute_F22       (does not use Work_Mod)        !
 !                      |                                                       !
-!                      +----> Solver_Mod_Cg     (safe to use r_cell_01..04)    !
+!                      +----> Cg                (safe to use r_cell_01..04)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -51,6 +50,8 @@
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter
+  real                       :: sum_a, fn
+  integer                    :: sum_n
 !==============================================================================!
 
   ! Take some aliases
@@ -64,12 +65,21 @@
   !--------------------------!
   !   Normalize the system   !
   !--------------------------!
+  sum_a = 0.0
+  sum_n = 0
+  do i = 1, ni
+    sum_a = sum_a + A % val(A % dia(i))
+    sum_n = sum_n + 1
+  end do
+  call Comm_Mod_Global_Sum_Real(sum_a)
+  call Comm_Mod_Global_Sum_Int (sum_n)  ! this is stored somewhere, check
+  sum_a = sum_a / sum_n
+  fn = 1.0 / sum_a
   do i = 1, nt
-    fn(i) = 1.0 / A % val(A % dia(i))
     do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) * fn(i)
+      A % val(j) = A % val(j) * fn
     end do
-    b(i) = b(i) * fn(i)
+    b(i) = b(i) * fn
   end do
 
   !---------------------!
@@ -177,7 +187,7 @@
 
     rho_old = rho
 
-  end do ! iter
+  end do  ! iter
 
   !----------------------------------!
   !                                  !
@@ -196,9 +206,9 @@
   !-----------------------------!
   do i = 1, nt
     do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) / fn(i)
+      A % val(j) = A % val(j) / fn
     end do
-    b(i) = b(i) / fn(i)
+    b(i) = b(i) / fn
   end do
 
   fin_res = res

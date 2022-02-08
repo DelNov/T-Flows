@@ -22,7 +22,7 @@
 !     |                                                                        !
 !     +----> Compute_Pressure        (does not use Work_Mod)                   !
 !              |                                                               !
-!              +----> Solver_Mod_Cg  (safe to use r_cell_07..12)               !
+!              +----> Cg             (safe to use r_cell_01..03)               !
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
@@ -30,7 +30,7 @@
 !              |                                                               !
 !              +---> Turb_Mod_Compute_F22       (does not use Work_Mod)        !
 !                      |                                                       !
-!                      +----> Solver_Mod_Cg     (safe to use r_cell_01..03)    !
+!                      +----> Cg                (safe to use r_cell_01..03)    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
