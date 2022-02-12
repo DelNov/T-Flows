@@ -6,7 +6,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: Grid
-  integer                 :: fh, disp, vc
+  integer                 :: fh
+  integer(DP)             :: disp
+  integer                 :: vc
   character(len=*)        :: var_name
   real                    :: array(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!

@@ -8,7 +8,7 @@
   class(Comm_Type)     :: Comm
   integer              :: fh    ! file handle
   real,   dimension(:) :: arr   ! array to read
-  integer              :: disp  ! displacement in bytes
+  integer(DP)          :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
 !==============================================================================!

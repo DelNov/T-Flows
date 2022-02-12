@@ -18,7 +18,8 @@
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
   character(SL)            :: name_out, name_mean, a_name
-  integer                  :: fh, d, vc, sc, ua
+  integer                  :: fh, vc, sc, ua
+  integer(DP)              :: d
 !==============================================================================!
 
   call Cpu_Timer % Start('Backup_Mod_Save')

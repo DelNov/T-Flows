@@ -31,9 +31,6 @@
   real              :: dist1, dist2
   real, allocatable :: values_cell(:)
   character(SL)     :: values_name, name_out, str1, str2
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP = DP  ! int. precision is double precision
-  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   ! Allocate local memory (no checks which arguments are present, ...

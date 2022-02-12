@@ -7,7 +7,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: Grid
-  integer                 :: fh, disp, vc
+  integer                 :: fh
+  integer(DP)             :: disp
+  integer                 :: vc
   character(len=*)        :: var_name
   real                    :: array(Grid % n_faces)
   logical, optional       :: correct_sign  ! for face fluxes, signs might have

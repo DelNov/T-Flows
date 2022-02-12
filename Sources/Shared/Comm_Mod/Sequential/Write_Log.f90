@@ -8,7 +8,7 @@
   class(Comm_Type) :: Comm
   integer          :: fh    ! file handle
   logical          :: var   ! variable to write out
-  integer          :: disp  ! displacement in bytes
+  integer(DP)      :: disp  ! displacement in bytes
 !==============================================================================!
 
   write(fh) var

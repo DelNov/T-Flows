@@ -7,7 +7,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Comm_Type)    :: Comm
-  integer            :: fh, disp, vc
+  integer            :: fh
+  integer(DP)        :: disp
+  integer            :: vc
   character(len=*)   :: arr_name
   real, dimension(:) :: arr_value
 !-----------------------------------[Locals]-----------------------------------!

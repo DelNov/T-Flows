@@ -6,12 +6,15 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Comm_Type)  :: Comm
-  integer          :: fh, disp, vc
+  integer          :: fh
+  integer(DP)      :: disp
+  integer          :: vc
   character(len=*) :: var_name
   logical          :: var_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
-  integer       :: vs, disp_loop, cnt_loop
+  integer       :: vs, cnt_loop
+  integer(DP)   :: disp_loop
 !==============================================================================!
 
   cnt_loop  = 0

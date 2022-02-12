@@ -4,11 +4,10 @@
 !   Module for no MPI functionality.                                           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+! use Mpi
   use Const_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!----------------------------------[Include]-----------------------------------!
-! include 'mpif.h'
 !==============================================================================!
 
   !-----------------!
@@ -44,8 +43,8 @@
     integer, allocatable :: face_glo(:)
 
     ! Single precision coud not be avoided here :-(
-    integer(SP), allocatable :: cell_map(:)
-    integer(SP), allocatable :: bnd_cell_map(:)
+    integer, allocatable :: cell_map(:)
+    integer, allocatable :: bnd_cell_map(:)
 
     ! Face maps.  They are not used in MPI calls, can be integers
     integer, allocatable :: face_map_uni_glo(:)  ! unique entries only
@@ -100,24 +99,18 @@
 
       ! Messaging
       procedure :: Create_New_Types
-      procedure :: Exchange_Int_Array     ! not used
-      procedure :: Exchange_Log_Array     ! not used
-      procedure :: Exchange_Real_Array    ! not used
-      procedure :: Recv_Int_Array         ! not used
-      procedure :: Recv_Log_Array         ! not used
-      procedure :: Recv_Real_Array        ! not used
+      procedure :: Exchange_Int_Array
+      procedure :: Exchange_Log_Array
+      procedure :: Exchange_Real_Array
       procedure :: Sendrecv_Int_Arrays
       procedure :: Sendrecv_Log_Arrays
       procedure :: Sendrecv_Real_Arrays
-      procedure :: Send_Int_Array         ! not used
-      procedure :: Send_Log_Array         ! not used
-      procedure :: Send_Real_Array        ! not used
 
   end type
 
   ! Parameters for size of typical variables in bytes
-  integer, parameter :: SIZE_INT  = 8
-  integer, parameter :: SIZE_LOG  = 8
+  integer, parameter :: SIZE_INT  = 4
+  integer, parameter :: SIZE_LOG  = 4
   integer, parameter :: SIZE_REAL = 8
 
   integer :: this_proc  ! processor i.d.
@@ -169,12 +162,6 @@
   include 'Comm_Mod/Sequential/Exchange_Int_Array.f90'
   include 'Comm_Mod/Sequential/Exchange_Log_Array.f90'
   include 'Comm_Mod/Sequential/Exchange_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Recv_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Recv_Log_Array.f90'
-  include 'Comm_Mod/Sequential/Recv_Real_Array.f90'
-  include 'Comm_Mod/Sequential/Send_Int_Array.f90'
-  include 'Comm_Mod/Sequential/Send_Log_Array.f90'
-  include 'Comm_Mod/Sequential/Send_Real_Array.f90'
   include 'Comm_Mod/Sequential/Sendrecv_Int_Arrays.f90'
   include 'Comm_Mod/Sequential/Sendrecv_Log_Arrays.f90'
   include 'Comm_Mod/Sequential/Sendrecv_Real_Arrays.f90'

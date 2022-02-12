@@ -8,7 +8,7 @@
   class(Comm_Type)      :: Comm
   integer               :: fh    ! file handle
   integer, dimension(:) :: arr   ! array to read
-  integer               :: disp  ! displacement in bytes
+  integer(DP)           :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
   integer :: error = 0
@@ -20,8 +20,8 @@
   ! Set it at position disp (same as in Write counterpart)
   call Mpi_File_Set_View(fh,             &
                          disp,           &
-                         MPI_INTEGER8,   &
-                         MPI_INTEGER8,   &
+                         MPI_INTEGER,    &
+                         MPI_INTEGER,    &
                          'native',       &
                          MPI_INFO_NULL,  &
                          error)
@@ -30,9 +30,9 @@
   call Mpi_File_Read(fh,                 &
                      arr(1),             &
                      length,             &
-                     MPI_INTEGER8,       &
+                     MPI_INTEGER,        &
                      MPI_STATUS_IGNORE,  &
-                     error) 
+                     error)
 
   disp = disp + SIZE_INT * length
 

@@ -5,7 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer                  :: fh, disp, vc
+  integer                  :: fh
+  integer(DP)              :: disp
+  integer                  :: vc
   type(Swarm_Type), target :: swr
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: grid

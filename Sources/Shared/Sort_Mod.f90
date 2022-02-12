@@ -26,8 +26,6 @@
       procedure :: Real_Carry_Two_Int
       procedure :: Reverse_Order_Int
       procedure :: Reverse_Order_Real
-      procedure :: Short_Array
-      procedure :: Short_Carry_Short
       procedure :: Three_Int_Carry_Two_Int
       procedure :: Three_Int_Carry_Three_Int
       procedure :: Three_Int_Carry_Int
@@ -64,8 +62,6 @@
   include 'Sort_Mod/Real_Carry_Two_Int.f90'
   include 'Sort_Mod/Reverse_Order_Int.f90'
   include 'Sort_Mod/Reverse_Order_Real.f90'
-  include 'Sort_Mod/Short_Array.f90'
-  include 'Sort_Mod/Short_Carry_Short.f90'
   include 'Sort_Mod/Three_Int_Carry_Two_Int.f90'
   include 'Sort_Mod/Three_Int_Carry_Three_Int.f90'
   include 'Sort_Mod/Three_Int_Carry_Int.f90'

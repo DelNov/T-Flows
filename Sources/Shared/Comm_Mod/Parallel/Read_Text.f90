@@ -8,7 +8,7 @@
   class(Comm_Type) :: Comm
   integer          :: fh           ! file handle
   character        :: text_in*(*)  ! text to write out
-  integer          :: disp         ! displacement in bytes
+  integer(DP)      :: disp         ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: leng
   integer :: error = 0

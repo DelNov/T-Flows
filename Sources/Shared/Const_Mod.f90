@@ -15,13 +15,15 @@
   ! Double and single precision constants definitions
   integer, parameter :: DP =  8  ! double precisions for real and integer
   integer, parameter :: SP =  4  ! single precisions for real and integer
+  integer, parameter :: IP = SP  ! integers will be in single precision
+  integer, parameter :: RP = DP  ! real numbers will be in single precision
 
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!
   real,    parameter :: HUGE     = 1.e+30
   real,    parameter :: TINY     = 1.e-30
-  integer, parameter :: HUGE_INT = 9223372036854775807
+  integer, parameter :: HUGE_INT = 2147483647
 
   ! Big and small numbers in metric system
   real, parameter :: PETA  = 1.e+15

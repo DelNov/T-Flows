@@ -8,17 +8,17 @@
   class(Comm_Type) :: Comm
   integer          :: fh    ! file handle
   real             :: num   ! number to write out
-  integer          :: disp  ! displacement in bytes
+  integer(DP)      :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0
 !==============================================================================!
 
   ! Set it at position disp (same as in Read counterpart)
-  call Mpi_File_Set_View(fh,             &   
-                         disp,           &   
+  call Mpi_File_Set_View(fh,             &
+                         disp,           &
                          MPI_DOUBLE,     &
-                         MPI_DOUBLE,     &   
-                         'native',       &   
+                         MPI_DOUBLE,     &
+                         'native',       &
                          MPI_INFO_NULL,  &
                          error)
 
@@ -28,7 +28,7 @@
                       1,                  &
                       MPI_DOUBLE,         &
                       MPI_STATUS_IGNORE,  &
-                      error) 
+                      error)
 
   disp = disp + SIZE_REAL
 

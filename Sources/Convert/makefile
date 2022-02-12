@@ -51,7 +51,7 @@ $(info #-----------------------------------------------------------------------)
 ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG), yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O0 -g \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
                -ffpe-trap=invalid,zero,overflow                             \
                -fimplicit-none -finit-real=nan                              \
@@ -63,7 +63,7 @@ ifeq ($(FORTRAN), gnu)
                -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check   \
                -Wconversion -Wintrinsics-std
   else
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O3
   endif
   ifeq ($(OPENMP), yes)
     OPT_COMP += -fopenmp
@@ -75,10 +75,10 @@ endif
 ifeq ($(FORTRAN), intel)
   FC = ifort
   ifeq ($(DEBUG), yes)
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g -warn all -check all \
                -debug all -fpe-all=0 -traceback
   else
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O3
   endif
   ifeq ($(OPENMP), yes)
     OPT_COMP += -qopenmp
@@ -90,9 +90,9 @@ endif
 ifeq ($(FORTRAN), nvidia)
   FC = nvfortran
   ifeq ($(DEBUG), yes)
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g
   else
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O3
   endif
   ifeq ($(OPENMP), yes)
     OPT_COMP += -mp
@@ -136,7 +136,6 @@ SRC_MOD = Const_Mod.f90          \
 SRC_FUN = Probe_1d_Nodes.f90  \
           Swap_Int.f90        \
           Swap_Real.f90       \
-          Swap_Short.f90      \
           To_Upper_Case.f90
 
 # Local functions are added one by one ...

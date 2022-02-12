@@ -8,12 +8,12 @@
   class(Comm_Type) :: Comm
   integer          :: fh         ! file handle
   real             :: array(:)
-  integer          :: disp       ! displacement in bytes
+  integer(DP)      :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0
 !==============================================================================!
 
-  ! Set view for distributed boundary cell data 
+  ! Set view for distributed boundary cell data
   ! (this part is the same as in Write counterpart)
   call Mpi_File_Set_View(fh,                        &
                          disp,                      &

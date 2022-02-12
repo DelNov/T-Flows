@@ -61,7 +61,7 @@ ifeq ($(FORTRAN), gnu)
     FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O0 -g \
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O0 -g \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
                -ffpe-trap=invalid,zero,overflow                             \
                -fimplicit-none -finit-real=nan                              \
@@ -73,7 +73,7 @@ ifeq ($(FORTRAN), gnu)
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
                -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O3
   endif
   OPT_LINK = $(OPT_COMP)
 endif
@@ -86,10 +86,10 @@ ifeq ($(FORTRAN), intel)
     FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g -warn all -check all \
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g -warn all -check all \
                -debug all -fpe-all=0 -traceback
   else
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O3
   endif
   OPT_LINK = $(OPT_COMP)
 endif
@@ -102,9 +102,9 @@ ifeq ($(FORTRAN), nvidia)
     FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g
   else
-    OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
+    OPT_COMP = -module $(DIR_MODULE) -r8 -O3
   endif
   OPT_LINK = $(OPT_COMP)
 endif
@@ -261,7 +261,6 @@ SRC_FUN += Tau_Wall_Low_Re.f90         \
 
 SRC_FUN += Swap_Int.f90       \
            Swap_Real.f90      \
-           Swap_Short.f90     \
            To_Upper_Case.f90
 
 #----------------------------------------------------------------------

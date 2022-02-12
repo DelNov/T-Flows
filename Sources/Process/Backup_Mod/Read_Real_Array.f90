@@ -6,12 +6,15 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Comm_Type)    :: Comm
-  integer            :: fh, disp, vc
+  integer            :: fh
+  integer(DP)        :: disp
+  integer            :: vc
   character(len=*)   :: arr_name
   real, dimension(:) :: arr_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
-  integer       :: vo, disp_loop, cnt_loop, length
+  integer       :: vo, cnt_loop, length
+  integer(DP)   :: disp_loop
 !==============================================================================!
 
   cnt_loop  = 0

@@ -13,9 +13,6 @@
   integer       :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns, fu
   character(SL) :: name_out, ext, str1, str2
   real          :: mag
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP = DP  ! int. precision is double precision
-  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   ! Starting and ending counters; file extension

@@ -6,13 +6,16 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: Grid
-  integer                 :: fh, disp, vc
+  integer                 :: fh
+  integer(DP)             :: disp
+  integer                 :: vc
   character(len=*)        :: var_name
   real                    :: array(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   character(SL)            :: vn
-  integer                  :: vs, disp_loop, cnt_loop, nb, nc
+  integer                  :: vs, cnt_loop, nb, nc
+  integer(DP)              :: disp_loop
 !==============================================================================!
 
   ! Take alias

@@ -19,8 +19,6 @@
   integer(SP)   :: data_size
   integer       :: c1, c2, c_f, c_l
   character(SL) :: str1
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP = DP  ! int. precision is double precision
 !==============================================================================!
 
   data_size = 0

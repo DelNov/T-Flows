@@ -17,7 +17,7 @@
   call Mpi_Allreduce(phi,             & ! send buffer
                      phi_res,         & ! recv buffer
                      n,               & ! length
-                     MPI_INTEGER8,    & ! datatype
+                     MPI_INTEGER,     & ! datatype
                      MPI_SUM,         & ! operation
                      MPI_COMM_WORLD,  &
                      error)

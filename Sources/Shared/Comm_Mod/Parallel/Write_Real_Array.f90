@@ -8,7 +8,7 @@
   class(Comm_Type)     :: Comm
   integer              :: fh    ! file handle
   real,   dimension(:) :: arr   ! array to write out
-  integer              :: disp  ! displacement in bytes
+  integer(DP)          :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
   integer :: error = 0
@@ -32,7 +32,7 @@
                       length,             &
                       MPI_DOUBLE,         &
                       MPI_STATUS_IGNORE,  &
-                      error) 
+                      error)
 
   disp = disp + SIZE_REAL * length
 

@@ -5,7 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: fh, disp, vc
+  integer          :: fh
+  integer(DP)      :: disp
+  integer          :: vc
   character(len=*) :: var_name
   type(Field_Type) :: Fld
   type(Var_Type)   :: var
@@ -13,7 +15,8 @@
   type(Comm_Type), pointer :: Comm
   type(Grid_Type), pointer :: Grid
   character(SL)            :: vn
-  integer                  :: vs, disp_loop, cnt_loop, nb, nc
+  integer                  :: vs, cnt_loop, nb, nc
+  integer(DP)              :: disp_loop
 !==============================================================================!
 
   ! Take aliases

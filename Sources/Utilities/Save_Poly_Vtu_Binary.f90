@@ -15,9 +15,6 @@
   integer         :: n_conns, n_polyg
   character(SL)   :: name_out
   character(DL*2) :: str1, str2
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP = DP  ! int. precision is double precision
-  integer, parameter :: RP = DP  ! real precision is double precision
 !==============================================================================!
 
   ! Count connections in this subdomain, you will need it later

@@ -54,8 +54,6 @@
   character(SL)            :: name_out_8, name_out_9, name_mean, a_name
   character(SL)            :: str1, str2
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: IP           = DP  ! int. precision is double precision
-  integer, parameter :: RP           = DP  ! real precision is double precision
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
 
