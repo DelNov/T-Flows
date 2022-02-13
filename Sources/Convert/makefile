@@ -51,7 +51,11 @@ $(info #-----------------------------------------------------------------------)
 #           change the value of IP parameter in Const_Mod, all occurrences
 #           of Int32 to Int64 in procedures saving VTU files and also all
 #           MPI_INTEGER to MPI_INTEGER8 in all MPI-related procedures.
+#           Besides, the proper METIS library should be linked to the code.
 #-------------------------------------------------------------------------------
+
+# METIS library
+METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r64.a
 
 # Fortran == gnu
 ifeq ($(FORTRAN), gnu)
@@ -62,7 +66,7 @@ ifeq ($(FORTRAN), gnu)
                -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion -finitreal=nan     -Wintrinsics-std             \
+               -Wconversion -finit-real=nan    -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
@@ -104,9 +108,6 @@ ifeq ($(FORTRAN), nvidia)
   endif
   OPT_LINK = $(OPT_COMP)
 endif
-
-# METIS library
-METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 
 #------------------------------------------------------
 #   List of sources for modules and functions

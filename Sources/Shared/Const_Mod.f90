@@ -23,6 +23,8 @@
   ! But that won't be enough for program to work.All routines saving .vtu
   ! files should have to specify "Int64" instead of "Int32" and all MPI-
   ! based routines would need to have MPI_INTEGER8 instead of MPI_INTEGER.
+  ! Also, you will have to link the program with proper METIS library, check
+  ! all the makefiles for details on that.
   integer, parameter :: IP = SP  ! integers will be in single precision
   integer, parameter :: RP = DP  ! real numbers will be in single precision
 

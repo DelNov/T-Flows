@@ -1,4 +1,4 @@
-  Compile with:
+The extensions _iXX and rXX are for integer and real number precision.
 
-  gfortran -fdefault-real-8 -fdefault-integer-8 -o Test_Metis_01 Test_Metis_01.f90 libmetis.a
-  gfortran -fdefault-real-8 -fdefault-integer-8 -o Test_Metis_02 Test_Metis_02.f90 libmetis.a
+So libmetis_i64_r64.a is for 64 bit integers and 64 bit reals and
+libmetis_i32_r64.a is for 32 bit integers and 64 bit reals
