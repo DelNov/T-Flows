@@ -12,9 +12,11 @@ find . -name "User_Mod" \
 | sed 's/\/User_Mod/\nif \[ -f ..\/..\/Binaries\/Process \]; then echo "SUCCESS"; else echo "FAILURE"; fi/g' \
 >> worker.sh
 
+echo "make clean" >> worker.sh
+
 # Make the test script executable
 chmod 755 worker.sh
 
-source ./worker.sh > test_compile_user_functions.$(date +%y-%m-%d-%T).log
+source ./worker.sh > test_user_functions_compile.$(date +%y-%m-%d-%T).log
 
-rm -f worker.sh
+/bin/rm worker.sh
