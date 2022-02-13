@@ -2,6 +2,10 @@
   subroutine Save_Vtu_Cells(Grid, sub, n_nodes_sub, n_cells_sub)
 !------------------------------------------------------------------------------!
 !   Writes cells in vtu file format                                            !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -79,7 +83,7 @@
 
   ! Cells' nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -88,7 +92,7 @@
 
   ! Cells' offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="offsets"'                //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -97,7 +101,7 @@
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="types"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -109,7 +113,7 @@
 
     ! Write polyhedral cells' faces
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+    write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                       ' Name="faces"'                  //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -118,7 +122,7 @@
 
     ! Write polyhedral cells' faces offsets
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+    write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                       ' Name="faceoffsets"'            //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -139,7 +143,7 @@
 
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="Processor"'              //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -148,7 +152,7 @@
 
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="GridNumberOfNodes"'      //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -375,7 +379,7 @@
 
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Int64" Name="Processor"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type="Int32" Name="Processor"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" ' //   &
                             ' Name="GridWallDistance"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type="Float64" ' //  &

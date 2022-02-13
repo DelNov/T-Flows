@@ -2,6 +2,10 @@
   subroutine Save_Vtu_Faces(Grid, plot_shadows, phi_f)
 !------------------------------------------------------------------------------!
 !   Writes boundary condition .faces.vtu or shadow .shadow.vtu file.           !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -85,7 +89,7 @@
 
   ! Faces' nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -94,7 +98,7 @@
 
   ! Faces' offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="offsets"'                //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -103,7 +107,7 @@
 
   ! Faces' types
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="types"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -122,7 +126,7 @@
 
   ! Boundary conditions
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="BoundaryConditions"'     //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -142,7 +146,7 @@
 
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="GridNumberOfNodes"'      //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF

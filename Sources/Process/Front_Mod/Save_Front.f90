@@ -2,6 +2,10 @@
   subroutine Save_Front(Front, time_step)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -79,7 +83,7 @@
     !--------------------!
     !   Particle i.d.s   !
     !--------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Index" ' // &
                             'format="ascii">'
     do v = 1, Front % n_verts
       write(fu,'(a,i9)') IN_5, v
@@ -89,7 +93,7 @@
     !--------------------------!
     !   Number of neighbours   !
     !--------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours" ' // &
                             'format="ascii">'
     do v = 1, Front % n_verts
       write(fu,'(a,i9)') IN_5, Front % Vert(v) % nne
@@ -115,7 +119,7 @@
     !           !
     !-----------!
     write(fu,'(a,a)') IN_3, '<Cells>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
                             ' format="ascii">'
     ! Cell topology
     do e = 1, Front % n_elems
@@ -124,7 +128,7 @@
 
     ! Cell offsets
     write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets"' //  &
                             ' format="ascii">'
     offset = 0
     do e = 1, Front % n_elems
@@ -134,7 +138,7 @@
 
     ! Cell types
     write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types"' //  &
                             ' format="ascii">'
     do e = 1, Front % n_elems
       write(fu,'(a,i9)') IN_5, VTK_POLYGON
@@ -154,7 +158,7 @@
     !-------------------------------------!
     !   Number of neighbouring elements   !
     !-------------------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours"' //  &
                             ' format="ascii">'
     do e = 1, Front % n_elems
       write(fu,'(a,i9)') IN_5, Front % Elem(e) % nne

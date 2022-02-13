@@ -2,6 +2,10 @@
   subroutine Save_Poly_Vtu_Ascii(grid)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -58,7 +62,7 @@
   write(fu,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
                           ' format="ascii">'
 
   do c = 1, grid % n_cells
@@ -99,7 +103,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' offsets
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' //  &
                           'Name="offsets" format="ascii">'
   cell_offset = 0
   do c = 1, grid % n_cells
@@ -109,7 +113,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' types
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types" format="ascii">'
   do c = 1, grid % n_cells
     if(grid % cells_n_nodes(c) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_TETRA
     if(grid % cells_n_nodes(c) .eq. 8) write(fu,'(a,i9)') IN_5, VTK_HEXAHEDRON
@@ -120,7 +124,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Write polyhedral cells' faces
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="faces" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="faces" format="ascii">'
   do c = 1, grid % n_cells
 
     ! You have found a polyhedron, write its faces out
@@ -141,7 +145,7 @@
 
   ! Write polyhedral cells' faces offsets
   cell_offset = 0
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="faceoffsets" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="faceoffsets" format="ascii">'
   do c = 1, grid % n_cells
 
     ! You have found a polyhedron
@@ -176,7 +180,7 @@
   write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Processor i.d.
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' //  &
                           'Name="Processor" format="ascii">'
   do c = 1, grid % n_cells
     write(fu,'(a,i9)') IN_5, grid % comm % cell_proc(c)

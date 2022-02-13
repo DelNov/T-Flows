@@ -2,6 +2,10 @@
   subroutine Save_Vtu_Edges(Grid, edge_data)
 !------------------------------------------------------------------------------!
 !   Writes edges in vtu file format                                            !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -56,7 +60,7 @@
   write(fu,'(a,a)') IN_3, '<Cells>'
 
   ! First write all edges' nodes
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
                           ' format="ascii">'
   do c = 1, Grid % n_edges
     write(fu,'(a,64i9)') IN_5, (Grid % edges_n(1:2, c))-1
@@ -64,7 +68,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all edges' offsets
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' //  &
                           'Name="offsets" format="ascii">'
   edge_offset = 0
   do c = 1, Grid % n_edges
@@ -74,7 +78,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all edges' types
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int64" Name="types" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types" format="ascii">'
   do c = 1, Grid % n_edges
     write(fu,'(a,i9)') IN_5, VTK_LINE
   end do
@@ -90,7 +94,7 @@
   write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   if(present(edge_data)) then
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int64"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type="Int32"' //  &
                             ' Name="EdgeData" format="ascii">'
     do c = 1, Grid % n_edges
       write(fu,'(a,i9)') IN_5, edge_data(c)

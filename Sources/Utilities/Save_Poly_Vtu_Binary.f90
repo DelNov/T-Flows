@@ -2,6 +2,10 @@
   subroutine Save_Poly_Vtu_Binary(grid)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -84,7 +88,7 @@
 
   ! First write all cells' nodes (a.k.a. connectivity)
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -93,7 +97,7 @@
 
   ! Cells' offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="offsets"'                //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -102,7 +106,7 @@
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="types"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -111,7 +115,7 @@
 
   ! Write polyhedral cells' faces
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="faces"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -121,7 +125,7 @@
 
   ! Write polyhedral cells' faces offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="faceoffsets"'            //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -139,7 +143,7 @@
 
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int64"'        //  &
+  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="Processor"'              //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF

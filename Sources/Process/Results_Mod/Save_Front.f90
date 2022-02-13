@@ -2,6 +2,10 @@
   subroutine Save_Front(Results, Front, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -103,10 +107,10 @@
   !   Particle i.d.s   !
   !--------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int64" Name="Index" '       //  &
+    write(f8) IN_4 // '<PDataArray type="Int32" Name="Index" '       //  &
                       'format="ascii"/>'                             // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Index" ' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="Index" ' //  &
                           'format="ascii">'
   do v = 1, Front % n_verts
     write(f9,'(a,i9)') IN_5, v
@@ -117,10 +121,10 @@
   !   Number of neighbours   !
   !--------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int64" Name="Neighbours" ' //  &
+    write(f8) IN_4 // '<PDataArray type="Int32" Name="Neighbours" ' //  &
                       'format="ascii"/>'                            // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours" ' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours" ' //  &
                           'format="ascii">'
   do v = 1, Front % n_verts
     write(f9,'(a,i9)') IN_5, Front % Vert(v) % nne
@@ -154,11 +158,11 @@
   !-----------!
   if(this_proc .eq. 1) then
     write(f8) IN_3 // '<PCells>' // LF
-    write(f8) IN_4 // '<PDataArray type="Int64" Name="connectivity"' //  &
+    write(f8) IN_4 // '<PDataArray type="Int32" Name="connectivity"' //  &
                       ' format="ascii"/>'                            // LF
   end if
   write(f9,'(a,a)') IN_3, '<Cells>'
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="connectivity"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
                           ' format="ascii">'
   ! Cell topology
   do e = 1, Front % n_elems
@@ -168,10 +172,10 @@
 
   ! Cell offsets
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int64" Name="offsets"' //  &
+    write(f8) IN_4 // '<PDataArray type="Int32" Name="offsets"' //  &
                       ' format="ascii"/>'                       // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="offsets"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets"' //  &
                           ' format="ascii">'
   offset = 0
   do e = 1, Front % n_elems
@@ -182,10 +186,10 @@
 
   ! Cell types
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int64" Name="types"' //  &
+    write(f8) IN_4 // '<PDataArray type="Int32" Name="types"' //  &
                       ' format="ascii"/>'                     // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="types"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="types"' //  &
                           ' format="ascii">'
   do e = 1, Front % n_elems
     write(f9,'(a,i9)') IN_5, VTK_POLYGON
@@ -213,10 +217,10 @@
   !   Number of neighbouring elements   !
   !-------------------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int64" Name="Neighbours"' //  &
+    write(f8) IN_4 // '<PDataArray type="Int32" Name="Neighbours"' //  &
                       ' format="ascii"/>'                          // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int64" Name="Neighbours"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours"' //  &
                           ' format="ascii">'
   do e = 1, Front % n_elems
     write(f9,'(a,i9)') IN_5, Front % elem(e) % nne

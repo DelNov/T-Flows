@@ -3,6 +3,10 @@
                           Flow, turb, Vof, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Work_Mod, only: v2_calc   => r_cell_01,  &
@@ -215,7 +219,7 @@
 
   ! Cells' nodes
   write(str1, '(i0.0)') data_offset
-  write(f9) IN_4 // '<DataArray type="Int64"'        //  &
+  write(f9) IN_4 // '<DataArray type="Int32"'        //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -268,7 +272,7 @@
 
     ! Write polyhedral cells' faces
     write(str1, '(i0.0)') data_offset
-    write(f9) IN_4 // '<DataArray type="Int64"'        //  &
+    write(f9) IN_4 // '<DataArray type="Int32"'        //  &
                       ' Name="faces"'                  //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -278,7 +282,7 @@
 
     ! Write polyhedral cells' faces offsets
     write(str1, '(i0.0)') data_offset
-    write(f9) IN_4 // '<DataArray type="Int64"'        //  &
+    write(f9) IN_4 // '<DataArray type="Int32"'        //  &
                       ' Name="faceoffsets"'            //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF

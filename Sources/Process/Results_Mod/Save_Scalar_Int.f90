@@ -5,6 +5,10 @@
                              data_offset, sweep)
 !------------------------------------------------------------------------------!
 !   Writes one integer scalar defined over cells.                              !
+!                                                                              !
+!   If you change precision of integers to 64 bits (currently set in the       !
+!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
+!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -30,13 +34,13 @@
   if(sweep .eq. 1) then
     if(n_proc > 1 .and. this_proc .eq. 1) then
       write(fs) IN_4                                  //  &
-                '<PDataArray type="Int64"'            //  &
+                '<PDataArray type="Int32"'            //  &
                 ' Name="' // trim(var_name) // '"/>'  // LF
     end if
 
     write(str1, '(i0.0)') data_offset
     if(data_offset .eq. 0) write(str1, '(i1)') data_offset
-    write(fp) IN_4 // '<DataArray type="Int64"'          //  &
+    write(fp) IN_4 // '<DataArray type="Int32"'          //  &
                       ' Name="' // trim(var_name) // '"' //  &
                       ' format="appended"'               //  &
                       ' offset="' // trim(str1) //'">'   // LF
