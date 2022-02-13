@@ -40,7 +40,12 @@ $(info #-----------------------------------------------------------------------)
 #-------------------------------------------------------------------------------
 #   Compiler and linker options
 #-------------------------------------------------------------------------------
-#   Note: Changes only when support to a new Fortran compiler is added.
+#   Note 1: Changes only when support to a new Fortran compiler is added.
+#
+#   Note 2: If you want to change the precision of integers to 64 bits via
+#           the compiler option (which should be avoided), you should also
+#           change the value of IP parameter in Const_Mod, all occurrences
+#           of Int32 to Int64 in procedures saving VTU files and also all
 #-------------------------------------------------------------------------------
 
 # Fortran == gnu
