@@ -19,7 +19,7 @@
   ! Put in reverse order
   do i = 1, n / 2
     j = n - i + 1
-    call Swap_Int(a(i), a(j))
+    call Swap_Real(a(i), a(j))
   end do
 
   end subroutine

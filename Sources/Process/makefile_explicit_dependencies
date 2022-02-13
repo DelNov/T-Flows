@@ -400,6 +400,15 @@ Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Interface_Mod.o \
 Interface_Mod/*.f90 
 
+#-- ./Backup_Mod_Seq.f90
+$(DIR_OBJECT)/Backup_Mod_Seq.o:\
+$(DIR_OBJECT)/User_Mod.o \
+User_Mod/*.f90 \
+Backup_Mod_Seq.f90 \
+Backup_Mod_Par.f90 \
+$(DIR_OBJECT)/Backup_Mod.o \
+Backup_Mod/*.f90 
+
 #-- ./Solver_Mod.f90
 $(DIR_OBJECT)/Solver_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
@@ -467,6 +476,8 @@ $(DIR_OBJECT)/Monitor_Mod.o \
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Eddies_Mod.o \
 Eddies_Mod/*.f90 \
+Backup_Mod_Seq.f90 \
+Backup_Mod_Par.f90 \
 $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
@@ -512,6 +523,8 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 $(DIR_OBJECT)/Backup_Mod.o:\
 $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
+Backup_Mod_Seq.f90 \
+Backup_Mod_Par.f90 \
 Backup_Mod/*.f90 
 
 #-- ./Elem_Mod.f90
@@ -572,6 +585,15 @@ $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #-- ./Side_Mod.f90
+#-- ./Backup_Mod_Par.f90
+$(DIR_OBJECT)/Backup_Mod_Par.o:\
+$(DIR_OBJECT)/User_Mod.o \
+User_Mod/*.f90 \
+Backup_Mod_Seq.f90 \
+Backup_Mod_Par.f90 \
+$(DIR_OBJECT)/Backup_Mod.o \
+Backup_Mod/*.f90 
+
 #-- ./Numerics_Mod/Advection_Scheme.f90
 #-- ./Numerics_Mod/Advection_Scheme_Code.f90
 #-- ./Numerics_Mod/Advection_Term.f90
@@ -807,6 +829,8 @@ $(DIR_OBJECT)/Results_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 Results_Mod/*.f90 \
+Backup_Mod_Seq.f90 \
+Backup_Mod_Par.f90 \
 $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
@@ -931,7 +955,6 @@ Face_Mod/*.f90
 #-- ./Monitor_Mod/Write_4_Vars.f90
 #-- ./Monitor_Mod/Write_5_Vars.f90
 #-- ./Monitor_Mod/Finalize.f90
-#-- ./Swap_Int.f90
 #-- ./Comm_Mod_Par.f90
 $(DIR_OBJECT)/Comm_Mod_Par.o:\
 $(DIR_OBJECT)/Const_Mod.o \
@@ -997,13 +1020,11 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Sort_Mod/Reverse_Order_Int.f90
 #-- ./Sort_Mod/Int_Carry_Real.f90
 #-- ./Sort_Mod/Real_Carry_Int.f90
-#-- ./Sort_Mod/Short_Array.f90
 #-- ./Sort_Mod/Three_Int.f90
 #-- ./Sort_Mod/Real_Array.f90
 #-- ./Sort_Mod/Two_Real_Carry_Int.f90
 #-- ./Sort_Mod/Three_Real_Carry_Two_Int.f90
 #-- ./Sort_Mod/Int_Carry_Int.f90
-#-- ./Sort_Mod/Short_Carry_Short.f90
 #-- ./Sort_Mod/Reverse_Order_Real.f90
 #-- ./Sort_Mod/Three_Int_Carry_Int.f90
 #-- ./Sort_Mod/Three_Int_Carry_Two_Int.f90
@@ -1017,9 +1038,9 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #-- ./Sort_Mod/Three_Real.f90
 #-- ./Sort_Mod/Two_Int_Carry_Two_Int.f90
 #-- ./Sort_Mod/Three_Real_Carry_Int.f90
-#-- ./Swap_Real.f90
 #-- ./Sort_Mod.f90
 $(DIR_OBJECT)/Sort_Mod.o:\
+$(DIR_OBJECT)/Swap_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 
@@ -1035,6 +1056,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
+#-- ./Swap_Mod.f90
 #-- ./Metis_Options_Mod.f90
 #-- ./Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90
 #-- ./Grid_Mod/Calculate_Cell_Volumes.f90
@@ -1223,10 +1245,6 @@ $(DIR_OBJECT)/Const_Mod.o
 #-- ./Work_Mod/Allocate_Real_Cells.f90
 #-- ./Work_Mod/Allocate_Real_Nodes.f90
 #-- ./Work_Mod/Allocate_Real_Faces.f90
-#-- ./Swap_Short.f90
-$(DIR_OBJECT)/Swap_Short.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-- ./Math_Mod/Approx_String.f90
 #-- ./Math_Mod/Tet_Volume.f90
 #-- ./Math_Mod/Harmonic_Mean.f90
@@ -1438,7 +1456,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-- ./Cgns_Mod/Parallel/Write_Block_Info.f90
 #-- ./Cgns_Mod/Initialize_Counters.f90
 #-- ./Const_Mod.f90
-#-- ./Tokenizer_Mod.f90
 #-- ./Comm_Mod_Seq.f90
 $(DIR_OBJECT)/Comm_Mod_Seq.o:\
 $(DIR_OBJECT)/Const_Mod.o \

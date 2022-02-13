@@ -51,19 +51,18 @@ $(info #-----------------------------------------------------------------------)
 ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG), yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O0 -g \
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O0 -g                     \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
-               -ffpe-trap=invalid,zero,overflow                             \
-               -fimplicit-none -finit-real=nan                              \
+               -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+               -Wconversion -finitreal=nan     -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
-               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check   \
-               -Wconversion -Wintrinsics-std
+               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O3
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O3
   endif
   ifeq ($(OPENMP), yes)
     OPT_COMP += -fopenmp
@@ -125,6 +124,7 @@ SRC_MOD = Const_Mod.f90          \
           Vtk_Mod.f90            \
           Metis_Options_Mod.f90  \
           Boundary_Mod.f90       \
+          Swap_Mod.f90           \
           Sort_Mod.f90           \
           Grid_Mod.f90
 
@@ -134,8 +134,6 @@ SRC_MOD = Const_Mod.f90          \
 
 # Sources for all shared functions
 SRC_FUN = Probe_1d_Nodes.f90  \
-          Swap_Int.f90        \
-          Swap_Real.f90       \
           To_Upper_Case.f90
 
 # Local functions are added one by one ...

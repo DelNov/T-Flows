@@ -61,13 +61,12 @@ ifeq ($(FORTRAN), gnu)
     FC = $(FCOMP)
   endif
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O0 -g \
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O0 -g                     \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
-               -ffpe-trap=invalid,zero,overflow                             \
-               -fimplicit-none -finit-real=nan                              \
+               -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion                    -Wintrinsics-std             \
+               -Wconversion -finitreal=nan     -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
@@ -180,6 +179,7 @@ endif
 # Modules in shared directory
 SRC_MOD += Cpu_Timer_Mod.f90      \
            Math_Mod.f90           \
+           Swap_Mod.f90           \
            Sort_Mod.f90           \
            File_Mod.f90           \
            Control_Mod.f90        \
@@ -259,9 +259,7 @@ SRC_FUN += Tau_Wall_Low_Re.f90         \
            Find_Nearest_Wall_Cell.f90  \
            Roughness_Coefficient.f90
 
-SRC_FUN += Swap_Int.f90       \
-           Swap_Real.f90      \
-           To_Upper_Case.f90
+SRC_FUN += To_Upper_Case.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions

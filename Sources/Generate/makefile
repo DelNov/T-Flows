@@ -47,45 +47,44 @@ $(info #-----------------------------------------------------------------------)
 ifeq ($(FORTRAN), gnu)
   FC = gfortran
   ifeq ($(DEBUG),yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O0 -g \
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O0 -g                     \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
-               -ffpe-trap=invalid,zero,overflow                             \
-               -fimplicit-none -finit-real=nan                              \
+               -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
                -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion                    -Wintrinsics-std             \
+               -Wconversion -finitreal=nan     -Wintrinsics-std             \
                -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
                -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8                     -O3
-  endif 
+    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O3
+  endif
   OPT_LINK = $(OPT_COMP)
-endif 
+endif
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
   FC = ifort
-  ifeq ($(DEBUG),yes)
+  ifeq ($(DEBUG), yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g -warn all -check all \
                -debug all -fpe-all=0 -traceback
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -O3
   endif
   OPT_LINK = $(OPT_COMP)
-endif 
+endif
 
 # Fortran == nvidia
 ifeq ($(FORTRAN), nvidia)
   FC = nvfortran
-  ifeq ($(DEBUG),yes)
+  ifeq ($(DEBUG), yes)
     OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -O3
   endif
   OPT_LINK = $(OPT_COMP)
-endif 
+endif
 
 # METIS library
 METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
@@ -93,9 +92,9 @@ METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis.a
 #------------------------------------------------------
 #   List of sources for modules and functions
 #------------------------------------------------------
-#   Modules' order must obey their dependency 
+#   Modules' order must obey their dependency
 #   This list should therefore be written "by hand".
-#   Note: Modules written in lower case 
+#   Note: Modules written in lower case
 #         letters are candidates for deletion.
 #------------------------------------------------------
 
@@ -112,6 +111,7 @@ SRC_MOD = Const_Mod.f90          \
           Vtk_Mod.f90            \
           Metis_Options_Mod.f90  \
           Boundary_Mod.f90       \
+          Swap_Mod.f90           \
           Sort_Mod.f90           \
           Grid_Mod.f90
 
@@ -131,8 +131,6 @@ SRC_MOD += Point_Mod.f90    \
 # Sources for all shared functions
 SRC_FUN = Probe_1d_Nodes.f90  \
           Probe_2d.f90        \
-          Swap_Int.f90        \
-          Swap_Real.f90       \
           To_Upper_Case.f90
 
 # Local functions are added one by one ...
@@ -143,7 +141,7 @@ SRC_FUN += Calculate_Geometry.f90  \
            Print_Grid_Statistics.f90
 
 #----------------------------------------------------------------------
-#   List of objects generated from the list of modules and functions  
+#   List of objects generated from the list of modules and functions
 #----------------------------------------------------------------------
 #   Note: This doesn't need editing.
 #----------------------------------------------------------------------
@@ -152,7 +150,7 @@ OBJ_FUN = $(SRC_FUN:%.f90=$(DIR_OBJECT)/%.o)
 OBJ = $(OBJ_MOD) $(OBJ_FUN)
 
 #-------------------------------------------------------
-#   List of modules currently used for target "clean" 
+#   List of modules currently used for target "clean"
 #-------------------------------------------------------
 #   Note: This doesn't need editing.
 #-------------------------------------------------------
@@ -180,7 +178,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #-----------------------------------
 #   Note: Should not be modified.
 #-----------------------------------
-$(PROGRAM_FILE): $(OBJ) 
+$(PROGRAM_FILE): $(OBJ)
 	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
 	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
