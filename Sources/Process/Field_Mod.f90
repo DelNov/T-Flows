@@ -187,7 +187,7 @@
       ! procedure          :: Grad_Component_Cells_To_Nodes         ! not used
       procedure          :: Grad_Gauss
       procedure, private :: Grad_Gauss_Pressure
-      procedure, private :: Grad_Gauss_Variable
+      procedure          :: Grad_Gauss_Variable
       procedure, private :: Grad_Least_Pressure
       procedure, private :: Grad_Least_Pressure_Correction
       procedure, private :: Grad_Least_Variable
