@@ -4,7 +4,7 @@
 !   Module for MPI functionality.                                              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Mpi
+  use Mpi_f08
   use Const_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -69,8 +69,8 @@
     type(Buffer_Type), allocatable :: cells_send(:)
     type(Buffer_Type), allocatable :: cells_recv(:)
 
-    integer, private :: cell_map_type
-    integer, private :: bnd_cell_map_type
+    type(Mpi_Datatype), private :: cell_map_type
+    type(Mpi_Datatype), private :: bnd_cell_map_type
 
     contains
 

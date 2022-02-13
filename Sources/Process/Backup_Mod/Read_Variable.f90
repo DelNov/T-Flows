@@ -1,11 +1,10 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Variable(fh, disp, vc, var_name, Fld, var)
+  subroutine Backup_Mod_Read_Variable(disp, vc, var_name, Fld, var)
 !------------------------------------------------------------------------------!
 !   Reads a whole variable from backup file.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: fh
   integer(DP)      :: disp
   integer          :: vc
   character(len=*) :: var_name

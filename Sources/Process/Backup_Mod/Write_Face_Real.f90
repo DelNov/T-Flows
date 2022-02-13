@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face_Real(Grid, fh, disp, vc, var_name, array, &
+  subroutine Backup_Mod_Write_Face_Real(Grid, disp, vc, var_name, array, &
                                         correct_sign)
 !------------------------------------------------------------------------------!
 !   Writes a vector variable with face values backup file.                     !
@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: Grid
-  integer                 :: fh
   integer(DP)             :: disp
   integer                 :: vc
   character(len=*)        :: var_name

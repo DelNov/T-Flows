@@ -1,11 +1,10 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Variable(fh, disp, vc, var_name, var)
+  subroutine Backup_Mod_Write_Variable(disp, vc, var_name, var)
 !------------------------------------------------------------------------------!
 !   Writes a whole variable to backup file.                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: fh
   integer(DP)      :: disp
   integer          :: vc
   character(len=*) :: var_name

@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Log(Comm, fh, disp, vc, var_name, var_value)
+  subroutine Backup_Mod_Read_Log(Comm, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
 !   Reads a single named logical variable from backup file.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Comm_Type)  :: Comm
-  integer          :: fh
   integer(DP)      :: disp
   integer          :: vc
   character(len=*) :: var_name

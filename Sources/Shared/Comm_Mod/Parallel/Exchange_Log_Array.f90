@@ -12,8 +12,8 @@
   logical          :: phi(length)
   integer          :: dest         ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: rtag, stag, error
-  integer :: status(MPI_STATUS_SIZE)
+  integer          :: rtag, stag, error
+  type(Mpi_Status) :: status
 !==============================================================================!
 
   ! Form send and receive tags

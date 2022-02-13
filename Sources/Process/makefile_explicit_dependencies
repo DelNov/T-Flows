@@ -406,7 +406,6 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
 Backup_Mod_Seq.f90 \
 Backup_Mod_Par.f90 \
-$(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
 #-- ./Solver_Mod.f90
@@ -478,7 +477,6 @@ $(DIR_OBJECT)/Eddies_Mod.o \
 Eddies_Mod/*.f90 \
 Backup_Mod_Seq.f90 \
 Backup_Mod_Par.f90 \
-$(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
 #-- ./Surf_Mod/Calculate_Curvatures_From_Edges.f90
@@ -518,14 +516,6 @@ $(DIR_OBJECT)/Var_Mod.o:\
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
-
-#-- ./Backup_Mod.f90
-$(DIR_OBJECT)/Backup_Mod.o:\
-$(DIR_OBJECT)/User_Mod.o \
-User_Mod/*.f90 \
-Backup_Mod_Seq.f90 \
-Backup_Mod_Par.f90 \
-Backup_Mod/*.f90 
 
 #-- ./Elem_Mod.f90
 $(DIR_OBJECT)/Elem_Mod.o:\
@@ -591,7 +581,6 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
 Backup_Mod_Seq.f90 \
 Backup_Mod_Par.f90 \
-$(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
 #-- ./Numerics_Mod/Advection_Scheme.f90
@@ -831,7 +820,6 @@ $(DIR_SHARED)/Work_Mod/*.f90 \
 Results_Mod/*.f90 \
 Backup_Mod_Seq.f90 \
 Backup_Mod_Par.f90 \
-$(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
 #-- ./Calculate_Vorticity.f90

@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Int(Comm, fh, disp, vc, var_name, var_value)
+  subroutine Backup_Mod_Write_Int(Comm, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
 !   Writes a single named integer variable to backup file.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Comm_Type)  :: Comm
-  integer          :: fh
   integer(DP)      :: disp
   integer          :: vc
   character(len=*) :: var_name

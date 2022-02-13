@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Comm_Type) :: Comm
-  integer          :: fh             ! file handle
+  type(Mpi_File)   :: fh             ! file handle
   character        :: file_name*(*)  ! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Face_Real(Grid, fh, disp, vc, var_name, array,  &
+  subroutine Backup_Mod_Read_Face_Real(Grid, disp, vc, var_name, array,  &
                                        correct_sign)
 !------------------------------------------------------------------------------!
 !   Reads a vector variable with face values from a backup file.               !
@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type), target :: Grid
-  integer                 :: fh, disp, vc
+  integer                 :: disp, vc
   character(len=*)        :: var_name
   real                    :: array(Grid % n_faces)
   logical, optional       :: correct_sign  ! for face fluxes, signs might have

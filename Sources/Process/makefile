@@ -223,7 +223,12 @@ SRC_MOD += Point_Mod.f90       \
 SRC_MOD += User_Mod.f90
 
 # Backup_Mod should come close to the end because it uses all other modules
-SRC_MOD += Backup_Mod.f90
+# Note the conditional support for MPI communication
+ifeq ($(MPI), yes)
+  SRC_MOD += Backup_Mod_Par.f90
+else
+  SRC_MOD += Backup_Mod_Seq.f90
+endif
 
 # Results_Mod must be last.
 SRC_MOD += Results_Mod.f90

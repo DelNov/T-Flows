@@ -17,6 +17,8 @@
   end type
   type(Backup_Type) :: backup
 
+  type(Mpi_File) :: fh
+
   contains
 
   include 'Backup_Mod/Load.f90'

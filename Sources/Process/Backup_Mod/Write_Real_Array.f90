@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Real_Array(Comm, fh, disp,  &
+  subroutine Backup_Mod_Write_Real_Array(Comm, disp,  &
                                          vc, arr_name, arr_value)
 !------------------------------------------------------------------------------!
 !   Writes a name real array to backup file.                                   !
@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Comm_Type)    :: Comm
-  integer            :: fh
   integer(DP)        :: disp
   integer            :: vc
   character(len=*)   :: arr_name

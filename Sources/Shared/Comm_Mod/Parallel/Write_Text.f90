@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Comm_Type) :: Comm
-  integer          :: fh            ! file handle
+  type(Mpi_File)   :: fh            ! file handle
   character        :: text_out*(*)  ! text to write out
   integer(DP)      :: disp          ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
