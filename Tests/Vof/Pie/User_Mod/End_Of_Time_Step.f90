@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
@@ -9,13 +9,13 @@
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n         ! current time step
   integer, intent(in)      :: n_stat_t  ! 1st t.s. statistics turbulence
   integer, intent(in)      :: n_stat_p  ! 1st t.s. statistics particles
   real,    intent(in)      :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
   integer                  :: c, last_cell, fu
   real                     :: b_volume, surface, rise_vel_int
@@ -24,7 +24,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   fun  => Vof % fun
 
   !----------------------------------------------!
@@ -34,18 +34,18 @@
   surface = 0.0
   y_pos_cen = 0.0
   rise_vel_int = 0.0
-  call Flow Grad_Variable(fun)
+  call Flow % Grad_Variable(fun)
 
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    b_volume = b_volume + grid % vol(c) * fun % n(c)
+  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+    b_volume = b_volume + Grid % vol(c) * fun % n(c)
     if (norm2((/fun % x(c),fun % y(c),fun % z(c)/)) > 1.0) then
 
       surface = surface + sqrt(fun % x(c) ** 2                    &
                              + fun % y(c) ** 2                    &
-                             + fun % z(c) ** 2) * grid % vol(c)
+                             + fun % z(c) ** 2) * Grid % vol(c)
     end if
-    y_pos_cen = y_pos_cen + grid % yc(c) * fun % n(c) * grid % vol(c)
-    rise_vel_int = rise_vel_int + Flow % v % n(c) * fun % n(c) * grid % vol(c)
+    y_pos_cen = y_pos_cen + Grid % yc(c) * fun % n(c) * Grid % vol(c)
+    rise_vel_int = rise_vel_int + Flow % v % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
   call Comm_Mod_Global_Sum_Real(b_volume)

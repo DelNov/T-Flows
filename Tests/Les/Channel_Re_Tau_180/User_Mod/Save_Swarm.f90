@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Swarm(Flow, turb, swarm, save_name)
+  subroutine User_Mod_Save_Swarm(Flow, turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -20,16 +20,16 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target  :: Flow
   type(Turb_Type),     target  :: turb
-  type(Swarm_Type),    target  :: swarm
-  type(Particle_Type), pointer :: part
-  character(len=*)             :: save_name
+  type(Vof_Type),      target  :: Vof
+  type(Swarm_Type),    target  :: Swarm
+  integer, intent(in)          :: ts     ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: grid
   type(Bulk_Type), pointer :: bulk
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points, k
-  integer                  :: index_p, j, ip, counter, blabla, ip0, ip01
-  integer                  :: ip1, ip2, counter_k, l, n_ss, kk, counter_kk 
+  integer                  :: index_p, j, counter
+  integer                  :: counter_k, l, n_ss, kk, counter_kk
   integer                  :: label, counter1, counter2
   character(SL)            :: coord_name, res_name, res_name_plus
   character(SL)            :: swarm_res_name, swarm_res_name_plus
@@ -57,9 +57,9 @@
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
 
-  ! constant fluid properties for single phase
-  visc_const      = maxval(viscosity(:))
-  density_const   = maxval(density(:))
+  ! Constant fluid properties for single phase
+  visc_const    = maxval(Flow % viscosity(:))
+  density_const = maxval(Flow % density(:))
 
   ! Set the name for coordinate file
   !call File % Set_Name(0, coord_name, ".1d")
@@ -115,37 +115,37 @@
   close(9)
 
   ! Primary Flow arrays:
-  allocate(n_p    (swarm % n_particles));   n_p      = 0
-  allocate(wall_p (swarm % n_particles));   wall_p   = 0.0
-  allocate(u_p    (swarm % n_particles));   u_p      = 0.0
-  allocate(v_p    (swarm % n_particles));   v_p      = 0.0
-  allocate(w_p    (swarm % n_particles));   w_p      = 0.0
+  allocate(n_p    (Swarm % n_particles));   n_p      = 0
+  allocate(wall_p (Swarm % n_particles));   wall_p   = 0.0
+  allocate(u_p    (Swarm % n_particles));   u_p      = 0.0
+  allocate(v_p    (Swarm % n_particles));   v_p      = 0.0
+  allocate(w_p    (Swarm % n_particles));   w_p      = 0.0
 
   ! Discrete phase arrays:
-  allocate(z_pp      (swarm % n_particles));   z_pp        = 0.0
-  allocate(u_pp      (swarm % n_particles));   u_pp        = 0.0
-  allocate(v_pp      (swarm % n_particles));   v_pp        = 0.0
-  allocate(w_pp      (swarm % n_particles));   w_pp        = 0.0
-  allocate(uu_pp     (swarm % n_particles));   uu_pp       = 0.0
-  allocate(vv_pp     (swarm % n_particles));   vv_pp       = 0.0
-  allocate(ww_pp     (swarm % n_particles));   ww_pp       = 0.0
-  allocate(uw_pp     (swarm % n_particles));   uw_pp       = 0.0
-  allocate(store     (swarm % n_particles));   store       = 0
+  allocate(z_pp      (Swarm % n_particles));   z_pp        = 0.0
+  allocate(u_pp      (Swarm % n_particles));   u_pp        = 0.0
+  allocate(v_pp      (Swarm % n_particles));   v_pp        = 0.0
+  allocate(w_pp      (Swarm % n_particles));   w_pp        = 0.0
+  allocate(uu_pp     (Swarm % n_particles));   uu_pp       = 0.0
+  allocate(vv_pp     (Swarm % n_particles));   vv_pp       = 0.0
+  allocate(ww_pp     (Swarm % n_particles));   ww_pp       = 0.0
+  allocate(uw_pp     (Swarm % n_particles));   uw_pp       = 0.0
+  allocate(store     (Swarm % n_particles));   store       = 0
   ! What if n_states>n_particles?!
-  allocate(n_states  (swarm % n_particles));   n_states    = 0
+  allocate(n_states  (Swarm % n_particles));   n_states    = 0
 
   ! saving particle index history before arrangement
-  allocate(memo_z    (swarm % n_particles));   memo_z      = 0.0
-  allocate(memo_u    (swarm % n_particles));   memo_u      = 0.0
-  allocate(memo_v    (swarm % n_particles));   memo_v      = 0.0
-  allocate(memo_w    (swarm % n_particles));   memo_w      = 0.0
-  allocate(memo_uu   (swarm % n_particles));   memo_uu     = 0.0
-  allocate(memo_vv   (swarm % n_particles));   memo_vv     = 0.0
-  allocate(memo_ww   (swarm % n_particles));   memo_ww     = 0.0
-  allocate(memo_uw   (swarm % n_particles));   memo_uw     = 0.0
+  allocate(memo_z    (Swarm % n_particles));   memo_z      = 0.0
+  allocate(memo_u    (Swarm % n_particles));   memo_u      = 0.0
+  allocate(memo_v    (Swarm % n_particles));   memo_v      = 0.0
+  allocate(memo_w    (Swarm % n_particles));   memo_w      = 0.0
+  allocate(memo_uu   (Swarm % n_particles));   memo_uu     = 0.0
+  allocate(memo_vv   (Swarm % n_particles));   memo_vv     = 0.0
+  allocate(memo_ww   (Swarm % n_particles));   memo_ww     = 0.0
+  allocate(memo_uw   (Swarm % n_particles));   memo_uw     = 0.0
 
-  allocate(n_count1(swarm % n_particles)); n_count1 = 0
-  allocate(n_count2(swarm % n_particles)); n_count2 = 0
+  allocate(n_count1(Swarm % n_particles)); n_count1 = 0
+  allocate(n_count2(Swarm % n_particles)); n_count2 = 0
   count = 0
 
   !--------------- ------!
@@ -157,22 +157,22 @@
          grid % zc(c) < (z_p(i+1))) then
 
       ! Mean velocities
-      u_pp(i) = u_pp(i) + swarm % u_mean(c)
-      v_pp(i) = v_pp(i) + swarm % v_mean(c)
-      w_pp(i) = w_pp(i) + swarm % w_mean(c)   
+      u_pp(i) = u_pp(i) + Swarm % u_mean(c)
+      v_pp(i) = v_pp(i) + Swarm % v_mean(c)
+      w_pp(i) = w_pp(i) + Swarm % w_mean(c)
 
       ! 2nd-moment-central-stationary statistics for swarm
-      uu_pp(i)    = uu_pp(i) + swarm % uu(c)  &
-                  - swarm % u_mean(c) * swarm % u_mean(c)
-      vv_pp(i)    = vv_pp(i) + swarm % vv(c)  &
-                  - swarm % v_mean(c) * swarm % v_mean(c)
-      ww_pp(i)    = ww_pp(i) + swarm % ww(c)  &
-                  - swarm % w_mean(c) * swarm % w_mean(c)
-      uw_pp(i)    = uw_pp(i) + swarm % uw(c)  &
-                  - swarm % u_mean(c) * swarm % w_mean(c)
+      uu_pp(i)    = uu_pp(i) + Swarm % uu(c)  &
+                  - Swarm % u_mean(c) * Swarm % u_mean(c)
+      vv_pp(i)    = vv_pp(i) + Swarm % vv(c)  &
+                  - Swarm % v_mean(c) * Swarm % v_mean(c)
+      ww_pp(i)    = ww_pp(i) + Swarm % ww(c)  &
+                  - Swarm % w_mean(c) * Swarm % w_mean(c)
+      uw_pp(i)    = uw_pp(i) + Swarm % uw(c)  &
+                  - Swarm % u_mean(c) * Swarm % w_mean(c)
 
       ! Number of realizations
-      n_states(i) = n_states(i) + swarm % n_states(c)   
+      n_states(i) = n_states(i) + Swarm % n_states(c)
       end if
     end do
   end do
@@ -181,7 +181,7 @@
   !   Flowfield statistics   !
   !--------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
+    do c = 1, grid % n_cells - grid % comm % n_buff_cells
       if(grid % zc(c) > (z_p(i)) .and.  &
          grid % zc(c) < (z_p(i+1))) then
 
@@ -192,12 +192,12 @@
         v_p(i) = v_p(i) + turb % v_mean(c)
         w_p(i) = w_p(i) + turb % w_mean(c)
 
-        n_count2(i) = n_count2(i) + 1  ! counter 2 for the flowfield 
+        n_count2(i) = n_count2(i) + 1  ! counter 2 for the flowfield
       end if
     end do
   end do
 
-  ! Average over all processors 
+  ! Average over all processors
   do pl=1, n_prob-1
 
     call Comm_Mod_Global_Sum_Int(n_count2(pl))
@@ -218,9 +218,9 @@
       u_p   (i)  = u_p   (i) / n_count2(i)
       v_p   (i)  = v_p   (i) / n_count2(i)
       w_p   (i)  = w_p   (i) / n_count2(i)
-    end if 
-   
-    ! Particle-related 
+    end if
+
+    ! Particle-related
     ! to be devided by n_states instead
     if(n_count1(i) .ne. 0) then
 
@@ -236,8 +236,6 @@
     end if
   end do
 
-
-
   ! Calculating friction velocity and friction temperature  (For the flow!)
   u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
                                    v_p(1)**2 +   &
@@ -245,7 +243,7 @@
   open(4, file = swarm_res_name_plus)
 
   do i = 3, 4
-    pr = visc_const * capacity / conductivity
+    pr = visc_const * maxval(Flow % capacity) / maxval(Flow % conductivity)
     re = density_const * ubulk * 2.0/visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
@@ -260,26 +258,25 @@
     write(i,'(a1,(a12,f12.6))')  &
     '#', 'Utau     = ', u_tau_p 
 
-
-      write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
-                                   ' u,'                    //  &  !  2
-                                   ' uu, vv, ww, uw'        //  &  !  3 -  6
-                                   ' kin'                          !  7
+    write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
+                                 ' u,'                    //  &  !  2
+                                 ' uu, vv, ww, uw'        //  &  !  3 -  6
+                                 ' kin'                          !  7
   end do
 
-    do i = 1, n_prob
-      if(n_count2(i) .ne. 0) then   ! 16:45 22nd Nov
-!      if(n_count1(i) .ne. 0) then   ! count index...
-        write(3,'(7es15.5e3)')  wall_p(i),                        & !  1
-!        write(3,'(7es15.5e3)')  z_pp(i),                        & !  1
-                                u_pp(i),                          & !  2
-                                uu_pp(i),                         & !  3
-                                vv_pp(i),                         & !  4
-                                ww_pp(i),                         & !  5
-                                uw_pp(i),                         & !  6
-                                0.5*(uu_pp(i)+vv_pp(i)+ww_pp(i))    !  7
-      end if
-    end do
+  do i = 1, n_prob
+    if(n_count2(i) .ne. 0) then   ! 16:45 22nd Nov
+!   if(n_count1(i) .ne. 0) then   ! count index...
+      write(3,'(7es15.5e3)')  wall_p(i),                        & !  1
+!     write(3,'(7es15.5e3)')  z_pp(i),                          & !  1
+                              u_pp(i),                          & !  2
+                              uu_pp(i),                         & !  3
+                              vv_pp(i),                         & !  4
+                              ww_pp(i),                         & !  5
+                              uw_pp(i),                         & !  6
+                              0.5*(uu_pp(i)+vv_pp(i)+ww_pp(i))    !  7
+    end if
+  end do
 
   do i = 1, n_prob-1
     wall_p(i) = density_const * wall_p(i)*u_tau_p/visc_const
@@ -296,20 +293,20 @@
     uw_pp (i) = uw_pp (i) / (u_tau_p**2)
   end do
 
-    !do i = 1, n_prob
-    do i = 1, n_prob-1
-      if(n_count2(i) .ne. 0) then
-!      if(n_count1(i) .ne. 0) then
-        write(4,'(7es15.5e3)')  wall_p(i),                          & !  1
-!        write(4,'(7es15.5e3)')  z_pp(i),                          & !  1
-                                u_pp(i),                            & !  2
-                                uu_pp(i),                           & !  3
-                                vv_pp(i),                           & !  4
-                                ww_pp(i),                           & !  5
-                                uw_pp(i),                           & !  6
-                                0.5*(uu_pp(i)+vv_pp(i)+ww_pp(i))      !  7
-      end if
-    end do
+  !do i = 1, n_prob
+  do i = 1, n_prob-1
+    if(n_count2(i) .ne. 0) then
+!   if(n_count1(i) .ne. 0) then
+      write(4,'(7es15.5e3)')  wall_p(i),                          & !  1
+!     write(4,'(7es15.5e3)')  z_pp(i),                            & !  1
+                              u_pp(i),                            & !  2
+                              uu_pp(i),                           & !  3
+                              vv_pp(i),                           & !  4
+                              ww_pp(i),                           & !  5
+                              uw_pp(i),                           & !  6
+                              0.5*(uu_pp(i)+vv_pp(i)+ww_pp(i))      !  7
+    end if
+  end do
 
   close(3)
   close(4)

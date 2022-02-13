@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -11,7 +11,7 @@
   type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
-  type(Swarm_Type),  target :: swarm
+  type(Swarm_Type),  target :: Swarm
   integer, intent(in)       :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -43,24 +43,25 @@
   call Control_Mod_Heat_Capacity       (capa_const)
   call Control_Mod_Thermal_Conductivity(k_const)
 
-  d        =  1.0                                         ! characteristic dim.
-  t_wall   = 50.0                                         ! temp. at the wal
+  d      =  1.0  ! characteristic dim.
+  t_wall = 50.0  ! temp. at the wal
 
-  alfa_const = k_const / (capa_const * rho_const)         ! thermal diffusivity
-  ra = (t_wall - t_ref) * d**3 / (nu_const * alfa_const)  ! rayleigh number
-  pr = nu_const / alfa_const                              ! prandtl number
+  alfa_const = k_const / (capa_const * rho_const)  ! thermal diffusivity
+  ra = (t_wall - Flow % t_ref) * d**3  &
+     / (nu_const * alfa_const)                     ! rayleigh number
+  pr = nu_const / alfa_const                       ! prandtl number
 
   ! Churchil and Chu formula
   h_cc = k_const * (0.6 + 0.387 * ra ** (1.0/6.0)                         &
-                           / (1.0 + (0.559/pr) ** (9.0/16.0)) ** (8.0/27.0)  &
+                        / (1.0 + (0.559/pr) ** (9.0/16.0)) ** (8.0/27.0)  &
                       ) ** 2.0
-  q_cc = h_cc * Flow % heated_area * (t_wall - t_ref)
+  q_cc = h_cc * Flow % heated_area * (t_wall - Flow % t_ref)
 
   ! Nusselt number from Churchil and Chu
   nuss_cc = h_cc * d / k_const
 
-  nuss_mean  = 0.0
-  n_points = 0
+  nuss_mean = 0.0
+  n_points  = 0
 
   if(Flow % heat_transfer) then
     do s = 1, Grid % n_faces
@@ -71,7 +72,7 @@
             Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
           nuss_mean = nuss_mean + t % q(c2)  &
-                  / (k_const * (t % n(c2) - t_ref + TINY))
+                    / (k_const * (t % n(c2) - Flow % t_ref + TINY))
           n_points = n_points + 1
         end if
       end if
@@ -86,7 +87,7 @@
   end if
 
   if(this_proc < 2) then
-    print *, 't_ref       = ', t_ref
+    print *, 't_ref       = ', Flow % t_ref
     print *, 'alfa_const  = ', alfa_const
     print *, 'ra          = ', ra
     print *, 'pr          = ', pr

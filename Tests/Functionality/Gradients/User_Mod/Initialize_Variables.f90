@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
-!   User initialization of dependent variables.                                !
+!   This was developed to devise strategy for pressure gradient calculation    !
 !------------------------------------------------------------------------------!
   use Work_Mod, only: phi_f    => r_face_01,  &
                       phi_n    => r_node_01,  &
@@ -17,8 +17,8 @@
   type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
-  type(Swarm_Type),  target :: swarm
-  type(Solver_Type), target :: sol
+  type(Swarm_Type),  target :: Swarm
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: t, p
@@ -34,6 +34,10 @@
   Grid => Flow % pnt_grid
   t    => Flow % t
   p    => Flow % p
+
+  ! Set tight tolerances for Gauss Theorem
+  Flow % gauss_miter = 100
+  Flow % gauss_tol   = 1e-3
 
   !----------------------------!
   !   Find cells at boundary   !
@@ -69,6 +73,7 @@
   end do
 
   ! Call cell-based least-square gradient method ...
+  t % grad_method = LEAST_SQUARES
   call Flow % Grad_Variable(t)
 
   ! ... and plot what you get
@@ -79,80 +84,9 @@
             vector_cell = (/t % x, t % y, t % z/),   &
             vector_name = 't_xyz')
 
-  !-------------------------------------------------!
-  !                                                 !
-  !   Test 2:                                       !
-  !                                                 !
-  !   Check Field % Grad_Component_Faces_To_Cells   !
-  !     It is the face-based least square method    !
-  !                                                 !
-  !-------------------------------------------------!
-
-  if(this_proc < 2) then
-    print *, '#=============================================================='
-    print *, '# Performing Test 2 - least square face based method'
-    print *, '#--------------------------------------------------------------'
-  end if
-
-  ! Specify exact cell values omittiing boundary values
-  do c = 1, Grid % n_cells
-    phi_c(c) =         Grid % xc(c)  &
-               + 2.0 * Grid % yc(C)  &
-               + 3.0 * Grid % zc(C)
-  end do
-
-  ! Specify exact face values over-writing boundary values
-  do s = 1, Grid % n_faces
-    phi_f(s) =       Grid % xf(s)  &
-             + 2.0 * Grid % yf(s)  &
-             + 3.0 * Grid % zf(s)
-  end do
-
-  ! Call least-squares face-based gradient calculation ...
-  call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 1, phi_x)
-  call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 2, phi_y)
-  call Flow % Grad_Component_Faces_To_Cells(phi_c, phi_f, 3, phi_z)
-
-  ! ... and save the results
-  call Grid % Save_Debug_Vtu(                        &
-            'test_2_least_square_face_base_method',  &
-            vector_cell = (/phi_x, phi_y, phi_z/),   &
-            vector_name = 'phi_xyz')
-
   !---------------------------------------------------------!
   !                                                         !
-  !   Test 3:                                               !
-  !                                                         !
-  !   Check if Field % Grad_Gauss_Variable works properly   !
-  !           when you ou start from good gradients         !
-  !                                                         !
-  !---------------------------------------------------------!
-
-  if(this_proc < 2) then
-    print *, '#=============================================================='
-    print *, '# Performing Test 3 - Gaussian method from good initial guess'
-    print *, '#--------------------------------------------------------------'
-  end if
-
-  ! Specify variable over-writing boundary values
-  do c = -Grid % n_bnd_cells, Grid % n_cells
-    t % n(c) =         Grid % xc(c)  &
-               + 2.0 * Grid % yc(C)  &
-               + 3.0 * Grid % zc(C)
-  end do
-
-  ! Calculate gradients with Gaussian theorem, (face values are exact) ...
-  call Flow % Grad_Gauss_Variable(t)
-
-  ! ... and plot the results
-  call Grid % Save_Debug_Vtu(                                  &
-            'test_3_gaussian_method_from_good_initial_guess',  &
-            vector_cell = (/t % x, t % y, t % z/),             &
-            vector_name = 't_xyz')
-
-  !---------------------------------------------------------!
-  !                                                         !
-  !   Test 4:                                               !
+  !   Test 2:                                               !
   !                                                         !
   !   Check if Field % Grad_Gauss_Variable works properly   !
   !           when you ou start from zero gradients         !
@@ -161,7 +95,7 @@
 
   if(this_proc < 2) then
     print *, '#=============================================================='
-    print *, '# Performing Test 4 - Gaussian method from poor initial guess'
+    print *, '# Performing Test 2 - Gaussian method from poor initial guess'
     print *, '#--------------------------------------------------------------'
   end if
 
@@ -171,17 +105,18 @@
   t % z(:) = 0.0
 
   ! Calculate gradients with Gaussian theorem, (face values are exact) ...
-  call Flow % Grad_Gauss_Variable(t)
+  t % grad_method = GAUSS_THEOREM
+  call Flow % Grad_Variable(t)
 
   ! ... and save the results.  These results should be poor
   call Grid % Save_Debug_Vtu(                                  &
-            'test_4_gaussian_method_from_poor_initial_guess',  &
+            'test_2_gaussian_method_from_poor_initial_guess',  &
             vector_cell = (/t % x, t % y, t % z/),             &
             vector_name = 't_xyz')
 
   !---------------------------------------------------------!
   !                                                         !
-  !   Test 5:                                               !
+  !   Test 3:                                               !
   !                                                         !
   !   Check if Field % Grad_Gauss_Variable works properly   !
   !           when you ou start from some gradients         !
@@ -190,7 +125,7 @@
 
   if(this_proc < 2) then
     print *, '#=============================================================='
-    print *, '# Performing Test 5 - Gaussian method from better initial guess'
+    print *, '# Performing Test 3 - Gaussian method from better initial guess'
     print *, '#--------------------------------------------------------------'
   end if
 
@@ -216,43 +151,45 @@
   ! Initialize with some gradients with the most robust and reliable tool
   ! you have at your disposal - least square cell-based method.  These
   ! gradients should be properly calculated inside the domain
+  t % grad_method = LEAST_SQUARES
   call Flow % Grad_Variable(t)
 
   call Grid % Save_Debug_Vtu(                                 &
-            'test_51_least_squares_initial_guess_for_gauss',  &
+            'test_31_least_squares_initial_guess_for_gauss',  &
             scalar_cell = t % n,                              &
             scalar_name = 't',                                &
             vector_cell = (/t % x, t % y, t % z/),            &
             vector_name = 't_xyz')
 
   ! Perform Gauss from gradients which are good inside obtained above ...
-  call Flow % Grad_Gauss_Variable(t)
+  t % grad_method = GAUSS_THEOREM
+  call Flow % Grad_Variable(t)
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
   call Grid % Save_Debug_Vtu(                                     &
-            'test_52_gaussian_method_from_better_initial_guess',  &
+            'test_32_gaussian_method_from_better_initial_guess',  &
             vector_cell = (/t % x, t % y, t % z/),                &
             vector_name = 't_xyz')
 
   !-------------------------------------------------------------------------!
   !                                                                         !
-  !   Test 6:                                                               !
+  !   Test 4:                                                               !
   !                                                                         !
-  !   Try to be more elaborate, make an evolutionary step from Test 5, by   !
+  !   Try to be more elaborate, make an evolutionary step from Test 3, by   !
   !    interpolating gradients at near-boundary cells from values inside    !
   !                                                                         !
   !-------------------------------------------------------------------------!
 
   if(this_proc < 2) then
     print *, '#=============================================================='
-    print *, '# Performing Test 6 - Gaussian method from an elaborate guess'
+    print *, '# Performing Test 4 - Gaussian method from an elaborate guess'
     print *, '#--------------------------------------------------------------'
   end if
 
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
-  ! (This is the repetition of what was done in Test 5)
+  ! (This is the repetition of what was done in Test 3)
   do c = 1, Grid % n_cells
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
@@ -261,7 +198,7 @@
 
   ! Then extrapolate interior values to boundary cells
   ! This still mimics a result from a numerical solution
-  ! (This is the repetition of what was done in Test 5)
+  ! (This is the repetition of what was done in Test 3)
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
@@ -274,7 +211,8 @@
   ! Initialize with some gradients with the most robust and reliable tool
   ! you have at your disposal - least square cell-based method.  These
   ! gradients should be properly calculated inside the domain
-  ! (This is the repetition of what was done in Test 5)
+  ! (This is the repetition of what was done in Test 3)
+  t % grad_method = LEAST_SQUARES
   call Flow % Grad_Variable(t)
 
   !--------------------------------------------------------------------!
@@ -381,25 +319,26 @@
 
   ! Save the initial guess that you got
   call Grid % Save_Debug_Vtu(                                &
-            'test_61_an_elaborate_initial_guess_for_Gauss',  &
+            'test_41_an_elaborate_initial_guess_for_Gauss',  &
             scalar_cell = t % n,                             &
             scalar_name = 't',                               &
             vector_cell = (/t % x, t % y, t % z/),           &
             vector_name = 't_xyz')
 
   ! Perform Gauss from gradients which are good inside obtained above ...
-  call Flow % Grad_Gauss_Variable(t)
+  t % grad_method = GAUSS_THEOREM
+  call Flow % Grad_Variable(t)
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
   call Grid % Save_Debug_Vtu(                                    &
-            'test_62_gaussian_method_from_the_elaborate_guess',  &
+            'test_42_gaussian_method_from_the_elaborate_guess',  &
             vector_cell = (/t % x, t % y, t % z/),               &
             vector_name = 't_xyz')
 
   !----------------------------------------------------------------------!
   !                                                                      !
-  !   Test 7:                                                            !
+  !   Test 5:                                                            !
   !                                                                      !
   !   Check if the (new) Grad_Gauss_Pressure works as intended to work   !
   !                                                                      !
@@ -407,13 +346,13 @@
 
   if(this_proc < 2) then
     print *, '#=============================================================='
-    print *, '# Performing Test 7 - Field % Grad_Gauss_Pressure '
+    print *, '# Performing Test 5 - Field % Grad_Gauss_Pressure '
     print *, '#--------------------------------------------------------------'
   end if
 
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
-  ! (This is the repetition of what was done in Test 5 & 6)
+  ! (This is the repetition of what was done in Test 4 & 5)
   do c = 1, Grid % n_cells
     p % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
@@ -421,12 +360,13 @@
   end do
 
   ! Perform Gauss from gradients which are good inside obtained above ...
-  call Flow % Grad_Gauss_Pressure(p)
+  p % grad_method = GAUSS_THEOREM
+  call Flow % Grad_Pressure(p)
 
   ! ... and plot what you got.  These should be better, but
   ! not quite.  Particularly not good for tetrahedral grids
   call Grid % Save_Debug_Vtu(                       &
-            'test_7_field_grad_gauss_pressure',     &
+            'test_5_field_grad_gauss_pressure',     &
             vector_cell = (/p % x, p % y, p % z/),  &
             vector_name = 'p_xyz')
 

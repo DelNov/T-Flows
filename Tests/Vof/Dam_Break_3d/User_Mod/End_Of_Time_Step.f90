@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm, n, n_stat_t,   &
+  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, Swarm, n, n_stat_t,   &
                                        n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for dam break                         !
@@ -13,7 +13,7 @@
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer                  :: n     ! time step
   integer                  :: n_stat_t, n_stat_p
   real                     :: time  ! physical time
@@ -109,7 +109,7 @@
 
   ! Write to file
   if (this_proc < 2) then
-    call File % Append_For_Writing('probe-data.dat', fu)
+    call File % Append_For_Writing_Ascii('probe-data.dat', fu)
     write(fu,'((E16.10E2),9(2X,E16.10E2),4(2X,E16.10E2))')            &
           time, b_volume, p_probe(1:size(nod_probe)),   &
           h_probe(1:N_PROBE)
