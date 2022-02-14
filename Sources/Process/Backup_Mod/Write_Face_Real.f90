@@ -33,7 +33,7 @@
   vn = var_name
   call Comm % Write_Text(fh, vn, disp)
 
-  vs = (Comm % nf_tot) * SIZE_REAL
+  vs = (Comm % nf_tot) * RP
   call Comm % Write_Int (fh, vs, disp)
 
   i_sid = 1

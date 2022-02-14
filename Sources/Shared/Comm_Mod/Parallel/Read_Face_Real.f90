@@ -17,7 +17,7 @@
   ! (this part is the same as in Write counterpart)
   call Mpi_File_Set_View(fh,                    &
                          disp,                  &
-                         MPI_DOUBLE,            &
+                         comm_type_real,        &
                          Comm % face_map_type,  &
                          'native',              &
                          MPI_INFO_NULL,         &
@@ -27,10 +27,10 @@
   call Mpi_File_Read(fh,                 &
                      array,              &
                      Comm % nf_sub,      &
-                     MPI_DOUBLE,         &
+                     comm_type_real,     &
                      MPI_STATUS_IGNORE,  &
                      error)
 
-  disp = disp + Comm % nf_tot * SIZE_REAL
+  disp = disp + Comm % nf_tot * RP
 
   end subroutine

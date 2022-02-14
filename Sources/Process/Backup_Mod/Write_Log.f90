@@ -22,7 +22,7 @@
 
   ! Just store one named logical
   vn = var_name;  call Comm % Write_Text(fh, vn, disp)
-  vs = SIZE_LOG;  call Comm % Write_Int (fh, vs, disp)
+  vs = LP;  call Comm % Write_Int (fh, vs, disp)
 
   call Comm % Write_Log(fh, var_value, disp)
 

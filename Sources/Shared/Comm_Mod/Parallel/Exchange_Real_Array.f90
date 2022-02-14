@@ -22,7 +22,7 @@
 
   call Mpi_Sendrecv_Replace(phi(1),                & ! buffer
                             length,                & ! length
-                            MPI_DOUBLE_PRECISION,  & ! datatype
+                            comm_type_real,        & ! datatype
                             (dest-1),              & ! dest,
                             stag,                  & ! sendtag,
                             (dest-1),              & ! source,

@@ -17,6 +17,6 @@
   ! Read integer
   read(fh) num
 
-  disp = disp + SIZE_REAL
+  disp = disp + RP
 
   end subroutine

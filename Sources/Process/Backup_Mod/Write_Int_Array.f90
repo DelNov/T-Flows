@@ -24,7 +24,7 @@
 
   ! Just store one named integer array
   vn = arr_name;           call Comm % Write_Text(fh, vn, disp)
-  vs = length * SIZE_INT;  call Comm % Write_Int (fh, vs, disp)
+  vs = length * IP;  call Comm % Write_Int (fh, vs, disp)
 
   call Comm % Write_Int_Array(fh, arr_value(1:length), disp)
 

@@ -23,7 +23,7 @@
   call Mpi_Type_Create_Indexed_Block(Comm % nc_sub,         &  ! length of map
                                      1,                     &  ! block size
                                      Comm % cell_map,       &  ! displacements
-                                     MPI_DOUBLE,            &  ! old data type
+                                     comm_type_real,        &  ! old data type
                                      Comm % cell_map_type,  &  ! new data type
                                      error)                    ! integer error
   call Mpi_Type_Commit(Comm % cell_map_type, error)
@@ -32,7 +32,7 @@
   call Mpi_Type_Create_Indexed_Block(max(Comm % nb_sub,1),      &  ! map length
                                      1,                         &  ! block size
                                      Comm % bnd_cell_map,       &  ! displacem
-                                     MPI_DOUBLE,                &  ! old type
+                                     comm_type_real,            &  ! old type
                                      Comm % bnd_cell_map_type,  &  ! new type
                                      error)                        ! int. error
   call Mpi_Type_Commit(Comm % bnd_cell_map_type, error)

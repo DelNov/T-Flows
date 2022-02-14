@@ -22,7 +22,7 @@
 
   ! Just store one named integer
   vn = var_name;  call Comm % Write_Text(fh, vn, disp)
-  vs = SIZE_INT;  call Comm % Write_Int (fh, vs, disp)
+  vs = IP;  call Comm % Write_Int (fh, vs, disp)
 
   call Comm % Write_Int(fh, var_value, disp)
 

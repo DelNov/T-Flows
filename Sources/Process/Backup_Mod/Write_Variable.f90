@@ -26,7 +26,7 @@
   ! Vector without boundaries
   vn = var_name
   call Comm % Write_Text(fh, vn, disp)
-  vs = (3*Comm % nc_tot + 3*Comm % nb_tot) * SIZE_REAL
+  vs = (3*Comm % nc_tot + 3*Comm % nb_tot) * RP
   call Comm % Write_Int (fh, vs, disp)
 
   call Comm % Write_Cell_Real(fh, var % n(1:Comm % nc_sub), disp)

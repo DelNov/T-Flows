@@ -16,17 +16,16 @@
   integer, parameter :: DP =  8  ! double precisions for real and integer
   integer, parameter :: SP =  4  ! single precisions for real and integer
 
-  ! Precision of integers and floating point numbers.  These values should
-  ! corrspond to what was set in the makefile (which is a bad practice but
-  ! that's another story).  If, for example, the precision for integers is
-  ! changed to double (64 bits, 8 bytes), the IP below should be set to DP.
-  ! But that won't be enough for program to work.All routines saving .vtu
-  ! files should have to specify "Int64" instead of "Int32" and all MPI-
-  ! based routines would need to have MPI_INTEGER8 instead of MPI_INTEGER.
+  ! Precision of integers and floating point numbers.  These parameters
+  ! assume values according to what is in the makefile (which is a bad
+  ! practice but that's another story).  But that's not enough for program
+  ! to work.  All MPI-based routines would need to have MPI_INTEGER8
+  ! instead of MPI_INTEGER.
   ! Also, you will have to link the program with proper METIS library, check
   ! all the makefiles for details on that.
-  integer, parameter :: IP = SP  ! integers will be in single precision
-  integer, parameter :: RP = DP  ! real numbers will be in single precision
+  integer, parameter :: IP = sizeof(1)   ! integer precision
+  integer, parameter :: LP = IP          ! logical precision
+  integer, parameter :: RP = sizeof(1.0) ! real number precision
 
   !----------------------------------------!
   !   A few handy mathematical constants   !

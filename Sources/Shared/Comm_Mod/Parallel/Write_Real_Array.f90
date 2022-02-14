@@ -20,8 +20,8 @@
   ! Set it at position disp (same as in Read counterpart)
   call Mpi_File_Set_View(fh,             &
                          disp,           &
-                         MPI_DOUBLE,     &
-                         MPI_DOUBLE,     &
+                         comm_type_real, &
+                         comm_type_real, &
                          'native',       &
                          MPI_INFO_NULL,  &
                          error)
@@ -30,10 +30,10 @@
   call Mpi_File_Write(fh,                 &
                       arr(1),             &
                       length,             &
-                      MPI_DOUBLE,         &
+                      comm_type_real,     &
                       MPI_STATUS_IGNORE,  &
                       error)
 
-  disp = disp + SIZE_REAL * length
+  disp = disp + RP * length
 
   end subroutine

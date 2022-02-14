@@ -108,13 +108,13 @@
 
   end type
 
-  ! Parameters for size of typical variables in bytes
-  integer, parameter :: SIZE_INT  = 4
-  integer, parameter :: SIZE_LOG  = 4
-  integer, parameter :: SIZE_REAL = 8
-
   integer :: this_proc  ! processor i.d.
   integer :: n_proc     ! number of processors
+
+  ! These communication types will depend on precision
+  integer :: comm_type_int
+  integer :: comm_type_log
+  integer :: comm_type_real
 
   contains
 

@@ -21,6 +21,6 @@
     read(fh) array(c)
   end do
 
-  disp = disp + Comm % nc_tot * SIZE_REAL
+  disp = disp + Comm % nc_tot * RP
 
   end subroutine

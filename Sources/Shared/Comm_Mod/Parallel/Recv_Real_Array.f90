@@ -19,7 +19,7 @@
 
   call Mpi_Recv(phi_r(1),              & ! receive buffer
                 len_r,                 & ! receive length
-                MPI_DOUBLE_PRECISION,  & ! datatype
+                comm_type_real,        & ! datatype
                 (dest-1),              & ! source,
                 rtag,                  & ! recvtag,
                 MPI_COMM_WORLD,        &

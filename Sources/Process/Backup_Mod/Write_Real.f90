@@ -22,7 +22,7 @@
 
   ! Just store one named real number
   vn = var_name;  call Comm % Write_Text(fh, vn, disp)
-  vs = SIZE_REAL; call Comm % Write_Int (fh, vs, disp)
+  vs = RP; call Comm % Write_Int (fh, vs, disp)
 
   call Comm % Write_Real(fh, var_value, disp)
 

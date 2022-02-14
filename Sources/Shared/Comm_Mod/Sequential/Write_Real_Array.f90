@@ -18,6 +18,6 @@
 
   write(fh) arr(1:length)
 
-  disp = disp + SIZE_REAL * length
+  disp = disp + RP * length
 
   end subroutine

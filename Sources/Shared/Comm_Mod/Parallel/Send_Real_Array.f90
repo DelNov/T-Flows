@@ -19,7 +19,7 @@
 
   call Mpi_Send(phi_s(1),              & ! send buffer
                 len_s,                 & ! send length
-                MPI_DOUBLE_PRECISION,  & ! datatype
+                comm_type_real,        & ! datatype
                 (dest-1),              & ! dest,
                 stag,                  & ! sendtag,
                 MPI_COMM_WORLD,        &

@@ -16,8 +16,8 @@
   ! Set it at position disp (same as in Read counterpart)
   call Mpi_File_Set_View(fh,             &
                          disp,           &
-                         MPI_LOGICAL8,   &
-                         MPI_LOGICAL8,   &
+                         comm_type_log,  &
+                         comm_type_log,  &
                          'native',       &
                          MPI_INFO_NULL,  &
                          error)
@@ -26,10 +26,10 @@
   call Mpi_File_Write(fh,                 &
                       var,                &
                       1,                  &
-                      MPI_LOGICAL8,       &
+                      comm_type_log,      &
                       MPI_STATUS_IGNORE,  &
                       error)
 
-  disp = disp + SIZE_LOG
+  disp = disp + LP
 
   end subroutine

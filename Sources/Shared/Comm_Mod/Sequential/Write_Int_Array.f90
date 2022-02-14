@@ -18,6 +18,6 @@
 
   write(fh) arr(1:length)
 
-  disp = disp + SIZE_INT * length
+  disp = disp + IP * length
 
   end subroutine

@@ -17,6 +17,6 @@
   ! Read integer
   read(fh) var
 
-  disp = disp + SIZE_LOG
+  disp = disp + LP
 
   end subroutine

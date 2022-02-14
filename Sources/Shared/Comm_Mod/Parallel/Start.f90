@@ -25,4 +25,16 @@
     this_proc = 0
   endif
 
+  ! Set proper types for communication
+  comm_type_int  = MPI_INTEGER
+  comm_type_log  = MPI_LOGICAL
+  comm_type_real = MPI_DOUBLE_PRECISION
+  if(IP .eq. DP) then
+    comm_type_int = MPI_INTEGER8
+    comm_type_log = MPI_LOGICAL8
+  end if
+  if(RP .eq. SP) then
+    comm_type_real = MPI_REAL
+  end if
+
   end subroutine
