@@ -4,15 +4,12 @@
 #
 #-------------------------------------------------------------------------------
 
-#--------------------------
-#   Variable definitions
-#--------------------------
-
-# Fortran compiler ("gnu", "intel" or "nvidia")
-FORTRAN = gnu
-
-# Debugging ("yes" or "no")
-DEBUG = no
+#-------------------------------------
+#   Default options for compilation
+#-------------------------------------
+FORTRAN ?= gnu
+DEBUG   ?= no
+REAL    ?= double
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -29,7 +26,10 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=yes/no>                      )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes>                      )
+$(info #        <REAL=double/single>                                           )
+$(info #                                                                       )
+$(info # Note: The first item, for each of the options above, is the default.  )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make              - compile with gnu compiler                       )
@@ -37,27 +37,25 @@ $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
 $(info #-----------------------------------------------------------------------)
 
-#-------------------------------------------------------------------------------
-#   Compiler and linker options
-#-------------------------------------------------------------------------------
-#   Note 1: Changes only when support to a new Fortran compiler is added.
-#
-#   Note 2: If you want to change the precision of integers to 64 bits via
-#           the compiler option (which should be avoided), you should also
-#           change the value of IP parameter in Const_Mod, all occurrences
-#           of Int32 to Int64 in procedures saving VTU files and also all
-#           MPI_INTEGER to MPI_INTEGER8 in all MPI-related procedures.
-#           Besides, the proper METIS library should be linked to the code.
-#-------------------------------------------------------------------------------
-
-# METIS library
+#-------------------
+#   METIS library
+#-------------------
 METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r64.a
+ifeq ($(REAL), single)
+  METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r32.a
+endif
+
+#-------------------------------------------------------------------------
+#   Compiler and linker options
+#-------------------------------------------------------------------------
+#   Note: Changes only when support to a new Fortran compiler is added.
+#-------------------------------------------------------------------------
 
 # Fortran == gnu
 ifeq ($(FORTRAN), gnu)
   FC = gfortran
-  ifeq ($(DEBUG),yes)
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O0 -g                     \
+  ifeq ($(DEBUG), yes)
+    OPT_COMP = -J $(DIR_MODULE) -O0 -g                                      \
                -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
                -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
                -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
@@ -68,7 +66,10 @@ ifeq ($(FORTRAN), gnu)
                -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
                -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
-    OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -O3
+    OPT_COMP = -J $(DIR_MODULE) -O3
+  endif
+  ifeq ($(REAL), double)
+    OPT_COMP += -fdefault-real-8
   endif
   OPT_LINK = $(OPT_COMP)
 endif
@@ -77,10 +78,13 @@ endif
 ifeq ($(FORTRAN), intel)
   FC = ifort
   ifeq ($(DEBUG), yes)
-    OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g -warn all -check all \
+    OPT_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
                -debug all -fpe-all=0 -traceback
   else
-    OPT_COMP = -module $(DIR_MODULE) -r8 -O3
+    OPT_COMP = -module $(DIR_MODULE) -O3
+  endif
+  ifeq ($(REAL), double)
+    OPT_COMP += -r8
   endif
   OPT_LINK = $(OPT_COMP)
 endif
@@ -89,9 +93,12 @@ endif
 ifeq ($(FORTRAN), nvidia)
   FC = nvfortran
   ifeq ($(DEBUG), yes)
-    OPT_COMP = -module $(DIR_MODULE) -r8 -O0 -g
+    OPT_COMP = -module $(DIR_MODULE) -O0 -g
   else
-    OPT_COMP = -module $(DIR_MODULE) -r8 -O3
+    OPT_COMP = -module $(DIR_MODULE) -O3
+  endif
+  ifeq ($(REAL), double)
+    OPT_COMP += -r8
   endif
   OPT_LINK = $(OPT_COMP)
 endif
@@ -173,7 +180,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #   Note: Should not be modified.
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ)
-	@echo Linking "\033[0;32m $(PROGRAM_FILE) \033[0m"
+	@echo Linking "\033[0;32m $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
 	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
 #--------------------------------------------------------------------
@@ -185,7 +192,7 @@ $(PROGRAM_FILE): $(OBJ)
 include makefile_explicit_dependencies
 
 #---------------------
-#   Explicit target.
+#   Explicit target
 #---------------------
 clean:
 	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
