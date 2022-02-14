@@ -1,4 +1,6 @@
 The extensions _iXX and rXX are for integer and real number precision.
 
-So libmetis_i64_r64.a is for 64 bit integers and 64 bit reals and
-libmetis_i32_r64.a is for 32 bit integers and 64 bit reals
+So libmetis_i32_r64.a is for 32 bit integers and 64 bit reals and
+libmetis_i32_r32.a is for 32 bit integers and 32 bit reals.  The
+integers 64 bits long are not supported because they mess up calls
+to MPI function significantly.  It ain't worth working around it.
