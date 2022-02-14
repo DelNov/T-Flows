@@ -2,10 +2,6 @@
   subroutine Save_Vtu_Faces(Grid, plot_shadows, phi_f)
 !------------------------------------------------------------------------------!
 !   Writes boundary condition .faces.vtu or shadow .shadow.vtu file.           !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -18,6 +14,9 @@
   character(SL) :: name_out, ext, str1, str2
   real          :: mag
 !==============================================================================!
+
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
 
   ! Starting and ending counters; file extension
   s_f = 1
@@ -74,7 +73,7 @@
   !-----------!
   write(str1, '(i1)') data_offset
   write(fu) IN_3 // '<Points>'                       // LF
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -89,7 +88,7 @@
 
   ! Faces' nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -98,7 +97,7 @@
 
   ! Faces' offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="offsets"'                //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -107,7 +106,7 @@
 
   ! Faces' types
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="types"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -126,7 +125,7 @@
 
   ! Boundary conditions
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="BoundaryConditions"'     //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -136,7 +135,7 @@
   ! Optional face variable
   if(present(phi_f)) then
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+    write(fu) IN_4 // '<DataArray type='//floatp       //  &
                       ' Name="FaceVariable"'           //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -146,7 +145,7 @@
 
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="GridNumberOfNodes"'      //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -155,7 +154,7 @@
 
   ! Surface vectors
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' Name="GridSurfaceVectors"'     //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
@@ -165,7 +164,7 @@
 
   ! Surface normals
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' Name="GridSurfaceNormals"'     //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
@@ -175,7 +174,7 @@
 
   ! Connection vectors
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' Name="GridConnectionVectors"'  //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &

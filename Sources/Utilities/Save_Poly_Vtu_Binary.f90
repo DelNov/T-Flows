@@ -21,6 +21,9 @@
   character(DL*2) :: str1, str2
 !==============================================================================!
 
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
+
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
   do c = 1, grid % n_cells
@@ -71,7 +74,7 @@
   !-----------!
   write(str1, '(i1)') data_offset
   write(fu) IN_3 // '<Points>'                       // LF
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -88,7 +91,7 @@
 
   ! First write all cells' nodes (a.k.a. connectivity)
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -97,7 +100,7 @@
 
   ! Cells' offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="offsets"'                //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -106,7 +109,7 @@
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="types"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -115,7 +118,7 @@
 
   ! Write polyhedral cells' faces
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="faces"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -125,7 +128,7 @@
 
   ! Write polyhedral cells' faces offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="faceoffsets"'            //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -143,7 +146,7 @@
 
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="Processor"'              //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -152,7 +155,7 @@
 
   ! Wall distance
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' Name="GeomWallDistance"'       //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -161,7 +164,7 @@
 
   ! Cell volume
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' Name="GeomCellVolume"'         //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF

@@ -2,10 +2,6 @@
   subroutine Save_Swarm(Results, Swarm, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes particles in VTU file format (for VisIt and Paraview)               !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -30,6 +26,9 @@
 !==============================================================================!
 
   if(Swarm % n_particles < 1) return
+
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
 
   ! Take aliases for the Swarm
   Grid => Swarm % pnt_grid
@@ -94,8 +93,9 @@
     !                       !
     !-----------------------!
     write(fu,'(a,a)') IN_3, '<Points>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
-                            '="3" format="ascii">'
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' NumberOfComponents=3'     //  &
+                            ' format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
       if(.not. Part % escaped) then
@@ -116,7 +116,7 @@
     !--------------------!
     !   Particle i.d.s   !
     !--------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Index" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Index" ' // &
                             'format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -129,7 +129,8 @@
     !-------------------!
     !   Closest cells   !
     !-------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="ClosestCell" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="ClosestCell" '    //  &
                             'format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -142,7 +143,7 @@
     !----------------------------!
     !   Closest boundary cells   !
     !----------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                             'Name="ClosestBndCell" format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -155,12 +156,13 @@
     !-------------------------!
     !   Particle velocities   !
     !-------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="Velocity" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' Name="Velocity" '         // &
                             ' NumberOfComponents="3" format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
       if(.not. Part % escaped) then
-        write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                       &
+        write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
                    IN_5, Part % u, Part % v, Part % w
       end if
     end do
@@ -169,7 +171,7 @@
     !-------------------------!
     !   Velocity magnitudes   !
     !-------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp    //  &
                             ' Name="VelocityMagnitude" '  //  &
                             ' format="ascii">'
     do k = 1, Swarm % n_particles
@@ -184,7 +186,7 @@
     !------------------------!
     !   Particle diameters   !
     !------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp    //  &
                             ' Name="ParticleDiameters" '  //  &
                             ' format="ascii">'
     do k = 1, Swarm % n_particles
@@ -198,8 +200,8 @@
     !----------------------!
     !   Particle density   !
     !----------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
-                            ' Name="ParticleDensity" '    //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' Name="ParticleDensity" '  //  &
                             ' format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -212,8 +214,8 @@
     !-------------------!
     !   Fluid density   !
     !-------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" '  //  &
-                            ' Name="FluidDensity" '       //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' Name="FluidDensity" '     //  &
                             ' format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -226,7 +228,8 @@
     !-------------------------!
     !   Particle processors   !
     !-------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Processor" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="Processor" '      //  &
                             'format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -239,7 +242,8 @@
     !------------------------------!
     !   Particle deposited state   !
     !------------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Deposited" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="Deposited" '      //  &
                             'format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -256,7 +260,7 @@
     !----------------------------!
     !   Particle trapped state   !
     !----------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Trapped" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Trapped" '  //  &
                             'format="ascii">'
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
@@ -283,13 +287,14 @@
     !           !
     !-----------!
     write(fu,'(a,a)') IN_3, '<Cells>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="connectivity"'    //  &
                            ' format="ascii">'
     write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="offsets"' //  &
                            ' format="ascii">'
     write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="types"' //  &
                            ' format="ascii">'
     write(fu,'(a,a)') IN_4, '</DataArray>'
     write(fu,'(a,a)') IN_3, '</Cells>'

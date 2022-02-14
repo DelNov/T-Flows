@@ -2,10 +2,6 @@
   subroutine Save_Front(Results, Front, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -26,6 +22,9 @@
   character(len= 8)  :: IN_4 = '        '
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
+
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
 
   !----------------------------!
   !                            !
@@ -77,13 +76,14 @@
   !------------------------!
   if(this_proc .eq. 1)  then
     write(f8) IN_3 // '<PPoints>'                                 // LF
-    write(f8) IN_4 // '<PDataArray type="Float64"'                //  &
+    write(f8) IN_4 // '<PDataArray type='//floatp//''             //  &
                       ' NumberOfComponents="3" format="ascii"/>'  // LF
     write(f8) IN_3 // '</PPoints>'                                // LF
   end if
 
   write(f9,'(a,a)') IN_3, '<Points>'
-  write(f9,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//floatp   //  &
+                          ' NumberOfComponents'        //  &
                           '="3" format="ascii">'
   do v = 1, Front % n_verts
     Vert => Front % Vert(v)
@@ -107,10 +107,10 @@
   !   Particle i.d.s   !
   !--------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int32" Name="Index" '       //  &
+    write(f8) IN_4 // '<PDataArray type='//intp//' Name="Index" '    //  &
                       'format="ascii"/>'                             // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="Index" ' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Index" ' //  &
                           'format="ascii">'
   do v = 1, Front % n_verts
     write(f9,'(a,i9)') IN_5, v
@@ -121,10 +121,10 @@
   !   Number of neighbours   !
   !--------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int32" Name="Neighbours" ' //  &
-                      'format="ascii"/>'                            // LF
+    write(f8) IN_4 // '<PDataArray type='//intp//' Name="Neighbours" '  //  &
+                      'format="ascii"/>'                                // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours" ' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Neighbours" '  //  &
                           'format="ascii">'
   do v = 1, Front % n_verts
     write(f9,'(a,i9)') IN_5, Front % Vert(v) % nne
@@ -135,10 +135,10 @@
   !   Curvatures at the nodes   !
   !-----------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Float64" Name="NodeCurv" ' //  &
-                      ' format="ascii"/>'                           // LF
+    write(f8) IN_4 // '<PDataArray type='//floatp//' Name="NodeCurv" ' //  &
+                      ' format="ascii"/>'                              // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//floatp//' Name="NodeCurv" ' // &
                          ' format="ascii">'
   do v = 1, Front % n_verts
     Vert => Front % Vert(v)
@@ -158,11 +158,12 @@
   !-----------!
   if(this_proc .eq. 1) then
     write(f8) IN_3 // '<PCells>' // LF
-    write(f8) IN_4 // '<PDataArray type="Int32" Name="connectivity"' //  &
-                      ' format="ascii"/>'                            // LF
+    write(f8) IN_4 // '<PDataArray type='//intp//' Name="connectivity"'  //  &
+                      ' format="ascii"/>'                                // LF
   end if
   write(f9,'(a,a)') IN_3, '<Cells>'
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                          ' Name="connectivity"'    //  &
                           ' format="ascii">'
   ! Cell topology
   do e = 1, Front % n_elems
@@ -172,10 +173,10 @@
 
   ! Cell offsets
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int32" Name="offsets"' //  &
-                      ' format="ascii"/>'                       // LF
+    write(f8) IN_4 // '<PDataArray type='//intp//' Name="offsets"'  //  &
+                      ' format="ascii"/>'                           // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//intp//' Name="offsets"'  //  &
                           ' format="ascii">'
   offset = 0
   do e = 1, Front % n_elems
@@ -186,10 +187,10 @@
 
   ! Cell types
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int32" Name="types"' //  &
-                      ' format="ascii"/>'                     // LF
+    write(f8) IN_4 // '<PDataArray type='//intp//' Name="types"'  //  &
+                      ' format="ascii"/>'                         // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="types"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//intp//' Name="types"'  //  &
                           ' format="ascii">'
   do e = 1, Front % n_elems
     write(f9,'(a,i9)') IN_5, VTK_POLYGON
@@ -209,7 +210,7 @@
 
   ! Beginning of cell data
   if(this_proc .eq. 1) then
-    write(f8) IN_3 // '<PCellData Scalars="scalars" vectors="velocity">' // LF
+    write(f8) IN_3 // '<PCellData Scalars="scalars" vectors="velocity">'  // LF
   end if
   write(f9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
@@ -217,10 +218,10 @@
   !   Number of neighbouring elements   !
   !-------------------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Int32" Name="Neighbours"' //  &
-                      ' format="ascii"/>'                          // LF
+    write(f8) IN_4 // '<PDataArray type='//intp//' Name="Neighbours"'  //  &
+                      ' format="ascii"/>'                              // LF
   end if
-  write(f9,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours"' //  &
+  write(f9,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Neighbours"'  //  &
                           ' format="ascii">'
   do e = 1, Front % n_elems
     write(f9,'(a,i9)') IN_5, Front % elem(e) % nne
@@ -231,11 +232,12 @@
   !   Surface normals   !
   !---------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElementNormals" ' //  &
-                      ' NumberOfComponents="3" format="ascii"/>'          // LF
+    write(f8) IN_4 // '<PDataArray type='//floatp                 //  &
+                      ' Name="ElementNormals" '                   //  &
+                      ' NumberOfComponents="3" format="ascii"/>'  // LF
   end if
-  write(f9,'(4a)') IN_4,                                                &
-                 '<DataArray type="Float64" Name="ElementNormals" ' //  &
+  write(f9,'(4a)') IN_4,                                                   &
+                 '<DataArray type='//floatp//' Name="ElementNormals" ' //  &
                  ' NumberOfComponents="3" format="ascii">'
   do e = 1, Front % n_elems
     write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
@@ -249,11 +251,12 @@
   !   Element areas   !
   !-------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElementArea" ' //  &
-                      ' format="ascii"/>'                              // LF
+    write(f8) IN_4 // '<PDataArray type='//floatp  //  &
+                      ' Name="ElementArea" '       //  &
+                      ' format="ascii"/>'          // LF
   end if
-  write(f9,'(4a)') IN_4,                                             &
-                 '<DataArray type="Float64" Name="ElementArea" ' //  &
+  write(f9,'(4a)') IN_4,                                                 &
+                 '<DataArray type='//floatp//' Name="ElementArea" '  //  &
                  ' format="ascii">'
   do e = 1, Front % n_elems
     write(f9,'(a,1pe16.6e4)') IN_5, Front % elem(e) % area
@@ -264,11 +267,13 @@
   !   Element coordinates   !
   !-------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElemenCoordi'   //  &
-                      'nates" NumberOfComponents="3" format="ascii"/>'  // LF
+    write(f8) IN_4 // '<PDataArray type='//floatp                 //  &
+                      ' Name="ElementCoordinates'                 //  &
+                      ' NumberOfComponents="3" format="ascii"/>'  // LF
   end if
-  write(f9,'(4a)') IN_4,                                                    &
-                 '<DataArray type="Float64" Name="ElementCoordinates" ' //  &
+  write(f9,'(4a)') IN_4,                            &
+                 '<DataArray type='//floatp     //  &
+                 ' Name="ElementCoordinates" '  //  &
                  ' NumberOfComponents="3" format="ascii">'
   do e = 1, Front % n_elems
     write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
@@ -282,11 +287,12 @@
   !   Surface curvatures   !
   !------------------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_4 // '<PDataArray type="Float64" Name="ElementCurv" ' //  &
-                      ' format="ascii"/>'                              // LF
+    write(f8) IN_4 // '<PDataArray type='//floatp  //  &
+                      ' Name="ElementCurv" '       //  &
+                      ' format="ascii"/>'          // LF
   end if
-  write(f9,'(4a)') IN_4,                                             &
-                 '<DataArray type="Float64" Name="ElementCurv" ' //  &
+  write(f9,'(4a)') IN_4,                                                &
+                 '<DataArray type='//floatp//' Name="ElementCurv" ' //  &
                  ' format="ascii">'
   do e = 1, Front % n_elems
     write(f9,'(a,1pe16.6e4)') IN_5, Front % elem(e) % curv

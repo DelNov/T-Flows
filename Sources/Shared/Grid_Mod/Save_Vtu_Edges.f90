@@ -2,10 +2,6 @@
   subroutine Save_Vtu_Edges(Grid, edge_data)
 !------------------------------------------------------------------------------!
 !   Writes edges in vtu file format                                            !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,6 +11,9 @@
   integer       :: c, n, s, edge_offset, fu
   character(SL) :: name_out
 !==============================================================================!
+
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
 
   !----------------------!
   !                      !
@@ -43,7 +42,7 @@
   !           !
   !-----------!
   write(fu,'(a,a)') IN_3, '<Points>'
-  write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//floatp//' NumberOfComponents' // &
                           '="3" format="ascii">'
   do n = 1, Grid % n_nodes
     write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')  &
@@ -60,7 +59,8 @@
   write(fu,'(a,a)') IN_3, '<Cells>'
 
   ! First write all edges' nodes
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp//  &
+                          ' Name="connectivity"' //  &
                           ' format="ascii">'
   do c = 1, Grid % n_edges
     write(fu,'(a,64i9)') IN_5, (Grid % edges_n(1:2, c))-1
@@ -68,7 +68,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all edges' offsets
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp//  &
                           'Name="offsets" format="ascii">'
   edge_offset = 0
   do c = 1, Grid % n_edges
@@ -78,7 +78,8 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all edges' types
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp//  &
+                         ' Name="types" format="ascii">'
   do c = 1, Grid % n_edges
     write(fu,'(a,i9)') IN_5, VTK_LINE
   end do
@@ -94,7 +95,7 @@
   write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   if(present(edge_data)) then
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//  &
                             ' Name="EdgeData" format="ascii">'
     do c = 1, Grid % n_edges
       write(fu,'(a,i9)') IN_5, edge_data(c)

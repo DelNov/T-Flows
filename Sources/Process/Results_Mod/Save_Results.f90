@@ -3,10 +3,6 @@
                           Flow, turb, Vof, swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Work_Mod, only: v2_calc   => r_cell_01,  &
@@ -62,6 +58,9 @@
 !==============================================================================!
 
   call Cpu_Timer % Start('Save_Vtu_Results')
+
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -197,17 +196,17 @@
   !-----------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
     write(f8) IN_3 // '<PPoints>' // LF
-    write(f8) IN_4 // '<PDataArray type="Float64"' //  &
+    write(f8) IN_4 // '<PDataArray type='//floatp  //  &
                       ' NumberOfComponents="3"/>'  // LF
     write(f8) IN_3 // '</PPoints>' // LF
   end if
 
   write(str1, '(i1)') data_offset
-  write(f9) IN_3 // '<Points>'                       // LF
-  write(f9) IN_4 // '<DataArray type="Float64"'      //  &
-                    ' NumberOfComponents="3"'        //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(f9) IN_3 // '<Points>'                        // LF
+  write(f9) IN_4 // '<DataArray type='//floatp        //  &
+                    ' NumberOfComponents="3"'         //  &
+                    ' format="appended"'              //  &
+                    ' offset="' // trim(str1) //'">'  // LF
   write(f9) IN_4 // '</DataArray>' // LF
   write(f9) IN_3 // '</Points>'    // LF
   data_offset = data_offset + SP + Grid % n_nodes * RP * 3
@@ -219,10 +218,10 @@
 
   ! Cells' nodes
   write(str1, '(i0.0)') data_offset
-  write(f9) IN_4 // '<DataArray type="Int32"'        //  &
-                    ' Name="connectivity"'           //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(f9) IN_4 // '<DataArray type='//intp          //  &
+                    ' Name="connectivity"'            //  &
+                    ' format="appended"'              //  &
+                    ' offset="' // trim(str1) //'">'  // LF
   write(f9) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_conns * IP  ! prepare for next
 
@@ -272,7 +271,7 @@
 
     ! Write polyhedral cells' faces
     write(str1, '(i0.0)') data_offset
-    write(f9) IN_4 // '<DataArray type="Int32"'        //  &
+    write(f9) IN_4 // '<DataArray type='//intp         //  &
                       ' Name="faces"'                  //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -282,7 +281,7 @@
 
     ! Write polyhedral cells' faces offsets
     write(str1, '(i0.0)') data_offset
-    write(f9) IN_4 // '<DataArray type="Int32"'        //  &
+    write(f9) IN_4 // '<DataArray type='//intp         //  &
                       ' Name="faceoffsets"'            //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF

@@ -2,10 +2,6 @@
   subroutine Save_Front(Front, time_step)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -25,6 +21,9 @@
   character(len= 8)  :: IN_4 = '        '
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
+
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
 
   if(Front % n_verts < 1) return
 
@@ -63,7 +62,8 @@
     !                        !
     !------------------------!
     write(fu,'(a,a)') IN_3, '<Points>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' NumberOfComponents'       //  &
                             '="3" format="ascii">'
     do v = 1, Front % n_verts
       Vert => Front % Vert(v)
@@ -83,7 +83,7 @@
     !--------------------!
     !   Particle i.d.s   !
     !--------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Index" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Index" ' //  &
                             'format="ascii">'
     do v = 1, Front % n_verts
       write(fu,'(a,i9)') IN_5, v
@@ -93,7 +93,8 @@
     !--------------------------!
     !   Number of neighbours   !
     !--------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="Neighbours" '     //  &
                             'format="ascii">'
     do v = 1, Front % n_verts
       write(fu,'(a,i9)') IN_5, Front % Vert(v) % nne
@@ -103,7 +104,8 @@
     !-----------------------------!
     !   Curvatures at the nodes   !
     !-----------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Float64" Name="NodeCurv" ' // &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' Name="NodeCurv" '         //  &
                            ' format="ascii">'
     do v = 1, Front % n_verts
       Vert => Front % Vert(v)
@@ -119,7 +121,8 @@
     !           !
     !-----------!
     write(fu,'(a,a)') IN_3, '<Cells>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="connectivity"'    //  &
                             ' format="ascii">'
     ! Cell topology
     do e = 1, Front % n_elems
@@ -128,7 +131,7 @@
 
     ! Cell offsets
     write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="offsets"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="offsets"' //  &
                             ' format="ascii">'
     offset = 0
     do e = 1, Front % n_elems
@@ -138,7 +141,7 @@
 
     ! Cell types
     write(fu,'(a,a)') IN_4, '</DataArray>'
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="types"' //  &
                             ' format="ascii">'
     do e = 1, Front % n_elems
       write(fu,'(a,i9)') IN_5, VTK_POLYGON
@@ -158,7 +161,8 @@
     !-------------------------------------!
     !   Number of neighbouring elements   !
     !-------------------------------------!
-    write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="Neighbours"' //  &
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="Neighbours"'      //  &
                             ' format="ascii">'
     do e = 1, Front % n_elems
       write(fu,'(a,i9)') IN_5, Front % Elem(e) % nne
@@ -168,8 +172,8 @@
     !---------------------!
     !   Surface normals   !
     !---------------------!
-    write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="ElementNormals" ' //  &
+    write(fu,'(4a)') IN_4,                                                   &
+                   '<DataArray type='//floatp//' Name="ElementNormals" ' //  &
                    ' NumberOfComponents="3" format="ascii">'
     do e = 1, Front % n_elems
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
@@ -183,7 +187,7 @@
     !   Element areas   !
     !-------------------!
     write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="ElementArea" ' //  &
+                   '<DataArray type='//floatp//' Name="ElementArea" ' //  &
                    ' format="ascii">'
     do e = 1, Front % n_elems
       write(fu,'(a,1pe16.6e4)') IN_5, Front % Elem(e) % area
@@ -193,8 +197,9 @@
     !-------------------------!
     !   Element coordinates   !
     !-------------------------!
-    write(fu,'(4a)') IN_4,                                                    &
-                   '<DataArray type="Float64" Name="ElementCoordinates" ' //  &
+    write(fu,'(4a)') IN_4,                           &
+                   '<DataArray type='//floatp    //  &
+                   ' Name="ElementCoordinates" ' //  &
                    ' NumberOfComponents="3" format="ascii">'
     do e = 1, Front % n_elems
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
@@ -208,7 +213,7 @@
     !   Surface curvatures   !
     !------------------------!
     write(fu,'(4a)') IN_4,                                                &
-                   '<DataArray type="Float64" Name="ElementCurv" ' //  &
+                   '<DataArray type='//floatp//' Name="ElementCurv" ' //  &
                    ' format="ascii">'
     do e = 1, Front % n_elems
       write(fu,'(a,1pe16.6e4)') IN_5, Front % Elem(e) % curv

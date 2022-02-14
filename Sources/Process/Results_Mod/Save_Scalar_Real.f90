@@ -21,6 +21,9 @@
   character(SL) :: str1
 !==============================================================================!
 
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
+
   data_size = 0
 
   c_f = lbound(val, 1)
@@ -30,13 +33,13 @@
   if(sweep .eq. 1) then
     if(n_proc > 1 .and. this_proc .eq. 1) then
       write(fs) IN_4                                  //  &
-                '<PDataArray type="Float64"'          //  &
+                '<PDataArray type='//floatp           //  &
                 ' Name="' // trim(var_name) // '"/>'  // LF
     end if
 
     write(str1, '(i0.0)') data_offset
     if(data_offset .eq. 0) write(str1, '(i1)') data_offset
-    write(fp) IN_4 // '<DataArray type="Float64"'        //  &
+    write(fp) IN_4 // '<DataArray type='//floatp         //  &
                       ' Name="' // trim(var_name) // '"' //  &
                       ' format="appended"'               //  &
                       ' offset="' // trim(str1) //'">'   // LF

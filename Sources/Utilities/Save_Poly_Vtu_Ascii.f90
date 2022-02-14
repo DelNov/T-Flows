@@ -18,6 +18,9 @@
   character(SL) :: name_out
 !==============================================================================!
 
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
+
   !----------------------!
   !                      !
   !   Create .vtu file   !
@@ -45,8 +48,9 @@
   !           !
   !-----------!
   write(fu,'(a,a)') IN_3, '<Points>'
-  write(fu,'(a,a)') IN_4, '<DataArray type="Float64" NumberOfComponents' //  &
-                          '="3" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                          ' NumberOfComponents=3'     //  &
+                          ' format="ascii">'
   do n = 1, grid % n_nodes
     write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')  &
               IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
@@ -62,7 +66,8 @@
   write(fu,'(a,a)') IN_3, '<Cells>'
 
   ! First write all cells' nodes
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="connectivity"' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                          ' Name="connectivity"'    //  &
                           ' format="ascii">'
 
   do c = 1, grid % n_cells
@@ -103,7 +108,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' offsets
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           'Name="offsets" format="ascii">'
   cell_offset = 0
   do c = 1, grid % n_cells
@@ -113,7 +118,8 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Now write all cells' types
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="types" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                          ' Name="types" format="ascii">'
   do c = 1, grid % n_cells
     if(grid % cells_n_nodes(c) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_TETRA
     if(grid % cells_n_nodes(c) .eq. 8) write(fu,'(a,i9)') IN_5, VTK_HEXAHEDRON
@@ -124,7 +130,8 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Write polyhedral cells' faces
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="faces" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                          ' Name="faces" format="ascii">'
   do c = 1, grid % n_cells
 
     ! You have found a polyhedron, write its faces out
@@ -145,7 +152,8 @@
 
   ! Write polyhedral cells' faces offsets
   cell_offset = 0
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" Name="faceoffsets" format="ascii">'
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                          ' Name="faceoffsets" format="ascii">'
   do c = 1, grid % n_cells
 
     ! You have found a polyhedron
@@ -180,7 +188,7 @@
   write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
 
   ! Processor i.d.
-  write(fu,'(a,a)') IN_4, '<DataArray type="Int32" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           'Name="Processor" format="ascii">'
   do c = 1, grid % n_cells
     write(fu,'(a,i9)') IN_5, grid % comm % cell_proc(c)
@@ -188,7 +196,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Wall distance
-  write(fu,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                           'Name="GeomWallDistance" format="ascii">'
   do c = 1, grid % n_cells
     write(fu,'(a,1pe15.7)') IN_5, grid % wall_dist(c)
@@ -196,7 +204,7 @@
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Cell volume
-  write(fu,'(a,a)') IN_4, '<DataArray type="Float64" ' //  &
+  write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                           'Name="GeomCellVolume" format="ascii">'
   do c = 1, grid % n_cells
     write(fu,'(a,1pe15.7)') IN_5, grid % vol(c)

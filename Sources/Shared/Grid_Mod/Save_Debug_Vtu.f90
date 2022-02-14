@@ -6,10 +6,6 @@
                                   plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
-!                                                                              !
-!   If you change precision of integers to 64 bits (currently set in the       !
-!   makefile and in Const_Mod.f90 with parameter IP), all occurences of        !
-!   Int32 here should be changed to Int64.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -37,7 +33,9 @@
   character(SL)     :: values_name, name_out, str1, str2
 !==============================================================================!
 
-  ! Allocate local memory (no checks which arguments are present, ...
+  ! Set precision for plotting (intp and floatp variables)
+  call Vtk_Mod_Set_Precision()
+
   ! ... because I am almost invariantly sending cell data here)
   allocate(values_cell(-Grid % n_bnd_cells:Grid % n_cells));
   values_cell(:) = 0.0
@@ -122,7 +120,7 @@
   !-----------!
   write(str1, '(i1)') data_offset
   write(fu) IN_3 // '<Points>'                       // LF
-  write(fu) IN_4 // '<DataArray type="Float64"'      //  &
+  write(fu) IN_4 // '<DataArray type='//floatp       //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -139,7 +137,7 @@
 
   ! First write all cells' nodes (a.k.a. connectivity)
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="connectivity"'           //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -148,7 +146,7 @@
 
   ! Cells' offsets
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="offsets"'                //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -157,7 +155,7 @@
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="types"'                  //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -168,7 +166,7 @@
 
     ! Write polyhedral cells' faces
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+    write(fu) IN_4 // '<DataArray type='//intp         //  &
                       ' Name="faces"'                  //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -178,7 +176,7 @@
 
     ! Write polyhedral cells' faces offsets
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+    write(fu) IN_4 // '<DataArray type='//intp         //  &
                       ' Name="faceoffsets"'            //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
@@ -199,7 +197,7 @@
   ! Additional node-based scalar array
   if(present(scalar_node)) then
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Float64"'            //  &
+    write(fu) IN_4 // '<DataArray type='//floatp             //  &
                       ' Name="'// trim(values_name) // '"'   //  &
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
@@ -210,7 +208,7 @@
   ! Additional node-based vector array
   if(present(vector_node)) then
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Float64"'            //  &
+    write(fu) IN_4 // '<DataArray type='//floatp             //  &
                       ' Name="'// trim(vector_name) // '"'   //  &
                       ' NumberOfComponents="3"'              //  &
                       ' format="appended"'                   //  &
@@ -232,7 +230,7 @@
 
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type="Int32"'        //  &
+  write(fu) IN_4 // '<DataArray type='//intp         //  &
                     ' Name="Processor"'              //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -243,7 +241,7 @@
   if(present(inside_cell) .or.  &
      present(scalar_cell)) then
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Float64"'            //  &
+    write(fu) IN_4 // '<DataArray type='//floatp             //  &
                       ' Name="'// trim(values_name) // '"'   //  &
                       ' format="appended"'                   //  &
                       ' offset="' // trim(str1)       //'">' // LF
@@ -254,7 +252,7 @@
   ! Additional cell vector
   if(present(vector_cell)) then
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type="Float64"'            //  &
+    write(fu) IN_4 // '<DataArray type='//floatp             //  &
                       ' Name="'// trim(vector_name) // '"'   //  &
                       ' NumberOfComponents="3"'              //  &
                       ' format="appended"'                   //  &
@@ -479,22 +477,22 @@
 
     ! This section must be present
     write(fu,'(a,a)') IN_2, '<PPoints>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  // &
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  // &
                             ' NumberOfComponents="3"/>'
     write(fu,'(a,a)') IN_2, '</PPoints>'
 
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
-    write(fu,'(a,a)') IN_3, '<PDataArray type="Int32" Name="Processor"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="Processor"/>'
     if(present(scalar_cell) .or.  &
        present(inside_cell)) then
-      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  //  &
-                              ' Name="'// trim(values_name) // '"/>'
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
+                              ' Name="'// trim(values_name)  // '"/>'
     end if
     if(present(vector_cell)) then
-      write(fu,'(a,a)') IN_3, '<PDataArray type="Float64"'  //  &
-                              ' NumberOfComponents="3"'     //  &
-                              ' Name="'// trim(vector_name) // '"/>'
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
+                              ' NumberOfComponents="3"'      //  &
+                              ' Name="'// trim(vector_name)  // '"/>'
     end if
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
