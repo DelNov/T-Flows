@@ -212,7 +212,9 @@ function make_file_explicit_dependencies() {
       # search for deps in list proc_mods and shar_mods
       # if found : add them to $tmp_file
       #-------------------------------------------------
-      echo '#-- '$f90_file >> $tmp_file
+      echo '#-----------------------------------------------------' >> $tmp_file
+      echo '# Dependencies for: '$f90_file >> $tmp_file
+      echo '#-----------------------------------------------------' >> $tmp_file
 
       if [ ! -z "$dependencies" ]; then #if non-empty
 
