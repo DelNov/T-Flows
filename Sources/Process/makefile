@@ -11,7 +11,6 @@ FORTRAN ?= gnu
 DEBUG   ?= no
 REAL    ?= double
 MPI     ?= no
-PETSC   ?= no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -35,9 +34,12 @@ $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <MPI=no/yes>         )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/...>                    )
 $(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
-$(info #        <REAL=double/single> <PETSC=no/yes>                            )
+$(info #        <REAL=double/single>                                           )
 $(info #                                                                       )
-$(info # Note: The first item, for each of the options above, is the default.  )
+$(info # Notes:                                                                )
+$(info #   1. The first item, for each of the options above, is the default.   )
+$(info #   2. If PETSC_DIR environment variable is defined, the code willl     )
+$(info #      make an attempt to compile with PETSc libraries.                 )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make                        - sequential version with gnu compiler  )
@@ -54,13 +56,6 @@ ifeq ($(REAL), single)
   METIS_LIB = ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r32.a
 endif
 
-#-------------------
-#   PETSc library
-#-------------------
-ifeq ($(PETSC), yes)
-  PETSC_LIB = ${PETSC_DIR}/lib/libpetsc.so.3.16.4
-endif
-
 #-------------------------------------------------------------------------
 #   Compiler and linker options
 #-------------------------------------------------------------------------
@@ -74,24 +69,23 @@ ifeq ($(FORTRAN), gnu)
   else
     FC = $(FCOMP)
   endif
-  ifeq ($(DEBUG),yes)
-    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g                                      \
-               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
-               -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
-               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
-               -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion -finit-real=nan    -Wintrinsics-std             \
-               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
-               -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
-               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
-               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g -cpp                                 \
+                 -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
+                 -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
+                 -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
+                 -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+                 -Wconversion -finit-real=nan    -Wintrinsics-std             \
+                 -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
+                 -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
+                 -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
+                 -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
   else
-    OPT_F_COMP = -J $(DIR_MODULE) -O3
+    OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
   endif
-  OPT_LINK = $(OPT_F_COMP)
 endif
 
 # Fortran == intel
@@ -101,7 +95,7 @@ ifeq ($(FORTRAN), intel)
   else
     FC = $(FCOMP)
   endif
-  ifeq ($(DEBUG),yes)
+  ifeq ($(DEBUG), yes)
     OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
                  -debug all -fpe-all=0 -traceback
   else
@@ -110,7 +104,6 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-  OPT_LINK = $(OPT_F_COMP)
 endif
 
 # Fortran == nvidia
@@ -120,7 +113,7 @@ ifeq ($(FORTRAN), nvidia)
   else
     FC = $(FCOMP)
   endif
-  ifeq ($(DEBUG),yes)
+  ifeq ($(DEBUG), yes)
     OPT_F_COMP = -module $(DIR_MODULE) -O0 -g
   else
     OPT_F_COMP = -module $(DIR_MODULE) -O3
@@ -128,8 +121,23 @@ ifeq ($(FORTRAN), nvidia)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-  OPT_LINK = $(OPT_F_COMP)
 endif
+
+# Set initial options for C compiler - this is probably not needed
+OPT_C_COMP = -cpp
+
+#----------------------------------------------
+#   Additional options to compile with PETSc
+#----------------------------------------------
+ifneq ($(PETSC_DIR),)
+  OPT_F_COMP += -I ${PETSC_DIR}/include
+  OPT_C_COMP += -I ${PETSC_DIR}/include
+endif
+
+#-----------------------------------------------------------
+#   Set linker options to be the same as compiler options
+#-----------------------------------------------------------
+OPT_LINK = $(OPT_F_COMP)
 
 # Use here your command for mpi fortran compiler:
 ifeq ($(MPI), yes)
@@ -220,14 +228,9 @@ SRC_F_MOD += Point_Mod.f90       \
              Surf_Mod.f90        \
              Matrix_Mod.f90      \
              Vector_Mod.f90      \
-             Solver_Mod.f90
-# Conditional support for PETSc
-ifeq ($(PETSC), yes)
-  SRC_F_MOD += Petsc_Mod_True.f90
-else
-  SRC_F_MOD += Petsc_Mod_Fake.f90
-endif
-SRC_F_MOD += Numerics_Mod.f90    \
+             Solver_Mod.f90      \
+             Petsc_Mod.f90       \
+             Numerics_Mod.f90    \
              Field_Mod.f90       \
              Info_Mod.f90        \
              Interface_Mod.f90   \
@@ -252,7 +255,6 @@ endif
 # Results_Mod must be last.
 SRC_F_MOD += Results_Mod.f90
 
-  $(info $(SRC_F_MOD))
 #---------------
 #   Functions
 #---------------
@@ -293,7 +295,8 @@ SRC_F_FUN += Tau_Wall_Low_Re.f90         \
 
 SRC_F_FUN += To_Upper_Case.f90
 
-ifeq ($(PETSC), yes)
+# C function/interface, if you compile with PETSc
+ifneq ($(PETSC_DIR),)
   SRC_C_FUN = C_Petsc_Interface.c
 endif
 
@@ -370,6 +373,6 @@ clean:
 #-----------------------------------
 #   Load options to compile PETSc
 #-----------------------------------
-ifeq ($(PETSC), yes)
+ifneq ($(PETSC_DIR),)
   include ${PETSC_DIR}/lib/petsc/conf/variables
 endif
