@@ -548,7 +548,7 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*/*.f90 \
 Solver_Mod/*.f90 \
-Petsc_Mod_True.f90 \
+Petsc_Mod.f90 \
 $(DIR_OBJECT)/Petsc_Mod.o \
 Numerics_Mod/*.f90 
 
@@ -1387,13 +1387,6 @@ $(DIR_OBJECT)/Const_Mod.o
 #-----------------------------------------------------
 # Dependencies for: ./Point_Mod/Find_Nearest_Node.f90
 #-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Petsc_Mod_True.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Petsc_Mod_True.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*/*.f90 \
-Solver_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Results_Mod.f90
