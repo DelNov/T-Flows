@@ -33,7 +33,8 @@
     integer, allocatable :: bnd_cond_type(:)
 
     ! Parameters for numerical solution of the variable
-    character(SL)     :: precond
+    character(SL)     :: precond      ! preconditioner
+    character(SL)     :: solver       ! solver (not used yet)
     integer           :: adv_scheme   ! advection scheme
     integer           :: grad_method  ! gradient computation method
     real              :: blend        ! blending (1.0 central; 0.0 upwind)

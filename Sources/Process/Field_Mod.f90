@@ -11,6 +11,7 @@
   use Grid_Mod
   use Bulk_Mod
   use Solver_Mod
+  use Petsc_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -154,6 +155,9 @@
     integer :: gauss_miter
     integer :: least_miter
 
+    ! Linear solvers; native or PETSc
+    integer :: solvers
+
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy
 
@@ -187,7 +191,7 @@
       ! procedure          :: Grad_Component_Cells_To_Nodes         ! not used
       procedure          :: Grad_Gauss
       procedure, private :: Grad_Gauss_Pressure
-      procedure          :: Grad_Gauss_Variable
+      procedure, private :: Grad_Gauss_Variable
       procedure, private :: Grad_Least_Pressure
       procedure, private :: Grad_Least_Pressure_Correction
       procedure, private :: Grad_Least_Variable

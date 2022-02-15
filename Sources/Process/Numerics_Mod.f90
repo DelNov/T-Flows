@@ -12,6 +12,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Solver_Mod
+  use Petsc_Mod
   use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -45,6 +46,10 @@
   integer, parameter :: LEAST_SQUARES = 40189
   integer, parameter :: GAUSS_THEOREM = 40193
 
+  ! Linear solvers, native or PETSc
+  integer, parameter :: NATIVE = 40213
+  integer, parameter :: PETSC  = 40231
+
   contains
 
   include 'Numerics_Mod/Advection_Scheme.f90'
@@ -53,6 +58,7 @@
   include 'Numerics_Mod/Advection_Min_Max.f90'
   include 'Numerics_Mod/Gradient_Method_Code.f90'
   include 'Numerics_Mod/Inertial_Term.f90'
+  include 'Numerics_Mod/Linear_Solvers_Code.f90'
   include 'Numerics_Mod/Pressure_Momentum_Coupling_Code.f90'
   include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
   include 'Numerics_Mod/Under_Relax.f90'

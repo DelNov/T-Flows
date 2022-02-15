@@ -288,8 +288,6 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*/*.f90 \
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Petsc_Mod_Fake.o \
-$(DIR_OBJECT)/Petsc_Mod_True.o \
 Petsc_Mod_True.f90 \
 Petsc_Mod_Fake.f90 \
 Petsc_Mod/*.f90 \

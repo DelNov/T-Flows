@@ -197,15 +197,20 @@
 
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
 
-  call Sol % Cg(A,             &
-                pp % n,        &
-                b,             &
-                pp % precond,  &
-                pp % mniter,   &      ! max number of iterations
-                pp % eniter,   &      ! executed number of iterations
-                pp % tol,      &
-                pp % res,      &
-                norm = p_nor)         ! number for normalisation
+  if(Flow % solvers == NATIVE) then
+    call Sol % Cg(A,             &
+                  pp % n,        &
+                  b,             &
+                  pp % precond,  &
+                  pp % mniter,   &      ! max number of iterations
+                  pp % eniter,   &      ! executed number of iterations
+                  pp % tol,      &
+                  pp % res,      &
+                  norm = p_nor)         ! number for normalisation
+  else
+    print *, '# PETSc solvers are not implemented yet'
+    stop
+  end if
 
   call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
 

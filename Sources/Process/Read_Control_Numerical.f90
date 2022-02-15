@@ -26,6 +26,12 @@
   ! Take alias
   Grid => Flow % pnt_grid
 
+  !-----------------------------------------------------!
+  !   Linear solvers you want to use; native or PETSc   !
+  !-----------------------------------------------------!
+  call Control_Mod_Linear_Solvers(name, .true.)
+  Flow % solvers = Numerics_Mod_Linear_Solvers_Code(name)
+
   !------------------------------------------!
   !   Pressure velocity coupling algorithm   !
   !------------------------------------------!

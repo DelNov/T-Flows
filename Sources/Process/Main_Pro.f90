@@ -22,7 +22,8 @@
   type(Swarm_Type)      :: Swarm(MD)       ! swarm of particles
   type(Turb_Type)       :: turb(MD)        ! turbulence modelling
   type(Vof_Type)        :: Vof(MD)         ! multiphase modelling with vof
-  type(Solver_Type)     :: Sol(MD)         ! linear solvers
+  type(Solver_Type)     :: Sol(MD)         ! native linear solvers
+  type(Petsc_Type)      :: Pet(MD)         ! PETSc linear solvers
   type(Turb_Plane_Type) :: turb_planes(MD) ! holder for synthetic turbulences
   type(Monitor_Type)    :: monitor(MD)     ! monitors
   type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
@@ -152,6 +153,7 @@
     ! Allocate memory for linear systems of equations
     ! (You need face geomtry for this step)
     call Sol(d) % Create_Solver(Grid(d))
+    call Pet(d) % Create_Petsc(Sol(d), Grid(d))
 
     call Read_Control_Physical_Properties(Flow(d), Vof(d), Swarm(d))
     call Read_Control_Boundary_Conditions(Flow(d), turb(d), Vof(d),   &
@@ -230,7 +232,7 @@
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
       call Control_Mod_Potential_Initialization(pot_init, .true.)
-      if(pot_init) call Flow(d) % Potential_Initialization(Sol(d))
+      if(pot_init) call Flow(d) % Potential_Initialization(Sol(d), Pet(d))
     end do
   end if
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Potential_Initialization(Flow, Sol)
+  subroutine Potential_Initialization(Flow, Sol, Pet)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -16,6 +16,7 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
   type(Solver_Type), target :: Sol
+  type(Petsc_Type),  target :: Pet
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: phi, u, v, w
@@ -220,7 +221,8 @@
     phi % precond = 'INCOMPLETE_CHOLESKY'
 
     ! Call linear solver to solve the equations
-    call Sol % Bicg(A,              &
+    if(Flow % solvers == NATIVE) then
+      call Sol % Cg(A,              &
                     phi % n,        &
                     b,              &
                     phi % precond,  &
@@ -228,6 +230,15 @@
                     phi % eniter,   &
                     phi % tol,      &
                     phi % res)
+    else
+      call Pet % Solve(Sol,           &
+                       A,             &
+                       phi % n,       &
+                       b,             &
+                       phi % mniter,  &
+                       phi % eniter,  &
+                       phi % tol)
+    end if
     if(this_proc < 2) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res
