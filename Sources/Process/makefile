@@ -27,6 +27,7 @@ VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
+
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
@@ -348,6 +349,20 @@ $(PROGRAM_FILE): $(OBJ)
 	@echo Linking "\033[0;32m $(PETSC_LIB) $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
 	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB) $(PETSC_LIB)
 
+#-------------------------------------------------------------------
+#   OK, so Petsc_Mod.f90 is a link which, depending if the system
+#   has PETSc or not, links to either Petsc.True or Petsc.Fake.
+#   So, I made the link itself a target, which changes every time
+#   a compilation on a particular system commences.
+#-------------------------------------------------------------------
+Petsc_Mod.f90:
+	rm -f Petsc_Mod.f90
+ifneq ($(PETSC_DIR),)
+	ln -f -s Petsc.True Petsc_Mod.f90
+else
+	ln -f -s Petsc.Fake Petsc_Mod.f90
+endif
+
 #--------------------------------------------------------------------
 #   Explicit dependencies for modules
 #--------------------------------------------------------------------
@@ -360,13 +375,16 @@ include makefile_explicit_dependencies
 #   Explicit target
 #---------------------
 clean:
-	@echo -n Removing objects and modules ... 
+	@echo -n Removing objects and modules ...
 	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
 	@echo done
-	@echo -n Removing links to sources in case directory ... 
+	@echo -n Removing links to sources in case directory ...
 	@rm -f $(DIR_USER)/*.f90
 	@echo done
-	@echo -n Retreiving default user functions from git repository ... 
+	@echo -n Removing the link Petsc_Mod.f90 ...
+	@rm -f Petsc_Mod.f90
+	@echo done
+	@echo -n Retreiving default user functions from git repository ...
 	@git checkout $(DIR_USER)/*.f90
 	@echo done
 
