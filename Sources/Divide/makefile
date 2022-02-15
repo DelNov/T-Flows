@@ -53,55 +53,69 @@ endif
 
 # Fortran == gnu
 ifeq ($(FORTRAN), gnu)
-  FC = gfortran
-  ifeq ($(DEBUG), yes)
-    OPT_COMP = -J $(DIR_MODULE) -O0 -g                                      \
-               -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
-               -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
-               -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
-               -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-               -Wconversion -finit-real=nan    -Wintrinsics-std             \
-               -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
-               -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
-               -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
-               -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
+  ifeq ($(FCOMP),)
+    FC = gfortran
   else
-    OPT_COMP = -J $(DIR_MODULE) -O3
+    FC = $(FCOMP)
+  endif
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g -cpp                                 \
+                 -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
+                 -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
+                 -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
+                 -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
+                 -Wconversion -finit-real=nan    -Wintrinsics-std             \
+                 -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
+                 -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
+                 -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
+                 -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
+  else
+    OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp
   endif
   ifeq ($(REAL), double)
-    OPT_COMP += -fdefault-real-8
+    OPT_F_COMP += -fdefault-real-8
   endif
-  OPT_LINK = $(OPT_COMP)
 endif
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
-  FC = ifort
-  ifeq ($(DEBUG), yes)
-    OPT_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
-               -debug all -fpe-all=0 -traceback
+  ifeq ($(FCOMP),)
+    FC = ifort
   else
-    OPT_COMP = -module $(DIR_MODULE) -O3
+    FC = $(FCOMP)
+  endif
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
+                 -debug all -fpe-all=0 -traceback
+  else
+    OPT_F_COMP = -module $(DIR_MODULE) -O3
   endif
   ifeq ($(REAL), double)
-    OPT_COMP += -r8
+    OPT_F_COMP += -r8
   endif
-  OPT_LINK = $(OPT_COMP)
 endif
 
 # Fortran == nvidia
 ifeq ($(FORTRAN), nvidia)
-  FC = nvfortran
-  ifeq ($(DEBUG), yes)
-    OPT_COMP = -module $(DIR_MODULE) -O0 -g
+  ifeq ($(FCOMP),)
+    FC = nvfortran
   else
-    OPT_COMP = -module $(DIR_MODULE) -O3
+    FC = $(FCOMP)
+  endif
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g
+  else
+    OPT_F_COMP = -module $(DIR_MODULE) -O3
   endif
   ifeq ($(REAL), double)
-    OPT_COMP += -r8
+    OPT_F_COMP += -r8
   endif
-  OPT_LINK = $(OPT_COMP)
 endif
+
+#-----------------------------------------------------------
+#   Set linker options to be the same as compiler options
+#-----------------------------------------------------------
+OPT_LINK = $(OPT_F_COMP)
 
 #------------------------------------------------------
 #   List of sources for modules and functions
@@ -117,46 +131,46 @@ endif
 #-------------
 
 # Modules in shared directories
-SRC_MOD = Const_Mod.f90          \
-          Comm_Mod_Seq.f90       \
-          Math_Mod.f90           \
-          File_Mod.f90           \
-          Gen_Mod.f90            \
-          Vtk_Mod.f90            \
-          Metis_Options_Mod.f90  \
-          Boundary_Mod.f90       \
-          Swap_Mod.f90           \
-          Sort_Mod.f90           \
-          Grid_Mod.f90
+SRC_F_MOD = Const_Mod.f90          \
+            Comm_Mod_Seq.f90       \
+            Math_Mod.f90           \
+            File_Mod.f90           \
+            Gen_Mod.f90            \
+            Vtk_Mod.f90            \
+            Metis_Options_Mod.f90  \
+            Boundary_Mod.f90       \
+            Swap_Mod.f90           \
+            Sort_Mod.f90           \
+            Grid_Mod.f90
 
 #---------------
 #   Functions
 #---------------
 
 # Sources for all shared functions
-SRC_FUN = To_Upper_Case.f90
+SRC_F_FUN = To_Upper_Case.f90
 
 # Local functions are added one by one ...
-SRC_FUN += Save_Subdomains.f90  \
-           Logo_Div.f90         \
-           Main_Div.f90
+SRC_F_FUN += Save_Subdomains.f90  \
+             Logo_Div.f90         \
+             Main_Div.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions
 #----------------------------------------------------------------------
 #   Note: This doesn't need editing.
 #----------------------------------------------------------------------
-OBJ_MOD = $(SRC_MOD:%.f90=$(DIR_OBJECT)/%.o)
-OBJ_FUN = $(SRC_FUN:%.f90=$(DIR_OBJECT)/%.o)
-OBJ = $(OBJ_MOD) $(OBJ_FUN)
+OBJ_F_MOD = $(SRC_F_MOD:%.f90=$(DIR_OBJECT)/%.o)
+OBJ_F_FUN = $(SRC_F_FUN:%.f90=$(DIR_OBJECT)/%.o)
+OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
 
 #-------------------------------------------------------
 #   List of modules currently used for target "clean"
 #-------------------------------------------------------
 #   Note: This doesn't need editing.
 #-------------------------------------------------------
-SRC_MOD_LOW = $(shell echo $(SRC_MOD) | tr A-Z a-z)
-MOD = $(SRC_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
+SRC_F_MOD_LOW = $(shell echo $(SRC_F_MOD) | tr A-Z a-z)
+MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 
 #---------------------------------------------------------
 #   Default rule to build Fortran modules and functions
@@ -164,15 +178,15 @@ MOD = $(SRC_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 #   Note: This doesn't need editing.
 #---------------------------------------------------------
 
-# Modules
+# Fortran modules
 $(DIR_OBJECT)/%.o: %.f90 %/*.f90
-	@echo FC $<
-	@$(FC) $(OPT_COMP) -c -o $@ $<
+	@echo $(FC) $<
+	@$(FC) $(OPT_F_COMP) -c -o $@ $<
 
-# Functions
+# Fortran functions
 $(DIR_OBJECT)/%.o: %.f90
-	@echo FC $<
-	@$(FC) $(OPT_COMP) -c -o $@ $<
+	@echo $(FC) $<
+	@$(FC) $(OPT_F_COMP) -c -o $@ $<
 
 #-----------------------------------
 #   Rule to build main program
