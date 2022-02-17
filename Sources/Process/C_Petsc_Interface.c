@@ -66,13 +66,11 @@ void c_petsc_mat_set_type_to_mat_aij_(Mat * A) {
 |  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetPreallocation.html
 +-----------------------------------------------------------------------------*/
 void c_petsc_mat_aij_set_preallocation_(Mat      * A,
-                                        PetscInt * m_lower,
                                         PetscInt * d_nnz,
-                                        PetscInt * m_upper,
                                         PetscInt * o_nnz) {
 
-  err = MatMPIAIJSetPreallocation(*A, *m_lower, d_nnz, *m_upper, o_nnz);
-  err = MatSeqAIJSetPreallocation(*A, *m_lower, d_nnz);
+  err = MatMPIAIJSetPreallocation(*A, 0, d_nnz, 0, o_nnz);
+  err = MatSeqAIJSetPreallocation(*A, 0, d_nnz);
 }
 
 /*-----------------------------------------------------------------------------+

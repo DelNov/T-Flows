@@ -122,9 +122,7 @@
 
   ! This will call both MPI and Seq versions of preallocation
   call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,        &
-                                         Pet % m_lower,  &
                                          Pet % d_nnz,    &
-                                         Pet % m_upper,  &
                                          Pet % o_nnz)
 
   !-----------------------------------------!
