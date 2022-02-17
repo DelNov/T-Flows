@@ -17,10 +17,6 @@ void c_petsc_initialize_() {
 
   /* Issue PETSc call */
   err = PetscInitialize(0, NULL, (char*)0, help);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to initialize PETSc from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -43,10 +39,6 @@ void c_petsc_mat_create_seq_aij_(Mat      * A,
                         zero,             /* this will be ignored */
                         d_nnz,
                         A);
-
-  /* Error trap */
-  if (err != 0) {printf("Successfully called MatCreateSeqAIJ from C\n");
-                 exit(0);}
 }
 
 
@@ -60,10 +52,6 @@ void c_petsc_mat_seq_aij_set_column_indices_(Mat      * A,
 
   /* Issue PETSc call */
   err = MatSeqAIJSetColumnIndices(*A, col);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed in call to MatSeqAIJSetColumnIndices from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -78,10 +66,6 @@ void c_petsc_mat_set_value_(Mat      * A,
 
   /* Issue PETSc call */
   err = MatSetValue(*A, *row, *col, *value, INSERT_VALUES);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to call MatSetValue from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -95,16 +79,8 @@ void c_petsc_assemble_mat_(Mat * A) {
   /* Issue PETSc call */
   err = MatAssemblyBegin(*A, MAT_FINAL_ASSEMBLY);
 
-  /* Error trap */
-  if (err != 0) {printf("Failed to perform MatAssemblyBegin from C\n");
-                 exit(0);}
-
   /* Issue PETSc call */
   err = MatAssemblyEnd  (*A, MAT_FINAL_ASSEMBLY);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to perform MatAssemblyEnd from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -123,11 +99,19 @@ void c_petsc_vec_create_seq_(Vec      * v,
 
   /* Issue PETSc call */
   err =  VecCreateSeq(PETSC_COMM_SELF, *m_lower, v);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed in call to VecCreateSeq from C\n");
-                 exit(0);}
 }
+
+/*-----------------------------------------------------------------------------+
+|  VecCreateMPI                                                                |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Vec/VecCreateMPI.html            |
++-----------------------------------------------------------------------------*/
+void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
+
+  /* Issue PETSc call */
+  err = VecCreateMPI(PETSC_COMM_SELF, *m_lower, *m_upper, v);
+}
+
 
 /*-----------------------------------------------------------------------------+
 |  VecSetValue                                                                 |
@@ -140,10 +124,6 @@ void c_petsc_vec_set_value_(Vec      * v,
 
   /* Issue PETSc call */
   err = VecSetValue(*v, *row, *value, INSERT_VALUES);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to call VecSetValue from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -158,10 +138,6 @@ void c_petsc_vec_get_values_(Vec      * v,
 
   /* Issue PETSc call */
   err = VecGetValues(*v, *ni, row, value);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to call VecGetValues from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -172,19 +148,9 @@ void c_petsc_vec_get_values_(Vec      * v,
 +-----------------------------------------------------------------------------*/
 void c_petsc_assemble_vec_(Vec * v) {
 
-  /* Issue PETSc call */
+  /* Issue PETSc calls */
   err = VecAssemblyBegin(*v);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to perform VecAssemblyBegin from C\n");
-                 exit(0);}
-
-  /* Issue PETSc call */
   err = VecAssemblyEnd(*v);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to perform VecAssemblyEnd from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -202,10 +168,6 @@ void c_petsc_ksp_create_(KSP * ksp) {
 
   /* Issue PETSc call */
   err = KSPCreate(PETSC_COMM_SELF, ksp);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to create KSP from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -238,17 +200,9 @@ void c_petsc_set_solver_and_preconditioner_(KSP  * ksp,
   /* Set solver */
   err = KSPSetType(*ksp, sol);
 
-  /* Error trap */
-  if (err != 0) {printf("Failed to set solver to %s from C\n", sol);
-                 exit(0);}
-
   /* Set preconditioner */
   err = KSPGetPC(*ksp, pc);
   err = PCSetType(*pc, prec);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed to set preconditioner to %s from C\n", prec);
-                 exit(0);}
 
   /* These two lines are needed to finish the setup */
   err = KSPSetFromOptions(*ksp);
@@ -289,10 +243,6 @@ void c_petsc_ksp_solve_(KSP * ksp,
 
   /* Issue PETSc call */
   err = KSPSolve(*ksp, *b, *x);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed in the call to KSPSetTolerances from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
@@ -305,8 +255,4 @@ void c_petsc_ksp_get_iteration_number_(KSP      * ksp,
 
   /* Issue PETSc call */
   err = KSPGetIterationNumber(*ksp, its);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed in the call to KSPGetIterationNumber from C\n");
-                 exit(0);}
 }
