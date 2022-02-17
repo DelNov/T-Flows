@@ -129,10 +129,8 @@
   allocate(Pet % col(nonzeros));  Pet % col(:) = 0
 
   ! For the time being, copy the values from T-Flows minus 1
+  ! (This was working well for sequential)
   Pet % col(1:nonzeros) = Sol % A % col(1:nonzeros) - PETSC_ONE
-
-  ! Set column indices (now this is really tough)
-  call C_Petsc_Mat_Seq_Aij_Set_Column_Indices(Pet % A, Pet % col)
 
   !--------------------------!
   !   Create PETSc vectors   !

@@ -85,7 +85,7 @@ void c_petsc_mat_seq_aij_set_preallocation_(Mat      * A,
 
 
 /*-----------------------------------------------------------------------------+
-|  MatSeqAIJSetColumnIndices                                                   |
+|  MatSeqAIJSetColumnIndices (candidate for deletion)                          |
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetColumnIndices.html
 +-----------------------------------------------------------------------------*/
