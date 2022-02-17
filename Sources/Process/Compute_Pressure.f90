@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Pressure(Flow, Vof, Sol, Pet, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -11,6 +11,7 @@
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
+  type(Petsc_Type),    target :: Pet
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -208,8 +209,13 @@
                   pp % res,      &
                   norm = p_nor)         ! number for normalisation
   else
-    print *, '# PETSc solvers are not implemented yet'
-    stop
+    call Pet % Solve(Sol,          &
+                     A,            &
+                     pp % n,       &
+                     b,            &
+                     pp % mniter,  &
+                     pp % eniter,  &
+                     pp % tol)
   end if
 
   call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
