@@ -41,7 +41,7 @@
     do c = 1, Grid % n_cells
       b(c) = b(c) - u % n(c) / bulk % u          &
                   * Flow % heat / bulk % area_x  &
-                  * Grid % vol(c)
+                  * Grid % vol(c) / Grid % per_x
     end do
   end if
 
