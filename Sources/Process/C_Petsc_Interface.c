@@ -36,67 +36,6 @@ void c_petsc_mat_create_(Mat * A) {
 }
 
 /*-----------------------------------------------------------------------------+
-|  MatCreateSeqAIJ                                                             |
-+-----------------------------------------------------------------------------*/
-void c_petsc_mat_create_seq_aij_(Mat      * A,
-                                 PetscInt * m_lower,
-                                 PetscInt * d_nnz) {
-
-  /* Issue PETSc call */
-  err = MatCreateSeqAIJ(PETSC_COMM_SELF,
-                        *m_lower,         /* number of rows       */
-                        *m_lower,         /* number of columns    */
-                        zero,             /* this will be ignored */
-                        d_nnz,
-                        A);
-}
-
-/*-----------------------------------------------------------------------------+
-|  MatSetType (to MATSEQAIJ)                                                   |
-|                                                                              |
-|  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html              |
-+-----------------------------------------------------------------------------*/
-void c_petsc_mat_set_type_to_seq_(Mat * A) {
-
-  err = MatSetType(*A, MATSEQAIJ);
-}
-
-/*-----------------------------------------------------------------------------+
-|  MatSetType (to MATMPIAIJ)                                                   |
-|                                                                              |
-|  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html              |
-+-----------------------------------------------------------------------------*/
-void c_petsc_mat_set_type_to_mpi_(Mat * A) {
-
-  err = MatSetType(*A, MATMPIAIJ);
-}
-
-/*-----------------------------------------------------------------------------+
-|  MatSeqAIJSetPreallocation                                                   |
-|                                                                              |
-|  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetPreallocation.html
-+-----------------------------------------------------------------------------*/
-void c_petsc_mat_seq_aij_set_preallocation_(Mat      * A,
-                                            PetscInt * m_lower,
-                                            PetscInt * d_nnz) {
-
-  err = MatSeqAIJSetPreallocation(*A, *m_lower, d_nnz);
-}
-
-
-/*-----------------------------------------------------------------------------+
-|  MatSeqAIJSetColumnIndices (candidate for deletion)                          |
-|                                                                              |
-|  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetColumnIndices.html
-+-----------------------------------------------------------------------------*/
-void c_petsc_mat_seq_aij_set_column_indices_(Mat      * A,
-                                             PetscInt * col) {
-
-  /* Issue PETSc call */
-  err = MatSeqAIJSetColumnIndices(*A, col);
-}
-
-/*-----------------------------------------------------------------------------+
 |  MatSetSizes                                                                 |
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Mat/MatSetSizes.html             |
@@ -104,6 +43,36 @@ void c_petsc_mat_seq_aij_set_column_indices_(Mat      * A,
 void c_petsc_mat_set_sizes_(Mat * A, PetscInt * m_lower, PetscInt * m_upper) {
 
   err = MatSetSizes(*A, *m_lower, *m_lower, *m_upper, *m_upper);
+}
+
+/*-----------------------------------------------------------------------------+
+|  MatSetType (to MATAIJ)                                                      |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html              |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_set_type_to_mat_aij_(Mat * A) {
+
+  err = MatSetType(*A, MATAIJ);
+}
+
+/*-----------------------------------------------------------------------------+
+|  MatMPIAIJSetPreallocation                                                   |
+|  MatSeqAIJSetPreallocation                                                   |
+|                                                                              |
+|  Combines two calls which seems to be important or necessary                 |
+|  https://petsc.org/release/docs/manualpages/Mat/MATAIJ.html#MATAIJ           |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatMPIAIJSetPreallocation.html
+|  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetPreallocation.html
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_aij_set_preallocation_(Mat      * A,
+                                        PetscInt * m_lower,
+                                        PetscInt * d_nnz,
+                                        PetscInt * m_upper,
+                                        PetscInt * o_nnz) {
+
+  err = MatMPIAIJSetPreallocation(*A, *m_lower, d_nnz, *m_upper, o_nnz);
+  err = MatSeqAIJSetPreallocation(*A, *m_lower, d_nnz);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -142,18 +111,6 @@ void c_petsc_assemble_mat_(Mat * A) {
 +-----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------+
-|  VecCreateSeq                                                                |
-|                                                                              |
-|  https://petsc.org/release/docs/manualpages/Vec/VecCreateSeq.html            |
-+-----------------------------------------------------------------------------*/
-void c_petsc_vec_create_seq_(Vec      * v,
-                             PetscInt * m_lower) {
-
-  /* Issue PETSc call */
-  err =  VecCreateSeq(PETSC_COMM_SELF, *m_lower, v);
-}
-
-/*-----------------------------------------------------------------------------+
 |  VecCreateMPI                                                                |
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecCreateMPI.html            |
@@ -179,6 +136,19 @@ void c_petsc_vec_set_value_(Vec      * v,
 }
 
 /*-----------------------------------------------------------------------------+
+|  VecAssemblyBegin and VecAssemblyEnd                                         |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyBegin.html        |
+|  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyEnd.html          |
++-----------------------------------------------------------------------------*/
+void c_petsc_assemble_vec_(Vec * v) {
+
+  /* Issue PETSc calls */
+  err = VecAssemblyBegin(*v);
+  err = VecAssemblyEnd(*v);
+}
+
+/*-----------------------------------------------------------------------------+
 |  VecGetValues                                                                |
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecGetValues.html            |
@@ -190,19 +160,6 @@ void c_petsc_vec_get_values_(Vec      * v,
 
   /* Issue PETSc call */
   err = VecGetValues(*v, *ni, row, value);
-}
-
-/*-----------------------------------------------------------------------------+
-|  VecAssemblyBegin and VecAssemblyEnd                                         |
-|                                                                              |
-|  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyBegin.html        |
-|  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyEnd.html          |
-+-----------------------------------------------------------------------------*/
-void c_petsc_assemble_vec_(Vec * v) {
-
-  /* Issue PETSc calls */
-  err = VecAssemblyBegin(*v);
-  err = VecAssemblyEnd(*v);
 }
 
 /*-----------------------------------------------------------------------------+
