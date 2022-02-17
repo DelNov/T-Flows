@@ -120,8 +120,8 @@
   !--------------------------!
   !   Create PETSc vectors   !
   !--------------------------!
-  call C_Petsc_Vec_Create_Seq(Pet % x, Pet % m_lower)
-  call C_Petsc_Vec_Create_Seq(Pet % b, Pet % m_lower)
+  call C_Petsc_Vec_Create_Mpi(Pet % x, Pet % m_lower, Pet % m_upper)
+  call C_Petsc_Vec_Create_Mpi(Pet % b, Pet % m_lower, Pet % m_upper)
 
   !-------------------------!
   !   Create PETSc solver   !
