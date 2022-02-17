@@ -105,8 +105,8 @@
   ! for entries in this processor (d_nnz), and other processors (o_nnz)
   allocate(Pet % d_nnz(Pet % m_lower))
   allocate(Pet % o_nnz(Pet % m_lower))
-  Pet % d_nnz(:) = 1  ! counts itself, hence set it to one
-  Pet % d_nnz(:) = 0  ! no cell is outside its processor, hence set it zero
+  Pet % d_nnz(:) = 0  ! counts itself, hence set it to one
+  Pet % o_nnz(:) = 0  ! no cell is outside its processor, hence set it zero
 
   ! Find number of nonzeros (nnz) in this processor and in other processors
   do i = 1, Pet % m_lower
