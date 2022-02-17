@@ -44,6 +44,9 @@
     type(PetscInt), allocatable :: col(:)    ! column indices
     type(PetscErrorCode)        :: err
 
+    ! Pointer to global cell (unknown) numbers
+    integer, pointer, dimension(:) :: cell_glo
+
     contains
       procedure :: Create_Petsc
       procedure :: Solve
@@ -65,6 +68,9 @@
 !==============================================================================!
 
   if(this_proc < 2) print *, '# Determining matrix topology.'
+
+  ! Take the address of global cell numbers
+  Pet % cell_glo => Grid % Comm % cell_glo
 
   !----------------------!
   !   Initialize PETSc   !
@@ -177,10 +183,10 @@
   do i = 1, Pet % m_lower
     do j = Sol % A % row(i), Sol % A % row(i+1)-1
       k = Sol % A % col(j)
-      call C_Petsc_Mat_Set_Value(Pet % A,           &  ! matrix
-                                 i-PETSC_ONE,       &  ! row
-                                 k-PETSC_ONE,       &  ! column
-                                 Sol % A % val(j))     ! value from orig. matrix
+      call C_Petsc_Mat_Set_Value(Pet % A,                &  ! matrix
+                                 Pet % cell_glo(i) - 1,  &  ! row
+                                 Pet % cell_glo(k) - 1,  &  ! column
+                                 Sol % A % val(j))          ! orig. matrix entry
     end do
   end do
 
