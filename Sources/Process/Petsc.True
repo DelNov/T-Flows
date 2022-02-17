@@ -71,13 +71,29 @@
   !----------------------!
   call C_Petsc_Initialize()
 
-  !-------------------------!
-  !   Set up PETSc matrix   !
-  !-------------------------!
+  !--------------------------!
+  !    Create PETSc matrix   !
+  !--------------------------!
+  call C_Petsc_Mat_Create(Pet % A)
+
+  !----------------------------!
+  !    Set PETSc matrix size   !
+  !----------------------------!
 
   ! Total number of unknowns and unknowns in this processor only
-  Pet % m_lower = Grid % n_cells - Grid % comm % n_buff_cells
   Pet % m_upper = Grid % comm % nc_tot
+  Pet % m_lower = Grid % n_cells - Grid % comm % n_buff_cells
+
+  call C_Petsc_Mat_Set_Sizes(Pet % A, Pet % m_lower, Pet % m_upper)
+
+  !---------------------------------------------------------!
+  !   Set PETSc matrix type (to MATSEQAIJ at this moment)   !
+  !---------------------------------------------------------!
+  call C_Petsc_Mat_Set_Type_To_Seq(Pet % A)
+
+  !-----------------------------------!
+  !   Pre-allocate the PETSc matrix   !
+  !-----------------------------------!
 
   ! Allocate memory for array with number of non-zero entries per row
   ! for entries in this processor (d_nnz), and other processors (o_nnz)
@@ -98,8 +114,9 @@
     end do
   end do
 
-  ! Create PETSc matrix
-  call C_Petsc_Mat_Create_Seq_Aij(Pet % A, Pet % m_lower, Pet % d_nnz)
+  call C_Petsc_Mat_Seq_Aij_Set_Preallocation(Pet % A,        &
+                                             Pet % m_lower,  &
+                                             Pet % d_nnz)
 
   !-----------------------------------------!
   !   Set column indices for PETSc matrix   !
