@@ -85,7 +85,6 @@ void c_petsc_mat_set_value_(Mat      * A,
                             PetscInt * col,
                             double   * value) {
 
-  /* Issue PETSc call */
   err = MatSetValue(*A, *row, *col, *value, INSERT_VALUES);
 }
 
@@ -97,10 +96,7 @@ void c_petsc_mat_set_value_(Mat      * A,
 +-----------------------------------------------------------------------------*/
 void c_petsc_assemble_mat_(Mat * A) {
 
-  /* Issue PETSc call */
   err = MatAssemblyBegin(*A, MAT_FINAL_ASSEMBLY);
-
-  /* Issue PETSc call */
   err = MatAssemblyEnd  (*A, MAT_FINAL_ASSEMBLY);
 }
 
@@ -117,7 +113,6 @@ void c_petsc_assemble_mat_(Mat * A) {
 +-----------------------------------------------------------------------------*/
 void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
 
-  /* Issue PETSc call */
   err = VecCreateMPI(MPI_COMM_WORLD, *m_lower, *m_upper, v);
 }
 
@@ -131,7 +126,6 @@ void c_petsc_vec_set_value_(Vec      * v,
                             PetscInt * row,
                             double   * value) {
 
-  /* Issue PETSc call */
   err = VecSetValue(*v, *row, *value, INSERT_VALUES);
 }
 
@@ -143,7 +137,6 @@ void c_petsc_vec_set_value_(Vec      * v,
 +-----------------------------------------------------------------------------*/
 void c_petsc_assemble_vec_(Vec * v) {
 
-  /* Issue PETSc calls */
   err = VecAssemblyBegin(*v);
   err = VecAssemblyEnd(*v);
 }
@@ -158,7 +151,6 @@ void c_petsc_vec_get_values_(Vec      * v,
                              PetscInt * row,
                              double   * value) {
 
-  /* Issue PETSc call */
   err = VecGetValues(*v, *ni, row, value);
 }
 
@@ -175,7 +167,6 @@ void c_petsc_vec_get_values_(Vec      * v,
 +-----------------------------------------------------------------------------*/
 void c_petsc_ksp_create_(KSP * ksp) {
 
-  /* Issue PETSc call */
   err = KSPCreate(MPI_COMM_WORLD, ksp);
 }
 
@@ -233,12 +224,7 @@ void c_petsc_ksp_set_tolerances_(KSP      * ksp,
                                  double   * atol,
                                  PetscInt * maxits) {
 
-  /* Issue PETSc call */
   err = KSPSetTolerances(*ksp, *rtol, *atol, 1.0e+3, *maxits);
-
-  /* Error trap */
-  if (err != 0) {printf("Failed in the call to KSPSetTolerances from C\n");
-                 exit(0);}
 }
 
 /*-----------------------------------------------------------------------------+
