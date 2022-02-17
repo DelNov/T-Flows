@@ -32,7 +32,7 @@ void c_petsc_initialize_() {
 +-----------------------------------------------------------------------------*/
 void c_petsc_mat_create_(Mat * A) {
 
-  err = MatCreate(PETSC_COMM_SELF, A);
+  err = MatCreate(MPI_COMM_WORLD, A);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -118,7 +118,7 @@ void c_petsc_assemble_mat_(Mat * A) {
 void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
 
   /* Issue PETSc call */
-  err = VecCreateMPI(PETSC_COMM_SELF, *m_lower, *m_upper, v);
+  err = VecCreateMPI(MPI_COMM_WORLD, *m_lower, *m_upper, v);
 }
 
 
@@ -176,7 +176,7 @@ void c_petsc_vec_get_values_(Vec      * v,
 void c_petsc_ksp_create_(KSP * ksp) {
 
   /* Issue PETSc call */
-  err = KSPCreate(PETSC_COMM_SELF, ksp);
+  err = KSPCreate(MPI_COMM_WORLD, ksp);
 }
 
 /*-----------------------------------------------------------------------------+
