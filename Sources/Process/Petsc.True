@@ -87,9 +87,9 @@
   call C_Petsc_Mat_Set_Sizes(Pet % A, Pet % m_lower, Pet % m_upper)
 
   !---------------------------------------------------------!
-  !   Set PETSc matrix type (to MATSEQAIJ at this moment)   !
+  !   Set PETSc matrix type to MATAIJ (and pray it works)   !
   !---------------------------------------------------------!
-  call C_Petsc_Mat_Set_Type_To_Seq(Pet % A)
+  call C_Petsc_Mat_Set_Type_To_Mat_Aij(Pet % A)
 
   !-----------------------------------!
   !   Pre-allocate the PETSc matrix   !
@@ -114,9 +114,12 @@
     end do
   end do
 
-  call C_Petsc_Mat_Seq_Aij_Set_Preallocation(Pet % A,        &
-                                             Pet % m_lower,  &
-                                             Pet % d_nnz)
+  ! This will call both MPI and Seq versions of preallocation
+  call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,        &
+                                         Pet % m_lower,  &
+                                         Pet % d_nnz,    &
+                                         Pet % m_upper,  &
+                                         Pet % o_nnz)
 
   !-----------------------------------------!
   !   Set column indices for PETSc matrix   !
