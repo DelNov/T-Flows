@@ -61,7 +61,7 @@
   type(Solver_Type)        :: Sol
   type(Grid_Type),  target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, s, j, nonzeros
+  integer :: i, j, k, nonzeros
 !==============================================================================!
 
   if(this_proc < 2) print *, '# Determining matrix topology.'
@@ -80,17 +80,22 @@
   Pet % m_upper = Grid % comm % nc_tot
 
   ! Allocate memory for array with number of non-zero entries per row
-  allocate(Pet % d_nnz(Grid % n_cells))
-  Pet % d_nnz(:) = 1
+  ! for entries in this processor (d_nnz), and other processors (o_nnz)
+  allocate(Pet % d_nnz(Pet % m_lower))
+  allocate(Pet % o_nnz(Pet % m_lower))
+  Pet % d_nnz(:) = 1  ! counts itself, hence set it to one
+  Pet % d_nnz(:) = 0  ! no cell is outside its processor, hence set it zero
 
-  ! Compute stencil widths
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 > 0) then
-      Pet % d_nnz(c1) = Pet % d_nnz(c1) + 1
-      Pet % d_nnz(c2) = Pet % d_nnz(c2) + 1
-    end if
+  ! Find number of nonzeros (nnz) in this processor and in other processors
+  do i = 1, Pet % m_lower
+    do j = Sol % A % row(i), Sol % A % row(i+1)-1
+      k = Sol % A % col(j)
+      if(Grid % Comm % cell_proc(k) .eq. this_proc) then
+        Pet % d_nnz(i) = Pet % d_nnz(i) + PETSC_ONE
+      else
+        Pet % o_nnz(i) = Pet % o_nnz(i) + PETSC_ONE
+      end if
+    end do
   end do
 
   ! Create PETSc matrix
