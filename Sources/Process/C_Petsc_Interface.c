@@ -26,6 +26,16 @@ void c_petsc_initialize_() {
 +-----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------+
+|  MatCreate                                                                   |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatCreate.html               |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_create_(Mat * A) {
+
+  err = MatCreate(PETSC_COMM_SELF, A);
+}
+
+/*-----------------------------------------------------------------------------+
 |  MatCreateSeqAIJ                                                             |
 +-----------------------------------------------------------------------------*/
 void c_petsc_mat_create_seq_aij_(Mat      * A,
@@ -41,6 +51,38 @@ void c_petsc_mat_create_seq_aij_(Mat      * A,
                         A);
 }
 
+/*-----------------------------------------------------------------------------+
+|  MatSetType (to MATSEQAIJ)                                                   |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html              |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_set_type_to_seq_(Mat * A) {
+
+  err = MatSetType(*A, MATSEQAIJ);
+}
+
+/*-----------------------------------------------------------------------------+
+|  MatSetType (to MATMPIAIJ)                                                   |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html              |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_set_type_to_mpi_(Mat * A) {
+
+  err = MatSetType(*A, MATMPIAIJ);
+}
+
+/*-----------------------------------------------------------------------------+
+|  MatSeqAIJSetPreallocation                                                   |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetPreallocation.html
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_seq_aij_set_preallocation_(Mat      * A,
+                                            PetscInt * m_lower,
+                                            PetscInt * d_nnz) {
+
+  err = MatSeqAIJSetPreallocation(*A, *m_lower, d_nnz);
+}
+
 
 /*-----------------------------------------------------------------------------+
 |  MatSeqAIJSetColumnIndices                                                   |
@@ -52,6 +94,16 @@ void c_petsc_mat_seq_aij_set_column_indices_(Mat      * A,
 
   /* Issue PETSc call */
   err = MatSeqAIJSetColumnIndices(*A, col);
+}
+
+/*-----------------------------------------------------------------------------+
+|  MatSetSizes                                                                 |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSetSizes.html             |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_set_sizes_(Mat * A, PetscInt * m_lower, PetscInt * m_upper) {
+
+  err = MatSetSizes(*A, *m_lower, *m_lower, *m_upper, *m_upper);
 }
 
 /*-----------------------------------------------------------------------------+
