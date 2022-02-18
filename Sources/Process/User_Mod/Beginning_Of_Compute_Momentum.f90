@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Nat,  &
+  subroutine User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
                                                     curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of Compute_Momentum function.     !
@@ -9,7 +9,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
@@ -24,6 +24,6 @@
   v    => Flow % u
   w    => Flow % u
   p    => Flow % p
-  M    => Nat % M
+  M    => Sol % Nat % M
 
   end subroutine

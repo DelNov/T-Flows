@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Nat,  &
+  subroutine User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Scalar function.             !
@@ -9,7 +9,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
   integer, intent(in)         :: sc       ! scalar index
@@ -23,6 +23,6 @@
   Grid => Flow % pnt_grid
   p    => Flow % p
   phi  => Flow % scalar(sc)
-  M    => Nat % M
+  M    => Sol % Nat % M
 
   end subroutine

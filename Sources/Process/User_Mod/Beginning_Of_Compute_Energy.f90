@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Nat,  &
+  subroutine User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol,  &
                                                   curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of Compute_Energy function.       !
@@ -9,7 +9,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
@@ -22,6 +22,6 @@
   Grid => Flow % pnt_grid
   t    => Flow % t
   p    => Flow % p
-  A    => Nat % A
+  A    => Sol % Nat % A
 
   end subroutine

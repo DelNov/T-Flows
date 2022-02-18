@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Nat,  &
+  subroutine User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol,  &
                                                     curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of Compute_Pressure function.     !
@@ -8,7 +8,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
@@ -23,7 +23,7 @@
   v    => Flow % u
   w    => Flow % u
   p    => Flow % p
-  A    => Nat % A
-  M    => Nat % M
+  A    => Sol % Nat % A
+  M    => Sol % Nat % M
 
   end subroutine
