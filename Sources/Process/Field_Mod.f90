@@ -155,9 +155,6 @@
     integer :: gauss_miter
     integer :: least_miter
 
-    ! Linear solvers; native or PETSc
-    integer :: solvers
-
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy
 

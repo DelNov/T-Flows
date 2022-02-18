@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(Flow, Vof, Nat, curr_dt, ini)
+  subroutine Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -34,13 +34,13 @@
   p      => Flow % p
   pp     => Flow % pp
   dt     =  Flow % dt
-  A      => Nat % A
-  M      => Nat % M
-  b      => Nat % b % val
+  A      => Sol % Nat % A
+  M      => Sol % Nat % M
+  b      => Sol % Nat % b % val
   call Flow % Alias_Momentum(u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, Nat, curr_dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -140,7 +140,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Nat, curr_dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Correct_Velocity')
 

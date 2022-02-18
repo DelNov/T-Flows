@@ -629,7 +629,7 @@ $(DIR_SHARED)/Work_Mod/*.f90
 $(DIR_OBJECT)/Numerics_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Petsc_Mod.o \
+$(DIR_OBJECT)/Solver_Mod.o \
 Numerics_Mod/*.f90 
 
 #-----------------------------------------------------
@@ -837,6 +837,15 @@ User_Mod/*.f90 \
 Backup_Mod_Seq.f90 \
 Backup_Mod_Par.f90 \
 Backup_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Solver_Mod.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Solver_Mod.o:\
+$(DIR_OBJECT)/Petsc_Mod.o \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Surf_Mod.f90
@@ -1198,6 +1207,9 @@ Var_Mod/*.f90 \
 $(DIR_OBJECT)/Petsc_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 Field_Mod/*/*.f90 \

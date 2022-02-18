@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(Flow, turb, Vof, Swarm, Nat)
+  subroutine Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !                                                                              !
@@ -27,7 +27,7 @@
   type(Turb_Type),  target :: turb
   type(Vof_Type)           :: Vof
   type(Swarm_Type)         :: Swarm
-  type(Native_Type)        :: Nat
+  type(Solver_Type)        :: Sol
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
@@ -363,7 +363,7 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Nat)
+  call User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 
   !--------------------------------!
   !      Calculate the inflow      !

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_T2(turb, Nat)
+  subroutine Turb_Mod_Src_T2(turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in t2 transport equation for k-eps_t2 model      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
 !---------------------------------[Calling]------------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
@@ -40,7 +40,7 @@
   call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Nat % Alias_Native        (A, b)
+  call Sol % Alias_Native        (A, b)
   call Turb_Mod_Alias_T2         (turb, t2)
 
   !-----------------------------------------!

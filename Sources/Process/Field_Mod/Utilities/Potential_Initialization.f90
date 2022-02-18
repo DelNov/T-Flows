@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Potential_Initialization(Flow, Nat, Pet)
+  subroutine Potential_Initialization(Flow, Sol)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -15,8 +15,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
-  type(Native_Type), target :: Nat
-  type(Petsc_Type),  target :: Pet
+  type(Solver_Type), target :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: phi, u, v, w
@@ -43,7 +42,7 @@
   phi  => Flow % pot
 
   call Flow % Alias_Momentum(u, v, w)
-  call Nat % Alias_Native(a, b)
+  call Sol % Alias_Native(A, b)
   allocate(store(Grid % n_cells)); store(:) = 0.0
 
   !--------------------------------------!
@@ -218,27 +217,18 @@
     ! Set number of iterations "by hand"
     phi % mniter  = 99
     phi % tol     =  1.0e-5
-    phi % precond = 'INCOMPLETE_CHOLESKY'
+    phi % precond = 'INCOMPLETE_CHOLESKY'  ! this string works for T-Flows only
 
     ! Call linear solver to solve the equations
-    if(Flow % solvers == NATIVE) then
-      call Nat % Cg(A,              &
-                    phi % n,        &
-                    b,              &
-                    phi % precond,  &
-                    phi % mniter,   &
-                    phi % eniter,   &
-                    phi % tol,      &
-                    phi % res)
-    else
-      call Pet % Solve(Nat,           &
-                       A,             &
-                       phi % n,       &
-                       b,             &
-                       phi % mniter,  &
-                       phi % eniter,  &
-                       phi % tol)
-    end if
+    call Sol % Run("CG", phi % precond,  &
+                   A,                    &
+                   phi % n,              &
+                   b,                    &
+                   phi % mniter,         &
+                   phi % eniter,         &
+                   phi % tol,            &
+                   phi % res)
+
     if(this_proc < 2) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res

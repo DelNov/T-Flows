@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_F22(turb, Nat, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_F22(turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type)           :: turb
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
@@ -42,7 +42,7 @@
   ! Take aliases
   Flow => turb % pnt_flow
   Grid => Flow % pnt_grid
-  call Nat % Alias_Native(A, b)
+  call Sol % Alias_Native(A, b)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -144,9 +144,9 @@
   !                                     !
   !-------------------------------------!
   if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, Nat)
+    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, Sol)
   else
-    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Nat)
+    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Sol)
   end if
 
   !---------------------------------!
@@ -158,15 +158,19 @@
   ! Underrelax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
+  call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
+
   ! Call linear solver to solve the equations
-  call Nat % BiCG(A,              &
-                  phi % n,        &
-                  b,              &
-                  phi % precond,  &
-                  phi % mniter,   &
-                  phi % eniter,   &
-                  phi % tol,      &
-                  phi % res)
+  call Sol % Run("BICG", phi % precond,  &
+                 A,                      &
+                 phi % n,                &
+                 b,                      &
+                 phi % mniter,           &
+                 phi % eniter,           &
+                 phi % tol,              &
+                 phi % res)
+
+  call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen
   if(turb % model .eq. K_EPS_ZETA_F) then

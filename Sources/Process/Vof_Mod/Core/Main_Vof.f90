@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Main_Vof(Vof, Flow, turb, Nat, curr_dt)
+  subroutine Main_Vof(Vof, Flow, turb, Sol, curr_dt)
 !------------------------------------------------------------------------------!
 !   Initialize inteface tracking simulations                                   !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
   class(Vof_Type),     target :: Vof
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
-  type(Native_Type)           :: Nat
+  type(Solver_Type)           :: Sol
   integer, intent(in)         :: curr_dt     ! time step
 !==============================================================================!
 
@@ -24,7 +24,7 @@
     !   Advance vof function (fun) and   !
     !    re-create its smooth variant    !
     !------------------------------------!
-    call Vof % Compute_Vof(Nat, Flow % dt, curr_dt)
+    call Vof % Compute_Vof(Sol, Flow % dt, curr_dt)
     call Vof % Smooth_For_Curvature_Csf()
 
     !------------------------------------------------!

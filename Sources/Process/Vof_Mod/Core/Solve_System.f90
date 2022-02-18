@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Solve_System(Vof, Nat, b)
+  subroutine Solve_System(Vof, Sol, b)
 !------------------------------------------------------------------------------!
 !   Solves linear system for VOF                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type),   target :: Vof
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
   real, contiguous,  target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),    pointer :: fun
@@ -18,20 +18,23 @@
   ! Take aliases
   fun  => Vof % fun
   flow => Vof % pnt_flow
-  A    => Nat % A
+  A    => Sol % Nat % A
 
   ! Get solver
   call Control_Mod_Solver_For_Vof(solver)
 
   call Cpu_Timer % Start('Linear_Solver_For_Vof')
-  call Nat % Bicg(A,              &
-                  fun % n,        &
-                  b,              &
-                  fun % precond,  &
-                  fun % mniter,   &      ! max number of iterations
-                  fun % eniter,   &      ! executed number of iterations
-                  fun % tol,      &
-                  fun % res)
+
+  ! Call linear solver to solve the equations
+  call Sol % Run("BICG", fun % precond,  &
+                 A,                      &
+                 fun % n,                &
+                 b,                      &
+                 fun % mniter,           &
+                 fun % eniter,           &
+                 fun % tol,              &
+                 fun % res)
+
   call Cpu_Timer % Stop('Linear_Solver_For_Vof')
 
   if(.not. flow % heat_transfer) then

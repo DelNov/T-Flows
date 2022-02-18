@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(Flow, turb, Vof, Nat, curr_dt, ini, sc)
+  subroutine Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for user defined scalar.                 !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
   integer, intent(in)         :: sc
@@ -55,10 +55,10 @@
   phi    => Flow % scalar(sc)
   dt     =  Flow % dt
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
-  call Nat % Alias_Native     (A, b)
+  call Sol % Alias_Native     (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Nat,  &
+  call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
@@ -217,16 +217,18 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, A, b)
 
-  ! Call linear solver to solve them
   call Cpu_Timer % Start('Linear_Solver_For_Scalars')
-  call Nat % Bicg(A,              &
-                  phi % n,        &
-                  b,              &
-                  phi % precond,  &
-                  phi % mniter,   &
-                  phi % eniter,   &
-                  phi % tol,      &
-                  phi % res)
+
+  ! Call linear solver to solve them
+  call Sol % Run("BICG", phi % precond,  &
+                 A,                      &
+                 phi % n,                &
+                 b,                      &
+                 phi % mniter,           &
+                 phi % eniter,           &
+                 phi % tol,              &
+                 phi % res)
+
   call Cpu_Timer % Stop('Linear_Solver_For_Scalars')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
@@ -238,7 +240,7 @@
   call Flow % Grad_Variable(phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Nat, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

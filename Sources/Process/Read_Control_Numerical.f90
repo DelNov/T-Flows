@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Read_Control_Numerical(Flow, turb, Vof)
+  subroutine Read_Control_Numerical(Flow, turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads details about numerical models from control file.                    !
 !------------------------------------------------------------------------------!
@@ -13,9 +13,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
-  type(Vof_Type),   target :: Vof
+  type(Field_Type),  target :: Flow
+  type(Turb_Type),   target :: turb
+  type(Vof_Type),    target :: Vof
+  type(Solver_Type), target :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi
@@ -30,7 +31,7 @@
   !   Linear solvers you want to use; native or PETSc   !
   !-----------------------------------------------------!
   call Control_Mod_Linear_Solvers(name, .true.)
-  Flow % solvers = Numerics_Mod_Linear_Solvers_Code(name)
+  Sol % solvers = Numerics_Mod_Linear_Solvers_Code(name)
 
   !------------------------------------------!
   !   Pressure velocity coupling algorithm   !

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Flow, turb, Vof, Nat, curr_dt, ini)
+  subroutine Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -91,11 +91,11 @@
   t      => Flow % t
   p      => Flow % p
   dt     =  Flow % dt
-  M      => Nat % M
-  b      => Nat % b % val
+  M      => Sol % Nat % M
+  b      => Sol % Nat % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Nat,  &
+  call User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
                                               curr_dt, ini)
 
   !-------------------------------------------------------!
@@ -341,7 +341,7 @@
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
-    call Compute_Momentum_Explicit(Flow, ui, Nat)
+    call Compute_Momentum_Explicit(Flow, ui, Sol)
 
     !-----------------------------------!
     !                                   !
@@ -360,15 +360,16 @@
       ! Call linear solver
       call Cpu_Timer % Start('Linear_Solver_For_Momentum')
 
-      call Nat % Bicg(M,             &
-                      ui % n,        &
-                      b,             &
-                      ui % precond,  &
-                      ui % mniter,   &
-                      ui % eniter,   &
-                      ui % tol,      &
-                      ui % res,      &
-                      norm = vel_max)
+      call Sol % Run("BICG", ui % precond,  &
+                     M,                     &
+                     ui % n,                &
+                     b,                     &
+                     ui % mniter,           &
+                     ui % eniter,           &
+                     ui % tol,              &
+                     ui % res,              &
+                     norm = vel_max)
+
       call Cpu_Timer % Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up
@@ -384,7 +385,7 @@
   call Grid % Exchange_Cells_Real(M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Nat, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 

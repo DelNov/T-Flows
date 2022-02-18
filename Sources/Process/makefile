@@ -231,6 +231,7 @@ SRC_F_MOD += Point_Mod.f90       \
              Vector_Mod.f90      \
              Native_Mod.f90      \
              Petsc_Mod.f90       \
+             Solver_Mod.f90      \
              Numerics_Mod.f90    \
              Field_Mod.f90       \
              Info_Mod.f90        \

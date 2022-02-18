@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Stress(turb, Nat, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_Stress(turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -25,7 +25,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
@@ -71,7 +71,7 @@
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Nat % Alias_Native         (A, b)
+  call Sol % Alias_Native         (A, b)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   phi % a(:) = 0.0
@@ -309,9 +309,9 @@
   if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Flow % Grad_Variable(f22)
 
-    call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, Nat, phi % name)
+    call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, Sol, phi % name)
   else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, Nat, phi % name)
+    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, Sol, phi % name)
   end if
 
   !---------------------------------!
@@ -323,16 +323,18 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
-  ! Call linear solver to solve the equations
   call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
-  call Nat % Bicg(A,              &
-                  phi % n,        &
-                  b,              &
-                  phi % precond,  &
-                  phi % mniter,   &
-                  phi % eniter,   &
-                  phi % tol,      &
-                  phi % res)
+
+  ! Call linear solver to solve the equations
+  call Sol % Run("BICG", phi % precond,  &
+                 A,                      &
+                 phi % n,                &
+                 b,                      &
+                 phi % mniter,           &
+                 phi % eniter,           &
+                 phi % tol,              &
+                 phi % res)
+
   call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen

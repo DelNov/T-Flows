@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(Flow, turb, Vof, Nat, curr_dt, ini)
+  subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -20,7 +20,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------! 
@@ -78,10 +78,10 @@
   dt     =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Nat % Alias_Native      (A, b)
+  call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Nat, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   t % a  (:) = 0.0
@@ -280,16 +280,18 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(t, A, b)
 
-  ! Call linear solver to solve the equations
   call Cpu_Timer % Start('Linear_Solver_For_Energy')
-  call Nat % Bicg(A,            &
-                  t % n,        &
-                  b,            &
-                  t % precond,  &
-                  t % mniter,   &
-                  t % eniter,   &
-                  t % tol,      &
-                  t % res)
+
+  ! Call linear solver to solve the equations
+  call Sol % Run("BICG", t % precond,  &
+                 A,                    &
+                 t % n,                &
+                 b,                    &
+                 t % mniter,           &
+                 t % eniter,           &
+                 t % tol,              &
+                 t % res)
+
   call Cpu_Timer % Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
@@ -306,7 +308,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Nat, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

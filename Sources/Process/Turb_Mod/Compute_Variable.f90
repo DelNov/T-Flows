@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Variable(turb, Nat, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
@@ -7,7 +7,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
@@ -47,7 +47,7 @@
   flux => Flow % v_flux % n
   dt   =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
-  call Nat % Alias_Native      (A, b)
+  call Sol % Alias_Native      (A, b)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   phi % a(:) = 0.0
@@ -192,27 +192,27 @@
   !                                     !
   !-------------------------------------!
   if(turb % model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, Nat)
-    if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, Nat)
+    if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, Sol)
+    if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, Sol)
     if(Flow % heat_transfer) then
-      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Nat)
+      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
     end if
   end if
 
   if(turb % model .eq. K_EPS_ZETA_F .or.  &
      turb % model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, Nat)
-    if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Nat)
+    if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, Sol)
+    if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
     if(phi % name .eq. 'ZETA')  &
-      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Nat, curr_dt)
+      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Sol, curr_dt)
     if(Flow % heat_transfer) then
-      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Nat)
+      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
     end if
   end if
 
   if(turb % model .eq. SPALART_ALLMARAS .or.  &
      turb % model .eq. DES_SPALART) then
-    call Turb_Mod_Src_Vis_Spalart_Almaras(turb, Nat)
+    call Turb_Mod_Src_Vis_Spalart_Almaras(turb, Sol)
   end if
 
   !---------------------------------!
@@ -224,16 +224,18 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, A, b)
 
-  ! Call linear solver to solve the equations
   call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
-  call Nat % Bicg(A,              &
-                  phi % n,        &
-                  b,              &
-                  phi % precond,  &
-                  phi % mniter,   &
-                  phi % eniter,   &
-                  phi % tol,      &
-                  phi % res)
+
+  ! Call linear solver to solve the equations
+  call Sol % Run("BICG", phi % precond,  &
+                 A,                      &
+                 phi % n,                &
+                 b,                      &
+                 phi % mniter,           &
+                 phi % eniter,           &
+                 phi % tol,              &
+                 phi % res)
+
   call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
 
   ! Avoid negative values for all computed turbulent quantities

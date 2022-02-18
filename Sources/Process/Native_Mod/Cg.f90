@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Cg_(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CG Method.            !
 !------------------------------------------------------------------------------!

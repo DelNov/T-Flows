@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Compute_Vof(Vof, Nat, dt, curr_dt)
+  subroutine Compute_Vof(Vof, Sol, dt, curr_dt)
 !------------------------------------------------------------------------------!
 !   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type),   target :: Vof
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
   real                      :: dt
   integer, intent(in)       :: curr_dt  ! current time step
 !-----------------------------------[Locals]-----------------------------------!
@@ -26,7 +26,7 @@
 
   call Cpu_Timer % Start('Compute_Vof (without solvers)')
 
-  call User_Mod_Beginning_Of_Compute_Vof(Vof, Nat, curr_dt)
+  call User_Mod_Beginning_Of_Compute_Vof(Vof, Sol, curr_dt)
 
   ! Take aliases
   Flow   => Vof % pnt_flow
@@ -36,8 +36,8 @@
   beta_f => Vof % beta_f
   beta_c => Vof % beta_c
   c_d    => Vof % c_d
-  A      => Nat % A
-  b      => Nat % b % val
+  A      => Sol % Nat % A
+  b      => Sol % Nat % b % val
 
   if(fun % adv_scheme .eq. CICSAM .or. &
      fun % adv_scheme .eq. STACS) then
@@ -75,7 +75,7 @@
     call Vof % Discretize(A, b, dt)
 
     ! Solve System
-    call Vof % Solve_System(Nat, b)
+    call Vof % Solve_System(Sol, b)
 
     call Grid % Exchange_Cells_Real(fun % n)
 
@@ -125,7 +125,7 @@
         call Vof % Discretize(A, b, dt / real(n_sub))
 
         ! Solve System
-        call Vof % Solve_System(Nat, b)
+        call Vof % Solve_System(Sol, b)
 
         do s = 1, Grid % n_faces
           c1 = Grid % faces_c(1,s)
@@ -252,7 +252,7 @@
 
   call Flow % Grad_Variable(fun)
 
-  call User_Mod_End_Of_Compute_Vof(Vof, Nat, curr_dt)
+  call User_Mod_End_Of_Compute_Vof(Vof, Sol, curr_dt)
 
   call Cpu_Timer % Stop('Compute_Vof (without solvers)')
 

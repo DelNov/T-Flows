@@ -11,8 +11,7 @@
 !    have them spread over included functions.)                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Native_Mod
-  use Petsc_Mod
+  use Solver_Mod
   use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -45,10 +44,6 @@
   ! Gradient computation algorithms
   integer, parameter :: LEAST_SQUARES = 40189
   integer, parameter :: GAUSS_THEOREM = 40193
-
-  ! Linear solvers, native or PETSc
-  integer, parameter :: NATIVE = 40213
-  integer, parameter :: PETSC  = 40231
 
   contains
 

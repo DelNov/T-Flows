@@ -32,9 +32,8 @@
     type(Vector_Type) :: b
 
     contains
-      procedure          :: Alias_Native
       procedure          :: Bicg                 ! bicg solver
-      procedure          :: Cg                   ! cg solver
+      procedure          :: Cg_                  ! cg solver
       procedure          :: Cgs                  ! cgs solver
       procedure          :: Create_Native
       procedure, private :: Normalized_Root_Mean_Square
@@ -47,7 +46,6 @@
 
   contains
 
-  include 'Native_Mod/Alias_Native.f90'
   include 'Native_Mod/Bicg.f90'
   include 'Native_Mod/Cg.f90'
   include 'Native_Mod/Cgs.f90'

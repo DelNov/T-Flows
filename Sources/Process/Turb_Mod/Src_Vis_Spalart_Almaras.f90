@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Vis_Spalart_Almaras(turb, Nat)
+  subroutine Turb_Mod_Src_Vis_Spalart_Almaras(turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -22,7 +22,7 @@
   Flow => turb % pnt_flow
   Grid => Flow % pnt_grid
   vis  => turb % vis
-  call Nat % Alias_Native(A, b)
+  call Sol % Alias_Native(A, b)
 
   if(turb % model .eq. SPALART_ALLMARAS) then
 
