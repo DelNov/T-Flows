@@ -70,7 +70,7 @@ ifeq ($(FORTRAN), gnu)
                  -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
                  -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
                  -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
-                 -Wcompare-reals -Wtarget-lifetime -Wpedantic -fstack-check
+                 -Wtarget-lifetime -Wpedantic -fstack-check
   else
     OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp
   endif
