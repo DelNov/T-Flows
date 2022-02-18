@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Potential_Initialization(Flow, Sol, Pet)
+  subroutine Potential_Initialization(Flow, Nat, Pet)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
   type(Petsc_Type),  target :: Pet
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -43,7 +43,7 @@
   phi  => Flow % pot
 
   call Flow % Alias_Momentum(u, v, w)
-  call Sol % Alias_Solver(a, b)
+  call Nat % Alias_Native(a, b)
   allocate(store(Grid % n_cells)); store(:) = 0.0
 
   !--------------------------------------!
@@ -222,7 +222,7 @@
 
     ! Call linear solver to solve the equations
     if(Flow % solvers == NATIVE) then
-      call Sol % Cg(A,              &
+      call Nat % Cg(A,              &
                     phi % n,        &
                     b,              &
                     phi % precond,  &
@@ -231,7 +231,7 @@
                     phi % tol,      &
                     phi % res)
     else
-      call Pet % Solve(Sol,           &
+      call Pet % Solve(Nat,           &
                        A,             &
                        phi % n,       &
                        b,             &

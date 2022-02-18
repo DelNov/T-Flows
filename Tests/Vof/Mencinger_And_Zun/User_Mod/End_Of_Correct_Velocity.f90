@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Nat, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
 !-----------------------------------[Locals]-----------------------------------!

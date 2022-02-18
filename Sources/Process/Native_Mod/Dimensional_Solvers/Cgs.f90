@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cgs(Sol, A, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Cgs(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a precond. CGS Method.           !
 !------------------------------------------------------------------------------!
@@ -28,11 +28,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type), target :: Sol
+  class(Native_Type), target :: Nat
   type(Matrix_Type)          :: A
-  real                       :: x(-Sol % pnt_grid % n_bnd_cells :  &
-                                   Sol % pnt_grid % n_cells)
-  real                       :: b( Sol % pnt_grid % n_cells)
+  real                       :: x(-Nat % pnt_grid % n_bnd_cells :  &
+                                   Nat % pnt_grid % n_cells)
+  real                       :: b( Nat % pnt_grid % n_cells)
   character(SL)              :: prec     ! preconditioner
   integer                    :: miter    ! maximum and actual ...
   integer                    :: niter    ! ... number of iterations
@@ -47,7 +47,7 @@
 !==============================================================================!
 
   ! Take some aliases
-  D => Sol % D
+  D => Nat % D
   nt = A % pnt_grid % n_cells
   ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
   nb = A % pnt_grid % n_bnd_cells
@@ -57,16 +57,16 @@
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Sol % Prec_Form(ni, A, D, prec)
+  call Nat % Prec_Form(ni, A, D, prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
   if(.not. present(norm)) then
-    bnrm2 = Sol % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
+    bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
   else
-    bnrm2 = Sol % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
+    bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
   end if
 
   if(bnrm2 < tol) then
@@ -77,12 +77,12 @@
   !-----------------!
   !   r1 = b - Ax   !
   !-----------------!
-  call Sol % Residual_Vector(ni, r1(1:nt), b(1:nt), A, x(1:nt))
+  call Nat % Residual_Vector(ni, r1(1:nt), b(1:nt), A, x(1:nt))
 
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
 
   if(res < tol) then
     iter=0
@@ -119,7 +119,7 @@
     !---------------------!
     !   Solve M p2 = u2   !
     !---------------------!
-    call Sol % Prec_Solve(ni, A, D, p2(1:nt), u2(1:nt), prec)
+    call Nat % Prec_Solve(ni, A, D, p2(1:nt), u2(1:nt), prec)
 
     !--------------!
     !   v2 = Ap2   !
@@ -150,7 +150,7 @@
     !   solve Mp1 = u1 + q1   !
     !-------------------------!
     u1_plus_q1(1:ni) = u1(1:ni) + q1(1:ni)
-    call Sol % Prec_Solve(ni, A, D, p1(1:nt), u1_plus_q1(1:nt), prec)
+    call Nat % Prec_Solve(ni, A, D, p1(1:nt), u1_plus_q1(1:nt), prec)
 
     !---------------------!
     !   x = x + alfa p1   !
@@ -178,9 +178,9 @@
     !   Check convergence   !
     !-----------------------!
     if(.not. present(norm)) then
-      res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+      res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
     else
-      res = Sol % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
+      res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
     end if
 
     if(res < tol) goto 1

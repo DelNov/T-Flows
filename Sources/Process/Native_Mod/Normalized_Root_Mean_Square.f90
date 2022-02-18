@@ -1,12 +1,12 @@
 !==============================================================================!
-  real function Normalized_Root_Mean_Square(Solver, ni, r, a, x, norm)
+  real function Normalized_Root_Mean_Square(Native, ni, r, a, x, norm)
 !------------------------------------------------------------------------------!
 !   Calculates root means square of vector r, normalizing it with entries      !
 !   in the system matrix (a), values of unknown (x) and optional norm.         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type) :: Solver
+  class(Native_Type) :: Native
   integer            :: ni
   real               :: r(:)  ! this may be only in inner cells
   type(Matrix_Type)  :: A

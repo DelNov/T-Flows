@@ -1,7 +1,7 @@
 !include '../User_Mod/Pv_Sat.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Nat)
 !------------------------------------------------------------------------------!
 !   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: t, scalar

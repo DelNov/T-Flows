@@ -6,7 +6,7 @@ include '../User_Mod/Intersection_Line_Face.f90'
 include '../User_Mod/Interpolate_From_Nodes.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Nat)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
@@ -16,7 +16,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun

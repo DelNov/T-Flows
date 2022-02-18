@@ -3,7 +3,7 @@ include '../User_Mod/Vof_Initialization_Box.f90'
 include '../User_Mod/Vof_Interface_Box.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Nat)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun, t
@@ -63,7 +63,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
   ! if(Vof % track_front) then
   !   call Vof % Surf % Allocate(Flow)
   !   call Vof % Surf % Place_At_Var_Value(Vof % fun,    &
-  !                                        Sol,          &
+  !                                        Nat,          &
   !                                        0.5,          &
   !                                       .false.)  ! don't print messages
   !   call Vof % Surf % Calculate_Curvatures_From_Elems()

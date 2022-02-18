@@ -1,5 +1,5 @@
 !==============================================================================!
-  module Solver_Mod
+  module Native_Mod
 !------------------------------------------------------------------------------!
 !   Module used for native linear solvers.                                     !
 !------------------------------------------------------------------------------!
@@ -11,10 +11,10 @@
   implicit none
 !==============================================================================!
 
-  !------------------!
-  !   Solvers type   !
-  !------------------!
-  type Solver_Type
+  !-----------------!
+  !   Native type   !
+  !-----------------!
+  type Native_Type
 
     type(Grid_Type), pointer :: pnt_grid
 
@@ -32,11 +32,11 @@
     type(Vector_Type) :: b
 
     contains
-      procedure          :: Alias_Solver
+      procedure          :: Alias_Native
       procedure          :: Bicg                 ! bicg solver
       procedure          :: Cg                   ! cg solver
       procedure          :: Cgs                  ! cgs solver
-      procedure          :: Create_Solver
+      procedure          :: Create_Native
       procedure, private :: Normalized_Root_Mean_Square
       procedure, private :: Prec_Form
       procedure, private :: Prec_Solve
@@ -47,15 +47,15 @@
 
   contains
 
-  include 'Solver_Mod/Alias_Solver.f90'
-  include 'Solver_Mod/Bicg.f90'
-  include 'Solver_Mod/Cg.f90'
-  include 'Solver_Mod/Cgs.f90'
-  include 'Solver_Mod/Create_Solver.f90'
-  include 'Solver_Mod/Normalized_Root_Mean_Square.f90'
-  include 'Solver_Mod/Prec_Form.f90'
-  include 'Solver_Mod/Prec_Solve.f90'
-  include 'Solver_Mod/Residual_Vector.f90'
-  include 'Solver_Mod/Root_Mean_Square.f90'
+  include 'Native_Mod/Alias_Native.f90'
+  include 'Native_Mod/Bicg.f90'
+  include 'Native_Mod/Cg.f90'
+  include 'Native_Mod/Cgs.f90'
+  include 'Native_Mod/Create_Native.f90'
+  include 'Native_Mod/Normalized_Root_Mean_Square.f90'
+  include 'Native_Mod/Prec_Form.f90'
+  include 'Native_Mod/Prec_Solve.f90'
+  include 'Native_Mod/Residual_Vector.f90'
+  include 'Native_Mod/Root_Mean_Square.f90'
 
   end module 

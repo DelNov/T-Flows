@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Vof(Vof, Sol, curr_dt)
+  subroutine User_Mod_End_Of_Compute_Vof(Vof, Nat, curr_dt)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Vof function.                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Native_Type),   target :: Nat
   integer, intent(in)         :: curr_dt  ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid

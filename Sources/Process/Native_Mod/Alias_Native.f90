@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Alias_Solver(Sol, A, b)
+  subroutine Alias_Native(Nat, A, b)
 !------------------------------------------------------------------------------!
 !   Create alias for system matrix and right hand side.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type), target  :: Sol
+  class(Native_Type), target  :: Nat
   type(Matrix_Type),  pointer :: A
   real,               pointer :: b(:)
 !==============================================================================!
 
-  A => Sol % A
-  b => Sol % b % val
+  A => Nat % A
+  b => Nat % b % val
 
   end subroutine

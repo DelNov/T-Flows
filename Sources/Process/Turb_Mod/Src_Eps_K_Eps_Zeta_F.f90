@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
+  subroutine Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Nat)
 !------------------------------------------------------------------------------!
 !   Calculates source terms in equation of dissipation of turbulent energy     !
 !   and imposes boundary condition                                             !
@@ -7,7 +7,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
   real :: Tau_Wall_Low_Re
@@ -58,7 +58,7 @@
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
   call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Sol % Alias_Solver         (A, b)
+  call Nat % Alias_Native         (A, b)
 
   call Time_And_Length_Scale(Grid, turb)
 

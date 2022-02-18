@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(Flow, turb, Vof, Nat, curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for user defined scalar.                 !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Native_Type),   target :: Nat
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
   integer, intent(in)         :: sc
@@ -55,10 +55,10 @@
   phi    => Flow % scalar(sc)
   dt     =  Flow % dt
   call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
-  call Sol % Alias_Solver     (A, b)
+  call Nat % Alias_Native     (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Nat,  &
                                             curr_dt, ini, sc)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
@@ -219,7 +219,7 @@
 
   ! Call linear solver to solve them
   call Cpu_Timer % Start('Linear_Solver_For_Scalars')
-  call Sol % Bicg(A,              &
+  call Nat % Bicg(A,              &
                   phi % n,        &
                   b,              &
                   phi % precond,  &
@@ -238,7 +238,7 @@
   call Flow % Grad_Variable(phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Nat, curr_dt, ini, sc)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

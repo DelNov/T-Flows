@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Kin_K_Eps(turb, Sol)
+  subroutine Turb_Mod_Src_Kin_K_Eps(turb, Nat)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation for k-epsilon model    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
   real :: Tau_Wall_Low_Re
@@ -48,7 +48,7 @@
   call Flow % Alias_Energy  (t)
   call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
   call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Sol % Alias_Solver        (A, b)
+  call Nat % Alias_Native        (A, b)
   call Turb_Mod_Alias_T2         (turb, t2)
 
   !-----------------------------------------!

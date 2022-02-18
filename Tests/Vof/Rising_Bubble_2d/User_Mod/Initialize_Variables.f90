@@ -13,7 +13,7 @@ include '../User_Mod/Vof_Area_Square_Circle.f90'
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Solver_Type), target :: sol
+  type(Native_Type), target :: sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun

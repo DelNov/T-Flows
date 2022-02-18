@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Eps_K_Eps(turb, Sol)
+  subroutine Turb_Mod_Src_Eps_K_Eps(turb, Nat)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in the eps transport equation,                   !
 !   wall shear stress (wall function approuch)                                 !
@@ -14,7 +14,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !---------------------------------[Calling]------------------------------------!
   real :: Roughness_Coefficient
   real :: Tau_Wall_Low_Re
@@ -50,7 +50,7 @@
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
-  call Sol % Alias_Solver      (A, b)
+  call Nat % Alias_Native      (A, b)
 
   do c = 1, Grid % n_cells
     kin_vis =  Flow % viscosity(c) / Flow % density(c)

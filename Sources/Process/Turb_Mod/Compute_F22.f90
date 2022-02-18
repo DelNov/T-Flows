@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_F22(turb, Sol, curr_dt, ini, phi)
+  subroutine Turb_Mod_Compute_F22(turb, Nat, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type)           :: turb
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
@@ -42,7 +42,7 @@
   ! Take aliases
   Flow => turb % pnt_flow
   Grid => Flow % pnt_grid
-  call Sol % Alias_Solver(A, b)
+  call Nat % Alias_Native(A, b)
 
   ! Initialize matrix and right hand side
   A % val(:) = 0.0
@@ -144,9 +144,9 @@
   !                                     !
   !-------------------------------------!
   if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, Sol)
+    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, Nat)
   else
-    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Sol)
+    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Nat)
   end if
 
   !---------------------------------!
@@ -159,7 +159,7 @@
   call Numerics_Mod_Under_Relax(phi, a, b)
 
   ! Call linear solver to solve the equations
-  call Sol % BiCG(A,              &
+  call Nat % BiCG(A,              &
                   phi % n,        &
                   b,              &
                   phi % precond,  &

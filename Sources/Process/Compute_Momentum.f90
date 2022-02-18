@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Momentum(Flow, turb, Vof, Nat, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Native_Type),   target :: Nat
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -91,11 +91,11 @@
   t      => Flow % t
   p      => Flow % p
   dt     =  Flow % dt
-  M      => Sol % M
-  b      => Sol % b % val
+  M      => Nat % M
+  b      => Nat % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Nat,  &
                                               curr_dt, ini)
 
   !-------------------------------------------------------!
@@ -341,7 +341,7 @@
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
-    call Compute_Momentum_Explicit(Flow, ui, Sol)
+    call Compute_Momentum_Explicit(Flow, ui, Nat)
 
     !-----------------------------------!
     !                                   !
@@ -360,7 +360,7 @@
       ! Call linear solver
       call Cpu_Timer % Start('Linear_Solver_For_Momentum')
 
-      call Sol % Bicg(M,             &
+      call Nat % Bicg(M,             &
                       ui % n,        &
                       b,             &
                       ui % precond,  &
@@ -384,7 +384,7 @@
   call Grid % Exchange_Cells_Real(M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Nat, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 

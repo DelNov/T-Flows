@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Flow, Vof, Sol, Pet, curr_dt, ini)
+  subroutine Compute_Pressure(Flow, Vof, Nat, Pet, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Native_Type),   target :: Nat
   type(Petsc_Type),    target :: Pet
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
@@ -61,13 +61,13 @@
   p      => Flow % p
   pp     => Flow % pp
   dt     =  Flow % dt
-  A      => Sol % A
-  M      => Sol % M
-  b      => Sol % b % val
+  A      => Nat % A
+  M      => Nat % M
+  b      => Nat % b % val
   call Flow % Alias_Momentum(u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Nat, curr_dt, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -111,7 +111,7 @@
   !   Compute volume fluxes at internal   !
   !    faces with Rhie and Chow method    !
   !---------------------------------------!
-  call Rhie_And_Chow(Flow, Vof, Sol)
+  call Rhie_And_Chow(Flow, Vof, Nat)
 
   !------------------------------------------!
   !   Update fluxes at boundaries and fill   !
@@ -199,7 +199,7 @@
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
 
   if(Flow % solvers == NATIVE) then
-    call Sol % Cg(A,             &
+    call Nat % Cg(A,             &
                   pp % n,        &
                   b,             &
                   pp % precond,  &
@@ -209,7 +209,7 @@
                   pp % res,      &
                   norm = p_nor)         ! number for normalisation
   else
-    call Pet % Solve(Sol,          &
+    call Pet % Solve(Nat,          &
                      A,            &
                      pp % n,       &
                      b,            &
@@ -251,7 +251,7 @@
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Nat, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Pressure (without solvers)')
 

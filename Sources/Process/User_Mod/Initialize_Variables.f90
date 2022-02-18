@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Nat)
 !------------------------------------------------------------------------------!
 !   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi

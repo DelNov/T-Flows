@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Energy(Flow, turb, Vof, Nat, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -20,7 +20,7 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: turb
   type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Native_Type),   target :: Nat
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------! 
@@ -78,10 +78,10 @@
   dt     =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Sol % Alias_Solver      (A, b)
+  call Nat % Alias_Native      (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Nat, curr_dt, ini)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   t % a  (:) = 0.0
@@ -282,7 +282,7 @@
 
   ! Call linear solver to solve the equations
   call Cpu_Timer % Start('Linear_Solver_For_Energy')
-  call Sol % Bicg(A,            &
+  call Nat % Bicg(A,            &
                   t % n,        &
                   b,            &
                   t % precond,  &
@@ -306,7 +306,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Nat, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

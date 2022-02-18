@@ -38,9 +38,9 @@
     integer, allocatable :: cell_proc(:)
 
     ! Global cell and node numbers
-    integer, allocatable :: cell_glo(:)
-    integer, allocatable :: node_glo(:)
-    integer, allocatable :: face_glo(:)
+    integer, contiguous, pointer :: cell_glo(:)
+    integer, contiguous, pointer :: node_glo(:)
+    integer, contiguous, pointer :: face_glo(:)
 
     ! Single precision coud not be avoided here :-(
     integer, allocatable :: cell_map(:)

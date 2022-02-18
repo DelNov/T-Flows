@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Rhie_And_Chow(Flow, Vof, Sol)
+  subroutine Rhie_And_Chow(Flow, Vof, Nat)
 !------------------------------------------------------------------------------!
 !   Computes face velocitites with Rhie and Chow interpolation method          !
 !------------------------------------------------------------------------------!
@@ -40,7 +40,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, p
@@ -60,8 +60,8 @@
   p      => Flow % p
   v_flux => Flow % v_flux
   col    => Vof % fun
-  A      => Sol % A
-  M      => Sol % M
+  A      => Nat % A
+  M      => Nat % M
   sigma  =  Vof % surface_tension
   call Flow % Alias_Momentum(u, v, w)
 

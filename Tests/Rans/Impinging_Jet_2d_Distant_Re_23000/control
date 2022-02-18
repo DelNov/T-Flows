@@ -49,6 +49,7 @@
 #----------------------
 # Numerical parameters
 #----------------------
+ LINEAR_SOLVERS                petsc
  PRESSURE_MOMENTUM_COUPLING    simple
 
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM      0.4

@@ -14,7 +14,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Iso_C_Binding
-  use Solver_Mod
+  use Native_Mod
   use PetscVec,   only: tVec
   use PetscMat,   only: tMat
   use PetscKSP,   only: tKSP, tPC
@@ -55,7 +55,7 @@
   contains
 
 !==============================================================================!
-  subroutine Create_Petsc(Pet, Sol, Grid)
+  subroutine Create_Petsc(Pet, Nat, Grid)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
 !for debug:  use Work_Mod, only: pet_glo => r_cell_01
@@ -63,7 +63,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)        :: Pet
-  type(Solver_Type)        :: Sol
+  type(Native_Type)        :: Nat
   type(Grid_Type),  target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, j, k, start
@@ -147,8 +147,8 @@
 
   ! Find number of nonzeros (nnz) in this processor and in other processors
   do i = 1, Pet % m_lower
-    do j = Sol % A % row(i), Sol % A % row(i+1)-1
-      k = Sol % A % col(j)
+    do j = Nat % A % row(i), Nat % A % row(i+1)-1
+      k = Nat % A % col(j)
       if(Grid % Comm % cell_proc(k) .eq. this_proc) then
         Pet % d_nnz(i) = Pet % d_nnz(i) + 1
       else
@@ -178,16 +178,16 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve(Pet, Sol, A, x, b, miter, niter, tol)
+  subroutine Solve(Pet, Nat, A, x, b, miter, niter, tol)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
-  type(Solver_Type)    :: Sol
+  type(Native_Type)    :: Nat
   type(Matrix_Type)    :: A
-  real                 :: x(-Sol % pnt_grid % n_bnd_cells :  &
-                             Sol % pnt_grid % n_cells)
-  real                 :: b( Sol % pnt_grid % n_cells)
+  real                 :: x(-Nat % pnt_grid % n_bnd_cells :  &
+                             Nat % pnt_grid % n_cells)
+  real                 :: b( Nat % pnt_grid % n_cells)
   integer, intent(in)  :: miter
   integer, intent(out) :: niter
   real,    intent(in)  :: tol
@@ -202,12 +202,12 @@
   !   Fill up PETSc matrix with values from original matrix   !
   !-----------------------------------------------------------!
   do i = 1, Pet % m_lower
-    do j = Sol % A % row(i), Sol % A % row(i+1)-1
-      k = Sol % A % col(j)
+    do j = Nat % A % row(i), Nat % A % row(i+1)-1
+      k = Nat % A % col(j)
       call C_Petsc_Mat_Set_Value(Pet % A,           &  ! matrix
                                  Pet % glo(i),      &  ! row
                                  Pet % glo(k),      &  ! column
-                                 Sol % A % val(j))     ! orig. matrix entry
+                                 Nat % A % val(j))     ! orig. matrix entry
     end do
   end do
 

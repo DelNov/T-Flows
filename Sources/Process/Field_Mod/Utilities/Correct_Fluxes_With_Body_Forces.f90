@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Fluxes_With_Body_Forces(Flow, Sol)
+  subroutine Correct_Fluxes_With_Body_Forces(Flow, Nat)
 !------------------------------------------------------------------------------!
 !   Calculates body forces (Only due to buoyancy for the time being)           !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: t
@@ -23,8 +23,8 @@
   ! Take aliases
   Grid => Flow % pnt_grid
   t    => Flow % t
-  M    => Sol % M
-  b    => Sol % b % val
+  M    => Nat % M
+  b    => Nat % b % val
 
   !-------------------------------!
   !   For Boussinesq hypothesis   !

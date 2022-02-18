@@ -4,14 +4,14 @@
 !   This is a fake PETSc module, when code is compiled without it.             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Solver_Mod
+  use Native_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
-  !------------------!
-  !   Solvers type   !
-  !------------------!
+  !----------------!
+  !   Petsc type   !
+  !----------------!
   type Petsc_Type
 
     contains
@@ -23,12 +23,12 @@
   contains
 
 !==============================================================================!
-  subroutine Create_Petsc(Pet, Sol, Grid)
+  subroutine Create_Petsc(Pet, Nat, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)        :: Pet
-  type(Solver_Type)        :: Sol
+  type(Native_Type)        :: Nat
   type(Grid_Type),  target :: Grid
 !==============================================================================!
 
@@ -42,16 +42,16 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve(Pet, Sol, A, x, b, miter, niter, tol)
+  subroutine Solve(Pet, Nat, A, x, b, miter, niter, tol)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
-  type(Solver_Type)    :: Sol
+  type(Native_Type)    :: Nat
   type(Matrix_Type)    :: A
-  real                 :: x(-Sol % pnt_grid % n_bnd_cells :  &
-                             Sol % pnt_grid % n_cells)
-  real                 :: b( Sol % pnt_grid % n_cells)
+  real                 :: x(-Nat % pnt_grid % n_bnd_cells :  &
+                             Nat % pnt_grid % n_cells)
+  real                 :: b( Nat % pnt_grid % n_cells)
   integer, intent(in)  :: miter
   integer, intent(out) :: niter
   real,    intent(in)  :: tol

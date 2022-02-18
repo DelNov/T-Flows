@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Residual_Vector(Solver, ni, r, b, A, x)
+  subroutine Residual_Vector(Native, ni, r, b, A, x)
 !------------------------------------------------------------------------------!
 !   Calculates residual vector {r} = {b} - [A]{x}                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type) :: Solver
+  class(Native_Type) :: Native
   integer            :: ni
   real               :: r(:)  ! this might be only for inner cells
   real               :: b(:)  ! this might be only for inner cells

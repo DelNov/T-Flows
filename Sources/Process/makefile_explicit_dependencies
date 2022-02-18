@@ -451,9 +451,9 @@ Particle_Mod/*.f90
 # Dependencies for: ./Petsc_Mod.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Petsc_Mod.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*/*.f90 \
-Solver_Mod/*.f90 
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Correct_Velocity.f90
@@ -540,15 +540,95 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 
 
 #-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Prec_Form.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Create_Native.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Root_Mean_Square.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Residual_Vector.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Normalized_Solvers/Bicg.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Bicg.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Normalized_Solvers/Cgs.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Cgs.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Normalized_Solvers/Cg.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Cg.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Bicg.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Bicg.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Cgs.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Cgs.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Alias_Native.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Prec_Solve.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Cg.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Cg.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Normalized_Root_Mean_Square.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Dimensional_Solvers/Bicg.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Bicg.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Dimensional_Solvers/Cgs.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Cgs.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Dimensional_Solvers/Cg.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Cg.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#-----------------------------------------------------
 # Dependencies for: ./Numerics_Mod.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Numerics_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*/*.f90 \
-Solver_Mod/*.f90 \
-Petsc_Mod.f90 \
 $(DIR_OBJECT)/Petsc_Mod.o \
 Numerics_Mod/*.f90 
 
@@ -759,21 +839,6 @@ Backup_Mod_Par.f90 \
 Backup_Mod/*.f90 
 
 #-----------------------------------------------------
-# Dependencies for: ./Solver_Mod.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Solver_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Vector_Mod.o \
-Vector_Mod/*.f90 \
-Solver_Mod/*/*.f90 \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 
-
-#-----------------------------------------------------
 # Dependencies for: ./Surf_Mod.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Surf_Mod.o:\
@@ -972,6 +1037,21 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 
 
 #-----------------------------------------------------
+# Dependencies for: ./Native_Mod.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Native_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Vector_Mod.o \
+Vector_Mod/*.f90 \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 \
+$(DIR_OBJECT)/Matrix_Mod.o \
+Matrix_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 
+
+#-----------------------------------------------------
 # Dependencies for: ./Update_Boundary_Values.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Update_Boundary_Values.o:\
@@ -1115,9 +1195,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*/*.f90 \
-Solver_Mod/*.f90 \
+$(DIR_OBJECT)/Petsc_Mod.o \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -1253,90 +1331,6 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Prec_Form.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Root_Mean_Square.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Residual_Vector.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Alias_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Normalized_Solvers/Bicg.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Bicg.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Normalized_Solvers/Cgs.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Cgs.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Normalized_Solvers/Cg.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Cg.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Create_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Bicg.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Bicg.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Cgs.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Cgs.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Prec_Solve.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Cg.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Cg.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Normalized_Root_Mean_Square.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Dimensional_Solvers/Bicg.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Bicg.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Dimensional_Solvers/Cgs.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Cgs.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
-# Dependencies for: ./Solver_Mod/Dimensional_Solvers/Cg.f90
-#-----------------------------------------------------
-$(DIR_OBJECT)/Cg.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 
-
-#-----------------------------------------------------
 # Dependencies for: ./Balance_Volume.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Balance_Volume.o:\
@@ -1387,7 +1381,6 @@ $(DIR_OBJECT)/Const_Mod.o
 #-----------------------------------------------------
 # Dependencies for: ./Point_Mod/Find_Nearest_Node.f90
 #-----------------------------------------------------
-
 #-----------------------------------------------------
 # Dependencies for: ./Results_Mod.f90
 #-----------------------------------------------------

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Solve(Solver, ni, a, d, x, b, prec)
+  subroutine Prec_Solve(Native, ni, a, d, x, b, prec)
 !------------------------------------------------------------------------------!
 !   Solves the preconditioning system [d]{x}={b}                               !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type) :: Solver
+  class(Native_Type) :: Native
   integer            :: ni
   type(Matrix_Type)  :: A
   type(Matrix_Type)  :: D

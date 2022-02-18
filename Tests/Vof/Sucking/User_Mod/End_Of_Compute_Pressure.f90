@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Nat, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Pressure function.           !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Native_Type),   target :: Nat
   integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!

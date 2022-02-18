@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Sol)
+  subroutine Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Nat)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation  equation                     !
 !   for vi2 and imposing  boundary condition for f22                           !
@@ -7,7 +7,7 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   type(Turb_Type),   target :: turb
-  type(Solver_Type), target :: Sol
+  type(Native_Type), target :: Nat
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -43,7 +43,7 @@
   Flow => turb % pnt_flow
   Grid => Flow % pnt_grid
   call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Sol % Alias_Solver         (A, b)
+  call Nat % Alias_Native         (A, b)
 
   call Time_And_Length_Scale(Grid, turb)
 

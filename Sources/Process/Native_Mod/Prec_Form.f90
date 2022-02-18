@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Prec_Form(Solver, ni, a, d, prec)
+  subroutine Prec_Form(Native, ni, a, d, prec)
 !------------------------------------------------------------------------------!
 !   Forms preconditioning matrix "d" from provided matrix "a".                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type) :: Solver
+  class(Native_Type) :: Native
   integer            :: ni
   type(Matrix_Type)  :: A
   type(Matrix_Type)  :: D
