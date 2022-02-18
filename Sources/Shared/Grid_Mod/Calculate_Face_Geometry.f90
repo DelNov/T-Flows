@@ -123,8 +123,8 @@
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
   if(this_proc < 2 .and. Grid % n_shadows > 0) then
-    print '(a,f9.3)', '# Minimum corrected distance at shadows:   ', min_d
-    print '(a,f9.3)', '# Maximum corrected distance at shadows:   ', max_d
+    print '(a,f9.3)', ' # Minimum corrected distance at shadows:   ', min_d
+    print '(a,f9.3)', ' # Maximum corrected distance at shadows:   ', max_d
   end if
 
   !---------------------------------------------------!
