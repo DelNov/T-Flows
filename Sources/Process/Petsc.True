@@ -22,8 +22,6 @@
   implicit none
 !==============================================================================!
 
-  type(PetscInt) :: PETSC_ONE = 1  ! one
-
   !------------------!
   !   Solvers type   !
   !------------------!
@@ -45,7 +43,7 @@
     type(PetscErrorCode)        :: err
 
     ! Pointer to global cell (unknown) numbers
-    integer, pointer, dimension(:) :: cell_glo
+    integer, allocatable :: glo(:)  ! global cell numbering for PETSc
 
     contains
       procedure :: Create_Petsc
@@ -58,19 +56,63 @@
 !==============================================================================!
   subroutine Create_Petsc(Pet, Sol, Grid)
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+!for debug:  use Work_Mod, only: pet_glo => r_cell_01
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)        :: Pet
   type(Solver_Type)        :: Sol
   type(Grid_Type),  target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, k, nonzeros
+  integer              :: i, j, k, row_f, row_l
+  integer, allocatable :: all_lower_ms(:)
 !==============================================================================!
 
-  if(this_proc < 2) print *, '# Determining matrix topology.'
+  if(this_proc < 2) print *, '# Initializing PETSc.'
 
-  ! Take the address of global cell numbers
-  Pet % cell_glo => Grid % Comm % cell_glo
+  ! Total number of unknowns and unknowns in this processor only
+  Pet % m_upper = Grid % comm % nc_tot
+  Pet % m_lower = Grid % n_cells - Grid % comm % n_buff_cells
+
+  !----------------------------------------+
+  !    Create global numbering for PETSc   !
+  !----------------------------------------+------------------!
+  !    This one has little to do with global numbering from   !
+  !    T-Flows and is unique for each number of processors    !
+  !-----------------------------------------------------------!
+  row_f = 1              ! first row
+  row_l = Pet % m_lower  ! last row
+  if(n_proc > 1) then
+    allocate(all_lower_ms(n_proc));  ! allocate array for all m_lowers
+    all_lower_ms(:) = 0              ! important to initialize to zero
+
+    ! Distribute m_lowers among all processors
+    all_lower_ms(this_proc) = Pet % m_lower
+    call Comm_Mod_Global_Sum_Int_Array(n_proc, all_lower_ms)
+
+    row_l = sum(all_lower_ms(1:this_proc))
+    row_f = row_l - Pet % m_lower + 1
+
+    ! Dimensions must spread from all boundary cells through all ...
+    ! ... buffers cells to successfully use Grid % Exchange_Cells_Int
+    allocate(Pet % glo(-Grid % n_bnd_cells:Grid % n_cells))
+    Pet % glo(:) = 0
+
+    ! Distribute global numbers over other processors
+    do i = 1, Pet % m_lower
+      Pet % glo(i) = i + row_f - 1
+    end do
+    call Grid % Exchange_Cells_Int(Pet % glo)
+
+    !for debug:    ! Check what you got
+    !for debug:    pet_glo(:) = Pet % glo(:)
+    !for debug:    call Grid % Save_Debug_Vtu("petsc-numbering",      &
+    !for debug:                               scalar_cell = pet_glo,  &
+    !for debug:                               scalar_name = "Petsc Numbers [1]")
+  end if
+  CALL COMM_MOD_END
+  STOP
 
   !----------------------!
   !   Initialize PETSc   !
@@ -85,10 +127,6 @@
   !----------------------------!
   !    Set PETSc matrix size   !
   !----------------------------!
-
-  ! Total number of unknowns and unknowns in this processor only
-  Pet % m_upper = Grid % comm % nc_tot
-  Pet % m_lower = Grid % n_cells - Grid % comm % n_buff_cells
 
   call C_Petsc_Mat_Set_Sizes(Pet % A, Pet % m_lower, Pet % m_upper)
 
@@ -113,9 +151,9 @@
     do j = Sol % A % row(i), Sol % A % row(i+1)-1
       k = Sol % A % col(j)
       if(Grid % Comm % cell_proc(k) .eq. this_proc) then
-        Pet % d_nnz(i) = Pet % d_nnz(i) + PETSC_ONE
+        Pet % d_nnz(i) = Pet % d_nnz(i) + 1
       else
-        Pet % o_nnz(i) = Pet % o_nnz(i) + PETSC_ONE
+        Pet % o_nnz(i) = Pet % o_nnz(i) + 1
       end if
     end do
   end do
@@ -124,20 +162,6 @@
   call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,        &
                                          Pet % d_nnz,    &
                                          Pet % o_nnz)
-
-  !-----------------------------------------!
-  !   Set column indices for PETSc matrix   !
-  !-----------------------------------------!
-
-  ! Work out number of non-zero entries
-  nonzeros = sum(Pet % d_nnz(1:Pet % m_lower))
-
-  ! Allocate memory for it
-  allocate(Pet % col(nonzeros));  Pet % col(:) = 0
-
-  ! For the time being, copy the values from T-Flows minus 1
-  ! (This was working well for sequential)
-  Pet % col(1:nonzeros) = Sol % A % col(1:nonzeros) - PETSC_ONE
 
   !--------------------------!
   !   Create PETSc vectors   !
@@ -181,10 +205,10 @@
   do i = 1, Pet % m_lower
     do j = Sol % A % row(i), Sol % A % row(i+1)-1
       k = Sol % A % col(j)
-      call C_Petsc_Mat_Set_Value(Pet % A,                &  ! matrix
-                                 Pet % cell_glo(i) - 1,  &  ! row
-                                 Pet % cell_glo(k) - 1,  &  ! column
-                                 Sol % A % val(j))          ! orig. matrix entry
+      call C_Petsc_Mat_Set_Value(Pet % A,         &  ! matrix
+                                 Pet % glo(i)-1,  &  ! row
+                                 Pet % glo(k)-1,  &  ! column
+                                 Sol % A % val(j))   ! orig. matrix entry
     end do
   end do
 
@@ -195,8 +219,8 @@
   !   Fill up vectors   !
   !---------------------!
   do i = 1, Pet % m_lower
-    call C_Petsc_Vec_Set_Value(Pet % x, i - PETSC_ONE, x(i));
-    call C_Petsc_Vec_Set_Value(Pet % b, i - PETSC_ONE, b(i));
+    call C_Petsc_Vec_Set_Value(Pet % x, Pet % glo(i)-1, x(i));
+    call C_Petsc_Vec_Set_Value(Pet % b, Pet % glo(i)-1, b(i));
   end do
 
   ! The following two calls are needed after the calls to VecSetValue
@@ -232,9 +256,9 @@
   !   Copy the solution back to T-Flows' vector   !
   !-----------------------------------------------!
   do i = 1, Pet % m_lower
-    call C_Petsc_Vec_Get_Values(Pet % x,      &
-                                PETSC_ONE,    &
-                                i-PETSC_ONE,  &
+    call C_Petsc_Vec_Get_Values(Pet % x,         &
+                                1,               &
+                                Pet % glo(i)-1,  &
                                 x(i))
   end do
 
