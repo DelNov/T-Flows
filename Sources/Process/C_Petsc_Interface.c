@@ -71,9 +71,6 @@ void c_petsc_mat_aij_set_preallocation_(Mat      * A,
 
   err = MatMPIAIJSetPreallocation(*A, 0, d_nnz, 0, o_nnz);
   err = MatSeqAIJSetPreallocation(*A, 0, d_nnz);
-
-  /* This call should probably not be here, but is a patch for the time being */
-  err = MatSetOption(*A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 }
 
 /*-----------------------------------------------------------------------------+
