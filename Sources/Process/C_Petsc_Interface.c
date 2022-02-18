@@ -8,7 +8,7 @@ PetscInt       one  = 1;
 const PetscInt zero = 0;
 PetscErrorCode err;
 
-static char help[] = "This is to initialize PETSc from T-Flows.\n";
+static char help[] = "This is to initialize PETSc from T-Flows!\n";
 
 /*-----------------------------------------------------------------------------+
 |  PetscInitialize                                                             |
@@ -71,6 +71,9 @@ void c_petsc_mat_aij_set_preallocation_(Mat      * A,
 
   err = MatMPIAIJSetPreallocation(*A, 0, d_nnz, 0, o_nnz);
   err = MatSeqAIJSetPreallocation(*A, 0, d_nnz);
+
+  /* This call should probably not be here, but is a patch for the time being */
+  err = MatSetOption(*A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -105,6 +108,16 @@ void c_petsc_assemble_mat_(Mat * A) {
 +-----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------+
+|  VecCreate                                                                   |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Vec/VecCreate.html               |
++-----------------------------------------------------------------------------*/
+void c_petsc_vec_create_(Vec * v) {
+
+  err = VecCreate(MPI_COMM_WORLD, v);
+}
+
+/*-----------------------------------------------------------------------------+
 |  VecCreateMPI                                                                |
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecCreateMPI.html            |
@@ -114,6 +127,25 @@ void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
   err = VecCreateMPI(MPI_COMM_WORLD, *m_lower, *m_upper, v);
 }
 
+/*-----------------------------------------------------------------------------+
+|  VecSetSizes                                                                 |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Vec/VecSetSizes.html             |
++-----------------------------------------------------------------------------*/
+void c_petsc_vec_set_sizes_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
+
+  err = VecSetSizes(*v, *m_lower, *m_upper);
+}
+
+/*-----------------------------------------------------------------------------+
+|  VecSetType (to VECSTANDARD)                                                  |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Vec/VecSetType.html              |
++-----------------------------------------------------------------------------*/
+void c_petsc_vec_set_type_to_standard_(Vec * v) {
+
+  err = VecSetType(*v, VECSTANDARD);
+}
 
 /*-----------------------------------------------------------------------------+
 |  VecSetValue                                                                 |
