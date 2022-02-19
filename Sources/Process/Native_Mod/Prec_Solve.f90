@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Prec_Solve(Native, ni, a, d, x, b, prec)
+  subroutine Prec_Solve(Native, ni, A, D, x, b, prec)
 !------------------------------------------------------------------------------!
-!   Solves the preconditioning system [d]{x}={b}                               !
+!   Solves the preconditioning system [D]{x}={b}                               !
 !------------------------------------------------------------------------------!
 !   Allows preconditioning of the system by:                                   !
 !     1. Diagonal preconditioning                                              !
@@ -30,7 +30,7 @@
   !---------------------------------!
   if(prec .eq. 'DIAGONAL') then
     do i = 1, ni
-      x(i) = b(i)/d % val(d % dia(i))
+      x(i) = b(i)/D % val(D % dia(i))
     end do
 
   !--------------------------------------------!
@@ -45,21 +45,21 @@
         k = A % col(j)
         sum1 = sum1 - A % val(j)*x(k)
       end do
-      x(i) = sum1 * d % val(d % dia(i))  ! BUG ?
+      x(i) = sum1 * D % val(D % dia(i))  ! BUG ?
     end do
 
     do i = 1, ni
-      x(i) = x(i) / ( d % val(d % dia(i)) + TINY )
+      x(i) = x(i) / ( D % val(D % dia(i)) + TINY )
     end do
 
     ! Backward substitution
     do i = ni, 1, -1
       sum1 = x(i)
-      do j = A % dia(i)+1, A % row(i+1)-1        ! upper triangular 
+      do j = A % dia(i)+1, A % row(i+1)-1          ! upper triangular
         k = A % col(j)
         if(k <= ni) sum1 = sum1 - A % val(j)*x(k)  ! avoid buffer entries
       end do
-      x(i) = sum1* d % val(d % dia(i))           ! BUG ?
+      x(i) = sum1* D % val(D % dia(i))             ! BUG ?
     end do
 
   !---------------------------!

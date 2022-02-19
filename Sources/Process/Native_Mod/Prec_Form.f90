@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Prec_Form(Native, ni, a, d, prec)
+  subroutine Prec_Form(Native, ni, A, D, prec)
 !------------------------------------------------------------------------------!
-!   Forms preconditioning matrix "d" from provided matrix "a".                 !
+!   Forms preconditioning matrix "D" from provided matrix "A".                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -20,7 +20,7 @@
   !---------------------------------!
   if(prec .eq. 'DIAGONAL') then
     do i = 1, ni
-      d % val(d % dia(i)) = A % val(A % dia(i))
+      D % val(D % dia(i)) = A % val(A % dia(i))
     end do
 
   !--------------------------------------------! 
@@ -31,9 +31,9 @@
       sum1 = A % val(A % dia(i))       ! take diaginal entry   
       do j = A % row(i), A % dia(i)-1  ! only lower traingular
         k = A % col(j)
-        sum1 = sum1 - d % val(d % dia(k)) * A % val(j) * A % val(j)  
+        sum1 = sum1 - D % val(D % dia(k)) * A % val(j) * A % val(j)
       end do
-      d % val(d % dia(i)) = 1.0 / sum1
+      D % val(D % dia(i)) = 1.0 / sum1
     end do
 
   !---------------------------!
@@ -41,7 +41,7 @@
   !---------------------------!
   else
     do i = 1, ni
-      d % val(d % dia(i)) = 1.0
+      D % val(D % dia(i)) = 1.0
     end do
   end if
 
