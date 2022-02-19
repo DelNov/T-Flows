@@ -220,13 +220,13 @@
     phi % precond = 'INCOMPLETE_CHOLESKY'  ! this string works for T-Flows only
 
     ! Call linear solver to solve the equations
-    call Sol % Run("CG", phi % precond,  &
-                   A,                    &
-                   phi % n,              &
-                   b,                    &
-                   phi % mniter,         &
-                   phi % eniter,         &
-                   phi % tol,            &
+    call Sol % Run("BICG", phi % precond,  &
+                   A,                      &
+                   phi % n,                &
+                   b,                      &
+                   phi % mniter,           &
+                   phi % eniter,           &
+                   phi % tol,              &
                    phi % res)
 
     if(this_proc < 2) then
