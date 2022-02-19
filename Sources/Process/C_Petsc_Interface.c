@@ -40,9 +40,9 @@ void c_petsc_mat_create_(Mat * A) {
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Mat/MatSetSizes.html             |
 +-----------------------------------------------------------------------------*/
-void c_petsc_mat_set_sizes_(Mat * A, PetscInt * m_lower, PetscInt * m_upper) {
+void c_petsc_mat_set_sizes_(Mat * A, PetscInt * m, PetscInt * M) {
 
-  err = MatSetSizes(*A, *m_lower, *m_lower, *m_upper, *m_upper);
+  err = MatSetSizes(*A, *m, *m, *M, *M);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -78,10 +78,10 @@ void c_petsc_mat_aij_set_preallocation_(Mat      * A,
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Mat/MatSetValue.html             |
 +-----------------------------------------------------------------------------*/
-void c_petsc_mat_set_value_(Mat      * A,
-                            PetscInt * row,
-                            PetscInt * col,
-                            double   * value) {
+void c_petsc_mat_set_value_(Mat         * A,
+                            PetscInt    * row,
+                            PetscInt    * col,
+                            PetscScalar * value) {
 
   err = MatSetValue(*A, *row, *col, *value, INSERT_VALUES);
 }
@@ -119,9 +119,9 @@ void c_petsc_vec_create_(Vec * v) {
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecCreateMPI.html            |
 +-----------------------------------------------------------------------------*/
-void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
+void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m, PetscInt * M) {
 
-  err = VecCreateMPI(MPI_COMM_WORLD, *m_lower, *m_upper, v);
+  err = VecCreateMPI(MPI_COMM_WORLD, *m, *M, v);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -129,9 +129,9 @@ void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecSetSizes.html             |
 +-----------------------------------------------------------------------------*/
-void c_petsc_vec_set_sizes_(Vec * v, PetscInt * m_lower, PetscInt * m_upper) {
+void c_petsc_vec_set_sizes_(Vec * v, PetscInt * m, PetscInt * M) {
 
-  err = VecSetSizes(*v, *m_lower, *m_upper);
+  err = VecSetSizes(*v, *m, *M);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -149,9 +149,9 @@ void c_petsc_vec_set_type_to_standard_(Vec * v) {
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecSetValue.html             |
 +-----------------------------------------------------------------------------*/
-void c_petsc_vec_set_value_(Vec      * v,
-                            PetscInt * row,
-                            double   * value) {
+void c_petsc_vec_set_value_(Vec         * v,
+                            PetscInt    * row,
+                            PetscScalar * value) {
 
   err = VecSetValue(*v, *row, *value, INSERT_VALUES);
 }
@@ -173,10 +173,10 @@ void c_petsc_assemble_vec_(Vec * v) {
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecGetValues.html            |
 +-----------------------------------------------------------------------------*/
-void c_petsc_vec_get_values_(Vec      * v,
-                             PetscInt * ni,
-                             PetscInt * row,
-                             double   * value) {
+void c_petsc_vec_get_values_(Vec         * v,
+                             PetscInt    * ni,
+                             PetscInt    * row,
+                             PetscScalar * value) {
 
   err = VecGetValues(*v, *ni, row, value);
 }
@@ -246,10 +246,10 @@ void c_petsc_set_solver_and_preconditioner_(KSP  * ksp,
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/KSP/KSPSetTolerances.html        |
 +-----------------------------------------------------------------------------*/
-void c_petsc_ksp_set_tolerances_(KSP      * ksp,
-                                 double   * rtol,
-                                 double   * atol,
-                                 PetscInt * maxits) {
+void c_petsc_ksp_set_tolerances_(KSP         * ksp,
+                                 PetscScalar * rtol,
+                                 PetscScalar * atol,
+                                 PetscInt    * maxits) {
 
   err = KSPSetTolerances(*ksp, *rtol, *atol, 1.0e+3, *maxits);
 }
@@ -277,4 +277,16 @@ void c_petsc_ksp_get_iteration_number_(KSP      * ksp,
 
   /* Issue PETSc call */
   err = KSPGetIterationNumber(*ksp, its);
+}
+
+/*-----------------------------------------------------------------------------+
+|  KSPGetResidualNorm                                                          |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/KSP/KSPGetResidualNorm.html      |
++-----------------------------------------------------------------------------*/
+void c_petsc_ksp_get_residual_norm_(KSP         * ksp,
+                                    PetscScalar * rnorm) {
+
+  /* Issue PETSc call */
+  err = KSPGetResidualNorm(*ksp, rnorm);
 }
