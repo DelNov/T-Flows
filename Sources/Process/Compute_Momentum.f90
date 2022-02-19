@@ -360,14 +360,14 @@
       ! Call linear solver
       call Cpu_Timer % Start('Linear_Solver_For_Momentum')
 
-      call Sol % Run("BICG", ui % precond,  &
-                     M,                     &
-                     ui % n,                &
-                     b,                     &
-                     ui % mniter,           &
-                     ui % eniter,           &
-                     ui % tol,              &
-                     ui % res,              &
+      call Sol % Run(ui % solver, ui % prec,  &
+                     M,                       &
+                     ui % n,                  &
+                     b,                       &
+                     ui % mniter,             &
+                     ui % eniter,             &
+                     ui % tol,                &
+                     ui % res,                &
                      norm = vel_max)
 
       call Cpu_Timer % Stop('Linear_Solver_For_Momentum')

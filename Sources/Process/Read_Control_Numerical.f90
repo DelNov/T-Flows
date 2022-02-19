@@ -78,8 +78,9 @@
     ui % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control_Mod_Blending_Coefficient_For_Momentum  (ui % blend)
     call Control_Mod_Simple_Underrelaxation_For_Momentum(ui % urf)
+    ui % solver = 'bicg'
+    call Control_Mod_Preconditioner_For_System_Matrix   (ui % prec)
     call Control_Mod_Tolerance_For_Momentum_Solver      (ui % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix   (ui % precond)
     call Control_Mod_Max_Iterations_For_Momentum_Solver (ui % mniter)
     call Control_Mod_Gradient_Method_For_Momentum       (name)
     ui % grad_method = Numerics_Mod_Gradient_Method_Code(name)
@@ -88,9 +89,10 @@
   !-------------------------!
   !   Related to pressure   !
   !-------------------------!
-  Flow % pp % mniter = 40
+  Flow % pp % mniter = 60
+  Flow % pp % solver = 'cg'
+  call Control_Mod_Preconditioner_For_System_Matrix   (Flow % pp % prec)
   call Control_Mod_Tolerance_For_Pressure_Solver      (Flow % pp % tol)
-  call Control_Mod_Preconditioner_For_System_Matrix   (Flow % pp % precond)
   call Control_Mod_Max_Iterations_For_Pressure_Solver (Flow % pp % mniter)
   call Control_Mod_Simple_Underrelaxation_For_Pressure(Flow % pp % urf)
   call Control_Mod_Gradient_Method_For_Pressure              (name)
@@ -109,8 +111,9 @@
     Flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control_Mod_Blending_Coefficient_For_Energy  (Flow % t % blend)
     call Control_Mod_Simple_Underrelaxation_For_Energy(Flow % t % urf)
+    Flow % t % solver = 'bicg'
+    call Control_Mod_Preconditioner_For_System_Matrix (Flow % t % prec)
     call Control_Mod_Tolerance_For_Energy_Solver      (Flow % t % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix (Flow % t % precond)
     call Control_Mod_Max_Iterations_For_Energy_Solver (Flow % t % mniter)
     call Control_Mod_Gradient_Method_For_Energy               (name)
     Flow % t % grad_method = Numerics_Mod_Gradient_Method_Code(name)
@@ -128,8 +131,9 @@
     Vof % fun % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control_Mod_Blending_Coefficient_For_Vof    (Vof % fun % blend)
     call Control_Mod_Simple_Underrelaxation_For_Vof  (Vof % fun % urf)
+    Vof % fun % solver = 'bicg'
+    call Control_Mod_Preconditioner_For_System_Matrix(Vof % fun % prec)
     call Control_Mod_Tolerance_For_Vof_Solver        (Vof % fun % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix(Vof % fun % precond)
     call Control_Mod_Max_Iterations_For_Vof_Solver   (Vof % fun % mniter)
     ! Max Courant number and Max substep cycles
     call Control_Mod_Max_Courant_Vof       (Vof % courant_max_param)
@@ -155,8 +159,9 @@
     phi % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control_Mod_Blending_Coefficient_For_Scalars  (phi % blend)
     call Control_Mod_Simple_Underrelaxation_For_Scalars(phi % urf)
+    phi % solver = 'bicg'
+    call Control_Mod_Preconditioner_For_System_Matrix  (phi % prec)
     call Control_Mod_Tolerance_For_Scalars_Solver      (phi % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix  (phi % precond)
     call Control_Mod_Max_Iterations_For_Scalars_Solver (phi % mniter)
     call Control_Mod_Gradient_Method_For_Scalars         (name)
     phi % grad_method = Numerics_Mod_Gradient_Method_Code(name)
@@ -186,9 +191,10 @@
     tq % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control_Mod_Blending_Coefficient_For_Turbulence  (tq % blend)
     call Control_Mod_Simple_Underrelaxation_For_Turbulence(tq % urf)
-    call Control_Mod_Tolerance_For_Turbulence_Solver      (tq % tol)
-    call Control_Mod_Preconditioner_For_System_Matrix     (tq % precond)
-    call Control_Mod_Max_Iterations_For_Turbulence_Solver (tq % mniter)
+    tq % solver = 'bicg'
+    call Control_Mod_Preconditioner_For_System_Matrix    (tq % prec)
+    call Control_Mod_Tolerance_For_Turbulence_Solver     (tq % tol)
+    call Control_Mod_Max_Iterations_For_Turbulence_Solver(tq % mniter)
     call Control_Mod_Gradient_Method_For_Turbulence     (name)
     tq % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   end do

@@ -587,9 +587,6 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-----------------------------------------------------
-# Dependencies for: ./Native_Mod/Alias_Native.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Native_Mod/Prec_Solve.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
@@ -601,6 +598,9 @@ $(DIR_SHARED)/Work_Mod/*.f90
 
 #-----------------------------------------------------
 # Dependencies for: ./Native_Mod/Normalized_Root_Mean_Square.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Native_Mod/Solve_Native.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Native_Mod/Dimensional_Solvers/Bicg.f90
@@ -630,6 +630,7 @@ $(DIR_OBJECT)/Numerics_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
+Solver_Mod/*.f90 \
 Numerics_Mod/*.f90 
 
 #-----------------------------------------------------
@@ -842,6 +843,7 @@ Backup_Mod/*.f90
 # Dependencies for: ./Solver_Mod.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Solver_Mod.o:\
+Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Petsc_Mod.o \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*/*.f90 \
@@ -1145,6 +1147,24 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-----------------------------------------------------
+# Dependencies for: ./Read_Control_Petsc_Options.f90
+#-----------------------------------------------------
+$(DIR_OBJECT)/Read_Control_Petsc_Options.o:\
+$(DIR_OBJECT)/Vof_Mod.o \
+Vof_Mod/*/*.f90 \
+$(DIR_OBJECT)/Var_Mod.o \
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+$(DIR_OBJECT)/Numerics_Mod.o \
+Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#-----------------------------------------------------
 # Dependencies for: ./Compute_Momentum_Explicit.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Compute_Momentum_Explicit.o:\
@@ -1159,6 +1179,8 @@ Field_Mod/*/*.f90
 # Dependencies for: ./Logo_Pro.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Logo_Pro.o:\
+$(DIR_OBJECT)/Solver_Mod.o \
+Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-----------------------------------------------------
@@ -1342,6 +1364,15 @@ Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
+#-----------------------------------------------------
+# Dependencies for: ./Solver_Mod/Create_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Solver_Mod/Run.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Solver_Mod/Alias_Native.f90
+#-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Balance_Volume.f90
 #-----------------------------------------------------

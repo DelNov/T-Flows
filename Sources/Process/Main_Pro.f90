@@ -63,7 +63,7 @@
   !   Splash out the logo screen   !
   !--------------------------------!
   if(this_proc  < 2) then
-    call Logo_Pro
+    call Logo_Pro()
   end if
 
   !-----------------------!
@@ -142,7 +142,10 @@
     call Control_Mod_Switch_To_Domain(d)  ! go back to local domain's control
 
     ! Read numerical models from control file (after the memory is allocated)
-    call Read_Control_Numerical(Flow(d), turb(d), Vof(d), Sol(d))
+    call Read_Control_Numerical    (Flow(d), turb(d), Vof(d), Sol(d))
+
+    ! Read PETSc options after, so that they get a prefferance
+    call Read_Control_Petsc_Options(Flow(d), turb(d), Vof(d), Sol(d))
 
     call Grid(d) % Find_Nodes_Cells()
     call Grid(d) % Calculate_Weights_Cells_To_Nodes()  ! needed for front

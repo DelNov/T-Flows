@@ -198,14 +198,15 @@
 
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
 
-  call Sol % Run("CG", pp % precond,  &
-                 A,                   &
-                 pp % n,              &
-                 b,                   &
-                 pp % mniter,         &
-                 pp % eniter,         &
-                 pp % tol,            &
-                 pp % res)
+  call Sol % Run(pp % solver, pp % prec,  &
+                 A,                       &
+                 pp % n,                  &
+                 b,                       &
+                 pp % mniter,             &      ! max number of iterations
+                 pp % eniter,             &      ! executed number of iterations
+                 pp % tol,                &      ! tolerance
+                 pp % res,                &      ! final residual
+                 norm = p_nor)                   ! number for normalisation
 
   call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
 

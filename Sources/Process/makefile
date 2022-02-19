@@ -279,6 +279,7 @@ SRC_F_FUN = Balance_Volume.f90                    \
             Piso_Algorithm.f90                    \
             Read_Control_Boundary_Conditions.f90  \
             Read_Control_Numerical.f90            \
+            Read_Control_Petsc_Options.f90        \
             Read_Control_Physical_Models.f90      \
             Read_Control_Physical_Properties.f90  \
             Rhie_And_Chow.f90                     \
@@ -295,7 +296,8 @@ SRC_F_FUN += Tau_Wall_Low_Re.f90         \
              Find_Nearest_Wall_Cell.f90  \
              Roughness_Coefficient.f90
 
-SRC_F_FUN += To_Upper_Case.f90
+SRC_F_FUN += To_Lower_Case.f90   \
+             To_Upper_Case.f90
 
 # C function/interface, if you compile with PETSc
 ifneq ($(PETSC_DIR),)

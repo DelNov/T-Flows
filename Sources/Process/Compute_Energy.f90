@@ -283,13 +283,13 @@
   call Cpu_Timer % Start('Linear_Solver_For_Energy')
 
   ! Call linear solver to solve the equations
-  call Sol % Run("BICG", t % precond,  &
-                 A,                    &
-                 t % n,                &
-                 b,                    &
-                 t % mniter,           &
-                 t % eniter,           &
-                 t % tol,              &
+  call Sol % Run(t % solver, t % prec,  &
+                 A,                     &
+                 t % n,                 &
+                 b,                     &
+                 t % mniter,            &
+                 t % eniter,            &
+                 t % tol,               &
                  t % res)
 
   call Cpu_Timer % Stop('Linear_Solver_For_Energy')

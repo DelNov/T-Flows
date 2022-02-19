@@ -215,18 +215,18 @@
     !---------------------------------!
 
     ! Set number of iterations "by hand"
-    phi % mniter  = 99
-    phi % tol     =  1.0e-5
-    phi % precond = 'INCOMPLETE_CHOLESKY'  ! this string works for T-Flows only
+    phi % mniter = 99
+    phi % tol    =  1.0e-5
+    phi % prec   = 'icc'    ! lower case to be compatible with PETSc
 
     ! Call linear solver to solve the equations
-    call Sol % Run("BICG", phi % precond,  &
-                   A,                      &
-                   phi % n,                &
-                   b,                      &
-                   phi % mniter,           &
-                   phi % eniter,           &
-                   phi % tol,              &
+    call Sol % Run('bicg', phi % prec,  &
+                   A,                   &
+                   phi % n,             &
+                   b,                   &
+                   phi % mniter,        &
+                   phi % eniter,        &
+                   phi % tol,           &
                    phi % res)
 
     if(this_proc < 2) then
