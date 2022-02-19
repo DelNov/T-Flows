@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Control_Mod_Read_Real_Item_On(keyword, def, val, verbose)
 !------------------------------------------------------------------------------!
-!   Working horse function to read integer value (argument "val") behind a     !
+!   Working horse function to read real values (argument "val") behind a       !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
 !   vaue specified in argument "def" is used.
 !------------------------------------------------------------------------------!
