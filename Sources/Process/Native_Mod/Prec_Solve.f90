@@ -28,7 +28,7 @@
   !---------------------------------!
   !   1) diagonal preconditioning   !
   !---------------------------------!
-  if(prec .eq. 'DIAGONAL') then
+  if(prec .eq. 'jacobi') then
     do i = 1, ni
       x(i) = b(i)/D % val(D % dia(i))
     end do
@@ -36,7 +36,7 @@
   !--------------------------------------------!
   !   2) incomplete cholesky preconditioning   !
   !--------------------------------------------!
-  else if(prec .eq. 'INCOMPLETE_CHOLESKY') then
+  else if(prec .eq. 'icc') then
 
     ! Forward substitutionn
     do i = 1, ni

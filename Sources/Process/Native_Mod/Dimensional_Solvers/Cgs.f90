@@ -1,15 +1,7 @@
 !==============================================================================!
   subroutine Cgs(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
-!   Solves the linear systems of equations by a precond. CGS Method.           !
-!------------------------------------------------------------------------------!
-!   Allows preconditioning of the system by:                                   !
-!     1. Diagonal preconditioning                                              !
-!     2. Incomplete Cholesky preconditioning                                   !
-!                                                                              !
-!   The type of precondtioning is chosen by setting the variable prec to 0     !
-!   (for no preconditioning), 1 (for diagonal preconditioning) or 2 (for       !
-!   incomplete Cholesky preconditioning)                                       !
+!   Solves the linear systems of equations by a preconditioned CGS method      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: p1         => r_cell_01,  &

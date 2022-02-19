@@ -22,14 +22,12 @@
   real, optional     :: norm     ! normalization
 !==============================================================================!
 
-  PRINT *, '@SOLVE_NATIVE: ', solver, ' ', prec
-
   ! Call the desired linear solver to solve the equations
-  if(solver .eq. 'BICG') then
+  if(solver .eq. 'bicg') then
     call Nat % Bicg(A, x, b, prec, miter, niter, tol, fin_res, norm)
-  else if(solver .eq. 'CG') then
+  else if(solver .eq. 'cg') then
     call Nat % Cg  (A, x, b, prec, miter, niter, tol, fin_res, norm)
-  else if(solver .eq. 'CGS') then
+  else if(solver .eq. 'cgs') then
     call Nat % Cgs (A, x, b, prec, miter, niter, tol, fin_res, norm)
   end if
 

@@ -18,7 +18,7 @@
   !---------------------------------! 
   !   1) diagonal preconditioning   !
   !---------------------------------!
-  if(prec .eq. 'DIAGONAL') then
+  if(prec .eq. 'jacobi') then
     do i = 1, ni
       D % val(D % dia(i)) = A % val(A % dia(i))
     end do
@@ -26,7 +26,7 @@
   !--------------------------------------------! 
   !   2) incomplete cholesky preconditioning   !
   !--------------------------------------------!
-  else if(prec .eq. 'INCOMPLETE_CHOLESKY') then
+  else if(prec .eq. 'icc') then
     do i = 1, ni
       sum1 = A % val(A % dia(i))       ! take diaginal entry   
       do j = A % row(i), A % dia(i)-1  ! only lower traingular
