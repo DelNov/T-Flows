@@ -39,7 +39,6 @@
     type(PetscInt)              :: niter     ! performed number of iterations
     type(PetscInt), allocatable :: d_nnz(:)  ! diagonal stencil width per cell
     type(PetscInt), allocatable :: o_nnz(:)  ! off-diag. stencil width per cell
-    type(PetscInt), allocatable :: col(:)    ! column indices
     type(PetscErrorCode)        :: err
 
     ! Global cell numbering for PETSc, which is
@@ -178,26 +177,32 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve_Petsc(Pet, Nat, solver, prec, A, x, b, miter, niter, tol)
+  subroutine Solve_Petsc(Pet, Nat,      &
+                         solver, prec,  &
+                         A, x, b,       &
+                         miter, niter,  &
+                         tol, fin_res,  &
+                         norm)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
   type(Native_Type)    :: Nat
-  character(*)         :: solver
-  character(*)         :: prec
+  character(*)         :: solver   ! solver
+  character(*)         :: prec     ! preconditioner
   type(Matrix_Type)    :: A
   real                 :: x(-Nat % pnt_grid % n_bnd_cells :  &
                              Nat % pnt_grid % n_cells)
   real                 :: b( Nat % pnt_grid % n_cells)
   integer, intent(in)  :: miter
   integer, intent(out) :: niter
-  real,    intent(in)  :: tol
+  real,    intent(in)  :: tol      ! tolerance
+  real,    intent(out) :: fin_res  ! final residual
+  real,    optional    :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(PetscInt) :: i, j, k
+  type(PetscInt) :: i, j, k, l
   character(SL)  :: sols           ! fortran string to store solver
   character(SL)  :: precs          ! fortran string to store preconditioner
-  integer        :: l
 !==============================================================================!
 
   !-----------------------------------------------------------!
@@ -220,8 +225,8 @@
   !   Fill up vectors   ! (Pet % glo starts from zero)
   !---------------------!
   do i = 1, Pet % m_lower
-    call C_Petsc_Vec_Set_Value(Pet % x, Pet % glo(i), x(i));
-    call C_Petsc_Vec_Set_Value(Pet % b, Pet % glo(i), b(i));
+    call C_Petsc_Vec_Set_Value(Pet % x, Pet % glo(i), x(i))
+    call C_Petsc_Vec_Set_Value(Pet % b, Pet % glo(i), b(i))
   end do
 
   ! The following two calls are needed after the calls to VecSetValue
@@ -247,11 +252,14 @@
                                   Pet % miter)
 
   ! Solve
-  call KSPSolve(Pet % ksp, Pet % b, Pet % x, Pet % err)
+  call C_Petsc_Ksp_Solve(Pet % ksp, Pet % b, Pet % x)
 
   ! Fetch the performed number of iterations
-  call KSPGetIterationNumber(Pet % ksp, Pet % niter, Pet % err)
+  call C_Petsc_Ksp_Get_Iteration_Number(Pet % ksp, Pet % niter)
   niter = Pet % niter
+
+  ! Fetch the performed number of iterations
+  call C_Petsc_Ksp_Get_Residual_Norm(Pet % ksp, fin_res)
 
   !-----------------------------------------------!
   !   Copy the solution back to T-Flows' vector   ! (Pet % glo starts from zero)

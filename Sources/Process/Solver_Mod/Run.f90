@@ -40,7 +40,8 @@
                                  b,          &
                                  miter,      &
                                  niter,      &
-                                 tol)
+                                 tol,        &
+                                 fin_res)
   end if
 
   end subroutine
