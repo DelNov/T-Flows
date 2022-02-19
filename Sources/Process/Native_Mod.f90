@@ -25,22 +25,23 @@
     type(Matrix_Type) :: M
 
     ! Preconditioning matrix for all variables (used inside solvers only)
-    type(Matrix_Type) :: D
+    type(Matrix_Type), private :: D
 
     ! Right-hand side for all variables
     ! (used in solvers and during discretization)
     type(Vector_Type) :: b
 
     contains
-      procedure          :: Bicg                 ! bicg solver
-      procedure          :: Cg_                  ! cg solver
-      procedure          :: Cgs                  ! cgs solver
+      procedure, private :: Bicg                 ! bicg solver
+      procedure, private :: Cg                   ! cg solver
+      procedure, private :: Cgs                  ! cgs solver
       procedure          :: Create_Native
       procedure, private :: Normalized_Root_Mean_Square
       procedure, private :: Prec_Form
       procedure, private :: Prec_Solve
       procedure, private :: Residual_Vector
       procedure, private :: Root_Mean_Square
+      procedure          :: Solve_Native
 
   end type
 
@@ -55,5 +56,6 @@
   include 'Native_Mod/Prec_Solve.f90'
   include 'Native_Mod/Residual_Vector.f90'
   include 'Native_Mod/Root_Mean_Square.f90'
+  include 'Native_Mod/Solve_Native.f90'
 
   end module 

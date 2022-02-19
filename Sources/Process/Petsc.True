@@ -10,7 +10,7 @@
 !                                                                              !
 !   Note: This module has all member procedures bundled in one file.  When I   !
 !         included them from separate files, I experienced difficulties with   !
-!         include files above.                                                 !
+!         include files above and definition of PETSc types.  Go figure?       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Iso_C_Binding
@@ -22,9 +22,9 @@
   implicit none
 !==============================================================================!
 
-  !------------------!
-  !   Solvers type   !
-  !------------------!
+  !----------------!
+  !   Petsc type   !
+  !----------------!
   type Petsc_Type
 
     ! Petsc-related variables
@@ -42,13 +42,13 @@
     type(PetscInt), allocatable :: col(:)    ! column indices
     type(PetscErrorCode)        :: err
 
-    ! Global cell numbering for PETSc, different
-    ! from T-Flows' and it stars from zero        <---= IMPORTANT
+    ! Global cell numbering for PETSc, which is
+    ! different from T-Flows' and stars from zero   <---= IMPORTANT
     integer, allocatable :: glo(:)
 
     contains
       procedure :: Create_Petsc
-      procedure :: Solve
+      procedure :: Solve_Petsc
 
   end type
 
@@ -178,12 +178,14 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve(Pet, Nat, A, x, b, miter, niter, tol)
+  subroutine Solve_Petsc(Pet, Nat, solver, prec, A, x, b, miter, niter, tol)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
   type(Native_Type)    :: Nat
+  character(*)         :: solver
+  character(*)         :: prec
   type(Matrix_Type)    :: A
   real                 :: x(-Nat % pnt_grid % n_bnd_cells :  &
                              Nat % pnt_grid % n_cells)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Normalized_Root_Mean_Square(Native, ni, r, a, x, norm)
+  real function Normalized_Root_Mean_Square(Native, ni, r, A, x, norm)
 !------------------------------------------------------------------------------!
 !   Calculates root means square of vector r, normalizing it with entries      !
 !   in the system matrix (a), values of unknown (x) and optional norm.         !
