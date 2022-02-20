@@ -23,6 +23,7 @@
 !==============================================================================!
 
   logical, parameter :: PETSC_ACTIVE = .true.
+  integer, parameter :: OUT_OF_ITS   = -3      ! KSP_DIVERGED_ITS
 
   !----------------!
   !   Petsc type   !
@@ -273,7 +274,8 @@
   !-----------------------------------------------!
   !   Copy the solution back to T-Flows' vector   ! (Pet % glo starts from zero)
   !-----------------------------------------------!
-  if(Pet % reason > 0) then
+  if(Pet % reason > 0 .or.  &            ! converged
+     Pet % reason .eq. OUT_OF_ITS) then  ! simply ran out of iterations
     do i = 1, Pet % m_lower
       call C_Petsc_Vec_Get_Values(Pet % x,       &
                                   1,             &
