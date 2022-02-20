@@ -6,6 +6,7 @@
 !   differentiate into numerical and physica parts.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Cpu_Timer_Mod
   use Var_Mod
   use Face_Mod
   use Grid_Mod

@@ -20,6 +20,8 @@
   real                     :: res, norm
 !==============================================================================!
 
+  call Cpu_Timer % Start('Grad_Gauss_Variable')
+
   ! Take alias
   Grid => Flow % pnt_grid
 
@@ -62,5 +64,7 @@
   !   print *, '# Final residual from Gauss: ', res,  &
   !            ' reached in ', iter, ' iterations '
   ! end if
+
+  call Cpu_Timer % Stop('Grad_Gauss_Variable')
 
   end subroutine
