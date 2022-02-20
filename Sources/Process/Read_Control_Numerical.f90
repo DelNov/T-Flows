@@ -99,6 +99,15 @@
   Flow % p  % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   Flow % pp % grad_method = Numerics_Mod_Gradient_Method_Code(name)
 
+  !--------------------------!
+  !   Related to potential   !  (for flow field initialization)
+  !--------------------------!
+  Flow % pot % mniter = 120
+  Flow % pot % solver = 'bicg'
+  call Control_Mod_Preconditioner_For_System_Matrix   (Flow % pot % prec)
+  call Control_Mod_Tolerance_For_Potential_Solver     (Flow % pot % tol)
+  call Control_Mod_Max_Iterations_For_Potential_Solver(Flow % pot % mniter)
+
   !------------------------------!
   !   Related to heat transfer   !
   !------------------------------!

@@ -86,8 +86,8 @@
                                         .false.)
   if(found) then
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC', 'asm', pstring, .true.)
-    call Control_Mod_Read_Strings_On('PREC_OPTIONS', opts, n_opts, .false.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
     else
@@ -108,8 +108,13 @@
     v % tol = tol
     w % tol = tol
   else
-    print *, '# NOTE!  PETSc options for momentum are not specified.'  //  &
-              ' Using the default values'
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for momentum are not specified.'  //  &
+                ' Using the default values'
+    end if
+    u % prec = 'asm'
+    v % prec = 'asm'
+    w % prec = 'asm'
   end if
 
   !---------------------------!
@@ -119,9 +124,9 @@
                                         found,                        &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'cg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC', 'asm', pstring, .true.)
-    call Control_Mod_Read_Strings_On('PREC_OPTIONS', opts, n_opts, .false.)
+    call Control_Mod_Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm', pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
     else
@@ -134,8 +139,40 @@
     Flow % pp % prec_opts = c_opts
     Flow % pp % tol = tol
   else
-    print *, '# NOTE!  PETSc options for pressure are not specified.'  //  &
-             ' Using the default values'
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for pressure are not specified.'  //  &
+               ' Using the default values'
+    end if
+    Flow % pp % prec = 'asm'
+  end if
+
+  !----------------------------!
+  !   For potential equation   !
+  !----------------------------!
+  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_POTENTIAL',  &
+                                        found,                         &
+                                        .false.)
+  if(found) then
+    call Control_Mod_Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm', pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    if(n_opts > 0) then
+      call Bundle_Options(opts, n_opts, c_opts)
+    else
+      c_opts = ''
+    end if
+    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+
+    Flow % pot % solver = sstring
+    Flow % pot % prec = pstring
+    Flow % pot % prec_opts = c_opts
+    Flow % pot % tol = tol
+  else
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for potential are not specified.'  //  &
+               ' Using the default values'
+    end if
+    Flow % pot % prec = 'asm'
   end if
 
   !-------------------------!
@@ -146,8 +183,8 @@
                                         .false.)
   if(found) then
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC', 'asm', pstring, .true.)
-    call Control_Mod_Read_Strings_On('PREC_OPTIONS', opts, n_opts, .false.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
     else
@@ -160,8 +197,11 @@
     t % prec_opts = c_opts
     t % tol = tol
   else
-    print *, '# NOTE!  PETSc options for energy are not specified.'  //  &
-             ' Using the default values'
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for energy are not specified.'  //  &
+               ' Using the default values'
+    end if
+    t % prec = 'asm'
   end if
 
   !--------------------------------!
@@ -173,8 +213,8 @@
 
   if(found) then
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC', 'asm', pstring, .true.)
-    call Control_Mod_Read_Strings_On('PREC_OPTIONS', opts, n_opts, .false.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
     else
@@ -190,8 +230,14 @@
       phi % tol = tol
     end do
   else
-    print *, '# NOTE!  PETSc options for scalars are not specified.'  //  &
-             ' Using the default values'
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for scalars are not specified.'  //  &
+               ' Using the default values'
+    end if
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
+      phi % prec = 'asm'
+    end do
   end if
 
   !------------------------------!
@@ -202,8 +248,8 @@
                                         .false.)
   if(found) then
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC', 'asm', pstring, .true.)
-    call Control_Mod_Read_Strings_On('PREC_OPTIONS', opts, n_opts, .false.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
     else
@@ -230,8 +276,25 @@
       tq % tol       = tol
     end do
   else
-    print *, '# NOTE!  PETSc options for turbulence are not specified.'  //  &
-             ' Using the default values'
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for turbulence are not specified.'  //  &
+               ' Using the default values'
+    end if
+    do i = 1, 12
+      if(i .eq.  1) tq => turb % kin
+      if(i .eq.  2) tq => turb % eps
+      if(i .eq.  3) tq => turb % zeta
+      if(i .eq.  4) tq => turb % f22
+      if(i .eq.  5) tq => turb % vis
+      if(i .eq.  6) tq => turb % t2
+      if(i .eq.  7) tq => turb % uu
+      if(i .eq.  8) tq => turb % vv
+      if(i .eq.  9) tq => turb % ww
+      if(i .eq. 10) tq => turb % uv
+      if(i .eq. 11) tq => turb % uw
+      if(i .eq. 12) tq => turb % vw
+      tq % prec = 'asm'
+    end do
   end if
 
   end subroutine
