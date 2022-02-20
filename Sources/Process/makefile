@@ -132,7 +132,9 @@ OPT_C_COMP = -cpp
 #----------------------------------------------
 ifneq ($(PETSC_DIR),)
   OPT_F_COMP += -I ${PETSC_DIR}/include
+  OPT_F_COMP += -I ${PETSC_DIR}/${PETSC_ARCH}/include
   OPT_C_COMP += -I ${PETSC_DIR}/include
+  OPT_C_COMP += -I ${PETSC_DIR}/${PETSC_ARCH}/include
 endif
 
 #-----------------------------------------------------------
