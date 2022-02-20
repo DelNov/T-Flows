@@ -16,6 +16,8 @@
   !----------------!
   type Petsc_Type
 
+    type(Grid_Type), pointer :: pnt_grid
+
     contains
       procedure :: Create_Petsc
       procedure :: Solve_Petsc
@@ -34,6 +36,8 @@
   type(Grid_Type),  target :: Grid
 !==============================================================================!
 
+  Pet % pnt_grid => Grid
+
   if(this_proc < 2) then
     print *, '# NOTE! This version was compiled without PETSc, so the '  //  &
              'PETSc class was not created ...'
@@ -44,7 +48,7 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve_Petsc(Pet, Nat,      &
+  subroutine Solve_Petsc(Pet,           &
                          solver, prec,  &
                          A, x, b,       &
                          miter, niter,  &
@@ -54,13 +58,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
-  type(Native_Type)    :: Nat
   character(*)         :: solver   ! solver
   character(*)         :: prec     ! preconditioner
   type(Matrix_Type)    :: A
-  real                 :: x(-Nat % pnt_grid % n_bnd_cells :  &
-                             Nat % pnt_grid % n_cells)
-  real                 :: b( Nat % pnt_grid % n_cells)
+  real                 :: x(-Pet % pnt_grid % n_bnd_cells :  &
+                             Pet % pnt_grid % n_cells)
+  real                 :: b( Pet % pnt_grid % n_cells)
   integer, intent(in)  :: miter
   integer, intent(out) :: niter
   real,    intent(in)  :: tol      ! tolerance

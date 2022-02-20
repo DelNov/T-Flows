@@ -32,8 +32,7 @@
                                   fin_res,  &
                                   norm)
   else
-    call Sol % Pet % Solve_Petsc(Sol % Nat,  &  ! 1st argument native solver
-                                 solver,     &
+    call Sol % Pet % Solve_Petsc(solver,     &
                                  prec,       &
                                  A,          &
                                  x,          &

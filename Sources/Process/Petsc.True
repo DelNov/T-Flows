@@ -14,10 +14,10 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Iso_C_Binding
-  use Native_Mod
   use PetscVec,   only: tVec
   use PetscMat,   only: tMat
   use PetscKSP,   only: tKSP, tPC
+  use Native_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -28,6 +28,8 @@
   !   Petsc type   !
   !----------------!
   type Petsc_Type
+
+    type(Grid_Type), pointer :: pnt_grid
 
     ! Petsc-related variables
     type(tMat)                  :: A         ! sparse matrix
@@ -70,6 +72,8 @@
   integer              :: i, j, k, start
   integer, allocatable :: all_lower_ms(:)
 !==============================================================================!
+
+  Pet % pnt_grid => Grid
 
   if(this_proc < 2) print *, '# Initializing PETSc.'
 
@@ -179,7 +183,7 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve_Petsc(Pet, Nat,      &
+  subroutine Solve_Petsc(Pet,           &
                          solver, prec,  &
                          A, x, b,       &
                          miter, niter,  &
@@ -189,13 +193,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
-  type(Native_Type)    :: Nat
   character(*)         :: solver   ! solver
   character(*)         :: prec     ! preconditioner
   type(Matrix_Type)    :: A
-  real                 :: x(-Nat % pnt_grid % n_bnd_cells :  &
-                             Nat % pnt_grid % n_cells)
-  real                 :: b( Nat % pnt_grid % n_cells)
+  real                 :: x(-Pet % pnt_grid % n_bnd_cells :  &
+                             Pet % pnt_grid % n_cells)
+  real                 :: b( Pet % pnt_grid % n_cells)
   integer, intent(in)  :: miter
   integer, intent(out) :: niter
   real,    intent(in)  :: tol      ! tolerance
@@ -211,12 +214,12 @@
   !   Fill up PETSc matrix with values from original matrix   !
   !-----------------------------------------------------------!
   do i = 1, Pet % m_lower
-    do j = Nat % A % row(i), Nat % A % row(i+1)-1
-      k = Nat % A % col(j)
+    do j = A % row(i), A % row(i+1)-1
+      k = A % col(j)
       call C_Petsc_Mat_Set_Value(Pet % A,           &  ! matrix
                                  Pet % glo(i),      &  ! row
                                  Pet % glo(k),      &  ! column
-                                 Nat % A % val(j))     ! orig. matrix entry
+                                 A % val(j))           ! matrix entry
     end do
   end do
 
