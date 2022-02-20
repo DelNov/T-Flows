@@ -22,8 +22,6 @@
   integer(DP)              :: d
 !==============================================================================!
 
-  call Cpu_Timer % Start('Backup_Mod_Load')
-
   ! Take aliases
   Grid => Fld % pnt_grid
   bulk => Fld % bulk
@@ -38,9 +36,11 @@
   backup = .true.
   if(answer .eq. 'SKIP') then
     backup = .false.
-    call Cpu_Timer % Stop('Backup_Mod_Load')
     return
   end if
+
+  ! OK, you are rading a backup, you may as well time it
+  call Cpu_Timer % Start('Backup_Mod_Load')
 
   inquire(file=trim(name_in), exist=present )
   if(.not.present) then
