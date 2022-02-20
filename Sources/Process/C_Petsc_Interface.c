@@ -91,12 +91,21 @@ void c_petsc_mat_set_value_(Mat         * A,
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Mat/MatAssemblyBegin.html        |
 |  https://petsc.org/release/docs/manualpages/Mat/MatAssemblyEnd.html          |
+|  https://petsc.org/main/docs/manualpages/Mat/MatSetOption.html               |
 +-----------------------------------------------------------------------------*/
 void c_petsc_assemble_mat_(Mat * A) {
 
+  /* These two always go in pairs */
   err = MatAssemblyBegin(*A, MAT_FINAL_ASSEMBLY);
   err = MatAssemblyEnd  (*A, MAT_FINAL_ASSEMBLY);
+
+  /* If one wishes to repeatedly assemble matrices that retain the
+     same nonzero pattern (such as within a time-dependent problem),
+     the option should be specified after the first matrix has been
+     fully assembled. It didn't lead to any improvement in speed. */
+  err = MatSetOption(*A, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
 }
+
 
 /*-----------------------------------------------------------------------------+
 |                                                                              |
