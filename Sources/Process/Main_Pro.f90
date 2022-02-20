@@ -144,7 +144,8 @@
     ! Read numerical models from control file (after the memory is allocated)
     call Read_Control_Numerical    (Flow(d), turb(d), Vof(d), Sol(d))
 
-    ! Read PETSc options after, so that they get a prefferance
+    ! Read PETSc options after, so that they get a prefferance, but also
+    ! keep the values for native solver if not specified
     call Read_Control_Petsc_Options(Flow(d), turb(d), Vof(d), Sol(d))
 
     call Grid(d) % Find_Nodes_Cells()

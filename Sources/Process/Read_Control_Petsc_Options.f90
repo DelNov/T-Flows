@@ -94,23 +94,23 @@
       c_opts = ''
     end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
-  else
-    print *, '# NOTE!  PETSc options for momentum are not specified'
-    print *, '#        Using the default values'
-  end if
 
-  u % solver = sstring
-  v % solver = sstring
-  w % solver = sstring
-  u % prec = pstring
-  v % prec = pstring
-  w % prec = pstring
-  u % prec_opts = c_opts
-  v % prec_opts = c_opts
-  w % prec_opts = c_opts
-  u % tol = tol
-  v % tol = tol
-  w % tol = tol
+    u % solver = sstring
+    v % solver = sstring
+    w % solver = sstring
+    u % prec = pstring
+    v % prec = pstring
+    w % prec = pstring
+    u % prec_opts = c_opts
+    v % prec_opts = c_opts
+    w % prec_opts = c_opts
+    u % tol = tol
+    v % tol = tol
+    w % tol = tol
+  else
+    print *, '# NOTE!  PETSc options for momentum are not specified.'  //  &
+              ' Using the default values'
+  end if
 
   !---------------------------!
   !   For pressure equation   !
@@ -128,15 +128,15 @@
       c_opts = ''
     end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
-  else
-    print *, '# NOTE!  PETSc options for pressure are not specified'
-    print *, '#        Using the default values'
-  end if
 
-  Flow % pp % solver = sstring
-  Flow % pp % prec = pstring
-  Flow % pp % prec_opts = c_opts
-  Flow % pp % tol = tol
+    Flow % pp % solver = sstring
+    Flow % pp % prec = pstring
+    Flow % pp % prec_opts = c_opts
+    Flow % pp % tol = tol
+  else
+    print *, '# NOTE!  PETSc options for pressure are not specified.'  //  &
+             ' Using the default values'
+  end if
 
   !-------------------------!
   !   For energy equation   !
@@ -154,15 +154,15 @@
       c_opts = ''
     end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
-  else
-    print *, '# NOTE!  PETSc options for energy are not specified'
-    print *, '#        Using the default values'
-  end if
 
-  t % solver = sstring
-  t % prec = pstring
-  t % prec_opts = c_opts
-  t % tol = tol
+    t % solver = sstring
+    t % prec = pstring
+    t % prec_opts = c_opts
+    t % tol = tol
+  else
+    print *, '# NOTE!  PETSc options for energy are not specified.'  //  &
+             ' Using the default values'
+  end if
 
   !--------------------------------!
   !   Related to passive scalars   !
@@ -177,23 +177,22 @@
     call Control_Mod_Read_Strings_On('PREC_OPTIONS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
-      t % prec_opts = c_opts
     else
-      t % prec_opts = ''
+      c_opts = ''
     end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
-  else
-    print *, '# NOTE!  PETSc options for energy are not specified'
-    print *, '#        Using the default values'
-  end if
 
-  do sc = 1, Flow % n_scalars
-    phi => Flow % scalar(sc)
-    phi % solver = sstring
-    phi % prec = pstring
-    phi % prec_opts = c_opts
-    phi % tol = tol
-  end do
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
+      phi % solver = sstring
+      phi % prec = pstring
+      phi % prec_opts = c_opts
+      phi % tol = tol
+    end do
+  else
+    print *, '# NOTE!  PETSc options for scalars are not specified.'  //  &
+             ' Using the default values'
+  end if
 
   !------------------------------!
   !   All turbuelnt quantities   !
@@ -211,28 +210,28 @@
       c_opts = ''
     end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
-  else
-    print *, '# NOTE!  PETSc options for energy are not specified'
-    print *, '#        Using the default values'
-  end if
 
-  do i = 1, 12
-    if(i .eq.  1) tq => turb % kin
-    if(i .eq.  2) tq => turb % eps
-    if(i .eq.  3) tq => turb % zeta
-    if(i .eq.  4) tq => turb % f22
-    if(i .eq.  5) tq => turb % vis
-    if(i .eq.  6) tq => turb % t2
-    if(i .eq.  7) tq => turb % uu
-    if(i .eq.  8) tq => turb % vv
-    if(i .eq.  9) tq => turb % ww
-    if(i .eq. 10) tq => turb % uv
-    if(i .eq. 11) tq => turb % uw
-    if(i .eq. 12) tq => turb % vw
-    tq % solver    = sstring
-    tq % prec      = pstring
-    tq % prec_opts = c_opts
-    tq % tol       = tol
-  end do
+    do i = 1, 12
+      if(i .eq.  1) tq => turb % kin
+      if(i .eq.  2) tq => turb % eps
+      if(i .eq.  3) tq => turb % zeta
+      if(i .eq.  4) tq => turb % f22
+      if(i .eq.  5) tq => turb % vis
+      if(i .eq.  6) tq => turb % t2
+      if(i .eq.  7) tq => turb % uu
+      if(i .eq.  8) tq => turb % vv
+      if(i .eq.  9) tq => turb % ww
+      if(i .eq. 10) tq => turb % uv
+      if(i .eq. 11) tq => turb % uw
+      if(i .eq. 12) tq => turb % vw
+      tq % solver    = sstring
+      tq % prec      = pstring
+      tq % prec_opts = c_opts
+      tq % tol       = tol
+    end do
+  else
+    print *, '# NOTE!  PETSc options for turbulence are not specified.'  //  &
+             ' Using the default values'
+  end if
 
   end subroutine
