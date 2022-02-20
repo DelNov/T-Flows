@@ -263,8 +263,18 @@ void c_petsc_ksp_solve_(KSP * ksp,
                         Vec * b,
                         Vec * x) {
 
-  /* Issue PETSc call */
   err = KSPSolve(*ksp, *b, *x);
+}
+
+/*-----------------------------------------------------------------------------+
+|  KSPGetConvergedReason                                                       |
+|                                                                              |
+|  https://petsc.org/main/docs/manualpages/KSP/KSPGetConvergedReason.html      |
++-----------------------------------------------------------------------------*/
+void c_petsc_ksp_converged_reason_(KSP                * ksp,
+                                   KSPConvergedReason * reason) {
+
+  err = KSPGetConvergedReason(*ksp, reason);
 }
 
 /*-----------------------------------------------------------------------------+
