@@ -1,7 +1,7 @@
 include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Nat)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
 !------------------------------------------------------------------------------!
 !   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@ include '../User_Mod/Vof_Initialization_Ellipsoid.f90'
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun

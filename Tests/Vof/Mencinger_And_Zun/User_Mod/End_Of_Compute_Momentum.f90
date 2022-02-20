@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Nat,  &
+  subroutine User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
                                                curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Momentum function.           !
@@ -9,13 +9,13 @@
   type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt  ! current time step
   integer, intent(in)       :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, p
-  type(Matrix_Type), pointer :: m
+  type(Matrix_Type), pointer :: M
   integer                    :: c
   character(40)              :: file_name =  &
                                 'velocity_before_correction_xxxxx_yyy.dat'
@@ -25,7 +25,7 @@
   Grid => Flow % pnt_grid
   u    => Flow % u
   p    => Flow % p
-  m    => Nat  % m
+  M    => Sol % Nat % M
 
   write(file_name(28:32), '(i5.5)') curr_dt
   write(file_name(34:36), '(i3.3)') ini
@@ -38,7 +38,7 @@
        Math % Approx_Real(Grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &
         Grid % xc(c), u % n(c), Flow % density(c), p % x(c) * Grid % vol(c),  &
-        m % val(m % dia(c)), Flow % fx(c) - p % x(c) * Grid % vol(c),  &
+        M % val(M % dia(c)), Flow % fx(c) - p % x(c) * Grid % vol(c),  &
         Grid % vol(c)
     end if
   end do

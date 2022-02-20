@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Nat)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   This was developed to devise strategy for pressure gradient calculation    !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,7 @@
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
-  type(Native_Type), target :: Nat
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: t, p

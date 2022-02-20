@@ -3,7 +3,7 @@ include '../User_Mod/Vof_Initialization_Box.f90'
 include '../User_Mod/Vof_Interface_Box.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, sol)
+  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: swarm
-  type(Native_Type), target :: sol
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: fun, t
