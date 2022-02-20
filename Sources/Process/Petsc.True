@@ -44,6 +44,7 @@
     type(PetscInt), allocatable :: d_nnz(:)  ! diagonal stencil width per cell
     type(PetscInt), allocatable :: o_nnz(:)  ! off-diag. stencil width per cell
     type(PetscErrorCode)        :: err
+    type(PetscEnum)             :: reason
 
     ! Global cell numbering for PETSc, which is
     ! different from T-Flows' and stars from zero   <---= IMPORTANT
@@ -206,7 +207,7 @@
   real,    optional    :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(PetscInt) :: i, j, k, l
-  character(SL)  :: sols           ! fortran string to store solver
+  character(SL)  :: solvers        ! fortran string to store solver
   character(SL)  :: precs          ! fortran string to store preconditioner
 !==============================================================================!
 
@@ -241,12 +242,12 @@
   !-----------------------------------!
   !   Set solver and preconditioner   !
   !-----------------------------------!
-  sols  = KSPBICG;  l = len_trim(sols);   sols (l+1:l+1) = c_null_char
-  precs = PCASM;    l = len_trim(precs);  precs(l+1:l+1) = c_null_char
+  solvers = solver;   l = len_trim(solvers);  solvers(l+1:l+1) = c_null_char
+  precs   = prec;     l = len_trim(precs);    precs  (l+1:l+1) = c_null_char
   call C_Petsc_Set_Solver_And_Preconditioner(Pet % ksp,  &  ! solver
                                              Pet % pc,   &  ! preconditioner
                                              Pet % A,    &
-                                             sols,       &
+                                             solvers,    &
                                              precs)
 
   ! Set solver tolerances
@@ -259,6 +260,9 @@
   ! Solve
   call C_Petsc_Ksp_Solve(Pet % ksp, Pet % b, Pet % x)
 
+  ! Check if converged
+  call C_Petsc_Ksp_Converged_Reason(Pet % ksp, Pet % reason)
+
   ! Fetch the performed number of iterations
   call C_Petsc_Ksp_Get_Iteration_Number(Pet % ksp, Pet % niter)
   niter = Pet % niter
@@ -269,12 +273,16 @@
   !-----------------------------------------------!
   !   Copy the solution back to T-Flows' vector   ! (Pet % glo starts from zero)
   !-----------------------------------------------!
-  do i = 1, Pet % m_lower
-    call C_Petsc_Vec_Get_Values(Pet % x,       &
-                                1,             &
-                                Pet % glo(i),  &
-                                x(i))
-  end do
+  if(Pet % reason > 0) then
+    do i = 1, Pet % m_lower
+      call C_Petsc_Vec_Get_Values(Pet % x,       &
+                                  1,             &
+                                  Pet % glo(i),  &
+                                  x(i))
+    end do
+  else
+    ! if(this_proc < 2) print *, ' # Warning: linear system failed to converge!'
+  end if
 
   end subroutine
 
