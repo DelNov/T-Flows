@@ -102,8 +102,9 @@
   !--------------------------!
   !   Related to potential   !  (for flow field initialization)
   !--------------------------!
-  Flow % pot % mniter = 120
+  Flow % pot % mniter = 99
   Flow % pot % solver = 'bicg'
+  Flow % pot % tol    =  1.0e-5
   call Control_Mod_Preconditioner_For_System_Matrix   (Flow % pot % prec)
   call Control_Mod_Tolerance_For_Potential_Solver     (Flow % pot % tol)
   call Control_Mod_Max_Iterations_For_Potential_Solver(Flow % pot % mniter)
