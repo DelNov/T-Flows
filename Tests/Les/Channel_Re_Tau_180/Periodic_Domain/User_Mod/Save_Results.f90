@@ -56,9 +56,9 @@
   call File % Set_Name(coord_name, extension='.1d')
 
   !call File % Set_Name(0, res_name,      "-res.dat")
-  call File % Set_Name(res_name, extension='-res.dat')
+  call File % Set_Name(res_name, time_step=ts, extension='-res.dat')
   !call File % Set_Name(0, res_name_plus, "-res-plus.dat")
-  call File % Set_Name(res_name_plus, extension='-res-plus.dat')
+  call File % Set_Name(res_name_plus, time_step=ts, extension='-res-plus.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -290,10 +290,6 @@
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(Flow % heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
-      write(i,'(a1,(a12, f12.6,a2,a39))')'#', 'Nu error  =',  &
-            abs(0.023*0.5*re**0.8*pr**0.4 - nu_mean)          &
-            / (0.023*0.5*re**0.8*pr**0.4) * 100.0, ' %',      &
-            'correlation of Dittus-Boelter is used.' 
     end if
 
     if(Flow % heat_transfer) then
@@ -364,18 +360,20 @@
   if(Flow % heat_transfer) then
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(4,'(12es15.5e3)') wall_p(i),                       & !  1
-                                u_p(i),                          & !  2
-                                uu_p(i),                         & !  3
-                                vv_p(i),                         & !  4
-                                ww_p(i),                         & !  5
-                                uw_p(i),                         & !  6
-                                0.5*(uu_p(i)+vv_p(i)+ww_p(i)),   & !  7
-                                t_p(i),                          & !  8
-                                t2_p(i),                         & !  9
-                                ut_p(i),                         & ! 10
-                                vt_p(i),                         & ! 11
-                                wt_p(i)                            ! 12
+        write(4,'(12es15.5e3)') wall_p(i),                         & !  1
+                                0.5*(u_p(i)  + u_p(n_prob-i)),     & !  2
+                                0.5*(uu_p(i) + uu_p(n_prob-i)),    & !  3
+                                0.5*(vv_p(i) + vv_p(n_prob-i)),    & !  4
+                                0.5*(ww_p(i) + ww_p(n_prob-i)),    & !  5
+                                0.5*(uw_p(i) - uw_p(n_prob-i)),    & !  6
+                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))     & 
+                              + 0.5*(vv_p(i) + vv_p(n_prob-i))     & 
+                              + 0.5*(ww_p(i) + ww_p(n_prob-i))),   & !  7
+                                t_p(i),                            & !  8
+                                t2_p(i),                           & !  9
+                                ut_p(i),                           & ! 10
+                                vt_p(i),                           & ! 11
+                                wt_p(i)                              ! 12
       end if
     end do
   else
@@ -383,11 +381,14 @@
       if(n_count(i) .ne. 0) then
         write(4,'(7es15.5e3)')  wall_p(i),                       & !  1
                                 u_p(i),                          & !  2
-                                uu_p(i),                         & !  3
-                                vv_p(i),                         & !  4
-                                ww_p(i),                         & !  5
-                                uw_p(i),                         & !  6
-                                0.5*(uu_p(i)+vv_p(i)+ww_p(i))      !  7
+                                0.5*(u_p(i)  + u_p(n_prob-i)),   & !  2
+                                0.5*(uu_p(i) + uu_p(n_prob-i)),  & !  3
+                                0.5*(vv_p(i) + vv_p(n_prob-i)),  & !  4
+                                0.5*(ww_p(i) + ww_p(n_prob-i)),  & !  5
+                                0.5*(uw_p(i) - uw_p(n_prob-i)),  & !  6
+                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))   & !  7 
+                              + 0.5*(vv_p(i) + vv_p(n_prob-i))   & 
+                              + 0.5*(ww_p(i) + ww_p(n_prob-i)))   
       end if
     end do
   end if
