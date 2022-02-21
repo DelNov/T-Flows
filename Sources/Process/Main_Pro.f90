@@ -142,7 +142,7 @@
     call Control_Mod_Switch_To_Domain(d)  ! go back to local domain's control
 
     ! Read numerical models from control file (after the memory is allocated)
-    call Read_Control_Numerical    (Flow(d), turb(d), Vof(d), Sol(d))
+    call Read_Control_Numerical(Flow(d), turb(d), Vof(d), Sol(d))
 
     ! Read PETSc options after, so that they get a prefferance, but also
     ! keep the values for native solver if not specified
