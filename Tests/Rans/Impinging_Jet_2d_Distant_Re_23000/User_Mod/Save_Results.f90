@@ -15,7 +15,7 @@ include '../User_Mod/Impinging_Jet_Profiles.f90'
   integer, intent(in) :: ts     ! time step
 !==============================================================================!
 
-  call User_Mod_Impinging_Jet_Nu      (turb)
-  call User_Mod_Impinging_Jet_Profiles(turb)
+  call User_Mod_Impinging_Jet_Nu      (turb, ts)
+  call User_Mod_Impinging_Jet_Profiles(turb, ts)
 
   end subroutine
