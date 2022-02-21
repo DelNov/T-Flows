@@ -66,6 +66,9 @@
   ! If it wasn't compiled with PETSc, don't confuse a user with this
   if(.not. PETSC_ACTIVE) return
 
+  ! Also, don't bother to read if user wants to use native solvers
+  if(Sol % solvers .ne. PETSC) return
+
   ! Take aliases
   Grid   => Flow % pnt_grid
   t      => Flow % t
@@ -153,8 +156,8 @@
                                         found,                         &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm', pstring, .true.)
+    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     if(n_opts > 0) then
       call Bundle_Options(opts, n_opts, c_opts)
