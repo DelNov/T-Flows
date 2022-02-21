@@ -26,13 +26,15 @@
   call Cpu_Timer % Start('Linear_Solver_For_Vof')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(fun % solver, fun % prec,  &
-                 A,                         &
-                 fun % n,                   &
-                 b,                         &
-                 fun % mniter,              &
-                 fun % eniter,              &
-                 fun % tol,                 &
+  call Sol % Run(fun % solver,     &
+                 fun % prec,       &
+                 fun % prec_opts,  &
+                 A,                &
+                 fun % n,          &
+                 b,                &
+                 fun % mniter,     &
+                 fun % eniter,     &
+                 fun % tol,        &
                  fun % res)
 
   call Cpu_Timer % Stop('Linear_Solver_For_Vof')

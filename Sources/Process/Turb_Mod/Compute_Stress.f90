@@ -326,13 +326,15 @@
   call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(phi % solver, phi % prec,  &
-                 A,                         &
-                 phi % n,                   &
-                 b,                         &
-                 phi % mniter,              &
-                 phi % eniter,              &
-                 phi % tol,                 &
+  call Sol % Run(phi % solver,     &
+                 phi % prec,       &
+                 phi % prec_opts,  &
+                 A,                &
+                 phi % n,          &
+                 b,                &
+                 phi % mniter,     &
+                 phi % eniter,     &
+                 phi % tol,        &
                  phi % res)
 
   call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')

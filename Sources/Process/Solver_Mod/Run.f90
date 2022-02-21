@@ -1,22 +1,28 @@
 !==============================================================================!
-  subroutine Run(Sol, solver, prec, A, x, b, miter, niter, tol, fin_res, norm)
+  subroutine Run(Sol,                      &
+                 solver, prec, prec_opts,  &
+                 A, x, b,                  &
+                 miter, niter,             &
+                 tol, fin_res,             &
+                 norm)
 !------------------------------------------------------------------------------!
 !   From this procedure, the code branches either to Native or Petsc solver    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Solver_Type) :: Sol
-  character(*)       :: solver   ! solver and preconditioner as ...
-  character(*)       :: prec     ! ... specifed in the control file
+  character(*)       :: solver          ! solver and preconditioner as ...
+  character(*)       :: prec            ! ... specifed in the control file
+  character(SL)      :: prec_opts(MSI)  ! ... specifed in the control file
   type(Matrix_Type)  :: A
   real               :: x(-Sol % Nat % pnt_grid % n_bnd_cells :  &
                            Sol % Nat % pnt_grid % n_cells)
   real               :: b( Sol % Nat % pnt_grid % n_cells)
-  integer            :: miter    ! maximum and actual ...
-  integer            :: niter    ! ... number of iterations
-  real               :: tol      ! desired tolerance
-  real               :: fin_res  ! final (achieved) residual
-  real, optional     :: norm     ! normalization
+  integer            :: miter           ! maximum and actual ...
+  integer            :: niter           ! ... number of iterations
+  real               :: tol             ! desired tolerance
+  real               :: fin_res         ! final (achieved) residual
+  real, optional     :: norm            ! normalization
 !==============================================================================!
 
   ! Call linear solver to solve the equations
@@ -34,6 +40,7 @@
   else
     call Sol % Pet % Solve_Petsc(solver,     &
                                  prec,       &
+                                 prec_opts,  &
                                  A,          &
                                  x,          &
                                  b,          &

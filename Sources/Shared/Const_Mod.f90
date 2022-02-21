@@ -12,6 +12,10 @@
   integer, parameter :: DL = 160  ! double string length
   integer, parameter :: QL = 320  ! quadruple string length
 
+  ! Maximum number of string items in a line
+  ! (when reading boundary conditions, options for PETSc)
+  integer, parameter :: MSI = 32
+
   ! Double and single precision constants definitions
   integer, parameter :: DP =  8  ! double precisions for real and integer
   integer, parameter :: SP =  4  ! single precisions for real and integer

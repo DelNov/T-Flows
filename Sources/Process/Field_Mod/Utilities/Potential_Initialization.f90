@@ -215,13 +215,15 @@
     !---------------------------------!
 
     ! Call linear solver to solve the equations
-    call Sol % Run(phi % solver, phi % prec,  &
-                   A,                         &
-                   phi % n,                   &
-                   b,                         &
-                   phi % mniter,              &
-                   phi % eniter,              &
-                   phi % tol,                 &
+    call Sol % Run(phi % solver,     &
+                   phi % prec,       &
+                   phi % prec_opts,  &
+                   A,                &
+                   phi % n,          &
+                   b,                &
+                   phi % mniter,     &
+                   phi % eniter,     &
+                   phi % tol,        &
                    phi % res)
 
     if(this_proc < 2) then

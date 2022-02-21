@@ -1,31 +1,4 @@
 !==============================================================================!
-  subroutine Bundle_Options(opts, n_opts, c_opts)
-!------------------------------------------------------------------------------!
-  use Const_Mod
-!----------------------------------[Modules]-----------------------------------!
-!------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  character(SL) :: opts(128)
-  integer       :: n_opts
-  character(QL) :: c_opts     ! catendated options
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: i, lc, ln
-!==============================================================================!
-
-  c_opts = ''                       ! start with an empty string
-  ln = len_trim(opts(1))            ! take its length
-  c_opts(1:ln) = opts(1)            ! and append first option to the end
-  do i = 2, n_opts                  ! browse through remaining options ...
-    lc = len_trim(c_opts)           ! ... taking the current length
-    ln = len_trim(opts(i))          ! ... lenth of the new option
-    c_opts(lc+1:lc+1) = ' '         ! ... adding a space
-    c_opts(lc+2:lc+2+ln) = opts(i)  ! ... and the new option
-  end do
-
-  end subroutine
-
-!==============================================================================!
   subroutine Read_Control_Petsc_Options(Flow, turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads options for PETSc solver from control file.                          !
@@ -46,8 +19,6 @@
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
-!----------------------------------[Calling]-----------------------------------!
-  integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, p, fun
@@ -57,8 +28,7 @@
   type(Var_Type),  pointer :: tq, phi
   logical                  :: found
   character(SL)            :: sstring, pstring
-  character(SL)            :: opts(128)
-  character(QL)            :: c_opts     ! catendated options
+  character(SL)            :: opts(MSI)
   integer                  :: i, n_opts, sc
   real                     :: tol
 !==============================================================================!
@@ -91,11 +61,6 @@
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
     call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    if(n_opts > 0) then
-      call Bundle_Options(opts, n_opts, c_opts)
-    else
-      c_opts = ''
-    end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     u % solver = sstring
@@ -104,9 +69,12 @@
     u % prec = pstring
     v % prec = pstring
     w % prec = pstring
-    u % prec_opts = c_opts
-    v % prec_opts = c_opts
-    w % prec_opts = c_opts
+    u % prec_opts(1:MSI) = ''
+    v % prec_opts(1:MSI) = ''
+    w % prec_opts(1:MSI) = ''
+    u % prec_opts(1:n_opts) = opts(1:n_opts)
+    v % prec_opts(1:n_opts) = opts(1:n_opts)
+    w % prec_opts(1:n_opts) = opts(1:n_opts)
     u % tol = tol
     v % tol = tol
     w % tol = tol
@@ -118,6 +86,9 @@
     u % prec = 'asm'
     v % prec = 'asm'
     w % prec = 'asm'
+    u % prec_opts(1:MSI) = ''
+    v % prec_opts(1:MSI) = ''
+    w % prec_opts(1:MSI) = ''
   end if
 
   !---------------------------!
@@ -130,16 +101,12 @@
     call Control_Mod_Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
     call Control_Mod_Read_Char_Item_On('PREC',   'asm', pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    if(n_opts > 0) then
-      call Bundle_Options(opts, n_opts, c_opts)
-    else
-      c_opts = ''
-    end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
     Flow % pp % solver = sstring
     Flow % pp % prec = pstring
-    Flow % pp % prec_opts = c_opts
+    Flow % pp % prec_opts(1:MSI)    = ''
+    Flow % pp % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % pp % tol = tol
   else
     if(this_proc < 2) then
@@ -147,6 +114,7 @@
                ' Using the default values'
     end if
     Flow % pp % prec = 'asm'
+    Flow % pp % prec_opts(1:MSI) = ''
   end if
 
   !----------------------------!
@@ -159,16 +127,12 @@
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
     call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    if(n_opts > 0) then
-      call Bundle_Options(opts, n_opts, c_opts)
-    else
-      c_opts = ''
-    end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
     Flow % pot % solver = sstring
     Flow % pot % prec = pstring
-    Flow % pot % prec_opts = c_opts
+    Flow % pot % prec_opts(1:MSI)    = ''
+    Flow % pot % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % pot % tol = tol
   else
     if(this_proc < 2) then
@@ -176,6 +140,7 @@
                ' Using the default values'
     end if
     Flow % pot % prec = 'asm'
+    Flow % pot % prec_opts(1:MSI) = ''
   end if
 
   !-------------------------!
@@ -188,16 +153,12 @@
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
     call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    if(n_opts > 0) then
-      call Bundle_Options(opts, n_opts, c_opts)
-    else
-      c_opts = ''
-    end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     t % solver = sstring
     t % prec = pstring
-    t % prec_opts = c_opts
+    t % prec_opts(1:MSI)    = ''
+    t % prec_opts(1:n_opts) = opts(1:n_opts)
     t % tol = tol
   else
     if(this_proc < 2) then
@@ -205,6 +166,7 @@
                ' Using the default values'
     end if
     t % prec = 'asm'
+    t % prec_opts(1:n_opts) = ''
   end if
 
   !--------------------------------!
@@ -218,18 +180,14 @@
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
     call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    if(n_opts > 0) then
-      call Bundle_Options(opts, n_opts, c_opts)
-    else
-      c_opts = ''
-    end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
       phi % solver = sstring
       phi % prec = pstring
-      phi % prec_opts = c_opts
+      phi % prec_opts(1:MSI)    = ''
+      phi % prec_opts(1:n_opts) = opts(1:n_opts)
       phi % tol = tol
     end do
   else
@@ -240,6 +198,7 @@
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
       phi % prec = 'asm'
+      phi % prec_opts(1:MSI) = ''
     end do
   end if
 
@@ -253,11 +212,6 @@
     call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
     call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
     call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    if(n_opts > 0) then
-      call Bundle_Options(opts, n_opts, c_opts)
-    else
-      c_opts = ''
-    end if
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     do i = 1, 12
@@ -273,10 +227,11 @@
       if(i .eq. 10) tq => turb % uv
       if(i .eq. 11) tq => turb % uw
       if(i .eq. 12) tq => turb % vw
-      tq % solver    = sstring
-      tq % prec      = pstring
-      tq % prec_opts = c_opts
-      tq % tol       = tol
+      tq % solver              = sstring
+      tq % prec                = pstring
+      tq % prec_opts(1:MSI)    = ''
+      tq % prec_opts(1:n_opts) = opts(1:n_opts)
+      tq % tol                 = tol
     end do
   else
     if(this_proc < 2) then
@@ -297,6 +252,7 @@
       if(i .eq. 11) tq => turb % uw
       if(i .eq. 12) tq => turb % vw
       tq % prec = 'asm'
+      tq % prec_opts(1:MSI) = ''
     end do
   end if
 

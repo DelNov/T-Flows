@@ -48,18 +48,19 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve_Petsc(Pet,           &
-                         solver, prec,  &
-                         A, x, b,       &
-                         miter, niter,  &
-                         tol, fin_res,  &
+  subroutine Solve_Petsc(Pet,                      &
+                         solver, prec, prec_opts,  &
+                         A, x, b,                  &
+                         miter, niter,             &
+                         tol, fin_res,             &
                          norm)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
-  character(*)         :: solver   ! solver
-  character(*)         :: prec     ! preconditioner
+  character(*)         :: solver          ! solver
+  character(*)         :: prec            ! preconditioner
+  character(SL)        :: prec_opts(MSI)  ! preconditioner options
   type(Matrix_Type)    :: A
   real                 :: x(-Pet % pnt_grid % n_bnd_cells :  &
                              Pet % pnt_grid % n_cells)

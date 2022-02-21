@@ -357,17 +357,19 @@
       ! Under-relax the equations
       call Numerics_Mod_Under_Relax(ui, M, b)
 
-      ! Call linear solver
       call Cpu_Timer % Start('Linear_Solver_For_Momentum')
 
-      call Sol % Run(ui % solver, ui % prec,  &
-                     M,                       &
-                     ui % n,                  &
-                     b,                       &
-                     ui % mniter,             &
-                     ui % eniter,             &
-                     ui % tol,                &
-                     ui % res,                &
+      ! Call linear solver
+      call Sol % Run(ui % solver,     &
+                     ui % prec,       &
+                     ui % prec_opts,  &
+                     M,               &
+                     ui % n,          &
+                     b,               &
+                     ui % mniter,     &
+                     ui % eniter,     &
+                     ui % tol,        &
+                     ui % res,        &
                      norm = vel_max)
 
       call Cpu_Timer % Stop('Linear_Solver_For_Momentum')

@@ -12,11 +12,22 @@ static char help[] = "This is to initialize PETSc from T-Flows!\n";
 
 /*-----------------------------------------------------------------------------+
 |  PetscInitialize                                                             |
+|                                                                              |
+|  https://petsc.org/main/docs/manualpages/Sys/PetscInitialize.html            |
 +-----------------------------------------------------------------------------*/
 void c_petsc_initialize_() {
 
-  /* Issue PETSc call */
   err = PetscInitialize(0, NULL, (char*)0, help);
+}
+
+/*-----------------------------------------------------------------------------+
+|  PetscOptionsSetValue                                                        |
+|                                                                              |
+|  https://petsc.org/main/docs/manualpages/Sys/PetscOptionsSetValue.html       |
++-----------------------------------------------------------------------------*/
+void c_petsc_options_value_(const char name[], const char value[]) {
+
+  err = PetscOptionsSetValue(NULL, name, value);
 }
 
 /*-----------------------------------------------------------------------------+
@@ -158,9 +169,7 @@ void c_petsc_vec_set_type_to_standard_(Vec * v) {
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/Vec/VecSetValue.html             |
 +-----------------------------------------------------------------------------*/
-void c_petsc_vec_set_value_(Vec         * v,
-                            PetscInt    * row,
-                            PetscScalar * value) {
+void c_petsc_vec_set_value_(Vec * v, PetscInt * row, PetscScalar * value) {
 
   err = VecSetValue(*v, *row, *value, INSERT_VALUES);
 }
@@ -268,9 +277,7 @@ void c_petsc_ksp_set_tolerances_(KSP         * ksp,
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/KSP/KSPSolve.html                |
 +-----------------------------------------------------------------------------*/
-void c_petsc_ksp_solve_(KSP * ksp,
-                        Vec * b,
-                        Vec * x) {
+void c_petsc_ksp_solve_(KSP * ksp, Vec * b, Vec * x) {
 
   err = KSPSolve(*ksp, *b, *x);
 }
@@ -280,8 +287,7 @@ void c_petsc_ksp_solve_(KSP * ksp,
 |                                                                              |
 |  https://petsc.org/main/docs/manualpages/KSP/KSPGetConvergedReason.html      |
 +-----------------------------------------------------------------------------*/
-void c_petsc_ksp_converged_reason_(KSP                * ksp,
-                                   KSPConvergedReason * reason) {
+void c_petsc_ksp_converged_reason_(KSP * ksp, KSPConvergedReason * reason) {
 
   err = KSPGetConvergedReason(*ksp, reason);
 }
@@ -291,10 +297,8 @@ void c_petsc_ksp_converged_reason_(KSP                * ksp,
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/KSP/KSPGetIterationNumber.html   |
 +-----------------------------------------------------------------------------*/
-void c_petsc_ksp_get_iteration_number_(KSP      * ksp,
-                                       PetscInt * its) {
+void c_petsc_ksp_get_iteration_number_(KSP * ksp, PetscInt * its) {
 
-  /* Issue PETSc call */
   err = KSPGetIterationNumber(*ksp, its);
 }
 
@@ -303,9 +307,7 @@ void c_petsc_ksp_get_iteration_number_(KSP      * ksp,
 |                                                                              |
 |  https://petsc.org/release/docs/manualpages/KSP/KSPGetResidualNorm.html      |
 +-----------------------------------------------------------------------------*/
-void c_petsc_ksp_get_residual_norm_(KSP         * ksp,
-                                    PetscScalar * rnorm) {
+void c_petsc_ksp_get_residual_norm_(KSP * ksp, PetscScalar * rnorm) {
 
-  /* Issue PETSc call */
   err = KSPGetResidualNorm(*ksp, rnorm);
 }

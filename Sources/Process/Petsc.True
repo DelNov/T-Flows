@@ -185,18 +185,19 @@
   end subroutine
 
 !==============================================================================!
-  subroutine Solve_Petsc(Pet,           &
-                         solver, prec,  &
-                         A, x, b,       &
-                         miter, niter,  &
-                         tol, fin_res,  &
+  subroutine Solve_Petsc(Pet,                      &
+                         solver, prec, prec_opts,  &
+                         A, x, b,                  &
+                         miter, niter,             &
+                         tol, fin_res,             &
                          norm)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)    :: Pet
-  character(*)         :: solver   ! solver
-  character(*)         :: prec     ! preconditioner
+  character(*)         :: solver          ! solver
+  character(*)         :: prec            ! preconditioner
+  character(SL)        :: prec_opts(MSI)  ! preconditioner options
   type(Matrix_Type)    :: A
   real                 :: x(-Pet % pnt_grid % n_bnd_cells :  &
                              Pet % pnt_grid % n_cells)
@@ -251,14 +252,41 @@
                                              solvers,    &
                                              precs)
 
-  ! Set solver tolerances
+  !------------------------------------!
+  !   Process preconditioner options   !
+  !------------------------------------!
+  if(prec_opts(1) .ne. '') then
+    i = 1
+    do while(i < MSI .and. prec_opts(i)(1:1) .ne. '')
+
+      ! Option is just a single word (followed by another option or end)
+      if( prec_opts(i)(1:1) .eq. '-' .and. prec_opts(i+1)(1:1) .eq. '-' .or. &
+          prec_opts(i)(1:1) .eq. '-' .and. prec_opts(i+1)(1:1) .eq. '') then
+        !debug: print *, 'A:', trim(prec_opts(i))
+        call C_Petsc_Options_Value(trim(prec_opts(i)), "")
+        i = i + 1
+
+      ! Option is followed by a switch
+      else
+        !debug: print *, 'B:', trim(prec_opts(i)), ' ', trim(prec_opts(i+1))
+        call C_Petsc_Options_Value(trim(prec_opts(i)), trim(prec_opts(i+1)))
+        i = i + 2
+
+      end if
+    end do
+  end if
+
+  !---------------------------!
+  !   Set solver tolerances   !
+  !---------------------------!
   Pet % miter = miter
   call C_Petsc_Ksp_Set_Tolerances(Pet % ksp,     &
                                   tol,           &  ! PetscReal rtol
                                   tol,           &  ! PetscReal abstol
                                   Pet % miter)
-
-  ! Solve
+  !-----------!
+  !   Solve   !
+  !-----------!
   call C_Petsc_Ksp_Solve(Pet % ksp, Pet % b, Pet % x)
 
   ! Check if converged

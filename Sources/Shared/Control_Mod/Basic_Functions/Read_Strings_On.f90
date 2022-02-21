@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword
-  character(SL)     :: values(128)   ! spefified value, if found
+  character(SL)     :: values(MSI)   ! spefified value, if found
   integer           :: n             ! number of items
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
@@ -15,7 +15,7 @@
 !==============================================================================!
 
   ! Set default values
-  values = ''
+  values(1:MSI) = ''
 
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !
