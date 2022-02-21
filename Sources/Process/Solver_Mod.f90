@@ -18,7 +18,7 @@
     type(Native_Type) :: Nat
     type(Petsc_Type)  :: Pet
 
-    ! Linear solvers; native or PETSc
+    ! Linear solvers; NATIVE or PETSC
     integer :: solvers
 
     contains
