@@ -62,9 +62,7 @@
   !--------------------------------!
   !   Splash out the logo screen   !
   !--------------------------------!
-  if(this_proc  < 2) then
-    call Logo_Pro()
-  end if
+  call Logo_Pro()
 
   !-----------------------!
   !   Open control file   !
