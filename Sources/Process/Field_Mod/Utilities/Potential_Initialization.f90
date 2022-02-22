@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Potential_Initialization(Flow, Sol)
 !------------------------------------------------------------------------------!
-!   Discretizes and solves eliptic relaxation equations for f22.               !
+!   Initializes velocity from potential (pressure-like) equation               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Work_Mod, only: log_dist => r_cell_01
