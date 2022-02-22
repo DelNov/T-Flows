@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(Flow, turb)
+  subroutine User_Mod_Backstep_Cf_St(Flow, turb, ts)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -27,6 +27,7 @@
   real                     :: kin_vis, u_tan, u_tau, tau_wall
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
+  integer                  :: ts
 !==============================================================================!
 
   ! Take aliases
@@ -157,7 +158,7 @@
     end if
   end do
 
-  call File % Set_Name(result_name, appendix='-cf-st', extension='.dat')
+  call File % Set_Name(result_name, time_step=ts, appendix='-cf-st', extension='.dat')
   call File % Open_For_Writing_Ascii(result_name, fu)
 
   write(fu,*) '# x, Cf, St, U, T, yPlus'
