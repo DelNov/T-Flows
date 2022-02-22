@@ -117,6 +117,32 @@
     Flow % pp % prec_opts(1:MSI) = ''
   end if
 
+  !-----------------------------------!
+  !   For wall distance computation   !
+  !-----------------------------------!
+  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_WALL_DISTANCE',  &
+                                        found,                             &
+                                        .false.)
+  if(found) then
+    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+
+    Flow % wall_dist % solver = sstring
+    Flow % wall_dist % prec = pstring
+    Flow % wall_dist % prec_opts(1:MSI)    = ''
+    Flow % wall_dist % prec_opts(1:n_opts) = opts(1:n_opts)
+    Flow % wall_dist % tol = tol
+  else
+    if(this_proc < 2) then
+      print *, '# NOTE!  PETSc options for potential are not specified.'  //  &
+               ' Using the default values'
+    end if
+    Flow % wall_dist % prec = 'asm'
+    Flow % wall_dist % prec_opts(1:MSI) = ''
+  end if
+
   !----------------------------!
   !   For potential equation   !
   !----------------------------!
@@ -166,7 +192,7 @@
                ' Using the default values'
     end if
     t % prec = 'asm'
-    t % prec_opts(1:n_opts) = ''
+    t % prec_opts(1:MSI) = ''
   end if
 
   !--------------------------------!

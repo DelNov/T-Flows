@@ -99,6 +99,19 @@
   Flow % p  % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   Flow % pp % grad_method = Numerics_Mod_Gradient_Method_Code(name)
 
+  !------------------------------!
+  !   Related to wall distance   !
+  !------------------------------!
+  Flow % wall_dist % mniter = 99
+  Flow % wall_dist % solver = 'bicg'
+  Flow % wall_dist % tol    =  1.0e-5
+  call Control_Mod_Preconditioner_For_System_Matrix         &
+       (Flow % wall_dist % prec)
+  call Control_Mod_Tolerance_For_Wall_Distance_Solver       &
+       (Flow % wall_dist % tol)
+  call Control_Mod_Max_Iterations_For_Wall_Distance_Solver  &
+       (Flow % wall_dist % mniter)
+
   !--------------------------!
   !   Related to potential   !  (for flow field initialization)
   !--------------------------!

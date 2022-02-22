@@ -49,6 +49,9 @@
   ! Potential for initial velocity computation
   call Var_Mod_Allocate_Solution(Flow % pot, Grid, 'POT', '')
 
+  ! For computation of wall distance
+  call Var_Mod_Allocate_Solution(Flow % wall_dist, Grid, 'WD', '')
+
   ! Allocate memory for pressure correction and pressure
   call Var_Mod_Allocate_New_Only(Flow % pp, Grid, 'PP')
   call Var_Mod_Allocate_New_Only(Flow % p,  Grid, 'P')

@@ -57,6 +57,9 @@
     type(Var_Type) :: pp   ! [N/m^2] = [kg/m/s^2]
     type(Var_Type) :: pot  ! pressure-like potential for initial velocity field
 
+    ! Wall distance
+    type(Var_Type) :: wall_dist
+
     ! Internal forces on the fluid.
     ! These includes forces due to discretization (cross diffusion terms),
     ! boundary conditions (diffusive or advective), under-relaxation
@@ -213,10 +216,11 @@
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Fluxes
-      procedure :: Potential_Initialization
+      procedure :: Potential_Initialization  ! see: Compute_Wall_Distance
       procedure :: Prandtl_Number
       procedure :: Schmidt_Number
       procedure :: U_Tan
+      procedure :: Compute_Wall_Distance     ! see: Potential_Initialization
 
   end type
 
@@ -277,5 +281,6 @@
   include 'Field_Mod/Utilities/Prandtl_Number.f90'
   include 'Field_Mod/Utilities/Schmidt_Number.f90'
   include 'Field_Mod/Utilities/U_Tan.f90'
+  include 'Field_Mod/Utilities/Compute_Wall_Distance.f90'
 
   end module
