@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(Flow, turb)
+  subroutine User_Mod_Backstep_Profiles(Flow, turb, ts)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Grid_Type), pointer :: grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
-                              k, c1, c2, s, n_hor, fu
+                              k, c1, c2, s, n_hor, fu, ts
   character(SL)            :: coord_name, result_name
   real, parameter          :: u_b = 11.3, h = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
@@ -24,7 +24,7 @@
                               v1_p(:), v2_p(:), v3_p(:), &
                               v4_p(:), v5_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
-  real                     :: z_coor
+  real                     :: z_coor, u_tau
   logical                  :: there
 !==============================================================================!
 
@@ -139,12 +139,14 @@
         if(grid % xc(c) < x1_p(k) .and. grid % xc(c) > x2_p(k)) then
           if(z_coor > z_p(i) .and. z_coor < z_p(i+1)) then
             um_p(i) = um_p(i) + u % n(c)
-            vm_p(i) = vm_p(i) + v % n(c)
+            vm_p(i) = vm_p(i) + sqrt(abs(Flow % viscosity(c) * u % n(c) &
+                                / Grid % wall_dist(c))/ Flow % density(c))
             wm_p(i) = wm_p(i) + w % n(c)
             uu_p(i) = uu_p(i) + kin % n(c)
             vv_p(i) = vv_p(i) + eps % n(c)
             v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/u_b**2
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
+            v3_p(i) = v3_p(i) + Grid % zc(c) / Flow % viscosity(c)
             n_count(i) = n_count(i) + 1
             if(turb % model == K_EPS_ZETA_F) then
               ww_p(i) = ww_p(i) + zeta % n(c)
@@ -184,7 +186,30 @@
       end if
     end do
 
-    call File % Set_Name(result_name, appendix='-prof', extension='.h.dat')
+    if(k == 1) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-0.35h', extension='.h.dat')
+    else if(k == 2) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-1.68h', extension='.h.dat')
+    else if(k == 3) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-2.30h', extension='.h.dat')
+    else if(k == 4) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-3.15h', extension='.h.dat')
+    else if(k == 5) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-3.92h', extension='.h.dat')
+    else if(k == 6) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-4.70h', extension='.h.dat')
+    else if(k == 7) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-5.20h', extension='.h.dat')
+    else if(k == 8) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-6.50h', extension='.h.dat')
+    else if(k == 9) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-8.90h', extension='.h.dat')
+    else if(k == 10) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-26.0h', extension='.h.dat')
+    else if(k == 11) then
+      call File % Set_Name(result_name, time_step=ts, appendix='-52.0h', extension='.h.dat')
+    end if  
+
     call File % Open_For_Writing_Ascii(result_name, fu)
 
     open(fu,file=result_name)
@@ -206,15 +231,22 @@
         v3_p(i) = v3_p(i) / n_count(i)
         v4_p(i) = v4_p(i) / n_count(i)
         v5_p(i) = v5_p(i) / n_count(i)
+      end if
+    end do
 
-        write(fu,'(8es15.5e3)') (z_p(i)+z_p(i+1))/(2.*h),    &
+    u_tau = vm_p(1)
+    write(*,*) u_tau 
+    do i = 1, n_prob
+      if(n_count(i) .ne. 0) then
+        write(fu,'(10es15.5e3)') (z_p(i)+z_p(i+1))/(2.*h),    &
                                  um_p(i) / u_b,              &
                                  uu_p(i) / u_b**2,           &
                                  vv_p(i) * h / u_b**3,       &
                                  ww_p(i) / u_b**2,           &
                                  uv_p(i) * h / u_b**2,       &
                                  v1_p(i),                    &
-                                 v2_p(i)
+                                 v2_p(i),                    &
+                                 v3_p(i)*u_tau, um_p(i)/u_tau
 
         wm_p(i)    = 0.0
         um_p(i)    = 0.0
