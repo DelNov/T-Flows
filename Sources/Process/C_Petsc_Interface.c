@@ -11,23 +11,35 @@ PetscErrorCode err;
 static char help[] = "This is to initialize PETSc from T-Flows!\n";
 
 /*-----------------------------------------------------------------------------+
-|  PetscInitialize                                                             |
+|  PetscInitialize (and PetcIntialized)                                        |
 |                                                                              |
 |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialize.html            |
+|  https://petsc.org/main/docs/manualpages/Sys/PetscInitialized.html           |
 +-----------------------------------------------------------------------------*/
 void c_petsc_initialize_() {
 
-  err = PetscInitialize(0, NULL, (char*)0, help);
+  PetscBool initialized;
+  err = PetscInitialized(&initialized);
+
+  if(!initialized) {
+    err = PetscInitialize(0, NULL, (char*)0, help);
+  }
 }
 
 /*-----------------------------------------------------------------------------+
-|  PetscFinalize                                                               |
+|  PetscFinalize (and PetscInitialized)                                        |
 |                                                                              |
 |  https://petsc.org/main/docs/manualpages/Sys/PetscFinalize.html              |
+|  https://petsc.org/main/docs/manualpages/Sys/PetscInitialized.html           |
 +-----------------------------------------------------------------------------*/
 void c_petsc_finalize_() {
 
-  err = PetscFinalize();
+  PetscBool initialized;
+  err = PetscInitialized(&initialized);
+
+  if(initialized) {
+    err = PetscFinalize();
+  }
 }
 
 /*-----------------------------------------------------------------------------+
