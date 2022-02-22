@@ -454,6 +454,13 @@
   call Cpu_Timer % Stop('Main')
   call Cpu_Timer % Statistics
 
+  !--------------------------!
+  !   Finalize the solvers   !
+  !--------------------------!
+  do d = 1, n_dom
+    call Sol(d) % End()
+  end do
+
   !----------------------------!
   !   End parallel execution   !
   !----------------------------!

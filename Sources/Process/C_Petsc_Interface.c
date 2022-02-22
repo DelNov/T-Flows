@@ -21,6 +21,16 @@ void c_petsc_initialize_() {
 }
 
 /*-----------------------------------------------------------------------------+
+|  PetscFinalize                                                               |
+|                                                                              |
+|  https://petsc.org/main/docs/manualpages/Sys/PetscFinalize.html              |
++-----------------------------------------------------------------------------*/
+void c_petsc_finalize_() {
+
+  err = PetscFinalize();
+}
+
+/*-----------------------------------------------------------------------------+
 |  PetscOptionsSetValue                                                        |
 |                                                                              |
 |  https://petsc.org/main/docs/manualpages/Sys/PetscOptionsSetValue.html       |
