@@ -71,8 +71,8 @@
     end do
 1   continue
   end do
-  PRINT *, '# Number of all cells near boundary:          ', cnt_c
-  PRINT *, '# Number of all cells''s faces near boundary: ', cnt_f
+  print *, '# Number of all cells near boundary:          ', cnt_c
+  print *, '# Number of all cells''s faces near boundary: ', cnt_f
 
   allocate(cr1(cnt_f));  cr1(:) = 0
   allocate(cr2(cnt_f));  cr2(:) = 0
@@ -164,7 +164,8 @@
     n_match = 0
     do i_fac = 1, cnt_f-1
       j_fac = i_fac + 1
-      if( w1(i_fac) * w1(j_fac) < 0 ) then  ! they have different signs
+      if(  sign(1, w1(i_fac))  &
+         + sign(1, w1(j_fac)) .eq. 0 ) then  ! they have different signs
 
         ! Is it a match?
         if( cr1(i_fac) .eq. cr1(j_fac) .and.  &
