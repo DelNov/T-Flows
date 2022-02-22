@@ -1,18 +1,11 @@
 !==============================================================================!
-  subroutine Read_Control_Numerical(Flow, turb, Vof, Sol)
+  subroutine Numerical_Schemes(Rc, Flow, turb, Vof, Sol)
 !------------------------------------------------------------------------------!
-!   Reads details about numerical models from control file.                    !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,    only: Field_Type
-  use Var_Mod,      only: Var_Type
-  use Turb_Mod,     only: Turb_Type
-  use Vof_Mod
-  use Control_Mod
-  use Numerics_Mod
+!   Reads details about numerical schemes from control file.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Read_Control_Type)  :: Rc
   type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof

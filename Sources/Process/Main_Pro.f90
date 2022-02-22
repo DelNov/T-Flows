@@ -5,10 +5,11 @@
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Eddies_Mod
-  use Work_Mod,      only: Work_Mod_Allocate
+  use Work_Mod,         only: Work_Mod_Allocate
   use User_Mod
-  use Results_Mod
   use Backup_Mod
+  use Results_Mod
+  use Read_Control_Mod
   use Monitor_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -121,7 +122,7 @@
   ! Read physical models for each domain from control file
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
-    call Read_Control_Physical_Models(Flow(d), turb(d), Vof(d), Swarm(d))
+    call Read_Control % Physical_Models(Flow(d), turb(d), Vof(d), Swarm(d))
   end do
 
   !----------------------------------------------------------!
@@ -140,11 +141,11 @@
     call Control_Mod_Switch_To_Domain(d)  ! go back to local domain's control
 
     ! Read numerical models from control file (after the memory is allocated)
-    call Read_Control_Numerical(Flow(d), turb(d), Vof(d), Sol(d))
+    call Read_Control % Numerical_Schemes(Flow(d), turb(d), Vof(d), Sol(d))
 
     ! Read PETSc options after, so that they get a prefferance, but also
     ! keep the values for native solver if not specified
-    call Read_Control_Petsc_Options(Flow(d), turb(d), Vof(d), Sol(d))
+    call Read_Control % Petsc_Options(Flow(d), turb(d), Vof(d), Sol(d))
 
     call Grid(d) % Find_Nodes_Cells()
     call Grid(d) % Calculate_Weights_Cells_To_Nodes()  ! needed for front
@@ -155,9 +156,9 @@
     ! (You need face geomtry for this step)
     call Sol(d) % Create_Solver(Grid(d))
 
-    call Read_Control_Physical_Properties(Flow(d), Vof(d), Swarm(d))
-    call Read_Control_Boundary_Conditions(Flow(d), turb(d), Vof(d),   &
-                                          turb_planes(d))
+    call Read_Control % Physical_Properties(Flow(d), Vof(d), Swarm(d))
+    call Read_Control % Boundary_Conditions(Flow(d), turb(d), Vof(d),   &
+                                            turb_planes(d))
   end do
 
   ! Create interfaces

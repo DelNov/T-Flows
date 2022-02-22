@@ -1,20 +1,13 @@
 !==============================================================================!
-  subroutine Read_Control_Petsc_Options(Flow, turb, Vof, Sol)
+  subroutine Petsc_Options(Rc, Flow, turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads options for PETSc solver from control file.                          !
 !   I don't put it together with Read_Control_Numerical because I am afraid    !
 !   it could grow a lot as we learn new PETSc options and want more from it    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,    only: Field_Type
-  use Var_Mod,      only: Var_Type
-  use Turb_Mod,     only: Turb_Type
-  use Vof_Mod
-  use Control_Mod
-  use Numerics_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Read_Control_Type)  :: Rc
   type(Field_Type),  target :: Flow
   type(Turb_Type),   target :: turb
   type(Vof_Type),    target :: Vof

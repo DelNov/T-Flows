@@ -1,24 +1,15 @@
 !==============================================================================!
-  subroutine Read_Control_Physical_Models(Flow, turb, Vof, swarm)
+  subroutine Physical_Models(Rc, Flow, turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod,      only: HUGE_INT
-  use Comm_Mod
-  use Field_Mod,      only: Field_Type
-  use Bulk_Mod,       only: Bulk_Type
-  use Turb_Mod
-  use Vof_Mod
-  use Control_Mod
-  use Swarm_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Read_Control_Type) :: Rc
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name
@@ -266,13 +257,13 @@
 
   if(Flow % with_particles) then
 
-    call Control_Mod_Number_Of_Particles(swarm % n_particles, verbose = .true.)
-    call Control_Mod_Swarm_Density      (swarm % density,     verbose = .true.)
-    call Control_Mod_Swarm_Diameter     (swarm % diameter,    verbose = .true.)
+    call Control_Mod_Number_Of_Particles(Swarm % n_particles, verbose = .true.)
+    call Control_Mod_Swarm_Density      (Swarm % density,     verbose = .true.)
+    call Control_Mod_Swarm_Diameter     (Swarm % diameter,    verbose = .true.)
 
-    call Control_Mod_Swarm_Coefficient_Of_Restitution(swarm % rst,         &
+    call Control_Mod_Swarm_Coefficient_Of_Restitution(Swarm % rst,         &
                                                       verbose = .true.)
-    call Control_Mod_Number_Of_Swarm_Sub_Steps       (swarm % n_sub_steps, &
+    call Control_Mod_Number_Of_Swarm_Sub_Steps       (Swarm % n_sub_steps, &
                                                       verbose = .true.)
 
     call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
@@ -282,9 +273,9 @@
     call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
     select case(name)
       case('BROWNIAN_FUKAGATA')
-           swarm % subgrid_scale_model = BROWNIAN_FUKAGATA
+           Swarm % subgrid_scale_model = BROWNIAN_FUKAGATA
       case('DISCRETE_RANDOM_WALK')
-           swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
+           Swarm % subgrid_scale_model = DISCRETE_RANDOM_WALK
     end select
 
     if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
@@ -293,7 +284,7 @@
                  'swarm statistics engaged!'                   // &
                  'and particle statistics begins at:', n_stat_p
       end if
-      swarm % statistics = .true.
+      Swarm % statistics = .true.
     end if
 
   end if
