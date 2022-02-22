@@ -6,6 +6,25 @@
                                   plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
+!                                                                              !
+!   Here:                                                                      !
+!                                                                              !
+!   - inside_cell (and inside_name) are for scalar variables defined only on   !
+!     inside cell, which is right hand side vector "b" at this point.          !
+!                                                                              !
+!   - scalar_cell (and scalar_name) are for scalar variables defined on both   !
+!     boundary and inside cell, like most variables in T-Flows.  They should   !
+!     not be defined at the same time as scalar_node.                          !
+!                                                                              !
+!   - scalar_node (and scalar_name) are for scalar variables defined on nodes. !
+!     They shouldn't be defined at the same time as scalar_cell.               !
+!                                                                              !
+!   - vector_cell (and vector_name) are for vector variables defined on both   !
+!     boundary and inside cell, like velocities and gradients in T-Flows.      !
+!     They should not be defined at the same time as vector_node.              !
+!                                                                              !
+!   - vector_node (and vector_name) are for vector variables defined on nodes. !
+!     They shouldn't be defined at the same time as vector_cell.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
