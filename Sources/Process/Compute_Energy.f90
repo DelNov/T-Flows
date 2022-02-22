@@ -26,7 +26,6 @@
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
-  type(Var_Type),    pointer :: ut, vt, wt
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
@@ -60,7 +59,6 @@
 !   temperature                 t % n             [K]
 !   right hand s.               b                 [J/s]
 !   turb. thermal conductivity  con_t_f           [W/(m K)]
-!   turb. hear flux             ut                [(m K)/s]
 !   turb. hear flux             ut_x_cap_dens_s   [J/(m^2 s)]
 !   turb. stress                t_stress          [J/s]
 !   turb. viscosity             vis_t             [kg/(m s)]
