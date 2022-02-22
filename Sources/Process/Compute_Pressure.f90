@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Flow, Vof, Sol, Pet, curr_dt, ini)
+  subroutine Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,6 @@
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  type(Petsc_Type),    target :: Pet
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
