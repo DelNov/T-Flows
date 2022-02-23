@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(Flow, turb, ts)
+  subroutine User_Mod_Plain_Profiles(Flow, turb, ts)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -32,7 +32,6 @@
   grid => Flow % pnt_grid
   t    => Flow % t
   call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
@@ -64,7 +63,7 @@
   allocate(x2_p(n_hor))
   allocate(lnum(n_hor))
   do pl=1, n_hor
-    read(9,*) x1_p(pl), x2_p(pl), lnum(pl)
+    read(9,*) x1_p(pl), x2_p(pl)
   end do
   close(9)
 
@@ -139,19 +138,8 @@
         if(grid % xc(c) < x1_p(k) .and. grid % xc(c) > x2_p(k)) then
           if(z_coor > z_p(i) .and. z_coor < z_p(i+1)) then
             um_p(i) = um_p(i) + u % n(c)
-            vm_p(i) = vm_p(i) + sqrt(abs(Flow % viscosity(c) * u % n(c) &
-                                / Grid % wall_dist(c))/ Flow % density(c))
-            wm_p(i) = wm_p(i) + w % n(c)
-            uu_p(i) = uu_p(i) + kin % n(c)
-            vv_p(i) = vv_p(i) + eps % n(c)
-            v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/u_b**2
-            v2_p(i) = v2_p(i) + t % n(c) - 20.0
-            v3_p(i) = v3_p(i) + Grid % zc(c) / Flow % viscosity(c)
+            tm_p(i) = tm_p(i) + t % n(c) 
             n_count(i) = n_count(i) + 1
-            if(turb % model == K_EPS_ZETA_F) then
-              ww_p(i) = ww_p(i) + zeta % n(c)
-              uv_p(i) = uv_p(i) + f22 % n(c)
-            end if
           end if
         end if
       end do 
@@ -187,34 +175,33 @@
     end do
 
     if(k == 1) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-0.35h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-1', extension='.dat')
     else if(k == 2) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-1.68h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-2', extension='.dat')
     else if(k == 3) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-2.30h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-3', extension='.dat')
     else if(k == 4) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-3.15h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-4', extension='.dat')
     else if(k == 5) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-3.92h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-5', extension='.dat')
     else if(k == 6) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-4.70h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-6', extension='.dat')
     else if(k == 7) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-5.20h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-7', extension='.dat')
     else if(k == 8) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-6.50h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-8', extension='.dat')
     else if(k == 9) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-8.90h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-9', extension='.dat')
     else if(k == 10) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-26.0h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-10', extension='.dat')
     else if(k == 11) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-52.0h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts, appendix='-11', extension='.dat')
     end if  
 
     call File % Open_For_Writing_Ascii(result_name, fu)
 
     open(fu,file=result_name)
-    write(fu,*) '# z, u, kin, eps, zeta, f22, uv, T'
-    write(fu,*) '# all data are normalized by Ub=11.3 and step height h=0.038'
+    write(fu,*) '# x, u, T'
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         wm_p(i) = wm_p(i) / n_count(i)
@@ -234,19 +221,11 @@
       end if
     end do
 
-    u_tau = vm_p(1)
-    write(*,*) u_tau 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu,'(10es15.5e3)') (z_p(i)+z_p(i+1))/(2.*h),    &
-                                 um_p(i) / u_b,              &
-                                 uu_p(i) / u_b**2,           &
-                                 vv_p(i) * h / u_b**3,       &
-                                 ww_p(i) / u_b**2,           &
-                                 uv_p(i) * h / u_b**2,       &
-                                 v1_p(i),                    &
-                                 v2_p(i),                    &
-                                 v3_p(i)*u_tau, um_p(i)/u_tau
+        write(fu,'(3es15.5e3)') (z_p(i)+z_p(i+1))/(2.),     &
+                                 um_p(i),                   &
+                                 tm_p(i)
 
         wm_p(i)    = 0.0
         um_p(i)    = 0.0

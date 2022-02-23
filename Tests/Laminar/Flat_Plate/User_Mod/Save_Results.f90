@@ -1,21 +1,21 @@
-include '../User_Mod/Impinging_Jet_Nu.f90'
-include '../User_Mod/Impinging_Jet_Profiles.f90'
+include '../User_Mod/Plain_Profiles.f90'
+include '../User_Mod/Plain_Nu.f90'
 
 !==============================================================================!
   subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
 !------------------------------------------------------------------------------!
-!   Calls User_Impinging_Jet_Nu and User_Impinging_Jet_Profile functions.      !
+!   Calls user-define subroutines                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type)    :: Flow
-  type(Turb_Type)     :: turb
-  type(Vof_Type)      :: Vof
-  type(Swarm_Type)    :: swarm
-  integer, intent(in) :: ts     ! time step
+  type(Field_Type), target :: Flow
+  type(Turb_Type),  target :: turb
+  type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: swarm
+  integer, intent(in)      :: ts
 !==============================================================================!
 
-  call User_Mod_Impinging_Jet_Nu      (turb, ts)
-  call User_Mod_Impinging_Jet_Profiles(turb, ts)
+  call User_Mod_Plain_Profiles(Flow, turb, ts)
+  call User_Mod_Plain_Nu   (Flow, turb, ts)
 
   end subroutine
