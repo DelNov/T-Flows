@@ -20,6 +20,7 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
                         P  = 5,  &  ! ... and pressure as the fifth
                         CB = 6      ! ... boundary value of scalar
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type), pointer :: Grid1, Grid2
   integer :: d1, d2     ! counters for domains 1 and 2
   integer :: n1, n2, n  ! local counters and number at interfaces 1 and 2
   integer :: ic1, bc1   ! internal (i) and boundary (b) cells in domain 1
@@ -33,14 +34,15 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
   real    :: p1, p2     ! pressure in domains 1 and 2
   real    :: M, m_h2o, m_air, m_salt
   real    :: p_v_air, p_v_h2o    ! partial vapor pressure in air domain
-  real    :: t_tmp, t_int
+  real    :: t_tmp, t_int, t_int_acc, t_int_avg
   real    :: mem_eps, mem_r, mem_tau, mem_d, mem_t, mem_matkap, mem_p, mem_pv
-  real    :: mem_kap, k_res
+  real    :: mem_kap, k_res, area_acc
   real    :: diff, h_d  ! diffusivity of vapor in air and latent heat
   real    :: c_k, c_m, c_t ! DGM coefficients
   real    :: lhs_lin, lhs_fun, rhs ! variables for jump cond at membrane
   real    :: res        ! residual of jump condition
   real    :: mem_j_diff, mem_j_heat
+  real    :: mem_j_diff_acc, mem_j_diff_avg, mem_j_heat_acc, mem_j_heat_avg
   real    :: sc1_new    ! accumulation of salt after evaporation helping variabl
   real    :: p_test
 !------------------------------[Local parameters]------------------------------!
@@ -101,8 +103,19 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
   !    to impose boundary conditions for each domain.    !
   !                                                      !
   !------------------------------------------------------!
+  mem_j_diff_acc = 0.0
+  mem_j_heat_acc = 0.0
+  area_acc       = 0.0
+  t_int_acc      = 0.0
   do d1 = 1, n_dom
+
+    ! Take the pointer to Grid1
+    Grid1 => Flow(d1) % pnt_grid
+
     do d2 = 1, n_dom
+
+      ! Take the pointer to Grid1
+      Grid2 => Flow(d2) % pnt_grid
 
       !-----------------------------!
       !   On the side of domain 1   !
@@ -215,6 +228,14 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
         ! Set temperature at the boundary of domain 1
         Flow(d1) % t % n(bc1) = t_int
 
+        ! If not in a buffer, update accumulated variables
+        if(Grid1 % Comm % cell_proc(ic1) .eq. this_proc) then
+          mem_j_heat_acc = mem_j_heat_acc  + mem_j_heat * Grid1 % s(n)
+          mem_j_diff_acc = mem_j_diff_acc  + mem_j_diff * Grid1 % s(n)
+          t_int_acc      = t_int_acc       + t_int      * Grid1 % s(n)
+          area_acc       = area_acc        + Grid1 % s(n)
+        end if
+
       end do
 
       !-----------------------------!
@@ -277,15 +298,22 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
     end do
   end do
 
+  call Comm_Mod_Global_Sum_Real(mem_j_diff_acc)
+  call Comm_Mod_Global_Sum_Real(mem_j_heat_acc)
+  call Comm_Mod_Global_Sum_Real(t_int_acc)
+  call Comm_Mod_Global_Sum_Real(area_acc)
+  mem_j_diff_avg = mem_j_diff_acc / area_acc
+  mem_j_heat_avg = mem_j_heat_acc / area_acc
+  t_int_avg      = t_int_acc      / area_acc
   ! Control
   if(this_proc < 2) then
-    print *, 'mem_j_diff = ' , mem_j_diff * 3600, ' kg/m²h'
-    print *, 'mem_j_heat = ' , mem_j_heat * 3600, ' kg/m²h'
+    print *, 'mem_j_diff = ' , mem_j_diff_avg * 3600, ' kg/m²h'
+    print *, 'mem_j_heat = ' , mem_j_heat_avg * 3600, ' kg/m²h'
     print *, 'jump condition coefficients: ', lhs_lin, lhs_fun, rhs
     print *, 'partial vapor pressure on water and air side: ', p_v_h2o, p_v_air
     print *, 'scalars salt and vapor: ', sc1, sc2
     print *, 'M in air gap: ', M
-    print *, 't_int_mem = ' , t_int, ' C'
+    print *, 't_int_mem = ' , t_int_avg, ' C'
   end if
 
   end subroutine
