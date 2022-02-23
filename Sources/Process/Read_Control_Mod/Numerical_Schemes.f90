@@ -104,6 +104,7 @@
        (Flow % wall_dist % tol)
   call Control_Mod_Max_Iterations_For_Wall_Distance_Solver  &
        (Flow % wall_dist % mniter)
+  call Control_Mod_Gradient_Method_For_Wall_Distance(name)
 
   !--------------------------!
   !   Related to potential   !  (for flow field initialization)

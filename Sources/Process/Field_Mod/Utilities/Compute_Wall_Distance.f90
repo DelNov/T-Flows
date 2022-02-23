@@ -3,15 +3,6 @@
 !------------------------------------------------------------------------------!
 !   www.cfd-online.com/Wiki/Transport_equation_based_wall_distance_calculation !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-! use Work_Mod, only: log_dist => r_cell_01
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                     (allocates Work_Mod)          !
-!     |                                                                        !
-!     +----> Field_Mod_Potential_Initialization  (safe to use r_cell_01)       !
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
@@ -31,7 +22,7 @@
 !==============================================================================!
 
   if(this_proc < 2) then
-    print '(a)',      ' # Computing potential to initialize velocity field ...'
+    print '(a)',      ' # Computing wall distance ...'
     print '(a,i3,a)', ' # ... with ', NDT, ' fake time steps.'
     print '(a)',      ' # This might take a while, please wait'
   end if
@@ -137,7 +128,7 @@
     !------------------!
 
     ! Gradients
-    call Flow % Grad_Variable(phi)
+    call Flow % Grad_Gauss_Variable(phi)
 
     !----------------------------!
     !   Spatial discretization   !
@@ -245,7 +236,7 @@
   end do
 
   ! Compute wall distance
-  call Flow % Grad_Variable(phi)
+  call Flow % Grad_Gauss_Variable(phi)
   do c = 1, Grid % n_cells
     phi % n(c) = sqrt(  phi % x(c) * phi % x(c)  &
                       + phi % y(c) * phi % y(c)  &
@@ -255,12 +246,10 @@
                       + phi % y(c) * phi % y(c)  &
                       + phi % z(c) * phi % z(c))
   end do
-  call Save_Debug_Vtu(Grid, "wall_dist_equation",          &
-                             scalar_cell = phi % n,        &
-                             scalar_name = "wall_dist_equation")
-  call Save_Debug_Vtu(Grid, "wall_dist_error",                              &
-                             scalar_cell = abs(phi % n - Grid % wall_dist)  &
-                                         / Grid % wall_dist * 100.0,        &
-                             scalar_name = "wall_dist_error [%]")
+
+  call Grid % Save_Debug_Vtu(append = "wall-dist-rel-error",                   &
+                             scalar_cell = abs(phi % n - Grid % wall_dist)     &
+                                         / (Grid % wall_dist + TINY) * 100.0,  &
+                             scalar_name = "Wall Distance Error [%]")
 
   end subroutine

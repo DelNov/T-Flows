@@ -156,6 +156,7 @@
     include 'Control_Mod/Numerics/Gradient_Method_For_Scalars.f90'
     include 'Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Gradient_Method_For_Vof.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90'
     include 'Control_Mod/Numerics/Gu_Correction.f90'
     include 'Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90'
     include 'Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90'
@@ -189,6 +190,7 @@
     include 'Control_Mod/Numerics/Solver_For_Scalars.f90'
     include 'Control_Mod/Numerics/Solver_For_Turbulence.f90'
     include 'Control_Mod/Numerics/Solver_For_Vof.f90'
+    include 'Control_Mod/Numerics/Solver_For_Wall_Distance.f90'
     include 'Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90'
     include 'Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90'
     include 'Control_Mod/Numerics/Normalization_For_Energy_Solver.f90'
@@ -204,9 +206,6 @@
     include 'Control_Mod/Numerics/Tolerance_For_Vof_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Wall_Distance_Solver.f90'
     include 'Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90'
-    include 'Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90'
-    include 'Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90'
-    include 'Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90'
 
     ! Numerical Parameters VOF (CICSAM)
     include 'Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90'

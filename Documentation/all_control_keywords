@@ -37,7 +37,8 @@
   GRADIENT_METHOD_FOR_PRESSURE             |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_SCALARS              |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_TURBULENCE           |         least_squares         !   gauss_theorem
-  GRADIENT_METHOD_FOR_VOF                  |         least_squares         |   cicsam, stacs
+  GRADIENT_METHOD_FOR_VOF                  |         least_squares         |   gauss_theorem
+  GRADIENT_METHOD_FOR_WALL_DISTANCE        |         gauss_theorem         |   least_squares -> not recommended
   GU_CORRECTION                            |         no                    |   yes
   LINEAR_SOLVERS                           |         native                |   petsc
   MAX_CORRECTION_CYCLES_BETA_VOF           |         2                     |   up to 5 makes sense
@@ -74,10 +75,12 @@
   SKEWNESS_CORRECTION_VOF                  |         no                    |   yes
   SOLVER_FOR_ENERGY                        |         bicg                  |   cg, cgs
   SOLVER_FOR_MOMENTUM                      |         bicg                  |   cg, cgs
+  SOLVER_FOR_POTENTIAL                     |         cg                    |   bicg, cgs
   SOLVER_FOR_PRESSURE                      |         cg                    |   bicg, cgs
   SOLVER_FOR_SCALARS                       |         bicg                  |   cg, cgs
   SOLVER_FOR_TURBULENCE                    |         bicg                  |   cg, cgs
-  SOLVER_FOR_VOF                           |         bicg                  |   s, bicg
+  SOLVER_FOR_VOF                           |         bicg                  |   cg, cgs
+  SOLVER_FOR_WALL_DISTANCE                 |         bicg                  |   cg, cgs
   TIME_INTEGRATION_SCHEME                  |         linear                |   parabolic
   TIME_STEP                                |         1.0e-4                |   any real number, usually < 0.1
   TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-3                |   any small number, but < 1.0e-3 is OK
@@ -88,6 +91,7 @@
   TOLERANCE_FOR_SCALARS_SOLVER             |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_TURBULENCE_SOLVER          |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_VOF_SOLVER                 |         1.0e-6                |   any small number, but > 1.0e-12 is OK
+  TOLERANCE_FOR_WALL_DISTANCE_SOLVER       |         1.0e-5                |   any small number, but > 1.0e-12 is OK
 ========================================================================================================================
   Physics
 ------------------------------------------------------------------------------------------------------------------------

@@ -49,7 +49,6 @@
 #----------------------
 # Numerical parameters
 #----------------------
- LINEAR_SOLVERS                petsc
  PRESSURE_MOMENTUM_COUPLING    simple
 
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM      0.4
@@ -68,11 +67,13 @@
 #------------------------
 # Linear solver settings
 #------------------------
+ LINEAR_SOLVERS                     petsc
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-5
  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
  TOLERANCE_FOR_TURBULENCE_SOLVER    1.e-5
  TOLERANCE_FOR_ENERGY_SOLVER        1.e-7
+
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER   120
