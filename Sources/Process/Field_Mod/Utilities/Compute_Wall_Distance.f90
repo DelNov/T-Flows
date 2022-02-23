@@ -227,8 +227,21 @@
 1 continue
 
   ! Set it to zero on boundaries (probably not needed)
-  do c = -Grid % n_bnd_cells, -1
-    phi % n(c) = 0.0
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
+
+    if(c2 < 0) then
+      ! On all walls set to zero
+      if( (Grid % Bnd_Cond_Type(c2) .eq. WALL)   .or.  &
+          (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
+        phi % n(c2) = 0.0
+
+      ! Copy from inside everywhere else
+      else
+        phi % n(c2) = phi % n(c1)
+      end if
+    end if
   end do
 
   ! Compute wall distance
