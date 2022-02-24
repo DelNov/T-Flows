@@ -2,6 +2,10 @@
   subroutine Physical_Models(Rc, Flow, turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
+!                                                                              !
+!   Good practice: default values, outlined in Documents/all_control_keywords, !
+!   should be defined only in Control_Mod, not be scattered around the code.   !
+!   In other words, Control_Mod changes less frequently than other parts of    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -118,7 +122,6 @@
   !   Rough or smooth walls?   !
   !----------------------------!
   call Control_Mod_Rough_Walls(turb % rough_walls, .true.)
-
 
   ! Does the user want to gather statistics?
   call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS',               &

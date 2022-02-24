@@ -25,11 +25,13 @@
   type Read_Control_Type
 
     contains
-      procedure :: Boundary_Conditions
-      procedure :: Numerical_Schemes
-      procedure :: Petsc_Options
-      procedure :: Physical_Models
-      procedure :: Physical_Properties
+      procedure          :: Boundary_Conditions
+      procedure          :: Linear_Solvers       ! on top of native & PETSc
+      procedure, private :: Native_Solvers
+      procedure          :: Numerical_Schemes
+      procedure, private :: Petsc_Solvers
+      procedure          :: Physical_Models
+      procedure          :: Physical_Properties
 
   end type
 
@@ -39,8 +41,10 @@
 
   ! Member function
   include 'Read_Control_Mod/Boundary_Conditions.f90'
+  include 'Read_Control_Mod/Linear_Solvers.f90'
+  include 'Read_Control_Mod/Native_Solvers.f90'
   include 'Read_Control_Mod/Numerical_Schemes.f90'
-  include 'Read_Control_Mod/Petsc_Options.f90'
+  include 'Read_Control_Mod/Petsc_Solvers.f90'
   include 'Read_Control_Mod/Physical_Models.f90'
   include 'Read_Control_Mod/Physical_Properties.f90'
 

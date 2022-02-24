@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Petsc_Options(Rc, Flow, turb, Vof, Sol)
+  subroutine Petsc_Solvers(Rc, Flow, turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads options for PETSc solver from control file.                          !
 !   I don't put it together with Read_Control_Numerical because I am afraid    !
