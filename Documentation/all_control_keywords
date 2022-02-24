@@ -47,7 +47,7 @@
   MAX_ITERATIONS_FOR_ENERGY_SOLVER         |         6                     |   up to 10 is reasonable
   MAX_ITERATIONS_FOR_MOMENTUM_SOLVER       |         6                     |   up to 10 is reasonable
   MAX_ITERATIONS_FOR_POTENTIAL_SOLVER      |       120                     |   better if higher, up to 900
-  MAX_ITERATIONS_FOR_PRESSURE_SOLVER       |        60                     |   better if higher, up to 900
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER       |       120                     |   better if higher, up to 900
   MAX_ITERATIONS_FOR_SCALARS_SOLVER        |         6                     |   up to 10 is reasonable
   MAX_ITERATIONS_FOR_TURBULENCE_SOLVER     |         6                     |   up to 10 is reasonable
   MAX_ITERATIONS_FOR_VOF_SOLVER            |         6                     |   up to 10 is reasonable
