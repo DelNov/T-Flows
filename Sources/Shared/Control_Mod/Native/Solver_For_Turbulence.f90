@@ -9,9 +9,9 @@
 
   call Control_Mod_Read_Char_Item('SOLVER_FOR_TURBULENCE', 'cg',  &
                                    val, verbose)
-  call To_Upper_Case(val)
+  call To_Lower_Case(val)
 
-  if( val.ne.'BICG' .and. val.ne.'CGS' .and. val.ne.'CG') then
+  if( val.ne.'bicg' .and. val.ne.'cgs' .and. val.ne.'cg') then
     if(this_proc < 2) then
       print *, '# ERROR!  Unknown linear solver for turbulence: ', trim(val)
       print *, '# Exiting!'
