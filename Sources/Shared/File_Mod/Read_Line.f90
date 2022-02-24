@@ -16,7 +16,7 @@
   character(6)  :: format = '(a000)'
   character(SL) :: fmtd
 !==============================================================================!
-!   A comment is each line which begins with "!", "#", "$", "%" or "*".        !
+!   A comment is each line which begins with "!", "#" or "%".                  !
 !   Input line must not exceed QL characters in length (defined in Const_Mod)  !
 !------------------------------------------------------------------------------!
 
