@@ -91,6 +91,9 @@
   call Grid % Save_Vtu_Faces()
   call Grid % Save_Vtu_Faces(plot_shadows=.true.)
 
+  ! Create a template control file for this domain
+  call Grid % Write_Template_Control_File()
+
   ! Save the 1d probe (good for the channel flow)
   call Probe_1d_Nodes(Grid)
 

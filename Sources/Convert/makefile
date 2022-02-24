@@ -160,6 +160,7 @@ SRC_F_MOD = Const_Mod.f90          \
 
 # Sources for all shared functions
 SRC_F_FUN = Probe_1d_Nodes.f90  \
+            To_Lower_Case.f90   \
             To_Upper_Case.f90
 
 # Local functions are added one by one ...
