@@ -49,10 +49,6 @@
   w    => Flow % w
   t    => Flow % t
 
-  ! Reading starting time for swarm statistics from control file
-  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics &
-       (n_stat_p, verbose=.true.)
-
   ! Reynolds number should be passed from Save_Results and number of bins should
   ! be defined in control file, also same for n_bin... (it's okey for now!) 
   re_tau =    142  ! operating shear Reynolds number (a little bit above what
