@@ -3,11 +3,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
+  real, intent(out) :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_PRESSURE', 0.3,  &
+  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_PRESSURE', 0.4,  &
                                    val, verbose)
 
   end subroutine

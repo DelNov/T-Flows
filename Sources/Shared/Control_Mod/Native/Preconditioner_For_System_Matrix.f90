@@ -4,6 +4,13 @@
 !   These are preconditioners for the T-Flows suite of solvers.  PETSc has     !
 !   many more, of course.  For compatibillity with PETSc, these keywords have  !
 !   the same values as in PETSc, and all are in lower case.                    !
+!                                                                              !
+!   It is probably also worth noting that, for native solvers, the only pre-   !
+!   conditioner which really makes sense is Incomplete Cholesky.  Jacobi (aka  !
+!   diagonal) is slow and no (none) preconditioning makes solvers diverge.     !
+!   Having said that, it is sufficient to have one procedure (this) which      !
+!   reads preconditioner for all variables, and maybe even that is overkill,   !
+!   maybe native solvers should use icc all the time without even asking.      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

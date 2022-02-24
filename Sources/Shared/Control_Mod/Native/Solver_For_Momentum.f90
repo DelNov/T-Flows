@@ -1,22 +1,19 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Wall_Distance(val, verbose)
+  subroutine Control_Mod_Solver_For_Momentum(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: val
-  logical, optional :: verbose
+  character(SL), intent(out) :: val
+  logical, optional          :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_WALL_DISTANCE', 'cg',  &
+  call Control_Mod_Read_Char_Item('SOLVER_FOR_MOMENTUM', 'bicg',  &
                                    val, verbose)
   call To_Upper_Case(val)
 
-  if( val .ne. 'ACM'  .and.  &
-      val .ne. 'BICG' .and.  &
-      val .ne. 'CGS'  .and.  &
-      val .ne. 'CG') then
+  if( val.ne.'BICG' .and. val.ne.'CGS' .and. val.ne.'CG') then
     if(this_proc < 2) then
-      print *, '# ERROR!  Unknown linear solver for pressure: ', trim(val)
+      print *, '# ERROR!  Unknown linear solver for momentum: ', trim(val)
       print *, '# Exiting!'
     end if
     call Comm_Mod_End

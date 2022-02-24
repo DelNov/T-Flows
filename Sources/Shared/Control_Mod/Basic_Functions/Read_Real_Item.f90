@@ -8,8 +8,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)  :: keyword
-  real              :: def      ! default value
-  real              :: val      ! spefified value, if found
+  real, intent(in)  :: def      ! default value
+  real, intent(out) :: val      ! spefified value, if found
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end

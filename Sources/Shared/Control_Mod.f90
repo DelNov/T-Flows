@@ -19,11 +19,10 @@
 
   contains
 
-  !--------------------!
-  !   Input / Output   !
-  !--------------------!
+  !-------------------------!
+  !   Basic functionality   !  (manouvering through control file)
+  !-------------------------!
 
-    ! Basic functionality
     include 'Control_Mod/Basic_Functions/Open_Domain_File.f90'
     include 'Control_Mod/Basic_Functions/Open_Root_File.f90'
     include 'Control_Mod/Basic_Functions/Position_At_One_Key.f90'
@@ -41,7 +40,10 @@
     include 'Control_Mod/Basic_Functions/Similar_Warning.f90'
     include 'Control_Mod/Basic_Functions/Switch_To_Domain.f90'
     include 'Control_Mod/Basic_Functions/Switch_To_Root.f90'
-!   include 'Control_Mod/Basic_Functions/Write_File.f90'
+
+  !--------------------!
+  !   Input / Output   !
+  !--------------------!
 
     ! Load
     include 'Control_Mod/Input_Output/Problem_Name.f90'
@@ -57,6 +59,100 @@
     include 'Control_Mod/Input_Output/Backup_Save_Interval.f90'
     include 'Control_Mod/Input_Output/Results_Save_Interval.f90'
     include 'Control_Mod/Input_Output/Swarm_Save_Interval.f90'
+
+  !--------------------!
+  !   Linear solvers   !  (native (from T-Flows) or PETSc)
+  !--------------------!
+
+    include 'Control_Mod/Linear_Solvers.f90'
+
+  !--------------------!
+  !   Native solvers   !
+  !--------------------!
+
+    ! Linear solvers
+    include 'Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Presssure_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90'
+    include 'Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90'
+    include 'Control_Mod/Native/Preconditioner_For_System_Matrix.f90'
+    include 'Control_Mod/Native/Solver_For_Energy.f90'
+    include 'Control_Mod/Native/Solver_For_Momentum.f90'
+    include 'Control_Mod/Native/Solver_For_Potential.f90'
+    include 'Control_Mod/Native/Solver_For_Pressure.f90'
+    include 'Control_Mod/Native/Solver_For_Scalars.f90'
+    include 'Control_Mod/Native/Solver_For_Turbulence.f90'
+    include 'Control_Mod/Native/Solver_For_Vof.f90'
+    include 'Control_Mod/Native/Solver_For_Wall_Distance.f90'
+    include 'Control_Mod/Native/Normalization_For_Momentum_Solver.f90'
+    include 'Control_Mod/Native/Normalization_For_Pressure_Solver.f90'
+    include 'Control_Mod/Native/Normalization_For_Energy_Solver.f90'
+    include 'Control_Mod/Native/Normalization_For_Scalars_Solver.f90'
+    include 'Control_Mod/Native/Normalization_For_Turbulence_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Momentum_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Potential_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Pressure_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Energy_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Scalars_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Vof_Solver.f90'
+    include 'Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90'
+
+  !--------------!
+  !   Numerics   !
+  !--------------!
+
+    ! Time Stepping
+    include 'Control_Mod/Numerics/Time_Step.f90'
+    include 'Control_Mod/Numerics/Number_Of_Time_Steps.f90'
+
+    ! Discretization
+    include 'Control_Mod/Numerics/Advection_Scheme_For_Energy.f90'
+    include 'Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90'
+    include 'Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90'
+    include 'Control_Mod/Numerics/Advection_Scheme_For_Vof.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Energy.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90'
+    include 'Control_Mod/Numerics/Blending_Coefficient_For_Vof.f90'
+    include 'Control_Mod/Numerics/Choi_Correction.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Energy.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Pressure.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Scalars.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Vof.f90'
+    include 'Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90'
+    include 'Control_Mod/Numerics/Gu_Correction.f90'
+    include 'Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90'
+    include 'Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90'
+    include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
+    include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
+    include 'Control_Mod/Numerics/Number_Of_Piso_Corrections.f90'
+    include 'Control_Mod/Numerics/Pressure_Momentum_Coupling.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90'
+    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90'
+    include 'Control_Mod/Numerics/Time_Integration_Scheme.f90'
+    include 'Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90'
+    include 'Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90'
+
+    ! Numerical Parameters VOF (CICSAM)
+    include 'Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
+    include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
+    include 'Control_Mod/Numerics/Skewness_Correction_Vof.f90'
 
   !-------------!
   !   Physics   !
@@ -130,88 +226,4 @@
     include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90'
     include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90'
 
-  !--------------!
-  !   Numerics   !
-  !--------------!
-
-    ! Time Stepping
-    include 'Control_Mod/Numerics/Time_Step.f90'
-    include 'Control_Mod/Numerics/Number_Of_Time_Steps.f90'
-
-    ! Discretization
-    include 'Control_Mod/Numerics/Advection_Scheme_For_Energy.f90'
-    include 'Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90'
-    include 'Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90'
-    include 'Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Advection_Scheme_For_Vof.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_For_Energy.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_For_Momentum.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Blending_Coefficient_For_Vof.f90'
-    include 'Control_Mod/Numerics/Choi_Correction.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Energy.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Momentum.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Pressure.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Scalars.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Vof.f90'
-    include 'Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90'
-    include 'Control_Mod/Numerics/Gu_Correction.f90'
-    include 'Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90'
-    include 'Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90'
-    include 'Control_Mod/Numerics/Max_Simple_Iterations.f90'
-    include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
-    include 'Control_Mod/Numerics/Number_Of_Piso_Corrections.f90'
-    include 'Control_Mod/Numerics/Pressure_Momentum_Coupling.f90'
-    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90'
-    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90'
-    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90'
-    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90'
-    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90'
-    include 'Control_Mod/Numerics/Time_Integration_Scheme.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90'
-
-    ! Linear solvers
-    include 'Control_Mod/Numerics/Linear_Solvers.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Energy_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Momentum_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Potential_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Presssure_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Scalars_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Turbulence_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Vof_Solver.f90'
-    include 'Control_Mod/Numerics/Max_Iterations_For_Wall_Distance_Solver.f90'
-    include 'Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90'
-    include 'Control_Mod/Numerics/Solver_For_Energy.f90'
-    include 'Control_Mod/Numerics/Solver_For_Momentum.f90'
-    include 'Control_Mod/Numerics/Solver_For_Pressure.f90'
-    include 'Control_Mod/Numerics/Solver_For_Scalars.f90'
-    include 'Control_Mod/Numerics/Solver_For_Turbulence.f90'
-    include 'Control_Mod/Numerics/Solver_For_Vof.f90'
-    include 'Control_Mod/Numerics/Solver_For_Wall_Distance.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Energy_Solver.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Scalars_Solver.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90'
-    include 'Control_Mod/Numerics/Normalization_For_Turbulence_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Momentum_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Potential_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Scalars_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Vof_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Wall_Distance_Solver.f90'
-    include 'Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90'
-
-    ! Numerical Parameters VOF (CICSAM)
-    include 'Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90'
-    include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90'
-    include 'Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90'
-    include 'Control_Mod/Numerics/Max_Courant_Vof.f90'
-    include 'Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90'
-    include 'Control_Mod/Numerics/Skewness_Correction_Vof.f90'
   end module

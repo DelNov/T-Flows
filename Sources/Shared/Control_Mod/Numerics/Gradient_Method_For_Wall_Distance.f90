@@ -6,8 +6,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: scheme_name
-  logical, optional :: verbose
+  character(SL), intent(out) :: scheme_name
+  logical, optional          :: verbose
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('GRADIENT_METHOD_FOR_WALL_DISTANCE',  &

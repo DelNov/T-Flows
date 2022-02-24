@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Tolerance_For_Vof_Solver(val, verbose)
+  subroutine Control_Mod_Tolerance_For_Pressure_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
+  real, intent(out) :: val
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_VOF_SOLVER',  &
+  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_PRESSURE_SOLVER',  &
                                    1.0e-6, val, verbose)
 
   end subroutine

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Pressure(val, verbose)
+  subroutine Control_Mod_Solver_For_Wall_Distance(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: val
-  logical, optional :: verbose
+  character(SL), intent(out) :: val
+  logical, optional          :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_PRESSURE', 'cg',  &
+  call Control_Mod_Read_Char_Item('SOLVER_FOR_WALL_DISTANCE', 'cg',  &
                                    val, verbose)
   call To_Upper_Case(val)
 

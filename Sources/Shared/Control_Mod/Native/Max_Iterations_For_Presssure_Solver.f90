@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Tolerance_For_Wall_Distance_Solver(val, verbose)
+  subroutine Control_Mod_Max_Iterations_For_Pressure_Solver(val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
-  logical, optional :: verbose
+  integer, intent(out) :: val
+  logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_WALL_DISTANCE_SOLVER',  &
-                                   1.0e-6, val, verbose)
+  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_PRESSURE_SOLVER',  &
+                                  120, val, verbose)
 
   end subroutine

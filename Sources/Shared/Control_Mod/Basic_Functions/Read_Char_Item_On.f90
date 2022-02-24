@@ -7,10 +7,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  character(len=*)  :: def      ! default value
-  character(SL)     :: val      ! spefified value, if found
-  logical, optional :: verbose
+  character(len=*)              :: keyword
+  character(len=*), intent(in)  :: def      ! default value
+  character(SL),    intent(out) :: val      ! spefified value, if found
+  logical,          optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
 !==============================================================================!
