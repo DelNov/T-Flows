@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine Control_Mod_Track_Surface(track_front, verbose)
+  subroutine Control_Mod_Track_Surface(track_surf, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical           :: track_front
-  logical, optional :: verbose
+  logical, intent(out) :: track_surf
+  logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
@@ -13,10 +13,10 @@
   call To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
-    track_front = .true.
+    track_surf = .true.
 
   else if( val .eq. 'NO' ) then
-    track_front = .false.
+    track_surf = .false.
 
   else
     if(this_proc < 2) then

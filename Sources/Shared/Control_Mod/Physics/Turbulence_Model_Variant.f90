@@ -5,9 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, optional :: verbose
-!-----------------------------------[Locals]-----------------------------------!
-  character(SL) :: val
+  character(SL), intent(out) :: val
+  logical,       optional    :: verbose
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('TURBULENCE_MODEL_VARIANT', 'stabilized',  &

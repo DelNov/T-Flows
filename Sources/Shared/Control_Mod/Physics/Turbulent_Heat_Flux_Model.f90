@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: val
-  logical, optional :: verbose
+  character(SL), intent(out) :: val
+  logical,       optional    :: verbose
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('TURBULENT_HEAT_FLUX_MODEL', 'SGDH',  &
