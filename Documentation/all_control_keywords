@@ -43,13 +43,15 @@
   LINEAR_SOLVERS                           |         native                |   petsc
   MAX_CORRECTION_CYCLES_BETA_VOF           |         2                     |   up to 5 makes sense
   MAX_COURANT_VOF                          |         0.25                  |   from 0.0 to 0.5
-  MAX_GAUSS_GRADIENTS_ITERATIONS           |        10                     |   up to 10 is reasonable
-  MAX_ITERATIONS_FOR_ENERGY_SOLVER         |         5                     |   up to 10 is reasonable
-  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER       |         5                     |   up to 10 is reasonable
-  MAX_ITERATIONS_FOR_VOF_SOLVER            |         5                     |   up to 10 is reasonable
-  MAX_ITERATIONS_FOR_PRESSURE_SOLVER       |        40                     |   better if higher, up to 900
+  MAX_GAUSS_GRADIENTS_ITERATIONS           |        12                     |   up to 10 is reasonable
+  MAX_ITERATIONS_FOR_ENERGY_SOLVER         |         6                     |   up to 10 is reasonable
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER       |         6                     |   up to 10 is reasonable
+  MAX_ITERATIONS_FOR_POTENTIAL_SOLVER      |       120                     |   better if higher, up to 900
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER       |        60                     |   better if higher, up to 900
   MAX_ITERATIONS_FOR_SCALARS_SOLVER        |         6                     |   up to 10 is reasonable
   MAX_ITERATIONS_FOR_TURBULENCE_SOLVER     |         6                     |   up to 10 is reasonable
+  MAX_ITERATIONS_FOR_VOF_SOLVER            |         6                     |   up to 10 is reasonable
+  MAX_ITERATIONS_FOR_WALL_DISTANCE_SOLVER  |       120                     |   up to 10 is reasonable
   MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   |         4                     |   any integer > 0
   MAX_SIMPLE_ITERATIONS                    |        12                     |   up to 60 makes sense
   MAX_SMOOTHING_CYCLES_CURVATURE_VOF       |         2                     |   an integer up to 5 makes sense
@@ -67,9 +69,9 @@
   PRECONDITIONER_FOR_SYSTEM_MATRIX         |         incomplete_cholesky   |   diagonal, none
   PRESSURE_MOMENTUM_COUPLING               |         simple                |   piso
   SIMPLE_UNDERRELAXATION_FOR_ENERGY        |         0.5                   |   from 0 to 1, around 0.7 should do
-  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM      |         0.7                   |   from 0 to 1, around 0.7 should be OK
-  SIMPLE_UNDERRELAXATION_FOR_PRESSURE      |         0.3                   |   from 0 to 1, around 0.3 should be fine
-  SIMPLE_UNDERRELAXATION_FOR_SCALARS       |         0.7                   |   from 0 to 1, like for energy
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM      |         0.6                   |   from 0 to 1, around 0.7 should be OK
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE      |         0.4                   |   from 0 to 1, around 0.3 should be fine
+  SIMPLE_UNDERRELAXATION_FOR_SCALARS       |         0.5                   |   from 0 to 1, like for energy
   SIMPLE_UNDERRELAXATION_FOR_TURBULENCE    |         0.7                   |   from 0 to 1, more around 0.5
   SIMPLE_UNDERRELAXATION_FOR_VOF           |         0.5                   |   from 0 to 1, around 0.7 should be OK
   SKEWNESS_CORRECTION_VOF                  |         no                    |   yes
@@ -80,7 +82,7 @@
   SOLVER_FOR_SCALARS                       |         bicg                  |   cg, cgs
   SOLVER_FOR_TURBULENCE                    |         bicg                  |   cg, cgs
   SOLVER_FOR_VOF                           |         bicg                  |   cg, cgs
-  SOLVER_FOR_WALL_DISTANCE                 |         bicg                  |   cg, cgs
+  SOLVER_FOR_WALL_DISTANCE                 |         cg                    |   cgs, bicg
   TIME_INTEGRATION_SCHEME                  |         linear                |   parabolic
   TIME_STEP                                |         1.0e-4                |   any real number, usually < 0.1
   TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-3                |   any small number, but < 1.0e-3 is OK
@@ -91,7 +93,7 @@
   TOLERANCE_FOR_SCALARS_SOLVER             |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_TURBULENCE_SOLVER          |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_VOF_SOLVER                 |         1.0e-6                |   any small number, but > 1.0e-12 is OK
-  TOLERANCE_FOR_WALL_DISTANCE_SOLVER       |         1.0e-5                |   any small number, but > 1.0e-12 is OK
+  TOLERANCE_FOR_WALL_DISTANCE_SOLVER       |         1.0e-6                |   any small number, but > 1.0e-12 is OK
 ========================================================================================================================
   Physics
 ------------------------------------------------------------------------------------------------------------------------
