@@ -180,6 +180,10 @@
 
   end do ! iter
 
+  ! Correct the number of executed iterations, because
+  ! Fortran goes one number up do loop's upper limit
+  iter = iter - 1
+
   !----------------------------------!
   !                                  !
   !   Convergence has been reached   !
