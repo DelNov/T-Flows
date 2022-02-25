@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, n, time)
 !------------------------------------------------------------------------------!
 !   Insert particles for Lagrangian particle tracking                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
+  type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Swarm_Type),    target :: Swarm
   integer, intent(in)         :: n     ! time step

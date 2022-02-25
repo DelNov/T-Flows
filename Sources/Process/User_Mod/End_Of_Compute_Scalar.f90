@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
+  subroutine User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Scalar function.             !
@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
+  type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt  ! current time step

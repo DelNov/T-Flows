@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   User initialization of dependent variables.                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
   type(Solver_Type), target :: Sol
