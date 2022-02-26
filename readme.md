@@ -1,6 +1,6 @@
 # T-Flows 
 
-T-Flows (stands for Turbulent Flows) is a Computational Fluid Dynamics (CFD) program, originally developed at Delft University of Technology, the Netherlands.  It features second order accurate, unstructured, cell-centered, finite volume discretization of incompressible Navier-Stokes equations with heat transfer and species transport.  It is written in Fortran 90 and uses Message Passing Interface (MPI) for parallel execution.
+T-Flows (stands for Turbulent Flows) is a Computational Fluid Dynamics (CFD) program, originally developed at Delft University of Technology, the Netherlands.  It features second order accurate, unstructured, cell-centered, finite volume discretization of incompressible Navier-Stokes equations with heat transfer and species transport.  It is written in Fortran 2008 and uses Message Passing Interface (MPI) for parallel execution.
 
 ## Basic Features: 
 
@@ -39,9 +39,7 @@ Compilation of the main program and sub-programs depends on the following tools:
 ld, make, gfortran, git and mpi (only for parallel execution).
 
 Compilation was tested with the following tools and versions:
-- ld >= 2.24
 - gfortran >= 4.8
-- mpich >= 3.0.4
 - openmpi >= 1.6.5
 - make >= 3.81
 - git >= 1.91
