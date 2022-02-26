@@ -116,10 +116,11 @@
   write(fu,'(a)') '# and also here sub-entries VARIABLES and VALUES must be'
   write(fu,'(a)') '# specified in the given order.'
   write(fu,'(a)') '#-----------------------------------------------------------'
-  write(fu,'(a)') '!  VARIABLES        u     v     w     t    '  //  &
-                                  'kin    eps    zeta     f22'
-  write(fu,'(a)') '!  VALUES           0.0   0.0   0.0   10   '  //  &
-                                  '1e-2   1e-3   6.6e-2   1e-3'
+  write(fu,'(a)') '! INITIAL_CONDITION'
+  write(fu,'(a)') '!   VARIABLES        u     v     w     t    '  //  &
+                                   'kin    eps    zeta     f22'
+  write(fu,'(a)') '!   VALUES           0.0   0.0   0.0   10   '  //  &
+                                   '1e-2   1e-3   6.6e-2   1e-3'
   write(fu,'(a1)', advance='no') CR
 
   write(fu,'(a)') '#-----------------------------------------------------------'
