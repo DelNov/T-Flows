@@ -1,15 +1,12 @@
 !==============================================================================!
-  real function Tau_Wall_Low_Re(turb, dens, u_tau, u_tan, y_plus)
+  real function Tau_Wall_Low_Re(Turb, dens, u_tau, u_tan, y_plus)
 !------------------------------------------------------------------------------!
 !   Calculates tau_wall for low Reynolds approach.                             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Turb_Mod,  only: Turb_Type, kappa, e_log
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type) :: turb
-  real            :: dens, u_tau, u_tan, y_plus
+  class(Turb_Type) :: Turb
+  real             :: dens, u_tau, u_tan, y_plus
 !==============================================================================!
 
   Tau_Wall_Low_Re = dens * kappa * u_tau * u_tan   &

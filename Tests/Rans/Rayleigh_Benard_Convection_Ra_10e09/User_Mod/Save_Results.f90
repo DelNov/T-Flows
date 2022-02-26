@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,9 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: n_prob, pl, c, i, count, s, c1, c2, n_points
@@ -40,10 +40,10 @@
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
-  call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt) 
-  call Turb_Mod_Alias_T2          (turb, t2) 
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
+  call Turb % Alias_T2          (t2)
 
   ! Set some constants
   t_cold =  5.0
@@ -143,37 +143,37 @@
         wall_p(i) = wall_p(i) + Grid % zc(c)
         tz_p  (i) = tz_p  (i) + t % z(c)
         ti_p  (i) = ti_p  (i) + t % n(c)
-        w_p   (i) = w_p   (i) + turb % w_mean(c)
+        w_p   (i) = w_p   (i) + Turb % w_mean(c)
 
-        uu_p(i)   = uu_p(i) + turb % uu_res(c)  &
-                            - turb % u_mean(c) * turb % u_mean(c)
-        vv_p(i)   = vv_p(i) + turb % vv_res(c)  &
-                            - turb % v_mean(c) * turb % v_mean(c)
-        ww_p(i)   = ww_p(i) + turb % ww_res(c)  &
-                            - turb % w_mean(c) * turb % w_mean(c)
-        uw_p(i)   = uw_p(i) + turb % uw_res(c)  &
-                            - turb % u_mean(c) * turb % w_mean(c)
+        uu_p(i)   = uu_p(i) + Turb % uu_res(c)  &
+                            - Turb % u_mean(c) * Turb % u_mean(c)
+        vv_p(i)   = vv_p(i) + Turb % vv_res(c)  &
+                            - Turb % v_mean(c) * Turb % v_mean(c)
+        ww_p(i)   = ww_p(i) + Turb % ww_res(c)  &
+                            - Turb % w_mean(c) * Turb % w_mean(c)
+        uw_p(i)   = uw_p(i) + Turb % uw_res(c)  &
+                            - Turb % u_mean(c) * Turb % w_mean(c)
         kin_p(i)  = kin_p(i) &
-                + 0.5*(turb % uu_res(c) - turb % u_mean(c) * turb % u_mean(c) &
-                     + turb % vv_res(c) - turb % v_mean(c) * turb % v_mean(c) &
-                     + turb % ww_res(c) - turb % w_mean(c) * turb % w_mean(c))
-        kin_mod_p(i) = kin_mod_p(i) + turb % kin_mean(c)
+                + 0.5*(Turb % uu_res(c) - Turb % u_mean(c) * Turb % u_mean(c) &
+                     + Turb % vv_res(c) - Turb % v_mean(c) * Turb % v_mean(c) &
+                     + Turb % ww_res(c) - Turb % w_mean(c) * Turb % w_mean(c))
+        kin_mod_p(i) = kin_mod_p(i) + Turb % kin_mean(c)
 
         if(Flow % heat_transfer) then
-          t_p(i)  = t_p(i)  + turb % t_mean(c) 
-          t2_p(i) = t2_p(i) + turb % t2_res(c)  &
-                            - turb % t_mean(c) * turb % t_mean(c)
-          t2_mod_p(i) = t2_mod_p(i) + turb % t2_mean(c)
-          ut_p(i) = ut_p(i) + turb % ut_res(c)  &
-                            - turb % u_mean(c) * turb % t_mean(c)
-          vt_p(i) = vt_p(i) + turb % vt_res(c)  &
-                            - turb % v_mean(c) * turb % t_mean(c)
-          wt_p(i) = wt_p(i) + turb % wt_res(c)  &
-                            - turb % w_mean(c) * turb % t_mean(c)
+          t_p(i)  = t_p(i)  + Turb % t_mean(c) 
+          t2_p(i) = t2_p(i) + Turb % t2_res(c)  &
+                            - Turb % t_mean(c) * Turb % t_mean(c)
+          t2_mod_p(i) = t2_mod_p(i) + Turb % t2_mean(c)
+          ut_p(i) = ut_p(i) + Turb % ut_res(c)  &
+                            - Turb % u_mean(c) * Turb % t_mean(c)
+          vt_p(i) = vt_p(i) + Turb % vt_res(c)  &
+                            - Turb % v_mean(c) * Turb % t_mean(c)
+          wt_p(i) = wt_p(i) + Turb % wt_res(c)  &
+                            - Turb % w_mean(c) * Turb % t_mean(c)
 
-          ut_mod(i) = ut_mod(i) + turb % ut_mean(c)
-          vt_mod(i) = vt_mod(i) + turb % vt_mean(c)
-          wt_mod(i) = wt_mod(i) + turb % wt_mean(c)
+          ut_mod(i) = ut_mod(i) + Turb % ut_mean(c)
+          vt_mod(i) = vt_mod(i) + Turb % vt_mean(c)
+          wt_mod(i) = wt_mod(i) + Turb % wt_mean(c)
 
         end if
         n_count(i) = n_count(i) + 1

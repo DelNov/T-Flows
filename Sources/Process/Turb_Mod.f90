@@ -131,6 +131,80 @@
     integer :: scalar_flux_model
     integer :: hybrid_les_rans_switch
 
+    contains
+      procedure :: Init_Turb
+      procedure :: Main_Turb
+      procedure :: Allocate_Turb
+
+      procedure :: Alias_K_Eps
+      procedure :: Alias_K_Eps_Zeta_F
+      procedure :: Alias_Heat_Fluxes
+      procedure :: Alias_Stresses
+      procedure :: Alias_T2
+
+      procedure :: Calculate_Deltas
+      procedure :: Calculate_Heat_Flux
+      procedure :: Calculate_Scalar_Flux
+      procedure :: Calculate_Mean
+      procedure :: Calculate_Stress
+      procedure :: Face_Cond_And_Stress
+      procedure :: Face_Diff_And_Stress
+      procedure :: Face_Stress
+      procedure :: Face_Vis
+      procedure :: Substract_Face_Stress
+
+      ! Functions to set turbulence constants
+      ! They are called from Read_Command_Mod
+      procedure :: Const_Hanjalic_Jakirlic
+      procedure :: Const_K_Eps
+      procedure :: Const_K_Eps_Zeta_F
+      procedure :: Const_Manceau_Hanjalic
+      procedure :: Const_Reynolds_Stress
+      procedure :: Const_Spalart_Allmaras
+
+      ! Computation of various turbulent quantities
+      procedure, private :: Compute_F22
+      procedure, private :: Compute_Stress
+      procedure, private :: Compute_Variable
+
+      ! Different sources
+      procedure, private :: Src_Eps_K_Eps
+      procedure, private :: Src_Eps_K_Eps_Zeta_F
+      procedure, private :: Src_F22_K_Eps_Zeta_F
+      procedure, private :: Src_F22_Rsm_Manceau_Hanjalic
+      procedure, private :: Src_Kin_K_Eps
+      procedure, private :: Src_Kin_K_Eps_Zeta_F
+      procedure, private :: Src_Rsm_Hanjalic_Jakirlic
+      procedure, private :: Src_Rsm_Manceau_Hanjalic
+      procedure, private :: Src_T2
+      procedure, private :: Src_Vis_Spalart_Almaras
+      procedure, private :: Src_Zeta_K_Eps_Zeta_F
+
+      ! Computation of turbulence viscosity
+      procedure          :: Vis_T_Dynamic             ! also called from Swarm
+      procedure, private :: Vis_T_Hybrid_Les_Prandtl
+      procedure, private :: Vis_T_Hybrid_Les_Rans
+      procedure, private :: Vis_T_K_Eps
+      procedure, private :: Vis_T_K_Eps_Zeta_F
+      procedure, private :: Vis_T_Rsm
+      procedure, private :: Vis_T_Smagorinsky
+      procedure, private :: Vis_T_Spalart_Allmaras
+      procedure, private :: Vis_T_Wale
+
+      procedure, private :: Ebf_Momentum
+      procedure, private :: Ebf_Scalar
+      procedure          :: Prandtl_Turb
+
+      procedure :: Find_Nearest_Wall_Cell
+      procedure :: Y_Plus_Low_Re
+      procedure :: Y_Plus_Rough_Walls
+      procedure :: Tau_Wall_Low_Re
+      procedure :: Tau_Wall_Rough_Walls
+      procedure :: U_Plus_Log_Law
+      procedure :: U_Plus_Rough_Walls
+      procedure :: Time_And_Length_Scale
+      procedure :: Roughness_Coefficient
+
   end type
 
   ! Parameters describing turbulence model choice
@@ -189,8 +263,8 @@
   contains
 
   ! Logic of turbulence models
-  include 'Turb_Mod/Init.f90'
-  include 'Turb_Mod/Main.f90'
+  include 'Turb_Mod/Init_Turb.f90'
+  include 'Turb_Mod/Main_Turb.f90'
 
   ! The constructor-like
   include 'Turb_Mod/Allocate.f90'
@@ -252,6 +326,17 @@
   ! Other subroutines ellipitic blending, turbulent Prandtl number
   include 'Turb_Mod/Ebf_Momentum.f90'
   include 'Turb_Mod/Ebf_Scalar.f90'
-  include 'Turb_Mod/Prandtl_Number.f90'
+  include 'Turb_Mod/Prandtl_Turb.f90'
+
+  include 'Turb_Mod/Find_Nearest_Wall_Cell.f90'
+  include 'Turb_Mod/Y_Plus_Low_Re.f90'
+  include 'Turb_Mod/Y_Plus_Rough_Walls.f90'
+
+  include 'Turb_Mod/Tau_Wall_Low_Re.f90'
+  include 'Turb_Mod/Tau_Wall_Rough_Walls.f90'
+  include 'Turb_Mod/U_Plus_Log_Law.f90'
+  include 'Turb_Mod/U_Plus_Rough_Walls.f90'
+  include 'Turb_Mod/Time_And_Length_Scale.f90'
+  include 'Turb_Mod/Roughness_Coefficient.f90'
 
   end module

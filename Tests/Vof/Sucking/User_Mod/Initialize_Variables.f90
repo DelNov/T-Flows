@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
-  type(Swarm_Type),  target :: swarm
+  type(Swarm_Type),  target :: Swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid

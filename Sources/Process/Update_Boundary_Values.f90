@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(Flow, turb, Vof, update)
+  subroutine Update_Boundary_Values(Flow, Turb, Vof, update)
 !------------------------------------------------------------------------------!
 !   Update variables on the boundaries (boundary cells) where needed.          !
 !   It does not update volume fluxes at boundaries - keep it like that.        !
@@ -23,11 +23,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   character(*)             :: update
-!---------------------------------[Calling]------------------------------------!
-  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
@@ -39,13 +37,13 @@
 
   ! Take aliases
   Grid => Flow % pnt_grid
-  vis  => turb % vis
+  vis  => Turb % vis
   fun  => Vof % fun
-  call Flow % Alias_Momentum(u, v, w)
-  call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_T2          (turb, t2)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Flow % Alias_Energy      (t)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_T2          (t2)
 
   call To_Upper_Case(update)
 
@@ -133,8 +131,8 @@
 
 
         ! Spalart Allmaras
-        if(turb % model .eq. SPALART_ALLMARAS .or.  &
-           turb % model .eq. DES_SPALART) then
+        if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+           Turb % model .eq. DES_SPALART) then
           if ( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
                Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
                Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
@@ -144,8 +142,8 @@
         end if
 
         ! Reynolds stress models
-        if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
           if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
@@ -159,16 +157,16 @@
             kin_vis = Flow % viscosity(c1) / Flow % density(c1)
             u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                   / Grid % wall_dist(c1)
-            turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,           &
-                                              Grid % wall_dist(c1),  &
-                                              kin_vis)
-            if(turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
+            Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,           &
+                                               Grid % wall_dist(c1),  &
+                                               kin_vis)
+            if(Turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
           end if
         end if
 
         ! k-epsilon-zeta-f
-        if(turb % model .eq. K_EPS_ZETA_F .or.  &
-           turb % model .eq. HYBRID_LES_RANS) then
+        if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+           Turb % model .eq. HYBRID_LES_RANS) then
           if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.   &
              Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.   &
              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.   &
@@ -185,7 +183,7 @@
         end if
 
         ! k-epsilon
-        if(turb % model .eq. K_EPS) then
+        if(Turb % model .eq. K_EPS) then
           if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
@@ -198,8 +196,8 @@
           end if
         end if
 
-        if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
           if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. CONVECT .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
@@ -211,7 +209,7 @@
             vw  % n(c2) = vw  % n(c1)
             kin % n(c2) = kin % n(c1)
             eps % n(c2) = eps % n(c1)
-            if(turb % model .eq. RSM_MANCEAU_HANJALIC)  &
+            if(Turb % model .eq. RSM_MANCEAU_HANJALIC)  &
               f22 % n(c2) = f22 % n(c1)
           end if
         end if
@@ -242,15 +240,15 @@
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
-        if(turb % model .eq. K_EPS_ZETA_F    .or.  &
-           turb % model .eq. HYBRID_LES_RANS .or.  &
-           turb % model .eq. LES_DYNAMIC     .or.  &
-           turb % model .eq. K_EPS) then
+        if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
+           Turb % model .eq. HYBRID_LES_RANS .or.  &
+           Turb % model .eq. LES_DYNAMIC     .or.  &
+           Turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
-                      / (turb % con_w(c1) + TINY)
+                      / (Turb % con_w(c1) + TINY)
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
-            t % q(c2) = ( t % n(c2) - t % n(c1) ) * turb % con_w(c1)  &
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * Turb % con_w(c1)  &
                       / Grid % wall_dist(c1)
           end if
 
@@ -309,15 +307,15 @@
 
           ! Wall temperature or heat fluxes for k-eps-zeta-f
           ! and high-re k-eps models. 
-          if(turb % model .eq. K_EPS_ZETA_F    .or.  &
-             turb % model .eq. HYBRID_LES_RANS .or.  &
-             turb % model .eq. K_EPS) then
+          if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
+             Turb % model .eq. HYBRID_LES_RANS .or.  &
+             Turb % model .eq. K_EPS) then
 
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
               phi % n(c2) = phi % n(c1) + phi % q(c2) * Grid % wall_dist(c1)  &
-                        / (turb % diff_w(c1) + TINY)
+                        / (Turb % diff_w(c1) + TINY)
             else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
-              phi % q(c2) = ( phi % n(c2) - phi % n(c1) ) * turb % diff_w(c1)  &
+              phi % q(c2) = ( phi % n(c2) - phi % n(c1) ) * Turb % diff_w(c1)  &
                         / Grid % wall_dist(c1)
             end if
 

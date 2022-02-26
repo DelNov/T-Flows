@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Convective_Outflow(Flow, turb, Vof)
+  subroutine Convective_Outflow(Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -34,9 +34,9 @@
   dt     =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_T2          (turb, t2)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_T2          (t2)
 
   call Flow % Calculate_Fluxes(v_flux % n)
 
@@ -85,7 +85,7 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(turb % model .eq. K_EPS) then
+  if(Turb % model .eq. K_EPS) then
 
     call Flow % Grad_Variable(kin)
     call Flow % Grad_Variable(eps)
@@ -123,8 +123,8 @@
   !------------------------!
   !   K-eps-zeta-f model   !
   !------------------------!
-  if(turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
 
     call Flow % Grad_Variable(kin)
     call Flow % Grad_Variable(eps)
@@ -173,8 +173,8 @@
   !   Reynolds stress models   !
   !----------------------------!
 
-  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     call Flow % Grad_Variable(uu)
     call Flow % Grad_Variable(vv)
@@ -183,7 +183,7 @@
     call Flow % Grad_Variable(uw)
     call Flow % Grad_Variable(vw)
     call Flow % Grad_Variable(eps)
-    if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
       call Flow % Grad_Variable(f22)
     end if
 
@@ -222,7 +222,7 @@
                       - ( bulk % u * eps % x(c1)           &
                         + bulk % v * eps % y(c1)           &
                         + bulk % w * eps % z(c1) ) * dt
-          if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+          if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
             f22 % n(c2) = f22 % n(c2)                      &
                         - ( bulk % u * f22 % x(c1)         &
                           + bulk % v * f22 % y(c1)         &

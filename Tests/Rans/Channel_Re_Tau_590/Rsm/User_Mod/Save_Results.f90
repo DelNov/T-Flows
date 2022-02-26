@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,9 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -40,9 +40,9 @@
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Take constant physical properties
   call Control_Mod_Mass_Density        (dens_const)

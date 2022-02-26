@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Stress(turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_Stress(Turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -24,7 +24,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
@@ -61,17 +61,17 @@
   call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   nc   =  Grid % n_cells
   nb   =  Grid % n_bnd_cells
   dt   =  Flow % dt
   flux => Flow % v_flux % n
-  call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Sol % Alias_Native         (A, b)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
+  call Sol % Alias_Native       (A, b)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   phi % a(:) = 0.0
@@ -115,16 +115,16 @@
 
     ! vis_tur is used to make diaginal element more dominant.
     ! This contribution is later substracted.
-    vis_t_f =      Grid % fw(s)  * turb % vis_t(c1)  &
-            + (1.0-Grid % fw(s)) * turb % vis_t(c2)
+    vis_t_f =      Grid % fw(s)  * Turb % vis_t(c1)  &
+            + (1.0-Grid % fw(s)) * Turb % vis_t(c2)
 
     visc_f =        Grid % fw(s)  * Flow % viscosity(c1)  &
            + (1.0 - Grid % fw(s)) * Flow % viscosity(c2)
 
     vis_eff = visc_f + vis_t_f
 
-    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      if(turb % model_variant .ne. STABILIZED) then
+    if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+      if(Turb % model_variant .ne. STABILIZED) then
         vis_eff = 1.5 * visc_f + vis_t_f
       end if
     end if
@@ -134,7 +134,7 @@
     phiz_f = Grid % fw(s) * phi_z(c1) + (1.0-Grid % fw(s)) * phi_z(c2)
 
 
-    ! Total (exact) diffusive flux plus turb. diffusion
+    ! Total (exact) diffusive flux plus Turb. diffusion
     f_ex = vis_eff * (  phix_f * Grid % sx(s)  &
                       + phiy_f * Grid % sy(s)  &
                       + phiz_f * Grid % sz(s) ) 
@@ -192,8 +192,8 @@
     c_mu_d = 0.22
   end if
 
-  if(turb % model_variant .ne. STABILIZED) then
-    if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(Turb % model_variant .ne. STABILIZED) then
+    if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = 1, Grid % n_cells
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
@@ -219,22 +219,22 @@
                         + ww % n(c) * phi_z(c))                        &
                      - Flow % viscosity(c) * phi_z(c)
       end do
-    else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
       do c = 1, Grid % n_cells
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
-                     * turb % t_scale(c)                                   &
+                     * Turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
                         + uv % n(c) * phi_y(c)                             &
                         + uw % n(c) * phi_z(c))
 
         u2uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
-                     * turb % t_scale(c)                                   &
+                     * Turb % t_scale(c)                                   &
                      * (  uv % n(c) * phi_x(c)                             &
                         + vv % n(c) * phi_y(c)                             &
                         + vw % n(c) * phi_z(c))
 
         u3uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
-                     * turb % t_scale(c)                                   &
+                     * Turb % t_scale(c)                                   &
                      * (  uw % n(c) * phi_x(c)                             &
                         + vw % n(c) * phi_y(c)                             &
                         + ww % n(c) * phi_z(c))
@@ -255,14 +255,14 @@
   !------------------------------------------------------------------!
   !   Here we clean up transport equation from the false diffusion   !
   !------------------------------------------------------------------!
-  if(turb % model_variant .ne. STABILIZED) then
+  if(Turb % model_variant .ne. STABILIZED) then
     do s = 1, Grid % n_faces
 
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      vis_eff = (Grid % fw(s)      * turb % vis_t(c1)  &
-              + (1.0-Grid % fw(s)) * turb % vis_t(c2))
+      vis_eff = (Grid % fw(s)      * Turb % vis_t(c1)  &
+              + (1.0-Grid % fw(s)) * Turb % vis_t(c2))
 
       phix_f = Grid % fw(s) * phi_x(c1) + (1.0-Grid % fw(s)) * phi_x(c2)
       phiy_f = Grid % fw(s) * phi_y(c1) + (1.0-Grid % fw(s)) * phi_y(c2)
@@ -306,12 +306,12 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+  if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Flow % Grad_Variable(f22)
 
-    call Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, Sol, phi % name)
-  else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, Sol, phi % name)
+    call Turb % Src_Rsm_Manceau_Hanjalic(Sol, phi % name)
+  else if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    call Turb % Src_Rsm_Hanjalic_Jakirlic(Sol, phi % name)
   end if
 
   !---------------------------------!

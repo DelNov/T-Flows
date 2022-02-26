@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Hybrid_Les_Rans(turb)
+  subroutine Vis_T_Hybrid_Les_Rans(Turb)
 !------------------------------------------------------------------------------!
 !   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -21,7 +21,7 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   t    => Flow % t
 
@@ -31,9 +31,9 @@
 
   do c = 1, Grid % n_cells
     lf = Grid % vol(c) ** ONE_THIRD
-    turb % vis_t_sgs(c) = Flow % density(c)  &
+    Turb % vis_t_sgs(c) = Flow % density(c)  &
                         * (lf*lf)            &          ! delta^2
-                        * turb % c_dyn(c)    &          ! c_dynamic
+                        * Turb % c_dyn(c)    &          ! c_dynamic
                         * Flow % shear(c)
   end do
 
@@ -42,11 +42,11 @@
       nc2 = -Flow % beta * (  Flow % grav_x * t % x(c)   &
                             + Flow % grav_y * t % y(c)   &
                             + Flow % grav_z * t % z(c))
-      turb % vis_t_sgs(c) = turb % vis_t_sgs(c)  &
+      Turb % vis_t_sgs(c) = Turb % vis_t_sgs(c)  &
              * max((1.0 - 2.5 * nc2 / (Flow % shear(c) + TINY)), 0.0)
     end do
   end if
 
-  call Grid % Exchange_Cells_Real(turb % vis_t_sgs)
+  call Grid % Exchange_Cells_Real(Turb % vis_t_sgs)
 
   end subroutine

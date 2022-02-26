@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Rsm(turb)
+  subroutine Vis_T_Rsm(Turb)
 !------------------------------------------------------------------------------!
 !   Computes the turbulent viscosity for RSM models ('EBM' and 'HJ').          !
 !   If hybrid option is used turbulent diffusivity is modeled by vis_t.        !
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -21,9 +21,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !   wall visc.    vis_w    [kg/(m*s)]  | kinematic viscosity       [m^2/s]     !
@@ -31,11 +31,11 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
-  call Turb_Mod_Alias_Stresses (turb, uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_K_Eps   (kin, eps)
+  call Turb % Alias_Stresses(uu, vv, ww, uv, uw, vw)
 
   call Calculate_Shear_And_Vorticity(Flow)
 
@@ -48,14 +48,14 @@
                     + uv % n(c) * (v % x(c) + u % y(c))  &
                     + uw % n(c) * (u % z(c) + w % x(c))  &
                     + vw % n(c) * (v % z(c) + w % y(c))) &
-      / (kin % n(c) * turb % t_scale(c) * Flow % shear(c)**2 + TINY), 0.0)
+      / (kin % n(c) * Turb % t_scale(c) * Flow % shear(c)**2 + TINY), 0.0)
 
     cmu_mod = min(0.12, cmu_mod)
-    turb % vis_t(c) = cmu_mod * Flow % density(c)  &
-                    * kin % n(c) * turb % t_scale(c)
-    turb % vis_t(c) = max(turb % vis_t(c), TINY)
+    Turb % vis_t(c) = cmu_mod * Flow % density(c)  &
+                    * kin % n(c) * Turb % t_scale(c)
+    Turb % vis_t(c) = max(Turb % vis_t(c), TINY)
   end do
 
-  call Grid % Exchange_Cells_Real(turb % vis_t)
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
 
   end subroutine

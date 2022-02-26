@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -17,8 +17,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
-  type(Swarm_Type), target :: swarm
+  type(Turb_Type),  target :: Turb
+  type(Swarm_Type), target :: Swarm
   type(Vof_Type),   target :: Vof
   integer, intent(in)      :: ts
 !-----------------------------------[Locals]-----------------------------------!
@@ -124,7 +124,7 @@
   !!=========================================================
   !! DEBUGGING 
   !do c = 1, grid % n_cells - grid % comm % n_buff_cells
-  !  ww_mod_p(c) =  turb % kin_mean(c) * turb % zeta_mean(c)
+  !  ww_mod_p(c) =  Turb % kin_mean(c) * Turb % zeta_mean(c)
   !end do 
   !if(this_proc < 2) then 
   ! print *, "w_mod(503) = ", ww_mod_p(503)
@@ -144,28 +144,28 @@
          grid % zc(c) < (z_p(i+1))) then
 
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
-        u_p   (i) = u_p   (i) + turb % u_mean(c)
-        v_p   (i) = v_p   (i) + turb % v_mean(c)
-        w_p   (i) = w_p   (i) + turb % w_mean(c)
+        u_p   (i) = u_p   (i) + Turb % u_mean(c)
+        v_p   (i) = v_p   (i) + Turb % v_mean(c)
+        w_p   (i) = w_p   (i) + Turb % w_mean(c)
 
-        uu_p(i) = uu_p(i) + turb % uu_res(c)  &
-                          - turb % u_mean(c) * turb % u_mean(c)
-        vv_p(i) = vv_p(i) + turb % vv_res(c)  &
-                          - turb % v_mean(c) * turb % v_mean(c)
-        ww_p(i) = ww_p(i) + turb % ww_res(c)  &
-                          - turb % w_mean(c) * turb % w_mean(c)
-        uw_p(i) = uw_p(i) + turb % uw_res(c)  &
-                          - turb % u_mean(c) * turb % w_mean(c)
-      
+        uu_p(i) = uu_p(i) + Turb % uu_res(c)  &
+                          - Turb % u_mean(c) * Turb % u_mean(c)
+        vv_p(i) = vv_p(i) + Turb % vv_res(c)  &
+                          - Turb % v_mean(c) * Turb % v_mean(c)
+        ww_p(i) = ww_p(i) + Turb % ww_res(c)  &
+                          - Turb % w_mean(c) * Turb % w_mean(c)
+        uw_p(i) = uw_p(i) + Turb % uw_res(c)  &
+                          - Turb % u_mean(c) * Turb % w_mean(c)
+
         ! Modeled quantities 
-        kin_p   (i) = kin_p   (i) + turb % kin_mean(c)
-        eps_p   (i) = eps_p   (i) + turb % eps_mean(c)
-        zeta_p  (i) = zeta_p  (i) + turb % zeta_mean(c)
-        f22_p   (i) = f22_p   (i) + turb % f22_mean(c)
-        uw_mod_p(i) = uw_mod_p(i) + turb % vis_t_eff(c)*(u % y(c) + v % x(c))
-        ww_mod_p(i) = ww_mod_p(i) + turb % kin_mean(c) * turb % zeta_mean(c)
-        vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
-        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c) 
+        kin_p   (i) = kin_p   (i) + Turb % kin_mean(c)
+        eps_p   (i) = eps_p   (i) + Turb % eps_mean(c)
+        zeta_p  (i) = zeta_p  (i) + Turb % zeta_mean(c)
+        f22_p   (i) = f22_p   (i) + Turb % f22_mean(c)
+        uw_mod_p(i) = uw_mod_p(i) + Turb % vis_t_eff(c)*(u % y(c) + v % x(c))
+        ww_mod_p(i) = ww_mod_p(i) + Turb % kin_mean(c) * Turb % zeta_mean(c)
+        vis_t_p (i) = vis_t_p (i) + Turb % vis_t(c) / visc_const
+        y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c) 
         n_count(i) = n_count(i) + 1
       end if
     end do

@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Turb_Mod_Alias_T2(turb, t2)
+  subroutine Alias_T2(Turb, t2)
 !------------------------------------------------------------------------------!
 !   Create alias for t2 variable.                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target  :: turb
-  type(Var_Type),  pointer :: t2
+  class(Turb_Type), target  :: Turb
+  type(Var_Type),   pointer :: t2
 !==============================================================================!
 
-  t2 => turb % t2
+  t2 => Turb % t2
 
   end subroutine

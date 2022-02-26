@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Calculate_Scalar_Flux(turb, sc)
+  subroutine Calculate_Scalar_Flux(Turb, sc)
 !------------------------------------------------------------------------------!
 !   Computes turbulent heat fluxes                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),  target :: turb
+  class(Turb_Type), target :: Turb
   integer, intent(in)      :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
@@ -20,12 +20,12 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   phi  => Flow % scalar(sc)
-  call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
-  call Flow % Alias_Momentum     (u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f)
 
   ! Check if these are already computed somewhere, ...
   ! ... maybe this call is not needed
@@ -41,75 +41,75 @@
   !-----------------------------------------!
   do c = 1, Grid % n_cells
 
-    turb % uc(c) = - turb % vis_t(c) / Flow % density(c) / sc_t * phi % x(c)
-    turb % vc(c) = - turb % vis_t(c) / Flow % density(c) / sc_t * phi % y(c)
-    turb % wc(c) = - turb % vis_t(c) / Flow % density(c) / sc_t * phi % z(c)
+    Turb % uc(c) = - Turb % vis_t(c) / Flow % density(c) / sc_t * phi % x(c)
+    Turb % vc(c) = - Turb % vis_t(c) / Flow % density(c) / sc_t * phi % y(c)
+    Turb % wc(c) = - Turb % vis_t(c) / Flow % density(c) / sc_t * phi % z(c)
 
-    if(turb % model .eq. HYBRID_LES_RANS) then
-      turb % uc(c) = - turb % vis_t_eff(c) / Flow % density(c) &
+    if(Turb % model .eq. HYBRID_LES_RANS) then
+      Turb % uc(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
                                         / sc_t * phi % x(c)
-      turb % vc(c) = - turb % vis_t_eff(c) / Flow % density(c) &
+      Turb % vc(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
                                         / sc_t * phi % y(c)
-      turb % wc(c) = - turb % vis_t_eff(c) / Flow % density(c) &
+      Turb % wc(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
                                         / sc_t * phi % z(c)
     end if
   end do
 
 
-  if(turb % scalar_flux_model .eq. GGDH) then
+  if(Turb % scalar_flux_model .eq. GGDH) then
 
     do c = 1, Grid % n_cells
-      turb % uc(c) = -c_theta * turb % t_scale(c) * (uu % n(c) * phi % x(c)  +  &
+      Turb % uc(c) = -c_theta * Turb % t_scale(c) * (uu % n(c) * phi % x(c)  +  &
                                                      uv % n(c) * phi % y(c)  +  &
                                                      uw % n(c) * phi % z(c))
-      turb % vc(c) = -c_theta * turb % t_scale(c) * (uv % n(c) * phi % x(c)  +  &
+      Turb % vc(c) = -c_theta * Turb % t_scale(c) * (uv % n(c) * phi % x(c)  +  &
                                                      vv % n(c) * phi % y(c)  +  &
                                                      vw % n(c) * phi % z(c))
-      turb % wc(c) = -c_theta * turb % t_scale(c) * (uw % n(c) * phi % x(c)  +  &
+      Turb % wc(c) = -c_theta * Turb % t_scale(c) * (uw % n(c) * phi % x(c)  +  &
                                                      vw % n(c) * phi % y(c)  +  &
                                                      ww % n(c) * phi % z(c))
     end do
 
-  else if(turb % scalar_flux_model .eq. AFM) then
+  else if(Turb % scalar_flux_model .eq. AFM) then
     call Flow % Grad_Variable(Flow % u)
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
     do k = 1, 3
       do c = 1, Grid % n_cells
 
-        uc_new = -c_theta * turb % t_scale(c) * ((  uu % n(c) * phi % x(c)    &
+        uc_new = -c_theta * Turb % t_scale(c) * ((  uu % n(c) * phi % x(c)    &
                                                   + uv % n(c) * phi % y(c)    &
                                                   + uw % n(c) * phi % z(c))   &
-                                        + 0.6*(  turb % uc(c) * u % x(c)      &
-                                               + turb % vc(c) * u % y(c)      &
-                                               + turb % wc(c) * u % z(c)))
+                                        + 0.6*(  Turb % uc(c) * u % x(c)      &
+                                               + Turb % vc(c) * u % y(c)      &
+                                               + Turb % wc(c) * u % z(c)))
 
 
-        vc_new = -c_theta * turb % t_scale(c) * ((  uv % n(c) * phi % x(c)    &
+        vc_new = -c_theta * Turb % t_scale(c) * ((  uv % n(c) * phi % x(c)    &
                                                   + vv % n(c) * phi % y(c)    &
                                                   + vw % n(c) * phi % z(c))   &
-                                        + 0.6*(  turb % uc(c) * v % x(c)      &
-                                               + turb % vc(c) * v % y(c)      &
-                                               + turb % wc(c) * v % z(c)))
+                                        + 0.6*(  Turb % uc(c) * v % x(c)      &
+                                               + Turb % vc(c) * v % y(c)      &
+                                               + Turb % wc(c) * v % z(c)))
 
-        wc_new = -c_theta * turb % t_scale(c) * ((  uw % n(c) * phi % x(c)    &
+        wc_new = -c_theta * Turb % t_scale(c) * ((  uw % n(c) * phi % x(c)    &
                                                   + vw % n(c) * phi % y(c)    &
                                                   + ww % n(c) * phi % z(c))   &
-                                        + 0.6*(  turb % uc(c) * w % x(c)      &
-                                               + turb % vc(c) * w % y(c)      &
-                                               + turb % wc(c) * w % z(c)))
+                                        + 0.6*(  Turb % uc(c) * w % x(c)      &
+                                               + Turb % vc(c) * w % y(c)      &
+                                               + Turb % wc(c) * w % z(c)))
 
-        turb % uc(c) = turb % uc(c) * 0.7 + uc_new * 0.3
-        turb % vc(c) = turb % vc(c) * 0.7 + vc_new * 0.3
-        turb % wc(c) = turb % wc(c) * 0.7 + wc_new * 0.3
+        Turb % uc(c) = Turb % uc(c) * 0.7 + uc_new * 0.3
+        Turb % vc(c) = Turb % vc(c) * 0.7 + vc_new * 0.3
+        Turb % wc(c) = Turb % wc(c) * 0.7 + wc_new * 0.3
 
       end do
     end do
   end if
 
-  if(turb % model .eq. K_EPS        .or.  &
-     turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. K_EPS        .or.  &
+     Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
 
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
@@ -124,23 +124,23 @@
           ny = Grid % sy(s) / Grid % s(s)
           nz = Grid % sz(s) / Grid % s(s)
 
-          ebf = Turb_Mod_Ebf_Momentum(turb, c1)
+          ebf = Turb % Ebf_Momentum(c1)
 
-          uc_log_law = - turb % diff_w(c1)  &
+          uc_log_law = - Turb % diff_w(c1)  &
                     / Flow % density(c1)    &
                     * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * nx
-          vc_log_law = - turb % diff_w(c1)  &
+          vc_log_law = - Turb % diff_w(c1)  &
                     / Flow % density(c1)    &
                     * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * ny
-          wc_log_law = - turb % diff_w(c1)  &
+          wc_log_law = - Turb % diff_w(c1)  &
                     / Flow % density(c1)    &
                     * (phi % n(c2) - phi % n(c1)) / Grid % wall_dist(c1) * nz
 
-          turb % uc(c1) = turb % uc(c1) * exp(-1.0 * ebf)  &
+          Turb % uc(c1) = Turb % uc(c1) * exp(-1.0 * ebf)  &
                            + uc_log_law * exp(-1.0 / ebf)
-          turb % vc(c1) = turb % vc(c1) * exp(-1.0 * ebf)  &
+          Turb % vc(c1) = Turb % vc(c1) * exp(-1.0 * ebf)  &
                            + vc_log_law * exp(-1.0 / ebf)
-          turb % wc(c1) = turb % wc(c1) * exp(-1.0 * ebf)  &
+          Turb % wc(c1) = Turb % wc(c1) * exp(-1.0 * ebf)  &
                            + wc_log_law * exp(-1.0 / ebf)
         end if
       end if

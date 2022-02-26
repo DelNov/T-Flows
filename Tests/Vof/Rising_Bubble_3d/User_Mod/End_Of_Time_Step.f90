@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
@@ -7,9 +7,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n         ! current time step
   integer, intent(in)      :: n_stat_t  ! 1st t.s. statistics turbulence
   integer, intent(in)      :: n_stat_p  ! 1st t.s. statistics particles

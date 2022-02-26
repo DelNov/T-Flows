@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_Variable(turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_Variable(Turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
@@ -41,9 +41,9 @@
   call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
-  vis  => turb % vis
+  vis  => Turb % vis
   flux => Flow % v_flux % n
   dt   =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
@@ -90,32 +90,32 @@
     visc_f =        Grid % fw(s)  * Flow % viscosity(c1)   &
            + (1.0 - Grid % fw(s)) * Flow % viscosity(c2)
 
-    vis_eff = visc_f + (    Grid % fw(s)  * turb % vis_t(c1)   &
-                     + (1.0-Grid % fw(s)) * turb % vis_t(c2))  &
+    vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t(c1)   &
+                     + (1.0-Grid % fw(s)) * Turb % vis_t(c2))  &
                      / phi % sigma
 
-    if(turb % model .eq. SPALART_ALLMARAS .or.               &
-       turb % model .eq. DES_SPALART)                        &
+    if(Turb % model .eq. SPALART_ALLMARAS .or.               &
+       Turb % model .eq. DES_SPALART)                        &
       vis_eff = visc_f + (    Grid % fw(s)  * vis % n(c1)    &
                        + (1.0-Grid % fw(s)) * vis % n(c2))   &
                        / phi % sigma
 
-    if(turb % model .eq. HYBRID_LES_RANS) then
-      vis_eff = visc_f + (    Grid % fw(s)  * turb % vis_t_eff(c1)   &
-                       + (1.0-Grid % fw(s)) * turb % vis_t_eff(c2))  &
+    if(Turb % model .eq. HYBRID_LES_RANS) then
+      vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t_eff(c1)   &
+                       + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2))  &
                        / phi % sigma
     end if
     phi_x_f = Grid % fw(s) * phi % x(c1) + (1.0-Grid % fw(s)) * phi % x(c2)
     phi_y_f = Grid % fw(s) * phi % y(c1) + (1.0-Grid % fw(s)) * phi % y(c2)
     phi_z_f = Grid % fw(s) * phi % z(c1) + (1.0-Grid % fw(s)) * phi % z(c2)
 
-    if(turb % model .eq. K_EPS_ZETA_F    .or.  &
-       turb % model .eq. HYBRID_LES_RANS .or.  &
-       turb % model .eq. K_EPS) then
+    if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
+       Turb % model .eq. HYBRID_LES_RANS .or.  &
+       Turb % model .eq. K_EPS) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
-          if(turb % y_plus(c1) > 4) then
+          if(Turb % y_plus(c1) > 4) then
 
             phi_x_f = 0.0
             phi_y_f = 0.0
@@ -191,28 +191,28 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turb % model .eq. K_EPS) then
-    if(phi % name .eq. 'KIN') call Turb_Mod_Src_Kin_K_Eps(turb, Sol)
-    if(phi % name .eq. 'EPS') call Turb_Mod_Src_Eps_K_Eps(turb, Sol)
+  if(Turb % model .eq. K_EPS) then
+    if(phi % name .eq. 'KIN') call Turb % Src_Kin_K_Eps(Sol)
+    if(phi % name .eq. 'EPS') call Turb % Src_Eps_K_Eps(Sol)
     if(Flow % heat_transfer) then
-      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
+      if(phi % name .eq. 'T2')  call Turb % Src_T2(Sol)
     end if
   end if
 
-  if(turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
-    if(phi % name .eq. 'KIN')  call Turb_Mod_Src_Kin_K_Eps_Zeta_F(turb, Sol)
-    if(phi % name .eq. 'EPS')  call Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
+  if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
+    if(phi % name .eq. 'KIN')  call Turb % Src_Kin_K_Eps_Zeta_F(Sol)
+    if(phi % name .eq. 'EPS')  call Turb % Src_Eps_K_Eps_Zeta_F(Sol)
     if(phi % name .eq. 'ZETA')  &
-      call Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Sol, curr_dt)
+      call Turb % Src_Zeta_K_Eps_Zeta_F(Sol, curr_dt)
     if(Flow % heat_transfer) then
-      if(phi % name .eq. 'T2')  call Turb_Mod_Src_T2(turb, Sol)
+      if(phi % name .eq. 'T2')  call Turb % Src_T2(Sol)
     end if
   end if
 
-  if(turb % model .eq. SPALART_ALLMARAS .or.  &
-     turb % model .eq. DES_SPALART) then
-    call Turb_Mod_Src_Vis_Spalart_Almaras(turb, Sol)
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    call Turb % Src_Vis_Spalart_Almaras(Sol)
   end if
 
   !---------------------------------!
@@ -253,16 +253,16 @@
   end if
 
   ! Set the lower limit of epsilon 
-  if(phi % name .eq. 'EPS'.and.turb % model == HYBRID_LES_RANS) then
+  if(phi % name .eq. 'EPS'.and.Turb % model == HYBRID_LES_RANS) then
     do c = 1, Grid % n_cells
       phi % n(c) = max(phi % n(c), 1.0e-10)
     end do
   end if
 
   ! Print info on the screen
-  if(turb % model .eq. K_EPS        .or.  &
-     turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. K_EPS        .or.  &
+     Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
       call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
     if(phi % name .eq. 'EPS')  &

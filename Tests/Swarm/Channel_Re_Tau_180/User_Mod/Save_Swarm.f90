@@ -1,5 +1,5 @@
 !==============================================================================!
-   subroutine User_Mod_Save_Swarm(Flow, turb, Vof, swarm, ts)
+   subroutine User_Mod_Save_Swarm(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -19,9 +19,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts      ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer  :: u, v, w, t
@@ -102,8 +102,8 @@
   allocate(v_p    (n_prob));   v_p      = 0.0
   allocate(w_p    (n_prob));   w_p      = 0.0
 
-  nb = turb % pnt_grid % n_bnd_cells                                            
-  nc = turb % pnt_grid % n_cells
+  nb = Turb % pnt_grid % n_bnd_cells                                            
+  nc = Turb % pnt_grid % n_cells
 
   ! Discrete phase arrays:
   allocate(u_pp    (-nb:nc));  u_pp     = 0.0
@@ -130,19 +130,19 @@
          grid % zc(c) < (z_p(i+1))) then
 
       ! Mean velocities
-      u_pp(i) = u_pp(i) + swarm % u_mean(c)
-      v_pp(i) = v_pp(i) + swarm % v_mean(c)
-      w_pp(i) = w_pp(i) + swarm % w_mean(c)   
+      u_pp(i) = u_pp(i) + Swarm % u_mean(c)
+      v_pp(i) = v_pp(i) + Swarm % v_mean(c)
+      w_pp(i) = w_pp(i) + Swarm % w_mean(c)   
 
-      ! 2nd-moment-central-stationary statistics for swarm
-      uu_pp(i)    = uu_pp(i) + swarm % uu(c)  &
-                  - swarm % u_mean(c) * swarm % u_mean(c)
-      vv_pp(i)    = vv_pp(i) + swarm % vv(c)  &
-                  - swarm % v_mean(c) * swarm % v_mean(c)
-      ww_pp(i)    = ww_pp(i) + swarm % ww(c)  &
-                  - swarm % w_mean(c) * swarm % w_mean(c)
-      uw_pp(i)    = uw_pp(i) + swarm % uw(c)  &
-                  - swarm % u_mean(c) * swarm % w_mean(c)
+      ! 2nd-moment-central-stationary statistics for Swarm
+      uu_pp(i)    = uu_pp(i) + Swarm % uu(c)  &
+                  - Swarm % u_mean(c) * Swarm % u_mean(c)
+      vv_pp(i)    = vv_pp(i) + Swarm % vv(c)  &
+                  - Swarm % v_mean(c) * Swarm % v_mean(c)
+      ww_pp(i)    = ww_pp(i) + Swarm % ww(c)  &
+                  - Swarm % w_mean(c) * Swarm % w_mean(c)
+      uw_pp(i)    = uw_pp(i) + Swarm % uw(c)  &
+                  - Swarm % u_mean(c) * Swarm % w_mean(c)
 
       ! Averaging over the number of cells in this bin  
       n_states(i) = n_states(i) + 1
@@ -161,12 +161,12 @@
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
 
         ! Mean velocities
-        u_p(i) = u_p(i) + turb % u_mean(c)
-        v_p(i) = v_p(i) + turb % v_mean(c)
-        w_p(i) = w_p(i) + turb % w_mean(c)
+        u_p(i) = u_p(i) + Turb % u_mean(c)
+        v_p(i) = v_p(i) + Turb % v_mean(c)
+        w_p(i) = w_p(i) + Turb % w_mean(c)
 
-        vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
-        y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
+        vis_t_p (i) = vis_t_p (i) + Turb % vis_t(c) / visc_const
+        y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c)
 
         n_count2(i) = n_count2(i) + 1  ! counter 2 for the flowfield 
       end if
@@ -228,11 +228,11 @@
     end if
   end do
 
-  ! Creating files for swarm statistics
-  call File % Set_Name(swarm_result_name, appendix='-swarm-res',            &
+  ! Creating files for Swarm statistics
+  call File % Set_Name(swarm_result_name, appendix='-Swarm-res',            &
                          time_step = ts, extension='.dat')
   call File % Open_For_Writing_Ascii(swarm_result_name, fu1)
-  call File % Set_Name(swarm_result_name_plus, appendix='-swarm-res-plus',  &
+  call File % Set_Name(swarm_result_name_plus, appendix='-Swarm-res-plus',  &
                          time_step = ts, extension='.dat')
   call File % Open_For_Writing_Ascii(swarm_result_name_plus, fu2)
 

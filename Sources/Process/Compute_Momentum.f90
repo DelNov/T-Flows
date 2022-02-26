@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Momentum(Flow, Turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
+  type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
@@ -95,7 +95,7 @@
   b      => Sol % Nat % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(Flow, turb, Vof, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Momentum(Flow, Turb, Vof, Sol,  &
                                               curr_dt, ini)
 
   !-------------------------------------------------------!
@@ -207,8 +207,8 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      call Turb_Mod_Face_Vis   (turb, vis_eff,  s)
-      call Turb_Mod_Face_Stress(turb, ui, f_stress, s)
+      call Turb % Face_Vis   (vis_eff,  s)
+      call Turb % Face_Stress(ui, f_stress, s)
 
       ui_i_f = Grid % fw(s)*ui_i(c1) + (1.0-Grid % fw(s))*ui_i(c2)
       ui_j_f = Grid % fw(s)*ui_j(c1) + (1.0-Grid % fw(s))*ui_j(c2)
@@ -259,9 +259,9 @@
       end if
 
       ! Here we clean up momentum from the false diffusion
-      call Turb_Mod_Substract_Face_Stress(turb, ui_si, ui_di,            &
-                                                ui % n(c1), ui % n(c2),  &
-                                                M % fc(s), fi, s)
+      call Turb % Substract_Face_Stress(ui_si, ui_di,            &
+                                        ui % n(c1), ui % n(c2),  &
+                                        M % fc(s), fi, s)
 
     end do  ! through faces
 
@@ -387,7 +387,7 @@
   call Grid % Exchange_Cells_Real(M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(Flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 

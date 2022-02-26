@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Turb_Mod_Alias_K_Eps(turb, kin, eps)
+  subroutine Alias_K_Eps(Turb, kin, eps)
 !------------------------------------------------------------------------------!
 !   Create aliases for k and epsilon.                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target  :: turb
-  type(Var_Type),  pointer :: kin, eps
+  class(Turb_Type), target  :: Turb
+  type(Var_Type),   pointer :: kin, eps
 !==============================================================================!
 
-  kin => turb % kin
-  eps => turb % eps
+  kin => Turb % kin
+  eps => Turb % eps
 
   end subroutine

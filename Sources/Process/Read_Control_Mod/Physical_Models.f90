@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Physical_Models(Rc, Flow, turb, Vof, Swarm)
+  subroutine Physical_Models(Rc, Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   Reads details about physical models from control file.                     !
 !                                                                              !
@@ -11,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Control_Type) :: Rc
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
 !----------------------------------[Locals]------------------------------------!
@@ -63,31 +63,31 @@
   select case(name)
 
     case('NONE')
-      turb % model = NO_TURBULENCE_MODEL
+      Turb % model = NO_TURBULENCE_MODEL
     case('K_EPS')
-      turb % model = K_EPS
+      Turb % model = K_EPS
     case('K_EPS_ZETA_F')
-      turb % model = K_EPS_ZETA_F
+      Turb % model = K_EPS_ZETA_F
     case('LES_SMAGORINSKY')
-      turb % model = LES_SMAGORINSKY
+      Turb % model = LES_SMAGORINSKY
     case('HYBRID_LES_PRANDTL')
-      turb % model = HYBRID_LES_PRANDTL
+      Turb % model = HYBRID_LES_PRANDTL
     case('LES_DYNAMIC')
-      turb % model = LES_DYNAMIC
+      Turb % model = LES_DYNAMIC
     case('LES_WALE')
-      turb % model = LES_WALE
+      Turb % model = LES_WALE
     case('DNS')
-      turb % model = DNS
+      Turb % model = DNS
     case('DES_SPALART')
-      turb % model = DES_SPALART
+      Turb % model = DES_SPALART
     case('SPALART_ALLMARAS')
-      turb % model = SPALART_ALLMARAS
+      Turb % model = SPALART_ALLMARAS
     case('RSM_HANJALIC_JAKIRLIC')
-      turb % model = RSM_HANJALIC_JAKIRLIC
+      Turb % model = RSM_HANJALIC_JAKIRLIC
     case('RSM_MANCEAU_HANJALIC')
-      turb % model = RSM_MANCEAU_HANJALIC
+      Turb % model = RSM_MANCEAU_HANJALIC
     case('HYBRID_LES_RANS')
-      turb % model = HYBRID_LES_RANS
+      Turb % model = HYBRID_LES_RANS
 
     case default
       if(this_proc < 2) then
@@ -102,13 +102,13 @@
   !---------------------------------------------------------!
   !   Turbulence model variant for Reynolds stress models   !
   !---------------------------------------------------------!
-  if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-     turb % model .eq. RSM_MANCEAU_HANJALIC) then
+  if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+     Turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Control_Mod_Turbulence_Model_Variant(name, .true.)
     if     (name .eq. 'NONE') then
-      turb % model_variant = NO_TURBULENCE_MODEL
+      Turb % model_variant = NO_TURBULENCE_MODEL
     else if(name .eq. 'STABILIZED') then
-      turb % model_variant = STABILIZED
+      Turb % model_variant = STABILIZED
     else
       if(this_proc < 2) then
         print *, '# ERROR!  Unknown turbulence model variant: ', trim(name)
@@ -121,7 +121,7 @@
   !----------------------------!
   !   Rough or smooth walls?   !
   !----------------------------!
-  call Control_Mod_Rough_Walls(turb % rough_walls, .true.)
+  call Control_Mod_Rough_Walls(Turb % rough_walls, .true.)
 
   ! Does the user want to gather statistics?
   call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS',               &
@@ -132,14 +132,14 @@
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
   !-------------------------------------------------------------------!
-  if((turb % model .eq. LES_SMAGORINSKY         .or.   &
-      turb % model .eq. LES_DYNAMIC             .or.   &
-      turb % model .eq. LES_WALE                .or.   &
-      turb % model .eq. DNS                     .or.   &
-      turb % model .eq. DES_SPALART             .or.   &
-      turb % model .eq. HYBRID_LES_PRANDTL      .or.   &
-      turb % model .eq. HYBRID_LES_RANS         .or.   &
-      turb % model .eq. K_EPS_ZETA_F)           .and.  &
+  if((Turb % model .eq. LES_SMAGORINSKY         .or.   &
+      Turb % model .eq. LES_DYNAMIC             .or.   &
+      Turb % model .eq. LES_WALE                .or.   &
+      Turb % model .eq. DNS                     .or.   &
+      Turb % model .eq. DES_SPALART             .or.   &
+      Turb % model .eq. HYBRID_LES_PRANDTL      .or.   &
+      Turb % model .eq. HYBRID_LES_RANS         .or.   &
+      Turb % model .eq. K_EPS_ZETA_F)           .and.  &
      n_times > n_stat) then  ! last line covers unsteady RANS models
 
     if(this_proc < 2) then
@@ -147,7 +147,7 @@
                'turbulence statistics engaged!'
     end if
 
-    turb % statistics = .true.
+    Turb % statistics = .true.
   end if
 
   !-------------------------------!
@@ -156,11 +156,11 @@
   call Control_Mod_Turbulent_Heat_Flux_Model(name, .true.)
   select case(name)
     case('SGDH')
-      turb % heat_flux_model = SGDH
+      Turb % heat_flux_model = SGDH
     case('GGDH')
-      turb % heat_flux_model = GGDH
+      Turb % heat_flux_model = GGDH
     case('AFM')
-      turb % heat_flux_model = AFM
+      Turb % heat_flux_model = AFM
     case default
       if(this_proc < 2) then
         print *, '# ERROR!  Unknown turbulent heat flux model :', trim(name)
@@ -172,13 +172,13 @@
   !-------------------------------------------!
   !   Type of switching for hybrid LES/RANS   !
   !-------------------------------------------!
-  if(turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. HYBRID_LES_RANS) then
     call Control_Mod_Hybrid_Les_Rans_Switch(name, .true.)
     select case(name)
       case('SWITCH_DISTANCE')
-        turb % hybrid_les_rans_switch = SWITCH_DISTANCE
+        Turb % hybrid_les_rans_switch = SWITCH_DISTANCE
       case('SWITCH_VELOCITY')
-        turb % hybrid_les_rans_switch = SWITCH_VELOCITY
+        Turb % hybrid_les_rans_switch = SWITCH_VELOCITY
       case default
         if(this_proc < 2) then
           print *, '# ERROR!  Unknown type of hybrid LES/RANS switch:',  &
@@ -192,31 +192,31 @@
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
   !-------------------------------------------------------------------------!
-  if(turb % model .eq. LES_SMAGORINSKY .or.  &
-     turb % model .eq. HYBRID_LES_PRANDTL) then
+  if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+     Turb % model .eq. HYBRID_LES_PRANDTL) then
     call Control_Mod_Smagorinsky_Constant(c_smag, .true.)
   end if
 
-  if(turb % model .eq. K_EPS) then
-    call Turb_Mod_Const_K_Eps(turb)
+  if(Turb % model .eq. K_EPS) then
+    call Turb % Const_K_Eps()
   end if
 
-  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb_Mod_Const_Manceau_Hanjalic(turb)
+  if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    call Turb % Const_Manceau_Hanjalic()
   end if
 
-  if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb_Mod_Const_Hanjalic_Jakirlic(turb)
+  if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    call Turb % Const_Hanjalic_Jakirlic()
   end if
 
-  if(turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
-    call Turb_Mod_Const_K_Eps_Zeta_F(turb)
+  if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
+    call Turb % Const_K_Eps_Zeta_F()
   end if
 
-  if(turb % model .eq. SPALART_ALLMARAS .or.  &
-     turb % model .eq. DES_SPALART) then
-    call Turb_Mod_Const_Spalart_Allmaras(turb)
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    call Turb % Const_Spalart_Allmaras()
   end if
 
   !------------------------------------!

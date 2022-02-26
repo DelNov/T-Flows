@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Hybrid_Les_Prandtl(turb)
+  subroutine Vis_T_Hybrid_Les_Prandtl(Turb)
 !------------------------------------------------------------------------------!
 !   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -27,7 +27,7 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   t    => Flow % t
@@ -41,8 +41,8 @@
   ! Calculate model's eddy viscosity
   do c = 1, Grid % n_cells
 
-    hmax = turb % h_max(c)
-    hwn  = turb % h_w(c)
+    hmax = Turb % h_max(c)
+    hwn  = Turb % h_w(c)
     dw   = Grid % wall_dist(c)
 
     ! Wall-modeled LES length scale
@@ -51,20 +51,20 @@
     ! If(nearest_wall_cell(c) .ne. 0) is needed for parallel
     ! version since the subdomains which do not "touch" wall
     ! has nearest_wall_cell(c) = 0. 
-    if(turb % nearest_wall_cell(c) .ne. 0) then
+    if(Turb % nearest_wall_cell(c) .ne. 0) then
       u_ff = sqrt( Flow % viscosity(c)  &
-                  * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
-                         + v % n(turb % nearest_wall_cell(c)) ** 2   &
-                         + w % n(turb % nearest_wall_cell(c)) ** 2)  &
-                 / (Grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-      turb % y_plus(c) = Grid % wall_dist(c) * u_ff / Flow % viscosity(c)
+                  * sqrt(  u % n(Turb % nearest_wall_cell(c)) ** 2   &
+                         + v % n(Turb % nearest_wall_cell(c)) ** 2   &
+                         + w % n(Turb % nearest_wall_cell(c)) ** 2)  &
+                 / (Grid % wall_dist(Turb % nearest_wall_cell(c))+TINY) )
+      Turb % y_plus(c) = Grid % wall_dist(c) * u_ff / Flow % viscosity(c)
 
       ! Piomelli damping function
-      fd = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)
+      fd = 1.0 - exp(-(Turb % y_plus(c)/25.0)**3)
     else
       fd = 1.0
     end if
-    turb % vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2)  &
+    Turb % vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2)  &
                     * Flow % shear(c) * fd
 
   end do
@@ -80,13 +80,13 @@
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      turb % vis_w(c1) = Flow % viscosity(c1)            &
-              +        Grid % fw(s)  * turb % vis_t(c1)  &
-              + (1.0 - Grid % fw(s)) * turb % vis_t(c2)
+      Turb % vis_w(c1) = Flow % viscosity(c1)            &
+              +        Grid % fw(s)  * Turb % vis_t(c1)  &
+              + (1.0 - Grid % fw(s)) * Turb % vis_t(c2)
     end if    ! c2 < 0
   end do
 
-  call Grid % Exchange_Cells_Real(turb % vis_t)
-  call Grid % Exchange_Cells_Real(turb % vis_w)
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
+  call Grid % Exchange_Cells_Real(Turb % vis_w)
 
   end subroutine

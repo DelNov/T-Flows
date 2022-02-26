@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Turb_Mod_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
+  subroutine Face_Cond_And_Stress(Turb, con_eff, t_stress, s)
 !------------------------------------------------------------------------------!
 !   Computes turbulent conductivity on a cell face for all turbulence models.  !
 !   It is called from Compute_Energy, while discretizing diffusion terms.      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
-  real                    :: con_eff
-  real                    :: t_stress
-  integer                 :: s
+  class(Turb_Type), target :: Turb
+  real                     :: con_eff
+  real                     :: t_stress
+  integer                  :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
@@ -22,14 +22,14 @@
 !==============================================================================!
 
   ! Take alias
-  Flow => turb % pnt_flow
-  Grid => turb % pnt_grid
+  Flow => Turb % pnt_flow
+  Grid => Turb % pnt_grid
   t    => Flow % t
 
   t_stress = 0.0
 
-  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Turb_Mod_Alias_T2         (turb, t2)
+  call Turb % Alias_Heat_Fluxes(ut, vt, wt)
+  call Turb % Alias_T2         (t2)
 
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
@@ -38,14 +38,14 @@
   !   Turbulent Prandtl number   !
   !------------------------------!
   pr_tf = pr_t
-  if(turb % model .ne. LES_SMAGORINSKY     .and.  &
-     turb % model .ne. LES_DYNAMIC         .and.  &
-     turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
-     turb % model .ne. LES_WALE            .and.  &
-     turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-     turb % model .ne. DNS) then
-    pr_t1 = Turb_Mod_Prandtl_Number(turb, c1)
-    pr_t2 = Turb_Mod_Prandtl_Number(turb, c2)
+  if(Turb % model .ne. LES_SMAGORINSKY     .and.  &
+     Turb % model .ne. LES_DYNAMIC         .and.  &
+     Turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
+     Turb % model .ne. LES_WALE            .and.  &
+     Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+     Turb % model .ne. DNS) then
+    pr_t1 = Turb % Prandtl_Turb(c1)
+    pr_t2 = Turb % Prandtl_Turb(c2)
     pr_tf = Grid % fw(s) * pr_t1 + (1.0-Grid % fw(s)) * pr_t2
   end if
 
@@ -59,15 +59,15 @@
   !-----------------------------------------------------------------!
   !   Compute turbulent conductivity for various turbulent models   !
   !-----------------------------------------------------------------!
-  if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-     turb % model .ne. DNS) then
-    con_turb  = Grid % fw(s) *Flow % capacity(c1) * turb % vis_t(c1) / pr_tf  &
-       +   (1.0-Grid % fw(s))*Flow % capacity(c2) * turb % vis_t(c2) / pr_tf
+  if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+     Turb % model .ne. DNS) then
+    con_turb  = Grid % fw(s) *Flow % capacity(c1) * Turb % vis_t(c1) / pr_tf  &
+       +   (1.0-Grid % fw(s))*Flow % capacity(c2) * Turb % vis_t(c2) / pr_tf
   end if
 
-  if(turb % model .eq. HYBRID_LES_RANS) then
-    con_turb  = Grid % fw(s)* Flow % capacity(c1)*turb % vis_t_eff(c1)/pr_tf  &
-         + (1.0-Grid % fw(s))*Flow % capacity(c2)*turb % vis_t_eff(c2)/pr_tf
+  if(Turb % model .eq. HYBRID_LES_RANS) then
+    con_turb  = Grid % fw(s)* Flow % capacity(c1)*Turb % vis_t_eff(c1)/pr_tf  &
+         + (1.0-Grid % fw(s))*Flow % capacity(c2)*Turb % vis_t_eff(c2)/pr_tf
   end if
 
   !-----------------------------------!
@@ -76,13 +76,13 @@
   con_eff = con_mol + con_turb
 
   ! Effective conductivity at walls
-  if(turb % model .eq. K_EPS        .or.  &
-     turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. K_EPS        .or.  &
+     Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
     if(c2 < 0) then
       if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .or.  &
          Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
-        con_eff = turb % con_w(c1)
+        con_eff = Turb % con_w(c1)
       end if
     end if
   end if
@@ -91,8 +91,8 @@
   !   Turbulent heat fluxes   !
   !---------------------------!
 
-  if(turb % heat_flux_model .eq. GGDH .or. &
-     turb % heat_flux_model .eq. AFM) then
+  if(Turb % heat_flux_model .eq. GGDH .or. &
+     Turb % heat_flux_model .eq. AFM) then
 
     ! Gradients on the cell face (fw corrects situation close to the wall)
     tx_f = Grid % fw(s) * t % x(c1) + (1.0-Grid % fw(s)) * t % x(c2)
@@ -119,12 +119,12 @@
                                  + tz_f * Grid % sz(s)) )
 
     if(Grid % cell_near_wall(c1).or.Grid % cell_near_wall(c2)) then
-      if( turb % y_plus(c1) > 11.0 .or. turb % y_plus(c2) > 11.0 ) then
+      if( Turb % y_plus(c1) > 11.0 .or. Turb % y_plus(c2) > 11.0 ) then
 
         t_stress = 0.0
 
       end if
     end if
-  end if  ! if turb % heat_flux_model is not SGDH
+  end if  ! if Turb % heat_flux_model is not SGDH
 
   end subroutine

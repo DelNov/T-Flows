@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(Flow, turb)
+  subroutine User_Mod_Backstep_Cf_St(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -7,9 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
-!----------------------------------[Calling]-----------------------------------!
-  real :: Y_Plus_Low_Re
+  type(Turb_Type),  target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
@@ -98,7 +96,7 @@
             um_p(i)   = um_p(i) + u % n(c1)
             vm_p(i)   = vm_p(i) + v % n(c1)
             wm_p(i)   = wm_p(i) + w % n(c1)
-            if(turb % y_plus(c1) < 4.0) then
+            if(Turb % y_plus(c1) < 4.0) then
               v1_p(i) = v1_p(i)  &
                       + (2.0 * visc_const * u % n(c1)   &
                              / Grid % wall_dist(c1))   &
@@ -106,17 +104,17 @@
             else
               kin_vis = visc_const / dens_const
               u_tan = Flow % U_Tan(s)
-              u_tau = c_mu25 * sqrt(turb % kin % n(c1))
-              turb % y_plus(c1) = Y_Plus_Low_Re(turb, u_tau,                 &
-                                                Grid % wall_dist(c1),  &
-                                                kin_vis)
+              u_tau = c_mu25 * sqrt(Turb % kin % n(c1))
+              Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
+                                                       Grid % wall_dist(c1),  &
+                                                       kin_vis)
               tau_wall = dens_const * kappa * u_tau * u_tan    &
-                       / log(e_log*max(turb % y_plus(c1), 1.05))
+                       / log(e_log*max(Turb % y_plus(c1), 1.05))
 
               v1_p(i) = v1_p(i)  &
                       + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))
             end if
-            v2_p(i) = v2_p(i) + turb % y_plus(c1)
+            v2_p(i) = v2_p(i) + Turb % y_plus(c1)
 
             v3_p(i) = v3_p(i) + t % q(c2)  &
                     / (dens_const * capa_const * (t % n(c2) - 20) * 11.3)

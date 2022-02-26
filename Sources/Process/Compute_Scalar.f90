@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(Flow, Turb, Vof, Sol, curr_dt, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for user defined scalar.                 !
 !------------------------------------------------------------------------------!
@@ -16,7 +16,7 @@
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
+  type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
@@ -54,11 +54,11 @@
   v_flux => Flow % v_flux
   phi    => Flow % scalar(sc)
   dt     =  Flow % dt
-  call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
-  call Sol % Alias_Native     (A, b)
+  call Turb % Alias_Stresses(uu, vv, ww, uv, uw, vw)
+  call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(Flow, turb, Vof, Sol,  &
+  call User_Mod_Beginning_Of_Compute_Scalar(Flow, Turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
@@ -75,9 +75,9 @@
   !   Initialize variables and fluxes   !
   !-------------------------------------!
 
-  if( turb % model .ne. NO_TURBULENCE_MODEL) then
-    call Turb_Mod_Calculate_Stress   (turb)
-    call Turb_Mod_Calculate_Scalar_Flux(turb, sc)
+  if( Turb % model .ne. NO_TURBULENCE_MODEL) then
+    call Turb % Calculate_Stress     ()
+    call Turb % Calculate_Scalar_Flux(sc)
   end if
 
   ! Old values (o and oo)
@@ -114,7 +114,7 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    call Turb_Mod_Face_Diff_And_Stress(turb, dif_eff, phi_stress, s, sc)
+    call Turb % Face_Diff_And_Stress(dif_eff, phi_stress, s, sc)
 
     ! Gradients on the cell face
     phix_f = Grid % fw(s)*phi % x(c1) + (1.0-Grid % fw(s))*phi % x(c2)
@@ -242,7 +242,7 @@
   call Flow % Grad_Variable(phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(Flow, turb, Vof, Sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, curr_dt, ini, sc)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

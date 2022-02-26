@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Calculate_Mean(turb, n0, n1)
+  subroutine Calculate_Mean(Turb, n0, n1)
 !------------------------------------------------------------------------------!
 !   Calculates time averaged velocity and velocity fluctuations.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),  target :: turb
+  class(Turb_Type), target :: Turb
   integer                  :: n0, n1
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
@@ -28,40 +28,40 @@
   real, contiguous, pointer :: phi_mean(:,:)
 !==============================================================================!
 
-  if(.not. turb % statistics) return
+  if(.not. Turb % statistics) return
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   p    => Flow % p
-  vis  => turb % vis
-  t2   => turb % t2
+  vis  => Turb % vis
+  t2   => Turb % t2
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Time averaged momentum and energy equations
-  u_mean => turb % u_mean;  v_mean => turb % v_mean;  w_mean => turb % w_mean
-  p_mean => turb % p_mean;  t_mean => turb % t_mean
+  u_mean => Turb % u_mean;  v_mean => Turb % v_mean;  w_mean => Turb % w_mean
+  p_mean => Turb % p_mean;  t_mean => Turb % t_mean
 
   ! Time averaged modeled quantities
-  kin_mean  => turb % kin_mean;   eps_mean  => turb % eps_mean
-  zeta_mean => turb % zeta_mean;  f22_mean  => turb % f22_mean
+  kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
+  zeta_mean => Turb % zeta_mean;  f22_mean  => Turb % f22_mean
 
   ! Time-averaged modelled Reynolds stresses and heat fluxes
-  uu_mean => turb % uu_mean;  vv_mean => turb % vv_mean
-  ww_mean => turb % ww_mean;  uv_mean => turb % uv_mean
-  vw_mean => turb % vw_mean;  uw_mean => turb % uw_mean
-  ut_mean => turb % ut_mean;  vt_mean => turb % vt_mean
-  wt_mean => turb % wt_mean;  t2_mean => turb % t2_mean
+  uu_mean => Turb % uu_mean;  vv_mean => Turb % vv_mean
+  ww_mean => Turb % ww_mean;  uv_mean => Turb % uv_mean
+  vw_mean => Turb % vw_mean;  uw_mean => Turb % uw_mean
+  ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
+  wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
 
   ! Resolved Reynolds stresses and heat fluxes
-  uu_res => turb % uu_res;  vv_res => turb % vv_res;  ww_res => turb % ww_res
-  uv_res => turb % uv_res;  vw_res => turb % vw_res;  uw_res => turb % uw_res
-  ut_res => turb % ut_res;  vt_res => turb % vt_res;  wt_res => turb % wt_res
-  t2_res => turb % t2_res
+  uu_res => Turb % uu_res;  vv_res => Turb % vv_res;  ww_res => Turb % ww_res
+  uv_res => Turb % uv_res;  vw_res => Turb % vw_res;  uw_res => Turb % uw_res
+  ut_res => Turb % ut_res;  vt_res => Turb % vt_res;  wt_res => Turb % wt_res
+  t2_res => Turb % t2_res
 
   n = n1 - n0
 
@@ -72,14 +72,14 @@
       !---------------------------------!
       !   Scale-resolving simulations   !
       !---------------------------------!
-      if(turb % model .eq. LES_SMAGORINSKY    .or.  &
-         turb % model .eq. LES_DYNAMIC        .or.  &
-         turb % model .eq. LES_WALE           .or.  &
-         turb % model .eq. HYBRID_LES_PRANDTL .or.  &
-         turb % model .eq. K_EPS              .or.  &
-         turb % model .eq. K_EPS_ZETA_F       .or.  &
-         turb % model .eq. DES_SPALART        .or.  &
-         turb % model .eq. DNS) then
+      if(Turb % model .eq. LES_SMAGORINSKY    .or.  &
+         Turb % model .eq. LES_DYNAMIC        .or.  &
+         Turb % model .eq. LES_WALE           .or.  &
+         Turb % model .eq. HYBRID_LES_PRANDTL .or.  &
+         Turb % model .eq. K_EPS              .or.  &
+         Turb % model .eq. K_EPS_ZETA_F       .or.  &
+         Turb % model .eq. DES_SPALART        .or.  &
+         Turb % model .eq. DNS) then
 
         ! Mean velocities (and temperature)
         u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
@@ -111,7 +111,7 @@
       !-----------------!
       !   K-eps model   !
       !-----------------!
-      if(turb % model .eq. K_EPS) then
+      if(Turb % model .eq. K_EPS) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
@@ -150,8 +150,8 @@
       !------------------!
       !   K-eps-zeta-f   !
       !------------------!
-      if(turb % model .eq. K_EPS_ZETA_F .or.  &
-         turb % model .eq. HYBRID_LES_RANS) then
+      if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+         Turb % model .eq. HYBRID_LES_RANS) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
@@ -196,8 +196,8 @@
       !----------------------------!
       !   Reynolds stress models   !
       !----------------------------!
-      if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-         turb % model .eq. RSM_MANCEAU_HANJALIC) then
+      if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+         Turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
         ! Time-averaged velocities (and temperature)
         u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
@@ -217,7 +217,7 @@
         vw_mean (c) = (vw_mean (c) * real(n) + vw  % n(c)) / real(n+1)
         kin_mean(c) = (kin_mean(c) * real(n) + kin % n(c)) / real(n+1)
         eps_mean(c) = (eps_mean(c) * real(n) + eps % n(c)) / real(n+1)
-        if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+        if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
           f22_mean(c) = (f22_mean(c) * real(n) + f22 % n(c)) / real(n+1)
         end if
 
@@ -245,7 +245,7 @@
       !-------------!
       do sc = 1, Flow % n_scalars
         phi      => Flow % scalar(sc)
-        phi_mean => turb % scalar_mean
+        phi_mean => Turb % scalar_mean
         phi_mean(sc, c) = (phi_mean(sc, c) * real(n) + phi % n(c)) / real(n+1)
       end do
     end do

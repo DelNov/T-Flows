@@ -1,19 +1,13 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Eps_K_Eps_Zeta_F(turb, Sol)
+  subroutine Src_Eps_K_Eps_Zeta_F(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Calculates source terms in equation of dissipation of turbulent energy     !
 !   and imposes boundary condition                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
-!---------------------------------[Calling]------------------------------------!
-  real :: Roughness_Coefficient
-  real :: Tau_Wall_Low_Re
-  real :: Y_Plus_Low_Re
-  real :: Y_Plus_Rough_Walls
-  real :: Tau_Wall_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -42,9 +36,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
@@ -53,19 +47,19 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
-  call Sol % Alias_Native         (A, b)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
+  call Sol % Alias_Native       (A, b)
 
-  call Time_And_Length_Scale(Grid, turb)
+  call Turb % Time_And_Length_Scale(Grid)
 
   do c = 1, Grid % n_cells 
-    e_sor = Grid % vol(c)/(turb % t_scale(c)+TINY)
+    e_sor = Grid % vol(c)/(Turb % t_scale(c)+TINY)
     c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
-    b(c) = b(c) + c_11e * e_sor * turb % p_kin(c)
+    b(c) = b(c) + c_11e * e_sor * Turb % p_kin(c)
 
     ! Fill in a diagonal of coefficient matrix
     A % val(A % dia(c)) =  A % val(A % dia(c))  &
@@ -73,9 +67,9 @@
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-      b(c) = b(c) + max(0.0, c_11e * e_sor * turb % g_buoy(c))
+      b(c) = b(c) + max(0.0, c_11e * e_sor * Turb % g_buoy(c))
       A % val(A % dia(c)) = A % val(A % dia(c))                         &
-                          + max(0.0, -c_11e * e_sor * turb % g_buoy(c)  &
+                          + max(0.0, -c_11e * e_sor * Turb % g_buoy(c)  &
                           / (eps % n(c) + TINY))
     end if
   end do
@@ -98,80 +92,76 @@
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
+        Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
+                                                 Grid % wall_dist(c1),  &
+                                                 kin_vis)
 
-        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              Flow % density(c1), &
-                                              u_tau,              &
-                                              u_tan,              &
-                                              turb % y_plus(c1))
+        Turb % tau_wall(c1) = Turb % Tau_Wall_Low_Re(Flow % density(c1), &
+                                                     u_tau,              &
+                                                     u_tan,              &
+                                                     Turb % y_plus(c1))
 
-        u_tau_new = sqrt(turb % tau_wall(c1) / Flow % density(c1))
+        u_tau_new = sqrt(Turb % tau_wall(c1) / Flow % density(c1))
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau_new,             &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
+        Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau_new,             &
+                                                 Grid % wall_dist(c1),  &
+                                                 kin_vis)
 
         eps_int = 2.0* kin_vis * kin % n(c1)  &
                 / Grid % wall_dist(c1)**2
         eps_wf  = c_mu75 * kin % n(c1)**1.5            &
                 / (Grid % wall_dist(c1) * kappa)
 
-        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
+        ebf = Turb % Ebf_Momentum(c1)
 
-        p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+        p_kin_wf  = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                 / (Grid % wall_dist(c1) * kappa)
 
-        p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
+        p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 
-        turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
+        Turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
                            * exp(-1.0 / ebf)
 
-        fa = min( p_kin_wf * exp(-1.0 / ebf) / (turb % p_kin(c1) + TINY), 1.0)
+        fa = min( p_kin_wf * exp(-1.0 / ebf) / (Turb % p_kin(c1) + TINY), 1.0)
 
         eps % n(c1) = (1.0 - fa)**0.5 * eps_int + fa**0.5 * eps_wf
 
-        if(turb % rough_walls) then
-          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+        if(Turb % rough_walls) then
+          z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
           z_o = max(Grid % wall_dist(c1)  &
-              / (e_log * max(turb % y_plus(c1), 1.0)), z_o)
+              / (e_log * max(Turb % y_plus(c1), 1.0)), z_o)
  
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                 u_tau,                 &
-                                                 Grid % wall_dist(c1),  &
-                                                 kin_vis)
+          Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(u_tau,                 &
+                                                        Grid % wall_dist(c1),  &
+                                                        kin_vis)
 
-          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
+          Turb % tau_wall(c1) = Turb % Tau_Wall_Rough_Walls(                &
                                                      Flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
                                                      Grid % wall_dist(c1),  &
                                                      z_o)
 
-          p_kin_wf = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+          p_kin_wf = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                    / (kappa * (Grid % wall_dist(c1) + z_o))
 
           eps_wf = c_mu75 * kin % n(c1)**1.5  &
                  / ((Grid % wall_dist(c1) + z_o) * kappa)
 
-          ebf = Turb_Mod_Ebf_Momentum(turb, c1)
+          ebf = Turb % Ebf_Momentum(c1)
 
-          p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
+          p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 
-          turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf)  &
+          Turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf)  &
                            + p_kin_wf * exp(-1.0 / ebf)
 
-          fa = min( p_kin_wf * exp(-1.0 / ebf) / (turb % p_kin(c1) + TINY), 1.0)
+          fa = min( p_kin_wf * exp(-1.0 / ebf) / (Turb % p_kin(c1) + TINY), 1.0)
 
           eps % n(c1) = (1.0 - fa)**0.5 * eps_int  &
                       + fa**0.5 * eps_wf
         end if  ! rough_walls
 
-        if(turb % y_plus(c1) > 3) then
+        if(Turb % y_plus(c1) > 3) then
           ! Adjusting coefficient to fix eps value in near wall calls
           do j = A % row(c1), A % row(c1 + 1) - 1
             A % val(j) = 0.0

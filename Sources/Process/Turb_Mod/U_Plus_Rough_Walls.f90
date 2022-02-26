@@ -1,19 +1,15 @@
 !==============================================================================!
-  real function U_Plus_Rough_Walls(turb, wall_dist)
+  real function U_Plus_Rough_Walls(Turb, wall_dist)
 !------------------------------------------------------------------------------!
 !   Calculates U+ for rough walls.                                             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: TINY
-  use Turb_Mod,  only: Turb_Type, kappa
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type) :: turb
-  real            :: wall_dist
+  class(Turb_Type) :: Turb
+  real             :: wall_dist
 !==============================================================================!
 
-  U_Plus_Rough_Walls = log( (wall_dist + turb % z_o) / turb % z_o)  &
+  U_Plus_Rough_Walls = log( (wall_dist + Turb % z_o) / Turb % z_o)  &
                             / (kappa + TINY) + TINY
 
   end function

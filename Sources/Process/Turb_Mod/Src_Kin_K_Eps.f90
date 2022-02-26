@@ -1,18 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Kin_K_Eps(turb, Sol)
+  subroutine Src_Kin_K_Eps(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in kin transport equation for k-epsilon model    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
-!---------------------------------[Calling]------------------------------------!
-  real :: Roughness_Coefficient
-  real :: Tau_Wall_Low_Re
-  real :: Tau_Wall_Rough_Walls
-  real :: Y_Plus_Low_Re
-  real :: Y_Plus_Rough_Walls
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -31,9 +25,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
@@ -42,35 +36,35 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
-  call Flow % Alias_Momentum(u, v, w)
-  call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps      (turb, kin, eps)
-  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Sol % Alias_Native        (A, b)
-  call Turb_Mod_Alias_T2         (turb, t2)
+  call Flow % Alias_Momentum   (u, v, w)
+  call Flow % Alias_Energy     (t)
+  call Turb % Alias_K_Eps      (kin, eps)
+  call Turb % Alias_Heat_Fluxes(ut, vt, wt)
+  call Turb % Alias_T2         (t2)
+  call Sol % Alias_Native      (A, b)
 
   !-----------------------------------------!
   !   Compute the sources in the interior   !
   !-----------------------------------------!
   ! Production source:
   do c = 1, Grid % n_cells
-    turb % p_kin(c) = turb % vis_t(c) * Flow % shear(c)**2
-    b(c) = b(c) + turb % p_kin(c) * Grid % vol(c)
+    Turb % p_kin(c) = Turb % vis_t(c) * Flow % shear(c)**2
+    b(c) = b(c) + Turb % p_kin(c) * Grid % vol(c)
 
     A % val(A % dia(c)) = A % val(A % dia(c)) + &
          Flow % density(c) * eps % n(c)/(kin % n(c) + TINY) * Grid % vol(c)
 
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-      turb % g_buoy(c) = -Flow % beta                   &
+      Turb % g_buoy(c) = -Flow % beta                   &
                        * (  Flow % grav_x * ut % n(c)   &
                           + Flow % grav_y * vt % n(c)   &
                           + Flow % grav_z * wt % n(c))  &
                        * Flow % density(c)
-      b(c) = b(c) + max(0.0, turb % g_buoy(c) * Grid % vol(c))
+      b(c) = b(c) + max(0.0, Turb % g_buoy(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))        &
-                          + max(0.0,-turb % g_buoy(c)  &
+                          + max(0.0,-Turb % g_buoy(c)  &
                           * Grid % vol(c) / (kin % n(c) + TINY))
     end if
   end do
@@ -91,46 +85,43 @@
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
-
-        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              Flow % density(c1), &
-                                              u_tau,              &
-                                              u_tan,              &
-                                              turb % y_plus(c1))
-
-        p_kin_wf  = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                  / (Grid % wall_dist(c1) * kappa)
-
-        p_kin_int = turb % vis_t(c1) * Flow % shear(c1)**2
-
-        turb % p_kin(c1) = p_kin_wf
-
-        if(turb % rough_walls) then
-          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                 u_tau,                 &
+        Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
                                                  Grid % wall_dist(c1),  &
                                                  kin_vis)
 
-          turb % tau_wall(c1) = Tau_Wall_Rough_Walls(turb,                  &
+        Turb % tau_wall(c1) = Turb % Tau_Wall_Low_Re(Flow % density(c1), &
+                                                     u_tau,              &
+                                                     u_tan,              &
+                                                     Turb % y_plus(c1))
+
+        p_kin_wf  = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+                  / (Grid % wall_dist(c1) * kappa)
+
+        p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
+
+        Turb % p_kin(c1) = p_kin_wf
+
+        if(Turb % rough_walls) then
+          z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
+
+          Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(u_tau,                 &
+                                                        Grid % wall_dist(c1),  &
+                                                        kin_vis)
+
+          Turb % tau_wall(c1) = Turb % Tau_Wall_Rough_Walls(                &
                                                      Flow % density(c1),    &
                                                      u_tau,                 &
                                                      u_tan,                 &
                                                      Grid % wall_dist(c1),  &
                                                      z_o)
 
-          turb % p_kin(c1) = turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+          Turb % p_kin(c1) = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                            / (kappa*(Grid % wall_dist(c1) + z_o))
 
         end if  ! rough_walls
 
         b(c1) = b(c1)                                                        &
-              + (turb % p_kin(c1) - turb % vis_t(c1) * Flow % shear(c1)**2)  &
+              + (Turb % p_kin(c1) - Turb % vis_t(c1) * Flow % shear(c1)**2)  &
               * Grid % vol(c1)
 
         ! Implementation of wall function for buoyancy-driven flows
@@ -143,13 +134,13 @@
           qy = t % q(c2) * ny
           qz = t % q(c2) * nz
 
-          ut_log_law = - turb % con_w(c1)  &
+          ut_log_law = - Turb % con_w(c1)  &
                      / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
-          vt_log_law = - turb % con_w(c1)  &
+          vt_log_law = - Turb % con_w(c1)  &
                      / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * ny
-          wt_log_law = - turb % con_w(c1)  &
+          wt_log_law = - Turb % con_w(c1)  &
                      / (Flow % density(c1) * Flow % capacity(c1))   &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nz
 
@@ -161,7 +152,7 @@
                      + wt_log_law * exp(-1.0 / ebf)
 
           if(Grid % Bnd_Cond_Type(c2) .eq. WALL)                    &
-            t % q(c2) = turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
+            t % q(c2) = Turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
           g_buoy_wall = Flow % density(c1)                                    &
@@ -174,12 +165,12 @@
                       * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           ! Clean up b(c) from old values of g_buoy
-          b(c1)      = b(c1) - turb % g_buoy(c1) * Grid % vol(c1)
-          turb % g_buoy(c1) = turb % g_buoy(c1) * exp(-1.0 * ebf) &
+          b(c1)      = b(c1) - Turb % g_buoy(c1) * Grid % vol(c1)
+          Turb % g_buoy(c1) = Turb % g_buoy(c1) * exp(-1.0 * ebf) &
                             + g_buoy_wall * exp(-1.0 / ebf)
 
           ! Add new values of g_buoy based on wall function approach
-          b(c1)      = b(c1) + turb % g_buoy(c1) * Grid % vol(c1)
+          b(c1)      = b(c1) + Turb % g_buoy(c1) * Grid % vol(c1)
 
         end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
       end if    ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL

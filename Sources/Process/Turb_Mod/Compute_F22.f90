@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Compute_F22(turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_F22(Turb, Sol, curr_dt, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Turb_Type)           :: turb
+  class(Turb_Type)          :: Turb
   type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
@@ -40,7 +40,7 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Sol % Alias_Native(A, b)
 
@@ -143,10 +143,10 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb_Mod_Src_F22_Rsm_Manceau_Hanjalic(turb, Sol)
+  if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    call Turb % Src_F22_Rsm_Manceau_Hanjalic(Sol)
   else
-    call Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Sol)
+    call Turb % Src_F22_K_Eps_Zeta_F(Sol)
   end if
 
   !---------------------------------!
@@ -175,9 +175,9 @@
   call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen
-  if(turb % model .eq. K_EPS_ZETA_F) then
+  if(Turb % model .eq. K_EPS_ZETA_F) then
     call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
-  else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+  else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
     call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % eniter, phi % res)
   end if
 

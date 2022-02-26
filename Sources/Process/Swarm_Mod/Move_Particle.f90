@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: Grid
-  type(Turb_Type),     pointer :: turb
+  type(Turb_Type),     pointer :: Turb
   type(Var_Type),      pointer :: u, v, w, kin, eps, zeta, f22
   type(Particle_Type), pointer :: Part
   real,                pointer :: fb_x, fb_y, fb_z
@@ -34,11 +34,11 @@
   ! Take aliases for Flow
   Flow => Swarm % pnt_flow
   Grid => Swarm % pnt_grid
-  turb => Swarm % pnt_turb
+  Turb => Swarm % pnt_turb
   call Flow % Alias_Momentum(u, v, w)
 
-  ! Take aliases for turb
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  ! Take aliases for Turb
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
 
   ! Take aliases for Swarm
   Part => Swarm % particle(k)
@@ -65,9 +65,9 @@
 
   ! Particle damping function for wall treatment (for feeded modeled Flow
   ! quantities)
-  !fd_p = 1.0 - exp(-(turb % y_plus(c)/25.0)**3)     ! Piomelli
-  if(turb % model .ne. NO_TURBULENCE_MODEL) then
-    fd_p = (1.0 - exp(-(turb % y_plus(c)/25.0)))**2    ! Van-Driest
+  !fd_p = 1.0 - exp(-(Turb % y_plus(c)/25.0)**3)     ! Piomelli
+  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+    fd_p = (1.0 - exp(-(Turb % y_plus(c)/25.0)))**2    ! Van-Driest
   end if
 
   !----------------------------------------------------------------------------!
@@ -92,7 +92,7 @@
   !--------------------------------------------!
   !   Add fluctuations from turbulent models   !
   !--------------------------------------------!
-  if(turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. HYBRID_LES_RANS) then
 
     ! Modeled quantity "zeta" at particle location
     v2_mod_xc = Swarm % v2_mod_x(c) * rx
@@ -107,7 +107,7 @@
 
 !    ! Simpler version of the modeled quantities'
 !    !   ad-hoc (No interpolation) "safer side"
-!    if(turb % y_plus(c) > 35.0) then
+!    if(Turb % y_plus(c) > 35.0) then
 !      w_mod = Swarm % v2_mod(c) * fd_p
 !    else 
 !      w_mod = Swarm % v2_mod(c)
@@ -116,9 +116,9 @@
     if(Swarm % subgrid_scale_model .eq. DISCRETE_RANDOM_WALK) then
 
       ! Relative velocity components between particle and fluid
-      Part % rel_u_mod = abs(Part % u - turb % u_mean(c))
-      Part % rel_v_mod = abs(Part % v - turb % v_mean(c))
-      Part % rel_w_mod = abs(Part % w - turb % w_mean(c))
+      Part % rel_u_mod = abs(Part % u - Turb % u_mean(c))
+      Part % rel_v_mod = abs(Part % v - Turb % v_mean(c))
+      Part % rel_w_mod = abs(Part % w - Turb % w_mean(c))
 
       ! Compute the magnitude of the interpolated velocity
       flow_vel = sqrt(up**2 + vp**2 + wp**2)

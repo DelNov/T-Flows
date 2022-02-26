@@ -1,16 +1,12 @@
 !==============================================================================!
-  real function Y_Plus_Low_Re(turb, u_tau, wall_dist, kin_vis)
+  real function Y_Plus_Low_Re(Turb, u_tau, wall_dist, kin_vis)
 !------------------------------------------------------------------------------!
 !   Calculates y+ for low Reynolds approach.                                   !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod, only: TINY
-  use Turb_Mod,  only: Turb_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type) :: turb
-  real            :: u_tau, wall_dist, kin_vis
+  class(Turb_Type) :: Turb
+  real             :: u_tau, wall_dist, kin_vis
 !==============================================================================!
 
   Y_Plus_Low_Re = max(u_tau * wall_dist / kin_vis, TINY)

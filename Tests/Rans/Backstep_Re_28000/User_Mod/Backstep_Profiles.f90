@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(Flow, turb)
+  subroutine User_Mod_Backstep_Profiles(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22
@@ -31,8 +31,8 @@
   ! Take aliases
   grid => Flow % pnt_grid
   t    => Flow % t
-  call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
@@ -143,10 +143,10 @@
             wm_p(i) = wm_p(i) + w % n(c)
             uu_p(i) = uu_p(i) + kin % n(c)
             vv_p(i) = vv_p(i) + eps % n(c)
-            v1_p(i) = v1_p(i) + turb % vis_t(c)*(u % y(c) + v % x(c))/u_b**2
+            v1_p(i) = v1_p(i) + Turb % vis_t(c)*(u % y(c) + v % x(c))/u_b**2
             v2_p(i) = v2_p(i) + t % n(c) - 20.0
             n_count(i) = n_count(i) + 1
-            if(turb % model == K_EPS_ZETA_F) then
+            if(Turb % model == K_EPS_ZETA_F) then
               ww_p(i) = ww_p(i) + zeta % n(c)
               uv_p(i) = uv_p(i) + f22 % n(c)
             end if

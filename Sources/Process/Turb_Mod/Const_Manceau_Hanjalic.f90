@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Const_Manceau_Hanjalic(turb)
+  subroutine Const_Manceau_Hanjalic(turb)
 !------------------------------------------------------------------------------!
 !   Initializes constants for Manceau Hanjalic Reynolds Stress turb. model     ! 
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),  target :: turb
+  class(Turb_Type), target :: turb
 !==============================================================================!
 
   c_1e    =  1.44

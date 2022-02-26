@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Nu(turb)
+  subroutine User_Mod_Impinging_Jet_Nu(Turb)
 !------------------------------------------------------------------------------!
 !   The subroutine creates ASCII file with Nusselt number averaged             !
 !   in azimuthal direction.                                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  type(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
@@ -26,16 +26,16 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
   t    => Flow % t
-  kin  => turb % kin
-  eps  => turb % eps
-  zeta => turb % zeta
-  f22  => turb % f22
+  kin  => Turb % kin
+  eps  => Turb % eps
+  zeta => Turb % zeta
+  f22  => Turb % f22
 
   inquire(file='rad_coordinate.dat', exist=there)
   if(.not.there) then
@@ -116,7 +116,7 @@
             wm_p(i) = wm_p(i) +   w % n(c1)
             tm_p(i) = tm_p(i) + t % n(c2) 
             v1_p(i) = v1_p(i) + Grid % zc(c1)
-            v2_p(i) = v2_p(i) + sqrt(turb % tau_wall(c1))
+            v2_p(i) = v2_p(i) + sqrt(Turb % tau_wall(c1))
             v3_p(i) = v3_p(i) + (c_mu**0.25 * kin % n(c1)**0.5)
             v4_p(i) = v4_p(i) + kin % n(c1)
             v5_p(i) = v5_p(i) + eps % n(c1)

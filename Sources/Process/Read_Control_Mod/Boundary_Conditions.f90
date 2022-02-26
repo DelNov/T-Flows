@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Boundary_Conditions(Rc, Flow, turb, Vof, turb_planes)
+  subroutine Boundary_Conditions(Rc, Flow, Turb, Vof, turb_planes)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
@@ -20,7 +20,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Control_Type)      :: Rc
   type(Field_Type),      target :: Flow
-  type(Turb_Type),       target :: turb
+  type(Turb_Type),       target :: Turb
   type(Vof_Type),        target :: Vof
   type(Turb_Plane_Type)         :: turb_planes
 !----------------------------------[Calling]-----------------------------------!
@@ -55,18 +55,18 @@
   t      => Flow % t
   p      => Flow % p
   scalar => Flow % scalar
-  vis    => turb % vis
-  t2     => turb % t2
+  vis    => Turb % vis
+  t2     => Turb % t2
   fun    => Vof % fun
 
-  call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
 
   !-------------------------!
   !   Read wall roughness   !
   !-------------------------!
-  call Control_Mod_Roughness_Coefficient(turb % z_o)
+  call Control_Mod_Roughness_Coefficient(Turb % z_o)
 
   !----------------------------------------------------------------!
   !   Count number of types per boundary condition, total number   !
@@ -286,8 +286,8 @@
             end do
 
             ! For turbulence models
-            if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-               turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+            if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+               Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
               i = Key_Ind('UU',  keys, nks); if(i > 0) uu  % b(c) = vals(i)
               i = Key_Ind('VV',  keys, nks); if(i > 0) vv  % b(c) = vals(i)
               i = Key_Ind('WW',  keys, nks); if(i > 0) ww  % b(c) = vals(i)
@@ -296,22 +296,22 @@
               i = Key_Ind('VW',  keys, nks); if(i > 0) vw  % b(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
 
-              if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+              if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
                 i = Key_Ind('F22', keys, nks); if(i > 0) f22 % b(c) = vals(i)
               end if
             end if
 
-            if(turb % model .eq. K_EPS) then
+            if(Turb % model .eq. K_EPS) then
               i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = vals(i)
               i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
-              turb % y_plus(c) = 1.1
+              Turb % y_plus(c) = 1.1
               if(Flow % heat_transfer) then
                 i = Key_Ind('T2',  keys, nks); if(i > 0) t2 % b(c) = vals(i)
               end if
             end if
 
-            if(turb % model .eq. K_EPS_ZETA_F .or.  &
-               turb % model .eq. HYBRID_LES_RANS) then
+            if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+               Turb % model .eq. HYBRID_LES_RANS) then
               i = Key_Ind('KIN',  keys, nks); if(i > 0) kin  % b(c) = vals(i)
               i = Key_Ind('EPS',  keys, nks); if(i > 0) eps  % b(c) = vals(i)
               i = Key_Ind('ZETA', keys, nks); if(i > 0) zeta % b(c) = vals(i)
@@ -321,8 +321,8 @@
               end if
             end if
 
-            if(turb % model .eq. SPALART_ALLMARAS .or.  &
-               turb % model .eq. DES_SPALART) then
+            if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+               Turb % model .eq. DES_SPALART) then
               i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % b(c) = vals(i)
             end if
           end if
@@ -459,7 +459,7 @@
               end do
 
               ! For turbulence models
-              if(turb % model .eq. K_EPS) then
+              if(Turb % model .eq. K_EPS) then
                 i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = prof(k,i)
                 i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = prof(k,i)
                 if(Flow % heat_transfer) then
@@ -467,8 +467,8 @@
                 end if
               end if
 
-              if(turb % model .eq. K_EPS_ZETA_F .or.  &
-                 turb % model .eq. HYBRID_LES_RANS) then
+              if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+                 Turb % model .eq. HYBRID_LES_RANS) then
                 i = Key_Ind('KIN',  keys, nks); if(i>0) kin  % b(c) = prof(k,i)
                 i = Key_Ind('EPS',  keys, nks); if(i>0) eps  % b(c) = prof(k,i)
                 i = Key_Ind('ZETA', keys, nks); if(i>0) zeta % b(c) = prof(k,i)
@@ -478,13 +478,13 @@
                 end if
               end if
 
-              if(turb % model .eq. SPALART_ALLMARAS .or.  &
-                 turb % model .eq. DES_SPALART) then
+              if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+                 Turb % model .eq. DES_SPALART) then
                 i = Key_Ind('VIS', keys, nks); if(i > 0) vis % b(c) = prof(k,i)
               end if
 
-              if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-                 turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+              if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+                 Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
                 i = Key_Ind('UU', keys, nks); if(i > 0) uu  % b(c) = prof(k,i)
                 i = Key_Ind('VV', keys, nks); if(i > 0) vv  % b(c) = prof(k,i)
                 i = Key_Ind('WW', keys, nks); if(i > 0) ww  % b(c) = prof(k,i)
@@ -493,7 +493,7 @@
                 i = Key_Ind('VW', keys, nks); if(i > 0) vw  % b(c) = prof(k,i)
                 i = Key_Ind('EPS',keys, nks); if(i > 0) eps % b(c) = prof(k,i)
 
-                if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+                if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
                   i = Key_Ind('F22', keys, nks); if(i>0) f22 % b(c) = prof(k,i)
                 end if
               end if
@@ -693,7 +693,7 @@
                   end do
 
                   ! For turbulence models
-                  if(turb % model .eq. K_EPS) then
+                  if(Turb % model .eq. K_EPS) then
 
                     i = Key_Ind('KIN',keys,nks)
                     if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
@@ -708,8 +708,8 @@
 
                   end if
 
-                  if(turb % model .eq. K_EPS_ZETA_F .or.  &
-                     turb % model .eq. HYBRID_LES_RANS) then
+                  if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+                     Turb % model .eq. HYBRID_LES_RANS) then
 
                     i = Key_Ind('KIN',keys,nks)
                     if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
@@ -730,8 +730,8 @@
 
                   end if
 
-                  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-                     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+                  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+                     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
                     i = Key_Ind('UU', keys, nks)
                     if(i > 0) uu % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
@@ -754,14 +754,14 @@
                     i = Key_Ind('EPS', keys, nks)
                     if(i > 0) eps % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
-                    if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+                    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
                       i = Key_Ind('F22', keys, nks)
                       if(i > 0)f22 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                     end if
                   end if
 
-                  if(turb % model .eq. SPALART_ALLMARAS .or.  &
-                     turb % model .eq. DES_SPALART) then
+                  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+                     Turb % model .eq. DES_SPALART) then
                     i = Key_Ind('VIS',keys,nks)
                     if(i > 0) vis % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   end if
@@ -837,8 +837,8 @@
       scalar(sc) % n(c) = scalar(sc) % b(c)
     end do
 
-    if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
       uu  % n(c) = uu  % b(c)
       vv  % n(c) = vv  % b(c)
       ww  % n(c) = ww  % b(c)
@@ -847,12 +847,12 @@
       vw  % n(c) = vw  % b(c)
       eps % n(c) = eps % b(c)
 
-      if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+      if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
         f22 % n(c) = f22 % b(c)
       end if
     end if
 
-    if(turb % model .eq. K_EPS) then
+    if(Turb % model .eq. K_EPS) then
       kin % n(c) = kin % b(c)
       eps % n(c) = eps % b(c)
       if(Flow % heat_transfer) then
@@ -860,8 +860,8 @@
       end if
     end if
 
-    if(turb % model .eq. K_EPS_ZETA_F .or.  &
-       turb % model .eq. HYBRID_LES_RANS) then
+    if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+       Turb % model .eq. HYBRID_LES_RANS) then
       kin  % n(c) = kin  % b(c)
       eps  % n(c) = eps  % b(c)
       zeta % n(c) = zeta % b(c)
@@ -871,8 +871,8 @@
       end if
     end if
 
-    if(turb % model .eq. SPALART_ALLMARAS .or.  &
-       turb % model .eq. DES_SPALART) then
+    if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+       Turb % model .eq. DES_SPALART) then
       vis % n(c) = vis % b(c)
     end if
 

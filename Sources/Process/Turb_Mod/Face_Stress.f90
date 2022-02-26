@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Turb_Mod_Face_Stress(turb, ui, f_stress, s)
+  subroutine Face_Stress(Turb, ui, f_stress, s)
 !------------------------------------------------------------------------------!
 !   Computes turbulent stress on a cell face for all turbulence models.        !
 !   It is called from Compute_Momentum, while discretizing diffusion terms.    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
-  real                    :: f_stress
-  integer                 :: s
+  class(Turb_Type), target :: Turb
+  real                     :: f_stress
+  integer                  :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: ui
@@ -18,16 +18,16 @@
 !==============================================================================!
 
   ! Take alias
-  Grid => turb % pnt_grid
-  call Turb_Mod_Alias_Stresses(turb, uu, vv, ww, uv, uw, vw)
+  Grid => Turb % pnt_grid
+  call Turb % Alias_Stresses(uu, vv, ww, uv, uw, vw)
 
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
 
   ! Add influence of Re stresses
-  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turb % model_variant .ne. STABILIZED) then
+  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(Turb % model_variant .ne. STABILIZED) then
       if(ui % name .eq. 'U') then
         uu_f = Grid % fw(s) * uu % n(c1) + (1.0-Grid % fw(s)) * uu % n(c2)
         uv_f = Grid % fw(s) * uv % n(c1) + (1.0-Grid % fw(s)) * uv % n(c2)

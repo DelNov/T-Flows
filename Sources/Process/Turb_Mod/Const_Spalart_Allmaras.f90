@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Const_Spalart_Allmaras(turb)
+  subroutine Const_Spalart_Allmaras(turb)
 !------------------------------------------------------------------------------!
 !   Initializes constants for Spalar-Allmaras and DES turbulence models.       ! 
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),  target :: turb
+  class(Turb_Type), target :: turb
 !==============================================================================!
 
   turb % vis % sigma = TWO_THIRDS

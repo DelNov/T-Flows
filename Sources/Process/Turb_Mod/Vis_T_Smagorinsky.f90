@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Smagorinsky(turb)
+  subroutine Vis_T_Smagorinsky(Turb)
 !------------------------------------------------------------------------------!
 !   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
@@ -9,11 +9,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
-!---------------------------------[Calling]------------------------------------!
-  real :: Roughness_Coefficient
-  real :: U_Plus_Rough_Walls
-  real :: Y_Plus_Rough_Walls
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -26,7 +22,7 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
   t    => Flow % t
@@ -40,45 +36,45 @@
     call Flow % Grad_Variable(t)
   end if
 
-  if(turb % model .eq. LES_SMAGORINSKY) then
+  if(Turb % model .eq. LES_SMAGORINSKY) then
     do c = 1, Grid % n_cells
       lf = Grid % vol(c)**ONE_THIRD
 
       ! if(nearest_wall_cell(c) .ne. 0) is needed for parallel version
       ! since the subdomains which do not "touch" wall
       ! has nearest_wall_cell(c) = 0.
-      if(turb % nearest_wall_cell(c) .ne. 0) then
+      if(Turb % nearest_wall_cell(c) .ne. 0) then
         u_f = sqrt( Flow % viscosity(c)                                &
-                    * sqrt(  u % n(turb % nearest_wall_cell(c)) ** 2   &
-                           + v % n(turb % nearest_wall_cell(c)) ** 2   &
-                           + w % n(turb % nearest_wall_cell(c)) ** 2)  &
-                   / (Grid % wall_dist(turb % nearest_wall_cell(c))+TINY) )
-        turb % y_plus(c) = Grid % wall_dist(c) * u_f / Flow % viscosity(c)
-        cs = c_smag * (1.0 - exp(-turb % y_plus(c) / 25.0))
+                    * sqrt(  u % n(Turb % nearest_wall_cell(c)) ** 2   &
+                           + v % n(Turb % nearest_wall_cell(c)) ** 2   &
+                           + w % n(Turb % nearest_wall_cell(c)) ** 2)  &
+                   / (Grid % wall_dist(Turb % nearest_wall_cell(c))+TINY) )
+        Turb % y_plus(c) = Grid % wall_dist(c) * u_f / Flow % viscosity(c)
+        cs = c_smag * (1.0 - exp(-Turb % y_plus(c) / 25.0))
       else
         cs = c_smag
       end if
-      turb % vis_t(c) = Flow % density(c)  &
+      Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
                       * (cs*cs)            &  ! cs^2
                       * Flow % shear(c)
     end do
 
-  else if(turb % model .eq. LES_DYNAMIC) then
+  else if(Turb % model .eq. LES_DYNAMIC) then
     do c = 1, Grid % n_cells
       lf = Grid % vol(c) ** ONE_THIRD
-      turb % vis_t(c) = Flow % density(c)  &
+      Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
-                      * turb % c_dyn(c)    &  ! c_dynamic
+                      * Turb % c_dyn(c)    &  ! c_dynamic
                       * Flow % shear(c)
     end do
-  else if(turb % model .eq. LES_WALE) then
+  else if(Turb % model .eq. LES_WALE) then
     do c = 1, Grid % n_cells
       lf = Grid % vol(c)**ONE_THIRD
-      turb % vis_t(c) = Flow % density(c)  &
+      Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
                       * (0.5*0.5)          &  ! cs^2
-                      * turb % wale_v(c)
+                      * Turb % wale_v(c)
     end do
   end if
 
@@ -87,7 +83,7 @@
       nc2 = - Flow % beta * (  Flow % grav_x * t % x(c)   &
                              + Flow % grav_y * t % y(c)   &
                              + Flow % grav_z * t % z(c))
-      turb % vis_t(c) = turb % vis_t(c)            &
+      Turb % vis_t(c) = Turb % vis_t(c)            &
              * max(1 - 2.5 * nc2 / (Flow % shear(c) + TINY), 0.0)
     end do
   end if
@@ -133,41 +129,41 @@
         u_tau_l = ( u_tan/a_pow * (nu/dely)**b_pow ) ** (1.0/(1.0+b_pow))
 
         ! Calculate tau_wall (but it is never used)
-        turb % tau_wall(c1) = Flow % viscosity(c1) * u_tan / dely
+        Turb % tau_wall(c1) = Flow % viscosity(c1) * u_tan / dely
 
         ! Calculate y+
-        turb % y_plus(c1)  = dely * u_tau_l / nu
+        Turb % y_plus(c1)  = dely * u_tau_l / nu
 
-        if(turb % y_plus(c1)  >=  11.81) then
+        if(Turb % y_plus(c1)  >=  11.81) then
 
-          if(turb % rough_walls) then
-            z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
+          if(Turb % rough_walls) then
+            z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
             z_o = max(Grid % wall_dist(c1)   &
-                / (e_log * max(turb % y_plus(c1),1.0)), z_o)
+                / (e_log * max(Turb % y_plus(c1),1.0)), z_o)
 
-            turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
+            Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(                &
                                                    u_tau_l,               &
                                                    Grid % wall_dist(c1),  &
                                                    nu)
-            u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
+            u_plus     = Turb % U_Plus_Rough_Walls(Grid % wall_dist(c1))
           end if
 
 
           ! This one is effective viscosity
-          turb % vis_w(c1) = Flow % density(c1) * u_tau_l * u_tau_l * dely  &
+          Turb % vis_w(c1) = Flow % density(c1) * u_tau_l * u_tau_l * dely  &
                            / abs(u_tan)
         else
-          turb % vis_w(c1) = Flow % viscosity(c1)                &
-                        +      Grid % fw(s)  * turb % vis_t(c1)  &
-                        + (1.0-Grid % fw(s)) * turb % vis_t(c2)
+          Turb % vis_w(c1) = Flow % viscosity(c1)                &
+                        +      Grid % fw(s)  * Turb % vis_t(c1)  &
+                        + (1.0-Grid % fw(s)) * Turb % vis_t(c2)
         end if
 
         if(Flow % heat_transfer) then
           u_plus = u_tan / u_tau_l
 
 
-          pr_t = Turb_Mod_Prandtl_Number(turb, c1)
-          pr   = Flow % Prandtl_Number(c1)          ! laminar Prandtl number
+          pr_t = Turb % Prandtl_Turb(c1)
+          pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
 
@@ -175,23 +171,23 @@
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
 
-          if(turb % rough_walls) then
+          if(Turb % rough_walls) then
             beta = 0.0
-            u_plus = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
+            u_plus = Turb % U_Plus_Rough_Walls(Grid % wall_dist(c1))
           end if
 
-          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
-          turb % con_w(c1) =    turb % y_plus(c1)                         &
+          ebf = Turb % Ebf_Scalar(c1, pr)
+          Turb % con_w(c1) =    Turb % y_plus(c1)                         &
                               * Flow % viscosity(c1)                      &
                               * Flow % capacity(c1)                       &
-                      / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
+                      / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
 
         if(Flow % n_scalars > 0) then
           u_plus = u_tan / u_tau_l
 
-          sc   = Flow % Schmidt_Number(c1)          ! laminar Schmidt number
+          sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
           beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                   &
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
 
@@ -199,16 +195,16 @@
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
 
-          if(turb % rough_walls) then
+          if(Turb % rough_walls) then
             beta = 0.0
-            u_plus = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
+            u_plus = Turb % U_Plus_Rough_Walls(Grid % wall_dist(c1))
           end if
 
-          ebf = 0.01 * (sc * turb % y_plus(c1)**4                 &
-              / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))
-          turb % diff_w(c1) =  turb % y_plus(c1)                  &
+          ebf = 0.01 * (sc * Turb % y_plus(c1)**4                 &
+              / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
-              / (turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
+              / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
@@ -216,9 +212,9 @@
     end if    ! c2 < 0
   end do
 
-  call Grid % Exchange_Cells_Real(turb % vis_t)
-  call Grid % Exchange_Cells_Real(turb % vis_w)
-  if(Flow % n_scalars > 0) call Grid % Exchange_Cells_Real(turb % diff_w)
-  if(Flow % heat_transfer) call Grid % Exchange_Cells_Real(turb % con_w)
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
+  call Grid % Exchange_Cells_Real(Turb % vis_w)
+  if(Flow % n_scalars > 0) call Grid % Exchange_Cells_Real(Turb % diff_w)
+  if(Flow % heat_transfer) call Grid % Exchange_Cells_Real(Turb % con_w)
 
   end subroutine

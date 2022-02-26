@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Piso_Algorithm(Flow, turb, Vof, Nat, ini)
+  subroutine Piso_Algorithm(Flow, Turb, Vof, Nat, ini)
 !------------------------------------------------------------------------------!
 !   PISO algorithm                                                             !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Native_Type), target :: Nat
   integer                   :: ini       ! current inner iteration
@@ -29,7 +29,7 @@
     do corr_steps = 1, Flow % n_piso_corrections
       Flow % i_corr = corr_steps
 
-      call Compute_Momentum(Flow, turb, Vof, Nat, ini)
+      call Compute_Momentum(Flow, Turb, Vof, Nat, ini)
       call Compute_Pressure(Flow, Vof, Nat, ini)
       call Correct_Velocity(Flow, Vof, Nat, ini)
     end do

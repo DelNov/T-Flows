@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_K_Eps(turb)
+  subroutine Vis_T_K_Eps(Turb)
 !------------------------------------------------------------------------------!
 !   Computes the turbulent viscosity for RANS models.                          !
 !                                                                              !
@@ -17,14 +17,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
-!---------------------------------[Calling]------------------------------------!
-  real :: Roughness_Coefficient
-  real :: Tau_Wall_Low_Re
-  real :: U_Plus_Log_Law
-  real :: U_Plus_Rough_Walls
-  real :: Y_Plus_Low_Re
-  real :: Y_Plus_Rough_Walls
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -39,9 +32,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear    [1/s]        !
-!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t    [kg/(m*s)]   !
+!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t    [kg/(m*s)]   !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity[kg/(m*s)]   !
-!   density       density  [kg/m^3]    | turb. kin en.   kin % n  [m^2/s^2]    !
+!   density       density  [kg/m^3]    | Turb. kin en.   kin % n  [m^2/s^2]    !
 !   cell volume   vol      [m^3]       | length          lf       [m]          !
 !   left hand s.  A        [kg/s]      | right hand s.   b        [kg*m^2/s^3] !
 !   wall visc.    vis_w    [kg/(m*s)]  | kinematic viscosity      [m^2/s]      !
@@ -52,10 +45,10 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps    (turb, kin, eps)
+  call Turb % Alias_K_Eps   (kin, eps)
 
   do c = 1, Grid % n_cells
 
@@ -72,7 +65,7 @@
 
     f_mu = min(1.0,f_mu)
 
-    turb % vis_t(c) = min(f_mu * c_mu * Flow % density(c) * kin % n(c)**2  &
+    Turb % vis_t(c) = min(f_mu * c_mu * Flow % density(c) * kin % n(c)**2  &
                     / (eps % n(c) + TINY), 0.6*kin % n(c)                  &
                     / (sqrt(6.0)*c_mu*Flow % shear(c) + TINY))
   end do
@@ -88,66 +81,62 @@
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
+        Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
+                                                 Grid % wall_dist(c1),  &
+                                                 kin_vis)
 
-        turb % tau_wall(c1) = Tau_Wall_Low_Re(turb,               &
-                                              Flow % density(c1), &
-                                              u_tau,              &
-                                              u_tan,              &
-                                              turb % y_plus(c1))
+        Turb % tau_wall(c1) = Turb % Tau_Wall_Low_Re(Flow % density(c1),  &
+                                                     u_tau,               &
+                                                     u_tan,               &
+                                                     Turb % y_plus(c1))
 
-        ebf = Turb_Mod_Ebf_Momentum(turb, c1)
+        ebf = Turb % Ebf_Momentum(c1)
 
-        u_plus = U_Plus_Log_Law(turb, turb % y_plus(c1))
+        u_plus = Turb % U_Plus_Log_Law(Turb % y_plus(c1))
 
-        if(turb % y_plus(c1) < 3.0) then
-          turb % vis_w(c1) = turb % vis_t(c1) + Flow % viscosity(c1)
+        if(Turb % y_plus(c1) < 3.0) then
+          Turb % vis_w(c1) = Turb % vis_t(c1) + Flow % viscosity(c1)
         else
-          turb % vis_w(c1) =    turb % y_plus(c1) * Flow % viscosity(c1)  &
-                           / (  turb % y_plus(c1) * exp(-1.0 * ebf)      &
+          Turb % vis_w(c1) =    Turb % y_plus(c1) * Flow % viscosity(c1)  &
+                           / (  Turb % y_plus(c1) * exp(-1.0 * ebf)      &
                               + u_plus * exp(-1.0/ebf) + TINY)
         end if
 
-        turb % y_plus(c1) = Y_Plus_Low_Re(turb,                  &
-                                          u_tau,                 &
-                                          Grid % wall_dist(c1),  &
-                                          kin_vis)
-
-        if(turb % rough_walls) then
-          z_o = Roughness_Coefficient(turb, turb % z_o_f(c1))
-          turb % y_plus(c1) = Y_Plus_Rough_Walls(turb,                  &
-                                                 u_tau,                 &
+        Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
                                                  Grid % wall_dist(c1),  &
                                                  kin_vis)
-          u_plus     = U_Plus_Rough_Walls(turb, Grid % wall_dist(c1))
-          turb % vis_w(c1) = turb % y_plus(c1) * Flow % viscosity(c1) / u_plus
+
+        if(Turb % rough_walls) then
+          z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
+          Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(u_tau,                 &
+                                                        Grid % wall_dist(c1),  &
+                                                        kin_vis)
+          u_plus     = Turb % U_Plus_Rough_Walls(Grid % wall_dist(c1))
+          Turb % vis_w(c1) = Turb % y_plus(c1) * Flow % viscosity(c1) / u_plus
         end if
 
         if(Flow % heat_transfer) then
-          pr   = Flow % Prandtl_Number(c1)
-          pr_t = Turb_Mod_Prandtl_Number(turb, c1)
+          pr   = Flow % Prandtl_Numb(c1)
+          pr_t = Turb % Prandtl_Turb(c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-          ebf = Turb_Mod_Ebf_Scalar(turb, c1, pr)
-          turb % con_w(c1) =    turb % y_plus(c1)                         &
+          ebf = Turb % Ebf_Scalar(c1, pr)
+          Turb % con_w(c1) =    Turb % y_plus(c1)                         &
                               * Flow % viscosity(c1)                      &
                               * Flow % capacity(c1)                       &
-                      / (  turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
+                      / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
 
         if(Flow % n_scalars > 0) then
-          sc   = Flow % Schmidt_Number(c1)            ! laminar Schmidt number
+          sc   = Flow % Schmidt_Numb(c1)            ! laminar Schmidt number
           beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                     &
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
-          ebf  = 0.01 * (sc * turb % y_plus(c1)**4                  &
-               / ((1.0 + 5.0 * sc**3 * turb % y_plus(c1)) + TINY))
-          turb % diff_w(c1) =  turb % y_plus(c1)                    &
+          ebf  = 0.01 * (sc * Turb % y_plus(c1)**4                  &
+               / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          Turb % diff_w(c1) =  Turb % y_plus(c1)                    &
                * (Flow % viscosity(c1)/Flow % density(c1))          &
-               / (  turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &
+               / (  Turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &
                + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
@@ -155,13 +144,13 @@
     end if    ! c2 < 0
   end do
 
-  call Grid % Exchange_Cells_Real(turb % vis_t)
-  call Grid % Exchange_Cells_Real(turb % vis_w)
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
+  call Grid % Exchange_Cells_Real(Turb % vis_w)
   if(Flow % heat_transfer) then
-    call Grid % Exchange_Cells_Real(turb % con_w)
+    call Grid % Exchange_Cells_Real(Turb % con_w)
   end if
   if(Flow % n_scalars > 0) then
-    call Grid % Exchange_Cells_Real(turb % diff_w)
+    call Grid % Exchange_Cells_Real(Turb % diff_w)
   end if
 
   end subroutine

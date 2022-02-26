@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Turb_Mod_Substract_Face_Stress(turb, ui_si, ui_di, ui_c1, ui_c2,  &
-                                                  a_fc, b, s)
+  subroutine Substract_Face_Stress(Turb, ui_si, ui_di, ui_c1, ui_c2,  &
+                                         a_fc, b, s)
 !------------------------------------------------------------------------------!
 !   Computes turbulent stress on a cell face for all turbulence models.        !
 !   It is called from Compute_Momentum, while discretizing diffusion terms.    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
-  real                    :: ui_si, ui_di, ui_c1, ui_c2, a_fc
-  real                    :: b(turb % pnt_grid % n_cells)
-  integer                 :: s
+  class(Turb_Type), target :: Turb
+  real                     :: ui_si, ui_di, ui_c1, ui_c2, a_fc
+  real                     :: b(Turb % pnt_grid % n_cells)
+  integer                  :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   real                      :: a0, f_ex, f_im, vis_tur
@@ -18,17 +18,17 @@
 !==============================================================================!
 
   ! Take alias
-  Grid => turb % pnt_grid
+  Grid => Turb % pnt_grid
 
   c1 = Grid % faces_c(1,s)
   c2 = Grid % faces_c(2,s)
 
-  if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    if(turb % model_variant .ne. STABILIZED) then
+  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(Turb % model_variant .ne. STABILIZED) then
 
-      vis_tur =     (Grid % fw(s)  * turb % vis_t(c1)  &
-              + (1.0-Grid % fw(s)) * turb % vis_t(c2))
+      vis_tur =     (Grid % fw(s)  * Turb % vis_t(c1)  &
+              + (1.0-Grid % fw(s)) * Turb % vis_t(c2))
 
       f_ex = vis_tur * ui_si
 

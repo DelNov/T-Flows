@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Const_Hanjalic_Jakirlic(turb)
+  subroutine Const_Hanjalic_Jakirlic(turb)
 !------------------------------------------------------------------------------!
 !   Initializes constants for Hanjalic-Jakirlic turbulence model.              ! 
 !   (It is very simular to constants for Reynolds Stress turbulence model.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: turb
 !==============================================================================!
 
   c_1e    =  1.44

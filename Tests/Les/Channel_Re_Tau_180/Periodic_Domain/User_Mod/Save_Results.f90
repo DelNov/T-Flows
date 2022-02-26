@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -17,9 +17,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -131,29 +131,29 @@
          Grid % zc(c) < (z_p(i+1))) then
 
         wall_p(i) = wall_p(i) + Grid % wall_dist(c)
-        u_p   (i) = u_p   (i) + turb % u_mean(c)
-        v_p   (i) = v_p   (i) + turb % v_mean(c)
-        w_p   (i) = w_p   (i) + turb % w_mean(c)
+        u_p   (i) = u_p   (i) + Turb % u_mean(c)
+        v_p   (i) = v_p   (i) + Turb % v_mean(c)
+        w_p   (i) = w_p   (i) + Turb % w_mean(c)
 
-        uu_p(i) = uu_p(i) + turb % uu_res(c)  &
-                          - turb % u_mean(c) * turb % u_mean(c)
-        vv_p(i) = vv_p(i) + turb % vv_res(c)  &
-                          - turb % v_mean(c) * turb % v_mean(c)
-        ww_p(i) = ww_p(i) + turb % ww_res(c)  &
-                          - turb % w_mean(c) * turb % w_mean(c)
-        uw_p(i) = uw_p(i) + turb % uw_res(c)  &
-                          - turb % u_mean(c) * turb % w_mean(c)
+        uu_p(i) = uu_p(i) + Turb % uu_res(c)  &
+                          - Turb % u_mean(c) * Turb % u_mean(c)
+        vv_p(i) = vv_p(i) + Turb % vv_res(c)  &
+                          - Turb % v_mean(c) * Turb % v_mean(c)
+        ww_p(i) = ww_p(i) + Turb % ww_res(c)  &
+                          - Turb % w_mean(c) * Turb % w_mean(c)
+        uw_p(i) = uw_p(i) + Turb % uw_res(c)  &
+                          - Turb % u_mean(c) * Turb % w_mean(c)
 
         if(Flow % heat_transfer) then
-          t_p (i) = t_p (i)  + turb % t_mean(c)
-          t2_p(i) = t2_p(i) + turb % t2_res(c)  &
-                            - turb % t_mean(c) * turb % t_mean(c)
-          ut_p(i) = ut_p(i) + turb % ut_res(c)  &
-                            - turb % u_mean(c) * turb % t_mean(c)
-          vt_p(i) = vt_p(i) + turb % vt_res(c)  &
-                            - turb % v_mean(c) * turb % t_mean(c)
-          wt_p(i) = wt_p(i) + turb % wt_res(c)  &
-                            - turb % w_mean(c) * turb % t_mean(c)
+          t_p (i) = t_p (i)  + Turb % t_mean(c)
+          t2_p(i) = t2_p(i) + Turb % t2_res(c)  &
+                            - Turb % t_mean(c) * Turb % t_mean(c)
+          ut_p(i) = ut_p(i) + Turb % ut_res(c)  &
+                            - Turb % u_mean(c) * Turb % t_mean(c)
+          vt_p(i) = vt_p(i) + Turb % vt_res(c)  &
+                            - Turb % v_mean(c) * Turb % t_mean(c)
+          wt_p(i) = wt_p(i) + Turb % wt_res(c)  &
+                            - Turb % w_mean(c) * Turb % t_mean(c)
         end if
         n_count(i) = n_count(i) + 1
       end if
@@ -229,7 +229,7 @@
     do c = 1, Grid % n_cells
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
-        t_inf  = turb % t_mean(c)
+        t_inf  = Turb % t_mean(c)
       end if
     end do
 
@@ -248,9 +248,9 @@
         if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
             Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
-          t_wall  = t_wall + turb % t_mean(c2)
+          t_wall  = t_wall + Turb % t_mean(c2)
           nu_mean = nu_mean + t % q(c2)  &
-                  / (cond_const*(turb % t_mean(c2) - t_inf))
+                  / (cond_const*(Turb % t_mean(c2) - t_inf))
           n_points = n_points + 1
         end if
       end if

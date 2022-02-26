@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
@@ -7,9 +7,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n         ! time step
   integer, intent(in)      :: n_stat_t  ! 1st step for turbulence statist.
   integer, intent(in)      :: n_stat_p  ! 1st step for particle statistics

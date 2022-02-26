@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_F22_K_Eps_Zeta_F(turb, Sol)
+  subroutine Src_F22_K_Eps_Zeta_F(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in eliptic relaxation  equation                     !
 !   for vi2 and imposing  boundary condition for f22                           !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
@@ -40,26 +40,26 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Sol % Alias_Native         (A, b)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Sol % Alias_Native       (A, b)
 
-  call Time_And_Length_Scale(Grid, turb)
+  call Turb % Time_And_Length_Scale(Grid)
 
  ! Source term f22hg
  do c = 1, Grid % n_cells
-   f22hg = (1.0 - c_f1 - 0.65 * turb % p_kin(c) / Flow % density(c)  &
+   f22hg = (1.0 - c_f1 - 0.65 * Turb % p_kin(c) / Flow % density(c)  &
          / (eps  % n(c) + TINY))                                     &
          * (zeta % n(c) - TWO_THIRDS)                                &
-         / (turb % t_scale(c) + TINY)                                &
-         + 0.0085 * (turb % p_kin(c) / Flow % density(c)) / (kin % n(c) + TINY)
-   b(c) = b(c) + f22hg * Grid % vol(c) / (turb % l_scale(c)**2 + TINY)
+         / (Turb % t_scale(c) + TINY)                                &
+         + 0.0085 * (Turb % p_kin(c) / Flow % density(c)) / (kin % n(c) + TINY)
+   b(c) = b(c) + f22hg * Grid % vol(c) / (Turb % l_scale(c)**2 + TINY)
  end do
 
  ! Source term f22hg
  do c = 1, Grid % n_cells
-   sor_11 = Grid % vol(c)/(turb % l_scale(c)**2 + TINY)
+   sor_11 = Grid % vol(c)/(Turb % l_scale(c)**2 + TINY)
    A % val(A % dia(c)) = A % val(A % dia(c)) + sor_11 
  end do
 

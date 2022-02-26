@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Rsm_Manceau_Hanjalic(turb, Sol, name_phi)
+  subroutine Src_Rsm_Manceau_Hanjalic(Turb, Sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for Re stresses and dissipation for 
 !   RSM_MANCEAU_HANJALIC model                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
   character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
@@ -27,14 +27,14 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Sol % Alias_Native         (A, b)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Sol % Alias_Native       (A, b)
 
-  call Time_And_Length_Scale(Grid, turb)
+  call Turb % Time_And_Length_Scale(Grid)
 
   call Flow % Grad_Variable(f22)
 
@@ -42,7 +42,7 @@
     kin % n(c) = max(0.5*(  uu % n(c)  &
                           + vv % n(c)  &
                           + ww % n(c)), TINY)
-    turb % p_kin(c) = max(-(  uu % n(c)*u % x(c)  &
+    Turb % p_kin(c) = max(-(  uu % n(c)*u % x(c)  &
                             + uv % n(c)*u % y(c)  &
                             + uw % n(c)*u % z(c)  &
                             + uv % n(c)*v % x(c)  &
@@ -105,7 +105,7 @@
                              - 0.5*(n1*n1+1.0)*uu_nn)
 
       phi_hom = - g1      * eps % n(c) * (-ONE_THIRD)                    &
-                - g1_star * turb % p_kin(c) * (-ONE_THIRD)               &
+                - g1_star * Turb % p_kin(c) * (-ONE_THIRD)               &
                 + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s11        &
                 +  g4 * kin % n(c)*( 2.0*(b11*s11 + b12*s12 + b13*s13)   &
                                     -2.0/3.0 * b_lk_s_lk)                &
@@ -129,7 +129,7 @@
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(uu % n(c), TINY)              &
                             + g1 * eps % n(c)           / (2.0*kin % n(c))   &
-                            + g1_star * turb % p_kin(c) / (2.0*kin % n(c)))  &
+                            + g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -143,7 +143,7 @@
                              - 0.5*(n2*n2+1.0)*uu_nn)
 
       phi_hom = - g1      * eps % n(c)      * (-ONE_THIRD)               &
-                - g1_star * turb % p_kin(c) * (-ONE_THIRD)               &
+                - g1_star * Turb % p_kin(c) * (-ONE_THIRD)               &
                 + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s22        &
                 +  g4 * kin % n(c) *( 2.0*(b21*s21 + b22*s22 + b23*s23)  &
                                      -2.0/3.0 * b_lk_s_lk)               &
@@ -171,7 +171,7 @@
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(vv % n(c), TINY)              &
                             + g1 * eps % n(c)           / (2.0*kin % n(c))   &
-                            + g1_star * turb % p_kin(c) / (2.0*kin % n(c)))  &
+                            + g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -185,7 +185,7 @@
                              - 0.5*(n3*n3+1.0)*uu_nn)
 
       phi_hom = - g1      * eps % n(c)      * (-ONE_THIRD)               &
-                - g1_star * turb % p_kin(c) * (-ONE_THIRD)               &
+                - g1_star * Turb % p_kin(c) * (-ONE_THIRD)               &
                 + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s33        &
                 +  g4 * kin % n(c) *( 2.0*(b31*s31 + b32*s32 + b33*s33)  &
                                      -2.0/3.0 * b_lk_s_lk)               &
@@ -212,7 +212,7 @@
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
            +      f22 % n(c)**2 *(diss_hom/max(ww % n(c), TINY)              &
                             + g1 * eps % n(c)           / (2.0*kin % n(c))   &
-                            + g1_star * turb % p_kin(c) / (2.0*kin % n(c)))  &
+                            + g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -256,7 +256,7 @@
         + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)       &
                             / kin % n(c)                                      &
                 + f22 % n(c)**2 *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
-                        + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))     &
+                        + g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))     &
           ) * Grid % vol(c)
 
     !---------------!
@@ -300,7 +300,7 @@
         + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)    &
                             / kin % n(c)                                   &
                 + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
-                         + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))     &
+                         + g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))     &
           ) * Grid % vol(c)
 
     !---------------!
@@ -344,18 +344,18 @@
         + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)  &
                            / kin % n(c)                                  &
         + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))              &
-                 + g1_star * turb % p_kin(c) / (2.0 * kin % n(c)))             &
+                 + g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))             &
                      ) * Grid % vol(c)
 
     !----------------------!
     !   Epsilon equation   !
     !----------------------!
     else if(name_phi == 'EPS') then
-      esor = Grid % vol(c) / max(turb % t_scale(c), TINY)
+      esor = Grid % vol(c) / max(Turb % t_scale(c), TINY)
 
       ce_11 = c_1e * (1.0 + 0.065*(1.0 - f22 % n(c)**3)  &
-                   * turb % p_kin(c) / eps % n(c))
-      b(c) = b(c) + Flow % density(c) * ce_11 * turb % p_kin(c) * esor
+                   * Turb % p_kin(c) / eps % n(c))
+      b(c) = b(c) + Flow % density(c) * ce_11 * Turb % p_kin(c) * esor
 
       ! Fill in a diagonal of coefficient matrix
       A % val(A % dia(c)) =  A % val(A % dia(c))  &

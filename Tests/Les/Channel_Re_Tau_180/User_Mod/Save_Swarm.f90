@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Swarm(Flow, turb, Vof, Swarm, ts)
+  subroutine User_Mod_Save_Swarm(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -19,7 +19,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target  :: Flow
-  type(Turb_Type),     target  :: turb
+  type(Turb_Type),     target  :: Turb
   type(Vof_Type),      target  :: Vof
   type(Swarm_Type),    target  :: Swarm
   integer, intent(in)          :: ts     ! time step
@@ -65,8 +65,8 @@
   !call File % Set_Name(0, coord_name, ".1d")
   call File % Set_Name(coord_name, extension='.1d')
 
-  call File % Set_Name(swarm_res_name, extension='-swarm-res.dat')
-  call File % Set_Name(swarm_res_name_plus, extension='-swarm-res-plus.dat')
+  call File % Set_Name(swarm_res_name, extension='-Swarm-res.dat')
+  call File % Set_Name(swarm_res_name_plus, extension='-Swarm-res-plus.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -161,7 +161,7 @@
       v_pp(i) = v_pp(i) + Swarm % v_mean(c)
       w_pp(i) = w_pp(i) + Swarm % w_mean(c)
 
-      ! 2nd-moment-central-stationary statistics for swarm
+      ! 2nd-moment-central-stationary statistics for Swarm
       uu_pp(i)    = uu_pp(i) + Swarm % uu(c)  &
                   - Swarm % u_mean(c) * Swarm % u_mean(c)
       vv_pp(i)    = vv_pp(i) + Swarm % vv(c)  &
@@ -188,9 +188,9 @@
         wall_p(i) = wall_p(i) + grid % wall_dist(c)
 
         ! Mean velocities
-        u_p(i) = u_p(i) + turb % u_mean(c)
-        v_p(i) = v_p(i) + turb % v_mean(c)
-        w_p(i) = w_p(i) + turb % w_mean(c)
+        u_p(i) = u_p(i) + Turb % u_mean(c)
+        v_p(i) = v_p(i) + Turb % v_mean(c)
+        w_p(i) = w_p(i) + Turb % w_mean(c)
 
         n_count2(i) = n_count2(i) + 1  ! counter 2 for the flowfield
       end if

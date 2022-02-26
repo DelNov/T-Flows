@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Sgs_Fukagata(swarm)
+  subroutine Swarm_Mod_Sgs_Fukagata(Swarm)
 !------------------------------------------------------------------------------!
 !   SGS model accounting for Brownian diffusion force by Fukagata et al., 2004 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
-  type(Grid_Type),  pointer :: grid
-  type(Turb_Type),  pointer :: turb
+  type(Field_Type), pointer :: Flow
+  type(Grid_Type),  pointer :: Grid
+  type(Turb_Type),  pointer :: Turb
   type(Var_Type),   pointer :: u, v, w
   integer                   :: c                     ! nearest cell
   real                      :: r1, r2, zeta          ! random number
@@ -23,13 +23,13 @@
   real                      :: visc_const            ! const viscosity
 !==============================================================================!
 
-  ! Take aliases for flow
-  flow => swarm % pnt_flow
-  grid => swarm % pnt_grid
-  turb => swarm % pnt_turb
-  u    => flow % u
-  v    => flow % v
-  w    => flow % w
+  ! Take aliases for Flow
+  Flow => Swarm % pnt_flow
+  Grid => Swarm % pnt_grid
+  Turb => Swarm % pnt_turb
+  u    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
 
   ! Model constants
   c_o   = 2.1
@@ -38,34 +38,34 @@
   r2    = 1.0
 
   ! Update eddy viscosity from the dynamic model
-  call Turb_Mod_Vis_T_Dynamic(turb)
+  call Turb % Vis_T_Dynamic()
 
   ! Characteristic viscosity
-  visc_const = maxval(flow % viscosity(:))
+  visc_const = maxval(Flow % viscosity(:))
 
-  ! Particle relaxation time (in this swarm)
-  ! it only needs to be calculated for the grid once/ts and not for all ...
+  ! Particle relaxation time (in this Swarm)
+  ! it only needs to be calculated for the Grid once/ts and not for all ...
   ! ...particles
-  swarm % tau = swarm % density * (swarm % diameter **2) / 18.0 / visc_const
+  Swarm % tau = Swarm % density * (Swarm % diameter **2) / 18.0 / visc_const
 
   ! LES dynamic SGS TKE and dissipation rate
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
-    if(turb % c_dyn(c) .eq. 0.0) then
-      swarm % f_fuka_x(c) = 0.0
-      swarm % f_fuka_y(c) = 0.0
-      swarm % f_fuka_z(c) = 0.0
+    if(Turb % c_dyn(c) .eq. 0.0) then
+      Swarm % f_fuka_x(c) = 0.0
+      Swarm % f_fuka_y(c) = 0.0
+      Swarm % f_fuka_z(c) = 0.0
 
     else ! Grid is allowing the model to add a contribution
 
       ! Length scale of Dynamic model
-      lf = grid % vol(c) ** ONE_THIRD
+      lf = Grid % vol(c) ** ONE_THIRD
 
       ! SGS turbulent kinetic energy
       k_sgs = lf*lf                &  ! delta^2
-            * turb % c_dyn(c)      &  ! c_dynamic
-            * (flow % shear(c))    &  ! |S|^2
-            * (flow % shear(c))
+            * Turb % c_dyn(c)      &  ! c_dynamic
+            * (Flow % shear(c))    &  ! |S|^2
+            * (Flow % shear(c))
 
 
       ! SGS dissipation rate
@@ -76,8 +76,8 @@
       t_sgs = (1.0/(0.5 + 0.75*c_o))*(k_sgs/eps_sgs)
 
       ! Standard deviation of particle velocity due to SGS vel. fluctuations 
-      theta  = swarm % tau / t_sgs
-      alpha  = flow % dt / swarm % tau
+      theta  = Swarm % tau / t_sgs
+      alpha  = Flow % dt / Swarm % tau
       lambda = (1.0/1.0 + theta)                    &
              * (1.0-exp(-1.0*alpha*(1.0+theta)))    &
              - (1.0/1.0 - theta) * exp(-2.0*alpha)  &
@@ -100,9 +100,9 @@
       end if
 
       ! Brownian diffusion force following isotropic turbulence
-      swarm % f_fuka_x(c) = sigma * zeta / swarm % dt
-      swarm % f_fuka_y(c) = sigma * zeta / swarm % dt
-      swarm % f_fuka_z(c) = sigma * zeta / swarm % dt
+      Swarm % f_fuka_x(c) = sigma * zeta / Swarm % dt
+      Swarm % f_fuka_y(c) = sigma * zeta / Swarm % dt
+      Swarm % f_fuka_z(c) = sigma * zeta / Swarm % dt
 
     end if
   end do

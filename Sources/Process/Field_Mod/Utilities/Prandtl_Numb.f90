@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Prandtl_Number(Flow, c)
+  real function Prandtl_Numb(Flow, c)
 !------------------------------------------------------------------------------!
 !   Computes laminar Prandtl number for cell "c"                               !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   integer                   :: c
 !==============================================================================!
 
-  Prandtl_Number = Flow % viscosity(c) * Flow % capacity(c)  &
-                 / Flow % conductivity(c)
+  Prandtl_Numb = Flow % viscosity(c) * Flow % capacity(c)  &
+               / Flow % conductivity(c)
 
   end function

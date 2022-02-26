@@ -23,7 +23,7 @@
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
-    type(Turb_Type),  pointer :: pnt_turb  ! turb field for which it is defined
+    type(Turb_Type),  pointer :: pnt_turb  ! Turb field for which it is defined
     type(Vof_Type),   pointer :: pnt_vof   ! vof, for three-phase situations
 
     integer                          :: n_particles = 0

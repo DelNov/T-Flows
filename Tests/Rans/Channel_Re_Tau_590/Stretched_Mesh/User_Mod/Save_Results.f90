@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,9 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -39,9 +39,9 @@
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Take constant physical properties
   call Control_Mod_Mass_Density        (dens_const)
@@ -138,22 +138,22 @@
         v_p   (i) = v_p(i) + v % n(c)
         w_p   (i) = w_p(i) + w % n(c)
 
-        if(turb % model .ne. NO_TURBULENCE_MODEL) then
+        if(Turb % model .ne. NO_TURBULENCE_MODEL) then
           kin_p   (i) = kin_p   (i) + kin % n(c)
           eps_p   (i) = eps_p   (i) + eps % n(c)
-          uw_p    (i) = uw_p    (i) + turb % vis_t(c) * (u % z(c) + w % x(c))
-          vis_t_p (i) = vis_t_p (i) + turb % vis_t(c) / visc_const
-          y_plus_p(i) = y_plus_p(i) + turb % y_plus(c)
+          uw_p    (i) = uw_p    (i) + Turb % vis_t(c) * (u % z(c) + w % x(c))
+          vis_t_p (i) = vis_t_p (i) + Turb % vis_t(c) / visc_const
+          y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c)
         end if
 
-        if(turb % model .eq. K_EPS_ZETA_F) then
+        if(Turb % model .eq. K_EPS_ZETA_F) then
           f22_p (i) = f22_p (i) + f22  % n(c)
           zeta_p(i) = zeta_p(i) + zeta % n(c)
         end if
 
         if(Flow % heat_transfer) then
           t_p (i) = t_p (i) + t  % n(c)
-          if(turb % model .ne. NO_TURBULENCE_MODEL) then
+          if(Turb % model .ne. NO_TURBULENCE_MODEL) then
             ut_p(i) = ut_p(i) + ut % n(c)
             vt_p(i) = vt_p(i) + vt % n(c)
             wt_p(i) = wt_p(i) + wt % n(c)
@@ -316,7 +316,7 @@
             'correlation of Dittus-Boelter is used.' 
     end if
 
-    if(turb % model .eq. K_EPS) then
+    if(Turb % model .eq. K_EPS) then
       if(Flow % heat_transfer) then
         write(i,'(a1,2X,a60)') '#',  ' z,'                    //  &
                                      ' u,'                    //  &
@@ -328,7 +328,7 @@
                                      ' u,'                    //  &
                                      ' kin, eps, uw, vis_t/visc_const'
       end if
-    else if(turb % model .eq. K_EPS_ZETA_F) then
+    else if(Turb % model .eq. K_EPS_ZETA_F) then
       if(Flow % heat_transfer) then
         write(i,'(a1,2x,a60)') '#',  ' z,'                    //  &
                                      ' u,'                    //  &
@@ -387,7 +387,7 @@
     eps_p (i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)  ! eps%n(c)
     uw_p  (i) = uw_p (i) / (u_tau_p**2 * dens_const)  ! vis_t(c)*(u%z(c)+w%x(c))
 
-    if(turb % model .eq. K_EPS_ZETA_F) then
+    if(Turb % model .eq. K_EPS_ZETA_F) then
       f22_p(i) = f22_p(i) * visc_const / u_tau_p**2   ! f22%n(c)
     end if
 

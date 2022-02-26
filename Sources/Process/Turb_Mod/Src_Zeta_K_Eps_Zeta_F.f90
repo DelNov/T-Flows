@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Zeta_K_Eps_Zeta_F(turb, Sol, curr_dt)
+  subroutine Src_Zeta_K_Eps_Zeta_F(Turb, Sol, curr_dt)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt
 !----------------------------------[Locals]------------------------------------!
@@ -33,10 +33,10 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Sol % Alias_Native(A, b)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Sol % Alias_Native       (A, b)
 
   ! Positive source term 
   ! The first option in treating the source is making computation very 
@@ -53,7 +53,7 @@
                           / (zeta % n(c) + TINY)) * Flow % density(c)
     end if
     A % val(A % dia(c)) =  A % val(A % dia(c))             &
-                        + Grid % vol(c) * turb % p_kin(c)  &
+                        + Grid % vol(c) * Turb % p_kin(c)  &
                         / (kin % n(c) + TINY) 
   end do
 

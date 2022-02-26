@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, turb, Vof, swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1r file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -9,9 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts   ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -39,12 +39,12 @@
   ! Take aliases
   Grid   => Flow % pnt_grid
   bulk   => Flow % bulk
-  vis_t  => turb % vis_t
-  call Flow % Alias_Momentum(u, v, w)
-  call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_Heat_Fluxes (turb, ut, vt, wt)
+  vis_t  => Turb % vis_t
+  call Flow % Alias_Momentum    (u, v, w)
+  call Flow % Alias_Energy      (t)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Take constant physical properties
   call Control_Mod_Mass_Density        (dens_const)
@@ -151,9 +151,9 @@
                    + b11 * vis_t(c) *(u % z(c) + w % x(c)) &
                    + b12 * vis_t(c) *(v % z(c) + w % y(c))
         vis_t_p(i) = vis_t_p(i) + vis_t(c) / visc_const
-        y_plus_p(i)= y_plus_p(i) + turb % y_plus(c)
+        y_plus_p(i)= y_plus_p(i) + Turb % y_plus(c)
 
-        if(turb % model .eq. K_EPS_ZETA_F) then
+        if(Turb % model .eq. K_EPS_ZETA_F) then
           f22_p(i)  = f22_p(i) + f22  % n(c)
           zeta_p(i) = zeta_p(i) + zeta % n(c)
         end if
@@ -319,7 +319,7 @@
       'correlation of Dittus-Boelter is used.' 
     end if
 
-    if(turb % model .eq. K_EPS) then
+    if(Turb % model .eq. K_EPS) then
       if(Flow % heat_transfer) then
         write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
@@ -331,7 +331,7 @@
                                     ' w,'                    //  &       !  2
                                     ' kin, eps, uw, vis_t/visc_const'  !  3-6
       end if
-    else if(turb % model .eq. K_EPS_ZETA_F) then
+    else if(Turb % model .eq. K_EPS_ZETA_F) then
       if(Flow % heat_transfer) then
         write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
@@ -392,7 +392,7 @@
     eps_p (i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)  ! eps%n(c)
     uw_p  (i) = uw_p (i) / (u_tau_p**2*dens_const)    ! vis_t(c)*(u%z(c)+w%x(c))
 
-    if(turb % model .eq. K_EPS_ZETA_F) then
+    if(Turb % model .eq. K_EPS_ZETA_F) then
       f22_p(i) = f22_p(i) * visc_const / u_tau_p**2  ! f22%n(c)
     end if
 

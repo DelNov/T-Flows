@@ -12,7 +12,7 @@
 
  RESULTS_SAVE_INTERVAL     1200
  BACKUP_SAVE_INTERVAL      1200
-#LOAD_BACKUP_NAME   pipe-ts009000.backup 
+#LOAD_BACKUP_NAME pipe-ts000001.backup
 
 #-------------------
 # Monitoring points 
@@ -29,7 +29,7 @@
  DYNAMIC_VISCOSITY      3.33333e-4
  HEAT_CAPACITY          1.0
 
- TURBULENCE_MODEL    les_dynamic
+TURBULENCE_MODEL les_dynamic
  PERTURB_MOMENTUM    yes
 
  PRESSURE_DROPS     0.0  0.0  -0.0072
@@ -73,3 +73,5 @@
     TYPE                wall
     VARIABLES           u     v     w     q
     VALUES              0.0   0.0   0.0   0.1
+INTERFACE_TRACKING no
+PARTICLE_TRACKING no

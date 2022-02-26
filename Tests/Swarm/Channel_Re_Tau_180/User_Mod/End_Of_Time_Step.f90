@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, turb, Vof, swarm,  &
+  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n, n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
@@ -14,12 +14,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n         ! current time step
-  integer, intent(in)      :: n_stat_t  ! 1st t.s. for turb. stat.
-  integer, intent(in)      :: n_stat_p  ! 1st t.s. for swarm. stat.
+  integer, intent(in)      :: n_stat_t  ! 1st t.s. for Turb. stat.
+  integer, intent(in)      :: n_stat_p  ! 1st t.s. for Swarm. stat.
   real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),      pointer :: u, v, w, t
@@ -57,13 +57,13 @@
   n_bin1 = 342237  ! time at which we should collect bins info t+=675
   n_bin2 = 343729  ! time at which we should collect bins info t+=1125
                    ! ..particle concentration should be equivalent to t+=1000).
-  n_test = 350000  ! testing (for swarm statistics)
+  n_test = 350000  ! testing (for Swarm statistics)
 
   ! Allocating some arrays for bins
-  allocate(rep(swarm % n_particles)); rep = 0.0
+  allocate(rep(Swarm % n_particles)); rep = 0.0
   allocate(bin(n_b)); bin = 0.0     ! bin distance from wall
   allocate(delta(n_b - 1)); delta = 0.0 ! bin thickness
-  allocate(bin_count(swarm % n_particles)); bin_count = 0
+  allocate(bin_count(Swarm % n_particles)); bin_count = 0
 
 !!<<<<<<<<<<< Binning Simulation latest 26th Feb 2020 >>>>>>>>>>>>>
 !  ! Chebyshev polynomials to compute slice thickness 
@@ -89,8 +89,8 @@
 !        bin_count(ss) = 0
 !
 !        ! browse through the particles 
-!        !do oo = 1, swarm % n_particles
-!        !  part => swarm % particle(oo)
+!        !do oo = 1, Swarm % n_particles
+!        !  part => Swarm % particle(oo)
 !        !  if(part % z_n .le. ss1 .and. ss .lt. n_b) then
 !        !    bin_count(ss) = bin_count(ss) + 1
 !        !  end if 
@@ -98,8 +98,8 @@
 !        !end do
 !
 !        ! browse through the particles 
-!        do oo = 1, swarm % n_particles
-!          part => swarm % particle(oo)
+!        do oo = 1, Swarm % n_particles
+!          part => Swarm % particle(oo)
 !          if(part % z_n .gt. level .and. part % z_n .le. ss1) then
 !            bin_count(ss) = bin_count(ss) + 1
 !          end if 
@@ -119,7 +119,7 @@
 !
 !      ! calling the problem name to open a new file for binning results
 !      call File % Set_Name(result_name, time_step = n,              & 
-!           appendix='-swarm-concentration', extension='.dat')
+!           appendix='-Swarm-concentration', extension='.dat')
 !      call File % Open_For_Writing_Ascii(result_name, fu)
 !
 !      ! printing info in a separate file...
@@ -127,7 +127,7 @@
 !      write(fu,'(a1,(a12,e12.6))')  &
 !      '#', 'Maximum Re_p    = ', max_rep
 !      write(fu,'(a1,(a12,e12.6))')  &
-!      '#', 'St+    = ', swarm % st 
+!      '#', 'St+    = ', Swarm % st 
 !      ! columns' headers
 !      write(fu,'(a1,2x,a50)') '#',   ' Bin index,'          //  &  !  1
 !                                     ' Bin_y+,'             //  &  !  2

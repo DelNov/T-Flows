@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Petsc_Solvers(Rc, Flow, turb, Vof, Sol)
+  subroutine Petsc_Solvers(Rc, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads options for PETSc solver from control file.                          !
 !   I don't put it together with Read_Control_Numerical because I am afraid    !
@@ -9,7 +9,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Control_Type)  :: Rc
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
@@ -37,12 +37,13 @@
   t      => Flow % t
   p      => Flow % p
   scalar => Flow % scalar
-  vis    => turb % vis
-  t2     => turb % t2
+  vis    => Turb % vis
+  t2     => Turb % t2
   fun    => Vof % fun
-  call Flow % Alias_Momentum      (u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+
 
   !----------------------------!
   !   For momentum equations   !
@@ -234,18 +235,18 @@
     call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     do i = 1, 12
-      if(i .eq.  1) tq => turb % kin
-      if(i .eq.  2) tq => turb % eps
-      if(i .eq.  3) tq => turb % zeta
-      if(i .eq.  4) tq => turb % f22
-      if(i .eq.  5) tq => turb % vis
-      if(i .eq.  6) tq => turb % t2
-      if(i .eq.  7) tq => turb % uu
-      if(i .eq.  8) tq => turb % vv
-      if(i .eq.  9) tq => turb % ww
-      if(i .eq. 10) tq => turb % uv
-      if(i .eq. 11) tq => turb % uw
-      if(i .eq. 12) tq => turb % vw
+      if(i .eq.  1) tq => Turb % kin
+      if(i .eq.  2) tq => Turb % eps
+      if(i .eq.  3) tq => Turb % zeta
+      if(i .eq.  4) tq => Turb % f22
+      if(i .eq.  5) tq => Turb % vis
+      if(i .eq.  6) tq => Turb % t2
+      if(i .eq.  7) tq => Turb % uu
+      if(i .eq.  8) tq => Turb % vv
+      if(i .eq.  9) tq => Turb % ww
+      if(i .eq. 10) tq => Turb % uv
+      if(i .eq. 11) tq => Turb % uw
+      if(i .eq. 12) tq => Turb % vw
       tq % solver              = sstring
       tq % prec                = pstring
       tq % prec_opts(1:MSI)    = ''
@@ -258,18 +259,18 @@
                ' Using the default values'
     end if
     do i = 1, 12
-      if(i .eq.  1) tq => turb % kin
-      if(i .eq.  2) tq => turb % eps
-      if(i .eq.  3) tq => turb % zeta
-      if(i .eq.  4) tq => turb % f22
-      if(i .eq.  5) tq => turb % vis
-      if(i .eq.  6) tq => turb % t2
-      if(i .eq.  7) tq => turb % uu
-      if(i .eq.  8) tq => turb % vv
-      if(i .eq.  9) tq => turb % ww
-      if(i .eq. 10) tq => turb % uv
-      if(i .eq. 11) tq => turb % uw
-      if(i .eq. 12) tq => turb % vw
+      if(i .eq.  1) tq => Turb % kin
+      if(i .eq.  2) tq => Turb % eps
+      if(i .eq.  3) tq => Turb % zeta
+      if(i .eq.  4) tq => Turb % f22
+      if(i .eq.  5) tq => Turb % vis
+      if(i .eq.  6) tq => Turb % t2
+      if(i .eq.  7) tq => Turb % uu
+      if(i .eq.  8) tq => Turb % vv
+      if(i .eq.  9) tq => Turb % ww
+      if(i .eq. 10) tq => Turb % uv
+      if(i .eq. 11) tq => Turb % uw
+      if(i .eq. 12) tq => Turb % vw
       tq % prec = 'asm'
       tq % prec_opts(1:MSI) = ''
     end do

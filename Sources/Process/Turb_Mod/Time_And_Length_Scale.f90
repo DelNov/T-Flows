@@ -1,27 +1,21 @@
 !==============================================================================!
-  subroutine Time_And_Length_Scale(Grid, turb)
+  subroutine Time_And_Length_Scale(Turb, Grid)
 !------------------------------------------------------------------------------!
 !   Calculates time scale and leght scale in manner to avoid singularity       !
 !   in eps equation.                                                           !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Const_Mod
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod
-  use Var_Mod
-  use Work_Mod, only: t_1   => r_cell_12,  &  ! [s]
-                      t_2   => r_cell_13,  &  ! [s]
-                      t_3   => r_cell_14,  &  ! [s]
-                      l_1   => r_cell_15,  &  ! [m]
-                      l_2   => r_cell_16,  &  ! [m]
-                      l_3   => r_cell_17,  &  ! [m]
-                      eps_l => r_cell_18      ! [m]
+  use Work_Mod, only: t_1   => r_cell_12,   &  ! [s]
+                      t_2   => r_cell_13,   &  ! [s]
+                      t_3   => r_cell_14,   &  ! [s]
+                      l_1   => r_cell_15,   &  ! [m]
+                      l_2   => r_cell_16,   &  ! [m]
+                      l_3   => r_cell_17,   &  ! [m]
+                      eps_l => r_cell_18       ! [m]
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type), target :: Grid
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
+  type(Grid_Type),  target :: Grid
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: kin, eps, zeta, f22
@@ -32,19 +26,19 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          l_1       [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
+  Flow => Turb % pnt_flow
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
 
-  if(turb % model .eq. K_EPS_ZETA_F) then
+  if(Turb % model .eq. K_EPS_ZETA_F) then
 
     do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
@@ -60,11 +54,11 @@
       l_3(c) = sqrt(kin % n(c)/3.0)  &
              / (c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
 
-      turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
-      turb % l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
+      Turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
+      Turb % l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
     end do
 
-  else if(turb % model .eq. HYBRID_LES_RANS) then
+  else if(Turb % model .eq. HYBRID_LES_RANS) then
     do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
@@ -77,11 +71,11 @@
       l_1(c) = kin % n(c)**1.5 / eps_l(c)
       l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
 
-      turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
-      turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
+      Turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
+      Turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
     end do
 
-  else if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+  else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
     do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
@@ -96,11 +90,11 @@
 
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
 
-      turb % t_scale(c) =       max( t_1(c), t_2(c) )
-      turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
+      Turb % t_scale(c) =       max( t_1(c), t_2(c) )
+      Turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
     end do
 
-  else if(turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+  else if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     do c = 1, Grid % n_cells
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
@@ -109,8 +103,8 @@
       l_1(c) = kin % n(c)**1.5/eps_l(c)
 
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
-      turb % t_scale(c) = t_1(c)
-      turb % l_scale(c) = l_1(c)
+      Turb % t_scale(c) = t_1(c)
+      Turb % l_scale(c) = l_1(c)
     end do
 
   end if

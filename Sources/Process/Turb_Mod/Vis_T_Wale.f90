@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Wale(turb)
+  subroutine Vis_T_Wale(Turb)
 !------------------------------------------------------------------------------!
 !  Compute SGS viscosity for 'LES' by using LES_WALE model.                    !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -22,7 +22,7 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Flow % Alias_Momentum(u, v, w)
 
@@ -78,7 +78,7 @@
     sijd_sijd(c) = s11d*s11d + s22d*s22d + s33d*s33d  &
                  + s12d*s12d + s13d*s13d + s23d*s23d
 
-    turb % wale_v(c) =  sqrt( abs (sijd_sijd(c)**3) )   &
+    Turb % wale_v(c) =  sqrt( abs (sijd_sijd(c)**3) )   &
               / (sqrt( abs (shear2(c)   **5) ) +        &
                  sqrt( sqrt(sijd_sijd(c)**6) ) + TINY)
   end do

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -18,7 +18,7 @@
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
+  type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
@@ -58,10 +58,10 @@
 !   left  hand s.               A                 [J/(s K)]
 !   temperature                 t % n             [K]
 !   right hand s.               b                 [J/s]
-!   turb. thermal conductivity  con_t_f           [W/(m K)]
-!   turb. hear flux             ut_x_cap_dens_s   [J/(m^2 s)]
-!   turb. stress                t_stress          [J/s]
-!   turb. viscosity             vis_t             [kg/(m s)]
+!   Turb. thermal conductivity  con_t_f           [W/(m K)]
+!   Turb. hear flux             ut_x_cap_dens_s   [J/(m^2 s)]
+!   Turb. stress                t_stress          [J/s]
+!   Turb. viscosity             vis_t             [kg/(m s)]
 !
 !   User_Mod variables:
 !   bulk flux                   bulk % flux_x     [kg/s]
@@ -79,7 +79,7 @@
   call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   t % a  (:) = 0.0
@@ -136,8 +136,8 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    call Turb_Mod_Face_Cond_And_Stress(turb, con_eff, t_stress, s)
-    
+    call Turb % Face_Cond_And_Stress(con_eff, t_stress, s)
+
     if(Flow % mass_transfer) then
       if(Vof % fun % n(c1) < 0.5 .and.  &
          Vof % fun % n(c2) < 0.5) con_eff = Vof % phase_cond(2)
@@ -308,7 +308,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(Flow, turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, turb, Vof, swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n     ! time step
   real,    intent(in)      :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
@@ -37,13 +37,13 @@
         y = dy * 0.5 + (j-1) * dy
         z = dz * 0.5 + (k-1) * dz
 
-        swarm % Particle(i) % x_n = x
-        swarm % Particle(i) % y_n = y
-        swarm % Particle(i) % z_n = z
+        Swarm % Particle(i) % x_n = x
+        Swarm % Particle(i) % y_n = y
+        Swarm % Particle(i) % z_n = z
 
         ! Searching for the closest cell and node to place the moved Particle
-        call swarm % Particle(i) % Find_Nearest_Cell(n_parts_in_buffers)
-        call swarm % Particle(i) % Find_Nearest_Node()
+        call Swarm % Particle(i) % Find_Nearest_Cell(n_parts_in_buffers)
+        call Swarm % Particle(i) % Find_Nearest_Node()
       end do
     end do
 

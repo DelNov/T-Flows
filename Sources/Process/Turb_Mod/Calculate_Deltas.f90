@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Calculate_Deltas(turb)
+  subroutine Calculate_Deltas(turb)
 !------------------------------------------------------------------------------!
 !   Calculates h_max, h_min and h_w needed for Spalart Allmaras models.        !
 !------------------------------------------------------------------------------!
@@ -12,11 +12,11 @@
 !                                                                              !
 !   Main_Pro                            (allocates Work_Mod)                   !
 !     |                                                                        !
-!     +----> Turb_Mod_Calculate_Deltas  (safe to use r_cell_01..03)            !
+!     +----> Turb % Calculate_Deltas    (safe to use r_cell_01..03)            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow

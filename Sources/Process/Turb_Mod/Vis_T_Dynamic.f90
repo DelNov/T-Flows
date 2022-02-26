@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Vis_T_Dynamic(turb)
+  subroutine Vis_T_Dynamic(Turb)
 !------------------------------------------------------------------------------!
 !   Calculates Smagorinsky constant with dynamic procedure                     !
 !------------------------------------------------------------------------------!
@@ -23,7 +23,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -59,7 +59,7 @@
 !------------------------------------------------------------------------------!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   nc   =  Grid % n_cells
   nb   =  Grid % n_bnd_cells
@@ -201,21 +201,21 @@
     m_33 = l_f**2 * shear_test(c) * w % z(c) - l_g**2 * m_33_f(c) 
 
     m_12 = l_f**2 * shear_test(c) * .5*(u % y(c)+v % x(c)) - l_g**2 * m_12_f(c)
-    m_13 = l_f**2 * shear_test(c) * .5*(u % z(c)+w % x(c)) - l_g**2 * m_13_f(c) 
-    m_23 = l_f**2 * shear_test(c) * .5*(v % z(c)+w % y(c)) - l_g**2 * m_23_f(c)  
+    m_13 = l_f**2 * shear_test(c) * .5*(u % z(c)+w % x(c)) - l_g**2 * m_13_f(c)
+    m_23 = l_f**2 * shear_test(c) * .5*(v % z(c)+w % y(c)) - l_g**2 * m_23_f(c)
 
-    m_dot_m = m_11**2 + m_22**2 + m_33**2 + 2.0 * (m_12**2 + m_13**2 + m_23**2) 
- 
-    l_dot_m =        l_11 * m_11 + l_22 * m_22 + l_33 * m_33   & 
+    m_dot_m = m_11**2 + m_22**2 + m_33**2 + 2.0 * (m_12**2 + m_13**2 + m_23**2)
+
+    l_dot_m =        l_11 * m_11 + l_22 * m_22 + l_33 * m_33   &
             + 2.0 * (l_12 * m_12 + l_13 * m_13 + l_23 * m_23)
 
-    turb % c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY) 
+    Turb % c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY) 
 
     ! Set lower and upper limiter on c_dyn
-    if(turb % c_dyn(c) < 0.0) then
-      turb % c_dyn(c) = 0.0 
-    else if(turb % c_dyn(c) > 0.04) then
-      turb % c_dyn(c) = 0.04
+    if(Turb % c_dyn(c) < 0.0) then
+      Turb % c_dyn(c) = 0.0 
+    else if(Turb % c_dyn(c) > 0.04) then
+      Turb % c_dyn(c) = 0.04
     end if 
   end do
 

@@ -6,14 +6,14 @@ include '../User_Mod/Intersection_Line_Face.f90'
 include '../User_Mod/Interpolate_From_Nodes.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
+  subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
   type(Solver_Type), target :: Sol

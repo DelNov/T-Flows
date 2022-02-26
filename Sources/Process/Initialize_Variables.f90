@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
+  subroutine Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !                                                                              !
@@ -24,7 +24,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type)           :: Vof
   type(Swarm_Type)         :: Swarm
   type(Solver_Type)        :: Sol
@@ -63,15 +63,15 @@
   Grid     => Flow % pnt_grid
   bulk     => Flow % bulk
   v_flux   => Flow % v_flux
-  vis      => turb % vis
-  u_mean   => turb % u_mean
-  v_mean   => turb % v_mean
-  w_mean   => turb % w_mean
-  call Flow % Alias_Momentum(u, v, w)
-  call Flow % Alias_Energy  (t)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Turb_Mod_Alias_T2          (turb, t2)
+  vis      => Turb % vis
+  u_mean   => Turb % u_mean
+  v_mean   => Turb % v_mean
+  w_mean   => Turb % w_mean
+  call Flow % Alias_Momentum    (u, v, w)
+  call Flow % Alias_Energy      (t)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Turb % Alias_T2          (t2)
 
   area  = 0.0
   if (this_proc < 2) print *, '# Grid name: ', Grid % name
@@ -163,7 +163,7 @@
             i=Key_Ind('T',keys,nks);prof(k,0)=t_def;t%n(c)=prof(k,i)
           end if
 
-          if(turb % model .eq. K_EPS) then
+          if(Turb % model .eq. K_EPS) then
             i=Key_Ind('KIN',keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
             if(Flow % heat_transfer) then
@@ -171,8 +171,8 @@
             end if
           end if
 
-          if(turb % model .eq. K_EPS_ZETA_F .or.  &
-             turb % model .eq. HYBRID_LES_RANS) then
+          if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+             Turb % model .eq. HYBRID_LES_RANS) then
             i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin %n(c)=prof(k,i)
             i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
             i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
@@ -182,12 +182,12 @@
             end if
            end if
 
-          if(turb % model .eq. DES_SPALART) then
+          if(Turb % model .eq. DES_SPALART) then
             i=Key_Ind('VIS',keys,nks); prof(k,0)=vis_def; vis%n(c)=prof(k,i)
           end if
 
-          if(turb % model .eq. RSM_MANCEAU_HANJALIC .or. &
-             turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+          if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or. &
+             Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
             i=Key_Ind('UU', keys,nks);prof(k,0)=uu_def; uu %n(c)=prof(k,i)
             i=Key_Ind('VV', keys,nks);prof(k,0)=vv_def; vv %n(c)=prof(k,i)
             i=Key_Ind('WW', keys,nks);prof(k,0)=ww_def; ww %n(c)=prof(k,i)
@@ -195,7 +195,7 @@
             i=Key_Ind('UW', keys,nks);prof(k,0)=uw_def; uw %n(c)=prof(k,i)
             i=Key_Ind('VW', keys,nks);prof(k,0)=vw_def; vw %n(c)=prof(k,i)
             i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def;eps%n(c)=prof(k,i)
-            if (turb % model .eq. RSM_MANCEAU_HANJALIC) then
+            if (Turb % model .eq. RSM_MANCEAU_HANJALIC) then
               i=Key_Ind('F22',keys,nks);prof(k,0)=f22_def;f22%n(c)=prof(k,i)
             end if
           end if
@@ -251,7 +251,7 @@
 
       do c = 1, Grid % n_cells
 
-        if(turb % statistics) then
+        if(Turb % statistics) then
           u_mean(c) = 0.0
           v_mean(c) = 0.0
           w_mean(c) = 0.0
@@ -283,8 +283,8 @@
           phi % oo(c) = phi % n(c)
         end do
 
-        if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
           vals(0) = uu_def;  uu  % n(c) = vals(Key_Ind('UU',  keys, nks))
           vals(0) = vv_def;  vv  % n(c) = vals(Key_Ind('VV',  keys, nks))
           vals(0) = ww_def;  ww  % n(c) = vals(Key_Ind('WW',  keys, nks))
@@ -304,14 +304,14 @@
           uw % oo(c) = uw % n(c)
           vw % o(c)  = vw % n(c)
           vw % oo(c) = vw % n(c)
-          if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+          if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
             vals(0) = f22_def; f22 % n(c) = vals(Key_Ind('F22', keys, nks))
             f22 % o(c)  = f22 % n(c)
             f22 % oo(c) = f22 % n(c)
           end if
         end if
 
-        if(turb % model .eq. K_EPS) then
+        if(Turb % model .eq. K_EPS) then
           vals(0) = kin_def;
           kin % n(c) = max(0.01, vals(Key_Ind('KIN', keys, nks)))
           vals(0) = eps_def;
@@ -320,7 +320,7 @@
           kin % oo(c) = kin % n(c)
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
-          turb % y_plus(c) = 0.001
+          Turb % y_plus(c) = 0.001
           if(Flow % heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
@@ -328,8 +328,8 @@
           end if
         end if
 
-        if(turb % model .eq. K_EPS_ZETA_F .or.  &
-           turb % model .eq. HYBRID_LES_RANS) then
+        if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+           Turb % model .eq. HYBRID_LES_RANS) then
           vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
           vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
           vals(0) = zeta_def; zeta % n(c) = vals(Key_Ind('ZETA', keys, nks))
@@ -342,7 +342,7 @@
           zeta % oo(c) = zeta % n(c)
           f22  % o(c)  = f22  % n(c)
           f22  % oo(c) = f22  % n(c)
-          turb % y_plus(c) = 0.001
+          Turb % y_plus(c) = 0.001
           if(Flow % heat_transfer) then
             vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
             t2 % o(c)  = t2 % n(c)
@@ -350,8 +350,8 @@
           end if
         end if
 
-        if(turb % model .eq. SPALART_ALLMARAS .or.  &
-           turb % model .eq. DES_SPALART) then
+        if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+           Turb % model .eq. DES_SPALART) then
           vals(0) = vis_def; vis % n(c) = vals(Key_Ind('VIS', keys, nks))
           vis % o(c)  = vis % n(c)
           vis % oo(c) = vis % n(c)
@@ -363,7 +363,7 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(Flow, turb, Vof, Swarm, Sol)
+  call User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
 
   !--------------------------------!
   !      Calculate the inflow      !

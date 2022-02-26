@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Schmidt_Number(Flow, c)
+  real function Schmidt_Numb(Flow, c)
 !------------------------------------------------------------------------------!
 !   Computes laminar Schmidt number for cell "c"                               !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   integer                   :: c
 !==============================================================================!
 
-  Schmidt_Number =  Flow % viscosity(c)  &
-                 / (Flow % diffusivity * Flow % density(c))
+  Schmidt_Numb =  Flow % viscosity(c)  &
+               / (Flow % diffusivity * Flow % density(c))
 
   end function

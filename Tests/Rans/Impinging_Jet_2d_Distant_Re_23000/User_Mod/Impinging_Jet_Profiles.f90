@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Profiles(turb)
+  subroutine User_Mod_Impinging_Jet_Profiles(Turb)
 !------------------------------------------------------------------------------!
 !   Subroutine reads ".1D" file created by the "Generator" or "Convert"        !
 !   and extracts profiles on several locations that corresponds with the       !
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target :: turb
+  type(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: grid
   type(Field_Type), pointer :: Flow
@@ -27,16 +27,16 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
   t    => Flow % t
-  kin  => turb % kin
-  eps  => turb % eps
-  zeta => turb % zeta
-  f22  => turb % f22
+  kin  => Turb % kin
+  eps  => Turb % eps
+  zeta => Turb % zeta
+  f22  => Turb % f22
 
   u_aver = 1.14
 
@@ -142,16 +142,16 @@
             vm_p(i)   = vm_p(i) + u_rad
             wm_p(i)   = wm_p(i) + w % n(c)
 
-            if(turb % model .eq. K_EPS) then
+            if(Turb % model .eq. K_EPS) then
               v1_p(i) = v1_p(i) + kin % n(c)
               v2_p(i) = v2_p(i) + eps % n(c)
-              v3_p(i) = v3_p(i) + turb % vis_t(c) / Flow % viscosity(c)
+              v3_p(i) = v3_p(i) + Turb % vis_t(c) / Flow % viscosity(c)
             end if
 
-            if(turb % model .eq. K_EPS_ZETA_F) then
+            if(Turb % model .eq. K_EPS_ZETA_F) then
               v1_p(i)   = v1_p(i) + kin % n(c)
               v2_p(i)   = v2_p(i) + eps % n(c)
-              v3_p(i)   = v3_p(i) + turb % vis_t(c) / Flow % viscosity(c)
+              v3_p(i)   = v3_p(i) + Turb % vis_t(c) / Flow % viscosity(c)
               v4_p(i)   = v4_p(i) + zeta % n(c)
               v5_p(i)   = v5_p(i) + f22 % n(c)
             end if

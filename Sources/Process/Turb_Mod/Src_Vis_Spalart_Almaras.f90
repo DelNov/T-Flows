@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Vis_Spalart_Almaras(turb, Sol)
+  subroutine Src_Vis_Spalart_Almaras(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
@@ -19,12 +19,12 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
-  vis  => turb % vis
+  vis  => Turb % vis
   call Sol % Alias_Native(A, b)
 
-  if(turb % model .eq. SPALART_ALLMARAS) then
+  if(Turb % model .eq. SPALART_ALLMARAS) then
 
     do c = 1, Grid % n_cells
 
@@ -59,11 +59,11 @@
       b(c)  = b(c) + dif * Grid % vol(c)
     end do
 
-  else if(turb % model .eq. DES_SPALART) then
+  else if(Turb % model .eq. DES_SPALART) then
     do c = 1, Grid % n_cells
 
       ! What is 0.65 here?  A ghost number
-      dist = min(Grid % wall_dist(c), 0.65 * turb % h_max(c))
+      dist = min(Grid % wall_dist(c), 0.65 * Turb % h_max(c))
 
       !---------------------------------!
       !   Compute the production term   !

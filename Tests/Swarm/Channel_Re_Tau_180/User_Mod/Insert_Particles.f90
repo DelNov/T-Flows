@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, turb, Vof, swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, n, time)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n     ! time step
   real,    intent(in)      :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
@@ -37,13 +37,13 @@
   if(n .eq. 1) then     ! should be after the Flow is developed
 
     ! Browsing through all introduced particles
-    do k = 1, swarm % n_particles
+    do k = 1, Swarm % n_particles
 
         ! Initalizing particle position (already initialized in
         ! Swarm_Mod_Allocate)
-        swarm % Particle(k) % x_n = 0.0
-        swarm % Particle(k) % y_n = 0.0
-        swarm % Particle(k) % z_n = 0.0
+        Swarm % Particle(k) % x_n = 0.0
+        Swarm % Particle(k) % y_n = 0.0
+        Swarm % Particle(k) % z_n = 0.0
 
         ! Generating random locations for particle
         call random_number(c1)
@@ -51,45 +51,45 @@
         call random_number(c3)
 
         ! Initalizing Particle position
-        swarm % Particle(k) % x_n = (L1 * c1) + swarm % Particle(k) % x_n
-        swarm % Particle(k) % y_n = (L2 * c2) + swarm % Particle(k) % y_n
-        swarm % Particle(k) % z_n = (L3 * c3) + swarm % Particle(k) % z_n
+        Swarm % Particle(k) % x_n = (L1 * c1) + Swarm % Particle(k) % x_n
+        Swarm % Particle(k) % y_n = (L2 * c2) + Swarm % Particle(k) % y_n
+        Swarm % Particle(k) % z_n = (L3 * c3) + Swarm % Particle(k) % z_n
 
         ! you essentially moved them a lot (from 0, 0, 0)
-        swarm % Particle(k) % cell = 0
-        swarm % Particle(k) % node = 0
-        swarm % Particle(k) % proc = 0
-        swarm % Particle(k) % buff = 0
+        Swarm % Particle(k) % cell = 0
+        Swarm % Particle(k) % node = 0
+        Swarm % Particle(k) % proc = 0
+        Swarm % Particle(k) % buff = 0
 
-        swarm % Particle(k) % x_o = swarm % Particle(k) % x_n
-        swarm % Particle(k) % y_o = swarm % Particle(k) % y_n
-        swarm % Particle(k) % z_o = swarm % Particle(k) % z_n
+        Swarm % Particle(k) % x_o = Swarm % Particle(k) % x_n
+        Swarm % Particle(k) % y_o = Swarm % Particle(k) % y_n
+        Swarm % Particle(k) % z_o = Swarm % Particle(k) % z_n
 
         ! Searching for the closest cell and node to place the moved particle
-        call swarm % Particle(k) % Find_Nearest_Cell(n_parts_in_buffers)
-        call swarm % Particle(k) % Find_Nearest_Node()
+        call Swarm % Particle(k) % Find_Nearest_Cell(n_parts_in_buffers)
+        call Swarm % Particle(k) % Find_Nearest_Node()
 
-        c = swarm % Particle(k) % cell
+        c = Swarm % Particle(k) % cell
 
         ! Set initial Particle velocities
-        rx = swarm % Particle(k) % x_n - grid % xc(c)
-        ry = swarm % Particle(k) % y_n - grid % yc(c)
-        rz = swarm % Particle(k) % z_n - grid % zc(c)
+        rx = Swarm % Particle(k) % x_n - grid % xc(c)
+        ry = Swarm % Particle(k) % y_n - grid % yc(c)
+        rz = Swarm % Particle(k) % z_n - grid % zc(c)
 
         ! Compute velocities at the particle position from velocity gradients
-        swarm % Particle(k) % u    &
+        Swarm % Particle(k) % u    &
            = Flow % u % n(c)       &  ! u velocity at the new time step (% n)
            + Flow % u % x(c) * rx  &  ! u % x is gradient du/dx
            + Flow % u % y(c) * ry  &  ! u % y is gradient du/dy
            + Flow % u % z(c) * rz     ! u % x is gradient du/dz
 
-        swarm % Particle(k) % v    &
+        Swarm % Particle(k) % v    &
            = Flow % v % n(c)       &  ! v velocity at the new time step (% n)
            + Flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
            + Flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
            + Flow % v % z(c) * rz     ! v % x is gradient dv/dz
 
-        swarm % Particle(k) % w    &
+        Swarm % Particle(k) % w    &
            = Flow % w % n(c)       &  ! w velocity at the new time step (% n)
            + Flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
            + Flow % w % y(c) * ry  &  ! w % y is gradient dw/dy

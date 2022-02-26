@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Turb_Mod_Calculate_Heat_Flux(turb)
+  subroutine Calculate_Heat_Flux(Turb)
 !------------------------------------------------------------------------------!
 !   Computes turbulent heat fluxes                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),  target :: turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -18,13 +18,13 @@
 !==============================================================================!
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   t    => Flow % t
-  call Turb_Mod_Alias_Heat_Fluxes(turb, ut, vt, wt)
-  call Turb_Mod_Alias_Stresses   (turb, uu, vv, ww, uv, uw, vw)
-  call Flow % Alias_Momentum     (u, v, w)
-  call Turb_Mod_Alias_T2         (turb, t2)
+  call Turb % Alias_Heat_Fluxes(ut, vt, wt)
+  call Turb % Alias_Stresses   (uu, vv, ww, uv, uw, vw)
+  call Flow % Alias_Momentum   (u, v, w)
+  call Turb % Alias_T2         (t2)
 
   ! Check if these are already computed somewhere, ...
   ! ... maybe this call is not needed
@@ -40,43 +40,43 @@
   !-----------------------------------------------------------!
 
   do c = 1, Grid % n_cells
-    pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
-    ut % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
-    vt % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
-    wt % n(c) = - turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+    pr_t = max(Turb % Prandtl_Turb(c), TINY)
+    ut % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+    vt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+    wt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
 
-    if(turb % model .eq. HYBRID_LES_RANS) then
-      ut % n(c) = - turb % vis_t_eff(c) / Flow % density(c) &
+    if(Turb % model .eq. HYBRID_LES_RANS) then
+      ut % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
                                         / pr_t * t % x(c)
-      vt % n(c) = - turb % vis_t_eff(c) / Flow % density(c) &
+      vt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
                                         / pr_t * t % y(c)
-      wt % n(c) = - turb % vis_t_eff(c) / Flow % density(c) &
+      wt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
                                         / pr_t * t % z(c)
     end if
   end do
 
-  if(turb % heat_flux_model .eq. GGDH) then
+  if(Turb % heat_flux_model .eq. GGDH) then
 
     do c = 1, Grid % n_cells
-      ut % n(c) = -c_theta * turb % t_scale(c) * (uu % n(c) * t % x(c)  +  &
+      ut % n(c) = -c_theta * Turb % t_scale(c) * (uu % n(c) * t % x(c)  +  &
                                                   uv % n(c) * t % y(c)  +  &
                                                   uw % n(c) * t % z(c))
-      vt % n(c) = -c_theta * turb % t_scale(c) * (uv % n(c) * t % x(c)  +  &
+      vt % n(c) = -c_theta * Turb % t_scale(c) * (uv % n(c) * t % x(c)  +  &
                                                   vv % n(c) * t % y(c)  +  &
                                                   vw % n(c) * t % z(c))
-      wt % n(c) = -c_theta * turb % t_scale(c) * (uw % n(c) * t % x(c)  +  &
+      wt % n(c) = -c_theta * Turb % t_scale(c) * (uw % n(c) * t % x(c)  +  &
                                                   vw % n(c) * t % y(c)  +  &
                                                   ww % n(c) * t % z(c))
     end do
 
-  else if(turb % heat_flux_model .eq. AFM) then
+  else if(Turb % heat_flux_model .eq. AFM) then
     call Flow % Grad_Variable(Flow % u)
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
 
     do k = 1, 2
       do c = 1, Grid % n_cells
-        ut % n(c) = -c_theta * turb % t_scale(c)          &
+        ut % n(c) = -c_theta * Turb % t_scale(c)          &
                   * ((  uu % n(c) * t % x(c)              &
                       + uv % n(c) * t % y(c)              &
                       + uw % n(c) * t % z(c))             &
@@ -85,7 +85,7 @@
                                + wt % n(c) * u % z(c))    &
                       + 0.2*Flow % beta * Flow % grav_x * t2 % n(c))
 
-        vt % n(c) = -c_theta * turb % t_scale(c)          &
+        vt % n(c) = -c_theta * Turb % t_scale(c)          &
                   * ((  uv % n(c) * t % x(c)              &
                       + vv % n(c) * t % y(c)              &
                       + vw % n(c) * t % z(c))             &
@@ -94,7 +94,7 @@
                                + wt % n(c) * v % z(c))    &
                       + 0.2*Flow % beta * Flow % grav_y * t2 % n(c))
 
-        wt % n(c) = -c_theta * turb % t_scale(c)          &
+        wt % n(c) = -c_theta * Turb % t_scale(c)          &
                   * ((  uw % n(c) * t % x(c)              &
                       + vw % n(c) * t % y(c)              &
                       + ww % n(c) * t % z(c))             &
@@ -106,9 +106,9 @@
     end do
   end if
 
-  if(turb % model .eq. K_EPS        .or.  &
-     turb % model .eq. K_EPS_ZETA_F .or.  &
-     turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. K_EPS        .or.  &
+     Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
 
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
@@ -126,17 +126,17 @@
           qy = t % q(c2) * ny
           qz = t % q(c2) * nz
 
-          ebf = Turb_Mod_Ebf_Momentum(turb, c1)
+          ebf = Turb % Ebf_Momentum(c1)
 
-          ut_log_law = - turb % con_w(c1)                             &
+          ut_log_law = - Turb % con_w(c1)                             &
                     / (Flow % density(c1) * Flow % capacity(c1))      &
                     * (t % n(c2) - t % n(c1)) / Grid % wall_dist(c1)  &
                     * nx
-          vt_log_law = - turb % con_w(c1)                             &
+          vt_log_law = - Turb % con_w(c1)                             &
                     / (Flow % density(c1) * Flow % capacity(c1))      &
                     * (t % n(c2) - t % n(c1)) / Grid % wall_dist(c1)  &
                     * ny
-          wt_log_law = - turb % con_w(c1)                             &
+          wt_log_law = - Turb % con_w(c1)                             &
                     / (Flow % density(c1) * Flow % capacity(c1))      &
                     * (t % n(c2) - t % n(c1)) / Grid % wall_dist(c1)  &
                     * nz

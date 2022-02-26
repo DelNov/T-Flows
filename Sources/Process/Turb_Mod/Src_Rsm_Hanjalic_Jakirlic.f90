@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Turb_Mod_Src_Rsm_Hanjalic_Jakirlic(turb, Sol, name_phi)
+  subroutine Src_Rsm_Hanjalic_Jakirlic(Turb, Sol, name_phi)
 !------------------------------------------------------------------------------!
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !
@@ -24,16 +24,16 @@
 !                                                                              !
 !   Main_Pro                                    (allocates Work_Mod)           !
 !     |                                                                        !
-!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
+!     +----> Turb % Main_Turb                   (does not use Work_Mod)        !
 !              |                                                               !
-!              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
+!              +---> Turb % Compute_Stress      (uses r_cell_01..09)           !
 !                      |                                                       !
-!                      +----> Turb_Mod_Src_Rsm_Hanjalic_Jakirlic               !
+!                      +----> Turb % Src_Rsm_Hanjalic_Jakirlic                 !
 !                                               (uses r_cell_11..24)           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type),   target :: turb
+  class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
   character(len=*)          :: name_phi
 !-----------------------------------[Locals]-----------------------------------!
@@ -72,9 +72,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !   wall visc.    vis_wall [kg/(m*s)]  |                                       !
@@ -83,14 +83,14 @@
 ! but dens > 1 mod. not applied here yet
 
   ! Take aliases
-  Flow => turb % pnt_flow
+  Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   nc   =  Grid % n_cells
   nb   =  Grid % n_bnd_cells
-  call Flow % Alias_Momentum(u, v, w)
-  call Turb_Mod_Alias_K_Eps_Zeta_F(turb, kin, eps, zeta, f22)
-  call Turb_Mod_Alias_Stresses    (turb, uu, vv, ww, uv, uw, vw)
-  call Sol % Alias_Native         (A, b)
+  call Flow % Alias_Momentum    (u, v, w)
+  call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
+  call Sol % Alias_Native       (A, b)
 
   diss1 = 0.0
 
@@ -341,7 +341,7 @@
     end do  ! i
   end if    ! end if EPS == yes
 
-  call Flow % Grad(turb % l_scale, l_sc_x(-nb:nc),  &
+  call Flow % Grad(Turb % l_scale, l_sc_x(-nb:nc),  &
                                    l_sc_y(-nb:nc),  &
                                    l_sc_z(-nb:nc))
 
@@ -349,7 +349,7 @@
   r23 = TWO_THIRDS
   do  c = 1, Grid % n_cells
     kin_vis = Flow % viscosity(c) / Flow % density(c)
-    turb % p_kin(c) = max(                                                     &
+    Turb % p_kin(c) = max(                                                     &
           - (  uu % n(c)*u % x(c) + uv % n(c)*u % y(c) + uw % n(c)*u % z(c)    &
              + uv % n(c)*v % x(c) + vv % n(c)*v % y(c) + vw % n(c)*v % z(c)    &
              + uw % n(c)*w % x(c) + vw % n(c)*w % y(c) + ww % n(c)*w % z(c)),  &
@@ -514,9 +514,9 @@
     var1_13 = -cc1*eps%n(c)*a13 
     var1_23 = -cc1*eps%n(c)*a23 
 
-    var2_11 = -cc2*(p11 - r23 * turb % p_kin(c))
-    var2_22 = -cc2*(p22 - r23 * turb % p_kin(c))
-    var2_33 = -cc2*(p33 - r23 * turb % p_kin(c))
+    var2_11 = -cc2*(p11 - r23 * Turb % p_kin(c))
+    var2_22 = -cc2*(p22 - r23 * Turb % p_kin(c))
+    var2_33 = -cc2*(p33 - r23 * Turb % p_kin(c))
     var2_12 = -cc2*p12
     var2_13 = -cc2*p13
     var2_23 = -cc2*p23
@@ -694,8 +694,8 @@
     !----------------------!
     else if(name_phi == 'EPS') then 
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
-      eps_1 = 1.44 * turb % p_kin(c) / turb % t_scale(c)
-      eps_2 = c_2e * f_eps  / turb % t_scale(c)
+      eps_1 = 1.44 * Turb % p_kin(c) / Turb % t_scale(c)
+      eps_2 = c_2e * f_eps  / Turb % t_scale(c)
       b(c) = b(c) + Flow % density(c) * (eps_1 + diss1(c)) * Grid % vol(c)
 
       A % val(A % dia(c)) = A % val(A % dia(c)) + Flow % density(c) * eps_2  &
@@ -716,7 +716,7 @@
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
       f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
       b(c) = b(c) + Flow % density(c)                               &
-                     * (c_2e * f_eps / turb % t_scale(c)            &
+                     * (c_2e * f_eps / Turb % t_scale(c)            &
                      * (kin_vis *(  kin_e_x(c)**2                   &
                                   + kin_e_y(c)**2                   &
                                   + kin_e_z(c)**2)))                &

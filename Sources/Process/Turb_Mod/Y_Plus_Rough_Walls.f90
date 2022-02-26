@@ -1,17 +1,14 @@
 !==============================================================================!
-  real function Y_Plus_Rough_Walls(turb, u_tau, wall_dist, kin_vis)
+  real function Y_Plus_Rough_Walls(Turb, u_tau, wall_dist, kin_vis)
 !------------------------------------------------------------------------------!
 !   Calculates y+ for rough walls.                                             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Turb_Mod, only: Turb_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type) :: turb
-  real            :: u_tau, wall_dist, kin_vis
+  class(Turb_Type) :: Turb
+  real             :: u_tau, wall_dist, kin_vis
 !==============================================================================!
 
-  Y_Plus_Rough_Walls = u_tau * (wall_dist + turb % z_o) / kin_vis
+  Y_Plus_Rough_Walls = u_tau * (wall_dist + Turb % z_o) / kin_vis
 
   end function
