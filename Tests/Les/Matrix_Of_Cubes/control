@@ -1,0 +1,88 @@
+#--------------
+# Problem name
+#--------------
+  PROBLEM_NAME        matrix
+
+#---------------
+# Time stepping
+#---------------
+  TIME_STEP                 0.0001
+  NUMBER_OF_TIME_STEPS   1200
+
+#-------------------
+# Monitoring points
+#-------------------
+  POINT_FOR_MONITORING_PLANES  0.005  0.005  0.005
+
+#---------------------
+# Physical properties
+#---------------------
+  MASS_DENSITY       1.2047
+  DYNAMIC_VISCOSITY  1.8205e-5
+
+#-------------------------------------------------
+# Prescribed mass flow
+#
+# Re = 13000
+# nu = 1.5112e-5
+# h  = 0.051
+# Re = Ub * h / nu = 13000
+# Ub = Re * nu / h = 3.852  [m/s]
+# m* = Ub * 1.2047 * 0.051 * 0.06 = 0.0142 [kg/s]
+#-------------------------------------------------
+  MASS_FLOW_RATES    0.0142,  0.0,  0.0
+
+#----------------------
+# Numerical parameters
+#----------------------
+ GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
+ MAX_GAUSS_GRADIENTS_ITERATIONS   3
+
+#------------------------
+# Linear solver settings
+#------------------------
+ LINEAR_SOLVERS                     petsc
+ PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+ TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+ TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER       100
+ MAX_ITERATIONS_FOR_WALL_DISTANCE_SOLVER  100
+
+ PETSC_OPTIONS_FOR_PRESSURE
+   SOLVER        cg
+   PREC          hypre       # asm or hypre
+   PREC_OPTS     
+   TOLERANCE     1.0e-3
+
+ PETSC_OPTIONS_FOR_WALL_DISTANCE
+   SOLVER        cg
+   PREC          hypre       # asm or hypre
+   PREC_OPTS     
+   TOLERANCE     1.0e-6
+
+ PETSC_OPTIONS_FOR_MOMENTUM
+   SOLVER        bicg
+   PREC          asm
+   PREC_OPTS     
+   TOLERANCE     1.0e-7
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION lower_wall
+    TYPE             wall
+    VARIABLES        u     v     w
+    VALUES           0.0   0.0   0.0
+
+  BOUNDARY_CONDITION top_wall
+    TYPE             wall
+    VARIABLES        u     v     w
+    VALUES           0.0   0.0   0.0
+
+  BOUNDARY_CONDITION cube_walls
+    TYPE             wall
+    VARIABLES        u     v     w
+    VALUES           0.0   0.0   0.0
+
