@@ -44,8 +44,8 @@
   !   User wants to skip calculation of wall distance   !
   !-----------------------------------------------------!
   if( answer .eq. 'SKIP' ) then
-    Grid % wall_dist = 1.0
-    print *, '# Distance to the wall set to 1.0 everywhere !'
+    Grid % wall_dist = -1.0
+    print *, '# Distance to the wall set to -1.0 everywhere !'
 
   !----------------------------------!
   !   Calculation of wall distance   !
