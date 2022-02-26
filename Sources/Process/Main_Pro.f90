@@ -229,6 +229,7 @@
   !-------------------------------------------------------------!
   if(first_dt .eq. 0) then
     do d = 1, n_dom
+      call Flow(d) % Compute_Wall_Distance(Sol(d))
       call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
       call Control_Mod_Potential_Initialization(pot_init, .true.)
       if(pot_init) call Flow(d) % Potential_Initialization(Sol(d))

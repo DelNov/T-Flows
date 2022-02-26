@@ -21,18 +21,20 @@
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
 
+  ! Take aliases
+  Grid => Flow % pnt_grid
+  phi  => Flow % wall_dist
+  call Flow % Alias_Momentum(u, v, w)
+  call Sol % Alias_Native   (A, b)
+
+  ! If wall distance was calculated, get out of here
+  if(Grid % wall_dist(1) > 0.0) return
+
   if(this_proc < 2) then
     print '(a)',      ' # Computing wall distance ...'
     print '(a,i3,a)', ' # ... with ', NDT, ' fake time steps.'
     print '(a)',      ' # This might take a while, please wait'
   end if
-
-  ! Take aliases
-  Grid => Flow % pnt_grid
-  phi  => Flow % wall_dist
-
-  call Flow % Alias_Momentum(u, v, w)
-  call Sol % Alias_Native   (A, b)
 
   !------------------------------------------!
   !                                          !
@@ -46,11 +48,9 @@
   A % val(:) = 0.0
   b      (:) = 0.0
 
-  ! Initial values
-  ! (Potential varies from 0 to 1, hence
-  !  0.5 seems like a good initial guess)
+  ! Initial values (for some cases, zero was necessary)
   do c = 1, Grid % n_cells
-    phi % n(c) = 0.5
+    phi % n(c) = 0.0
   end do
 
   !----------------------------------------!
@@ -247,9 +247,11 @@
                       + phi % z(c) * phi % z(c))
   end do
 
-  call Grid % Save_Debug_Vtu(append = "wall-dist-rel-error",                   &
-                             scalar_cell = abs(phi % n - Grid % wall_dist)     &
-                                         / (Grid % wall_dist + TINY) * 100.0,  &
-                             scalar_name = "Wall Distance Error [%]")
+! This was used for debugging, with calculated wall distance
+! call Grid % Save_Debug_Vtu(append = "wall-dist-rel-error",                   &
+!                            scalar_cell = abs(phi % n - Grid % wall_dist)     &
+!                                        / (Grid % wall_dist + TINY) * 100.0,  &
+!                            scalar_name = "Wall Distance Error [%]")
+  Grid % wall_dist(:) = phi % n(:)
 
   end subroutine
