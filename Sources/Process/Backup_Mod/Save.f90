@@ -104,16 +104,20 @@
   !   Volume fluxes   ! -> don't use for the time being, too much trouble
   !-------------------!
 
-  !----------------------------------!
-  !   Does it have pressure outlet   !
-  !----------------------------------!
+  !-----------------------------------!
+  !   Does it have pressure/outflow   !
+  !-----------------------------------!
   ! Update on July 17, 2021: I have some reservations about this part, since
   ! there was another bug fix when computing fluxes in the meanwhile (check:
   ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
   ! bug when loading backup file (also check "Compute_Pressure" as well as
   ! "Initialize_Variables" procedures)
-  call Backup_Mod_Write_Log(Comm, d, vc, 'has_pressure_outlet',  &
-                            Fld % has_pressure_outlet)
+  ! Update on February 27, 2022: I have also added "has_outflow_boundary"
+  ! to be able to tell PETSc if matrix for pressure is singular
+  call Backup_Mod_Write_Log(Comm, d, vc, 'has_pressure_boundary',  &
+                            Fld % has_pressure_boundary)
+  call Backup_Mod_Write_Log(Comm, d, vc, 'has_outflow_boundary',  &
+                            Fld % has_pressure_boundary)
 
   !--------------!
   !              !

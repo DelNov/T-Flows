@@ -24,8 +24,10 @@
     contains
       procedure :: Alias_Native
       procedure :: Create_Solver
-      procedure :: Run
       procedure :: End
+      procedure :: Remove_Singular
+      procedure :: Run
+      procedure :: Set_Singular
 
   end type
 
@@ -37,7 +39,9 @@
 
   include 'Solver_Mod/Alias_Native.f90'
   include 'Solver_Mod/Create_Solver.f90'
-  include 'Solver_Mod/Run.f90'
   include 'Solver_Mod/End.f90'
+  include 'Solver_Mod/Remove_Singular.f90'
+  include 'Solver_Mod/Run.f90'
+  include 'Solver_Mod/Set_Singular.f90'
 
   end module

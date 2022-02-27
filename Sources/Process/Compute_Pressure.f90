@@ -182,7 +182,11 @@
   ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
   ! bug when loading backup file (also check "Initialize_Variables" and 
   ! "Backup_Mod/Load and Backup_Mod/Save" procedures)
-  if( .not. Flow % has_pressure_outlet) then
+  !
+  ! Update on February 27, 2022: I have also added "has_outflow_boundary"
+  ! to be able to tell PETSc if matrix for pressure is singular.  Shall
+  ! it also be included in this test?
+  if( .not. Flow % has_pressure_boundary) then
     if(total_cells .eq. 0) then  ! wasn't set yet
       total_cells = Grid % n_cells - Grid % comm % n_buff_cells
       call Comm_Mod_Global_Sum_Int(total_cells)
@@ -197,6 +201,12 @@
 
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
 
+  ! Tell solvers it is a singular system which you are trying to solve
+  if( .not. Flow % has_pressure_boundary .and. &
+      .not. Flow % has_outflow_boundary) then
+    call Sol % Set_Singular(A)
+  end if
+
   ! Call linear solver
   call Sol % Run(pp % solver,     &
                  pp % prec,       &
@@ -209,6 +219,12 @@
                  pp % tol,        &  ! tolerance
                  pp % res,        &  ! final residual
                  norm = p_nor)       ! number for normalisation
+
+  ! Remove singularity from the matrix
+  if( .not. Flow % has_pressure_boundary .and. &
+      .not. Flow % has_outflow_boundary) then
+    call Sol % Remove_Singular(A)
+  end if
 
   call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
 
