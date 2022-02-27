@@ -139,6 +139,30 @@ void c_petsc_assemble_mat_(Mat * A) {
   err = MatSetOption(*A, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
 }
 
+/*-----------------------------------------------------------------------------+
+|  MatSetNullSpace                                                             |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatNullSpaceCreate.html      |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSetNullSpace.html         |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_set_null_space_(Mat * A) {
+
+  MatNullSpace nullspace;
+
+  MatNullSpaceCreate(MPI_COMM_WORLD, PETSC_TRUE, 0, 0, &nullspace);
+  MatSetNullSpace(*A, nullspace);
+  MatNullSpaceDestroy(&nullspace);
+}
+
+/*-----------------------------------------------------------------------------+
+|  MatSetNullSpace                                                             |
+|                                                                              |
+|  https://petsc.org/release/docs/manualpages/Mat/MatSetNullSpace.html         |
++-----------------------------------------------------------------------------*/
+void c_petsc_mat_remove_null_space_(Mat * A) {
+
+  MatSetNullSpace(*A, NULL);
+}
 
 /*-----------------------------------------------------------------------------+
 |                                                                              |
