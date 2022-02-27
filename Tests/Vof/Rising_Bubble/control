@@ -53,6 +53,7 @@
 #------------------------
 # Linear solver settings
 #------------------------
+ LINEAR_SOLVERS                     petsc
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-12
  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-12
@@ -66,6 +67,12 @@
  COMPRESION_FACTOR_VOF               1.0
  MIN_SIMPLE_ITERATIONS               3
  #DUAL_TIME_STEP_VOF                 yes
+
+ PETSC_OPTIONS_FOR_PRESSURE
+   SOLVER        cg
+   PREC          hypre       # asm or hypre
+   PREC_OPTS     
+   TOLERANCE     1.0e-3
 
 #--------------------
 # Initial conditions
