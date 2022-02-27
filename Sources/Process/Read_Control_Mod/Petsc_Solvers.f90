@@ -74,7 +74,7 @@
     w % tol = tol
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for momentum are not specified.'  //  &
+      print *, '# NOTE! PETSc options for momentum are not specified.'  //  &
                 ' Using the default values'
     end if
     u % prec = 'asm'
@@ -104,7 +104,7 @@
     Flow % pp % tol = tol
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for pressure are not specified.'  //  &
+      print *, '# NOTE! PETSc options for pressure are not specified.'  //  &
                ' Using the default values'
     end if
     Flow % pp % prec = 'asm'
@@ -130,7 +130,7 @@
     Flow % wall_dist % tol = tol
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for potential are not specified.'  //  &
+      print *, '# NOTE! PETSc options for potential are not specified.'  //  &
                ' Using the default values'
     end if
     Flow % wall_dist % prec = 'asm'
@@ -156,7 +156,7 @@
     Flow % pot % tol = tol
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for potential are not specified.'  //  &
+      print *, '# NOTE! PETSc options for potential are not specified.'  //  &
                ' Using the default values'
     end if
     Flow % pot % prec = 'asm'
@@ -182,7 +182,7 @@
     t % tol = tol
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for energy are not specified.'  //  &
+      print *, '# NOTE! PETSc options for energy are not specified.'  //  &
                ' Using the default values'
     end if
     t % prec = 'asm'
@@ -212,7 +212,7 @@
     end do
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for scalars are not specified.'  //  &
+      print *, '# NOTE! PETSc options for scalars are not specified.'  //  &
                ' Using the default values'
     end if
     do sc = 1, Flow % n_scalars
@@ -255,7 +255,7 @@
     end do
   else
     if(this_proc < 2) then
-      print *, '# NOTE!  PETSc options for turbulence are not specified.'  //  &
+      print *, '# NOTE! PETSc options for turbulence are not specified.'  //  &
                ' Using the default values'
     end if
     do i = 1, 12
