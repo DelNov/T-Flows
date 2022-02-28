@@ -120,9 +120,8 @@ In any case, the local directory to which all the sources have been retrieved, w
 # Compiling the code <a name="compiling"></a>
 
 To cover this section, we assume that you have an open terminal and that you have retreived the sources with one of the two options described in [section above](#obtaining).  The _root_ directory has the following structure:
-
 ```
-T-Flows/
+(root)/
 ├── Binaries
 ├── Documentation
 ├── license
@@ -130,9 +129,11 @@ T-Flows/
 ├── Sources
 └── Tests
 ```
+> **_Note:_** Remebre, (root) is the name of the directory to which you cloned or unzipped the sources.  
+
 The sub-folders have self-explanatory names and we believe that it is only worth mentioning that directory ```Binaries``` will contain executable files.  If you check the contents of the ```Sources``` sub-folder, it will reveal the following structure:
 ```
-T-Flows-Matrix/Sources/
+(root)/Sources/
 ├── Convert
 ├── Divide
 ├── Generate
@@ -141,9 +142,13 @@ T-Flows-Matrix/Sources/
 ├── Shared
 └── Utilities
 ```
-which needs additional explanation.  T-Flows entails four sub-programs called: _Generate_, _Convert_, _Divide_ and _Process_, whose sources lie in corresponding sub-directory names.  Directory ```Shared``` contains sources (by end large Fortran 2008 classes) which are shared by all the programs mentioned above.  Directory ```Libraries``` contains third party libraries and, at the time of writing this manual, contains only [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) libraries for domain decomposition with _Divide_.  Folder ```Utilities``` contains small utilities and prototype procedures used to test some basic concepts.
+which needs a bit more attention.  T-Flows entails four sub-programs called: _Generate_, _Convert_, _Divide_ and _Process_, whose sources lie in corresponding sub-directory names.  Directory ```Shared``` contains sources (by end large Fortran 2008 classes) which are shared by all the programs mentioned above.  Directory ```Libraries``` contains third party libraries and, at the time of writing this manual, contains only [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) libraries for domain decomposition with _Divide_.  Folder ```Utilities``` contains small utilities and prototype procedures used to test some basic concepts.
 
+### Sub-programs: _Generate_, _Convert_, _Divide_ and _Process_
 
+_Process_ as the name implies, has all the functionality needed to discretize flow equations on a given numerical grid, but it is no mesh generator on its own.  To provide a mesh to _Process_, you can either use the buildt-in program _Generate_, which is quite rudimentary and useful for very simple geometries, or convert a mesh from an external mesh generator (we would recommend GMSH, but any other software producing the files in Fluent's .msh format will do) using the program _Convert_.  So, as a bare minimum, you have to compile _Generate_ or _Convert_ and _Process_.
+
+Should you want to run your simulations in parallel, you will have to decompose the meshes obtained from _Generate_ or _Convert_ with the program _Divide_.  The parallel processing is not covered as of yet, we dedicate a separate section for it in the section below.
 
 
 
