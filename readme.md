@@ -80,7 +80,7 @@ The bare minimum you need to get T-Flows running is:
 
 - you are able to download T-Flows sources as a .zip file from [GitHub](https://github.com/DelNov/T-Flows)
 - you can find your way through your operating system from a terminal, you can find your path to downloaded sources and decompress them
-- you know that your operating system has make command, Fortran and C compiler, and if not, you know who to ask to install them for you
+- you know that your operating system has ```make``` command, Fortran and C compiler, and if not, you know who to ask to install them for you
 
 If you are not even on this level, T-Flows is not for you and you are just wasting your time with it.  You are better of venturing into CFD with some commercial package featuring fully fledged GUI.
 
@@ -89,7 +89,7 @@ If you are not even on this level, T-Flows is not for you and you are just wasti
 Just like in software requirements section, the minimum will only get you so far.  In order to take a better advantage of T-Flows, your background knowledge should also entail:
 
 - prudence in using Linux operating system from a terminal
-- understanding of the make command
+- understanding of the ```make``` command
 - ability to install third-party software on your computer, such as GMSH and Paraview
 - one of the high-level programming languages such as C/C++, Fortran 2003+, Python, Julia or alike
 - understanding of fluid mechanics
@@ -129,7 +129,7 @@ In any case, the local directory to which all the sources have been retrieved, w
 
 To cover this section, we assume that you have an open terminal and that you have retreived the sources with one of the two options described in [section above](#obtaining).  The _root_ directory has the following structure:
 ```
-(root)/
+[root]/
 ├── Binaries
 ├── Documentation
 ├── license
@@ -137,11 +137,11 @@ To cover this section, we assume that you have an open terminal and that you hav
 ├── Sources
 └── Tests
 ```
-> **_Note:_** Remember, (root) is the name of the directory to which you cloned or unzipped the sources.  
+> **_Note:_** Remember, [root] is the name of the directory to which you cloned or unzipped the sources.  
 
 The sub-folders have self-explanatory names and we believe that it is only worth mentioning that directory ```Binaries``` will contain executable files.  If you check the contents of the ```Sources``` sub-folder, it will reveal the following structure:
 ```
-(root)/Sources/
+[root]/Sources/
 ├── Convert
 ├── Divide
 ├── Generate
@@ -161,7 +161,7 @@ _Process_, as the name implies, has all the functionality needed to process (dis
 
 Should you want to run your simulations in parallel, you will have to decompose the meshes obtained from _Generate_ or _Convert_ with the program _Divide_.  The parallel processing is not covered here, we dedicate a separate section for it [below](#parallel_proc).  Here, we will only compile the program.
 
-The compilation of each of the sub-programs is performed in their directories (```(root)/Sources/Generate```, ```(root)/Sources/Convert```, ```(root)/Sources/Divide``` and ```(root)/Sources/Process``` by simply issuing command ```make``` in each of them.  When compiling _Convert_, for example, command ```make``` in its directory prints the following on the terminal:
+The compilation of each of the sub-programs is performed in their directories (```[root]/Sources/Generate```, ```[root]/Sources/Convert```, ```[root]/Sources/Divide``` and ```[root]/Sources/Process``` by simply issuing command ```make``` in each of them.  When compiling _Convert_, for example, command ```make``` in its directory prints the following on the terminal:
 ```
 #=======================================================================
 # Compiling Convert with compiler gnu
@@ -191,7 +191,7 @@ gfortran Load_Gmsh.f90
 gfortran Main_Con.f90
 Linking  ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r64.a ../../Binaries/Convert 
 ```
-At each invokation of the command ```make``` for any of the four programs` folders, makefile will print a header with possible options which can be passed to make.  In the above you can see that you can specify which compiler you want to use (we use almost exclusivelly gnu), wheather you want debugging information in the executable and, probably most important of all, the precision of the floating point numbers.  If you specify ```make REAL=single```, make will compile the program with 32-bit representation of floating point numbers and if you define ```make REAL=double```, it will use the 64-bit representation.  
+At each invokation of the command ```make``` for any of the four programs` folders, makefile will print a header with possible options which can be passed to ```make```.  In the above you can see that you can specify which compiler you want to use (we use almost exclusivelly gnu), wheather you want debugging information in the executable and, probably most important of all, the precision of the floating point numbers.  If you specify ```make REAL=single```, ```make``` will compile the program with 32-bit representation of floating point numbers and if you define ```make REAL=double```, it will use the 64-bit representation.  
 
 The command ```make clean``` will clean all object and module files from the local directory.
 
@@ -201,7 +201,7 @@ The command ```make clean``` will clean all object and module files from the loc
 
 > **_Warning:_** All sub-programs should be compiled with the same precision.  At the time of writing these pages, _Process_ compiled with double precision will not be able to read files created by _Convert_ in single precision.  So, decide on a precision and stick with it for all sub-programs.
 
-After you visit all four sub-directories with sources and run the ```make``` command in each, the sub-folder ```(root)/Binaries``` will have the following files:
+After you visit all four sub-directories with sources and run the ```make``` command in each, the sub-folder ```[root]/Binaries``` will have the following files:
 ```
 [root]/Binaries/
 ├── Convert
