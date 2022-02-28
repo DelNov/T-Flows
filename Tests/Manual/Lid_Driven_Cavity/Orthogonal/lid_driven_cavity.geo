@@ -1,5 +1,5 @@
 A  =  1.0;  // length and height of the cavity
-B  =  0.5;  // width of the cavity
+B  =  0.1;  // width of the cavity
 NA = 20;    // resolution in length and height
 NB =  3;    // resolution in width (periodic direction)
 
