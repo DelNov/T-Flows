@@ -5,18 +5,20 @@
     1. [Minimim](#soft_req_min)
     2. [Higlhy desirable](#soft_req_des)
     3. [Optional](#soft_req_opt)
+2. [User requirements](#user_req)
+    1. [Minimim](#user_req_min)
+    2. [Higlhy desirable](#user_req_des)
 3. [Obtaining the code](#obtaining)
 4. [Compiling the code](#compiling)
 
 
 # Introduction <a name="intro"></a>
-<br />
+
 T-Flows is a computational fluid dynamics (CFD) program for simulation of turbulent, single and multiphase flows.  Numerical method is based on collocated finite volume method on unstructured arbitrary grids and turbulence models include a range of Reynolds-averaged Navier-Stokes (RANS) models, large eddy simulations (LES), as well as hybrid RANS-LES approach.  A more comprehensive list of turbulence models is [here](https://github.com/DelNov/T-Flows/blob/bojan_petsc_solvers_almost_alpha/Documentation/Manual/turbulence_models.md).
 
 Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangian particle tracking model.  Three-phase flows situations (two fluid phases with VOF and one solid phase as particles) are also supported.
 
 > **_Note:_** In T-Flows, the Navier-Stokes equations are discretized in their _incompressible_ form, meaning _only_ that pressure and temperatures are _not_ linked through an equation of state.  All physical properties in T-Flows can be variable, but you should keep in mind that variable density does not mean compressibility.
-
 
 # Software requirements <a name="soft_req"></a>
 
@@ -33,7 +35,6 @@ t
 Although there is, in principle, no restriction on the operating system on which you can use T-Flows, its natural habitat is Linux, as we develop test it on Linux, and Linux meets the minimum software requirements either _out of the box_, or with minimum installation effort.
 
 > **_Note:_** We do not specify the minimum version for any of the required or recommended software.  We believe that if you are reading these pages, you do have access to a relatively recent hardware which also implies an up to date operating system and the associated tools.  
-
 
 ## Highly desirable software requirements <a name="soft_req_des"></a>
 
@@ -63,6 +64,34 @@ Although T-Flows comes with its own suite of linear solvers based on Krylov sub-
 
 T-Flows resides on [GitHub](www.github.com) platform, and its development is controled by git commands.  Although you can download T-Flows from GitHub as a tarball and use it locally from there on, the connection to GitHub repository gives you the possibility to _pull_ updates, report issues, _track_ your own developments, and even share with them rest of community by pushing your changes.
 
+
+# User requirements <a name="user_req"></a>
+
+There is no point in denying that successful use of a software package depends on the quality, robustness and intitivity of the software itself, but also on the level of user's experience.  This is even more true for open source software, particularly open source scientific software such as T-Flows.  So, in this section we list some background knowledge required from you in order to successfuly use T-Flows.
+
+## Minimum user requirements <a name="user_req_min"></a>
+
+The bare minimum you need to get T-Flows running is:
+
+- you can use a web browser and download a tarball from GitHub
+- you can find your way through your operating system from a terminal, you are able to create directories, change them, find downloaded files and unpack them if they are compressed
+- you know that your operating system has make command, Fortran and C compiler, and if not, you know who to ask to install them for you.
+
+If you are not on this level, T-Flows is not for you and you are just wasting your time with it.
+
+## Highly desirable user requirements <a name="user_req_des"></a>
+
+Just like in software requirements section, the minimum will only get you so far.  In order to take a better advantage of T-Flows, your background knowledge also entails:
+
+- the operating system on which you prudently manouver happens to be a Linux
+- you understanding that using a keyboard and a terminal is much faster than using a mouse and windows
+- you understand how make command works, how is the makefile organized, and that you can pass options to makefile
+- you are able to install missing software on the hardware you want to run T-Flows on
+- you have a basic understanding of one of the high-level computing languages such as C/C++, Fortran 2003+, Python, Julia or alike
+- you have basic understanding of fluid mechanics
+- you know the essence of finite volume method and how conservation equations are solved
+- you know that turbulence modelling is an important issue and you've heard about approaches such as RANS and LES
+- you know that there are many approaches to simulate multiphase flows and that VOF simulates interfaces between phases, whereas Lagrangian particle tracking is used to track individual particles in the carrier fluid.
 
 # Obtaining the code <a name="obtaining"></a>
 
