@@ -717,7 +717,11 @@ With time step set to ```0.1```, convergence is observed after 312 time steps si
                        #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
                        #---------------------------+---------------------------+---------------------------#
 ```
-That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven_cavity-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cut-plane through the middle of the domain vectors represented glyphs and pressure with a colormap.
+That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven_cavity-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cut-plane through the middle of the domain vectors represented glyphs and pressure with a colormap:
+
+![Lid-driven cavity solution!](Documentation/Manual/Figures/lid_driven_cavity_solution_050.png "Lid driven cavity solution")
+
+but you obviously have the freedom to explore other options in ParaView.
 
 #### Things to try next
 
