@@ -435,7 +435,7 @@ if you rotate the domain in ParaView, you will see something which may surprise 
 
 The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for all numerical algorithms in T-Flows.
 
-> **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computational domain.  To visualize those period pairs, one can read the file ```lid_driven_cavity.shadows.vtu```.  If plotted together with ```lid_driven_cavity.faces.vtu```, they close the domain/
+> **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computational domain.  To visualize those period pairs, one can read the file ```lid_driven_cavity.shadows.vtu```.  If plotted together with ```lid_driven_cavity.faces.vtu```, they close the domain.
 
 ### Running the simulation.  
 
