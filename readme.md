@@ -216,6 +216,8 @@ and you are ready to start your first simulations.
 
 ## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
 
+### Using orthogonal grids
+
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
 
 ![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_cavity_domain_050.png "Lid driven cavity domain")
@@ -271,6 +273,7 @@ Physical Volume("fluid", 30) = {1};
 ```
 to see that it is very readable and intuitive.  Script defines the points, the lines, a surface, extends this surface to create a volume in third dimension and finally prescribes the boundary conditions (called ```Pysical Surface``` and set to ```moving_wall```, ```static_wall``` and ```periodicity_y``` for this case.  The script is wrapped up by specifying a ```Physical Volume```, whose name is simply set to ```fluid```.
 
+Please note that GMSH comes with a GUI, and you don't have to write a script like that at all - you can create a mesh solely from GUI.  That might seem comfortable at first, but it comes with a big disadvantage, particuarly for scientific work, that it is _not_ reproducable.  However, the main strength of GMSH as we see it is that it automatically creates a script with commands you enter in GUI so that you can use it for reproducing your actions, or tuning the script for more precise adjustments.  We usually create grids in GMSH in an iterative fashion: work in the GUI for a few steps, then exit and examine the script it created or updated and make fine tuning as we please.  Another advantage of GMSH's scripting is the possibility of parametrization.  We introduced variables ```A```, ```B```, ```NA``` and ```NB``` to be able to easily change domain dimensions and resolutions.
 
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
