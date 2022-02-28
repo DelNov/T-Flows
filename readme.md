@@ -8,6 +8,7 @@
 2. [User requirements](#user_req)
     1. [Minimim](#user_req_min)
     2. [Higlhy desirable](#user_req_des)
+    3. [Perfect](#user_req_per)
 3. [Obtaining the code](#obtaining)
 4. [Compiling the code](#compiling)
 
