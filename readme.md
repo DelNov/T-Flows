@@ -548,14 +548,10 @@ Please read through it, it gives a lots of explanations which are probably not w
 
 remove all non-essential comments and set the velocity of the moving wall to ```1.0``` in the section ```BOUNDARY_CONDITION moving_wall``` until you get this: 
 ```
-#--------------
 # Problem name
-#--------------
 PROBLEM_NAME        lid_driven_cavity
 
-#---------------------
 # Boundary conditions
-#---------------------
 BOUNDARY_CONDITION moving_wall
   TYPE             wall  (or: inflow / outflow / pressure / convective)
   VARIABLES        u     v     w     t    kin    eps    zeta     f22
@@ -570,11 +566,151 @@ BOUNDARY_CONDITION static_wall
 
 At this point, you are ready to run.  Invoke _Process_ by issing command:
 
-    ../../../../Binaries/Process
+    ../../../../Binaries/Process > out  &
     
-    
+Since _Process_ writes a lot of information on the screen while it is computing, it is useful to re-direct the output to a log file, here simply called ```out```.  We also send the process in the background with an ampersand ```&``` at the end of the command line.  Next, let's analyze the output from _Process_.  It starts with a header:
+``` 
+ #=======================================================================        
+ #                                                                               
+ #    ______________________ ____    ________  __      __  _________             
+ #    \__    ___/\_   _____/|    |   \_____  \/  \    /  \/   _____/             
+ #      |    |    |    __)  |    |    /   |   \   \/\/   /\_____  \              
+ #      |    |    |     \   |    |___/    |    \        / /        \             
+ #      |____|    \___  /   |_______ \_______  /\__/\  / /_______  /             
+ #                    \/            \/       \/      \/          \/              
+ #                      ___                                                      
+ #                     / _ \_______  _______ ___ ___                             
+ #                    / ___/ __/ _ \/ __/ -_|_-<(_-<                             
+ #                   /_/  /_/  \___/\__/\__/___/___/                             
+ #                                                                               
+ #                        Double precision mode                                  
+ #                     Compiled with PETSc solvers                               
+ #-----------------------------------------------------------------------
+```
+which gives two important pieces of information at the end: that the _Process_ was compiled in 64-bit representation of floating point numbers (```Double precision mode```) and that it was linked with PETSc libraries (```Compiled with PETSc solvers```).  What follows is a bunch of parameters it reads from the ```control``` file, and it is generally worth observing the lines such as (some are ommited):
+```
+ # NOTE! Could not find the keyword: NUMBER_OF_TIME_STEPS. Using the default:      1200
+ # ...
+ # NOTE! Could not find the keyword: HEAT_TRANSFER. Using the default: no        
+ # ...
+ # NOTE! Could not find the keyword: TURBULENCE_MODEL. Using the default: none   
+ # NOTE! Could not find the keyword: INTERFACE_TRACKING. Using the default: no    
+ # NOTE! Could not find the keyword: PARTICLE_TRACKING. Using the default: no    
+ # NOTE! Could not find the keyword: TIME_STEP. Using the default: 1.000E-02     
+```    
+At this point, most important is that, because neither the number of time steps nor the time step is prescribed in ```control``` file, it sets them to default values of ```1200``` and ```1.0E-2``` respectivelly.
 
+Each time step performed by _Process_ prints some information on convergence of solution procedure, and it looks as follows:
+```
+                                         #===============================================#
+                                         #                                               #
+                                         #              Time step :    131               #
+                                         #                                               #
+                                         #    Simulation time : 1.310E+00 [s]            #
+                                         #    Wall-clock time : 000:00:02 [hhh:mm:ss]    #
+                                         #                                               #
+                                         #-----------------------------------------------#
+                                                                                 
+  #=============================================================================================================================#
+  #                                                        Iteration:  1                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  2 2.966E-08 | V   :  0 0.000E+00 | W   :  2 4.583E-09 | PP  : 14 7.786E-07 | MASS:    1.476E-08 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  2                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  2 1.390E-08 | V   :  0 0.000E+00 | W   :  2 2.981E-09 | PP  : 14 8.401E-07 | MASS:    1.706E-08 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  2 6.594E-09 | V   :  0 0.000E+00 | W   :  1 7.434E-07 | PP  : 14 7.609E-07 | MASS:    1.528E-08 |                    #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 1.602E-01    |    Maximum Peclet number: 4.006E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x :  0.000E+00    |    Flux y :  -1.49E-10    |    Flux z :   0.00E+00    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       #---------------------------+---------------------------+---------------------------#
+```
+In the header, it shows the current time step, current simulation (numerical) time and elapsed wall-clock time.  That is followed by information on achieved convergence within each time step.  The equations being solved for this case are three velocity components (```U```, ```V``` and ```W```) and pressure correction (```PP```).  For each of them it shows number of iterations performed in linear solver (the small integer values), as well as the final residual achieved (the number written in exponential form).  The footer shows the maximum Courant and Peclet number at the end of the time step, as well as global fluxes and pressure drops in the current time step.  For this simulation, global fluxes and pressure drops are of no relevance, but maximum Courant number gives us insight about convergence.  If it grows beyond a hundred, we will likely face divergence.  
 
+Since we know that this test case reaches a steady solution in the end, we should expect number of iterations to drop to zero.  In this case, it is not quite like that.  Last performed time step shows:
+```
+                                         #===============================================#
+                                         #                                               #
+                                         #              Time step :   1200               #
+                                         #                                               #
+                                         #    Simulation time : 1.200E+01 [s]            #
+                                         #    Wall-clock time : 000:00:19 [hhh:mm:ss]    #
+                                         #                                               #
+                                         #-----------------------------------------------#
+                                                                                 
+  #=============================================================================================================================#
+  #                                                        Iteration:  1                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  1 2.462E-08 | V   :  0 0.000E+00 | W   :  1 1.886E-08 | PP  :  2 5.501E-07 | MASS:    1.053E-08 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  2                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  1 1.134E-08 | V   :  0 0.000E+00 | W   :  1 8.567E-09 | PP  :  0 0.000E+00 | MASS:    1.716E-08 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  1 5.195E-09 | V   :  0 0.000E+00 | W   :  1 3.848E-09 | PP  :  2 5.312E-07 | MASS:    1.184E-08 |                    #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 1.672E-01    |    Maximum Peclet number: 4.179E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x :  0.000E+00    |    Flux y :  -2.07E-11    |    Flux z :   0.00E+00    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       #---------------------------+---------------------------+---------------------------#
+```
+Number of iteratons are all one or two, but not quite zero yet.  So, if we want to be purists, we can't say we achieved steady state to the tolerance set by T-Flows.  In order to work around it, we could either increase the number of time steps, or the time step itself.  Since CFL is well below unity, let's re-run the simulation with ```control``` file modified as:
+```
+# Problem name                                                                   
+PROBLEM_NAME        lid_driven_cavity                                            
+                                                                                 
+# Time step                                                                      
+TIME_STEP  0.1                                                                   
+                                                                                 
+# Boundary conditions                                                            
+BOUNDARY_CONDITION moving_wall                                                   
+  TYPE             wall  (or: inflow / outflow / pressure / convective)          
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22             
+  VALUES           1.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3            
+                                                                                 
+BOUNDARY_CONDITION static_wall                                                   
+  TYPE             wall  (or: inflow / outflow / pressure / convective)          
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22             
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+```
+With time step set to ```0.1```, convergence is observed after 312 time steps:
+```
+                                         #===============================================#
+                                         #                                               #
+                                         #              Time step :    312               #
+                                         #                                               #
+                                         #    Simulation time : 3.120E+01 [s]            #
+                                         #    Wall-clock time : 000:00:05 [hhh:mm:ss]    #
+                                         #                                               #
+                                         #-----------------------------------------------#
+                                                                                 
+  #=============================================================================================================================#
+  #                                                        Iteration:  1                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 9.789E-07 | V   :  0 0.000E+00 | W   :  0 9.640E-07 | PP  :  0 0.000E+00 | MASS:    1.856E-07 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  2                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 9.789E-07 | V   :  0 0.000E+00 | W   :  0 9.640E-07 | PP  :  0 0.000E+00 | MASS:    1.856E-07 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 9.789E-07 | V   :  0 0.000E+00 | W   :  0 9.640E-07 | PP  :  0 0.000E+00 | MASS:    1.856E-07 |                    #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 1.672E+00    |    Maximum Peclet number: 4.181E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x :  0.000E+00    |    Flux y :   8.54E-11    |    Flux z :   0.00E+00    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       #---------------------------+---------------------------+---------------------------#
+```
 
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
