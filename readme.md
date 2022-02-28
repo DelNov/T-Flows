@@ -147,7 +147,7 @@ The sub-folders have self-explanatory names and we believe that it is only worth
 ├── Shared
 └── Utilities
 ```
-which needs a bit more attention.  T-Flows entails four sub-programs called: _Generate_, _Convert_, _Divide_ and _Process_, whose sources lie in corresponding sub-directory names.  Directory ```Shared``` contains sources (by end large Fortran 2008 classes) which are shared by all the programs mentioned above.  Directory ```Libraries``` contains third party libraries and, at the time of writing this manual, contains only [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) libraries for domain decomposition with _Divide_.  Folder ```Utilities``` contains small utilities and prototype procedures used to test some basic concepts.
+which needs a bit more attention.  T-Flows entails four sub-programs called: _Generate_, _Convert_, _Divide_ and _Process_, whose sources lie in corresponding sub-directory names.  Directory ```Shared``` contains sources (by end large Fortran 2008 classes) which are shared by all the programs mentioned above.  Directory ```Libraries``` contains third party libraries and, at the time of writing this manual, contains only [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) libraries for domain decomposition with _Divide_.  Folder ```Utilities``` contains small utilities and prototype procedures used to test some basic concepts and we will epxlain some of them when the need occurs.
 
 ## Sub-programs: _Generate_, _Convert_, _Divide_ and _Process_  <a name="compiling_sub_programs"></a>
 
@@ -193,4 +193,6 @@ At each invokation of the command ```make``` for any of the four programs` folde
 The command ```make clean``` will clean all object and module files from the local directory.
 
 > **_Note 1:_** You don't really have to specify ```REAL=double``` since it is the default options, as described in the information written by the makefile.
+> **_Note 2:_** The provided makefiles take care of the dependency of the sources, if you change precision in-between two compilations, you will have to run a ```make clean``` in between, to make sure that objects with 32-bit and 64-bit representation of floating points mix up.
+> **_Warning:_** All sub-programs should be compiled with the same precision.  At the time of writing these pages, _Process_ compiled with double precision will not be able to read files created by _Convert_ in single precision.
 
