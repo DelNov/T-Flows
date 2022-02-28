@@ -5,11 +5,14 @@
     1. [Minimum](#soft_req_min)
     2. [Higlhy desirable](#soft_req_des)
     3. [Optional](#soft_req_opt)
-2. [User requirements](#user_req)
+3. [User requirements](#user_req)
     1. [Minimum](#user_req_min)
     2. [Desirable](#user_req_des)
-3. [Obtaining the code](#obtaining)
-4. [Compiling the code](#compiling)
+4. [Obtaining the code](#obtaining)
+5. [Compiling the code](#compiling)
+    1. [Directory structure](#compiling_dir_struct)
+    2. [Sub-programs](#compiling_sub_progs)
+7. [Parallel processing](#parallel_proc)
 
 
 # Introduction <a name="intro"></a>
@@ -119,6 +122,8 @@ In any case, the local directory to which all the sources have been retrieved, w
 
 # Compiling the code <a name="compiling"></a>
 
+## Directory structure <a name="compiling_dir_struct"></a>
+
 To cover this section, we assume that you have an open terminal and that you have retreived the sources with one of the two options described in [section above](#obtaining).  The _root_ directory has the following structure:
 ```
 (root)/
@@ -144,11 +149,11 @@ The sub-folders have self-explanatory names and we believe that it is only worth
 ```
 which needs a bit more attention.  T-Flows entails four sub-programs called: _Generate_, _Convert_, _Divide_ and _Process_, whose sources lie in corresponding sub-directory names.  Directory ```Shared``` contains sources (by end large Fortran 2008 classes) which are shared by all the programs mentioned above.  Directory ```Libraries``` contains third party libraries and, at the time of writing this manual, contains only [METIS](http://glaros.dtc.umn.edu/gkhome/metis/metis/overview) libraries for domain decomposition with _Divide_.  Folder ```Utilities``` contains small utilities and prototype procedures used to test some basic concepts.
 
-### Sub-programs: _Generate_, _Convert_, _Divide_ and _Process_
+## Sub-programs: _Generate_, _Convert_, _Divide_ and _Process_  <a name="compiling_sub_programs"></a>
 
 _Process_ as the name implies, has all the functionality needed to discretize flow equations on a given numerical grid, but it is no mesh generator on its own.  To provide a mesh to _Process_, you can either use the buildt-in program _Generate_, which is quite rudimentary and useful for very simple geometries, or convert a mesh from an external mesh generator (we would recommend GMSH, but any other software producing the files in Fluent's .msh format will do) using the program _Convert_.  So, as a bare minimum, you have to compile _Generate_ or _Convert_ and _Process_.
 
-Should you want to run your simulations in parallel, you will have to decompose the meshes obtained from _Generate_ or _Convert_ with the program _Divide_.  The parallel processing is not covered as of yet, we dedicate a separate section for it in the section below.
+Should you want to run your simulations in parallel, you will have to decompose the meshes obtained from _Generate_ or _Convert_ with the program _Divide_.  The parallel processing is not covered here, we dedicate a separate section for it in the [section below](#parallel_proc).
 
 
 
