@@ -419,7 +419,7 @@ During the conversion process, _Convert_ creates the following files:
 
 Which will be described in this section.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with Paraview or Visit for inspection.  The most interesting is the ```lid_driven_cavity.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven_cavity.faces.vtu``` shows the following:
 
-[Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_faces_front.png "Lid driven cavity faces front")
+[Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_faces_front.png "Lid driven cavity faces front") 
 
 
 
