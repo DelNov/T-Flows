@@ -14,7 +14,7 @@ T-Flows is a computational fluid dynamics (CFD) program for simulation of turbul
 
 Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangian particle tracking model.  Three-phase flows situations (two fluid phases with VOF and one solid phase as particles) are also supported.
 
-> **_NOTE:_** In T-Flows, Navier-Stokes equations are discretized in their incompressible form, meaning only that pressure and temperatures are _not_ linked through an equation of state.  All physical properties in T-Flows can be variable, including the density.  
+> **_Note:_** In T-Flows, the Navier-Stokes equations are discretized in their _incompressible_ form, meaning _only_ that pressure and temperatures are _not_ linked through an equation of state.  All physical properties in T-Flows can be variable, but you should keep in mind that variable density does not mean compressibility.
 
 # Software requirements <a name="soft_req"></a>
 
@@ -30,9 +30,7 @@ T-Flows is almost entirely written in Fortran 2008 (only one function is written
 t
 Although there is, in principle, no restriction on the operating system on which you can use T-Flows, its natural habitat is Linux, as we develop test it on Linux, and Linux meets the minimum software requirements either _out of the box_, or with minimum installation effort.
 
-<div class="alert alert-info">
-  <i class="fas fa-info-circle"></i> <strong>Note:</strong> We do not specify the minimum version for any of the required or recommended software.  We believe that if you are reading these pages, you do have access to a relatively recent hardware which also implies an up to date operating system and the associated tools.  
-</div>
+> **_Note:_** We do not specify the minimum version for any of the required or recommended software.  We believe that if you are reading these pages, you do have access to a relatively recent hardware which also implies an up to date operating system and the associated tools.  
 
 ## Highly desirable software requirements <a name="soft_req_des"></a>
 
