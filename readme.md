@@ -160,5 +160,36 @@ Should you want to run your simulations in parallel, you will have to decompose 
 
 The compilation of each of the sub-programs is performed in their directories (```(root)/Sources/Generate```, ```(root)/Sources/Convert```, ```(root)/Sources/Divide``` and ```(root)/Sources/Process``` by simply issuing command ```make``` in each of them.  When compiling _Convert_, for example, command ```make``` in its directory prints the following on the terminal:
 ```
+#=======================================================================
+# Compiling Convert with compiler gnu
+#-----------------------------------------------------------------------
+# Usage:                                                                
+#   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> OPENMP=<no/yes>      
+#        <REAL=double/single>                                           
+#                                                                       
+# Note: The first item, for each of the options above, is the default.  
+#                                                                       
+# Examples:                                                             
+#   make              - compile with gnu compiler                       
+#   make FORTAN=intel - compile with intel compiler                     
+#   make DEBUG=yes    - compile with gnu compiler in debug mode         
+#   make OPENMP=yes   - compile with gnu compiler for parallel Convert  
+#-----------------------------------------------------------------------
+gfortran ../Shared/Const_Mod.f90
+gfortran ../Shared/Comm_Mod_Seq.f90
+gfortran ../Shared/Math_Mod.f90
+gfortran ../Shared/File_Mod.f90
+...
+...
+gfortran Load_Fluent.f90
+gfortran Load_Gmsh.f90
+...
+...
+gfortran Main_Con.f90
+Linking  ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r64.a ../../Binaries/Convert 
 ```
+At each invokation of the command ```make``` for any of the four programs` folders, makefile will print a header with possible options which can be passed to make.  In the above you can see that you can specify which compiler you want to use (we use almost exclusivelly gnu), wheather you want debugging information in the executable and, probably most important of all, the precision of the floating point numbers.  If you specify ```make REAL=single```, make will compile the program with 32-bit representation of floating point numbers and if you define ```make REAL=double```, it will use the 64-bit representation.  
+
+The command ```make clean``` will clean all object and module files from the local directory.
+
 
