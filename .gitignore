@@ -33,7 +33,6 @@ Tests/**/*.aux
 Tests/**/*.ps
 Tests/**/stop
 Tests/**/*pdf
-Tests/**/*png
 Tests/**/*tex
 Tests/**/*tmp
 __pycache__
