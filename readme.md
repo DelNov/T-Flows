@@ -112,15 +112,16 @@ This set of desirable user background knowledge is a bit on the exhaustive side 
 # Obtaining the code <a name="obtaining"></a>
 
 The code resides on Github, more preciselly here [T-Flows@Github](https://github.com/DelNov/T-Flows).  You can either download just the zipped sources (from the "Code" dropdown menu, or use git in your terminal to retrive the sources under the git version control system:
-
-    git clone https://github.com/DelNov/T-Flows
+```
+git clone https://github.com/DelNov/T-Flows
+```
 
 > **_Tip 1:_** We strongly recommend the latter approach as git will track all the changes you do to the code and give you access to all possibilities offered by git suite of commands.
 
 If you are using the git command, you might even specify the name of the local directory where you want all the sources to be retrived, for example:
-
-    git clone https://github.com/DelNov/T-Flows  T-Flows-Let-Me-Check-If-It-Works
-
+```
+git clone https://github.com/DelNov/T-Flows  T-Flows-Let-Me-Check-If-It-Works
+```
 In any case, the local directory to which all the sources have been retrieved, will be referred to as _root_ from this point in the manual on.
 
 # Compiling the code <a name="compiling"></a>
@@ -280,18 +281,20 @@ to see that it is very readable and intuitive.  Script defines the points, the l
 > **_Warning:_** It is easy to forget to specify the ```Physical Volume``` in GMSH which is a pitfall, because if you don't do it, it will only export surface mesh blocking T-Flows in discretizing equations through volumes.
 
 Since the script for GMSH is ready, you can run it from command line with this command:
-
-    gmsh -3 lid_driven_cavity.geo
-
+```
+gmsh -3 lid_driven_cavity.geo
+```
 which will, after a few instances, create the file:
-
-    lid_driven_cavity.msh
+```
+lid_driven_cavity.msh
+```
 
 #### Converting the mesh to T-Flows format
 
 Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
-
-    ../../../../Binaries/Convert
+```
+../../../../Binaries/Convert
+```
 
 which will prompt you with the screen:
 ```
@@ -543,8 +546,9 @@ BOUNDARY_CONDITION static_wall
 #-----------------------------------------------------------
 ```
 Please read through it, it gives a lots of explanations which are probably not worth repeating here.  We will cover different options in subsequent sections of this manual.  For the sake of shorteness, copy the templated control file to just ```control``` file with:
-
-    cp  control_template_for_lid_driven_cavity  control
+```
+cp  control_template_for_lid_driven_cavity  control
+```
 
 remove all non-essential comments and set the velocity of the moving wall to ```1.0``` in the section ```BOUNDARY_CONDITION moving_wall``` until you get this: 
 ```
@@ -565,9 +569,10 @@ BOUNDARY_CONDITION static_wall
 ```
 
 At this point, you are ready to run.  Invoke _Process_ by issing command:
+```
+../../../../Binaries/Process > out  &
+```
 
-    ../../../../Binaries/Process > out  &
-    
 Since _Process_ writes a lot of information on the screen while it is computing, it is useful to re-direct the output to a log file, here simply called ```out```.  We also send the process in the background with an ampersand ```&``` at the end of the command line.  Next, let's analyze the output from _Process_.  It starts with a header:
 ``` 
  #=======================================================================        
