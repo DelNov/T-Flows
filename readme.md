@@ -711,7 +711,64 @@ With time step set to ```0.1```, convergence is observed after 312 time steps si
                        #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
                        #---------------------------+---------------------------+---------------------------#
 ```
+That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven_cavity-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cutplane through the middle of the domain vectors represented glyphs and pressure with a colormap.
 
+#### Things to try next
+
+##### Refining the grid
+
+This grid was rather coarse, only 20 x 20 cells in the cross plane, and three rows of cells in the spanwise direction.  Since spanwise direction is periodic, it doesn't make sense in it, but you can refine in other directions.  To that end, you should modifiy the ```lid_driven_cavity.geo``` file in line which currently reads:
+```
+NA = 20;    // resolution in length and height
+```
+to:
+```
+NA = 40;    // resolution in length and height
+```
+After that, you should:
+- Re-run GMSH with: ```gmsh -3 lid_driven_cavity.geo```
+- Re-run _Convert_ with the newly created ```lid_driven_cavity.msh``` file
+- Re-Run _Process_ with ```../../../../Binaries/Process > out_finer_mesh  &```
+
+and see how the results look on a refined mesh.  You can carry on my increasing the parameter ```NA``` to 80, 160, or even higher values.
+
+#### Typical workflow
+
+The sequence outlined above represents a typical workflow in T-Flows, hence:
+1. Set or modify parameters in ```.geo``` file
+2. Re-run GMSH
+3. Re-run _Convert_ to get the files in the T-Flows format
+4. Re-run the simulation
+5. Check results, go back to step 1, if further improvements are needed.
+
+#### Advice on speeding up the conversion
+
+Since in the workflow outline above, entering values into _Convert_ every time you run can become tedious, you can speed up the process by creating a special file, we call it ```convert.scr``` which contains all the answers you give to _Convert_.  In this particular case, the file ```convert.scr``` would look like:
+```
+lid_driven_cavity.msh
+no
+skip
+2
+3
+skip
+skip
+skip
+```
+Once you have this file, you can invoke _Convert_ with:
+```
+../../../../Binaries/Convert < convert.scr
+```
+and don't have to type anything.
+
+#### A hack to shorten those paths
+
+The T-Flows directory structure, test cases are many and are cathegorized in many directories and their directiries.  Invoking executables such as _Convert_ and _Process_ can be tedious and error prone with all those dots and slashes before the executable name.  In order to avoid it, directory ```[root]/Sources/Utilites``` holds a bash script called ```seek_binaries.sh```.  It is an executable script and if you place it somewhere in your path (say in ```/usr/local/bin```) every time you call it from a test directory, it will seek the executables and make soft links in your test directory.  For this particular case it will create links:
+```
+Orthogonal/
+├── Convert -> ../../../../Binaries/Convert
+└── Process -> ../../../../Binaries/Process
+```
+and from there on you can invoke them with simple ```./Convert``` and ```./Process```.
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
