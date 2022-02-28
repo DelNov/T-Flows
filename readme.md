@@ -285,11 +285,111 @@ which will, after a few instances, create the file:
 
     lid_driven_cavity.msh
     
-Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
+Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
 
     ../../../../Binaries/Convert
 
+which will prompt you with the screen:
+```
+ #=======================================================================
+ #                                                                   
+ #    ______________________ ____    ________  __      __  _________ 
+ #    \__    ___/\_   _____/|    |   \_____  \/  \    /  \/   _____/ 
+ #      |    |    |    __)  |    |    /   |   \   \/\/   /\_____  \  
+ #      |    |    |     \   |    |___/    |    \        / /        \ 
+ #      |____|    \___  /   |_______ \_______  /\__/\  / /_______  / 
+ #                    \/            \/       \/      \/          \/  
+ #                     _____                      __                 
+ #                    / ___/__  ___ _  _____ ____/ /_                
+ #                   / /__/ _ \/ _ \ |/ / -_) __/ __/                
+ #                   \___/\___/_//_/___/\__/_/  \__/                 
+ #                                                                   
+ #                         Double precision mode
+ #-----------------------------------------------------------------------
+ #================================================================
+ # Enter the name of the grid file you are importing (with ext.):
+ #----------------------------------------------------------------
+```
+Here you have to type the name of the grid with extension, hence ```lid_driven_cavity.msh```.  Many messages on the screen will follow outlining the conversion process which we won't cover now, but the _Convert_ will stop with the next question:
+```
+ #=================================================
+ # Would you like to create a dual grid? (yes/no)
+ #-------------------------------------------------
+```
+at which point you type ```no```, dual grids will be covered in the next example.  Next question _Convert_ asks you concerns geometric extents:
+```
+ #=========================================
+ # Geometric extents:                 
+ #-----------------------------------------
+ # X from:  0.000E+00  to:  1.000E+00
+ # Y from:  0.000E+00  to:  5.000E-01
+ # Z from:  0.000E+00  to:  1.000E+00
+ # Enter scaling factor for geometry: 
+ # (or skip to keep as is): 
+ #-----------------------------------------
+```
+You may wish to scale the entire geometry if, for example, you generated it in milimeters but you know that T-Flows' _Process_ works in SI units, or if you want to use scaling to change the nondimensional numbers (such as Reynolds or Rayleigh) that way.  For this case, we are not doing it, so just answer ```skip```.  Next question which _Convert_ will pose you concerns connections of boundary cells to inside cells:
+```
+ #====================================
+ # Position the boundary cell centres:
+ #------------------------------------
+ # Type 1 for barycentric placement
+ # Type 2 for orthogonal placement
+ #------------------------------------
+```
+We noticed that, in some cases, the accuracy of gradient computations is more accurate if these connections are orthogonal, so it is safe to answer with ```2```.
 
+> **_Note:_** For orthogonal grids, these boundary cell centers coincide, so it hardly matters.  It makes a difference on distorted grids.
+
+Next thing _Convert_ wil ask you about is about the periodic boundary conditions:
+```
+ #======================================================
+ # Grid currently has the following boundary conditions:
+ #------------------------------------------------------
+ #  1. MOVING_WALL                                                                     
+ #  2. STATIC_WALL                                                                     
+ #  3. PERIODIC_Y                                                                      
+ #------------------------------------------------------
+ #==============================================================
+ # Enter the ordinal number(s) of periodic-boundary condition(s)
+ # from the boundary condition list (see above)                 
+ # Type skip if there is none !                                 
+ #--------------------------------------------------------------
+```
+It lists all the boundary conditions specified in the ```.msh``` file and asks you which of those you want to set to be periodic.  In this case, you enter ```3```, because the periodicity set in GMSH to be called ```periodic_y``` is third in the list.  Since you can have peroidicity in more than one direction, _Convert_ will prompt you with the same question but with a shorter list of boundary conditions:
+```
+ #======================================================
+ # Grid currently has the following boundary conditions:
+ #------------------------------------------------------
+ #  1. MOVING_WALL                                                                     
+ #  2. STATIC_WALL                                                                     
+ #------------------------------------------------------
+ #==============================================================
+ # Enter the ordinal number(s) of periodic-boundary condition(s)
+ # from the boundary condition list (see above)                 
+ # Type skip if there is none !                                 
+ #--------------------------------------------------------------
+```
+and this time you answer ```skip```.  Finally, _Convert_ asks you about the distance from the wall calculation:
+```
+ #==================================================================
+ # Calculating distance from the walls                              
+ #------------------------------------------------------------------
+ # Type ordinal number(s) of wall or wall_flux boundary condition(s)
+ # from the boundary condition list (see above) separated by space. 
+ # Cells' centers distances to the nearest wall will be calculated 
+ # for the listed wall boundary(s).                                 
+ #                                                                  
+ # This is needed for RANS and HYBRID turbulence models as well as  
+ # for proper initialization with potential pressure-like field.    
+ #                                                                  
+ # Type skip to skip this and set wall distance to one everywhere.  
+ #------------------------------------------------------------------
+```
+Distance to the wall is important for many turbulence models as well as for problems with conjugate heat transfer.  It can be computed in two ways:
+- Geometrically from _Convert_, browsing through all inside cells and searching for nearest boundary cells which is accurate but can be time consuming for large grids, or
+- From a partial differential equation propoposed by Spalding which is done from _Process_ in cases the above step is skipped in _Convert_.  Wall distance calculation from partial differential equaton is faster for large grids, but less accurate.  However, the errors in the near wall reagions are rather small, invariantly smaller than 1%.
+For this case, let's compute them from here so you answer ```1 2``` to the above question to instruct _Convert_ which bounaries can be considered as solid walls.
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
