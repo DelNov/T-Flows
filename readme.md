@@ -134,7 +134,7 @@ To cover this section, we assume that you have an open terminal and that you hav
 ├── Sources
 └── Tests
 ```
-> **_Note:_** Remebre, (root) is the name of the directory to which you cloned or unzipped the sources.  
+> **_Note:_** Remember, (root) is the name of the directory to which you cloned or unzipped the sources.  
 
 The sub-folders have self-explanatory names and we believe that it is only worth mentioning that directory ```Binaries``` will contain executable files.  If you check the contents of the ```Sources``` sub-folder, it will reveal the following structure:
 ```
@@ -151,9 +151,14 @@ which needs a bit more attention.  T-Flows entails four sub-programs called: _Ge
 
 ## Sub-programs: _Generate_, _Convert_, _Divide_ and _Process_  <a name="compiling_sub_programs"></a>
 
-_Process_ as the name implies, has all the functionality needed to discretize flow equations on a given numerical grid, but it is no mesh generator on its own.  To provide a mesh to _Process_, you can either use the buildt-in program _Generate_, which is quite rudimentary and useful for very simple geometries, or convert a mesh from an external mesh generator (we would recommend GMSH, but any other software producing the files in Fluent's .msh format will do) using the program _Convert_.  So, as a bare minimum, you have to compile _Generate_ or _Convert_ and _Process_.
+_Process_, as the name implies, has all the functionality needed to discretize and solve flow equations on a given numerical grid, but it is not a mesh generator on its own.  To provide a mesh to _Process_, you can either use the built-in program _Generate_, which is quite rudimentary and useful for very simple geometries only, or convert a mesh from an external mesh generator (we would recommend [GMSH](https://gmsh.info), but any other software producing the files in Fluent's .msh format will do) using the program _Convert_.  So, as a bare minimum, you have to compile:
 
-Should you want to run your simulations in parallel, you will have to decompose the meshes obtained from _Generate_ or _Convert_ with the program _Divide_.  The parallel processing is not covered here, we dedicate a separate section for it in the [section below](#parallel_proc).
+1. _Generate_ or _Convert_ and
+2. _Process_
 
+Should you want to run your simulations in parallel, you will have to decompose the meshes obtained from _Generate_ or _Convert_ with the program _Divide_.  The parallel processing is not covered here, we dedicate a separate section for it [below](#parallel_proc).  Here, we will only compile the program.
 
+The compilation of each of the sub-programs is performed in their directories (```(root)/Sources/Generate```, ```(root)/Sources/Convert```, ```(root)/Sources/Divide``` and ```(root)/Sources/Process``` by simply issuing command ```make``` in each of them.  When compiling _Convert_, for example, command ```make``` in its directory prints the following on the terminal:
+```
+```
 
