@@ -46,8 +46,8 @@
   write(fu,'(a)') '# the lines below, only "wall" will be read as the type of'
   write(fu,'(a)') '# boundary conditions, everything in () braces is skipped.'
   write(fu,'(a)') '#'
-  write(fu,'(a)') '# The same holds for the valuse listed.  If simulation is'
-  write(fu,'(a)') '# laminar or LES, T-Flows will skip the valies for "k",'
+  write(fu,'(a)') '# The same holds for the values listed.  If simulation is'
+  write(fu,'(a)') '# laminar or LES, T-Flows will skip the values for "k",'
   write(fu,'(a)') '# "eps", "zeta" and "f22"'
   write(fu,'(a)') '#-----------------------------------------------------------'
 
