@@ -11,6 +11,7 @@
 
 
 # Introduction <a name="intro"></a>
+<br />
 
 T-Flows is a computational fluid dynamics (CFD) program for simulation of turbulent, single and multiphase flows.  Numerical method is based on collocated finite volume method on unstructured arbitrary grids and turbulence models include a range of Reynolds-averaged Navier-Stokes (RANS) models, large eddy simulations (LES), as well as hybrid RANS-LES approach.  A more comprehensive list of turbulence models can be found [here](./Documentation/Manual/turbulence_models.md).
 
@@ -21,6 +22,7 @@ Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangi
 
 
 # Software requirements <a name="soft_req"></a>
+<br />
 
 ## Minimum software requirements <a name="soft_req_min"></a>
 
@@ -38,6 +40,7 @@ Although there is, in principle, no restriction on the operating system on which
 <br />
 
 ## Highly desirable software requirements <a name="soft_req_des"></a>
+<br />
 
 Although without meeting the minimum software requirements listed above you will not get anywhere, they alone will not get you very far either.  To make a practical use of T-Flows, it is highly desirable that you also have the following:
 
@@ -52,6 +55,7 @@ From its beginnings, T-Flows was developed for parallel execution with Message P
 <br />
 
 ## Optional software packages <a name="soft_req_opt"></a>
+<br />
 
 The following packages are not essential to T-Flows, but could prove to be very useful if you become and experienced user, or even developer:
 
@@ -67,5 +71,8 @@ T-Flows resides on [GitHub](www.github.com) platform, and its development is con
 <br />
 
 # Obtaining the code <a name="obtaining"></a>
+<br />
 
 # Compiling the code <a name="compiling"></a>
+<br />
+
