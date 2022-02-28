@@ -2,7 +2,7 @@
 
 1. [Introduction](#intro)
 2. [Software requirements](#soft_req)
-    1. [Minimim](#soft_req_min)
+    1. [Minimum](#soft_req_min)
     2. [Higlhy desirable](#soft_req_des)
     3. [Optional](#soft_req_opt)
 2. [User requirements](#user_req)
@@ -74,42 +74,44 @@ There is no point in denying that successful use of a software package depends o
 
 The bare minimum you need to get T-Flows running is:
 
-- you can use a web browser and download a tarball from GitHub
-- you can find your way through your operating system from a terminal, you are able to create directories, change them, find downloaded files and unpack them if they are compressed
-- you know that your operating system has make command, Fortran and C compiler, and if not, you know who to ask to install them for you.
+- you are able to download T-Flows sources as a .zip file from [GitHub](https://github.com/DelNov/T-Flows)
+- you can find your way through your operating system from a terminal, you can find your path to downloaded sources and decompress them
+- you know that your operating system has make command, Fortran and C compiler, and if not, you know who to ask to install them for you
 
-If you are not on this level, T-Flows is not for you and you are just wasting your time with it.
+If you are not even on this level, T-Flows is not for you and you are just wasting your time with it.  You are better of venturing into CFD with some commercial package featuring fully fledged GUI.
 
-## Highly desirable user requirements <a name="user_req_des"></a>
+## Desirable user requirements <a name="user_req_des"></a>
 
-Just like in software requirements section, the minimum will only get you so far.  In order to take a better advantage of T-Flows, your background knowledge also entails:
+Just like in software requirements section, the minimum will only get you so far.  In order to take a better advantage of T-Flows, your background knowledge should also entail:
 
-- the operating system on which you prudently manouver happens to be a Linux
-- you understand that using a keyboard and a terminal is much faster than using a mouse and windows
-- you understand how make command works, how is the makefile organized, and that you can pass options to makefile
-- you are able to install missing software on the computer you want to run T-Flows on
-- you have a basic understanding of one of the high-level programming languages such as C/C++, Fortran 2003+, Python, Julia or alike
-- you have basic understanding of fluid mechanics
-- you know the essence of finite volume method and how conservation equations are numerically solved and linked
-- you know that turbulence modelling is an important part of CFD and you've heard about approaches such as RANS and LES
-- you know that there are many approaches to simulate multiphase flows and that VOF simulates interfaces between phases, whereas Lagrangian particle tracking is used to track individual particles in the carrier fluid.
+- prudence in using Linux operating system from a terminal
+- understanding of the make command
+- ability to install third-party software on your computer, such as GMSH and Paraview
+- one of the high-level programming languages such as C/C++, Fortran 2003+, Python, Julia or alike
+- understanding of fluid mechanics
+- essence of finite volume method and how conservation equations are numerically solved and linked
+- the basic approaches in turbulence modelling, relative merits of RANS and LES and reasons why hybrid RANS/LES are being used
+- approaches to multiphase flows descriptions, in particular VOF for flows with resolved interfaces and Lagrangian particle tracking for flows laden with particles
 
-## Perfect user requirements <a name="user_req_per"></a>
+Ideally, when opting for open-source CFD code such as T-Flows, you should also be:
 
-You will take the best advantage of T-Flows if, in addition to the requirements listed so far, the following is also true:
+- eager to see how all components of a CFD program, hence the numerical methods, physical models and linear solvers, are implemented in an unstructured finite volume solver
+- able to understand the essence of object-oriented code architecture
+- familiar with single-program multiple-data (SPMD) programming paradigm and MPI commands
+- version control system with git command
+- drive to modify the sources of the program you are using, either in an attempt to improve it or to implement new features be it physical models or numerical methods and algorithms
+- ready to adhere to coding standards laid down by T-Flows core development
+- willing to share your developments with the rest of the scientific community through GitHub platform
 
-- you are eager to see how all components of a CFD program, hence the numerical methods, physical models and linear solvers, are implemented in an unstructured finite volume solver
-- you are not a stranger to an object-oriented architecture of the code
-- you are familiar with single-program multiple-data (SPMD) programming paradigm and understand MPI commands
-- you are eager to modify the program you are using, either in an attempt to improve it or implement new features be it physical models or numerical algorithms
-- you underestand that deviationg from coding standards laid down by T-Flows core development team is _not_ creativity.
-- you are ready to share your developments with the rest of the scientific community through GitHub platform
-- you believe that counting from one is more intuitive than counting from zero
-- you are aware that Fortran is passing arguments by reference, but you think this notion is better than constant contemplations at each function call if you should pass by value, by pointer or by reference.
-- 
+This set of desirable user background knowledge should not all be met, but the more you know, the better you will be of.  In full openess, not all members of T-Flows core development team are experts in all of these fields, but through organized team work we are covering them all.  Even if you don't posess all of the desirable background knowledge, we hope that you will broaden your knowledge through the use of T-Flows.
 
 # Obtaining the code <a name="obtaining"></a>
 
+The code resides on Github, more preciselly here [T-Flows@Github](https://github.com/DelNov/T-Flows).  You can either download just the zipped sources (from the "Code" dropdown menu, or use git in your terminal to retrive the sources under the git version control system:
+
+    git clone https://github.com/DelNov/T-Flows
+
+> **_Tip:_** We strongly recommend the latter approach as git will track all the changes you do to the code and give you access to all possibilities offered by git suite of commands.
 
 # Compiling the code <a name="compiling"></a>
 
