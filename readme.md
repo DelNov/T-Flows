@@ -216,8 +216,6 @@ and you are ready to start your first simulations.
 
 ## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
 
-### Using orthogonal grids
-
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
 
 ![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_cavity_domain_050.png "Lid driven cavity domain")
@@ -231,7 +229,11 @@ We will use this case to introduce a few new concepts in T-Flows:
 - running the simulation and adjusting the control file
 - visualization of results
 
-In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```.  There you will find the following files:
+### Using orthogonal grids
+
+#### Creating the mesh
+
+We start with a grid build from orthogonal hexahedral cell. In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```.  There you will find the following files:
 * ```lid_driven_cavity.geo```
 * ```lid_driven_cavity.msh```
 
@@ -284,7 +286,9 @@ Since the script for GMSH is ready, you can run it from command line with this c
 which will, after a few instances, create the file:
 
     lid_driven_cavity.msh
-    
+
+#### Converting the mesh to T-Flows format
+
 Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
 
     ../../../../Binaries/Convert
@@ -410,6 +414,10 @@ Which will be described in the following.  Before it ends, _Convert_ will ask yo
  # (x, y, z, rx, ry, rz or skip)
  # -------------------------------------------
 ```
+#### Analyzing the results of the _Convert_
+
+
+
 which is important for computation of turbulent flows and described below.  For the time being, feel free to answer with a ```skip```.
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
