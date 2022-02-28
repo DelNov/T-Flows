@@ -421,6 +421,17 @@ Which will be described in this section.  Files with extension ```.cfn``` and ``
 
 [Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_faces_front.png "Lid driven cavity faces front") 
 
+which reveals boundary conditions for this case, which range from zero (internal cells) through one and two, which are the ordinal numbers which are used to store boundary conditions.
+
+> **_Note:_** Don't worry, you won't have to deal with these numbers later on, just with strings you were using with GMSH to describe boundary conditions.  The reason you see them here is because ParaView can't plot strings as results to the best of our knowledge.
+
+if you rotate the domain in ParaView, you will see something which may surprise you at first:
+
+[Lid-driven cavity faces back!](Documentation/Manual/Figures/lid_driven_cavity_faces_back.png "Lid driven cavity faces back") 
+
+The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but stil have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for all numerical algoritms in T-Flows.
+
+> **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computioal domain.  To visualize those period pairs, one can read the file ```lid_driven_cavity.shadows.vtu```.  If plotted together with ```lid_driven_cavity.faces.vtu```, they close the domain/
 
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
