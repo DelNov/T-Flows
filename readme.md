@@ -216,6 +216,8 @@ and you are ready to start your first simulations.
 
 ## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
 
+![The San Juan Mountains are beautiful!](./Documents/Manual/Figures/lid_driven_cavity_050.png "San Juan Mountains")
+
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
 # Parallel processing  <a name="parallel_proc"></a>
