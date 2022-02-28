@@ -216,6 +216,213 @@ and you are ready to start your first simulations.
 
 ## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
 
+It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
+
+![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_cavity_domain_050.png "Lid driven cavity domain")
+
+The flow occurs in a cavity with square cross section, in which all the walls are static except the top one which is moving.  The cavity is long enough in the spanwise direction that an assumption of two-dimensionality can be made.  The simplicity of this case is hard to beat as it occurs in one of the simplest possible domain geometries (a cube or a square in two dimensions), the fact that there are no inflow and outflow boundaries, and that there are steady laminar solutions for a range of Reynolds numbers.  Owing to its simplicity, it is well benchmarked and quite often the first test case one ever considers with a new CFD code.
+
+We will use this case to introduce a few new concepts in T-Flows:
+- conversion of a grid from GMSH with _Convert_
+- specification of periodic boundary conditions
+- setting up a control file for _Process_
+- running the simulation and adjusting the control file
+- visualization of results
+
+### Using orthogonal grids
+
+#### Creating the mesh
+
+We start with a grid build from orthogonal hexahedral cell. In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```.  There you will find the following files:
+* ```lid_driven_cavity.geo```
+* ```lid_driven_cavity.msh```
+
+The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  It is beyond the scope of this manual to teach you how to use third party software, but it's probably worth having a look at it:
+```
+A  =  1.0;  // length and height of the cavity
+B  =  0.5;  // width of the cavity
+NA = 20;    // resolution in length and height
+NB =  3;    // resolution in width (periodic direction)
+
+// Define points
+Point(1) = {0, 0, 0};  Point(2) = {A, 0, 0};
+Point(3) = {A, 0, A};  Point(4) = {0, 0, A};
+
+// Define lines
+Line(1) = {1, 2};  Line(2) = {2, 3};
+Line(3) = {3, 4};  Line(4) = {4, 1};
+
+// Define front surface
+Curve Loop(1) = {1, 2, 3, 4};  Plane Surface(1) = {1};
+
+// Set lines to transfinite
+// (+1 is because GMSH expects number of points here)
+Transfinite Curve {1, 2, 3, 4} = NA+1  Using Bump  1.0;
+
+// Set surface to be transfinite and quadrilateral
+Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
+
+// Expand in spanwise direction
+Extrude {0, B, 0} {Surface{1}; Layers {NB}; Recombine;}
+
+// Define boundary conditions
+Physical Surface("moving_wall", 27) = {21};
+Physical Surface("static_wall", 28) = {25, 13, 17};
+Physical Surface("periodic_y", 29) = {1, 26};
+
+// Define volume condition
+Physical Volume("fluid", 30) = {1};
+```
+to see that it is very readable and intuitive.  Script defines the points, the lines, a surface, extends this surface to create a volume in third dimension and finally prescribes the boundary conditions (called ```Pysical Surface``` and set to ```moving_wall```, ```static_wall``` and ```periodicity_y``` for this case.  The script is wrapped up by specifying a ```Physical Volume```, whose name is simply set to ```fluid```.
+
+> **_Note:_** GMSH comes with a GUI, and you don't have to write a script like that at all - you can create a mesh solely from GUI.  That might seem comfortable at first, but it comes with a big disadvantage, particuarly for scientific work, that it is _not_ reproducable.  However, the main strength of GMSH as we see it is that it automatically creates a script with commands you enter in GUI so that you can use it for reproducing your actions, or tuning the script for more precise adjustments.  We usually create grids in GMSH in an iterative fashion: work in the GUI for a few steps, then exit and examine the script it created or updated and make fine tuning as we please.  Another advantage of GMSH's scripting is the possibility of parametrization.  We introduced variables ```A```, ```B```, ```NA``` and ```NB``` to be able to easily change domain dimensions and resolutions.
+
+> **_Warning:_** It is easy to forget to specify the ```Physical Volume``` in GMSH which is a pitfall, because if you don't do it, it will only export surface mesh blocking T-Flows in discretizing equations through volumes.
+
+Since the script for GMSH is ready, you can run it from command line with this command:
+
+    gmsh -3 lid_driven_cavity.geo
+
+which will, after a few instances, create the file:
+
+    lid_driven_cavity.msh
+
+#### Converting the mesh to T-Flows format
+
+Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
+
+    ../../../../Binaries/Convert
+
+which will prompt you with the screen:
+```
+ #=======================================================================
+ #                                                                   
+ #    ______________________ ____    ________  __      __  _________ 
+ #    \__    ___/\_   _____/|    |   \_____  \/  \    /  \/   _____/ 
+ #      |    |    |    __)  |    |    /   |   \   \/\/   /\_____  \  
+ #      |    |    |     \   |    |___/    |    \        / /        \ 
+ #      |____|    \___  /   |_______ \_______  /\__/\  / /_______  / 
+ #                    \/            \/       \/      \/          \/  
+ #                     _____                      __                 
+ #                    / ___/__  ___ _  _____ ____/ /_                
+ #                   / /__/ _ \/ _ \ |/ / -_) __/ __/                
+ #                   \___/\___/_//_/___/\__/_/  \__/                 
+ #                                                                   
+ #                         Double precision mode
+ #-----------------------------------------------------------------------
+ #================================================================
+ # Enter the name of the grid file you are importing (with ext.):
+ #----------------------------------------------------------------
+```
+Here you have to type the name of the grid with extension, hence ```lid_driven_cavity.msh```.  Many messages on the screen will follow outlining the conversion process which we won't cover now, but the _Convert_ will stop with the next question:
+```
+ #=================================================
+ # Would you like to create a dual grid? (yes/no)
+ #-------------------------------------------------
+```
+at which point you type ```no```, dual grids will be covered in the next example.  Next question _Convert_ asks you concerns geometric extents:
+```
+ #=========================================
+ # Geometric extents:                 
+ #-----------------------------------------
+ # X from:  0.000E+00  to:  1.000E+00
+ # Y from:  0.000E+00  to:  5.000E-01
+ # Z from:  0.000E+00  to:  1.000E+00
+ # Enter scaling factor for geometry: 
+ # (or skip to keep as is): 
+ #-----------------------------------------
+```
+You may wish to scale the entire geometry if, for example, you generated it in milimeters but you know that T-Flows' _Process_ works in SI units, or if you want to use scaling to change the nondimensional numbers (such as Reynolds or Rayleigh) that way.  For this case, we are not doing it, so just answer ```skip```.  Next question which _Convert_ will pose you concerns connections of boundary cells to inside cells:
+```
+ #====================================
+ # Position the boundary cell centres:
+ #------------------------------------
+ # Type 1 for barycentric placement
+ # Type 2 for orthogonal placement
+ #------------------------------------
+```
+We noticed that, in some cases, the accuracy of gradient computations is more accurate if these connections are orthogonal, so it is safe to answer with ```2```.
+
+> **_Note:_** For orthogonal grids, these boundary cell centers coincide, so it hardly matters.  It makes a difference on distorted grids.
+
+Next thing _Convert_ wil ask you about is about the periodic boundary conditions:
+```
+ #======================================================
+ # Grid currently has the following boundary conditions:
+ #------------------------------------------------------
+ #  1. MOVING_WALL                                                                     
+ #  2. STATIC_WALL                                                                     
+ #  3. PERIODIC_Y                                                                      
+ #------------------------------------------------------
+ #==============================================================
+ # Enter the ordinal number(s) of periodic-boundary condition(s)
+ # from the boundary condition list (see above)                 
+ # Type skip if there is none !                                 
+ #--------------------------------------------------------------
+```
+It lists all the boundary conditions specified in the ```.msh``` file and asks you which of those you want to set to be periodic.  In this case, you enter ```3```, because the periodicity set in GMSH to be called ```periodic_y``` is third in the list.  Since you can have peroidicity in more than one direction, _Convert_ will prompt you with the same question but with a shorter list of boundary conditions:
+```
+ #======================================================
+ # Grid currently has the following boundary conditions:
+ #------------------------------------------------------
+ #  1. MOVING_WALL                                                                     
+ #  2. STATIC_WALL                                                                     
+ #------------------------------------------------------
+ #==============================================================
+ # Enter the ordinal number(s) of periodic-boundary condition(s)
+ # from the boundary condition list (see above)                 
+ # Type skip if there is none !                                 
+ #--------------------------------------------------------------
+```
+and this time you answer ```skip```.  Finally, _Convert_ asks you about the distance from the wall calculation:
+```
+ #==================================================================
+ # Calculating distance from the walls                              
+ #------------------------------------------------------------------
+ # Type ordinal number(s) of wall or wall_flux boundary condition(s)
+ # from the boundary condition list (see above) separated by space. 
+ # Cells' centers distances to the nearest wall will be calculated 
+ # for the listed wall boundary(s).                                 
+ #                                                                  
+ # This is needed for RANS and HYBRID turbulence models as well as  
+ # for proper initialization with potential pressure-like field.    
+ #                                                                  
+ # Type skip to skip this and set wall distance to one everywhere.  
+ #------------------------------------------------------------------
+```
+Distance to the wall is important for many turbulence models as well as for problems with conjugate heat transfer.  It can be computed in two ways:
+- Geometrically from _Convert_, browsing through all inside cells and searching for nearest boundary cells which is accurate but can be time consuming for large grids, or
+- From a partial differential equation propoposed by Spalding which is done from _Process_ in cases the above step is skipped in _Convert_.  Wall distance calculation from partial differential equaton is faster for large grids, but less accurate.  However, the errors in the near wall reagions are rather small, invariantly smaller than 1%.
+
+For this case, let's compute them from here so you answer ```1 2``` to the above question to instruct _Convert_ which bounaries can be considered as solid walls.  Before it ends, _Convert_ will ask you one more thing:
+```
+ #===========================================
+ # Creating 1d file with the node 
+ # coordinates in non-homogeneous directions 
+ #-------------------------------------------
+ # Insert non-homogeneous direction 
+ # (x, y, z, rx, ry, rz or skip)
+ # -------------------------------------------
+ 
+which is important for computation of turbulent flows and described below.  For the time being, feel free to answer with a ```skip```.
+ 
+```
+#### Analyzing the results of the _Convert_
+
+During the conversion process, _Convert_ creates the following files:
+- ```lid_driven_cavity.cfn```
+- ```lid_driven_cavity.dim```
+- ```lid_driven_cavity.vtu```
+- ```lid_driven_cavity.faces.vtu```
+- ```lid_driven_cavity.shadows.vtu```
+- ```control_template_for_lid_driven_cavity```
+
+Which will be described in this section.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with Paraview or Visit for inspection.  The most interesting is the ```lid_driven_cavity.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven_cavity.faces.vtu``` shows the following:
+
+[Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_faces_front.png "Lid driven cavity faces front")
+
+
+
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
 # Parallel processing  <a name="parallel_proc"></a>
