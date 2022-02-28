@@ -403,6 +403,9 @@ For this case, let's compute them from here so you answer ```1 2``` to the above
  # Insert non-homogeneous direction 
  # (x, y, z, rx, ry, rz or skip)
  # -------------------------------------------
+ 
+which is important for computation of turbulent flows and described below.  For the time being, feel free to answer with a ```skip```.
+ 
 ```
 #### Analyzing the results of the _Convert_
 
@@ -414,9 +417,11 @@ During the conversion process, _Convert_ creates the following files:
 - ```lid_driven_cavity.shadows.vtu```
 - ```control_template_for_lid_driven_cavity```
 
-Which will be described in this section.    
+Which will be described in this section.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with Paraview or Visit for inspection.  The most interesting is the ```lid_driven_cavity.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven_cavity.faces.vtu``` shows the following:
 
-which is important for computation of turbulent flows and described below.  For the time being, feel free to answer with a ```skip```.
+[Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_faces_front.png "Lid driven cavity faces front")
+
+
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
