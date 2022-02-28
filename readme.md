@@ -1,5 +1,5 @@
-# T-Flows
-
+# T-Flows 
+<br />
 1. [Introduction](#intro)
 2. [Software requirements](#soft_req)
     1. [Minimim](#soft_req_min)
@@ -12,7 +12,6 @@
 
 # Introduction <a name="intro"></a>
 <br />
-
 T-Flows is a computational fluid dynamics (CFD) program for simulation of turbulent, single and multiphase flows.  Numerical method is based on collocated finite volume method on unstructured arbitrary grids and turbulence models include a range of Reynolds-averaged Navier-Stokes (RANS) models, large eddy simulations (LES), as well as hybrid RANS-LES approach.  A more comprehensive list of turbulence models can be found [here](./Documentation/Manual/turbulence_models.md).
 
 Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangian particle tracking model.  Three-phase flows situations (two fluid phases with VOF and one solid phase as particles) are also supported.
@@ -25,6 +24,7 @@ Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangi
 <br />
 
 ## Minimum software requirements <a name="soft_req_min"></a>
+<br />
 
 The bare minimum to get T-Flows running entails:
 
