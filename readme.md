@@ -389,7 +389,28 @@ and this time you answer ```skip```.  Finally, _Convert_ asks you about the dist
 Distance to the wall is important for many turbulence models as well as for problems with conjugate heat transfer.  It can be computed in two ways:
 - Geometrically from _Convert_, browsing through all inside cells and searching for nearest boundary cells which is accurate but can be time consuming for large grids, or
 - From a partial differential equation propoposed by Spalding which is done from _Process_ in cases the above step is skipped in _Convert_.  Wall distance calculation from partial differential equaton is faster for large grids, but less accurate.  However, the errors in the near wall reagions are rather small, invariantly smaller than 1%.
+
 For this case, let's compute them from here so you answer ```1 2``` to the above question to instruct _Convert_ which bounaries can be considered as solid walls.
+
+After this, _Convert_ is almost done, and it creates the following files:
+- lid_driven_cavity.cfn
+- lid_driven_cavity.dim
+- lid_driven_cavity.vtu
+- lid_driven_cavity.faces.vtu
+- lid_driven_cavity.shadows.vtu
+- control_template_for_lid_driven_cavity
+
+Which will be described in the following.  Before it ends, _Convert_ will ask you one more thing:
+```
+ #===========================================
+ # Creating 1d file with the node 
+ # coordinates in non-homogeneous directions 
+ #-------------------------------------------
+ # Insert non-homogeneous direction 
+ # (x, y, z, rx, ry, rz or skip)
+ # -------------------------------------------
+```
+which is important for computation of turbulent flows and described below.  For the time being, feel free to answer with a ```skip```.
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
