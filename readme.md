@@ -440,7 +440,7 @@ The cells in the back seem to be hollow, as if they are missing the faces on per
 
 In order to run a simulation, you have to compile _Process_ as explained in [this section](#compiling_sub_programs).  In addition to that, you need a special file called ```control``` which controls all the numerical parameters (by _numerical_ we mean discretization), physical models (turbulence, multiphase, multiple domains) and linear solver parameters (either for native or PETSc, if the code was compiled with PETSc) and most importantly sets boundary condition.  Although the amount of options which can be prescribed in ```control``` file is rather big, T-Flows' _Processs_ is very flexible and for all the options which are not specified, it takes default values.  At its bare minimum, ```control``` file needs problem name specified, to know which grids to read (files ```.cfn``` and ```.dim```) and boundary conditions.
 
-In order to facilitate the setup of ``control``` files, _Convert_ and _Generate_ create a templated version of the control file for the given grid.  In this case, the templated control file is called ```control_template_for_lid_driven_cavity``` and it resides in the current directory.  Feel free to open it, because it comes with a lots of useful information:
+In order to facilitate the setup of ```control``` files, _Convert_ and _Generate_ create a templated version of the control file for the given grid.  In this case, the templated control file is called ```control_template_for_lid_driven_cavity``` and it resides in the current directory.  Feel free to open it, because it comes with a lots of useful information:
 ```
 #-----------------------------------------------------------
 # This is a minimum control file for T-Flows for the domain
