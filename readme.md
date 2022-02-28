@@ -229,7 +229,8 @@ We will use this case to introduce a few new concepts in T-Flows:
 - running the simulation and adjusting the control file
 - visualization of results
 
-In order to run this
+In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity```.  There you will find the following files:
+
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
