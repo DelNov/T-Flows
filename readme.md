@@ -230,6 +230,47 @@ We will use this case to introduce a few new concepts in T-Flows:
 - visualization of results
 
 In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity```.  There you will find the following files:
+* ```lid_driven_cavity.geo```
+* ```lid_driven_cavity.msh```
+
+The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  It is beyond the scope of this manual to teach you how to use third party software, but it's probably worth having a look at it:
+```
+A  =  1.0;  // length and height of the cavity
+B  =  0.5;  // width of the cavity
+NA = 20;    // resolution in length and height
+NB =  3;    // resolution in width (periodic direction)
+
+// Define points
+Point(1) = {0, 0, 0};  Point(2) = {A, 0, 0};
+Point(3) = {A, 0, A};  Point(4) = {0, 0, A};
+
+// Define lines
+Line(1) = {1, 2};  Line(2) = {2, 3};
+Line(3) = {3, 4};  Line(4) = {4, 1};
+
+// Define front surface
+Curve Loop(1) = {1, 2, 3, 4};  Plane Surface(1) = {1};
+
+// Set lines to transfinite
+// (+1 is because GMSH expects number of points here)
+Transfinite Curve {1, 2, 3, 4} = NA+1  Using Bump  1.0;
+
+// Set surface to be transfinite and quadrilateral
+Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
+
+// Expand in spanwise direction
+Extrude {0, B, 0} {Surface{1}; Layers {NB}; Recombine;}
+
+// Define boundary conditions
+Physical Surface("moving_wall", 27) = {21};
+Physical Surface("static_wall", 28) = {25, 13, 17};
+Physical Surface("periodic_y", 29) = {1, 26};
+
+// Define volume condition
+Physical Volume("fluid", 30) = {1};
+```
+to see that it is very readable and intuitive.  Script defines the points, the lines, a surface, extends this surface to create a volume in third dimension and finally prescribes the boundary conditions (called ```Pysical Surface``` and set to ```moving_wall```, ```static_wall``` and ```periodicity_y``` for this case.  The script is wrapped up by specifying a ```Physical Volume```, whose name is simply set to ```fluid```.
+
 
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
