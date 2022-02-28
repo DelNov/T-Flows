@@ -218,7 +218,7 @@ and you are ready to start your first simulations.
 
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
 
-![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_cavity_domain_050.png "Lid driven cavity domain")
+![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_domain.png "Lid driven cavity domain")
 
 The flow occurs in a cavity with square cross section, in which all the walls are static except the top one which is moving.  The cavity is long enough in the spanwise direction that an assumption of two-dimensionality can be made.  The simplicity of this case is hard to beat as it occurs in one of the simplest possible domain geometries (a cube or a square in two dimensions), the fact that there are no inflow and outflow boundaries, and that there are steady laminar solutions for a range of Reynolds numbers.  Owing to its simplicity, it is well documented, often used to benchmark CFD codes and, for its simplicity, quite often the first test case one ever considers with a new CFD code.
 
@@ -241,7 +241,7 @@ We start with a grid build from orthogonal hexahedral cell. In order to run this
 The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  It is beyond the scope of this manual to teach you how to use third party software, but it's probably worth having a look at it:
 ```
 A  =  1.0;  // length and height of the cavity
-B  =  0.5;  // width of the cavity
+B  =  0.1;  // width of the cavity
 NA = 20;    // resolution in length and height
 NB =  3;    // resolution in width (periodic direction)
 
@@ -267,14 +267,16 @@ Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
 Extrude {0, B, 0} {Surface{1}; Layers {NB}; Recombine;}
 
 // Define boundary conditions
-Physical Surface("moving_wall", 27) = {21};
-Physical Surface("static_wall", 28) = {25, 13, 17};
-Physical Surface("periodic_y", 29) = {1, 26};
+Physical Surface("upper_wall", 27) = {21};
+Physical Surface("side_walls", 28) = {25, 17};
+Physical Surface("lower_wall", 29) = {13};
+Physical Surface("periodic_y", 30) = {1, 26};
 
 // Define volume condition
-Physical Volume("fluid", 30) = {1};
+Physical Volume("fluid", 31) = {1};
+
 ```
-to see that it is very readable and intuitive.  Script defines the points, the lines, a surface, extends this surface to create a volume in third dimension and finally prescribes the boundary conditions (called ```Pysical Surface``` and set to ```moving_wall```, ```static_wall``` and ```periodicity_y``` for this case.  The script is wrapped up by specifying a ```Physical Volume```, whose name is simply set to ```fluid```.
+to see that it is very readable and intuitive.  Script defines the points, the lines, a surface, extends this surface to create a volume in third dimension and finally prescribes the boundary conditions (called ```Pysical Surface``` and set to ```upper_wall```, ```side_walls```, ```lower_wall``` and ```periodicity_y``` for this case.  The script is wrapped up by specifying a ```Physical Volume```, whose name is simply set to ```fluid```.
 
 > **_Note:_** GMSH comes with a GUI, and you don't have to write a script like that at all - you can create a mesh solely from GUI.  That might seem comfortable at first, but it comes with a big disadvantage, particularly for scientific work, that it is _not_ reproducible.  However, the main strength of GMSH as we see it is that it automatically creates a script with commands you enter in GUI so that you can use it for reproducing your actions, or tuning the script for more precise adjustments.  We usually create grids in GMSH in an iterative fashion: work in the GUI for a few steps, then exit and examine the script it created or updated and make fine tuning as we please.  Another advantage of GMSH's scripting is the possibility of parametrization.  We introduced variables ```A```, ```B```, ```NA``` and ```NB``` to be able to easily change domain dimensions and resolutions.
 
@@ -354,9 +356,10 @@ Next thing _Convert_ will ask you about is about the periodic boundary condition
  #======================================================
  # Grid currently has the following boundary conditions:
  #------------------------------------------------------
- #  1. MOVING_WALL                                                                     
- #  2. STATIC_WALL                                                                     
- #  3. PERIODIC_Y                                                                      
+ #  1. UPPER_WALL
+ #  2. SIDE_WALLS
+ #  3. LOWER_WALL
+ #  4. PERIODIC_Y
  #------------------------------------------------------
  #==============================================================
  # Enter the ordinal number(s) of periodic-boundary condition(s)
@@ -364,13 +367,14 @@ Next thing _Convert_ will ask you about is about the periodic boundary condition
  # Type skip if there is none !                                 
  #--------------------------------------------------------------
 ```
-It lists all the boundary conditions specified in the ```.msh``` file and asks you which of those you want to set to be periodic.  In this case, you enter ```3```, because the periodicity set in GMSH to be called ```periodic_y``` is third in the list.  Since you can have periodicity in more than one direction, _Convert_ will prompt you with the same question but with a shorter list of boundary conditions:
+It lists all the boundary conditions specified in the ```.msh``` file and asks you which of those you want to set to be periodic.  In this case, you enter ```4```, because the periodicity set in GMSH to be called ```periodic_y``` is third in the list.  Since you can have periodicity in more than one direction, _Convert_ will prompt you with the same question but with a shorter list of boundary conditions:
 ```
  #======================================================
  # Grid currently has the following boundary conditions:
  #------------------------------------------------------
- #  1. MOVING_WALL                                                                     
- #  2. STATIC_WALL                                                                     
+ #  1. UPPER_WALL
+ #  2. SIDE_WALLS
+ #  3. LOWER_WALL
  #------------------------------------------------------
  #==============================================================
  # Enter the ordinal number(s) of periodic-boundary condition(s)
@@ -423,7 +427,7 @@ During the conversion process, _Convert_ creates the following files:
 
 Which will be described next.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with ParaView or VisIt for inspection.  The most interesting is the ```lid_driven_cavity.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven_cavity.faces.vtu``` shows the following:
 
-![Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_front_050.png "Lid driven cavity faces front")
+![Lid-driven hexa front!](Documentation/Manual/Figures/lid_driven_hexa_front.png "Lid driven hexa front")
 
 which reveals boundary conditions for this case, which range from zero (internal cells) through one and two, which are the ordinal numbers which are used to store boundary conditions.
 
@@ -431,7 +435,7 @@ which reveals boundary conditions for this case, which range from zero (internal
 
 if you rotate the domain in ParaView, you will see something which may surprise you at first:
 
-![Lid-driven cavity faces back!](Documentation/Manual/Figures/lid_driven_cavity_back_050.png "Lid driven cavity faces back")
+![Lid-driven hexa back!](Documentation/Manual/Figures/lid_driven_hexa_back.png "Lid driven hexa back")
 
 The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for all numerical algorithms in T-Flows.
 
@@ -473,12 +477,17 @@ PROBLEM_NAME        lid_driven_cavity
 # laminar or LES, T-Flows will skip the values for "k",
 # "eps", "zeta" and "f22"
 #-----------------------------------------------------------
-BOUNDARY_CONDITION moving_wall
+BOUNDARY_CONDITION upper_wall
   TYPE             wall  (or: inflow / outflow / pressure / convective)
   VARIABLES        u     v     w     t    kin    eps    zeta     f22
   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
 
-BOUNDARY_CONDITION static_wall
+BOUNDARY_CONDITION side_walls
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+BOUNDARY_CONDITION lower_wall
   TYPE             wall  (or: inflow / outflow / pressure / convective)
   VARIABLES        u     v     w     t    kin    eps    zeta     f22
   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
@@ -719,7 +728,7 @@ With time step set to ```0.1```, convergence is observed after 312 time steps si
 ```
 That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven_cavity-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cut-plane through the middle of the domain vectors represented glyphs and pressure with a colormap:
 
-![Lid-driven cavity solution!](Documentation/Manual/Figures/lid_driven_cavity_solution_with_cells_050.png "Lid driven cavity solution")
+![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "Lid driven hexa solution")
 
 but you obviously have the freedom to explore other options in ParaView.
 
@@ -779,6 +788,21 @@ Orthogonal/
 └── Process -> ../../../../Binaries/Process
 ```
 and from there on you can invoke them with simple ```./Convert``` and ```./Process```.
+
+### On polyhedral grids
+
+The only difference is that these two lines are missing in the current ```.geo``` file:
+```
+// Set surface to be transfinite and quadrilateral
+Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
+```
+meaning we do not instruct GMSH to create quadrilateral cells on the surface.  So, running the GMSH on this scritp (```gmsh -3 lid_driven.geo```) creates a computation grid like this:
+
+![Lid-driven prismatic!](Documentation/Manual/Figures/lid_driven.png "Lid driven prismatic grid")
+
+![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid driven polyhedral grid")
+
+![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid driven dual solution")
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 

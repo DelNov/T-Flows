@@ -25,9 +25,10 @@ Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
 Extrude {0, B, 0} {Surface{1}; Layers {NB}; Recombine;}
 
 // Define boundary conditions
-Physical Surface("moving_wall", 27) = {21};
-Physical Surface("static_wall", 28) = {25, 13, 17};
-Physical Surface("periodic_y", 29) = {1, 26};
+Physical Surface("upper_wall", 27) = {21};
+Physical Surface("side_walls", 28) = {25, 17};
+Physical Surface("lower_wall", 29) = {13};
+Physical Surface("periodic_y", 30) = {1, 26};
 
 // Define volume condition
-Physical Volume("fluid", 30) = {1};
+Physical Volume("fluid", 31) = {1};
