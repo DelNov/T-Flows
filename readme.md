@@ -15,7 +15,8 @@ T-Flows is a computational fluid dynamics (CFD) program for simulation of turbul
 Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangian particle tracking model.  Three-phase flows situations (two fluid phases with VOF and one solid phase as particles) are also supported.
 
 > **_Note:_** In T-Flows, the Navier-Stokes equations are discretized in their _incompressible_ form, meaning _only_ that pressure and temperatures are _not_ linked through an equation of state.  All physical properties in T-Flows can be variable, but you should keep in mind that variable density does not mean compressibility.
-  
+
+
 # Software requirements <a name="soft_req"></a>
 
 ## Minimum software requirements <a name="soft_req_min"></a>
