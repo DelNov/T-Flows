@@ -214,9 +214,9 @@ and you are ready to start your first simulations.
 
 # Test cases <a name="test_cases"></a>
 
-# Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
+## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
 
-# Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
+## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
 # Parallel processing  <a name="parallel_proc"></a>
 
