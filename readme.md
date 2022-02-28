@@ -231,7 +231,7 @@ We will use this case to introduce a few new concepts in T-Flows:
 - running the simulation and adjusting the control file
 - visualization of results
 
-In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity```.  There you will find the following files:
+In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```.  There you will find the following files:
 * ```lid_driven_cavity.geo```
 * ```lid_driven_cavity.msh```
 
@@ -285,7 +285,11 @@ which will, after a few instances, create the file:
 
     lid_driven_cavity.msh
     
-Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   
+Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
+
+    ../../../../Binaries/Convert
+
+
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
