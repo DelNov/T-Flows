@@ -6,9 +6,8 @@
     2. [Higlhy desirable](#soft_req_des)
     3. [Optional](#soft_req_opt)
 2. [User requirements](#user_req)
-    1. [Minimim](#user_req_min)
-    2. [Higlhy desirable](#user_req_des)
-    3. [Perfect](#user_req_per)
+    1. [Minimum](#user_req_min)
+    2. [Desirable](#user_req_des)
 3. [Obtaining the code](#obtaining)
 4. [Compiling the code](#compiling)
 
@@ -55,16 +54,15 @@ From its beginnings, T-Flows was developed for parallel execution with Message P
 
 The following packages are not essential to T-Flows, but could prove to be very useful if you become and experienced user, or even developer:
 
-- [grace](https://plasma-gate.weizmann.ac.il/Grace/)
+- [git](https://git-scm.com/)
 - [PETSc](https://petsc.org/release/)
-- git
-
-Visualization tools such as ParaView and VisIt are powerful, self-contained and sufficient for all sorts of post-processings, occasionally you might want to extract profiles from your solution fields and compare them agains experiments or direct numerical simulation (DNS) results, so a two-dimensional plotting software might come handy.  We find grace light particularly suitable for that purpose and many test cases which come with T-Flows, already have benchmark cases compared in xmgrace's format.
-
-Although T-Flows comes with its own suite of linear solvers based on Krylov sub-space family of methods (Incomplete Cholesky and Jacobi preonditioned CG, BiCG and  CGS), to have a better scaling with problem size, you may want to have more choice or even use algebraic multigrid preconditioners available through PETSc.  If PETSc is available on your system, T-Flows' makefiles will link with them and you will have all PETSc solvers at your disposal.
+- [grace](https://plasma-gate.weizmann.ac.il/Grace/)
 
 T-Flows resides on [GitHub](www.github.com) platform, and its development is controled by git commands.  Although you can download T-Flows from GitHub as a tarball and use it locally from there on, the connection to GitHub repository gives you the possibility to _pull_ updates, report issues, _track_ your own developments, and even share with them rest of community by pushing your changes.
 
+Although T-Flows comes with its own suite of linear solvers based on Krylov sub-space family of methods (Incomplete Cholesky and Jacobi preonditioned CG, BiCG and  CGS), to have a better scaling with problem size, you may want to have more choice or even use algebraic multigrid preconditioners available through PETSc.  If PETSc is available on your system, T-Flows' makefiles will link with them and you will have all PETSc solvers at your disposal.
+
+Visualization tools such as ParaView and VisIt are powerful, self-contained and sufficient for all sorts of post-processings, occasionally you might want to extract profiles from your solution fields and compare them agains experiments or direct numerical simulation (DNS) results, so a two-dimensional plotting software might come handy.  We find grace light particularly suitable for that purpose and many test cases which come with T-Flows, already have benchmark cases compared in xmgrace's format.
 
 # User requirements <a name="user_req"></a>
 
@@ -103,7 +101,7 @@ Ideally, when opting for open-source CFD code such as T-Flows, you should also b
 - ready to adhere to coding standards laid down by T-Flows core development
 - willing to share your developments with the rest of the scientific community through GitHub platform
 
-This set of desirable user background knowledge should not all be met, but the more you know, the better you will be of.  In full openess, not all members of T-Flows core development team are experts in all of these fields, but through organized team work we are covering them all.  Even if you don't posess all of the desirable background knowledge, we hope that you will broaden your knowledge through the use of T-Flows.
+This set of desirable user background knowledge is a bit on the exhaustive side and all the items should not met.  In full openess, not all members of T-Flows core development team are experts in all of these fields, but through organized team work we are covering them all.  Last, but maybe the most import, we hope that the usage of T-Flows will broaden your knowledge in as many of these fields as possible.
 
 # Obtaining the code <a name="obtaining"></a>
 
@@ -111,8 +109,25 @@ The code resides on Github, more preciselly here [T-Flows@Github](https://github
 
     git clone https://github.com/DelNov/T-Flows
 
-> **_Tip:_** We strongly recommend the latter approach as git will track all the changes you do to the code and give you access to all possibilities offered by git suite of commands.
+> **_Tip 1:_** We strongly recommend the latter approach as git will track all the changes you do to the code and give you access to all possibilities offered by git suite of commands.
+
+If you are using the git command, you might even specify the name of the local directory where you want all the sources to be retrived, for example:
+
+    git clone https://github.com/DelNov/T-Flows  T-Flows-Let-Me-Check-If-It-Works
+
+In any case, the local directory to which all the sources have been retrieved, will be referred to as _root_ from this point in the manual on.
 
 # Compiling the code <a name="compiling"></a>
 
+To cover this section, we assume that you have an open terminal and that you have retreived the sources with one of the two options described in [section above](#obtaining).  The _root_ directory has the following structure:
+
+```
+T-Flows/
+├── Binaries
+├── Documentation
+├── license
+├── readme.md
+├── Sources
+└── Tests
+```
 
