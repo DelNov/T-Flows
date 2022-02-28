@@ -216,7 +216,20 @@ and you are ready to start your first simulations.
 
 ## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
 
+It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
+
 ![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_cavity_domain_050.png "Lid driven cavity domain")
+
+The flow occurs in a cavity with square cross section, in which all the walls are static except the top one which is moving.  The cavity is long enough in the spanwise direction that an assumption of two-dimensionality can be made.  The simplicity of this case is hard to beat as it occurs in one of the simplest possible domain geometries (a cube or a square in two dimensions), the fact that there are no inflow and outflow boundaries, and that there are steady laminar solutions for a range of Reynolds numbers.  Owing to its simplicity, it is well benchmarked and quite often the first test case one ever considers with a new CFD code.
+
+We will use this case to introduce a few new concepts in T-Flows:
+- conversion of a grid from GMSH with _Convert_
+- specification of periodic boundary conditions
+- setting up a control file for _Process_
+- running the simulation and adjusting the control file
+- visualization of results
+
+In order to run this
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
