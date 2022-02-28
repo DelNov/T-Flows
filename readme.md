@@ -681,7 +681,7 @@ BOUNDARY_CONDITION static_wall
   VARIABLES        u     v     w     t    kin    eps    zeta     f22             
   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
 ```
-With time step set to ```0.1```, convergence is observed after 312 time steps:
+With time step set to ```0.1```, convergence is observed after 312 time steps since all iterations for all computed quantities fell to zero:
 ```
                                          #===============================================#
                                          #                                               #
