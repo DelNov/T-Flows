@@ -542,7 +542,40 @@ BOUNDARY_CONDITION static_wall
 # Documents/all_control_keywords.
 #-----------------------------------------------------------
 ```
-Please read through it, it gives a lots of explanations which are probably not worth repeating here.  We will cover different options in subsequent sections of this manual.
+Please read through it, it gives a lots of explanations which are probably not worth repeating here.  We will cover different options in subsequent sections of this manual.  For the sake of shorteness, copy the templated control file to just ```control``` file with:
+
+    cp  control_template_for_lid_driven_cavity  control
+
+remove all non-essential comments and set the velocity of the moving wall to ```1.0``` in the section ```BOUNDARY_CONDITION moving_wall``` until you get this: 
+```
+#--------------
+# Problem name
+#--------------
+PROBLEM_NAME        lid_driven_cavity
+
+#---------------------
+# Boundary conditions
+#---------------------
+BOUNDARY_CONDITION moving_wall
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           1.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+BOUNDARY_CONDITION static_wall
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+```
+
+At this point, you are ready to run.  Invoke _Process_ by issing command:
+
+    ../../../../Binaries/Process
+    
+    
+
+
+
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
