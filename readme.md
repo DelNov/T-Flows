@@ -122,13 +122,13 @@ If you are using the git command, you might even specify the name of the local d
 ```
 git clone https://github.com/DelNov/T-Flows  T-Flows-Let-Me-Check-If-It-Works
 ```
-In any case, the local directory to which all the sources have been retrieved, will be referred to as _root_ from this point in the manual on.
+In any case, the local directory to which all the sources have been retrieved, will be referred to as ```[root]``` from this point in the manual on.
 
 # Compiling the code <a name="compiling"></a>
 
 ## Directory structure <a name="compiling_dir_struct"></a>
 
-To cover this section, we assume that you have an open terminal and that you have retreived the sources with one of the two options described in [section above](#obtaining).  The _root_ directory has the following structure:
+To cover this section, we assume that you have an open terminal and that you have retreived the sources with one of the two options described in [section above](#obtaining).  The ```[root]``` directory has the following structure:
 ```
 [root]/
 ├── Binaries
