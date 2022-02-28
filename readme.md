@@ -12,6 +12,9 @@
 5. [Compiling the code](#compiling)
     1. [Directory structure](#compiling_dir_struct)
     2. [Sub-programs](#compiling_sub_progs)
+6. [Test cases](#test_cases)
+    1. [Lid-driven cavity flow](#test_cases_lid_driven_cavity)
+    2. [Thermally-driven cavity flow](#test_cases_lid_driven_cavity)
 7. [Parallel processing](#parallel_proc)
 
 
@@ -208,6 +211,12 @@ After you visit all four sub-directories with sources and run the ```make``` com
 └── readme
 ```
 and you are ready to start your first simulations.
+
+# Test cases <a name="test_cases"></a>
+
+# Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
+
+# Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
 # Parallel processing  <a name="parallel_proc"></a>
 
