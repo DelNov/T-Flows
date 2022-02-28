@@ -84,28 +84,28 @@ If you are not on this level, T-Flows is not for you and you are just wasting yo
 Just like in software requirements section, the minimum will only get you so far.  In order to take a better advantage of T-Flows, your background knowledge also entails:
 
 - the operating system on which you prudently manouver happens to be a Linux
-- you understanding that using a keyboard and a terminal is much faster than using a mouse and windows
+- you understand that using a keyboard and a terminal is much faster than using a mouse and windows
 - you understand how make command works, how is the makefile organized, and that you can pass options to makefile
-- you are able to install missing software on the hardware you want to run T-Flows on
-- you have a basic understanding of one of the high-level computing languages such as C/C++, Fortran 2003+, Python, Julia or alike
+- you are able to install missing software on the computer you want to run T-Flows on
+- you have a basic understanding of one of the high-level programming languages such as C/C++, Fortran 2003+, Python, Julia or alike
 - you have basic understanding of fluid mechanics
-- you know the essence of finite volume method and how conservation equations are numerically linked solved
-- you know that turbulence modelling is an important issue and you've heard about approaches such as RANS and LES
+- you know the essence of finite volume method and how conservation equations are numerically solved and linked
+- you know that turbulence modelling is an important part of CFD and you've heard about approaches such as RANS and LES
 - you know that there are many approaches to simulate multiphase flows and that VOF simulates interfaces between phases, whereas Lagrangian particle tracking is used to track individual particles in the carrier fluid.
 
 ## Perfect user requirements <a name="user_req_per"></a>
 
 You will take the best advantage of T-Flows if, in addition to the requirements listed so far, the following is also true:
 
-- you are eager to see how all components of a CFD simulation, hence the numerical methods, physical models and linear solvers, are implemented in an unstructured grid solver
+- you are eager to see how all components of a CFD program, hence the numerical methods, physical models and linear solvers, are implemented in an unstructured finite volume solver
 - you are not a stranger to an object-oriented architecture of the code
 - you are familiar with single-program multiple-data (SPMD) programming paradigm and understand MPI commands
-- you are eager to modify the program you are using, either in an attempt to improve it, or implement new features be it physical models or numerical algorithms
-- you are ready to follow the coding standards accepted by T-Flows core research team
+- you are eager to modify the program you are using, either in an attempt to improve it or implement new features be it physical models or numerical algorithms
+- you underestand that deviationg from coding standards laid down by T-Flows core development team is _not_ creativity.
 - you are ready to share your developments with the rest of the scientific community through GitHub platform
 - you believe that counting from one is more intuitive than counting from zero
-- you are aware that Fortran is passing arguments by reference, but you think it is better than contemplating at each function call if you should pass by value, by pointer or by reference.
-
+- you are aware that Fortran is passing arguments by reference, but you think this notion is better than constant contemplations at each function call if you should pass by value, by pointer or by reference.
+- 
 
 # Obtaining the code <a name="obtaining"></a>
 
