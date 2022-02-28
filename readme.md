@@ -277,6 +277,16 @@ to see that it is very readable and intuitive.  Script defines the points, the l
 
 > **_Warning:_** It is easy to forget to specify the ```Physical Volume``` in GMSH which is a pitfall, because if you don't do it, it will only export surface mesh blocking T-Flows in discretizing equations through volumes.
 
+Since the script for GMSH is ready, you can run it from command line with this command:
+
+    gmsh -3 lid_driven_cavity.geo
+
+which will, after a few instances, create the file:
+
+    lid_driven_cavity.msh
+    
+Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   
+
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
 # Parallel processing  <a name="parallel_proc"></a>
