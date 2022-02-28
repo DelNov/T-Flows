@@ -198,8 +198,5 @@ The command ```make clean``` will clean all object and module files from the loc
 
 > **_Warning:_** All sub-programs should be compiled with the same precision.  At the time of writing these pages, _Process_ compiled with double precision will not be able to read files created by _Convert_ in single precision.  So, decide on a precision and stick with it for all sub-programs.
 
-
-
-
-# Parallel processing  <a name="compiling_sub_programs"></a>
+# Parallel processing  <a name="parallel_proc"></a>
 
