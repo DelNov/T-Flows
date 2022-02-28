@@ -130,4 +130,19 @@ T-Flows/
 ├── Sources
 └── Tests
 ```
+The sub-folders have self-explanatory names and we believe that it is only worth mentioning that directory ```Binaries``` will contain executable files.  If you check the contents of the ```Sources``` sub-folder, it will reveal the following structure:
+```
+T-Flows-Matrix/Sources/
+├── Convert
+├── Divide
+├── Generate
+├── Libraries
+├── Process
+├── Shared
+└── Utilities
+```
+| Syntax | Description |
+| --- | ----------- |
+| Header | Title |
+| Paragraph | Text |
 
