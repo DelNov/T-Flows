@@ -34,7 +34,7 @@
   print *, '# This is needed for RANS and HYBRID turbulence models as well as  '
   print *, '# for proper initialization with potential pressure-like field.    '
   print *, '#                                                                  '
-  print *, '# Type skip to skip this and set wall distance to one everywhere.  '
+  print *, '# Type skip to skip this and set wall distance to -1.0 everywhere. '
   print *, '#------------------------------------------------------------------'
   call File % Read_Line(5)
   answer = line % tokens(1)
