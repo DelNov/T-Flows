@@ -192,4 +192,5 @@ At each invokation of the command ```make``` for any of the four programs` folde
 
 The command ```make clean``` will clean all object and module files from the local directory.
 
+> **_Note 1:_** You don't really have to specify ```REAL=double``` since it is the default options, as described in the information written by the makefile.
 
