@@ -7,6 +7,8 @@
     3. [Optional](#soft_req_opt)
 3. [Obtaining the code](#obtaining)
 4. [Compiling the code](#compiling)
+<br />
+
 
 # Introduction <a name="intro"></a>
 
@@ -16,6 +18,7 @@ Multiphase models include an algebraic volume of fluid (VOF) method and Lagrangi
 
 > **_Note:_** In T-Flows, the Navier-Stokes equations are discretized in their _incompressible_ form, meaning _only_ that pressure and temperatures are _not_ linked through an equation of state.  All physical properties in T-Flows can be variable, but you should keep in mind that variable density does not mean compressibility.
 <br />
+
 
 # Software requirements <a name="soft_req"></a>
 
@@ -32,6 +35,7 @@ t
 Although there is, in principle, no restriction on the operating system on which you can use T-Flows, its natural habitat is Linux, as we develop test it on Linux, and Linux meets the minimum software requirements either _out of the box_, or with minimum installation effort.
 
 > **_Note:_** We do not specify the minimum version for any of the required or recommended software.  We believe that if you are reading these pages, you do have access to a relatively recent hardware which also implies an up to date operating system and the associated tools.  
+<br />
 
 ## Highly desirable software requirements <a name="soft_req_des"></a>
 
@@ -44,7 +48,8 @@ Although without meeting the minimum software requirements listed above you will
 
 T-Flows is, in essence, the flow solver without any graphical user interface (GUI).  Although it comes with its own mesh generator, it is very rudimentary and an external software, either free or commercial, would be highly desirable for meshing of complex computational domains.  We regularly use GMSH and would highly recommend it for its inherent scipting ability, but if you have access to any commercial mesh generator which can export meshes in ANSYS' .msh (and .cas, this should be checked) format, that would just fine.  Having no GUI, T-Flows relies on external tools for visualisation of results.  The results are saved in .vtu, Paraview's unstructured data format, and any visualisation software which can read that format is highly desirable for post-processing of results.
 
-From its beginnings, T-Flows was developed for parallel execution with Message Passing Interface (MPI).  If you inted to run it on parallel computational platforms, you will also need an installation of OpenMPI on your system.  
+From its beginnings, T-Flows was developed for parallel execution with Message Passing Interface (MPI).  If you inted to run it on parallel computational platforms, you will also need an installation of OpenMPI on your system.
+<br />
 
 ## Optional software packages <a name="soft_req_opt"></a>
 
@@ -59,6 +64,7 @@ Visualization tools such as ParaView and VisIt are powerful, self-contained and 
 Although T-Flows comes with its own suite of linear solvers based on Krylov sub-space family of methods (Incomplete Cholesky and Jacobi preonditioned CG, BiCG and  CGS), to have a better scaling with problem size, you may want to have more choice or even use algebraic multigrid preconditioners available through PETSc.  If PETSc is available on your system, T-Flows' makefiles will link with them and you will have all PETSc solvers at your disposal.
 
 T-Flows resides on [GitHub](www.github.com) platform, and its development is controled by git commands.  Although you can download T-Flows from GitHub as a tarball and use it locally from there on, the connection to GitHub repository gives you the possibility to _pull_ updates, report issues, _track_ your own developments, and even share with them rest of community by pushing your changes.
+<br />
 
 # Obtaining the code <a name="obtaining"></a>
 
