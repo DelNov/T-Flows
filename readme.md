@@ -423,7 +423,7 @@ During the conversion process, _Convert_ creates the following files:
 
 Which will be described next.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with ParaView or VisIt for inspection.  The most interesting is the ```lid_driven_cavity.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven_cavity.faces.vtu``` shows the following:
 
-![Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_faces_front.png "Lid driven cavity faces front")
+![Lid-driven cavity faces front!](Documentation/Manual/Figures/lid_driven_cavity_front_050.png "Lid driven cavity faces front")
 
 which reveals boundary conditions for this case, which range from zero (internal cells) through one and two, which are the ordinal numbers which are used to store boundary conditions.
 
@@ -431,7 +431,7 @@ which reveals boundary conditions for this case, which range from zero (internal
 
 if you rotate the domain in ParaView, you will see something which may surprise you at first:
 
-![Lid-driven cavity faces back!](Documentation/Manual/Figures/lid_driven_cavity_faces_back.png "Lid driven cavity faces back")
+![Lid-driven cavity faces back!](Documentation/Manual/Figures/lid_driven_cavity_back_050.png "Lid driven cavity faces back")
 
 The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for all numerical algorithms in T-Flows.
 
