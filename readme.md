@@ -433,6 +433,116 @@ The cells in the back seem to be hollow, as if they are missing the faces on per
 
 > **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computioal domain.  To visualize those period pairs, one can read the file ```lid_driven_cavity.shadows.vtu```.  If plotted together with ```lid_driven_cavity.faces.vtu```, they close the domain/
 
+### Running the simulation.  
+
+In order to run a simulation, you have to compile _Process_ as explained in [this section](#compiling_sub_programs).  In addition to that, you need a special file called ```control``` which controls all the numerical parameters (by _numerical_ we mean discretization), physical models (turbulence, multiphase, multiple domains) and linear solver parameters (either for native or PETSc, if the code was compiled with PETSc) and most importantly sets boundary condition.  Although the amount of options which can be prescribed in ```control``` file is rather big, T-Flows' _Processs_ is very flexible and for all the options which are not specified, it takes default values.  At its bare minimum, ```control``` file needs problem name specified, to know which grids to read (files ```.cfn``` and ```.dim```) and boundary conditions.
+
+In order to facilitate the setup of ``control``` files, _Convert_ and _Generate_ create a templated version of the control file for the given grid.  In this case, the templated control file is called ```control_template_for_lid_driven_cavity``` and it resides in the current directory.  Feel free to open it, because it comes with a lots of useful information:
+```
+#-----------------------------------------------------------
+# This is a minimum control file for T-Flows for the domain
+# "lid_driven_cavity"
+#
+# One can use it as a staring point for defining entries
+# in T-Flows' control file.  These files are created at
+# the end of each call to Conver or Generate sub-programs.
+#
+# Each line starting with a # is, obviously, a comment.
+# Lines starting with ! or % are also skipped as comments.
+#-----------------------------------------------------------
+
+#-----------------------------------------------------------
+# Problem name must be specified and corresponds to the
+# base name (without extensions) of the grid file used.
+#-----------------------------------------------------------
+PROBLEM_NAME        lid_driven_cavity
+
+#-----------------------------------------------------------
+# Boundary conditions also must be specified and are
+# listed here, for this grid, with some dummy values
+#
+# T-Flows neglects what it doesn't need to read, so in
+# the lines below, only "wall" will be read as the type of
+# boundary conditions, everything in () braces is skipped.
+#
+# The same holds for the valuse listed.  If simulation is
+# laminar or LES, T-Flows will skip the valies for "k",
+# "eps", "zeta" and "f22"
+#-----------------------------------------------------------
+BOUNDARY_CONDITION moving_wall
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+BOUNDARY_CONDITION static_wall
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+#-----------------------------------------------------------
+# And, that's it, what is listed above is the bare minimum.
+# If nothing else is prescribed, T-Flows will take default
+# values as documented in Documents/all_control_keywords.
+#
+# Clearly, such a simulation wouldn't be very useful, so
+# in the following are some of the most essential options
+# for the control file. Simply uncomment what you need.
+#
+# All the entries (except the sub-entries such as: TYPE,
+# VARIABLES/VALUES after each of the BOUNDARY_CONDITION
+# can be inserted in any order.  T-Flows will take whatever
+# it needs, whenever it needs it.  The entire boundary
+# section may as well be at he end of the file.
+#-----------------------------------------------------------
+
+#-----------------------------------------------------------
+# Time stepping
+#-----------------------------------------------------------
+! TIME_STEP                 0.001
+! NUMBER_OF_TIME_STEPS   1200
+! RESULTS_SAVE_INTERVAL   300  (how often will it save)
+
+#-----------------------------------------------------------
+# Physical properties
+#-----------------------------------------------------------
+! MASS_DENSITY           1.0
+! THERMAL_CONDUCTIVITY   1.4e-4
+! DYNAMIC_VISCOSITY      1.0e-4
+! HEAT_CAPACITY          1.0
+
+#-----------------------------------------------------------
+# Monitoring points
+#-----------------------------------------------------------
+! NUMBER_OF_MONITORING_POINTS  4
+!   MONITORING_POINT_001       0.0  0.0  2.0
+!   MONITORING_POINT_002       0.0  0.0  2.5
+!   MONITORING_POINT_003       0.0  0.0  3.0
+!   MONITORING_POINT_004       0.0  0.0  3.5
+! POINT_FOR_MONITORING_PLANES  0.17  0.17  1.51
+
+#-----------------------------------------------------------
+# Initial condition
+#
+# These are very simular to BOUNDARY_CONDITION section above
+# and also here sub-entries VARIABLES and VALUES must be
+# specified in the given order.
+#-----------------------------------------------------------
+! INITIAL_CONDITION
+!   VARIABLES        u     v     w     t    kin    eps    zeta     f22
+!   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+#-----------------------------------------------------------
+# For flows with inlets and outlets, initialization by a
+# pressure-like potential field could prove to be useful
+#-----------------------------------------------------------
+!  POTENTIAL_INTIALIZATION      yes
+
+#-----------------------------------------------------------
+# For more customizations, check the file:
+# Documents/all_control_keywords.
+#-----------------------------------------------------------
+```
+Please read through it, it gives a lots of explanations which are probably not worth repeating here.  We will cover different options in subsequent sections of this manual.
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
 
