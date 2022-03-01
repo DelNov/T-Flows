@@ -35,4 +35,5 @@ Tests/**/stop
 Tests/**/*pdf
 Tests/**/*tex
 Tests/**/*tmp
+Tests/**/control_template_*
 __pycache__
