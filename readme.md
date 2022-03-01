@@ -789,16 +789,42 @@ Orthogonal/
 ```
 and from there on you can invoke them with simple ```./Convert``` and ```./Process```.
 
-### On polyhedral grids
+### On dual grids
 
-The only difference is that these two lines are missing in the current ```.geo``` file:
+During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Dual``` where you will find the following files:
+* ```lid_dual.geo```
+* ```convert.scr````
+
+The ```.geo``` file is almost the same as the one we used for orthhogonal grid.  If you run the two ```.geo``` files through ```diff``` command:
 ```
-// Set surface to be transfinite and quadrilateral
-Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
+diff lid_dual.geo ../Hexa/lid_driven_hexa.ge
 ```
-meaning we do not instruct GMSH to create quadrilateral cells on the surface.  So, running the GMSH on this scritp (```gmsh -3 lid_driven.geo```) creates a computation grid like this:
+you will see the following output:
+```
+> // Set surface to be transfinite and quadrilateral
+> Transfinite Surface {1} = {1, 2, 3, 4};  Recombine Surface {1};
+```
+meaning that only the line which instructs GMSH to create quadrilateral mesh is missing.  Since that is the only change and boundary conditions are exactly the same, the ```convert.scr``` is the same as in previous case, we can re-use it.
+
+Without being instructed to create quadrilateral cells, GMSH creates triangular.  If you run this script:
+```
+gmsh -3 lid_driven.geo
+```
+and convert it to T-Flows format with:
+```
+./Convert < convert.scr
+```
+it will creates a computation grid like this:
 
 ![Lid-driven prismatic!](Documentation/Manual/Figures/lid_driven.png "Lid driven prismatic grid")
+
+For a node-base numerical framework this grid looks rather descent, but T-Flows is cell-based and on grids based on triangular prisms (and tertahedra) induce:
+- poor accuracy of gradient computation which impacts the accuracy of the overall numerical scheme, and 
+- large explicit diffusion terms causing slower convergence of pressure-velocity coupling algorithm (SIMPLE or PISO in T-Flows)
+
+The disadvantage of the tetrahedral grids has been recognized long ago, and polyhedral grids have been introduced as their alternatives.  In mathematical sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  Having mentioned the duality of the two grids, it is worth briefly explaining how _Convert_ performs this.  It reads a grid with triangular prisms and/or tetrahedra in the usual way, does its conversion (finds the connectivity between cells, faces, nodes and edges it needs) and in the next step creates a graph dual of the first mesh.  This little explanation is to justify why, in order to create dual grids, you will have to answer twice as many 
+
+
 
 ![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid driven polyhedral grid")
 
