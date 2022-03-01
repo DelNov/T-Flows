@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Geometry(Grid)
+  subroutine Calculate_Geometry(Grid, ask)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
@@ -9,6 +9,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
+  integer         :: ask
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
@@ -117,28 +118,30 @@
   !   => depends on: xn, yn, zn   !
   !   <= gives:      xn, yn, zn   !
   !-------------------------------!
-  print *, '#========================================='
-  print *, '# Geometric extents:                 '
-  print *, '#-----------------------------------------'
-  print '(2(a,es10.3))', ' # X from: ', minval(Grid % xn(:)),  &
-                         '  to: ',      maxval(Grid % xn(:))
-  print '(2(a,es10.3))', ' # Y from: ', minval(Grid % yn(:)),  &
-                         '  to: ',      maxval(Grid % yn(:))
-  print '(2(a,es10.3))', ' # Z from: ', minval(Grid % zn(:)),  &
-                         '  to: ',      maxval(Grid % zn(:))
-  print *, '# Enter scaling factor for geometry: '
-  print *, '# (or skip to keep as is): '
-  print *, '#-----------------------------------------'
-  call File % Read_Line(5)
-  answer = line % tokens(1)
-  call To_Upper_Case(answer)
+  if(ask == 0) then
+    print *, '#========================================='
+    print *, '# Geometric extents:                 '
+    print *, '#-----------------------------------------'
+    print '(2(a,es10.3))', ' # X from: ', minval(Grid % xn(:)),  &
+                           '  to: ',      maxval(Grid % xn(:))
+    print '(2(a,es10.3))', ' # Y from: ', minval(Grid % yn(:)),  &
+                           '  to: ',      maxval(Grid % yn(:))
+    print '(2(a,es10.3))', ' # Z from: ', minval(Grid % zn(:)),  &
+                           '  to: ',      maxval(Grid % zn(:))
+    print *, '# Enter scaling factor for geometry: '
+    print *, '# (or skip to keep as is): '
+    print *, '#-----------------------------------------'
+    call File % Read_Line(5)
+    answer = line % tokens(1)
+    call To_Upper_Case(answer)
 
-  if( answer .ne. 'SKIP' ) then
-    read(line % tokens(1), *) factor
-    print '(a,es10.3)', ' # Scaling geometry by factor: ', factor
-    Grid % xn(:) = Grid % xn(:) * factor
-    Grid % yn(:) = Grid % yn(:) * factor
-    Grid % zn(:) = Grid % zn(:) * factor
+    if( answer .ne. 'SKIP' ) then
+      read(line % tokens(1), *) factor
+      print '(a,es10.3)', ' # Scaling geometry by factor: ', factor
+      Grid % xn(:) = Grid % xn(:) * factor
+      Grid % yn(:) = Grid % yn(:) * factor
+      Grid % zn(:) = Grid % zn(:) * factor
+    end if
   end if
 
   ! Estimate big and small
@@ -174,13 +177,17 @@
   !   => depends on: xc, yc, zc, sx, sy, sz   !
   !   <= gives:      xc, yc, zc  for c<0      !
   !-------------------------------------------!
-  print *, '#===================================='
-  print *, '# Position the boundary cell centres:'
-  print *, '#------------------------------------'
-  print *, '# Type 1 for barycentric placement'
-  print *, '# Type 2 for orthogonal placement'
-  print *, '#------------------------------------'
-  read(*,*) bou_cen
+  if(ask == 0) then
+    print *, '#===================================='
+    print *, '# Position the boundary cell centres:'
+    print *, '#------------------------------------'
+    print *, '# Type 1 for barycentric placement'
+    print *, '# Type 2 for orthogonal placement'
+    print *, '#------------------------------------'
+    read(*,*) bou_cen
+  else
+    bou_cen = 1
+  end if
 
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
@@ -260,200 +267,202 @@
   !   Phase I  ->  find the faces on periodic boundaries   !
   !                                                        !
   !--------------------------------------------------------!
-  answer = ''
-  do while(answer .ne. 'SKIP')
+  if(ask == 0) then
+    answer = ''
+    do while(answer .ne. 'SKIP')
 
-    call Grid % Print_Bnd_Cond_List()
-    n_per = 0
-    print *, '#=============================================================='
-    print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
-    print *, '# from the boundary condition list (see above)                 '
-    print *, '# Type skip if there is none !                                 '
-    print *, '#--------------------------------------------------------------'
-    call File % Read_Line(5)
-    answer = line % tokens(1)
-    call To_Upper_Case(answer)
+      call Grid % Print_Bnd_Cond_List()
+      n_per = 0
+      print *, '#=============================================================='
+      print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
+      print *, '# from the boundary condition list (see above)                 '
+      print *, '# Type skip if there is none !                                 '
+      print *, '#--------------------------------------------------------------'
+      call File % Read_Line(5)
+      answer = line % tokens(1)
+      call To_Upper_Case(answer)
 
-    if( answer .eq. 'SKIP' ) then
-      color_per = 0
-      exit
-    end if
+      if( answer .eq. 'SKIP' ) then
+        color_per = 0
+        exit
+      end if
 
-    read(line % tokens(1), *) color_per
-    if( color_per > Grid % n_bnd_cond ) then
-      print *, '# Critical error: boundary condition ', color_per,  &
-                 ' doesn''t exist!'
-      print *, '# Exiting! '
-      stop
-    end if
+      read(line % tokens(1), *) color_per
+      if( color_per > Grid % n_bnd_cond ) then
+        print *, '# Critical error: boundary condition ', color_per,  &
+                   ' doesn''t exist!'
+        print *, '# Exiting! '
+        stop
+      end if
 
-    !-----------------------------!
-    !   Find periodic direction   !
-    !-----------------------------!
-    cnt_per = 0
-    v(1:3)  = 0.0
-    ! Browse through all the faces at periodic bc
-    ! and accumulate periodic direction vector
-    do s = 1, Grid % n_faces
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(Grid % bnd_cond % color(c2) .eq. color_per) then
-          cnt_per = cnt_per + 1
+      !-----------------------------!
+      !   Find periodic direction   !
+      !-----------------------------!
+      cnt_per = 0
+      v(1:3)  = 0.0
+      ! Browse through all the faces at periodic bc
+      ! and accumulate periodic direction vector
+      do s = 1, Grid % n_faces
+        c2 = Grid % faces_c(2,s)
+        if(c2 < 0) then
+          if(Grid % bnd_cond % color(c2) .eq. color_per) then
+            cnt_per = cnt_per + 1
 
-          ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
-          if( Grid % sx(s) + Grid % sy(s) + Grid % sz(s) > 0.0 ) then
-            v(1) = v(1) + Grid % sx(s)
-            v(2) = v(2) + Grid % sy(s)
-            v(3) = v(3) + Grid % sz(s)
-          else
-            v(1) = v(1) - Grid % sx(s)
-            v(2) = v(2) - Grid % sy(s)
-            v(3) = v(3) - Grid % sz(s)
+            ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
+            if( Grid % sx(s) + Grid % sy(s) + Grid % sz(s) > 0.0 ) then
+              v(1) = v(1) + Grid % sx(s)
+              v(2) = v(2) + Grid % sy(s)
+              v(3) = v(3) + Grid % sz(s)
+            else
+              v(1) = v(1) - Grid % sx(s)
+              v(2) = v(2) - Grid % sy(s)
+              v(3) = v(3) - Grid % sz(s)
+            end if
           end if
         end if
-      end if
-    end do
-    v(1:3) = v(1:3) / cnt_per;  v(1:3) = v(1:3) / norm2(v(1:3))
-    k(1:3) = Math % Cross_Product(v(1:3), (/1.,0.,0./))
-    theta  = acos(dot_product      (v(1:3), (/1.,0.,0./)))
-    print '(A)',       ' #====================================================='
-    print '(A,3F7.3)', ' # Periodic direction vector: ', v(1:3)
-    print '(A,3F7.3)', ' # Rotational vector:       : ', k(1:3)
-    print '(A,3F7.3)', ' # Rotational angle:        : ', theta * 57.2957795131
-    print '(A)',       ' #-----------------------------------------------------'
+      end do
+      v(1:3) = v(1:3) / cnt_per;  v(1:3) = v(1:3) / norm2(v(1:3))
+      k(1:3) = Math % Cross_Product(v(1:3), (/1.,0.,0./))
+      theta  = acos(dot_product    (v(1:3), (/1.,0.,0./)))
+      print '(a)',       ' #==================================================='
+      print '(a,3f7.3)', ' # Periodic direction vector: ', v(1:3)
+      print '(a,3f7.3)', ' # Rotational vector:       : ', k(1:3)
+      print '(a,3f7.3)', ' # Rotational angle:        : ', theta * 57.2957795131
+      print '(a)',       ' #---------------------------------------------------'
 
-    !---------------------------------------------------!
-    !   Fill up helping vectors with sorting criteria   !
-    !---------------------------------------------------!
-    cnt_per = 0
-    do s = 1, Grid % n_faces
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(Grid % bnd_cond % color(c2) .eq. color_per) then
-          v_o(1) = Grid % xf(s)
-          v_o(2) = Grid % yf(s)
-          v_o(3) = Grid % zf(s)
-          v_r(1:3) = Math % Rotate_Vector(v_o(1:3), k(1:3), theta)
-          cnt_per = cnt_per + 1
-          b_coor(cnt_per) = v_r(1)*big**2 + v_r(2)*big + v_r(3)
-          b_face(cnt_per) = s
+      !---------------------------------------------------!
+      !   Fill up helping vectors with sorting criteria   !
+      !---------------------------------------------------!
+      cnt_per = 0
+      do s = 1, Grid % n_faces
+        c2 = Grid % faces_c(2,s)
+        if(c2 < 0) then
+          if(Grid % bnd_cond % color(c2) .eq. color_per) then
+            v_o(1) = Grid % xf(s)
+            v_o(2) = Grid % yf(s)
+            v_o(3) = Grid % zf(s)
+            v_r(1:3) = Math % Rotate_Vector(v_o(1:3), k(1:3), theta)
+            cnt_per = cnt_per + 1
+            b_coor(cnt_per) = v_r(1)*big**2 + v_r(2)*big + v_r(3)
+            b_face(cnt_per) = s
+          end if
         end if
-      end if
-    end do
+      end do
 
-    !-------------------------------------------!
-    !   Sort the faces at periodic boundaries   !
-    !-------------------------------------------!
-    call Sort % Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
+      !-------------------------------------------!
+      !   Sort the faces at periodic boundaries   !
+      !-------------------------------------------!
+      call Sort % Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
 
-    !---------------------------------------------!
-    !   Match the periodic faces with shadows &   !
-    !    fill up the Grid % faces_s structure     !
-    !---------------------------------------------!
-    do s = 1, cnt_per / 2
-      s1 = b_face(s)
-      s2 = b_face(s + cnt_per / 2)
-      c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
-      c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
-      c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2
-      c22 = Grid % faces_c(2,s2)  ! cell 2 for face 2
-      Grid % faces_s(s1) = s2     ! store where it was coppied from ...
-      Grid % faces_s(s2) = s1     ! ... and for the mirror face too
-      Grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
-      Grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
-      Grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
-    end do
+      !---------------------------------------------!
+      !   Match the periodic faces with shadows &   !
+      !    fill up the Grid % faces_s structure     !
+      !---------------------------------------------!
+      do s = 1, cnt_per / 2
+        s1 = b_face(s)
+        s2 = b_face(s + cnt_per / 2)
+        c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
+        c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
+        c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2
+        c22 = Grid % faces_c(2,s2)  ! cell 2 for face 2
+        Grid % faces_s(s1) = s2     ! store where it was coppied from ...
+        Grid % faces_s(s2) = s1     ! ... and for the mirror face too
+        Grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
+        Grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+        Grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+      end do
 
-    n_per = cnt_per / 2
-    print *, '# Phase I: periodic cells: ', n_per
+      n_per = cnt_per / 2
+      print *, '# Phase I: periodic cells: ', n_per
 
-    !---------------------------------!
-    !      Find periodic extents      !
-    !   (This is actually obsolete)   !
-    !---------------------------------!
-    Grid % per_x = 0.0
-    Grid % per_y = 0.0
-    Grid % per_z = 0.0
-    do s = 1, n_per
-      s1 = b_face(s)
-      s2 = b_face(s + n_per)
-      Grid % per_x = max(Grid % per_x, abs(Grid % xf(s1) - Grid % xf(s2)))
-      Grid % per_y = max(Grid % per_y, abs(Grid % yf(s1) - Grid % yf(s2)))
-      Grid % per_z = max(Grid % per_z, abs(Grid % zf(s1) - Grid % zf(s2)))
-    end do
-    print '(a38,f8.3)', ' # Periodicity in x direction         ', Grid % per_x
-    print '(a38,f8.3)', ' # Periodicity in y direction         ', Grid % per_y
-    print '(a38,f8.3)', ' # Periodicity in z direction         ', Grid % per_z
+      !---------------------------------!
+      !      Find periodic extents      !
+      !   (This is actually obsolete)   !
+      !---------------------------------!
+      Grid % per_x = 0.0
+      Grid % per_y = 0.0
+      Grid % per_z = 0.0
+      do s = 1, n_per
+        s1 = b_face(s)
+        s2 = b_face(s + n_per)
+        Grid % per_x = max(Grid % per_x, abs(Grid % xf(s1) - Grid % xf(s2)))
+        Grid % per_y = max(Grid % per_y, abs(Grid % yf(s1) - Grid % yf(s2)))
+        Grid % per_z = max(Grid % per_z, abs(Grid % zf(s1) - Grid % zf(s2)))
+      end do
+      print '(a38,f8.3)', ' # Periodicity in x direction         ', Grid % per_x
+      print '(a38,f8.3)', ' # Periodicity in y direction         ', Grid % per_y
+      print '(a38,f8.3)', ' # Periodicity in z direction         ', Grid % per_z
 
-    !-------------------------------------------------!
-    !   Compress all boundary cells by removing all   !
-    !   cells which were holding periodic condition   !
-    !-------------------------------------------------!
-    cnt_bnd = 0
-    Grid % new_c = 0
-    do c = -1, -Grid % n_bnd_cells, -1
-      if(Grid % bnd_cond % color(c) .ne. color_per) then
-        cnt_bnd = cnt_bnd + 1
-        Grid % new_c(c) = -cnt_bnd
-      end if
-    end do
-
-    ! Compress coordinates
-    do c = -1, -Grid % n_bnd_cells, -1
-      if(Grid % new_c(c) .ne. 0) then
-        Grid % xc(Grid % new_c(c)) = Grid % xc(c)
-        Grid % yc(Grid % new_c(c)) = Grid % yc(c)
-        Grid % zc(Grid % new_c(c)) = Grid % zc(c)
-       Grid % bnd_cond % color(Grid % new_c(c)) = Grid % bnd_cond % color(c)
-      end if
-    end do
-
-    ! Compress indices
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(Grid % new_c(c2) .ne. 0) then
-        Grid % faces_c(2,s) = Grid % new_c(c2)
-      end if
-    end do
-
-    Grid % n_bnd_cells = cnt_bnd
-    print *, '# Kept boundary cells: ', Grid % n_bnd_cells
-
-    !--------------------------------------------------------------------!
-    !   Remove boundary condition with color_per and compress the rest   !
-    !--------------------------------------------------------------------!
-    if(color_per < Grid % n_bnd_cond) then
-
-      ! Set the color of boundary selected to be periodic to zero
+      !-------------------------------------------------!
+      !   Compress all boundary cells by removing all   !
+      !   cells which were holding periodic condition   !
+      !-------------------------------------------------!
+      cnt_bnd = 0
+      Grid % new_c = 0
       do c = -1, -Grid % n_bnd_cells, -1
-        if(Grid % bnd_cond % color(c) .eq. color_per) then
-          Grid % bnd_cond % color(c) = 0
+        if(Grid % bnd_cond % color(c) .ne. color_per) then
+          cnt_bnd = cnt_bnd + 1
+          Grid % new_c(c) = -cnt_bnd
         end if
       end do
 
-      ! Shift the rest of the boundary cells
-      do b = 1, Grid % n_bnd_cond - 1
-        if(b .ge. color_per) then
-
-          ! Correct the names
-          Grid % bnd_cond % name(b) = Grid % bnd_cond % name (b+1)
-
-          ! Correct all boundary colors too
-          do c = -1, -Grid % n_bnd_cells, -1
-            if(Grid % bnd_cond % color(c) .eq. (b+1)) then
-              Grid % bnd_cond % color(c) = b
-            end if
-          end do
-
+      ! Compress coordinates
+      do c = -1, -Grid % n_bnd_cells, -1
+        if(Grid % new_c(c) .ne. 0) then
+          Grid % xc(Grid % new_c(c)) = Grid % xc(c)
+          Grid % yc(Grid % new_c(c)) = Grid % yc(c)
+          Grid % zc(Grid % new_c(c)) = Grid % zc(c)
+         Grid % bnd_cond % color(Grid % new_c(c)) = Grid % bnd_cond % color(c)
         end if
       end do
-    else
-      Grid % bnd_cond % name(Grid % n_bnd_cond) = ''
-    end if
-    Grid % n_bnd_cond = Grid % n_bnd_cond - 1
 
-  end do  ! while answer .ne. 'SKIP'
+      ! Compress indices
+      do s = 1, Grid % n_faces
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+        if(Grid % new_c(c2) .ne. 0) then
+          Grid % faces_c(2,s) = Grid % new_c(c2)
+        end if
+      end do
+
+      Grid % n_bnd_cells = cnt_bnd
+      print *, '# Kept boundary cells: ', Grid % n_bnd_cells
+
+      !--------------------------------------------------------------------!
+      !   Remove boundary condition with color_per and compress the rest   !
+      !--------------------------------------------------------------------!
+      if(color_per < Grid % n_bnd_cond) then
+
+        ! Set the color of boundary selected to be periodic to zero
+        do c = -1, -Grid % n_bnd_cells, -1
+          if(Grid % bnd_cond % color(c) .eq. color_per) then
+            Grid % bnd_cond % color(c) = 0
+          end if
+        end do
+
+        ! Shift the rest of the boundary cells
+        do b = 1, Grid % n_bnd_cond - 1
+          if(b .ge. color_per) then
+
+            ! Correct the names
+            Grid % bnd_cond % name(b) = Grid % bnd_cond % name (b+1)
+
+            ! Correct all boundary colors too
+            do c = -1, -Grid % n_bnd_cells, -1
+              if(Grid % bnd_cond % color(c) .eq. (b+1)) then
+                Grid % bnd_cond % color(c) = b
+              end if
+            end do
+
+          end if
+        end do
+      else
+        Grid % bnd_cond % name(Grid % n_bnd_cond) = ''
+      end if
+      Grid % n_bnd_cond = Grid % n_bnd_cond - 1
+
+    end do  ! while answer .ne. 'SKIP'
+  end if    ! ask == 0
 
   !----------------------------------------------------!
   !                                                    !

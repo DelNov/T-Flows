@@ -115,13 +115,15 @@
     !--------------------------------------!
     !   Calculate geometrical quantities   !
     !--------------------------------------!
-    call Calculate_Geometry(Grid(g))
+    call Calculate_Geometry(Grid(g), g-n_grids)  ! if zero, ask questions
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
     ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
     call Grid(g) % Sort_Cells_Smart       ()
     call Grid(g) % Sort_Faces_Smart       ()
-    call Grid(g) % Calculate_Wall_Distance()
+    if( (g-n_grids) .eq. 0) then
+      call Grid(g) % Calculate_Wall_Distance()
+    end if
     call Grid(g) % Find_Cells_Faces       ()
 
     call Grid(g) % Initialize_New_Numbers()
@@ -161,11 +163,13 @@
     call Grid(g) % Save_Vtu_Faces()
     call Grid(g) % Save_Vtu_Faces(plot_shadows=.true.)
 
-    ! Create a template control file for this domain
-    call Grid(g) % Write_Template_Control_File()
+    if( (g-n_grids) .eq. 0) then
+      ! Create a template control file for this domain
+      call Grid(g) % Write_Template_Control_File()
 
-    ! Create 1D file (used for channel or pipe flow)
-    call Probe_1d_Nodes(Grid(g))
+      ! Create 1D file (used for channel or pipe flow)
+      call Probe_1d_Nodes(Grid(g))
+    end if
 
   end do
 
