@@ -15,8 +15,8 @@
 6. [Test cases](#test_cases)
     1. [Lid-driven cavity flow](#test_cases_lid_driven)
         1. [On hexahedral grid](#test_cases_lid_driven_hexa)
-            1. [Creating the mesh](#test_cases_lid_driven_hexa_create)
-            1. [Converting the mesh](#test_cases_lid_driven_hexa_convert)
+            1. [Creating the grid](#test_cases_lid_driven_hexa_create)
+            1. [Converting the grid](#test_cases_lid_driven_hexa_convert)
         2. [On polyhedral grid](#test_cases_lid_driven_dual)
     2. [Thermally-driven cavity flow](#test_cases_thermally_driven)
 7. [Parallel processing](#parallel_proc)
@@ -52,10 +52,10 @@ Although without meeting the minimum software requirements listed above you will
 
 - [GMSH](https://gmsh.info)
 - any other free or commercial mesh generator exporting ANSYS' ```.msh``` format
-- visualization software which can read ```.vtu``` file format such as [Paraview](https://www.paraview.org/) or [VisIt](https://wci.llnl.gov/simulation/computer-codes/visit), or any tool which can read .vtu file format
+- visualization software which can read ```.vtu``` file format such as [ParaView](https://www.paraview.org/) or [VisIt](https://wci.llnl.gov/simulation/computer-codes/visit), or any tool which can read .vtu file format
 - [OpenMPI](https://www.open-mpi.org/) installation (mpif90 for compilation and mpirun for parallel processing)
 
-T-Flows is, in essence, the flow solver without any graphical user interface (GUI).  Although it comes with its own mesh generator, it is very rudimentary and an external software, either free or commercial, would be highly desirable for meshing of complex computational domains.  We regularly use GMSH and would highly recommend it for its inherent scipting ability, but if you have access to any commercial mesh generator which can export meshes in ANSYS' ```.msh``` (and .cas, this should be checked) format, that would just fine.  Having no GUI, T-Flows relies on external tools for visualisation of results.  The results are saved in ```.vtu```, Paraview's unstructured data format, and any visualisation software which can read that format is highly desirable for post-processing of results.
+T-Flows is, in essence, the flow solver without any graphical user interface (GUI).  Although it comes with its own mesh generator, it is very rudimentary and an external software, either free or commercial, would be highly desirable for meshing of complex computational domains.  We regularly use GMSH and would highly recommend it for its inherent scipting ability, but if you have access to any commercial mesh generator which can export meshes in ANSYS' ```.msh``` (and .cas, this should be checked) format, that would just fine.  Having no GUI, T-Flows relies on external tools for visualisation of results.  The results are saved in ```.vtu```, ParaView's unstructured data format, and any visualisation software which can read that format is highly desirable for post-processing of results.
 
 From its beginnings, T-Flows was developed for parallel execution with Message Passing Interface (MPI).  If you inted to run it on parallel computational platforms, you will also need an installation of OpenMPI on your system.
 
@@ -93,7 +93,7 @@ Just like in software requirements section, the minimum will only get you so far
 
 - prudence in using Linux operating system from a terminal
 - understanding of the ```make``` command
-- ability to install third-party software on your computer, such as GMSH and Paraview
+- ability to install third-party software on your computer, such as GMSH and ParaView
 - one of the high-level programming languages such as C/C++, Fortran 2003+, Python, Julia or alike
 - understanding of fluid mechanics
 - essence of finite volume method and how conservation equations are numerically solved and linked
@@ -332,7 +332,7 @@ Here you have to type the name of the grid with extension, hence ```lid_driven.m
  # Would you like to create a dual grid? (yes/no)
  #-------------------------------------------------
 ```
-at which point you type ```no```, dual grids will be covered in the next example.  Next question _Convert_ asks you concerns geometric extents:
+at which point you type ```no```, dual grids will be covered in the [next example](#test_cases_lid_driven_dual).  Next question _Convert_ asks you concerns geometric extents:
 ```
  #=========================================
  # Geometric extents:                 
@@ -435,9 +435,7 @@ Which will be described next.  Files with extension ```.cfn``` and ```.dim``` ar
 
 ![Lid-driven hexa front!](Documentation/Manual/Figures/lid_driven_hexa_front.png "Lid driven hexa front")
 
-which reveals boundary conditions for this case, which range from zero (internal cells) through one and two, which are the ordinal numbers which are used to store boundary conditions.
-
-> **_Note:_** Don't worry, you won't have to deal with these numbers later on, just with strings you were using with GMSH to describe boundary conditions.  The reason you see them here is because ParaView can't plot strings as results to the best of our knowledge.
+which reveals boundary conditions for this case, which are show in different colors.  Light blue is for the inside cells (no boundary conditions there) and orange and red are for different boundary conditions.
 
 if you rotate the domain in ParaView, you will see something which may surprise you at first:
 
@@ -561,7 +559,7 @@ BOUNDARY_CONDITION lower_wall
 # Documents/all_control_keywords.
 #-----------------------------------------------------------
 ```
-Please read through it, it gives a lots of explanations which are probably not worth repeating here.  We will cover different options in subsequent sections of this manual.  For the sake of shortness, copy the template control file to just ```control``` file with:
+Please read through it, it gives a lots of explanations which are probably not necessary repeating here.  We will cover different options in subsequent sections of this manual.  For the sake of shortness, copy the template control file to just ```control``` file with:
 ```
 cp  control_template_for_lid_driven  control
 ```
@@ -774,7 +772,7 @@ lid_driven.msh
 no
 skip
 2
-3
+4
 skip
 skip
 skip
@@ -795,15 +793,18 @@ Orthogonal/
 ```
 and from there on you can invoke them with simple ```./Convert``` and ```./Process```.
 
-### On polyhedral grid <a name=#test_cases_lid_driven_dual></a>
+### On polyhedral grid <a name="test_cases_lid_driven_dual"></a>
 
-During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven/Dual``` where you will find the following files:
-* ```lid_dual.geo```
-* ```convert.scr````
+During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Dual``` where you will find the following files:
+* ```convert.scr```
+* ```lid_driven.geo```
+* ```lid_driven.msh.gz```
 
-The ```.geo``` file is almost the same as the one we used for orthhogonal grid.  If you run the two ```.geo``` files through ```diff``` command:
+> **_Note:_** The file ```lid_driven.msh.gz``` is here for the same reason as explained above: to keep you going even if you don't have GMSH installed.
+
+The ```.geo``` file is almost the same as the one we used for orthogonal grid.  If you run the two ```.geo``` files through ```diff``` command:
 ```
-diff lid_dual.geo ../Hexa/lid_driven_hexa.ge
+diff lid_driven.geo ../Hexa/lid_driven.geo
 ```
 you will see the following output:
 ```
@@ -828,11 +829,64 @@ For a node-base numerical framework this grid looks rather descent, but T-Flows 
 - poor accuracy of gradient computation which impacts the accuracy of the overall numerical scheme, and
 - large explicit diffusion terms causing slower convergence of pressure-velocity coupling algorithm (SIMPLE or PISO in T-Flows)
 
-The disadvantage of the tetrahedral grids has been recognized long ago, and polyhedral grids have been introduced as their alternatives.  In mathematical sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  Having mentioned the duality of the two grids, it is worth briefly explaining how _Convert_ performs this.  It reads a grid with triangular prisms and/or tetrahedra in the usual way, does its conversion (finds the connectivity between cells, faces, nodes and edges it needs) and in the next step creates a graph dual of the first mesh.  This little explanation is to justify why, in order to create dual grids, you will have to answer twice as many
+The disadvantage of the tetrahedral grids has been recognized long ago, and polyhedral grids have been introduced as their alternative.  In mathematical sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  
 
+Having mentioned the duality of the two grids, it is worth briefly explaining how _Convert_ performs this.  It reads a grid with triangular prisms and/or tetrahedra in the usual way, does its conversion (finds the connectivity between cells, faces, nodes and edges it needs) and in the next step creates a graph dual of the first mesh.  The only differnce for you, as a user is that when prompted by the question:
+```
+ #=================================================
+ # Would you like to create a dual grid? (yes/no)
+ #-------------------------------------------------
+```
+you answer ```yes```.  From that point on, everything is the same as explained in the [section above](#test_cases_lid_driven_hexa_convert).  To save you from typing all the answers, the file ```convert.scr``` is also provided in the current directory.  If you created such a file for the case with [hexaderal cells](#test_cases_lid_driven_hexa), it would be almost the same as this one.  If you ran two files through a diff command:
+```
+diff convert.scr ../Hexa/convert.scr
+```
+you would see only this:
+```
+< yes
+---
+> no
+```
+the only difference between the files is the fact that you answered ```yes``` in this case when aasked whether you want to create a dual grid.
 
+Anyhow, in order to distinguish between the original and the dual grid, _Convert_ adds extension ```_dual``` to all the file names it creates.  Thus, after running the _Convert_ you will have the following files in the directory:
+- ```lid_driven_dual.cfn```
+- ```lid_driven_dual.dim```
+- ```lid_driven_dual.edges.vtu```
+- ```lid_driven_dual.faces.vtu```
+- ```lid_driven_dual.shadows.vtu```
+- ```lid_driven_dual.vtu```
+
+The first two are T-Flows's native files for further processing, and the remaining four are for you to explore with Paraview.  Opening the ```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the same as in the [previous case](#test_cases_lid_driven_hexa):
 
 ![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid driven polyhedral grid")
+
+To run the case, we have already provided the ```control``` file, derived from the previous case we ran.  Here it is in full:
+```
+# Problem
+PROBLEM_NAME        lid_driven_dual
+
+# Time stepping
+TIME_STEP  0.1
+
+# Boundary conditions
+BOUNDARY_CONDITION upper_wall
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           1.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+BOUNDARY_CONDITION side_walls
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+BOUNDARY_CONDITION lower_wall
+  TYPE             wall  (or: inflow / outflow / pressure / convective)
+  VARIABLES        u     v     w     t    kin    eps    zeta     f22
+  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+
+```
+The only novelty compared to the previous case is line with the ```PROBLEM_NAME```.  It is set to ```lid_driven_dual``` here.  In any case, after running the simulation, a possible representation fo the solution looks like:
 
 ![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid driven dual solution")
 
