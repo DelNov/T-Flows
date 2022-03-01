@@ -218,7 +218,7 @@ and you are ready to start your first simulations.
 
 # Test cases <a name="test_cases"></a>
 
-## Lid-driven cavity flow <a name="test_cases_lid_driven_cavity"></a>
+## Lid-driven cavity flow <a name="test_cases_lid_driven"></a>
 
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
 
@@ -356,7 +356,7 @@ You may wish to scale the entire geometry if, for example, you generated it in m
  # Type 2 for orthogonal placement
  #------------------------------------
 ```
-We noticed that, in some cases, the accuracy of gradient computations is more accurate if these connections are orthogonal, so it is safe to answer with ```2```.
+We noticed that, in some cases, the accuracy of gradient computations with the least squares method is more accurate if these connections are orthogonal, so it is safe to answer with ```2```.
 
 > **_Note:_** For orthogonal grids, these boundary cell centers coincide, so it hardly matters.  It makes a difference on distorted grids.
 
@@ -427,12 +427,15 @@ which is important for computation of turbulent flows and described below.  For 
 #### Analyzing the results of the _Convert_
 
 During the conversion process, _Convert_ creates the following files:
-- ```lid_driven.cfn```
-- ```lid_driven.dim```
-- ```lid_driven.vtu```
-- ```lid_driven.faces.vtu```
-- ```lid_driven.shadows.vtu```
-- ```control_template_for_lid_driven```
+```
+Hexa/
+├── lid_driven.cfn
+├── lid_driven.dim
+├── lid_driven.vtu
+├── lid_driven.faces.vtu
+├── lid_driven.shadows.vtu
+└── control_template_for_lid_driven
+```
 
 Which will be described next.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with ParaView or VisIt for inspection.  The most interesting is the ```lid_driven.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven.faces.vtu``` shows the following:
 
@@ -444,7 +447,7 @@ if you rotate the domain in ParaView, you will see something which may surprise 
 
 ![Lid-driven hexa back!](Documentation/Manual/Figures/lid_driven_hexa_back.png "Lid driven hexa back")
 
-The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for all numerical algorithms in T-Flows.
+The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for almost all numerical algorithms in T-Flows.
 
 > **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computational domain.  To visualize those period pairs, one can read the file ```lid_driven.shadows.vtu```.  If plotted together with ```lid_driven.faces.vtu```, they close the domain.
 
@@ -460,7 +463,7 @@ In order to facilitate the setup of ```control``` files, _Convert_ and _Generate
 #
 # One can use it as a staring point for defining entries
 # in T-Flows' control file.  These files are created at
-# the end of each call to Conver or Generate sub-programs.
+# the end of each call to Convert or Generate sub-programs.
 #
 # Each line starting with a # is, obviously, a comment.
 # Lines starting with ! or % are also skipped as comments.
@@ -470,7 +473,7 @@ In order to facilitate the setup of ```control``` files, _Convert_ and _Generate
 # Problem name must be specified and corresponds to the
 # base name (without extensions) of the grid file used.
 #-----------------------------------------------------------
-PROBLEM_NAME        lid_driven
+ PROBLEM_NAME        lid_driven
 
 #-----------------------------------------------------------
 # Boundary conditions also must be specified and are
@@ -484,20 +487,20 @@ PROBLEM_NAME        lid_driven
 # laminar or LES, T-Flows will skip the values for "k",
 # "eps", "zeta" and "f22"
 #-----------------------------------------------------------
-BOUNDARY_CONDITION upper_wall
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+ BOUNDARY_CONDITION upper_wall
+   TYPE             wall  (or: inflow / outflow / pressure / convective)
+   VARIABLES        u     v     w     t    kin    eps    zeta     f22
+   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
 
-BOUNDARY_CONDITION side_walls
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+ BOUNDARY_CONDITION side_walls
+   TYPE             wall  (or: inflow / outflow / pressure / convective)
+   VARIABLES        u     v     w     t    kin    eps    zeta     f22
+   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
 
-BOUNDARY_CONDITION lower_wall
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+ BOUNDARY_CONDITION lower_wall
+   TYPE             wall  (or: inflow / outflow / pressure / convective)
+   VARIABLES        u     v     w     t    kin    eps    zeta     f22
+   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
 
 #-----------------------------------------------------------
 # And, that's it, what is listed above is the bare minimum.
@@ -566,23 +569,26 @@ Please read through it, it gives a lots of explanations which are probably not n
 ```
 cp  control_template_for_lid_driven  control
 ```
-
 remove all non-essential comments and set the velocity of the moving wall to ```1.0``` in the section ```BOUNDARY_CONDITION moving_wall``` until you get this:
 ```
 # Problem name
-PROBLEM_NAME        lid_driven
+ PROBLEM_NAME        lid_driven
 
 # Boundary conditions
-BOUNDARY_CONDITION moving_wall
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           1.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+ BOUNDARY_CONDITION upper_wall
+   TYPE             wall  
+   VARIABLES        u     v     w
+   VALUES           1.0   0.0   0.0
 
-BOUNDARY_CONDITION static_wall
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+ BOUNDARY_CONDITION side_walls
+   TYPE             wall
+   VARIABLES        u     v     w
+   VALUES           0.0   0.0   0.0
 
+ BOUNDARY_CONDITION lower_wall
+   TYPE             wall  
+   VARIABLES        u     v     w
+   VALUES           0.0   0.0   0.0
 ```
 
 At this point, you are ready to run.  Invoke _Process_ by issuing command:
@@ -686,22 +692,27 @@ Since we know that this test case reaches a steady solution in the end, we shoul
 ```
 Number of iterations are all one or two, but not quite zero yet.  So, if we want to be purists, we can't say we achieved steady state to the tolerance set by T-Flows.  In order to work around it, we could either increase the number of time steps, or the time step itself.  Since CFL is well below unity, let's re-run the simulation with ```control``` file modified as:
 ```
-# Problem name                                                                   
-PROBLEM_NAME        lid_driven                                            
+# Problem name
+ PROBLEM_NAME        lid_driven
 
-# Time step                                                                      
-TIME_STEP  0.1                                                                   
+# Time step
+ TIME_STEP  0.1
 
-# Boundary conditions                                                            
-BOUNDARY_CONDITION moving_wall                                                   
-  TYPE             wall  (or: inflow / outflow / pressure / convective)          
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22             
-  VALUES           1.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3            
+# Boundary conditions
+ BOUNDARY_CONDITION upper_wall
+   TYPE             wall
+   VARIABLES        u     v     w
+   VALUES           1.0   0.0   0.0
 
-BOUNDARY_CONDITION static_wall                                                   
-  TYPE             wall  (or: inflow / outflow / pressure / convective)          
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22             
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+ BOUNDARY_CONDITION side_walls
+   TYPE             wall
+   VARIABLES        u     v     w
+   VALUES           0.0   0.0   0.0
+
+ BOUNDARY_CONDITION lower_wall
+   TYPE             wall
+   VARIABLES        u     v     w
+   VALUES           0.0   0.0   0.0
 ```
 With time step set to ```0.1```, convergence is observed after 312 time steps since all iterations for all computed quantities fell to zero:
 ```
@@ -884,20 +895,19 @@ TIME_STEP  0.1
 
 # Boundary conditions
 BOUNDARY_CONDITION upper_wall
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           1.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+  TYPE             wall
+  VARIABLES        u     v     w
+  VALUES           1.0   0.0   0.0
 
 BOUNDARY_CONDITION side_walls
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+  TYPE             wall
+  VARIABLES        u     v     w
+  VALUES           0.0   0.0   0.0
 
 BOUNDARY_CONDITION lower_wall
-  TYPE             wall  (or: inflow / outflow / pressure / convective)
-  VARIABLES        u     v     w     t    kin    eps    zeta     f22
-  VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
-
+  TYPE             wall
+  VARIABLES        u     v     w
+  VALUES           0.0   0.0   0.0
 ```
 The only novelty compared to the previous case is line with the ```PROBLEM_NAME```.  It is set to ```lid_driven_dual``` here.  In any case, after running the simulation, a possible representation fo the solution looks like:
 
@@ -905,35 +915,43 @@ The only novelty compared to the previous case is line with the ```PROBLEM_NAME`
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven"></a>
 
-Thermally driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven_cavity).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
+Thermally driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
 
 The biggest differences between the cases is the driving force.  Whereas the lid-driven cavity flow is driven by shear created by top moving wall, thermally driven cavity is driven by the buoyancy forces occurring on vertical opposing sides of the problem domain:
 
 ![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally driven cavity domain")
 
-In the figure above the left (red) wall is kept at higher temperature than the right wall (blue), which creates clockwise motion of the fluid.  To solve this case, please go to the directory: ```[root]/Tests/Manual/Thermally_Driven/Direct``` where you can find the following files:
+In the figure above the left (red) wall is kept at higher temperature than the right wall (blue), which creates clockwise motion of the fluid.  
+
+We will use this case to introduce a few new concepts in T-Flows:
+- instruct _Process_ to solve energy equation (temperature)
+- specify different boundary conditions for temperature (Dirichlet or Neumann)
+- changing from default under-relaxation parameters
+- setting the linear solver tolerances
+- setting the initial condition
+To solve this case, please go to the directory: ```[root]/Tests/Manual/Thermally_Driven/Direct``` where you can find the following files:
+
 ```
 Direct/
 ├── convert.scr
-└── therm_driven.geo
+├── therm_driven.geo
+└── therm_driven.msh.gz
 ```
-The ```.geo``` file is the GMSH script.  Since the geometries for the lid-driven [cavity flow](#tests_lid_driven_cavity) and this case are almost the same, the similarity in the ```.geo``` shouldn't be a suprise.  You can find the following differences:
+
+The ```.geo``` file is the GMSH script.  Since the geometries for the lid-driven [cavity flow](#tests_lid_driven) and this case are almost the same, the similarity in the ```.geo``` shouldn't be a suprise.  You can find the following differences:
 ```
 A    =  1.0;  // length and height of the cavity
 B    =  0.1;  // width of the cavity
 NA   = 60;    // resolution in length and height
 NB   =  3;    // resolution in width (periodic direction)
 BUMP = 0.1;   // control clustering towards the walls
-
 ...
 ...
-
 // Set lines to transfinite
 // (+1 is because GMSH expects number of points here)
 Transfinite Curve {1, 2, 3, 4} = NA+1  Using Bump BUMP;
 ...
 ...
-
 // Define boundary conditions
 Physical Surface("upper_wall", 27) = {21};
 Physical Surface("left_wall", 28) = {17};
@@ -943,10 +961,12 @@ Physical Surface("periodic_y", 31) = {1, 26};
 ...
 ...
 ```
+
 The novelties include:
 - increased resolution ```NA```
 - new parameter ```BUMP``` which ...
-- controls the clustering of the lines towards the walls in the calle to ```Transfinite Curve```
+- controls the clustering of the lines towards the walls in the
+- call to ```Transfinite Curve```
 - boundary condition names have changed; ```left_wall``` and ```right_wall``` are new, the ```side_walls``` has been dropped.
 
 First thing would be to generate the mesh with:
