@@ -239,8 +239,11 @@ We will use this case to introduce a few new concepts in T-Flows:
 #### Creating the mesh <a name="test_cases_lid_driven_hexa_create"></a>
 
 We start with a grid build from hexahedral cell. In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```.  There you will find the following files:
-* ```lid_driven.geo```
-* ```lid_driven.msh.gz```
+```
+Hexa/
+├── lid_driven.geo
+└── lid_driven_msh.gz
+```
 
 The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh, whereas the second file, ```lid_driven.msh.gz```, is in this directory in case you don't have GMSH installed on your system.  If that is the case, skip directly [here](#test_cases_lid_driven_hexa_convert).
 
@@ -787,7 +790,7 @@ and don't have to type anything.
 
 The T-Flows directory structure, test cases are many and are categorized in many directories and their directories.  Invoking executables such as _Convert_ and _Process_ can be tedious and error prone with all those dots and slashes before the executable name.  In order to avoid it, directory ```[root]/Sources/Utilites``` holds a bash script called ```seek_binaries.sh```.  It is an executable script and if you place it somewhere in your path (say in ```/usr/local/bin```) every time you call it from a test directory, it will seek the executables and make soft links in your test directory.  For this particular case it will create links:
 ```
-Orthogonal/
+Hexa/
 ├── Convert -> ../../../../Binaries/Convert
 └── Process -> ../../../../Binaries/Process
 ```
@@ -796,9 +799,12 @@ and from there on you can invoke them with simple ```./Convert``` and ```./Proce
 ### On polyhedral grid <a name="test_cases_lid_driven_dual"></a>
 
 During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Dual``` where you will find the following files:
-* ```convert.scr```
-* ```lid_driven.geo```
-* ```lid_driven.msh.gz```
+```
+Dual/
+├── convert.scr
+├── lid_driven.geo
+└── lid_driven.msh.gz
+```
 
 > **_Note:_** The file ```lid_driven.msh.gz``` is here for the same reason as explained above: to keep you going even if you don't have GMSH installed.
 
@@ -850,12 +856,15 @@ you would see only this:
 the only difference between the files is the fact that you answered ```yes``` in this case when aasked whether you want to create a dual grid.
 
 Anyhow, in order to distinguish between the original and the dual grid, _Convert_ adds extension ```_dual``` to all the file names it creates.  Thus, after running the _Convert_ you will have the following files in the directory:
-- ```lid_driven_dual.cfn```
-- ```lid_driven_dual.dim```
-- ```lid_driven_dual.edges.vtu```
-- ```lid_driven_dual.faces.vtu```
-- ```lid_driven_dual.shadows.vtu```
-- ```lid_driven_dual.vtu```
+```
+Dual/
+├── lid_driven_dual.cfn
+├── lid_driven_dual.dim
+├── lid_driven_dual.edges.vtu
+├── lid_driven_dual.faces.vtu
+├── lid_driven_dual.shadows.vtu
+└── lid_driven_dual.vtu
+```
 
 The first two are T-Flows's native files for further processing, and the remaining four are for you to explore with Paraview.  Opening the ```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the same as in the [previous case](#test_cases_lid_driven_hexa):
 
