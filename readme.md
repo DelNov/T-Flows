@@ -15,8 +15,10 @@
 6. [Test cases](#test_cases)
     1. [Lid-driven cavity flow](#test_cases_lid_driven)
         1. [On hexahedral grid](#test_cases_lid_driven_hexa)
+            1. [Creating the mesh](#test_cases_lid_driven_hexa_create)
+            1. [Converting the mesh](#test_cases_lid_driven_hexa_convert)
         2. [On polyhedral grid](#test_cases_lid_driven_dual)
-    2. [Thermally-driven cavity flow](#test_cases_thermally_driven_cavity)
+    2. [Thermally-driven cavity flow](#test_cases_thermally_driven)
 7. [Parallel processing](#parallel_proc)
 
 
@@ -232,16 +234,17 @@ We will use this case to introduce a few new concepts in T-Flows:
 - visualization of results
 - typical workflow in T-Flows
 
-### On hexahedral grid <a name=#test_cases_lid_driven_cavity_hexa></a>
+### On hexahedral grid <a name=#test_cases_lid_driven_hexa></a>
 
-#### Creating the mesh
+#### Creating the mesh <a name=##test_cases_lid_driven_hexa_create></a>
 
 We start with a grid build from hexahedral cell. In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven/Hexa```.  There you will find the following files:
 * ```lid_driven.geo```
 * ```lid_driven.msh.gz```
 
-The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  The file ```lid_driven.msh.gz``` is in this directory in case you don't have GMSH installed on your system.  If that is the case, skip directly [here]().
+The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  
 
+> **_Note:_** The file ```lid_driven.msh.gz``` is in this directory in case you don't have GMSH installed on your system.  If that is the case, skip directly [here](#test_cases_lid_driven_hexa_convert).
 
 It is beyond the scope of this manual to teach you how to use third party software, but it's probably worth having a look at it:
 ```
@@ -297,9 +300,9 @@ lid_driven.msh
 ```
 > **_Note:_** Both GMSH and Fluent produce grid files with extnesion ```.msh```, the formats are completely different and GMSH makes an educated guess which one it is reading based on their contents.
 
-#### Converting the mesh to T-Flows format
+#### Converting the mesh to T-Flows format <a name=##test_cases_lid_driven_hexa_convert></a> 
 
-Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven/Hexa```, you can call _Convert_ with:
+Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```, you can call _Convert_ with:
 ```
 ../../../../Binaries/Convert
 ```
