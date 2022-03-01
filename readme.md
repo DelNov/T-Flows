@@ -19,6 +19,8 @@
             1. [Converting the grid](#test_cases_lid_driven_hexa_convert)
         2. [On polyhedral grid](#test_cases_lid_driven_dual)
     2. [Thermally-driven cavity flow](#test_cases_thermally_driven)
+        1. [With Boussinesq approximation](#test_cases_thermally_driven_boussinesq)
+        2. [With variable physical properties](#test_cases_thermally_driven_variable)
 7. [Parallel processing](#parallel_proc)
 
 
@@ -915,13 +917,18 @@ The only novelty compared to the previous case is line with the ```PROBLEM_NAME`
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven"></a>
 
-Thermally driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
+Thermally-driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
 
 The biggest differences between the cases is the driving force.  Whereas the lid-driven cavity flow is driven by shear created by top moving wall, thermally driven cavity is driven by the buoyancy forces occurring on vertical opposing sides of the problem domain:
 
 ![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally driven cavity domain")
 
 In the figure above the left (red) wall is kept at higher temperature than the right wall (blue), which creates clockwise motion of the fluid.  
+
+We will cover the thermall-driven cavity flow in two modelling ways: with 
+Boussinesq approximation, and with variable physical properties.
+
+### With Boussinesq approximation <a name="test_cases_thermally_driven_boussinesq"> </a>
 
 We will use this case to introduce a few new concepts in T-Flows:
 - instruct _Process_ to solve energy equation (temperature)
@@ -1192,8 +1199,334 @@ Having obtained steady solution for this case, you may visualise some results in
 
 ![Thermally-driven solution!](Documentation/Manual/Figures/thermally_driven_solution.png "Thermally driven solution")
 
-### Thing to try next
+#### Thing to try next
 
 Better and more elaborate test cases for the thermall-driven cavity flow have been set in ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Direct```, for a range of _Ra_ numbers.  Feel free to explore them further.
+
+### With variable physical properties <a name="test_cases_thermally_driven_variable"> </a>
+
+Using Boussinesq hypotehsis is not the only way we can deal with buoyancy driven flows.
+The alternative would be to be to change air density as the function of temperature, and
+imposing a gravitational vector, _Process_ would work out buoyancy forces acting on
+momentum equations.  Dependency of density on temperature has to be imposed in some way
+and we see it as a look-up table.  We would have to use a _user function_ at each time
+step to update the values of physical properties.
+
+With this case we want to demonstrate:
+- how to run a buoyancy driven flows without Boussinesq approximation
+- how to write user functions.
+
+A case which demonstrates how it is done resides in ```[root]/Tests/Manual/Thermally_Driven/Variable_Properties```.
+The directory contains the following files:
+```
+[root]/Tests/Manual/Thermally_Driven/Variable_Properties
+├── air.geo
+├── air_properties_at_1_bar.dat
+├── control
+├── convert.scr
+├── readme
+└── User_Mod/
+    ├── Beginning_Of_Simulation.f90
+    ├── Beginning_Of_Time_Step.f90
+    └── Types.f90
+```
+The purpose of files ```air.geo```, ```control``` and ```convert.scr``` should be clear by now.  If not, refer to previous sections on lid- and thermally-driven cavities.
+What is new is the look-up table in file ```air_properties_at_1_bar```.  If you open it, you can see that it lists air properties for a range of temperatures from -20 to 125 in increments of 5 degrees.  
+
+In addition to these, there is a sub-directory called ```User_Mod``` with three functions.  The way T-Flows handles user functions is as follows.  In the directory which holds sources for _Process_, there is also a sub-directory called ```User_Mod``` holding a number of functions user can modify.  They are:
+```
+[root]/Sources/Process/User_Mod
+├── Before_Exit.f90
+├── Beginning_Of_Compute_Energy.f90
+├── Beginning_Of_Compute_Momentum.f90
+├── Beginning_Of_Compute_Pressure.f90
+├── Beginning_Of_Compute_Scalar.f90
+├── Beginning_Of_Compute_Vof.f90
+├── Beginning_Of_Correct_Velocity.f90
+├── Beginning_Of_Iteration.f90
+├── Beginning_Of_Simulation.f90
+├── Beginning_Of_Time_Step.f90
+├── Calculate_Mean.f90
+├── End_Of_Compute_Energy.f90
+├── End_Of_Compute_Momentum.f90
+├── End_Of_Compute_Pressure.f90
+├── End_Of_Compute_Scalar.f90
+├── End_Of_Compute_Vof.f90
+├── End_Of_Correct_Velocity.f90
+├── End_Of_Iteration.f90
+├── End_Of_Simulation.f90
+├── End_Of_Time_Step.f90
+├── Force.f90
+├── Initialize_Variables.f90
+├── Insert_Particles.f90
+├── Interface_Exchange.f90
+├── Save_Results.f90
+├── Save_Swarm.f90
+├── Source.f90
+└── Types.f90
+```
+Their names are self-explanatory, as their names correspond to places in _Processs_ from which they are called.  When _Process_ is compiled with simple ```make``` command, the functions from the ```[root]/Sources/Process/User_Mod``` will be called and they, in essence, do nothing.  They are _empty hooks_ so to speak.  If _Process_ is compiled with ```DIR_CASE=full_or_relative_path_to_case```, sources (_empty hooks_) from ```[root]/Sources/Process/User_Mod``` will be replaced by the links to ```User_Mod``` directory residing with the case.
+
+Try to see it in action.  Change the current directory to ```[root]/Sources/Process``` and issue the commands:
+```
+make clean
+make DIR_CASE=../../Tests/Manual/Thermally_Driven/Varible/
+```
+> **_Tip:_** When dealing with user functions, it is not a bad idea to conduct ```make clean``` every once in a while.  It is possible, and often the case, that objects from the last compilation of the _Process_ are newer than user function specified in the case.
+
+When the compilation completes, the contents of the ```User_Mod``` in ```[root]/Sources/Process``` will read:
+```
+User_Mod
+├── Before_Exit.f90
+├── Beginning_Of_Compute_Energy.f90
+├── Beginning_Of_Compute_Momentum.f90
+├── Beginning_Of_Compute_Pressure.f90
+├── Beginning_Of_Compute_Scalar.f90
+├── Beginning_Of_Compute_Vof.f90
+├── Beginning_Of_Correct_Velocity.f90
+├── Beginning_Of_Iteration.f90
+├── Beginning_Of_Simulation.f90 -> ../../../Tests/Manual/Thermally_Driven/Varible/User_Mod/Beginning_Of_Simulation.f90
+├── Beginning_Of_Time_Step.f90 -> ../../../Tests/Manual/Thermally_Driven/Varible/User_Mod/Beginning_Of_Time_Step.f90
+├── Calculate_Mean.f90
+├── End_Of_Compute_Energy.f90
+├── End_Of_Compute_Momentum.f90
+├── End_Of_Compute_Pressure.f90
+├── End_Of_Compute_Scalar.f90
+├── End_Of_Compute_Vof.f90
+├── End_Of_Correct_Velocity.f90
+├── End_Of_Iteration.f90
+├── End_Of_Simulation.f90
+├── End_Of_Time_Step.f90
+├── Force.f90
+├── Initialize_Variables.f90
+├── Insert_Particles.f90
+├── Interface_Exchange.f90
+├── Save_Results.f90
+├── Save_Swarm.f90
+├── Source.f90
+└── Types.f90 -> ../../../Tests/Manual/Thermally_Driven/Varible/User_Mod/Types.f90
+```
+The three files which are defined in the case's ```User_Mod``` are now linked to the _Process'_ ```User_Mod```.  That means they are not _empty hooks_ any longer, but whatever user modified them to do.
+
+Having describe the mechanism by which _Process_ deals with user functions, we can describe each of them more closely.
+
+The source ```Types.f90``` holds definion of new types which might be used with user functions.  It is not always necessary to define new types for user functions, but in this particular case we want to store look-up tables with variable air properties in memory.  It reads:
+```
+  1 !==============================================================================!
+  2 !   Introduce new types to be used with User_Mod                               !
+  3 !==============================================================================!
+  4
+  5   integer, parameter :: N_ITEMS = 30
+  6
+  7   real :: air_t     (N_ITEMS)
+  8   real :: air_rho   (N_ITEMS)
+  9   real :: air_mu    (N_ITEMS)
+ 10   real :: air_cp    (N_ITEMS)
+ 11   real :: air_lambda(N_ITEMS)
+
+```
+We know that there are 30 entries in the file ```air_properties_at_a_bar.dat``` and we therefore introduce a parameter called ```N_ITEMS``` in line 5 and set it to ```30```.  Arrays holding phyiscal properties are statically allocate with that size in lines 7 - 11.
+
+The source ```Beginning_Of_Simulation``` is, clearly enough, called at the beginning of simulation, and we wrote in a way to read physical properties:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm, n, time)
+  3 !------------------------------------------------------------------------------!
+  4 !   This function is called at the beginning of simulation.                    !
+  5 !------------------------------------------------------------------------------!
+  6   implicit none
+  7 !---------------------------------[Arguments]----------------------------------!
+  8   type(Field_Type),    target :: Flow
+  9   type(Turb_Type),     target :: Turb
+ 10   type(Vof_Type),      target :: Vof
+ 11   type(Swarm_Type),    target :: Swarm
+ 12   integer, intent(in)         :: n     ! time step
+ 13   real,    intent(in)         :: time  ! physical time
+ 14 !-----------------------------------[Locals]-----------------------------------!
+ 15   type(Grid_Type), pointer :: Grid
+ 16   integer                  :: i, fu
+ 17 !==============================================================================!
+ 18
+ 19   ! Take aliases
+ 20   Grid => Flow % pnt_grid
+ 21
+ 22   !----------------------------------------!
+ 23   !   Open file with physical properties   !
+ 24   !----------------------------------------!
+ 25   call File % Open_For_Reading_Ascii("air_properties_at_1_bar.dat", fu)
+ 26
+ 27   !-----------------------------!
+ 28   !   Read all the properties   !
+ 29   !-----------------------------!
+ 30   do i = 1, N_ITEMS
+ 31     call File % Read_Line(fu)
+ 32
+ 33     ! Read desired properties
+ 34     read(line % tokens(1), *) air_t(i)
+ 35     read(line % tokens(2), *) air_rho(i)
+ 36     read(line % tokens(3), *) air_mu(i)
+ 37     read(line % tokens(5), *) air_cp(i)
+ 38     read(line % tokens(6), *) air_lambda(i)
+ 39
+ 40     ! Fix units where needed (check the values in the table)
+ 41     air_cp(i) = air_cp(i) * 1.0e3
+ 42     air_mu(i) = air_mu(i) / 1.0e5
+ 43   end do
+ 44
+ 45   close(fu)
+ 46
+ 47   if(this_proc < 2) then
+ 48     print '(a)',        ' #============================================'
+ 49     print '(a)',        ' # Output from user function, read properties!'
+ 50     print '(a)',        ' #--------------------------------------------'
+ 51   end if
+```
+
+This probalby needs some explanation.  As arguments to this function, _Process_
+sends a number of its classes which are used to model different aspects of numerical
+simulation.  Class ```Field_Type``` holds velocities, temperatures and other variables
+describing a flow _field_.  Class _Turb_Type_ holds variables describing the state
+of turbulence; turbulent kinetic energy  (k), its dissipation (epsilon), individial
+Reynolds stresses for second moment closures or turbulent statistics.  Multiphase
+flows with interface tracking are described by class ```Vof_Type``` and Lagrangian
+particle tracking with ```Swarm_Type```.  In addition to these classes, _Process_
+also sends current time step (```n```) and physical time of simulation (```time```)
+
+> **_Note:_** It may sound counter-intuitive to send the last two variables to a
+procedure called at the beginning of simulation, but think of a restart.  This
+procedure is also called, and time step and time of simulation are not zero any
+more.
+
+All the classes outlined above hold a pointer to a grid (```pnt_grid```) for which 
+are they defined. The grid and its entities could be accessed as ```Flow % pnt_grid```,
+but we make sytnax shorter by introducing local pointer:
+```
+ 15   type(Grid_Type), pointer :: Grid
+```
+and assingning it a value:
+```
+ 20   Grid => Flow % pnt_grid
+```
+
+Line 20 calls T-Flows's class ```File_Type``` member function ```Open_For_Reading_Ascii``` whose purpose is clear from the name.  The function returns a handle to file it openned called ```fu```.
+
+From lines 30 to 43 we read the look-up table from the file, and store it into memory defined in ```Types.f90```.  Note that in lines 41 and 42 we convert units from the table to plain SI units for compatibility with T-Flows.  While reading the files we use another procedure from ```File_Type``` called ```Read_Line``` which reads a line from ASCII file and splits it into individual tokens.  Tokens are stored in the fields ```line % token(:)```.
+
+Finally, in the lines 47 to 51 we print a message that physical properties have been read.  Here we use global variable ```this_proc``` to make sure we print the message only from first processor in parallel runs.
+
+Once the look-up table is properly read into memory, we can use it at the beginning of each time step with procedure ```Beginning_Of_Time_Step``` which reads:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm, n, time)
+  3 !------------------------------------------------------------------------------!
+  4 !   This function is called at the beginning of time step.                     !
+  5 !------------------------------------------------------------------------------!
+  6   implicit none
+  7 !---------------------------------[Arguments]----------------------------------!
+  8   type(Field_Type),    target :: Flow
+  9   type(Turb_Type),     target :: Turb
+ 10   type(Vof_Type),      target :: Vof
+ 11   type(Swarm_Type),    target :: Swarm
+ 12   integer, intent(in)         :: n     ! time step
+ 13   real,    intent(in)         :: time  ! physical time
+ 14 !-----------------------------------[Locals]-----------------------------------!
+ 15   type(Grid_Type), pointer :: Grid
+ 16   type(Var_Type),  pointer :: u, v, w, t, phi
+ 17   integer                  :: c, i
+ 18   real                     :: wi, wip
+ 19 !==============================================================================!
+ 20
+ 21   ! Take aliases
+ 22   Grid => Flow % pnt_grid
+ 23
+ 24   !------------------------------!
+ 25   !   Browse through all cells   !
+ 26   !------------------------------!
+ 27   do c = -Grid % n_bnd_cells, Grid % n_cells
+ 28
+ 29     ! Browse through all table entries
+ 30     do i = 1, N_ITEMS - 1
+ 31
+ 32       ! Did you find the right interval
+ 33       if(Flow % t % n(c) >= air_t(i) .and.  &
+ 34          Flow % t % n(c) <  air_t(i+1)) then
+ 35
+ 36         ! If so, calculate interpolation factors ...
+ 37         wi  = (air_t(i+1) - Flow % t % n(c)) / (air_t(i+1) - air_t(i))
+ 38         wip = 1.0 - wi
+ 39
+ 40         ! ... and interpolate physical properties
+ 41         Flow % density(c)      = wi * air_rho   (i)  + wip * air_rho   (i+1)
+ 42         Flow % viscosity(c)    = wi * air_mu    (i)  + wip * air_mu    (i+1)
+ 43         Flow % conductivity(c) = wi * air_lambda(i)  + wip * air_lambda(i+1)
+ 44         Flow % capacity(c)     = wi * air_cp    (i)  + wip * air_cp    (i+1)
+ 45       end if
+ 46
+ 47     end do
+ 48   end do
+ 49
+ 50   end subroutine
+```
+Arguments are the same as in the call to previous procedure and don't need explanation.  
+What is new here are the fields ```n_bnd_cells``` and ```n_cells``` from class 
+```Grid_Type```..  They hold number of boundary cells and number of inside cells 
+respectivelly.  As you can see from the beginning of the loop in line 27, 
+boundary cells are stored with negative indices.  
+
+Anyhow, for each of the cells in the grid, the entire look-up table is browsed 
+through in lines 30 - 47, and for temperature in that cell (```Flow % t % n(c)```) 
+the interval for interpolation is searched in lines 33 and 34.  Once found, 
+the interpolation factors are calculated in lines 37 and 38, and physical 
+properties interpolated in lines 41 - 44.
+
+The only novelty in the present ```control``` file is that we set the time step
+and the total number of time steps as:
+```
+ TIME_STEP                1.0e-2
+ NUMBER_OF_TIME_STEPS  6000
+```
+resulting in a total physical time of simulation of 0.6 seconds.  
+
+> **_Note:_** You might have noticed that we usuall set the number of time steps
+and saving frequencies, to be multiples of 60.  We acknowledged that time steps 
+are usually set to be round in decimal values, such as 1.0e-3, 5e-4, ... and so 
+forth.  If one combines such values of time steps with number of time steps 
+which are multiples of 60, it is highly likely that simulation time and saving
+frequency will easy to convert in minutes, maybe hours, which is easier to
+comprehend than _thousands of seconds_.
+
+There is nothing else particularly interseting in the ```control``` file for this case, 
+except the fact that physical properties are not defined.  It is because they are
+set from user functions.
+
+With all this explained, grid can be generated and converted with:
+```
+gmsh -3 air.geo
+./Convert < convert.scr
+./Process > out
+```
+
+> **_Note:_** Here we assume that you created soft links to executables with 
+script ```seek_binaries.sh``` and that you have compiled _Process_ with user 
+functions, i.e. with command: ```make DIR_CASE=../../Tests/Manual/Thermally_Driven/Varible```
+
+In the case of thermally driven cavity with Boussinesq approximation, we were
+setting physical properties _and_ gravitational vector in a way to meet the
+desired _Ra_ number.  Here, physical properties are physical, dependent on
+temperature, as meassured and reported [here](https://theengineeringmindset.com/properties-of-air-at-atmospheric-pressure/).
+So, one way to achive the desired _Ra_ would be to change boundary temperaures,
+but that could put us out of the range of the look-up table we have.  The other
+way, which was used here, was to change the charactersitic length and we do it
+by setting a scaling factor in ```convert.scr```.  Please chech the ```readme```
+file in the local directory for details and ```convert.scr``` in line 3 to see
+the scaling factor used.
+
+The final velocity vector imposed over the temperature fields look like this:
+
+![Thermally-driven variable temp!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_temp.png "Thermally driven variable temp")
+
+whereas the same velocity vectors over pressure, look like:
+
+![Thermally-driven variable press!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_press.png "Thermally driven variable temp")
 
 # Parallel processing  <a name="parallel_proc"></a>
