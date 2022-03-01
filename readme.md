@@ -13,8 +13,10 @@
     1. [Directory structure](#compiling_dir_struct)
     2. [Sub-programs](#compiling_sub_progs)
 6. [Test cases](#test_cases)
-    1. [Lid-driven cavity flow](#test_cases_lid_driven_cavity)
-    2. [Thermally-driven cavity flow](#test_cases_lid_driven_cavity)
+    1. [Lid-driven cavity flow](#test_cases_lid_driven)
+        1. [On hexahedral grid](#test_cases_lid_driven_hexa)
+        2. [On polyhedral grid](#test_cases_lid_driven_dual)
+    2. [Thermally-driven cavity flow](#test_cases_thermally_driven_cavity)
 7. [Parallel processing](#parallel_proc)
 
 
@@ -230,15 +232,18 @@ We will use this case to introduce a few new concepts in T-Flows:
 - visualization of results
 - typical workflow in T-Flows
 
-### Using orthogonal grids
+### On hexahedral grid <a name=#test_cases_lid_driven_cavity_hexa></a>
 
 #### Creating the mesh
 
-We start with a grid build from orthogonal hexahedral cell. In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```.  There you will find the following files:
-* ```lid_driven_cavity.geo```
-* ```lid_driven_cavity.msh```
+We start with a grid build from hexahedral cell. In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven/Hexa```.  There you will find the following files:
+* ```lid_driven.geo```
+* ```lid_driven.msh.gz```
 
-The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  It is beyond the scope of this manual to teach you how to use third party software, but it's probably worth having a look at it:
+The first file, with extension ```.geo``` is the script GMSH uses to generate a mesh.  The file ```lid_driven.msh.gz``` is in this directory in case you don't have GMSH installed on your system.  If that is the case, skip directly [here]().
+
+
+It is beyond the scope of this manual to teach you how to use third party software, but it's probably worth having a look at it:
 ```
 A  =  1.0;  // length and height of the cavity
 B  =  0.1;  // width of the cavity
@@ -284,17 +289,17 @@ to see that it is very readable and intuitive.  Script defines the points, the l
 
 Since the script for GMSH is ready, you can run it from command line with this command:
 ```
-gmsh -3 lid_driven_cavity.geo
+gmsh -3 lid_driven.geo
 ```
 which will, after a few instances, create the file:
 ```
-lid_driven_cavity.msh
+lid_driven.msh
 ```
 > **_Note:_** Both GMSH and Fluent produce grid files with extnesion ```.msh```, the formats are completely different and GMSH makes an educated guess which one it is reading based on their contents.
 
 #### Converting the mesh to T-Flows format
 
-Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Orthogonal```, you can call _Convert_ with:
+Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven/Hexa```, you can call _Convert_ with:
 ```
 ../../../../Binaries/Convert
 ```
@@ -320,7 +325,7 @@ which will prompt you with the screen:
  # Enter the name of the grid file you are importing (with ext.):
  #----------------------------------------------------------------
 ```
-Here you have to type the name of the grid with extension, hence ```lid_driven_cavity.msh```.  Many messages on the screen will follow outlining the conversion process which we won't cover now, but the _Convert_ will stop with the next question:
+Here you have to type the name of the grid with extension, hence ```lid_driven.msh```.  Many messages on the screen will follow outlining the conversion process which we won't cover now, but the _Convert_ will stop with the next question:
 ```
  #=================================================
  # Would you like to create a dual grid? (yes/no)
@@ -338,7 +343,7 @@ at which point you type ```no```, dual grids will be covered in the next example
  # (or skip to keep as is):
  #-----------------------------------------
 ```
-You may wish to scale the entire geometry if, for example, you generated it in milimeters but you know that T-Flows' _Process_ works in SI units, or if you want to use scaling to change the nondimensional numbers (such as Reynolds or Rayleigh) that way.  For this case, we are not doing it, so just answer ```skip```.  Next question which _Convert_ will pose you concerns connections of boundary cells to inside cells:
+You may wish to scale the entire geometry if, for example, you generated it in millimeters but you know that T-Flows' _Process_ works in SI units, or if you want to use scaling to change the non-dimensional numbers (such as Reynolds or Rayleigh) that way.  For this case, we are not doing it, so just answer ```skip```.  Next question which _Convert_ will pose you concerns connections of boundary cells to inside cells:
 ```
  #====================================
  # Position the boundary cell centres:
@@ -418,14 +423,14 @@ which is important for computation of turbulent flows and described below.  For 
 #### Analyzing the results of the _Convert_
 
 During the conversion process, _Convert_ creates the following files:
-- ```lid_driven_cavity.cfn```
-- ```lid_driven_cavity.dim```
-- ```lid_driven_cavity.vtu```
-- ```lid_driven_cavity.faces.vtu```
-- ```lid_driven_cavity.shadows.vtu```
-- ```control_template_for_lid_driven_cavity```
+- ```lid_driven.cfn```
+- ```lid_driven.dim```
+- ```lid_driven.vtu```
+- ```lid_driven.faces.vtu```
+- ```lid_driven.shadows.vtu```
+- ```control_template_for_lid_driven```
 
-Which will be described next.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with ParaView or VisIt for inspection.  The most interesting is the ```lid_driven_cavity.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven_cavity.faces.vtu``` shows the following:
+Which will be described next.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with ParaView or VisIt for inspection.  The most interesting is the ```lid_driven.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven.faces.vtu``` shows the following:
 
 ![Lid-driven hexa front!](Documentation/Manual/Figures/lid_driven_hexa_front.png "Lid driven hexa front")
 
@@ -439,17 +444,17 @@ if you rotate the domain in ParaView, you will see something which may surprise 
 
 The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for all numerical algorithms in T-Flows.
 
-> **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computational domain.  To visualize those period pairs, one can read the file ```lid_driven_cavity.shadows.vtu```.  If plotted together with ```lid_driven_cavity.faces.vtu```, they close the domain.
+> **_Note:_** The exception is Lagrangian particle tracking which needs the periodic face-pairs not to allow particles escape the computational domain.  To visualize those period pairs, one can read the file ```lid_driven.shadows.vtu```.  If plotted together with ```lid_driven.faces.vtu```, they close the domain.
 
 ### Running the simulation.  
 
 In order to run a simulation, you have to compile _Process_ as explained in [this section](#compiling_sub_programs).  In addition to that, you need a special file called ```control``` which controls all the numerical parameters (by _numerical_ we mean discretization), physical models (turbulence, multiphase, multiple domains) and linear solver parameters (either for native or PETSc, if the code was compiled with PETSc) and most importantly sets boundary condition.  Although the amount of options which can be prescribed in ```control``` file is rather big, T-Flows' _Processs_ is very flexible and for all the options which are not specified, it takes default values.  At its bare minimum, ```control``` file needs problem name specified, to know which grids to read (files ```.cfn``` and ```.dim```) and boundary conditions.
 
-In order to facilitate the setup of ```control``` files, _Convert_ and _Generate_ create a control file template for the given grid.  In this case, the control file template is called ```control_template_for_lid_driven_cavity``` and it resides in the current directory.  Feel free to open it, because it comes with a lots of useful information:
+In order to facilitate the setup of ```control``` files, _Convert_ and _Generate_ create a control file template for the given grid.  In this case, the control file template is called ```control_template_for_lid_driven``` and it resides in the current directory.  Feel free to open it, because it comes with a lots of useful information:
 ```
 #-----------------------------------------------------------
 # This is a minimum control file for T-Flows for the domain
-# "lid_driven_cavity"
+# "lid_driven"
 #
 # One can use it as a staring point for defining entries
 # in T-Flows' control file.  These files are created at
@@ -463,7 +468,7 @@ In order to facilitate the setup of ```control``` files, _Convert_ and _Generate
 # Problem name must be specified and corresponds to the
 # base name (without extensions) of the grid file used.
 #-----------------------------------------------------------
-PROBLEM_NAME        lid_driven_cavity
+PROBLEM_NAME        lid_driven
 
 #-----------------------------------------------------------
 # Boundary conditions also must be specified and are
@@ -557,13 +562,13 @@ BOUNDARY_CONDITION lower_wall
 ```
 Please read through it, it gives a lots of explanations which are probably not worth repeating here.  We will cover different options in subsequent sections of this manual.  For the sake of shortness, copy the template control file to just ```control``` file with:
 ```
-cp  control_template_for_lid_driven_cavity  control
+cp  control_template_for_lid_driven  control
 ```
 
 remove all non-essential comments and set the velocity of the moving wall to ```1.0``` in the section ```BOUNDARY_CONDITION moving_wall``` until you get this:
 ```
 # Problem name
-PROBLEM_NAME        lid_driven_cavity
+PROBLEM_NAME        lid_driven
 
 # Boundary conditions
 BOUNDARY_CONDITION moving_wall
@@ -680,7 +685,7 @@ Since we know that this test case reaches a steady solution in the end, we shoul
 Number of iterations are all one or two, but not quite zero yet.  So, if we want to be purists, we can't say we achieved steady state to the tolerance set by T-Flows.  In order to work around it, we could either increase the number of time steps, or the time step itself.  Since CFL is well below unity, let's re-run the simulation with ```control``` file modified as:
 ```
 # Problem name                                                                   
-PROBLEM_NAME        lid_driven_cavity                                            
+PROBLEM_NAME        lid_driven                                            
 
 # Time step                                                                      
 TIME_STEP  0.1                                                                   
@@ -726,7 +731,7 @@ With time step set to ```0.1```, convergence is observed after 312 time steps si
                        #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
                        #---------------------------+---------------------------+---------------------------#
 ```
-That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven_cavity-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cut-plane through the middle of the domain vectors represented glyphs and pressure with a colormap:
+That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cut-plane through the middle of the domain vectors represented glyphs and pressure with a colormap:
 
 ![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "Lid driven hexa solution")
 
@@ -736,7 +741,7 @@ but you obviously have the freedom to explore other options in ParaView.
 
 ##### Refining the grid
 
-This grid was rather coarse, only 20 x 20 cells in the cross plane, and three rows of cells in the spanwise direction.  Since spanwise direction is periodic, it doesn't make sense in it, but you can refine in other directions.  To that end, you should modify the ```lid_driven_cavity.geo``` file in line which currently reads:
+This grid was rather coarse, only 20 x 20 cells in the cross plane, and three rows of cells in the spanwise direction.  Since spanwise direction is periodic, it doesn't make sense in it, but you can refine in other directions.  To that end, you should modify the ```lid_driven.geo``` file in line which currently reads:
 ```
 NA = 20;    // resolution in length and height
 ```
@@ -745,8 +750,8 @@ to:
 NA = 40;    // resolution in length and height
 ```
 After that, you should:
-- Re-run GMSH with: ```gmsh -3 lid_driven_cavity.geo```
-- Re-run _Convert_ with the newly created ```lid_driven_cavity.msh``` file
+- Re-run GMSH with: ```gmsh -3 lid_driven.geo```
+- Re-run _Convert_ with the newly created ```lid_driven.msh``` file
 - Re-Run _Process_ with ```../../../../Binaries/Process > out_finer_mesh  &```
 
 and see how the results look on a refined mesh.  You can carry on my increasing the parameter ```NA``` to 80, 160, or even higher values.
@@ -764,7 +769,7 @@ The sequence outlined above represents a typical workflow in T-Flows, hence:
 
 Since in the workflow outline above, entering values into _Convert_ every time you run can become tedious, you can speed up the process by creating a special file, we call it ```convert.scr``` which contains all the answers you give to _Convert_.  In this particular case, the file ```convert.scr``` would look like:
 ```
-lid_driven_cavity.msh
+lid_driven.msh
 no
 skip
 2
@@ -789,9 +794,9 @@ Orthogonal/
 ```
 and from there on you can invoke them with simple ```./Convert``` and ```./Process```.
 
-### On dual grids
+### On polyhedral grid <a name=#test_cases_lid_driven_dual></a>
 
-During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Dual``` where you will find the following files:
+During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven/Dual``` where you will find the following files:
 * ```lid_dual.geo```
 * ```convert.scr````
 
@@ -819,10 +824,10 @@ it will creates a computation grid like this:
 ![Lid-driven prismatic!](Documentation/Manual/Figures/lid_driven.png "Lid driven prismatic grid")
 
 For a node-base numerical framework this grid looks rather descent, but T-Flows is cell-based and on grids based on triangular prisms (and tertahedra) induce:
-- poor accuracy of gradient computation which impacts the accuracy of the overall numerical scheme, and 
+- poor accuracy of gradient computation which impacts the accuracy of the overall numerical scheme, and
 - large explicit diffusion terms causing slower convergence of pressure-velocity coupling algorithm (SIMPLE or PISO in T-Flows)
 
-The disadvantage of the tetrahedral grids has been recognized long ago, and polyhedral grids have been introduced as their alternatives.  In mathematical sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  Having mentioned the duality of the two grids, it is worth briefly explaining how _Convert_ performs this.  It reads a grid with triangular prisms and/or tetrahedra in the usual way, does its conversion (finds the connectivity between cells, faces, nodes and edges it needs) and in the next step creates a graph dual of the first mesh.  This little explanation is to justify why, in order to create dual grids, you will have to answer twice as many 
+The disadvantage of the tetrahedral grids has been recognized long ago, and polyhedral grids have been introduced as their alternatives.  In mathematical sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  Having mentioned the duality of the two grids, it is worth briefly explaining how _Convert_ performs this.  It reads a grid with triangular prisms and/or tetrahedra in the usual way, does its conversion (finds the connectivity between cells, faces, nodes and edges it needs) and in the next step creates a graph dual of the first mesh.  This little explanation is to justify why, in order to create dual grids, you will have to answer twice as many
 
 
 
@@ -830,6 +835,6 @@ The disadvantage of the tetrahedral grids has been recognized long ago, and poly
 
 ![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid driven dual solution")
 
-## Thermally-driven cavity flow <a name="test_cases_thermally_driven_cavity"></a>
+## Thermally-driven cavity flow <a name="test_cases_thermally_driven"></a>
 
 # Parallel processing  <a name="parallel_proc"></a>
