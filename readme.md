@@ -224,7 +224,7 @@ and you are ready to start your first simulations.
 
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a cavity:
 
-![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_domain.png "Lid driven cavity domain")
+![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_domain.png "Lid-driven cavity domain")
 
 The flow occurs in a cavity with square cross section, in which all the walls are static except the top one which is moving.  The cavity is long enough in the spanwise direction that an assumption of two-dimensionality can be made.  The simplicity of this case is hard to beat as it occurs in one of the simplest possible domain geometries (a cube or a square in two dimensions), the fact that there are no inflow and outflow boundaries, and that there are steady laminar solutions for a range of Reynolds numbers.  Owing to its simplicity, it is well documented, often used to benchmark CFD codes and, for its simplicity, quite often the first test case one ever considers with a new CFD code.
 
@@ -441,13 +441,13 @@ Hexa/
 
 Which will be described next.  Files with extension ```.cfn``` and ```.dim``` are binary files in internal T-Flows format, which can be read by _Process_ (or _Divide_ for domain decomposition, which is covered in the separate [section](#parallel_proc) below).  A number of files with extension ```.vtu``` is created too.  You can visualize them with ParaView or VisIt for inspection.  The most interesting is the ```lid_driven.faces.vtu``` because it shows boundary conditions.  Once visualized, the ```lid_driven.faces.vtu``` shows the following:
 
-![Lid-driven hexa front!](Documentation/Manual/Figures/lid_driven_hexa_front.png "Lid driven hexa front")
+![Lid-driven hexa front!](Documentation/Manual/Figures/lid_driven_hexa_front.png "Lid-driven hexa front")
 
 which reveals boundary conditions for this case, which are show in different colors.  Light blue is for the inside cells (no boundary conditions there) and orange and red are for different boundary conditions.
 
 if you rotate the domain in ParaView, you will see something which may surprise you at first:
 
-![Lid-driven hexa back!](Documentation/Manual/Figures/lid_driven_hexa_back.png "Lid driven hexa back")
+![Lid-driven hexa back!](Documentation/Manual/Figures/lid_driven_hexa_back.png "Lid-driven hexa back")
 
 The cells in the back seem to be hollow, as if they are missing the faces on periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data structure (that is each face works on the cells surrounding it) the faces are stored on one side of periodic boundary, but still have information about cells on each side of periodicity.  It is enough to browse through one copy of the periodic face for almost all numerical algorithms in T-Flows.
 
@@ -748,7 +748,7 @@ With time step set to ```0.1```, convergence is observed after 312 time steps si
 ```
 That is it, you got your first CFD solutions with T-Flows.  You can read the final results (```lid_driven-ts001200.vtu```) in ParaView, and explore different options for visualization of results.  We chose to plot a cut-plane through the middle of the domain vectors represented glyphs and pressure with a colormap:
 
-![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "Lid driven hexa solution")
+![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "Lid-driven hexa solution")
 
 but you obviously have the freedom to explore other options in ParaView.
 
@@ -846,7 +846,7 @@ and convert it to T-Flows format with:
 ```
 it will creates a computation grid like this:
 
-![Lid-driven prismatic!](Documentation/Manual/Figures/lid_driven.png "Lid driven prismatic grid")
+![Lid-driven prismatic!](Documentation/Manual/Figures/lid_driven.png "Lid-driven prismatic grid")
 
 For a node-base numerical framework this grid looks rather descent, but T-Flows is cell-based and on grids based on triangular prisms (and tertahedra) induce:
 - poor accuracy of gradient computation which impacts the accuracy of the overall numerical scheme, and
@@ -885,7 +885,7 @@ Dual/
 
 The first two are T-Flows's native files for further processing, and the remaining four are for you to explore with Paraview.  Opening the ```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the same as in the [previous case](#test_cases_lid_driven_hexa):
 
-![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid driven polyhedral grid")
+![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid-driven polyhedral grid")
 
 To run the case, we have already provided the ```control``` file, derived from the previous case we ran.  Here it is in full:
 ```
@@ -913,15 +913,15 @@ BOUNDARY_CONDITION lower_wall
 ```
 The only novelty compared to the previous case is line with the ```PROBLEM_NAME```.  It is set to ```lid_driven_dual``` here.  In any case, after running the simulation, a possible representation fo the solution looks like:
 
-![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid driven dual solution")
+![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid-driven dual solution")
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven"></a>
 
 Thermally-driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
 
-The biggest differences between the cases is the driving force.  Whereas the lid-driven cavity flow is driven by shear created by top moving wall, thermally driven cavity is driven by the buoyancy forces occurring on vertical opposing sides of the problem domain:
+The biggest differences between the cases is the driving force.  Whereas the lid-driven cavity flow is driven by shear created by top moving wall, thermally-driven cavity is driven by the buoyancy forces occurring on vertical opposing sides of the problem domain:
 
-![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally driven cavity domain")
+![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally-driven cavity domain")
 
 In the figure above the left (red) wall is kept at higher temperature than the right wall (blue), which creates clockwise motion of the fluid.  
 
@@ -994,7 +994,7 @@ We advise to run ```seek_binaries.sh``` next to get all executables to current d
 
 If you visualize the file ```therm_driven.faces.vtu``` created by _Convert_ you will see this:
 
-![Thermally-driven front!](Documentation/Manual/Figures/thermally_driven_front.png "Thermally driven front")
+![Thermally-driven front!](Documentation/Manual/Figures/thermally_driven_front.png "Thermally-driven front")
 
 a grid with cells clustered towards the walls for better resolution of boundary layers.  It is not a waste of time to visualize grids created by _Convert_ to make sure that no anomalities are present.  
 
@@ -1197,7 +1197,7 @@ With these settings in the control file, you will reach convergence in about 400
 ```
 Having obtained steady solution for this case, you may visualise some results in ParaView by opening the file: ```therm_driven-ts001200.vtu```.  Here we show solutions for temperature with velocity vectors scaled by their magitude:
 
-![Thermally-driven solution!](Documentation/Manual/Figures/thermally_driven_solution.png "Thermally driven solution")
+![Thermally-driven solution!](Documentation/Manual/Figures/thermally_driven_solution.png "Thermally-driven solution")
 
 #### Thing to try next
 
@@ -1510,7 +1510,7 @@ gmsh -3 air.geo
 script ```seek_binaries.sh``` and that you have compiled _Process_ with user 
 functions, i.e. with command: ```make DIR_CASE=../../Tests/Manual/Thermally_Driven/Varible```
 
-In the case of thermally driven cavity with Boussinesq approximation, we were
+In the case of thermally-driven cavity with Boussinesq approximation, we were
 setting physical properties _and_ gravitational vector in a way to meet the
 desired _Ra_ number.  Here, physical properties are physical, dependent on
 temperature, as meassured and reported [here](https://theengineeringmindset.com/properties-of-air-at-atmospheric-pressure/).
@@ -1523,10 +1523,10 @@ the scaling factor used.
 
 The final velocity vector imposed over the temperature fields look like this:
 
-![Thermally-driven variable temp!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_temp.png "Thermally driven variable temp")
+![Thermally-driven variable temp!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_temp.png "Thermally-driven variable temp")
 
 whereas the same velocity vectors over pressure, look like:
 
-![Thermally-driven variable press!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_press.png "Thermally driven variable temp")
+![Thermally-driven variable press!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_press.png "Thermally-driven variable temp")
 
 # Parallel processing  <a name="parallel_proc"></a>
