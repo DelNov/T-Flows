@@ -301,7 +301,7 @@ lid_driven.msh
 ```
 > **_Note:_** Both GMSH and Fluent produce grid files with extnesion ```.msh```, the formats are completely different and GMSH makes an educated guess which one it is reading based on its contents.
 
-#### Converting the mesh to T-Flows format <a name="test_cases_lid_driven_hexa_convert"></a> 
+#### Converting the mesh to T-Flows format <a name="test_cases_lid_driven_hexa_convert"></a>
 
 Once you have the mesh in this format, you can use _Convert_ to transform it into T-Flows native file format.  This will take a few minutes and will require your attention, so we don't recommend you going on with _Convert_ unless you are sure you can have 15 minutes of peace and focus ahead of you.  We assume you compiled _Convert_ as it was described in [this section](#compiling_sub_programs).   Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```, you can call _Convert_ with:
 ```
@@ -796,6 +796,10 @@ Hexa/
 ```
 and from there on you can invoke them with simple ```./Convert``` and ```./Process```.
 
+#### Try some of the standard T-Flows's cases
+
+Better and more elaborate test cases for the lid-driven cavity flow have been set in ```[root]/Tests/Laminar/Cavity/Lid_Driven```.  Feel free to explore them further.
+
 ### On polyhedral grid <a name="test_cases_lid_driven_dual"></a>
 
 During the conversion process outlined above, you were asked if you wanted to created a dual grid which we simply skipped.  In this section, we will show you what is behind it.  In order to run this case, please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Dual``` where you will find the following files:
@@ -900,5 +904,276 @@ The only novelty compared to the previous case is line with the ```PROBLEM_NAME`
 ![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid driven dual solution")
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven"></a>
+
+Thermally driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven_cavity).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
+
+The biggest differences between the cases is the driving force.  Whereas the lid-driven cavity flow is driven by shear created by top moving wall, thermally driven cavity is driven by the buoyancy forces occurring on vertical opposing sides of the problem domain:
+
+![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally driven cavity domain")
+
+In the figure above the left (red) wall is kept at higher temperature than the right wall (blue), which creates clockwise motion of the fluid.  To solve this case, please go to the directory: ```[root]/Tests/Manual/Thermally_Driven/Direct``` where you can find the following files:
+```
+Direct/
+├── convert.scr
+└── therm_driven.geo
+```
+The ```.geo``` file is the GMSH script.  Since the geometries for the lid-driven [cavity flow](#tests_lid_driven_cavity) and this case are almost the same, the similarity in the ```.geo``` shouldn't be a suprise.  You can find the following differences:
+```
+A    =  1.0;  // length and height of the cavity
+B    =  0.1;  // width of the cavity
+NA   = 60;    // resolution in length and height
+NB   =  3;    // resolution in width (periodic direction)
+BUMP = 0.1;   // control clustering towards the walls
+
+...
+...
+
+// Set lines to transfinite
+// (+1 is because GMSH expects number of points here)
+Transfinite Curve {1, 2, 3, 4} = NA+1  Using Bump BUMP;
+...
+...
+
+// Define boundary conditions
+Physical Surface("upper_wall", 27) = {21};
+Physical Surface("left_wall", 28) = {17};
+Physical Surface("right_wall", 29) = {25};
+Physical Surface("lower_wall", 30) = {13};
+Physical Surface("periodic_y", 31) = {1, 26};
+...
+...
+```
+The novelties include:
+- increased resolution ```NA```
+- new parameter ```BUMP``` which ...
+- controls the clustering of the lines towards the walls in the calle to ```Transfinite Curve```
+- boundary condition names have changed; ```left_wall``` and ```right_wall``` are new, the ```side_walls``` has been dropped.
+
+First thing would be to generate the mesh with:
+```
+gmsh -3 therm_driven.geo
+```
+
+which will create ```therm_driven.msh```.
+
+> **_Note:_** For those without GMSH, the file ```therm_driven.msh.gz``` is provided.
+
+We advise to run ```seek_binaries.sh``` next to get all executables to current directiory, after which you can call _Convert_ with provided script:
+```
+./Convert < convert.scr
+```
+
+> **_Note:_** The script ```convert.scr``` is also almost the same as in the case of the lid-driven cavity.  You can explore it yourself to check that only the input file name is different (```therm_driven.msh``` instead of ```lid_driven.msh```), and that periodic boundary is listed under different number (```5```, not ```4```).
+
+If you visualize the file ```therm_driven.faces.vtu``` created by _Convert_ you will see this:
+
+![Thermally-driven front!](Documentation/Manual/Figures/thermally_driven_front.png "Thermally driven front")
+
+a grid with cells clustered towards the walls for better resolution of boundary layers.  It is not a waste of time to visualize grids created by _Convert_ to make sure that no anomalities are present.  
+
+With grids converted, we should set up the ```control``` file.  To that end, lets' consider the section related to boundary conditions created by _Convert_ (```control_template_for_therm_driven```, with all variables which are not solved removed for the sake of clarity:
+```
+BOUNDARY_CONDITION upper_wall
+  TYPE             wall
+  VARIABLES        u     v     w     q
+  VALUES           0.0   0.0   0.0   0.0
+
+BOUNDARY_CONDITION left_walls
+  TYPE             wall
+  VARIABLES        u     v     w     t
+  VALUES           0.0   0.0   0.0   1.0
+
+BOUNDARY_CONDITION right_walls
+  TYPE             wall
+  VARIABLES        u     v     w     t
+  VALUES           0.0   0.0   0.0   0.0
+
+BOUNDARY_CONDITION lower_wall
+  TYPE             wall
+  VARIABLES        u     v     w     q
+  VALUES           0.0   0.0   0.0   0.0
+
+```
+In the above, we left velocities at all walls to zero, we set temperature at the left wall to ```1.0```, temperature at the ```right_wall``` to ```0.0```, but in order to specify that ```upper_wall``` and ```lower_wall``` are with prescribed heat flux rather than temperature, we change letter ```t``` to ```q``` (as a usual symbol for heat flux).  We also set it to zero, because they are insulated.
+
+We should also instruct _Process_ to solve for temperature, which is obtained with the line:
+```
+HEAT_TRANSFER    yes
+```
+Given that the temperatures at the boundaries are zero and one, and since there are no internal sources or sinks, we may expect final average temperature to be around 0.5.  Hence, it makes sense to set initial temperature to be 0.5 everywhere:
+```
+ INITIAL_CONDITION
+   VARIABLES           u     v     w     t
+   VALUES              0.0   0.0   0.0   0.5
+```
+
+Next, we should also specify physical properties.  For this case, we will solve equations in their non-dimensional form:
+
+EQUATIONS WHICH ARE MISSING
+
+from which we can see that the flow is fully characterized with two non-dimenensional numbers: Rayleigh (_Ra_) and Prandtl (_Pr_).  _Process_ doesn't know about these numbers, so we set physical properties in a way to reach the desired values.  If we want to solve the case for:
+- _Ra_ = 1.0e+6
+- _Pr_ = 0.71
+
+physical properties section in the control file should read:
+```
+ # Properties based on Pr and Ra numbers:
+ # Pr = 0.71
+ # Ra = 10e6
+ # mu     = 1.0 / sqrt(Pr * Ra) = 0.001186781658
+ # lambda = sqrt(Pr / Ra)       = 0.000842614977
+ DYNAMIC_VISCOSITY      0.001186781658
+ THERMAL_CONDUCTIVITY   0.000842614977
+```
+Mass density, heat capacity and thermal expansion coefficient are not set, and _Process_ will set them to their default values of 1.0.
+
+> **_Note:_** Be reminded that default values for all parameters needed by _Process_ are outlined in the file: ```[root]/Documentation/all_control_keywords```.
+
+We should also instruct _Process_ that we want to use Boussinesq approximation to solve the system, which is obtained with the line:
+```
+ BUOYANCY         thermal
+```
+_Process_ also needs to know the direction and magnitude of the gravitational vector which is set by:
+```
+GRAVITATIONAL_VECTOR   0.0  0.0  -1.0
+```
+
+Since we know in advance that the velocities in this case are rather small we can increase the time step to 1.0:
+```
+TIME_STEP    1.0
+```
+and, since we seek a steady solution, we can reduce the saving frequency as:
+```
+RESULTS_SAVE_INTERVAL    300
+```
+
+_Process_, by default, links velocities and pressure through the SIMPLE algorith.  (The other option in the code is PISO.)  An important aspect of the pressure-velocity algorithms are the _under-relaxation_ factors, which may be fiddled with in order to improve convergence of the solution procedure.  If not specified, _Process_ sets very conservative (read: small) values to make sure the system will converge.  For this case, given that it's reletivelly simple, laminar, and that we have to make sure that temperatures reach final stratification, we may want to set them explicitly.  From simulations we conducted beforehand, we found these values to work for this case:
+```
+ PRESSURE_MOMENTUM_COUPLING             simple
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+ SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.3
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
+```
+
+> **_Note:_** The first line is optional, since default pressure-velocity coupling in T-Flows is SIMPLE.
+
+Another thing worth noting for this case is that the default linear solver parameters might not be the best ones (for all variables solved, it is 1.0e-6).  This may be too tight for velocities and temperature, and a bit too loose for pressure.  We therefore set them as following:
+```
+ LINEAR_SOLVERS                     native
+ TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+ TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-7
+```
+First line tells _Process_ to use its owen (_native_) solvers, whereas the remaining three lines are self-explanatory, we trully believe.
+
+With all this in place, the entire control file may read like this:
+```
+# Problem name
+ PROBLEM_NAME             therm_driven
+
+# Related to temperature
+ HEAT_TRANSFER            yes
+ BUOYANCY                 thermal
+ GRAVITATIONAL_VECTOR     0.0  0.0  -1.0
+
+# Time stepping
+ TIME_STEP                1
+ RESULTS_SAVE_INTERVAL  300
+
+# Properties based on Pr and Ra numbers:
+# Pr = 0.71
+# Ra = 10e6
+# mu     = 1.0 / sqrt(Pr * Ra) = 0.001186781658
+# lambda = sqrt(Pr / Ra)       = 0.000842614977
+ DYNAMIC_VISCOSITY      0.001186781658
+ THERMAL_CONDUCTIVITY   0.000842614977
+
+# Initial conditions
+ INITIAL_CONDITION
+   VARIABLES           u     v     w     t
+   VALUES              0.0   0.0   0.0   0.5
+
+# Numerical parameters
+ PRESSURE_MOMENTUM_COUPLING             simple
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+ SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.3
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
+ TOLERANCE_FOR_SIMPLE_ALGORITHM         1.0e-3
+
+# Linear solver parameters
+ LINEAR_SOLVERS                     native
+ TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+ TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-7
+
+# Initial condition
+ INITIAL_CONDITION
+   VARIABLES           u     v     w     t
+   VALUES              0.0   0.0   0.0   0.5
+
+# Boundary conditions
+ BOUNDARY_CONDITION upper_wall
+   TYPE             wall
+   VARIABLES        u     v     w     q
+   VALUES           0.0   0.0   0.0   0.0
+
+ BOUNDARY_CONDITION left_wall
+   TYPE             wall
+   VARIABLES        u     v     w     t
+   VALUES           0.0   0.0   0.0   1.0
+
+ BOUNDARY_CONDITION right_wall
+   TYPE             wall
+   VARIABLES        u     v     w     t
+   VALUES           0.0   0.0   0.0   0.0
+
+ BOUNDARY_CONDITION lower_wall
+   TYPE             wall
+   VARIABLES        u     v     w     q
+   VALUES           0.0   0.0   0.0   0.0
+```
+We say "may" because, as mentioned above, the order of individual entries doesn't matter.  Feel free to copy the above contents to ```control``` file and launch the simulation with:
+```
+./Process > out &
+```
+given that you created soft links to executables in this directory with ```seek_binaries.sh``` script.
+
+With these settings in the control file, you will reach convergence in about 400 time step, as obvious from the output:
+```
+                                         #===============================================#
+                                         #                                               #
+                                         #              Time step :   1000               #
+                                         #                                               #
+                                         #    Simulation time : 1.000E+03 [s]            #
+                                         #    Wall-clock time : 000:01:39 [hhh:mm:ss]    #
+                                         #                                               #
+                                         #-----------------------------------------------#
+
+  #=============================================================================================================================#
+  #                                                        Iteration:  1                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 9.044E-04 | V   :  0 0.000E+00 | W   :  0 8.232E-04 | PP  :  0 0.000E+00 | MASS:    9.222E-07 | T   :  0 9.996E-04 #
+  #=============================================================================================================================#
+  #                                                        Iteration:  2                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 9.044E-04 | V   :  0 0.000E+00 | W   :  0 8.232E-04 | PP  :  0 0.000E+00 | MASS:    9.222E-07 | T   :  0 9.996E-04 #
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 9.044E-04 | V   :  0 0.000E+00 | W   :  0 8.232E-04 | PP  :  0 0.000E+00 | MASS:    9.222E-07 | T   :  0 9.996E-04 #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 7.483E+00    |    Maximum Peclet number: 5.288E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x :  0.000E+00    |    Flux y :   1.91E-12    |    Flux z :   0.00E+00    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       #---------------------------+---------------------------+---------------------------#
+```
+Having obtained steady solution for this case, you may visualise some results in ParaView by opening the file: ```therm_driven-ts001200.vtu```.  Here we show solutions for temperature with velocity vectors scaled by their magitude:
+
+![Thermally-driven solution!](Documentation/Manual/Figures/thermally_driven_solution.png "Thermally driven solution")
+
+### Thing to try next
+
+Better and more elaborate test cases for the thermall-driven cavity flow have been set in ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Direct```, for a range of _Ra_ numbers.  Feel free to explore them further.
 
 # Parallel processing  <a name="parallel_proc"></a>
