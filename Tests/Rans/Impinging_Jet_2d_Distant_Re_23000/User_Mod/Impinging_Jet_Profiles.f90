@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Profiles(Turb)
+  subroutine User_Mod_Impinging_Jet_Profiles(Turb, ts)
 !------------------------------------------------------------------------------!
 !   Subroutine reads ".1D" file created by the "Generator" or "Convert"        !
 !   and extracts profiles on several locations that corresponds with the       !
@@ -23,6 +23,7 @@
                                ind(:)
   integer, allocatable      :: n_p(:), n_count(:)
   real                      :: r, r1, r2, u_aver, u_rad, u_tan, lnum
+  integer                   :: ts     ! time step
   logical                   :: there
 !==============================================================================!
 
@@ -72,7 +73,6 @@
     read(fu,*) ind(pl), z_p(pl)
   end do
   close(fu)
-!  call Sort_Mod_Real_Carry_Int(z_p(1:n_prob), ind(1:n_prob))
 
   allocate(n_p(n_prob));   n_p  = 0 
   allocate(um_p(n_prob));  um_p = 0.0
@@ -100,30 +100,37 @@
       r1 = 0.0
       r2 = 0.04
       lnum = 0.0
+      call File % Set_Name(res_name, time_step=ts, appendix='-0.0D', extension='.dat')
     else if(k .eq. 1) then
       r1 = 0.992
       r2 = 1.0
       lnum = 0.5
+      call File % Set_Name(res_name, time_step=ts, appendix='-0.5D', extension='.dat')
     else if(k .eq. 2) then
       r1 = 2.0
       r2 = 2.1500
       lnum = 1.0
+      call File % Set_Name(res_name, time_step=ts, appendix='-1.0D', extension='.dat')
     else if(k .eq. 3) then
       r1 = 2.9744
       r2 = 3.0684
       lnum = 1.5
+      call File % Set_Name(res_name, time_step=ts, appendix='-1.5D', extension='.dat')
     else if(k .eq. 4) then
       r1 = 3.9098
       r2 = 4.1433
       lnum = 2.0
+      call File % Set_Name(res_name, time_step=ts, appendix='-2.0D', extension='.dat')
     else if(k .eq. 5) then
       r1 = 0.4803200E+01
       r2 = 0.5347000E+01
       lnum = 2.5
+      call File % Set_Name(res_name, time_step=ts, appendix='-2.5D', extension='.dat')
     else if(k .eq. 6) then
       r1 = 0.5876600E+01
       r2 = 0.6000000E+01
       lnum = 3.0
+      call File % Set_Name(res_name, time_step=ts, appendix='-3.0D', extension='.dat')
     end if
 
     do i = 1, n_prob-1
@@ -207,7 +214,8 @@
     if(this_proc < 2) then
 
       ! Set the file name
-      call File % Set_Name(res_name, appendix='-prof', extension='.dat')
+!      call File % Set_Name(res_name, time_step=ts, &
+!                 appendix='-prof', extension='.dat')
       call File % Open_For_Writing_Ascii(res_name, fu)
 
       write(fu,'(a1,2x,a101)') '#', ' 1:Xrad, ' // &

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(Flow, Turb, ts)
+  subroutine User_Mod_Plain_Nu(Flow, turb, ts)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -7,11 +7,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: Turb
+  type(Turb_Type),  target :: turb
+!----------------------------------[Calling]-----------------------------------!
+  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
-  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu
+  type(Bulk_Type), pointer :: bulk
+  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu, ts
   character(SL)            :: result_name
   real, allocatable        :: r1_p(:), r2_p(:), z_p(:),  &
                               um_p(:), vm_p(:), wm_p(:), & 
@@ -25,11 +28,12 @@
   real                     :: kin_vis, u_tan, u_tau, tau_wall
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
-  integer                  :: ts
+  logical                  :: there
 !==============================================================================!
 
   ! Take aliases
   Grid => Flow % pnt_grid
+  bulk => Flow % bulk
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
@@ -44,7 +48,15 @@
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !
   !----------------------------------!
-  if(this_proc < 2) print *, '# Now reading the file: x_coordinate.dat ' 
+  inquire(file='x_coordinate.dat', exist=there)
+
+  if(.not.there) then
+    if(this_proc < 2) then
+      print *, "File x_coordinate.dat does not exist. Exit Plain_Nu.f90 !"
+    end if
+    return
+  end if
+
   open(9, file='x_coordinate.dat')
 
   ! Read the number of probes 
@@ -92,34 +104,26 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid % Bnd_Cond_Type(c2).eq.WALLFL.and.t % q(c2) > 1.e-8) then
+        if(Grid % Bnd_Cond_Type(c2).eq.WALL) then
           if(Grid % xc(c1) > z_p(i) .and. Grid % xc(c1) < z_p(i+1)) then
             um_p(i)   = um_p(i) + u % n(c1)
             vm_p(i)   = vm_p(i) + v % n(c1)
             wm_p(i)   = wm_p(i) + w % n(c1)
-            if(Turb % y_plus(c1) < 4.0) then
-              v1_p(i) = v1_p(i)  &
-                      + (2.0 * visc_const * u % n(c1)   &
-                             / Grid % wall_dist(c1))   &
-                      / (dens_const * 11.3**2)
-            else
-              kin_vis = visc_const / dens_const
-              u_tan = Flow % U_Tan(s)
-              u_tau = c_mu25 * sqrt(Turb % kin % n(c1))
-              Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
-                                                       Grid % wall_dist(c1),  &
-                                                       kin_vis)
-              tau_wall = dens_const * kappa * u_tau * u_tan    &
-                       / log(e_log*max(Turb % y_plus(c1), 1.05))
+            v1_p(i) = v1_p(i)  &
+                    + (2.0 * visc_const * u % n(c1)       &
+                           / (Grid % wall_dist(c1))   &
+                           / (dens_const * bulk % u**2))
 
-              v1_p(i) = v1_p(i)  &
-                      + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))
-            end if
-            v2_p(i) = v2_p(i) + Turb % y_plus(c1)
+            v2_p(i) = v2_p(i) &
+            + 0.664/sqrt(dens_const * bulk % u * (Grid % xc(c2)-0.5)/visc_const)
+            v3_p(i) = v3_p(i) + t % q(c2) * (Grid % xc(c2)-0.5)  &
+                    / ((t % n(c2) - 20) * Flow % conductivity(c2))
 
-            v3_p(i) = v3_p(i) + t % q(c2)  &
-                    / (dens_const * capa_const * (t % n(c2) - 20) * 11.3)
-            v5_p(i) = v5_p(i) + t % n(c2)
+            v4_p(i) = v4_p(i) + 0.332 * &
+            (dens_const * bulk % u * (Grid % xc(c2)-0.5)  &
+            /visc_const)**0.5*0.71**0.33333
+
+            v5_p(i) = v5_p(i) + t % q(c2)
             n_count(i) = n_count(i) + 1
           end if
         end if
@@ -156,10 +160,10 @@
     end if
   end do
 
-  call File % Set_Name(result_name, time_step=ts, appendix='-cf-st', extension='.dat')
+  call File % Set_Name(result_name, time_step=ts, appendix='-Nu', extension='.dat')
   call File % Open_For_Writing_Ascii(result_name, fu)
 
-  write(fu,*) '# x, Cf, St, U, T, yPlus'
+  write(fu,*) '# x, Cf, Cf_corr, Nu, Nu_corr, q'
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
       wm_p(i) = wm_p(i) / n_count(i)
@@ -177,12 +181,13 @@
       v4_p(i) = v4_p(i) / n_count(i)
       v5_p(i) = v5_p(i) / n_count(i)
 
-      write(fu,'(6es15.5e3)') (z_p(i)+z_p(i+1))/(2.*0.038),  &
+      if(z_p(i) > 0.5) & 
+      write(fu,'(6es15.5e3)') (z_p(i)+z_p(i+1))/2.,          &
                               v1_p(i),                       &
+                              v2_p(i),                       &
                               v3_p(i),                       &
-                              um_p(i),                       &
-                              v5_p(i),                       &
-                              v2_p(i) 
+                              v4_p(i),                       &
+                              v5_p(i)
     end if
   end do 
   close(fu)
@@ -212,6 +217,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) write(*,*) '# Finished with User_Backstep_Cf_St'
+  if(this_proc < 2) write(*,*) '# Finished with User_Plain_Nu'
 
   end subroutine

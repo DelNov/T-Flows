@@ -1,7 +1,7 @@
 # Grace project file
 #
 @version 50125
-@page size 792, 612
+@page size 842, 595
 @page scroll 5%
 @page inout 5%
 @link page off
@@ -105,7 +105,7 @@
 @default font 0
 @default char size 1.000000
 @default symbol size 1.000000
-@default sformat "%16.8g"
+@default sformat "%.8g"
 @background color 0
 @page background fill on
 @timestamp off
@@ -114,7 +114,7 @@
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Thu Feb 17 12:47:16 2022"
+@timestamp def "Mon Feb 14 11:59:55 2022"
 @r0 off
 @link r0 to g0
 @r0 type above
@@ -161,7 +161,7 @@
 @g0 fixedpoint format general general
 @g0 fixedpoint prec 6, 6
 @with g0
-@    world 0.501187234, 0, 300, 25
+@    world 0, 0, 50, 200
 @    stack world 0, 0, 0, 0
 @    znorm 1
 @    view 0.150000, 0.150000, 1.150000, 0.850000
@@ -169,11 +169,11 @@
 @    title font 0
 @    title size 1.500000
 @    title color 1
-@    subtitle ""
+@    subtitle "Nusselt number"
 @    subtitle font 0
-@    subtitle size 1.000000
+@    subtitle size 1.330000
 @    subtitle color 1
-@    xaxes scale Logarithmic
+@    xaxes scale Normal
 @    yaxes scale Normal
 @    xaxes invert off
 @    yaxes invert off
@@ -184,17 +184,16 @@
 @    xaxis  bar color 1
 @    xaxis  bar linestyle 1
 @    xaxis  bar linewidth 1.0
-@    xaxis  label "z\S+"
+@    xaxis  label "x"
 @    xaxis  label layout para
-@    xaxis  label place spec
-@    xaxis  label place 0.000000, 0.080000
-@    xaxis  label char size 1.900000
+@    xaxis  label place auto
+@    xaxis  label char size 1.310000
 @    xaxis  label font 0
 @    xaxis  label color 1
 @    xaxis  label place normal
 @    xaxis  tick on
 @    xaxis  tick major 10
-@    xaxis  tick minor ticks 9
+@    xaxis  tick minor ticks 1
 @    xaxis  tick default 6
 @    xaxis  tick place rounded true
 @    xaxis  tick in
@@ -224,7 +223,7 @@
 @    xaxis  ticklabel start 0.000000
 @    xaxis  ticklabel stop type auto
 @    xaxis  ticklabel stop 0.000000
-@    xaxis  ticklabel char size 1.910000
+@    xaxis  ticklabel char size 1.300000
 @    xaxis  ticklabel font 0
 @    xaxis  ticklabel color 1
 @    xaxis  tick place both
@@ -236,16 +235,15 @@
 @    yaxis  bar color 1
 @    yaxis  bar linestyle 1
 @    yaxis  bar linewidth 1.0
-@    yaxis  label "U\S+"
+@    yaxis  label "Nu"
 @    yaxis  label layout para
-@    yaxis  label place spec
-@    yaxis  label place 0.000000, 0.080000
-@    yaxis  label char size 1.900000
+@    yaxis  label place auto
+@    yaxis  label char size 1.390000
 @    yaxis  label font 0
 @    yaxis  label color 1
 @    yaxis  label place normal
 @    yaxis  tick on
-@    yaxis  tick major 5
+@    yaxis  tick major 50
 @    yaxis  tick minor ticks 1
 @    yaxis  tick default 6
 @    yaxis  tick place rounded true
@@ -276,7 +274,7 @@
 @    yaxis  ticklabel start 0.000000
 @    yaxis  ticklabel stop type auto
 @    yaxis  ticklabel stop 0.000000
-@    yaxis  ticklabel char size 1.910000
+@    yaxis  ticklabel char size 1.300000
 @    yaxis  ticklabel font 0
 @    yaxis  ticklabel color 1
 @    yaxis  tick place both
@@ -285,7 +283,7 @@
 @    altyaxis  off
 @    legend on
 @    legend loctype view
-@    legend 0.3, 0.85
+@    legend 0.6, 0.8
 @    legend box color 1
 @    legend box pattern 1
 @    legend box linewidth 1.0
@@ -293,7 +291,7 @@
 @    legend box fill color 0
 @    legend box fill pattern 1
 @    legend font 0
-@    legend char size 1.330000
+@    legend char size 1.370000
 @    legend color 1
 @    legend length 4
 @    legend vgap 1
@@ -308,8 +306,8 @@
 @    frame background pattern 0
 @    s0 hidden false
 @    s0 type xy
-@    s0 symbol 1
-@    s0 symbol size 0.980000
+@    s0 symbol 0
+@    s0 symbol size 1.000000
 @    s0 symbol color 1
 @    s0 symbol pattern 1
 @    s0 symbol fill color 1
@@ -318,10 +316,10 @@
 @    s0 symbol linestyle 1
 @    s0 symbol char 65
 @    s0 symbol char font 0
-@    s0 symbol skip 2
-@    s0 line type 0
+@    s0 symbol skip 0
+@    s0 line type 1
 @    s0 line linestyle 1
-@    s0 line linewidth 1.0
+@    s0 line linewidth 3.0
 @    s0 line color 1
 @    s0 line pattern 1
 @    s0 baseline type 0
@@ -343,7 +341,7 @@
 @    s0 avalue append ""
 @    s0 avalue offset 0.000000 , 0.000000
 @    s0 errorbar on
-@    s0 errorbar place normal
+@    s0 errorbar place both
 @    s0 errorbar color 1
 @    s0 errorbar pattern 1
 @    s0 errorbar size 1.000000
@@ -353,11 +351,11 @@
 @    s0 errorbar riser linestyle 1
 @    s0 errorbar riser clip off
 @    s0 errorbar riser clip length 0.100000
-@    s0 comment "Cols 1:2"
-@    s0 legend  "DNS, Kim et al. (1898)"
+@    s0 comment "Cols 1:4"
+@    s0 legend  "numerical solution"
 @    s1 hidden false
 @    s1 type xy
-@    s1 symbol 0
+@    s1 symbol 1
 @    s1 symbol size 1.000000
 @    s1 symbol color 1
 @    s1 symbol pattern 1
@@ -368,9 +366,9 @@
 @    s1 symbol char 65
 @    s1 symbol char font 0
 @    s1 symbol skip 0
-@    s1 line type 1
+@    s1 line type 0
 @    s1 line linestyle 1
-@    s1 line linewidth 2.0
+@    s1 line linewidth 1.0
 @    s1 line color 1
 @    s1 line pattern 1
 @    s1 baseline type 0
@@ -402,140 +400,151 @@
 @    s1 errorbar riser linestyle 1
 @    s1 errorbar riser clip off
 @    s1 errorbar riser clip length 0.100000
-@    s1 comment "Cols 1:2"
-@    s1 legend  "LES"
+@    s1 comment "Cols 1:5"
+@    s1 legend  "analitical solution"
 @target G0.S0
 @type xy
-               0       2.9866e-11
-        0.054213          0.05327
-         0.21682          0.21295
-         0.48772          0.47865
-         0.86675          0.84964
-          1.3537           1.3247
-          1.9482           1.9016
-            2.65           2.5759
-          3.4586           3.3397
-          4.3736             4.18
-          5.3944           5.0774
-          6.5203           6.0069
-          7.7507           6.9403
-          9.0849           7.8502
-          10.522           8.7133
-          12.061            9.513
-          13.702            10.24
-          15.442           10.892
-          17.282            11.47
-           19.22            11.98
-          21.254            12.43
-          23.384           12.825
-          25.609           13.174
-          27.926           13.484
-          30.335           13.759
-          32.835           14.007
-          35.423           14.232
-          38.098           14.438
-          40.858           14.628
-          43.702           14.806
-          46.629           14.974
-          49.636           15.133
-          52.721           15.286
-          55.883           15.432
-          59.119           15.574
-          62.429           15.711
-          65.809           15.844
-          69.258           15.974
-          72.774           16.101
-          76.355           16.226
-          79.997           16.348
-            83.7           16.467
-          87.462           16.583
-          91.278           16.696
-          95.149           16.805
-           99.07           16.911
-          103.04           17.014
-          107.06           17.113
-          111.12           17.209
-          115.22           17.301
-          119.36           17.389
-          123.54           17.474
-          127.75           17.555
-          131.99           17.632
-          136.26           17.705
-          140.56           17.771
-          144.88           17.832
-          149.23           17.887
-          153.59           17.936
-          157.97           17.978
-          162.36           18.013
-          166.76            18.04
-          171.17            18.06
-          175.58           18.072
-             180           18.076
+1.25 13.8309
+1.75 18.4803
+2.25 22.0769
+2.75 24.9665
+3.25 27.7549
+3.75 30.4834
+4.25 32.7325
+4.75 34.5239
+5.25 36.7627
+5.75 39.0074
+6.25 40.8125
+6.75 42.6286
+7.25 43.9988
+7.75 45.3783
+8.25 47.2311
+8.75 48.6313
+9.25 50.0427
+9.75 51.4634
+10.25 52.8961
+10.75 54.3385
+11.25 55.3068
+11.75 56.7694
+12.25 58.2424
+12.75 59.2317
+13.25 60.2265
+13.75 61.227
+14.25 62.2335
+14.75 63.2461
+15.25 64.265
+15.75 65.2905
+16.25 66.3229
+16.75 67.3623
+17.25 68.409
+17.75 69.4632
+18.25 70.5253
+18.75 71.5953
+19.25 72.6735
+19.75 73.7601
+20.25 74.8553
+21.25 75.9594
+21.75 77.0724
+22.25 78.1946
+23.25 79.3261
+23.75 80.4671
+24.25 81.6176
+25.25 82.7777
+25.75 83.9476
+26.75 85.1266
+27.25 86.3148
+28.25 87.5122
+29.25 88.7178
+29.75 89.9309
+30.75 91.151
+31.75 92.3775
+32.75 93.6095
+33.25 94.8471
+34.25 96.0894
+35.25 97.3388
+36.25 98.5945
+37.25 99.8649
+38.75 101.146
+39.75 102.458
+40.75 103.777
+41.75 105.155
+43.25 106.518
+44.25 107.955
+45.25 109.371
+46.75 110.693
+48.25 112.536
+49.25 112.8
 &
 @target G0.S1
 @type xy
-        0.098326         0.098326
-         0.31508         0.314856
-        0.576117         0.575284
-          0.8904           0.8883
-         1.26867          1.26414
-          1.7238          1.71469
-         2.27113          2.25335
-         2.92901          2.89442
-         3.71925          3.65149
-         4.66772          4.53427
-         5.80505          5.54329
-          7.1673          6.66344
-         8.79677          7.85909
-         10.7427          9.07545
-         13.0622          10.2491
-         15.8205          11.3243
-         19.0918          12.2674
-         22.9589          13.0714
-         27.5131          13.7496
-         32.8523          14.3235
-         39.0791          14.8159
-         46.2966          15.2491
-         54.6035           15.637
-         64.0866          15.9942
-         74.8123          16.3312
-          86.817          16.6516
-         100.097          16.9562
-         114.597          17.2338
-          130.21          17.4679
-         146.766          17.6634
-         164.044           17.806
-         181.774          17.8885
-         181.774          17.8974
-         164.044          17.8245
-         146.766          17.6892
-          130.21          17.5027
-         114.597          17.2881
-         100.097          17.0497
-          86.817          16.7718
-         74.8123          16.4543
-         64.0866          16.1091
-         54.6035           15.742
-         46.2966          15.3405
-         39.0791          14.8846
-         32.8523          14.3579
-         27.5131          13.7441
-         22.9589          13.0259
-         19.0918          12.1878
-         15.8205          11.2215
-         13.0622           10.136
-         10.7427          8.96352
-         8.79677          7.75633
-          7.1673          6.57401
-         5.80505          5.46829
-         4.66772          4.47292
-         3.71925          3.60222
-         2.92901          2.85547
-         2.27113           2.2231
-          1.7238          1.69172
-         1.26867          1.24723
-          0.8904         0.876431
-        0.576117         0.567605
-         0.31508         0.310657
-        0.098326        0.0970155
+1.25 13.9568
+1.75 18.5418
+2.25 22.0682
+2.75 24.8973
+3.25 27.6262
+3.75 30.2958
+4.25 32.4959
+4.75 34.2482
+5.25 36.4379
+5.75 38.634
+6.25 40.4006
+6.75 42.1792
+7.25 43.5223
+7.75 44.8757
+8.25 46.6961
+8.75 48.0743
+9.25 49.4667
+9.75 50.871
+10.25 52.2914
+10.75 53.7254
+11.25 54.6908
+11.75 56.1537
+12.25 57.6321
+12.75 58.6283
+13.25 59.6327
+13.75 60.6457
+14.25 61.6673
+14.75 62.6979
+15.25 63.7375
+15.75 64.7865
+16.25 65.845
+16.75 66.9133
+17.25 67.9916
+17.75 69.08
+18.25 70.1787
+18.75 71.2881
+19.25 72.4082
+19.75 73.5394
+20.25 74.6818
+21.25 75.8355
+21.75 77.0009
+22.25 78.1782
+23.25 79.3675
+23.75 80.569
+24.25 81.7831
+25.25 83.0098
+25.75 84.2494
+26.75 85.5021
+27.25 86.7682
+28.25 88.0478
+29.25 89.3412
+29.75 90.6486
+30.75 91.9702
+31.75 93.3062
+32.75 94.657
+33.25 96.0226
+34.25 97.4033
+35.25 98.7995
+36.25 100.211
+37.25 101.639
+38.75 103.082
+39.75 104.542
+40.75 106.019
+41.75 107.512
+43.25 109.022
+44.25 110.55
+45.25 112.095
+46.75 113.658
+48.25 115.239
+49.25 116.838
 &
