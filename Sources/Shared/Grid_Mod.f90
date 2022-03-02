@@ -191,7 +191,6 @@
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
       procedure :: Decompose
-      procedure :: Estimate_Big_And_Small
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
@@ -240,7 +239,6 @@
   include 'Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90'
   include 'Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90'
   include 'Grid_Mod/Decompose.f90'
-  include 'Grid_Mod/Estimate_Big_And_Small.f90'
   include 'Grid_Mod/Exchange_Cells_Int.f90'
   include 'Grid_Mod/Exchange_Cells_Log.f90'
   include 'Grid_Mod/Exchange_Cells_Real.f90'

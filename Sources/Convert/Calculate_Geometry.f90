@@ -17,7 +17,7 @@
   real                 :: xs2, ys2, zs2
   real                 :: t, sur_tot, max_dis
   real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
-  real,    allocatable :: b_coor(:)
+  real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
   integer, allocatable :: b_face(:)
   character(SL)        :: answer
   real                 :: big, small, factor, prod
@@ -144,9 +144,6 @@
     end if
   end if
 
-  ! Estimate big and small
-  call Grid % Estimate_Big_And_Small(big, small)
-
   !-----------------------------------------!
   !   Calculate the cell centers            !
   !-----------------------------------------!
@@ -259,8 +256,10 @@
   !   => depends on: xc, yc, zc, sx, sy, sz    !
   !   <= gives:      dx, dy, dz                !
   !--------------------------------------------!
-  allocate(b_coor(Grid % n_faces)); b_coor = 0.0
-  allocate(b_face(Grid % n_faces)); b_face = 0
+  allocate(b_coor_1(Grid % n_faces)); b_coor_1 = 0.0
+  allocate(b_coor_2(Grid % n_faces)); b_coor_2 = 0.0
+  allocate(b_coor_3(Grid % n_faces)); b_coor_3 = 0.0
+  allocate(b_face  (Grid % n_faces)); b_face   = 0
 
   !--------------------------------------------------------!
   !                                                        !
@@ -343,8 +342,10 @@
             v_o(3) = Grid % zf(s)
             v_r(1:3) = Math % Rotate_Vector(v_o(1:3), k(1:3), theta)
             cnt_per = cnt_per + 1
-            b_coor(cnt_per) = v_r(1)*big**2 + v_r(2)*big + v_r(3)
-            b_face(cnt_per) = s
+            b_coor_1(cnt_per) = v_r(1)
+            b_coor_2(cnt_per) = v_r(2)
+            b_coor_3(cnt_per) = v_r(3)
+            b_face(cnt_per)   = s
           end if
         end if
       end do
@@ -352,7 +353,10 @@
       !-------------------------------------------!
       !   Sort the faces at periodic boundaries   !
       !-------------------------------------------!
-      call Sort % Real_Carry_Int(b_coor(1:cnt_per), b_face(1:cnt_per))
+      call Sort % Three_Real_Carry_Int(b_coor_1(1:cnt_per),  &
+                                       b_coor_2(1:cnt_per),  &
+                                       b_coor_3(1:cnt_per),  &
+                                       b_face(1:cnt_per))
 
       !---------------------------------------------!
       !   Match the periodic faces with shadows &   !
@@ -677,9 +681,6 @@
     print *, '# Execution will halt now!'
     stop
   end if
-
-  deallocate(b_coor)
-  deallocate(b_face)
 
   !------------------------------------------------------------!
   !   Calculate the interpolation factors for the cell faces   !
