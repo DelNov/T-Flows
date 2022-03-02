@@ -29,12 +29,18 @@
   comm_type_int  = MPI_INTEGER
   comm_type_log  = MPI_LOGICAL
   comm_type_real = MPI_DOUBLE_PRECISION
-  if(IP .eq. DP) then
-    comm_type_int = MPI_INTEGER8
-    comm_type_log = MPI_LOGICAL8
-  end if
   if(RP .eq. SP) then
     comm_type_real = MPI_REAL
+  end if
+
+  ! Make sure that integers are 32-bit
+  if(IP .eq. DP) then
+    if(this_proc < 2) then
+      print *, '# Error - 64 bit integers are not supported!'
+      print *, '# This error is critical, exiting!'
+      call Comm_Mod_End
+      stop
+    end if
   end if
 
   end subroutine
