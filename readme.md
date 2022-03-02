@@ -2287,6 +2287,20 @@ to get rid of ```.vtu``` files, you should delete like this:
 rm -f Sub-0*/*.vtu
 ```
 
+#### Thing to try next
+
+Another interesting feature of this case is that it has no less than four
+periodic direction.  Instead of converting the grid obtaing from GMSH with:
+```
+./Convert < convert.scr
+```
+try to do it without the script, simply by:
+```
+./Convert
+```
+For this case, it is interestng to see how the periodic directions are
+dealt with.
+
 # Benchmark cases  <a name="bench_cases"></a>
 
 ## Large eddy simulation over a matrix of cubes] <a name="bench_cases_matrix"> </a>
