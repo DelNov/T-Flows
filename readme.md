@@ -1182,15 +1182,28 @@ is cell-based and on grids based on triangular prisms (and tertahedra) induce:
 - large explicit diffusion terms causing slower convergence of pressure-velocity 
   coupling algorithm (SIMPLE or PISO in T-Flows)
 
-The disadvantage of the tetrahedral grids has been recognized long ago, and polyhedral grids have been introduced as their alternative.  In mathematical sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  
+The disadvantage of the tetrahedral grids has been recognized long ago, and 
+polyhedral grids have been introduced as their alternative.  In mathematical 
+sense, a polyhedral is nothing more than a [dual graph](https://en.wikipedia.org/wiki/Dual_graph) of 
+tetrahedral grid, and that's why _Convert_ calls this a _dual_ grid.  
 
-Having mentioned the duality of the two grids, it is worth briefly explaining how _Convert_ performs this.  It reads a grid with triangular prisms and/or tetrahedra in the usual way, does its conversion (finds the connectivity between cells, faces, nodes and edges it needs) and in the next step creates a graph dual of the first mesh.  The only differnce for you, as a user is that when prompted by the question:
+Having mentioned the duality of the two grids, it is worth briefly explaining 
+how _Convert_ performs this.  It reads a grid with triangular prisms and/or 
+tetrahedra in the usual way, does its conversion (finds the connectivity between 
+cells, faces, nodes and edges it needs) and in the next step creates a graph 
+dual of the first mesh.  The only differnce for you, as a user is that when 
+prompted by the question:
 ```
  #=================================================
  # Would you like to create a dual grid? (yes/no)
  #-------------------------------------------------
 ```
-you answer ```yes```.  From that point on, everything is the same as explained in the [section above](#test_cases_lid_driven_hexa_convert).  To save you from typing all the answers, the file ```convert.scr``` is also provided in the current directory.  If you created such a file for the case with [hexaderal cells](#test_cases_lid_driven_hexa), it would be almost the same as this one.  If you ran two files through a diff command:
+you answer ```yes```.  From that point on, everything is the same as explained 
+in the [section above](#test_cases_lid_driven_hexa_convert).  To save you from 
+typing all the answers, the file ```convert.scr``` is also provided in the 
+current directory.  If you created such a file for the case with 
+[hexaderal cells](#test_cases_lid_driven_hexa), it would be almost the same as 
+this one.  If you ran two files through a diff command:
 ```
 diff convert.scr ../Hexa/convert.scr
 ```
@@ -1200,9 +1213,12 @@ you would see only this:
 ---
 > no
 ```
-the only difference between the files is the fact that you answered ```yes``` in this case when aasked whether you want to create a dual grid.
+the only difference between the files is the fact that you answered ```yes``` 
+in this case when aasked whether you want to create a dual grid.
 
-Anyhow, in order to distinguish between the original and the dual grid, _Convert_ adds extension ```_dual``` to all the file names it creates.  Thus, after running the _Convert_ you will have the following files in the directory:
+Anyhow, in order to distinguish between the original and the dual grid, 
+_Convert_ adds extension ```_dual``` to all the file names it creates.  
+Thus, after running the _Convert_ you will have the following files in the directory:
 ```
 Dual/
 ├── lid_driven_dual.cfn
@@ -1213,11 +1229,15 @@ Dual/
 └── lid_driven_dual.vtu
 ```
 
-The first two are T-Flows's native files for further processing, and the remaining four are for you to explore with Paraview.  Opening the ```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the same as in the [previous case](#test_cases_lid_driven_hexa):
+The first two are T-Flows's native files for further processing, and the 
+remaining four are for you to explore with Paraview.  Opening the 
+```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the 
+same as in the [previous case](#test_cases_lid_driven_hexa):
 
 ![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid-driven polyhedral grid")
 
-To run the case, we have already provided the ```control``` file, derived from the previous case we ran.  Here it is in full:
+To run the case, we have already provided the ```control``` file, derived from 
+the previous case we ran.  Here it is in full:
 ```
 # Problem
 PROBLEM_NAME        lid_driven_dual
@@ -1241,19 +1261,32 @@ BOUNDARY_CONDITION lower_wall
   VARIABLES        u     v     w
   VALUES           0.0   0.0   0.0
 ```
-The only novelty compared to the previous case is line with the ```PROBLEM_NAME```.  It is set to ```lid_driven_dual``` here.  In any case, after running the simulation, a possible representation fo the solution looks like:
+The only novelty compared to the previous case is line with the ```PROBLEM_NAME```.  
+It is set to ```lid_driven_dual``` here.  In any case, after running the 
+simulation, a possible representation fo the solution looks like:
 
 ![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid-driven dual solution")
 
 ## Thermally-driven cavity flow <a name="test_cases_thermally_driven"></a>
 
-Thermally-driven cavity flow bears many similarities with the lid-driven [cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with square cross-section, both are without inflows and outflows facilitating prescription of boundary conditions, both are occuring in ddomains which are long enough in spanwise direction so that the assumption of two-dimsionality or periodicity can be made.  Owing to their simplicity, both of these cases have widely been used by CFD community for benchmarking and verification of CFD codes and both are well documented.
+Thermally-driven cavity flow bears many similarities with the lid-driven 
+[cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with 
+square cross-section, both are without inflows and outflows facilitating 
+prescription of boundary conditions, both are occuring in ddomains which are 
+long enough in spanwise direction so that the assumption of two-dimsionality or 
+periodicity can be made.  Owing to their simplicity, both of these cases have 
+widely been used by CFD community for benchmarking and verification of CFD 
+codes and both are well documented.
 
-The biggest differences between the cases is the driving force.  Whereas the lid-driven cavity flow is driven by shear created by top moving wall, thermally-driven cavity is driven by the buoyancy forces occurring on vertical opposing sides of the problem domain:
+The biggest differences between the cases is the driving force.  Whereas the 
+lid-driven cavity flow is driven by shear created by top moving wall, 
+thermally-driven cavity is driven by the buoyancy forces occurring on vertical 
+opposing sides of the problem domain:
 
 ![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally-driven cavity domain")
 
-In the figure above the left (red) wall is kept at higher temperature than the right wall (blue), which creates clockwise motion of the fluid.  
+In the figure above the left (red) wall is kept at higher temperature than the 
+right wall (blue), which creates clockwise motion of the fluid.  
 
 We will cover the thermall-driven cavity flow in two modelling ways: with 
 Boussinesq approximation, and with variable physical properties.
@@ -1266,7 +1299,8 @@ We will use this case to introduce a few new concepts in T-Flows:
 - changing from default under-relaxation parameters
 - setting the linear solver tolerances
 - setting the initial condition
-To solve this case, please go to the directory: ```[root]/Tests/Manual/Thermally_Driven/Direct``` where you can find the following files:
+To solve this case, please go to the directory: ```[root]/Tests/Manual/Thermally_Driven/Direct``` 
+where you can find the following files:
 
 ```
 Direct/
@@ -1275,7 +1309,10 @@ Direct/
 └── therm_driven.msh.gz
 ```
 
-The ```.geo``` file is the GMSH script.  Since the geometries for the lid-driven [cavity flow](#tests_lid_driven) and this case are almost the same, the similarity in the ```.geo``` shouldn't be a suprise.  You can find the following differences:
+The ```.geo``` file is the GMSH script.  Since the geometries for the lid-driven 
+[cavity flow](#tests_lid_driven) and this case are almost the same, the 
+similarity in the ```.geo``` shouldn't be a suprise.  You can find the 
+following differences:
 ```
 A    =  1.0;  // length and height of the cavity
 B    =  0.1;  // width of the cavity
@@ -1304,7 +1341,8 @@ The novelties include:
 - new parameter ```BUMP``` which ...
 - controls the clustering of the lines towards the walls in the
 - call to ```Transfinite Curve```
-- boundary condition names have changed; ```left_wall``` and ```right_wall``` are new, the ```side_walls``` has been dropped.
+- boundary condition names have changed; ```left_wall``` and ```right_wall``` 
+  are new, the ```side_walls``` has been dropped.
 
 First thing would be to generate the mesh with:
 ```
@@ -1315,20 +1353,31 @@ which will create ```therm_driven.msh```.
 
 > **_Note:_** For those without GMSH, the file ```therm_driven.msh.gz``` is provided.
 
-We advise to run ```seek_binaries.sh``` next to get all executables to current directiory, after which you can call _Convert_ with provided script:
+We advise to run ```seek_binaries.sh``` next to get all executables to current 
+folder, after which you can call _Convert_ with provided script:
 ```
 ./Convert < convert.scr
 ```
 
-> **_Note:_** The script ```convert.scr``` is also almost the same as in the case of the lid-driven cavity.  You can explore it yourself to check that only the input file name is different (```therm_driven.msh``` instead of ```lid_driven.msh```), and that periodic boundary is listed under different number (```5```, not ```4```).
+> **_Note:_** The script ```convert.scr``` is also almost the same as in the 
+case of the lid-driven cavity.  You can explore it yourself to check that only 
+the input file name is different (```therm_driven.msh``` instead of 
+```lid_driven.msh```), and that periodic boundary is listed under different 
+number (```5```, not ```4```).
 
-If you visualize the file ```therm_driven.faces.vtu``` created by _Convert_ you will see this:
+If you visualize the file ```therm_driven.faces.vtu``` created by _Convert_ you 
+will see this:
 
 ![Thermally-driven front!](Documentation/Manual/Figures/thermally_driven_front.png "Thermally-driven front")
 
-a grid with cells clustered towards the walls for better resolution of boundary layers.  It is not a waste of time to visualize grids created by _Convert_ to make sure that no anomalities are present.  
+a grid with cells clustered towards the walls for better resolution of boundary 
+layers.  It is not a waste of time to visualize grids created by _Convert_ to 
+make sure that no anomalities are present.  
 
-With grids converted, we should set up the ```control``` file.  To that end, lets' consider the section related to boundary conditions created by _Convert_ (```control_template_for_therm_driven```, with all variables which are not solved removed for the sake of clarity:
+With grids converted, we should set up the ```control``` file.  To that end, 
+lets' consider the section related to boundary conditions created by _Convert_ 
+(```control_template_for_therm_driven```, with all variables which are not solved 
+removed for the sake of clarity:
 ```
 BOUNDARY_CONDITION upper_wall
   TYPE             wall
@@ -1351,24 +1400,34 @@ BOUNDARY_CONDITION lower_wall
   VALUES           0.0   0.0   0.0   0.0
 
 ```
-In the above, we left velocities at all walls to zero, we set temperature at the left wall to ```1.0```, temperature at the ```right_wall``` to ```0.0```, but in order to specify that ```upper_wall``` and ```lower_wall``` are with prescribed heat flux rather than temperature, we change letter ```t``` to ```q``` (as a usual symbol for heat flux).  We also set it to zero, because they are insulated.
+In the above, we left velocities at all walls to zero, we set temperature at 
+the left wall to ```1.0```, temperature at the ```right_wall``` to ```0.0```, 
+but in order to specify that ```upper_wall``` and ```lower_wall``` are with 
+prescribed heat flux rather than temperature, we change letter ```t``` to ```q``` 
+(as a usual symbol for heat flux).  We also set it to zero, because they are insulated.
 
 We should also instruct _Process_ to solve for temperature, which is obtained with the line:
 ```
 HEAT_TRANSFER    yes
 ```
-Given that the temperatures at the boundaries are zero and one, and since there are no internal sources or sinks, we may expect final average temperature to be around 0.5.  Hence, it makes sense to set initial temperature to be 0.5 everywhere:
+Given that the temperatures at the boundaries are zero and one, and since there 
+are no internal sources or sinks, we may expect final average temperature to be 
+around 0.5.  Hence, it makes sense to set initial temperature to be 0.5 everywhere:
 ```
  INITIAL_CONDITION
    VARIABLES           u     v     w     t
    VALUES              0.0   0.0   0.0   0.5
 ```
 
-Next, we should also specify physical properties.  For this case, we will solve equations in their non-dimensional form:
+Next, we should also specify physical properties.  For this case, we will solve 
+equations in their non-dimensional form:
 
 EQUATIONS WHICH ARE MISSING
 
-from which we can see that the flow is fully characterized with two non-dimenensional numbers: Rayleigh (_Ra_) and Prandtl (_Pr_).  _Process_ doesn't know about these numbers, so we set physical properties in a way to reach the desired values.  If we want to solve the case for:
+from which we can see that the flow is fully characterized with two 
+non-dimenensional numbers: Rayleigh (_Ra_) and Prandtl (_Pr_).  _Process_ 
+doesn't know about these numbers, so we set physical properties in a way to 
+reach the desired values.  If we want to solve the case for:
 - _Ra_ = 1.0e+6
 - _Pr_ = 0.71
 
@@ -1382,20 +1441,27 @@ physical properties section in the control file should read:
  DYNAMIC_VISCOSITY      0.001186781658
  THERMAL_CONDUCTIVITY   0.000842614977
 ```
-Mass density, heat capacity and thermal expansion coefficient are not set, and _Process_ will set them to their default values of 1.0.
 
-> **_Note:_** Be reminded that default values for all parameters needed by _Process_ are outlined in the file: ```[root]/Documentation/all_control_keywords```.
+Mass density, heat capacity and thermal expansion coefficient are not set, and 
+_Process_ will set them to their default values of 1.0.
 
-We should also instruct _Process_ that we want to use Boussinesq approximation to solve the system, which is obtained with the line:
+> **_Note:_** Be reminded that default values for all parameters needed by 
+_Process_ are outlined in the file: ```[root]/Documentation/all_control_keywords```.
+
+We should also instruct _Process_ that we want to use Boussinesq approximation 
+to solve the system, which is obtained with the line:
 ```
  BUOYANCY         thermal
 ```
-_Process_ also needs to know the direction and magnitude of the gravitational vector which is set by:
+
+_Process_ also needs to know the direction and magnitude of the gravitational 
+vector which is set by:
 ```
 GRAVITATIONAL_VECTOR   0.0  0.0  -1.0
 ```
 
-Since we know in advance that the velocities in this case are rather small we can increase the time step to 1.0:
+Since we know in advance that the velocities in this case are rather small we 
+can increase the time step to 1.0:
 ```
 TIME_STEP    1.0
 ```
@@ -1404,7 +1470,15 @@ and, since we seek a steady solution, we can reduce the saving frequency as:
 RESULTS_SAVE_INTERVAL    300
 ```
 
-_Process_, by default, links velocities and pressure through the SIMPLE algorith.  (The other option in the code is PISO.)  An important aspect of the pressure-velocity algorithms are the _under-relaxation_ factors, which may be fiddled with in order to improve convergence of the solution procedure.  If not specified, _Process_ sets very conservative (read: small) values to make sure the system will converge.  For this case, given that it's reletivelly simple, laminar, and that we have to make sure that temperatures reach final stratification, we may want to set them explicitly.  From simulations we conducted beforehand, we found these values to work for this case:
+_Process_, by default, links velocities and pressure through the SIMPLE algorith.  
+(The other option in the code is PISO.)  An important aspect of the 
+pressure-velocity algorithms are the _under-relaxation_ factors, which may be 
+fiddled with in order to improve convergence of the solution procedure.  If not 
+specified, _Process_ sets very conservative (read: small) values to make sure 
+the system will converge.  For this case, given that it's relativelly simple, 
+laminar, and that we have to make sure that temperatures reach final 
+stratification, we may want to set them explicitly.  From simulations we 
+conducted beforehand, we found these values to work for this case:
 ```
  PRESSURE_MOMENTUM_COUPLING             simple
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
@@ -1412,16 +1486,21 @@ _Process_, by default, links velocities and pressure through the SIMPLE algorith
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
 ```
 
-> **_Note:_** The first line is optional, since default pressure-velocity coupling in T-Flows is SIMPLE.
+> **_Note:_** The first line is optional, since default pressure-velocity 
+coupling in T-Flows is SIMPLE.
 
-Another thing worth noting for this case is that the default linear solver parameters might not be the best ones (for all variables solved, it is 1.0e-6).  This may be too tight for velocities and temperature, and a bit too loose for pressure.  We therefore set them as following:
+Another thing worth noting for this case is that the default linear solver 
+parameters might not be the best ones (for all variables solved, it is 1.0e-6).  
+This may be too tight for velocities and temperature, and a bit too loose for 
+pressure.  We therefore set them as following:
 ```
  LINEAR_SOLVERS                     native
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
  TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-7
 ```
-First line tells _Process_ to use its owen (_native_) solvers, whereas the remaining three lines are self-explanatory, we trully believe.
+First line tells _Process_ to use its owen (_native_) solvers, whereas the 
+remaining three lines are self-explanatory, we trully believe.
 
 With all this in place, the entire control file may read like this:
 ```
@@ -1489,13 +1568,17 @@ With all this in place, the entire control file may read like this:
    VARIABLES        u     v     w     q
    VALUES           0.0   0.0   0.0   0.0
 ```
-We say "may" because, as mentioned above, the order of individual entries doesn't matter.  Feel free to copy the above contents to ```control``` file and launch the simulation with:
+We say "may" because, as mentioned above, the order of individual entries 
+doesn't matter.  Feel free to copy the above contents to ```control``` file and 
+launch the simulation with:
 ```
 ./Process > out &
 ```
-given that you created soft links to executables in this directory with ```seek_binaries.sh``` script.
+given that you created soft links to executables in this directory with 
+```seek_binaries.sh``` script.
 
-With these settings in the control file, you will reach convergence in about 400 time step, as obvious from the output:
+With these settings in the control file, you will reach convergence in about 
+1000 time step, as obvious from the output:
 ```
                                          #===============================================#
                                          #                                               #
@@ -1525,13 +1608,17 @@ With these settings in the control file, you will reach convergence in about 400
                        #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
                        #---------------------------+---------------------------+---------------------------#
 ```
-Having obtained steady solution for this case, you may visualise some results in ParaView by opening the file: ```therm_driven-ts001200.vtu```.  Here we show solutions for temperature with velocity vectors scaled by their magitude:
+Having obtained steady solution for this case, you may visualise some results 
+in ParaView by opening the file: ```therm_driven-ts001200.vtu```.  Here we show 
+solutions for temperature with velocity vectors scaled by their magitude:
 
 ![Thermally-driven solution!](Documentation/Manual/Figures/thermally_driven_solution.png "Thermally-driven solution")
 
 #### Thing to try next
 
-Better and more elaborate test cases for the thermall-driven cavity flow have been set in ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Direct```, for a range of _Ra_ numbers.  Feel free to explore them further.
+Better and more elaborate test cases for the thermall-driven cavity flow have 
+been placed in ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Direct```, for a 
+range of _Ra_ numbers.  Feel free to explore them further.
 
 ### With variable physical properties <a name="test_cases_thermally_driven_variable"> </a>
 
@@ -1546,7 +1633,8 @@ With this case we want to demonstrate:
 - how to run a buoyancy driven flows without Boussinesq approximation
 - how to write user functions.
 
-A case which demonstrates how it is done resides in ```[root]/Tests/Manual/Thermally_Driven/Variable_Properties```.
+A case which demonstrates how it is done resides in 
+```[root]/Tests/Manual/Thermally_Driven/Variable_Properties```.
 The directory contains the following files:
 ```
 [root]/Tests/Manual/Thermally_Driven/Variable_Properties
@@ -1560,10 +1648,17 @@ The directory contains the following files:
     ├── Beginning_Of_Time_Step.f90
     └── Types.f90
 ```
-The purpose of files ```air.geo```, ```control``` and ```convert.scr``` should be clear by now.  If not, refer to previous sections on lid- and thermally-driven cavities.
-What is new is the look-up table in file ```air_properties_at_1_bar```.  If you open it, you can see that it lists air properties for a range of temperatures from -20 to 125 in increments of 5 degrees.  
+The purpose of files ```air.geo```, ```control``` and ```convert.scr``` 
+should be clear by now.  If not, refer to previous sections on lid- and 
+thermally-driven cavities.
+What is new is the look-up table in file ```air_properties_at_1_bar.dat```.  
+If you open it, you can see that it lists air properties for a range of 
+temperatures from -20 to 125 in increments of 5 degrees.  
 
-In addition to these, there is a sub-directory called ```User_Mod``` with three functions.  The way T-Flows handles user functions is as follows.  In the directory which holds sources for _Process_, there is also a sub-directory called ```User_Mod``` holding a number of functions user can modify.  They are:
+In addition to these, there is a sub-directory called ```User_Mod``` with three 
+functions.  The way T-Flows handles user functions is as follows.  In the 
+folder which holds sources for _Process_, there is also a sub-folder called 
+```User_Mod``` holding a number of functions user can modify.  They are:
 ```
 [root]/Sources/Process/User_Mod
 ├── Before_Exit.f90
@@ -1595,18 +1690,29 @@ In addition to these, there is a sub-directory called ```User_Mod``` with three 
 ├── Source.f90
 └── Types.f90
 ```
-Their names are self-explanatory, as their names correspond to places in _Processs_ from which they are called.  When _Process_ is compiled with simple ```make``` command, the functions from the ```[root]/Sources/Process/User_Mod``` will be called and they, in essence, do nothing.  They are _empty hooks_ so to speak.  If _Process_ is compiled with ```DIR_CASE=full_or_relative_path_to_case```, sources (_empty hooks_) from ```[root]/Sources/Process/User_Mod``` will be replaced by the links to ```User_Mod``` directory residing with the case.
+Their names are self-explanatory, as their names correspond to places in 
+_Processs_ from which they are called.  When _Process_ is compiled with simple 
+```make``` command, the functions from the ```[root]/Sources/Process/User_Mod``` 
+will be called and they, in essence, do nothing.  They are _empty hooks_ so to 
+speak.  If _Process_ is compiled with ```DIR_CASE=full_or_relative_path_to_case```, 
+sources (_empty hooks_) from ```[root]/Sources/Process/User_Mod``` will be 
+replaced by the links to ```User_Mod``` directory residing with the case.
 
-Try to see it in action.  Change the current directory to ```[root]/Sources/Process``` and issue the commands:
+Try to see it in action.  Change the current directory to 
+```[root]/Sources/Process``` and issue the commands:
 ```
 make clean
 make DIR_CASE=../../Tests/Manual/Thermally_Driven/Varible/
 ```
-> **_Tip:_** When dealing with user functions, it is not a bad idea to conduct ```make clean``` every once in a while.  It is possible, and often the case, that objects from the last compilation of the _Process_ are newer than user function specified in the case.
+> **_Tip:_** When dealing with user functions, it is not a bad idea to conduct 
+```make clean``` every once in a while.  It is possible, and often the case, 
+that objects from the last compilation of the _Process_ are newer than user 
+function specified in the case.
 
-When the compilation completes, the contents of the ```User_Mod``` in ```[root]/Sources/Process``` will read:
+When the compilation completes, the contents of the ```User_Mod``` in 
+```[root]/Sources/Process``` will read:
 ```
-User_Mod
+[root]/Sources/Process/User_Mod
 ├── Before_Exit.f90
 ├── Beginning_Of_Compute_Energy.f90
 ├── Beginning_Of_Compute_Momentum.f90
@@ -1636,11 +1742,16 @@ User_Mod
 ├── Source.f90
 └── Types.f90 -> ../../../Tests/Manual/Thermally_Driven/Varible/User_Mod/Types.f90
 ```
-The three files which are defined in the case's ```User_Mod``` are now linked to the _Process'_ ```User_Mod```.  That means they are not _empty hooks_ any longer, but whatever user modified them to do.
+The three files which are defined in the case's ```User_Mod``` are now linked 
+to the _Process'_ ```User_Mod```.  That means they are not _empty hooks_ any 
+longer, but whatever user modified them to do.
 
-Having describe the mechanism by which _Process_ deals with user functions, we can describe each of them more closely.
+Having described the mechanism by which _Process_ deals with user functions, 
+we can describe each of them more closely.
 
-The source ```Types.f90``` holds definion of new types which might be used with user functions.  It is not always necessary to define new types for user functions, but in this particular case we want to store look-up tables with variable air properties in memory.  It reads:
+The source ```Types.f90``` holds definion of new types which might be used with 
+user functions.  It is not always necessary to define new types for user 
+functions, but in this particular case we want to store look-up tables with variable air properties in memory.  It reads:
 ```
   1 !==============================================================================!
   2 !   Introduce new types to be used with User_Mod                               !
@@ -1655,9 +1766,13 @@ The source ```Types.f90``` holds definion of new types which might be used with 
  11   real :: air_lambda(N_ITEMS)
 
 ```
-We know that there are 30 entries in the file ```air_properties_at_a_bar.dat``` and we therefore introduce a parameter called ```N_ITEMS``` in line 5 and set it to ```30```.  Arrays holding phyiscal properties are statically allocate with that size in lines 7 - 11.
+We know that there are 30 entries in the file ```air_properties_at_a_bar.dat``` 
+and we therefore introduce a parameter called ```N_ITEMS``` in line 5 and set 
+it to ```30```.  Arrays holding phyiscal properties are statically allocate 
+with that size in lines 7 - 11.
 
-The source ```Beginning_Of_Simulation``` is, clearly enough, called at the beginning of simulation, and we wrote in a way to read physical properties:
+The source ```Beginning_Of_Simulation``` is, clearly enough, called at the 
+beginning of simulation, and we wrote in a way to read physical properties:
 ```
   1 !==============================================================================!
   2   subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm, n, time)
@@ -1738,13 +1853,23 @@ and assingning it a value:
  20   Grid => Flow % pnt_grid
 ```
 
-Line 20 calls T-Flows's class ```File_Type``` member function ```Open_For_Reading_Ascii``` whose purpose is clear from the name.  The function returns a handle to file it openned called ```fu```.
+Line 20 calls T-Flows's class ```File_Type``` member function 
+```Open_For_Reading_Ascii``` whose purpose is clear from the name.  
+The function returns a handle to file it openned called ```fu```.
 
-From lines 30 to 43 we read the look-up table from the file, and store it into memory defined in ```Types.f90```.  Note that in lines 41 and 42 we convert units from the table to plain SI units for compatibility with T-Flows.  While reading the files we use another procedure from ```File_Type``` called ```Read_Line``` which reads a line from ASCII file and splits it into individual tokens.  Tokens are stored in the fields ```line % token(:)```.
+From lines 30 to 43 we read the look-up table from the file, and store it into 
+memory defined in ```Types.f90```.  Note that in lines 41 and 42 we convert 
+units from the table to plain SI units for compatibility with T-Flows.  
+While reading the files we use another procedure from ```File_Type``` called 
+```Read_Line``` which reads a line from ASCII file and splits it into individual 
+tokens.  Tokens are stored in the fields ```line % token(:)```.
 
-Finally, in the lines 47 to 51 we print a message that physical properties have been read.  Here we use global variable ```this_proc``` to make sure we print the message only from first processor in parallel runs.
+Finally, in the lines 47 to 51 we print a message that physical properties 
+have been read.  Here we use global variable ```this_proc``` to make sure we 
+print the message only from first processor in parallel runs.
 
-Once the look-up table is properly read into memory, we can use it at the beginning of each time step with procedure ```Beginning_Of_Time_Step``` which reads:
+Once the look-up table is properly read into memory, we can use it at the 
+beginning of each time step with procedure ```Beginning_Of_Time_Step``` which reads:
 ```
   1 !==============================================================================!
   2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm, n, time)
