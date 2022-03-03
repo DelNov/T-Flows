@@ -1,16 +1,16 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME        rising
+ PROBLEM_NAME        bubble
  INTERFACE_TRACKING  yes
 
 #--------------------------
 # Time should be 3 seconds
 #--------------------------
  NUMBER_OF_TIME_STEPS    1200
- TIME_STEP                  0.005
+ TIME_STEP                  0.0025
 
- RESULTS_SAVE_INTERVAL      1
+ RESULTS_SAVE_INTERVAL     12
  BACKUP_SAVE_INTERVAL  999999
 
 #-------------------
