@@ -8,9 +8,9 @@ H = 0.015;    // 15 mm
 h = 3.4*H;    // 51 mm
 
 // Ns are in cells
-N_CUBE = 30;  B_CUBE = 1.0;
-N_HIGH = 72;  B_HIGH = 1.0;
-N_REST = 45;  B_REST = 1.0;
+N_CUBE = 40;  B_CUBE = 0.2;
+N_HIGH = 48;  B_HIGH = 0.12;
+N_REST = 30;  P_REST = 1.1;
 
 POINT_DELTA = 100;
 POINT_FLOOR =   0;
@@ -127,7 +127,7 @@ For i_f In{ 1 : 3 }
   If(i_f == 2)  SL = LINE_H_CUBE;   EndIf
   If(i_f == 3)  SL = LINE_H_TOP;    EndIf
   For l In{ 1 : 16 }
-    Transfinite Curve {SL+l} = N_REST+1 Using Progression B_REST;
+    Transfinite Curve {SL+l} = N_REST+1 Using Progression P_REST;
   EndFor
 EndFor
 
