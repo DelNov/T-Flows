@@ -163,6 +163,32 @@
     Flow % pot % prec_opts(1:MSI) = ''
   end if
 
+  !----------------------!
+  !   For VOF function   !
+  !----------------------!
+  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_VOF',  &
+                                        found,                   &
+                                        .false.)
+  if(found) then
+    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+
+    Vof % fun % solver = sstring
+    Vof % fun % prec = pstring
+    Vof % fun % prec_opts(1:MSI)    = ''
+    Vof % fun % prec_opts(1:n_opts) = opts(1:n_opts)
+    Vof % fun % tol = tol
+  else
+    if(this_proc < 2) then
+      print *, '# NOTE! PETSc options for VOF are not specified.'  //  &
+               ' Using the default values'
+    end if
+    Vof % fun % prec = 'asm'
+    Vof % fun % prec_opts(1:MSI) = ''
+  end if
+
   !-------------------------!
   !   For energy equation   !
   !-------------------------!
