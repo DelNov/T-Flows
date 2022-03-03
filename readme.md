@@ -2355,16 +2355,16 @@ The resides in the folder ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
 there and check the contents.  They include the following:
 ```
 [root]/Tests/Manual/Rising_Bubble/
+├── bubble.geo
 ├── control
 ├── convert.scr
 ├── ellipsoid_parameters.ini
-├── rising.geo
 └── User_Mod/
     ├── End_Of_Time_Step.f90
     └── Initialize_Variables.f90
 ```
 
-The usage of ```control```, ```convert.scr``` and ```rising.geo``` files should
+The usage of ```control```, ```convert.scr``` and ```bubble.geo``` files should
 be clear to you by now.  If not, revisit the section with [demonstration cases]
 (#demo_cases).
 
