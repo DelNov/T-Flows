@@ -26,7 +26,15 @@
         2. [Creating and dividing the grid](#demo_parallel_proc_dividing)
         3. [Running the simulation in parallel](#demo_parallel_proc_running)
 7. [Benchmark cases](#bench_cases)
-    1. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
+    1. [Laminar flow over a flat plate](#bench_flat_plate)
+        1. [Pre-processing](#bench_flat_plate_pre)
+        2. [Processing - running the case](#bench_flat_plate_run)
+        3. [Post-processing - visualization of results and plotting profiles](#bench_flat_plate_post)
+    2. [Fully-developed turbulent a plane channel flow](#bench_plane_channel)
+        1. [RANS computation of a channel flow](#bench_plate_channel_rans)
+        2. [LES computation of a channel flow](#bench_plate_channel_les)
+    3. [Round impinging jet and heat transfe](#bench_cases_jet)
+    4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
 
 
 # Introduction <a name="intro"></a>
