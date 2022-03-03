@@ -12,7 +12,7 @@
 5. [Compiling the code](#compiling)
     1. [Directory structure](#compiling_dir_struct)
     2. [Sub-programs](#compiling_sub_programs)
-6. [Demonstration cases](#test_cases)
+6. [Demonstration cases](#demo_cases)
     1. [Lid-driven cavity flow](#demo_lid_driven)
         1. [On hexahedral grid](#demo_lid_driven_hexa)
             1. [Creating the grid](#demo_lid_driven_hexa_create)
@@ -36,6 +36,11 @@
     3. [Round impinging jet and heat transfer](#bench_cases_jet)
     4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
     5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
+        1. [Initialization of VOF function](#bench_cases_buble_init)
+        2. [Compiling](#bench_cases_buble_compiling)
+        3. [Running the case](#bench_cases_buble_running)
+        4. [Checking the initial condition](#bench_cases_buble_checking)
+        5. [Final solution and benchmarking](#bench_cases_buble_final)
     6. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
 
 # Introduction <a name="intro"></a>
@@ -378,7 +383,7 @@ files:
 ```
 and you are ready to start your first simulations.
 
-# Demonstration cases <a name="test_cases"></a>
+# Demonstration cases <a name="demo_cases"></a>
 
 The cases presented in this chapter serve only to show the basic usage of T-Flows.
 They are by no means adhering to best practice guidlines, nor is their aim to be
@@ -391,7 +396,7 @@ rigirous CFD practices.
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a
 cavity:
 
-![Lid-driven cavity domain!](Documentation/Manual/Figures/lid_driven_domain.png "Lid-driven cavity domain")
+![!](Documentation/Manual/Figures/lid_driven_domain.png "")
 
 The flow occurs in a cavity with square cross section, in which all the walls
 are static except the top one which is moving.  The cavity is long enough in
@@ -522,18 +527,18 @@ you can call _Convert_ with:
 which will prompt you with the screen:
 ```
  #=======================================================================
- #                                                                   
+ #
  #    ______________________ ____    ________  __      __  _________
  #    \__    ___/\_   _____/|    |   \_____  \/  \    /  \/   _____/
  #      |    |    |    __)  |    |    /   |   \   \/\/   /\_____  \  
  #      |    |    |     \   |    |___/    |    \        / /        \
  #      |____|    \___  /   |_______ \_______  /\__/\  / /_______  /
  #                    \/            \/       \/      \/          \/  
- #                     _____                      __                 
- #                    / ___/__  ___ _  _____ ____/ /_                
- #                   / /__/ _ \/ _ \ |/ / -_) __/ __/                
- #                   \___/\___/_//_/___/\__/_/  \__/                 
- #                                                                   
+ #                     _____                      __     
+ #                    / ___/__  ___ _  _____ ____/ /_    
+ #                   / /__/ _ \/ _ \ |/ / -_) __/ __/    
+ #                   \___/\___/_//_/___/\__/_/  \__/     
+ #
  #                         Double precision mode
  #-----------------------------------------------------------------------
  #================================================================
@@ -555,7 +560,7 @@ at which point you type ```no```.  Dual grids will be covered in the
 concerns geometric extents:
 ```
  #=========================================
- # Geometric extents:                 
+ # Geometric extents:
  #-----------------------------------------
  # X from:  0.000E+00  to:  1.000E+00
  # Y from:  0.000E+00  to:  5.000E-01
@@ -600,8 +605,8 @@ boundary conditions:
  #------------------------------------------------------
  #==============================================================
  # Enter the ordinal number(s) of periodic-boundary condition(s)
- # from the boundary condition list (see above)                 
- # Type skip if there is none !                                 
+ # from the boundary condition list (see above)
+ # Type skip if there is none !   
  #--------------------------------------------------------------
 ```
 
@@ -620,8 +625,8 @@ will prompt you with the same question but with a shorter list of boundary condi
  #------------------------------------------------------
  #==============================================================
  # Enter the ordinal number(s) of periodic-boundary condition(s)
- # from the boundary condition list (see above)                 
- # Type skip if there is none !                                 
+ # from the boundary condition list (see above)
+ # Type skip if there is none !   
  #--------------------------------------------------------------
 ```
 and this time you answer ```skip```.  Finally, _Convert_ asks you about the
@@ -629,16 +634,16 @@ distance from the wall calculation:
 
 ```
  #==================================================================
- # Calculating distance from the walls                              
+ # Calculating distance from the walls
  #------------------------------------------------------------------
  # Type ordinal number(s) of wall or wall_flux boundary condition(s)
  # from the boundary condition list (see above) separated by space.
  # Cells' centers distances to the nearest wall will be calculated
- # for the listed wall boundary(s).                                 
- #                                                                  
+ # for the listed wall boundary(s).   
+ #
  # This is needed for RANS and HYBRID turbulence models as well as  
  # for proper initialization with potential pressure-like field.    
- #                                                                  
+ #                              
  # Type skip to skip this and set wall distance to one everywhere.  
  #------------------------------------------------------------------
 ```
@@ -694,7 +699,7 @@ The most interesting is the ```lid_driven.faces.vtu``` because it shows
 boundary conditions.  Once visualized, the ```lid_driven.faces.vtu``` shows
 the following:
 
-![Lid-driven hexa front!](Documentation/Manual/Figures/lid_driven_hexa_front.png "Lid-driven hexa front")
+![!](Documentation/Manual/Figures/lid_driven_hexa_front.png "")
 
 which reveals boundary conditions for this case, shown here in different colors.  
 Light blue is for the inside cells (no boundary conditions there) and orange
@@ -703,7 +708,7 @@ and red are for different boundary conditions.
 if you rotate the domain in ParaView, you will see something which may surprise
 you at first:
 
-![Lid-driven hexa back!](Documentation/Manual/Figures/lid_driven_hexa_back.png "Lid-driven hexa back")
+![!](Documentation/Manual/Figures/lid_driven_hexa_back.png "")
 
 The cells in the back seem to be hollow, as if they are missing the faces on
 periodic boundary.  This is done on purpose.  Since T-Flows uses face-base data
@@ -914,7 +919,7 @@ these (some are omitted):
 ```
  # NOTE! Could not find the keyword: NUMBER_OF_TIME_STEPS. Using the default:      1200
  # ...
- # NOTE! Could not find the keyword: HEAT_TRANSFER. Using the default: no        
+ # NOTE! Could not find the keyword: HEAT_TRANSFER. Using the default: no  
  # ...
  # NOTE! Could not find the keyword: TURBULENCE_MODEL. Using the default: none   
  # NOTE! Could not find the keyword: INTERFACE_TRACKING. Using the default: no    
@@ -1068,7 +1073,7 @@ final results (```lid_driven-ts001200.vtu```) in ParaView, and explore different
 options for visualization of results.  We chose to plot a cut-plane through the
 middle of the domain vectors represented glyphs and pressure with a colormap:
 
-![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "Lid-driven hexa solution")
+![!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "")
 
 but you obviously have the freedom to explore other options in ParaView.
 
@@ -1193,7 +1198,7 @@ and convert it to T-Flows format with:
 ```
 it will creates a computation grid like this:
 
-![Lid-driven prismatic!](Documentation/Manual/Figures/lid_driven.png "Lid-driven prismatic grid")
+![!](Documentation/Manual/Figures/lid_driven.png "")
 
 For a node-base numerical framework this grid looks rather descent, but T-Flows
 is cell-based and on grids based on triangular prisms (and tertahedra) induce:
@@ -1254,7 +1259,7 @@ remaining four are for you to explore with Paraview.  Opening the
 ```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the
 same as in the [previous case](#demo_lid_driven_hexa):
 
-![Lid-driven polyhedral!](Documentation/Manual/Figures/lid_driven_dual.png "Lid-driven polyhedral grid")
+![!](Documentation/Manual/Figures/lid_driven_dual.png "")
 
 To run the case, we have already provided the ```control``` file, derived from
 the previous case we ran.  Here it is in full:
@@ -1285,7 +1290,7 @@ The only novelty compared to the previous case is line with the ```PROBLEM_NAME`
 It is set to ```lid_driven_dual``` here.  In any case, after running the
 simulation, a possible representation fo the solution looks like:
 
-![Lid-driven hexa solution!](Documentation/Manual/Figures/lid_driven_dual_solution.png "Lid-driven dual solution")
+![!](Documentation/Manual/Figures/lid_driven_dual_solution.png "")
 
 ## Thermally-driven cavity flow <a name="demo_thermally_driven"></a>
 
@@ -1303,7 +1308,7 @@ lid-driven cavity flow is driven by shear created by top moving wall,
 thermally-driven cavity is driven by the buoyancy forces occurring on vertical
 opposing sides of the problem domain:
 
-![Thermally-driven cavity domain!](Documentation/Manual/Figures/thermally_driven_domain.png "Thermally-driven cavity domain")
+![!](Documentation/Manual/Figures/thermally_driven_domain.png "")
 
 In the figure above the left (red) wall is kept at higher temperature than the
 right wall (blue), which creates clockwise motion of the fluid.  
@@ -1388,7 +1393,7 @@ number (```5```, not ```4```).
 If you visualize the file ```therm_driven.faces.vtu``` created by _Convert_ you
 will see this:
 
-![Thermally-driven front!](Documentation/Manual/Figures/thermally_driven_front.png "Thermally-driven front")
+![!](Documentation/Manual/Figures/thermally_driven_front.png "")
 
 a grid with cells clustered towards the walls for better resolution of boundary
 layers.  It is not a waste of time to visualize grids created by _Convert_ to
@@ -1632,7 +1637,7 @@ Having obtained steady solution for this case, you may visualise some results
 in ParaView by opening the file: ```therm_driven-ts001200.vtu```.  Here we show
 solutions for temperature with velocity vectors scaled by their magitude:
 
-![Thermally-driven solution!](Documentation/Manual/Figures/thermally_driven_solution.png "Thermally-driven solution")
+![!](Documentation/Manual/Figures/thermally_driven_solution.png "")
 
 #### Thing to try next
 
@@ -1657,7 +1662,7 @@ A case which demonstrates how it is done resides in
 ```[root]/Tests/Manual/Thermally_Driven/Variable_Properties```.
 The directory contains the following files:
 ```
-[root]/Tests/Manual/Thermally_Driven/Variable_Properties
+[root]/Tests/Manual/Thermally_Driven/Variable_Properties/
 ├── air.geo
 ├── air_properties_at_1_bar.dat
 ├── control
@@ -1680,7 +1685,7 @@ functions.  The way T-Flows handles user functions is as follows.  In the
 folder which holds sources for _Process_, there is also a sub-folder called
 ```User_Mod``` holding a number of functions user can modify.  They are:
 ```
-[root]/Sources/Process/User_Mod
+[root]/Sources/Process/User_Mod/
 ├── Before_Exit.f90
 ├── Beginning_Of_Compute_Energy.f90
 ├── Beginning_Of_Compute_Momentum.f90
@@ -1732,7 +1737,7 @@ function specified in the case.
 When the compilation completes, the contents of the ```User_Mod``` in
 ```[root]/Sources/Process``` will read:
 ```
-[root]/Sources/Process/User_Mod
+[root]/Sources/Process/User_Mod/
 ├── Before_Exit.f90
 ├── Beginning_Of_Compute_Energy.f90
 ├── Beginning_Of_Compute_Momentum.f90
@@ -1884,6 +1889,10 @@ While reading the files we use another procedure from ```File_Type``` called
 ```Read_Line``` which reads a line from ASCII file and splits it into individual
 tokens.  Tokens are stored in the fields ```line % token(:)```.
 
+> **_Note_** The procedure ```Read_Line``` not only tokenizes a line from
+input, it also skips all the lines beginning with ```#```, ```!``` and ```%```,
+considering such lines as comments.
+
 Finally, in the lines 47 to 51 we print a message that physical properties
 have been read.  Here we use global variable ```this_proc``` to make sure we
 print the message only from first processor in parallel runs.
@@ -1998,15 +2007,15 @@ the scaling factor used.
 
 The final velocity vector imposed over the temperature fields look like this:
 
-![Thermally-driven variable temp!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_temp.png "Thermally-driven variable temp")
+![!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_temp.png "")
 
 whereas the same velocity vectors over pressure, look like:
 
-![Thermally-driven variable press!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_press.png "Thermally-driven variable temp")
+![!](Documentation/Manual/Figures/thermally_driven_solution_variable_velo_press.png "")
 
 ## Parallel processing  <a name="demo_parallel_proc"></a>
 
-The cases considered in previous [chapter](#test_cases) were all on very small
+The cases considered in previous [chapter](#demo_cases) were all on very small
 grids an no parallel processing was needed.  As the grids we use grow bigger
 and number of time steps we want to perform grow, the need for parallel runs
 become imminent.
@@ -2072,14 +2081,14 @@ We will use the case in ```[root]/Tests/Manual/Parallel``` to show you how to
 set up a parallel run.  Please change to that folder and check the contents.  
 They should read:
 ```
-[root]/Tests/Manual/Parallel
+[root]/Tests/Manual/Parallel/
 ├── control
 ├── convert.scr
 └── rod_tet.geo
 ```
 
 The purpose of these files should be clear to you by now.  If not, re-visit
-[chapter](#test_cases).  The creation of the mesh is as usual:
+[chapter](#demo_cases).  The creation of the mesh is as usual:
 ```
 gmsh -3 rod_tet.geo
 ```
@@ -2116,17 +2125,17 @@ above.  That should tell you that the grid is polyhedral.  If you visualize
 ```rod_tet.vtu``` or ```rod_tet_dual.vtu```, the overall domain will look like
 this:
 
-![Rod bundle domain!](Documentation/Manual/Figures/rod_domain.png "Rod bundle domain")
+![!](Documentation/Manual/Figures/rod_domain.png "")
 
 It is a segment from a bundle of rods arranged in a hexagonal matrix.  We will
 study a flow across this matrix with LES.  The details of the mesh for
 ```rod_tet.vtu``` or ```rod_tet_dual.vtu``` are different, as shown here for the former:
 
-![Rod tet grid detail!](Documentation/Manual/Figures/rod_tet_detail.png "Rod tet grid detail")
+![!](Documentation/Manual/Figures/rod_tet_detail.png "")
 
 and here for the latter:
 
-![Rod tet dual grid detail!](Documentation/Manual/Figures/rod_tet_dual_detail.png "Rod tet dual grid detail")
+![!](Documentation/Manual/Figures/rod_tet_dual_detail.png "")
 
 Next step is to divide the mesh using the _Divide_.  The fastest is to invoke
 _Divide_ from the command line as this:
@@ -2137,7 +2146,7 @@ by which we tell _Divide_ the name of the grid we want to divide, and number of
 sub-divisions.  If the command is successful, your directory structure, showing
 only new files, looks like this:
 ```
-[root]/Tests/Manual/Parallel
+[root]/Tests/Manual/Parallel/
 ├── ...
 ├── rod_tet_dual.pvtu
 ├── ...
@@ -2178,7 +2187,7 @@ This file re-directs ParaView to read the partial ```.vtu``` files from the
 new folder, and if you visualize the ```rod_tet_dual.pvtu``` it will show you
 the domain decomposition obtained by _Divide_:
 
-![Rod tet dual decomposed!](Documentation/Manual/Figures/rod_tet_dual_decomposed.png "Rod tet dual decomposed")
+![!](Documentation/Manual/Figures/rod_tet_dual_decomposed.png "")
 
 ### Running the simulation in parallel <a name="demo_parallel_proc_running"> </a>
 
@@ -2258,18 +2267,18 @@ If we do it now, at the time of writing this manual, _Process_ will save results
 at the time step of ... 357.  File ```rod_tet_dual-ts000357.pvtu``` has been
 created and we can visualize it to show current velocity field in _x_ direction:
 
-![Rod tet dual vel x!](Documentation/Manual/Figures/rod_tet_dual_ts0357_vel_x.png "Rod tet dual")
+![!](Documentation/Manual/Figures/rod_tet_dual_ts0357_vel_x.png "")
 
 This actually happened to be a lucky moment, because we can observe recirculation
 zones behind each of the rods (blue areas).  A more detailed view of the recirculation
 zones shown as vector imposed over pressure looks like:
 
-![Rod tet dual vel x!](Documentation/Manual/Figures/rod_tet_dual_ts0357_recirc.png "Rod tet dual")
+![!](Documentation/Manual/Figures/rod_tet_dual_ts0357_recirc.png "")
 
 Next time we _touched_ ```save_now``` happened to be time step 1061, at which the
 flow start to exhibit three-dimensional patterns:
 
-![Rod tet dual vel x!](Documentation/Manual/Figures/rod_tet_dual_ts1061_vel_x.png "Rod tet dual")
+![!](Documentation/Manual/Figures/rod_tet_dual_ts1061_vel_x.png "")
 
 Fine, maybe the simulation doesn't need to continue.  You have hopefully grasped
 how to launch a parallel simulation.  Before we end, let's just stop the simulation
@@ -2332,5 +2341,338 @@ dealt with.
 
 ## Volume of fluid simulation of a rising bubble <a name="bench_cases_bubble"> </a>
 
-## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
+To demonstrate the use of VOF in T-Flows, we decided to use the case described
+by Safi at el. [here](https://www.sciencedirect.com/science/article/pii/S089812211630685X#f000005).
+In this work, the authors are establishing a three-dimensional rising bubble case
+and compare thier results with lattice-Boltzman simulations, against highly refined
+finite element results obtained with commercial package COMSOL.
 
+The schematic of the problem is shown in this picture:
+
+![!](Documentation/Manual/Figures/bubble_domain.png "")
+
+The resides in the folder ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
+there and check the contents.  They include the following:
+```
+[root]/Tests/Manual/Rising_Bubble/
+├── control
+├── convert.scr
+├── ellipsoid_parameters.ini
+├── rising.geo
+└── User_Mod/
+    ├── End_Of_Time_Step.f90
+    └── Initialize_Variables.f90
+```
+
+The usage of ```control```, ```convert.scr``` and ```rising.geo``` files should
+be clear to you by now.  If not, revisit the section with [demonstration cases]
+(#demo_cases).
+
+### Initialization of VOF function <a name="bench_cases_buble_init"> </a>
+
+An _important characteristic_ of simulating multiphase flows with VOF, is that
+initial conditions can _only_ be defined through user functions.  At the time
+of writing this manual, we believe that the initial conditions for VOF are very
+case dependent, and expanding the ```control``` file, as well as all the
+procedures to read them, would be overwhelming.
+
+Because of this, with each case using VOF, you will have a ```User_Mod``` folder
+with function to initialize VOF.  In this particular case, the subroutine
+```Initialize_Variables.f90``` reads:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
+  3 !------------------------------------------------------------------------------!
+  4 !   Case-dependent initialization of VOF variable.                             !
+  5 !------------------------------------------------------------------------------!
+  6 !----------------------------------[Modules]-----------------------------------!
+  7   use Work_Mod, only: prelim_vof => r_cell_01,  &
+  8                       min_dist   => r_cell_02,  &
+  9                       max_dist   => r_cell_03,  &
+ 10                       dist_node  => r_node_01
+ 11 !------------------------------------------------------------------------------!
+ 12   implicit none
+ 13 !---------------------------------[Arguments]----------------------------------!
+ 14   type(Field_Type),  target :: Flow
+ 15   type(Turb_Type),   target :: Turb
+ 16   type(Vof_Type),    target :: Vof
+ 17   type(Swarm_Type),  target :: Swarm
+ 18   type(Solver_Type), target :: Sol
+ 19 !-----------------------------------[Locals]-----------------------------------!
+ 20   type(Grid_Type), pointer :: Grid
+ 21   type(Var_Type),  pointer :: fun
+ 22   real,            pointer :: dt
+ 23   integer                  :: c, n, i_nod, e, n_ellipses, fu
+ 24   real                     :: radius_x, radius_y, radius_z
+ 25   real                     :: cent_x, cent_y, cent_z, dist_norm
+ 26 !==============================================================================!
+ 27
+ 28   ! Take aliases
+ 29   Grid => Flow % pnt_grid
+ 30   fun  => Vof % fun
+ 31   dt   => Flow % dt
+ 32
+ 33   !---------------------------------!
+ 34   !   Initialize the VOF function   !
+ 35   !---------------------------------!
+ 36
+ 37   ! Initialize the whole domain as 0.0
+ 38   fun % n(:) = 0.0
+ 39
+ 40   ! Open file to read Ellipsoid parameters:
+ 41   call File % Open_For_Reading_Ascii('ellipsoid_parameters.ini', fu)
+ 42
+ 43   call File % Read_Line(fu)
+ 44   read(line % tokens(1), *) n_ellipses
+ 45
+ 46   do e = 1, n_ellipses
+ 47
+ 48     ! Initialize working arrays
+ 49     prelim_vof(:) = 0.0
+ 50
+ 51     ! Read line with radii
+ 52     call File % Read_Line(fu)
+ 53     read(line % tokens(1), *) radius_x
+ 54     read(line % tokens(2), *) radius_y
+ 55     read(line % tokens(3), *) radius_z
+ 56
+ 57     ! Read line with coordinates of the elliposoid's center
+ 58     call File % Read_Line(fu)
+ 59     read(line % tokens(1), *) cent_x
+ 60     read(line % tokens(2), *) cent_y
+ 61     read(line % tokens(3), *) cent_z
+ 62
+ 63     ! Normalized distance from ellipsoid center in nodes
+ 64     dist_node (:) = 0.0
+ 65     do n = 1, Grid % n_nodes
+ 66       dist_node(n) = sqrt(  ((Grid % xn(n) - cent_x) / radius_x)**2   &
+ 67                           + ((Grid % yn(n) - cent_y) / radius_y)**2   &
+ 68                           + ((Grid % zn(n) - cent_z) / radius_z)**2)
+ 69     end do
+ 70
+ 71     ! Minimum and maximum normalized distance in cells
+ 72     min_dist(:) = +HUGE
+ 73     max_dist(:) = -HUGE
+ 74     do c = 1, Grid % n_cells
+ 75       do i_nod = 1, Grid % cells_n_nodes(c)
+ 76         n = Grid % cells_n(i_nod, c)
+ 77
+ 78         min_dist(c)= min(dist_node(n), min_dist(c))
+ 79         max_dist(c)= max(dist_node(n), max_dist(c))
+ 80       end do
+ 81     end do
+ 82
+ 83     ! Simply interpolate linearly
+ 84     do c = 1, Grid % n_cells
+ 85
+ 86       ! Since surface is at 1.0 this checks if cell crosses the surface
+ 87       if (min_dist(c) < 1.0 .and. max_dist(c) > 1.0) then
+ 88         prelim_vof(c) = (1.0 - min_dist(c))  &
+ 89                       / (max_dist(c)-min_dist(c))
+ 90
+ 91       else if (max_dist(c) <= 1.0) then
+ 92         prelim_vof(c) = 1.0
+ 93       end if
+ 94
+ 95     end do
+ 96
+ 97     ! This is useful if more elliposoids are
+ 98     ! defined and they intersect each other
+ 99     do c = 1, Grid % n_cells
+100       Vof % fun % n(c) = max(prelim_vof(c), Vof % fun % n(c))
+101     end do
+102
+103   end do
+104
+105   close(fu)
+106
+107   ! Update buffer values
+108   call Grid % Exchange_Cells_Real(fun % n)
+109
+110   ! Set old values to be the same as new ones
+111   fun % o(:) = fun % n(:)
+112
+113   end subroutine
+
+```
+In the argument list, you can see a number of _Process'_ classes which were
+described [above](#demo_thermally_driven_variable).  The only class you didn't
+see before is ```Sol_Type``` which is an _abstraction_ of two other classes
+```Nat_Type``` for T-Flows' native linear solvers and ```Pet_Type``` for
+PETSc solver.  None of them will be used in this function, and we will not
+describe them further.
+
+An interesting novelty here is in between lines 7 and 10, the usage of ```Work_Mod```.
+This module has no functionality, but holds a number of pre-allocated fields of
+different types (```r_cell_..```, ```r_node_```, ```i_cell_```, ...) with sizes
+which span over cells, faces or nodes.  These pre-allocated memory locations
+are used inside _Process'_ functions to avoid frequent allocations and
+de-allocations of memory.  In this case, we will use three real fields (```r_```
+in the name) spanning over cells (```cell_``` in the name) and one real field
+spanning over nodes (```r_node_01```).
+
+Lines 28 to 31 take different _aliases_ to shorten the syntax in the rest of
+this subroutine.  It is probably worth noting that VOF's phase indicator function
+is stored in ```Vof % fun```, and the value of VOF function in the new time
+step is in the field ```Vof % fun % n```.
+
+Line 41 opens the file ```ellipsoid_parameters.ini``` which holds the definition
+of ellipsoids we want to define.  It reads:
+```
+# Number of ellipsoids
+ 1
+
+# Ellipsoids' characteristic radii in x, y and z direction
+ 0.25 0.25 0.25
+
+# Ellipsoid's center
+ 0.0  0.0  0.0
+```
+which, we believe, is self-explanatory.  This file will be read by user function
+in lines 51 - 61.
+
+> **_Note_** Remember that procedure ```Read_Line``` not only tokenizes a line 
+from input, but also skips all the lines beginning with ```#```, ```!``` and 
+```%```, which it considers comments.  That is why we can have comments inside
+```ellipsoid_parameters.dat```
+
+Lines 63 - 69 calculate normalized distance from the ellipsoid in the nodes.  It
+is worth reminding you at this point that T-Flows is cell-centered, _nodes are
+not_ computational points, _cell centers are_.  Once we have all normalized
+distances in nodes, we can define them for cells in lines 71 - 81.  These lines show
+how can you access cells' nodes.
+```
+  74     do c = 1, Grid % n_cells
+```
+will start browsing through all the cells,
+```
+ 75       do i_nod = 1, Grid % cells_n_nodes(c)
+```
+will browse through local nodes of each cell and
+```
+ 76         n = Grid % cells_n(i_nod, c)
+```
+gives you a global number of the cell's node.  Lines 78 and 79 compute minimum
+and maximuim normalized distance for each cell, which is used in lines 83 to 95
+to calculate preliminary VOF in cell centers.  We don't put these values straight
+into VOF function (```Vof % n```) to prevent that, in case we have more than
+one ellipsoid defined, they over-write each other, which is achieved in lines
+97 - 101.  
+
+Line 108 is important for parallel runs since it echanges the values
+of VOF functions in buffer cells.  
+
+Finally, once VOF is set in the entire domain, we also make sure that the
+values in the old time step (```fun % o```) are the same as new ones in
+line 110.
+
+### Compilation <a name="bench_cases_buble_compiling"> </a>
+
+Next step is the compilation of the sources.  _Convert_ (and _Divide_ if you
+intend to run in parallel) are compiled in the usual way, with ```make```
+command in their folders, but for _Process_ you should specify the case folder,
+hence from ```[root]/Sources/Process``` run:
+```
+make clean
+make DIR_CASE=../../Tests/Manual/Rising_Bubble/
+```
+
+> **_Note 1:_** Every time you run ```make clean``` for the _Processs_ it will
+replace the existing links in its ```User_Mod``` with _empty hooks_ as explained
+[above](#demo_thermally_driven_variable).  Running make with ```DIR_CASE```
+option will establish new links to user's case.
+
+### Running the case <a name="bench_cases_buble_running"> </a>
+
+At this point feel free to proceed with generating the grid:
+```
+gmsh -3 rising.geo
+```
+and converting it to T-Flows format:
+```
+./Convert < convert.scr
+```
+From this point, you can either decompose the domain with _Divide_ as it was
+explained in [this section](#demo_parallel_proc) or run the simulation straight
+away with:
+```
+./Process > out_coarse &
+```
+
+### Checking the initial condition <a name="bench_cases_buble_checking"> </a>
+
+Since VOF simulations inherently depend on initializing VOF function with user
+function, it is of utmost importance to check if we really specified what we
+wanted.  For that, for checking initial condition, _Process_ creates results
+with ```-ts000000``` appended just before the extension (which is either ```.vtu```
+or ```.pvtu``` depending if you ran your simulation in sequential or parallel
+mode.
+
+![!](Documentation/Manual/Figures/bubble_initial.png "")
+
+While the _Process_ is running, and we are sure that initial condition was
+properly set, we would like to turn your attenion to a few things in the
+```control``` file which are characteristic for VOF simulation.
+
+For two-fluid systems, physical properties have to be set for both phases.
+In ```control``` file this is achieved with:
+```
+ PHASE_DENSITIES           1.0e2   1.0e3
+ PHASE_VISCOSITIES         1.0e0   1.0e1
+```
+where values in the first column correspond to fluid for which VOF function is
+1, and the second column corresponds to fluid with VOF function 0.
+
+Surface tension is not a characteristic of one fluid, but depends on combination
+of considered fluids.  In ```control``` file it is set like this:
+````
+ SURFACE_TENSION        24.5
+ ````
+
+Time steps are typically small for VOF, the Courant number should not exceed 0.25
+for good accuracy.  For such small time steps, PISO algorithm is more efficient
+than SIMPLE, and this is set with lines:
+```
+ PRESSURE_MOMENTUM_COUPLING             piso
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    1.0
+```
+
+> **_Note:_** We did the same in LES computations [above](#bench_cases_matrix).
+For PISO, under-relaxation factors are either 1.0 or very close to it.  The
+_rule of thumb" for SIMPLE, that sum of under-relaxation factors for velocity
+and pressure should be close to one, doesn't apply for PISO.
+
+For VOF, gradient method for computation for pressure and VOF function should
+be the same for consistency of surface tension forces, which is set with:
+```
+ GRADIENT_METHOD_FOR_PRESSURE           gauss_theorem
+ GRADIENT_METHOD_FOR_VOF                gauss_theorem
+```
+
+To make sure that in order for volume forces (buoyancy) surface tension forces
+to be properly balanced at cell faces during the Rhie and Chow interpolation,
+we also set Gu's and Choi's correction in the control file:
+```
+ GU_CORRECTION                          yes
+ CHOI_CORRECTION                        yes
+```
+
+One of the most serious source of inaccuracies of surface phenomena in VOF is
+the calculation of curvature and, associated with that, surface normals.  In
+_Process_, we use a smoothing procedure which is controlled with following
+parameters:
+```
+ MAX_SMOOTHING_CYCLES_CURVATURE_VOF  12
+ MAX_SMOOTHING_CYCLES_NORMAL_VOF      0
+```
+
+### Final solution and benchmarking <a name="bench_cases_buble_final"> </a>
+
+The final result of rising bubble simulation is shown on this picture, where
+bubble surface is represented as a wire-frame, superimposed on velocity
+magnitude field:
+
+![!](Documentation/Manual/Figures/bubble_final.png "")
+
+## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
