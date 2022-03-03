@@ -10,7 +10,7 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('ADVECTION_SCHEME_FOR_VOF',  &
-                                   'upwind', scheme_name, verbose)
+                                  'upwind', scheme_name, verbose)
   call To_Upper_Case(scheme_name)
 
   end subroutine
