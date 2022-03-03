@@ -33,9 +33,10 @@
     2. [Fully-developed turbulent a plane channel flow](#bench_plane_channel)
         1. [RANS computation of a channel flow](#bench_plate_channel_rans)
         2. [LES computation of a channel flow](#bench_plate_channel_les)
-    3. [Round impinging jet and heat transfe](#bench_cases_jet)
+    3. [Round impinging jet and heat transfer](#bench_cases_jet)
     4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
-
+    5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
+    6. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
 
 # Introduction <a name="intro"></a>
 
@@ -381,9 +382,9 @@ and you are ready to start your first simulations.
 
 The cases presented in this chapter serve only to show the basic usage of T-Flows.
 They are by no means adhering to best practice guidlines, nor is their aim to be
-used as verifcation against experiments, DNS or other published results.  
-The following chapter is dedicated to benchmarking and more rigirous CFD
-practices.
+used as verifcation against experiments, DNS or other published results.
+The following [chapter](#bench_cases) is dedicated to benchmarking and
+rigirous CFD practices.
 
 ## Lid-driven cavity flow <a name="demo_lid_driven"></a>
 
@@ -2311,4 +2312,25 @@ dealt with.
 
 # Benchmark cases  <a name="bench_cases"></a>
 
-## Large eddy simulation over a matrix of cubes] <a name="bench_cases_matrix"> </a>
+## Laminar flow over a flat plate <a name="bench_flat_plate"> </a>
+
+### Pre-processing <a name="bench_flat_plate_pre"> </a>
+
+### Processing - running the case <a name="bench_flat_plate_run"> </a>
+
+### Post-processing - visualization of results and plotting profiles <a name="bench_flat_plate_post"> </a>
+
+## Fully-developed turbulent a plane channel flow] <a name="bench_plane_channel"> </a>
+
+### RANS computation of a channel flow <a name="bench_plate_channel_rans"> </a>
+
+### LES computation of a channel flow <a name="bench_plate_channel_les"> </a>
+
+## Round impinging jet and heat transfer <a name="bench_cases_jet"> </a>
+
+## Large eddy simulation over a matrix of cubes <a name="bench_cases_matrix"> </a>
+
+## Volume of fluid simulation of a rising bubble <a name="bench_cases_bubble"> </a>
+
+## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
+
