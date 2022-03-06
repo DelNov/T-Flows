@@ -35,6 +35,7 @@
         2. [LES computation of a channel flow](#bench_plate_channel_les)
     3. [Round impinging jet and heat transfer](#bench_cases_jet)
     4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
+        1. [Preparing the grid](#bench_cases_matrix_prep)
     5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
@@ -163,7 +164,6 @@ on the quality, robustness and intuitivity of the software itself, but also on
 the user's previous experience.  This is even more true for open source
 software, particularly open source scientific software such as T-Flows.
 In this section we list some background knowledge required from you in
-order to successfully use T-Flows.
 
 ## Minimum user requirements <a name="user_req_min"></a>
 
@@ -2398,6 +2398,191 @@ dealt with.
 ## Round impinging jet and heat transfer <a name="bench_cases_jet"> </a>
 
 ## Large eddy simulation over a matrix of cubes <a name="bench_cases_matrix"> </a>
+
+We chose the case of the flow over a surface-mounted matrix of cubes to give you
+an additional example of setting up and running an LES case, but also to 
+introduce PISO algorithm to link velocities and pressure.  The case was studied
+experimentally by Meinders and Hanjalic (**give link**) and the problen domain
+is sketched in this figure:
+
+There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15 
+mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
+cubes is 60 mm.  Working fluid is air at room temperature, and PIV measurments
+are reported by Meinders and Hanjalic for comparison against CFD simulations.
+
+Large eddy simulation approach is particularly well suited for this flow because
+the periodicity can be assumed, meaning that only one segment of the entire
+matrix can be simulated, with periodic boundary conditions in streamwise and
+spanwise direction.  Furthermore, the Reynolds number is relativelly low
+(13000 based on bulk velocity and channel height) meaning that LES without wall
+functions are amenable for this case.  On top of it, due to the fact that the
+cubes create large coherent structures which are inherently unsteady, RANS
+approach alone can't yield accurate predictions for this case.
+
+The case resides in the directiory ```[root]/Tests/Manual/Matrix_Of_Cubes/```.
+if you check its contents, you will see that the following files have been
+prepared for you there:
+```
+[root]/Tests/Manual/Matrix_Of_Cubes/
+├── control
+├── convert.scr
+└── matrix.geo
+```
+The meaning of all these files should be clear to you by now.  In addition to
+these, you will have to compile _Convert_ and _Process_.  For this case, it
+would be highly beneficial if you also compiled _Divide_ and ran the case in
+parallel.  (Refer to [Parallel processing](#demo_parallel_proc) section again
+if you forgot how to compile _Process_ with MPI.
+
+### Preparing the grid <a name="bench_cases_matrix_prep"> </a>
+
+Once you compile all the sub-programs and create necessary links in the current
+directory, ganerate, convert and divide the mesh with:
+```
+gmsh -3 matrix.geo
+./Convert < convert.scr
+./Divide matrix 8
+```
+
+> **_Note:_** We divided the mesh into 8 sub-domains, but you have the freedom
+to use any other number of sub-domains.  Keep in mind, however, that there is
+a tradeof in what you gain by splitting the work between processors and what
+you lose in communication.  A rule of thumb says that you should try to keep
+around hundred thousand cells in each processor.  In this case, the grid has
+roughly 800`000 cells and we therefore dividide it in eight sub-grids.
+
+The grid looks like this:
+
+![!](Documentation/Manual/Figures/matrix_grid.png "")
+
+Given that it is possible to cover this domain with hexahedral cells only,
+we did that.  We have also took care to cluster the grid lines towards the
+walls, both channel walls and cube walls.
+
+### Runnig the case <a name="bench_cases_matrix_prep"> </a>
+
+Large eddy simulations have to be run in at least two stages.  The first stage
+is for developing the turbulence in the problem domain, and the second stage
+is for gathering the turbulence statistics for the flow.  The control file for
+the first stage has a few things we would like to turn your attention to.
+
+#### First stage: turbulence development
+
+The time step should be small in order to keep the Courant number around unity,
+at most.  We did some test runs and found out that the time step which satisfies
+this is 2.0e-5.  Given that the number of time steps is so small, we should
+perform quite a lot of them.  For this case we set it 60'000 which, when
+combined with the time step, gives a physical time of simulation of 1.2 s.
+So, the time stepping section in the control file looks like:
+```
+  TIME_STEP                 0.00002
+  NUMBER_OF_TIME_STEPS  60000
+```
+
+With small time steps, SIMPLE is not the most efficient method for coupling
+velocity and pressure in time.  We therefore chose PISO.  When PISO is used,
+the under-relaxation factors should be much higher than in SIMPLE.  In fact,
+for both velocities and pressure, they should be set close to 1.0.  For this
+case, setting them both to 1.0 worked:
+```
+ PRESSURE_MOMENTUM_COUPLING           piso
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM  1.0
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE  1.0
+ MIN_SIMPLE_ITERATIONS                2
+```
+
+We also decreased the minimum number of SIMPLE iterations (PISO is viewed as
+a sub-step within SIMPLE) to two, from the default three.  Since that
+under-relaxation factors are 1.0, maybe even that it is too much, but we
+kept it like this to make sure advection don't have a time lag.
+
+Since this stage of computation serves as a turbulence development, we should
+come up with some indicator on wheather turbulence is fully developed.  We
+could gather the statistics for that and check results against experiments.
+but there is a faster indicator.  We know that, in this case, turbulence will
+start to develop over and around sharp edges of the cube, and penetratate
+towards the upper channel wall.  To see this development, we defined eight
+monitoring points, spanning from just above the top of the cube, towards the
+upper channel wall with:
+```
+  NUMBER_OF_MONITORING_POINTS     8
+    MONITORING_POINT_001          0.0301  0.0301  0.016
+    MONITORING_POINT_002          0.0301  0.0301  0.02
+    MONITORING_POINT_003          0.0301  0.0301  0.025
+    MONITORING_POINT_004          0.0301  0.0301  0.03
+    MONITORING_POINT_005          0.0301  0.0301  0.035
+    MONITORING_POINT_006          0.0301  0.0301  0.04
+    MONITORING_POINT_007          0.0301  0.0301  0.045
+    MONITORING_POINT_008          0.0301  0.0301  0.05
+```
+
+> **_Note:_**  The center of the computational domain in _x-y_ plane is at
+(0.03, 0.03).  The top if the cube is at height 0.015, and the upper channel
+wall at _z_=0.051.  Hence, the points defined above spread from the top of the
+cube to the upper channel.
+
+For LES, it is of utmost importance to keep the accuracy level of the numerical
+scheme as high as possible.  For the cell-centered finite volume method used
+in T-Flows, the highest we can hope to get is two, provided that advection
+scheme we use to solve conservation equation is central.  We also set time
+integration scheme to the more accurate parabolic interpolation between the
+new, old and time step older than old:
+```
+ TIME_INTEGRATION_SCHEME              parabolic
+```
+
+Since the all streamwise and spanwise boundary conditions are periodic, we
+prescribe the desired mass flux through the computational domain with:
+```
+#-------------------------------------------------
+# Prescribed mass flow
+#
+# Re = 13000
+# nu = 1.5112e-5
+# h  = 0.051
+# Re = Ub * h / nu = 13000
+# Ub = Re * nu / h = 3.852  [m/s]
+# m* = Ub * 1.2047 * 0.051 * 0.06 = 0.0142 [kg/s]
+#-------------------------------------------------
+  MASS_FLOW_RATES    0.0142  0.0  0.0
+```
+
+With this explained, you can launch a simulation with:
+```
+mpirun -np 8 ./Process > out_01_developing_turbulence.
+```
+
+This simulation takes a long time.  It depends on the hardware you are using a
+lot, but you can expect it to run for days.  However, it is not a bad practice
+to visualize results occasionally to make sure your simulations are not marred
+by numerical instabilities, and they well could be because the central scheme
+for advection is unstable.
+
+> **_Note:_**  If initial stages of the turbulence development prove to be
+unstable, you could use some upwind biased scheme for advection, but such a
+scheme should _not_ be used in the later stage when you start to gather
+turbulent statisics.
+
+At time step 30'000 (physical time 0.6 s) we plotted streamwise components of
+velocity at different elevations:
+
+![!](Documentation/Manual/Figures/matrix_turb_devel.png "")
+
+Here you can see that for the point closes to the cube top (blue, _z_=0.02) the
+turbulence develops straight aways.  The sharp edges of the cube give rise to
+it rather quickly, as we expected.  The turbulence spreads pretty fast to the
+upper layers of the cube.  Next level (green, _z_=0.03) starts to show a
+turbulent history at _t_=0.05 s.  The level above it (orange, _z_=0.04) starts
+to rise in a laminar fashion until, roughly, _t_=0.15 s, but the highest level
+(red, _z_=0.05) takes as long as _t_=0.3 s to start exhibiting turbulent
+trace.  The velocity history we show here is up to 0.6 s.  We conducted 0.6 s
+more to start gathering the statistics.
+
+> **_Note:_** Keep in mind that observing time histories like this is a bit on
+the _ad-hoc_ side.  If we wanted to be scientifically correct, we would have
+to perform Fourier analyzis of the signals, but we already know that we don't
+have enough samples for high quality spectra and we don't even bother at this
+initial stages of turbulence development.
 
 ## Volume of fluid simulation of a rising bubble <a name="bench_cases_bubble"> </a>
 
