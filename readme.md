@@ -11,13 +11,13 @@
 4. [Obtaining the code](#obtaining)
 5. [Compiling the code](#compiling)
     1. [Directory structure](#compiling_dir_struct)
-    2. [Sub-programs](#compiling_sub_programs)
+    2. [Compiling sub-programs](#compiling_sub_programs)
 6. [Demonstration cases](#demo_cases)
     1. [Lid-driven cavity flow](#demo_lid_driven)
-        1. [On hexahedral grid](#demo_lid_driven_hexa)
+        1. [Lid-driven cavity on hexahedral grid](#demo_lid_driven_hexa)
             1. [Creating the grid](#demo_lid_driven_hexa_create)
             1. [Converting the grid](#demo_lid_driven_hexa_convert)
-        2. [On polyhedral grid](#demo_lid_driven_dual)
+        2. [Lid-driven cavity on polyhedral grid](#demo_lid_driven_dual)
     2. [Thermally-driven cavity flow](#demo_thermally_driven)
         1. [With Boussinesq approximation](#demo_thermally_driven_boussinesq)
         2. [With variable physical properties](#demo_thermally_driven_variable)
@@ -30,7 +30,7 @@
         1. [Pre-processing](#bench_flat_plate_pre)
         2. [Processing - running the case](#bench_flat_plate_run)
         3. [Post-processing - visualization of results and plotting profiles](#bench_flat_plate_post)
-    2. [Fully-developed turbulent a plane channel flow](#bench_plane_channel)
+    2. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
         1. [RANS computation of a channel flow](#bench_plate_channel_rans)
         2. [LES computation of a channel flow](#bench_plate_channel_les)
     3. [Round impinging jet and heat transfer](#bench_cases_jet)
@@ -254,8 +254,8 @@ will be referred to as ```[root]``` from this point in the manual on.
 ## Directory structure <a name="compiling_dir_struct"></a>
 
 To cover this section, we assume that you have an open terminal and that you
-have retrieved the sources with one of the two options described in
-[section above](#obtaining).  The ```[root]``` directory has the following
+have retrieved the sources with one of the two options described in section
+[Obtaining the code](#obtaining).  The ```[root]``` directory has the following
 structure:
 ```
 [root]/
@@ -314,7 +314,8 @@ So, as a bare minimum, you have to compile:
 Should you want to run your simulations in parallel, you will have to decompose
 the grids obtained from _Generate_ or _Convert_ with the program _Divide_.
 The parallel processing is not covered here, we dedicate a separate section
-for it [below](#demo_parallel_proc).  Here, we will only compile the program _Divide_.
+[Parallel processing](#demo_parallel_proc) for it.  Here, we will only compile
+the program _Divide_.
 
 The compilation of each of the sub-programs is performed in their directories
 (```[root]/Sources/Generate```, ```[root]/Sources/Convert```, ```[root]/Sources/Divide```
@@ -394,8 +395,8 @@ and you are ready to start your first simulations.
 The cases presented in this chapter serve only to show the basic usage of T-Flows.
 They are by no means adhering to best practice guidlines, nor is their aim to be
 used as verifcation against experiments, DNS or other published results.
-The following [chapter](#bench_cases) is dedicated to benchmarking and
-rigirous CFD practices.
+The following chapter, [Benchmark cases](#bench_cases), is dedicated to
+benchmarking and rigirous CFD practices.
 
 ## Lid-driven cavity flow <a name="demo_lid_driven"></a>
 
@@ -422,7 +423,7 @@ We will use this case to introduce a few new concepts in T-Flows:
 - visualization of results
 - typical workflow in T-Flows
 
-### On hexahedral grid <a name="demo_lid_driven_hexa"></a>
+### Lid-driven cavity on hexahedral grid <a name="demo_lid_driven_hexa"></a>
 
 We show how to solve this example with two grids with different topolgies; a
 hexahedral grid and a polyhedral grid.
@@ -441,7 +442,7 @@ There you will find the following files:
 The first file, with the extension ```.geo```, is the script GMSH uses to
 generate a mesh, whereas the second file, ```lid_driven.msh.gz```, is in this
 directory in the case you don't have GMSH installed on your system.
-If that is the  case, skip directly [here](#demo_lid_driven_hexa_convert).
+If that is the  case, skip directly to [Converting the grid](#demo_lid_driven_hexa_convert).
 
 Although it is beyond the scope of this manual to teach you how to use third
 party software, we believe it's interesting to have a look at the
@@ -523,9 +524,10 @@ Once you have the mesh in this format, you can use _Convert_ to convert it
 into T-Flows native file format.  This will take some and will require your
 attention, so we don't recommend you going on with _Convert_ unless you are
 sure you can have 15 minutes of peace and focus ahead of you.  We assume you
-compiled _Convert_ as it was described in [this section](#compiling_sub_programs).
-Given that you are in directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```,
-you can call _Convert_ with:
+compiled _Convert_ as it was described in the section
+[Compiling sub-programs](#compiling_sub_programs).  Given that you are in
+directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```, you can 
+call _Convert_ with:
 ```
 ../../../../Binaries/Convert
 ```
@@ -568,8 +570,8 @@ won't cover now, but _Convert_ will stop with the following question:
 ```
 
 at which point you type ```no```.  Dual grids will be covered in the
-[next example](#demo_lid_driven_dual).  Next question _Convert_ asks you
-concerns geometric extents:
+[Lid-driven cavity on polyhedral grids](#demo_lid_driven_dual).
+Next question _Convert_ asks you concerns geometric extents:
 ```
  #=========================================
  # Geometric extents:
@@ -688,8 +690,8 @@ Before it ends, _Convert_ will ask you one more thing:
 ```
 
 which is important for computation of turbulent flows and described with some
-turbulent benchmark cases [below](#bench_plane_channel).  For the time being,
-feel free to answer with a ```skip```.
+turbulent benchmark cases [RANS computation of a channel flow](#bench_plane_channel_rans).
+For the time being, feel free to answer with a ```skip```.
 
 #### Analyzing the outcome of _Convert_
 
@@ -706,9 +708,10 @@ During the conversion process, _Convert_ creates the following files:
 
 which will be described now.  Files with extension ```.cfn``` and ```.dim```
 are binary files in internal T-Flows format, which can be read by _Process_
-(or _Divide_ for domain decomposition, which is covered in the separate
-[section](#demo_parallel_proc) below.  A number of files with extension ```.vtu```
-is created too.  You can visualize them with ParaView or VisIt for inspection.
+(or _Divide_ for domain decomposition, which is covered in section
+[Parallel processing](#demo_parallel_proc).  A number of files with extension
+```.vtu``` is created too.  You can visualize them with ParaView or VisIt
+for inspection.
 
 The most interesting is the ```lid_driven.faces.vtu``` because it shows
 boundary conditions.  Once visualized with ParaView, the
@@ -740,7 +743,8 @@ If plotted together with ```lid_driven.faces.vtu```, they close the domain.
 ### Running the simulation.
 
 In order to run a simulation, you have to compile _Process_ as explained in
-[this section](#compiling_sub_programs).  In addition to that, you need a special
+[Compiling sub programs](#compiling_sub_programs).  In addition to that, you
+need a special
 file called ```control``` which controls all the numerical parameters
 (by _numerical_ we mean discretization), physical models (turbulence,
 multiphase, multiple domains) and linear solver parameters (either for native
@@ -1177,7 +1181,7 @@ Better and more elaborate test cases for the lid-driven cavity flow have been
 set in ```[root]/Tests/Laminar/Cavity/Lid_Driven/```.  Feel free to explore
 them further.
 
-### On polyhedral grid <a name="demo_lid_driven_dual"></a>
+### Lid-driven cavity on polyhedral grid <a name="demo_lid_driven_dual"></a>
 
 During the conversion process outlined above, you were asked if you wanted to
 created a dual grid which we simply skipped.  In this section, we will show you
@@ -1248,11 +1252,11 @@ prompted by the question:
  #-------------------------------------------------
 ```
 you answer ```yes```.  From that point on, everything is the same as explained
-in the [section above](#demo_lid_driven_hexa_convert).  To save you from
-typing all the answers, the file ```convert.scr``` is also provided in the
-current directory.  If you created such a file for the case with
-[hexaderal cells](#demo_lid_driven_hexa), it would be almost the same as
-this one.  If you ran two files through a diff command:
+in the [Converting the mesh to T-Flows format](#demo_lid_driven_hexa_convert).
+To save you from typing all the answers, the file ```convert.scr``` is also
+provided in the current directory.  If you created such a file for the case in
+[Lid-driven cavity on hexaderal cells](#demo_lid_driven_hexa), it would be 
+almost the same as this one.  If you ran two files through a diff command:
 ```
 diff convert.scr ../Hexa/convert.scr
 ```
@@ -1281,7 +1285,7 @@ Thus, after running the _Convert_ you will have the following files in the direc
 The first two are T-Flows's native files for further processing, and the
 remaining four are for you to explore with Paraview.  Opening the
 ```lid_driven_dual.shadows.vtu```, shows boundary conditions, which are the
-same as in the [previous case](#demo_lid_driven_hexa):
+same as in the case [Lid-driven cavity on hexahedral grid](#demo_lid_driven_hexa):
 
 ![!](Documentation/Manual/Figures/lid_driven_dual.png "")
 
@@ -1323,8 +1327,8 @@ Section [Benchmark cases](#bench_cases) serves that purpose.
 
 ## Thermally-driven cavity flow <a name="demo_thermally_driven"></a>
 
-Thermally-driven cavity flow bears many similarities with the lid-driven
-[cavity flow](#tests_lid_driven).  Both of these flows occur in enclosures with
+Thermally-driven cavity flow bears many similarities with the [Lid-driven
+cavity flow](#demo_lid_driven).  Both of these flows occur in enclosures with
 square cross-section, both are without inflows and outflows facilitating
 prescription of boundary conditions, both are occuring in ddomains which are
 long enough in spanwise direction so that the assumption of two-dimsionality or
@@ -1364,8 +1368,8 @@ where you can find the following files:
 └── therm_driven.msh.gz
 ```
 
-The ```.geo``` file is the GMSH script.  Since the geometries for the lid-driven
-[cavity flow](#tests_lid_driven) and this case are almost the same, the
+The ```.geo``` file is the GMSH script.  Since the geometries for the [Lid-driven
+cavity flow](#demo_lid_driven) and this case are almost the same, the
 similarity in the ```.geo``` shouldn't be a suprise.  You can find the
 following differences:
 ```
@@ -2070,10 +2074,10 @@ whereas the same velocity vectors over pressure, look like:
 
 ## Parallel processing  <a name="demo_parallel_proc"></a>
 
-The cases considered in previous [chapter](#demo_cases) were all on very small
-grids an no parallel processing was needed.  As the grids we use grow bigger
-and number of time steps we want to perform grow, the need for parallel runs
-become imminent.
+The cases considered in section [Demonstration cases](#demo_cases) were all on
+very small grids an no parallel processing was needed.  As the grids we use
+grow bigger and number of time steps we want to perform grow, the need for
+parallel runs become imminent.
 
 In this chapter, we will teach you:
 - how to divide a computational grid over into a number of sub-domains
@@ -2143,7 +2147,7 @@ They should read:
 ```
 
 The purpose of these files should be clear to you by now.  If not, re-visit
-[chapter](#demo_cases).  The creation of the mesh is as usual:
+[Demonstration cases](#demo_cases).  The creation of the mesh is as usual:
 ```
 gmsh -3 rod_tet.geo
 ```
@@ -2175,7 +2179,8 @@ the directory:
 
 It should be clear to you by now that files ```.cfn``` and ```.dim``` is the grid
 in internal T-Flows format.  The ```.vtu``` files come in two variants.  Without
-insertion of ```_dual``` and with it, like we had in this [chapter](#demo_lid_driven_dual)
+insertion of ```_dual``` and with it, like we had in the section
+[Lid-driven cavity on polyhedral_grids](#demo_lid_driven_dual)
 above.  That should tell you that the grid is polyhedral.  If you visualize
 ```rod_tet.vtu``` or ```rod_tet_dual.vtu```, the overall domain will look like
 this:
@@ -2384,7 +2389,7 @@ dealt with.
 
 ### Post-processing - visualization of results and plotting profiles <a name="bench_flat_plate_post"> </a>
 
-## Fully-developed turbulent a plane channel flow] <a name="bench_plane_channel"> </a>
+## Fully-developed turbulent plane channel flow] <a name="bench_plane_channel"> </a>
 
 ### RANS computation of a channel flow <a name="bench_plate_channel_rans"> </a>
 
@@ -2420,8 +2425,8 @@ there and check the contents.  They include the following:
 ```
 
 The usage of ```control```, ```convert.scr``` and ```bubble.geo``` files should
-be clear to you by now.  If not, revisit the section with [demonstration cases]
-(#demo_cases).
+be clear to you by now.  If not, revisit the section on
+[Demonstration cases](#demo_cases).
 
 ### Initialization of VOF function <a name="bench_cases_buble_init"> </a>
 
@@ -2648,8 +2653,8 @@ and converting it to T-Flows format:
 ./Convert < convert.scr
 ```
 From this point, you can either decompose the domain with _Divide_ as it was
-explained in [this section](#demo_parallel_proc) or run the simulation straight
-away with:
+explained in the section [Parallel processing](#demo_parallel_proc)
+or run the simulation straight away with:
 ```
 ./Process > out_coarse &
 ```
@@ -2693,10 +2698,11 @@ than SIMPLE, and this is set with lines:
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    1.0
 ```
 
-> **_Note:_** We did the same in LES computations [above](#bench_cases_matrix).
-For PISO, under-relaxation factors are either 1.0 or very close to it.  The
-_rule of thumb" for SIMPLE, that sum of under-relaxation factors for velocity
-and pressure should be close to one, doesn't apply for PISO.
+> **_Note:_** We did the same in the section [Large eddy simulation over a
+matrix of cubes](#bench_cases_matrix) above. For PISO, under-relaxation factors
+are either 1.0 or very close to it.  The _rule of thumb" for SIMPLE, that sum
+of under-relaxation factors for velocity and pressure should be close to one,
+doesn't apply for PISO.
 
 For VOF, gradient method for computation for pressure and VOF function should
 be the same for consistency of surface tension forces, which is set with:
