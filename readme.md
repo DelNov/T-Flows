@@ -2558,6 +2558,13 @@ to visualize results occasionally to make sure your simulations are not marred
 by numerical instabilities, and they well could be because the central scheme
 for advection is unstable.
 
+Figure is showing instantaneous solution of the velocity at _t_=0.48 s.  We can
+see that the velocity field is unstady, but doesn't suffer from any
+non-physical numerical instabilities (usually detected as check-board
+solutions):
+
+![!](Documentation/Manual/Figures/matrix_instant.png "")
+
 > **_Note:_**  If initial stages of the turbulence development prove to be
 unstable, you could use some upwind biased scheme for advection, but such a
 scheme should _not_ be used in the later stage when you start to gather
