@@ -32,12 +32,12 @@
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
  # Ra = 10e3
- # mu     = 1.0 / sqrt(Pr * Ra) = 0.03752933125
- # lambda = sqrt(Pr / Ra)       = 0.02664582518
+ # mu     = sqrt(Pr / Ra)       = 0.02664582518
+ # lambda = 1.0 / sqrt(Pr * Ra) = 0.03752933125
  MASS_DENSITY           1.0
  HEAT_CAPACITY          1.0
- DYNAMIC_VISCOSITY      0.03752933125
- THERMAL_CONDUCTIVITY   0.02664582518
+ DYNAMIC_VISCOSITY      0.02664582518
+ THERMAL_CONDUCTIVITY   0.03752933125
 
  TURBULENCE_MODEL       none
 
