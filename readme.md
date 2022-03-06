@@ -556,7 +556,7 @@ Here you have to type the name of the grid _with extension_, hence
 ```lid_driven.msh```.
 
 > **_Note:_** Both GMSH and Fluent produce grid files with extnesion ```.msh```,
-but the formats are completely different and GMSH makes an educated guess which 
+but the formats are completely different and GMSH makes an educated guess which
 one it is reading based on its contents.
 
 Many messages on the screen will follow outlining the conversion process which we
@@ -619,7 +619,7 @@ boundary conditions:
  #==============================================================
  # Enter the ordinal number(s) of periodic-boundary condition(s)
  # from the boundary condition list (see above)
- # Type skip if there is none ! 
+ # Type skip if there is none !
  #--------------------------------------------------------------
 ```
 
@@ -640,7 +640,7 @@ conditions:
  #==============================================================
  # Enter the ordinal number(s) of periodic-boundary condition(s)
  # from the boundary condition list (see above)
- # Type skip if there is none ! 
+ # Type skip if there is none !
  #--------------------------------------------------------------
 ```
 and this time you answer ```skip```.  Finally, _Convert_ asks you about the
@@ -653,11 +653,11 @@ distance from the wall calculation:
  # Type ordinal number(s) of wall or wall_flux boundary condition(s)
  # from the boundary condition list (see above) separated by space.
  # Cells' centers distances to the nearest wall will be calculated
- # for the listed wall boundary(s). 
+ # for the listed wall boundary(s).
  #
  # This is needed for RANS and HYBRID turbulence models as well as
- # for proper initialization with potential pressure-like field.  
- #                            
+ # for proper initialization with potential pressure-like field.
+ #
  # Type skip to skip this and set wall distance to -1.0 everywhere.
  #------------------------------------------------------------------
 ```
@@ -733,7 +733,7 @@ on each side of periodicity.  It is enough to browse through one copy of the
 periodic face for almost all numerical algorithms in T-Flows.
 
 > **_Note:_** The exception is Lagrangian particle tracking which needs the
-periodic face-pairs not to allow particles escape the computational domain. 
+periodic face-pairs not to allow particles escape the computational domain.
 To visualize those period pairs, one can read the file ```lid_driven.shadows.vtu```.
 If plotted together with ```lid_driven.faces.vtu```, they close the domain.
 
@@ -936,10 +936,10 @@ these (some are omitted):
  # ...
  # NOTE! Could not find the keyword: HEAT_TRANSFER. Using the default: no
  # ...
- # NOTE! Could not find the keyword: TURBULENCE_MODEL. Using the default: none 
- # NOTE! Could not find the keyword: INTERFACE_TRACKING. Using the default: no  
- # NOTE! Could not find the keyword: PARTICLE_TRACKING. Using the default: no  
- # NOTE! Could not find the keyword: TIME_STEP. Using the default: 1.000E-02   
+ # NOTE! Could not find the keyword: TURBULENCE_MODEL. Using the default: none
+ # NOTE! Could not find the keyword: INTERFACE_TRACKING. Using the default: no
+ # NOTE! Could not find the keyword: PARTICLE_TRACKING. Using the default: no
+ # NOTE! Could not find the keyword: TIME_STEP. Using the default: 1.000E-02
 ```
 
 At this point, most important is that, because neither the number of time steps i
@@ -1479,16 +1479,16 @@ everywhere:
 Next, we should also specify physical properties.  The conservation equations
 which describe this case read:
 
-EQUATIONS WHICH ARE MISSING
+![!](Documentation/Manual/Figures/thermally_driven_eq_1.png "")
 
 If we recall the defintion for Rayleigh (_Ra_) and Prandtl (_Pr_) non-dimensional
 numbers:
 
-ALSO MISSING
+![!](Documentation/Manual/Figures/thermally_driven_eq_2.png "")
 
 we can write the conservation equations in their non-dimensional form:
 
-YET TO BE WRITTEN
+![!](Documentation/Manual/Figures/thermally_driven_eq_3.png "")
 
 from which we can see that the flow is fully characterized with
 _Ra_ and _Pr_ numbers.  _Process_ doesn't know about these numbers, it works
@@ -1503,10 +1503,10 @@ physical properties section in the control file should read:
  # Properties based on Pr and Ra numbers:
  # Pr = 0.71
  # Ra = 1.0e+6
- # mu     = 1.0 / sqrt(Pr * Ra) = 0.001186781658
- # lambda = sqrt(Pr / Ra)       = 0.000842614977
- DYNAMIC_VISCOSITY      0.001186781658
- THERMAL_CONDUCTIVITY   0.000842614977
+ # mu     = sqrt(Pr / Ra)       = 0.000842614977
+ # lambda = 1.0 / sqrt(Pr * Ra) = 0.001186781658
+ DYNAMIC_VISCOSITY      0.000842614977
+ THERMAL_CONDUCTIVITY   0.001186781658
 ```
 
 Mass density, heat capacity and thermal expansion coefficient are not prescribed,
@@ -2397,7 +2397,7 @@ dealt with.
 ## Volume of fluid simulation of a rising bubble <a name="bench_cases_bubble"> </a>
 
 To demonstrate the use of VOF in T-Flows, we decided to use the case described
-by Safi at el. [here](https://www.sciencedirect.com/science/article/pii/S089812211630685X#f000005).
+by [Safi at el.](https://www.sciencedirect.com/science/article/pii/S089812211630685X#f000005).
 In this work, the authors are establishing a three-dimensional rising bubble case
 and compare thier results with lattice-Boltzman simulations, against highly refined
 finite element results obtained with commercial package COMSOL.
@@ -2586,8 +2586,8 @@ of ellipsoids we want to define.  It reads:
 which, we believe, is self-explanatory.  This file will be read by user function
 in lines 51 - 61.
 
-> **_Note_** Remember that procedure ```Read_Line``` not only tokenizes a line 
-from input, but also skips all the lines beginning with ```#```, ```!``` and 
+> **_Note_** Remember that procedure ```Read_Line``` not only tokenizes a line
+from input, but also skips all the lines beginning with ```#```, ```!``` and
 ```%```, which it considers comments.  That is why we can have comments inside
 ```ellipsoid_parameters.dat```
 
@@ -2625,7 +2625,7 @@ line 110.
 
 Next step is the compilation of the sources.  _Convert_ (and _Divide_ if you
 intend to run in parallel) are compiled in the usual way, with ```make```
-command in their directories, but for _Process_ you should specify the case 
+command in their directories, but for _Process_ you should specify the case
 directory, hence from ```[root]/Sources/Process``` run:
 ```
 make clean
@@ -2729,5 +2729,98 @@ bubble surface is represented as a wire-frame, superimposed on velocity
 magnitude field:
 
 ![!](Documentation/Manual/Figures/bubble_final.png "")
+
+But, for this case, we are also checking some quantitative data against the
+benchmark solutions proposed in Safi et al.  For the sake of shoreness, we
+decided to check the bubble position during the simulation and rise velocity.
+These data are extracted at the end of each time step, by calling the user
+function ```End_Of_Time_Step```, given here in full:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
+  3                                        n, n_stat_t, n_stat_p, time)
+  4 !------------------------------------------------------------------------------!
+  5 !   This function is computing benchmark for rising bubble.                    !
+  6 !------------------------------------------------------------------------------!
+  7   implicit none
+  8 !---------------------------------[Arguments]----------------------------------!
+  9   type(Field_Type), target :: Flow
+ 10   type(Turb_Type),  target :: Turb
+ 11   type(Vof_Type),   target :: Vof
+ 12   type(Swarm_Type), target :: Swarm
+ 13   integer                  :: n         ! current time step
+ 14   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
+ 15   integer                  :: n_stat_p  ! 1st t.s. statistics particles
+ 16   real                     :: time      ! physical time
+ 17 !-----------------------------------[Locals]-----------------------------------!
+ 18   type(Grid_Type), pointer :: Grid
+ 19   type(Var_Type),  pointer :: fun
+ 20   integer                  :: c, fu
+ 21   real                     :: b_volume, rise_velocity, c_position
+ 22 !==============================================================================!
+ 23
+ 24   ! Take aliases
+ 25   Grid => Flow % pnt_Grid
+ 26   fun  => Vof % fun
+ 27
+ 28   ! Integrate bubble volume, current position and rise velocity over cells
+ 29   b_volume      = 0.0
+ 30   c_position    = 0.0
+ 31   rise_velocity = 0.0
+ 32
+ 33   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+ 34     b_volume      = b_volume + Grid % vol(c) * fun % n(c)
+ 35     c_position    = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
+ 36     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
+ 37   end do
+ 38
+ 39   call Comm_Mod_Global_Sum_Real(b_volume)
+ 40   call Comm_Mod_Global_Sum_Real(c_position)
+ 41   call Comm_Mod_Global_Sum_Real(rise_velocity)
+ 42
+ 43   ! Write to file
+ 44   if (this_proc < 2) then
+ 45     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
+ 46
+ 47     write(fu,'(4(2x,e16.10e2))') time,                   &
+ 48                                  b_volume,               &
+ 49                                  c_position/b_volume,    &
+ 50                                  rise_velocity/b_volume
+ 51     close(fu)
+ 52   end if
+ 53
+ 54   end subroutine
+```
+Arguments in lines 9 - 11 have been described above, as well as local aliases
+in lines 18 and 19. Arguments which haven't beel explained before are the
+staring time step for turbulent and particle statistics, ```n_stat_t``` and
+```n_stat_p``` in lines 14 and 15.  These are irrelevant for this case and not
+used.  Their importance and use is explained in sections describing LES and
+simulations of particle-laden flows.
+
+The function integrates bubble position, velocity and volume in lines 33 - 37.
+One thing worth emphasising here is that we are not browsing over _all_ cells,
+but rather restrict the loop in line 33 to cells inside the domain, which
+_do not_ include _buffer cells_:
+```
+ 33   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+```
+Buffer cells are passive cells added to each sub-domain for communication with
+other processsors and are illustrated here:
+
+![!](Documentation/Manual/Figures/bubble_buffers.png "")
+
+Figure shows a possible cell arrangement in processor 1.  Dark blue cells belong
+to processor 1 and are active for that processor, meaning processor 1 is doing
+computations for them. Light blue, pink and red cells are activelly
+computed in processors 2 - 4 and processor 1 uses them only to properly
+compute gradients, fluxes through cell faces and matrix-vector products in
+its active cells.  If we integrated over these buffer cells, that is looping
+from ```1``` to ```Grid % n_cells```, buffer cells would be counted twice
+in lines 39 - 41, which perform global sums.
+
+Anyway, lines 43 - 52 update file ```benchmark.dat``` with bubble position and
+rise velocity at the end of each time step.  We use tool Grace to plot the
+results and compare them with benchmark solutions.
 
 ## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
