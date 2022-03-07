@@ -403,7 +403,7 @@ benchmarking and rigirous CFD practices.
 It is hard to imagine a problem in CFD simpler than a lid-driven flow in a
 cavity:
 
-![!](Documentation/Manual/Figures/lid_driven_domain.png "")
+<img src="Documentation/Manual/Figures/lid_driven_domain.png" width="500"/>
 
 The flow occurs in a cavity with square cross section, in which all the walls
 are static except the top one which is moving.  The cavity is long enough in
@@ -1341,7 +1341,7 @@ lid-driven cavity flow is driven by shear created by top moving wall,
 thermally-driven cavity is driven by the buoyancy forces occurring on vertical
 opposing sides of the problem domain:
 
-![!](Documentation/Manual/Figures/thermally_driven_domain.png "")
+<img src="Documentation/Manual/Figures/thermally_driven_domain.png" width="500"/>
 
 In the figure above the left (red) wall is kept at higher temperature than the
 right wall (blue), which creates clockwise motion of the fluid.
@@ -1443,12 +1443,12 @@ BOUNDARY_CONDITION upper_wall
   VARIABLES        u     v     w     q
   VALUES           0.0   0.0   0.0   0.0
 
-BOUNDARY_CONDITION left_walls
+BOUNDARY_CONDITION left_wall
   TYPE             wall
   VARIABLES        u     v     w     t
   VALUES           0.0   0.0   0.0   1.0
 
-BOUNDARY_CONDITION right_walls
+BOUNDARY_CONDITION right_wall
   TYPE             wall
   VARIABLES        u     v     w     t
   VALUES           0.0   0.0   0.0   0.0
