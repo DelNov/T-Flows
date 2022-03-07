@@ -2407,6 +2407,8 @@ is sketched in this figure:
 
 ![!](Documentation/Manual/Figures/matrix_domain_font_20.png =500x "")
 
+<img src="Documentation/Manual/Figures/matrix_domain_font_20.png" width="500"/>
+
 There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15 
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
 cubes is 60 mm.  Working fluid is air at room temperature, and PIV measurments
