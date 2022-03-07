@@ -2575,7 +2575,7 @@ turbulent statisics.
 At time step 30'000 (physical time 0.6 s) we plotted streamwise components of
 velocity at different elevations:
 
-![!](Documentation/Manual/Figures/matrix_turb_devel.png "")
+<img src="Documentation/Manual/Figures/matrix_turb_devel.png" width="600"/>
 
 Here you can see that for the point closes to the cube top (blue, _z_=0.02) the
 turbulence develops straight aways.  The sharp edges of the cube give rise to
@@ -2603,7 +2603,7 @@ finite element results obtained with commercial package COMSOL.
 
 The schematic of the problem is shown in this picture:
 
-<img src="Documentation/Manual/Figures/bubble_domain.png" width="250"/>
+<img src="Documentation/Manual/Figures/bubble_domain.png" width="350"/>
 
 The resides in the directory ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
 there and check the contents.  They include the following:
