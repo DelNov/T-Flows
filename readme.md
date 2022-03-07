@@ -2405,6 +2405,8 @@ introduce PISO algorithm to link velocities and pressure.  The case was studied
 experimentally by Meinders and Hanjalic (**give link**) and the problen domain
 is sketched in this figure:
 
+![!](Documentation/Manual/Figures/matrix_domain_font_20.png "")
+
 There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15 
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
 cubes is 60 mm.  Working fluid is air at room temperature, and PIV measurments
@@ -2501,25 +2503,25 @@ come up with some indicator on wheather turbulence is fully developed.  We
 could gather the statistics for that and check results against experiments.
 but there is a faster indicator.  We know that, in this case, turbulence will
 start to develop over and around sharp edges of the cube, and penetratate
-towards the upper channel wall.  To see this development, we defined eight
+towards the upper channel wall.  To see this development, we defined four
 monitoring points, spanning from just above the top of the cube, towards the
 upper channel wall with:
 ```
-  NUMBER_OF_MONITORING_POINTS     8
-    MONITORING_POINT_001          0.0301  0.0301  0.016
-    MONITORING_POINT_002          0.0301  0.0301  0.02
-    MONITORING_POINT_003          0.0301  0.0301  0.025
-    MONITORING_POINT_004          0.0301  0.0301  0.03
-    MONITORING_POINT_005          0.0301  0.0301  0.035
-    MONITORING_POINT_006          0.0301  0.0301  0.04
-    MONITORING_POINT_007          0.0301  0.0301  0.045
-    MONITORING_POINT_008          0.0301  0.0301  0.05
+  NUMBER_OF_MONITORING_POINTS     4
+    MONITORING_POINT_001          0.0301  0.0301  0.02
+    MONITORING_POINT_002          0.0301  0.0301  0.03
+    MONITORING_POINT_003          0.0301  0.0301  0.04
+    MONITORING_POINT_004          0.0301  0.0301  0.05
 ```
 
 > **_Note:_**  The center of the computational domain in _x-y_ plane is at
 (0.03, 0.03).  The top if the cube is at height 0.015, and the upper channel
 wall at _z_=0.051.  Hence, the points defined above spread from the top of the
 cube to the upper channel.
+
+The monitoring points are illustrated here:
+
+![!](Documentation/Manual/Figures/matrix_unit_pnts.png "")
 
 For LES, it is of utmost importance to keep the accuracy level of the numerical
 scheme as high as possible.  For the cell-centered finite volume method used
