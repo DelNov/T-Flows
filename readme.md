@@ -2405,7 +2405,7 @@ introduce PISO algorithm to link velocities and pressure.  The case was studied
 experimentally by Meinders and Hanjalic (**give link**) and the problen domain
 is sketched in this figure:
 
-![!](Documentation/Manual/Figures/matrix_domain_font_20.png "")
+![!](Documentation/Manual/Figures/matrix_domain_font_20.png =500x "")
 
 There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15 
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
