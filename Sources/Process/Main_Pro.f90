@@ -224,12 +224,19 @@
     call Control_Mod_Swarm_Save_Interval(prsi, verbose=.true.)
   end if
 
+  !-------------------------------------------------------!
+  !   Compute wall distance - it is not saved in backup   !
+  !      file and could be set to -1.0 in .dim file       !
+  !-------------------------------------------------------!
+  do d = 1, n_dom
+    call Flow(d) % Compute_Wall_Distance(Sol(d))
+  end do
+
   !-------------------------------------------------------------!
   !   Perform potential initialization in the first time step   !
   !-------------------------------------------------------------!
   if(first_dt .eq. 0) then
     do d = 1, n_dom
-      call Flow(d) % Compute_Wall_Distance(Sol(d))
       call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
       call Control_Mod_Potential_Initialization(pot_init, .true.)
       if(pot_init) call Flow(d) % Potential_Initialization(Sol(d))
