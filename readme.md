@@ -2405,9 +2405,7 @@ introduce PISO algorithm to link velocities and pressure.  The case was studied
 experimentally by Meinders and Hanjalic (**give link**) and the problen domain
 is sketched in this figure:
 
-![!](Documentation/Manual/Figures/matrix_domain_font_20.png =500x "")
-
-<img src="Documentation/Manual/Figures/matrix_domain_font_20.png" width="500"/>
+<img src="Documentation/Manual/Figures/matrix_domain_font_20.png" width="600"/>
 
 There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15 
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
@@ -2523,7 +2521,7 @@ cube to the upper channel.
 
 The monitoring points are illustrated here:
 
-![!](Documentation/Manual/Figures/matrix_unit_pnts.png "")
+<img src="Documentation/Manual/Figures/matrix_unit_pnts.png" width="300"/>
 
 For LES, it is of utmost importance to keep the accuracy level of the numerical
 scheme as high as possible.  For the cell-centered finite volume method used
@@ -2605,7 +2603,7 @@ finite element results obtained with commercial package COMSOL.
 
 The schematic of the problem is shown in this picture:
 
-![!](Documentation/Manual/Figures/bubble_domain.png "")
+<img src="Documentation/Manual/Figures/bubble_domain.png" width="200"/>
 
 The resides in the directory ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
 there and check the contents.  They include the following:
