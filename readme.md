@@ -2603,7 +2603,7 @@ finite element results obtained with commercial package COMSOL.
 
 The schematic of the problem is shown in this picture:
 
-<img src="Documentation/Manual/Figures/bubble_domain.png" width="200"/>
+<img src="Documentation/Manual/Figures/bubble_domain.png" width="250"/>
 
 The resides in the directory ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
 there and check the contents.  They include the following:
