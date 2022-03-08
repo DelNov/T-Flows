@@ -2629,7 +2629,7 @@ in the sense that the computational domain for the fluid remains the same, but
 left and right (hot and cold) boundaries are replaced with two solid regions
 as illustrated in the following picture:
 
-<img src="Documentation/Manual/Figures/conjugate_domain_a.png" width="400"/>
+<img src="Documentation/Manual/Figures/conjugate_domain_a.png" width="450"/>
 
 The case resides in the directory ```[root]/Tests/Manual/Conjugate/```.  If you
 check the contents of the file, you can see that it contains the following files:
@@ -2898,14 +2898,14 @@ cases and benchmark further.
 We chose the case of the flow over a surface-mounted matrix of cubes to give you
 an additional example of setting up and running an LES case, but also to
 introduce PISO algorithm to link velocities and pressure.  The case was studied
-experimentally by Meinders and Hanjalic (**give link**) and the problen domain
-is sketched in this figure:
+experimentally by [Meinders and Hanjalic](#https://www.sciencedirect.com/science/article/abs/pii/S0142727X99000168)
+and the problen domain is sketched in this figure:
 
 <img src="Documentation/Manual/Figures/matrix_domain_font_20.png" width="600"/>
 
 There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
-cubes is 60 mm.  Working fluid is air at room temperature, and PIV measurments
+cubes is 60 mm.  Working fluid is air at room temperature, and LDA measurments
 are reported by Meinders and Hanjalic for comparison against CFD simulations.
 
 Large eddy simulation approach is particularly well suited for this flow because
