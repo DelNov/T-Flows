@@ -25,28 +25,33 @@
         1. [Compiling for parallel runs](#demo_parallel_proc_compiling)
         2. [Creating and dividing the grid](#demo_parallel_proc_dividing)
         3. [Running the simulation in parallel](#demo_parallel_proc_running)
-    4. [Link with PETSc solvers](#demo_petsc)
-        1. [Compiling PETSc](#demo_petsc_compiling)
-        2. [Linking T-Flows with PETSc](#demo_petsc_link)
-        3. [Using PETSc](#demo_petsc_using)
-7. [Benchmark cases](#bench_cases)
+7. [PETSc solvers](#link_petsc)
+    1. [Compiling PETSc](#link_petsc_compiling)
+    2. [Linking T-Flows with PETSc](#link_petsc_tflows)
+    3. [Using PETSc](#link_petsc_using)
+8. [Benchmark cases](#bench_cases)
     1. [Laminar flow over a flat plate](#bench_flat_plate)
         1. [Pre-processing](#bench_flat_plate_pre)
         2. [Processing - running the case](#bench_flat_plate_run)
         3. [Post-processing - visualization of results and plotting profiles](#bench_flat_plate_post)
-    2. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
+    2. [Conjugate heat transfer](#bench_conjugate)
+        1. [Generating the grids](#bench_conjugate_generating)
+        2. [Compiling and running](#bench_conjugate_running)
+        3. [Comparison with benchmark solution](#bench_conjugate_compare)
+        4. [Thing to try next](#bench_conjugate_next)
+    3. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
         1. [RANS computation of a channel flow](#bench_plate_channel_rans)
         2. [LES computation of a channel flow](#bench_plate_channel_les)
-    3. [Round impinging jet and heat transfer](#bench_cases_jet)
-    4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
+    4. [Round impinging jet and heat transfer](#bench_cases_jet)
+    5. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
-    5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
+    6. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
         3. [Running the case](#bench_cases_buble_running)
         4. [Checking the initial condition](#bench_cases_buble_checking)
         5. [Final solution and benchmarking](#bench_cases_buble_final)
-    6. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
+    7. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
 
 # Introduction <a name="intro"></a>
 
@@ -2383,7 +2388,7 @@ try to do it without the script, simply by:
 For this case, it is interestng to see how the periodic directions are
 dealt with.
 
-## Link with PETSc solvers <a name="demo_petsc"> </a>
+# PETSc solvers <a name="link_petsc"> </a>
 
 Citing the official [PETSc](https://petsc.org/release/) pages, _PETSc, the
 Portable, Extensible Toolkit for Scientific Computation, pronounced PET-see
@@ -2406,14 +2411,12 @@ If you are familiar with PETSc, already have it on your system and are ready
 to start using it in the remainder of this manual, feel free to skip to section
 [Using PETSc](#demo_petsc_using)
 
-### Compiling PETSc <a name="demo_petsc_compiling"> </a>
+## Compiling PETSc <a name="link_petsc_compiling"> </a>
 
 PETSc compilation is explained in enough details in [Installation: Configuring,
 and Building PETSc](#https://petsc.org/release/install) and we see no need to
 repeat it all here.  However, we believe we might help you if we point out a
 few details of PETSc installation relevant for use with T-Flows.
-
-#### Which options to set?
 
 One of the first thing PETSc documentation presents you are the options for
 downloading additional packages with PETSs, like:
@@ -2484,7 +2487,7 @@ PETSc for usage with T-Flows:
 
 After that, just follow instructions on the screen.
 
-### Linking T-Flows with PETSc <a name="demo_petsc_link"> </a>
+## Linking T-Flows with PETSc <a name="link_petsc_tflows"> </a>
 
 At the end of compilation process explained in [Compiling PETSc](#demo_petsc_compiling)
 the PETSc configure script will advise you to set two environment variables,
@@ -2551,6 +2554,10 @@ options can be set to ```bicg```, ```cg``` or ```cgs```,  and that
 _only_ ```incomplete_cholesky``` makes sense because the other two options stand
 little chance to converge.
 
+> **_Note:_** Don't forget that _all_ of these are optional.  As described in
+the section [Lid-driven cavity flow](#demo_lid_driven), if any or none of these
+are not given in the ```control``` file, _Process_ will set default values.
+
 For backward compatibility, these options are also read and used by PETSc solvers
 unless you add a special section in the control file for different/additional
 tuning for PETSc.  For example, in the case of [Large eddy simulation over a
@@ -2611,7 +2618,274 @@ throw an error but also suggest a workaround.
 
 ### Post-processing - visualization of results and plotting profiles <a name="bench_flat_plate_post"> </a>
 
-## Fully-developed turbulent plane channel flow] <a name="bench_plane_channel"> </a>
+## Conjugate heat transfer <a name="bench_conjugate"> </a>
+
+To benchmark conjugate heat transfer, we chose the case introduced by [Basak et al.](#https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
+In particular, we focus on the case authors call: _Case 3; t1+t2 = 0.2_, which is
+the case with both heated walls represented as solids, whose total thickness
+is 0.2 of the lenght of the domain.
+The case is a slight extension of the [Thermally-driven cavity flow](#demo_thermally_driven)
+in the sense that the computational domain for the fluid remains the same, but
+left and right (hot and cold) boundaries are replaced with two solid regions
+as illustrated in the following picture:
+
+<img src="Documentation/Manual/Figures/conjugate_domain_a.png" width="400"/>
+
+The case resides in the directory ```[root]/Tests/Manual/Conjugate/```.  If you
+check the contents of the file, you can see that it contains the following files:
+```
+[root]/Tests/Manual/Conjugate/
+├── cold_solid.geo
+├── control
+├── control.1
+├── control.2
+├── control.3
+├── convert.1.scr
+├── convert.2.scr
+├── convert.3.scr
+├── fluid.geo
+├── hot_solid.geo
+└── User_Mod
+    └── End_Of_Time_Step.f90
+```
+The case entails three computational domains; two solid domains described in
+files ```cold_solid.geo``` and ```hot_solid.geo``` and ```fluid.geo```, whose
+purpose should be clear from their names.  So, this case not only benchmarks
+conjugate heat transfer in T-Flows, but also demonstrates how to set up a
+simulation with multiple domains.  The case also comes with a user function
+for calculating the Nusselt number, but we will come to that later.
+
+### Coupling domains
+
+The way how T-Flows goes about simulations in multiple domains is as follows.
+It still reads the ```control``` file which now has some special infromation.
+First, this _central_ ```control``` file specifies the number of domains you
+are simultaneously solving with the line:
+```
+NUMBER_OF_DOMAINS         3
+```
+
+Then it specifies ceratin parameters which must be the same for all domains,
+which are include: time step, total number of time steps, saving intervals
+and tolerance for SIMPLE algorithm:
+```
+ TIME_STEP                  0.1
+ NUMBER_OF_TIME_STEPS    1200
+ RESULTS_SAVE_INTERVAL     30
+
+ TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+```
+
+Finally, it specifies how the domains are linked.  In order to explain it better,
+we also show a picture of three computational domains, with boundary conditions
+important for the links to be established:
+
+<img src="Documentation/Manual/Figures/conjugate_domain_b.png" width="500"/>
+
+In addition to top, bottom and periodic direction which are not illustrated
+here, each grid has boundary conditions called ```LEFT_WALL``` and ```RIGHT_WALL```
+as you can also see in acompanying ```.geo``` files.  For completness, we show
+an exceprt from ```cold_solid.geo``` showing that:
+```
+Physical Surface("LEFT_WALL") = {13};
+Physical Surface("RIGHT_WALL", 27) = {21};
+Physical Surface("PERIODIC") = {1, 26};
+Physical Surface("BOTTOM_WALL") = {25};
+Physical Surface("TOP_WALL") = {17};
+Physical Volume("COLD_SOLID", 31) = {1};
+```
+
+Knowing how the domains should be coupled to one another, you can finish the
+central ```control``` file by specifying the coupling:
+```
+ # Connection between hot solid and the fluid:
+ INTERFACE_CONDITION      hot_solid    fluid
+   BOUNDARY_CONDITIONS    right_wall   left_wall
+
+ # Connection between fluid and the cold solid
+ INTERFACE_CONDITION      fluid        cold_solid
+   BOUNDARY_CONDITIONS    right_wall   left_wall
+```
+which should literally be read as: interface condition shared between ```hot_solid```
+and ```fluid``` is between ```hot_solid```'s ```right_wall``` (underneat it)
+and ```fluid```'s ```left_wall```.  Also, interface condition between ```fluid```
+and the ```cold_solid``` is shared between ```fluid```'s ```right_wall``` and
+```cold_solid```'s ```left_wall```.
+
+Number of domains, specified above, instructs _Process_ to read three additional
+control files, named ```control.1```, ```control.2``` and ```control.3```, which
+specify domain-specific parameters, such as (sub)problem name, boundary conditions
+and _all_ the other parameters not specified in central ```control``` file.
+
+### Generating the grids <a name="bench_conjugate_generating"> </a>
+
+The case comes with three grids which all should be generated with:
+```
+gmsh -3 hot_solid.geo
+gmsh -3 fluid.geo
+gmsh -3 cold_solid.geo
+```
+after which, provided you compiled _Convert_ and created necessary links in
+the current directory, can be done with provided scripts:
+```
+./Convert < convert.1.scr
+./Convert < convert.2.scr
+./Convert < convert.3.scr
+```
+Which creates all the necessary files for furhter processing, but let's just
+focus on three of them: ```hot_solid.vtu```, ```fluid.vtu``` and ```cold_solid.vtu```.
+If you visualise all three of them in Paraview you should see something like this:
+
+![!](Documentation/Manual/Figures/conjugate_grid.png "")
+
+What you see are the three domains you will simultenaously solve, with cells
+clustered towards the walls.  What you should also see is that grids are
+_conforming_ at the interfaces.
+
+> **_Warning:_** For conjugate heat transfer problems, or any problems where you
+want to couple several domains, they must have conforming grids at the
+interfaces.  You must ensure it yourself in the grid generator you are using.
+
+### Compiling and running <a name="bench_conjugate_running"> </a>
+
+As we said above, this case comes with a user function which calculates Nusselt
+number at the end of each time step, so _Process_ must be compiled with it.
+From ```[root]/Sources/Process/``` invoke:
+```
+make DIR_CASE=../../Tests/Manual/Conjugate
+```
+
+> **_Warning:_**  Make sure you compile the _Process_ with the same precision
+as you used for _Convert_ as it was outlined in [Compiling the code](#compiling).
+
+You can now go back to the test directory (```[root]/Tests/Manual/Conjugate/```)
+and run the simulation with:
+```
+./Process > out &
+```
+
+When you are solving multiple domains, _Process_ will print executed iterations
+and residuals for each of them, one under another like this:
+```
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  0 0.000E+00 | V   :  0 0.000E+00 | W   :  0 0.000E+00 | PP  :  0 0.000E+00 | MASS:    0.000E+00 | T   :  3 2.614E-06 #
+  # U   :  2 2.115E-07 | V   :  1 2.176E-09 | W   :  2 3.232E-07 | PP  : 21 9.666E-07 | MASS:    1.302E-07 | T   :  3 1.852E-06 #
+  # U   :  0 0.000E+00 | V   :  0 0.000E+00 | W   :  0 0.000E+00 | PP  :  0 0.000E+00 | MASS:    0.000E+00 | T   :  3 1.531E-06 #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 0.000E+00    |    Maximum Peclet number: 0.000E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x :  0.000E+00    |    Flux y :   0.00E+00    |    Flux z :   0.00E+00    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       +=========================================+=========================================+
+                       #    Maximum Courant number: 5.500E-01    |    Maximum Peclet number: 2.109E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x : -2.000E-11    |    Flux y :   0.00E+00    |    Flux z :   6.30E-10    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       +=========================================+=========================================+
+                       #    Maximum Courant number: 0.000E+00    |    Maximum Peclet number: 0.000E+00     #
+                       #---------------------------+-------------+-------------+---------------------------#
+                       #    Flux x :  0.000E+00    |    Flux y :   0.00E+00    |    Flux z :   0.00E+00    #
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
+                       #---------------------------+---------------------------+---------------------------#
+```
+The first and the third domains are solids, and iterations and residuals for
+each of them is zero.  The trailer also shows information for each domain
+individually.  Here too you can see that nothing is being solved for momentum
+as Courant, Peclet numbers and all the fluxes are zero.
+
+What you can also see in the ```out``` log file is the output from the user
+function which reads:
+```
+ #===========================================
+ # Output from user function, Nusslet number!
+ #-------------------------------------------
+ # Toral  area    :    5.000E-01
+ # Nusselt number :    2.221E+00
+```
+
+An exceprt from the user function ```End_Of_Time_Step``` is given here:
+```
+ 29   !------------------------------------!
+ 30   !   Compute average Nusselt number   !
+ 31   !------------------------------------!
+ 32   if(Grid % name(1:6) .eq. 'FLUID') then
+ 33
+ 34     ! Initialize variables for computing average Nusselt number
+ 35     nu   = 0.0
+ 36     area = 0.0
+ 37
+ 38     do s = 1, Grid % n_faces
+ 39       c1 = Grid % faces_c(1,s)
+ 40       c2 = Grid % faces_c(2,s)
+ 41
+ 42       if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
+ 43
+ 44         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL ) then
+ 45           area = area + Grid % s(s)
+ 46           nu   = nu + Grid % s(s)                 &
+ 47                     * abs(t % n(c2) - t % n(c1))  &
+ 48                     / Grid % d(s)
+ 49         end if  ! if wall
+ 50       end if    ! c2 < 0
+ 51     end do      ! through s
+ 52
+ 53     !-----------------------------------------------!
+ 54     !   Integrate (summ) heated area, and heat up   !
+ 55     !-----------------------------------------------!
+ 56     call Comm_Mod_Global_Sum_Real(area)
+ 57     call Comm_Mod_Global_Sum_Real(nu)
+ 58
+ 59     !-------------------------------------------------!
+ 60     !   Compute averaged Nussel number and print it   !
+ 61     !-------------------------------------------------!
+ 62     nu = nu / area
+ 63
+ 64     if(this_proc < 2) then
+ 65       print '(a)',        ' #==========================================='
+ 66       print '(a)',        ' # Output from user function, Nusslet number!'
+ 67       print '(a)',        ' #-------------------------------------------'
+ 68       print '(a,es12.3)', ' # Toral  area    : ', area
+ 69       print '(a,es12.3)', ' # Nusselt number : ', nu
+ 70     end if
+ 71
+ 72   end if  ! domain is middle
+```
+Line 32 ensures that the code which follows is only executed in the fluid domain.
+At line 38 you can see an example of the face-based data structure which is one
+of the main features of finite volume based unstructured solvers.  We browse
+through all faces (```Grid % n_faces```) and for each one of them fetch the
+cells surrounding it from structure ```Grid % faces_c(:,s)```.  Once both cells
+surrounding the face are known and stored in variables ```c1``` and ```c2```,
+we check if ```c2``` is a boundary face in line 42.
+
+> **_Note:_** In T-Flows, boundary faces have negative indices.
+
+What we also check in the same line is that ```c1``` is in the current processor,
+_i.e._ it is not in the buffer cells, because otherwise global summs of area
+and accumulated Nusselt number in lines 56 and 57, wouldn't be correct for
+parallel runs.  In line 62 all processors have the same values of ```nu```
+and ```area``` and we can compute the average Nusselt number.  Lines 64 - 70
+print the value of Nuseelt number only from one processor.
+
+### Comparison with benchmark solution <a name="bench_conjugate_compare"> </a>
+
+The case we solved here corresponds to Rayleigh number of 1.0e+5 and Pr of 0.7.
+In addition, conductivities in solids are equal to the conductivities in fluid
+([Basak et al.](#https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
+denote such a case with K=1.)  Anyhow, the value of Nusselt number reported by
+Basak is 0.2233 and our computations show value of 0.223, meaning we passed
+this benchmark.
+
+### Thing to try next <a name="bench_conjugate_next"> </a>
+
+In directory ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Conjugate/``` you
+can find the same test case, but with directories defining a range of solid
+conductivities and different Rayleigh numbers.  Feel free to explore these
+cases and benchmark further.
+
+## Fully-developed turbulent plane channel flow <a name="bench_plane_channel"> </a>
 
 ### RANS computation of a channel flow <a name="bench_plate_channel_rans"> </a>
 
