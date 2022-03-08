@@ -45,6 +45,7 @@
     4. [Round impinging jet and heat transfer](#bench_cases_jet)
     5. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
+        2. [Running the case](#bench_cases_matrix_running)
     6. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
@@ -2957,7 +2958,7 @@ Given that it is possible to cover this domain with hexahedral cells only,
 we did that.  We have also took care to cluster the grid lines towards the
 walls, both channel walls and cube walls.
 
-### Runnig the case <a name="bench_cases_matrix_prep"> </a>
+### Running the case <a name="bench_cases_matrix_running"> </a>
 
 Large eddy simulations have to be run in at least two stages.  The first stage
 is for developing the turbulence in the problem domain, and the second stage
