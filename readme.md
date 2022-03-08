@@ -25,6 +25,10 @@
         1. [Compiling for parallel runs](#demo_parallel_proc_compiling)
         2. [Creating and dividing the grid](#demo_parallel_proc_dividing)
         3. [Running the simulation in parallel](#demo_parallel_proc_running)
+    4. [Link with PETSc solvers](#demo_petsc)
+        1. [Compiling PETSc](#demo_petsc_compiling)
+        2. [Linking T-Flows with PETSc](#demo_petsc_link)
+        3. [Using PETSc](#demo_petsc_using)
 7. [Benchmark cases](#bench_cases)
     1. [Laminar flow over a flat plate](#bench_flat_plate)
         1. [Pre-processing](#bench_flat_plate_pre)
@@ -526,7 +530,7 @@ attention, so we don't recommend you going on with _Convert_ unless you are
 sure you can have 15 minutes of peace and focus ahead of you.  We assume you
 compiled _Convert_ as it was described in the section
 [Compiling sub-programs](#compiling_sub_programs).  Given that you are in
-directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```, you can 
+directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```, you can
 call _Convert_ with:
 ```
 ../../../../Binaries/Convert
@@ -909,7 +913,7 @@ Since _Process_ writes a lot of information on the screen while it is computing,
 it is useful to re-direct the output to a log file, here simply called ```out```.
 We also send the process in the background with an ampersand ```&``` at the end
 of the command line.  Next, let's analyze the output from _Process_.
-It starts with a header:
+It starts with a header: <a name="a_heck_of_a_header"> </a>
 ```
  #=======================================================================
  #
@@ -1255,7 +1259,7 @@ you answer ```yes```.  From that point on, everything is the same as explained
 in the [Converting the mesh to T-Flows format](#demo_lid_driven_hexa_convert).
 To save you from typing all the answers, the file ```convert.scr``` is also
 provided in the current directory.  If you created such a file for the case in
-[Lid-driven cavity on hexaderal cells](#demo_lid_driven_hexa), it would be 
+[Lid-driven cavity on hexaderal cells](#demo_lid_driven_hexa), it would be
 almost the same as this one.  If you ran two files through a diff command:
 ```
 diff convert.scr ../Hexa/convert.scr
@@ -2379,6 +2383,224 @@ try to do it without the script, simply by:
 For this case, it is interestng to see how the periodic directions are
 dealt with.
 
+## Link with PETSc solvers <a name="demo_petsc"> </a>
+
+Citing the official [PETSc](https://petsc.org/release/) pages, _PETSc, the
+Portable, Extensible Toolkit for Scientific Computation, pronounced PET-see
+(/ˈpɛt-siː/), is a suite of data structures and routines for the scalable
+(parallel) solution of scientific applications modeled by partial differential
+equations.  It supports MPI, and GPUs through CUDA, HIP or OpenCL, as well
+as hybrid MPI-GPU parallelism; it also supports the NEC-SX Tsubasa Vector
+Engine._
+
+From T-Flows' perspective, given that its data structures and discretization
+techniques are established, PETSc is sought as a library of high performance
+linear solvers.  Yes, T-Flows has its own (_native_) suite of solvers which
+work pretty decent with MPI, but the T-Flows' core development team has no
+capacity to keep up with the latest linear solver algorithms and their ports
+to ever-emerging computational platforms, in the way the team around PETSc does.
+We believe that the link we established with PETSC will give us continuous
+access to state-of-the-art linear solver.
+
+If you are familiar with PETSc, already have it on your system and are ready
+to start using it in the remainder of this manual, feel free to skip to section
+[Using PETSc](#demo_petsc_using)
+
+### Compiling PETSc <a name="demo_petsc_compiling"> </a>
+
+PETSc compilation is explained in enough details in [Installation: Configuring,
+and Building PETSc](#https://petsc.org/release/install) and we see no need to
+repeat it all here.  However, we believe we might help you if we point out a
+few details of PETSc installation relevant for use with T-Flows.
+
+#### Which options to set?
+
+One of the first thing PETSc documentation presents you are the options for
+downloading additional packages with PETSs, like:
+```
+./configure --download-mpich --download-fblaslapack
+```
+
+Well, don't get too overwhelmed with it.  If you download MPICH (or OpenMPI for
+that matter) with PETSc, it might not be the same version of MPICH you already
+have on your system, and you might have clashes in definitions in header files
+and alike.
+
+We believe you are much better off using the compilers you already have on your
+system, or have installed trying to meet [Highly desirable software
+requirements](#soft_req_des) to avoid compatibility issues between different
+compilers.  So, we suggest the following options:
+```
+--with-cc=mpicc  --with-cxx=mpicxx  --with-fc=mpif90
+```
+
+which will instruct PETSc to use the compilers you aleady have on your system
+and have (maybe) even used them to compile T-Flows before.
+
+As we mentioned in a few places in this manual, T-Flows comes with its own suite
+of linear solvers which work decently.  Indeed, if you pick the same solver and
+the same preconditioner from T-Flows _native_ set and from PETSc suite of solvers
+you will observe pretty much the same convergence history and performance.
+
+> **_Note:_** You might even observe that T-Flows' native solvers are faster
+becuase they avoid the step of copying the matrix from T-Flows' memory space
+to PETSc memory space.
+
+However, the point where T-Flows solvers will never be able to match PETSc are
+the algebraic multigrid preconditiores, which are of utmost importance for good
+scaling with problem size, and we therefore see no reason to use PETSc unless
+you also download [HYPRE](#https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
+preconditioners with it:
+```
+--download-hypre=yes
+```
+
+We suggest you to also download [BLAS](#http://www.netlib.org/blas/) and
+[LAPACK](#http://www.netlib.org/lapack/) with PETSc as we are not aware that
+it could cause any compatibility issues even if you already have a different
+BLAS on your system.  Hence add also:
+```
+--download-fblaslapack
+```
+to the list of options to compile PETSc.
+
+If you want to run T-Flows+PETSc in parallel, you may be tempted to also download
+METIS with PETSc.  Well, don't.  You don't need it, you won't be using domain
+decomposition from any of PETSc functions and T-Flows already has METIS library
+in ```[root]/Sources/Libraries```.
+
+As far as debugging options in PETSc are concerned, we have set them on during
+the initial stages of linking T-Flows with PETSc, but believe that they are not
+needed for productive runs, so we suggest compiling with these options instead:
+```
+--with-debugging=no  --CFLAGS='-O3' --CXXFLAGS='-O3' --FFLAGS='-O3'
+```
+
+So, all these options combined, we suggest you to use this command to configure
+PETSc for usage with T-Flows:
+```
+./configure  --with-debugging=no  --CFLAGS='-O3' --CXXFLAGS='-O3' --FFLAGS='-O3'  --with-cc=mpicc  --with-cxx=mpicxx  --with-fc=mpif90  --download-fblaslapack  --download-hypre=yes
+```
+
+After that, just follow instructions on the screen.
+
+### Linking T-Flows with PETSc <a name="demo_petsc_link"> </a>
+
+At the end of compilation process explained in [Compiling PETSc](#demo_petsc_compiling)
+the PETSc configure script will advise you to set two environment variables,
+```PETSC_DIR``` and ```PETSC_ARCH```, to PETSc installation directory and
+architecture you chose to build for.  In our case, with options we suggested
+you to use before, these environment variables are set as this in ```.bashrc``` file:
+```
+# Opt + Hypre
+export PETSC_ARCH=arch-linux-c-opt
+export PETSC_DIR=$HOME/petsc-opt-hypre
+```
+
+If these variables are set in the shell in which you compile T-Flows' _Process_,
+T-Flows' makefiles will use them to link T-Flows with PETSc.  As simple as that.
+There is nothing else there for you to do.
+
+> **_Note:_** Only _Process_ can link with PETSc, none of the other T-Flows'
+sub-programs calls any of the PETSc functions.
+
+If you compile _Process_ with PETSc, it will show it in the header it outputs
+when a simulation starts, like for example [here](#a_heck_of_a_header).
+
+### Using PETSc from T-Flows <a name="demo_petsc_using"> </a>
+
+We developed T-Flows' native solvers first and were using them for a couple of
+decades before we established a link to PETSc.  All the native solvers settings
+could be set from the control file with following options (coppied from
+```[root]/Documentation/all_control_keywords```):
+```
+  MAX_ITERATIONS_FOR_ENERGY_SOLVER
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER
+  MAX_ITERATIONS_FOR_POTENTIAL_SOLVER
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER
+  MAX_ITERATIONS_FOR_SCALARS_SOLVER
+  MAX_ITERATIONS_FOR_TURBULENCE_SOLVER
+  MAX_ITERATIONS_FOR_VOF_SOLVER
+  MAX_ITERATIONS_FOR_WALL_DISTANCE_SOLVER
+  ...
+  PRECONDITIONER_FOR_SYSTEM_MATRIX
+  ...
+  SOLVER_FOR_ENERGY
+  SOLVER_FOR_MOMENTUM
+  SOLVER_FOR_POTENTIAL
+  SOLVER_FOR_PRESSURE
+  SOLVER_FOR_SCALARS
+  SOLVER_FOR_TURBULENCE
+  SOLVER_FOR_VOF
+  SOLVER_FOR_WALL_DISTANCE
+  ...
+  TOLERANCE_FOR_ENERGY_SOLVER
+  TOLERANCE_FOR_MOMENTUM_SOLVER
+  TOLERANCE_FOR_POTENTIAL_SOLVER
+  TOLERANCE_FOR_PRESSURE_SOLVER
+  TOLERANCE_FOR_SCALARS_SOLVER
+  TOLERANCE_FOR_TURBULENCE_SOLVER
+  TOLERANCE_FOR_VOF_SOLVER
+  TOLERANCE_FOR_WALL_DISTANCE_SOLVER
+```
+Which we believe should be descriptive enough except maybe just to say that all
+the options having ```FOR_TURBULENCE``` in the name are applied for all turbulent
+quantities computed from partial differential equations, that ```SOLVER_FOR_```
+options can be set to ```bicg```, ```cg``` or ```cgs```,  and that
+```PRECONDITIONER_FOR_SYSTEM_MATRIX``` is applied to _all_ linear systems and
+_only_ ```incomplete_cholesky``` makes sense because the other two options stand
+little chance to converge.
+
+For backward compatibility, these options are also read and used by PETSc solvers
+unless you add a special section in the control file for different/additional
+tuning for PETSc.  For example, in the case of [Large eddy simulation over a
+matrix of cubes](#bench_cases_matrix), the section dedicated to linear solver
+for pressure reads:
+```
+ PETSC_OPTIONS_FOR_PRESSURE
+   SOLVER        cg
+   PREC          hypre       # asm or hypre
+   PREC_OPTS·····
+   TOLERANCE     1.0e-3
+```
+Here we set ```cg``` to be the solver pressure, we direct preconditier to
+algebraic multigrid from [HYPRE](#https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
+and we set the tolerance to 1.0e-3.  The line with ```PREC_OPTS``` is empty, we
+are not sending any options to preconditioner.
+
+> **_Note:_** If you want to send options to PETSc preconditioner, the syntax
+from ```control``` file is exactly the same as it would be from PETSc command
+line.  For example, if you wanted to change the nodal coarsening for hypre to 4,
+you would set ```PREC_OPTS -pc_hypre_boomeramg_nodal_coarsen 4```, exactly as
+described [here](#https://petsc.org/main/docs/manualpages/PC/PCHYPRE.html)
+
+Please be careful.  The options passed to PETSc solver are a bit like boundary
+condition section in the ```control``` file.  All of the four options must be
+given, and in the same order as above.
+
+Clearly, PETSc options can be set for all other variables, not just for pressure.
+All of them are listed here for completness:
+```
+  PETSC_OPTIONS_FOR_ENERGY
+  PETSC_OPTIONS_FOR_MOMENTUM
+  PETSC_OPTIONS_FOR_POTENTIAL
+  PETSC_OPTIONS_FOR_PRESSURE
+  PETSC_OPTIONS_FOR_SCALARS
+  PETSC_OPTIONS_FOR_TURBULENCE
+  PETSC_OPTIONS_FOR_VOF
+  PETSC_OPTIONS_FOR_WALL_DISTANCE
+```
+
+By default, _Process_ will use its native solvers.  (It is a safer bet if
+_Process_ was compiled without PETSc).  However, if you wants to use PETSc
+solvers, you should include this line in the ```control``` file:
+```
+LINEAR_SOLVERS    petsc
+```
+
+If you set the line above and T-Flows was compiled without PETSc, it will
+throw an error but also suggest a workaround.
+
 # Benchmark cases  <a name="bench_cases"></a>
 
 ## Laminar flow over a flat plate <a name="bench_flat_plate"> </a>
@@ -2400,14 +2622,14 @@ dealt with.
 ## Large eddy simulation over a matrix of cubes <a name="bench_cases_matrix"> </a>
 
 We chose the case of the flow over a surface-mounted matrix of cubes to give you
-an additional example of setting up and running an LES case, but also to 
+an additional example of setting up and running an LES case, but also to
 introduce PISO algorithm to link velocities and pressure.  The case was studied
 experimentally by Meinders and Hanjalic (**give link**) and the problen domain
 is sketched in this figure:
 
 <img src="Documentation/Manual/Figures/matrix_domain_font_20.png" width="600"/>
 
-There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15 
+There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
 cubes is 60 mm.  Working fluid is air at room temperature, and PIV measurments
 are reported by Meinders and Hanjalic for comparison against CFD simulations.
