@@ -65,8 +65,8 @@
       print '(a)',        ' #==========================================='
       print '(a)',        ' # Output from user function, Nusslet number!'
       print '(a)',        ' #-------------------------------------------'
-      print '(a,es12.3)', ' # Toral  area    : ', area
-      print '(a,es12.3)', ' # Nusselt number : ', nu
+      print '(a,es12.4)', ' # Toral  area    : ', area
+      print '(a,es12.4)', ' # Nusselt number : ', nu
     end if
 
   end if  ! domain is middle

@@ -2875,8 +2875,8 @@ The case we solved here corresponds to Rayleigh number of 1.0e+5 and Pr of 0.7.
 In addition, conductivities in solids are equal to the conductivities in fluid
 ([Basak et al.](#https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
 denote such a case with K=1.)  Anyhow, the value of Nusselt number reported by
-Basak is 0.2233 and our computations show value of 0.223, meaning we passed
-this benchmark.
+Basak is 0.2233 and our computations show value of 0.2233, meaning we passed
+this benchmark.  We actually nailed it.
 
 ### Thing to try next <a name="bench_conjugate_next"> </a>
 
