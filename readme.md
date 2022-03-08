@@ -2415,7 +2415,7 @@ to start using it in the remainder of this manual, feel free to skip to section
 ## Compiling PETSc <a name="link_petsc_compiling"> </a>
 
 PETSc compilation is explained in enough details in [Installation: Configuring,
-and Building PETSc](#https://petsc.org/release/install) and we see no need to
+and Building PETSc](https://petsc.org/release/install) and we see no need to
 repeat it all here.  However, we believe we might help you if we point out a
 few details of PETSc installation relevant for use with T-Flows.
 
@@ -2453,14 +2453,14 @@ to PETSc memory space.
 However, the point where T-Flows solvers will never be able to match PETSc are
 the algebraic multigrid preconditiores, which are of utmost importance for good
 scaling with problem size, and we therefore see no reason to use PETSc unless
-you also download [HYPRE](#https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
+you also download [HYPRE](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
 preconditioners with it:
 ```
 --download-hypre=yes
 ```
 
-We suggest you to also download [BLAS](#http://www.netlib.org/blas/) and
-[LAPACK](#http://www.netlib.org/lapack/) with PETSc as we are not aware that
+We suggest you to also download [BLAS](http://www.netlib.org/blas/) and
+[LAPACK](http://www.netlib.org/lapack/) with PETSc as we are not aware that
 it could cause any compatibility issues even if you already have a different
 BLAS on your system.  Hence add also:
 ```
@@ -2572,7 +2572,7 @@ for pressure reads:
    TOLERANCE     1.0e-3
 ```
 Here we set ```cg``` to be the solver pressure, we direct preconditier to
-algebraic multigrid from [HYPRE](#https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
+algebraic multigrid from [HYPRE](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
 and we set the tolerance to 1.0e-3.  The line with ```PREC_OPTS``` is empty, we
 are not sending any options to preconditioner.
 
@@ -2580,7 +2580,7 @@ are not sending any options to preconditioner.
 from ```control``` file is exactly the same as it would be from PETSc command
 line.  For example, if you wanted to change the nodal coarsening for hypre to 4,
 you would set ```PREC_OPTS -pc_hypre_boomeramg_nodal_coarsen 4```, exactly as
-described [here](#https://petsc.org/main/docs/manualpages/PC/PCHYPRE.html)
+described [here](https://petsc.org/main/docs/manualpages/PC/PCHYPRE.html)
 
 Please be careful.  The options passed to PETSc solver are a bit like boundary
 condition section in the ```control``` file.  All of the four options must be
@@ -2621,7 +2621,7 @@ throw an error but also suggest a workaround.
 
 ## Conjugate heat transfer <a name="bench_conjugate"> </a>
 
-To benchmark conjugate heat transfer, we chose the case introduced by [Basak et al.](#https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
+To benchmark conjugate heat transfer, we chose the case introduced by [Basak et al.](https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
 In particular, we focus on the case authors call: _Case 3; t1+t2 = 0.2_, which is
 the case with both heated walls represented as solids, whose total thickness
 is 0.2 of the lenght of the domain.
@@ -2874,7 +2874,7 @@ print the value of Nuseelt number only from one processor.
 
 The case we solved here corresponds to Rayleigh number of 1.0e+5 and Pr of 0.7.
 In addition, conductivities in solids are equal to the conductivities in fluid
-([Basak et al.](#https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
+([Basak et al.](https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
 denote such a case with K=1.)  Anyhow, the value of Nusselt number reported by
 Basak is 0.2233 and our computations show value of 0.2233, meaning we passed
 this benchmark.  We actually nailed it.
@@ -2899,7 +2899,7 @@ cases and benchmark further.
 We chose the case of the flow over a surface-mounted matrix of cubes to give you
 an additional example of setting up and running an LES case, but also to
 introduce PISO algorithm to link velocities and pressure.  The case was studied
-experimentally by [Meinders and Hanjalic](#https://www.sciencedirect.com/science/article/abs/pii/S0142727X99000168)
+experimentally by [Meinders and Hanjalic](https://www.sciencedirect.com/science/article/abs/pii/S0142727X99000168)
 and the problen domain is sketched in this figure:
 
 <img src="Documentation/Manual/Figures/matrix_domain_font_20.png" width="600"/>
