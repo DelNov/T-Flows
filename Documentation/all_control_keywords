@@ -88,6 +88,7 @@
   TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-3                |   any small number, but < 1.0e-3 is OK
   TOLERANCE_FOR_ENERGY_SOLVER              |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_MOMENTUM_SOLVER            |         1.0e-6                |   any small number, but > 1.0e-12 is OK
+  TOLERANCE_FOR_POTENTIAL_SOLVER           |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_PRESSURE_SOLVER            |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_SIMPLE_ALGORITHM           |         1.0e-4                |   any small number, but > 1.0e-6  is OK
   TOLERANCE_FOR_SCALARS_SOLVER             |         1.0e-6                |   any small number, but > 1.0e-12 is OK
