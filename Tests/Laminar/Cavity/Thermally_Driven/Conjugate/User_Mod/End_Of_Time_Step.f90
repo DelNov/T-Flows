@@ -39,7 +39,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL ) then
           area = area + Grid % s(s)
