@@ -105,7 +105,7 @@
           !   Count boundary cells on each side   !
           !---------------------------------------!
 
-          ! Innitialize counter in first domain
+          ! Innitialize counter in the first domain
           n1 = 0
 
           ! On physical boundary cells
@@ -128,7 +128,7 @@
           end do
           inter(d1, d2) % n1_sub = n1
 
-          ! Innitialize counter in first domain
+          ! Innitialize counter in the second domain
           n2 = 0
 
           ! On physical boundary cells
