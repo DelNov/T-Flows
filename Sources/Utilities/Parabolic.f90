@@ -45,12 +45,13 @@
   area     = 0.0
   integral = 0.0
   do i = 1, n
-    x_l  = (x_s + dx * (i-1))  ! x left
-    x_r  = (x_s + dx *  i   )  ! x rigth
-    y_l = (1.0 - ((x_l/lx) ** 2 / 0.25)) * bulk *  1.5
-    y_r = (1.0 - ((x_r/lx) ** 2 / 0.25)) * bulk *  1.5
+    ! x_l and x_r are in range -0.5 -> +0.5
+    x_l  = -0.5 + real((i-1))/real(n-1)  ! x left
+    x_r  = -0.5 + real( i   )/real(n-1)  ! x rigth
+    y_l = (1.0 - x_l ** 2 / 0.25) * bulk *  1.5
+    y_r = (1.0 - x_r ** 2 / 0.25) * bulk *  1.5
 
-    print '(2es16.5)', x_l, y_l
+    print '(2es16.5)', x_s + (i-1)*dx,  y_l
 
     if(i < n) then
       y_c      = (y_l + y_r) * 0.5
