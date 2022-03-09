@@ -11,16 +11,16 @@
   type(Grid_Type) :: Grid
   integer         :: ask
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, n1, n2, s, b
+  integer              :: c, c1, c2, n, n1, n2, s, b, i, j
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces
   real                 :: xs2, ys2, zs2
-  real                 :: t, sur_tot, max_dis
+  real                 :: t, sur_tot, dis, min_dis, max_dis
   real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
   real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
   integer, allocatable :: b_face(:)
   character(SL)        :: answer
-  real                 :: big, small, factor, prod
+  real                 :: factor, prod
 !==============================================================================!
 !                                                                              !
 !                                n3                                            !
@@ -235,11 +235,11 @@
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      if( Math % Approx_Real(Grid % dx(c1), 0.0, small) )  &
+      if( Math % Approx_Real(Grid % dx(c1), 0.0) )  &
         Grid % xc(c1) = 0.75 * Grid % xc(c1) + 0.25 * Grid % xc(c2)
-      if( Math % Approx_Real(Grid % dy(c1), 0.0, small) )  &
+      if( Math % Approx_Real(Grid % dy(c1), 0.0) )  &
         Grid % yc(c1) = 0.75 * Grid % yc(c1) + 0.25 * Grid % yc(c2)
-      if( Math % Approx_Real(Grid % dz(c1), 0.0, small) )  &
+      if( Math % Approx_Real(Grid % dz(c1), 0.0) )  &
         Grid % zc(c1) = 0.75 * Grid % zc(c1) + 0.25 * Grid % zc(c2)
     end if
   end do ! through faces
@@ -362,19 +362,62 @@
       !   Match the periodic faces with shadows &   !
       !    fill up the Grid % faces_s structure     !
       !---------------------------------------------!
+
+      ! Check if this simple sort worked out
+      min_dis =  HUGE
+      max_dis = -HUGE
       do s = 1, cnt_per / 2
         s1 = b_face(s)
         s2 = b_face(s + cnt_per / 2)
-        c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
-        c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
-        c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2
-        c22 = Grid % faces_c(2,s2)  ! cell 2 for face 2
-        Grid % faces_s(s1) = s2     ! store where it was coppied from ...
-        Grid % faces_s(s2) = s1     ! ... and for the mirror face too
-        Grid % faces_c(2,s1) = c12  ! inside cell on the other side of periodicity
-        Grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face -> dirty
-        Grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face -> dirty
+        dis = Math % Distance(Grid % xf(s1), Grid % yf(s1), Grid % zf(s1),  &
+                              Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
+        min_dis = min(min_dis, dis)
+        max_dis = max(max_dis, dis)
       end do
+
+      ! Simple sort didn't work out
+      if( .not. Math % Approx_Real(min_dis, max_dis) ) then
+        print *, '# Simple sort of periodic faces failed,'  //  &
+                 ' trying a slower algorithm'
+        do i = 1, cnt_per / 2
+          s1 = b_face(i)
+          do j = cnt_per / 2 + 1, cnt_per
+            s2 = b_face(j)
+            dis = Math % Distance(Grid % xf(s1), Grid % yf(s1), Grid % zf(s1), &
+                                  Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
+            if(Math % Approx_Real(min_dis, dis) ) then
+              c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
+              c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
+              c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2
+              c22 = Grid % faces_c(2,s2)  ! cell 2 for face 2
+              Grid % faces_s(s1) = s2     ! store where it was coppied from ...
+              Grid % faces_s(s2) = s1     ! ... and for the mirror face too
+              Grid % faces_c(2,s1) = c12  ! inside cell on the other side
+              Grid % faces_c(1,s2) = 0    ! c21; zero marks a shadow face, dirty
+              Grid % faces_c(2,s2) = 0    ! c21; zero marks a shadow face, dirty
+              goto 1
+            end if
+          end do  ! s2
+1         continue
+        end do    ! s1
+
+      ! Simple sort worked out
+      else
+        print *, '# Simple sort for periodic faces worked out - good!'
+        do s = 1, cnt_per / 2
+          s1 = b_face(s)
+          s2 = b_face(s + cnt_per / 2)
+          c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
+          c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
+          c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2
+          c22 = Grid % faces_c(2,s2)  ! cell 2 for face 2
+          Grid % faces_s(s1) = s2     ! store where it was coppied from ...
+          Grid % faces_s(s2) = s1     ! ... and for the mirror face too
+          Grid % faces_c(2,s1) = c12  ! inside cell on the other side
+          Grid % faces_c(1,s2) = 0    ! c21; this zero marks a shadow face, dirty
+          Grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face, dirty
+        end do
+      end if
 
       n_per = cnt_per / 2
       print *, '# Phase I: periodic cells: ', n_per
@@ -388,7 +431,7 @@
       Grid % per_z = 0.0
       do s = 1, n_per
         s1 = b_face(s)
-        s2 = b_face(s + n_per)
+        s2 = Grid % faces_s(s1)
         Grid % per_x = max(Grid % per_x, abs(Grid % xf(s1) - Grid % xf(s2)))
         Grid % per_y = max(Grid % per_y, abs(Grid % yf(s1) - Grid % yf(s2)))
         Grid % per_z = max(Grid % per_z, abs(Grid % zf(s1) - Grid % zf(s2)))
