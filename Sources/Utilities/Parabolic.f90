@@ -1,16 +1,32 @@
 !==============================================================================!
   program Parabolic
 !------------------------------------------------------------------------------!
+!  Compile with: gfortran -o Parabolic Parabolic.f90                           !
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  real    :: x_s =  -0.005
-  real    :: x_e =   0.005
-  real    :: bulk = -1.0
-  integer :: i
-  integer :: n = 41
-
-  real    :: x_l, x_r, x_c, y_l, y_r, y_c, dx, lx, integral, area
+  real          :: x_s, x_e, bulk
+  integer       :: n, i
+  real          :: x_l, x_r, x_c, y_l, y_r, y_c, dx, lx, integral, area
+  character(80) :: arg
 !==============================================================================!
+
+  ! Proper invocation
+  if(command_argument_count() .eq. 4) then
+
+    ! Get x_s, x_e and bulk
+    call get_command_argument(1, arg);  read(arg, *) x_s
+    call get_command_argument(2, arg);  read(arg, *) x_e
+    call get_command_argument(3, arg);  read(arg, *) bulk
+    call get_command_argument(4, arg);  read(arg, *) n
+
+  ! Wrong invocation
+  else
+    print *, '# You failed to invoke the program properly.'
+    print *, '# Correct invocation:'
+    print *, './Parabolic  x_start  x_end  bulk_velocity  n_points'
+    stop
+  end if
 
   print *, '#=================='
   print *, '# Number of points '
