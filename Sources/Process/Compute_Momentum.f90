@@ -341,7 +341,7 @@
     !----------------------------------------------!
     !   Explicit solution for the PISO algorithm   !
     !----------------------------------------------!
-    call Compute_Momentum_Explicit(Flow, ui, Sol)
+    call Compute_Momentum_Explicit(Flow, ui, Sol % Nat)
 
     !-----------------------------------!
     !                                   !
@@ -350,7 +350,7 @@
     !-----------------------------------!
 
     !--------------------------------------------------------!
-    !   If not inside the PRIME part of the PISO algorithm   !
+    !   If not inside the prime part of the PISO algorithm   !
     !--------------------------------------------------------!
     if(Flow % piso_status .eqv. .false.) then
 
