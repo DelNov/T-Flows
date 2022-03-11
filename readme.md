@@ -3,7 +3,7 @@
 1. [Introduction](#intro)
 2. [Software requirements](#soft_req)
     1. [Minimum](#soft_req_min)
-    2. [Higlhy desirable](#soft_req_des)
+    2. [Highly desirable](#soft_req_des)
     3. [Optional](#soft_req_opt)
 3. [User requirements](#user_req)
     1. [Minimum](#user_req_min)
@@ -119,20 +119,20 @@ practical use of T-Flows, it is highly desirable that you also have the followin
   mpirun for parallel processing)
 
 T-Flows is, in essence, a fluid flow solver without any graphical user interface (GUI).
-Although it comes with its own grid generator, it is very rudimental, and an
+Although it comes with its own grid generator, it is very rudimentary, and an
 external grid generation software would be highly desirable for meshing complex
 computational domains.  We regularly use GMSH and would highly recommend it for
-its inherent scipting ability, but if you have access to any commercial grid
+its inherent scripting ability, but if you have access to any commercial grid
 generator which can export meshes in ANSYS' ```.msh``` (and ```.cas```, **this should
 be checked**) format, that would just fine.
 
 Having no GUI, T-Flows relies on
-external tools for visualisation of results.  The results are saved in ```.vtu```,
-ParaView's unstructured data format, and any visualisation software which can
+external tools for visualization of results.  The results are saved in ```.vtu```,
+ParaView's unstructured data format, and any visualization software which can
 read that format is highly desirable for post-processing of results.
 
 From its beginnings, T-Flows was developed for parallel execution with Message
-Passing Interface (MPI).  If you inted to run it on parallel computational
+Passing Interface (MPI).  If you intend to run it on parallel computational
 platforms, you will also need an installation of OpenMPI on your system.
 
 ## Optional software packages <a name="soft_req_opt"></a>
@@ -153,7 +153,7 @@ pushing your changes.
 
 Even though T-Flows comes with its own suite of linear solvers based on Krylov
 sub-space family of methods (Incomplete Cholesky and Jacobi preconditioned
-conjugate gradient (CG), bi-conjugate gradient (BiCG) and conjugate gradeint
+conjugate gradient (CG), bi-conjugate gradient (BiCG) and conjugate gradient
 squared (CGS)), you might want to have more choice or even want to use
 algebraic multigrid preconditioners for better scaling with problem size.
 To that end, we linked T-Flows with PETSc.  If PETSc is installed on your
@@ -189,7 +189,7 @@ The bare minimum you need to get T-Flows running is:
 - you don't have to click icons in a file manager to reach your files or execute
   commands, because you _can_ use your operating system (OS) from a terminal.
 - you know that your operating system has ```make``` command, Fortran and
-  C compiler, and if not, you know who to ask to install these facilites for you
+  C compiler, and if not, you know who to ask to install these facilities for you
 
 If you are not even on this level, T-Flows is not for you and you are just
 wasting your time with it.  You are better of venturing into CFD with some
@@ -223,7 +223,7 @@ Ideally, when opting for open-source CFD code such as T-Flows, you should also b
 - able to understand the essence of object-oriented code architecture
 - familiar with single-program multiple-data (SPMD) programming paradigm and
   related MPI commands
-- acquianted with version control system with ```git``` command
+- acquainted with version control system with ```git``` command
 - interested to modify the sources of the program you are using, either in an
   attempt to improve it or to implement new features be it physical models or
   numerical methods and algorithms
@@ -253,7 +253,7 @@ the changes you do to the code and give you access to all possibilities offered
 by git suite of commands.
 
 > **_Tip 2:_** If you are not familiar with version control system (such as ```.git```,
-you are better of learning it soon as possible since it is an indespensible
+you are better of learning it soon as possible since it is an indispensable
 tool in software development and maintenance.
 
 If you are using the ```git``` command, you might also specify the name of the
@@ -286,7 +286,7 @@ structure:
 > **_Note:_** Remember, [root] is the name of the directory to which you cloned
 or unzipped the sources.  It is not ```/``` in Linux or ```C:\``` on Windows.
 
-The sub-directories have reather self-explanatory names and we believe that it is
+The sub-directories have rather self-explanatory names and we believe that it is
 only worth mentioning that the directory ```Binaries``` will contain executable
 files.  If you check the contents of the ```Sources``` sub-directory, it will reveal
 the following structure:
@@ -316,7 +316,7 @@ with some menial tasks and we will explain some of them when the need occurs.
 _Process_, as the name implies, has all the functionality needed to process
 (discretize and solve) flow equations on a given numerical grid, but it is not
 a grid generator on its own.  To provide a grid to _Process_, you can either
-use the built-in program _Generate_, which is quite rudimental and useful for
+use the built-in program _Generate_, which is quite rudimentary and useful for
 very simple geometries only, or convert a mesh from an external mesh generator.
 
 > **_Note:_**  As third-party grid generator we would recommend [GMSH](https://gmsh.info),
@@ -367,7 +367,7 @@ gfortran Load_Gmsh.f90
 gfortran Main_Con.f90
 Linking  ../Libraries/Metis_5.1.0_Linux_64/libmetis_i32_r64.a ../../Binaries/Convert
 ```
-At each invokation of the command ```make``` for any of the four sub-program's
+At each invocation of the command ```make``` for any of the four sub-program's
 directories, ```makefile``` will print a header with possible options which can be
 passed to ```make```.  In the above you can see that you can specify which
 compiler you want to use (we use almost exclusively gnu), whether you want
@@ -409,10 +409,10 @@ and you are ready to start your first simulations.
 # Demonstration cases <a name="demo_cases"></a>
 
 The cases presented in this chapter serve only to show the basic usage of T-Flows.
-They are by no means adhering to best practice guidlines, nor is their aim to be
-used as verifcation against experiments, DNS or other published results.
+They are by no means adhering to best practice guidelines, nor is their aim to be
+used as verification against experiments, DNS or other published results.
 The following chapter, [Benchmark cases](#bench_cases), is dedicated to
-benchmarking and rigirous CFD practices.
+benchmarking and rigorous CFD practices.
 
 ## Lid-driven cavity flow <a name="demo_lid_driven"></a>
 
@@ -441,12 +441,12 @@ We will use this case to introduce a few new concepts in T-Flows:
 
 ### Lid-driven cavity on hexahedral grid <a name="demo_lid_driven_hexa"></a>
 
-We show how to solve this example with two grids with different topolgies; a
+We show how to solve this example with two grids with different topologies; a
 hexahedral grid and a polyhedral grid.
 
 #### Creating the mesh <a name="demo_lid_driven_hexa_create"></a>
 
-We start with a grid build from hexahedral cell. In order to run this case,
+We start with a grid built from hexahedral cell. In order to run this case,
 please go to the directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa/```.
 There you will find the following files:
 ```
@@ -498,7 +498,6 @@ Physical Surface("periodic_y", 30) = {1, 26};
 
 // Define volume condition
 Physical Volume("fluid", 31) = {1};
-
 ```
 
 to see that it is very readable and intuitive.  Script defines the points,
@@ -537,9 +536,9 @@ lid_driven.msh
 #### Converting the mesh to T-Flows format <a name="demo_lid_driven_hexa_convert"></a>
 
 Once you have the mesh in this format, you can use _Convert_ to convert it
-into T-Flows native file format.  This will take some and will require your
-attention, so we don't recommend you going on with _Convert_ unless you are
-sure you can have 15 minutes of peace and focus ahead of you.  We assume you
+into T-Flows native file format.  This will take some time and will require your
+attention, so we don't recommend you continue with this section unless you are
+sure you can have 15 minutes of peace and quietness ahead of you.  We assume you
 compiled _Convert_ as it was described in the section
 [Compiling sub-programs](#compiling_sub_programs).  Given that you are in
 directory ```[root]/Tests/Manual/Lid_Driven_Cavity/Hexa```, you can
@@ -573,7 +572,7 @@ which will prompt you with the screen:
 Here you have to type the name of the grid _with extension_, hence
 ```lid_driven.msh```.
 
-> **_Note:_** Both GMSH and Fluent produce grid files with extnesion ```.msh```,
+> **_Note:_** Both GMSH and Fluent produce grid files with extension ```.msh```,
 but the formats are completely different and GMSH makes an educated guess which
 one it is reading based on its contents.
 
@@ -886,7 +885,7 @@ useful information:
 #-----------------------------------------------------------
 ```
 Please take time to read through it, it gives a lots of explanations which are
-probably not necessary to be repeated here agian.  We will cover different
+probably not necessary to be repeated here again.  We will cover different
 options in subsequent sections of this manual.  For the sake of shortness,
 copy the template control file to just ```control``` file with:
 ```
@@ -1105,7 +1104,7 @@ since all iterations for all computed quantities fell to zero:
 That is it, you got your first CFD solutions with T-Flows.  You can read the
 final results (```lid_driven-ts001200.vtu```) in ParaView, and explore different
 options for visualization of results.  We chose to plot a cut-plane through the
-middle of the domain vectors represented glyphs and pressure with a colormap:
+middle of the domain vectors represented glyphs and pressure with a color-map:
 
 ![!](Documentation/Manual/Figures/lid_driven_hexa_solution.png "")
 
@@ -3106,9 +3105,9 @@ finite element results obtained with commercial package COMSOL.
 
 The schematic of the problem is shown in this picture:
 
-<img src="Documentation/Manual/Figures/bubble_domain.png" width="350"/>
+<img src="Documentation/Manual/Figures/bubble_domain.png" width="300"/>
 
-The resides in the directory ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
+The case resides in the directory ```[root]/Tests/Manual/Rising_Bubble/```.  Please go
 there and check the contents.  They include the following:
 ```
 [root]/Tests/Manual/Rising_Bubble/
@@ -3666,7 +3665,7 @@ For inflow (called ```in``` in ```.geo``` file) we set the type to ```inflow```
 and specify velocity in _x_ direction to be constant and equal to one.  For
 outflow (called ```out``` in ```.geo``` file) we set the condition to be of
 type ```convective```, which is described by [Bottaro](https://www.tandfonline.com/doi/abs/10.1080/10407799008944952)
-and it should allow eddies to leave computational domain without disrupting 
+and it should allow eddies to leave computational domain without disrupting
 the flow field inside.
 
 Other options for outflow include ```outflow``` which is a simple vanishing
@@ -3739,7 +3738,7 @@ desired bulk velocity is one, we can invoke _Parabolic_ with:
 to get:
 ```
  #==================
- # Number of points 
+ # Number of points
  #==================
           31
  #=================================
@@ -3920,7 +3919,7 @@ have to be.
 As explained in [Conjugate heat transfer](#bench_conjugate), the way _Process_
 goes about simulating in multiple domains, is to have a control file for each
 of the domains called ```control.1```, ```control.2``` and so forth, and one
-central control file with information about coupling.  For this particular
+central ```control``` file with information about coupling.  For this particular
 case, all control files are in sub-directory ```Option_4```.  To use them,
 feel free to remove any existing control files currently residing in the
 working directory and make the links:
@@ -3930,12 +3929,14 @@ ln -i -s Option_4/control* .
 ```
 
 At this point it might be worth nothing that ```control.2``` is the same as
-```control``` from ```Option_1```.  The ```control.1```, for the precursor,
-has a few differences.  Problem domain is called ```precursor```.
+```control``` from ```Option_1```.  The ```control.1```, for the precursor is
+not very different from ```control.2```.  Problem domain is called
+```precursor```.
 ```
  PROBLEM_NAME        precursor
 ```
-advection scheme is set to ```central``` to help maintian turbulence
+advection scheme is set to ```central``` to help maintain turbulence in the
+precursor domain
 ```
  ADVECTION_SCHEME    central
 ```
@@ -3944,9 +3945,9 @@ and desired mass flux is prescribed in _x_ direction:
  MASS_FLOW_RATES              16.4  0.0  0.0
 ```
 
-> **_Note:_** Desired bulk velocity is 1.0, cross sectional area is 4 x 4.1,
-density is not prescribed hence _Process_ will set it to one, which makes the
-desired mass flow rate of 16.4.
+> **_Note:_** Desired bulk velocity is 1.0, cross sectional area is
+4 x 4.1 = 16.4.  Density is not prescribed hence _Process_ will set it to 1.0,
+which makes the desired mass flow rate of 16.4.
 
 Furthermore, the point for monitoring plane has been shifted to be inside the
 precursor domain:
@@ -3983,22 +3984,23 @@ in domain ```cylinder```.
 However, that is not enough.  Since types of couplings between domains in a CFD
 simulation are infinite, they are dealt with through a user function.  In
 [Conjugate heat transfer](#bench_conjugate) we used the one provided with
-_Process_ by default, which couples temperatures, for velocity coupling we
-need a tailored version which is in sub-directory ```Option_4/User_Mod/Interface_Exchange.f90```.
+_Process_ by default, which couples temperatures, as presumably the most basic
+case for coupled simulations.  For velocity coupling we need a special version
+which is in sub-directory ```Option_4/User_Mod/Interface_Exchange.f90```.
 It would take us too far to explain this function in detail, but let's just say
 that it works in two steps; in the first one it gathers information from all
 domains involved and stores them in a special buffer, and in the second step
 distributes the information from one step to another.
 
-In the same directory there is another user function which introduces synthetic
-eddies in the precursor domain.  It is the ```User_Mod_End_Of_Time_Step```.  
-These eddies are introduced to help the precursor domain to reach turbulent
-flow regime.  The eddies are formed from initial rigid body rotation velocity
-field (_u_=0; _v_=_z_-_zo_; _w_=_y_-_yo_; where _yo_ and _zo_ are the center
-of an eddy in the plane normal to streamwise velocity direction), which are
-damped by Gaussian distribution as we move further away from eddies centers
-(_xo_, _yo_ and _zo_). This may sound a bit fuzzy, so we illustrate it in the
-following figure:
+In the same directory there is another user function whose purpose is to
+introduces synthetic eddies in the precursor domain.  It is the
+```User_Mod_End_Of_Time_Step```.  These eddies are introduced to help the
+precursor domain to reach turbulent flow regime.  The eddies are formed from
+initial rigid body rotation velocity field (_u_=0; _v_=_z_-_zo_; _w_=_y_-_yo_;
+where _yo_ and _zo_ are the center of an eddy in the plane normal to streamwise
+velocity direction), which are damped by Gaussian distribution as we move
+further away from eddies centers (_xo_, _yo_ and _zo_). This may sound a bit
+fuzzy, so we make an attempt to illustrate our words in the following figure:
 
 <img src="Documentation/Manual/Figures/eddy_convolution.png" width="750"/>
 
@@ -4006,7 +4008,7 @@ The graph on the left (black lines and gray shaded areas) represent rigid body
 rotation with center at (_y_=0, _z_=0).  The graph in the middle shows two
 Gaussuan curves (red lines, pink shades, darker pink the overlap) formed around
 the eddy center.  The graph on the right (blue lines, light blue shades) shows
-the confolution of the previous two functions and shows a smooth eddy whose
+the convolution of the previous two functions and shows a smooth eddy whose
 center is at (_y_=0, _z_=0).
 
 The eddies are placed at random positions, random senses of rotation and random
@@ -4030,7 +4032,6 @@ together after the time step 1440:
 ```
  40   if(curr_dt > 1440) return
 ```
-
 The minimum and maximum size of the eddies is given in these lines:
 ```
  54   ! Minimum and maximum size of eddies
@@ -4202,5 +4203,3 @@ and run:
 ```
 mpirun -np 4 ./Process > out_04 &
 ```
-
-
