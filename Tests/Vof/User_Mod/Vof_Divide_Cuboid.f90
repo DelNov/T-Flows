@@ -13,7 +13,7 @@
   type(Vof_Type), target :: Vof
   integer                :: c
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n, fu, n_node_vol, s
   integer                  :: ee, n_cylinders, iterat
   integer                  :: alloc_nod, alloc_fac
@@ -29,7 +29,7 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
   n_nod_vol = 8
   alloc_nod = 0
   alloc_fac = 0
@@ -49,19 +49,19 @@
 
   !list nodes first cuboid:
   i_nod = 1
-  do n = 1, grid % cells_n_nodes(c)
-    nod_x(inod) = grid % xn(grid % cells_n(n,c)) 
-    nod_y(inod) = grid % yn(grid % cells_n(n,c))
-    nod_z(inod) = grid % zn(grid % cells_n(n,c))
+  do n = 1, Grid % cells_n_nodes(c)
+    nod_x(inod) = Grid % xn(Grid % cells_n(n,c)) 
+    nod_y(inod) = Grid % yn(Grid % cells_n(n,c))
+    nod_z(inod) = Grid % zn(Grid % cells_n(n,c))
     i_nod = i_nod + 1
   end do
 
   !list of nodes on faces:
   i_fac = 1
-  do iterat = 1, grid % cells_n_faces(c)
-    s = grid % cells_f(iterat, c)
-    do n = 1, grid % faces_n_nodes(s)
-      faces_nod(i_fac,n) = grid % faces_n(n,s)
+  do iterat = 1, Grid % cells_n_faces(c)
+    s = Grid % cells_f(iterat, c)
+    do n = 1, Grid % faces_n_nodes(s)
+      faces_nod(i_fac,n) = Grid % faces_n(n,s)
       i_fac = i_fac + 1
     end do
   end do

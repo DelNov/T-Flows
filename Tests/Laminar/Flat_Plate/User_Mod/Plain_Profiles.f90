@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
                               k, c1, c2, s, n_hor, fu, ts
   character(SL)            :: coord_name, result_name
@@ -29,7 +29,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   call Flow % Alias_Momentum(u, v, w)
 
@@ -133,9 +133,9 @@
   !-------------------------!
   do k = 1, n_hor
     do i = 1, n_prob-1
-      do c = 1, grid % n_cells
-        z_coor = grid % zc(c)
-        if(grid % xc(c) < x1_p(k) .and. grid % xc(c) > x2_p(k)) then
+      do c = 1, Grid % n_cells
+        z_coor = Grid % zc(c)
+        if(Grid % xc(c) < x1_p(k) .and. Grid % xc(c) > x2_p(k)) then
           if(z_coor > z_p(i) .and. z_coor < z_p(i+1)) then
             um_p(i) = um_p(i) + u % n(c)
             tm_p(i) = tm_p(i) + t % n(c) 

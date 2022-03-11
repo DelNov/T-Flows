@@ -15,7 +15,7 @@
   integer, intent(in)      :: n_stat_p  ! 1st step for particle statistics
   real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w
   integer                  :: c, e, dir
   real                     :: lo, xo(4), yo(4), zo, ro,           &
@@ -24,7 +24,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
@@ -79,10 +79,10 @@
 
     ! Superimpose eddies on the velocity field
     do dir = 1, 4
-      do c = 1, grid % n_cells
-        xc = grid % xc(c)
-        yc = grid % yc(c)
-        zc = grid % zc(c)
+      do c = 1, Grid % n_cells
+        xc = Grid % xc(c)
+        yc = Grid % yc(c)
+        zc = Grid % zc(c)
         wc = sg * sin( (yc-yo(dir))/ro * PI )
         vc = sg * sin( (zc-zo)/ro * PI )
 
@@ -102,12 +102,12 @@
   end do
 
   vmax = 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
   call Comm_Mod_Global_Max_Real(vmax)
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     v % n(c) = v % n(c) / vmax / 10.0
     w % n(c) = w % n(c) / vmax / 10.0
   end do

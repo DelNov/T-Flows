@@ -26,7 +26,7 @@
 
   ! In x direction
   var(:) = 0.0
-  do c = 1, G % n_cells - G % comm % n_buff_cells
+  do c = 1, G % n_cells - G % Comm % n_buff_cells
     var(c) = G % xc(c)
   end do
   call G % Save_Debug_Vtu('x1',scalar_cell=var(-nb:nc),scalar_name='x')
@@ -35,7 +35,7 @@
 
   ! In y direction
   var(:) = 0.0
-  do c = 1, G % n_cells - G % comm % n_buff_cells
+  do c = 1, G % n_cells - G % Comm % n_buff_cells
     var(c) = G % yc(c)
   end do
   call G % Save_Debug_Vtu('y1',scalar_cell=var(-nb:nc),scalar_name='y')
@@ -44,7 +44,7 @@
 
   ! In z direction
   var(:) = 0.0
-  do c = 1, G % n_cells - G % comm % n_buff_cells
+  do c = 1, G % n_cells - G % Comm % n_buff_cells
     var(c) = G % zc(c)
   end do
   call G % Save_Debug_Vtu('z1',scalar_cell=var(-nb:nc),scalar_name='z')

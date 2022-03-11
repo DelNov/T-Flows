@@ -16,14 +16,14 @@
   real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: c, e, dir
   real                     :: lo, xo, yo, zo(2), ro, xc, yc, zc, uc, vc, sg, &
                               sig_xy, sig_z, rmin, rmax, rp, lx, ly, lz, vmax
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
@@ -84,10 +84,10 @@
     if( sqrt(xo**2 + yo**2) < (rp-ro) ) then
 
       do dir = 1, 2
-        do c = 1, grid % n_cells
-          xc = grid % xc(c)
-          yc = grid % yc(c)
-          zc = grid % zc(c)
+        do c = 1, Grid % n_cells
+          xc = Grid % xc(c)
+          yc = Grid % yc(c)
+          zc = Grid % zc(c)
 
           ! Calculate non-axial velocity components
           uc = sg * sin( (yc-yo)/ro * PI )
@@ -115,12 +115,12 @@
   end do  ! next eddy
 
   vmax = 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     vmax = max(vmax, abs(u % n(c)))
     vmax = max(vmax, abs(v % n(c)))
   end do
   call Comm_Mod_Global_Max_Real(vmax)
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     u % n(c) = u % n(c) / vmax / 10.0
     v % n(c) = v % n(c) / vmax / 10.0
   end do

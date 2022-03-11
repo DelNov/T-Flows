@@ -15,7 +15,7 @@
   integer                  :: n_stat_p  ! 1st step for particle statistics
   real                     :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
   integer                  :: c, last_cell
   real                     :: b_volume, surface, rise_velocity,  &
@@ -23,7 +23,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   fun  => Vof % fun
 
   !-------------------!
@@ -34,13 +34,13 @@
   c_position = 0.0
   rise_velocity = 0.0
 
-  do c = 1, grid % n_cells - grid % comm % n_buff_cells
-    b_volume = b_volume + grid % vol(c) * fun % n(c)
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    b_volume = b_volume + Grid % vol(c) * fun % n(c)
     surface = surface + sqrt(fun % x(c) ** 2                                  &
                            + fun % y(c) ** 2                                  &
-                           + fun % z(c) ** 2) * grid % vol(c)
-    c_position = c_position + grid % zc(c) * fun % n(c) * grid % vol(c)
-    rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * grid % vol(c)
+                           + fun % z(c) ** 2) * Grid % vol(c)
+    c_position = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
+    rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
   call Comm_Mod_Global_Sum_Real(b_volume)  

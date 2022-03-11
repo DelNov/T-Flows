@@ -25,7 +25,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   real                      :: p_xyz(8,3)
   real,         allocatable :: p(:,:)
   integer                   :: c, n, i, fu
@@ -38,7 +38,7 @@
 !==============================================================================!
 
   ! First take aliases
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
 
   prelim_vof = 0.0
 
@@ -92,12 +92,12 @@
       p(i_fac,:) = p_xyz(trios(i_fac,1), :)
     end do
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       inside_c(c) = Check_Inside_Box(Vof, p, dd, n_xyz, c = c)
     end do
 
     ! Simply interpolate linearly
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       if (inside_c(c) == 1) then
         !prelim_vof(c) = 1.0 - (min_max_crit_2(c) - dd)  &
         !              / (min_max_crit_2(c)-min_max_crit_1(c))
@@ -114,7 +114,7 @@
     end do
 
     ! Precision
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       Vof % fun % n(c) = max(prelim_vof(c),Vof % fun % n(c))
     end do
 

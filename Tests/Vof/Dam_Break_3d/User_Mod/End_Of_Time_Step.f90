@@ -101,7 +101,7 @@
   !---------------------!
   b_volume = 0.0
 
-  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
   end do
 
