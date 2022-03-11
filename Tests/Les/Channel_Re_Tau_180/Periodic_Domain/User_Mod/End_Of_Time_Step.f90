@@ -98,8 +98,8 @@
         xc = grid % xc(c)
         yc = grid % yc(c)
         zc = grid % zc(c)
-        wc = sg * ( (yc-yo(dir))/ro )
         vc = sg * ( (zo-zc     )/ro )
+        wc = sg * ( (yc-yo(dir))/ro )
 
         !--------------------------------------------+
         !   Gaussian distribution:                   !
