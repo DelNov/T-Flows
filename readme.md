@@ -3555,18 +3555,19 @@ go there and check the contensts.  It should read:
 ├── convert.precursor.scr
 ├── cylinder.geo
 ├── precursor.geo
-├── Option_1/
+├── Option_1
 │   └── control
-├── Option_2/
+├── Option_2
 │   └── control
-├── Option_3/
+├── Option_3
 │   └── control
-├── Option_4/
-│   ├── control
-│   ├── control.1
-│   └── control.2
-└── Option_5/
-    └── control
+└── Option_4
+    ├── control
+    ├── control.1
+    ├── control.2
+    └── User_Mod
+        ├── End_Of_Time_Step.f90
+        └── Interface_Exchange.f90
 ```
 
 Please compile the sources as explained in [Compiling the code](#compiling) and
@@ -3598,7 +3599,7 @@ would recommend, you should also decompose the grid with:
 
 > **_Note:_**  Don't go overboard with number of processors as you will end up
 communicating between processors more than computing.  A useful rule of thumb
-is to have around hundred thousand cells per processor.  This grid has around
+is to have around a hundred thousand cells per processor.  This grid has approximatelly
 300'000 cells, so four is a reasonable choice.
 
 ## Flat velocity profile <a name="demo_inflows_flat"> </a>
@@ -3862,6 +3863,21 @@ you can launch it with:
 ```
 mpirun -np 4 ./Process > out_03  &
 ```
+
+After a minute of simulation time, results look like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_3a.png "")
+
+We hope you can see eddies at the inlet plane, they show as orange rings with
+locally higher velocity magnitueds.  To see the evolution of the eddies, it
+would probably be good to play a movie in ParaView.
+
+A cut through solution:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_3b.png "")
+
+Shows how eddies from the inlet face (```in```) penetrate all the way to the
+cylinder.
 
 ## Turbulent precursor domain <a name="demo_inflows_turbulent"> </a>
 
