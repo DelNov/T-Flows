@@ -3540,9 +3540,10 @@ extent, outflow.
 To demonstrate it, we picked the flow around a cylinder, using the computational
 domain as described by [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195).
 We do not solve the same case as the authors did.  We increase the domain size
-by a factor of ten, and the Reynolds number by a factor of 250.  The flow we
-will be solving here will neither be two-dimensional, nor steady.  A sketch
-of the computational domain is presented here:
+by a factor of ten, and the Reynolds number by a factor of 250.  In spite of the
+similarity with the computational domain used in [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195),
+the flow we will be solving here will neither be two-dimensional, nor steady.
+A sketch of the computational domain is presented here:
 
 <img src="Documentation/Manual/Figures/cylinder_domain.png" width="800"/>
 
@@ -3611,7 +3612,7 @@ ln -i -s Option_1/control .
 
 If you open it, you can see the couple of choices we made.  Time step is 0.01
 and the number of time steps 6000, resulting in a total physical simulation
-time of 60 s or 1 minute.
+time of 60 s or one minute.
 ```
  TIME_STEP                             0.01
  NUMBER_OF_TIME_STEPS               6000
@@ -3684,7 +3685,7 @@ like, which you can do if you visualize the file ```cylinder-ts000000.pvtu```:
 
 ![!](Documentation/Manual/Figures/cylinder_initial.png "")
 
-The solution after 1 minute of physical time looks like this:
+The solution after one minute of physical time looks like this:
 
 ![!](Documentation/Manual/Figures/cylinder_final_option_1.png "")
 
@@ -3798,7 +3799,22 @@ You only have to follow the format:
 
 Anyhow, once you have the ```profile.dat``` in the working directory
 (```[root]/Tests/Manual/Inflows/```), you can
-launch the simulation in the same way you did for the [Flat velocity profile](#demo_inflows_flat).
+launch the simulation in the same way you did for the [Flat velocity profile](#demo_inflows_flat)
+which could be:
+```
+mpirun -np 4 ./Process > out_4  &
+```
+
+The solution after one minute of physical time looks like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_2.png "")
+
+We hope you can see distribution of velocity magnitude at the inlet, which
+was constant in the previous case.  THe intensities of velocity magnitude in
+this case are higher by some 20% than in the case with flat velocity profile.
+For both cases we computed roughly three flow through times and ```convective```
+outflow seems to be handling the eddies which are leaving the domain pretty
+well.
 
 ## Synthetic eddies <a name="demo_inflows_eddies"> </a>
 
@@ -4032,46 +4048,38 @@ together after the time step 1440:
 ```
  40   if(curr_dt > 1440) return
 ```
-The minimum and maximum size of the eddies is given in these lines:
-```
- 54   ! Minimum and maximum size of eddies
- 55   rmin = 0.2
- 56   rmax = 0.6
-```
-and it is clear they should correspond to the size of the domain, be smaller
-than the domain, otherwise we would only get fractions of eddies.
 
 In order to place the eddies inside the domain, we must find its extents over
 nodes.  This is done in these lines:
 ```
- 58   !--------------------------------------!
- 59   !   Size of the computational domain   !
- 60   !                                      !
- 61   !   This algorithm is not silly. We    !
- 62   !   could have browsed through nodes   !
- 63   !   only, but then we might have en-   !
- 64   !   countered some hanging from GMSH   !
- 65   !--------------------------------------!
- 66   xmin = HUGE;  xmax = -HUGE
- 67   ymin = HUGE;  ymax = -HUGE
- 68   zmin = HUGE;  zmax = -HUGE
- 69   do c = 1, Grid % n_cells
- 70     do i_nod = 1, Grid % cells_n_nodes(c)
- 71       n = Grid % cells_n(i_nod, c)
- 72       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
- 73       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
- 74       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
- 75     end do
- 76   end do
- 77   call Comm_Mod_Global_Min_Real(xmin)
- 78   call Comm_Mod_Global_Min_Real(ymin)
- 79   call Comm_Mod_Global_Min_Real(zmin)
- 80   call Comm_Mod_Global_Max_Real(xmax)
- 81   call Comm_Mod_Global_Max_Real(ymax)
- 82   call Comm_Mod_Global_Max_Real(zmax)
- 83   lx = xmax - xmin
- 84   ly = ymax - ymin
- 85   lz = zmax - zmin
+ 54   !--------------------------------------!
+ 55   !   Size of the computational domain   !
+ 56   !                                      !
+ 57   !   This algorithm is not silly. We    !
+ 58   !   could have browsed through nodes   !
+ 59   !   only, but then we might have en-   !
+ 60   !   countered some hanging from GMSH   !
+ 61   !--------------------------------------!
+ 62   xmin = HUGE;  xmax = -HUGE
+ 63   ymin = HUGE;  ymax = -HUGE
+ 64   zmin = HUGE;  zmax = -HUGE
+ 65   do c = 1, Grid % n_cells
+ 66     do i_nod = 1, Grid % cells_n_nodes(c)
+ 67       n = Grid % cells_n(i_nod, c)
+ 68       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
+ 69       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
+ 70       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
+ 71     end do
+ 72   end do
+ 73   call Comm_Mod_Global_Min_Real(xmin)
+ 74   call Comm_Mod_Global_Min_Real(ymin)
+ 75   call Comm_Mod_Global_Min_Real(zmin)
+ 76   call Comm_Mod_Global_Max_Real(xmax)
+ 77   call Comm_Mod_Global_Max_Real(ymax)
+ 78   call Comm_Mod_Global_Max_Real(zmax)
+ 79   lx = xmax - xmin
+ 80   ly = ymax - ymin
+ 81   lz = zmax - zmin
 ```
 In lines 69 - 76, we browse through all the cells, and through individual nodes
 of each cell in line 70.  Field ```Grid % cells_n_nodes(c)``` holds the number
@@ -4080,6 +4088,17 @@ is just to browse locally through cell) and in lines 72 - 74, we are seeking
 for minimum and maximum coordinates in each direction.  Lines 77 - 82 ensure
 we work with extrema over all processors.  Variables ```lx```, ```ly``` and
 ```lz``` hold global domain dimensions.
+
+Once the domain dimensions are know, we can also set minimum and maximum size
+of the eddies:
+```
+ 83   ! Minimum and maximum size of eddies
+ 84   rmin = min(ly, lz) / 10.0
+ 85   rmax = min(ly, lz) /  3.0
+```
+We only compare eddy radius in plane orthogonal to the streamwise direction
+(assumed to be _x_ here) and that is why we only use dimension in _y_ and
+_z_ to correlate eddy sizes.
 
 This function introduces 48 eddies (hard-coded) in line 90:
 ```
