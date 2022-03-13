@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine Info_Mod_Bulk_Print(flow, dom, n_dom)
+  subroutine Info_Mod_Bulk_Print(Flow, dom, n_dom)
 !------------------------------------------------------------------------------!
 !   Prints information about inner iteration on the screen.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type) :: flow
+  type(Field_Type) :: Flow
   integer          :: dom, n_dom
 !==============================================================================!
 
-  call Info_Mod_Bulk_Fill(flow)
+  call Info_Mod_Bulk_Fill(Flow)
 
   if(this_proc < 2) then
 
