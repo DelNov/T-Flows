@@ -18,6 +18,9 @@
 
     type(Grid_Type), pointer :: pnt_grid
 
+    ! Fake Petsc-related variables
+    type(Matrix_Type) :: A         ! sparse matrix
+
     contains
       procedure :: Create_Petsc
       procedure :: Solve_Petsc

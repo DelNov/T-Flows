@@ -230,9 +230,15 @@ SRC_F_MOD += Point_Mod.f90       \
              Side_Mod.f90        \
              Matrix_Mod.f90      \
              Vector_Mod.f90      \
-             Native_Mod.f90      \
-             Petsc_Mod.f90       \
-             Solver_Mod.f90      \
+             Native_Mod.f90
+ifneq ($(PETSC_DIR),)
+  SRC_F_MOD += Petsc_Mod_True.f90
+  SRC_C_FUN = C_Petsc_Interface_True.c
+else
+  SRC_F_MOD += Petsc_Mod_Fake.f90
+  SRC_C_FUN = C_Petsc_Interface_Fake.c
+endif
+SRC_F_MOD += Solver_Mod.f90      \
              Numerics_Mod.f90    \
              Field_Mod.f90       \
              Front_Mod.f90       \
@@ -287,11 +293,6 @@ SRC_F_FUN = Balance_Volume.f90                 \
 SRC_F_FUN += To_Lower_Case.f90  \
              To_Upper_Case.f90
 
-# C function/interface, if you compile with PETSc
-ifneq ($(PETSC_DIR),)
-  SRC_C_FUN = C_Petsc_Interface.c
-endif
-
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions
 #----------------------------------------------------------------------
@@ -340,20 +341,6 @@ $(PROGRAM_FILE): $(OBJ)
 	@echo Linking "\033[0;32m $(PETSC_LIB) $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
 	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB) $(PETSC_LIB)
 
-# #-------------------------------------------------------------------
-# #   OK, so Petsc_Mod.f90 is a link which, depending if the system
-# #   has PETSc or not, links to either Petsc.True or Petsc.Fake.
-# #   So, I made the link itself a target, which changes every time
-# #   a compilation on a particular system commences.
-# #-------------------------------------------------------------------
-# Petsc_Mod.f90:
-# 	rm -f Petsc_Mod.f90
-# ifneq ($(PETSC_DIR),)
-# 	ln -f -s Petsc.True Petsc_Mod.f90
-# else
-# 	ln -f -s Petsc.Fake Petsc_Mod.f90
-# endif
-
 #--------------------------------------------------------------------
 #   Explicit dependencies for modules
 #--------------------------------------------------------------------
@@ -372,9 +359,6 @@ clean:
 	@echo -n Removing links to sources in case directory ...
 	@rm -f $(DIR_USER)/*.f90
 	@echo done
-# 	@echo -n Removing the link Petsc_Mod.f90 ...
-# 	@rm -f Petsc_Mod.f90
-# 	@echo done
 	@echo -n Retreiving default user functions from git repository ...
 	@git checkout $(DIR_USER)/*.f90
 	@echo done

@@ -122,14 +122,6 @@ $(DIR_OBJECT)/Particle_Mod.o \
 Particle_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Petsc_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Petsc_Mod.o:\
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*/*.f90 \
-Native_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Correct_Velocity.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Correct_Velocity.o:\
@@ -321,7 +313,8 @@ Backup_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Solver_Mod.o:\
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Petsc_Mod.o 
+Petsc_Mod_True.f90 \
+Petsc_Mod_Fake.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Surf_Mod.f90
@@ -361,6 +354,8 @@ $(DIR_OBJECT)/User_Mod.o \
 User_Mod/*.f90 \
 $(DIR_OBJECT)/Results_Mod.o \
 Results_Mod/*.f90 \
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Monitor_Mod.o \
 Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Eddies_Mod.o \
@@ -579,6 +574,14 @@ $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Control_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Petsc_Mod_Fake.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Petsc_Mod_Fake.o:\
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Compute_Scalar.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Compute_Scalar.o:\
@@ -641,6 +644,14 @@ $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Control_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Petsc_Mod_True.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Petsc_Mod_True.o:\
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Results_Mod.f90
