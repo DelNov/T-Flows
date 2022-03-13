@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
   use Numerics_Mod
-  use Work_Mod,     only: neigh => r_cell_01
+  use Work_Mod,     only: sum_neigh => r_cell_01
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -38,20 +38,21 @@
       Flow % piso_status .eqv. .true.) then
 
     ! Sum of neighbours
-    neigh = 0.0
+    sum_neigh(:) = 0.0
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
-      if(c2 > 0) then
-        neigh(c1) = neigh(c1) - M % val(M % pos(1,s)) * ui % n(c2)
-        neigh(c2) = neigh(c2) - M % val(M % pos(2,s)) * ui % n(c1)
+      if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
+        if(c2 > 0) then
+          sum_neigh(c1) = sum_neigh(c1) - M % val(M % pos(1,s)) * ui % n(c2)
+          sum_neigh(c2) = sum_neigh(c2) - M % val(M % pos(2,s)) * ui % n(c1)
+        end if
       end if
     end do
-    call Grid % Exchange_Cells_Real(neigh)
 
     ! Solve velocity explicitely (no under relaxation!!)
-    do c = 1, Grid % n_cells
-      ui % n(c) = (neigh(c) + b(c)) / M % val(M % dia(c))
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+      ui % n(c) = (sum_neigh(c) + b(c)) / M % val(M % dia(c))
     end do
 
     call Flow % Grad_Variable(ui)
