@@ -25,7 +25,7 @@
   integer, intent(in)      :: ts      ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer  :: u, v, w, t
-  type(Grid_Type), pointer  :: grid
+  type(Grid_Type), pointer  :: Grid
   type(Bulk_Type), pointer  :: bulk
   integer                   :: n_prob, pl, c, i, count, s, c1, c2, k
   integer                   :: j, counter
@@ -46,7 +46,7 @@
 !==============================================================================!
 
   ! Take aliases for the Flow 
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
@@ -125,9 +125,9 @@
   !   Swarm statistics   !
   !----------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+      if(Grid % zc(c) > (z_p(i)) .and.  &
+         Grid % zc(c) < (z_p(i+1))) then
 
       ! Mean velocities
       u_pp(i) = u_pp(i) + Swarm % u_mean(c)
@@ -154,11 +154,11 @@
   !   Flowfield statistics   !
   !--------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+      if(Grid % zc(c) > (z_p(i)) .and.  &
+         Grid % zc(c) < (z_p(i+1))) then
 
-        wall_p(i) = wall_p(i) + grid % wall_dist(c)
+        wall_p(i) = wall_p(i) + Grid % wall_dist(c)
 
         ! Mean velocities
         u_p(i) = u_p(i) + Turb % u_mean(c)

@@ -121,7 +121,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
       rad = 1.0 - Grid % wall_dist(c)
       if( rad < (z_p(i)) .and.  &
           rad > (z_p(i+1))) then

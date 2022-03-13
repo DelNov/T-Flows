@@ -14,7 +14,7 @@
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u
   real, pointer            :: ub
@@ -26,7 +26,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid   => Flow % pnt_grid
+  Grid   => Flow % pnt_grid
   u      => Flow % u
   ub     => Flow % bulk % u
 
@@ -74,12 +74,12 @@
   !   Summarize the results   !
   !---------------------------!
   do i = 1, n - 1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells
-      if(grid % yc(c) > y_f(i) .and. grid % yc(c) < y_f(i+1)) then
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+      if(Grid % yc(c) > y_f(i) .and. Grid % yc(c) < y_f(i+1)) then
 
         n_count(i) = n_count(i) + 1
 
-        y_p(i) = y_p(i) + grid % yc(c)
+        y_p(i) = y_p(i) + Grid % yc(c)
         u_p(i) = u_p(i) + u % n(c)
 
       end if

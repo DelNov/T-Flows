@@ -9,7 +9,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
@@ -29,7 +29,7 @@
 
   ! Take aliases
   Flow => Turb % pnt_flow
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
@@ -134,15 +134,15 @@
     end if
 
     do i = 1, n_prob-1
-      do c = 1, grid % n_cells
-        r = sqrt(grid % xc(c)**2 + grid % yc(c)**2) + TINY
+      do c = 1, Grid % n_cells
+        r = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) + TINY
         if(r > r1 .and. r < r2) then
-          if(grid % zc(c) > z_p(i) .and.  &
-             grid % zc(c) < z_p(i+1)) then
-            u_rad   = (  u % n(c)*grid % xc(c)/r   &
-                       + v % n(c)*grid % yc(c)/r)
-            u_tan   = (- u % n(c)*grid % yc(c)/r   &
-                       + v % n(c)*grid % xc(c)/r)
+          if(Grid % zc(c) > z_p(i) .and.  &
+             Grid % zc(c) < z_p(i+1)) then
+            u_rad   = (  u % n(c)*Grid % xc(c)/r   &
+                       + v % n(c)*Grid % yc(c)/r)
+            u_tan   = (- u % n(c)*Grid % yc(c)/r   &
+                       + v % n(c)*Grid % xc(c)/r)
             um_p(i)   = um_p(i) + sqrt(  u % n(c)**2   &
                                        + v % n(c)**2   &
                                        + w % n(c)**2)
@@ -167,7 +167,7 @@
               tm_p(i)   = tm_p(i) + T % n(c)
             end if
 
-            zm_p(i) = zm_p(i) + grid % zc(c)
+            zm_p(i) = zm_p(i) + Grid % zc(c)
             n_count(i) = n_count(i) + 1
           end if
         end if

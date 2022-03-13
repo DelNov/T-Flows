@@ -13,7 +13,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   real, allocatable         :: p_xyz(:,:)
   integer                   :: c, n, fu
   integer                   :: ee, n_planes
@@ -23,7 +23,7 @@
 !==============================================================================!
 
   ! First take aliases
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
 
   prelim_vof = 0.0
 
@@ -69,14 +69,14 @@
 
     dd = n_xyz(1) * p_xyz(1,1) + n_xyz(2) * p_xyz(1,2) + n_xyz(3) * p_xyz(1,3)
 
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
 
       ! For every node:
-      do n = 1, grid % cells_n_nodes(c)
+      do n = 1, Grid % cells_n_nodes(c)
 
-        res_dummy = n_xyz(1) * grid % xn(grid % cells_n(n,c))      &
-                  + n_xyz(2) * grid % yn(grid % cells_n(n,c))      &
-                  + n_xyz(3) * grid % zn(grid % cells_n(n,c))
+        res_dummy = n_xyz(1) * Grid % xn(Grid % cells_n(n,c))      &
+                  + n_xyz(2) * Grid % yn(Grid % cells_n(n,c))      &
+                  + n_xyz(3) * Grid % zn(Grid % cells_n(n,c))
 
         min_max_crit_1(c)= min(res_dummy, min_max_crit_1(c))
         min_max_crit_2(c)= max(res_dummy, min_max_crit_2(c))
@@ -84,7 +84,7 @@
     end do
 
     ! Simply interpolate linearly
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       if (min_max_crit_1(c) < dd .and. min_max_crit_2(c) > dd) then
         prelim_vof(c) = 1.0 - (min_max_crit_2(c) - dd)  &
                       / (min_max_crit_2(c)-min_max_crit_1(c))
@@ -94,7 +94,7 @@
     end do
 
     ! Precision
-    do c = 1, grid % n_cells
+    do c = 1, Grid % n_cells
       Vof % fun % n(c) = max(prelim_vof(c),Vof % fun % n(c))
     end do
 

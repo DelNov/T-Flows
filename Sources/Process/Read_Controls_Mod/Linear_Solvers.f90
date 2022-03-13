@@ -5,18 +5,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Control_Type)  :: Rc
-  type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
-  type(Vof_Type),    target :: Vof
-  type(Solver_Type), target :: Sol
+  class(Read_Controls_Type)  :: Rc
+  type(Field_Type),   target :: Flow
+  type(Turb_Type),    target :: turb
+  type(Vof_Type),     target :: Vof
+  type(Solver_Type),  target :: Sol
 !----------------------------------[Locals]------------------------------------!
   character(SL) :: name
 !==============================================================================!
 
   ! Linear solvers you want to use; native or PETSc
   call Control_Mod_Linear_Solvers(name, .true.)
-  Sol % solvers = Numerics_Mod_Linear_Solvers_Code(name)
+  Sol % solvers = Solver_Mod_Linear_Solvers_Code(name)
 
   ! Read options for native solvers first ...
   call Rc % Native_Solvers(Flow, turb, Vof, Sol)

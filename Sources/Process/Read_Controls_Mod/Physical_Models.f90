@@ -9,11 +9,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Control_Type) :: Rc
-  type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: Turb
-  type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: Swarm
+  class(Read_Controls_Type) :: Rc
+  type(Field_Type),  target :: Flow
+  type(Turb_Type),   target :: Turb
+  type(Vof_Type),    target :: Vof
+  type(Swarm_Type),  target :: Swarm
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name

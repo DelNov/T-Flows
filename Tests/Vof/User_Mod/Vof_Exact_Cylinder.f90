@@ -19,7 +19,7 @@
   real                   :: vof_int
   real                   :: min_max_c1, min_max_c2
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: nod, n_int, n_tot, n_tot_int, fu
   real                     :: xmin, xmax, ymin, ymax, zmin, zmax
   real                     :: zminprim, zmaxprim
@@ -28,19 +28,19 @@
 !==============================================================================!
 
   ! First take aliasesd
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
 
   ! find bounding box:
   xmin =  HUGE; ymin =  HUGE; zmin =  HUGE;
   xmax = -HUGE; ymax = -HUGE; zmax = -HUGE;
 
-  do nod = 1, grid % cells_n_nodes(c)
-    xmin = min(xmin, grid % xn(grid % cells_n(nod,c)))
-    ymin = min(ymin, grid % yn(grid % cells_n(nod,c)))
-    zmin = min(zmin, grid % zn(grid % cells_n(nod,c)))
-    xmax = max(xmax, grid % xn(grid % cells_n(nod,c)))
-    ymax = max(ymax, grid % yn(grid % cells_n(nod,c)))
-    zmax = max(zmax, grid % zn(grid % cells_n(nod,c)))
+  do nod = 1, Grid % cells_n_nodes(c)
+    xmin = min(xmin, Grid % xn(Grid % cells_n(nod,c)))
+    ymin = min(ymin, Grid % yn(Grid % cells_n(nod,c)))
+    zmin = min(zmin, Grid % zn(Grid % cells_n(nod,c)))
+    xmax = max(xmax, Grid % xn(Grid % cells_n(nod,c)))
+    ymax = max(ymax, Grid % yn(Grid % cells_n(nod,c)))
+    zmax = max(zmax, Grid % zn(Grid % cells_n(nod,c)))
   end do
 
   thick_y = ymax-ymin

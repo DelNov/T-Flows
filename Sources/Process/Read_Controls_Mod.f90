@@ -1,5 +1,5 @@
 !==============================================================================!
-  module Read_Control_Mod
+  module Read_Controls_Mod
 !------------------------------------------------------------------------------!
 !   Module containig functions for reading control file.  They are, to some    !
 !   extent, independent from each other, but they all do similar tasks, are    !
@@ -22,7 +22,7 @@
   !-----------------------!
   !   Read control type   !
   !-----------------------!
-  type Read_Control_Type
+  type Read_Controls_Type
 
     contains
       procedure          :: Boundary_Conditions
@@ -35,17 +35,17 @@
 
   end type
 
-  type(Read_Control_Type) :: Read_Control
+  type(Read_Controls_Type) :: Read_Control
 
   contains
 
   ! Member function
-  include 'Read_Control_Mod/Boundary_Conditions.f90'
-  include 'Read_Control_Mod/Linear_Solvers.f90'
-  include 'Read_Control_Mod/Native_Solvers.f90'
-  include 'Read_Control_Mod/Numerical_Schemes.f90'
-  include 'Read_Control_Mod/Petsc_Solvers.f90'
-  include 'Read_Control_Mod/Physical_Models.f90'
-  include 'Read_Control_Mod/Physical_Properties.f90'
+  include 'Read_Controls_Mod/Boundary_Conditions.f90'
+  include 'Read_Controls_Mod/Linear_Solvers.f90'
+  include 'Read_Controls_Mod/Native_Solvers.f90'
+  include 'Read_Controls_Mod/Numerical_Schemes.f90'
+  include 'Read_Controls_Mod/Petsc_Solvers.f90'
+  include 'Read_Controls_Mod/Physical_Models.f90'
+  include 'Read_Controls_Mod/Physical_Properties.f90'
 
   end module

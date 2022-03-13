@@ -50,15 +50,15 @@
 
   ! Find max and min vfractions, to limit pressure calculation:
 
-  min_vfrac = minval(fun % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
-  max_vfrac = maxval(fun % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
+  min_vfrac = minval(fun % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
+  max_vfrac = maxval(fun % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
 
   call Comm_Mod_Global_Min_Real(min_vfrac)
   call Comm_Mod_Global_Max_Real(max_vfrac)
 
-  n_tot_cells = Grid % n_cells - Grid % comm % n_buff_cells
+  n_tot_cells = Grid % n_cells - Grid % Comm % n_buff_cells
 
-  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     u_res = sqrt( Flow % u % n(c) ** 2       &
                 + Flow % v % n(c) ** 2       &
                 + Flow % w % n(c) ** 2)
@@ -85,11 +85,11 @@
   call Comm_Mod_Global_Sum_Real(u_rms)
   u_rms = sqrt(1.0 / real(n_tot_cells) * u_rms)
 
-  u_max = maxval(sum_v1(1:Grid % n_cells - Grid % comm % n_buff_cells))
+  u_max = maxval(sum_v1(1:Grid % n_cells - Grid % Comm % n_buff_cells))
   call Comm_Mod_Global_Max_Real(u_max)
 
-  p_max = maxval(Flow % p % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
-  p_min = minval(Flow % p % n(1:Grid % n_cells - Grid % comm % n_buff_cells))
+  p_max = maxval(Flow % p % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
+  p_min = minval(Flow % p % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
   call Comm_Mod_Global_Max_Real(p_max)
   call Comm_Mod_Global_Min_Real(p_min)
 

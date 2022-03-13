@@ -23,7 +23,7 @@
   real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),      pointer :: u, v, w, t
-  type(Grid_Type),     pointer :: grid
+  type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: part
   character(SL)                :: result_name
   integer                      :: c, eddy, dir, npb = 0, nn
@@ -43,7 +43,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   u    => Flow % u
   v    => Flow % v
   w    => Flow % w
@@ -205,10 +205,10 @@
 
     ! Superimpose eddies on the velocity field
     do dir = 1, 4
-      do c = 1, grid % n_cells
-        xc = grid % xc(c)
-        yc = grid % yc(c)
-        zc = grid % zc(c)
+      do c = 1, Grid % n_cells
+        xc = Grid % xc(c)
+        yc = Grid % yc(c)
+        zc = Grid % zc(c)
         wc = sg * ( (yc-yo(dir))/ro )
         vc = sg * ( (zo-zc     )/ro )
 
@@ -247,12 +247,12 @@
   end do
 
   vmax = 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
   call Comm_Mod_Global_Max_Real(vmax)
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     v % n(c) = v % n(c) / vmax / 5.0
     v % o(c) = v % o(c) / vmax / 5.0
     w % n(c) = w % n(c) / vmax / 5.0

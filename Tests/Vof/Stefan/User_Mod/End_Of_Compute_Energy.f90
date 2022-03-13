@@ -27,8 +27,8 @@
 
       ! Write down Stefan's solution
       if(ini .eq. 1                            .and.  &
-         Math % Approx_Real(grid % ys(s), 0.0) .and.  &
-         Math % Approx_Real(grid % zs(s), 0.0)) then
+         Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
+         Math % Approx_Real(Grid % zs(s), 0.0)) then
         write(fu,  '(99(es12.4))') curr_dt * Flow % dt, Grid % xs(s)
       end if
 

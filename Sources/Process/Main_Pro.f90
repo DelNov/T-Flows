@@ -9,7 +9,7 @@
   use User_Mod
   use Backup_Mod
   use Results_Mod
-  use Read_Control_Mod
+  use Read_Controls_Mod
   use Monitor_Mod
 !------------------------------------------------------------------------------!
   implicit none

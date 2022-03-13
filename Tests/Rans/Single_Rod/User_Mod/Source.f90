@@ -14,14 +14,14 @@
   type(Matrix_Type)        :: a_matrix
   real, dimension(:)       :: b_vector
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   integer                  :: c
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   u    => Flow % u
   v    => Flow % v
@@ -37,10 +37,10 @@
   !-------------------------------!
   !  Set source for temperature   !
   !-------------------------------!
-  if( grid % name .eq. 'FUEL') then
+  if( Grid % name .eq. 'FUEL') then
     if( phi % name .eq. 'T' ) then
-      do c = 1, grid % n_cells
-        b_vector(c) = b_vector(c) + 1.0e9 * grid % vol(c)
+      do c = 1, Grid % n_cells
+        b_vector(c) = b_vector(c) + 1.0e9 * Grid % vol(c)
       end do
     end if
   end if

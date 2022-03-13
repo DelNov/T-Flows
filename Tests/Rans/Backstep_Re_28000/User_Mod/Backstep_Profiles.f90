@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
                               k, c1, c2, s, n_hor, fu, ts
   character(SL)            :: coord_name, result_name
@@ -29,7 +29,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   t    => Flow % t
   call Flow % Alias_Momentum    (u, v, w)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
@@ -127,16 +127,16 @@
     allocate(ut_p(n_prob));   ut_p = 0.0
     allocate(vt_p(n_prob));   vt_p = 0.0
     allocate(wt_p(n_prob));   wt_p = 0.0
-  end if  
+  end if
 
   !-------------------------!
   !   Average the results   !
   !-------------------------!
   do k = 1, n_hor
     do i = 1, n_prob-1
-      do c = 1, grid % n_cells
-        z_coor = grid % zc(c)
-        if(grid % xc(c) < x1_p(k) .and. grid % xc(c) > x2_p(k)) then
+      do c = 1, Grid % n_cells
+        z_coor = Grid % zc(c)
+        if(Grid % xc(c) < x1_p(k) .and. Grid % xc(c) > x2_p(k)) then
           if(z_coor > z_p(i) .and. z_coor < z_p(i+1)) then
             um_p(i) = um_p(i) + u % n(c)
             vm_p(i) = vm_p(i) + sqrt(abs(Flow % viscosity(c) * u % n(c) &
@@ -187,27 +187,38 @@
     end do
 
     if(k == 1) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-0.35h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-0.35h', extension='.h.dat')
     else if(k == 2) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-1.68h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-1.68h', extension='.h.dat')
     else if(k == 3) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-2.30h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-2.30h', extension='.h.dat')
     else if(k == 4) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-3.15h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-3.15h', extension='.h.dat')
     else if(k == 5) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-3.92h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-3.92h', extension='.h.dat')
     else if(k == 6) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-4.70h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-4.70h', extension='.h.dat')
     else if(k == 7) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-5.20h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-5.20h', extension='.h.dat')
     else if(k == 8) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-6.50h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-6.50h', extension='.h.dat')
     else if(k == 9) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-8.90h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-8.90h', extension='.h.dat')
     else if(k == 10) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-26.0h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-26.0h', extension='.h.dat')
     else if(k == 11) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-52.0h', extension='.h.dat')
+      call File % Set_Name(result_name, time_step=ts,  &
+                           appendix='-52.0h', extension='.h.dat')
     end if  
 
     call File % Open_For_Writing_Ascii(result_name, fu)
@@ -238,7 +249,7 @@
     write(*,*) u_tau 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu,'(10es15.5e3)') (z_p(i)+z_p(i+1))/(2.*h),    &
+        write(fu,'(10es15.5e3)') (z_p(i)+z_p(i+1))/(2.*h),   &
                                  um_p(i) / u_b,              &
                                  uu_p(i) / u_b**2,           &
                                  vv_p(i) * h / u_b**3,       &

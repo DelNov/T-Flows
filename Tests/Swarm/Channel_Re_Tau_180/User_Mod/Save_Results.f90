@@ -23,7 +23,7 @@
   integer, intent(in)      :: ts
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
   integer                  :: fu1, fu2
@@ -43,7 +43,7 @@
 !==============================================================================!
 
   ! Take aliases
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
@@ -79,7 +79,7 @@
     return
   end if
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
     t_wall   = 0.0
     nu_mean  = 0.0
@@ -114,7 +114,7 @@
   allocate(f22_p   (n_prob));  f22_p    = 0.0
   allocate(uw_mod_p(n_prob));  uw_mod_p = 0.0
   allocate(ww_mod_p(n_prob));  ww_mod_p = 0.0
-!  allocate(ww_mod_p(grid % n_cells));  ww_mod_p = 0.0
+!  allocate(ww_mod_p(Grid % n_cells));  ww_mod_p = 0.0
   allocate(vis_t_p (n_prob));  vis_t_p  = 0.0
   allocate(y_plus_p(n_prob));  y_plus_p = 0.0
 
@@ -123,7 +123,7 @@
 
   !!=========================================================
   !! DEBUGGING 
-  !do c = 1, grid % n_cells - grid % comm % n_buff_cells
+  !do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
   !  ww_mod_p(c) =  Turb % kin_mean(c) * Turb % zeta_mean(c)
   !end do 
   !if(this_proc < 2) then 
@@ -139,11 +139,11 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, grid % n_cells - grid % comm % n_buff_cells 
-      if(grid % zc(c) > (z_p(i)) .and.  &
-         grid % zc(c) < (z_p(i+1))) then
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+      if(Grid % zc(c) > (z_p(i)) .and.  &
+         Grid % zc(c) < (z_p(i+1))) then
 
-        wall_p(i) = wall_p(i) + grid % wall_dist(c)
+        wall_p(i) = wall_p(i) + Grid % wall_dist(c)
         u_p   (i) = u_p   (i) + Turb % u_mean(c)
         v_p   (i) = v_p   (i) + Turb % v_mean(c)
         w_p   (i) = w_p   (i) + Turb % w_mean(c)
@@ -225,7 +225,7 @@
   end do
 
   ! Calculating friction velocity and friction temperature
-!    do c= 1, grid % n_cells
+!    do c= 1, Grid % n_cells
  if(y_plus_p(1) > 5.0) then
     u_tau_p = sqrt(max(abs(bulk % p_drop_x),  &
                        abs(bulk % p_drop_y),  &

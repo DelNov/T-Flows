@@ -12,7 +12,7 @@
   integer, intent(in)      :: n     ! time step
   real,    intent(in)      :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
+  type(Grid_Type), pointer :: Grid
   integer                  :: c, i, j, k, n_parts_in_buffers
   real                     :: x, y, z, dy, dz, my, mz
   real                     :: rx, ry, rz
@@ -24,7 +24,7 @@
 !==============================================================================!
 
   ! Take alias(es)
-  grid => Flow % pnt_grid
+  Grid => Flow % pnt_grid
 
   ! Random variables
   c1 = 1.0
@@ -72,9 +72,9 @@
         c = Swarm % Particle(k) % cell
 
         ! Set initial Particle velocities
-        rx = Swarm % Particle(k) % x_n - grid % xc(c)
-        ry = Swarm % Particle(k) % y_n - grid % yc(c)
-        rz = Swarm % Particle(k) % z_n - grid % zc(c)
+        rx = Swarm % Particle(k) % x_n - Grid % xc(c)
+        ry = Swarm % Particle(k) % y_n - Grid % yc(c)
+        rz = Swarm % Particle(k) % z_n - Grid % zc(c)
 
         ! Compute velocities at the particle position from velocity gradients
         Swarm % Particle(k) % u    &
