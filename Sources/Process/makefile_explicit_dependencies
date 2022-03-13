@@ -114,19 +114,11 @@ $(DIR_SHARED)/Work_Mod/*.f90
 # Dependencies for: ./Turb_Mod/Ebf_Momentum.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Turb_Mod/Prandtl_Number.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Allocate.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Y_Plus_Low_Re.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/Y_Plus_Low_Re.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Src_Eps_K_Eps.f90
 #-----------------------------------------------------
@@ -141,22 +133,17 @@ $(DIR_SHARED)/Work_Mod/*.f90
 # Dependencies for: ./Turb_Mod/Calculate_Mean.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
+# Dependencies for: ./Turb_Mod/Main_Turb.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Face_Stress.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Y_Plus_Rough_Walls.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/Y_Plus_Rough_Walls.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Tau_Wall_Low_Re.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/Tau_Wall_Low_Re.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Const_K_Eps_Zeta_F.f90
 #-----------------------------------------------------
@@ -173,11 +160,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/U_Plus_Rough_Walls.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/U_Plus_Rough_Walls.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Alias_K_Eps_Zeta_F.f90
 #-----------------------------------------------------
@@ -188,9 +170,6 @@ $(DIR_OBJECT)/Const_Mod.o
 # Dependencies for: ./Turb_Mod/Alias_T2.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Turb_Mod/Init.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
@@ -198,6 +177,9 @@ $(DIR_OBJECT)/Const_Mod.o
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Alias_Stresses.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Turb_Mod/Init_Turb.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Vis_T_K_Eps_Zeta_F.f90
@@ -217,10 +199,6 @@ $(DIR_OBJECT)/Const_Mod.o
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/U_Plus_Log_Law.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/U_Plus_Log_Law.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Face_Cond_And_Stress.f90
 #-----------------------------------------------------
@@ -230,10 +208,9 @@ Turb_Mod/*.f90
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Tau_Wall_Rough_Walls.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/Tau_Wall_Rough_Walls.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 
-
+#-----------------------------------------------------
+# Dependencies for: ./Turb_Mod/Prandtl_Turb.f90
+#-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Compute_Stress.f90
 #-----------------------------------------------------
@@ -247,16 +224,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Find_Nearest_Wall_Cell.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/Find_Nearest_Wall_Cell.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod_Seq.f90 \
-$(DIR_SHARED)/Comm_Mod_Par.f90 \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Vis_T_Dynamic.f90
 #-----------------------------------------------------
@@ -304,11 +271,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Roughness_Coefficient.f90
 #-----------------------------------------------------
-$(DIR_OBJECT)/Roughness_Coefficient.o:\
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Const_Hanjalic_Jakirlic.f90
 #-----------------------------------------------------
@@ -320,20 +282,8 @@ $(DIR_OBJECT)/Const_Mod.o
 #-----------------------------------------------------
 $(DIR_OBJECT)/Time_And_Length_Scale.o:\
 $(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
+$(DIR_SHARED)/Work_Mod/*.f90 
 
-#-----------------------------------------------------
-# Dependencies for: ./Turb_Mod/Main.f90
-#-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Turb_Mod/Calculate_Heat_Flux.f90
 #-----------------------------------------------------
@@ -357,7 +307,8 @@ Eddies_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Control_Mod.o \
 Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Face_Mod/Allocate.f90
@@ -382,10 +333,16 @@ Field_Mod/*/*.f90
 # Dependencies for: ./Read_Control_Mod/Numerical_Schemes.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Read_Control_Mod/Petsc_Options.f90
+# Dependencies for: ./Read_Control_Mod/Native_Solvers.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Read_Control_Mod/Boundary_Conditions.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Read_Control_Mod/Petsc_Solvers.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Read_Control_Mod/Linear_Solvers.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Vert_Mod.f90
@@ -542,6 +499,7 @@ $(DIR_OBJECT)/Read_Control_Mod.o \
 Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -648,9 +606,9 @@ $(DIR_SHARED)/Work_Mod/*.f90
 $(DIR_OBJECT)/Numerics_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-Numerics_Mod/*.f90 
+Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Matrix_Mod.o \
+Matrix_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Backup_Mod/Write_Log_Array.f90
@@ -821,10 +779,7 @@ Backup_Mod/*.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Solver_Mod.o:\
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Petsc_Mod.o \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*/*.f90 \
-Native_Mod/*.f90 
+$(DIR_OBJECT)/Petsc_Mod.o 
 
 #-----------------------------------------------------
 # Dependencies for: ./Surf_Mod.f90
@@ -1021,10 +976,9 @@ Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
 Matrix_Mod/*.f90 \
-$(DIR_OBJECT)/Read_Control_Mod.o \
-Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Update_Boundary_Values.f90
@@ -1042,6 +996,7 @@ $(DIR_OBJECT)/Read_Control_Mod.o \
 Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
@@ -1076,9 +1031,6 @@ Backup_Mod/*.f90
 
 #-----------------------------------------------------
 # Dependencies for: ./Numerics_Mod/Advection_Scheme.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Numerics_Mod/Linear_Solvers_Code.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Numerics_Mod/Advection_Scheme_Code.f90
@@ -1153,12 +1105,8 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Var_Mod.o \
 Var_Mod/*.f90 \
-$(DIR_OBJECT)/Petsc_Mod.o \
-$(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*/*.f90 \
-Native_Mod/*.f90 \
+$(DIR_OBJECT)/Solver_Mod.o \
+Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 Field_Mod/*/*.f90 \
@@ -1251,7 +1199,8 @@ $(DIR_SHARED)/Cpu_Timer_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Control_Mod.o \
 Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Compute_Scalar.f90
@@ -1296,6 +1245,9 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #-----------------------------------------------------
+# Dependencies for: ./Solver_Mod/Linear_Solvers_Code.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
 # Dependencies for: ./Solver_Mod/End.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
@@ -1306,6 +1258,12 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Solver_Mod/Alias_Native.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Solver_Mod/Set_Singular.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Solver_Mod/Remove_Singular.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Balance_Volume.f90
@@ -1352,7 +1310,8 @@ Eddies_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Control_Mod.o \
 Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #-----------------------------------------------------
 # Dependencies for: ./Particle_Mod/Initialize_Particle.f90
@@ -1373,6 +1332,7 @@ $(DIR_OBJECT)/Read_Control_Mod.o \
 Read_Control_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #-----------------------------------------------------
@@ -1592,9 +1552,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 # Dependencies for: ./Field_Mod/Utilities/Compute_Wall_Distance.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Field_Mod/Utilities/Prandtl_Number.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Field_Mod/Utilities/Potential_Initialization.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Potential_Initialization.o:\
@@ -1621,6 +1578,9 @@ $(DIR_SHARED)/Work_Mod/*.f90
 # Dependencies for: ./Field_Mod/Utilities/Calculate_Fluxes.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
+# Dependencies for: ./Field_Mod/Utilities/Prandtl_Numb.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
 # Dependencies for: ./Field_Mod/Utilities/Buoyancy_Forces.f90
 #-----------------------------------------------------
 $(DIR_OBJECT)/Buoyancy_Forces.o:\
@@ -1635,7 +1595,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #-----------------------------------------------------
-# Dependencies for: ./Field_Mod/Utilities/Schmidt_Number.f90
+# Dependencies for: ./Field_Mod/Utilities/Schmidt_Numb.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Face_Mod.f90
@@ -1719,6 +1679,7 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 Read_Control_Mod/*.f90 \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
 $(DIR_SHARED)/Comm_Mod_Seq.f90 \
 $(DIR_SHARED)/Comm_Mod_Par.f90 \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
@@ -1890,6 +1851,9 @@ $(DIR_SHARED)/File_Mod/*.f90
 # Dependencies for: ./Grid_Mod/Save_Cfn.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
+# Dependencies for: ./Grid_Mod/Write_Template_Control_File.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
 # Dependencies for: ./Grid_Mod/Calculate_Global_Volumes.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
@@ -1942,9 +1906,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Grid_Mod/Calculate_Wall_Distance.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Grid_Mod/Estimate_Big_And_Small.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90
@@ -2580,22 +2541,10 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Skewness_Correction_Vof.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/V_Cycle_Number_Of_Smoothing_Iterations.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Normalization_For_Pressure_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Blending_Coefficient_For_Momentum.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Energy_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Normalization_For_Scalars_Solver.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90
@@ -2604,49 +2553,16 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Choi_Correction.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Presssure_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Max_Courant_Vof.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Solver_For_Pressure.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Normalization_For_Energy_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/V_Cycle_Max_Grid_Levels.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Normalization_For_Turbulence_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Turbulence_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Potential_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Scalars_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Turbulence_Solver.f90
+# Dependencies for: ./Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Number_Of_Piso_Corrections.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Wall_Distance_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Blending_Coefficient_For_Energy.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Solver_For_Energy.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/V_Cycle_Residual_Ratio.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90
@@ -2655,16 +2571,10 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Gradient_Method_For_Vof.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Vof_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Gradient_Method_For_Energy.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Gu_Correction.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Solver_For_Scalars.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Pressure_Momentum_Coupling.f90
@@ -2673,13 +2583,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Solver_For_Vof.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Energy_Solver.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90
@@ -2700,18 +2604,6 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Solver_For_Momentum.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Vof_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Momentum_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Momentum_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Time_Step.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
@@ -2727,22 +2619,13 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Pressure_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Min_Simple_Iterations.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Max_Iterations_For_Wall_Distance_Solver.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Time_Integration_Scheme.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Normalization_For_Simple_Algorithm.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90
@@ -2754,25 +2637,13 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Max_Simple_Iterations.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Scalars_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Solver_For_Turbulence.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Preconditioner_For_System_Matrix.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Advection_Scheme_For_Energy.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Tolerance_For_Potential_Solver.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90
@@ -2784,13 +2655,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 # Dependencies for: ./Control_Mod/Numerics/Gradient_Method_For_Pressure.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Normalization_For_Momentum_Solver.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Numerics/Advection_Scheme_For_Vof.f90
-#-----------------------------------------------------
-#-----------------------------------------------------
-# Dependencies for: ./Control_Mod/Numerics/Linear_Solvers.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Input_Output/Save_Initial_Condition.f90
@@ -2824,6 +2689,96 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Input_Output/Backup_Save_Interval.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Normalization_For_Pressure_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Energy_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Normalization_For_Scalars_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Potential.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Presssure_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Pressure.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Normalization_For_Energy_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Normalization_For_Turbulence_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Energy.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Vof_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Scalars.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Vof.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Momentum.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Wall_Distance.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Momentum_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Pressure_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Scalars_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Solver_For_Turbulence.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Preconditioner_For_System_Matrix.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Tolerance_For_Potential_Solver.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Native/Normalization_For_Momentum_Solver.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Basic_Functions/Switch_To_Domain.f90
@@ -2875,6 +2830,9 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Control_Mod/Basic_Functions/Similar_Warning.f90
+#-----------------------------------------------------
+#-----------------------------------------------------
+# Dependencies for: ./Control_Mod/Linear_Solvers.f90
 #-----------------------------------------------------
 #-----------------------------------------------------
 # Dependencies for: ./Probe_1d_Cells_Nodes.f90

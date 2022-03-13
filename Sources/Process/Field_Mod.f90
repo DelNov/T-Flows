@@ -11,8 +11,7 @@
   use Face_Mod
   use Grid_Mod
   use Bulk_Mod
-  use Native_Mod
-  use Petsc_Mod
+  use Solver_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none

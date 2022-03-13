@@ -11,7 +11,7 @@
 !    have them spread over included functions.)                                !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Solver_Mod
+  use Matrix_Mod
   use Var_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -53,7 +53,6 @@
   include 'Numerics_Mod/Advection_Min_Max.f90'
   include 'Numerics_Mod/Gradient_Method_Code.f90'
   include 'Numerics_Mod/Inertial_Term.f90'
-  include 'Numerics_Mod/Linear_Solvers_Code.f90'
   include 'Numerics_Mod/Pressure_Momentum_Coupling_Code.f90'
   include 'Numerics_Mod/Time_Integration_Scheme_Code.f90'
   include 'Numerics_Mod/Under_Relax.f90'

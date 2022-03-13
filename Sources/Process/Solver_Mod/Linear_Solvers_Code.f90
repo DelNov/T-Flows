@@ -1,5 +1,5 @@
 !==============================================================================!
-  integer function Numerics_Mod_Linear_Solvers_Code(name)
+  integer function Solver_Mod_Linear_Solvers_Code(name)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -9,10 +9,10 @@
   select case(name)
 
     case('NATIVE')
-      Numerics_Mod_Linear_Solvers_Code = NATIVE
+      Solver_Mod_Linear_Solvers_Code = NATIVE
 
     case('PETSC')
-      Numerics_Mod_Linear_Solvers_Code = PETSC
+      Solver_Mod_Linear_Solvers_Code = PETSC
 
     case default
       if(this_proc < 2) then
