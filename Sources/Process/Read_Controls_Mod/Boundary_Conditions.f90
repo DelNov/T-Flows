@@ -3,26 +3,13 @@
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-!  use Const_Mod
-!  use File_Mod
-!  use Comm_Mod
-!  use Field_Mod,   only: Field_Type
-!  use Turb_Mod
-!  use Vof_Mod
-!  use Grid_Mod,    only: Grid_Type
-!  use Eddies_Mod
-!  use User_Mod
-!  use Control_Mod
-!  use Var_Mod,     only: Var_Type
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Control_Type)      :: Rc
-  type(Field_Type),      target :: Flow
-  type(Turb_Type),       target :: Turb
-  type(Vof_Type),        target :: Vof
-  type(Turb_Plane_Type)         :: turb_planes
+  class(Read_Controls_Type)      :: Rc
+  type(Field_Type),       target :: Flow
+  type(Turb_Type),        target :: Turb
+  type(Vof_Type),         target :: Vof
+  type(Turb_Plane_Type)          :: turb_planes
 !----------------------------------[Calling]-----------------------------------!
   integer :: Key_Ind
 !-----------------------------------[Locals]-----------------------------------!

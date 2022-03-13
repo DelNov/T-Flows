@@ -259,7 +259,7 @@ endif
 
 # Results_Mod must be last.
 SRC_F_MOD += Results_Mod.f90       \
-             Read_Control_Mod.f90
+             Read_Controls_Mod.f90
 
 #---------------
 #   Functions

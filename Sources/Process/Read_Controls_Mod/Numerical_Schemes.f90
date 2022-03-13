@@ -9,11 +9,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Control_Type)  :: Rc
-  type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
-  type(Vof_Type),    target :: Vof
-  type(Solver_Type), target :: Sol
+  class(Read_Controls_Type)  :: Rc
+  type(Field_Type),   target :: Flow
+  type(Turb_Type),    target :: turb
+  type(Vof_Type),     target :: Vof
+  type(Solver_Type),  target :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi
