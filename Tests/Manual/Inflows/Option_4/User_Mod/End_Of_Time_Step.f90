@@ -85,7 +85,7 @@
 
   ! Minimum and maximum size of eddies
   rmin = min(ly, lz) / 10.0
-  rmax = min(ly, lz) /  3.0
+  rmax = min(ly, lz) /  5.0
 
   !-------------------------------!
   !   Browse through all eddies   !
@@ -172,10 +172,10 @@
   end do
   call Comm_Mod_Global_Max_Real(vmax)
   do c = 1, Grid % n_cells
-    v % n(c) = v % n(c) / vmax / 5.0
-    v % o(c) = v % o(c) / vmax / 5.0
-    w % n(c) = w % n(c) / vmax / 5.0
-    w % o(c) = w % o(c) / vmax / 5.0
+    v % n(c) = v % n(c) / vmax
+    v % o(c) = v % o(c) / vmax
+    w % n(c) = w % n(c) / vmax
+    w % o(c) = w % o(c) / vmax
   end do
 
   end subroutine
