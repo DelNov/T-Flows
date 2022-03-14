@@ -1,0 +1,95 @@
+!==============================================================================!
+  subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm,  &
+                                              curr_dt, time)
+!------------------------------------------------------------------------------!
+!   This function is called at the beginning of simulation.                    !
+!                                                                              !
+!   In its current form, it only extracts the results in specified probes      !
+!   prints values of mean velocity and mean Reynolds stresses and exits.       !
+!------------------------------------------------------------------------------!
+  use Work_Mod, only: node_ind => i_node_01,  &
+                      d_probe  => r_node_01,  &
+                      z_probe  => r_node_02,  &
+                      u_mean_n => r_node_03,  &
+                      uu_res_n => r_node_04,  &
+                      vv_res_n => r_node_05
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  type(Field_Type),    target :: Flow
+  type(Turb_Type),     target :: Turb
+  type(Vof_Type),      target :: Vof
+  type(Swarm_Type),    target :: Swarm
+  integer, intent(in)         :: curr_dt  ! time step
+  real,    intent(in)         :: time     ! physical time
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type), pointer :: Grid
+  integer                  :: n, n_probes, backup_dt
+  real                     :: x_p, y_p     ! coordinates of the probe
+  real                     :: backup_time
+  character(80)            :: arg
+!==============================================================================!
+
+  Grid => Flow % pnt_grid
+
+  !--------------------------!
+  !   Check the invocation   !
+  !--------------------------!
+  if(command_argument_count() .eq. 2) then
+
+    ! Get x_p and y_p
+    call get_command_argument(1, arg);  read(arg, *) x_p
+    call get_command_argument(2, arg);  read(arg, *) y_p
+  else
+    print *, '# You failed to invoke the program properly.'
+    print *, '# Correct invocation:'
+    print *, './Process  x_probe  y_probe'
+    stop
+  end if
+
+  !-----------------------------------------------!
+  !   Find nodes closest to the specified probe   !
+  !-----------------------------------------------!
+
+  ! Store node indices, distances to the probe and nodes' z coordinates
+  d_probe(:) = HUGE
+  do n = 1, Grid % n_nodes
+    node_ind(n) = n
+    d_probe(n) = min(d_probe(n),  &
+                     sqrt((Grid % xn(n)-x_p)**2 + (Grid % yn(n)-y_p)**2) )
+    z_probe(n) = Grid % zn(n)
+  end do
+
+  ! Sort nodes by their distance from probe and z coordinate
+  call Sort % Two_Real_Carry_Int(d_probe, z_probe, node_ind)
+
+  ! Find number of probes (use the z coordinate for that)
+  do n = 1, Grid % n_nodes-1
+    if(z_probe(n+1) < z_probe(n)) then
+      n_probes = n
+      goto 1
+    end if
+  end do
+1 continue
+
+  !--------------------------------------------------!
+  !   Interpolate cell-based to node based results   !
+  !--------------------------------------------------!
+  call Flow % Interpolate_Cells_To_Nodes(Turb % u_mean, u_mean_n)
+  call Flow % Interpolate_Cells_To_Nodes(Turb % uu_res, uu_res_n)
+  call Flow % Interpolate_Cells_To_Nodes(Turb % vv_res, vv_res_n)
+
+  !---------------------------!
+  !   Print the profile out   !
+  !---------------------------!
+  print *, '# Profile at (x,y) = ', x_p, y_p
+  do n = 1, n_probes
+    print *, z_probe(n), u_mean_n(node_ind(n)),                             &
+                         uu_res_n(node_ind(n)) - u_mean_n(node_ind(n))**2,  &
+                         vv_res_n(node_ind(n))
+  end do
+
+  call Comm_Mod_End
+  stop
+
+  end subroutine

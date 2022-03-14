@@ -46,6 +46,7 @@
     5. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
         2. [Running the case](#bench_cases_matrix_running)
+        3. [Comparing against experiments](#bench_cases_matrix_comparing)
     6. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
@@ -3094,6 +3095,135 @@ the _ad-hoc_ side.  If we wanted to be scientifically correct, we would have
 to perform Fourier analyzis of the signals, but we already know that we don't
 have enough samples for high quality spectra and we don't even bother at this
 initial stages of turbulence development.
+
+### Comparing against experiments <a name="bench_cases_matrix_comparing"> </a>
+
+To compare resutls against measurements, we wrote a user function and placed
+it in ```User_Mod_Beginning_Of_Simulation```.  Its source resides in
+```[root]/Tests/Manual/Matrix/User_Mod```.  This function will, after _Process_
+starts and reads the backup file, extract profiles in locations specified by
+the user and exit.  Since the profiles are extracted in the vertical mid-plane
+of the computational domain, we decided to extract them at the nodes.  Since
+_Process_ is cell-centered, we decided to first interpolate results from cells
+to nodes, and then extract data from the nodes.
+
+The function works in four stages.  In the first stage it checks command line
+arguments passed to _Process_:
+```
+ 35   !--------------------------!
+ 36   !   Check the invocation   !
+ 37   !--------------------------!
+ 38   if(command_argument_count() .eq. 2) then
+ 39
+ 40     ! Get x_p and y_p
+ 41     call get_command_argument(1, arg);  read(arg, *) x_p
+ 42     call get_command_argument(2, arg);  read(arg, *) y_p
+ 43   else
+ 44     print *, '# You failed to invoke the program properly.'
+ 45     print *, '# Correct invocation:'
+ 46     print *, './Process  x_probe  y_probe'
+ 47     stop
+ 48   end if
+```
+In lines 42 and 43 it reads _x_ and _y_ coordinates of the probes you want to
+extract results from.
+
+In the second stage, it will calculate distance from each grid node to the probe
+and store it in work array ```d_probe``` and will also store nodes' _z_
+coordinates in ```z_probe``` array and nodes' indices in ```node_ind``` array.
+```
+ 50   !-----------------------------------------------!
+ 51   !   Find nodes closest to the specified probe   !
+ 52   !-----------------------------------------------!
+ 53
+ 54   ! Store node indices, distances to the probe and nodes' z coordinates
+ 55   d_probe(:) = HUGE
+ 56   do n = 1, Grid % n_nodes
+ 57     node_ind(n) = n
+ 58     d_probe(n) = min(d_probe(n),  &
+ 59                      sqrt((Grid % xn(n)-x_p)**2 + (Grid % yn(n)-y_p)**2) )
+ 60     z_probe(n) = Grid % zn(n)
+ 61   end do
+ 62
+ 63   ! Sort nodes by their distance from probe and z coordinate
+ 64   call Sort % Two_Real_Carry_Int(d_probe, z_probe, node_ind)
+ 65
+ 66   ! Find number of probes (use the z coordinate for that)
+ 67   do n = 1, Grid % n_nodes-1
+ 68     if(z_probe(n+1) < z_probe(n)) then
+ 69       n_probes = n
+ 70       goto 1
+ 71     end if
+ 72   end do
+ 73 1 continue
+```
+These arrays ```d_probe``` and ```z_probe``` are sorted in line 65, and carry
+node indices along.  After this sorting, node indices will be ordered by their
+shortest distance to the probe and _z_ coordinate.  The _z_ coordinate is
+further used in lines 68 - 74 to find out how many probes are worth considering.
+
+In the third stage, we interpolate results we want to compare against the
+experiments, from cells to nodes:
+```
+ 75   !--------------------------------------------------!
+ 76   !   Interpolate cell-based to node based results   !
+ 77   !--------------------------------------------------!
+ 78   call Flow % Interpolate_Cells_To_Nodes(Turb % u_mean, u_mean_n)
+ 79   call Flow % Interpolate_Cells_To_Nodes(Turb % uu_res, uu_res_n)
+ 80   call Flow % Interpolate_Cells_To_Nodes(Turb % vv_res, vv_res_n)
+```
+whose syntax is, we belive, rather clear.
+
+> **_Warning:_** It is generally not a good idea to compare results interpolated
+in nodes, because they migh mask some numerical instabilities, which we don't
+want to be masked.
+
+Finally, in the fourth and final stage profiles are printed on the screen:
+```
+ 82   !---------------------------!
+ 83   !   Print the profile out   !
+ 84   !---------------------------!
+ 85   print *, '# Profile at (x,y) = ', x_p, y_p
+ 86   do n = 1, n_probes
+ 87     print *, z_probe(n), u_mean_n(node_ind(n)),                             &
+ 88                          uu_res_n(node_ind(n)) - u_mean_n(node_ind(n))**2,  &
+ 89                          vv_res_n(node_ind(n)) - v_mean_n(node_ind(n))**2
+ 90   end do
+```
+Next step would obviously be to recompile _Process_ with this user function.
+Please note that, in order to make things less complicated, this extraction
+works only sequentially.  Once compiled, run _Process_ with these commands to
+extract profiles in the spanwise midplane, at _x_ locations of 0.018, 0.027 and
+0.042:
+```
+ ./Process 0.018 0.03
+ ./Process 0.027 0.03
+ ./Process 0.042 0.03
+```
+Clearly, output from these files should be stored in text files, preferably
+with extension ```.dat```, for comparison with experimental measurements
+from Meinders.  The raw measurements from Meinders at all are in the directory
+```[root]/Tests/Manual/Matrix/Data/Meinders```. but one of the core developers
+renamed the files and gave them names corresponding to the grid we used for
+this case.  These data are in ```[root]/Tests/Manual/Matrix/Data/Niceno```.
+
+> **_Note:_** Lengths in experimental data are in milimeters, don't forget to
+scale them properly to match numerical results.
+
+After processing results in Grace, this is how computed profiles compare against
+measurements at _x_ = 0.018:
+
+<img src="Documentation/Manual/Figures/matrix_x0.018_all.png" width="600"/>
+
+at _x_ = 0.027:
+
+<img src="Documentation/Manual/Figures/matrix_x0.027_all.png" width="600"/>
+
+and _x_ = 0.042:
+
+<img src="Documentation/Manual/Figures/matrix_x0.042_all.png" width="600"/>
+
+Except for the spanwise stresses at _x_ = 0.018, the agreement is satisfactory.
 
 ## Volume of fluid simulation of a rising bubble <a name="bench_cases_bubble"> </a>
 
