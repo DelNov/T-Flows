@@ -96,12 +96,6 @@
 
     call Grid(d) % Form_Cells_Comm()
     call Grid(d) % Form_Maps()
-
-    call Comm_Mod_Wait
-
-    ! The following two calls are just to see if buffers look sane
-    call Grid(d) % Save_Vtu_Faces()
-    call Grid(d) % Save_Vtu_Faces(plot_shadows=.true.)
   end do
 
   ! Out of domain loop - go back to root
@@ -243,16 +237,14 @@
     end do
   end if
 
-  !--------------------------!
-  !   Save initial results   !
-  !--------------------------!
-  call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                              Flow, Turb, Vof, Swarm, exit_now)
-
   !-------------------------------------!
   !   The time loop really begins now   !
   !-------------------------------------!
   do curr_dt = first_dt + 1, last_dt
+
+    ! Save initial results
+    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
+                                Flow, Turb, Vof, Swarm, exit_now)
 
     ! Good time to call user function for beginning of simulation
     if(curr_dt .eq. first_dt + 1) then
