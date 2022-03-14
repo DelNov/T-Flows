@@ -4058,59 +4058,66 @@ that eddies are not placed too frequently, only every 120 time steps:
 ```
  37   if(mod(curr_dt, 120) .ne. 0) return
 ```
-Also, we hope that after a certain number of time steps turbulence in the
-precursor domain will be self-sustainable, so we stop introducing them all
-together after the time step 1440:
+We hope that after a certain number of time steps turbulence in the
+precursor domain will be self-sustainable, so we stop introducing the eddies
+after the time step 1440:
 ```
  40   if(curr_dt > 1440) return
+```
+
+Also, we want to restrict perturbation with eddies only in precursor domain
+which is achiveve with this line:
+```
+ 49   ! Impose eddies only in precursor domain
+ 50   if(Grid % name .ne. 'PRECURSOR') return
 ```
 
 In order to place the eddies inside the domain, we must find its extents over
 nodes.  This is done in these lines:
 ```
- 54   !--------------------------------------!
- 55   !   Size of the computational domain   !
- 56   !                                      !
- 57   !   This algorithm is not silly. We    !
- 58   !   could have browsed through nodes   !
- 59   !   only, but then we might have en-   !
- 60   !   countered some hanging from GMSH   !
- 61   !--------------------------------------!
- 62   xmin = HUGE;  xmax = -HUGE
- 63   ymin = HUGE;  ymax = -HUGE
- 64   zmin = HUGE;  zmax = -HUGE
- 65   do c = 1, Grid % n_cells
- 66     do i_nod = 1, Grid % cells_n_nodes(c)
- 67       n = Grid % cells_n(i_nod, c)
- 68       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
- 69       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
- 70       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
- 71     end do
- 72   end do
- 73   call Comm_Mod_Global_Min_Real(xmin)
- 74   call Comm_Mod_Global_Min_Real(ymin)
- 75   call Comm_Mod_Global_Min_Real(zmin)
- 76   call Comm_Mod_Global_Max_Real(xmax)
- 77   call Comm_Mod_Global_Max_Real(ymax)
- 78   call Comm_Mod_Global_Max_Real(zmax)
- 79   lx = xmax - xmin
- 80   ly = ymax - ymin
- 81   lz = zmax - zmin
+ 57   !--------------------------------------!
+ 58   !   Size of the computational domain   !
+ 59   !                                      !
+ 60   !   This algorithm is not silly. We    !
+ 61   !   could have browsed through nodes   !
+ 62   !   only, but then we might have en-   !
+ 63   !   countered some hanging from GMSH   !
+ 64   !--------------------------------------!
+ 65   xmin = HUGE;  xmax = -HUGE
+ 66   ymin = HUGE;  ymax = -HUGE
+ 67   zmin = HUGE;  zmax = -HUGE
+ 68   do c = 1, Grid % n_cells
+ 69     do i_nod = 1, Grid % cells_n_nodes(c)
+ 70       n = Grid % cells_n(i_nod, c)
+ 71       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
+ 72       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
+ 73       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
+ 74     end do
+ 75   end do
+ 76   call Comm_Mod_Global_Min_Real(xmin)
+ 77   call Comm_Mod_Global_Min_Real(ymin)
+ 78   call Comm_Mod_Global_Min_Real(zmin)
+ 79   call Comm_Mod_Global_Max_Real(xmax)
+ 80   call Comm_Mod_Global_Max_Real(ymax)
+ 81   call Comm_Mod_Global_Max_Real(zmax)
+ 82   lx = xmax - xmin
+ 83   ly = ymax - ymin
+ 84   lz = zmax - zmin
 ```
-In lines 69 - 76, we browse through all the cells, and through individual nodes
-of each cell in line 70.  Field ```Grid % cells_n_nodes(c)``` holds the number
-of nodes for each cell.  In line 71, we take the grid node index (```i_nod```
-is just to browse locally through cell) and in lines 72 - 74, we are seeking
-for minimum and maximum coordinates in each direction.  Lines 77 - 82 ensure
+In lines 68 - 75, we browse through all the cells, and through individual nodes
+of each cell in line 69.  Field ```Grid % cells_n_nodes(c)``` holds the number
+of nodes for each cell.  In line 70, we take the grid node index (```i_nod```
+is just to browse locally through cell) and in lines 71 - 73, we are seeking
+for minimum and maximum coordinates in each direction.  Lines 76 - 81 ensure
 we work with extrema over all processors.  Variables ```lx```, ```ly``` and
 ```lz``` hold global domain dimensions.
 
 Once the domain dimensions are know, we can also set minimum and maximum size
 of the eddies:
 ```
- 83   ! Minimum and maximum size of eddies
- 84   rmin = min(ly, lz) / 10.0
- 85   rmax = min(ly, lz) /  3.0
+ 86   ! Minimum and maximum size of eddies
+ 87   rmin = min(ly, lz) / 10.0
+ 88   rmax = min(ly, lz) /  5.0
 ```
 We only compare eddy radius in plane orthogonal to the streamwise direction
 (assumed to be _x_ here) and that is why we only use dimension in _y_ and
@@ -4118,52 +4125,52 @@ _z_ to correlate eddy sizes.
 
 This function introduces 48 eddies (hard-coded) in line 90:
 ```
- 87   !-------------------------------!
- 88   !   Browse through all eddies   !
- 89   !-------------------------------!
- 90   do eddy = 1, 48
- 91
- 92     ! Random direction of the vortex
- 93     call random_number(sg);
- 94     if(sg < 0.5) then
- 95       sg = -1.0
- 96     else
- 97       sg = +1.0
- 98     end if
- 99
-100     ! Determine random position of a vortex
-101     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
-102     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
-103     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
-104     call random_number(yo);     yo = ro + (ly - 2.0*ro) * y
-105
-106     ! Handle periodicity; that is: copy eddie in periodic directions
-107     xo(2:4) = xo(1)
-108     zo(2:4) = zo(1)
-109     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
-110     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
-111     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
-112     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
-113     xo(4) = xo(3)
-114     zo(4) = zo(2)
+ 90   !-------------------------------!
+ 91   !   Browse through all eddies   !
+ 92   !-------------------------------!
+ 93   do eddy = 1, 48
+ 94
+ 95     ! Random direction of the vortex
+ 96     call random_number(sg);
+ 97     if(sg < 0.5) then
+ 98       sg = -1.0
+ 99     else
+100       sg = +1.0
+101     end if
+102
+103     ! Determine random position of a vortex
+104     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
+105     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
+106     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
+107     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
+108
+109     ! Handle periodicity; that is: copy eddie in periodic directions
+110     xo(2:4) = xo(1)
+111     zo(2:4) = zo(1)
+112     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
+113     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
+114     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
+115     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
+116     xo(4) = xo(3)
+117     zo(4) = zo(2)
 ...
 ```
-Their sense of rotation is assigned randomly in lines 93 - 98, and their random
-positions (inside the domain) in lines 101 - 104.  Lines 107 - 114 take care of
+Their sense of rotation is assigned randomly in lines 96 - 101, and their random
+positions (inside the domain) in lines 104 - 107.  Lines 110 - 117 take care of
 periodicity, that is, make coppies of eddies in periodic directions (here _x_
 and _z_) depending on their relative position inside the domain.
 
 We set the lenght of each eddy to be six times its radius:
 ```
-116     ! Length of the eddy is six times the diameter
-117     lo = ro * 6.0
+119     ! Length of the eddy is six times the diameter
+120     lo = ro * 6.0
 ```
 We limit eddy extents with Gaussian distribution.  The sigma coefficients
 for Gaussian distribution in direction orthogonal to the flow (_y_ and _z_) and
 parallel to the flow (_x_) is set in lines 119 and 120:
 ```
-119     sig_yz = ro / 2.0
-120     sig_x  = lo / 2.0
+122     sig_yz = ro / 2.0
+123     sig_x  = lo / 2.0
 ```
 
 > **_Note:_** The ```sigma_yz``` would be the red functions in the figure
@@ -4178,48 +4185,48 @@ and ```wc```)
 figure introduced above.
 
 ```
-122     ! Superimpose eddies on the velocity field
-123     do dir = 1, 4
-124       do c = 1, Grid % n_cells
-125         xc = Grid % xc(c)
-126         yc = Grid % yc(c)
-127         zc = Grid % zc(c)
-128         wc = sg * ( (zc-zo(dir))/ro )
-129         vc = sg * ( (yo-yc     )/ro )
-130
-131         !--------------------------------------------+
-132         !   Gaussian distribution:                   !
-133         !                                - (x-a)^2   !
-134         !                  1           ^ ---------   !
-135         !   f(x) = ------------------ e  2 sigma^2   !
-136         !          sqrt(2 PI sigma^2)                !
-137         !                                            !
-138         !                                            !
-139         !          exp[-(x-a)^2 / (2 sigma^2)]       !
-140         !   f(x) = ---------------------------       !
-141         !              sqrt(2 PI sigma^2)            !
-142         !                                            !
-143         !          exp[-0.5 ((x-a) / sigma)^2]       !
-144         !   f(x) = ---------------------------       !
-145         !               sigma sqrt(2 PI)             !
-146         !--------------------------------------------!
-147         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-148         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-149
-150         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-151         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+125     ! Superimpose eddies on the velocity field
+126     do dir = 1, 4
+127       do c = 1, Grid % n_cells
+128         xc = Grid % xc(c)
+129         yc = Grid % yc(c)
+130         zc = Grid % zc(c)
+131         vc = sg * ( (zc-zo(dir))/ro )
+132         wc = sg * ( (yo-yc     )/ro )
+133
+134         !--------------------------------------------+
+135         !   Gaussian distribution:                   !
+136         !                                - (x-a)^2   !
+137         !                  1           ^ ---------   !
+138         !   f(x) = ------------------ e  2 sigma^2   !
+139         !          sqrt(2 PI sigma^2)                !
+140         !                                            !
+141         !                                            !
+142         !          exp[-(x-a)^2 / (2 sigma^2)]       !
+143         !   f(x) = ---------------------------       !
+144         !              sqrt(2 PI sigma^2)            !
+145         !                                            !
+146         !          exp[-0.5 ((x-a) / sigma)^2]       !
+147         !   f(x) = ---------------------------       !
+148         !               sigma sqrt(2 PI)             !
+149         !--------------------------------------------!
+150         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+151         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
 152
-153         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-154         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+153         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+154         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
 155
-156         ! Superimposed those fluctuations on spanwise and normal velocity comp.
-157         v % n(c) = v % n(c) + vc
-158         v % o(c) = v % o(c) + vc
-159         w % n(c) = w % n(c) + wc
-160         w % o(c) = w % o(c) + wc
-161       end do
-162     end do
-163   end do
+156         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+157         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+158
+159         ! Superimposed those fluctuations on spanwise and normal velocity comp.
+160         v % n(c) = v % n(c) + vc
+161         v % o(c) = v % o(c) + vc
+162         w % n(c) = w % n(c) + wc
+163         w % o(c) = w % o(c) + wc
+164       end do
+165     end do
+166   end do
 ```
 
 If all this seems a bit complicated to you, don't worry, this same function
@@ -4238,3 +4245,18 @@ and run:
 ```
 mpirun -np 4 ./Process > out_04 &
 ```
+
+After a minute of simulation time, the results in the precursor and in the
+principal computational domain look like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_4.png "")
+
+Solution in the precursor domain is periodic in streamwise and spanwise
+direction, and the leftmost plane from the precursor is coppied to the inlet
+of the principal computaional domain.  This case only demonstrates how to set
+boundary condidtion from a precursor domain.  In real application, the results
+from the precursor domain should be put under scrutiny themselves; is mesh
+fine enough, did we use proper physical models, is the domain large enough in
+periodic directions, are some of the questions which should be seriously
+addressed.
+
