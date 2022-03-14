@@ -5,7 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error
+  integer              :: error
+  integer              :: n
+  integer, allocatable :: seeds(:)
 !==============================================================================!
 
   call Mpi_Init(error)
@@ -42,5 +44,11 @@
       stop
     end if
   end if
+
+  ! Initialize random seeds (to make all processors
+  ! generate the same sequence of random numbers)
+  call random_seed(size = n)
+  allocate(seeds(n)); seeds(:) = 12321
+  call random_seed(put = seeds)
 
   end subroutine
