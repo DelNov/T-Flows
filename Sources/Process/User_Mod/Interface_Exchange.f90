@@ -22,6 +22,14 @@
   real    :: wd1, wd2   ! wall distances in domains 1 and 2
 !==============================================================================!
 
+  ! If there is only one domain, there is nothing to exchange
+  if(n_dom < 2) return
+
+  ! If there is no heat transfer, there is nothing to exchange
+  do d1 = 1, n_dom
+    if(.not. Flow(d1) % heat_transfer) return
+  end do
+
   !-------------------------------------------!
   !                                           !
   !   Store the desired values to interface   !
