@@ -27,8 +27,8 @@ box_y_min =  0.0;
 box_y_max =  4.1;
 
 // Shift for the precursor domain
-prec_x_max = -0.5;
-prec_x_min = -9.5;
+prec_x_max =  -0.5;
+prec_x_min = -12.5;
 
 cyl_x = 2.0;
 cyl_y = (box_y_max - box_y_min) / 2.0;
