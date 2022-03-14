@@ -1,11 +1,11 @@
 !==============================================================================!
-  logical function Backup_Mod_Time_To_Save(n)
+  logical function Backup_Mod_Time_To_Save(curr_dt)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n  ! current time step
+  integer :: curr_dt  ! current time step
 !==============================================================================!
 
-  Backup_Mod_Time_To_Save = mod(n, backup % interval) .eq. 0
+  Backup_Mod_Time_To_Save = mod(curr_dt, backup % interval) .eq. 0
 
   end function
