@@ -65,14 +65,12 @@
   ! ... it can spread over several lines ...
   ! ... with dots for continuation.
 
-  do s = 1, grid % n_faces     ! fourth level comments start with small letters
+  do s = 1, Grid % n_faces     ! fourth level comments start with small letters
 
-    c1 = grid % faces_c(1, s)  ! they are too small to qualify as sentences
-    c2 = grid % faces_c(1, s)  ! keep them two columns apart from the last ...
+    c1 = Grid % faces_c(1, s)  ! they are too small to qualify as sentences
+    c2 = Grid % faces_c(1, s)  ! keep them two columns apart from the last ...
                                ! column with the code
 
   end do
-
-
 
   end subroutine
