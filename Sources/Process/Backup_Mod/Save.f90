@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_Mod_Save(Fld, Swr, tur, Vof, time, time_step, domain)
+  subroutine Backup_Mod_Save(Fld, Swr, Tur, Vof, time, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Fld
   type(Swarm_Type),  target :: Swr
-  type(Turb_Type),   target :: tur
+  type(Turb_Type),   target :: Tur
   type(Vof_Type),    target :: Vof
   real                      :: time            ! time of simulation
   integer                   :: time_step       ! current time step
@@ -28,6 +28,8 @@
   Grid => Fld % pnt_grid
   bulk => Fld % bulk
   Comm => Grid % Comm
+
+  VC = SC / 0
 
   ! Name backup file
   call File % Set_Name(name_out, time_step=time_step,  &
@@ -133,11 +135,11 @@
   !   Roughness  !
   !              !
   !--------------!
-  if(tur % rough_walls) then
+  if(Tur % rough_walls) then
     call Backup_Mod_Write_Cell_Real(Grid, d, vc,'id_zone',  &
-                                    tur % id_zone)
+                                    Tur % id_zone)
     call Backup_Mod_Write_Cell_Real(Grid, d, vc,'z_o_f',    &
-                                    tur % z_o_f)
+                                    Tur % z_o_f)
   end if
 
   !--------------!
@@ -158,23 +160,23 @@
   !-----------------!
   !   K-eps model   !
   !-----------------!
-  if(tur % model .eq. K_EPS) then
+  if(Tur % model .eq. K_EPS) then
 
     ! K and epsilon
-    call Backup_Mod_Write_Variable(d, vc, 'kin', tur % kin)
-    call Backup_Mod_Write_Variable(d, vc, 'eps', tur % eps)
+    call Backup_Mod_Write_Variable(d, vc, 'kin', Tur % kin)
+    call Backup_Mod_Write_Variable(d, vc, 'eps', Tur % eps)
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_kin',  tur % p_kin )
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'y_plus', tur % y_plus)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_t',  tur % vis_t )
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_w',  tur % vis_w )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_kin',  Tur % p_kin )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'y_plus', Tur % y_plus)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_t',  Tur % vis_t )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_w',  Tur % vis_w )
 
     ! Turbulence quantities connected with heat transfer
     if(Fld % heat_transfer) then
-      call Backup_Mod_Write_Variable(d, vc, 't2',    tur % t2)
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_t2',  tur % p_t2 )
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'con_w', tur % con_w)
+      call Backup_Mod_Write_Variable(d, vc, 't2',    Tur % t2)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_t2',  Tur % p_t2 )
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'con_w', Tur % con_w)
     end if
 
   end if
@@ -182,27 +184,27 @@
   !------------------------!
   !   K-eps-zeta-f model   !
   !------------------------!
-  if(tur % model .eq. K_EPS_ZETA_F .or.  &
-     tur % model .eq. HYBRID_LES_RANS) then
+  if(Tur % model .eq. K_EPS_ZETA_F .or.  &
+     Tur % model .eq. HYBRID_LES_RANS) then
 
     ! K, eps, zeta and f22
-    call Backup_Mod_Write_Variable(d, vc, 'kin',  tur % kin)
-    call Backup_Mod_Write_Variable(d, vc, 'eps',  tur % eps)
-    call Backup_Mod_Write_Variable(d, vc, 'zeta', tur % zeta)
-    call Backup_Mod_Write_Variable(d, vc, 'f22',  tur % f22)
+    call Backup_Mod_Write_Variable(d, vc, 'kin',  Tur % kin)
+    call Backup_Mod_Write_Variable(d, vc, 'eps',  Tur % eps)
+    call Backup_Mod_Write_Variable(d, vc, 'zeta', Tur % zeta)
+    call Backup_Mod_Write_Variable(d, vc, 'f22',  Tur % f22)
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'p_kin',   tur % p_kin  )
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'y_plus',  tur % y_plus )
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'vis_t',   tur % vis_t  )
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'vis_w',   tur % vis_w  )
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'t_scale', tur % t_scale)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'l_scale', tur % l_scale)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'p_kin',   Tur % p_kin  )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'y_plus',  Tur % y_plus )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'vis_t',   Tur % vis_t  )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'vis_w',   Tur % vis_w  )
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'t_scale', Tur % t_scale)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'l_scale', Tur % l_scale)
 
     if(Fld % heat_transfer) then
-      call Backup_Mod_Write_Variable(d, vc, 't2',    tur % t2)
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_t2',  tur % p_t2 )
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'con_w', tur % con_w)
+      call Backup_Mod_Write_Variable(d, vc, 't2',    Tur % t2)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_t2',  Tur % p_t2 )
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'con_w', Tur % con_w)
     end if
 
   end if
@@ -210,32 +212,32 @@
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
-  if(tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
+  if(Tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+     Tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
     ! Reynolds stresses
-    call Backup_Mod_Write_Variable(d, vc, 'uu',  tur % uu)
-    call Backup_Mod_Write_Variable(d, vc, 'vv',  tur % vv)
-    call Backup_Mod_Write_Variable(d, vc, 'ww',  tur % ww)
-    call Backup_Mod_Write_Variable(d, vc, 'uv',  tur % uv)
-    call Backup_Mod_Write_Variable(d, vc, 'uw',  tur % uw)
-    call Backup_Mod_Write_Variable(d, vc, 'vw',  tur % vw)
+    call Backup_Mod_Write_Variable(d, vc, 'uu',  Tur % uu)
+    call Backup_Mod_Write_Variable(d, vc, 'vv',  Tur % vv)
+    call Backup_Mod_Write_Variable(d, vc, 'ww',  Tur % ww)
+    call Backup_Mod_Write_Variable(d, vc, 'uv',  Tur % uv)
+    call Backup_Mod_Write_Variable(d, vc, 'uw',  Tur % uw)
+    call Backup_Mod_Write_Variable(d, vc, 'vw',  Tur % vw)
 
     ! Epsilon
-    call Backup_Mod_Write_Variable(d, vc, 'eps', tur % eps)
+    call Backup_Mod_Write_Variable(d, vc, 'eps', Tur % eps)
 
     ! F22
-    if(tur % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup_Mod_Write_Variable(d, vc, 'f22',  tur % f22)
+    if(Tur % model .eq. RSM_MANCEAU_HANJALIC) then
+      call Backup_Mod_Write_Variable(d, vc, 'f22',  Tur % f22)
     end if
 
     ! Other turbulent quantities
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_t', tur % vis_t)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_w', tur % vis_w)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_t', Tur % vis_t)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vis_w', Tur % vis_w)
 
     ! Turbulence quantities connected with heat transfer
     if(Fld % heat_transfer) then
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc,'con_w', tur % con_w)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc,'con_w', Tur % con_w)
     end if
   end if
 
@@ -252,86 +254,86 @@
   !   Turbulent statistics for all models   !
   !                                         !
   !-----------------------------------------!
-  if(tur % statistics) then
+  if(Tur % statistics) then
 
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'u_mean', tur % u_mean)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'v_mean', tur % v_mean)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'w_mean', tur % w_mean)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_mean', tur % p_mean)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'u_mean', Tur % u_mean)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'v_mean', Tur % v_mean)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'w_mean', Tur % w_mean)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'p_mean', Tur % p_mean)
     if(Fld % heat_transfer) then
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 't_mean', tur % t_mean)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 't_mean', Tur % t_mean)
     end if
 
     ! K and epsilon
-    if(tur % model .eq. K_EPS) then
+    if(Tur % model .eq. K_EPS) then
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'kin_mean',  &
-                                      tur % kin_mean)
+                                      Tur % kin_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'eps_mean',  &
-                                      tur % eps_mean)
+                                      Tur % eps_mean)
       if(Fld % heat_transfer) then
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 't2_mean',  &
-                                        tur % t2_mean)
+                                        Tur % t2_mean)
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ut_mean',  &
-                                        tur % ut_mean)
+                                        Tur % ut_mean)
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vt_mean',  &
-                                        tur % vt_mean)
+                                        Tur % vt_mean)
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'wt_mean',  &
-                                        tur % wt_mean)
+                                        Tur % wt_mean)
       end if
     end if
 
     ! K-eps-zeta-f and the hybrid model
-    if(tur % model .eq. K_EPS_ZETA_F .or.  &
-       tur % model .eq. HYBRID_LES_RANS) then
+    if(Tur % model .eq. K_EPS_ZETA_F .or.  &
+       Tur % model .eq. HYBRID_LES_RANS) then
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'kin_mean',  &
-                                      tur % kin_mean )
+                                      Tur % kin_mean )
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'eps_mean',  &
-                                      tur % eps_mean )
+                                      Tur % eps_mean )
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'zeta_mean',  &
-                                      tur % zeta_mean)
+                                      Tur % zeta_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'f22_mean',  &
-                                      tur % f22_mean )
+                                      Tur % f22_mean )
       if(Fld % heat_transfer) then
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 't2_mean',  &
-                                        tur % t2_mean)
+                                        Tur % t2_mean)
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ut_mean',  &
-                                        tur % ut_mean)
+                                        Tur % ut_mean)
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vt_mean',  &
-                                        tur % vt_mean)
+                                        Tur % vt_mean)
         call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'wt_mean',  &
-                                        tur % wt_mean)
+                                        Tur % wt_mean)
       end if
     end if
 
     ! Reynolds stress models
-    if(tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(Tur % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       Tur % model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uu_mean',  &
-                                      tur % uu_mean)
+                                      Tur % uu_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vv_mean',  &
-                                      tur % vv_mean)
+                                      Tur % vv_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ww_mean',  &
-                                      tur % ww_mean)
+                                      Tur % ww_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uv_mean',  &
-                                      tur % uv_mean)
+                                      Tur % uv_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uw_mean',  &
-                                      tur % uw_mean)
+                                      Tur % uw_mean)
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vw_mean',  &
-                                      tur % vw_mean)
+                                      Tur % vw_mean)
     end if
 
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uu_res', tur % uu_res)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vv_res', tur % vv_res)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ww_res', tur % ww_res)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uv_res', tur % uv_res)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uw_res', tur % uw_res)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vw_res', tur % vw_res)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uu_res', Tur % uu_res)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vv_res', Tur % vv_res)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ww_res', Tur % ww_res)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uv_res', Tur % uv_res)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'uw_res', Tur % uw_res)
+    call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vw_res', Tur % vw_res)
 
     if(Fld % heat_transfer) then
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 't2_res', tur % t2_res)
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ut_res', tur % ut_res)
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vt_res', tur % vt_res)
-      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'wt_res', tur % wt_res)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 't2_res', Tur % t2_res)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'ut_res', Tur % ut_res)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'vt_res', Tur % vt_res)
+      call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'wt_res', Tur % wt_res)
     end if
 
     ! Scalars
@@ -340,7 +342,7 @@
       name_mean = phi % name
       name_mean(5:9) = '_mean'
       call Backup_Mod_Write_Cell_Real(Grid, d, vc, name_mean,  &
-                                      tur % scalar_mean(sc, :))
+                                      Tur % scalar_mean(sc, :))
     end do
 
   end if
