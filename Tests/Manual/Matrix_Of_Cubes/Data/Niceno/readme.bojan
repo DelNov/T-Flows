@@ -1,0 +1,34 @@
+I have renamed the files from Meinders since I found them too criptic.
+
+First I changed the locations, with following considerations:
+
+For Meinders, first two digits meant the following:
+
+     code  01        02       03      04      05
+     x/H=  -0.3      0.3      1.3     1.7     2.3
+
+Since H = 0.015 and since Meinders coordinates begin at the leading face of the
+cube, which is at x = 0.0225 in matrix.geo file, I shift the above coordinates
+by that value, meaning:
+
+     rename 's/_01/_x0.018/g' *.dat
+     rename 's/_02/_x0.027/g' *.dat
+     rename 's/_03/_x0.042/g' *.dat
+     rename 's/_04/_x0.048/g' *.dat
+     rename 's/_05/_x0.057/g' *.dat
+
+Then I also changed the last two digits (01 or 02) to _ver and _hor like:
+
+     rename 's/01.dat/_ver.dat/g' *.dat
+     rename 's/02.dat/_hor.dat/g' *.dat
+
+Finally, his meaning of v and w is mixed, so I also did:
+
+     rename 's/fww/fvv/g' *.dat
+     rename 's/mw/mv/g' *.dat
+     rename 's/fuw/fuv/g' *.dat
+
+So, for example, my file "fvv_x0.042_ver.dat" would correspond to Meinder's
+"fww_0301.dat", and "mu__x0.027_ver.dat" to Meinders' "mu__0201.dat"
+
+
