@@ -1499,20 +1499,14 @@ everywhere:
 Next, we should also specify physical properties.  The conservation equations
 which describe this case read:
 
-![!](Documentation/Manual/Figures/thermally_driven_eq_1.png "")
-
 <img src="Documentation/Manual/Figures/thermally_driven_eq_1.png" width="400"/>
 
-If we recall the defintion for Rayleigh (_Ra_) and Prandtl (_Pr_) non-dimensional
+If we recall the defintion for Rayleigh (Ra) and Prandtl (Pr) non-dimensional
 numbers:
-
-![!](Documentation/Manual/Figures/thermally_driven_eq_2.png "")
 
 <img src="Documentation/Manual/Figures/thermally_driven_eq_2.png" width="400"/>
 
 we can write the conservation equations in their non-dimensional form:
-
-![!](Documentation/Manual/Figures/thermally_driven_eq_3.png "")
 
 <img src="Documentation/Manual/Figures/thermally_driven_eq_3.png" width="400"/>
 
