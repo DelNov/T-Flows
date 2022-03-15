@@ -27,6 +27,13 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Turb_Mod/Find_Nearest_Wall_Cell.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Find_Nearest_Wall_Cell.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Turb_Mod/Vis_T_Dynamic.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vis_T_Dynamic.o:\
@@ -577,6 +584,8 @@ $(DIR_SHARED)/Control_Mod/*.f90
 # Dependencies for: ./Petsc_Mod_Fake.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Petsc_Mod_Fake.o:\
+Petsc_Mod_True.f90 \
+Petsc_Mod_Fake.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*/*.f90 \
 Native_Mod/*.f90 
@@ -649,6 +658,8 @@ $(DIR_OBJECT)/Const_Mod.o
 # Dependencies for: ./Petsc_Mod_True.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Petsc_Mod_True.o:\
+Petsc_Mod_True.f90 \
+Petsc_Mod_Fake.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*/*.f90 \
 Native_Mod/*.f90 
@@ -805,6 +816,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Sort_Mod.o:\
 $(DIR_OBJECT)/Swap_Mod.o \
+$(DIR_SHARED)/Swap_Mod/*.f90 \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 
@@ -821,6 +833,12 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Swap_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Swap_Mod.o:\
+$(DIR_SHARED)/Swap_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_2d.f90
