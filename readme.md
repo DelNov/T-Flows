@@ -1500,18 +1500,21 @@ Next, we should also specify physical properties.  The conservation equations
 which describe this case read:
 
 ![!](Documentation/Manual/Figures/thermally_driven_eq_1.png "")
-<img src="Documentation/Manual/Figures/thermally_driven_eq_1" width="500"/>
+
+<img src="Documentation/Manual/Figures/thermally_driven_eq_1.png" width="500"/>
 
 If we recall the defintion for Rayleigh (_Ra_) and Prandtl (_Pr_) non-dimensional
 numbers:
 
 ![!](Documentation/Manual/Figures/thermally_driven_eq_2.png "")
-<img src="Documentation/Manual/Figures/thermally_driven_eq_2" width="500"/>
+
+<img src="Documentation/Manual/Figures/thermally_driven_eq_2.png" width="500"/>
 
 we can write the conservation equations in their non-dimensional form:
 
 ![!](Documentation/Manual/Figures/thermally_driven_eq_3.png "")
-<img src="Documentation/Manual/Figures/thermally_driven_eq_3" width="500"/>
+
+<img src="Documentation/Manual/Figures/thermally_driven_eq_3.png" width="500"/>
 
 from which we can see that the flow is fully characterized with
 _Ra_ and _Pr_ numbers.  _Process_ doesn't know about these numbers, it works
