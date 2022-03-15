@@ -1501,7 +1501,7 @@ which describe this case read:
 
 <img src="Documentation/Manual/Figures/thermally_driven_eq_1.png" width="400"/>
 
-If we recall the defintion for Rayleigh (Ra) and Prandtl (Pr) non-dimensional
+If we recall the defintion for Prandtl (Pr) and Rayleigh (Ra) non-dimensional
 numbers:
 
 <img src="Documentation/Manual/Figures/thermally_driven_eq_2.png" width="400"/>
@@ -1511,12 +1511,12 @@ we can write the conservation equations in their non-dimensional form:
 <img src="Documentation/Manual/Figures/thermally_driven_eq_3.png" width="400"/>
 
 from which we can see that the flow is fully characterized with
-_Ra_ and _Pr_ numbers.  _Process_ doesn't know about these numbers, it works
+Ra and Pr numbers.  _Process_ doesn't know about these numbers, it works
 with physical properties set in the ```control``` file, so we set physical
 properties which do not (in general case) correspond to a real fluid, but are
-set to meet _Ra_ and _Pr_.  If we want to solve this case for:
-- _Ra_ = 1.0e+6
-- _Pr_ = 0.71
+set to meet Ra and Pr.  If we want to solve this case for:
+- Ra = 1.0e+6
+- Pr = 0.71
 
 physical properties section in the control file should read:
 ```
@@ -1548,7 +1548,7 @@ vector which is set by:
 ```
 GRAVITATIONAL_VECTOR   0.0  0.0  -1.0
 ```
-which is again chosen to fit the desired _Ra_ number and doesn't reflect the
+which is again chosen to fit the desired Ra number and doesn't reflect the
 reality (on Earth).
 
 Since we know in advance that the velocities in this case are rather small we
@@ -1717,7 +1717,7 @@ to cold wall.
 
 Better and more elaborate test cases for the thermall-driven cavity flow have
 been placed in ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Direct```, for a
-range of _Ra_ numbers.  Feel free to explore them further.
+range of Ra numbers.  Feel free to explore them further.
 
 ### With variable physical properties <a name="demo_thermally_driven_variable"> </a>
 
@@ -2071,9 +2071,9 @@ functions, i.e. with command: ```make DIR_CASE=../../Tests/Manual/Thermally_Driv
 
 In the case of thermally-driven cavity with Boussinesq approximation, we were
 setting physical properties _and_ gravitational vector in a way to meet the
-desired _Ra_ number.  Here, physical properties are physical, dependent on
+desired Ra number.  Here, physical properties are physical, dependent on
 temperature, as meassured and reported [here](https://theengineeringmindset.com/properties-of-air-at-atmospheric-pressure/).
-So, one way to achive the desired _Ra_ would be to change boundary temperaures,
+So, one way to achive the desired Ra would be to change boundary temperaures,
 but that could put us out of the range of the look-up table we have.  The other
 way, which was used here, was to change the charactersitic length and we do it
 by setting a scaling factor in ```convert.scr```.  Please chech the ```readme```
@@ -2878,7 +2878,7 @@ print the value of Nuseelt number only from one processor.
 
 ### Comparison with benchmark solution <a name="bench_conjugate_compare"> </a>
 
-The case we solved here corresponds to Rayleigh number of 1.0e+5 and Pr of 0.7.
+The case we solved here corresponds to Ra number of 1.0e+5 and Pr of 0.7.
 In addition, conductivities in solids are equal to the conductivities in fluid
 ([Basak et al.](https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
 denote such a case with K=1.)  Anyhow, the value of Nusselt number reported by
@@ -2889,7 +2889,7 @@ this benchmark.  We actually nailed it.
 
 In directory ```[root]/Tests/Laminar/Cavity/Thermally_Driven/Conjugate/``` you
 can find the same test case, but with directories defining a range of solid
-conductivities and different Rayleigh numbers.  Feel free to explore these
+conductivities and different Ra numbers.  Feel free to explore these
 cases and benchmark further.
 
 ## Fully-developed turbulent plane channel flow <a name="bench_plane_channel"> </a>
@@ -2918,7 +2918,7 @@ are reported by Meinders and Hanjalic for comparison against CFD simulations.
 Large eddy simulation approach is particularly well suited for this flow because
 the periodicity can be assumed, meaning that only one segment of the entire
 matrix can be simulated, with periodic boundary conditions in streamwise and
-spanwise direction.  Furthermore, the Reynolds number is relativelly low
+spanwise direction.  Furthermore, the Reynolds (Re) number is relativelly low
 (13000 based on bulk velocity and channel height) meaning that LES without wall
 functions are amenable for this case.  On top of it, due to the fact that the
 cubes create large coherent structures which are inherently unsteady, RANS
@@ -3670,7 +3670,7 @@ extent, outflow.
 To demonstrate it, we picked the flow around a cylinder, using the computational
 domain as described by [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195).
 We do not solve the same case as the authors did.  We increase the domain size
-by a factor of ten, and the Reynolds number by a factor of 250.  In spite of the
+by a factor of ten, and the Re number by a factor of 250.  In spite of the
 similarity with the computational domain used in [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195),
 the flow we will be solving here will neither be two-dimensional, nor steady.
 A sketch of the computational domain is presented here:
@@ -3753,7 +3753,7 @@ time of 60 s or one minute.
 which are multiples of 30.  It is more likely that final simulation times would
 be in units more amenable to humans.
 
-Viscosity is 2.0e-4, resulting in Reynolds number of 5000, which might not be
+Viscosity is 2.0e-4, resulting in Re number of 5000, which might not be
 quite turbulent, but is certainly not steady either.  We do, nonetheless, set
 the turbulence model to be LES with Smagorinsky:
 ```
@@ -3949,7 +3949,7 @@ well.
 
 ## Synthetic eddies <a name="demo_inflows_eddies"> </a>
 
-As we said in [](#), we departed from the benchmark in increasing the Reynolds
+As we said in [](#), we departed from the benchmark in increasing the Re
 number by a factor of 250, so we might expect some turbulence, unsteadiness at
 the very least.  Since we run simulations in unsteady mode with LES model, why
 not adding some unsteadiness at the inlet?  Well, that is possible thanks to
