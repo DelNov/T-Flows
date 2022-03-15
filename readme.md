@@ -574,7 +574,7 @@ Here you have to type the name of the grid _with extension_, hence
 ```lid_driven.msh```.
 
 > **_Note:_** Both GMSH and Fluent produce grid files with extension ```.msh```,
-but the formats are completely different and GMSH makes an educated guess which
+but the formats are completely different and _Convert_ makes an educated guess which
 one it is reading based on its contents.
 
 Many messages on the screen will follow outlining the conversion process which we
