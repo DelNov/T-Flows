@@ -29,8 +29,6 @@
   bulk => Fld % bulk
   Comm => Grid % Comm
 
-  VC = SC / 0
-
   ! Name backup file
   call File % Set_Name(name_out, time_step=time_step,  &
                        extension='.backup', domain=domain)
