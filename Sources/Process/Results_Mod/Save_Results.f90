@@ -4,34 +4,6 @@
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
-!---------------------------------[Modules]------------------------------------!
-  use Work_Mod, only: v2_calc   => r_cell_01,  &
-                      uu_save   => r_cell_02,  &
-                      vv_save   => r_cell_03,  &
-                      ww_save   => r_cell_04,  &
-                      uv_save   => r_cell_05,  &
-                      uw_save   => r_cell_06,  &
-                      vw_save   => r_cell_07,  &
-                      t2_save   => r_cell_08,  &
-                      ut_save   => r_cell_09,  &
-                      vt_save   => r_cell_10,  &
-                      wt_save   => r_cell_11,  &
-                      kin_vis_t => r_cell_12,  &
-                      phi_save  => r_cell_13,  &
-                      q_save    => r_cell_14,  &
-                      px_save   => r_cell_15,  &
-                      py_save   => r_cell_16,  &
-                      pz_save   => r_cell_17,  &
-                      tx_save   => r_cell_18,  &
-                      ty_save   => r_cell_19,  &
-                      tz_save   => r_cell_20,  &
-                      u_ins     => r_cell_21,  &
-                      v_ins     => r_cell_22,  &
-                      w_ins     => r_cell_23,  &
-                      var_ins   => r_cell_24,  &
-                      int_save  => i_cell_01,  &
-                      type_save => i_cell_02,  &  ! cell type save array
-                      offs_save => i_cell_03      ! cell offsets save array
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -44,20 +16,30 @@
   logical                   :: plot_inside  ! plot results inside?
   integer,         optional :: domain
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: phi
-  integer(SP)              :: data_size
-  integer                  :: data_offset, cell_offset, i_fac
-  integer                  :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
-  integer                  :: s1, s2, c1, c2, c_f, c_l
-  real                     :: dist1, dist2
-  character(SL)            :: name_out_8, name_out_9, name_mean, a_name
-  character(SL)            :: str1, str2
+  type(Grid_Type), pointer     :: Grid
+  type(Var_Type),  pointer     :: phi
+  integer(SP)                  :: data_size
+  integer                      :: data_offset, cell_offset, i_fac
+  integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
+  integer                      :: s1, s2, c1, c2, c_f, c_l
+  real                         :: dist1, dist2
+  character(SL)                :: name_out_8, name_out_9, name_mean, a_name
+  character(SL)                :: str1, str2
+  integer, pointer, contiguous :: int_save(:), type_save(:), offs_save(:)
+  real,    pointer, contiguous :: save_01(:), save_02(:), save_03(:)
+  real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
+  real,    pointer, contiguous :: var_ins(:)
+  real,    pointer, contiguous :: v2_calc(:), kin_vis_t(:), phi_save(:)
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
 
   call Cpu_Timer % Start('Save_Vtu_Results')
+
+  call Work % Connect_Int_Cell(int_save, type_save, offs_save)
+  call Work % Connect_Real_Cell(save_01, save_02, save_03,  &
+                                save_04, save_05, save_06)
+  call Work % Connect_Real_Cell(var_ins, v2_calc, kin_vis_t, phi_save)
 
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
@@ -456,36 +438,36 @@
                                     plot_inside,                &
                                     Flow % pp % n(c_f:c_l),     &
                                     f8, f9, data_offset, run)
-    px_save(:) = 0.0
-    py_save(:) = 0.0
-    pz_save(:) = 0.0
+    save_01(:) = 0.0
+    save_02(:) = 0.0
+    save_03(:) = 0.0
     do c1 = c_f, c_l
-      px_save(c1) = Flow % pp % x(c1) * Grid % vol(c1)
-      py_save(c1) = Flow % pp % y(c1) * Grid % vol(c1)
-      pz_save(c1) = Flow % pp % z(c1) * Grid % vol(c1)
+      save_01(c1) = Flow % pp % x(c1) * Grid % vol(c1)
+      save_02(c1) = Flow % pp % y(c1) * Grid % vol(c1)
+      save_03(c1) = Flow % pp % z(c1) * Grid % vol(c1)
     end do
     call Results % Save_Vector_Real("PressureCorrectionForce [N]",  &
                                     plot_inside,                    &
-                                    px_save(c_f:c_l),               &
-                                    py_save(c_f:c_l),               &
-                                    pz_save(c_f:c_l),               &
+                                    save_01(c_f:c_l),               &
+                                    save_02(c_f:c_l),               &
+                                    save_03(c_f:c_l),               &
                                     f8, f9, data_offset, run)
 
     call Results % Save_Scalar_Real("Pressure [Pa]", plot_inside,  &
                                     Flow % p % n(c_f:c_l),         &
                                     f8, f9, data_offset, run)
-    px_save(:) = 0.0
-    py_save(:) = 0.0
-    pz_save(:) = 0.0
+    save_01(:) = 0.0
+    save_02(:) = 0.0
+    save_03(:) = 0.0
     do c1 = c_f, c_l
-      px_save(c1) = Flow % p % x(c1) * Grid % vol(c1)
-      py_save(c1) = Flow % p % y(c1) * Grid % vol(c1)
-      pz_save(c1) = Flow % p % z(c1) * Grid % vol(c1)
+      save_01(c1) = Flow % p % x(c1) * Grid % vol(c1)
+      save_02(c1) = Flow % p % y(c1) * Grid % vol(c1)
+      save_03(c1) = Flow % p % z(c1) * Grid % vol(c1)
     end do
     call Results % Save_Vector_Real("PressureForce [N]", plot_inside,    &
-                                    px_save(c_f:c_l),                    &
-                                    py_save(c_f:c_l),                    &
-                                    pz_save(c_f:c_l),                    &
+                                    save_01(c_f:c_l),                    &
+                                    save_02(c_f:c_l),                    &
+                                    save_03(c_f:c_l),                    &
                                     f8, f9, data_offset, run)
 
     !-----------------!
@@ -495,13 +477,13 @@
       call Results % Save_Scalar_Real("Temperature [K]", plot_inside,  &
                                       Flow % t % n(c_f:c_l),           &
                                       f8, f9, data_offset, run)
-      tx_save(:) = 0.0
-      ty_save(:) = 0.0
-      tz_save(:) = 0.0
+      save_01(:) = 0.0
+      save_02(:) = 0.0
+      save_03(:) = 0.0
       do c1 = c_f, c_l
-        tx_save(c1) = Flow % t % x(c1)
-        ty_save(c1) = Flow % t % y(c1)
-        tz_save(c1) = Flow % t % z(c1)
+        save_01(c1) = Flow % t % x(c1)
+        save_02(c1) = Flow % t % y(c1)
+        save_03(c1) = Flow % t % z(c1)
       end do
 
       if(.not. Flow % mass_transfer) then
@@ -514,9 +496,9 @@
 
       call Results % Save_Vector_Real("TemperatureGradients [K/m]",  &
                                       plot_inside,                   &
-                                      tx_save(c_f:c_l),              &
-                                      ty_save(c_f:c_l),              &
-                                      tz_save(c_f:c_l),              &
+                                      save_01(c_f:c_l),              &
+                                      save_02(c_f:c_l),              &
+                                      save_03(c_f:c_l),              &
                                       f8, f9, data_offset, run)
 
     end if
@@ -612,12 +594,12 @@
     !-----------------!
     !   Q-criterion   !
     !-----------------!
-    q_save(:) = 0.0
+    phi_save(:) = 0.0
     do c1 = c_f, c_l
-      q_save(c1) = (Flow % vort(c1)**2 - Flow % shear(c1)**2)/4.
+      phi_save(c1) = (Flow % vort(c1)**2 - Flow % shear(c1)**2)/4.
     end do
     call Results % Save_Scalar_Real("QCriterion [1/s^2]", plot_inside,   &
-                                    q_save(c_f:c_l),                     &
+                                    phi_save(c_f:c_l),                   &
                                     f8, f9, data_offset, run)
 
     !--------------------------!
@@ -793,74 +775,74 @@
                                       turb % v_mean(c_f:c_l),    &
                                       turb % w_mean(c_f:c_l),    &
                                       f8, f9, data_offset, run)
-      uu_save(:) = 0.0
-      vv_save(:) = 0.0
-      ww_save(:) = 0.0
-      uv_save(:) = 0.0
-      uw_save(:) = 0.0
-      vw_save(:) = 0.0
+      save_01(:) = 0.0
+      save_02(:) = 0.0
+      save_03(:) = 0.0
+      save_04(:) = 0.0
+      save_05(:) = 0.0
+      save_06(:) = 0.0
       do c1 = c_f, c_l
-        uu_save(c1) = turb % uu_res(c1) - turb % u_mean(c1) * turb % u_mean(c1)
-        vv_save(c1) = turb % vv_res(c1) - turb % v_mean(c1) * turb % v_mean(c1)
-        ww_save(c1) = turb % ww_res(c1) - turb % w_mean(c1) * turb % w_mean(c1)
-        uv_save(c1) = turb % uv_res(c1) - turb % u_mean(c1) * turb % v_mean(c1)
-        uw_save(c1) = turb % uw_res(c1) - turb % u_mean(c1) * turb % w_mean(c1)
-        vw_save(c1) = turb % vw_res(c1) - turb % v_mean(c1) * turb % w_mean(c1)
+        save_01(c1) = turb % uu_res(c1) - turb % u_mean(c1) * turb % u_mean(c1)
+        save_02(c1) = turb % vv_res(c1) - turb % v_mean(c1) * turb % v_mean(c1)
+        save_03(c1) = turb % ww_res(c1) - turb % w_mean(c1) * turb % w_mean(c1)
+        save_04(c1) = turb % uv_res(c1) - turb % u_mean(c1) * turb % v_mean(c1)
+        save_05(c1) = turb % uw_res(c1) - turb % u_mean(c1) * turb % w_mean(c1)
+        save_06(c1) = turb % vw_res(c1) - turb % v_mean(c1) * turb % w_mean(c1)
       end do
       call Results % Save_Scalar_Real("MeanReynoldsStressXX [m^s/s^2]",  &
                                       plot_inside,                       &
-                                      uu_save(c_f:c_l),                  &
+                                      save_01(c_f:c_l),                  &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("MeanReynoldsStressYY [m^s/s^2]",  &
                                       plot_inside,                       &
-                                      vv_save(c_f:c_l),                  &
+                                      save_02(c_f:c_l),                  &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("MeanReynoldsStressZZ [m^s/s^2]",  &
                                       plot_inside,                       &
-                                      ww_save(c_f:c_l),                  &
+                                      save_03(c_f:c_l),                  &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("MeanReynoldsStressXY [m^s/s^2]",  &
                                       plot_inside,                       &
-                                      uv_save(c_f:c_l),                  &
+                                      save_04(c_f:c_l),                  &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("MeanReynoldsStressXZ [m^s/s^2]",  &
                                       plot_inside,                       &
-                                      uw_save(c_f:c_l),                  &
+                                      save_05(c_f:c_l),                  &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("MeanReynoldsStressYZ [m^s/s^2]",  &
                                       plot_inside,                       &
-                                      vw_save(c_f:c_l),                  &
+                                      save_06(c_f:c_l),                  &
                                       f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
         call Results % Save_Scalar_Real("MeanTemperature [K]",           &
                                         plot_inside,                     &
                                         turb % t_mean(c_f:c_l),          &
                                         f8, f9, data_offset, run)
-        t2_save(:) = 0.0
-        ut_save(:) = 0.0
-        vt_save(:) = 0.0
-        wt_save(:) = 0.0
+        phi_save(:) = 0.0
+        save_01(:) = 0.0
+        save_02(:) = 0.0
+        save_03(:) = 0.0
         do c1 = c_f, c_l
-          t2_save(c1) = turb % t2_res(c1) - turb % t_mean(c1)*turb % t_mean(c1)
-          ut_save(c1) = turb % ut_res(c1) - turb % u_mean(c1)*turb % t_mean(c1)
-          vt_save(c1) = turb % vt_res(c1) - turb % v_mean(c1)*turb % t_mean(c1)
-          wt_save(c1) = turb % wt_res(c1) - turb % w_mean(c1)*turb % t_mean(c1)
+          phi_save(c1) = turb % t2_res(c1) - turb % t_mean(c1)*turb % t_mean(c1)
+          save_01(c1)  = turb % ut_res(c1) - turb % u_mean(c1)*turb % t_mean(c1)
+          save_02(c1)  = turb % vt_res(c1) - turb % v_mean(c1)*turb % t_mean(c1)
+          save_03(c1)  = turb % wt_res(c1) - turb % w_mean(c1)*turb % t_mean(c1)
         end do
         call Results % Save_Scalar_Real("MeanTurbulentQuantityT2 [K^2]",     &
                                         plot_inside,                         &
-                                        t2_save(c_f:c_l),                    &
+                                        phi_save(c_f:c_l),                   &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("MeanTurbulentHeatFluxX [K m/s]",    &
                                         plot_inside,                         &
-                                        ut_save(c_f:c_l),                    &
+                                        save_01(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("MeanTurbulentHeatFluxY [K m/s]",    &
                                         plot_inside,                         &
-                                        vt_save(c_f:c_l),                    &
+                                        save_02(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("MeanTurbulentHeatFluxZ [K m/s]",    &
                                         plot_inside,                         &
-                                        wt_save(c_f:c_l),                    &
+                                        save_03(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
       end if
 
@@ -917,24 +899,24 @@
     if( .not. plot_inside ) then 
 
       ! Initialize working variables to zero
-      u_ins(:) = 0.0
-      v_ins(:) = 0.0
-      w_ins(:) = 0.0
+      save_01(:) = 0.0
+      save_02(:) = 0.0
+      save_03(:) = 0.0
 
       ! Copy internal values to boundary
       do s = 1, Grid % n_faces
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)
         if(c2 < 0) then 
-          u_ins(c2) = Flow % u % n(c1)
-          v_ins(c2) = Flow % v % n(c1)
-          w_ins(c2) = Flow % w % n(c1)
+          save_01(c2) = Flow % u % n(c1)
+          save_02(c2) = Flow % v % n(c1)
+          save_03(c2) = Flow % w % n(c1)
         end if
       end do
       call Results % Save_Vector_Real("Velocity Near Wall [m/s]", plot_inside, &
-                                      u_ins(c_f:c_l),                          &
-                                      v_ins(c_f:c_l),                          &
-                                      w_ins(c_f:c_l),                          &
+                                      save_01(c_f:c_l),                        &
+                                      save_02(c_f:c_l),                        &
+                                      save_03(c_f:c_l),                        &
                                       f8, f9, data_offset, run)
 
       if(turb % model .eq. K_EPS                 .or.  &
@@ -1108,6 +1090,11 @@
     write(f8) IN_0 // '</VTKFile>'           // LF
     close(f8)
   end if
+
+  call Work % Disconnect_Int_Cell(int_save, type_save, offs_save)
+  call Work % Disconnect_Real_Cell(save_01, save_02, save_03,  &
+                                   save_04, save_05, save_06)
+  call Work % Disconnect_Real_Cell(var_ins, v2_calc, kin_vis_t, phi_save)
 
   call Cpu_Timer % Stop('Save_Vtu_Results')
 

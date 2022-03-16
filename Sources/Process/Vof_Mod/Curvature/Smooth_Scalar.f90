@@ -3,10 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Smoothes scalar using a Laplacian smoother                                 !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: sum_vol_area => r_cell_01,   &
-                      sum_area     => r_cell_02
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
@@ -16,9 +12,12 @@
   real                    :: smooth_var(-Grid % n_bnd_cells    &
                                        : Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, c, c1, c2, c_iter
-  real    :: fs, vol_face
+  integer                   :: s, c, c1, c2, c_iter
+  real                      :: fs, vol_face
+  real, contiguous, pointer :: sum_vol_area(:), sum_area(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(sum_vol_area, sum_area)
 
   ! Take aliases
   nb = Grid % n_bnd_cells
@@ -85,5 +84,7 @@
   end do
 
   call Grid % Exchange_Cells_Real(smooth_var)
+
+  call Work % Disconnect_Real_Cell(sum_vol_area, sum_area)
 
   end subroutine

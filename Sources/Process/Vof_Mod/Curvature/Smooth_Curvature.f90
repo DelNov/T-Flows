@@ -5,25 +5,22 @@
 !   Interface and second in the direction of the normal. This technique can    !
 !   be found at https://spiral.imperial.ac.uk/handle/10044/1/28101
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: k_star       => r_cell_14,    &
-                      gradk_x      => r_cell_15,    &
-                      gradk_y      => r_cell_16,    &
-                      gradk_z      => r_cell_17,    &
-                      sum_k_weight => r_cell_18,    &
-                      sum_weight   => r_cell_19
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: col   ! colour; could be vof or smooth
-  integer                  :: s, c, c1, c2, nb, nc
-  real                     :: fs, w_v1, w_v2, w_m1, w_m2
-  real                     :: weight_s, weight_n
-  real                     :: curvf
+  type(Grid_Type), pointer  :: Grid
+  type(Var_Type),  pointer  :: col   ! colour; could be vof or smooth
+  integer                   :: s, c, c1, c2, nb, nc
+  real                      :: fs, w_v1, w_v2, w_m1, w_m2
+  real                      :: weight_s, weight_n
+  real                      :: curvf
+  real, contiguous, pointer :: gradk_x(:), gradk_y(:), gradk_z(:)
+  real, contiguous, pointer :: k_star(:), sum_k_weight(:), sum_weight(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(gradk_x, gradk_y, gradk_z,  &
+                                k_star, sum_k_weight, sum_weight)
 
   ! Take aliases
   Grid => Vof % pnt_grid
@@ -164,5 +161,8 @@
   end do
 
   call Grid % Exchange_Cells_Real(Vof % curv)
+
+  call Work % Disconnect_Real_Cell(gradk_x, gradk_y, gradk_z,  &
+                                   k_star, sum_k_weight, sum_weight)
 
   end subroutine

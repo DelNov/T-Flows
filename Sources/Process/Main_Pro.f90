@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Eddies_Mod
-  use Work_Mod,         only: Work_Mod_Allocate
+  use Work_Mod
   use User_Mod
   use Backup_Mod
   use Results_Mod
@@ -102,7 +102,7 @@
   call Control_Mod_Switch_To_Root()
 
   ! Allocate memory for working arrays
-  call Work_Mod_Allocate(Grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
+  call Work % Allocate_Work(Grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
 
   ! Get the number of time steps from the control file
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)

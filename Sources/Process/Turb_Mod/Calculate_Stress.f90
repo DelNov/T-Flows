@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Calculates algebraic Reynolds stresses                                     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: wd_x => r_cell_01,  &
-                      wd_y => r_cell_02,  &
-                      wd_z => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
@@ -19,7 +14,10 @@
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, nc, nb
   real                      :: wd_m, u2, v2, w2
+  real, contiguous, pointer :: wd_x(:), wd_y(:), wd_z(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(wd_x, wd_y, wd_z)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -94,7 +92,7 @@
         uw % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) * (u % z(c) + w % x(c))
         vw % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) * (v % z(c) + w % y(c))
       end if
- 
+
       ! ... and balance them with explicitly resolved normal stresses
       uu % n(c) = uu % n(c) * (1.0 - wd_x(c)) + u2
       vv % n(c) = vv % n(c) * (1.0 - wd_y(c)) + v2
@@ -102,5 +100,7 @@
 
     end do
   end if
+
+  call Work % Disconnect_Real_Cell(wd_x, wd_y, wd_z)
 
   end subroutine

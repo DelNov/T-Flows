@@ -1,9 +1,6 @@
 !==============================================================================!
   subroutine Create_Petsc(Pet, Nat, Grid)
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-!for debug:  use Work_Mod, only: pet_glo => r_cell_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)        :: Pet
@@ -53,11 +50,6 @@
     end do
     call Grid % Exchange_Cells_Int(Pet % glo)
 
-    !for debug:    ! Check what you got
-    !for debug:    pet_glo(:) = Pet % glo(:)
-    !for debug:    call Grid % Save_Debug_Vtu("petsc-numbering",      &
-    !for debug:                               scalar_cell = pet_glo,  &
-    !for debug:                               scalar_name = "Petsc Numbers [1]")
   end if
 
   !----------------------!

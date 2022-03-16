@@ -5,13 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: q_turb => r_cell_04
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                (allocates Work_Mod)                               !
-!     |                                                                        !
-!     +----> Compute_Scalar (safe to use r_cell_04)                            !
+  use Work_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
@@ -35,6 +29,7 @@
   real                       :: dif_eff, f_ex, f_im
   real                       :: phi_stress, q_exp
   real                       :: phix_f, phiy_f, phiz_f
+  real, contiguous,  pointer :: q_turb(:)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -48,6 +43,8 @@
 !==============================================================================!
 
   call Cpu_Timer % Start('Compute_Scalars (without solvers)')
+
+  call Work % Connect_Real_Cell(q_turb)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -243,6 +240,8 @@
 
   ! User function
   call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, curr_dt, ini, sc)
+
+  call Work % Disconnect_Real_Cell(q_turb)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

@@ -6,9 +6,6 @@
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: tz_mean => r_cell_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
@@ -34,7 +31,10 @@
   real                 :: t_wall, t_tau, d_wall, t_hot, t_cold, t_diff, pr_t
   real                 :: vel_ref
   logical              :: there
+  real, contiguous, pointer :: tz_mean(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(tz_mean)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -332,5 +332,7 @@
   end if
 
   if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+
+  call Work % Disconnect_Real_Cell(tz_mean)
 
   end subroutine

@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: prelim_vof     => r_cell_01,  &
-                      min_max_crit_1 => r_cell_02,  &
-                      min_max_crit_2 => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type), target :: Vof
@@ -19,7 +14,10 @@
   real                      :: p1_x, p1_y, p1_z
   real                      :: p2_x, p2_y, p2_z
   real                      :: res_dummy, minnody, maxnody
+  real, contiguous, pointer :: prelim_vof(:),min_max_crit_1(:),min_max_crit_2(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(prelim_vof, min_max_crit_1, min_max_crit_2)
 
   ! First take aliasesd
   Grid => Vof % pnt_grid
@@ -102,5 +100,7 @@
   end do
 
   close(fu)
+
+  call Work % Disconnect_Real_Cell(prelim_vof, min_max_crit_1, min_max_crit_2)
 
   end subroutine

@@ -4,10 +4,6 @@
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for dam break                         !
 !------------------------------------------------------------------------------!
-  use Work_Mod, only: face_dipped => i_face_01,    &
-                      p_node      => r_node_01,    &
-                      vof_node    => r_node_02
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
@@ -18,18 +14,24 @@
   integer                  :: n_stat_t, n_stat_p
   real                     :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: fun
-  integer                  :: c, last_cell, fu
-  real                     :: b_volume, surface, rise_velocity,  &
-                              circularity, c_position
-  integer                  :: s, p, c1, c2, closest_face, i_probe, code, i_s, th
-  integer, parameter       :: N_PROBE = 4
-  real                     :: vf_up, vf_down, z_up, z_down, height
-  real                     :: h_probe(N_PROBE)
-  real                     :: tmp_h(100)
-  real                     :: dist, glo_dist, min_dist
+  type(Grid_Type), pointer     :: Grid
+  type(Var_Type),  pointer     :: fun
+  integer                      :: c, last_cell, fu
+  real                         :: b_volume, surface, rise_velocity,  &
+                                  circularity, c_position
+  integer                      :: s, p, c1, c2, closest_face, i_probe,  &
+                                  code, i_s, th
+  integer, parameter           :: N_PROBE = 4
+  real                         :: vf_up, vf_down, z_up, z_down, height
+  real                         :: h_probe(N_PROBE)
+  real                         :: tmp_h(100)
+  real                         :: dist, glo_dist, min_dist
+  real,    contiguous, pointer :: p_node(:), vof_node(:)
+  integer, contiguous, pointer :: face_dipped(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Node(p_node, vof_node)
+  call Work % Connect_Int_Face (face_dipped)
 
   ! Take aliases
   Grid  => Flow % pnt_grid
@@ -110,10 +112,13 @@
   ! Write to file
   if (this_proc < 2) then
     call File % Append_For_Writing_Ascii('probe-data.dat', fu)
-    write(fu,'((E16.10E2),9(2X,E16.10E2),4(2X,E16.10E2))')            &
+    write(fu,'((e16.10e2),9(2x,e16.10e2),4(2x,e16.10e2))')            &
           time, b_volume, p_probe(1:size(nod_probe)),   &
           h_probe(1:N_PROBE)
     close(fu)
   end if
+
+  call Work % Disconnect_Real_Node(p_node, vof_node)
+  call Work % Disconnect_Int_Face (face_dipped)
 
   end subroutine

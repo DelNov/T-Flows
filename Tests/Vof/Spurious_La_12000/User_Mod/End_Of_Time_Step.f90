@@ -3,11 +3,6 @@
                                        n_stat_t, n_stat_p, time)
 !------------------------------------------------------------------------------!
 !   This function computes parasitic current intensities around a droplet      !
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: sum_v1  => r_cell_01,   &
-                      dist_ck => r_Cell_02,   &
-                      dist_cn => r_Cell_02,   &
-                      dist_n  => i_cell_01
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,20 +14,26 @@
   integer                  :: n_stat_t, n_stat_p
   real                     :: time  ! physical time
 !--------------------------------[Locals]--------------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: fun
-  integer                  :: s, c, c1, c2, last_cell, fu, n_tot_cells, c_dist
-  real                     :: pos_mcl, h_drop !position mcl, droplet height
-  real                     :: vol_wall_bot, vol_symm !volume of boundaries
+  type(Grid_Type),     pointer :: Grid
+  type(Var_Type),      pointer :: fun
+  integer                      :: s, c, c1, c2, last_cell, fu, n_tot_cells,  &
+                                  c_dist
+  real                         :: pos_mcl, h_drop !position mcl, droplet height
+  real                         :: vol_wall_bot, vol_symm !volume of boundaries
   ! RMS u, area of droplet, area outside droplet
   ! pressure inside and outside, area of droplet
-  real                     :: u_rms, a_in, a_out, p_in, p_out, a_vof
-  real                     :: u_res, u_max, p_max, p_min
-  real                     :: min_vfrac, max_vfrac
-  real                     :: L_dom, H_dom ! width and jeight of domain
-  real                     :: epsloc, norm_res, maxcurv, mincurv, ngrd
-  real                     :: x0(3), x1(3), x2(3)
+  real                         :: u_rms, a_in, a_out, p_in, p_out, a_vof
+  real                         :: u_res, u_max, p_max, p_min
+  real                         :: min_vfrac, max_vfrac
+  real                         :: L_dom, H_dom ! width and jeight of domain
+  real                         :: epsloc, norm_res, maxcurv, mincurv, ngrd
+  real                         :: x0(3), x1(3), x2(3)
+  real,    contiguous, pointer :: sum_v1(:), dist_ck(:), dist_cn(:)
+  integer, contiguous, pointer :: dist_n(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(sum_v1, dist_ck, dist_cn)
+  call Work % Connect_Int_Cell (dist_n)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -117,5 +118,8 @@
                                   p_max-p_min, p_in-p_out, mincurv, maxcurv
     close(fu)
   end if
+
+  call Work % Disconnect_Real_Cell(sum_v1, dist_ck, dist_cn)
+  call Work % Disconnect_Int_Cell (dist_n)
 
   end subroutine

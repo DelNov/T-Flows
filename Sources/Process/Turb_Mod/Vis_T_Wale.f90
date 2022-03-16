@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !  Compute SGS viscosity for 'LES' by using LES_WALE model.                    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: sijd_sijd => r_cell_01,  &
-                      shear2    => r_cell_02,  &
-                      vort2     => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
@@ -19,7 +14,10 @@
   real                      :: s11, s22, s33,  s12, s13, s23,  s21, s31, s32
   real                      :: s11d,s22d,s33d, s12d,s13d,s23d, s21d,s31d,s32d
   real                      :: v11, v22, v33,  v12, v13, v23,  v21, v31, v32
+  real, contiguous, pointer :: sijd_sijd(:), shear2(:), vort2(:)
 !==============================================================================!
+
+  call Work % Disconnect_Real_Cell(sijd_sijd, shear2, vort2)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -82,5 +80,7 @@
               / (sqrt( abs (shear2(c)   **5) ) +        &
                  sqrt( sqrt(sijd_sijd(c)**6) ) + TINY)
   end do
+
+  call Work % Disconnect_Real_Cell(sijd_sijd, shear2, vort2)
 
   end subroutine

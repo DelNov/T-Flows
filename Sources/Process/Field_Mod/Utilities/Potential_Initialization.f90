@@ -3,15 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Initializes velocity from potential (pressure-like) equation               !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: log_dist => r_cell_01
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                     (allocates Work_Mod)          !
-!     |                                                                        !
-!     +----> Field_Mod_Potential_Initialization  (safe to use r_cell_01)       !
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
@@ -26,10 +17,13 @@
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
   real, allocatable          :: store(:)
+  real, contiguous,  pointer :: log_dist(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NDT = 24       ! number of false time steps
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(log_dist)
 
   if(this_proc < 2) then
     print '(a)',      ' # Computing potential to initialize velocity field ...'
@@ -329,5 +323,7 @@
     v % oo(c) = v % n(c)
     w % oo(c) = w % n(c)
   end do
+
+  call Work % Disconnect_Real_Cell(log_dist)
 
   end subroutine

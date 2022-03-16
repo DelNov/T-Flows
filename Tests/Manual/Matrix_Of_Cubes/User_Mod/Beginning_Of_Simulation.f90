@@ -7,13 +7,6 @@
 !   In its current form, it only extracts the results in specified probes      !
 !   prints values of mean velocity and mean Reynolds stresses and exits.       !
 !------------------------------------------------------------------------------!
-  use Work_Mod, only: node_ind => i_node_01,  &
-                      d_probe  => r_node_01,  &
-                      z_probe  => r_node_02,  &
-                      u_mean_n => r_node_03,  &
-                      uu_res_n => r_node_04,  &
-                      vv_res_n => r_node_05
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target :: Flow
@@ -23,12 +16,18 @@
   integer, intent(in)         :: curr_dt  ! time step
   real,    intent(in)         :: time     ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: n, n_probes, backup_dt
-  real                     :: x_p, y_p     ! coordinates of the probe
-  real                     :: backup_time
-  character(80)            :: arg
+  type(Grid_Type),     pointer :: Grid
+  integer                      :: n, n_probes, backup_dt
+  real                         :: x_p, y_p     ! coordinates of the probe
+  real                         :: backup_time
+  character(80)                :: arg
+  real,    contiguous, pointer :: d_probe(:), z_probe(:)
+  real,    contiguous, pointer :: u_mean_n(:), uu_res_n(:), vv_res_n(:)
+  integer, contiguous, pointer :: node_ind(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Node(d_probe, z_probe, u_mean_n, uu_res_n, vv_res_n)
+  call Work % Connect_Int_Node (node_ind)
 
   Grid => Flow % pnt_grid
 
@@ -88,6 +87,9 @@
                          uu_res_n(node_ind(n)) - u_mean_n(node_ind(n))**2,  &
                          vv_res_n(node_ind(n))
   end do
+
+  call Work % Disconnect_Real_Node(d_probe,z_probe,u_mean_n,uu_res_n,vv_res_n)
+  call Work % Disconnect_Int_Node (node_ind)
 
   call Comm_Mod_End
   stop

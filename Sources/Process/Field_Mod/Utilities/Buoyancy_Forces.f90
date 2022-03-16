@@ -5,17 +5,6 @@
 !   it is used for both single phase flows with density assumed constant and   !
 !   for multiphase flows with VOF and large density variations.                !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: dens_f => r_face_01
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                    (allocates Work_Mod)           !
-!     |                                                                        !
-!     +----> Compute_Momentum                   (doesn't use Work_Mod)         !
-!             |                                                                !
-!             +----> Field_Mod_Buoyancy_Forces  (safe to use r_face_01..02)    !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow
@@ -28,7 +17,10 @@
   real,              pointer :: grav_i
   real, contiguous,  pointer :: xic(:), xif(:), si(:), dxi(:)
   real, contiguous,  pointer :: cell_fi(:), face_fi(:)
+  real, contiguous,  pointer :: dens_f(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Face(dens_f)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -141,5 +133,7 @@
   end do
 
   call Grid % Exchange_Cells_Real(cell_fi)
+
+  call Work % Disconnect_Real_Face(dens_f)
 
   end subroutine

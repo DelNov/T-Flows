@@ -3,21 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a preconditioned CGS method      !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: p1         => r_cell_01,  &
-                      p2         => r_cell_02,  &
-                      q1         => r_cell_03,  &
-                      q2         => r_cell_04,  &
-                      r1         => r_cell_06,  &
-                      r2         => r_cell_07,  &
-                      u1         => r_cell_08,  &
-                      u2         => r_cell_09,  &
-                      v2         => r_cell_10,  &
-                      u1_plus_q1 => r_cell_11
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined, but this         !
-!   procedure is never called, so it doesn't make much sense to do it.         !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Native_Type), target :: Nat
@@ -38,7 +23,12 @@
   integer                    :: i, j, k, iter
   real                       :: sum_a, fn
   integer                    :: sum_n
+  real, contiguous, pointer  :: p1(:), q1(:), r1(:), p2(:), q2(:), r2(:),  &
+                                u1(:), u2(:), v2(:), u1_plus_q1(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(p1, q1, r1, p2, q2, r2,  &
+                                u1, u2, v2, u1_plus_q1)
 
   ! Take some aliases
   D => Nat % D
@@ -231,5 +221,8 @@
 
   fin_res = res
   niter   = iter
+
+  call Work % Disconnect_Real_Cell(p1, q1, r1, p2, q2, r2,  &
+                                   u1, u2, v2, u1_plus_q1)
 
   end subroutine

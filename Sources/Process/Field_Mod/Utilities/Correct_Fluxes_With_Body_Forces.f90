@@ -3,9 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Calculates body forces (Only due to buoyancy for the time being)           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: t_face_delta => r_face_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow
@@ -18,7 +15,10 @@
   integer                    :: c1, c2, s
   real                       :: xc1, yc1, zc1, xc2, yc2, zc2
   real                       :: gravity_source, dotprod, a12, dens_h
+  real, contiguous,  pointer :: t_face_delta(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Face(t_face_delta)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -105,5 +105,7 @@
     end do
 
   end if
+
+  call Work % Disconnect_Real_Face(t_face_delta)
 
   end subroutine

@@ -17,25 +17,27 @@
 !   |/          |/                                                             !
 !   1-----------2                                                              !
 !                                                                              !
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: prelim_vof => r_cell_01,  &
-                      inside_c   => i_cell_02
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
-  real                      :: p_xyz(8,3)
-  real,         allocatable :: p(:,:)
-  integer                   :: c, n, i, fu
-  integer                   :: ee, n_boxes, n_p, np_count, i_fac, seeds(1024)
-  integer                   :: trios(6,3)
-  real                      :: n_xyz(6,3), v1aux(3), v2aux(3)
-  real                      :: res_dummy
-  real                      :: dd(6)
-  character(20)             :: p_name_aux
+  type(Grid_Type),     pointer :: Grid
+  real                         :: p_xyz(8,3)
+  real,            allocatable :: p(:,:)
+  integer                      :: c, n, i, fu
+  integer                      :: ee, n_boxes, n_p, np_count, i_fac, seeds(1024)
+  integer                      :: trios(6,3)
+  real                         :: n_xyz(6,3), v1aux(3), v2aux(3)
+  real                         :: res_dummy
+  real                         :: dd(6)
+  character(20)                :: p_name_aux
+  real,    contiguous, pointer :: prelim_vof(:)
+  integer, contiguous, pointer :: inside_c(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(prelim_vof)
+  call Work % Connect_Int_Cell (inside_c)
 
   ! First take aliases
   Grid => Vof % pnt_grid
@@ -121,5 +123,8 @@
   end do
 
   close(fu)
+
+  call Work % Disconnect_Real_Cell(prelim_vof)
+  call Work % Disconnect_Int_Cell (inside_c)
 
   end subroutine

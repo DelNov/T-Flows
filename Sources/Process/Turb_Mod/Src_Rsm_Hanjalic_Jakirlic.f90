@@ -4,33 +4,6 @@
 !   Calculate source terms for transport equations for Re stresses and         !
 !   dissipation for Hanjalic-Jakirlic model.                                   !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: l_sc_x => r_cell_11,  &
-                      l_sc_y => r_cell_12,  &
-                      l_sc_z => r_cell_13,  &
-                      ui_xx  => r_cell_14,  &
-                      ui_yy  => r_cell_15,  &
-                      ui_zz  => r_cell_16,  &
-                      ui_xy  => r_cell_17,  &
-                      ui_xz  => r_cell_18,  &
-                      ui_yz  => r_cell_19,  &
-                      kin_e  => r_cell_20,  &
-                      kin_e_x=> r_cell_21,  &
-                      kin_e_y=> r_cell_22,  &
-                      kin_e_z=> r_cell_23,  &
-                      diss1  => r_cell_24
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                    (allocates Work_Mod)           !
-!     |                                                                        !
-!     +----> Turb % Main_Turb                   (does not use Work_Mod)        !
-!              |                                                               !
-!              +---> Turb % Compute_Stress      (uses r_cell_01..09)           !
-!                      |                                                       !
-!                      +----> Turb % Src_Rsm_Hanjalic_Jakirlic                 !
-!                                               (uses r_cell_11..24)           !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type),  target :: Turb
@@ -68,7 +41,12 @@
   real                       :: var2_11,var2_22,var2_33,var2_12,var2_13,var2_23
   real                       :: p11, p22, p33, p12, p13, p23, eps_1, eps_2
   real                       :: ff5, tkolm, kin_vis
-!==============================================================================!
+  real, contiguous,  pointer :: l_sc_x(:), l_sc_y(:), l_sc_z(:)
+  real, contiguous,  pointer :: ui_xx(:), ui_yy(:), ui_zz(:)
+  real, contiguous,  pointer :: ui_xy(:), ui_xz(:), ui_yz(:)
+  real, contiguous,  pointer :: kin_e(:), kin_e_x(:), kin_e_y(:), kin_e_z(:)
+  real, contiguous,  pointer :: diss1(:)
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
@@ -79,8 +57,12 @@
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !   wall visc.    vis_wall [kg/(m*s)]  |                                       !
 !   thermal cap.  capacity[m^2/(s^2*K)]| therm. conductivity     [kg*m/(s^3*K)]!
-!------------------------------------------------------------------------------!
-! but dens > 1 mod. not applied here yet
+!   =--> but dens > 1 modification not applied here yet                        !
+!==============================================================================!
+
+  call Work % Connect_Real_Cell(l_sc_x, l_sc_y, l_sc_z,                    &
+                                ui_xx, ui_yy, ui_zz, ui_xy, ui_xz, ui_yz,  &
+                                kin_e, kin_e_x, kin_e_y, kin_e_z, diss1)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -743,5 +725,9 @@
       end if    ! end if of c2<0
     end do
   end if
+
+  call Work % Disconnect_Real_Cell(l_sc_x, l_sc_y, l_sc_z,                    &
+                                   ui_xx, ui_yy, ui_zz, ui_xy, ui_xz, ui_yz,  &
+                                   kin_e, kin_e_x, kin_e_y, kin_e_z, diss1)
 
   end subroutine

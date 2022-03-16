@@ -3,7 +3,7 @@
 #----------
  PROBLEM_NAME        cavity
  HEAT_TRANSFER       no
- INTERFACE_TRACKING  yes
+INTERFACE_TRACKING yes
  TRACK_FRONT         yes
 
  NUMBER_OF_TIME_STEPS    1200
@@ -42,10 +42,10 @@
  PHASE_DENSITIES           1.0      1.0e3
  PHASE_VISCOSITIES         0.005    0.005    # 0.01  0.01
  SURFACE_TENSION         0.05                # 0.36
- TURBULENCE_MODEL       none
+TURBULENCE_MODEL none
  GRAVITATIONAL_VECTOR   0.0  0.0  -9.81
 
- PARTICLE_TRACKING                          yes
+PARTICLE_TRACKING yes
  SWARM_DIAMETER                               5.0e-04
  SWARM_DENSITY                                1.0e+04
  NUMBER_OF_SWARM_SUB_STEPS                   12
@@ -113,3 +113,4 @@
     VARIABLES           u     v     w     vof
     VALUES              0.0   0.0   0.0   0.0
 
+#LOAD_BACKUP_NAME cavity-ts000001.backup

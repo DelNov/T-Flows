@@ -20,39 +20,26 @@
 !      (for inside cells), bcel_1, bcel_2 for boundary cells and face_1        !
 !      and face_2 for global faces at the interface.                           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: xf_1 => r_face_01,  &  ! face coordinates ...
-                      yf_1 => r_face_02,  &  ! ... on the each side ...
-                      zf_1 => r_face_03,  &  ! ... of the interface
-                      xf_2 => r_face_04,  &
-                      yf_2 => r_face_05,  &
-                      zf_2 => r_face_06,  &
-                      ic_1 => i_face_01,  &  ! internal cells in domain 1
-                      ib_1 => i_face_02,  &  ! boundary cells in domain 1
-                      ip_1 => i_face_03,  &  ! processor in domain 1
-                      ic_2 => i_face_04,  &  ! internal cells in domain 2
-                      ib_2 => i_face_05,  &  ! boundary cells in domain 2
-                      ip_2 => i_face_06      ! processor in domain 2
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                       (allocates Work_Mod)                        !
-!     |                                                                        !
-!     +----> Interface_Mod_Create  (fine for r_face_01..06 and i_face_01..06)  !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)    :: inter(MD, MD)
   type(Grid_Type), target :: Grid(MD)
   integer                 :: n_dom
 !-----------------------------------[Locals]-----------------------------------!
-  integer, allocatable :: off_1(:)
-  integer, allocatable :: off_2(:)
-  integer              :: n, n1, n2, n1_tot, n2_tot, n_tot
-  integer              :: pos, c, c1, c2, d1, d2, k, nks, s, p
-  logical              :: found
-  character(SL)        :: keys(128)
+  integer,         allocatable :: off_1(:)
+  integer,         allocatable :: off_2(:)
+  integer                      :: n, n1, n2, n1_tot, n2_tot, n_tot
+  integer                      :: pos, c, c1, c2, d1, d2, k, nks, s, p
+  logical                      :: found
+  character(SL)                :: keys(128)
+  real,    contiguous, pointer :: xf_1(:), yf_1(:), zf_1(:)
+  real,    contiguous, pointer :: xf_2(:), yf_2(:), zf_2(:)
+  integer, contiguous, pointer :: ic_1(:), ib_1(:), ip_1(:)
+  integer, contiguous, pointer :: ic_2(:), ib_2(:), ip_2(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Face(xf_1, yf_1, zf_1, xf_2, yf_2, zf_2)
+  call Work % Connect_Int_Face(ic_1, ib_1, ip_1, ic_2, ib_2, ip_2)
 
   ! Allocate memory for offsets
   if(n_proc > 1) then
@@ -382,5 +369,8 @@
     deallocate(off_1)
     deallocate(off_2)
   end if
+
+  call Work % Disconnect_Real_Face(xf_1, yf_1, zf_1, xf_2, yf_2, zf_2)
+  call Work % Disconnect_Int_Face(ic_1, ib_1, ip_1, ic_2, ib_2, ip_2)
 
   end subroutine

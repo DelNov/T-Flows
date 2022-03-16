@@ -3,29 +3,29 @@
 !------------------------------------------------------------------------------!
 !   Computes distance from a surface                                           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_c  => r_cell_01  ! cell values of phi
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
   type(Var_Type)            :: cell_dist
   type(Var_Type)            :: vof
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: grid
-  real                     :: dist
-  real                     :: xc, yc, zc, xs, ys, zs, min_d, max_d, eps
-  integer                  :: nc, nn, nv, n, c, d, v, e
-  integer                  :: i_ele, i_nod, j_nod, i_cel
-  integer                  :: n_cnt, node_list(512)
-  integer                  :: c_cnt, cell_list(512)
+  type(Grid_Type), pointer  :: Grid
+  real                      :: dist
+  real                      :: xc, yc, zc, xs, ys, zs, min_d, max_d, eps
+  integer                   :: nc, nn, nv, n, c, d, v, e
+  integer                   :: i_ele, i_nod, j_nod, i_cel
+  integer                   :: n_cnt, node_list(512)
+  integer                   :: c_cnt, cell_list(512)
+  real, contiguous, pointer :: phi_c(:)
 !==============================================================================!
 
+  call Work % Connect_Real_Cell(phi_c)
+
   ! Take some aliases
-  grid => Front % pnt_grid
+  Grid => Front % pnt_grid
   nv = Front % n_verts
-  nc = grid % n_cells
-  nn = grid % n_nodes
+  nc = Grid % n_cells
+  nn = Grid % n_nodes
 
   ! Initialize distance to some large value
   phi_c(1:nc) = MEGA
@@ -42,14 +42,14 @@
 
     ! Make a list of nodes surrounding the nearest cell
     n_cnt = 0  ! initialize node count
-    do j_nod = 1, grid % cells_n_nodes(d)
-      n = grid % cells_n(j_nod, d)
+    do j_nod = 1, Grid % cells_n_nodes(d)
+      n = Grid % cells_n(j_nod, d)
 
-      do i_cel = 1, grid % nodes_n_cells(n)
-        c = grid % nodes_c(i_cel, n)
-        do i_nod = 1, grid % cells_n_nodes(c)
+      do i_cel = 1, Grid % nodes_n_cells(n)
+        c = Grid % nodes_c(i_cel, n)
+        do i_nod = 1, Grid % cells_n_nodes(c)
           n_cnt = n_cnt + 1
-          node_list(n_cnt) = grid % cells_n(i_nod, c)
+          node_list(n_cnt) = Grid % cells_n(i_nod, c)
         end do
       end do
     end do
@@ -60,9 +60,9 @@
     ! Make a list of cells surrounding the stored nodes
     c_cnt = 0  ! initialize cell count
     do i_nod = 1, n_cnt
-      do i_cel = 1, grid % nodes_n_cells( node_list(i_nod) )
+      do i_cel = 1, Grid % nodes_n_cells( node_list(i_nod) )
         c_cnt = c_cnt + 1
-        cell_list(c_cnt) = grid % nodes_c(i_cel, node_list(i_nod))
+        cell_list(c_cnt) = Grid % nodes_c(i_cel, node_list(i_nod))
       end do
     end do
     call Sort % Unique_Int(cell_list(1:c_cnt), c_cnt)
@@ -79,9 +79,9 @@
       do i_cel = 1, c_cnt
         c = cell_list(i_cel)
 
-        xc = grid % xc(c)
-        yc = grid % yc(c)
-        zc = grid % zc(c)
+        xc = Grid % xc(c)
+        yc = Grid % yc(c)
+        zc = Grid % zc(c)
 
         dist = Math % Distance(xc, yc, zc, xs, ys, zs)  &
              - 1.0 / Front % Elem(e) % curv
@@ -128,5 +128,7 @@
                           + 1.0/PI * sin(PI * cell_dist % n(c) / eps) )
     end if
   end do
+
+  call Work % Disconnect_Real_Cell(phi_c)
 
   end subroutine

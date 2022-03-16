@@ -3,25 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_x       => r_cell_01,  &
-                      phi_y       => r_cell_02,  &
-                      phi_z       => r_cell_03,  &
-                      u1uj_phij   => r_cell_04,  &
-                      u2uj_phij   => r_cell_05,  &
-                      u3uj_phij   => r_cell_06,  &
-                      u1uj_phij_x => r_cell_07,  &
-                      u2uj_phij_y => r_cell_08,  &
-                      u3uj_phij_z => r_cell_09
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                  (allocates Work_Mod)             !
-!     |                                                                        !
-!     +----> Turb_Mod_Main                    (does not use Work_Mod)          !
-!              |                                                               !
-!              +---> Turb_Mod_Compute_Stress  (safe to use r_cell_01..09)      !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type),  target :: Turb
@@ -46,6 +27,9 @@
   real                       :: vis_t_f
   real                       :: dt
   real                       :: visc_f
+  real, contiguous,  pointer :: phi_x(:), phi_y(:), phi_z(:)
+  real, contiguous,  pointer :: u1uj_phij(:),   u2uj_phij(:),   u3uj_phij(:)
+  real, contiguous,  pointer :: u1uj_phij_x(:), u2uj_phij_y(:), u3uj_phij_z(:)
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are being solved:                              !
@@ -59,6 +43,10 @@
 !------------------------------------------------------------------------------!
 
   call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
+
+  call Work % Connect_Real_Cell(phi_x, phi_y, phi_z,              &
+                                u1uj_phij, u2uj_phij, u3uj_phij,  &
+                                u1uj_phij_x, u2uj_phij_y, u3uj_phij_z)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -376,6 +364,10 @@
   end if
 
   call Flow % Grad_Variable(phi)
+
+  call Work % Disconnect_Real_Cell(phi_x, phi_y, phi_z,              &
+                                   u1uj_phij, u2uj_phij, u3uj_phij,  &
+                                   u1uj_phij_x, u2uj_phij_y, u3uj_phij_z)
 
   call Cpu_Timer % Stop('Compute_Turbulence (without solvers)')
 

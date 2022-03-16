@@ -6,16 +6,16 @@
 !                                                                              !
 !   What if the nearest wall cell is in another processor?                     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: min_dis => r_cell_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type) :: Turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: c1, c2, s
+  type(Grid_Type), pointer  :: Grid
+  integer                   :: c1, c2, s
+  real, contiguous, pointer :: min_dis(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(min_dis)
 
   Grid => Turb % pnt_grid
 
@@ -48,6 +48,8 @@
   end do
 
   if(this_proc < 2) print *, '# Searching finished'
+
+  call Work % Disconnect_Real_Cell(min_dis)
 
   end subroutine
 

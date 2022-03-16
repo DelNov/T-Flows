@@ -3,36 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a preconditioned BiCG method     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: p1 => r_cell_11,  &
-                      p2 => r_cell_12,  &
-                      q1 => r_cell_13,  &
-                      q2 => r_cell_14,  &
-                      r1 => r_cell_15,  &
-                      r2 => r_cell_16
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                  (allocates Work_Mod)                             !
-!     |                                                                        !
-!     +----> Compute_Energy   (uses r_cell_01..03)                             !
-!     |        |                                                               !
-!     +----> Compute_Momentum (does not use Work_Mod)                          !
-!     |        |                                                               !
-!     +----> Compute_Scalar   (uses r_cell_04)                                 !
-!              |                                                               !
-!              +----> Bicg    (safe to use r_cell_11..17)                      !
-!                                                                              !
-!   Main_Pro                                    (allocates Work_Mod)           !
-!     |                                                                        !
-!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
-!              |                                                               !
-!              +---> Turb_Mod_Compute_Variable  (does not use Work_Mod)        !
-!              |       |                                                       !
-!              +---> Turb_Mod_Compute_Stress    (uses r_cell_01..09)           !
-!                      |                                                       !
-!                      +----> Bicg              (safe to use r_cell_11..16)    !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Native_Type), target :: Nat
@@ -53,7 +23,10 @@
   integer                    :: i, j, k, iter
   real                       :: sum_a, fn
   integer                    :: sum_n
+  real, contiguous,  pointer :: p1(:), q1(:), r1(:), p2(:), q2(:), r2(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(p1, q1, r1, p2, q2, r2)
 
   ! Take some aliases
   D => Nat % D
@@ -230,5 +203,7 @@
 
   fin_res = res
   niter   = iter
+
+  call Work % Disconnect_Real_Cell(p1, q1, r1, p2, q2, r2)
 
   end subroutine

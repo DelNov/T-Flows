@@ -3,26 +3,18 @@
 !------------------------------------------------------------------------------!
 !   Calculates h_max, h_min and h_w needed for Spalart Allmaras models.        !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: h_w_x => r_cell_01,  &
-                      h_w_y => r_cell_02,  &
-                      h_w_z => r_cell_03
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                            (allocates Work_Mod)                   !
-!     |                                                                        !
-!     +----> Turb % Calculate_Deltas    (safe to use r_cell_01..03)            !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
-  type(Field_Type), pointer :: Flow
-  integer                   :: s, c, c1, c2, nc, nb
-  real                      :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2
+  type(Grid_Type),   pointer :: Grid
+  type(Field_Type),  pointer :: Flow
+  integer                    :: s, c, c1, c2, nc, nb
+  real                       :: d, d1, d2, dx1, dx2, dy1, dy2, dz1, dz2
+  real, contiguous,  pointer :: h_w_x(:), h_w_y(:), h_w_z(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(h_w_x, h_w_y, h_w_z)
 
   ! Take aliases
   Flow => turb % pnt_flow
@@ -92,5 +84,7 @@
   call Grid % Exchange_Cells_Real(turb % h_max)
   call Grid % Exchange_Cells_Real(turb % h_min)
   call Grid % Exchange_Cells_Real(turb % h_w)
+
+  call Work % Disconnect_Real_Cell(h_w_x, h_w_y, h_w_z)
 
   end subroutine

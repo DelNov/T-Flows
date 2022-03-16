@@ -3,24 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Calculates Smagorinsky constant with dynamic procedure                     !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: u_f        => r_cell_01,  &
-                      v_f        => r_cell_02,  &
-                      w_f        => r_cell_03,  &
-                      uu_f       => r_cell_04,  &
-                      vv_f       => r_cell_05,  &
-                      ww_f       => r_cell_06,  &
-                      uv_f       => r_cell_07,  &
-                      uw_f       => r_cell_08,  &
-                      vw_f       => r_cell_09,  &
-                      m_11_f     => r_cell_10,  &
-                      m_22_f     => r_cell_11,  &
-                      m_33_f     => r_cell_12,  &
-                      m_12_f     => r_cell_13,  &
-                      m_13_f     => r_cell_14,  &
-                      m_23_f     => r_cell_15,  &
-                      shear_test => r_cell_16
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
@@ -35,7 +17,13 @@
   real                       :: l_11, l_22, l_33, l_12, l_13, l_23
   real                       :: m_11, m_22, m_33, m_12, m_13, m_23
   real                       :: m_dot_m, l_dot_m, l_g, l_f, vol_e
-!==============================================================================!
+  real, contiguous,  pointer :: u_f(:), v_f(:), w_f(:)
+  real, contiguous,  pointer :: uu_f(:), vv_f(:), ww_f(:)
+  real, contiguous,  pointer :: uv_f(:), uw_f(:), vw_f(:)
+  real, contiguous,  pointer :: m_11_f(:), m_22_f(:), m_33_f(:)
+  real, contiguous,  pointer :: m_12_f(:), m_13_f(:), m_23_f(:)
+  real, contiguous,  pointer :: shear_test(:)
+!------------------------------------------------------------------------------!
 !                                                                              !
 !   C is derived from:    Lij_res = Lij_mod                                    !
 !                                                                              !
@@ -54,9 +42,15 @@
 !   C = 0.5 * Lij:Mij / Mij:Mij                                                !
 !                                                                              !
 !   aij : bij = a11 * b11 + a22 * b22 + a33 * b33                              !
-!             + 2.0 * a12 * b12 + 2.0 a13 * b13 + 2.0 * a23 * b23              !   
+!             + 2.0 * a12 * b12 + 2.0 a13 * b13 + 2.0 * a23 * b23              !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
+
+  call Work % Connect_Real_Cell(u_f, v_f, w_f,                       &
+                                uu_f, vv_f, ww_f, uv_f, uw_f, vw_f,  &
+                                m_11_f, m_22_f, m_33_f,              &
+                                m_12_f, m_13_f, m_23_f,              &
+                                shear_test)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -216,7 +210,13 @@
       Turb % c_dyn(c) = 0.0 
     else if(Turb % c_dyn(c) > 0.04) then
       Turb % c_dyn(c) = 0.04
-    end if 
+    end if
   end do
+
+  call Work % Disconnect_Real_Cell(u_f, v_f, w_f,                       &
+                                   uu_f, vv_f, ww_f, uv_f, uw_f, vw_f,  &
+                                   m_11_f, m_22_f, m_33_f,              &
+                                   m_12_f, m_13_f, m_23_f,              &
+                                   shear_test)
 
   end subroutine

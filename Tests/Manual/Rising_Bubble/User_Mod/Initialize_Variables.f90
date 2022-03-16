@@ -3,12 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Case-dependent initialization of VOF variable.                             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: prelim_vof => r_cell_01,  &
-                      min_dist   => r_cell_02,  &
-                      max_dist   => r_cell_03,  &
-                      dist_node  => r_node_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
@@ -17,13 +11,18 @@
   type(Swarm_Type),  target :: Swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: fun
-  real,            pointer :: dt
-  integer                  :: c, n, i_nod, e, n_ellipses, fu
-  real                     :: radius_x, radius_y, radius_z
-  real                     :: cent_x, cent_y, cent_z, dist_norm
+  type(Grid_Type),  pointer :: Grid
+  type(Var_Type),   pointer :: fun
+  real,             pointer :: dt
+  integer                   :: c, n, i_nod, e, n_ellipses, fu
+  real                      :: radius_x, radius_y, radius_z
+  real                      :: cent_x, cent_y, cent_z, dist_norm
+  real, contiguous, pointer :: prelim_vof(:), min_dist(:), max_dist(:)
+  real, contiguous, pointer :: dist_node(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(prelim_vof, min_dist, max_dist)
+  call Work % Connect_Real_Node(dist_node)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -109,5 +108,8 @@
 
   ! Set old values to be the same as new ones
   fun % o(:) = fun % n(:)
+
+  call Work % Disconnect_Real_Cell(prelim_vof, min_dist, max_dist)
+  call Work % Disconnect_Real_Node(dist_node)
 
   end subroutine

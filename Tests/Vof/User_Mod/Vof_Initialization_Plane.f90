@@ -4,11 +4,6 @@
 !   Initialize as vof = 1 all cells beneath the plane given by 3 points        !
 !   sorted anticlockwise to the direction of the plane normal                  !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: prelim_vof     => r_cell_01,  &
-                      min_max_crit_1 => r_cell_02,  &
-                      min_max_crit_2 => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type), target :: Vof
@@ -20,7 +15,10 @@
   real                      :: n_xyz(3), v1aux(3), v2aux(3)
   real                      :: res_dummy
   real                      :: dd
+  real, contiguous, pointer :: prelim_vof(:),min_max_crit_1(:),min_max_crit_2(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(prelim_vof, min_max_crit_1, min_max_crit_2)
 
   ! First take aliases
   Grid => Vof % pnt_grid
@@ -101,5 +99,7 @@
   end do
 
   close(fu)
+
+  call Work % Disconnect_Real_Cell(prelim_vof, min_max_crit_1, min_max_crit_2)
 
   end subroutine

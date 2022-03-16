@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Work_Mod_Allocate(Grid, rc, rf, rn, ic, if, in)
+  subroutine Allocate_Work(Work, Grid, rc, rf, rn, ic, if, in)
 !------------------------------------------------------------------------------!
 !   Alocates memory for working arrays                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: Grid(:)
-  integer         :: rc  ! number of real cell arrays
-  integer         :: rf  ! number of real face arrays
-  integer         :: rn  ! number of real node arrays
-  integer         :: ic  ! number of integer cell arrays
-  integer         :: if  ! number of integer face arrays
-  integer         :: in  ! number of integer node arrays
+  class(Work_Type) :: Work
+  type(Grid_Type)  :: Grid(:)
+  integer          :: rc  ! number of real cell arrays
+  integer          :: rf  ! number of real face arrays
+  integer          :: rn  ! number of real node arrays
+  integer          :: ic  ! number of integer cell arrays
+  integer          :: if  ! number of integer face arrays
+  integer          :: in  ! number of integer node arrays
 !==============================================================================!
 
   call Work % Allocate_Real_Cell(Grid, rc)

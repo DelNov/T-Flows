@@ -3,18 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use User_Mod
-  use Work_Mod, only: cap_dens => r_cell_01,  &
-                      q_int    => r_cell_02,  &
-                      q_turb   => r_cell_03      ! turbulent heat fluxes
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                (allocates Work_Mod)                               !
-!     |                                                                        |
-!     +----> Compute_Energy (safe to use r_cell_01..02)                        !
-!------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Field_Type),    target :: Flow
@@ -33,6 +21,7 @@
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff
   real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, dt
+  real, contiguous,  pointer :: cap_dens(:), q_int(:), q_turb(:)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -71,6 +60,8 @@
 !==============================================================================!
 
   call Cpu_Timer % Start('Compute_Energy (without solvers)')
+
+  call Work % Connect_Real_Cell(cap_dens, q_int, q_turb)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -314,6 +305,8 @@
 
   ! User function
   call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
+
+  call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

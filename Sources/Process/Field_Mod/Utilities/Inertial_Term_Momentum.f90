@@ -14,14 +14,7 @@
 !   Yet, it is surprising and I better keep it for a while longer in the       !
 !   code for a subsequent analysis - should I ever have time for that.         !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: dens_f  => r_face_01,  &
-                      dens_cx => r_cell_01,  &
-                      dens_cy => r_cell_02,  &
-                      dens_cz => r_cell_03
-!------------------------------------------------------------------------------!
   implicit none
-!-----------------------------------[Arguments]--------------------------------!
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow
   type(Var_Type)            :: phi
@@ -29,11 +22,15 @@
   real                      :: b(:)
   real                      :: dt
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  real                     :: a0
-  integer                  :: c, c1, c2, s
-  real                     :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod
+  type(Grid_Type), pointer  :: Grid
+  real                      :: a0
+  integer                   :: c, c1, c2, s
+  real                      :: xc1, yc1, zc1, xc2, yc2, zc2, dotprod
+  real, contiguous, pointer :: dens_f(:), dens_cx(:), dens_cy(:), dens_cz(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Face(dens_f)
+  call Work % Connect_Real_Cell(dens_cx, dens_cy, dens_cz)
 
   ! Take alias to Grid
   Grid => Flow % pnt_grid
@@ -114,5 +111,8 @@
       b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)
     end do
   end if
+
+  call Work % Disconnect_Real_Face(dens_f)
+  call Work % Disconnect_Real_Cell(dens_cx, dens_cy, dens_cz)
 
   end subroutine

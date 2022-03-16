@@ -5,26 +5,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use User_Mod
-  use Work_Mod, only: u_c   => r_cell_01,  &
-                      v_c   => r_cell_02,  &
-                      w_c   => r_cell_03,  &
-                      v_m   => r_cell_04,  &  ! for Rhie and Chow
-                      t_m   => r_cell_05,  &  ! for Choi
-                      pst_x => r_cell_06,  &  ! d(p + st) / dx
-                      pst_y => r_cell_07,  &  ! d(p + st) / dy
-                      pst_z => r_cell_08,  &  ! d(p + st) / dz
-                      pst_d => r_face_01,  &  ! pressure and surface tension
-                      u_f   => r_face_02,  &
-                      v_f   => r_face_03,  &
-                      w_f   => r_face_04
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence must be established                  !
-!                                                                              !
-!   Main_Pro                        (allocates Work_Mod)                       !
-!     |                                                                        |
-!     +----> Compute_Pressure       (doesn't use Work_Mod)                     !
-!             |                                                                |
-!             +----> Rhie_And_Chow  (safe to use Work_Mod)                     !
+  use Work_Mod
 !------------------------------------------------------------------------------!
 !   Remember one important thing:                                              !
 !                                                                              !
@@ -51,9 +32,15 @@
   real                       :: a12, px_f, py_f, pz_f, fs, sigma
   real                       :: w_o, w_oo, curv_f
   integer                    :: s, c1, c2, c
+  real, contiguous,  pointer :: u_c(:), v_c(:), w_c(:), v_m(:), t_m(:)
+  real, contiguous,  pointer :: pst_x(:), pst_y(:), pst_z(:), pst_d(:)
+  real, contiguous,  pointer :: u_f(:), v_f(:), w_f(:)
 !==============================================================================!
 
   call Cpu_Timer % Start('Rhie_And_Chow')
+
+  call Work % Connect_Real_Cell(u_c, v_c, w_c, v_m, t_m, pst_x, pst_y, pst_z)
+  call Work % Connect_Real_Face(pst_d, u_f, v_f, w_f)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -243,6 +230,9 @@
 
     end if
   end do
+
+  call Work % Disconnect_Real_Cell(u_c, v_c, w_c, v_m, t_m, pst_x, pst_y, pst_z)
+  call Work % Disconnect_Real_Face(pst_d, u_f, v_f, w_f)
 
   call Cpu_Timer % Stop('Rhie_And_Chow')
 

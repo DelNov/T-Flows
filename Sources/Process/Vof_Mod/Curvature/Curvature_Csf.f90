@@ -3,11 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Computes the Curvature based on Brackbill's CSF using Gauss theorem        !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: div_x => r_cell_10,  &
-                      div_y => r_cell_11,  &
-                      div_z => r_cell_12
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
@@ -19,7 +14,10 @@
   integer                   :: c, c1, c2, s, nb, nc
   real                      :: v1(3), v2(3), v3(3), v4(3)
   real                      :: norm_grad, dotprod
+  real, contiguous, pointer :: div_x(:), div_y(:), div_z(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(div_x, div_y, div_z)
 
   Grid   => Vof % pnt_grid
   Flow   => Vof % pnt_flow
@@ -170,5 +168,7 @@
   do c = 1, Grid % n_cells
     if(smooth % n(c) < 0.01 .or. smooth % n(c) > 0.99) Vof % curv(c) = 0.0
   end do
+
+  call Work % Disconnect_Real_Cell(div_x, div_y, div_z)
 
   end subroutine

@@ -4,14 +4,6 @@
 !   Calculates time scale and leght scale in manner to avoid singularity       !
 !   in eps equation.                                                           !
 !------------------------------------------------------------------------------!
-  use Work_Mod, only: t_1   => r_cell_12,   &  ! [s]
-                      t_2   => r_cell_13,   &  ! [s]
-                      t_3   => r_cell_14,   &  ! [s]
-                      l_1   => r_cell_15,   &  ! [m]
-                      l_2   => r_cell_16,   &  ! [m]
-                      l_3   => r_cell_17,   &  ! [m]
-                      eps_l => r_cell_18       ! [m]
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
@@ -22,7 +14,9 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   real                      :: kin_vis   ! kinematic viscosity [m^2/s]
   integer                   :: c
-!==============================================================================!
+  real, contiguous, pointer :: t_1(:), t_2(:), t_3(:), l_1(:), l_2(:), l_3(:)
+  real, contiguous, pointer :: eps_l(:)
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
@@ -31,7 +25,9 @@
 !   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          l_1       [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
-!------------------------------------------------------------------------------!
+!==============================================================================!
+
+  call Work % Connect_Real_Cell(t_1, t_2, t_3, l_1, l_2, l_3, eps_l)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -108,5 +104,7 @@
     end do
 
   end if
+
+  call Work % Disconnect_Real_Cell(t_1, t_2, t_3, l_1, l_2, l_3, eps_l)
 
   end subroutine

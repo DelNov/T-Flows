@@ -6,7 +6,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
   use Numerics_Mod
-  use Work_Mod,     only: sum_neigh => r_cell_01
+  use Work_Mod
 !------------------------------------------------------------------------------!
 !   When using Work_Mod, calling sequence should be outlined                   !
 !                                                                              !
@@ -26,7 +26,10 @@
   type(Matrix_Type), pointer :: M
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
+  real, contiguous,  pointer :: sum_neigh(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(sum_neigh)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -58,5 +61,7 @@
     call Flow % Grad_Variable(ui)
 
   end if
+
+  call Work % Disconnect_Real_Cell(sum_neigh)
 
   end subroutine

@@ -3,30 +3,21 @@
 !------------------------------------------------------------------------------!
 !   Tries to find pressure gradients with Gaussian in an iterative fashion.    !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: c_at_bnd => i_cell_01,  &  ! cell at boundary?
-                      c_cnt    => i_cell_02      ! counting neighbours
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                         (allocates Work_Mod)      !
-!     |                                                                        !
-!     +----> Compute_Pressure                        (doesn't use Work_Mod)    !
-!              |                                                               !
-!              +----> Field_Mod_Grad_Gauss_Pressure  (i_cell_01..02 are safe)  !
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
   type(Var_Type),    target :: p     ! should be pressure or pressure correction
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: s, c, c1, c2
-  integer                  :: i_fac, c1_prim, c2_prim, s_prim
+  type(Grid_Type),     pointer :: Grid
+  integer                      :: s, c, c1, c2
+  integer                      :: i_fac, c1_prim, c2_prim, s_prim
+  integer, contiguous, pointer :: c_at_bnd(:), c_cnt(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: YES = 1
   integer, parameter :: NO  = YES-1
 !==============================================================================!
+
+  call Work % Connect_Int_Cell(c_at_bnd, c_cnt)
 
   ! Take alias
   Grid => Flow % pnt_grid
@@ -152,5 +143,7 @@
 
   ! Perform Gauss from gradients which are good inside obtained above
   call Flow % Grad_Gauss_Variable(p)
+
+  call Work % Disconnect_Int_Cell(c_at_bnd, c_cnt)
 
   end subroutine

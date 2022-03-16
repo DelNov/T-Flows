@@ -6,21 +6,20 @@
 !   a more elaborate approach is therefore needed, which will probably be in   !
 !   Grad_Gauss_Pressure, when introduced.
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_f_n  => r_face_01,  &
-                      phi_f_o  => r_face_02
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
   type(Var_Type),    target :: phi
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: s, c, c1, c2, iter
-  real                     :: res, norm
+  type(Grid_Type), pointer  :: Grid
+  integer                   :: s, c, c1, c2, iter
+  real                      :: res, norm
+  real, contiguous, pointer :: phi_f_n(:), phi_f_o(:)
 !==============================================================================!
 
   call Cpu_Timer % Start('Grad_Gauss_Variable')
+
+  call Work % Connect_Real_Face(phi_f_n, phi_f_o)
 
   ! Take alias
   Grid => Flow % pnt_grid
@@ -64,6 +63,8 @@
   !   print *, '# Final residual from Gauss: ', res,  &
   !            ' reached in ', iter, ' iterations '
   ! end if
+
+  call Work % Disconnect_Real_Face(phi_f_n, phi_f_o)
 
   call Cpu_Timer % Stop('Grad_Gauss_Variable')
 

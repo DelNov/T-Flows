@@ -3,8 +3,6 @@
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
-  use Work_Mod, only: var => r_cell_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
@@ -14,10 +12,13 @@
   integer, intent(in)      :: n     ! time step
   real,    intent(in)      :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: G
-  type(Var_Type),  pointer :: u, v, w, t, phi
-  integer                  :: c, nb, nc
+  type(Grid_Type),  pointer :: G
+  type(Var_Type),   pointer :: u, v, w, t, phi
+  integer                   :: c, nb, nc
+  real, contiguous, pointer :: var(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(var)
 
   ! Take aliases
   G  => Flow % pnt_grid
@@ -50,6 +51,8 @@
   call G % Save_Debug_Vtu('z1',scalar_cell=var(-nb:nc),scalar_name='z')
   call G % Exchange_Cells_Real(var)
   call G % Save_Debug_Vtu('z2',scalar_cell=var(-nb:nc),scalar_name='z')
+
+  call Work % Disconnect_Real_Cell(var)
 
   call Comm_Mod_End
   stop

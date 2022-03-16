@@ -3,12 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Initialize dependent variables.  (It is a bit of a mess still)             !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: prelim_vof => r_cell_01,  &
-                      min_dist   => r_cell_02,  &
-                      max_dist   => r_cell_03,  &
-                      dist_node  => r_node_01
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type), target :: Vof
@@ -18,7 +12,12 @@
   integer                   :: ee, n_ellipses
   real                      :: radius_1, radius_2, radius_3
   real                      :: cent_x, cent_y, cent_z, dist_norm
+  real, contiguous, pointer :: prelim_vof(:), min_dist(:), max_dist(:)
+  real, contiguous, pointer :: dist_node(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(prelim_vof, min_dist, max_dist)
+  call Work % Connect_Real_Node(dist_node)
 
   ! First take aliases
   Grid => Vof % pnt_grid
@@ -86,5 +85,8 @@
   end do
 
   close(fu)
+
+  call Work % Disconnect_Real_Cell(prelim_vof, min_dist, max_dist)
+  call Work % Disconnect_Real_Node(dist_node)
 
   end subroutine

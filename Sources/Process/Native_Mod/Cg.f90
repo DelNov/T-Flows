@@ -3,27 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Solves the linear systems of equations by a preconditioned CG method       !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: p1 => r_cell_01,  &
-                      q1 => r_cell_02,  &
-                      r1 => r_cell_03
-!------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                         (allocates Work_Mod)                      !
-!     |                                                                        !
-!     +----> Compute_Pressure        (does not use Work_Mod)                   !
-!              |                                                               !
-!              +----> Cg             (safe to use r_cell_01..03)               !
-!                                                                              !
-!   Main_Pro                                    (allocates Work_Mod)           !
-!     |                                                                        !
-!     +----> Turb_Mod_Main                      (does not use Work_Mod)        !
-!              |                                                               !
-!              +---> Turb_Mod_Compute_F22       (does not use Work_Mod)        !
-!                      |                                                       !
-!                      +----> Cg                (safe to use r_cell_01..04)    !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Native_Type), target :: Nat
@@ -44,7 +23,10 @@
   integer                    :: i, j, k, iter
   real                       :: sum_a, fn
   integer                    :: sum_n
+  real, contiguous,  pointer :: p1(:), q1(:), r1(:)
 !==============================================================================!
+
+  call Work % Connect_Real_Cell(p1, q1, r1)
 
   ! Take some aliases
   D => Nat % D
@@ -209,5 +191,7 @@
 
   fin_res = res
   niter   = iter
+
+  call Work % Disconnect_Real_Cell(p1, q1, r1)
 
   end subroutine

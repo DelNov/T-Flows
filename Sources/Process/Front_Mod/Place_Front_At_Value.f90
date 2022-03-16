@@ -3,9 +3,6 @@
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value 0.5                            !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Work_Mod, only: phi_n => r_node_01  ! value at the static Grid nodes
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
@@ -25,11 +22,14 @@
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
   real                       :: surf_v(3)
+  real, contiguous, pointer  :: phi_n(:)
 !------------------------------------------------------------------------------!
   include 'Front_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
   call Cpu_Timer % Start('Creating_Front_From_Vof_Function')
+
+  call Work % Connect_Real_Node(phi_n)
 
   ! Take aliases
   Grid => Front % pnt_grid
@@ -217,6 +217,8 @@
   !                                                                 !
   !-----------------------------------------------------------------!
   call Front % Mark_Cells_And_Faces(sharp)
+
+  call Work % Disconnect_Real_Node(phi_n)
 
   call Cpu_Timer % Stop('Creating_Front_From_Vof_Function')
 

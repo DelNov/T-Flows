@@ -3,15 +3,6 @@
 !------------------------------------------------------------------------------!
 !   This was developed to devise strategy for pressure gradient calculation    !
 !------------------------------------------------------------------------------!
-  use Work_Mod, only: phi_f    => r_face_01,  &
-                      phi_n    => r_node_01,  &
-                      phi_x    => r_cell_01,  &
-                      phi_y    => r_cell_02,  &
-                      phi_z    => r_cell_03,  &
-                      phi_c    => r_cell_04,  &
-                      c_at_bnd => i_cell_01,  &
-                      c_cnt    => i_cell_02
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
@@ -20,15 +11,23 @@
   type(Swarm_Type),  target :: Swarm
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: t, p
-  integer                  :: c, s, c1, c2, iter
-  integer                  :: i_fac, c1_prim, c2_prim, s_prim
-  character(8)             :: name = 'check_xx'
+  type(Grid_Type),     pointer :: Grid
+  type(Var_Type),      pointer :: t, p
+  integer                      :: c, s, c1, c2, iter
+  integer                      :: i_fac, c1_prim, c2_prim, s_prim
+  character(8)                 :: name = 'check_xx'
+  real,    contiguous, pointer :: phi_f(:), phi_n(:), phi_c(:)
+  real,    contiguous, pointer :: phi_x(:), phi_y(:), phi_z(:)
+  integer, contiguous, pointer :: c_at_bnd(:), c_cnt(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: YES = 1
   integer, parameter :: NO  = YES-1
 !==============================================================================!
+
+  call Work % Connect_Real_Face(phi_f)
+  call Work % Connect_Real_Node(phi_n)
+  call Work % Connect_Real_Cell(phi_x, phi_y, phi_z, phi_c)
+  call Work % Connect_Int_Cell (c_at_bnd, c_cnt)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -369,5 +368,10 @@
             'test_5_field_grad_gauss_pressure',     &
             vector_cell = (/p % x, p % y, p % z/),  &
             vector_name = 'p_xyz')
+
+  call Work % Disconnect_Real_Face(phi_f)
+  call Work % Disconnect_Real_Node(phi_n)
+  call Work % Disconnect_Real_Cell(phi_x, phi_y, phi_z, phi_c)
+  call Work % Disconnect_Int_Cell (c_at_bnd, c_cnt)
 
   end subroutine
