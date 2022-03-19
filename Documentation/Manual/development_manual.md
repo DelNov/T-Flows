@@ -32,6 +32,9 @@
         5. [Module ```Boundary_Mod```](#modules_second_level_boundary)
             1. [New type](#modules_second_level_boundary_type)
             2. [Data members](#modules_second_level_boundary_data)
+        6. [Module ```Vtk_Mod```](#modules_second_level_vtk)
+            1. [Data members](#modules_second_level_vtk_data)
+            1. [Member procedure](#modules_second_level_vtk_proc)
 
 
 # Coding standards <a name="coding"> </a>
@@ -982,3 +985,86 @@ discourage programmers to identify boundary conditions by small integers
 like 1, 2, 3 . . . Similar approach has been taken to give values to many other
 constants in T-Flows' modules.
 
+### Module ```Vtk_Mod``` <a name="modules_second_level_vtk"> </a>
+
+The module ```Vtk_Mod``` is simular in its scope to
+```Metis_Options_Mod```](#modules_first_level_metis) in the sense that all of
+its data members are parameters used while creating ```.vtu``` files, and the
+only procedure it has, is to change one or two variables depending on the
+precision of the numbers we are saving.
+
+
+#### Data members <a name="modules_second_level_vtk_data"> </a>
+
+Parameters introduced in ```Vtk_Mod``` are used either to describe cell shapes
+we are passing to the file, such as:
+- ```VTK_LINE       =  3```
+- ```VTK_TRIANGLE   =  5```
+- ```VTK_POLYGON    =  7```
+- ```VTK_QUAD       =  9```
+- ```VTK_TETRA      = 10```
+- ```VTK_HEXAHEDRON = 12```
+- ```VTK_WEDGE      = 13```
+- ```VTK_PYRAMID    = 14```
+- ```VTK_POLYHEDRON = 42```
+
+whose purpose should be clear to you.  The values these parameters take are
+stipulated in [VTK File Format](../Literature/VTK_File_Format.pdf).
+
+When creating ```.vtu``` files, we like to keep a neat indentation.  For
+example, some portions of a neatly indented ```.vtu``` file could read:
+```
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="11942" NumberOfCells ="354">
+      <Points>
+        <DataArray type="Float64" NumberOfComponents="3" format="appended" offset="0">
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="appended" offset="286612">
+        </DataArray>
+        ...
+      </Cells>
+      <CellData Scalars="scalars" vectors="velocity">
+        <DataArray type="Int32" Name="Processor [1]" format="appended" offset="295120">
+        </DataArray>
+        ...
+      </CellData>
+    </Piece>
+  </UnstructuredGrid>
+<AppendedData encoding="raw">
+...
+</AppendedData>
+</VTKFile>
+```
+
+In order to achieve that in an easier way from procedures in upper level modules
+which create ```.vtu``` files, we introduce character parameters for indentation:
+- ``` IN_0``` which is an empty string
+- ``` IN_1``` which is a string with one space character
+- ``` IN_2``` a string with two spaces
+- ``` IN_3``` with three spaces
+- ``` IN_4``` four spaces
+- ``` IN_5``` a string with five spaces
+
+and one character for _line feed_ (also know as _new line_, _carriage return_)
+- ``` LF   = char(10)```
+
+Finally, two strings are introduced which hold the precision written to
+```.vtu``` files:
+- ```intp``` for integer precision in ```.vtu``` files
+-``` floatp``` for floating point precision in ```.vtu``` files
+
+#### Member procedure <a name="modules_second_level_vtk_proc"> </a>
+
+There is only procedure introduced with ```Vtk_Mod``` and it is:
+
+- ```Vtk_Mod_Set_Precision```
+
+which, based on the precision of integer and floating point numbers used in
+T-Flows, set module's variables ```intp``` and ```floatp``` to ```"Int32"``` or
+```"Int64"``` for the former and ```"Float32"``` or ```"Float64"``` for the
+latter. If you glance through the example portion of ```.vtu``` file above, you
+can see that these identifiers are used inside a ```.vtu``` file.

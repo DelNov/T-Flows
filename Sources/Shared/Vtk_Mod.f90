@@ -25,13 +25,14 @@
   !-------------------------------------------------------!
   !   Constants for text formatting; indentation levels   !
   !-------------------------------------------------------!
-  character(len= 1), parameter :: LF   = char(10)      ! line feed
   character(len= 0), parameter :: IN_0 = ''            ! indentation levels
   character(len= 2), parameter :: IN_1 = '  '
   character(len= 4), parameter :: IN_2 = '    '
   character(len= 6), parameter :: IN_3 = '      '
   character(len= 8), parameter :: IN_4 = '        '
   character(len=10), parameter :: IN_5 = '          '
+
+  character(len= 1), parameter :: LF = char(10)  ! line feed
 
   character(len=7) :: intp   = '"IntXX"'
   character(len=9) :: floatp = '"FloatXX"'
