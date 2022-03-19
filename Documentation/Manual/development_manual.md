@@ -555,7 +555,7 @@ parameters passed to it
 - ```Invert_3x3_Matrix``` inverts a small (3 × 3) matrix.
 
 - ```Rotate_Vector``` rotates a vector around the prescribed axis for a
-prescribed angle, using [Rodrigues' formula]#https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula)
+prescribed angle, using [Rodrigues' formula](https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula)
 
 - ```Smaller_Real``` is a logical function similar to ```Approx_Real```, but it
 returns true if first argument is smaller that the second, within a certain
