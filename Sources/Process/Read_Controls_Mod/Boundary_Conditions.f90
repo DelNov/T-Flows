@@ -158,9 +158,6 @@
       else if( bc_type_name .eq. 'PRESSURE') then
         bc_type_tag = PRESSURE
         Grid % bnd_cond % type(bc) = PRESSURE
-      else if( bc_type_name .eq. 'OPENBC') then
-        bc_type_tag = OPENBC
-        Grid % bnd_cond % type(bc) = OPENBC
       else
         if(this_proc < 2) then
           print *, '# ERROR!  Read_Control_Boundary_Conditions: '//        &
