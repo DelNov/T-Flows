@@ -13,28 +13,29 @@
         2. [Modules](#coding_headers_mod)
 2. [Description of modules](#modules)
     1. [First level modules](#modules_first_level)
-        1. [Module ```Const_Mod```](#modules_first_level_const)
-        2. [Module ```Swap_Mod```](#modules_first_level_swap)
+        1. [```Const_Mod```](#modules_first_level_const)
+        2. [```Swap_Mod```](#modules_first_level_swap)
             1. [Member procedures](#modules_first_level_swap_proc)
-        3. [Module ```Metis_Options_Mod```](#modules_first_level_metis)
+        3. [```Metis_Options_Mod```](#modules_first_level_metis)
     2. [Second level modules](#modules_second_level)
-        1. [Module ```Math_Mod```](#modules_second_level_math)
+        1. [```Math_Mod```](#modules_second_level_math)
             1. [New types](#modules_second_level_math_type)
             2. [Data members](#modules_second_level_math_data)
             3. [Member procedures](#modules_second_level_math_proc)
-        2. [Module ```Sort_Mod```](#modules_second_level_sort)
-            1. [Member procedures](#modules_second_level_sort_proc)
-        3. [Module ```File_Mod```](#modules_second_level_file)
+        2. [```File_Mod```](#modules_second_level_file)
             1. [New types](#modules_second_level_file_type)
             2. [Data members](#modules_second_level_file_data)
             3. [Member procedures](#modules_second_level_file_proc)
-        4. [Module ```Comm_Mod```](#modules_second_level_comm)
-        5. [Module ```Boundary_Mod```](#modules_second_level_boundary)
+        3. [```Comm_Mod```](#modules_second_level_comm)
+        4. [```Boundary_Mod```](#modules_second_level_boundary)
             1. [New type](#modules_second_level_boundary_type)
             2. [Data members](#modules_second_level_boundary_data)
-        6. [Module ```Vtk_Mod```](#modules_second_level_vtk)
+        5. [```Vtk_Mod```](#modules_second_level_vtk)
             1. [Data members](#modules_second_level_vtk_data)
             1. [Member procedure](#modules_second_level_vtk_proc)
+    3. [Third level modules](#modules_third_level)
+        1. [```Sort_Mod```](#modules_second_level_sort)
+            1. [Member procedures](#modules_second_level_sort_proc)
 
 
 # Coding standards <a name="coding"> </a>
@@ -428,7 +429,7 @@ have difficulties to find and/or change it in the code later.  Maybe you wrote
 it as 1.0e-6, maybe as 1.0E-6, maybe just 1e-6 or even 0.000001.  With
 ```MICRO```, you have no doubts and you will find it very fast.
 
-### Module ```Swap_Mod``` <a name="modules_first_level_swap"> </a>
+### ```Swap_Mod``` <a name="modules_first_level_swap"> </a>
 
 This is a very small module containing only two procedures and, since it is used
 from all sub-programs, it resides in ```[root]/Sources/Shared/```.  This is the
@@ -448,7 +449,7 @@ is on the first level.
 - ```Swap_Int``` swaps two integer numbers
 - ```Swap_Real``` swaps two floating point numbers
 
-### Module ```Metis_Options_Mod``` <a name="modules_first_level_metis"> </a>
+### ```Metis_Options_Mod``` <a name="modules_first_level_metis"> </a>
 
 The only purpose of the ```Metis_Options_Mod``` is to hold a number of integer
 constants (parameters in Fortran) for passing options to
@@ -459,7 +460,7 @@ interested, please consult the METIS’ documentation.
 
 ## Second level modules <a name="modules_second_level"> </a>
 
-### Module ```Math_Mod``` <a name="modules_second_level_math"> </a>
+### ```Math_Mod``` <a name="modules_second_level_math"> </a>
 
 Except for one constant, ```Math_Mod``` contains only useful mathematical
 functions which could be used throughout the code.  As such, it is shared by
@@ -572,124 +573,7 @@ coordinates of the four defining points in order: ```x1```, ```y1```, ```z1```,
 ```x2```, ... ```z3```, ```x4```, ```y4``` and ```z4```.  It is used when
 computing volumes of cells of all shapes from their coordinates.
 
-### Module ```Sort_Mod``` <a name="modules_second_level_sort"> </a>
-
-As the name implies, ```Sort_Mod``` contains sorting procedures.  It introduces
-a new data type ```Sort_Type``` which has all the member procedures.  This
-module is defined in ```[root]/Sources/Shared/``` directory.
-
-#### Member procedures <a name="modules_second_level_sort_proc"> </a>
-
-- ```Int_Array``` and ```Real_Sort``` sort an integer (or a real) array whose
-size is not specified, but deduced from the array itself with the Fortran’s
-```size``` function.
-
-- ```Int_By_Index``` and ```Real_By_Index``` sort an integer (or a real) array
-with specified size by a supplied index array.
-
-- ```Int_Carry_Int``` sorts one integer array and make the same changes in
-another integer array which is supplied. Size of arrays is not specified, but
-deduced from first array itself with the Fortran’s ```size``` function.  
-Example:
-```
-1   a = (/ 6, 3, 4, 8, 9, 2, 1, 7, 5/)
-2   b = (/40, 78, 32, 17, 81, 10, 17, 24, 36/)
-3
-4   call Sort % Int_Carry_Int(a, b)
-5
-6   a .eq. (/ 1, 2, 3, 4, 5, 6, 7, 8, 9/)
-7   b .eq. (/17, 10, 78, 32, 36, 40, 24, 17, 81/)
-```
-
-- ```Int_Carry_Real``` sorts one integer array and makes the same changes in
-the supplied real array.  Size of arrays is not specified by an argument, but
-deduced from first array itself with the Fortran’s ```size``` function.
-
-- ```Real_Carry_Int``` sorts one real array and make the same changes in the
-supplied integer array.  Size of arrays is not specified by an argument, but
-deduced from first array itself.
-
-- ```Real_Carry_Two_Int``` sorts one real array and make the same changes in the
-two supplied integer array.  Size of arrays is not specified by an argument, but
-deduced from first array itself.
-
-- ```Reverse_Order_Int``` and ```Reverse_Order_Real``` sort an integer (or real)
-array in reverse order
-
-- ```Two_Int``` sorts two integer arrays, with first having higher weight. Size
-of arrays is not specified by an argument.  
-Example:
-```
-1   a = (/ 6, 3, 4, 4, 6, 3, 1, 1, 5/)
-2   b = (/40, 78, 32, 17, 81, 10, 17, 24, 36/)
-3
-4   call Sort % Two_Int(a, b)
-5
-6   a .eq. (/ 1, 1, 3, 3, 4, 4, 5, 6, 6/)
-7   b .eq. (/17, 24, 10, 78, 17, 32, 36, 40, 81/
-```
-
-- ```Two_Int_Carry_Int``` and ```Two_Int_Carry_Two_Int``` does the same as
-```Two_Int```, but carries one (or two) integer arrays along.
-
-- ```Two_Real``` does the same as ```Two_Int```, but for two real arrays.
-
-- ```Two_Real_Carry_Int``` and ```Two_Real_Carry_Two_Int``` do the same as
-```Two_Real``` but carry one (or two) integer arrays along.
-
-- ```Three_Int``` does the same as ```Two_Int``` but for three integer arrays.
-
-- ```Three_Int_Carry_Int```, ```Three_Int_Carry_Two_Int``` and
-```Three_Int_Carry_Three_Int``` do the same as ```Three_Int```, but carry one,
-two or three integer arrays along.  
-Example:
-```
- 1   a = (/ 5,  6,  6,  6,  5,  5,  6,  5,  5/)
- 2   b = (/ 3,  2,  1,  3,  1,  2,  3,  2,  1/)
- 3   c = (/ 6,  3,  4,  4,  6,  3,  1,  1,  5/)
- 4   d = (/40, 78, 32, 17, 81, 10, 17, 24, 36/)
- 5
- 6   call Sort % Three_Int_Carry_Int(a, b, c, d)
- 7
- 8   a .eq. (/ 5,  5,  5,  5,  5,  6,  6,  6,  6/)
- 9   b .eq. (/ 1,  1,  2,  2,  3,  1,  2,  3,  3/)
-10   c .eq. (/ 5,  6,  1,  3,  6,  4,  3,  1,  4/)
-11   d .eq. (/36, 81, 24, 10, 40, 32, 78, 17, 17/)
-```
-
-- ```Three_Real_Carry_Int```, ```Three_Real_Carry_Two_Int``` and
-```Three_Real_Carry_Three_Int``` do the same as above functions, but sorting
-is based on three real arrays.
-
-- ```Unique_Int``` sorts and integer array without repetition, i.e. compresses
-it if some entries are repeated. The size of array is passed as input parameter,
-and at the exit, it holds the size of the compressed array.  
-Example:
-```
-1   n = 9
-2   a = (/6, 3, 4, 4, 6, 3, 1, 1, 6/)
-3
-4   call Sort % Unique_Int(n, a)
-5
-6   n .eq. 4
-7   a .eq. (/1, 3, 4, 6/)
-```
-
-> **_Note:_** It should be noted at this point that the procedures which sort
-by more than one real array (all starting with ```Two_Real_``` and
-```Three_Real_```) are prone to round off errors from the outset.
-In order to make their outcomes more predictable, we heavily use
-```Math % Approx_Real``` and ```Math % Smaller_Real``` inside them, which
-improves their behaviour quite a bit.
-
-Most of the procedures in ```Sort_Mod``` are derived from the
-[Quicksort](https://dl.acm.org/doi/10.1145/366622.366644) algorithm shared by
-[Reznikova](https://gist.github.com/1AdAstra1/6f7785373efe5bb6c254d2e20c78ccc4)
-and the inspiration to carry additional arrays along comes from subroutines
-shared by [Jones et al.](https://www.netlib.org/slatec/src/isort.f) on
-[Netlib](http://www.netlib.org/).
-
-### Module ```File_Mod``` <a name="modules_second_level_file"> </a>
+### ```File_Mod``` <a name="modules_second_level_file"> </a>
 
 As the name implies, ```File_Mod```'s main purpose is file manipulation, and
 to an extent manipulation with input lines from ASCII files.  It uses
@@ -843,7 +727,7 @@ sent to ```Set_Name``` is too big for a meaningful example, but if you want
 to see it _in action_, simply observe the names of the files created by
 T-Flows sub-programs, they all use this procedure to set file names.
 
-### Module ```Comm_Mod``` <a name="modules_second_level_comm"> </a>
+### ```Comm_Mod``` <a name="modules_second_level_comm"> </a>
 
 The name of this module is abbreviation for _communication_ and it contains data
 and procedures which ease and unify parallel programming with message passing
@@ -898,7 +782,7 @@ buffer cells should be _fresh_, that is, buffers have to be _refresshed_ in
 a timely manner.  We sill come to that later.  Note that _structured_ numbering
 is completely lost in individual sub-domains.
 
-### Module ```Boundary_Mod``` <a name="modules_second_level_boundary"> </a>
+### ```Boundary_Mod``` <a name="modules_second_level_boundary"> </a>
 
 The purpose is to help manipulating with boundary conditions inside the module
 ```Grid_Mod``` introduced below. The module has no member procedures, only
@@ -985,7 +869,7 @@ discourage programmers to identify boundary conditions by small integers
 like 1, 2, 3 . . . Similar approach has been taken to give values to many other
 constants in T-Flows' modules.
 
-### Module ```Vtk_Mod``` <a name="modules_second_level_vtk"> </a>
+### ```Vtk_Mod``` <a name="modules_second_level_vtk"> </a>
 
 The module ```Vtk_Mod``` is simular in its scope to
 ```Metis_Options_Mod```](#modules_first_level_metis) in the sense that all of
@@ -1068,3 +952,164 @@ T-Flows, set module's variables ```intp``` and ```floatp``` to ```"Int32"``` or
 ```"Int64"``` for the former and ```"Float32"``` or ```"Float64"``` for the
 latter. If you glance through the example portion of ```.vtu``` file above, you
 can see that these identifiers are used inside a ```.vtu``` file.
+
+## Third level modules <a name="modules_third_level"> </a>
+
+### ```Sort_Mod``` <a name="modules_third_level_sort"> </a>
+
+As the name implies, ```Sort_Mod``` contains sorting procedures.  It introduces
+a new data type ```Sort_Type``` which has all the member procedures.  This
+module is defined in ```[root]/Sources/Shared/``` directory.  It uses the
+[```Swap_Mod```](#modules_first_level_swap), which is a first level module;
+the [```Math_Mod```](#modules_second_level_math), which is a second level
+module, making ```Sort_Mod``` a module of the _third level_.  Its dependency
+on other module is depicted in this diagram:
+
+<img src="Figures/Diagrams/sort.png" width="300"/>
+
+> **_Note:_** This diagram was created almost automatically with utility
+_PyFA_ (Python Fortran Analyzer) which you can use to analyze any portion
+of the T-Flows code.  _PyFA_ resides in directory
+```[root]Sources/Utilities/PyFA/``` and in its most basic usage, it analyzes
+a number of Fortran sources you provide to it in a list, and creates a
+diagram in [Xfig](http://mcj.sourceforge.net/) format.  For the graph above,
+we had the file called ```sort.src``` with the list of sources we want
+to analyze:
+```
+../../../../Sources/Shared/Const_Mod.f90
+../../../../Sources/Shared/Sort_Mod.f90
+../../../../Sources/Shared/Swap_Mod.f90
+../../../../Sources/Shared/Math_Mod.f90
+```
+and invoked _PyFA_ from ```[root]/Documentaion/Manual/Figures/Diagrams/``` with
+```
+./PyFA.py -s sort.src
+```
+which created the file ```diagram.fig```.  _PyFA_ comes with a number of
+command line options which you can use to customize the look and the layout
+of your diagrams.  If you think it is useful, feel free to explore different
+options yourself.
+
+> **_Hint:_** Creation of diagrams with _PyFA_ should be sought as an iterative
+process.  You first run just with a list of Fortran sources and see what you
+get (file ```diagram.fig```).  From that point on, you can fine-tune by editing
+the files ```diagram.ij```, ```diagram.xy``` and ```diagram.d``` whose purpose
+is to to change logical positions (```ij```) of modules, change their absolute
+positons (```xy```) or level of details (```d```) you want for each module. For
+the diagram you see above, we used the command:
+```
+./PyFA.py -s sort.src -xy sort.xy
+```
+where ```sort.xy``` was created from initial ```diagram.xy``` by changing two
+_x_ coordinates only.
+
+#### Member procedures <a name="modules_third_level_sort_proc"> </a>
+
+- ```Int_Array``` and ```Real_Sort``` sort an integer (or a real) array whose
+size is not specified, but deduced from the array itself with the Fortran’s
+```size``` function.
+
+- ```Int_By_Index``` and ```Real_By_Index``` sort an integer (or a real) array
+with specified size by a supplied index array.
+
+- ```Int_Carry_Int``` sorts one integer array and make the same changes in
+another integer array which is supplied. Size of arrays is not specified, but
+deduced from first array itself with the Fortran’s ```size``` function.  
+Example:
+```
+1   a = (/ 6, 3, 4, 8, 9, 2, 1, 7, 5/)
+2   b = (/40, 78, 32, 17, 81, 10, 17, 24, 36/)
+3
+4   call Sort % Int_Carry_Int(a, b)
+5
+6   a .eq. (/ 1, 2, 3, 4, 5, 6, 7, 8, 9/)
+7   b .eq. (/17, 10, 78, 32, 36, 40, 24, 17, 81/)
+```
+
+- ```Int_Carry_Real``` sorts one integer array and makes the same changes in
+the supplied real array.  Size of arrays is not specified by an argument, but
+deduced from first array itself with the Fortran’s ```size``` function.
+
+- ```Real_Carry_Int``` sorts one real array and make the same changes in the
+supplied integer array.  Size of arrays is not specified by an argument, but
+deduced from first array itself.
+
+- ```Real_Carry_Two_Int``` sorts one real array and make the same changes in the
+two supplied integer array.  Size of arrays is not specified by an argument, but
+deduced from first array itself.
+
+- ```Reverse_Order_Int``` and ```Reverse_Order_Real``` sort an integer (or real)
+array in reverse order
+
+- ```Two_Int``` sorts two integer arrays, with first having higher weight. Size
+of arrays is not specified by an argument.  
+Example:
+```
+1   a = (/ 6, 3, 4, 4, 6, 3, 1, 1, 5/)
+2   b = (/40, 78, 32, 17, 81, 10, 17, 24, 36/)
+3
+4   call Sort % Two_Int(a, b)
+5
+6   a .eq. (/ 1, 1, 3, 3, 4, 4, 5, 6, 6/)
+7   b .eq. (/17, 24, 10, 78, 17, 32, 36, 40, 81/
+```
+
+- ```Two_Int_Carry_Int``` and ```Two_Int_Carry_Two_Int``` does the same as
+```Two_Int```, but carries one (or two) integer arrays along.
+
+- ```Two_Real``` does the same as ```Two_Int```, but for two real arrays.
+
+- ```Two_Real_Carry_Int``` and ```Two_Real_Carry_Two_Int``` do the same as
+```Two_Real``` but carry one (or two) integer arrays along.
+
+- ```Three_Int``` does the same as ```Two_Int``` but for three integer arrays.
+
+- ```Three_Int_Carry_Int```, ```Three_Int_Carry_Two_Int``` and
+```Three_Int_Carry_Three_Int``` do the same as ```Three_Int```, but carry one,
+two or three integer arrays along.  
+Example:
+```
+ 1   a = (/ 5,  6,  6,  6,  5,  5,  6,  5,  5/)
+ 2   b = (/ 3,  2,  1,  3,  1,  2,  3,  2,  1/)
+ 3   c = (/ 6,  3,  4,  4,  6,  3,  1,  1,  5/)
+ 4   d = (/40, 78, 32, 17, 81, 10, 17, 24, 36/)
+ 5
+ 6   call Sort % Three_Int_Carry_Int(a, b, c, d)
+ 7
+ 8   a .eq. (/ 5,  5,  5,  5,  5,  6,  6,  6,  6/)
+ 9   b .eq. (/ 1,  1,  2,  2,  3,  1,  2,  3,  3/)
+10   c .eq. (/ 5,  6,  1,  3,  6,  4,  3,  1,  4/)
+11   d .eq. (/36, 81, 24, 10, 40, 32, 78, 17, 17/)
+```
+
+- ```Three_Real_Carry_Int```, ```Three_Real_Carry_Two_Int``` and
+```Three_Real_Carry_Three_Int``` do the same as above functions, but sorting
+is based on three real arrays.
+
+- ```Unique_Int``` sorts and integer array without repetition, i.e. compresses
+it if some entries are repeated. The size of array is passed as input parameter,
+and at the exit, it holds the size of the compressed array.  
+Example:
+```
+1   n = 9
+2   a = (/6, 3, 4, 4, 6, 3, 1, 1, 6/)
+3
+4   call Sort % Unique_Int(n, a)
+5
+6   n .eq. 4
+7   a .eq. (/1, 3, 4, 6/)
+```
+
+> **_Note:_** It should be noted at this point that the procedures which sort
+by more than one real array (all starting with ```Two_Real_``` and
+```Three_Real_```) are prone to round off errors from the outset.
+In order to make their outcomes more predictable, we heavily use
+```Math % Approx_Real``` and ```Math % Smaller_Real``` inside them, which
+improves their behaviour quite a bit.
+
+Most of the procedures in ```Sort_Mod``` are derived from the
+[Quicksort](https://dl.acm.org/doi/10.1145/366622.366644) algorithm shared by
+[Reznikova](https://gist.github.com/1AdAstra1/6f7785373efe5bb6c254d2e20c78ccc4)
+and the inspiration to carry additional arrays along comes from subroutines
+shared by [Jones et al.](https://www.netlib.org/slatec/src/isort.f) on
+[Netlib](http://www.netlib.org/).
