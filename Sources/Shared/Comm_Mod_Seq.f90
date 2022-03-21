@@ -17,7 +17,7 @@
   !-----------------!
   type Buffer_Type
     integer              :: n_items
-    integer, allocatable :: map(:)     ! map to local node / face
+    integer, allocatable :: map(:)     ! map to local items
     integer, allocatable :: i_buff(:)  ! integer values stored in buffers
     logical, allocatable :: l_buff(:)  ! logical values stored in buffers
     real,    allocatable :: r_buff(:)  ! real values stored in buffers
@@ -41,10 +41,6 @@
     integer, contiguous, pointer :: cell_glo(:)
     integer, contiguous, pointer :: node_glo(:)
 
-    ! Single precision coud not be avoided here :-(
-    integer, allocatable :: cell_map(:)
-    integer, allocatable :: bnd_cell_map(:)
-
     ! Variables which follow are for backup saving to single file
     integer :: nc_sub   ! number of cells in subdomain
     integer :: nb_sub   ! number of bundary cells in subdomain
@@ -53,15 +49,16 @@
     integer :: nc_tot   ! total number of cells
     integer :: nb_tot   ! total number of bundary cells
 
-    ! Number of processors per node and processor i.d.s for each node
-    integer,           allocatable :: nodes_n_procs(:)
-    integer,           allocatable :: nodes_p(:,:)
-    type(Buffer_Type), allocatable :: nodes_repl(:)
-    type(Buffer_Type), allocatable :: cells_send(:)
-    type(Buffer_Type), allocatable :: cells_recv(:)
+    ! Single precision coud not be avoided here :-(
+    integer(SP), allocatable :: cell_map(:)
+    integer(SP), allocatable :: bnd_cell_map(:)
 
     integer, private :: cell_map_type
     integer, private :: bnd_cell_map_type
+
+    ! Number of processors per node and processor i.d.s for each node
+    type(Buffer_Type), allocatable :: cells_send(:)
+    type(Buffer_Type), allocatable :: cells_recv(:)
 
     contains
 
