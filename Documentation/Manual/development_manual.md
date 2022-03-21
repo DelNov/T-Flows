@@ -27,6 +27,10 @@
             2. [Data members](#modules_second_level_file_data)
             3. [Member procedures](#modules_second_level_file_proc)
         3. [```Comm_Mod```](#modules_second_level_comm)
+            1. [New types](#modules_second_level_comm_type)
+            2. [Data members](#modules_second_level_comm_data)
+            3. [Member procedures belonging to class](#modules_second_level_comm_proc_class)
+            4. [Other module procedures](#modules_second_level_comm_proc_mod)
         4. [```Boundary_Mod```](#modules_second_level_boundary)
             1. [New type](#modules_second_level_boundary_type)
             2. [Data members](#modules_second_level_boundary_data)
@@ -583,14 +587,14 @@ to an extent manipulation with input lines from ASCII files.  It uses
 
 The ```Tokenizer_Type```, introduced here, reads:
 ```
- 20   type Tokenizer_Type
- 21     character(QL) :: whole               ! whole string
- 22     character(SL) :: tokens(MAX_TOKENS)  ! tokens
- 23     integer       :: n_tokens            ! number of tokens
- 24     integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
- 25                      e(MAX_TOKENS)       ! ... and ends
- 26     character(1)  :: first, last         ! first and last characters in whole
- 27   end type
+  type Tokenizer_Type
+    character(QL) :: whole               ! whole string
+    character(SL) :: tokens(MAX_TOKENS)  ! tokens
+    integer       :: n_tokens            ! number of tokens
+    integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
+                     e(MAX_TOKENS)       ! ... and ends
+    character(1)  :: first, last         ! first and last characters in whole
+  end type
 ```
 and holds only data members which help manipulation of input from ASCII files.
 Here:
@@ -775,6 +779,183 @@ parallel simulation to be successful, the data in the buffer cells should be
 _fresh_, that is, buffers have to be _refresshed_ in a timely manner.  We will
 come to that later.  Note that _structured_ numbering is completely lost in
 individual sub-domains.
+
+#### New types <a name=modules_second_level_comm_type"> </a>
+
+Module ```Comm_Mod``` introduces two new types; the ```Buffer_Type```, which
+holds data fields to facilitate communication between processors, and
+```Comm_Type```, a class holding communicator's member functions.
+
+```Buffer_Type``` is short enought that we can give it in full:
+```
+  type Buffer_Type
+    integer              :: n_items
+    integer, allocatable :: map(:)     ! map to local items
+    integer, allocatable :: i_buff(:)  ! integer values stored in buffers
+    logical, allocatable :: l_buff(:)  ! logical values stored in buffers
+    real,    allocatable :: r_buff(:)  ! real values stored in buffers
+    real,    allocatable :: o_buff(:)  ! old real values stored in buffers
+  end type
+```
+Field ```n_items``` holds the number of item to be exchanged between processors,
+```map(:)``` is an array which holds mapping from local cells to buffer cells,
+```_ibuff(:)```, ```l_buff(:)``` and ```r_buff(:)``` are memory location where
+buffer values are stored before exchanging them between processors.  To see
+their usage, please see ```[root]/Shared/Grid_Mod/Exchange_Cells_Real.f90```.
+The final field, ```o_buff(:)``` can be used to check if a call to function
+which exchanges real values was needed.  This was implemented to avoid too
+frequent calles to buffer refreshment.   If you are interested in this
+functionlity, please check ```[root]/Shared/Grid_Mod/Exchange_Cells_Real.f90```
+to see more details.
+
+If we take a look at the above figure with an example of simple domain (grid)
+decomposition in two, we can work out some of the values data fields from
+```Buffer_Type``` would have.  Number of buffer cells (pink cells on the left
+and green cells on the right) would be 35 for both processors.
+
+To figure out
+which values would be stored in ```map(S)``` ... **TOO EARLY FOR THAT**
+
+The ```Comm_Type``` which is also introduce with ```Comm_Mod``` is more focal
+to the ```Comm_Mod```, since it is essentially a class holding all parallel
+functionality.  In addition to functions, it does introduce a few data members:
+
+- ```n_buff_cells``` holds the number of buffer cells.  For the figure with two
+domains showb above, ```n_buff_cells``` will be 35 in both processors. (Count
+pink cells on the left and green cells on the right to make sure.)
+
+- ```cell_proc(:)``` an integer array holding processir number for each cell.
+If you take a look at the above sub-grids again, you can notice that each
+sub-grid has 140 cells.  However, 105 cells are _inside_ cells, computed in
+current processor and 35 cells are _buffer_ cells.  Array ```cell_proc(:)```
+will in this case read:
+```
+cell_proc(  1:105) .eq. 1
+cell_proc(106:140) .eq. 2
+```
+in processor one, and:
+```
+cell_proc(  1:105) .eq. 2
+cell_proc(106:140) .eq. 1
+```
+In this simple case, it may sound redundant.  But it becomes useful when domains
+are decomposed in more than two sub-domains and communication patterns are more
+complex.
+
+- ```cell_glo(:)``` and ```node_glo(:)``` are arrays holding _global_ (meaning
+before decomposition) cell and node numbers.  In the figure introduced above,
+selected portions of ```cell_glo(:)``` in processor 1 would read:
+```
+cell_glo(  1:  4) = (/  1,  2,  3,  4/)
+cell_glo( 21: 24) = (/ 36, 37, 38, 39/)
+cell_glo(103:105)=  (/204,205,206/)
+```
+We skip example for processor 2 for the sake of brevity.
+
+> **_Note:_** Since T-Flows uses SPMD parallel programming paradigm, and
+since MD, multiple data, boils down to different sub-domains (each with
+its own sub-grid), the ```Comm_Mod``` and ```Grid_Mod``` are linked on a
+very intricate level.  The question: "Should ```Buffer_Type``` be part of
+```Grid_Mod``` or ```Comm_Mod``` is legitimate, and each option has merits
+and drawbacks.  Since ```Grid_Mod``` is already one of the largest modules
+in T-Flows, we decided to pull all what concerns parallel execution (like
+the _buffers_) in ```Comm_Mod```.
+
+- ```nc_sub```, ```nb_sub```, ```nb_f```, ```nb_l```, ```nc_tot``` and
+  ```nb_tot``` are all used to determine new types for MPI I/O (saving into
+  a single ```.backup```) file, and are used in ```Grid % Form_Maps```,
+  but also in basic MPI I/O procedures such as ```Comm % Read/Write_Cell_Real```
+  and ```Comm % Read/Write_Bnd_Real```.
+- ```cell_map(:)```, ```bnd_cell_map(:)``` are used for the same purpose and in
+  the same procedures as above.
+- ```cell_map_type``` and ```bnd_cell_map_type``` are the new types used
+  in MPI I/O procedures.
+
+#### Data members <a name="modules_second_level_comm_data"> </a>
+
+#### Member procedures belonging to class <a name="modules_second_level_comm_proc_class"> </a>
+
+The ```Comm_Type```, contains a large number of its member routines, which are
+listed below.  We can divide them into procedures for MPI I/O and
+messaging between processors.
+
+Procedures for MPI I/O are:
+
+- ```Close_File``` closes a file in parallel.
+(Interface to ```Mpi_File_Open```).
+
+- ```Open_File_Read``` and ```Open_File_Write``` open a file to read or write in
+parallel. (Interfaces to ```Mpi_File_Open```)
+
+- ```Read_Int```, ```Read_Log``` and ```Read_Real``` read an integer, logical or
+real number from a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Read```.)
+
+- ```Read_Int_Array```, ```Read_Log_Array``` and ```Read_Real_Array``` read an
+integer, logical or real array from a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Read```.)
+
+- ```Read_Bnd_Real``` and ```Read_Cell_Real``` read a real boundary-cell-based,
+or cell-based array from a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Read```
+with ```bnd_cell_map_type``` and ```cell_map_type```.)
+
+- ```Read_Text``` reads a string (character array) from a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Read```.)
+
+- ```Write_Int```, ```Write_Log``` and ```Write_Real``` write an integer,
+logical or real number to a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Write```.)
+
+- ```Write_Int_Array```, ```Write_Log_Array``` and ```Write_Real_Array``` write
+an integer, logical or real array to a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Write```.)
+
+- ```Write_Bnd_Real``` and ```Write_Cell_Real``` write a real boundary-cell-based
+or cell-based array to a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Write```
+with ```bnd_cell_map_type``` and ```cell_map_type```.)
+
+- ```Write_Text``` writes a string (character array) to a file in parallel.
+(Interfaces to ```Mpi_File_Set_View``` and ```Mpi_File_Write```.)
+
+Messaging (exchanging data between processors) procedures are:
+
+- ```Create_New_Types``` creates ```cell_map_type``` and ```bnd_cell_map_type```.
+
+- ```Exchange_Int_Array```, ```Exchange_Log_Array``` and
+```Exchange_Real_Array``` exchange integer, logical or real array with specified
+size with another processor. They are used to refresh buffers of different types.
+(In essence it is an interface to ```Mpi_Sendrecv_Replace```.)
+
+- ```Sendrecv_Int_Arrays```, ```Sendrecv_Log_Arrays``` and
+```Sendrecv_Real_Arrays``` do the same as above, but don't replace buffers,
+just send and receive them.  (Interfaces to ```Mpi_Sendrecv```.)
+
+#### Other module procedures <a name="modules_second_level_comm_proc_mod"> </a>
+
+For some procedures, it didn't make sense to make them members of the
+```Comm_Type``` for a simple reason they neither use nor operate on
+```Comm_Type```'s member data, but on other data in parallel environment.
+These functions include:
+
+- ```Comm_Mod_Global_Lor_Log_Array``` performs logical _or_ over all processor
+on a logical array with specified size.
+(It is essentially an interface to ```Mpi_Allreduce```.)
+
+- ```Comm_Mod_Global_Max_Int``` and ```Comm_Mod_Global_Max_Real``` find global
+(over all processors) maximum of an integer or real argument.
+(They are both another interfaces to ```Mpi_Allreduce```.)
+
+- ```Comm_Mod_Global_Min_Int``` and ```Comm_Mod_Global_Min_Real``` find global
+minimum of an integer or real argument. (Also interfaces to ```Mpi_Allreduce```.)
+
+- ```Comm_Mod_Global_Sum_Int``` and ```Comm_Mod_Global_Sum_Real``` compute global
+sum of an integer or real argument. (Interfaces to ```Mpi_Allreduce```.)
+
+- ```Comm_Mod_Global_Sum_Int_Array``` and ```Comm_Mod_Global_Sum_Real_Array```
+compute global sum of all members of an integer or real array with specified
+size. (Interfaces to ```Mpi_Allreduce```.)
 
 ### ```Boundary_Mod``` <a name="modules_second_level_boundary"> </a>
 
