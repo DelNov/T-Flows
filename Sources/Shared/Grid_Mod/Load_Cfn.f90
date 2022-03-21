@@ -232,9 +232,6 @@
     end if
   end do
 
-  ! Faces' global numbers
-  read(fu) (Grid % comm % face_glo(s), s = 1, Grid % n_faces + Grid % n_shadows)
-
   !--------------!
   !   Boundary   !
   !--------------!

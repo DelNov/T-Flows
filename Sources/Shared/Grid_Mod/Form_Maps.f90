@@ -30,22 +30,6 @@
     end if
   end do
 
-  ! Initialize number of faces in subdomain
-  Grid % Comm % nf_sub = 0
-  Grid % Comm % nf_tot = 0
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1, s)
-    c2 = Grid % faces_c(2, s)
-    c1g = Grid % Comm % cell_glo(c1)
-    c2g = Grid % Comm % cell_glo(c2)
-
-    ! Pick unique faces by selecting boundary faces as
-    ! well as inside faces for which c1g < c2g
-    if(c2g < 0 .or. c1g < c2g) then
-      Grid % Comm % nf_sub = Grid % Comm % nf_sub + 1
-    end if
-  end do
-
   ! First and last cell to send
   Grid % Comm % nb_f = Grid % n_bnd_cells
   Grid % Comm % nb_l = Grid % n_bnd_cells - Grid % Comm % nb_sub + 1
@@ -53,24 +37,14 @@
   ! Initialize total number of cells
   Grid % Comm % nc_tot = Grid % Comm % nc_sub
   Grid % Comm % nb_tot = Grid % Comm % nb_sub
-  Grid % Comm % nf_tot = Grid % Comm % nf_sub
   call Comm_Mod_Global_Sum_Int(Grid % Comm % nc_tot)
   call Comm_Mod_Global_Sum_Int(Grid % Comm % nb_tot)
-  call Comm_Mod_Global_Sum_Int(Grid % Comm % nf_tot)
 
   ! Allocate memory for mapping matrices
   allocate(Grid % Comm % cell_map    (Grid % Comm % nc_sub))
   allocate(Grid % Comm % bnd_cell_map(Grid % Comm % nb_sub))
-  allocate(Grid % Comm % face_map_uni_glo(Grid % Comm % nf_sub))
-  allocate(Grid % Comm % face_map_uni_loc(Grid % Comm % nf_sub))
-  allocate(Grid % Comm % face_map_dup_glo(Grid % n_faces))
-  allocate(Grid % Comm % face_map_dup_loc(Grid % n_faces))
   Grid % Comm % cell_map(:)         = 0
   Grid % Comm % bnd_cell_map(:)     = 0
-  Grid % Comm % face_map_uni_glo(:) = 0
-  Grid % Comm % face_map_uni_loc(:) = 0
-  Grid % Comm % face_map_dup_glo(:) = 0
-  Grid % Comm % face_map_dup_loc(:) = 0
 
   !--------------------------------!
   !                                !
@@ -98,14 +72,6 @@
     ! -1 is to start from zero, as needed by MPI functions
     do c = 1, Grid % Comm % nb_tot
       Grid % Comm % bnd_cell_map(c) = int(c-1, SP)
-    end do
-
-    ! -1 is to start from zero, as needed by MPI functions
-    do s = 1, Grid % Comm % nf_tot
-      Grid % Comm % face_map_uni_glo(s) = s
-      Grid % Comm % face_map_uni_loc(s) = s
-      Grid % Comm % face_map_dup_glo(s) = s
-      Grid % Comm % face_map_dup_loc(s) = s
     end do
 
   !-----------------------!
@@ -137,33 +103,6 @@
                                             + Grid % Comm % nb_tot, SP)
     end do
 
-    !--------------!
-    !   Face map   !
-    !--------------!
-    cnt = 0
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1, s)
-      c2 = Grid % faces_c(2, s)
-      c1g = Grid % Comm % cell_glo(c1)
-      c2g = Grid % Comm % cell_glo(c2)
-
-      ! Pick unique faces by selecting boundary faces as
-      ! well as inside faces for which c1g < c2g
-      if(c2g < 0 .or. c1g < c2g) then
-        cnt = cnt + 1
-        Grid % Comm % face_map_uni_glo(cnt) = Grid % Comm % face_glo(s)
-        Grid % Comm % face_map_uni_loc(cnt) = s
-      end if
-
-      Grid % Comm % face_map_dup_glo(s) = Grid % Comm % face_glo(s)
-      Grid % Comm % face_map_dup_loc(s) = s
-    end do
-
-    ! It is essantial to sort these maps by global face numbers
-    call Sort % Int_Carry_Int(Grid % Comm % face_map_uni_glo,  &
-                              Grid % Comm % face_map_uni_loc)
-    call Sort % Int_Carry_Int(Grid % Comm % face_map_dup_glo,  &
-                              Grid % Comm % face_map_dup_loc)
   end if
 
   end subroutine

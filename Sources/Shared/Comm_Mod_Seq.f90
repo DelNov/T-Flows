@@ -40,17 +40,10 @@
     ! Global cell and node numbers
     integer, contiguous, pointer :: cell_glo(:)
     integer, contiguous, pointer :: node_glo(:)
-    integer, contiguous, pointer :: face_glo(:)
 
     ! Single precision coud not be avoided here :-(
     integer, allocatable :: cell_map(:)
     integer, allocatable :: bnd_cell_map(:)
-
-    ! Face maps.  They are not used in MPI calls, can be integers
-    integer, allocatable :: face_map_uni_glo(:)  ! unique entries only
-    integer, allocatable :: face_map_uni_loc(:)  ! unique entries only
-    integer, allocatable :: face_map_dup_glo(:)  ! duplicate entries too
-    integer, allocatable :: face_map_dup_loc(:)  ! duplicate entries too
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_sub   ! number of cells in subdomain
@@ -59,8 +52,6 @@
     integer :: nb_l     ! last boundary cell to save
     integer :: nc_tot   ! total number of cells
     integer :: nb_tot   ! total number of bundary cells
-    integer :: nf_sub   ! number of faces in subdomain
-    integer :: nf_tot   ! total number of faces
 
     ! Number of processors per node and processor i.d.s for each node
     integer,           allocatable :: nodes_n_procs(:)
