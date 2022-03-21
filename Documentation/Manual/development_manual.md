@@ -748,39 +748,33 @@ n order to describe certain data members in ```Comm_Mod``` in a clearer way, it
 is handy to introduce a very simple, orthogonal computational grid with 210
 cells (7 × 5 × 6 in each coordinate direction) as shown in this figure:
 
-<img src="Figures/grid_cells.png" width="350"/>
+<img src="Figures/Development/grid_cells_and_par_grid_decomposed.png" width="1000"/>
 
-The figure shows a single processor representation of an orthogonal grid with
-210 cells before grid division. Cells numbers in some cells are also shown. If
-you take a ceraful look, you will see that the cells are numbered in a
-_structured_ way for simplicity: numbers rise from left to right, then in
-depth, and eventually in height.
+The figure above shows a single processor representation of an orthogonal grid
+with 210 cells before (left) and after (right) grid division. Cells numbers
+in some cells are also shown. The cells are numbered in a _structured_ way for
+simplicity: numbers rise from left to right, then in depth, and eventually in
+height.  After dividing it for execution on two processors, partitions may look
+like the ones colored in light green (say in processor 1) and pink (processor 2)
+in the following, as show above.  In this figure, the cells are still numbered
+_globally_, like they would be for a sequential run.
 
-After dividing it for execution on two processors, partitions may look like
-the ones colored in light green (say in processor 1) and pink (processor 2)
-in the following figure:
+The internal
+representation inside each processor is different and internal cells are
+numbered from 1 to the number of cells in this particular processor, as
+illustrated here for both processors
 
-<img src="Figures/par_grid_decomposed.png" width="350"/>
-
-In this figure, the cells are still numbered _globally_, like they would be for
-a sequential run.  The internal representation inside each processor is
-different and internal cells are numbered from 1 to the number of cells in this
-particular processor, as illustrated here for processor 1:
-
-<img src="Figures/par_subgrid_1.png" width="300"/>
-
-and here for processor 2:
-
-<img src="Figures/par_subgrid_2.png" width="300"/>
+<img src="Figures/Development/par_subgrid_1_and_2.png" width="900"/>
 
 In the two figures above, it is important to note that each processor has its
 _inside_ cells (green in processor 1 and pink in processor 2), and the _buffer_
-cells (pink in processor 1 and green in processor 2).  The inside cells are
-computed in its processor, whereas the _buffer_ cells hold information from
-other processors.  For a parallel simulation to be successful, the data in the
-buffer cells should be _fresh_, that is, buffers have to be _refresshed_ in
-a timely manner.  We sill come to that later.  Note that _structured_ numbering
-is completely lost in individual sub-domains.
+cells (pink in processor 1 and green in processor 2).  _Process_, which conducts
+same program in multiple processors, computes inside cells in its processor,
+whereas the _buffer_ cells hold information from other processors.  For a
+parallel simulation to be successful, the data in the buffer cells should be
+_fresh_, that is, buffers have to be _refresshed_ in a timely manner.  We will
+come to that later.  Note that _structured_ numbering is completely lost in
+individual sub-domains.
 
 ### ```Boundary_Mod``` <a name="modules_second_level_boundary"> </a>
 
@@ -974,7 +968,7 @@ of the T-Flows code.  _PyFA_ resides in directory
 a number of Fortran sources you provide to it in a list, and creates a
 diagram in [Xfig](http://mcj.sourceforge.net/) format.  For the graph above,
 we had the file called ```sort.src``` with the list of sources we want
-to analyze:
+to analyze:  
 ```
 ../../../../Sources/Shared/Const_Mod.f90
 ../../../../Sources/Shared/Sort_Mod.f90
