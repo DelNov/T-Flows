@@ -38,8 +38,19 @@
             1. [Data members](#modules_second_level_vtk_data)
             1. [Member procedure](#modules_second_level_vtk_proc)
     3. [Third level modules](#modules_third_level)
-        1. [```Sort_Mod```](#modules_second_level_sort)
-            1. [Member procedures](#modules_second_level_sort_proc)
+        1. [```Sort_Mod```](#modules_third_level_sort)
+            1. [Member procedures](#modules_third_level_sort_proc)
+    4. [Fourth level modules](#modules_fourth_level)
+        1. [```Grid_Mod```](#modules_fourth_level_grid)
+            1. [New types](#modules_fourth_level_grid_type)
+            2. [Data members](#modules_fourth_level_grid_data)
+            3. [Member procedures](#modules_fourth_level_grid_proc)
+    5. [Fifth level modules](#modules_fifth_level)
+        1. [```Matrix_Mod```](#modules_fifth_level_matrix)
+            1. [New type](#modules_fifth_level_matrix_type)
+            2. [Data members](#modules_fifth_level_matrix_data)
+            3. [Member procedure](#modules_fifth_level_matrix_proc)
+    6. [Python tool for Fortran Analysis - PyFA](#modules_pyfa)
 
 
 # Coding standards <a name="coding"> </a>
@@ -1288,3 +1299,113 @@ Most of the procedures in ```Sort_Mod``` are derived from the
 and the inspiration to carry additional arrays along comes from subroutines
 shared by [Jones et al.](https://www.netlib.org/slatec/src/isort.f) on
 [Netlib](http://www.netlib.org/).
+
+# Fourth level modules  <a name="modules_fourth_level">  </a>
+
+## ```Grid_Mod```  <a name="modules_fourth_level_grid">  </a>
+
+Without doubt, ```Grid_Mod``` is one of the most important modules in T-Flows
+as it holds data which describes numerical grid and contains all procedures for
+accessing grid properties.  ```Grid_Mod``` is a fourth level module, and
+depends on the following first level modules:
+- ```Const Mod```
+- ```Math Mod```
+- ```Sort Mod```
+- ```File Mod```
+- ```Comm Mod ```
+- ```Boundary Mod```
+- ```Metis Options Mod
+
+This dependency is graphically represented in the following figure:
+
+<img src="Figures/Diagrams/grid.png" width="900"/>
+
+It shows a rather neat, symmetrical structure, and clearly shows ```Grid_Mod```
+to be on level four (it is in the fourth row from the bottom).
+
+Another reason why ```Grid_Mod``` is so important is also becuase it is the
+most sophisticated module for three programs for grid manipulation: _Generate_,
+_Convert_ and _Divide_.  In _Process_, ```Grid_Mod``` acts as a bridge between
+more numerical oriented modules (such as ```Matrix_Mod```, ```Solver_Mod```,
+```Numerics_Mod```, ...) and lower level functionality (almost utility-like)
+modules (such as ```Const_Mod```, ```Math_Mod``` and ```Sort_Mod```).  It is,
+as if all the modules from the first three levels came together to form
+```Grid_Mod```, which then spreads above towards discretization, numerical
+solution, phyiscal models and algorithms.  Owing to its close ties with
+```Comm_Mod```, ```Grid_Mod``` also brings important parallel functionality
+(buffer refreshment in particular) to the modules on levels above it.
+
+### New types  <a name="modules_fourth_level_grid_type">  </a>
+
+### Data members  <a name="modules_fourth_level_grid_data">  </a>
+
+### Member procedures  <a name="modules_fourth_level_grid_proc">  </a>
+
+# Fifth level modules <a name="modules_fifth_level"
+
+## ```Matrix_Mod```  <a name="modules_fifth_level_matrix">  </a>
+
+Matrices from systems of linear algebraic equations stemming from discretization
+of conservation equation over a given computational grid are stored in module
+```Matrix Mod```.  Clearly enough, since discretization takes place over a
+computational grid, ```Matrix_Mod``` is using ```Grid_Mod``` and, consequently,
+all modules used by ```Grid_Mod```.
+
+### New type  <a name="modules_fifth_level_matrix_type">  </a>
+
+The module ```Matrix_Mod``` introduces one new type, the ```Matrix_Type```,
+which facilitates storage of matrices in compressed row format.
+```Matrix_Type``` has the following data records:
+
+- ```pnt grid``` pointer to the grid for which the matrix is defined
+
+- ```nonzero``` number of non-zero entries in the matrix
+
+- ```val(:)``` array of size nonzero which stores matrix entries
+
+- ```fc(:)``` storage of _bare_ non-zero matrix entries, that means matrix
+coefficients based only on geometrical characteristics of the grid.
+(Previous entry, ```val(:)``` contains ```fc(:)``` multiplied with physical
+properties.)
+
+- ```sav(:)``` array of saved entries from momentum conservation discretization.
+It is needed for discretization of pressure equation.
+
+- ```row(:)``` index of the beginning of each row
+
+- ```col(:)``` column positions
+
+- ```dia(:)``` diagonal entries for each row
+
+- ```pos(:,:)``` for each cell-face, (row,column) position in the matrix.
+(Keep in mind that non-zero matrix entries come from faces).
+
+The meaning of data records in Matrix Type might be supplemented with an
+example. If we were storing this matrix:
+```
+ A = [ 10   0   4   5 ]
+     [  2  12  -1   0 ]
+     [  0   1  99   7 ]
+     [ -3  11   0  53 ]
+```
+in T-Flows' ```Matrix_Type```, some entries would read:
+```
+  type(Matrix_Type) :: A  ! matrix would be declared like this
+                          ! Matrix_Type is a class, therefore upper case
+  A % nonzero .eq. 12
+  A % val(:) .eq. (/10, 4, 5, 2, 12, -1, 1, 99, 7, -3, 11, 53/)
+  A % col(:) .eq. (/ 1, 3 4, 1, 2, 3, 2, 3, 4, 1, 2, 4/)
+  A % row(:) .eq. (/ 1, 4, 7, 10/)
+  A % dia(:) .eq. (/ 1, 5, 8, 12/)
+```
+
+### Data members  <a name="modules_fifth_level_matrix_data">  </a>
+
+### Member procedure  <a name="modules_fifth_level_matrix_proc">  </a>
+
+- ```Create``` is the only member procedure defined for ```Matrix_Type```.
+It take one object of type ```Grid_Type``` as argument, allocates memory for
+the matrix, determines connectivity (records in ```Matrix_Type```) and bare
+matrix coefficients (```fc(:)```). It also stores pointer to the grid it was
+created. It acts pretty much as a _constructor_ for ```Matrix_Type```.
+
