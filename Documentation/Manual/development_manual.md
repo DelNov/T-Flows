@@ -48,9 +48,16 @@
     5. [Fifth level modules](#modules_fifth_level)
         1. [```Matrix_Mod```](#modules_fifth_level_matrix)
             1. [New type](#modules_fifth_level_matrix_type)
-            2. [Data members](#modules_fifth_level_matrix_data)
-            3. [Member procedure](#modules_fifth_level_matrix_proc)
-    6. [Python tool for Fortran Analysis - PyFA](#modules_pyfa)
+            2. [Member procedure](#modules_fifth_level_matrix_proc)
+        2. [```Vector_Mod```](#modules_fifth_level_vector)
+            1. [New type](#modules_fifth_level_vector_type)
+            2. [Member procedure](#modules_fifth_level_vector_proc)
+    6. [Sixth level modules](#modules_sixth_level)
+        1. [```Native_Mod```](#modules_sixth_level_native)
+            1. [New types](#modules_sixth_level_native_type)
+            2. [Data members](#modules_sixth_level_native_data)
+            3. [Member procedures](#modules_fourth_level_native_proc)
+   13. [Python tool for Fortran Analysis - PyFA](#modules_pyfa)
 
 
 # Coding standards <a name="coding"> </a>
@@ -1350,6 +1357,11 @@ of conservation equation over a given computational grid are stored in module
 ```Matrix Mod```.  Clearly enough, since discretization takes place over a
 computational grid, ```Matrix_Mod``` is using ```Grid_Mod``` and, consequently,
 all modules used by ```Grid_Mod```.
+It is used by [```Native_Mod```](#modules_sixth_level_native) and other modules
+related to solution of discretized systems of equations such as ```Petsc_Mod```
+and ```Solver_Mod```.
+```Matrix_Mod``` is defined in ```[root]/Sources/Process/Vector_Mod.f90``` and
+its member procedures in ```[root]/Sources/Process/Vector_Mod```.
 
 ### New type  <a name="modules_fifth_level_matrix_type">  </a>
 
@@ -1399,8 +1411,6 @@ in T-Flows' ```Matrix_Type```, some entries would read:
   A % dia(:) .eq. (/ 1, 5, 8, 12/)
 ```
 
-### Data members  <a name="modules_fifth_level_matrix_data">  </a>
-
 ### Member procedure  <a name="modules_fifth_level_matrix_proc">  </a>
 
 - ```Create``` is the only member procedure defined for ```Matrix_Type```.
@@ -1408,4 +1418,47 @@ It take one object of type ```Grid_Type``` as argument, allocates memory for
 the matrix, determines connectivity (records in ```Matrix_Type```) and bare
 matrix coefficients (```fc(:)```). It also stores pointer to the grid it was
 created. It acts pretty much as a _constructor_ for ```Matrix_Type```.
+
+## ```Vector_Mod```  <a name="modules_fifth_level_vector">  </a>
+
+Just like ```Matrix_Mod```, ```Vector_Mod``` was introdced to assist solution
+of linear algebraic equations stemming from discretization of conservation
+equation over a given computational grid.  It is used by
+[```Native_Mod```](#modules_sixth_level_native) and other modules related to
+solution of discretized systems of equations such as ```Petsc_Mod``` and
+```Solver_Mod```.
+```Vector_Mod``` is defined in ```[root]/Sources/Process/Vector_Mod.f90``` and
+its member procedure in ```[root]/Sources/Process/Vector_Mod```.
+
+### New type  <a name="modules_fifth_level_vector_type">  </a>
+
+The module ```Vector_Mod``` introduces one new type, the ```Vector_Type```,
+which facilitates storage of matrices in compressed row format.  It is small
+enough to be introduced in full:
+```
+  type Vector_Type
+
+    type(Grid_Type), pointer :: pnt_grid
+
+    real, allocatable :: val(:)    ! value
+  end type
+```
+It has following two records:
+- ```pnt grid``` pointer to the grid for which the vector is defined
+
+- ```val(:)``` array of size nonzero which stores vector entries
+
+### Member procedure  <a name="modules_fifth_level_vector_proc">  </a>
+
+- ```Vector_Mod_Allocate``` is the only member procedure defined for
+```Vector_Type```.  It take one object of type ```Vector_Type``` and one
+of ```Grid_Type``` as arguments, allocates memory for the vector based on
+the number of cells in the grid.  It also stores pointer to the grid it was
+created.
+
+> **_Note:_** Such a practice, to have a module (or type) procedure with
+```Allocate``` or ```Create``` in the name, which takes its own type to
+allocate memory for it while storing pointer to an object from which it was
+derived, is very simular to what was used in ```Matrix_Mod```, and in many
+other modules which follow.
 
