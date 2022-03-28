@@ -62,21 +62,22 @@
 
   ! Production source:
   do c = 1, Grid % n_cells
-    turb % p_kin(c) = turb % vis_t(c) * Flow % shear(c)**2
+    turb % p_kin(c) = max(turb % vis_t(c) * Flow % shear(c)**2,tiny)
     b(c) = b(c) + turb % p_kin(c) * Grid % vol(c)
   end do
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, Grid % n_cells
       turb % g_buoy(c) = -Flow % beta                    &
-                       * (  Flow % grav_x * ut % n(c)    &
+                        * ( Flow % grav_x * ut % n(c)    &
                           + Flow % grav_y * vt % n(c)    &
-                          + Flow % grav_z * wt % n(c))   &
+                          + Flow % grav_z * wt % n(c) )  &
                         * Flow % density(c)
 
-      if(turb % g_buoy(c) + turb % p_kin(c) < 0.0) then
-        turb % g_buoy(c) = 0.0
-      end if
+! In general, this clipping should be avoided.  
+!      if(turb % g_buoy(c) + turb % p_kin(c) < 0.0) then
+!        turb % g_buoy(c) = 0.0
+!      end if
 
       b(c) = b(c) + max(0.0, turb % g_buoy(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))         &
