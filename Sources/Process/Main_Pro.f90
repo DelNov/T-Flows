@@ -340,6 +340,9 @@
 
         call Piso_Algorithm(Flow(d), turb(d), Vof(d), Sol(d), ini)
 
+        ! Deal with turbulence (if you dare ;-))
+        call Turb_Mod_Main(turb(d), Sol(d), curr_dt, ini)
+
         ! Energy (practically temperature)
         if(Flow(d) % heat_transfer) then
           call Compute_Energy(Flow(d), turb(d), Vof(d), Sol(d), curr_dt, ini)
@@ -350,9 +353,6 @@
           call Compute_Scalar(Flow(d), turb(d), Vof(d), Sol(d),  &
                               curr_dt, ini, sc)
         end do
-
-        ! Deal with turbulence (if you dare ;-))
-        call Turb_Mod_Main(turb(d), Sol(d), curr_dt, ini)
 
         ! Update the values at boundaries
         call Convective_Outflow(Flow(d), turb(d), Vof(d))
