@@ -249,7 +249,7 @@
   end if
 
   ! Set the lower limit of epsilon 
-  if(phi % name .eq. 'EPS'.and.turb % model == HYBRID_LES_RANS) then
+  if(phi % name .eq. 'EPS') then
     do c = 1, Grid % n_cells
       phi % n(c) = max(phi % n(c), 1.0e-10)
     end do
