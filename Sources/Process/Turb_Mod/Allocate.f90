@@ -87,6 +87,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -168,6 +169,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -246,6 +248,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -327,6 +330,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -383,6 +387,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -492,6 +497,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -546,6 +552,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -583,6 +590,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -660,6 +668,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
