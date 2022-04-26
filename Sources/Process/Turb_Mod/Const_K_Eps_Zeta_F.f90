@@ -23,7 +23,7 @@
   alpha   =  0.012
   c_f1    =  1.4
   c_f2    =  0.3
-  c_theta =  0.2
+  c_theta =  0.22
 
   ! Constants for buoyancy wall function
   c_mu_theta   =  0.1225
@@ -33,6 +33,6 @@
   turb % kin  % sigma = 1.0
   turb % eps  % sigma = 1.3
   turb % zeta % sigma = 1.2
-  turb % t2   % sigma = 1.1
+  turb % t2   % sigma = 1.0
 
   end subroutine
