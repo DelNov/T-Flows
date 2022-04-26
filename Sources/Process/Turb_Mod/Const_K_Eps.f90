@@ -21,7 +21,7 @@
   turb % eps % sigma = 1.4
 
   ! Copied from Turb_Mod_Const_K_Eps_Zeta_F
-  turb % t2  % sigma = 1.1
+  turb % t2  % sigma = 1.0
   c_mu_theta5  =  0.35
   kappa_theta  =  0.38         ! von Karman constant for temperature
 
