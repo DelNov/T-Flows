@@ -53,10 +53,19 @@
   ! Production source:
   do c = 1, Grid % n_cells
 
+!-------------------------------------------------------------------!
+! ut, vt and wt defined by AFM or GGDH could lead to divergence.
+!-------------------------------------------------------------------! 
     pr_t = max(Turb_Mod_Prandtl_Number(turb, c), TINY)
     ut_sgdh = - turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
     vt_sgdh = - turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
     wt_sgdh = - turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+
+    if(turb % model .eq. HYBRID_LES_RANS) then
+      ut_sgdh = - turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % x(c)
+      vt_sgdh = - turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % y(c)
+      wt_sgdh = - turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % z(c)
+    end if
 
     turb % p_t2(c) = - 2.0 * Flow % density(c)       &
                            * (  ut_sgdh * t % x(c)   &
