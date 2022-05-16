@@ -16,7 +16,6 @@
   c_mu_d  =  0.21
   c_mu25  = sqrt(sqrt(c_mu))
   c_mu75  = c_mu25**3
-  c_theta = 0.25
 
   turb % kin % sigma = 1.0
   turb % eps % sigma = 1.0
@@ -26,5 +25,12 @@
   turb % uv  % sigma = 1.0
   turb % uw  % sigma = 1.0
   turb % vw  % sigma = 1.0
+
+  ! Constants for GGDH turbulent flux
+  c_theta =  0.255555
+
+  ! Constants for AFM turbulent flux
+  afm_psi      = 0.1 
+  afm_eta      = 0.1 
 
   end subroutine
