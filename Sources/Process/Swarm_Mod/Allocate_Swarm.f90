@@ -1,23 +1,23 @@
 !==============================================================================!
-  subroutine Allocate_Swarm(Swarm, Flow, turb, Vof)
+  subroutine Allocate_Swarm(Swarm, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
-!   Allocates memory to store the charge of each Particle                      !
+!   Allocates memory to store the charge of each particle                      !
 !   It assumes that the number of particles was read from the control file     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Swarm_Type), target :: Swarm
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
 !----------------------------------[Locals]------------------------------------!
   integer :: k, nb, nc
 !==============================================================================!
 
-  ! Take aliases to object Particle Flow around
+  ! Take aliases to object particle Flow around
   Swarm % pnt_flow => Flow
   Swarm % pnt_grid => Flow % pnt_grid
-  Swarm % pnt_turb => turb
+  Swarm % pnt_turb => Turb
   Swarm % pnt_vof  => Vof
 
   ! Allocate memory for all of them
@@ -43,8 +43,8 @@
   end do
 
   ! Aliases for cell-based variables
-  nb = turb % pnt_grid % n_bnd_cells
-  nc = turb % pnt_grid % n_cells
+  nb = Turb % pnt_grid % n_bnd_cells
+  nc = Turb % pnt_grid % n_cells
 
   ! Reflected and deposited particles on the walls and the escaped particles
   if(nb > 0) then

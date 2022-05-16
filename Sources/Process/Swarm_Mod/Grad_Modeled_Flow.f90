@@ -10,22 +10,22 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: grid
-  type(Turb_Type),  pointer :: turb
+  type(Turb_Type),  pointer :: Turb
   integer                   :: c
 !==============================================================================!
 
   ! Take aliases for Flow
   Flow => swarm % pnt_flow
   grid => swarm % pnt_grid
-  turb => swarm % pnt_turb
+  Turb => swarm % pnt_turb
 
   ! Gradients of turbulent quantities
-  call Flow % Grad_Variable(turb % kin)
-  call Flow % Grad_Variable(turb % eps)
+  call Flow % Grad_Variable(Turb % kin)
+  call Flow % Grad_Variable(Turb % eps)
 
   ! Array for v^2
   do c = -grid % n_bnd_cells, grid % n_cells
-    swarm % v2_mod(c) = sqrt(turb % zeta % n(c) * turb % kin % n(c))
+    swarm % v2_mod(c) = sqrt(Turb % zeta % n(c) * Turb % kin % n(c))
   end do
 
   ! Storing the gradients of v2_mod in Work_Mod arrays

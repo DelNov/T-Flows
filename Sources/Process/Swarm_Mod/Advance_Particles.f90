@@ -7,12 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n           ! current time step
-  integer, intent(in)      :: n_stat_p    ! starting time for Swarm statistics
-  integer, intent(in)      :: first_dt_p  ! starting time for Swarm simulation
+  integer, intent(in)      :: n_stat_p    ! starting time for swarm statistics
+  integer, intent(in)      :: first_dt_p  ! starting time for wwarm simulation
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: grid
-  type(Field_Type),    pointer :: flow
-  type(Turb_Type),     pointer :: turb
+  type(Grid_Type),     pointer :: Grid
+  type(Field_Type),    pointer :: Flow
+  type(Turb_Type),     pointer :: Turb
   type(Particle_Type), pointer :: Part
   logical,             pointer :: deposited
   logical,             pointer :: escaped
@@ -23,28 +23,28 @@
 !==============================================================================!
 
   ! Take aliases for the Swarm
-  grid => Swarm % pnt_grid
-  flow => Swarm % pnt_flow
-  turb => Swarm % pnt_turb
+  Grid => Swarm % pnt_grid
+  Flow => Swarm % pnt_flow
+  Turb => Swarm % pnt_turb
 
   ! Particle time step (division of the global time step)
-  Swarm % dt = flow % dt / real(Swarm % n_sub_steps)
+  Swarm % dt = Flow % dt / real(Swarm % n_sub_steps)
 
   !------------------------!
   !   Fukagata SGS model   !
   !------------------------!
-  if(turb % model .eq. HYBRID_LES_PRANDTL) then
+  if(Turb % model .eq. HYBRID_LES_PRANDTL) then
     if(Swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
       call Swarm_Mod_Sgs_Fukagata(Swarm)
     end if
   end if
 
-  if(turb % model .eq. HYBRID_LES_RANS) then
+  if(Turb % model .eq. HYBRID_LES_RANS) then
 
     ! Correcting for particle time step size (if ER-HRL model is used)
     call Swarm_Mod_Particle_Time_Scale(Swarm)
 
-    ! Store gradients for modeled flow quantities for Swarm
+    ! Store gradients for modeled Flow quantities for Swarm
     call Swarm_Mod_Grad_Modeled_Flow(Swarm, k)
 
   end if

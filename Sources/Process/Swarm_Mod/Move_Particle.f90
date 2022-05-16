@@ -41,7 +41,7 @@
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
 
   ! Take aliases for Swarm
-  Part => Swarm % particle(k)
+  Part => Swarm % Particle(k)
   fb_x => Part  % fb_x
   fb_y => Part  % fb_y
   fb_z => Part  % fb_z

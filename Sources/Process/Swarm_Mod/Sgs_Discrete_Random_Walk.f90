@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Sgs_Discrete_Random_Walk(swarm, k, rx, ry, rz)
+  subroutine Swarm_Mod_Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
 !------------------------------------------------------------------------------!
 !  SGS model introducing stochasticity to LES/K-Eps-Zeta-F modeled quantities..
 !  .. seen by particles. (taken from Z. Cheng et. al., (2018) 435-451)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: swarm
+  type(Swarm_Type), target :: Swarm
   integer                  :: k
   real                     :: rx
   real                     :: ry
@@ -14,7 +14,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: Grid
-  type(Turb_Type),     pointer :: turb
+  type(Turb_Type),     pointer :: Turb
   type(Particle_Type), pointer :: Part
   integer,             pointer :: time
   integer :: c                          ! nearest cell
@@ -35,11 +35,11 @@
 !==============================================================================!
 
   ! Take aliases for Flow
-  Flow => swarm % pnt_flow
-  Grid => swarm % pnt_grid
-  turb => swarm % pnt_turb
-  time => swarm % time_eim
-  Part => swarm % particle(k)
+  Flow => Swarm % pnt_flow
+  Grid => Swarm % pnt_grid
+  Turb => Swarm % pnt_turb
+  time => Swarm % time_eim
+  Part => Swarm % Particle(k)
 
   ! Model constants
   c_o   = 3.0  ! calibration constant taken as the same value for k-w model
@@ -67,12 +67,12 @@
   ! Particle relaxation time (in this swarm)
   ! this needs to be calculated for the Grid once/ts and not for all
   ! ...particles
-  swarm % tau = swarm % density * (swarm % diameter **2) / 18.0 / visc_fluid
+  Swarm % tau = Swarm % density * (Swarm % diameter **2) / 18.0 / visc_fluid
 
   ! Mean life time of the turbulent eddy
-  t_i_x = 1.0 / (6.0 * c_mu * abs(turb % eps % x(c)))
-  t_i_y = 1.0 / (6.0 * c_mu * abs(turb % eps % y(c)))
-  t_i_z = 1.0 / (6.0 * c_mu * abs(turb % eps % z(c)))
+  t_i_x = 1.0 / (6.0 * c_mu * abs(Turb % eps % x(c)))
+  t_i_y = 1.0 / (6.0 * c_mu * abs(Turb % eps % y(c)))
+  t_i_z = 1.0 / (6.0 * c_mu * abs(Turb % eps % z(c)))
 
   ! Instantaneous eddy lifetime
   call random_number(r1)
@@ -88,9 +88,9 @@
   t_e_z = - c_o * log(1.0 - zeta3) * t_i_z
 
   ! Eddy length
-  l_e_x = t_e_x * sqrt(TWO_THIRDS * abs(turb % kin % x(c) * rx))
-  l_e_y = t_e_y * sqrt(TWO_THIRDS * abs(turb % kin % y(c) * ry))
-  l_e_z = t_e_z * sqrt(TWO_THIRDS * abs(turb % kin % z(c) * rz))
+  l_e_x = t_e_x * sqrt(TWO_THIRDS * abs(Turb % kin % x(c) * rx))
+  l_e_y = t_e_y * sqrt(TWO_THIRDS * abs(Turb % kin % y(c) * ry))
+  l_e_z = t_e_z * sqrt(TWO_THIRDS * abs(Turb % kin % z(c) * rz))
 
   ! Compute drag coefficient
   if (Part % re .ge. 1000.0) then
@@ -100,11 +100,11 @@
   end if
 
   ! Particle time scale
-  tau_p_x = (4.0 * swarm % density * swarm % diameter)      &
+  tau_p_x = (4.0 * Swarm % density * Swarm % diameter)      &
           / (3.0 * dens_fluid * Part % rel_u_mod * cd)
-  tau_p_y = (4.0 * swarm % density * swarm % diameter)      &
+  tau_p_y = (4.0 * Swarm % density * Swarm % diameter)      &
           / (3.0 * dens_fluid * Part % rel_v_mod * cd)
-  tau_p_z = (4.0 * swarm % density * swarm % diameter)      &
+  tau_p_z = (4.0 * Swarm % density * Swarm % diameter)      &
           / (3.0 * dens_fluid * Part % rel_w_mod * cd)
 
   l1 = tau_p_x * Part % rel_u_mod
@@ -167,12 +167,12 @@
 
   ! Re-initializing the time interval again
   if(flag1 .or. flag2 .or. flag3) then
-    swarm % time_eim = 0
+    Swarm % time_eim = 0
   end if
 
   ! EIM contribution for the modeled turbulent quantitis
-  Part % u_drw = sqrt(TWO_THIRDS * abs(turb % kin % x(c) * rx)) * sigma1
-  Part % v_drw = sqrt(TWO_THIRDS * abs(turb % kin % y(c) * ry)) * sigma2
-  Part % w_drw = sqrt(TWO_THIRDS * abs(turb % kin % z(c) * rz)) * sigma3
+  Part % u_drw = sqrt(TWO_THIRDS * abs(Turb % kin % x(c) * rx)) * sigma1
+  Part % v_drw = sqrt(TWO_THIRDS * abs(Turb % kin % y(c) * ry)) * sigma2
+  Part % w_drw = sqrt(TWO_THIRDS * abs(Turb % kin % z(c) * rz)) * sigma3
 
   end subroutine

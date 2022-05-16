@@ -24,7 +24,7 @@
 
   ! Take aliases
   Grid      => Swarm % pnt_grid
-  Part      => Swarm % particle(k)
+  Part      => Swarm % Particle(k)
   deposited => Part  % deposited
   escaped   => Part  % escaped
 

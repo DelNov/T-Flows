@@ -18,7 +18,7 @@
 
   ! Take aliases
   Flow => Swarm % pnt_flow
-  Part => Swarm % particle(k)
+  Part => Swarm % Particle(k)
 
   ! Particle surface area (assuming spherical shape)
   part_area =  PI * (Part % d ** 2)

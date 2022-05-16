@@ -19,7 +19,7 @@
   ! Take aliases
   Grid      => Swarm % pnt_grid
   Vof       => Swarm % pnt_vof
-  Part      => Swarm % particle(k)
+  Part      => Swarm % Particle(k)
   trapped   => Part  % trapped
 
   c = Part % cell      ! index of the closest cell for interpolation
