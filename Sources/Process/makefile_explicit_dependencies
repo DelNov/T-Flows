@@ -896,7 +896,6 @@ $(DIR_SHARED)/Work_Mod/*.f90
 #-- ./Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90
 #-- ./Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90
 #-- ./Field_Mod/Utilities/Prandtl_Number.f90
-#-- ./Field_Mod/Utilities/Reference_Temperature.f90
 #-- ./Field_Mod/Utilities/Potential_Initialization.f90
 $(DIR_OBJECT)/Potential_Initialization.o:\
 $(DIR_OBJECT)/Work_Mod.o \
