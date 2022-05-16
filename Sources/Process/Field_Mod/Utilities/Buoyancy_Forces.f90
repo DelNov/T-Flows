@@ -25,11 +25,9 @@
   type(Var_Type),    pointer :: t
   integer                    :: c, c1, c2, s
   real                       :: xic1, xic2, temp_f
-  real                       :: ref_temp_1, ref_temp_2, ref_temp, temp_f_ref
   real,              pointer :: grav_i
   real, contiguous,  pointer :: xic(:), xif(:), si(:), dxi(:)
   real, contiguous,  pointer :: cell_fi(:), face_fi(:)
-  real                       :: Reference_Temperature
 !==============================================================================!
 
   ! Take aliases
@@ -89,12 +87,7 @@
 
       ! Transform density into one assumed by Boussinesq
       ! Units: kg/m^3 * K * 1/K = kg/m^3
-      ref_temp_1 = Flow % Reference_Temperature(Flow % t_ref_f(c1))
-      ref_temp_2 = Flow % Reference_Temperature(Flow % t_ref_f(c2))
-      temp_f_ref =        Grid % f(s)  * ref_temp_1  &
-                 + (1.0 - Grid % f(s)) * ref_temp_2
-
-      dens_f(s) = dens_f(s) * (temp_f_ref - temp_f) * Flow % beta
+      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
     end do
 
   !---------------------------------------------------------------------!
