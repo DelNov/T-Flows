@@ -78,9 +78,6 @@
     ! Reference density (for buoyancy)
     real :: dens_ref
 
-    ! Reference temperature for buoyancy term
-    real, allocatable :: t_ref_f(:)
-
     ! True if it has pressure outlet (needed for a fix in Compute_Pressure)
     !
     ! Update on July 17, 2021: I have some reservations about this part, since
@@ -216,7 +213,6 @@
       procedure :: Calculate_Fluxes
       procedure :: Potential_Initialization
       procedure :: Prandtl_Number
-      procedure :: Reference_Temperature
       procedure :: Schmidt_Number
       procedure :: U_Tan
 
@@ -277,7 +273,6 @@
   include 'Field_Mod/Utilities/Calculate_Fluxes.f90'
   include 'Field_Mod/Utilities/Potential_Initialization.f90'
   include 'Field_Mod/Utilities/Prandtl_Number.f90'
-  include 'Field_Mod/Utilities/Reference_Temperature.f90'
   include 'Field_Mod/Utilities/Schmidt_Number.f90'
   include 'Field_Mod/Utilities/U_Tan.f90'
 
