@@ -18,4 +18,11 @@
   c_w2   = 0.3
   c_w3   = 2.0
 
+  ! Constants for GGDH turbulent flux
+  c_theta =  0.22
+
+  ! Constants for AFM turbulent flux
+  afm_psi      = 0.1 
+  afm_eta      = 0.1 
+
   end subroutine
