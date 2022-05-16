@@ -61,10 +61,6 @@
   !-----------------------------------------!
   if(Flow % heat_transfer) then
     call Var_Mod_Allocate_Solution(Flow % t, Grid, 'T', 'Q')
-    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-      allocate(flow % t_ref_f(-grid % n_bnd_cells:grid % n_cells)); &
-               flow % t_ref_f = 1000000.0
-    end if
   end if ! heat_transfer
 
   allocate(Flow % vort (-nb:nc)); Flow % vort  = 0.
