@@ -127,7 +127,7 @@
   write(fu,'(a)') '# For flows with inlets and outlets, initialization by a'
   write(fu,'(a)') '# pressure-like potential field could prove to be useful'
   write(fu,'(a)') '#-----------------------------------------------------------'
-  write(fu,'(a)') '!  POTENTIAL_INTIALIZATION      yes'
+  write(fu,'(a)') '!  POTENTIAL_INITIALIZATION     yes'
   write(fu,'(a1)', advance='no') CR
 
   write(fu,'(a)') '#-----------------------------------------------------------'
