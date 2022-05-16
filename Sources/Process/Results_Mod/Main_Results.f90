@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Main_Results(Results,                           &
                           curr_dt, last_dt, time, n_dom,     &
-                          Flow, turb, Vof, Swarm, exit_now)
+                          Flow, Turb, Vof, Swarm, exit_now)
 !------------------------------------------------------------------------------!
 !   Main function for saving results (postprocessing and backup)               !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
   real                :: time            ! physical time of the simulation
   integer             :: n_dom
   type(Field_Type)    :: Flow(MD)        ! Flow field
-  type(Turb_Type)     :: turb(MD)        ! turbulence modelling
+  type(Turb_Type)     :: Turb(MD)        ! turbulence modelling
   type(Vof_Type)      :: Vof(MD)         ! multiphase modelling with vof
   type(Swarm_Type)    :: Swarm(MD)       ! swarm of particles
   logical             :: exit_now
@@ -33,7 +33,7 @@
      Info_Mod_Time_To_Exit()) then
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
-      call Backup_Mod_Save(Flow(d), Swarm(d), turb(d), Vof(d),  &
+      call Backup_Mod_Save(Flow(d), Swarm(d), Turb(d), Vof(d),  &
                            time, curr_dt, domain=d)
     end do
   end if
@@ -47,9 +47,9 @@
 
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
-      call Results % Save_Results(Flow(d), turb(d), Vof(d), Swarm(d),  &
+      call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                                   curr_dt, plot_inside=.true., domain=d)
-      call Results % Save_Results(Flow(d), turb(d), Vof(d), Swarm(d),  &
+      call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                                   curr_dt, plot_inside=.false., domain=d)
       call Results % Save_Swarm(Swarm(d), curr_dt)
 
@@ -63,8 +63,8 @@
       end if
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(Flow(d), turb(d), Vof(d), Swarm(d), curr_dt)
-      call User_Mod_Save_Swarm(Flow(d), turb(d), Vof(d), Swarm(d), curr_dt)
+      call User_Mod_Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d), curr_dt)
+      call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d), curr_dt)
 
     end do  ! through domains
   end if

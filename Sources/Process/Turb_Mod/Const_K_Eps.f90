@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Const_K_Eps(turb)
+  subroutine Const_K_Eps(Turb)
 !------------------------------------------------------------------------------!
 !   Initializes constants for k-eps turbulence model.                          ! 
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !==============================================================================!
 
   c_1e    = 1.5
@@ -17,11 +17,11 @@
   e_log   = 8.342
   c_theta = 0.2
 
-  turb % kin % sigma = 1.4
-  turb % eps % sigma = 1.4
+  Turb % kin % sigma = 1.4
+  Turb % eps % sigma = 1.4
 
   ! Copied from Turb_Mod_Const_K_Eps_Zeta_F
-  turb % t2  % sigma = 1.1
+  Turb % t2  % sigma = 1.1
   c_mu_theta5  =  0.35
   kappa_theta  =  0.38         ! von Karman constant for temperature
 

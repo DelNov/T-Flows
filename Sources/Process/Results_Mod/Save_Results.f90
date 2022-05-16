@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Save_Results(Results,  &
-                          Flow, turb, Vof, swarm, ts, plot_inside, domain)
+                          Flow, Turb, Vof, Swarm, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -9,9 +9,9 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Results_Type)       :: Results
   type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: turb
+  type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
-  type(Swarm_Type),  target :: swarm
+  type(Swarm_Type),  target :: Swarm
   integer                   :: ts           ! time step
   logical                   :: plot_inside  ! plot results inside?
   integer,         optional :: domain
@@ -523,10 +523,10 @@
                                     Flow % capacity(c_f:c_l),        &
                                     f8, f9, data_offset, run)
 
-    if(turb % rough_walls) then
+    if(Turb % rough_walls) then
       call Results % Save_Scalar_Real("Roughness Coefficient z_o",  &
                                       plot_inside,                  &
-                                      turb % z_o_f(c_f:c_l),        &
+                                      Turb % z_o_f(c_f:c_l),        &
                                       f8, f9, data_offset, run)
 
     end if
@@ -573,11 +573,11 @@
     if(Flow % with_particles .and. .not. plot_inside) then
       call Results % Save_Scalar_Real("ParticlesReflected [1]",      &
                                       plot_inside,                   &
-                                      swarm % n_reflected(c_f:c_l),  &
+                                      Swarm % n_reflected(c_f:c_l),  &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("ParticlesDeposited [1]",      &
                                       plot_inside,                   &
-                                      swarm % n_deposited(c_f:c_l),  &
+                                      Swarm % n_deposited(c_f:c_l),  &
                                       f8, f9, data_offset, run)
     end if
 
@@ -607,32 +607,32 @@
     !--------------------------!
 
     ! Save kin and eps
-    if(turb % model .eq. K_EPS                 .or.  &
-       turb % model .eq. K_EPS_ZETA_F          .or.  &
-       turb % model .eq. HYBRID_LES_RANS       .or.  &
-       turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-       turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
+    if(Turb % model .eq. K_EPS                 .or.  &
+       Turb % model .eq. K_EPS_ZETA_F          .or.  &
+       Turb % model .eq. HYBRID_LES_RANS       .or.  &
+       Turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
+       Turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
       call Results % Save_Scalar_Real("TurbulentKineticEnergy [m^2/s^2]",  &
                             plot_inside,                                   &
-                            turb % kin % n(c_f:c_l),                       &
+                            Turb % kin % n(c_f:c_l),                       &
                             f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("TurbulentDissipation [m^2/s^3]",    &
                                       plot_inside,                         &
-                                      turb % eps % n(c_f:c_l),             &
+                                      Turb % eps % n(c_f:c_l),             &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real(                                     &
                             "TurbulentKineticEnergyProduction [m^2/s^3]",  &
                             plot_inside,                                   &
-                            turb % p_kin(c_f:c_l),                         &
+                            Turb % p_kin(c_f:c_l),                         &
                             f8, f9, data_offset, run)
     end if
 
     ! Save zeta and f22
-    if(turb % model .eq. K_EPS_ZETA_F .or.  &
-       turb % model .eq. HYBRID_LES_RANS) then
+    if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+       Turb % model .eq. HYBRID_LES_RANS) then
       v2_calc(:) = 0.0
       do c1 = c_f, c_l
-        v2_calc(c1) = turb % kin % n(c1) * turb % zeta % n(c1)
+        v2_calc(c1) = Turb % kin % n(c1) * Turb % zeta % n(c1)
       end do
 !      call Results % Save_Scalar_Real("TurbulentQuantityV2 [m^2/s^2]",    &
 !                                      plot_inside,                        &
@@ -640,57 +640,57 @@
 !                                      f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("TurbulentQuantityZeta [1]",        &
                                       plot_inside,                        &
-                                      turb % zeta % n(c_f:c_l),           &
+                                      Turb % zeta % n(c_f:c_l),           &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("TurbulentQuantityF22 [1]",         &
                                       plot_inside,                        &
-                                      turb % f22  % n(c_f:c_l),           &
+                                      Turb % f22  % n(c_f:c_l),           &
                                       f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
         call Results % Save_Scalar_Real("TurbulentQuantityT2 [K^2]",      &
                                         plot_inside,                      &
-                                        turb % t2 % n(c_f:c_l),           &
+                                        Turb % t2 % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
 !        call Results % Save_Scalar_Real("TurbulentT2Production [K^2/s]",  &
 !                                        plot_inside,                      &
-!                                        turb % p_t2(c_f:c_l),             &
+!                                        Turb % p_t2(c_f:c_l),             &
 !                                        f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("TurbulentHeatFluxX [K m/s]",     &
                                         plot_inside,                      &
-                                        turb % ut % n(c_f:c_l),           &
+                                        Turb % ut % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("TurbulentHeatFluxY [K m/s]",     &
                                         plot_inside,                      &
-                                        turb % vt % n(c_f:c_l),           &
+                                        Turb % vt % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("TurbulentHeatFluxZ [K m/s]",     &
                                         plot_inside,                      &
-                                        turb % wt % n(c_f:c_l),           &
+                                        Turb % wt % n(c_f:c_l),           &
                                         f8, f9, data_offset, run)
 !        call Results % Save_Scalar_Real("TurbulenQuantityAlphaL",         &
 !                                        plot_inside,                      &
-!                                        turb % alpha_l(c_f:c_l),          &
+!                                        Turb % alpha_l(c_f:c_l),          &
 !                                        f8, f9, data_offset, run)
 !        call Results % Save_Scalar_Real("TurbulenQuantityAlphaU",         &
 !                                        plot_inside,                      &
-!                                        turb % alpha_u(c_f:c_l),          &
+!                                        Turb % alpha_u(c_f:c_l),          &
 !                                        f8, f9, data_offset, run)
       end if
     end if
 
-    if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
       call Results % Save_Scalar_Real("TurbulentQuantityF22 [1]",  &
                                       plot_inside,                 &
-                                      turb % f22 % n(c_f:c_l),     &
+                                      Turb % f22 % n(c_f:c_l),     &
                                       f8, f9, data_offset, run)
     end if
 
     ! Save vis and vis_t
-    if(turb % model .eq. DES_SPALART .or.  &
-       turb % model .eq. SPALART_ALLMARAS) then
+    if(Turb % model .eq. DES_SPALART .or.  &
+       Turb % model .eq. SPALART_ALLMARAS) then
       call Results % Save_Scalar_Real("TurbulentViscosity [Pa s]",  &
                                       plot_inside,                  &
-                                      turb % vis % n(c_f:c_l),      &
+                                      Turb % vis % n(c_f:c_l),      &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("VorticityMagnitude [1/s]",   &
                                       plot_inside,                  &
@@ -699,25 +699,25 @@
     end if
 
     kin_vis_t(:) = 0.0
-    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-       turb % model .ne. HYBRID_LES_RANS     .and.  &
-       turb % model .ne. DNS) then
-      kin_vis_t(c_f:c_l) = turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+    if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+       Turb % model .ne. HYBRID_LES_RANS     .and.  &
+       Turb % model .ne. DNS) then
+      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
       call Results % Save_Scalar_Real("EddyOverMolecularViscosity [1]",  &
                                       plot_inside,                       &
                                       kin_vis_t(c_f:c_l),                &
                                       f8, f9, data_offset, run)
     end if
 
-    if(turb % model .eq. HYBRID_LES_RANS) then
+    if(Turb % model .eq. HYBRID_LES_RANS) then
       kin_vis_t(:) = 0.0
-      kin_vis_t(c_f:c_l) = turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
       call Results % Save_Scalar_Real("RansEddyOverMolecularViscosity [1]",  &
                                       plot_inside,                           &
                                       kin_vis_t(c_f:c_l),                    &
                                       f8, f9, data_offset, run)
       kin_vis_t(:) = 0.0
-      kin_vis_t(c_f:c_l) = turb % vis_t_sgs(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      kin_vis_t(c_f:c_l) = Turb % vis_t_sgs(c_f:c_l) / Flow % viscosity(c_f:c_l)
       call Results % Save_Scalar_Real("SgsEddyOverMolecularViscosity [1]",  &
                                       plot_inside,                          &
                                       kin_vis_t(c_f:c_l),                   &
@@ -725,55 +725,55 @@
     end if
 
     ! Reynolds stress models
-    if(turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
       call Results % Save_Scalar_Real("ReynoldsStressXX [m^2/s^2]",  &
                                       plot_inside,                   &
-                                      turb % uu % n(c_f:c_l),        &
+                                      Turb % uu % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("ReynoldsStressYY [m^2/s^2]",  &
                                       plot_inside,                   &
-                                      turb % vv % n(c_f:c_l),        &
+                                      Turb % vv % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("ReynoldsStressZZ [m^2/s^2]",  &
                                       plot_inside,                   &
-                                      turb % ww % n(c_f:c_l),        &
+                                      Turb % ww % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("ReynoldsStressXY [m^2/s^2]",  &
                                       plot_inside,                   &
-                                      turb % uv % n(c_f:c_l),        &
+                                      Turb % uv % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("ReynoldsStressXZ [m^2/s^2]",  &
                                       plot_inside,                   &
-                                      turb % uw % n(c_f:c_l),        &
+                                      Turb % uw % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       call Results % Save_Scalar_Real("ReynoldsStressYZ [m^2/s^2]",  &
                                       plot_inside,                   &
-                                      turb % vw % n(c_f:c_l),        &
+                                      Turb % vw % n(c_f:c_l),        &
                                       f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
         call Results % Save_Scalar_Real("TurbulentHeatFluxX [K m/s]",  &
                                         plot_inside,                   &
-                                        turb % ut % n(c_f:c_l),        &
+                                        Turb % ut % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("TurbulentHeatFluxY [K m/s]",  &
                                         plot_inside,                   &
-                                        turb % vt % n(c_f:c_l),        &
+                                        Turb % vt % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
         call Results % Save_Scalar_Real("TurbulentHeatFluxZ [K m/s]",  &
                                         plot_inside,                   &
-                                        turb % wt % n(c_f:c_l),        &
+                                        Turb % wt % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
       end if
     end if
 
     ! Statistics for large-scale simulations of turbulence
-    if(turb % statistics) then
+    if(Turb % statistics) then
       call Results % Save_Vector_Real("MeanVelocity [m/s]",      &
                                       plot_inside,               &
-                                      turb % u_mean(c_f:c_l),    &
-                                      turb % v_mean(c_f:c_l),    &
-                                      turb % w_mean(c_f:c_l),    &
+                                      Turb % u_mean(c_f:c_l),    &
+                                      Turb % v_mean(c_f:c_l),    &
+                                      Turb % w_mean(c_f:c_l),    &
                                       f8, f9, data_offset, run)
       save_01(:) = 0.0
       save_02(:) = 0.0
@@ -782,12 +782,12 @@
       save_05(:) = 0.0
       save_06(:) = 0.0
       do c1 = c_f, c_l
-        save_01(c1) = turb % uu_res(c1) - turb % u_mean(c1) * turb % u_mean(c1)
-        save_02(c1) = turb % vv_res(c1) - turb % v_mean(c1) * turb % v_mean(c1)
-        save_03(c1) = turb % ww_res(c1) - turb % w_mean(c1) * turb % w_mean(c1)
-        save_04(c1) = turb % uv_res(c1) - turb % u_mean(c1) * turb % v_mean(c1)
-        save_05(c1) = turb % uw_res(c1) - turb % u_mean(c1) * turb % w_mean(c1)
-        save_06(c1) = turb % vw_res(c1) - turb % v_mean(c1) * turb % w_mean(c1)
+        save_01(c1) = Turb % uu_res(c1) - Turb % u_mean(c1) * Turb % u_mean(c1)
+        save_02(c1) = Turb % vv_res(c1) - Turb % v_mean(c1) * Turb % v_mean(c1)
+        save_03(c1) = Turb % ww_res(c1) - Turb % w_mean(c1) * Turb % w_mean(c1)
+        save_04(c1) = Turb % uv_res(c1) - Turb % u_mean(c1) * Turb % v_mean(c1)
+        save_05(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
+        save_06(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
       end do
       call Results % Save_Scalar_Real("MeanReynoldsStressXX [m^s/s^2]",  &
                                       plot_inside,                       &
@@ -816,17 +816,17 @@
       if(Flow % heat_transfer) then
         call Results % Save_Scalar_Real("MeanTemperature [K]",           &
                                         plot_inside,                     &
-                                        turb % t_mean(c_f:c_l),          &
+                                        Turb % t_mean(c_f:c_l),          &
                                         f8, f9, data_offset, run)
         phi_save(:) = 0.0
         save_01(:) = 0.0
         save_02(:) = 0.0
         save_03(:) = 0.0
         do c1 = c_f, c_l
-          phi_save(c1) = turb % t2_res(c1) - turb % t_mean(c1)*turb % t_mean(c1)
-          save_01(c1)  = turb % ut_res(c1) - turb % u_mean(c1)*turb % t_mean(c1)
-          save_02(c1)  = turb % vt_res(c1) - turb % v_mean(c1)*turb % t_mean(c1)
-          save_03(c1)  = turb % wt_res(c1) - turb % w_mean(c1)*turb % t_mean(c1)
+          phi_save(c1) = Turb % t2_res(c1) - Turb % t_mean(c1)*Turb % t_mean(c1)
+          save_01(c1)  = Turb % ut_res(c1) - Turb % u_mean(c1)*Turb % t_mean(c1)
+          save_02(c1)  = Turb % vt_res(c1) - Turb % v_mean(c1)*Turb % t_mean(c1)
+          save_03(c1)  = Turb % wt_res(c1) - Turb % w_mean(c1)*Turb % t_mean(c1)
         end do
         call Results % Save_Scalar_Real("MeanTurbulentQuantityT2 [K^2]",     &
                                         plot_inside,                         &
@@ -852,7 +852,7 @@
         name_mean = 'Mean'
         name_mean(5:8) = phi % name
         do c1 = c_f, c_l
-          phi_save(c1) = turb % scalar_mean(sc, c1)
+          phi_save(c1) = Turb % scalar_mean(sc, c1)
         end do
         call Results % Save_Scalar_Real(name_mean, plot_inside,    &
                                         phi_save(c_f:c_l),         &
@@ -861,11 +861,11 @@
     end if
 
     ! Save y+ for all turbulence models
-    if(turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-       turb % model .ne. DNS) then
+    if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
+       Turb % model .ne. DNS) then
       call Results % Save_Scalar_Real("TurbulentQuantityYplus",  &
                                       plot_inside,               &
-                                      turb % y_plus(c_f:c_l),    &
+                                      Turb % y_plus(c_f:c_l),    &
                                       f8, f9, data_offset, run)
     end if
 
@@ -880,15 +880,15 @@
                                     f8, f9, data_offset, run)
     call Results % Save_Scalar_Real("GridCellDeltaMax [m]",     &
                                     plot_inside,                &
-                                    turb % h_max(c_f:c_l),      &
+                                    Turb % h_max(c_f:c_l),      &
                                     f8, f9, data_offset, run)
     call Results % Save_Scalar_Real("GridCellDeltaMin [m]",     &
                                     plot_inside,                &
-                                    turb % h_min(c_f:c_l),      &
+                                    Turb % h_min(c_f:c_l),      &
                                     f8, f9, data_offset, run)
     call Results % Save_Scalar_Real("GridCellDeltaWall [m]",    &
                                     plot_inside,                &
-                                    turb % h_w  (c_f:c_l),      &
+                                    Turb % h_w  (c_f:c_l),      &
                                     f8, f9, data_offset, run)
 
     !---------------------------------------------------------------------!
@@ -919,9 +919,9 @@
                                       save_03(c_f:c_l),                        &
                                       f8, f9, data_offset, run)
 
-      if(turb % model .eq. K_EPS                 .or.  &
-         turb % model .eq. K_EPS_ZETA_F          .or.  &
-         turb % model .eq. HYBRID_LES_RANS) then
+      if(Turb % model .eq. K_EPS                 .or.  &
+         Turb % model .eq. K_EPS_ZETA_F          .or.  &
+         Turb % model .eq. HYBRID_LES_RANS) then
 
         ! Copy internal values to boundary
         var_ins(:) = 0.0
@@ -944,7 +944,7 @@
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
           if(c2 < 0) then
-            var_ins(c2) = turb % y_plus(c1)
+            var_ins(c2) = Turb % y_plus(c1)
           end if
         end do
 
@@ -953,14 +953,14 @@
                                         var_ins(c_f:c_l),           &
                                         f8, f9, data_offset, run)
 
-        if(turb % rough_walls) then
+        if(Turb % rough_walls) then
           ! Copy internal values to boundary
           var_ins(:) = 0.0
           do s = 1, Grid % n_faces
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
             if(c2 < 0) then
-              var_ins(c2) = turb % id_zone(c1)
+              var_ins(c2) = Turb % id_zone(c1)
             end if
           end do
 
@@ -993,7 +993,7 @@
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
             if(c2 < 0) then
-              var_ins(c2) = phi_save(c1)  ! turb % scalar_mean(sc, c1)
+              var_ins(c2) = phi_save(c1)  ! Turb % scalar_mean(sc, c1)
             end if
           end do
 
@@ -1008,7 +1008,7 @@
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
             if(c2 < 0) then
-              var_ins(c2) = phi % q(c2)  ! turb % scalar_mean(sc, c1)
+              var_ins(c2) = phi % q(c2)  ! Turb % scalar_mean(sc, c1)
             end if
           end do
 

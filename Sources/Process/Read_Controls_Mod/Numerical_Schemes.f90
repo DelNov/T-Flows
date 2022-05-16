@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Numerical_Schemes(Rc, Flow, turb, Vof, Sol)
+  subroutine Numerical_Schemes(Rc, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads details about numerical schemes from control file.                   !
 !                                                                              !
@@ -11,7 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Controls_Type)  :: Rc
   type(Field_Type),   target :: Flow
-  type(Turb_Type),    target :: turb
+  type(Turb_Type),    target :: Turb
   type(Vof_Type),     target :: Vof
   type(Solver_Type),  target :: Sol
 !----------------------------------[Locals]------------------------------------!
@@ -141,18 +141,18 @@
   !   All turbuelnt quantities   !
   !------------------------------!
   do i = 1, 12
-    if(i .eq.  1) tq => turb % kin
-    if(i .eq.  2) tq => turb % eps
-    if(i .eq.  3) tq => turb % zeta
-    if(i .eq.  4) tq => turb % f22
-    if(i .eq.  5) tq => turb % vis
-    if(i .eq.  6) tq => turb % t2
-    if(i .eq.  7) tq => turb % uu
-    if(i .eq.  8) tq => turb % vv
-    if(i .eq.  9) tq => turb % ww
-    if(i .eq. 10) tq => turb % uv
-    if(i .eq. 11) tq => turb % uw
-    if(i .eq. 12) tq => turb % vw
+    if(i .eq.  1) tq => Turb % kin
+    if(i .eq.  2) tq => Turb % eps
+    if(i .eq.  3) tq => Turb % zeta
+    if(i .eq.  4) tq => Turb % f22
+    if(i .eq.  5) tq => Turb % vis
+    if(i .eq.  6) tq => Turb % t2
+    if(i .eq.  7) tq => Turb % uu
+    if(i .eq.  8) tq => Turb % vv
+    if(i .eq.  9) tq => Turb % ww
+    if(i .eq. 10) tq => Turb % uv
+    if(i .eq. 11) tq => Turb % uw
+    if(i .eq. 12) tq => Turb % vw
     call Control_Mod_Advection_Scheme_For_Turbulence          (name)
     tq % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
     call Control_Mod_Time_Integration_Scheme                  (name)

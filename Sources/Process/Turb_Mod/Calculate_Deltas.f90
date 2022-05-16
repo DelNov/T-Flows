@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Deltas(turb)
+  subroutine Calculate_Deltas(Turb)
 !------------------------------------------------------------------------------!
 !   Calculates h_max, h_min and h_w needed for Spalart Allmaras models.        !
 !------------------------------------------------------------------------------!
@@ -17,8 +17,8 @@
   call Work % Connect_Real_Cell(h_w_x, h_w_y, h_w_z)
 
   ! Take aliases
-  Flow => turb % pnt_flow
-  Grid => turb % pnt_grid
+  Flow => Turb % pnt_flow
+  Grid => Turb % pnt_grid
   nc = Grid % n_cells
   nb = Grid % n_bnd_cells
 
@@ -36,9 +36,9 @@
   end do
 
   ! Initialize all "deltas"
-  turb % h_min(:) = +HUGE
-  turb % h_max(:) = -HUGE
-  turb % h_w  (:) = 0.0
+  Turb % h_min(:) = +HUGE
+  Turb % h_max(:) = -HUGE
+  Turb % h_w  (:) = 0.0
 
   ! Browse through faces
   do s = 1, Grid % n_faces
@@ -52,10 +52,10 @@
     d1 = d *      Grid % fw(s)
     d2 = d * (1.0-Grid % fw(s))
 
-    turb % h_max(c1) = max(turb % h_max(c1), d1)
-    turb % h_max(c2) = max(turb % h_max(c2), d2)
-    turb % h_min(c1) = min(turb % h_min(c1), d1)
-    turb % h_min(c2) = min(turb % h_min(c2), d2)
+    Turb % h_max(c1) = max(Turb % h_max(c1), d1)
+    Turb % h_max(c2) = max(Turb % h_max(c2), d2)
+    Turb % h_min(c1) = min(Turb % h_min(c1), d1)
+    Turb % h_min(c2) = min(Turb % h_min(c2), d2)
 
     ! Wall normal distance
     dx1 = Grid % dx(s) *      Grid % fw(s)
@@ -65,11 +65,11 @@
     dy2 = Grid % dy(s) * (1.0-Grid % fw(s))
     dz2 = Grid % dz(s) * (1.0-Grid % fw(s))
 
-    turb % h_w(c1) = (turb % h_w(c1)+ abs(  dx1 * h_w_x(c1)  &
+    Turb % h_w(c1) = (Turb % h_w(c1)+ abs(  dx1 * h_w_x(c1)  &
                                           + dy1 * h_w_y(c1)  &
                                           + dz1 * h_w_z(c1)))
     if(c2 > 0) then
-      turb % h_w(c2) = (turb % h_w(c2)+ abs(  dx2 * h_w_x(c2)  &
+      Turb % h_w(c2) = (Turb % h_w(c2)+ abs(  dx2 * h_w_x(c2)  &
                                             + dy2 * h_w_y(c2)  &
                                             + dz2 * h_w_z(c2)))
     end if
@@ -77,13 +77,13 @@
 
   ! Correct h_max and h_min
   do c = 1, Grid % n_cells
-    turb % h_max(c) = turb % h_max(c) * 2.0
-    turb % h_min(c) = turb % h_min(c) * 2.0
+    Turb % h_max(c) = Turb % h_max(c) * 2.0
+    Turb % h_min(c) = Turb % h_min(c) * 2.0
   end do
 
-  call Grid % Exchange_Cells_Real(turb % h_max)
-  call Grid % Exchange_Cells_Real(turb % h_min)
-  call Grid % Exchange_Cells_Real(turb % h_w)
+  call Grid % Exchange_Cells_Real(Turb % h_max)
+  call Grid % Exchange_Cells_Real(Turb % h_min)
+  call Grid % Exchange_Cells_Real(Turb % h_w)
 
   call Work % Disconnect_Real_Cell(h_w_x, h_w_y, h_w_z)
 

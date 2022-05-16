@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Const_Reynolds_Stress(turb)
+  subroutine Const_Reynolds_Stress(Turb)
 !------------------------------------------------------------------------------!
 !   Initializes constants for Reynolds Stress turbulence model.                ! 
 !   (It is very simular to constants for Hanjalic-Jakirlic turbulence model    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type), target :: turb
+  class(Turb_Type), target :: Turb
 !==============================================================================!
 
   c_1e    =  1.44
@@ -27,13 +27,13 @@
   g4      =  1.25
   g5      =  0.4
 
-  turb % kin % sigma = 1.0
-  turb % eps % sigma = 1.15
-  turb % uu  % sigma = 1.0
-  turb % vv  % sigma = 1.0
-  turb % ww  % sigma = 1.0
-  turb % uv  % sigma = 1.0
-  turb % uw  % sigma = 1.0
-  turb % vw  % sigma = 1.0
+  Turb % kin % sigma = 1.0
+  Turb % eps % sigma = 1.15
+  Turb % uu  % sigma = 1.0
+  Turb % vv  % sigma = 1.0
+  Turb % ww  % sigma = 1.0
+  Turb % uv  % sigma = 1.0
+  Turb % uw  % sigma = 1.0
+  Turb % vw  % sigma = 1.0
 
   end subroutine

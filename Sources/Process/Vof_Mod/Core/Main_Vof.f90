@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Main_Vof(Vof, Flow, turb, Sol, curr_dt)
+  subroutine Main_Vof(Vof, Flow, Turb, Sol, curr_dt)
 !------------------------------------------------------------------------------!
 !   Initialize inteface tracking simulations                                   !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type),     target :: Vof
   type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: turb
+  type(Turb_Type),     target :: Turb
   type(Solver_Type)           :: Sol
   integer, intent(in)         :: curr_dt     ! time step
 !==============================================================================!
