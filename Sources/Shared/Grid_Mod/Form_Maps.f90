@@ -41,8 +41,8 @@
   call Comm_Mod_Global_Sum_Int(Grid % Comm % nb_tot)
 
   ! Allocate memory for mapping matrices
-  allocate(Grid % Comm % cell_map    (Grid % Comm % nc_sub))
-  allocate(Grid % Comm % bnd_cell_map(Grid % Comm % nb_sub))
+  allocate(Grid % Comm % cell_map        (Grid % Comm % nc_sub))
+  allocate(Grid % Comm % bnd_cell_map(max(Grid % Comm % nb_sub,1)))
   Grid % Comm % cell_map(:)         = 0
   Grid % Comm % bnd_cell_map(:)     = 0
 
@@ -102,6 +102,14 @@
       Grid % Comm % bnd_cell_map(cnt) = int(  Grid % Comm % cell_glo(c)  &
                                             + Grid % Comm % nb_tot, SP)
     end do
+
+    ! If domain has zero boundary cells, make the only
+    ! (fictitious) member in the map point it to zero.
+    if(cnt .eq. 0) then
+      Grid % Comm % bnd_cell_map(1) = int(0, SP)
+      Grid % Comm % nb_f = 0
+      Grid % Comm % nb_l = 0
+    end if
 
   end if
 
