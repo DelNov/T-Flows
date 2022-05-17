@@ -14,6 +14,8 @@
   real, contiguous,  pointer :: h_w_x(:), h_w_y(:), h_w_z(:)
 !==============================================================================!
 
+  if( Turb % model .ne. SPALART_ALLMARAS) return
+
   call Work % Connect_Real_Cell(h_w_x, h_w_y, h_w_z)
 
   ! Take aliases
