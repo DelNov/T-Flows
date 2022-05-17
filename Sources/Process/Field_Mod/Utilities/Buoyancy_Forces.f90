@@ -83,7 +83,7 @@
     end do
 
   !---------------------------------------------------------------------!
-  !   no Boussinesq hypothesis, this will include multiphase Flow and   !
+  !   no Boussinesq hypothesis, this will include multiphase flow and   !
   !    probably very abbrupt changes in density, go for harmonic mean   !
   !---------------------------------------------------------------------!
   else
