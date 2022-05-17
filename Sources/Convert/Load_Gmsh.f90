@@ -79,8 +79,8 @@
   call File % Read_Line(fu)
   read(line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
-  allocate(p_tag_corr(n_sect * 128))  ! allocate more than needed because
-                                      ! it's all very messy in .msh files
+  allocate(p_tag_corr(n_sect * 65536))  ! allocate more than needed because
+                                        ! it's all very messy in .msh files
   do i = 1, n_sect
     call File % Read_Line(fu)
     read(line % tokens(2), *) j
