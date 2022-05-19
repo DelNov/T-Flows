@@ -41,7 +41,7 @@
 
   if(Turb % heat_flux_model .eq. SGDH) then
     do c = 1, Grid % n_cells
-      pr_t = max(Turb_Mod_Prandtl_Number(Turb, c), TINY)
+      pr_t = max(Turb % Prandtl_Turb(c), TINY)
       ut % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
       vt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
       wt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)

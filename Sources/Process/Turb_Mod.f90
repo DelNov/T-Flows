@@ -161,7 +161,6 @@
       procedure :: Const_K_Eps
       procedure :: Const_K_Eps_Zeta_F
       procedure :: Const_Manceau_Hanjalic
-      procedure :: Const_Reynolds_Stress
       procedure :: Const_Spalart_Allmaras
 
       ! Computation of various turbulent quantities

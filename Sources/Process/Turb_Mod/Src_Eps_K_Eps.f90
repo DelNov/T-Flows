@@ -31,9 +31,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^4]!
 !------------------------------------------------------------------------------!
@@ -116,6 +116,7 @@
                                                        Turb % y_plus(c1))
 
           u_tau_new = sqrt(Turb % tau_wall(c1) / Flow % density(c1))
+
           Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau_new,             &
                                                    Grid % wall_dist(c1),  &
                                                    kin_vis)

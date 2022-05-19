@@ -95,17 +95,17 @@
                      / phi % sigma
 
     if(phi % name .eq. 'T2') then
-      pr_t1 = Turb_Mod_Prandtl_Number(Turb, c1)
-      pr_t2 = Turb_Mod_Prandtl_Number(Turb, c2)
-      pr_1  = Flow % Prandtl_Number(c1)
-      pr_2  = Flow % Prandtl_Number(c2)
+      pr_t1 = Turb % Prandtl_Turb(c1)
+      pr_t2 = Turb % Prandtl_Turb(c2)
+      pr_1  = Flow % Prandtl_Numb(c1)
+      pr_2  = Flow % Prandtl_Numb(c2)
 
       visc_f =      Grid % fw(s)  * Flow % viscosity(c1) / pr_1   &
            + (1.0 - Grid % fw(s)) * Flow % viscosity(c2) / pr_2
 
-      vis_eff = visc_f + (    Grid % fw(s)  * turb % vis_t(c1)  / pr_t1  &  
-                       + (1.0-Grid % fw(s)) * turb % vis_t(c2)) / pr_t2  &
-                       / phi % sigma 
+      vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t(c1)  / pr_t1  &
+                       + (1.0-Grid % fw(s)) * Turb % vis_t(c2)) / pr_t2  &
+                       / phi % sigma
     end if
 
     if(Turb % model .eq. SPALART_ALLMARAS .or.               &

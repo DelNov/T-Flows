@@ -61,9 +61,9 @@
       ww % n(c) = - 2. * Turb % vis_t_eff(c) / Flow % density(c)  &
                        * w % z(c) + TWO_THIRDS * kin % n(c)
 
-      uv % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) * (u % y(c) + v % x(c))
-      uw % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) * (u % z(c) + w % x(c))
-      vw % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) * (v % z(c) + w % y(c))
+      uv % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) * (u % y(c)+v % x(c))
+      uw % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) * (u % z(c)+w % x(c))
+      vw % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) * (v % z(c)+w % y(c))
     end do
   end if
 
