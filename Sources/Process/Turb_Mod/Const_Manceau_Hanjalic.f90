@@ -25,7 +25,13 @@
   g3_star =  1.3
   g4      =  1.25
   g5      =  0.4
+
+  ! Constants for GGDH turbulent flux
   c_theta =  0.22
+
+  ! Constants for AFM turbulent flux
+  afm_psi      = 0.1 
+  afm_eta      = 0.1 
 
   turb % kin % sigma = 1.0
   turb % eps % sigma = 1.15

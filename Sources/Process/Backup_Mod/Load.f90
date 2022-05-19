@@ -281,6 +281,7 @@
     call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'p_mean', tur % p_mean)
     if(Fld % heat_transfer) then
       call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 't_mean', tur % t_mean)
+      call Backup_Mod_Read_Cell_Real(Grid, fh, d, vc, 'q_mean', tur % q_mean)
     end if
 
     ! K and epsilon

@@ -56,9 +56,10 @@
     call Var_Mod_Allocate_Solution(turb % eps, Grid, 'EPS', '')
 
     ! Other turbulent quantities
-    allocate(turb % vis_t (-nb:nc));  turb % vis_t  = 0.
-    allocate(turb % vis_w (-nb:nc));  turb % vis_w  = 0.  ! wall visc
-    allocate(turb % p_kin (-nb:nc));  turb % p_kin  = 0.
+    allocate(turb % vis_t (-nb:nc));   turb % vis_t   = 0.
+    allocate(turb % vis_w (-nb:nc));   turb % vis_w   = 0.  ! wall visc
+    allocate(turb % p_kin (-nb:nc));   turb % p_kin   = 0.
+    allocate(turb % t_scale (-nb:nc)); turb % t_scale = 0.
 
     if(Flow % heat_transfer) then
       call Var_Mod_Allocate_Solution(turb % t2, Grid, 'T2', '')
@@ -86,7 +87,12 @@
       allocate(turb % w_mean(-nb:nc));  turb % w_mean = 0.
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
-        allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % t_mean (-nb:nc));  turb % t_mean  = 0.
+        allocate(turb % q_mean (-nb:nc));  turb % q_mean  = 0.
+        allocate(turb % t2_mean(-nb:nc));  turb % t2_mean = 0.
+        allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
+        allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
+        allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -107,9 +113,6 @@
         allocate(turb % ut_res (-nb:nc));  turb % ut_res  = 0.
         allocate(turb % vt_res (-nb:nc));  turb % vt_res  = 0.
         allocate(turb % wt_res (-nb:nc));  turb % wt_res  = 0.
-        allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
-        allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
-        allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.
       end if ! Flow % heat_transfer
 
     end if ! turb % statistics
@@ -168,6 +171,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -246,6 +250,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -327,6 +332,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -383,6 +389,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -492,6 +499,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -546,6 +554,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -583,6 +592,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Resolved Reynolds stresses
@@ -660,6 +670,7 @@
       allocate(turb % p_mean(-nb:nc));  turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(turb % t_mean(-nb:nc));  turb % t_mean = 0.
+        allocate(turb % q_mean(-nb:nc));  turb % q_mean = 0.
       end if
 
       ! Time-averaged modeled quantities
@@ -681,10 +692,10 @@
 
       ! Resolved turbulent heat fluxes
       if(Flow % heat_transfer) then
-        allocate(turb % t2_res(-nb:nc));  turb % t2_res = 0.
-        allocate(turb % ut_res(-nb:nc));  turb % ut_res = 0.
-        allocate(turb % vt_res(-nb:nc));  turb % vt_res = 0.
-        allocate(turb % wt_res(-nb:nc));  turb % wt_res = 0.
+        allocate(turb % t2_res (-nb:nc));  turb % t2_res  = 0.
+        allocate(turb % ut_res (-nb:nc));  turb % ut_res  = 0.
+        allocate(turb % vt_res (-nb:nc));  turb % vt_res  = 0.
+        allocate(turb % wt_res (-nb:nc));  turb % wt_res  = 0.
         allocate(turb % ut_mean(-nb:nc));  turb % ut_mean = 0.
         allocate(turb % vt_mean(-nb:nc));  turb % vt_mean = 0.
         allocate(turb % wt_mean(-nb:nc));  turb % wt_mean = 0.

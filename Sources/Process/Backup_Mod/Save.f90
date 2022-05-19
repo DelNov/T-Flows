@@ -253,8 +253,10 @@
     call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'v_mean', tur % v_mean)
     call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'w_mean', tur % w_mean)
     call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'p_mean', tur % p_mean)
+
     if(Fld % heat_transfer) then
       call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 't_mean', tur % t_mean)
+      call Backup_Mod_Write_Cell_Real(Grid, fh, d, vc, 'q_mean', tur % q_mean)
     end if
 
     ! K and epsilon

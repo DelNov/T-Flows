@@ -16,7 +16,7 @@
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c, n, sc
   real, contiguous, pointer :: u_mean(:), v_mean(:), w_mean(:),  &
-                               p_mean(:), t_mean(:)
+                               p_mean(:), t_mean(:), q_mean(:)
   real, contiguous, pointer :: kin_mean (:), eps_mean(:),  &
                                zeta_mean(:), f22_mean(:)
   real, contiguous, pointer :: uu_res(:), vv_res(:), ww_res(:),  &
@@ -44,7 +44,7 @@
 
   ! Time averaged momentum and energy equations
   u_mean => turb % u_mean;  v_mean => turb % v_mean;  w_mean => turb % w_mean
-  p_mean => turb % p_mean;  t_mean => turb % t_mean
+  p_mean => turb % p_mean;  t_mean => turb % t_mean;  q_mean => turb % q_mean
 
   ! Time averaged modeled quantities
   kin_mean  => turb % kin_mean;   eps_mean  => turb % eps_mean
@@ -69,42 +69,46 @@
 
     do c = -Grid % n_bnd_cells, Grid % n_cells
 
-      !---------------------------------!
-      !   Scale-resolving simulations   !
-      !---------------------------------!
-      if(turb % model .eq. LES_SMAGORINSKY    .or.  &
-         turb % model .eq. LES_DYNAMIC        .or.  &
-         turb % model .eq. LES_WALE           .or.  &
-         turb % model .eq. HYBRID_LES_PRANDTL .or.  &
-         turb % model .eq. K_EPS              .or.  &
-         turb % model .eq. K_EPS_ZETA_F       .or.  &
-         turb % model .eq. DES_SPALART        .or.  &
-         turb % model .eq. DNS) then
+      ! Mean velocities (and temperature)
+      u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
+      v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
+      w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
+      p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
 
-        ! Mean velocities (and temperature)
-        u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
-        v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
-        w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
-        p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(Flow % heat_transfer) then
-          t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
-        end if
+      if(Flow % heat_transfer) then
+        t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
+        q_mean(c) = (q_mean(c) * real(n) + t % q(c)) / real(n+1)
+      end if
 
-        ! Resolved Reynolds stresses
-        uu_res(c) = (uu_res(c) * real(n) + u % n(c) * u % n(c)) / real(n+1)
-        vv_res(c) = (vv_res(c) * real(n) + v % n(c) * v % n(c)) / real(n+1)
-        ww_res(c) = (ww_res(c) * real(n) + w % n(c) * w % n(c)) / real(n+1)
+      ! Resolved Reynolds stresses
+      uu_res(c) = (uu_res(c) * real(n) + u % n(c) * u % n(c)) / real(n+1)
+      vv_res(c) = (vv_res(c) * real(n) + v % n(c) * v % n(c)) / real(n+1)
+      ww_res(c) = (ww_res(c) * real(n) + w % n(c) * w % n(c)) / real(n+1)
 
-        uv_res(c) = (uv_res(c) * real(n) + u % n(c) * v % n(c)) / real(n+1)
-        uw_res(c) = (uw_res(c) * real(n) + u % n(c) * w % n(c)) / real(n+1)
-        vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
+      uv_res(c) = (uv_res(c) * real(n) + u % n(c) * v % n(c)) / real(n+1)
+      uw_res(c) = (uw_res(c) * real(n) + u % n(c) * w % n(c)) / real(n+1)
+      vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
+
+      ! Resolved turbulent heat fluxes
+      if(Flow % heat_transfer) then
+        t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
+        ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
+        vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
+        wt_res(c) = (wt_res(c) * real(n) + w % n(c) * t % n(c)) / real(n+1)
+      end if
+
+      if(turb % model .eq. K_EPS                 .or.  &
+         turb % model .eq. K_EPS_ZETA_F          .or.  &
+         turb % model .eq. HYBRID_LES_RANS       .or.  &
+         turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+         turb % model .eq. RSM_MANCEAU_HANJALIC ) then
 
         ! Resolved turbulent heat fluxes
         if(Flow % heat_transfer) then
-          t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
-          ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
-          vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
-          wt_res(c) = (wt_res(c) * real(n) + w % n(c) * t % n(c)) / real(n+1)
+          t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
+          ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c)) / real(n+1)
+          vt_mean(c) = (vt_mean(c) * real(n) + vt % n(c)) / real(n+1)
+          wt_mean(c) = (wt_mean(c) * real(n) + wt % n(c)) / real(n+1)
         end if
       end if
 
@@ -113,38 +117,9 @@
       !-----------------!
       if(turb % model .eq. K_EPS) then
 
-        ! Time-averaged velocities (and temperature)
-        u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
-        v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
-        w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
-        p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(Flow % heat_transfer) then
-          t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
-        end if
-
         ! Time-averaged modeled quantities
         kin_mean(c) = (kin_mean(c) * real(n) + kin % n(c)) / real(n+1)
         eps_mean(c) = (eps_mean(c) * real(n) + eps % n(c)) / real(n+1)
-
-        ! Resolved Reynolds stresses
-        uu_res(c) = (uu_res(c) * real(n) + u % n(c) * u % n(c)) / real(n+1)
-        vv_res(c) = (vv_res(c) * real(n) + v % n(c) * v % n(c)) / real(n+1)
-        ww_res(c) = (ww_res(c) * real(n) + w % n(c) * w % n(c)) / real(n+1)
-
-        uv_res(c) = (uv_res(c) * real(n) + u % n(c) * v % n(c)) / real(n+1)
-        uw_res(c) = (uw_res(c) * real(n) + u % n(c) * w % n(c)) / real(n+1)
-        vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
-
-        ! Resolved turbulent heat fluxes
-        if(Flow % heat_transfer) then
-          t2_res (c) = (t2_res (c) * real(n) + t % n (c) * t % n(c)) / real(n+1)
-          ut_res (c) = (ut_res (c) * real(n) + u %  n(c) * t % n(c)) / real(n+1)
-          vt_res (c) = (vt_res (c) * real(n) + v %  n(c) * t % n(c)) / real(n+1)
-          wt_res (c) = (wt_res (c) * real(n) + w %  n(c) * t % n(c)) / real(n+1)
-          ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c))            / real(n+1)
-          vt_mean(c) = (vt_mean(c) * real(n) + vt % n(c))            / real(n+1)
-          wt_mean(c) = (wt_mean(c) * real(n) + wt % n(c))            / real(n+1)
-        end if
       end if
 
       !------------------!
@@ -153,44 +128,11 @@
       if(turb % model .eq. K_EPS_ZETA_F .or.  &
          turb % model .eq. HYBRID_LES_RANS) then
 
-        ! Time-averaged velocities (and temperature)
-        u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
-        v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
-        w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
-        p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(Flow % heat_transfer) then
-          t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
-        end if
-
         ! Time-averaged modeled quantities
         kin_mean (c) = (kin_mean (c) * real(n) + kin  % n(c)) / real(n+1)
         eps_mean (c) = (eps_mean (c) * real(n) + eps  % n(c)) / real(n+1)
         zeta_mean(c) = (zeta_mean(c) * real(n) + zeta % n(c)) / real(n+1)
         f22_mean (c) = (f22_mean (c) * real(n) + f22  % n(c)) / real(n+1)
-        if(Flow % heat_transfer) then
-          t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
-        end if
-
-        ! Resolved Reynolds stresses
-        uu_res(c) = (uu_res(c) * real(n) + u % n(c) * u % n(c)) / real(n+1)
-        vv_res(c) = (vv_res(c) * real(n) + v % n(c) * v % n(c)) / real(n+1)
-        ww_res(c) = (ww_res(c) * real(n) + w % n(c) * w % n(c)) / real(n+1)
-
-        uv_res(c) = (uv_res(c) * real(n) + u % n(c) * v % n(c)) / real(n+1)
-        uw_res(c) = (uw_res(c) * real(n) + u % n(c) * w % n(c)) / real(n+1)
-        vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
-
-        ! Resolved turbulent heat fluxes
-        if(Flow % heat_transfer) then
-          t2_res (c) = (t2_res (c) * real(n) + t % n (c) * t % n(c)) / real(n+1)
-          ut_res (c) = (ut_res (c) * real(n) + u % n (c) * t % n(c)) / real(n+1)
-          vt_res (c) = (vt_res (c) * real(n) + v % n (c) * t % n(c)) / real(n+1)
-          wt_res (c) = (wt_res (c) * real(n) + w % n (c) * t % n(c)) / real(n+1)
-          ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c))            / real(n+1)
-          vt_mean(c) = (vt_mean(c) * real(n) + vt % n(c))            / real(n+1)
-          wt_mean(c) = (wt_mean(c) * real(n) + wt % n(c))            / real(n+1)
-        end if
-
       end if
 
       !----------------------------!
@@ -198,15 +140,6 @@
       !----------------------------!
       if(turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
          turb % model .eq. RSM_MANCEAU_HANJALIC) then
-
-        ! Time-averaged velocities (and temperature)
-        u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
-        v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
-        w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
-        p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
-        if(Flow % heat_transfer) then
-          t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
-        end if
 
         ! Time-averaged modeled quantities (modelled Reynolds stresses)
         uu_mean (c) = (uu_mean (c) * real(n) + uu  % n(c)) / real(n+1)
@@ -220,24 +153,6 @@
         if(turb % model .eq. RSM_MANCEAU_HANJALIC) then
           f22_mean(c) = (f22_mean(c) * real(n) + f22 % n(c)) / real(n+1)
         end if
-
-        ! Resolved Reynolds stresses
-        uu_res(c) = (uu_res(c) * real(n) + u % n(c) * u % n(c)) / real(n+1)
-        vv_res(c) = (vv_res(c) * real(n) + v % n(c) * v % n(c)) / real(n+1)
-        ww_res(c) = (ww_res(c) * real(n) + w % n(c) * w % n(c)) / real(n+1)
-
-        uv_res(c) = (uv_res(c) * real(n) + u % n(c) * v % n(c)) / real(n+1)
-        uw_res(c) = (uw_res(c) * real(n) + u % n(c) * w % n(c)) / real(n+1)
-        vw_res(c) = (vw_res(c) * real(n) + v % n(c) * w % n(c)) / real(n+1)
-
-        ! Resolved turbulent heat fluxes
-        if(Flow % heat_transfer) then
-          t2_res(c) = (t2_res(c) * real(n) + t % n(c) * t % n(c)) / real(n+1)
-          ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
-          vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
-          wt_res(c) = (wt_res(c) * real(n) + w % n(c) * t % n(c)) / real(n+1)
-        end if
-
       end if
 
       !-------------!
@@ -249,6 +164,7 @@
         phi_mean(sc, c) = (phi_mean(sc, c) * real(n) + phi % n(c)) / real(n+1)
       end do
     end do
+
   end if
 
   end subroutine

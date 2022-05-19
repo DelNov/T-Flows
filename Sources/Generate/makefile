@@ -35,6 +35,7 @@ $(info # Examples:                                                             )
 $(info #   make              - compile with gnu compiler                       )
 $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
+$(info #   make OPENMP=yes   - compile with gnu compiler for parallel Generate )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------------------------------------------------------------------
@@ -61,6 +62,9 @@ ifeq ($(FORTRAN), gnu)
   else
     OPT_COMP = -J $(DIR_MODULE) -fdefault-real-8 -fdefault-integer-8 -O3
   endif 
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
+  endif
   OPT_LINK = $(OPT_COMP)
 endif 
 
@@ -73,6 +77,9 @@ ifeq ($(FORTRAN), intel)
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
+  endif
   OPT_LINK = $(OPT_COMP)
 endif 
 
@@ -83,6 +90,9 @@ ifeq ($(FORTRAN), nvidia)
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O0 -g
   else
     OPT_COMP = -module $(DIR_MODULE) -r8 -i8 -O3
+  endif
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
   endif
   OPT_LINK = $(OPT_COMP)
 endif 
