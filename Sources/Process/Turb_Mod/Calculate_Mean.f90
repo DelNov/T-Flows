@@ -105,10 +105,10 @@
 
         ! Resolved turbulent heat fluxes
         if(Flow % heat_transfer) then
-          t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c))            / real(n+1)
-          ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c))            / real(n+1)
-          vt_mean(c) = (vt_mean(c) * real(n) + vt % n(c))            / real(n+1)
-          wt_mean(c) = (wt_mean(c) * real(n) + wt % n(c))            / real(n+1)
+          t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
+          ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c)) / real(n+1)
+          vt_mean(c) = (vt_mean(c) * real(n) + vt % n(c)) / real(n+1)
+          wt_mean(c) = (wt_mean(c) * real(n) + wt % n(c)) / real(n+1)
         end if
       end if
 
