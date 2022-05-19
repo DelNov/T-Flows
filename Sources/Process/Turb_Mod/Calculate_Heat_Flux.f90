@@ -39,24 +39,24 @@
   !   By default turbulent heat flux is caalculated by SGDH   !
   !-----------------------------------------------------------!
 
-  do c = 1, Grid % n_cells
-    pr_t = max(Turb % Prandtl_Turb(c), TINY)
-    ut % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
-    vt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
-    wt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+  if(Turb % heat_flux_model .eq. SGDH) then
+    do c = 1, Grid % n_cells
+      pr_t = max(Turb_Mod_Prandtl_Number(Turb, c), TINY)
+      ut % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+      vt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+      wt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
 
-    if(Turb % model .eq. HYBRID_LES_RANS) then
-      ut % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                        / pr_t * t % x(c)
-      vt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                        / pr_t * t % y(c)
-      wt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                        / pr_t * t % z(c)
-    end if
-  end do
+      if(Turb % model .eq. HYBRID_LES_RANS) then
+        ut % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
+                                          / pr_t * t % x(c)
+        vt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
+                                          / pr_t * t % y(c)
+        wt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
+                                          / pr_t * t % z(c)
+      end if
+    end do
 
-  if(Turb % heat_flux_model .eq. GGDH) then
-
+  else if(Turb % heat_flux_model .eq. GGDH) then
     do c = 1, Grid % n_cells
       ut % n(c) = -c_theta * Turb % t_scale(c) * (uu % n(c) * t % x(c)  +  &
                                                   uv % n(c) * t % y(c)  +  &
@@ -74,35 +74,33 @@
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
 
-    do k = 1, 2
-      do c = 1, Grid % n_cells
-        ut % n(c) = -c_theta * Turb % t_scale(c)          &
-                  * ((  uu % n(c) * t % x(c)              &
-                      + uv % n(c) * t % y(c)              &
-                      + uw % n(c) * t % z(c))             &
-                      + 0.6 * (  ut % n(c) * u % x(c)     &
-                               + vt % n(c) * u % y(c)     &
-                               + wt % n(c) * u % z(c))    &
-                      + 0.2*Flow % beta * Flow % grav_x * t2 % n(c))
+    do c = 1, Grid % n_cells
+      ut % n(c) = -c_theta * Turb % t_scale(c)          &
+                    * ((  uu % n(c) * t % x(c)          &
+                        + uv % n(c) * t % y(c)          &
+                        + uw % n(c) * t % z(c))         &
+                + afm_eta * (  ut % n(c) * u % x(c)     &
+                             + vt % n(c) * u % y(c)     &
+                             + wt % n(c) * u % z(c))    &
+                + afm_psi * Flow % beta * Flow % grav_x * t2 % n(c))
 
-        vt % n(c) = -c_theta * Turb % t_scale(c)          &
-                  * ((  uv % n(c) * t % x(c)              &
-                      + vv % n(c) * t % y(c)              &
-                      + vw % n(c) * t % z(c))             &
-                      + 0.6 * (  ut % n(c) * v % x(c)     &
-                               + vt % n(c) * v % y(c)     &
-                               + wt % n(c) * v % z(c))    &
-                      + 0.2*Flow % beta * Flow % grav_y * t2 % n(c))
+      vt % n(c) = -c_theta * Turb % t_scale(c)          &
+                    * ((  uv % n(c) * t % x(c)          &
+                        + vv % n(c) * t % y(c)          &
+                        + vw % n(c) * t % z(c))         &
+                + afm_eta * (  ut % n(c) * v % x(c)     &
+                             + vt % n(c) * v % y(c)     &
+                             + wt % n(c) * v % z(c))    &
+                + afm_psi * Flow % beta * Flow % grav_y * t2 % n(c))
 
-        wt % n(c) = -c_theta * Turb % t_scale(c)          &
-                  * ((  uw % n(c) * t % x(c)              &
-                      + vw % n(c) * t % y(c)              &
-                      + ww % n(c) * t % z(c))             &
-                      + 0.6 * (  ut % n(c) * w % x(c)     &
-                               + vt % n(c) * w % y(c)     &
-                               + wt % n(c) * w % z(c))    &
-                      + 0.2*Flow % beta * Flow % grav_z * t2 % n(c))
-      end do
+      wt % n(c) = -c_theta * Turb % t_scale(c)          &
+                    * ((  uw % n(c) * t % x(c)          &
+                        + vw % n(c) * t % y(c)          &
+                        + ww % n(c) * t % z(c))         &
+                + afm_eta * (  ut % n(c) * w % x(c)     &
+                             + vt % n(c) * w % y(c)     &
+                             + wt % n(c) * w % z(c))    &
+                + afm_psi * Flow % beta * Flow % grav_z * t2 % n(c))
     end do
   end if
 

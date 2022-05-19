@@ -21,7 +21,8 @@ include '../User_Mod/T_Sat.f90'
   real                      :: dens_air(9), dens_h2o(9), temperat_int(9)
   real                      :: weight, a0, a1, a2, a3, a4, a5, b0, b1, b2, c0
   real                      :: aa, bb, cc, a_tmp, m_h2o, m_air, M, pv, t_int
-  real                      :: t_film, k_film, d_film, h_d, m_evap
+  real                      :: t_film, t_int_acc, k_film, d_film, h_d, m_evap
+  real                      :: t_int_avg, m_evap_acc, area_acc, m_evap_avg
 !==============================================================================!
 
   ! Take aliases
@@ -115,6 +116,9 @@ include '../User_Mod/T_Sat.f90'
     k_film = 0.6009 ! W/mK
     d_film = 1e-3  ! m
 
+    area_acc   = 0.0             ! initialize area for averaging
+    m_evap_acc = 0.0             ! initialize m_evap for averaging
+    t_int_acc  = 0.0             ! initialize t_int for averaging
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s) !-> each face 2 cells, right cell
@@ -137,15 +141,27 @@ include '../User_Mod/T_Sat.f90'
                   / Grid % wall_dist(c1) * (t % n(c1)-t_int)  &
                  + k_film / d_film * (t_film - t_int)) / h_d
 
+          ! If not in a buffer, update accumulated variables
+          if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
+            t_int_acc  = t_int_acc  + t_int  * Grid % s(s)
+            m_evap_acc = m_evap_acc + m_evap * Grid % s(s)
+            area_acc   = area_acc   + Grid % s(s)
+          end if
+
           ! scalar % q(c2) = m_evap * Grid % sz(s)
         end if
       end if
     end do
 
     ! Positive for evaporation, negative for condensation
+    call Comm_Mod_Global_Sum_Real(t_int_acc)
+    call Comm_Mod_Global_Sum_Real(m_evap_acc)
+    call Comm_Mod_Global_Sum_Real(area_acc)
+    m_evap_avg = m_evap_acc / area_acc
+    t_int_avg  = t_int_acc  / area_acc
     if(this_proc < 2) then
-      print * , 'm_evap =', m_evap * 3600, ' kg/m²h '
-      print * , 't_int = ', t_int, 'Celsius'
+      print * , 'm_evap =', m_evap_avg * 3600, ' kg/m²h '
+      print * , 't_int = ', t_int_avg, 'Celsius'
     end if
 
   end if

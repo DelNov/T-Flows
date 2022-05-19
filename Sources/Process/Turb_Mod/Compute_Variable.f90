@@ -25,7 +25,7 @@
   real                       :: vis_eff
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: dt
-  real                       :: visc_f
+  real                       :: visc_f, pr_t1, pr_t2, pr_1, pr_2
 !==============================================================================!
 !                                                                              !
 !  The form of equations which are solved:                                     !
@@ -47,7 +47,7 @@
   flux => Flow % v_flux % n
   dt   =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
-  call Sol % Alias_Native      (A, b)
+  call Sol % Alias_Native   (A, b)
 
   ! Initialize advection and cross diffusion sources, matrix and right hand side
   phi % a(:) = 0.0
@@ -93,6 +93,20 @@
     vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t(c1)   &
                      + (1.0-Grid % fw(s)) * Turb % vis_t(c2))  &
                      / phi % sigma
+
+    if(phi % name .eq. 'T2') then
+      pr_t1 = Turb_Mod_Prandtl_Number(Turb, c1)
+      pr_t2 = Turb_Mod_Prandtl_Number(Turb, c2)
+      pr_1  = Flow % Prandtl_Number(c1)
+      pr_2  = Flow % Prandtl_Number(c2)
+
+      visc_f =      Grid % fw(s)  * Flow % viscosity(c1) / pr_1   &
+           + (1.0 - Grid % fw(s)) * Flow % viscosity(c2) / pr_2
+
+      vis_eff = visc_f + (    Grid % fw(s)  * turb % vis_t(c1)  / pr_t1  &  
+                       + (1.0-Grid % fw(s)) * turb % vis_t(c2)) / pr_t2  &
+                       / phi % sigma 
+    end if
 
     if(Turb % model .eq. SPALART_ALLMARAS .or.               &
        Turb % model .eq. DES_SPALART)                        &
@@ -253,7 +267,7 @@
   end if
 
   ! Set the lower limit of epsilon 
-  if(phi % name .eq. 'EPS'.and.Turb % model == HYBRID_LES_RANS) then
+  if(phi % name .eq. 'EPS') then
     do c = 1, Grid % n_cells
       phi % n(c) = max(phi % n(c), 1.0e-10)
     end do

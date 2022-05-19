@@ -23,7 +23,6 @@
   alpha   =  0.012
   c_f1    =  1.4
   c_f2    =  0.3
-  c_theta =  0.2
 
   ! Constants for buoyancy wall function
   c_mu_theta   =  0.1225
@@ -34,5 +33,12 @@
   Turb % eps  % sigma = 1.3
   Turb % zeta % sigma = 1.2
   Turb % t2   % sigma = 1.1
+
+  ! Constants for GGDH turbulent flux
+  c_theta =  0.22
+
+  ! Constants for AFM turbulent flux
+  afm_psi = 0.1
+  afm_eta = 0.1
 
   end subroutine

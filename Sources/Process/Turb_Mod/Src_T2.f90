@@ -51,10 +51,19 @@
   ! Production source:
   do c = 1, Grid % n_cells
 
-    pr_t = max(Turb % Prandtl_Turb(c), TINY)
-    ut_sgdh = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
-    vt_sgdh = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
-    wt_sgdh = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+    !-------------------------------------------------------------------!
+    !   ut, vt and wt defined by AFM or GGDH could lead to divergence   !
+    !-------------------------------------------------------------------!
+    pr_t = max(Turb_Mod_Prandtl_Number(Turb, c), TINY)
+    ut_sgdh = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+    vt_sgdh = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+    wt_sgdh = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+
+    if(Turb % model .eq. HYBRID_LES_RANS) then
+      ut_sgdh = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % x(c)
+      vt_sgdh = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % y(c)
+      wt_sgdh = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % z(c)
+    end if
 
     Turb % p_t2(c) = - 2.0 * Flow % density(c)       &
                            * (  ut_sgdh * t % x(c)   &
