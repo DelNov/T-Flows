@@ -62,7 +62,7 @@
 
   ! Production source:
   do c = 1, Grid % n_cells
-    turb % p_kin(c) = max(turb % vis_t(c) * Flow % shear(c)**2,tiny)
+    turb % p_kin(c) = max(turb % vis_t(c) * Flow % shear(c)**2, TINY)
     b(c) = b(c) + turb % p_kin(c) * Grid % vol(c)
   end do
 
