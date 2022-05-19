@@ -44,8 +44,8 @@
     !----------------!
 
     ! Time averaged momentum and energy equations
-    real, allocatable :: u_mean(:), v_mean(:), w_mean(:), p_mean(:), t_mean(:)
-    real, allocatable :: q_mean(:)
+    real, allocatable :: u_mean(:), v_mean(:), w_mean(:), p_mean(:)
+    real, allocatable :: t_mean(:), q_mean(:)
 
     ! Time averaged modeled quantities
     ! (Time averages of modeled equations)
