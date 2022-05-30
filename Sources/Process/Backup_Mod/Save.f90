@@ -117,7 +117,7 @@
   call Backup_Mod_Write_Log(Comm, d, vc, 'has_pressure_boundary',  &
                             Fld % has_pressure_boundary)
   call Backup_Mod_Write_Log(Comm, d, vc, 'has_outflow_boundary',  &
-                            Fld % has_pressure_boundary)
+                            Fld % has_outflow_boundary)
 
   !--------------!
   !              !
