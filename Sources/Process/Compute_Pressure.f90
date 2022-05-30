@@ -201,7 +201,8 @@
   ! Update on February 27, 2022: I have also added "has_outflow_boundary"
   ! to be able to tell PETSc if matrix for pressure is singular.  Shall
   ! it also be included in this test?
-  if( .not. Flow % has_pressure_boundary) then
+  if( .not. Flow % has_pressure_boundary .and. &
+      .not. Flow % has_outflow_boundary) then
     if(total_cells .eq. 0) then  ! wasn't set yet
       total_cells = Grid % n_cells - Grid % comm % n_buff_cells
       call Comm_Mod_Global_Sum_Int(total_cells)
