@@ -432,7 +432,7 @@
   ! to be able to tell PETSc if matrix for pressure is singular.  Shall
   ! it also be included in this test?
   Flow % has_pressure_boundary = .false.
-  Flow % has_outflow_boundary = .false.
+  Flow % has_outflow_boundary  = .false.
   if(n_pressure > 0) Flow % has_pressure_boundary = .true.
   if(n_outflow  > 0) Flow % has_outflow_boundary  = .true.
 
