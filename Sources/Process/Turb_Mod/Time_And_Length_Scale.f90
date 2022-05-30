@@ -103,6 +103,15 @@
       Turb % l_scale(c) = l_1(c)
     end do
 
+  else if(Turb % model .eq. K_EPS) then
+
+    do c = 1, Grid % n_cells
+      eps_l(c) = eps % n(c) + TINY ! limited eps % n
+
+      t_1(c) = kin % n(c) / eps_l(c)
+      t_3(c) = 0.6/(sqrt(6.0) * c_mu * Flow % shear(c) + TINY)
+      Turb % t_scale(c) =  min(t_1(c), t_3(c))
+    end do
   end if
 
   call Work % Disconnect_Real_Cell(t_1, t_2, t_3, l_1, l_2, l_3, eps_l)

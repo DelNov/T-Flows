@@ -2,7 +2,7 @@
 // Parameters defining the geometry
 //----------------------------------
 WIDTH  = 1.0;
-HEIGHT = 2.0;
+HEIGHT = 1.0;
 DELTA  = WIDTH / 80.0; // Controls grid size (WIDTH / 40.0 ,
                        //                     WIDTH / 80.0 ,
                        //                     WIDTH / 160.0,

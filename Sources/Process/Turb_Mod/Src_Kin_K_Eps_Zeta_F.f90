@@ -34,9 +34,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
@@ -56,21 +56,22 @@
 
   ! Production source:
   do c = 1, Grid % n_cells
-    Turb % p_kin(c) = Turb % vis_t(c) * Flow % shear(c)**2
+    Turb % p_kin(c) = max(Turb % vis_t(c) * Flow % shear(c)**2, TINY)
     b(c) = b(c) + Turb % p_kin(c) * Grid % vol(c)
   end do
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, Grid % n_cells
       Turb % g_buoy(c) = -Flow % beta                    &
-                       * (  Flow % grav_x * ut % n(c)    &
+                        * ( Flow % grav_x * ut % n(c)    &
                           + Flow % grav_y * vt % n(c)    &
-                          + Flow % grav_z * wt % n(c))   &
+                          + Flow % grav_z * wt % n(c) )  &
                         * Flow % density(c)
 
-      if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
-        Turb % g_buoy(c) = 0.0
-      end if
+! In general, this clipping should be avoided.  
+!      if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
+!        Turb % g_buoy(c) = 0.0
+!      end if
 
       b(c) = b(c) + max(0.0, Turb % g_buoy(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))         &

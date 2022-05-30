@@ -45,7 +45,8 @@
     !----------------!
 
     ! Time averaged momentum and energy equations
-    real, allocatable :: u_mean(:), v_mean(:), w_mean(:), p_mean(:), t_mean(:)
+    real, allocatable :: u_mean(:), v_mean(:), w_mean(:), p_mean(:)
+    real, allocatable :: t_mean(:), q_mean(:)
 
     ! Time averaged modeled quantities
     ! (Time averages of modeled equations)
@@ -160,7 +161,6 @@
       procedure :: Const_K_Eps
       procedure :: Const_K_Eps_Zeta_F
       procedure :: Const_Manceau_Hanjalic
-      procedure :: Const_Reynolds_Stress
       procedure :: Const_Spalart_Allmaras
 
       ! Computation of various turbulent quantities
@@ -241,18 +241,25 @@
   !--------------------------------!
 
   ! For the k-eps model:
-  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75, kappa, e_log
+  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75
 
   ! For the k-eps-v2f model:
   real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
+
+  ! For HJ and EBM Reynolds Stress Models:
   real :: g1, g1_star, g2, g3, g3_star, g4, g5, c_theta
-  real :: c_mu_theta, c_mu_theta5, kappa_theta
+
+  ! For wall function:
+  real :: kappa, e_log, c_mu_theta, c_mu_theta5, kappa_theta
 
   ! For the Spalart-Allmaras model:
   real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
 
   ! For scale-resolving models
   real :: c_smag
+
+  ! For AFM turbulent flux model
+  real :: afm_eta, afm_psi
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
@@ -292,7 +299,6 @@
   include 'Turb_Mod/Const_K_Eps.f90'
   include 'Turb_Mod/Const_K_Eps_Zeta_F.f90'
   include 'Turb_Mod/Const_Manceau_Hanjalic.f90'
-  include 'Turb_Mod/Const_Reynolds_Stress.f90'
   include 'Turb_Mod/Const_Spalart_Allmaras.f90'
 
   ! Computation of various turbulent quantities

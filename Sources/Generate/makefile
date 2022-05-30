@@ -35,6 +35,7 @@ $(info # Examples:                                                             )
 $(info #   make              - compile with gnu compiler                       )
 $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
+$(info #   make OPENMP=yes   - compile with gnu compiler for parallel Generate )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------
@@ -75,6 +76,10 @@ ifeq ($(FORTRAN), gnu)
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
+  endif
+  OPT_LINK = $(OPT_COMP)
 endif
 
 # Fortran == intel
@@ -90,10 +95,18 @@ ifeq ($(FORTRAN), intel)
   else
     OPT_F_COMP = -module $(DIR_MODULE) -O3
   endif
+<<<<<<< HEAD
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
 endif
+=======
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
+  endif
+  OPT_LINK = $(OPT_COMP)
+endif 
+>>>>>>> f59fc147ce98f9d93d8b871e44e863c10184e20a
 
 # Fortran == nvidia
 ifeq ($(FORTRAN), nvidia)
@@ -110,7 +123,15 @@ ifeq ($(FORTRAN), nvidia)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
+<<<<<<< HEAD
 endif
+=======
+  ifeq ($(OPENMP), yes)
+    OPT_COMP += -fopenmp
+  endif
+  OPT_LINK = $(OPT_COMP)
+endif 
+>>>>>>> f59fc147ce98f9d93d8b871e44e863c10184e20a
 
 #-----------------------------------------------------------
 #   Set linker options to be the same as compiler options

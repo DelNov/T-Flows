@@ -24,6 +24,7 @@
 
   if(Turb % model .eq. K_EPS) then
     call Calculate_Shear_And_Vorticity(Flow)
+    call Turb % Time_And_Length_Scale(Grid)
 
     call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % kin)
     call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % eps)

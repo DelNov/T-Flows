@@ -73,7 +73,7 @@
     m_h2o  = 18e+3 ! kg/mol
     m_air  = 28e+3 ! kg/mol
     t_cold = 15.0  ! deg C
-    t_hot  = 80.0  ! deg C
+    t_hot  = 74.68  ! deg C
 
     ! Modify for multiple processors:
     z_ext  = maxval(Grid % zc(:))  &
