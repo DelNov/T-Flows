@@ -95,7 +95,7 @@
       procedure, private :: Curvature_Csf
       procedure, private :: Smooth_Curvature
       procedure          :: Smooth_For_Curvature_Csf
-      procedure, private :: Smooth_Scalar
+      procedure          :: Smooth_Scalar
 
       !----------------------------------------------!
       !   Procedures to be called by other modules   !
