@@ -95,18 +95,14 @@ ifeq ($(FORTRAN), intel)
   else
     OPT_F_COMP = -module $(DIR_MODULE) -O3
   endif
-<<<<<<< HEAD
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-endif
-=======
   ifeq ($(OPENMP), yes)
     OPT_COMP += -fopenmp
   endif
   OPT_LINK = $(OPT_COMP)
-endif 
->>>>>>> f59fc147ce98f9d93d8b871e44e863c10184e20a
+endif
 
 # Fortran == nvidia
 ifeq ($(FORTRAN), nvidia)
@@ -123,15 +119,11 @@ ifeq ($(FORTRAN), nvidia)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-<<<<<<< HEAD
-endif
-=======
   ifeq ($(OPENMP), yes)
     OPT_COMP += -fopenmp
   endif
   OPT_LINK = $(OPT_COMP)
-endif 
->>>>>>> f59fc147ce98f9d93d8b871e44e863c10184e20a
+endif
 
 #-----------------------------------------------------------
 #   Set linker options to be the same as compiler options
