@@ -8,14 +8,6 @@
   use Numerics_Mod
   use Work_Mod
 !------------------------------------------------------------------------------!
-!   When using Work_Mod, calling sequence should be outlined                   !
-!                                                                              !
-!   Main_Pro                                    (allocates Work_Mod)           !
-!     |                                                                        !
-!     +----> Compute_Momentum                   (doesn't use Work_Mod)         !
-!             |                                                                !
-!             +----> Compute_Momentum_Explicit  (safe to use r_cell_01)        !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
