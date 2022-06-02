@@ -201,8 +201,10 @@
   ! Update on February 27, 2022: I have also added "has_outflow_boundary"
   ! to be able to tell PETSc if matrix for pressure is singular.  Shall
   ! it also be included in this test?
-  if( .not. Flow % has_pressure_boundary .and. &
-      .not. Flow % has_outflow_boundary) then
+  !
+  ! Update on June 2, 2022: Unified all outlet boundaries into one
+  ! to be able to tell PETSc if matrix for pressure is singular
+  if(.not. Flow % has_outlet) then
     if(total_cells .eq. 0) then  ! wasn't set yet
       total_cells = Grid % n_cells - Grid % comm % n_buff_cells
       call Comm_Mod_Global_Sum_Int(total_cells)
@@ -218,8 +220,7 @@
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
 
   ! Tell solvers it is a singular system which you are trying to solve
-  if( .not. Flow % has_pressure_boundary .and. &
-      .not. Flow % has_outflow_boundary) then
+  if(.not. Flow % has_outlet) then
     call Sol % Set_Singular(A)
   end if
 
@@ -237,8 +238,7 @@
                  norm = p_nor)       ! number for normalisation
 
   ! Remove singularity from the matrix
-  if( .not. Flow % has_pressure_boundary .and. &
-      .not. Flow % has_outflow_boundary) then
+  if(.not. Flow % has_outlet) then
     call Sol % Remove_Singular(A)
   end if
 

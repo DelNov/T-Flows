@@ -428,13 +428,17 @@
   ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
   ! bug when loading backup file (also check "Compute_Pressure" as well as
   ! "Backup_Mod/Load and Backup_Mod/Save" procedures)
+  !
   ! Update on February 27, 2022: I have also added "has_outflow_boundary"
   ! to be able to tell PETSc if matrix for pressure is singular.  Shall
   ! it also be included in this test?
-  Flow % has_pressure_boundary = .false.
-  Flow % has_outflow_boundary  = .false.
-  if(n_pressure > 0) Flow % has_pressure_boundary = .true.
-  if(n_outflow  > 0) Flow % has_outflow_boundary  = .true.
+  !
+  ! Update on June 2, 2022: Unified all outlet boundaries into one
+  ! to be able to tell PETSc if matrix for pressure is singular
+  Flow % has_outlet = .false.
+  if(n_pressure > 0) Flow % has_outlet = .true.
+  if(n_outflow  > 0) Flow % has_outlet = .true.
+  if(n_convect  > 0) Flow % has_outlet = .true.
 
   !----------------------!
   !   Initializes time   !

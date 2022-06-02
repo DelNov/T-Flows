@@ -82,7 +82,7 @@
     ! Reference density (for buoyancy)
     real :: dens_ref
 
-    ! True if it has pressure/outflow (needed for a fix in Compute_Pressure)
+    ! True if it has outlets (needed for a fix in Compute_Pressure)
     !
     ! Update on July 17, 2021: I have some reservations about this part, since
     ! there was another bug fix when computing fluxes in the meanwhile (check:
@@ -92,8 +92,10 @@
     !
     ! Update on February 27, 2022: I have also added "has_outflow_boundary"
     ! to be able to tell PETSc if matrix for pressure is singular
-    logical :: has_pressure_boundary
-    logical :: has_outflow_boundary
+    !
+    ! Update on June 2, 2022: Unified all outlet boundaries into one
+    ! to be able to tell PETSc if matrix for pressure is singular
+    logical :: has_outlet
 
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !
