@@ -142,7 +142,7 @@
       end if
 
       if(Grid % Bnd_Cond_Type( c2) .eq. PRESSURE  &
-         .and. v_flux % n(s) >0.0) then
+         .and. v_flux % n(s) > 0.0) then
         bulk % vol_out = bulk % vol_out + v_flux % n(s)
         area_out = area_out + Grid % s(s)
       end if
