@@ -336,8 +336,6 @@
         ! All three velocity components one after another
         call Compute_Momentum(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
         call Compute_Pressure(Flow(d), Vof(d), Sol(d), curr_dt, ini)
-
-        call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
         call Correct_Velocity(Flow(d), Vof(d), Sol(d), curr_dt, ini)
 
         call Piso_Algorithm(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
@@ -357,7 +355,6 @@
         end do
 
         ! Update the values at boundaries
-        call Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
         call Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'ALL')
 
         ! End of the current iteration
@@ -382,6 +379,12 @@
     !   End of the current time step   !
     !----------------------------------!
 1   continue
+
+    do d = 1, n_dom
+      call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
+      call Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
+    end do
+
     do d = 1, n_dom
       call Info_Mod_Bulk_Print(Flow(d), d, n_dom)
     end do
