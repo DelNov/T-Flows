@@ -76,9 +76,7 @@
   !   Calculate the max volume error   !
   !   with the new corrected fluxes    !
   !------------------------------------!
-  do c = 1, Grid % n_cells
-    b(c) = 0.0
-  end do
+  b(:) = 0.0
 
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
