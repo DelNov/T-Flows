@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Plain_Nu(Flow, turb, ts)
+  subroutine User_Mod_Plain_Nu(Flow, Turb, ts)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
 !----------------------------------[Calling]-----------------------------------!
   real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!

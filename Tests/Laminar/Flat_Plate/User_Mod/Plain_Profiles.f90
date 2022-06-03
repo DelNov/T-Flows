@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine User_Mod_Plain_Profiles(Flow, turb, ts)
+  subroutine User_Mod_Plain_Profiles(Flow, Turb, ts)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: turb
+  type(Turb_Type),  target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: kin, eps, zeta, f22
