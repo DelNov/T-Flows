@@ -41,6 +41,8 @@
 
  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
 
+ GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
+
 #------------------------
 # Linear solver settings
 #------------------------
