@@ -81,7 +81,7 @@
     VALUES              0.0   0.0   0.0  20.0  0.0   1.0e-3   0.0   0.0
 
   BOUNDARY_CONDITION    top
-    TYPE                outflow
+    TYPE                convective
     VARIABLES           u     v     w    t     kin   eps      zeta  f22
     VALUES              0.0   0.0   0.0  20.0  0.0   1.0e-3   0.0   0.0
 
