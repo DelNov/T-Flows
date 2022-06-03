@@ -36,11 +36,6 @@
 
   call Cpu_Timer % Start('Save_Vtu_Results')
 
-  call Work % Connect_Int_Cell(int_save, type_save, offs_save)
-  call Work % Connect_Real_Cell(save_01, save_02, save_03,  &
-                                save_04, save_05, save_06)
-  call Work % Connect_Real_Cell(var_ins, v2_calc, kin_vis_t, phi_save)
-
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
@@ -48,6 +43,11 @@
   Grid => Flow % pnt_grid
 
   if(.not. plot_inside .and. .not. Results % boundary) return
+
+  call Work % Connect_Int_Cell(int_save, type_save, offs_save)
+  call Work % Connect_Real_Cell(save_01, save_02, save_03,  &
+                                save_04, save_05, save_06)
+  call Work % Connect_Real_Cell(var_ins, v2_calc, kin_vis_t, phi_save)
 
   !------------------------------------------------!
   !   Mark the beginnings and end of cell ranges   !
