@@ -13,6 +13,8 @@
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: BEGIN = 12
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
@@ -138,8 +140,7 @@
 
         b(c1) = b(c1) - v_flux % n(s)
 
-      else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-              Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
+      else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
 
         v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
                         + v % n(c2) * Grid % sy(s)     &
@@ -150,14 +151,22 @@
         a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
 
+      else if(Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
+
+        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
+                        + v % n(c2) * Grid % sy(s)     &
+                        + w % n(c2) * Grid % sz(s) )
+
+        b(c1) = b(c1) - v_flux % n(s)
+
       else if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-        if(curr_dt < 10) then
-          v_flux % n(s) = ( u % n(c1)  * Grid % sx(s)     &   
-                          + v % n(c1)  * Grid % sy(s)     &   
-                          + w % n(c1)  * Grid % sz(s) )
+        if(curr_dt < BEGIN) then
+          v_flux % n(s) = ( u % n(c1) * Grid % sx(s)     &
+                          + v % n(c1) * Grid % sy(s)     &
+                          + w % n(c1) * Grid % sz(s) )
         else
-          v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &   
-                          + v % n(c2) * Grid % sy(s)     &   
+          v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
+                          + v % n(c2) * Grid % sy(s)     &
                           + w % n(c2) * Grid % sz(s) )
         end if
 
