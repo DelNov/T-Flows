@@ -75,8 +75,6 @@
       if(c2 < 0) then
 
         ! Extrapolate velocities on the outflow boundary
-        ! SYMMETRY is intentionally not treated here because I wanted to
-        ! be sure that is handled only via graPHI and NewUVW functions)
         if( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.     &
             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.    &
             Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY ) then
