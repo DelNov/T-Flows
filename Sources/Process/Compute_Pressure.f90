@@ -26,7 +26,7 @@
   integer                    :: s, c, c1, c2
   integer, save              :: total_cells
   real                       :: total_source
-  real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12, fs
+  real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
   character(SL)              :: solver
 !==============================================================================!
 !
@@ -114,14 +114,14 @@
   !---------------------------------------!
   call Rhie_And_Chow(Flow, Vof, Sol)
 
-  !------------------------------------------!
-  !   Update fluxes at boundaries and fill   !
-  !   up source term for pressure equation   !
-  !------------------------------------------!
+  !----------------------------------------------!
+  !   Update source term for pressure equation   !
+  !     and take care of the pressure matrix     !
+  !        close to outflow along the way        !
+  !----------------------------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    fs = Grid % f(s)
 
     ! Internal fluxes fixed with Rhie and Chow method, just update source
     if(c2 > 0) then
@@ -132,51 +132,11 @@
     ! Side is on the boundary
     else
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
+      b(c1) = b(c1) - v_flux % n(s)
 
-        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
-                        + v % n(c2) * Grid % sy(s)     &
-                        + w % n(c2) * Grid % sz(s) )
-
-        b(c1) = b(c1) - v_flux % n(s)
-
-      else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
-
-        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
-                        + v % n(c2) * Grid % sy(s)     &
-                        + w % n(c2) * Grid % sz(s) )
-
-        b(c1) = b(c1) - v_flux % n(s)
-
+      if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
         a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-
-      else if(Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
-
-        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
-                        + v % n(c2) * Grid % sy(s)     &
-                        + w % n(c2) * Grid % sz(s) )
-
-        b(c1) = b(c1) - v_flux % n(s)
-
-      else if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-        if(curr_dt < BEGIN) then
-          v_flux % n(s) = ( u % n(c1) * Grid % sx(s)     &
-                          + v % n(c1) * Grid % sy(s)     &
-                          + w % n(c1) * Grid % sz(s) )
-        else
-          v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
-                          + v % n(c2) * Grid % sy(s)     &
-                          + w % n(c2) * Grid % sz(s) )
-        end if
-
-        b(c1) = b(c1) - v_flux % n(s)
-
-        a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
-        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12 
-
-      else  ! it is SYMMETRY
-        v_flux % n(s) = 0.0
       end if
     end if
 

@@ -1,10 +1,9 @@
 !==============================================================================!
   subroutine Balance_Volume(Flow, Vof)
 !------------------------------------------------------------------------------!
-!   Modifies the fluxes at outflow boundaries to conserve the volume.          !
-!   This function modifies velocities and volume fluxes at outflows.           !
-!   It should be called with fresh values at boundaries, thus after the        !
-!   call to Update_Boundary_Values.                                            !
+!   Modifies fluxes and velocities at outflows to conserve the volume.         !
+!   It is called from Compute_Pressure because there we need strict            !
+!   volume conservation to achieve convergence of pressure linear solver.      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -36,6 +35,30 @@
   bulk   => Flow % bulk
   v_flux => Flow % v_flux
   call Flow % Alias_Momentum(u, v, w)
+
+  !--------------------------------------------------------!
+  !                                                        !
+  !   Update fluxes at boundaries with latest velocities   !
+  !     (These might not obey the volume conservation)     !
+  !                                                        !
+  !--------------------------------------------------------!
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+
+    ! Side is on the boundary
+    if(c2 < 0) then
+
+      if(Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
+        v_flux % n(s) = 0.0
+      else
+        v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
+                        + v % n(c2) * Grid % sy(s)     &
+                        + w % n(c2) * Grid % sz(s) )
+      end if
+    end if
+
+  end do
 
   !--------------------------------------!
   !                                      !
@@ -75,74 +98,31 @@
   call Comm_Mod_Global_Sum_Real(vol_outflow)
   call Comm_Mod_Global_Sum_Real(area_outflow)
 
-  !-----------------------------------!
-  !                                   !
-  !   Calculate all boundary fluxes   !
-  !    and the inflow volume flux     !
-  !                                   !
-  !-----------------------------------!
-  bulk % vol_in = 0.0
-  area_in       = 0.0
+  !------------------------------------------------------!
+  !                                                      !
+  !   Calculate all boundary volume fluxes; in and out   !
+  !                                                      !
+  !------------------------------------------------------!
+  bulk % vol_in  = 0.0
+  bulk % vol_out = 0.0
+  area_in        = 0.0
+  area_out       = 0.0
+
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
+
+    ! Volume flux at the boundary face
     if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
-      v_flux % n(s) = u % n(c2) * Grid % sx(s)    &
-                    + v % n(c2) * Grid % sy(s)    &
-                    + w % n(c2) * Grid % sz(s)
 
       if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
         bulk % vol_in = bulk % vol_in - v_flux % n(s)
         area_in = area_in + Grid % s(s)
       end if
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE  &
-         .and. v_flux % n(s) < 0.0) then
-        bulk % vol_in = bulk % vol_in - v_flux % n(s)
-        area_in = area_in + Grid % s(s)
-      end if
-
-      if(Grid % Bnd_Cond_Type(c2) .eq. CONVECT  &
-         .and. v_flux % n(s) < 0.0) then
-        bulk % vol_in = bulk % vol_in - v_flux % n(s)
-        area_in = area_in + Grid % s(s)
-      end if
-
-      if(Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
-        v_flux % n(s) = 0.0
-      end if
-
-    end if
-  end do
-
-  call Comm_Mod_Global_Sum_Real(bulk % vol_in)  ! not checked
-  call Comm_Mod_Global_Sum_Real(area_in)
-
-  !---------------------------------------!
-  !   Calculate the outflow mass fluxes   !
-  !     then correct it to satisfy the    !
-  !          overall mass balance         !
-  !---------------------------------------!
-  bulk % vol_out = 0.0
-  area_out = 0.0
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
-
-      if(Grid % Bnd_Cond_Type( c2) .eq. OUTFLOW) then
-        bulk % vol_out = bulk % vol_out + v_flux % n(s)
-        area_out = area_out + Grid % s(s)
-      end if
-
-      if(Grid % Bnd_Cond_Type( c2) .eq. CONVECT  &
-         .and. v_flux % n(s) > 0.0) then
-        bulk % vol_out = bulk % vol_out + v_flux % n(s)
-        area_out = area_out + Grid % s(s)
-      end if
-
-      if(Grid % Bnd_Cond_Type( c2) .eq. PRESSURE  &
-         .and. v_flux % n(s) > 0.0) then
+      if(Grid % Bnd_Cond_Type( c2) .eq. OUTFLOW  .or.  &
+         Grid % Bnd_Cond_Type( c2) .eq. CONVECT  .or.  &
+         Grid % Bnd_Cond_Type( c2) .eq. PRESSURE) then
         bulk % vol_out = bulk % vol_out + v_flux % n(s)
         area_out = area_out + Grid % s(s)
       end if
@@ -150,7 +130,9 @@
     end if
   end do
 
+  call Comm_Mod_Global_Sum_Real(bulk % vol_in)   ! not checked
   call Comm_Mod_Global_Sum_Real(bulk % vol_out)  ! not checked
+  call Comm_Mod_Global_Sum_Real(area_in)
   call Comm_Mod_Global_Sum_Real(area_out)
 
   ! Avoid divisions by zero for the cases without any fluid motion
