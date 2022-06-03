@@ -35,7 +35,7 @@
   write(fu,'(a)') '# Problem name must be specified and corresponds to the'
   write(fu,'(a)') '# base name (without extensions) of the grid file used.'
   write(fu,'(a)') '#-----------------------------------------------------------'
-  write(fu,'(a,a)') ' PROBLEM_NAME        ', trim(work)
+  write(fu,'(a,a)') '  PROBLEM_NAME        ', trim(work)
   write(fu,'(a1)', advance='no') CR
 
   write(fu,'(a)') '#-----------------------------------------------------------'
@@ -54,12 +54,12 @@
   do j = 1, Grid % n_bnd_cond
     work = Grid % bnd_cond % name(j)
     call To_Lower_Case(work)
-    write(fu,'(a,a)') ' BOUNDARY_CONDITION ', trim(work)
-    write(fu,'(a)') '   TYPE             wall  (or: '  //  &
-                   'inflow / outflow / pressure / convective)'
-    write(fu,'(a)') '   VARIABLES        u     v     w     t    '  //  &
+    write(fu,'(a,a)') '  BOUNDARY_CONDITION ', trim(work)
+    write(fu,'(a)') '    TYPE             wall  (or: '  //  &
+                    'inflow / outflow / pressure / convective)'
+    write(fu,'(a)') '    VARIABLES        u     v     w     t    '  //  &
                                    'kin    eps    zeta     f22'
-    write(fu,'(a)') '   VALUES           0.0   0.0   0.0   10   '  //  &
+    write(fu,'(a)') '    VALUES           0.0   0.0   0.0   10   '  //  &
                                    '1e-2   1e-3   6.6e-2   1e-3'
     write(fu,'(a1)', advance='no') CR
   end do
