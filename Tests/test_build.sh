@@ -61,6 +61,7 @@ LAMINAR_CAVITY_LID_DRIVEN_DIR=Laminar/Cavity/Lid_Driven/Re_1000
 LAMINAR_CAVITY_THERM_DRIVEN_106_DIR=Laminar/Cavity/Thermally_Driven/Direct/Ra_10e6
 LAMINAR_CAVITY_THERM_DRIVEN_108_DIR=Laminar/Cavity/Thermally_Driven/Direct/Ra_10e8
 LAMINAR_CHANNEL_DIR=Laminar/Accuracy_Test/Channel_Re_2000
+LAMINAR_CONVECTIVE_DIR=Laminar/Convective_Outflow
 LAMINAR_MODULE_POLYHEDRAL_DIR=Laminar/Module
 LAMINAR_T_JUNCTION_DIR=Swarm/T_Junction_Square
 
@@ -164,6 +165,7 @@ DONE_GENERATE_TESTS=0
 ALL_CONVERT_TESTS=( \
                    "$LAMINAR_BACKSTEP_POLYHEDRAL_DIR" \
                    "$LAMINAR_MODULE_POLYHEDRAL_DIR" \
+                   "$LAMINAR_CONVECTIVE_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
@@ -185,6 +187,7 @@ ALL_DIVIDE_TESTS=( \
                   "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                  "$LAMINAR_CONVECTIVE_DIR" \
                   "$LAMINAR_MODULE_POLYHEDRAL_DIR" \
                   "$LAMINAR_T_JUNCTION_DIR" \
                   "$RANS_BACKSTEP_05100_DIR" \
@@ -225,6 +228,7 @@ ALL_PROCESS_TESTS=( \
                    "$LAMINAR_CAVITY_LID_DRIVEN_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
                    "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
+                   "$LAMINAR_CONVECTIVE_DIR" \
                    "$RANS_BACKSTEP_05100_DIR" \
                    "$RANS_BACKSTEP_28000_DIR" \
                    "$RANS_CHANNEL_LR_UNIFORM_DIR" \
@@ -241,6 +245,7 @@ ALL_PROCESS_TESTS=( \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    )
 ALL_TURBULENCE_MODELS=( \
+                       "none" \
                        "none" \
                        "none" \
                        "none" \
@@ -278,6 +283,7 @@ ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "no" \
                        "no" \
+                       "no" \
                        "yes" \
                        "yes" \
                        "no" \
@@ -285,6 +291,7 @@ ALL_INTERFACE_TRACKING=( \
                        "no" \
                        )
 ALL_PARTICLE_TRACKING=( \
+                       "no" \
                        "no" \
                        "no" \
                        "no" \
