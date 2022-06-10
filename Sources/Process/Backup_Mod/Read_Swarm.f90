@@ -9,7 +9,7 @@
   integer                  :: vc
   type(Swarm_Type), target :: Swr
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: grid
+  type(Grid_Type),     pointer :: Grid
   type(Comm_Type),     pointer :: Comm
   type(Particle_Type), pointer :: part
   integer                      :: i, k, n_part, n_parts_in_buffers

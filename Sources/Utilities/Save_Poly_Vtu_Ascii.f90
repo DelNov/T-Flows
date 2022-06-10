@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Poly_Vtu_Ascii(grid)
+  subroutine Save_Poly_Vtu_Ascii(Grid)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !                                                                              !
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: c, n, s, i_pol, cell_offset, fu
   character(SL) :: name_out
@@ -39,8 +39,8 @@
                           'byte_order="LittleEndian">'
   write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
   write(fu,'(a,a,i0.0,a,i0.0,a)')   &
-                    IN_2, '<Piece NumberOfPoints="', grid % n_nodes,      &
-                               '" NumberOfCells ="', grid % n_cells, '">'
+                    IN_2, '<Piece NumberOfPoints="', Grid % n_nodes,      &
+                               '" NumberOfCells ="', Grid % n_cells, '">'
 
   !-----------!
   !           !
@@ -51,9 +51,9 @@
   write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                           ' NumberOfComponents=3'     //  &
                           ' format="ascii">'
-  do n = 1, grid % n_nodes
+  do n = 1, Grid % n_nodes
     write(fu, '(a,1pe15.7,1pe15.7,1pe15.7)')  &
-              IN_5, grid % xn(n), grid % yn(n), grid % zn(n)
+              IN_5, Grid % xn(n), Grid % yn(n), Grid % zn(n)
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
   write(fu,'(a,a)') IN_3, '</Points>'
@@ -70,36 +70,36 @@
                           ' Name="connectivity"'    //  &
                           ' format="ascii">'
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Hexahedral
-    if(grid % cells_n_nodes(c) .eq. 8) then
+    if(Grid % cells_n_nodes(c) .eq. 8) then
       write(fu,'(a,64i9)')  &
-        IN_5, (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+        IN_5, (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
     ! Wedge
-    else if(grid % cells_n_nodes(c) .eq. 6) then
+    else if(Grid % cells_n_nodes(c) .eq. 6) then
       write(fu,'(a,64i9)')  &
-        IN_5, (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+        IN_5, (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
     ! Tetrahedra
-    else if(grid % cells_n_nodes(c) .eq. 4) then
+    else if(Grid % cells_n_nodes(c) .eq. 4) then
       write(fu,'(a,64i9)')  &
-        IN_5, (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+        IN_5, (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
     ! Pyramid
-    else if(grid % cells_n_nodes(c) .eq. 5) then
+    else if(Grid % cells_n_nodes(c) .eq. 5) then
       write(fu,'(a,64i9)')  &
-        IN_5, (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+        IN_5, (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
     ! Polyhedral cells
-    else if(grid % cells_n_nodes(c) < 0) then
+    else if(Grid % cells_n_nodes(c) < 0) then
       write(fu,'(a,64i9)')  &
-        IN_5, (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
+        IN_5, (Grid % cells_n(1:-Grid % cells_n_nodes(c), c))-1
 
     else
       print *, '# Unsupported cell type with ',  &
-                  grid % cells_n_nodes(c), ' nodes.'
+                  Grid % cells_n_nodes(c), ' nodes.'
       print *, '# Exiting'
       stop 
     end if
@@ -111,8 +111,8 @@
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           'Name="offsets" format="ascii">'
   cell_offset = 0
-  do c = 1, grid % n_cells
-    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
+  do c = 1, Grid % n_cells
+    cell_offset = cell_offset + abs(Grid % cells_n_nodes(c))
     write(fu,'(a,i9)') IN_5, cell_offset
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -120,31 +120,31 @@
   ! Now write all cells' types
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           ' Name="types" format="ascii">'
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_TETRA
-    if(grid % cells_n_nodes(c) .eq. 8) write(fu,'(a,i9)') IN_5, VTK_HEXAHEDRON
-    if(grid % cells_n_nodes(c) .eq. 6) write(fu,'(a,i9)') IN_5, VTK_WEDGE
-    if(grid % cells_n_nodes(c) .eq. 5) write(fu,'(a,i9)') IN_5, VTK_PYRAMID
-    if(grid % cells_n_nodes(c) .lt. 0) write(fu,'(a,i9)') IN_5, VTK_POLYHEDRON
+  do c = 1, Grid % n_cells
+    if(Grid % cells_n_nodes(c) .eq. 4) write(fu,'(a,i9)') IN_5, VTK_TETRA
+    if(Grid % cells_n_nodes(c) .eq. 8) write(fu,'(a,i9)') IN_5, VTK_HEXAHEDRON
+    if(Grid % cells_n_nodes(c) .eq. 6) write(fu,'(a,i9)') IN_5, VTK_WEDGE
+    if(Grid % cells_n_nodes(c) .eq. 5) write(fu,'(a,i9)') IN_5, VTK_PYRAMID
+    if(Grid % cells_n_nodes(c) .lt. 0) write(fu,'(a,i9)') IN_5, VTK_POLYHEDRON
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Write polyhedral cells' faces
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           ' Name="faces" format="ascii">'
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! You have found a polyhedron, write its faces out
-    if(grid % cells_n_nodes(c) .lt. 0) then
+    if(Grid % cells_n_nodes(c) .lt. 0) then
 
       ! Write number of polyfaces for this cell
-      write(fu,'(a,i9)') IN_5, grid % cells_n_faces(c)
+      write(fu,'(a,i9)') IN_5, Grid % cells_n_faces(c)
 
-      do i_pol = 1, grid % cells_n_faces(c)
-        s = grid % cells_f(i_pol, c)
-        n = grid % faces_n_nodes(s)
-        write(fu,'(a,64i9)') IN_5,  grid % faces_n_nodes(s),  &
-                                   (grid % faces_n(1:n, s))-1
+      do i_pol = 1, Grid % cells_n_faces(c)
+        s = Grid % cells_f(i_pol, c)
+        n = Grid % faces_n_nodes(s)
+        write(fu,'(a,64i9)') IN_5,  Grid % faces_n_nodes(s),  &
+                                   (Grid % faces_n(1:n, s))-1
       end do
     end if
   end do
@@ -154,18 +154,18 @@
   cell_offset = 0
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           ' Name="faceoffsets" format="ascii">'
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! You have found a polyhedron
-    if(grid % cells_n_nodes(c) .lt. 0) then
+    if(Grid % cells_n_nodes(c) .lt. 0) then
 
       ! Increase offset for storing number of polyfaces
       cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
-      do i_pol = 1, grid % cells_n_faces(c)
-        s = grid % cells_f(i_pol, c)
-        n = grid % faces_n_nodes(s)
+      do i_pol = 1, Grid % cells_n_faces(c)
+        s = Grid % cells_f(i_pol, c)
+        n = Grid % faces_n_nodes(s)
         cell_offset = cell_offset + 1 + n
       end do
 
@@ -190,24 +190,24 @@
   ! Processor i.d.
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           'Name="Processor" format="ascii">'
-  do c = 1, grid % n_cells
-    write(fu,'(a,i9)') IN_5, grid % comm % cell_proc(c)
+  do c = 1, Grid % n_cells
+    write(fu,'(a,i9)') IN_5, Grid % comm % cell_proc(c)
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Wall distance
   write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                           'Name="GeomWallDistance" format="ascii">'
-  do c = 1, grid % n_cells
-    write(fu,'(a,1pe15.7)') IN_5, grid % wall_dist(c)
+  do c = 1, Grid % n_cells
+    write(fu,'(a,1pe15.7)') IN_5, Grid % wall_dist(c)
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 
   ! Cell volume
   write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                           'Name="GeomCellVolume" format="ascii">'
-  do c = 1, grid % n_cells
-    write(fu,'(a,1pe15.7)') IN_5, grid % vol(c)
+  do c = 1, Grid % n_cells
+    write(fu,'(a,1pe15.7)') IN_5, Grid % vol(c)
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 

@@ -10,14 +10,14 @@
   real, contiguous,  target :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),    pointer :: fun
-  type(Field_Type),  pointer :: flow
+  type(Field_Type),  pointer :: Flow
   type(Matrix_Type), pointer :: A
   character(SL)              :: solver
 !==============================================================================!
 
   ! Take aliases
   fun  => Vof % fun
-  flow => Vof % pnt_flow
+  Flow => Vof % pnt_flow
   A    => Sol % Nat % A
 
   ! Get solver
@@ -39,7 +39,7 @@
 
   call Cpu_Timer % Stop('Linear_Solver_For_Vof')
 
-  if(.not. flow % heat_transfer) then
+  if(.not. Flow % heat_transfer) then
     call Info_Mod_Iter_Fill_At(1, 6, fun % name, fun % eniter, fun % res)
   else
     call Info_Mod_Iter_Fill_At(2, 1, fun % name, fun % eniter, fun % res)

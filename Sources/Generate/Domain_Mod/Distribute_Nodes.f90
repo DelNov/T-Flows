@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Domain_Mod_Distribute_Nodes(dom, grid, b, w,   &
+  subroutine Domain_Mod_Distribute_Nodes(dom, Grid, b, w,   &
                                          is, js, ks, ie, je, ke)
 !------------------------------------------------------------------------------!
 !   Places the nodes on the line defined with local block position             !
@@ -7,7 +7,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type)   :: dom
-  type(Grid_Type)     :: grid
+  type(Grid_Type)     :: Grid
   integer, intent(in) :: b, is, js, ks, ie, je, ke
   real,    intent(in) :: w
 !----------------------------------[Calling]-----------------------------------!
@@ -21,12 +21,12 @@
   nj = dom % blocks(b) % resolutions(2)
   nk = dom % blocks(b) % resolutions(3)
 
-  x0   = grid % xn(grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
-  y0   = grid % yn(grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
-  z0   = grid % zn(grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
-  delx = grid % xn(grid % n_nodes+(ke-1)*ni*nj+(je-1)*ni+ie) - x0
-  dely = grid % yn(grid % n_nodes+(ke-1)*ni*nj+(je-1)*ni+ie) - y0
-  delz = grid % zn(grid % n_nodes+(ke-1)*ni*nj+(je-1)*ni+ie) - z0
+  x0   = Grid % xn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
+  y0   = Grid % yn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
+  z0   = Grid % zn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
+  delx = Grid % xn(Grid % n_nodes+(ke-1)*ni*nj+(je-1)*ni+ie) - x0
+  dely = Grid % yn(Grid % n_nodes+(ke-1)*ni*nj+(je-1)*ni+ie) - y0
+  delz = Grid % zn(Grid % n_nodes+(ke-1)*ni*nj+(je-1)*ni+ie) - z0
 
   n = max( (ie-is), (je-js),  (ke-ks) )
 
@@ -44,31 +44,31 @@
           if( ie .ne. is ) then
             dt=1.0/real(n)+(real(i)-0.5*(real(n)+1)) * ddt
             t=t+dt
-            node = grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
-            if( (i  < ie).and.(grid % xn(node) .gt. TERA) ) then
-              grid % xn(node) = x0 + t*delx
-              grid % yn(node) = y0 + t*dely
-              grid % zn(node) = z0 + t*delz
+            node = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
+            if( (i  < ie).and.(Grid % xn(node) .gt. TERA) ) then
+              Grid % xn(node) = x0 + t*delx
+              Grid % yn(node) = y0 + t*dely
+              Grid % zn(node) = z0 + t*delz
             end if
           end if
           if( je .ne. js ) then
             dt=1.0/real(n)+(real(j)-0.5*(real(n)+1)) * ddt
             t=t+dt
-            node = grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
-            if( (j  < je).and.(grid % xn(node) .gt. TERA) ) then
-              grid % xn(node) = x0 + t*delx
-              grid % yn(node) = y0 + t*dely
-              grid % zn(node) = z0 + t*delz
+            node = Grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
+            if( (j  < je).and.(Grid % xn(node) .gt. TERA) ) then
+              Grid % xn(node) = x0 + t*delx
+              Grid % yn(node) = y0 + t*dely
+              Grid % zn(node) = z0 + t*delz
             end if
           end if
           if( ke .ne. ks ) then
             dt=1.0/real(n)+(real(k)-0.5*(real(n)+1)) * ddt
             t=t+dt
-            node = grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
-            if( (k  < ke).and.(grid % xn(node) .gt. TERA) ) then
-              grid % xn(node) = x0 + t*delx
-              grid % yn(node) = y0 + t*dely
-              grid % zn(node) = z0 + t*delz
+            node = Grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
+            if( (k  < ke).and.(Grid % xn(node) .gt. TERA) ) then
+              Grid % xn(node) = x0 + t*delx
+              Grid % yn(node) = y0 + t*dely
+              Grid % zn(node) = z0 + t*delz
             end if
           end if
         end do
@@ -98,25 +98,25 @@
             if(case .eq. 1) xi =       - 1.0*real(i)/real(n)
             if(case .eq. 2) xi =   1.0 - 1.0*real(i)/real(n)
             if(case .eq. 3) xi = - 1.0 + 2.0*real(i)/real(n)
-            node = grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
-            if( (i  < ie).and.(grid % xn(node) .gt. TERA) ) then
+            node = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
+            if( (i  < ie).and.(Grid % xn(node) .gt. TERA) ) then
               if    (case .eq. 1) then
-                grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0 - (tanh(xi*atanh(pr))/pr)*delz
+                Grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
+                Grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
+                Grid % zn(node) = z0 - (tanh(xi*atanh(pr))/pr)*delz
               elseif(case .eq. 2) then
-                grid % xn(node) = x0  &
+                Grid % xn(node) = x0  &
                                 + delx - (tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0  &
+                Grid % yn(node) = y0  &
                                 + dely - (tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0  &
+                Grid % zn(node) = z0  &
                                 + delz - (tanh(xi*atanh(pr))/pr)*delz
               elseif(case .eq. 3) then
-                grid % xn(node) = x0  &
+                Grid % xn(node) = x0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0  &
+                Grid % yn(node) = y0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0  &
+                Grid % zn(node) = z0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delz
               end if
             end if
@@ -125,25 +125,25 @@
             if(case .eq. 1) xi =        - 1.0*real(j)/real(n)
             if(case .eq. 2) xi =    1.0 - 1.0*real(j)/real(n)
             if(case .eq. 3) xi = -  1.0 + 2.0*real(j)/real(n)
-            node = grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
-            if( (j  < je).and.(grid % xn(node) .gt. TERA) ) then
+            node = Grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
+            if( (j  < je).and.(Grid % xn(node) .gt. TERA) ) then
               if    (case .eq. 1) then
-                grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0 - (tanh(xi*atanh(pr))/pr)*delz
+                Grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
+                Grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
+                Grid % zn(node) = z0 - (tanh(xi*atanh(pr))/pr)*delz
               elseif(case .eq. 2) then
-                grid % xn(node) = x0  &
+                Grid % xn(node) = x0  &
                                 + delx - (tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0  &
+                Grid % yn(node) = y0  &
                                 + dely - (tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0  &
+                Grid % zn(node) = z0  &
                                 + delz - (tanh(xi*atanh(pr))/pr)*delz
               elseif(case .eq. 3) then
-                grid % xn(node) = x0  &
+                Grid % xn(node) = x0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0  &
+                Grid % yn(node) = y0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0  &
+                Grid % zn(node) = z0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delz
               end if
             end if
@@ -152,25 +152,25 @@
             if(case .eq. 1) xi =       - 1.0*real(k)/real(n)
             if(case .eq. 2) xi =   1.0 - 1.0*real(k)/real(n)
             if(case .eq. 3) xi = - 1.0 + 2.0*real(k)/real(n)
-            node = grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
-            if( (k  < ke).and.(grid % xn(node) .gt. TERA) ) then
+            node = Grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
+            if( (k  < ke).and.(Grid % xn(node) .gt. TERA) ) then
               if    (case .eq. 1) then
-                grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
-                grid % yn(node) = z0 - (tanh(xi*atanh(pr))/pr)*delz
+                Grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
+                Grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
+                Grid % yn(node) = z0 - (tanh(xi*atanh(pr))/pr)*delz
               elseif(case .eq. 2) then
-                grid % xn(node) = x0  &
+                Grid % xn(node) = x0  &
                                 + delx - (tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0  &
+                Grid % yn(node) = y0  &
                                 + dely - (tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0  &
+                Grid % zn(node) = z0  &
                                 + delz - (tanh(xi*atanh(pr))/pr)*delz
               elseif(case .eq. 3) then
-                grid % xn(node) = x0  &
+                Grid % xn(node) = x0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delx
-                grid % yn(node) = y0  &
+                Grid % yn(node) = y0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*dely
-                grid % zn(node) = z0  &
+                Grid % zn(node) = z0  &
                                 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delz
               end if
             end if

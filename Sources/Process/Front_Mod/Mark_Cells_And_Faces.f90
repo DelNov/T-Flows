@@ -18,7 +18,7 @@
 
   ! Take aliases
   Flow  => Front % pnt_flow
-  grid  => Front % pnt_grid
+  Grid  => Front % pnt_grid
 
   !------------------------------------------!
   !                                          !

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Smooths_Mod_Grid(smr, grid)
+  subroutine Smooths_Mod_Grid(smr, Grid)
 !------------------------------------------------------------------------------!
 !   Smooths the grid lines by a Laplacian-like algorithm.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Smooths_Type) :: smr
-  type(Grid_Type)    :: grid
+  type(Grid_Type)    :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, n, s, c2, i, j, k, m
   real                 :: x_new_tmp, y_new_tmp, z_new_tmp
@@ -18,15 +18,15 @@
 !==============================================================================!
 
   ! Allocate memory for additional arrays
-  allocate(x_node_new(grid % max_n_nodes));         x_node_new    = 0
-  allocate(y_node_new(grid % max_n_nodes));         y_node_new    = 0
-  allocate(z_node_new(grid % max_n_nodes));         z_node_new    = 0
-  allocate(node_to_nodes(grid % max_n_nodes,0:40)); node_to_nodes = 0
+  allocate(x_node_new(Grid % max_n_nodes));         x_node_new    = 0
+  allocate(y_node_new(Grid % max_n_nodes));         y_node_new    = 0
+  allocate(z_node_new(Grid % max_n_nodes));         z_node_new    = 0
+  allocate(node_to_nodes(Grid % max_n_nodes,0:40)); node_to_nodes = 0
 
   print *, '# Now smoothing the cells. This may take a while !'
 
   ! Node connectivity
-  do n = 1, grid % n_nodes
+  do n = 1, Grid % n_nodes
     node_to_nodes(n,0) = 0
   end do
 
@@ -36,23 +36,23 @@
   x_min=+HUGE
   y_min=+HUGE
   z_min=+HUGE
-  do n = 1, grid % n_nodes
-    x_max=max(grid % xn(n), x_max)
-    y_max=max(grid % yn(n), y_max)
-    z_max=max(grid % zn(n), z_max)
-    x_min=min(grid % xn(n), x_min)
-    y_min=min(grid % yn(n), y_min)
-    z_min=min(grid % zn(n), z_min)
+  do n = 1, Grid % n_nodes
+    x_max=max(Grid % xn(n), x_max)
+    y_max=max(Grid % yn(n), y_max)
+    z_max=max(Grid % zn(n), z_max)
+    x_min=min(Grid % xn(n), x_min)
+    y_min=min(Grid % yn(n), y_min)
+    z_min=min(Grid % zn(n), z_min)
   end do
 
   !-----------------------!
   !   Connect the nodes   !
   !-----------------------!
-  do c = 1, grid % n_cells         ! through cells
+  do c = 1, Grid % n_cells         ! through cells
     do i = 1, 8                    ! through nodes of a cell
-      n = grid % cells_n(i,c)      ! first cell
+      n = Grid % cells_n(i,c)      ! first cell
       do j = 1, 8                  ! through nodes of a cell
-        m = grid % cells_n(j,c)    ! second cell
+        m = Grid % cells_n(j,c)    ! second cell
         if(n .ne.  m) then
           do k=1,node_to_nodes(n,0)
             if(node_to_nodes(n,k) .eq. m) goto 10
@@ -71,34 +71,34 @@
     if( ( .not. smr % in_x(reg) ) .and.  &
         ( .not. smr % in_y(reg) ) .and.  &
         ( .not. smr % in_z(reg) ) ) then
-      do n = 1, grid % n_nodes
+      do n = 1, Grid % n_nodes
         x1 = smr % x_min(reg)
         y1 = smr % y_min(reg)
         z1 = smr % z_min(reg)
         x8 = smr % x_max(reg)
         y8 = smr % y_max(reg)
         z8 = smr % z_max(reg)
-        if( (x1 <= grid % xn(reg)) .and. (grid % xn(reg) <= x8) .and. &
-            (y1 <= grid % yn(reg)) .and. (grid % yn(reg) <= y8) .and. &
-            (z1 <= grid % zn(reg)) .and. (grid % zn(reg) <= z8) ) then
+        if( (x1 <= Grid % xn(reg)) .and. (Grid % xn(reg) <= x8) .and. &
+            (y1 <= Grid % yn(reg)) .and. (Grid % yn(reg) <= y8) .and. &
+            (z1 <= Grid % zn(reg)) .and. (Grid % zn(reg) <= z8) ) then
           node_to_nodes(n,0) = 0
         end if
       end do
     end if
   end do
 
-  do s = 1, grid % n_faces               ! boundary through faces
-    c2 = grid % faces_c(2, s)
+  do s = 1, Grid % n_faces               ! boundary through faces
+    c2 = Grid % faces_c(2, s)
     if(c2 < 0) then
-      do i = 1, grid % faces_n_nodes(s)  ! through nodes of a face
-        n = grid % faces_n(i, s)
+      do i = 1, Grid % faces_n_nodes(s)  ! through nodes of a face
+        n = Grid % faces_n(i, s)
         node_to_nodes(n,0) = 0
       end do
     end if
   end do
 
   !---------------------!
-  !   Smooth the grid   !
+  !   Smooth the Grid   !
   !---------------------!
   do reg = 1, smr % n_smooths
     print *, '# Now smoothing region ',reg,' with:',  &
@@ -107,36 +107,36 @@
     do j = 1, smr % iters(reg)
 
       ! Calculate new coordinates using the old values
-      do n = 1, grid % n_nodes
+      do n = 1, Grid % n_nodes
         if(node_to_nodes(n,0) > 0) then
           x_new_tmp=0.0
           y_new_tmp=0.0
           z_new_tmp=0.0
           do i = 1, node_to_nodes(n,0)
-            x_new_tmp = x_new_tmp + grid % xn(node_to_nodes(n,i))
-            y_new_tmp = y_new_tmp + grid % yn(node_to_nodes(n,i))
-            z_new_tmp = z_new_tmp + grid % zn(node_to_nodes(n,i))
+            x_new_tmp = x_new_tmp + Grid % xn(node_to_nodes(n,i))
+            y_new_tmp = y_new_tmp + Grid % yn(node_to_nodes(n,i))
+            z_new_tmp = z_new_tmp + Grid % zn(node_to_nodes(n,i))
           end do
           x_new_tmp = x_new_tmp / real(node_to_nodes(n,0))
           y_new_tmp = y_new_tmp / real(node_to_nodes(n,0))
           z_new_tmp = z_new_tmp / real(node_to_nodes(n,0))
-          if(grid % xn(n) > 0.001*x_min .and.                  &
-             grid % xn(n) < 0.999*x_max)                       &
-          x_node_new(n) = (1.0-smr % relax(reg))*grid % xn(n)  &
+          if(Grid % xn(n) > 0.001*x_min .and.                  &
+             Grid % xn(n) < 0.999*x_max)                       &
+          x_node_new(n) = (1.0-smr % relax(reg))*Grid % xn(n)  &
                         +      smr % relax(reg) *x_new_tmp
-          if(grid % yn(n) > 0.001*y_min .and.                  &
-             grid % yn(n) < 0.999*y_max)                       &
-          y_node_new(n) = (1.0-smr % relax(reg))*grid % yn(n)  &
+          if(Grid % yn(n) > 0.001*y_min .and.                  &
+             Grid % yn(n) < 0.999*y_max)                       &
+          y_node_new(n) = (1.0-smr % relax(reg))*Grid % yn(n)  &
                         +      smr % relax(reg) *y_new_tmp
-          if(grid % zn(n) > 0.001*z_min .and.                  &
-             grid % zn(n) < 0.999*z_max)                       &
-          z_node_new(n) = (1.0-smr % relax(reg))*grid % zn(n)  &
+          if(Grid % zn(n) > 0.001*z_min .and.                  &
+             Grid % zn(n) < 0.999*z_max)                       &
+          z_node_new(n) = (1.0-smr % relax(reg))*Grid % zn(n)  &
                         +      smr % relax(reg)* z_new_tmp
         end if
       end do  ! through nodes
 
       ! Update coordinates
-      do n = 1, grid % n_nodes
+      do n = 1, Grid % n_nodes
         if(node_to_nodes(n,0)   >  0) then
 
           x1 = smr % x_min(reg)
@@ -146,26 +146,26 @@
           y8 = smr % y_max(reg)
           z8 = smr % z_max(reg)
 
-          if( (x1 <= grid % xn(n)) .and. (grid % xn(n) <= x8) .and.  &
-              (y1 <= grid % yn(n)) .and. (grid % yn(n) <= y8) .and.  &
-              (z1 <= grid % zn(n)) .and. (grid % zn(n) <= z8) ) then
+          if( (x1 <= Grid % xn(n)) .and. (Grid % xn(n) <= x8) .and.  &
+              (y1 <= Grid % yn(n)) .and. (Grid % yn(n) <= y8) .and.  &
+              (z1 <= Grid % zn(n)) .and. (Grid % zn(n) <= z8) ) then
 
             if(smr % in_x(reg)) then
-              if(grid % xn(n) > 0.001*x_min .and. &
-                 grid % xn(n) < 0.999*x_max)      &
-              grid % xn(n)=x_node_new(n)
+              if(Grid % xn(n) > 0.001*x_min .and. &
+                 Grid % xn(n) < 0.999*x_max)      &
+              Grid % xn(n)=x_node_new(n)
             end if
 
             if(smr % in_y(reg)) then
-              if(grid % yn(n) > 0.001*y_min .and.  &
-                 grid % yn(n) < 0.999*y_max)      &
-              grid % yn(n)=y_node_new(n)
+              if(Grid % yn(n) > 0.001*y_min .and.  &
+                 Grid % yn(n) < 0.999*y_max)      &
+              Grid % yn(n)=y_node_new(n)
             end if
 
             if(smr % in_z(reg)) then
-              if(grid % zn(n) > 0.001*z_min .and.  &
-                 grid % zn(n) < 0.999*z_max)      &
-              grid % zn(n)=z_node_new(n)
+              if(Grid % zn(n) > 0.001*z_min .and.  &
+                 Grid % zn(n) < 0.999*z_max)      &
+              Grid % zn(n)=z_node_new(n)
             end if
 
           end if  ! if the point belongs to region

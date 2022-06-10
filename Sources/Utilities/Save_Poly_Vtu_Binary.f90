@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Poly_Vtu_Binary(grid)
+  subroutine Save_Poly_Vtu_Binary(Grid)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
 !                                                                              !
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)     :: data_size
   integer         :: c, n, s, i_pol, data_offset, cell_offset, fu
@@ -26,18 +26,18 @@
 
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
-  do c = 1, grid % n_cells
-    n_conns = n_conns + abs(grid % cells_n_nodes(c))
+  do c = 1, Grid % n_cells
+    n_conns = n_conns + abs(Grid % cells_n_nodes(c))
   end do
 
   ! Count face data for polyhedral cells, you will need it later
   n_polyg = 0
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+  do c = 1, Grid % n_cells
+    if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
       n_polyg = n_polyg + 1                  ! add one for number of polyfaces
-      do i_pol = 1, grid % cells_n_faces(c)  ! add all faces and their nodes
-        s = grid % cells_f(i_pol, c)
-        n = grid % faces_n_nodes(s)
+      do i_pol = 1, Grid % cells_n_faces(c)  ! add all faces and their nodes
+        s = Grid % cells_f(i_pol, c)
+        n = Grid % faces_n_nodes(s)
         n_polyg = n_polyg + 1 + n
       end do
     end if
@@ -61,8 +61,8 @@
                     ' version="0.1"'                    //  &
                     ' byte_order="LittleEndian">'       // LF
   write(fu) IN_1 // '<UnstructuredGrid>'                // LF
-  write(str1, '(i0.0)') grid % n_nodes
-  write(str2, '(i0.0)') grid % n_cells
+  write(str1, '(i0.0)') Grid % n_nodes
+  write(str2, '(i0.0)') Grid % n_cells
   write(fu) IN_2 // '<Piece NumberOfPoints="' // trim(str1) // '"' //  &
                     ' NumberOfCells="' // trim(str2) // '">'       // LF
   data_offset = 0  ! prepare for the next (the first in this case)
@@ -80,7 +80,7 @@
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
   write(fu) IN_3 // '</Points>'    // LF
-  data_offset = data_offset + SP + grid % n_nodes * RP * 3  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_nodes * RP * 3  ! prepare for next
 
   !-----------!
   !           !
@@ -105,7 +105,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_cells * IP  ! prepare for next
 
   ! Cells' types
   write(str1, '(i0.0)') data_offset
@@ -114,7 +114,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_cells * IP  ! prepare for next
 
   ! Write polyhedral cells' faces
   write(str1, '(i0.0)') data_offset
@@ -133,7 +133,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_cells * IP  ! prepare for next
 
   write(fu) IN_3 // '</Cells>' // LF
 
@@ -151,7 +151,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * IP  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_cells * IP  ! prepare for next
 
   ! Wall distance
   write(str1, '(i0.0)') data_offset
@@ -160,7 +160,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * RP  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_cells * RP  ! prepare for next
 
   ! Cell volume
   write(str1, '(i0.0)') data_offset
@@ -169,7 +169,7 @@
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + grid % n_cells * RP  ! prepare for next
+  data_offset = data_offset + SP + Grid % n_cells * RP  ! prepare for next
 
   !------------!
   !            !
@@ -191,10 +191,10 @@
   !-----------!
   !   Nodes   !
   !-----------!
-  data_size = grid % n_nodes * RP * 3
+  data_size = Grid % n_nodes * RP * 3
   write(fu) data_size
-  do n = 1, grid % n_nodes
-    write(fu) grid % xn(n), grid % yn(n), grid % zn(n)
+  do n = 1, Grid % n_nodes
+    write(fu) Grid % xn(n), Grid % yn(n), Grid % zn(n)
   end do
 
   !-----------!
@@ -205,83 +205,83 @@
   data_size = n_conns * IP
   write(fu) data_size
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! Tetrahedral, pyramid, wedge and hexahedral cells
-    if( any( grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
-      write(fu) (grid % cells_n(1:grid % cells_n_nodes(c), c))-1
+    if( any( Grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
+      write(fu) (Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
 
     ! Polyhedral cells
-    else if(grid % cells_n_nodes(c) < 0) then
-      write(fu) (grid % cells_n(1:-grid % cells_n_nodes(c), c))-1
+    else if(Grid % cells_n_nodes(c) < 0) then
+      write(fu) (Grid % cells_n(1:-Grid % cells_n_nodes(c), c))-1
 
     else
       print *, '# Unsupported cell type with ',  &
-                  grid % cells_n_nodes(c), ' nodes.'
+                  Grid % cells_n_nodes(c), ' nodes.'
       print *, '# Exiting'
       stop
     end if
   end do
 
   ! Cells' offset
-  data_size = grid % n_cells * IP
+  data_size = Grid % n_cells * IP
   write(fu) data_size
 
   cell_offset = 0
-  do c = 1, grid % n_cells
-    cell_offset = cell_offset + abs(grid % cells_n_nodes(c))
+  do c = 1, Grid % n_cells
+    cell_offset = cell_offset + abs(Grid % cells_n_nodes(c))
     write(fu) cell_offset
   end do
 
   ! Cells' types
-  data_size = grid % n_cells * IP
+  data_size = Grid % n_cells * IP
   write(fu) data_size
 
-  do c = 1, grid % n_cells
-    if(grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
-    if(grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
-    if(grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
-    if(grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
-    if(grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
+  do c = 1, Grid % n_cells
+    if(Grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
+    if(Grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
+    if(Grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
+    if(Grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
+    if(Grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
   end do
 
   ! Write polyhedral cells' faces
   data_size = n_polyg * IP
   write(fu) data_size
 
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! You have found a polyhedron, write its faces out
-    if(grid % cells_n_nodes(c) .lt. 0) then
+    if(Grid % cells_n_nodes(c) .lt. 0) then
 
       ! Write number of polyfaces for this cell
-      write(fu) grid % cells_n_faces(c)
+      write(fu) Grid % cells_n_faces(c)
 
-      do i_pol = 1, grid % cells_n_faces(c)
-        s = grid % cells_f(i_pol, c)
-        n = grid % faces_n_nodes(s)
-        write(fu) n, (grid % faces_n(1:n, s))-1
+      do i_pol = 1, Grid % cells_n_faces(c)
+        s = Grid % cells_f(i_pol, c)
+        n = Grid % faces_n_nodes(s)
+        write(fu) n, (Grid % faces_n(1:n, s))-1
       end do
     end if
   end do
 
   ! Write polyhedral cells' faces offsets
-  data_size = grid % n_cells * IP
+  data_size = Grid % n_cells * IP
   write(fu) data_size
 
   cell_offset = 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
 
     ! You have found a polyhedron
-    if(grid % cells_n_nodes(c) .lt. 0) then
+    if(Grid % cells_n_nodes(c) .lt. 0) then
 
       ! Increase offset for storing number of polyfaces
       cell_offset = cell_offset + 1
 
       ! Update the offset with all faces and their nodes
-      do i_pol = 1, grid % cells_n_faces(c)
-        s = grid % cells_f(i_pol, c)
-        n = grid % faces_n_nodes(s)
+      do i_pol = 1, Grid % cells_n_faces(c)
+        s = Grid % cells_f(i_pol, c)
+        n = Grid % faces_n_nodes(s)
         cell_offset = cell_offset + 1 + n
       end do
 
@@ -300,24 +300,24 @@
   !---------------!
 
   ! Processor i.d.
-  data_size = grid % n_cells * IP
+  data_size = Grid % n_cells * IP
   write(fu) data_size
-  do c = 1, grid % n_cells
-    write(fu) grid % comm % cell_proc(c)
+  do c = 1, Grid % n_cells
+    write(fu) Grid % comm % cell_proc(c)
   end do
 
   ! Wall distance
-  data_size = grid % n_cells * RP
+  data_size = Grid % n_cells * RP
   write(fu) data_size
-  do c = 1, grid % n_cells
-    write(fu) grid % wall_dist(c)
+  do c = 1, Grid % n_cells
+    write(fu) Grid % wall_dist(c)
   end do
 
   ! Cell volume
-  data_size = grid % n_cells * RP
+  data_size = Grid % n_cells * RP
   write(fu) data_size
-  do c = 1, grid % n_cells
-    write(fu) grid % vol(c)
+  do c = 1, Grid % n_cells
+    write(fu) Grid % vol(c)
   end do
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF

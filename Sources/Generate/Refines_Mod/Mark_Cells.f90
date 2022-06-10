@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Refines_Mod_Mark_Cells(ref, grid)
+  subroutine Refines_Mod_Mark_Cells(ref, Grid)
 !------------------------------------------------------------------------------!
 !   Mark the region of the domain for local refinement and refine the grid!    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Refines_Type) :: ref
-  type(Grid_Type)    :: grid
+  type(Grid_Type)    :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, lev, reg, n1, n2, n3, n4, n5, n6, n7, n8
   real    :: x1, y1, z1, x8, y8, z8, x0, y0, z0
@@ -26,28 +26,28 @@
       y8 = ref % region(lev,reg) % pnt(2) % y
       z8 = ref % region(lev,reg) % pnt(2) % z
 
-      do c = 1, grid % n_cells
-        n1 = grid % cells_n(1,c)
-        n2 = grid % cells_n(2,c)
-        n3 = grid % cells_n(3,c)
-        n4 = grid % cells_n(4,c)
-        n5 = grid % cells_n(5,c)
-        n6 = grid % cells_n(6,c)
-        n7 = grid % cells_n(7,c)
-        n8 = grid % cells_n(8,c)
+      do c = 1, Grid % n_cells
+        n1 = Grid % cells_n(1,c)
+        n2 = Grid % cells_n(2,c)
+        n3 = Grid % cells_n(3,c)
+        n4 = Grid % cells_n(4,c)
+        n5 = Grid % cells_n(5,c)
+        n6 = Grid % cells_n(6,c)
+        n7 = Grid % cells_n(7,c)
+        n8 = Grid % cells_n(8,c)
 
-        x0=1.25e-1*(grid % xn(n1) + grid % xn(n2) +   &
-                    grid % xn(n3) + grid % xn(n4) +   &
-                    grid % xn(n5) + grid % xn(n6) +   &
-                    grid % xn(n7) + grid % xn(n8))
-        y0=1.25e-1*(grid % yn(n1) + grid % yn(n2) +   &
-                    grid % yn(n3) + grid % yn(n4) +   &
-                    grid % yn(n5) + grid % yn(n6) +   &
-                    grid % yn(n7) + grid % yn(n8))
-        z0=1.25e-1*(grid % zn(n1) + grid % zn(n2) +   &
-                    grid % zn(n3) + grid % zn(n4) +   &
-                    grid % zn(n5) + grid % zn(n6) +   &
-                    grid % zn(n7) + grid % zn(n8))
+        x0=1.25e-1*(Grid % xn(n1) + Grid % xn(n2) +   &
+                    Grid % xn(n3) + Grid % xn(n4) +   &
+                    Grid % xn(n5) + Grid % xn(n6) +   &
+                    Grid % xn(n7) + Grid % xn(n8))
+        y0=1.25e-1*(Grid % yn(n1) + Grid % yn(n2) +   &
+                    Grid % yn(n3) + Grid % yn(n4) +   &
+                    Grid % yn(n5) + Grid % yn(n6) +   &
+                    Grid % yn(n7) + Grid % yn(n8))
+        z0=1.25e-1*(Grid % zn(n1) + Grid % zn(n2) +   &
+                    Grid % zn(n3) + Grid % zn(n4) +   &
+                    Grid % zn(n5) + Grid % zn(n6) +   &
+                    Grid % zn(n7) + Grid % zn(n8))
 
         if(ref % region(lev,reg) % shape .eq. ELIPSOID) then
           if(  ( ((x1-x0)/x8)**2 +                                  &
@@ -70,7 +70,7 @@
 
     end do   ! reg
 
-    call Refines_Mod_Refine_Marked_Cells(ref, grid, lev)
+    call Refines_Mod_Refine_Marked_Cells(ref, Grid, lev)
 
     ref % cell_marked(:) = .false.
 

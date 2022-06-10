@@ -9,14 +9,14 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   integer                   :: e, g, l, s, c1, c2, i_ele
   real                      :: cond_1, cond_2
 !==============================================================================!
 
   ! Take aliases
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
   Flow => Vof % pnt_flow
 
   ! If not a problem with mass transfer, get out of here
@@ -38,10 +38,10 @@
   !----------------------------------------!
   !   Compute heat flux at the interface   !
   !----------------------------------------!
-  do s = 1, grid % n_faces
+  do s = 1, Grid % n_faces
 
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
 

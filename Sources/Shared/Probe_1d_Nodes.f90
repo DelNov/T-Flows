@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Probe_1d_Nodes(grid)
+  subroutine Probe_1d_Nodes(Grid)
 !------------------------------------------------------------------------------!
 !   This subroutine finds the coordinate of nodes in non-homogeneous           !
 !   direction and write them in file name.1d                                   !
@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: n_prob, p, n, fu
   real          :: zp(16384)
@@ -37,37 +37,37 @@
   !-----------------------------!
   !   Browse through all nodes  !
   !-----------------------------!
-  do n = 1, grid % n_nodes 
+  do n = 1, Grid % n_nodes 
 
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'X') then
-        if( Math % Approx_Real(grid % xn(n), zp(p)) ) go to 1
+        if( Math % Approx_Real(Grid % xn(n), zp(p)) ) go to 1
       else if(answer .eq. 'Y') then
-        if( Math % Approx_Real(grid % yn(n), zp(p)) ) go to 1
+        if( Math % Approx_Real(Grid % yn(n), zp(p)) ) go to 1
       else if(answer .eq. 'Z') then
-        if( Math % Approx_Real(grid % zn(n), zp(p)) ) go to 1
+        if( Math % Approx_Real(Grid % zn(n), zp(p)) ) go to 1
       else if(answer .eq. 'RX') then
-        if( Math % Approx_Real( sqrt(grid % zn(n)**2 +   &
-                                       grid % yn(n)**2), zp(p)) ) go to 1
+        if( Math % Approx_Real( sqrt(Grid % zn(n)**2 +   &
+                                       Grid % yn(n)**2), zp(p)) ) go to 1
       else if(answer .eq. 'RY') then
-        if( Math % Approx_Real( sqrt(grid % xn(n)**2 +   &
-                                       grid % zn(n)**2), zp(p)) ) go to 1
+        if( Math % Approx_Real( sqrt(Grid % xn(n)**2 +   &
+                                       Grid % zn(n)**2), zp(p)) ) go to 1
       else if(answer .eq. 'RZ') then
-        if( Math % Approx_Real( sqrt(grid % xn(n)**2 +   &
-                                       grid % yn(n)**2), zp(p)) ) go to 1
+        if( Math % Approx_Real( sqrt(Grid % xn(n)**2 +   &
+                                       Grid % yn(n)**2), zp(p)) ) go to 1
       end if
     end do
 
     ! Couldn't find a cell among the probes, add a new one
     n_prob = n_prob+1
-    if(answer .eq. 'X') zp(n_prob)= grid % xn(n)
-    if(answer .eq. 'Y') zp(n_prob)= grid % yn(n)
-    if(answer .eq. 'Z') zp(n_prob)= grid % zn(n)
+    if(answer .eq. 'X') zp(n_prob)= Grid % xn(n)
+    if(answer .eq. 'Y') zp(n_prob)= Grid % yn(n)
+    if(answer .eq. 'Z') zp(n_prob)= Grid % zn(n)
 
-    if(answer .eq. 'RX') zp(n_prob)= sqrt(grid % zn(n)**2 + grid % yn(n)**2)
-    if(answer .eq. 'RY') zp(n_prob)= sqrt(grid % xn(n)**2 + grid % zn(n)**2)
-    if(answer .eq. 'RZ') zp(n_prob)= sqrt(grid % xn(n)**2 + grid % yn(n)**2)
+    if(answer .eq. 'RX') zp(n_prob)= sqrt(Grid % zn(n)**2 + Grid % yn(n)**2)
+    if(answer .eq. 'RY') zp(n_prob)= sqrt(Grid % xn(n)**2 + Grid % zn(n)**2)
+    if(answer .eq. 'RZ') zp(n_prob)= sqrt(Grid % xn(n)**2 + Grid % yn(n)**2)
 
     if(n_prob .eq. 16384) then
       print *, '# Probe 1d: Not a 1d (channel flow) problem.'

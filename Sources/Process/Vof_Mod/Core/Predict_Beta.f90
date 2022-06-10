@@ -7,8 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: beta_f(:)
@@ -24,9 +24,9 @@
 !==============================================================================!
 
   ! Take aliases
-  flow   => Vof % pnt_flow
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
+  Flow   => Vof % pnt_flow
+  Grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
   fun    => Vof % fun
   beta_f => Vof % beta_f
   beta_c => Vof % beta_c
@@ -38,9 +38,9 @@
     !   Compute beta_f   !
     !--------------------!
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       if(c2 > 0) then
 
@@ -60,9 +60,9 @@
           alfa_d = fun % n(donor)
           alfa_a = fun % n(accept)
 
-          dotprod = signo * (  fun % x(donor) * grid % dx(s)   &
-                             + fun % y(donor) * grid % dy(s)   &
-                             + fun % z(donor) * grid % dz(s))
+          dotprod = signo * (  fun % x(donor) * Grid % dx(s)   &
+                             + fun % y(donor) * Grid % dy(s)   &
+                             + fun % z(donor) * Grid % dz(s))
 
           alfa_u = min(max(alfa_a - 2.0 * dotprod, 0.0), 1.0)  ! old way
 
@@ -99,7 +99,7 @@
             prodmag = sqrt(  fun % x(donor) ** 2   &
                            + fun % y(donor) ** 2   &
                            + fun % z(donor) ** 2)  &
-                    * grid % d(s)
+                    * Grid % d(s)
 
             if(prodmag > FEMTO) then
               ang = dotprod / prodmag
@@ -124,9 +124,9 @@
 
   else if(fun % adv_scheme .eq. STACS) then
 
-    do s = 1, grid % n_faces
-      c1 = grid % faces_c(1,s)
-      c2 = grid % faces_c(2,s)
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
       if(c2 > 0) then
 
@@ -146,9 +146,9 @@
           alfa_d = fun % n(donor)
           alfa_a = fun % n(accept)
 
-          dotprod = signo * (  fun % x(donor) * grid % dx(s)   &
-                             + fun % y(donor) * grid % dy(s)   &
-                             + fun % z(donor) * grid % dz(s))
+          dotprod = signo * (  fun % x(donor) * Grid % dx(s)   &
+                             + fun % y(donor) * Grid % dy(s)   &
+                             + fun % z(donor) * Grid % dz(s))
 
           ! Face is inside the domain
           alfa_u = min(max(alfa_a - 2.0 * dotprod, 0.0), 1.0)
@@ -178,7 +178,7 @@
             prodmag = sqrt(  fun % x(donor) ** 2   &
                            + fun % y(donor) ** 2   &
                            + fun % z(donor) ** 2)  &
-                    * grid % d(s)
+                    * Grid % d(s)
 
             if(prodmag > FEMTO) then
               ang = dotprod / prodmag
