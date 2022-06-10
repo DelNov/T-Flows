@@ -104,7 +104,9 @@
   ! Allocate memory for working arrays
   call Work % Allocate_Work(Grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
 
-  ! Get the number of time steps from the control file
+  ! Initialize first and current and read the last time step
+  curr_dt  = 0
+  first_dt = 0
   call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
   call Control_Mod_Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
                                                           verbose = .true.)
@@ -155,9 +157,6 @@
   ! Create interfaces
   call Control_Mod_Switch_To_Root()
   call Interface_Mod_Create(inter, Grid, n_dom)
-
-  ! First time step is one, unless read from backup otherwise
-  first_dt = 0
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
   do d = 1, n_dom
@@ -237,8 +236,14 @@
     end do
   end if
 
-  ! Save initial results
-  curr_dt = 0
+  ! Good time to call user function for beginning of simulation
+  do d = 1, n_dom
+    call User_Mod_Beginning_Of_Simulation(Flow(d), Turb(d),  &
+                                          Vof(d), Swarm(d),  &
+                                          first_dt, time)
+  end do
+
+  ! Save initial condition
   call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
                               Flow, Turb, Vof, Swarm, exit_now)
 
@@ -246,16 +251,6 @@
   !   The time loop really begins now   !
   !-------------------------------------!
   do curr_dt = first_dt + 1, last_dt
-
-    ! Good time to call user function for beginning of simulation
-    if(curr_dt .eq. first_dt + 1) then
-      do d = 1, n_dom
-        call User_Mod_Beginning_Of_Simulation(Flow(d), Turb(d),  &
-                                              Vof(d), Swarm(d),  &
-                                              curr_dt, time)
-      end do
-    end if
-
 
     !------------------------------------!
     !   Preparations for new time step   !
@@ -340,6 +335,8 @@
 
         call Piso_Algorithm(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
 
+        call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
+
         ! Deal with turbulence (if you dare ;-))
         call Turb(d) % Main_Turb(Sol(d), curr_dt, ini)
 
@@ -381,7 +378,6 @@
 1   continue
 
     do d = 1, n_dom
-      call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
       call Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
     end do
 
