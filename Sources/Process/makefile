@@ -244,13 +244,13 @@ SRC_F_MOD += Solver_Mod.f90      \
              Front_Mod.f90       \
              Surf_Mod.f90        \
              Info_Mod.f90        \
-             Interface_Mod.f90   \
              Eddies_Mod.f90      \
              Monitor_Mod.f90     \
              Turb_Mod.f90        \
              Vof_Mod.f90         \
              Particle_Mod.f90    \
-             Swarm_Mod.f90
+             Swarm_Mod.f90       \
+             Interface_Mod.f90
 
 # User_Mod should come before Results_Mod
 SRC_F_MOD += User_Mod.f90

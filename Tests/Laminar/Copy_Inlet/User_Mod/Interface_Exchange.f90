@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Interface_Exchange(inter, Flow, n_dom)
+  subroutine User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 !------------------------------------------------------------------------------!
 !   Create interface between two grids.                                        !
 !------------------------------------------------------------------------------!
@@ -7,13 +7,17 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
   type(Field_Type),    target :: Flow(MD)
+  type(Turb_Type),     target :: Turb(MD)
+  type(Vof_Type),      target :: Vof(MD)
+  type(Swarm_Type),    target :: Swarm(MD)
   integer, intent(in)         :: n_dom
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
-  real    :: u1, v1, w1
+!------------------------------[Local parameters]------------------------------!
   integer, parameter :: U = 1,  &  ! store u-velocity component as first ...
                         V = 2,  &  ! ... v-velocity components as second ...
                         W = 3      ! ... and w-velocity as the third
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
+  real    :: u1, v1, w1
 !==============================================================================!
 
   !-------------------------------------------!

@@ -3,7 +3,7 @@ include '../User_Mod/Jump_Cond.f90'
 include '../User_Mod/Brent_For_Jump_Cond.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Interface_Exchange(inter, Flow, n_dom)
+  subroutine User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 !------------------------------------------------------------------------------!
 !   Create interface between two grids.                                        !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,10 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
   type(Field_Type),    target :: Flow(MD)
-  integer                     :: n_dom
+  type(Turb_Type),     target :: Turb(MD)
+  type(Vof_Type),      target :: Vof(MD)
+  type(Swarm_Type),    target :: Swarm(MD)
+  integer, intent(in)         :: n_dom
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...
