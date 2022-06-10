@@ -51,7 +51,9 @@
                                   curr_dt, plot_inside=.true., domain=d)
       call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                                   curr_dt, plot_inside=.false., domain=d)
-      call Results % Save_Swarm(Swarm(d), curr_dt)
+      if(Flow(d) % with_particles) then
+        call Results % Save_Swarm(Swarm(d), curr_dt, domain=d)
+      end if
 
       if(Flow(d) % with_interface) then
         if(Vof(d) % track_front) then
@@ -63,8 +65,12 @@
       end if
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d), curr_dt)
-      call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d), curr_dt)
+      call User_Mod_Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                 curr_dt, domain=d)
+      if(Flow(d) % with_particles) then
+        call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                 curr_dt, domain=d)
+      end if
 
     end do  ! through domains
   end if
