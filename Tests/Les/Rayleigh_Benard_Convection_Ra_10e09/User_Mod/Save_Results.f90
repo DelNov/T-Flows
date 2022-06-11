@@ -34,6 +34,9 @@
   real, contiguous, pointer :: tz_mean(:)
 !==============================================================================!
 
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
+
   call Work % Connect_Real_Cell(tz_mean)
 
   ! Take aliases

@@ -15,6 +15,9 @@ include '../User_Mod/Plain_Nu.f90'
   integer, intent(in)      :: ts
 !==============================================================================!
 
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
+
   call User_Mod_Plain_Profiles(Flow, Turb, ts)
   call User_Mod_Plain_Nu      (Flow, Turb, ts)
 

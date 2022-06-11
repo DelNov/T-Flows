@@ -15,6 +15,9 @@ include '../User_Mod/Impinging_Jet_Profiles.f90'
   integer, intent(in) :: ts     ! time step
 !==============================================================================!
 
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
+
   call User_Mod_Impinging_Jet_Nu      (Turb, ts)
   call User_Mod_Impinging_Jet_Profiles(Turb, ts)
 
