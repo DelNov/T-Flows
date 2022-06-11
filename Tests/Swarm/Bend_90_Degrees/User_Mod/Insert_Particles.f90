@@ -25,12 +25,12 @@
   !-------------------!
   !   1st time step   !
   !-------------------!
-  if(n .eq. 2401) then     ! should be after the Flow is developed
+  if(n .eq. 1001) then     ! should be after the Flow is developed
 
     ! First Particle in the center
     l = 1
     Swarm % Particle(l) % x_n =  0.0
-    Swarm % Particle(l) % y_n =  0.0399999
+    Swarm % Particle(l) % y_n =  0.099999
     Swarm % Particle(l) % z_n =  0.0
 
     d_r = 0.0085 / (n_r - 2)
