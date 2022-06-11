@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Probe_1d_Cells_Nodes(grid)
+  subroutine Probe_1d_Cells_Nodes(Grid)
 !------------------------------------------------------------------------------!
 !   This subroutine finds the coordinate of cell's nodes in non-homogeneous    !
 !   direction and write them in file called "name.1d"                          !
@@ -11,7 +11,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: n_prob, p, c, n, fu
   real          :: zp(16384)
@@ -37,53 +37,53 @@
   !-----------------------------!
   !   Browse through all cells  !
   !-----------------------------!
-  do c = -grid % n_bnd_cells, grid % n_cells
-    do n = 1, abs(grid % cells_n_nodes(c))
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    do n = 1, abs(Grid % cells_n_nodes(c))
 
       ! Try to find the cell among the probes
       do p=1, n_prob
         if(answer .eq. 'X') then
           if( Math_Mod_Approx_Real(  &
-              grid % xn(grid % cells_n(n,c)), zp(p)) ) go to 1
+              Grid % xn(Grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'Y') then
           if( Math_Mod_Approx_Real(  &
-              grid % yn(grid % cells_n(n,c)), zp(p)) ) go to 1
+              Grid % yn(Grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'Z') then
           if( Math_Mod_Approx_Real(  &
-              grid % zn(grid % cells_n(n,c)), zp(p)) ) go to 1
+              Grid % zn(Grid % cells_n(n,c)), zp(p)) ) go to 1
         else if(answer .eq. 'RX') then
           if( Math_Mod_Approx_Real(                              &
-              sqrt(grid % zn(grid % cells_n(n,c))**2 +           &
-                   grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
+              sqrt(Grid % zn(Grid % cells_n(n,c))**2 +           &
+                   Grid % yn(Grid % cells_n(n,c))**2), zp(p)) )  &
             go to 1
         else if(answer .eq. 'RY') then
           if( Math_Mod_Approx_Real(                              &
-              sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
-                   grid % zn(grid % cells_n(n,c))**2), zp(p)) )  &
+              sqrt(Grid % xn(Grid % cells_n(n,c))**2 +           &
+                   Grid % zn(Grid % cells_n(n,c))**2), zp(p)) )  &
             go to 1
         else if(answer .eq. 'RZ') then
           if( Math_Mod_Approx_Real(                              &
-              sqrt(grid % xn(grid % cells_n(n,c))**2 +           &
-                   grid % yn(grid % cells_n(n,c))**2), zp(p)) )  &
+              sqrt(Grid % xn(Grid % cells_n(n,c))**2 +           &
+                   Grid % yn(Grid % cells_n(n,c))**2), zp(p)) )  &
             go to 1
         end if
       end do
 
       ! Couldn't find a cell among the probes, add a new one
       n_prob = n_prob + 1
-      if(answer .eq. 'X') zp(n_prob) = grid % xn(grid % cells_n(n,c))
-      if(answer .eq. 'Y') zp(n_prob) = grid % yn(grid % cells_n(n,c))
-      if(answer .eq. 'Z') zp(n_prob) = grid % zn(grid % cells_n(n,c))
+      if(answer .eq. 'X') zp(n_prob) = Grid % xn(Grid % cells_n(n,c))
+      if(answer .eq. 'Y') zp(n_prob) = Grid % yn(Grid % cells_n(n,c))
+      if(answer .eq. 'Z') zp(n_prob) = Grid % zn(Grid % cells_n(n,c))
 
       if(answer .eq. 'RX') zp(n_prob) =                                  &
-                           sqrt(grid % zn(grid % cells_n(n,c))**2 +      &
-                                grid % yn(grid % cells_n(n,c))**2)
+                           sqrt(Grid % zn(Grid % cells_n(n,c))**2 +      &
+                                Grid % yn(Grid % cells_n(n,c))**2)
       if(answer .eq. 'RY') zp(n_prob) =                                  &
-                           sqrt(grid % xn(grid % cells_n(n,c))**2 +      &
-                                grid % zn(grid % cells_n(n,c))**2)
+                           sqrt(Grid % xn(Grid % cells_n(n,c))**2 +      &
+                                Grid % zn(Grid % cells_n(n,c))**2)
       if(answer .eq. 'RZ') zp(n_prob) =                                  &
-                           sqrt(grid % xn(grid % cells_n(n,c))**2 +      &
-                                grid % yn(grid % cells_n(n,c))**2)
+                           sqrt(Grid % xn(Grid % cells_n(n,c))**2 +      &
+                                Grid % yn(Grid % cells_n(n,c))**2)
 
       if(n_prob .eq. 16384) then
         print *, '# Probe 1d: Not a 1d (channel flow) problem.'

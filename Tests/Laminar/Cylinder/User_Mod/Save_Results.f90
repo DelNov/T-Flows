@@ -27,6 +27,9 @@
   real                     :: capa_const, k_const
 !==============================================================================!
 
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
+
   ! Take aliases
   Grid   => Flow % pnt_grid
   bulk   => Flow % bulk

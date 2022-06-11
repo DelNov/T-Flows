@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Domain_Mod_Laplace(dom, grid, b,i,j,k, wx16, wx24, wx35,  &
+  subroutine Domain_Mod_Laplace(dom, Grid, b,i,j,k, wx16, wx24, wx35,  &
                                                     wy16, wy24, wy35,  &
                                                     wz16, wz24, wz35)
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
-  type(Grid_Type)   :: grid
+  type(Grid_Type)   :: Grid
   integer           :: b, i, j, k
   real              :: wx16, wx24, wx35, wy16, wy24, wy35, wz16, wz24, wz35 
 !-----------------------------------[Locals]-----------------------------------!
@@ -28,18 +28,18 @@
     zt(n) = dom % points( dom % blocks(b) % corners(n) ) % z
   end do  
 
-  n = grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i
+  n = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i
 
   ! Node numbers at the block faces
-  n1 = grid % n_nodes + ( 1-1)*ni*nj + ( j-1)*ni + i     !  ->  k .eq. 1
-  n2 = grid % n_nodes + ( k-1)*ni*nj + ( j-1)*ni + 1     !  ->  i .eq. 1
-  n3 = grid % n_nodes + ( k-1)*ni*nj + ( 1-1)*ni + i     !  ->  j .eq. 1
-  n4 = grid % n_nodes + ( k-1)*ni*nj + ( j-1)*ni + ni    !  ->  i .eq. ni
-  n5 = grid % n_nodes + ( k-1)*ni*nj + (nj-1)*ni + i     !  ->  j .eq. nj
-  n6 = grid % n_nodes + (nk-1)*ni*nj + ( j-1)*ni + i     !  ->  k .eq. nk
+  n1 = Grid % n_nodes + ( 1-1)*ni*nj + ( j-1)*ni + i     !  ->  k .eq. 1
+  n2 = Grid % n_nodes + ( k-1)*ni*nj + ( j-1)*ni + 1     !  ->  i .eq. 1
+  n3 = Grid % n_nodes + ( k-1)*ni*nj + ( 1-1)*ni + i     !  ->  j .eq. 1
+  n4 = Grid % n_nodes + ( k-1)*ni*nj + ( j-1)*ni + ni    !  ->  i .eq. ni
+  n5 = Grid % n_nodes + ( k-1)*ni*nj + (nj-1)*ni + i     !  ->  j .eq. nj
+  n6 = Grid % n_nodes + (nk-1)*ni*nj + ( j-1)*ni + i     !  ->  k .eq. nk
 
   ! Face I
-  if(grid % xn(n1) .gt. TERA) then
+  if(Grid % xn(n1) .gt. TERA) then
     xf1=( (real(ni-i)*xt(1) + real(i-1)*xt(2)) * real(nj-j) +   &
           (real(ni-i)*xt(3) + real(i-1)*xt(4)) * real(j-1)  )   &
        /  (real(ni-1)*real(nj-1))
@@ -51,13 +51,13 @@
        /  (real(ni-1)*real(nj-1))
 
   else
-    xf1 = grid % xn(n1)
-    yf1 = grid % yn(n1)
-    zf1 = grid % zn(n1)
+    xf1 = Grid % xn(n1)
+    yf1 = Grid % yn(n1)
+    zf1 = Grid % zn(n1)
   end if
 
   ! Face VI
-  if(grid % xn(n6) .gt. TERA) then
+  if(Grid % xn(n6) .gt. TERA) then
     xf6=( (real(ni-i)*xt(5) + real(i-1)*xt(6)) * real(nj-j) +   &
           (real(ni-i)*xt(7) + real(i-1)*xt(8)) * real(j-1)  )   &
        /  (real(ni-1)*real(nj-1))
@@ -68,13 +68,13 @@
           (real(ni-i)*zt(7) + real(i-1)*zt(8)) * real(j-1)  )   &
        /  (real(ni-1)*real(nj-1))
   else
-    xf6 = grid % xn(n6)
-    yf6 = grid % yn(n6)
-    zf6 = grid % zn(n6)
+    xf6 = Grid % xn(n6)
+    yf6 = Grid % yn(n6)
+    zf6 = Grid % zn(n6)
   end if
 
   ! Face III
-  if(grid % xn(n3) .gt. TERA) then
+  if(Grid % xn(n3) .gt. TERA) then
     xf3=( (real(ni-i)*xt(1) + real(i-1)*xt(2)) * real(nk-k) +   &
           (real(ni-i)*xt(5) + real(i-1)*xt(6)) * real(k-1)  )   &
        /  (real(ni-1)*real(nk-1))
@@ -85,13 +85,13 @@
           (real(ni-i)*zt(5) + real(i-1)*zt(6)) * real(k-1)  )   &
        /  (real(ni-1)*real(nk-1))
   else
-    xf3 = grid % xn(n3)
-    yf3 = grid % yn(n3)
-    zf3 = grid % zn(n3)
+    xf3 = Grid % xn(n3)
+    yf3 = Grid % yn(n3)
+    zf3 = Grid % zn(n3)
   end if
 
   ! Face V
-  if(grid % xn(n5) .gt. TERA) then
+  if(Grid % xn(n5) .gt. TERA) then
     xf5=( (real(ni-i)*xt(3) + real(i-1)*xt(4)) * real(nk-k) +   &
           (real(ni-i)*xt(7) + real(i-1)*xt(8)) * real(k-1)  )   &
        /  (real(ni-1)*real(nk-1))
@@ -102,13 +102,13 @@
           (real(ni-i)*zt(7) + real(i-1)*zt(8)) * real(k-1)  )   &
        /  (real(ni-1)*real(nk-1))
   else
-    xf5 = grid % xn(n5)
-    yf5 = grid % yn(n5)
-    zf5 = grid % zn(n5)
+    xf5 = Grid % xn(n5)
+    yf5 = Grid % yn(n5)
+    zf5 = Grid % zn(n5)
   end if
 
   ! Face II
-  if(grid % xn(n2) .gt. TERA) then
+  if(Grid % xn(n2) .gt. TERA) then
     xf2=( (real(nj-j)*xt(1) + real(j-1)*xt(3)) * real(nk-k) +   &
           (real(nj-j)*xt(5) + real(j-1)*xt(7)) * real(k-1)  )   &
        /  (real(nj-1)*real(nk-1))
@@ -119,13 +119,13 @@
           (real(nj-j)*zt(5) + real(j-1)*zt(7)) * real(k-1)  )   &
        /  (real(nj-1)*real(nk-1))
   else
-    xf2 = grid % xn(n2)
-    yf2 = grid % yn(n2)
-    zf2 = grid % zn(n2)
+    xf2 = Grid % xn(n2)
+    yf2 = Grid % yn(n2)
+    zf2 = Grid % zn(n2)
   end if
 
   ! Face IV
-  if(grid % xn(n4) .gt. TERA) then
+  if(Grid % xn(n4) .gt. TERA) then
     xf4=( (real(nj-j)*xt(2) + real(j-1)*xt(4)) * real(nk-k) +   &
           (real(nj-j)*xt(6) + real(j-1)*xt(8)) * real(k-1)  )   &
        /  (real(nj-1)*real(nk-1))
@@ -136,21 +136,21 @@
           (real(nj-j)*zt(6) + real(j-1)*zt(8)) * real(k-1)  )   &
        /  (real(nj-1)*real(nk-1))
   else
-    xf4 = grid % xn(n4)
-    yf4 = grid % yn(n4)
-    zf4 = grid % zn(n4)
+    xf4 = Grid % xn(n4)
+    yf4 = Grid % yn(n4)
+    zf4 = Grid % zn(n4)
   end if
 
-  if( grid % xn(n) .gt. TERA ) then
-    grid % xn(n) = ( xf1*real(nk-k) + xf6*real(k-1) ) * wx16 / real(nk-1)  &
+  if( Grid % xn(n) .gt. TERA ) then
+    Grid % xn(n) = ( xf1*real(nk-k) + xf6*real(k-1) ) * wx16 / real(nk-1)  &
                  + ( xf2*real(ni-i) + xf4*real(i-1) ) * wx24 / real(ni-1)  &
                  + ( xf3*real(nj-j) + xf5*real(j-1) ) * wx35 / real(nj-1)
 
-    grid % yn(n) = ( yf1*real(nk-k) + yf6*real(k-1) ) * wy16 / real(nk-1)  &
+    Grid % yn(n) = ( yf1*real(nk-k) + yf6*real(k-1) ) * wy16 / real(nk-1)  &
                  + ( yf2*real(ni-i) + yf4*real(i-1) ) * wy24 / real(ni-1)  &
                  + ( yf3*real(nj-j) + yf5*real(j-1) ) * wy35 / real(nj-1)
 
-    grid % zn(n) = ( zf1*real(nk-k) + zf6*real(k-1) ) * wz16 / real(nk-1)  &
+    Grid % zn(n) = ( zf1*real(nk-k) + zf6*real(k-1) ) * wz16 / real(nk-1)  &
                  + ( zf2*real(ni-i) + zf4*real(i-1) ) * wz24 / real(ni-1)  &
                  + ( zf3*real(nj-j) + zf5*real(j-1) ) * wz35 / real(nj-1)
   end if

@@ -9,13 +9,9 @@
   type(Eddies_Type), target :: eddies
   integer                   :: e
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: grid
-  integer                  :: rc, oe
-  real                     :: tmp, min_dist
+  integer :: rc, oe
+  real    :: tmp, min_dist
 !==============================================================================!
-
-  ! Create an alias
-  grid => eddies % pnt_grid
 
   !-----------------------!
   !   Set eddy's radius   !

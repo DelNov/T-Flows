@@ -34,6 +34,9 @@
   logical                  :: there
 !==============================================================================!
 
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
+
   ! Take aliases
   Grid => Flow % pnt_grid
   bulk => Flow % bulk
@@ -228,10 +231,10 @@
                        abs(bulk % p_drop_z)) / dens_const)
   else
     u_tau_p =  sqrt( (visc_const*sqrt(u_p(1)**2 +        &
-                                     v_p(1)**2 +        &
-                                     w_p(1)**2)         &
-                                     / wall_p(1))       &
-                                     / dens_const)
+                                      v_p(1)**2 +        &
+                                      w_p(1)**2)         &
+                                      / wall_p(1))       &
+                                      / dens_const)
   end if
 
   if(u_tau_p .eq. 0.0) then
@@ -290,7 +293,7 @@
 
   do i = 3, 4
     pr = visc_const * capa_const / cond_const
-    re = dens_const * ubulk * 2.0/visc_const
+    re = dens_const * ubulk * 2.0 / visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0

@@ -25,15 +25,15 @@
   integer, allocatable :: n_p(:), n_count(:)
   real                 :: t_wall, t_tau, d_wall, t_hot, t_cold, t_diff
   logical              :: there
-!==============================================================================!
-
-!-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: kin, eps, zeta, f, ut, vt, wt, t2
 !==============================================================================!
+
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
 
   ! Take aliases
   Grid => Flow % pnt_grid

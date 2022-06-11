@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Probe_2D(grid)
+  subroutine Probe_2D(Grid)
 !------------------------------------------------------------------------------!
 ! Finds coordinates of all the planes for the channel flow.                    !
 ! It assumes that homogeneous directions of the flow are x and y.              !
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: grid
+  type(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: n_prob, p, c, fu
   real          :: yp(32768), zp(32768)
@@ -35,33 +35,33 @@
   !-----------------------------!
   !   Browse through all cells  !
   !-----------------------------!
-  do c=1,grid % n_cells
+  do c=1,Grid % n_cells
 
     ! Try to find the cell among the probes
     do p=1,n_prob
       if(answer .eq. 'YZ') then
-        if( Math % Approx_Real(grid % yc(c), yp(p)) .and.      &
-            Math % Approx_Real(grid % zc(c), zp(p)) ) go to 1
+        if( Math % Approx_Real(Grid % yc(c), yp(p)) .and.      &
+            Math % Approx_Real(Grid % zc(c), zp(p)) ) go to 1
       else if(answer .eq. 'ZX') then
-        if( Math % Approx_Real(grid % xc(c), yp(p)) .and.      &
-            Math % Approx_Real(grid % zc(c), zp(p)) ) go to 1
+        if( Math % Approx_Real(Grid % xc(c), yp(p)) .and.      &
+            Math % Approx_Real(Grid % zc(c), zp(p)) ) go to 1
       else if(answer .eq. 'XY') then
-        if( Math % Approx_Real(grid % xc(c), yp(p)) .and.      &
-            Math % Approx_Real(grid % yc(c), zp(p)) ) go to 1
+        if( Math % Approx_Real(Grid % xc(c), yp(p)) .and.      &
+            Math % Approx_Real(Grid % yc(c), zp(p)) ) go to 1
       end if
     end do 
 
     ! Couldn't find a cell among the probes, add a new one
     n_prob = n_prob+1
     if(answer .eq. 'YZ') then
-      yp(n_prob)=grid % yc(c)
-      zp(n_prob)=grid % zc(c)
+      yp(n_prob)=Grid % yc(c)
+      zp(n_prob)=Grid % zc(c)
     else if(answer .eq. 'ZX') then
-      yp(n_prob)=grid % xc(c)
-      zp(n_prob)=grid % zc(c)
+      yp(n_prob)=Grid % xc(c)
+      zp(n_prob)=Grid % zc(c)
     else if(answer .eq. 'XY') then
-      yp(n_prob)=grid % xc(c)
-      zp(n_prob)=grid % yc(c)
+      yp(n_prob)=Grid % xc(c)
+      zp(n_prob)=Grid % yc(c)
     end if 
 
     if(n_prob .eq. 32768) then

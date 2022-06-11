@@ -8,21 +8,21 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Eddies_Type), target :: eddies
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type), pointer :: flow
+  type(Field_Type), pointer :: Flow
   integer                   :: e
 !==============================================================================!
 
   ! Create an alias
-  flow => eddies % pnt_flow
+  Flow => eddies % pnt_flow
 
   ! Advance all eddies
   do e = 1, eddies % n_eddies
     eddies % eddy(e) % x = eddies % eddy(e) % x  &
-                         + eddies % eddy(e) % u * flow % dt
+                         + eddies % eddy(e) % u * Flow % dt
     eddies % eddy(e) % y = eddies % eddy(e) % y  &
-                         + eddies % eddy(e) % v * flow % dt
+                         + eddies % eddy(e) % v * Flow % dt
     eddies % eddy(e) % z = eddies % eddy(e) % z  &
-                         + eddies % eddy(e) % w * flow % dt
+                         + eddies % eddy(e) % w * Flow % dt
   end do
 
   ! Check which eddies left

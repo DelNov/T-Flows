@@ -384,7 +384,7 @@
   end do  ! browsing through components
 
   ! Update boundary values for momentum
-  ! (These do not, in generaly, obey volume conservation.)
+  ! (These do not, in general, obey volume conservation.)
   call Update_Boundary_Values(Flow, Turb, Vof, 'MOMENTUM')
 
   ! Refresh buffers for M % sav before discretizing for pressure

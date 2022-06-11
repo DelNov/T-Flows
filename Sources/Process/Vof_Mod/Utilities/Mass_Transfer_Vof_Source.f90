@@ -10,13 +10,13 @@
   class(Vof_Type), target :: Vof
   real                    :: b(Vof % pnt_grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
+  type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   integer                   :: c, e, g, l
 !==============================================================================!
 
   ! Take aliases
-  grid => Vof % pnt_grid
+  Grid => Vof % pnt_grid
   Flow => Vof % pnt_flow
 
   ! If not a problem with mass transfer, get out of here
@@ -32,7 +32,7 @@
   ! Here is the trick to get the sign correct:
   ! - if gas is 1 and liquid 2 => l-g =  1 => source > 0
   ! - if gas is 2 and liquid 1 => l-g = -1 => source < 0
-  do c = 1, grid % n_cells
+  do c = 1, Grid % n_cells
     e = Vof % Front % cell_at_elem(c)  ! Front element
 
     ! As Yohei and Lubomir ademantly told me - you divide with the density

@@ -9,29 +9,29 @@
   type(Var_Type)        :: phi
   integer               :: s
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   real                      :: w1, w2, dx1, dy1, dz1, dx2, dy2, dz2
   integer                   :: c1, c2
 !==============================================================================!
 
-  flow => Vof % pnt_flow
-  grid => flow % pnt_grid
+  Flow => Vof % pnt_flow
+  Grid => Flow % pnt_grid
 
-  c1 = grid % faces_c(1,s)
-  c2 = grid % faces_c(2,s)
+  c1 = Grid % faces_c(1,s)
+  c2 = Grid % faces_c(2,s)
 
   ! Vector from c1 to face
-  dx1 = grid % xf(s) - grid % xc(c1)
-  dy1 = grid % yf(s) - grid % yc(c1)
-  dz1 = grid % zf(s) - grid % zc(c1)
+  dx1 = Grid % xf(s) - Grid % xc(c1)
+  dy1 = Grid % yf(s) - Grid % yc(c1)
+  dz1 = Grid % zf(s) - Grid % zc(c1)
 
   ! Vector from c2 to face
-  dx2 = grid % xf(s) - (grid % xc(c1) + grid % dx(s))
-  dy2 = grid % yf(s) - (grid % yc(c1) + grid % dy(s))
-  dz2 = grid % zf(s) - (grid % zc(c1) + grid % dz(s))
+  dx2 = Grid % xf(s) - (Grid % xc(c1) + Grid % dx(s))
+  dy2 = Grid % yf(s) - (Grid % yc(c1) + Grid % dy(s))
+  dz2 = Grid % zf(s) - (Grid % zc(c1) + Grid % dz(s))
 
-  w1 = grid % f(s)
+  w1 = Grid % f(s)
   if(Vof % cell_at_elem(c1) .eq. 0 .and.  &
      Vof % cell_at_elem(c2) .ne. 0) w1 = 1.0
   if(Vof % cell_at_elem(c2) .eq. 0 .and.  &

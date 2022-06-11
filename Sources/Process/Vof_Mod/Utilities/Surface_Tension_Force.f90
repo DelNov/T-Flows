@@ -45,8 +45,8 @@
   class(Vof_Type), target :: Vof
   integer, intent(in)     :: i
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: flow
-  type(Grid_Type),   pointer :: grid
+  type(Field_Type),  pointer :: Flow
+  type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: col
   real, contiguous,  pointer :: surf_fx(:), surf_fy(:), surf_fz(:)
   integer                    :: c
@@ -56,8 +56,8 @@
   if(Vof % surface_tension < TINY) return
 
   ! Take aliases
-  flow    => Vof % pnt_flow
-  grid    => Vof % pnt_grid
+  Flow    => Vof % pnt_flow
+  Grid    => Vof % pnt_grid
   col     => Vof % fun
   surf_fx => Vof % surf_fx
   surf_fy => Vof % surf_fy
@@ -71,19 +71,19 @@
   ! N/m * 1/m * 1/m = N / m^3
   select case(i)
     case(1)
-      do c = 1, grid % n_cells
+      do c = 1, Grid % n_cells
         surf_fx(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
                    * col % x(c)
        end do
     case(2)
-      do c = 1, grid % n_cells
+      do c = 1, Grid % n_cells
         surf_fy(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
                    * col % y(c)
       end do
     case(3)
-      do c = 1, grid % n_cells
+      do c = 1, Grid % n_cells
         surf_fz(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
                    * col % z(c)

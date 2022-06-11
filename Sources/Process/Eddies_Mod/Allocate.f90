@@ -3,14 +3,14 @@
                                  n_edd,    &
                                  max_r,    &
                                  intns,    &
-                                 flow, bnd_cond_name)
+                                 Flow, bnd_cond_name)
 !------------------------------------------------------------------------------!
 !   Allocate memory for eddies                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Eddies_Type), target :: eddies
-  type(Field_Type),  target :: flow
+  type(Field_Type),  target :: Flow
   integer                   :: n_edd   ! number of eddies
   real                      :: max_r   ! maximum eddy radius
   real                      :: intns   ! eddy intensity
@@ -20,8 +20,8 @@
 !==============================================================================!
 
   ! Store pointers to grid, flow and the name of boundary condition
-  eddies % pnt_flow => flow
-  eddies % pnt_grid => flow % pnt_grid
+  eddies % pnt_flow => Flow
+  eddies % pnt_grid => Flow % pnt_grid
   eddies % bc_name  =  bnd_cond_name
 
   !---------------------!

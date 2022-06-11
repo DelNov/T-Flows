@@ -7,8 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: grid
-  type(Field_Type), pointer :: flow
+  type(Grid_Type),  pointer :: Grid
+  type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: beta_f(:)
@@ -18,17 +18,17 @@
 !==============================================================================!
 
   ! Take aliases
-  flow   => Vof % pnt_flow
-  grid   => flow % pnt_grid
-  v_flux => flow % v_flux
+  Flow   => Vof % pnt_flow
+  Grid   => Flow % pnt_grid
+  v_flux => Flow % v_flux
   fun    => Vof % fun
   beta_f => Vof % beta_f
   c_d    => Vof % c_d
 
   ! Interior faces
-  do s = 1, grid % n_faces
-    c1 = grid % faces_c(1,s)
-    c2 = grid % faces_c(2,s)
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     if(c2 > 0) then
 

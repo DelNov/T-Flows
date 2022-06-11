@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Domain_Mod_Connect_Blocks(dom, grid)
+  subroutine Domain_Mod_Connect_Blocks(dom, Grid)
 !------------------------------------------------------------------------------!
 !   Solve the cell connectivity after block by block grid generation           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
-  type(Grid_Type)   :: grid
+  type(Grid_Type)   :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n                         ! counters
   integer :: b1, b2                          ! block 1 and 2
@@ -25,8 +25,8 @@
 !==============================================================================!
 
   ! Initialize the new_n array
-  do n = 1, grid % n_nodes
-    grid % new_n(n) = n
+  do n = 1, Grid % n_nodes
+    Grid % new_n(n) = n
   end do
 
   ! If number of dom % blocks is equal to one, there is nothing to do
@@ -216,8 +216,8 @@
                    + (k1-1)*ci1*cj1 + (j1-1)*ci1 + i1
                 c2 = dom % blocks(b2) % n_cells  &
                    + (k2-1)*ci2*cj2 + (j2-1)*ci2 + i2
-                grid % cells_c(f1,c1) = c2
-                grid % cells_c(f2,c2) = c1
+                Grid % cells_c(f1,c1) = c2
+                Grid % cells_c(f2,c2) = c1
               end do
             end do
 
@@ -248,7 +248,7 @@
                    + (k1-1)*ni1*nj1 + (j1-1)*ni1 + i1
                 n2 = dom % blocks(b2) % n_nodes  &
                    + (k2-1)*ni2*nj2 + (j2-1)*ni2 + i2
-                grid % new_n(n2) = grid % new_n(n1)
+                Grid % new_n(n2) = Grid % new_n(n1)
               end do
             end do
 
@@ -261,24 +261,24 @@
     ! Update node numbers
     do n = dom % blocks(b2) % n_nodes + 1,  &
            dom % blocks(b2) % n_nodes + ni2*nj2*nk2
-      if(grid % new_n(n) .ne. n) del = del + 1
-      if(grid % new_n(n) .eq. n) grid % new_n(n) = grid % new_n(n) - del
+      if(Grid % new_n(n) .ne. n) del = del + 1
+      if(Grid % new_n(n) .eq. n) Grid % new_n(n) = Grid % new_n(n) - del
     end do
 
   end do          ! b2
 
-  do n = 1, grid % n_nodes
-    grid % xn(grid % new_n(n)) = grid % xn(n)
-    grid % yn(grid % new_n(n)) = grid % yn(n)
-    grid % zn(grid % new_n(n)) = grid % zn(n)
+  do n = 1, Grid % n_nodes
+    Grid % xn(Grid % new_n(n)) = Grid % xn(n)
+    Grid % yn(Grid % new_n(n)) = Grid % yn(n)
+    Grid % zn(Grid % new_n(n)) = Grid % zn(n)
   end do
 
-  grid % n_nodes = grid % n_nodes - del
+  Grid % n_nodes = Grid % n_nodes - del
 
   ! Skip the merged points in the node() structure
-  do i = 1, grid % n_cells
+  do i = 1, Grid % n_cells
     do n = 1, 8
-      grid % cells_n(n,i) = grid % new_n(grid % cells_n(n, i))
+      Grid % cells_n(n,i) = Grid % new_n(Grid % cells_n(n, i))
     end do
   end do
 

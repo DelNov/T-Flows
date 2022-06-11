@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Domain_Mod_Connect_Periodicity(dom, grid)
+  subroutine Domain_Mod_Connect_Periodicity(dom, Grid)
 !------------------------------------------------------------------------------!
 !   Solve the cell connectivity for periodic boundary conditions.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
-  type(Grid_Type)   :: grid
+  type(Grid_Type)   :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n, p                      ! counters
   integer :: b1, b2                          ! block 1 and 2
@@ -25,7 +25,7 @@
 !==============================================================================!
 
   ! Initialise twin_n.
-  do n = 1, grid % max_n_nodes
+  do n = 1, Grid % max_n_nodes
     twin_n(n,0) = 0
   end do
 
@@ -219,8 +219,8 @@
                      + (k1-1)*ci1*cj1 + (j1-1)*ci1 + i1
                   c2 = dom % blocks(b2) % n_cells  &
                      + (k2-1)*ci2*cj2 + (j2-1)*ci2 + i2
-                  grid % cells_c(f1,c1) = c2
-                  grid % cells_c(f2,c2) = c1
+                  Grid % cells_c(f1,c1) = c2
+                  Grid % cells_c(f2,c2) = c1
                 end do
               end do
 
@@ -251,8 +251,8 @@
                      + (k1-1)*ni1*nj1 + (j1-1)*ni1 + i1
                   n2 = dom % blocks(b2) % n_nodes  &
                      + (k2-1)*ni2*nj2 + (j2-1)*ni2 + i2
-                  n1 = grid % new_n(n1)
-                  n2 = grid % new_n(n2)
+                  n1 = Grid % new_n(n1)
+                  n2 = Grid % new_n(n2)
 
                   ! Check if they are already connected
                   do n=1, twin_n(n1,0)
@@ -280,7 +280,7 @@
   !   Twin of my twin   ! 
   !   is also my twin   !
   !---------------------!
-  do n1=1,grid % n_nodes
+  do n1=1,Grid % n_nodes
     do i1=1,twin_n(n1,0)
       n2=twin_n(n1,i1) 
       do i2=1,twin_n(n2,0)

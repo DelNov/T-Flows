@@ -15,6 +15,9 @@ include '../User_Mod/Backstep_Cf_St.f90'
   integer, intent(in)      :: ts
 !==============================================================================!
 
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(ts .eq. 0) return
+
   call User_Mod_Backstep_Profiles(Flow, Turb, ts)
   call User_Mod_Backstep_Cf_St   (Flow, Turb, ts)
 

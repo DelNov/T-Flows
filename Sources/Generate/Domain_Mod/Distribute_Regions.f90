@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Domain_Mod_Distribute_Regions(dom, grid)
+  subroutine Domain_Mod_Distribute_Regions(dom, Grid)
 !------------------------------------------------------------------------------!
 !   Distribute regions (defined in .dom file) to boundary conditions           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Domain_Type) :: dom
-  type(Grid_Type)   :: grid
+  type(Grid_Type)   :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, i, j, k, n, c, r
   integer :: n_bnd                         ! number of boundary conditions
@@ -22,7 +22,7 @@
 
   ! This is too much memory but that's OK 
   !  (+1 is to store the default values)
-  allocate(grid % bnd_cond % name(dom % n_regions + 1))
+  allocate(Grid % bnd_cond % name(dom % n_regions + 1))
 
   ! Initialize number of boundary conditions
   n_bnd = 0
@@ -87,19 +87,19 @@
 
       found = .false. 
       do r=1,n_bnd
-        if( grid % bnd_cond % name(r) .eq.   &
+        if( Grid % bnd_cond % name(r) .eq.   &
             dom % regions(n) % name ) found = .true.
       end do
       if( .not. found) then
         n_bnd = n_bnd + 1
-        grid % bnd_cond % name(n_bnd) = dom % regions(n) % name
+        Grid % bnd_cond % name(n_bnd) = dom % regions(n) % name
       end if
 
       do i=is,ie
         do j=js,je
           do k=ks,ke
             c = dom % blocks(b) % n_cells + (k-1)*ci*cj + (j-1)*ci + i   
-            grid % cells_c(face,c) = -n_bnd
+            Grid % cells_c(face,c) = -n_bnd
           end do
         end do
       end do
@@ -109,13 +109,13 @@
   end do  !  n_regions
 
   ! Store the number of boundary conditions
-  grid % n_bnd_cond  = n_bnd
+  Grid % n_bnd_cond  = n_bnd
 
   print *, '#==================================================='
   print *, '# Found following boundary conditions:'
   print *, '#---------------------------------------------------'
-  do n = 1, grid % n_bnd_cond
-    print *, '# ', trim(grid % bnd_cond % name(n))
+  do n = 1, Grid % n_bnd_cond
+    print *, '# ', trim(Grid % bnd_cond % name(n))
   end do
   print *, '#---------------------------------------------------'
 
