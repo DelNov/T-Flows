@@ -14,8 +14,8 @@
 #-----------------
 # Physical models
 #-----------------
- MASS_DENSITY              1.0
- DYNAMIC_VISCOSITY         1.4706e-5
+ MASS_DENSITY              1.2
+ DYNAMIC_VISCOSITY         1.8e-5
 
  TURBULENCE_MODEL          k_eps
 
@@ -24,11 +24,19 @@
 #----------------
  PARTICLE_TRACKING                               yes
 # SWARM_SUBGRID_SCALE_MODEL           brownian_fukagata
- SWARM_DIAMETER                                    2.5e-5
+ SWARM_DIAMETER                                    3.0e-6
+# SWARM_DIAMETER                                    5.0e-6
+# SWARM_DIAMETER                                   10.0e-6
+# SWARM_DIAMETER                                   15.0e-6
+# SWARM_DIAMETER                                   20.0e-6
+# SWARM_DIAMETER                                   25.0e-6
+# SWARM_DIAMETER                                   30.0e-6
+# SWARM_DIAMETER                                   40.0e-6
+# SWARM_DIAMETER                                   50.0e-6
  SWARM_DENSITY                                  1000.0
- NUMBER_OF_SWARM_SUB_STEPS                         8
+ NUMBER_OF_SWARM_SUB_STEPS                        16
  NUMBER_OF_PARTICLES                           10000
- SWARM_COEFFICIENT_OF_RESTITUTION                1.0
+ SWARM_COEFFICIENT_OF_RESTITUTION                0.0
 
 #----------------------
 # Numerical parameters
