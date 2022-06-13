@@ -17,9 +17,10 @@
   !------------------!
   type Results_Type
 
-    integer :: interval  ! result save interval
-    logical :: initial   ! save intial condition or not
-    logical :: boundary  ! save results at boundaries or not
+    logical :: boundary        ! save results at boundaries or not
+    logical :: initial         ! save intial condition or not
+    integer :: interval        ! result save interval
+    integer :: interval_swarm  ! result save interval for particles
 
     contains
       procedure :: Main_Results
@@ -32,6 +33,7 @@
       procedure, private :: Save_Swarm
       procedure, private :: Save_Vector_Real
       procedure, private :: Time_To_Save
+      procedure, private :: Time_To_Save_Swarm
 
   end type
 
@@ -48,5 +50,6 @@
   include 'Results_Mod/Save_Vector_Real.f90'  ! binary
   include 'Results_Mod/Save_Surf.f90'
   include 'Results_Mod/Time_To_Save.f90'
+  include 'Results_Mod/Time_To_Save_Swarm.f90'
 
   end module 

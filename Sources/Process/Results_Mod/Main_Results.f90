@@ -75,6 +75,25 @@
     end do  ! through domains
   end if
 
+  ! Is it time to save particles for post-processing?
+  if(curr_dt .eq. last_dt                  .or.  &
+     save_now                              .or.  &
+     exit_now                              .or.  &
+     Results % Time_To_Save_Swarm(curr_dt) .or.  &
+     Info_Mod_Time_To_Exit()) then
+
+    do d = 1, n_dom
+      call Control_Mod_Switch_To_Domain(d)
+      if(Flow(d) % with_particles) then
+        call Results % Save_Swarm(Swarm(d), curr_dt, domain=d)
+
+        call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                 curr_dt, domain=d)
+      end if
+
+    end do  ! through domains
+  end if
+
   if(save_now) then
     if(this_proc < 2) then
       open (9, file='save_now', status='old')

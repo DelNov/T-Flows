@@ -4,9 +4,9 @@
  TIME_STEP                          0.0001
  NUMBER_OF_TIME_STEPS           20000
 
- RESULTS_SAVE_INTERVAL                            10
- BACKUP_SAVE_INTERVAL                           5000
+ RESULTS_SAVE_INTERVAL                          5000
  SWARM_SAVE_INTERVAL                              10
+ BACKUP_SAVE_INTERVAL                           5000
  STARTING_TIME_STEP_FOR_SWARM_COMPUTATION       1001
 
  SAVE_RESULTS_AT_BOUNDARIES       yes
