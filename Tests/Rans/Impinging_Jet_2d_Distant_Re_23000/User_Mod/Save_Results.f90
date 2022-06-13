@@ -2,7 +2,7 @@ include '../User_Mod/Impinging_Jet_Nu.f90'
 include '../User_Mod/Impinging_Jet_Profiles.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
 !------------------------------------------------------------------------------!
 !   Calls User_Impinging_Jet_Nu and User_Impinging_Jet_Profile functions.      !
 !------------------------------------------------------------------------------!
@@ -13,6 +13,7 @@ include '../User_Mod/Impinging_Jet_Profiles.f90'
   type(Vof_Type)      :: Vof
   type(Swarm_Type)    :: Swarm
   integer, intent(in) :: ts     ! time step
+  integer, optional   :: domain
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
