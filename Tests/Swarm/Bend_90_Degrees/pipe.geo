@@ -44,18 +44,7 @@ p_cc =  1.0;    // progression center to octagon core
 // Geo. algorithm //      Please don't change nothing from this point
 //================//------------------------------------------------------------
 
-// 5 points defining the central wire
-Point(1) = {0.0, r_c, 0.0, 1.0};
-Point(2) = {r_c, 0.0, 0.0, 1.0};
 Point(3) = {0.0, len_i, 0.0, 1.0};
-Point(4) = {len_o, 0.0, 0.0, 1.0};
-Point(5) = {r_c, r_c, 0.0, 1.0};
-
-// Center-line wire (needed for extrusion of the 2d plane y=0.14 at top)
-Line(1) = {3, 1};
-Line(2) = {2, 4};
-Circle(3) = {1, 5, 2};
-
 // Top-circle points (to draw the circumference)
 Point(6) = {rad_1,  len_i, 0.0, 1.0};
 Point(7) = {0.0,   len_i, -rad_1, 1.0};
@@ -148,16 +137,6 @@ Line(45) = {19, 28};
 Line(46) = {17, 25};
 Line(47) = {21, 29};
 
-// Center to quadron lines
-Line(48) = {14, 3};
-Line(49) = {18, 3};
-Line(50) = {16, 3};
-Line(51) = {20, 3};
-Line(52) = {15, 3};
-Line(53) = {19, 3};
-Line(54) = {17, 3};
-Line(55) = {21, 3};
-
 //================//
 // Plane surfaces //
 //================//
@@ -212,13 +191,9 @@ Plane Surface(18) = {19};
 //============//
 // Core lines //
 //============//
-Line(56) = {3, 29};
 Line(57) = {3, 22};
-Line(58) = {26, 3};
 Line(59) = {23, 3};
-Line(60) = {27, 3};
 Line(61) = {24, 3};
-Line(62) = {28, 3};
 Line(63) = {25, 3};
 
 // Partitioning into number of nodes
@@ -250,45 +225,10 @@ Transfinite Line{29}   = n_c Using Progression 1;
 Transfinite Curve{13}  = n_c Using Progression 1;
 Transfinite Curve{17}  = n_c Using Progression 1;
 
-//=======================//
-// Triangles at the core //
-//=======================//
-// -=-> Line Loop(20) = {56, 57, 31};
-// -=-> Plane Surface(19) = {20};
-// -=-> 
-// -=-> Line Loop(22) = {57, 58, 24};
-// -=-> Plane Surface(20) = {22};
-// -=-> 
-// -=-> Line Loop(24) = {58, 59, 25};
-// -=-> Plane Surface(21) = {24};
-// -=-> 
-// -=-> Line Loop(26) = {59, 60, 26};
-// -=-> Plane Surface(22) = {26};
-// -=-> 
-// -=-> Line Loop(28) = {60, 61, 27};
-// -=-> Plane Surface(23) = {28};
-// -=-> 
-// -=-> Line Loop(30) = {61, 62, 28};
-// -=-> Plane Surface(24) = {30};
-// -=-> 
-// -=-> Line Loop(32) = {62, 63, 29};
-// -=-> Plane Surface(25) = {32};
-// -=-> 
-// -=-> Line Loop(34) = {63, 56, 30};
-// -=-> Plane Surface(26) = {34};
-//+++++++++++++++++++++++++++++++++++
-
-Line Loop(20) = {57, 24, 25, 59};
-Plane Surface(19) = {20};
-
-Line Loop(22) = {59, 26, 27, 61};
-Plane Surface(20) = {22};
-
-Line Loop(24) = {61, 28, 29, 63};
-Plane Surface(21) = {24};
-
-Line Loop(26) = {63, 30, 31, 57};
-Plane Surface(22) = {26};
+Line Loop(20) = {57, 24, 25, 59};  Plane Surface(19) = {20};
+Line Loop(22) = {59, 26, 27, 61};  Plane Surface(20) = {22};
+Line Loop(24) = {61, 28, 29, 63};  Plane Surface(21) = {24};
+Line Loop(26) = {63, 30, 31, 57};  Plane Surface(22) = {26};
 
 //=================//
 // 2D surface mesh //
@@ -299,30 +239,14 @@ Transfinite Line{57,59,61,63}                = n_cc Using Progression p_cc;
 Transfinite Surface{2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22};
 Recombine Surface{2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22};
 
-// Wire of extrusion 
-Wire(29) = {1, 3, 2};
-
 //===================//
 // Surface extrusion //
 //===================//
-Extrude {0,-arm_i,0} {Surface{2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22}; Layers{la_i}; Recombine; }
-Extrude{{0,0,1}, {r_c,r_c,0}, r_a} {Surface{81,86,85,83,27,78,51,47,43,39,35,31,62,59,55,76,74,71,68,65}; Layers{la_b}; Recombine; }
-Extrude{arm_o,0,0} {Surface{102,91,95,99,121,124,126,106,109,112,115,118,145,148,150,130,133,136,139,142}; Layers{la_o}; Recombine; }
-Extrude { Line{56,58,60,62};    } Using Wire {29}
-
- // Not used extrusions but maybe needed in the future!
- //Extrude { Surface{2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22}; } Using Wire {29}
- //Extrude { Curve{8,9,10,11,12,13,14,15};   } Using Wire {29}
- //Extrude { Curve{16,17,18,19,20,21,22,23}; } Using Wire {29}
- //Extrude { Line{40,41,42,43,44,45,46,47};  } Using Wire {29}
- //Extrude { Line{24,25,26,27,28,29,30,31};  } Using Wire {29}
- //Extrude { Line{56,57,58,59,60,61,62,63};  } Using Wire {29}
- //Extrude { Line{32,33,34,35,36,37,38,39};  } Using Wire {29}
+Extrude {0,0.01,0} {Surface{2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,18,19,20,21,22}; Layers{n_c}; Recombine; }
 
 //=====================//
 // Boundary conditions //
 //=====================//
-Physical Surface("bend_inlet") = {21, 20, 5, 4, 14, 13, 12, 2, 19, 22, 18, 11, 10, 8, 7, 17, 16, 6, 15, 3};
-Physical Surface("bend_walls") = {63, 75, 53, 57, 60, 66, 70, 73, 127, 149, 146, 143, 140, 137, 134, 131, 195, 198, 201, 204, 207, 210, 213, 192};
-Physical Surface("bend_outlet") = {173, 176, 188, 212, 190, 214, 166, 163, 159, 155, 170, 194, 197, 200, 179, 182, 206, 185, 209, 203};
+Physical Surface("periodic") = {21, 20, 5, 4, 14, 13, 12, 2, 19, 22, 18, 11, 10, 8, 7, 17, 16, 6, 15, 3, 81, 83, 85, 86, 27, 31, 35, 39, 43, 47, 51, 78, 59, 62, 65, 68, 71, 74, 76, 55};
+Physical Surface("pipe_walls") = {63, 75, 53, 57, 60, 66, 70, 73, 127, 149, 146, 143, 140, 137, 134, 131, 195, 198, 201, 204, 207, 210, 213, 192};
 Physical Volume("fluid") = {12, 3, 13, 4, 14, 5, 19, 6, 15, 7, 8, 20, 16, 9, 10, 1, 17, 18, 2, 11, 40, 39, 31, 32, 33, 25, 21, 24, 30, 38, 37, 29, 23, 22, 26, 34, 27, 35, 28, 36, 55, 47, 54, 46, 48, 56, 42, 41, 45, 53, 43, 57, 49, 44, 52, 60, 51, 59, 58, 50};

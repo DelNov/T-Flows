@@ -32,11 +32,10 @@
   integer               :: last_dt         ! number of time steps
   integer               :: max_ini         ! max number of inner iterations
   integer               :: min_ini         ! min number of inner iterations
-  integer               :: n_stat_t        ! first time step for Turb. statistic
+  integer               :: n_stat_t        ! first time step for turb. statistic
   integer               :: n_stat_p        ! first time step for swarm statistic
   integer               :: first_dt_p      ! first t.s. for swarm computation
   integer               :: ini             ! inner iteration counter
-  integer               :: prsi            ! particles save interval
   real                  :: simple_tol      ! tolerance for SIMPLE algorithm
   integer               :: n_dom           ! number of domains
   integer               :: d               ! domain counter
@@ -119,6 +118,7 @@
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Read_Control % Physical_Models(Flow(d), Turb(d), Vof(d), Swarm(d))
+    PRINT *, Swarm(d) % diameter
   end do
 
   !----------------------------------------------------------!
@@ -213,9 +213,7 @@
   call Control_Mod_Results_Save_Interval (Results % interval, verbose=.true.)
   call Control_Mod_Save_Initial_Condition(Results % initial,  verbose=.true.)
   call Control_Mod_Save_Results_At_Boundaries(Results % boundary)
-  if(Flow(d) % with_particles) then
-    call Control_Mod_Swarm_Save_Interval(prsi, verbose=.true.)
-  end if
+  call Control_Mod_Swarm_Save_Interval(Results % interval_swarm, verbose=.true.)
 
   !-------------------------------------------------------!
   !   Compute wall distance - it is not saved in backup   !
@@ -244,8 +242,10 @@
   end do
 
   ! Save initial condition
-  call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                              Flow, Turb, Vof, Swarm, exit_now)
+  if(first_dt .eq. 0) then
+    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
+                                Flow, Turb, Vof, Swarm, exit_now)
+  end if
 
   !-------------------------------------!
   !   The time loop really begins now   !
@@ -311,7 +311,7 @@
     do ini = 1, max_ini
 
       ! Exchange data between domains
-      call User_Mod_Interface_Exchange(inter, Flow, n_dom)
+      call User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 
       do d = 1, n_dom
 

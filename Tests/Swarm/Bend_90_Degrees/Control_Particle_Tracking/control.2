@@ -1,62 +1,51 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME     bend_full
+ PROBLEM_NAME     bend
  HEAT_TRANSFER    no
 
- NUMBER_OF_TIME_STEPS     6000
-
- RESULTS_SAVE_INTERVAL      10
- BACKUP_SAVE_INTERVAL     2000
-
- TIME_STEP                  0.00005
-# LOAD_BACKUP_NAME           bend-ts004000.backup
-
- SWARM_SAVE_INTERVAL                             200
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION       4005
- STARTING_TIME_STEP_FOR_TURB_STATISTICS      1200000
- STARTING_TIME_STEP_FOR_SWARM_STATISTICS     1200000
+ LOAD_BACKUP_NAME           bend-ts001000.backup
 
 #-------------------
 # Monitoring points 
 #-------------------
- NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         0.0  0.0  0.0
-
- POINT_FOR_MONITORING_PLANES    0.0  0.0  0.0
+ POINT_FOR_MONITORING_PLANES    0.07  0.0  0.0
 
 #-----------------
 # Physical models
 #-----------------
-
- MASS_DENSITY              1.0
- DYNAMIC_VISCOSITY         1.4706e-5
+ MASS_DENSITY              1.2
+ DYNAMIC_VISCOSITY         1.8e-5
 
  TURBULENCE_MODEL          k_eps
-# TURBULENCE_MODEL          hybrid_les_rans
- PRESSURE_DROPS            0.0     0.0      0.0
-# GRAVITATIONAL_VECTOR      0.0   -9.81  0.0
- POTENTIAL_INITIALIZATION  yes
 
 #----------------
 # Swarm related
 #----------------
  PARTICLE_TRACKING                               yes
 # SWARM_SUBGRID_SCALE_MODEL           brownian_fukagata
- SWARM_DIAMETER                                    2.5e-5
+ SWARM_DIAMETER                                    3.0e-6
+# SWARM_DIAMETER                                    5.0e-6
+# SWARM_DIAMETER                                   10.0e-6
+# SWARM_DIAMETER                                   15.0e-6
+# SWARM_DIAMETER                                   20.0e-6
+# SWARM_DIAMETER                                   25.0e-6
+# SWARM_DIAMETER                                   30.0e-6
+# SWARM_DIAMETER                                   40.0e-6
+# SWARM_DIAMETER                                   50.0e-6
  SWARM_DENSITY                                  1000.0
- NUMBER_OF_SWARM_SUB_STEPS                         8
+ NUMBER_OF_SWARM_SUB_STEPS                        16
  NUMBER_OF_PARTICLES                           10000
- SWARM_COEFFICIENT_OF_RESTITUTION                1.0
+ SWARM_COEFFICIENT_OF_RESTITUTION                0.0
 
 #----------------------
 # Numerical parameters
 #----------------------
-
  PRESSURE_MOMENTUM_COUPLING    simple
 
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
+ SIMPLE_UNDERRELAXATION_FOR_TURBULENCE  0.3
 
  TIME_INTEGRATION_SCHEME  linear
 
@@ -74,6 +63,8 @@
  MIN_SIMPLE_ITERATIONS                   3
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER    480
 
+ GRADIENT_METHOD_FOR_PRESSURE       gauss_theorem
+
 #--------------------
 # Initial conditions
 #--------------------
@@ -84,7 +75,6 @@
 #---------------------
 # Boundary conditions
 #---------------------
-
   BOUNDARY_CONDITION    bend_walls
     TYPE                wall
     VARIABLES           u     v     w

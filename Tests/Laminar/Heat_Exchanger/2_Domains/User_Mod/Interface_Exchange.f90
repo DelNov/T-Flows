@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Interface_Exchange(inter, Flow, n_dom)
+  subroutine User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 !------------------------------------------------------------------------------!
 !   Create interface between two grids.                                        !
 !------------------------------------------------------------------------------!
@@ -7,13 +7,17 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Interface_Type)        :: inter(MD, MD)
   type(Field_Type),    target :: Flow(MD)
+  type(Turb_Type),     target :: Turb(MD)
+  type(Vof_Type),      target :: Vof(MD)
+  type(Swarm_Type),    target :: Swarm(MD)
   integer, intent(in)         :: n_dom
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
-  real    :: t1, t2, k1, wd1, k2, wd2
+!------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...
                         WD = 3      ! ... and wall distance as the third
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: d1, d2, n1, n2, n, ic1, bc1, ic2, bc2
+  real    :: t1, t2, k1, wd1, k2, wd2
 !==============================================================================!
 
   !-------------------------------------------!
