@@ -20,6 +20,9 @@
   ! Take alias(es)
   Grid => Flow % pnt_grid
 
+  ! Re-set the diameters, since what you have in backup could be different
+  Swarm % Particle(:) % d =  Swarm % diameter
+
   n_r = 40
 
   !-------------------!
@@ -30,10 +33,15 @@
     ! First Particle in the center
     l = 1
     Swarm % Particle(l) % x_n =  0.0
-    Swarm % Particle(l) % y_n =  0.099999
+    Swarm % Particle(l) % y_n =  0.0999
     Swarm % Particle(l) % z_n =  0.0
 
-    d_r = 0.0085 / (n_r - 2)
+    d_r = 0.00970 / (n_r - 2)  ! 0.00999 not OK
+                               ! 0.00995 not OK
+                               ! 0.0099  not OK
+                               ! 0.0098  not OK
+                               ! 0.00975 not OK
+                               ! 0.0097  was OK
 
     ! Place the particles where you want them
     ! Theta loop
@@ -47,7 +55,7 @@
 
         l = l + 1
         Swarm % Particle(l) % x_n = x
-        Swarm % Particle(l) % y_n = 0.0399
+        Swarm % Particle(l) % y_n = 0.0999
         Swarm % Particle(l) % z_n = z
       end do
     end do
