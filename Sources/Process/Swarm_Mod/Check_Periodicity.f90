@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Check_Periodicity(Swarm, k, n_parts_in_buffers)
+  subroutine Check_Periodicity(Swarm, k, n_parts_in_buffers)
 !------------------------------------------------------------------------------!
 !   Check if particle left the the domain in a periodic direction              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
-  integer                  :: k
-  integer                  :: n_parts_in_buffers
+  class(Swarm_Type), target :: Swarm
+  integer                   :: k
+  integer                   :: n_parts_in_buffers
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part
