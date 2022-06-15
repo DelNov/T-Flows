@@ -118,7 +118,6 @@
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
     call Read_Control % Physical_Models(Flow(d), Turb(d), Vof(d), Swarm(d))
-    PRINT *, Swarm(d) % diameter
   end do
 
   !----------------------------------------------------------!
