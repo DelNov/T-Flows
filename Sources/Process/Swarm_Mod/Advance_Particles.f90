@@ -8,7 +8,7 @@
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n           ! current time step
   integer, intent(in)      :: n_stat_p    ! starting time for swarm statistics
-  integer, intent(in)      :: first_dt_p  ! starting time for wwarm simulation
+  integer, intent(in)      :: first_dt_p  ! starting time for swarm simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow
