@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1r file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -13,6 +13,7 @@
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts   ! time step
+  integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
