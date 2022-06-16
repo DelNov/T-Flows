@@ -13,7 +13,7 @@
   logical,             pointer :: deposited            ! part. deposition flag
   logical,             pointer :: escaped              ! part. departure  flag
   integer                      :: c, c2, s, bs         ! nearest cells, face
-  real                         :: vel_dot_n
+  real                         :: vel_dot_n, vel_magn
   real                         :: xi, yi, zi, nx, ny, nz
   real                         :: u_ref, v_ref, w_ref
   real                         :: part_x_n, part_y_n, part_z_n
@@ -55,11 +55,6 @@
     nx = -Grid % sx(s) / Grid % s(s)
     ny = -Grid % sy(s) / Grid % s(s)
     nz = -Grid % sz(s) / Grid % s(s)
-
-    ! Velocity normal to the wall
-    vel_dot_n = Part % u * nx   &
-              + Part % v * ny   &
-              + Part % w * nz
 
     ! Vector connecting particle with boundary face center; new and old
     vec_new_face_dot_n = (Part % x_n - Grid % xf(s)) * nx  &
@@ -169,11 +164,20 @@
       !---------------------------------!
       !   The boundary cell is a wall   !
       !---------------------------------!
-      if(Grid % Bnd_Cond_Type( c2) == WALL .or.  & 
-         Grid % Bnd_Cond_Type( c2) == WALLFL) then
+      if(Grid % Bnd_Cond_Type(c2) == WALL .or.  & 
+         Grid % Bnd_Cond_Type(c2) == WALLFL) then
 
-        ! Trap condition (deposition) >>> narrowed the tolerance  <<<
-        if(Swarm % rst <= TINY .or. abs(vel_dot_n) <= MILI) then
+        ! Velocity normal to the wall and velocity magnitude
+        vel_dot_n = Part % u * nx   &
+                  + Part % v * ny   &
+                  + Part % w * nz
+        vel_magn = sqrt(  Part % u * Part % u   &
+                        + Part % v * Part % v   &
+                        + Part % w * Part % w)
+
+        ! Trap condition (deposition)
+        if(Swarm % rst <= TINY                            .or.  &  ! sticky
+           Swarm % rst <= 1.0-TINY .and. vel_magn < MICRO) then    ! too slow
 
           deposited = .true.
           Swarm % n_deposited(c2) = Swarm % n_deposited(c2) + 1
@@ -230,9 +234,9 @@
       !------------------------------------!
       !   The boundary cell is an outlet   !
       !------------------------------------!
-      if(Grid % Bnd_Cond_Type( c2) == OUTFLOW  .or.  &
-         Grid % Bnd_Cond_Type( c2) == PRESSURE .or.  &
-         Grid % Bnd_Cond_Type( c2) == CONVECT) then
+      if(Grid % Bnd_Cond_Type(c2) == OUTFLOW  .or.  &
+         Grid % Bnd_Cond_Type(c2) == PRESSURE .or.  &
+         Grid % Bnd_Cond_Type(c2) == CONVECT) then
         escaped = .true.
         Swarm % n_escaped(c2) = Swarm % n_escaped(c2) + 1
       end if  ! it is an outflow
