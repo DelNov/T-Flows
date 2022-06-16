@@ -155,9 +155,10 @@
             kin_vis = Flow % viscosity(c1) / Flow % density(c1)
             u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
                   / Grid % wall_dist(c1)
-            Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,           &
-                                               Grid % wall_dist(c1),  &
-                                               kin_vis)
+            Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(u_tau,            &
+                                                     Grid % wall_dist(c1),  &
+                                                     kin_vis,               &
+                                                     0.0)
             if(Turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
           end if
         end if

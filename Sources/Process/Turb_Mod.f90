@@ -199,10 +199,8 @@
       procedure :: Find_Nearest_Wall_Cell
       procedure :: Y_Plus_Low_Re
       procedure :: Y_Plus_Rough_Walls
-      procedure :: Tau_Wall_Low_Re
-      procedure :: Tau_Wall_Rough_Walls
+      procedure :: Tau_Wall_Log_Law
       procedure :: U_Plus_Log_Law
-      procedure :: U_Plus_Rough_Walls
       procedure :: Time_And_Length_Scale
       procedure :: Roughness_Coefficient
 
@@ -339,10 +337,8 @@
   include 'Turb_Mod/Y_Plus_Low_Re.f90'
   include 'Turb_Mod/Y_Plus_Rough_Walls.f90'
 
-  include 'Turb_Mod/Tau_Wall_Low_Re.f90'
-  include 'Turb_Mod/Tau_Wall_Rough_Walls.f90'
+  include 'Turb_Mod/Tau_Wall_Log_Law.f90'
   include 'Turb_Mod/U_Plus_Log_Law.f90'
-  include 'Turb_Mod/U_Plus_Rough_Walls.f90'
   include 'Turb_Mod/Time_And_Length_Scale.f90'
   include 'Turb_Mod/Roughness_Coefficient.f90'
 

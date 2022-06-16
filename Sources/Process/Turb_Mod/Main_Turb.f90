@@ -12,6 +12,8 @@
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
+  type(Var_Type),   pointer :: phi
+  integer                   :: sc
 !==============================================================================!
 
   ! Take aliases
@@ -41,6 +43,15 @@
 
   if(Turb % model .eq. K_EPS_ZETA_F .or. &
      Turb % model .eq. HYBRID_LES_RANS) then
+
+    ! Calculate turbulent scalar fluxes
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
+      if(Flow % n_scalars > 0) then
+        call Turb % Calculate_Stress     ()
+        call Turb % Calculate_Scalar_Flux(sc)
+      end if
+    end do
 
     call Calculate_Shear_And_Vorticity(Flow)
 

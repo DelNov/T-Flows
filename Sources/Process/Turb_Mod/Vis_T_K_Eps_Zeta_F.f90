@@ -71,37 +71,42 @@
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
+        ! Set up roughness coefficient
+        z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
+        if(Turb % rough_walls) then
+          z_o = max(Grid % wall_dist(c1)  &
+              / (e_log * max(Turb % y_plus(c1), 1.0)), z_o)
+        end if
+
+        ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
-        Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
-                                                 Grid % wall_dist(c1),  &
-                                                 kin_vis)
 
-        Turb % tau_wall(c1) = Turb % Tau_Wall_Low_Re(Flow % density(c1),  &
-                                                     u_tau,               &
-                                                     u_tan,               &
-                                                     Turb % y_plus(c1))
+        Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(   &
+                                   u_tau,                &
+                                   Grid % wall_dist(c1), &
+                                   kin_vis,              &
+                                   z_o)
+
+        Turb % tau_wall(c1) = Turb % Tau_Wall_Log_Law(              &
+                                              Flow % density(c1),   &
+                                              u_tau,                &
+                                              u_tan,                &
+                                              Grid % wall_dist(c1), &
+                                              Turb % y_plus(c1),    &
+                                              z_o)
 
         ebf = Turb % Ebf_Momentum(c1)
 
-        u_plus = Turb % U_Plus_Log_Law(Turb % y_plus(c1))
+        u_plus = Turb % U_Plus_Log_Law(               &
+                               Grid % wall_dist(c1),  &
+                               Turb % y_plus(c1),     &
+                               z_o)
 
         if(Turb % y_plus(c1) < 3.0) then
           Turb % vis_w(c1) = Turb % vis_t(c1) + Flow % viscosity(c1)
         else
-
-          if(Turb % rough_walls) then
-            z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
-            z_o = max(Grid % wall_dist(c1)   &
-                / (e_log * max(Turb % y_plus(c1),1.0)), z_o)
-
-            Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(                &
-                                                   u_tau,                 &
-                                                   Grid % wall_dist(c1),  &
-                                                   kin_vis)
-            u_plus     = Turb % U_Plus_Rough_Walls(Grid % wall_dist(c1))
-          end if
 
           if(Turb % y_plus(c1) < 11.3 ) then
             ebf = 0.00001

@@ -68,14 +68,9 @@
   ! and fluxes coming from interfaces
   q_turb(:) = 0.0
 
-  !-------------------------------------!
-  !   Initialize variables and fluxes   !
-  !-------------------------------------!
-
-  if( Turb % model .ne. NO_TURBULENCE_MODEL) then
-    call Turb % Calculate_Stress     ()
-    call Turb % Calculate_Scalar_Flux(sc)
-  end if
+  !--------------------------!
+  !   Initialize variables   !
+  !--------------------------!
 
   ! Old values (o and oo)
   if(ini.lt.2) then

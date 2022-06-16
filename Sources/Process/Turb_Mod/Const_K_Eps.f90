@@ -16,14 +16,16 @@
   kappa   = 0.41
   e_log   = 8.342
 
+  ! Transport properties
   Turb % kin % sigma = 1.4
   Turb % eps % sigma = 1.4
-
-  ! Copied from Turb_Mod_Const_K_Eps_Zeta_F
-  Turb % t2  % sigma = 1.0
+  Turb % t2  % sigma = 1.0  ! copied from Const_K_Eps_Zeta_F
 
   c_mu_theta5 = 0.35
   kappa_theta = 0.38         ! von Karman constant for temperature
+
+  ! Roughness coefficient
+  Turb % z_o = 0.0
 
   ! Constants for GGDH turbulent flux
   c_theta = 0.2

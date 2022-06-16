@@ -33,9 +33,9 @@
   allocate(Turb % y_plus  (-nb:nc));  Turb % y_plus   = 0.
 
   ! Hydraulic roughness given by formula
+  allocate(Turb % z_o_f(-nb:nc)); Turb % z_o_f = -1.0
   if(Turb % rough_walls) then
-    allocate(Turb % z_o_f  (-nb:nc)); Turb % z_o_f   = -1.0
-    allocate(Turb % id_zone(-nb:nc)); Turb % id_zone =  0.0
+    allocate(Turb % id_zone(-nb:nc)); Turb % id_zone = 0.0
   end if
 
   !  Wall difussivity for user scalar
