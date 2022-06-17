@@ -4,10 +4,10 @@
  PROBLEM_NAME     backstep
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS     300
- RESULTS_SAVE_INTERVAL    60
- BACKUP_SAVE_INTERVAL    150
- TIME_STEP               1.0
+ NUMBER_OF_TIME_STEPS    300
+ RESULTS_SAVE_INTERVAL    30
+ BACKUP_SAVE_INTERVAL    300
+ TIME_STEP               0.04
 
 #LOAD_BACKUP_NAME backstep_orthogonal-ts.backup
 
@@ -23,7 +23,7 @@ NUMBER_OF_TIME_STEPS     300
 # Physical models
 #-----------------
  MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.0e-2
+ DYNAMIC_VISCOSITY      1.0e-3
  HEAT_CAPACITY          1.0
 
  TURBULENCE_MODEL       none
@@ -41,12 +41,14 @@ NUMBER_OF_TIME_STEPS     300
 
  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
 
+ GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
+
 #------------------------
 # Linear solver settings
 #------------------------
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER 400
@@ -77,6 +79,6 @@ NUMBER_OF_TIME_STEPS     300
     VALUES              1.0   0.0   0.0
 
   BOUNDARY_CONDITION    out
-    TYPE                outflow
+    TYPE                convective
     VARIABLES           u     v     w
     VALUES              0.0   0.0   0.0
