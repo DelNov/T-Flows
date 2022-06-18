@@ -94,6 +94,7 @@
     contains
       procedure          :: Allocate_Swarm
       procedure, private :: Bounce_Particle
+      procedure, private :: Check_Periodicity
       procedure, private :: Move_Particle
       procedure, private :: Move_Trapped
       procedure, private :: Particle_Forces

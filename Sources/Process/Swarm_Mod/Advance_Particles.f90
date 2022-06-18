@@ -8,7 +8,7 @@
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: n           ! current time step
   integer, intent(in)      :: n_stat_p    ! starting time for swarm statistics
-  integer, intent(in)      :: first_dt_p  ! starting time for wwarm simulation
+  integer, intent(in)      :: first_dt_p  ! starting time for swarm simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow
@@ -117,7 +117,7 @@
           call Part % Find_Nearest_Node()
 
           ! First check if it didn't escape through periodicity
-          call Swarm_Mod_Check_Periodicity(Swarm, k, n_parts_in_buffers)
+          call Swarm % Check_Periodicity(k, n_parts_in_buffers)
 
           ! Gathering Swarm statistics
           call Swarm_Mod_Calculate_Mean(Swarm, k, n, n_stat_p, ss)

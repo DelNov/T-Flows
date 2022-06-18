@@ -47,15 +47,9 @@
   nc = Turb % pnt_grid % n_cells
 
   ! Reflected and deposited particles on the walls and the escaped particles
-  if(nb > 0) then
-    allocate(Swarm % n_reflected(-nb:nc));  Swarm % n_reflected(:) = 0
-    allocate(Swarm % n_deposited(-nb:nc));  Swarm % n_deposited(:) = 0
-    allocate(Swarm % n_escaped  (-nb:nc));  Swarm % n_escaped(:)   = 0
-  else  ! take care of subdomains which have no boundary cells
-    allocate(Swarm % n_reflected(0:0));  Swarm % n_reflected(:) = 0
-    allocate(Swarm % n_deposited(0:0));  Swarm % n_deposited(:) = 0
-    allocate(Swarm % n_escaped  (0:0));  Swarm % n_escaped(:)   = 0
-  end if
+  allocate(Swarm % n_reflected(-nb:nc));  Swarm % n_reflected(:) = 0
+  allocate(Swarm % n_deposited(-nb:nc));  Swarm % n_deposited(:) = 0
+  allocate(Swarm % n_escaped  (-nb:nc));  Swarm % n_escaped(:)   = 0
   Swarm % n_trapped = 0
 
   ! Allocate variables for ensemble-averaging

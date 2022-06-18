@@ -6,21 +6,25 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod,  only: Grid_Type
-  use Field_Mod
+  use Field_Mod, only: Field_Type
   use Var_Mod,   only: Var_Type
   use Const_Mod, only: PI
   use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), target :: Flow
-  type(Turb_Type),  target :: Turb
-  type(Vof_Type),   target :: Vof
-  type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! current time step
-  integer, intent(in)      :: n_stat_t  ! 1st t.s. for Turb. stat.
-  integer, intent(in)      :: n_stat_p  ! 1st t.s. for Swarm. stat.
-  real,    intent(in)      :: time      ! physical time
+  type(Field_Type), target     :: Flow
+  type(Turb_Type),  target     :: Turb
+  type(Vof_Type),   target     :: Vof
+  type(Swarm_Type), target     :: Swarm
+  integer,          intent(in) :: n         ! current time step
+  integer                      :: n_stat_t  ! 1st t.s. for turb. stat.
+  integer                      :: n_stat_p  ! 1st t.s. for swarm. stat.
+  real                         :: time      ! physical time
+!------------------------------[Local parameters]------------------------------!
+  real, parameter :: LX = 6.28  ! streamwise
+  real, parameter :: LY = 3.14  ! spanwise
+  real, parameter :: LZ = 2.0   ! wall-normal
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),      pointer :: u, v, w, t
   type(Grid_Type),     pointer :: Grid
@@ -32,14 +36,10 @@
   integer, allocatable         :: bin_count(:)
   real, allocatable            :: rep(:), delta(:), bin(:)
   real                         :: lo, xo(4), yo(4),                          &
-                                  re_tau, ss0, ss1, ss00, ss11,  &
+                                  re_tau, ss0, ss1, ss00, ss11,              &
                                   zo, ro, xc, yc, zc, vc, wc, sig_x, sig_yz, &
-                                  rmin, rmax, sg, vmax, max_rep, &
+                                  rmin, rmax, sg, vmax, max_rep,             &
                                   level
-!------------------------------[Local parameters]------------------------------!
-  real, parameter :: LX = 6.28  ! streamwise
-  real, parameter :: LY = 3.14  ! spanwise
-  real, parameter :: LZ = 2.0   ! wall-normal
 !==============================================================================!
 
   ! Take aliases
@@ -48,6 +48,10 @@
   v    => Flow % v
   w    => Flow % w
   t    => Flow % t
+
+  ! Reading starting time for Swarm statistics from control file
+  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics &
+       (n_stat_p, verbose=.true.)
 
   ! Reynolds number should be passed from Save_Results and number of bins should
   ! be defined in control file, also same for n_bin... (it's okey for now!) 
@@ -118,9 +122,9 @@
 !      !stop 
 !
 !      ! calling the problem name to open a new file for binning results
-!      call File % Set_Name(result_name, time_step = n,              & 
-!           appendix='-Swarm-concentration', extension='.dat')
-!      call File % Open_For_Writing_Ascii(result_name, fu)
+!      call File_Mod_Set_Name(result_name, time_step = n,              & 
+!           appendix='-swarm-concentration', extension='.dat')
+!      call File_Mod_Open_File_For_Writing(result_name, fu)
 !
 !      ! printing info in a separate file...
 !      open(fu,file=result_name)
