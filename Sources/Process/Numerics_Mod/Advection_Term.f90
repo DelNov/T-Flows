@@ -11,28 +11,29 @@
   real           :: v_flux(phi % pnt_grid % n_faces)
   real           :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  real                     :: phi_f          ! phi and coef at the cell face
-  integer                  :: c, c1, c2, s
+  type(Grid_Type), pointer  :: Grid
+  real                      :: phif          ! phi and coef at the cell face
+  integer                   :: c, c1, c2, s
+  real, contiguous, pointer :: phi_min(:), phi_max(:), advect(:), upwind(:)
 !==============================================================================!
 
   ! Take alias to Grid
   Grid => phi % pnt_grid
 
+  call Work % Connect_Real_Cell(phi_min, phi_max, advect, upwind)
+
   !----------------------------------------------------------------------------!
   !   Compute phi % max and phi % min (used in Numerics_Mod_Advection_Scheme)  !
   !----------------------------------------------------------------------------!
   if(phi % adv_scheme .ne. CENTRAL) then
-    call Numerics_Mod_Min_Max(phi)
+    call Numerics_Mod_Min_Max(phi, phi_min, phi_max)
   end if
 
   !----------------!
   !   New values   !
   !----------------!
-  do c = 1, Grid % n_cells
-    phi % a(c) = 0.0
-    phi % c(c) = 0.0  ! use phi % c for upwind advective fluxes
-  end do
+  advect(:) = 0.0
+  upwind(:) = 0.0
 
   !----------------------------------!
   !   Browse through all the faces   !
@@ -43,32 +44,32 @@
     c2 = Grid % faces_c(2,s)
 
     ! This could be computed with gradient extrapolation
-    phi_f =      Grid % f(s)  * phi % n(c1)   &
-          + (1.0-Grid % f(s)) * phi % n(c2)
+    phif =      Grid % f(s)  * phi % n(c1)   &
+         + (1.0-Grid % f(s)) * phi % n(c2)
 
-    ! Compute phi_f with desired advection scheme
+    ! Compute phif with desired advection scheme
     if(phi % adv_scheme .ne. CENTRAL) then
-      call Numerics_Mod_Advection_Scheme(phi_f, s, phi, v_flux)
+      call Numerics_Mod_Advection_Scheme(phif, s, phi, phi_min, phi_max, v_flux)
     end if
 
     ! Compute advection term (non-conservative form)
     if(c2 > 0) then
-      phi % a(c1) = phi % a(c1) - v_flux(s) * phi_f * coef(c1)
-      phi % a(c2) = phi % a(c2) + v_flux(s) * phi_f * coef(c2)
+      advect(c1) = advect(c1) - v_flux(s) * phif * coef(c1)
+      advect(c2) = advect(c2) + v_flux(s) * phif * coef(c2)
     else
-      phi % a(c1) = phi % a(c1) - v_flux(s) * phi_f * coef(c1)
+      advect(c1) = advect(c1) - v_flux(s) * phif * coef(c1)
     end if
 
-    ! Store upwinded part of the advection term in "c"
+    ! Store upwinded part of the advection term
     if(v_flux(s) .lt. 0) then   ! from c2 to c1
-      phi % c(c1) = phi % c(c1) - v_flux(s) * phi % n(c2) * coef(c1)
+      upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c2) * coef(c1)
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2) + v_flux(s) * phi % n(c2) * coef(c2)
+        upwind(c2) = upwind(c2) + v_flux(s) * phi % n(c2) * coef(c2)
       end if
     else
-      phi % c(c1) = phi % c(c1) - v_flux(s) * phi % n(c1) * coef(c1)
+      upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c1) * coef(c1)
       if(c2 > 0) then
-        phi % c(c2) = phi % c(c2) + v_flux(s) * phi % n(c1) * coef(c2)
+        upwind(c2) = upwind(c2) + v_flux(s) * phi % n(c1) * coef(c2)
       end if
     end if
 
@@ -79,8 +80,9 @@
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
   do c = 1, Grid % n_cells
-    b(c) = b(c) + phi % a(c) - phi % c(c)
-    phi % c(c) = 0.0                       ! set it back to zero
+    b(c) = b(c) + advect(c) - upwind(c)
   end do
+
+  call Work % Disconnect_Real_Cell(phi_min, phi_max, advect, upwind)
 
   end subroutine

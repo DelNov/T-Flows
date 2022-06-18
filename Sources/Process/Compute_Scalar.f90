@@ -29,7 +29,7 @@
   real                       :: dif_eff, f_ex, f_im
   real                       :: phi_stress, q_exp
   real                       :: phix_f, phiy_f, phiz_f
-  real, contiguous,  pointer :: q_turb(:)
+  real, contiguous,  pointer :: q_turb(:), cross(:)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -44,7 +44,7 @@
 
   call Cpu_Timer % Start('Compute_Scalars (without solvers)')
 
-  call Work % Connect_Real_Cell(q_turb)
+  call Work % Connect_Real_Cell(q_turb, cross)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -58,9 +58,8 @@
   call User_Mod_Beginning_Of_Compute_Scalar(Flow, Turb, Vof, Sol,  &
                                             curr_dt, ini, sc)
 
-  ! Initialize advection and cross diffusion sources, matrix and right hand side
-  phi % a(:) = 0.0
-  phi % c(:) = 0.0
+  ! Initialize cross diffusion sources, matrix and right hand side
+  cross(:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 
@@ -132,9 +131,9 @@
     a21 = a21  + max(v_flux % n(s), 0.0) * Flow % density(c2)
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + f_ex - f_im
+    cross(c1) = cross(c1) + f_ex - f_im
     if(c2 .gt. 0) then
-      phi % c(c2) = phi % c(c2) - f_ex + f_im
+      cross(c2) = cross(c2) - f_ex + f_im
     end if
 
     ! Put the influence of turbulent scalar fluxes explicitly in the system
@@ -175,7 +174,7 @@
   do c = 1, Grid % n_cells
 
     ! Total explicit heat flux
-    q_exp = phi % c(c) + q_turb(c)
+    q_exp = cross(c) + q_turb(c)
 
     if(q_exp >= 0) then
       b(c)  = b(c) + q_exp
@@ -236,7 +235,7 @@
   ! User function
   call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, curr_dt, ini, sc)
 
-  call Work % Disconnect_Real_Cell(q_turb)
+  call Work % Disconnect_Real_Cell(q_turb, cross)
 
   call Cpu_Timer % Stop('Compute_Scalars (without solvers)')
 

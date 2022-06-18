@@ -2,6 +2,8 @@
   subroutine Numerics_Mod_Advection_Scheme(phi_f,                &
                                            s,                    &
                                            phi,                  &
+                                           phi_min,              &
+                                           phi_max,              &
                                            flux)
 !------------------------------------------------------------------------------!
 !   Computes the value at the cell face using different convective  schemes.   !
@@ -13,6 +15,10 @@
   real           :: phi_f, phi_f_c, phi_f_u
   integer        :: s
   type(Var_Type) :: phi
+  real           :: phi_min(-phi % pnt_grid % n_bnd_cells:  &
+                             phi % pnt_grid % n_cells)
+  real           :: phi_max(-phi % pnt_grid % n_bnd_cells:  &
+                             phi % pnt_grid % n_cells)
   real           :: flux(phi % pnt_grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -71,7 +77,7 @@
                                    + phi % z(c)*Grid % dz(s) )
   end if
 
-  phi_u = max( phi % min(c), min(phi_star, phi % max(c)) )
+  phi_u = max( phi_min(c), min(phi_star, phi_max(c)) )
 
   rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-16 )
 

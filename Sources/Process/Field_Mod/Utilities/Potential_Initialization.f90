@@ -17,13 +17,13 @@
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
   real, allocatable          :: store(:)
-  real, contiguous,  pointer :: log_dist(:)
+  real, contiguous,  pointer :: log_dist(:), cross(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NDT = 24       ! number of false time steps
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
 
-  call Work % Connect_Real_Cell(log_dist)
+  call Work % Connect_Real_Cell(log_dist, cross)
 
   if(this_proc < 2) then
     print '(a)',      ' # Computing potential to initialize velocity field ...'
@@ -47,7 +47,8 @@
   !                                      !
   !--------------------------------------!
 
-  ! Initialize matrix and right hand side
+  ! Initialize cross diffusion term, matrix and right hand side
+  cross  (:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 
@@ -155,9 +156,9 @@
              + phi_z_f * Grid % dz(s)) * A % fc(s)
 
       ! Cross diffusion part
-      phi % c(c1) = phi % c(c1) + f_ex - f_im
+      cross(c1) = cross(c1) + f_ex - f_im
       if(c2  > 0) then
-        phi % c(c2) = phi % c(c2) - f_ex + f_im
+        cross(c2) = cross(c2) - f_ex + f_im
       end if
 
       ! Fill the system matrix
@@ -185,7 +186,7 @@
     ! field, particularly if Grid featured concave cells near edges)
     if(.not. Grid % polyhedral) then
       do c = 1, Grid % n_cells
-        b(c) = b(c) + phi % c(c)
+        b(c) = b(c) + cross(c)
       end do
 
       ! Fix negative sources
@@ -238,7 +239,7 @@
 
     ! Re-initialize cross diffusion terms (for the next time step)
     do c = 1, Grid % n_cells
-      phi % c(c) = 0.0
+      cross(c) = 0.0
     end do
 
   end do
@@ -324,6 +325,6 @@
     w % oo(c) = w % n(c)
   end do
 
-  call Work % Disconnect_Real_Cell(log_dist)
+  call Work % Disconnect_Real_Cell(log_dist, cross)
 
   end subroutine

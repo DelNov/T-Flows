@@ -24,7 +24,7 @@
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff, dt
   real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, q_exp
-  real, contiguous,  pointer :: cap_dens(:), q_int(:), q_turb(:)
+  real, contiguous,  pointer :: cap_dens(:), q_int(:), q_turb(:), cross(:)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -63,7 +63,7 @@
 
   call Cpu_Timer % Start('Compute_Energy (without solvers)')
 
-  call Work % Connect_Real_Cell(cap_dens, q_int, q_turb)
+  call Work % Connect_Real_Cell(cap_dens, q_int, q_turb, cross)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -76,9 +76,8 @@
   ! User function
   call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
 
-  ! Initialize advection and cross diffusion sources, matrix and right hand side
-  t % a  (:) = 0.0
-  t % c  (:) = 0.0
+  ! Initialize cross diffusion sources, matrix and right hand side
+  cross  (:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 
@@ -189,9 +188,9 @@
     end if
 
     ! Cross diffusion part
-    t % c(c1) = t % c(c1) + f_ex - f_im
+    cross(c1) = cross(c1) + f_ex - f_im
     if(c2 > 0) then
-      t % c(c2) = t % c(c2) - f_ex + f_im
+      cross(c2) = cross(c2) - f_ex + f_im
     end if
 
     ! Put the influence of turbulent heat fluxes explicitly in the system
@@ -231,7 +230,7 @@
   do c = 1, Grid % n_cells
 
     ! Total explicit heat flux
-    q_exp = t % c(c) + q_turb(c) + q_int(c)
+    q_exp = cross(c) + q_turb(c) + q_int(c)
 
     if(q_exp >= 0) then
       b(c)  = b(c) + q_exp
@@ -305,7 +304,7 @@
   ! User function
   call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
 
-  call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb)
+  call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb, cross)
 
   call Cpu_Timer % Stop('Compute_Energy (without solvers)')
 

@@ -19,9 +19,7 @@
                                 ! very short (4, defined in Const_Mod)
     real, allocatable :: n(:)              ! new value
     real, allocatable :: o(:), oo(:)       ! old and older then old
-    real, allocatable :: a(:)              ! advection fluxes
     real, allocatable :: b(:)              ! boundary value
-    real, allocatable :: c(:)              ! cross-difusion fluxes
     real, allocatable :: x(:), y(:), z(:)  ! gradient components
     real, allocatable :: q(:)              ! flux of the variable
     real              :: sigma             ! sigma
@@ -44,8 +42,6 @@
     real              :: urf             ! under-relaxation factor
     integer           :: mniter          ! max number of iterations for variable
     integer           :: eniter          ! executed number of iterations for var
-    real, allocatable :: max(:)          ! max and min around a face ...
-    real, allocatable :: min(:)          ! important for advection schemes
   end type
 
   contains

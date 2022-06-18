@@ -19,6 +19,7 @@
   real                       :: f_ex, f_im
   real                       :: a0, a12, a21
   real                       :: phi_x_f, phi_y_f, phi_z_f
+  real, contiguous,  pointer :: cross(:)
 !==============================================================================!
 !                                                                              !
 !   The form of equations which are solved:                                    !
@@ -39,12 +40,15 @@
 !     Lsc            [m]                                                       !
 !------------------------------------------------------------------------------!
 
+  call Work % Connect_Real_Cell(cross)
+
   ! Take aliases
   Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   call Sol % Alias_Native(A, b)
 
-  ! Initialize matrix and right hand side
+  ! Initialize cross diffusion term, matrix and right hand side
+  cross  (:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 
@@ -58,7 +62,7 @@
 
   ! New values
   do c = 1, Grid % n_cells
-    phi % c(c) = 0.0
+    cross(c) = 0.0
   end do
 
   ! Gradients
@@ -95,9 +99,9 @@
            + phi_z_f * Grid % dz(s)) * a0
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + f_ex - f_im
+    cross(c1) = cross(c1) + f_ex - f_im
     if(c2  > 0) then
-      phi % c(c2) = phi % c(c2) - f_ex + f_im
+      cross(c2) = cross(c2) - f_ex + f_im
     end if
 
     ! Calculate the coefficients for the sysytem matrix
@@ -135,7 +139,7 @@
 
   ! Cross diffusion terms are treated explicity
   do c = 1, Grid % n_cells
-    b(c) = b(c) + phi % c(c)
+    b(c) = b(c) + cross(c)
   end do
 
   !-------------------------------------!
@@ -182,5 +186,7 @@
   end if
 
   call Flow % Grad_Variable(phi)
+
+  call Work % Disconnect_Real_Cell(cross)
 
   end subroutine

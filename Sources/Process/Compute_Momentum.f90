@@ -32,6 +32,7 @@
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: grav_i, p_drop_i
   real                       :: ui_si, ui_di
+  real, contiguous,  pointer :: cross(:)
 !------------------------------------------------------------------------------!
 !                                                                              !
 !  Stress tensor on the face s:                                                !
@@ -83,6 +84,8 @@
 !==============================================================================!
 
   call Cpu_Timer % Start('Compute_Momentum (without solvers)')
+
+  call Work % Connect_Real_Cell(cross)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -156,9 +159,8 @@
       st_i     => Vof % surf_fz
     end if
 
-    ! Initialize advection, cross diffusion, forces, matrix and right hand side
-    ui % a (:) = 0.0
-    ui % c (:) = 0.0
+    ! Initialize cross diffusion, forces, matrix and right hand side
+    cross (:) = 0.0
     fi     (:) = 0.0  ! all "internal" forces acting on this component
     f_stress   = 0.0  ! this is presumably not needed
     M % val(:) = 0.0
@@ -231,9 +233,9 @@
       f_im = ui_di * m0
 
       ! Cross diffusion part
-      ui % c(c1) = ui % c(c1) + f_ex - f_im + f_stress * Flow % density(c1)
+      cross(c1) = cross(c1) + f_ex - f_im + f_stress * Flow % density(c1)
       if(c2  > 0) then
-        ui % c(c2) = ui % c(c2) - f_ex + f_im - f_stress * Flow % density(c2)
+        cross(c2) = cross(c2) - f_ex + f_im - f_stress * Flow % density(c2)
       end if
 
       ! Compute the coefficients for the sysytem matrix
@@ -269,7 +271,7 @@
     ! (Shouldn't theese, in an ideal world,
     !  also be treated in Rhie and Chow?)
     do c = 1, Grid % n_cells
-      fi(c) = fi(c) + ui % c(c)
+      fi(c) = fi(c) + cross(c)
     end do
 
     !--------------------!
@@ -392,6 +394,8 @@
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol, curr_dt, ini)
+
+  call Work % Disconnect_Real_Cell(cross)
 
   call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
 

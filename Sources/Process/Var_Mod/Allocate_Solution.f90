@@ -26,12 +26,6 @@
   allocate (phi % o (-Grid % n_bnd_cells:Grid % n_cells));  phi % o  = 0.
   allocate (phi % oo(-Grid % n_bnd_cells:Grid % n_cells));  phi % oo = 0.
 
-  ! Advection terms
-  allocate (phi % a(Grid % n_cells));  phi % a = 0.
-
-  ! Cross diffusion terms
-  allocate (phi % c(Grid % n_cells));  phi % c = 0.
-
   ! Variable's boundary value
   allocate (phi % b(-Grid % n_bnd_cells:Grid % n_cells));  phi % b = 0.
 
@@ -50,9 +44,5 @@
   allocate (phi % x(-Grid % n_bnd_cells:Grid % n_cells));  phi % x = 0.0
   allocate (phi % y(-Grid % n_bnd_cells:Grid % n_cells));  phi % y = 0.0
   allocate (phi % z(-Grid % n_bnd_cells:Grid % n_cells));  phi % z = 0.0
-
-  ! Min and max
-  allocate (phi % min(-Grid % n_bnd_cells:Grid % n_cells));  phi % min = 0.0
-  allocate (phi % max(-Grid % n_bnd_cells:Grid % n_cells));  phi % max = 0.0
 
   end subroutine

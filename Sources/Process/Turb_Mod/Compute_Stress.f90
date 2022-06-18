@@ -27,7 +27,7 @@
   real                       :: vis_t_f
   real                       :: dt
   real                       :: visc_f
-  real, contiguous,  pointer :: phi_x(:), phi_y(:), phi_z(:)
+  real, contiguous,  pointer :: phi_x(:), phi_y(:), phi_z(:), cross(:)
   real, contiguous,  pointer :: u1uj_phij(:),   u2uj_phij(:),   u3uj_phij(:)
   real, contiguous,  pointer :: u1uj_phij_x(:), u2uj_phij_y(:), u3uj_phij_z(:)
 !==============================================================================!
@@ -44,7 +44,7 @@
 
   call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
 
-  call Work % Connect_Real_Cell(phi_x, phi_y, phi_z,              &
+  call Work % Connect_Real_Cell(phi_x, phi_y, phi_z, cross,       &
                                 u1uj_phij, u2uj_phij, u3uj_phij,  &
                                 u1uj_phij_x, u2uj_phij_y, u3uj_phij_z)
 
@@ -61,9 +61,8 @@
   call Turb % Alias_Heat_Fluxes (ut, vt, wt)
   call Sol % Alias_Native       (A, b)
 
-  ! Initialize advection and cross diffusion sources, matrix and right hand side
-  phi % a(:) = 0.0
-  phi % c(:) = 0.0
+  ! Initialize cross diffusion sources, matrix and right hand side
+  cross  (:) = 0.0
   A % val(:) = 0.0
   b      (:) = 0.0
 
@@ -137,9 +136,9 @@
           +phiz_f*Grid % dz(s))*a0
 
     ! Cross diffusion part
-    phi % c(c1) = phi % c(c1) + f_ex - f_im
+    cross(c1) = cross(c1) + f_ex - f_im
     if(c2  > 0) then
-      phi % c(c2) = phi % c(c2) - f_ex + f_im
+      cross(c2) = cross(c2) - f_ex + f_im
     end if
 
     ! Compute coefficients for the sysytem matrix
@@ -279,7 +278,7 @@
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
   do c = 1, Grid % n_cells
-    b(c) = b(c) + phi % c(c)
+    b(c) = b(c) + cross(c)
   end do
 
   !--------------------!
@@ -365,7 +364,7 @@
 
   call Flow % Grad_Variable(phi)
 
-  call Work % Disconnect_Real_Cell(phi_x, phi_y, phi_z,              &
+  call Work % Disconnect_Real_Cell(phi_x, phi_y, phi_z, cross,       &
                                    u1uj_phij, u2uj_phij, u3uj_phij,  &
                                    u1uj_phij_x, u2uj_phij_y, u3uj_phij_z)
 
