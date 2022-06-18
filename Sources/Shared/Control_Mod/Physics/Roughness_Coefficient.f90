@@ -3,11 +3,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
+  real, intent(out) :: val(:)
   logical, optional :: verbose
+!-----------------------------------[Locals]-----------------------------------!
+  real :: con
 !==============================================================================!
 
   call Control_Mod_Read_Real_Item('ROUGHNESS_COEFFICIENT', 0.0,  &
-                                   val, verbose)
+                                   con, verbose)
+
+  ! Set the same value everywhere
+  val(:) = con
 
   end subroutine

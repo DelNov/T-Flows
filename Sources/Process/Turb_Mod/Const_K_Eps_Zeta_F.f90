@@ -30,9 +30,6 @@
   Turb % zeta % sigma = 1.2
   Turb % t2   % sigma = 1.0
 
-  ! Roughness coefficient
-  Turb % z_o = 0.0
-
   ! Constants for buoyancy wall function
   c_mu_theta  = 0.1225
   c_mu_theta5 = 0.35

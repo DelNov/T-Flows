@@ -90,11 +90,7 @@
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
         ! Set up roughness coefficient 
-        z_o = Turb % Roughness_Coefficient(Turb % z_o_f(c1))
-        if(Turb % rough_walls) then
-          z_o = max(Grid % wall_dist(c1)   &
-              / (e_log * max(Turb % y_plus(c1), 1.0)), z_o)
-        end if
+        z_o = Turb % Roughness_Coefficient(c1, c2)
 
         ! Kinematic viscosities
         kin_vis = Flow % viscosity(c1) / Flow % density(c1)

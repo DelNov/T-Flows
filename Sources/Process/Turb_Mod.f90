@@ -40,6 +40,9 @@
     type(Var_Type) :: uv, uw, vw
     type(Var_Type) :: ut, vt, wt, t2
 
+    ! Hydraulic roughness
+    real, allocatable :: z_o(:)
+
     !----------------!
     !   Statistics   !
     !----------------!
@@ -105,10 +108,6 @@
     ! Rough walls
     logical :: rough_walls
 
-    ! Hydraulic roughness (constant and variable)
-    real              :: z_o
-    real, allocatable :: z_o_f(:)
-
     ! Various cell sizes for Spalart-Allmaras and DES models
     real, allocatable :: h_max(:)
     real, allocatable :: h_min(:)
@@ -120,9 +119,6 @@
 
     ! For LES you need to know nearest wall cell
     integer, allocatable :: nearest_wall_cell(:)
-
-    ! I.D. of different zones for roughness interpolation
-    real, allocatable :: id_zone(:)
 
     ! Variable holding the turbulence model; its variant and statistics
     integer :: model

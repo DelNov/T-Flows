@@ -18,6 +18,7 @@
   type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
+  real,            pointer :: z_o(:)
   integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s,fu
   character(SL)            :: name_prof(128)
   real                     :: wi, dist_min, x, y, z, xp, dist
@@ -44,15 +45,17 @@
   scalar => Flow % scalar
   vis    => Turb % vis
   t2     => Turb % t2
+  z_o    => Turb % z_o
   fun    => Vof % fun
 
   call Flow % Alias_Momentum    (u, v, w)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
 
-  !-------------------------!
-  !   Read wall roughness   !
-  !-------------------------!
+  !-------------------------------------------------------------------!
+  !   Read wall roughness, if specified as a constant for all walls   !
+  !   (If it is not specified in the control file, it will be zero)   !
+  !-------------------------------------------------------------------!
   call Control_Mod_Roughness_Coefficient(Turb % z_o)
 
   !----------------------------------------------------------------!
@@ -239,11 +242,12 @@
         do c = -1, -Grid % n_bnd_cells, -1
           if(Grid % bnd_cond % color(c) .eq. bc) then
 
-            ! For velocity and pressure
-            i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = vals(i)
-            i = Key_Ind('V', keys, nks); if(i > 0) v % b(c) = vals(i)
-            i = Key_Ind('W', keys, nks); if(i > 0) w % b(c) = vals(i)
-            i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = vals(i)
+            ! For velocity, pressure and wall roughness
+            i = Key_Ind('U',   keys, nks); if(i > 0) u % b(c) = vals(i)
+            i = Key_Ind('V',   keys, nks); if(i > 0) v % b(c) = vals(i)
+            i = Key_Ind('W',   keys, nks); if(i > 0) w % b(c) = vals(i)
+            i = Key_Ind('P',   keys, nks); if(i > 0) p % b(c) = vals(i)
+            i = Key_Ind('Z_O', keys, nks); if(i > 0) z_o  (c) = vals(i)
 
             ! Temperature
             if(Flow % heat_transfer) then
@@ -420,11 +424,12 @@
 
               end do
 
-              ! For velocity and pressure
-              i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = prof(k,i)
-              i = Key_Ind('V', keys, nks); if(i > 0) v % b(c) = prof(k,i)
-              i = Key_Ind('W', keys, nks); if(i > 0) w % b(c) = prof(k,i)
-              i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = prof(k,i)
+              ! For velocity, pressure and wall roughness
+              i = Key_Ind('U',   keys, nks); if(i > 0) u % b(c) = prof(k,i)
+              i = Key_Ind('V',   keys, nks); if(i > 0) v % b(c) = prof(k,i)
+              i = Key_Ind('W',   keys, nks); if(i > 0) w % b(c) = prof(k,i)
+              i = Key_Ind('P',   keys, nks); if(i > 0) p % b(c) = prof(k,i)
+              i = Key_Ind('Z_O', keys, nks); if(i > 0) z_o  (c) = prof(k,i)
 
               ! For temperature
               if(Flow % heat_transfer) then
@@ -632,7 +637,7 @@
                 ! Interpolate the profiles
                 if(here) then
 
-                  ! For velocity and pressure
+                  ! For velocity, pressure and wall roughness
                   i = Key_Ind('U',keys,nks)
                   if(i > 0) u % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('V',keys,nks)
@@ -641,6 +646,8 @@
                   if(i > 0) w % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
                   i = Key_Ind('P',keys,nks)
                   if(i > 0) p % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  i = Key_Ind('Z_O',keys,nks)
+                  if(i > 0) z_o  (c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
 
                   ! For temperature
                   if(Flow % heat_transfer) then

@@ -524,9 +524,9 @@
                                     f8, f9, data_offset, run)
 
     if(Turb % rough_walls) then
-      call Results % Save_Scalar_Real("Roughness Coefficient z_o",  &
-                                      plot_inside,                  &
-                                      Turb % z_o_f(c_f:c_l),        &
+      call Results % Save_Scalar_Real("Roughness Coefficient z_o [1]",  &
+                                      plot_inside,                      &
+                                      Turb % z_o(c_f:c_l),              &
                                       f8, f9, data_offset, run)
 
     end if
@@ -952,23 +952,6 @@
                                         plot_inside,                &
                                         var_ins(c_f:c_l),           &
                                         f8, f9, data_offset, run)
-
-        if(Turb % rough_walls) then
-          ! Copy internal values to boundary
-          var_ins(:) = 0.0
-          do s = 1, Grid % n_faces
-            c1 = Grid % faces_c(1,s)
-            c2 = Grid % faces_c(2,s)
-            if(c2 < 0) then
-              var_ins(c2) = Turb % id_zone(c1)
-            end if
-          end do
-
-          call Results % Save_Scalar_Real("Zone [1]",                &
-                                          plot_inside,               &
-                                          var_ins(c_f:c_l),          &
-                                          f8, f9, data_offset, run)
-        end if
 
         do sc = 1, Flow % n_scalars
           phi => Flow % scalar(sc)

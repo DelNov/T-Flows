@@ -1,18 +1,26 @@
 !==============================================================================!
-  real function Roughness_Coefficient(Turb, z_o_function)
+  real function Roughness_Coefficient(Turb, c1, c2)
 !------------------------------------------------------------------------------!
-!   Set lower limit to roughness coefficient based on wall distance.           !
+!   Set up roughness coefficient                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type) :: Turb
-  real             :: z_o_function
+  class(Turb_Type)    :: Turb
+  integer, intent(in) :: c1, c2
+!-----------------------------------[Locals]-----------------------------------!
+  real :: z_o
 !==============================================================================!
 
-  Roughness_Coefficient = Turb % z_o
+  ! Take the value specified in control file
+  z_o = Turb % z_o(c2)
 
-  if(z_o_function > -TINY) then
-    Roughness_Coefficient = z_o_function
+  ! Set lower limit to roughness coefficient based on wall distance
+  if(Turb % rough_walls) then
+    z_o = max(Turb % pnt_grid % wall_dist(c1)  &
+        / (e_log * max(Turb % y_plus(c1), 1.0)), z_o)
   end if
+
+  ! Specify the return value
+  Roughness_Coefficient = z_o
 
   end function

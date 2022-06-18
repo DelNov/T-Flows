@@ -134,12 +134,7 @@
   !   Roughness  !
   !              !
   !--------------!
-  if(Tur % rough_walls) then
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'id_zone',  &
-                                    Tur % id_zone)
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc,'z_o_f',    &
-                                    Tur % z_o_f)
-  end if
+  call Backup_Mod_Write_Cell_Real(Grid, d, vc, 'z_o', Tur % z_o)
 
   !--------------!
   !              !
