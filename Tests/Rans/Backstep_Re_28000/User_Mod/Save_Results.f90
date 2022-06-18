@@ -2,7 +2,7 @@ include '../User_Mod/Backstep_Profiles.f90'
 include '../User_Mod/Backstep_Cf_St.f90'
 
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
 !------------------------------------------------------------------------------!
 !   Calls User_Backstep_Profiles and User_Backstep_Cf_St functions.            !
 !------------------------------------------------------------------------------!
@@ -13,6 +13,7 @@ include '../User_Mod/Backstep_Cf_St.f90'
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: ts
+  integer, optional        :: domain
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
