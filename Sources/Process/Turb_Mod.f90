@@ -193,7 +193,6 @@
       procedure          :: Prandtl_Turb
 
       procedure :: Find_Nearest_Wall_Cell
-      procedure :: Y_Plus_Low_Re
       procedure :: Y_Plus_Rough_Walls
       procedure :: Tau_Wall_Log_Law
       procedure :: U_Plus_Log_Law
@@ -330,7 +329,6 @@
   include 'Turb_Mod/Prandtl_Turb.f90'
 
   include 'Turb_Mod/Find_Nearest_Wall_Cell.f90'
-  include 'Turb_Mod/Y_Plus_Low_Re.f90'
   include 'Turb_Mod/Y_Plus_Rough_Walls.f90'
 
   include 'Turb_Mod/Tau_Wall_Log_Law.f90'
