@@ -106,9 +106,11 @@
               kin_vis = visc_const / dens_const
               u_tan = Flow % U_Tan(s)
               u_tau = c_mu25 * sqrt(Turb % kin % n(c1))
-              Turb % y_plus(c1) = Turb % Y_Plus_Low_Re(u_tau,                 &
-                                                       Grid % wall_dist(c1),  &
-                                                       kin_vis)
+              Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(           &
+                                                u_tau,                 &
+                                                Grid % wall_dist(c1),  &
+                                                kin_vis,               &
+                                                0.0)
               tau_wall = dens_const * kappa * u_tau * u_tan    &
                        / log(e_log*max(Turb % y_plus(c1), 1.05))
 
