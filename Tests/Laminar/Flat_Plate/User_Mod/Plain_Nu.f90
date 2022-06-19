@@ -8,8 +8,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: Turb
-!----------------------------------[Calling]-----------------------------------!
-  real :: Y_Plus_Low_Re
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
