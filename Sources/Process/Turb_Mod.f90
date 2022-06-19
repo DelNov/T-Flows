@@ -40,9 +40,6 @@
     type(Var_Type) :: uv, uw, vw
     type(Var_Type) :: ut, vt, wt, t2
 
-    ! Hydraulic roughness
-    real, allocatable :: z_o(:)
-
     !----------------!
     !   Statistics   !
     !----------------!
@@ -105,8 +102,9 @@
     real, allocatable :: c_dyn(:)
     real, allocatable :: wale_v(:)
 
-    ! Rough walls
-    logical :: rough_walls
+    ! Are walls treated as rough, and array for hydraulic roughness
+    logical           :: rough_walls
+    real, allocatable :: z_o(:)
 
     ! Various cell sizes for Spalart-Allmaras and DES models
     real, allocatable :: h_max(:)

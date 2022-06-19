@@ -156,13 +156,6 @@
 
   !--------------!
   !              !
-  !   Roughness  !
-  !              !
-  !--------------!
-  call Backup_Mod_Read_Cell_Real(Grid, d, vc, 'z_o', Tur % z_o)
-
-  !--------------!
-  !              !
   !  Multiphase  !
   !              !
   !--------------!
@@ -259,6 +252,13 @@
     if(Fld % heat_transfer) then
       call Backup_Mod_Read_Cell_Real(Grid, d, vc, 'con_w', Tur % con_w)
     end if
+  end if
+
+  !--------------!
+  !   Roughness  !
+  !--------------!
+  if(Tur % rough_walls) then
+    call Backup_Mod_Read_Cell_Real(Grid, d, vc, 'z_o', Tur % z_o)
   end if
 
   !------------------!
