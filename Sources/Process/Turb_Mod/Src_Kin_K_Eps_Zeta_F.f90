@@ -13,7 +13,7 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
   implicit none
-!--------------------------------[Arguments]-----------------------------------!
+!---------------------------------[Arguments]----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
@@ -120,18 +120,22 @@
     end do
   end if
 
+  !-----------------------------------------------!
+  !  Compute the sources in the near wall cells   !
+  !-----------------------------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      ! Kinematic viscosities
+
+      ! Kinematic viscosity
       kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
+      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
-        ! Set up roughness coefficient 
+        ! Set up roughness coefficient
         z_o = Turb % Roughness_Coefficient(c1, c2)
 
         ! Compute tangential velocity component
@@ -139,10 +143,10 @@
 
         u_tau = c_mu25 * sqrt(kin % n(c1))
 
-        Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(   &
-                                   u_tau,                &
-                                   Grid % wall_dist(c1), &
-                                   kin_vis,              &
+        Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
+                                   u_tau,                 &
+                                   Grid % wall_dist(c1),  &
+                                   kin_vis,               &
                                    z_o)
 
         Turb % tau_wall(c1) = Turb % Tau_Wall_Log_Law(              &
@@ -163,8 +167,9 @@
         Turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int   &
                          + exp(-1.0 / ebf) * p_kin_wf
 
-        b(c1) = b(c1) + (Turb % p_kin(c1)  &
-              - Turb % vis_t(c1) * Flow % shear(c1)**2) * Grid % vol(c1)
+        b(c1) = b(c1)                                                        &
+              + (Turb % p_kin(c1) - Turb % vis_t(c1) * Flow % shear(c1)**2)  &
+              * Grid % vol(c1)
 
         ! Implementation of wall function for buoyancy-driven flows
         if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
@@ -193,7 +198,7 @@
           wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
                      + wt_log_law * exp(-1.0 / ebf)
 
-          if(Grid % Bnd_Cond_Type(c2) .eq. WALL)             &
+          if(Grid % Bnd_Cond_Type(c2) .eq. WALL)                    &
             t % q(c2) = Turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
@@ -203,8 +208,8 @@
                                           + Flow % grav_z)                    &
                       * sqrt(abs(  t % q(c2)                                  &
                                  / (Flow % density(c1)*Flow % capacity(c1)))  &
-                             * c_mu_theta5                                    &
-                             * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+                      * c_mu_theta5                                           &
+                      * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - Turb % g_buoy(c1) * Grid % vol(c1)
@@ -215,10 +220,9 @@
           ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + Turb % g_buoy(c1) * Grid % vol(c1)
 
-        end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
-
-      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
-    end if    ! c2 < 0
+        end if  ! Flow % buoyancy .eq. THERMALLY_DRIVEN
+      end if    ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
+    end if      ! c2 < 0
   end do
 
   end subroutine

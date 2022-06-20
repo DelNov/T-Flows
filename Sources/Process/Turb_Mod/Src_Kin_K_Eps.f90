@@ -25,9 +25,9 @@
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
-!   dissipation   eps % n  [m^2/s^3]   | Turb. visc.     vis_t     [kg/(m*s)]  !
+!   dissipation   eps % n  [m^2/s^3]   | turb. visc.     vis_t     [kg/(m*s)]  !
 !   wall shear s. tau_wall [kg/(m*s^2)]| dyn visc.       viscosity [kg/(m*s)]  !
-!   density       density  [kg/m^3]    | Turb. kin en.   kin % n   [m^2/s^2]   !
+!   density       density  [kg/m^3]    | turb. kin en.   kin % n   [m^2/s^2]   !
 !   cell volume   vol      [m^3]       | length          lf        [m]         !
 !   left hand s.  A        [kg/s]      | right hand s.   b         [kg*m^2/s^3]!
 !------------------------------------------------------------------------------!
@@ -77,7 +77,10 @@
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
+
+      ! Kinematic viscosity
       kin_vis = Flow % viscosity(c1) / Flow % density(c1)
+
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
@@ -103,18 +106,19 @@
                                               Turb % y_plus(c1),    &
                                               z_o)
 
+        ebf = Turb % Ebf_Momentum(c1)
+
         p_kin_wf  = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
                   / ((Grid % wall_dist(c1) + z_o) * kappa)
 
         p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 
-        Turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int   &   
+        Turb % p_kin(c1) = exp(-1.0 * ebf) * p_kin_int   &
                          + exp(-1.0 / ebf) * p_kin_wf
 
         b(c1) = b(c1)                                                        &
               + (Turb % p_kin(c1) - Turb % vis_t(c1) * Flow % shear(c1)**2)  &
               * Grid % vol(c1)
-
 
         ! Implementation of wall function for buoyancy-driven flows
         if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
@@ -158,13 +162,14 @@
 
           ! Clean up b(c) from old values of g_buoy
           b(c1)      = b(c1) - Turb % g_buoy(c1) * Grid % vol(c1)
+
           Turb % g_buoy(c1) = Turb % g_buoy(c1) * exp(-1.0 * ebf) &
                             + g_buoy_wall * exp(-1.0 / ebf)
 
           ! Add new values of g_buoy based on wall function approach
           b(c1)      = b(c1) + Turb % g_buoy(c1) * Grid % vol(c1)
 
-        end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
+        end if  ! Flow % buoyancy .eq. THERMALLY_DRIVEN
       end if    ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
     end if      ! c2 < 0
   end do

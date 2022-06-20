@@ -86,6 +86,7 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
+      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
       if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
           Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
 
@@ -108,9 +109,8 @@
                                               u_tau,                 &
                                               u_tan,                 &
                                               Grid % wall_dist(c1),  &
-                                              turb % y_plus(c1),     &
+                                              Turb % y_plus(c1),     &
                                               z_o)
-
 
         u_tau_new = sqrt(Turb % tau_wall(c1) / Flow % density(c1))
 
@@ -157,8 +157,8 @@
           eps % n(c2) = 2.0 * kin_vis * kin % n(c1)  &
                       / Grid % wall_dist(c1)**2
         end if  ! y_plus(c1) < 3
-      end if     ! wall or wall_flux
-    end if       ! c2 < 0
+      end if    ! wall or wall_flux
+    end if      ! c2 < 0
   end do
 
   end subroutine

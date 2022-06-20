@@ -5,7 +5,7 @@
 !   and imposes boundary condition                                             !
 !------------------------------------------------------------------------------!
   implicit none
-!--------------------------------[Arguments]-----------------------------------!
+!---------------------------------[Arguments]----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
@@ -102,12 +102,12 @@
                                    z_o)
 
         Turb % tau_wall(c1) = Turb % Tau_Wall_Log_Law(               &
-                                               Flow % density(c1),   &
-                                               u_tau,                &
-                                               u_tan,                &
-                                               Grid % wall_dist(c1), &
-                                               Turb % y_plus(c1),    &
-                                               z_o)
+                                              Flow % density(c1),    &
+                                              u_tau,                 &
+                                              u_tan,                 &
+                                              Grid % wall_dist(c1),  &
+                                              Turb % y_plus(c1),     &
+                                              z_o)
 
         u_tau_new = sqrt(Turb % tau_wall(c1) / Flow % density(c1))
 
@@ -117,7 +117,7 @@
                                    kin_vis,               &
                                    z_o)
 
-        eps_int = 2.0* kin_vis * kin % n(c1)  &
+        eps_int = 2.0 * kin_vis * kin % n(c1)  &
                 / Grid % wall_dist(c1)**2
 
         eps_wf  = c_mu75 * kin % n(c1)**1.5   &
@@ -125,13 +125,13 @@
 
         ebf = Turb % Ebf_Momentum(c1)
 
-        p_kin_wf  = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                / ((Grid % wall_dist(c1) + z_o) * kappa)
+        p_kin_wf = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
+                 / ((Grid % wall_dist(c1) + z_o) * kappa)
 
         p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 
         Turb % p_kin(c1) = p_kin_int * exp(-1.0 * ebf) + p_kin_wf  &
-                           * exp(-1.0 / ebf)
+                         * exp(-1.0 / ebf)
 
         fa = min(p_kin_wf * exp(-1.0 / ebf) / (Turb % p_kin(c1) + TINY), 1.0)
 
@@ -151,11 +151,11 @@
 
         else
 
-          eps % n(c2) = 2.0* kin_vis * kin % n(c1)  &
+          eps % n(c2) = 2.0 * kin_vis * kin % n(c1)  &
                       / Grid % wall_dist(c1)**2
         end if  ! y_plus(c1) < 3
-      end if      ! wall or wall_flux
-    end if        ! c2 < 0
+      end if    ! wall or wall_flux
+    end if      ! c2 < 0
   end do
 
   end subroutine
