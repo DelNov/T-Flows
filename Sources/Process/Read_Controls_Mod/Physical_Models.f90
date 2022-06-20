@@ -23,6 +23,13 @@
   ! Take aliases
   bulk => Flow % bulk
 
+  !--------------------------!
+  !                          !
+  !   Number of time steps   !
+  !                          !
+  !--------------------------!
+  call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS', 0, n_times, .false.)
+
   !-------------------------------------------!
   !                                           !
   !   Related to heat transfer and bouyancy   !
@@ -124,8 +131,6 @@
   call Control_Mod_Rough_Walls(Turb % rough_walls, .true.)
 
   ! Does the user want to gather statistics?
-  call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS',               &
-                                 0, n_times, .false.)
   call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
                                  HUGE_INT, n_stat, .false.)
 
