@@ -33,7 +33,6 @@
   allocate(Turb % y_plus  (-nb:nc));  Turb % y_plus   = 0.
 
   ! Hydraulic roughness
-  Turb % rough_walls = .false.
   allocate(Turb % z_o(-nb:nc)); Turb % z_o = 0.0
 
   !  Wall difussivity for user scalar
