@@ -435,10 +435,8 @@
   !
   ! Update on June 2, 2022: Unified all outlet boundaries into one
   ! to be able to tell PETSc if matrix for pressure is singular
-  Flow % has_outlet = .false.
-  if(n_pressure > 0) Flow % has_outlet = .true.
-  if(n_outflow  > 0) Flow % has_outlet = .true.
-  if(n_convect  > 0) Flow % has_outlet = .true.
+  Flow % has_pressure = .false.
+  if(n_pressure > 0) Flow % has_pressure = .true.
 
   !----------------------!
   !   Initializes time   !

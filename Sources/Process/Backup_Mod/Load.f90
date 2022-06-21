@@ -143,7 +143,7 @@
   !
   ! Update on June 2, 2022: Unified all outlet boundaries into one
   ! to be able to tell PETSc if matrix for pressure is singular
-  call Backup_Mod_Read_Log(Comm, d, vc, 'has_outlet', Fld % has_outlet)
+  call Backup_Mod_Read_Log(Comm, d, vc, 'has_pressure', Fld % has_pressure)
 
   !--------------!
   !              !

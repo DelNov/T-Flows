@@ -95,7 +95,7 @@
     !
     ! Update on June 2, 2022: Unified all outlet boundaries into one
     ! to be able to tell PETSc if matrix for pressure is singular
-    logical :: has_outlet
+    logical :: has_pressure
 
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !

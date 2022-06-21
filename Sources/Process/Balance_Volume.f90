@@ -120,9 +120,9 @@
         area_in = area_in + Grid % s(s)
       end if
 
-      if(Grid % Bnd_Cond_Type( c2) .eq. OUTFLOW  .or.  &
-         Grid % Bnd_Cond_Type( c2) .eq. CONVECT  .or.  &
-         Grid % Bnd_Cond_Type( c2) .eq. PRESSURE) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
         bulk % vol_out = bulk % vol_out + v_flux % n(s)
         area_out = area_out + Grid % s(s)
       end if
@@ -158,10 +158,10 @@
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
-      if(c2  < 0) then
-        if(Grid % Bnd_Cond_Type( c2) .eq. OUTFLOW  .or.  &
-           Grid % Bnd_Cond_Type( c2) .eq. CONVECT  .or.  &
-           Grid % Bnd_Cond_Type( c2) .eq. PRESSURE) then
+      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
 
           ! Update velocity components ...
           u % n(c2) = (bulk % vol_in + bulk % vol_src) / area_outflow  &
@@ -182,6 +182,9 @@
       end if
     end do
 
+    ! Holy mackrele: summ it up over all processors
+    call Comm_Mod_Global_Sum_Real(bulk % vol_out)
+
   !-------------------------------------------------!
   !   Something is coming out from real outflows,   !
   !   presumably not in the first iteration of      !
@@ -197,10 +200,10 @@
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
-      if(c2  < 0) then
-        if(Grid % Bnd_Cond_Type( c2) .eq. OUTFLOW  .or.  &
-           Grid % Bnd_Cond_Type( c2) .eq. CONVECT  .or.  &
-           Grid % Bnd_Cond_Type( c2) .eq. PRESSURE) then
+      if(c2 < 0) then
+        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
 
           ! Update velocity components ...
           u % n(c2) = u % n(c2) * fac + bulk % vol_src / area_out  &
@@ -221,6 +224,14 @@
       end if
     end do
 
+    ! Holy mackrele: summ it up over all processors
+    call Comm_Mod_Global_Sum_Real(bulk % vol_out)  ! not checked
+
   end if
+
+  ! You were modifying the velocity components -> refresh their buffers
+  call Grid % Exchange_Cells_Real(u % n)
+  call Grid % Exchange_Cells_Real(v % n)
+  call Grid % Exchange_Cells_Real(w % n)
 
   end subroutine

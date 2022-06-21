@@ -114,11 +114,7 @@
   !---------------------------------------!
   call Rhie_And_Chow(Flow, Vof, Sol)
 
-  !----------------------------------------------!
-  !   Update source term for pressure equation   !
-  !     and take care of the pressure matrix     !
-  !        close to outflow along the way        !
-  !----------------------------------------------!
+  b(:) = 0.0
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
@@ -147,49 +143,13 @@
   !-------------------------------------------------------------------------!
   call Vof % Mass_Transfer_Pressure_Source(b)
 
-  !----------------------------------------!
-  !   Balance the source over processors   !
-  !----------------------------------------!
-  ! Since the introduction of face-based body forces, a very slight
-  ! imbalance in pressure source can occur globally (over all processors)
-  ! and we are talking about the values of the order 1e-18 here.  This
-  ! happens because of the round-off errors associated with real arithmetics
-  ! performed in CPUs, meaning that: A + B = B + A + epsilon.  If forces
-  ! are computed over faces, they are slightly different in different
-  ! processors due to these round-off errors, although values in cells
-  ! surrounding them are the same after exchanging the buffers.  In order
-  ! to fix it, the balancing procedure which follows is introduced.
-  ! However, the fix should not be applied if domain has pressure outlet.
-  !
-  ! Update on July 17, 2021: I have some reservations about this part, since
-  ! there was another bug fix when computing fluxes in the meanwhile (check:
-  ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
-  ! bug when loading backup file (also check "Initialize_Variables" and 
-  ! "Backup_Mod/Load and Backup_Mod/Save" procedures)
-  !
-  ! Update on February 27, 2022: I have also added "has_outflow_boundary"
-  ! to be able to tell PETSc if matrix for pressure is singular.  Shall
-  ! it also be included in this test?
-  !
-  ! Update on June 2, 2022: Unified all outlet boundaries into one
-  ! to be able to tell PETSc if matrix for pressure is singular
-  if(.not. Flow % has_outlet) then
-    if(total_cells .eq. 0) then  ! wasn't set yet
-      total_cells = Grid % n_cells - Grid % comm % n_buff_cells
-      call Comm_Mod_Global_Sum_Int(total_cells)
-    end if
-    total_source = sum(b(1:(Grid % n_cells - Grid % comm % n_buff_cells)))
-    call Comm_Mod_Global_Sum_Real(total_source)
-    b(:) = b(:) - total_source/real(total_cells)
-  end if
-
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
   call Cpu_Timer % Start('Linear_Solver_For_Pressure')
 
-  ! Tell solvers it is a singular system which you are trying to solve
-  if(.not. Flow % has_outlet) then
+  ! Set singularity to the matrix
+  if(.not. Flow % has_pressure) then
     call Sol % Set_Singular(A)
   end if
 
@@ -207,7 +167,7 @@
                  norm = p_nor)       ! number for normalisation
 
   ! Remove singularity from the matrix
-  if(.not. Flow % has_outlet) then
+  if(.not. Flow % has_pressure) then
     call Sol % Remove_Singular(A)
   end if
 
