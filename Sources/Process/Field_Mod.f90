@@ -136,7 +136,7 @@
 
     ! Pressure velocity coupling algorithm
     integer :: p_m_coupling, i_corr, n_piso_corrections
-    logical :: piso_status
+    logical :: inside_piso_loop
     logical :: choi_correction
     logical :: gu_correction
 

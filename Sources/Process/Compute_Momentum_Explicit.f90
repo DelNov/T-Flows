@@ -29,8 +29,7 @@
   b    => Nat % b % val
 
   ! PISO corrections are executed here
-  if (Flow % p_m_coupling == PISO .and.  &
-      Flow % piso_status .eqv. .true.) then
+  if (Flow % p_m_coupling == PISO .and. Flow % inside_piso_loop) then
 
     ! Sum of neighbours
     sum_neigh(:) = 0.0

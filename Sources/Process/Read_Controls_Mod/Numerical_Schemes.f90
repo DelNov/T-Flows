@@ -34,7 +34,7 @@
 
   if( Flow % p_m_coupling .eq. PISO) then
     call Control_Mod_Number_Of_Piso_Corrections(Flow % n_piso_corrections)
-    Flow % piso_status = .false.
+    Flow % inside_piso_loop = .false.
   end if
 
   ! Improvements to Rhie and Chow method (Choi, Gu)

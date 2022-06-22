@@ -104,7 +104,7 @@
   !-------------------------------------------------------!
   !   Store the old volume fluxes for Choi's correction   !
   !-------------------------------------------------------!
-  if (Flow % piso_status .eqv. .false.) then  ! check about this
+  if(.not. Flow % inside_piso_loop) then  ! check about this
     if(ini .eq. 1) then
       do s = 1, Grid % n_faces
         v_flux % oo(s) = v_flux % o(s)
@@ -174,7 +174,7 @@
     call Comm_Mod_Global_Max_Real(vel_max)
 
     ! Old values (o) and older than old (oo)
-    if (Flow % piso_status .eqv. .false.) then
+    if(.not. Flow % inside_piso_loop) then
       if(ini .eq. 1) then
         do c = 1, Grid % n_cells
           ui % oo(c) = ui % o(c)
@@ -354,7 +354,7 @@
     !--------------------------------------------------------!
     !   If not inside the prime part of the PISO algorithm   !
     !--------------------------------------------------------!
-    if(Flow % piso_status .eqv. .false.) then
+    if(.not. Flow % inside_piso_loop) then
 
       ! Under-relax the equations
       call Numerics_Mod_Under_Relax(ui, M, b)

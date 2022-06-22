@@ -26,7 +26,7 @@
 
   if (Flow % p_m_coupling == PISO) then
 
-    Flow % piso_status = .true.
+    Flow % inside_piso_loop = .true.
     do corr_steps = 1, Flow % n_piso_corrections
       Flow % i_corr = corr_steps
 
@@ -35,7 +35,7 @@
       call Correct_Velocity(Flow,       Vof, Sol, curr_dt, ini)
     end do
 
-    Flow % piso_status = .false.
+    Flow % inside_piso_loop = .false.
     call Info_Mod_Iter_Fill_At(1, 1, u % name, u % eniter, u % res)
     call Info_Mod_Iter_Fill_At(1, 2, v % name, v % eniter, v % res)
     call Info_Mod_Iter_Fill_At(1, 3, w % name, w % eniter, w % res)

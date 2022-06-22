@@ -170,7 +170,7 @@
 
     if(Flow(d) % with_interface) then
       if (read_backup(d))  then
-        Flow % piso_status = .false.
+        Flow % inside_piso_loop = .false.
       end if
       call Vof(d) % Update_Physical_Properties()
     end if
