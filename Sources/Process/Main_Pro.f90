@@ -389,11 +389,7 @@
       call Control_Mod_Switch_To_Domain(d)
 
       ! Write the values in monitoring points
-      if(.not. Flow(d) % heat_transfer) then
-        call Monitor(d) % Write_4_Vars(curr_dt, Flow(d))
-      else
-        call Monitor(d) % Write_5_Vars(curr_dt, Flow(d))
-      end if
+      call Monitor(d) % Write_Vars(curr_dt, Flow(d))
 
       ! Calculate mean values
       call Turb(d) % Calculate_Mean(n_stat_t, curr_dt)

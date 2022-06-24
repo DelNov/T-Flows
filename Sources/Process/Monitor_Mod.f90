@@ -24,8 +24,7 @@
     contains
       procedure :: Initialize
       procedure :: Finalize
-      procedure :: Write_4_Vars
-      procedure :: Write_5_Vars
+      procedure :: Write_Vars
 
   end type
 
@@ -33,7 +32,6 @@
 
   include 'Monitor_Mod/Initialize.f90'
   include 'Monitor_Mod/Finalize.f90'
-  include 'Monitor_Mod/Write_4_Vars.f90'
-  include 'Monitor_Mod/Write_5_Vars.f90'
+  include 'Monitor_Mod/Write_Vars.f90'
 
   end module
