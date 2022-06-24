@@ -139,6 +139,7 @@
     logical :: inside_piso_loop
     logical :: choi_correction
     logical :: gu_correction
+    logical :: report_vol_balance
 
     ! Maximum CFL and Pe numbers
     real :: cfl_max, pe_max
@@ -172,6 +173,9 @@
 
     ! Angular velocity
     real :: omega_x, omega_y, omega_z!, omega
+
+    ! For volume balance reporting
+    integer :: fuvbr
 
     contains
 
@@ -221,11 +225,14 @@
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Fluxes
+      procedure :: Compute_Wall_Distance     ! see: Potential_Initialization
       procedure :: Potential_Initialization  ! see: Compute_Wall_Distance
       procedure :: Prandtl_Numb
       procedure :: Schmidt_Numb
       procedure :: U_Tan
-      procedure :: Compute_Wall_Distance     ! see: Potential_Initialization
+      procedure :: Report_Volume_Balance
+      procedure :: Report_Volume_Balance_Start
+      procedure :: Report_Volume_Balance_Stop
 
   end type
 
@@ -287,5 +294,8 @@
   include 'Field_Mod/Utilities/Schmidt_Numb.f90'
   include 'Field_Mod/Utilities/U_Tan.f90'
   include 'Field_Mod/Utilities/Compute_Wall_Distance.f90'
+  include 'Field_Mod/Utilities/Report_Volume_Balance.f90'
+  include 'Field_Mod/Utilities/Report_Volume_Balance_Start.f90'
+  include 'Field_Mod/Utilities/Report_Volume_Balance_Stop.f90'
 
   end module

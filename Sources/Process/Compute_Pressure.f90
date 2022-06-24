@@ -13,8 +13,6 @@
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: BEGIN = 12
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
@@ -24,10 +22,12 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  integer, save              :: total_cells
+  integer, save              :: total_cells, fu
   real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
   character(SL)              :: solver
+  real                       :: f_ex, f_im, px_f, py_f, pz_f
+  real                       :: v_m_c1, v_m_c2, v_m_f, fs, src
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -40,12 +40,12 @@
 !
 !   Dimension of the system under consideration
 !
-!     [App] {pp} = {bpp}     [m^3/s]
+!     [A] {pp} = {b}     [m^3/s]
 !
 !   Dimensions of certain variables
 !
-!     app                   [m^4s/kg]
-!     pp                    [kg/ms^2]
+!     A                     [m^4s/kg]
+!     pp                    [kg/(ms^2)]
 !     p % x, p % y, p % z   [kg/(m^2 s^2)]
 !     px_f, py_f, pz_f      [kg/(m^2 s^2)]
 !     b                     [m^3/s]
@@ -66,6 +66,9 @@
   M      => Sol % Nat % M
   b      => Sol % Nat % b % val
   call Flow % Alias_Momentum(u, v, w)
+
+  ! Volume balance reporting
+  call Flow % Report_Volume_Balance_Start(curr_dt, ini)
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
@@ -114,6 +117,9 @@
   !---------------------------------------!
   call Rhie_And_Chow(Flow, Vof, Sol)
 
+  !-----------------------------------------------!
+  !   Update pressure r.h.s. with volume fluxes   !
+  !-----------------------------------------------!
   b(:) = 0.0
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
@@ -135,7 +141,43 @@
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
       end if
     end if
+  end do
 
+  ! Volume balance reporting
+  call Flow % Report_Volume_Balance(Sol, curr_dt, ini)
+
+  !------------------------------------------!
+  !   Cross diffusion fluxes for pressure?   !
+  !------------------------------------------!
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+    fs = Grid % f(s)
+
+    if(c2 > 0) then
+
+      ! Unit: (m^3 s)/kg
+      v_m_c1 = Grid % vol(c1) / M % sav(c1)
+      v_m_c2 = Grid % vol(c2) / M % sav(c2)
+      v_m_f  = fs * v_m_c1 + (1.0-fs) * v_m_c2
+
+      ! Interpolate pressure gradients
+      ! Unit: kg/(m^2 s^2)
+      px_f = fs * pp % x(c1) + (1.0-fs) * pp % x(c2)
+      py_f = fs * pp % y(c1) + (1.0-fs) * pp % y(c2)
+      pz_f = fs * pp % z(c1) + (1.0-fs) * pp % z(c2)
+
+      ! Explicit and implicit pressure correction "fluxes"
+      ! Unit: (m^3 s)/kg * kg/(m^2 s^2) * m^2 = m^3/s
+      f_ex = v_m_f * (   px_f * Grid % sx(s)   &
+                       + py_f * Grid % sy(s)   &
+                       + pz_f * Grid % sz(s))
+
+      ! Unit: (m^3 s)/kg * m * kg/(m^2 s^2) * m = m^3/s
+      f_im = v_m_f * A % fc(s) * (   px_f * Grid % dx(s)    &
+                                   + py_f * Grid % dy(s)    &
+                                   + pz_f * Grid % dz(s) )
+    end if
   end do
 
   !-------------------------------------------------------------------------!
@@ -205,6 +247,9 @@
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+
+  ! Volume balance reporting
+  call Flow % Report_Volume_Balance_Stop()
 
   call Cpu_Timer % Stop('Compute_Pressure (without solvers)')
 
