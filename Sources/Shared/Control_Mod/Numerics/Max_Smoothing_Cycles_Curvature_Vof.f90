@@ -3,8 +3,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
-  logical, optional :: verbose
+  integer, intent(out) :: val
+  logical, optional    :: verbose
 !==============================================================================!
 
   call Control_Mod_Read_Int_Item('MAX_SMOOTHING_CYCLES_CURVATURE_VOF',  &

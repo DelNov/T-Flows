@@ -3,8 +3,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical           :: skew_corr
-  logical, optional :: verbose
+  logical, intent(out) :: skew_corr
+  logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
@@ -21,7 +21,7 @@
 
   else
     if(this_proc < 2) then
-      print *, '# ERROR!  Unknown state for temporal skewure correction: ',   &
+      print *, '# ERROR!  Unknown state for temporal skewness correction: ',   &
                 trim(val)
       print *, '# Exiting!'
     end if
