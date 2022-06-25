@@ -105,4 +105,10 @@
 
   end do
 
+  !--------------------------------------------------------!
+  !   Initialize counters for Gauss gradient computation   !
+  !--------------------------------------------------------!
+  Flow % gauss_iters = 0.0
+  Flow % gauss_calls = 0
+
   end subroutine

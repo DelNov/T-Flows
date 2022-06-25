@@ -164,6 +164,8 @@
     real    :: gauss_tol
     integer :: gauss_miter
     integer :: least_miter
+    real    :: gauss_iters
+    integer :: gauss_calls
 
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy

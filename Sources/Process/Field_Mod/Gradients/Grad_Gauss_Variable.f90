@@ -54,6 +54,10 @@
 
   end do  ! iter
 
+  ! Accumulate all Gauss iterations
+  Flow % gauss_iters = Flow % gauss_iters + iter
+  Flow % gauss_calls = Flow % gauss_calls + 1
+
   ! Refresh buffers for gradient components (these calls are needed)
   call Grid % Exchange_Cells_Real(phi % x)
   call Grid % Exchange_Cells_Real(phi % y)
