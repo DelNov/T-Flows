@@ -19,7 +19,7 @@
 
   do i = 1, n
     allocate(Work % i_face(i) % ptr(1:nf))
-    Work % i_face(i) % ptr(:) = 0.0
+    Work % i_face(i) % ptr(:) = 0
   end do
 
   Work % last_i_face = 0

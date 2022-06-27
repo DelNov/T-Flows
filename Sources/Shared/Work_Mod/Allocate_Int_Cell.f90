@@ -20,7 +20,7 @@
 
   do i = 1, n
     allocate(Work % i_cell(i) % ptr(-nb:nc))
-    Work % i_cell(i) % ptr(:) = 0.0
+    Work % i_cell(i) % ptr(:) = 0
   end do
 
   Work % last_i_cell = 0
