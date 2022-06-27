@@ -86,8 +86,7 @@
   SOLVER_FOR_WALL_DISTANCE                 |         cg                    |   cgs, bicg
   TIME_INTEGRATION_SCHEME                  |         linear                |   parabolic
   TIME_STEP                                |         1.0e-2                |   any real number, usually < 0.1
-  TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-6                |   any small number, but should be close
-                                           |                               |   to the TOLERANCE_FOR_PRESSURE_SOLVER
+  TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-3                |   any small number, but < 1.0e-3 is OK
   TOLERANCE_FOR_ENERGY_SOLVER              |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_MOMENTUM_SOLVER            |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_POTENTIAL_SOLVER           |         1.0e-6                |   any small number, but > 1.0e-12 is OK
