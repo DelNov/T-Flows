@@ -223,7 +223,7 @@
     end if
   end if
 
-  call Flow % Grad_Pressure_Correction(pp)
+  call Flow % Grad_Pressure(pp)
 
   !-------------------------------!
   !   Update the pressure field   !

@@ -205,10 +205,8 @@
       procedure, private :: Grad_Gauss_Pressure
       procedure, private :: Grad_Gauss_Variable
       procedure, private :: Grad_Least_Pressure
-      procedure, private :: Grad_Least_Pressure_Correction
       procedure, private :: Grad_Least_Variable
       procedure          :: Grad_Pressure
-      procedure          :: Grad_Pressure_Correction
       procedure          :: Grad_Variable
 
       !----------------------------------!
@@ -269,10 +267,8 @@
   include 'Field_Mod/Gradients/Grad_Gauss_Pressure.f90'
   include 'Field_Mod/Gradients/Grad_Gauss_Variable.f90'
   include 'Field_Mod/Gradients/Grad_Least_Pressure.f90'
-  include 'Field_Mod/Gradients/Grad_Least_Pressure_Correction.f90'
   include 'Field_Mod/Gradients/Grad_Least_Variable.f90'
   include 'Field_Mod/Gradients/Grad_Pressure.f90'
-  include 'Field_Mod/Gradients/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Gradients/Grad_Variable.f90'
 
   !----------------------------------!
