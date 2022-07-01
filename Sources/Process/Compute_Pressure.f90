@@ -26,8 +26,6 @@
   real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
   character(SL)              :: solver
-  real                       :: f_ex, f_im, px_f, py_f, pz_f
-  real                       :: v_m_c1, v_m_c2, v_m_f, fs, src
 !==============================================================================!
 !
 !   The form of equations which I am solving:
@@ -147,38 +145,41 @@
   call Flow % Report_Volume_Balance(Sol, curr_dt, ini)
 
   !------------------------------------------!
-  !   Cross diffusion fluxes for pressure?   !
-  !------------------------------------------!
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    fs = Grid % f(s)
-
-    if(c2 > 0) then
-
-      ! Unit: (m^3 s)/kg
-      v_m_c1 = Grid % vol(c1) / M % sav(c1)
-      v_m_c2 = Grid % vol(c2) / M % sav(c2)
-      v_m_f  = fs * v_m_c1 + (1.0-fs) * v_m_c2
-
-      ! Interpolate pressure gradients
-      ! Unit: kg/(m^2 s^2)
-      px_f = fs * pp % x(c1) + (1.0-fs) * pp % x(c2)
-      py_f = fs * pp % y(c1) + (1.0-fs) * pp % y(c2)
-      pz_f = fs * pp % z(c1) + (1.0-fs) * pp % z(c2)
-
-      ! Explicit and implicit pressure correction "fluxes"
-      ! Unit: (m^3 s)/kg * kg/(m^2 s^2) * m^2 = m^3/s
-      f_ex = v_m_f * (   px_f * Grid % sx(s)   &
-                       + py_f * Grid % sy(s)   &
-                       + pz_f * Grid % sz(s))
-
-      ! Unit: (m^3 s)/kg * m * kg/(m^2 s^2) * m = m^3/s
-      f_im = v_m_f * A % fc(s) * (   px_f * Grid % dx(s)    &
-                                   + py_f * Grid % dy(s)    &
-                                   + pz_f * Grid % dz(s) )
-    end if
-  end do
+  !   Cross diffusion fluxes for pressure    !
+  !- - - - - - - - - - - - - - - - - - - - - +-------------------------!
+  !   They are correct in the present form, but they have very small   !
+  !   impact on results while being quite detremental on convergence   !
+  !--------------------------------------------------------------------!
+  !@  do s = 1, Grid % n_faces
+  !@    c1 = Grid % faces_c(1,s)
+  !@    c2 = Grid % faces_c(2,s)
+  !@    fs = Grid % f(s)
+  !@
+  !@    if(c2 > 0) then
+  !@
+  !@      ! Unit: (m^3 s)/kg
+  !@      v_m_c1 = Grid % vol(c1) / M % sav(c1)
+  !@      v_m_c2 = Grid % vol(c2) / M % sav(c2)
+  !@      v_m_f  = fs * v_m_c1 + (1.0-fs) * v_m_c2
+  !@
+  !@      ! Interpolate pressure gradients
+  !@      ! Unit: kg/(m^2 s^2)
+  !@      px_f = fs * pp % x(c1) + (1.0-fs) * pp % x(c2)
+  !@      py_f = fs * pp % y(c1) + (1.0-fs) * pp % y(c2)
+  !@      pz_f = fs * pp % z(c1) + (1.0-fs) * pp % z(c2)
+  !@
+  !@      ! Explicit and implicit pressure correction "fluxes"
+  !@      ! Unit: (m^3 s)/kg * kg/(m^2 s^2) * m^2 = m^3/s
+  !@      f_ex = v_m_f * (   px_f * Grid % sx(s)   &
+  !@                       + py_f * Grid % sy(s)   &
+  !@                       + pz_f * Grid % sz(s))
+  !@
+  !@      ! Unit: (m^3 s)/kg * m * kg/(m^2 s^2) * m = m^3/s
+  !@      f_im = v_m_f * A % fc(s) * (   px_f * Grid % dx(s)    &
+  !@                                   + py_f * Grid % dy(s)    &
+  !@                                   + pz_f * Grid % dz(s) )
+  !@    end if
+  !@  end do
 
   !-------------------------------------------------------------------------!
   !   In case of mass transfer, add addtional source to pressure equation   !
