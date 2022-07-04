@@ -1930,8 +1930,8 @@ beginning of simulation, and we wrote it in a way to read physical properties:
 This probalby needs some explanation.  As arguments to this function, _Process_
 sends a number of its classes which are used to model different aspects of numerical
 simulation.  Class ```Field_Type``` holds velocities, temperatures and other variables
-describing a flow _field_.  Class _Turb_Type_ holds variables describing the state
-of turbulence; turbulent kinetic energy  (k), its dissipation (epsilon), individial
+describing a flow _field_.  Class ```Turb_Type``` holds variables describing the state
+of turbulence; turbulent kinetic energy (k), its dissipation (ε), individial
 Reynolds stresses for second moment closures or turbulent statistics.  Multiphase
 flows with interface tracking are described by class ```Vof_Type``` and Lagrangian
 particle tracking with ```Swarm_Type```.  In addition to these classes, _Process_
