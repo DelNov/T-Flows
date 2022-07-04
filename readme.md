@@ -2276,7 +2276,7 @@ mpirun  -np 6  ./Process > out_6_proc  &
 where ```-np 6``` tells ```mpirun``` how many processors you want to use.  And
 that is it, the code should be running now.
 
-#### Setting the mass fluxes and pressure drops
+#### Setting the mass fluxes and pressure drops <a name="demo_parallel_proc_setting_mass_fluxes"> </a>
 
 While the process is running, we should spare a few words on a couple of new
 concepts introduced in the ```control``` file.  The flow across these rod
@@ -2894,7 +2894,210 @@ cases and benchmark further.
 
 ## Fully-developed turbulent plane channel flow <a name="bench_plane_channel"> </a>
 
+A fully developed turbulent plane channel flow is a standard benchmark for
+testing turbulence models. It is one of the basic test cases for testing
+implementation of various RANS and LES models into CFD codes. The flow
+is well investigated and documented both experimentally and numerically.
+Direct numerical simulation data are available for moderate and high Reynolds
+numbers. The DNS data of [Kim et al.](https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/abs/turbulence-statistics-in-fully-developed-channel-flow-at-low-reynolds-number/308DCF387F4488D6A0FB189D8206DF7B) for Re<sub>τ</sub> = 590 are
+used here for comparison with RANS and LES solutions.
+
+The flow is bounded by two parallel flat walls separated by a distance 2h.
+Fluid flows in _x_ direction and has two homogeneous directions, _x_ and _y_, 
+meaning that the flow properties change only in the wall-normal direction 
+_z_. Reynolds number is Re = 13'000 based on the channel’s height, whereas 
+Reynolds number based on the friction velocity is Re<sub>τ</sub> = 590.
+
+<img src="Documentation/Manual/Figures/channel_domain.png" width="600"/>
+
+With this benchmark you will see how a turbulence models are defined in T-Flows,
+how wall is treated, basic setup of RANS and LES approaches and collecting 
+statistics for scale-resolving simulations (LES in this section).
+
 ### RANS computation of a channel flow <a name="bench_plate_channel_rans"> </a>
+
+The cases for RANS simulations of the channel flow come in two variants: a
+case with cells stretched towards the walls for low-Re number approach
+(integration down to the walls) and a case with uniform cells for high-Re
+number approach (wall functions).  Both cases are located in directory 
+```[root]/Manual/Channel_Re_Tau_590```, which has the following structure:
+```
+[root]/Manual/Channel_Re_Tau_590/
+├── Results
+│   ├── re_tau_590_dns.agr
+│   └── re_tau_590_tflows.agr
+├── Stretched_Mesh
+│   ├── chan.dom
+│   ├── control
+│   ├── generate.scr
+│   └── User_Mod
+│       └── Save_Results.f90
+└── Uniform_Mesh
+    ├── chan.dom
+    ├── control -> ../Stretched_Mesh/control
+    ├── generate.scr
+    └── User_Mod -> ../Stretched_Mesh/User_Mod
+```
+The directory ```Results``` holds bare reference DNS results for this case
+(```re_tau_590_dns.agr```) and comparison of T-Flows results agains the DNS
+(```re_tau_590_tflows.agr```).  The other two directories hold the necessary
+files to run the case on stretched and uniform grids.
+
+#### Generating the grids
+
+The cases for the channel flow will use T-Flows' own mesh generator
+called _Generate_.  The input files for _Generate_ have extension ```.dom```,
+as an abbreviation for _domain_.  To run it, you first have to compile it
+in the way described in section [Compiling sub-programs](#compiling_sub_programs)
+and then create soft links to executables in sub-directories ```Stretched_Mesh```
+and ```Uniform_Mesh``` as it is described [here](#seek_binaries).
+
+When you run _Generate_ in each of the sub-directories with:
+```
+./Generate < generate.scr
+```
+it will create the ```.cfn```, ```.dim```, as well as a few files in ```.vtu```
+format which you can use to visualise the grids you just created.  Please
+observe that files with extension ```.1d``` are also created.  Since the channel
+flow is essentially a one-dimensional problem, _Generate_ creates this file
+with node coordinates in singe non-homogenous direction (_z_ in this case).
+The ```.1d``` file is used in user functions explained below.
+
+> **_Note:_** Although _Generate_ was quite useful in the early stages of
+development of T-Flows, and although it has some nice features like local grid
+refinement and smoothing, it doesn't come with a graphical user interface and
+its usage for generating complex grids is tedious.  Moreover, having in mind
+the availability of free GMSH, the _Generate_ is obsolete and its usage is
+discouraged.  We use it in this section partially for completness, and
+partially for ease of use for periodic channel flows on orthogonal grids.
+
+The uniform and the stretched grid for RANS simulations of the channel flow
+created by _Generate_ look like this:
+
+<img src="Documentation/Manual/Figures/channel_rans_grids.png" width="600"/>
+
+The dimensions of both computational domain were set to 1×1×1 in all directions.
+Only half of the domain is considered and symmetry condition is imposed on its
+upper plane.
+
+#### Compiling _Process_
+
+Since this is a benchmark case, we want to extract data from results in a
+special way, from user function ```User_Mod_Save_Results```, residing in
+case's sub-directory ```User_Mod```.  In order to compile _Process_ with this
+user function, go to the directory: ```[root]/Sources/Process/``` and issue
+commands:
+```
+make clean
+make DIR_CASE=../../Tests/Manual/Channel_Re_Tau_590
+```
+
+> **_Note 1:_**  The way T-Flows deals with user functions was first introduced
+in [this](#demo_thermally_driven_variable) section.
+
+> **_Note 2:_**  The cases in directories ```Stretched_Grid``` and
+```Uniform_Grid``` have the same user function.  Hence, the entire ```User_Mod```
+in ```Uniform_Grid``` is a mere link to its counterpart in ```Stretched_Grid```.
+
+The compiled user function (```User_Mod_Save_Results```) for these cases works
+in the following way:  it first reads the node coordinates from the ```.1d```
+file created during the grid generation, allocates memory for a number of
+variables to be defined in homogeneous planes, averages results over cells
+which are situated in between consecutive nodes in ```.1d``` file,
+non-dimensionalizes the results and writes them in a file with extension
+```.dat``` for further processing.  All these steps are clearly indicated in
+the source file ```[root]/Tests/Manual/Channel_Re_Tau_590/User_Mod/Save_Results.f90```
+and we believe they don't need further explanations.
+
+#### Running the cases
+
+The stretched and the uniform computational mesh obviously differ in resolution
+in the near-wall region. The stretched mesh has the first near-wall cell within
+the viscous sub-layer (_z_<sup>+</sup> < 3), whereas the uniform mesh has
+_z_<sup>+</sup> located in the logarithmic region (_z_<sup>+</sup> ≈ 30).
+
+Although the boundary conditions applied in the ```control``` files for both
+cases are the same, T-Flows will automatically switch from wall-integration
+to wall-function treatmen based on the local values of _z_<sup>+</sup>.
+This automatic switching is known as a _compound wall treatment_, and is
+described in detail by [Popovac and Hanjalic](https://link.springer.com/article/10.1007/s10494-006-9067-x).
+
+Finally, we must choose a turbulence model. This is one of the most critical
+decision you have to make when running a CFD simulation. A universal turbulence
+model, that will perform equally well in all flow configurations and types,
+still does not exist.  In the last three decades a substantial number of
+turbulence models have developed and proposed. They differ in level of
+complexity and sophistication, but also in approach to turbulence modeling.
+Three main approaches are present, the LES, where most of turbulence is
+resolved (present in solution fields) and only a small fraction of turbulent
+kinetic energy is modelled, RANS where all turbulence is modelled, and hybrid
+RANS-LES approach where RANS and LES are combined in a way that ratio of
+resolved and modelled turbulence varies throughout domain.  You should choose
+turbulence model carefully, balancing between economy of computation (required
+time and computer power) and accuracy.
+
+On top of the economic reasons, you should also consider flow physics when
+chosing a turbulence model.  Certain flows are inherently unsteady (some flows
+over blunt bodies, mixed convection flows) and RANS equations would never
+converge for them, and you should use an unsteady approach, be it LES, unsteady
+RANS or hybrid RANS-LES. Since the turbulent channel flow does not fall into
+category of inherently unsteady flows, RANS approach is appropriate.
+
+T-Flows has several turbulence models implemented which differ in complexity 
+and level of physical description of turbulence. The default RANS model in
+T-Flows is the k-ε-ζ-f model proposed by [Hanjalic et al.](https://www.sciencedirect.com/science/article/abs/pii/S0142727X0400116X?via%3Dihub).
+The model proved to be more accurate and reliable compared to widely used
+standard k-ε model, which is also implemented in T-Flows . The k-ε-ζ-f
+In the control file, a turbulence model is defined by using a key word
+```TURBULENCE MODEL``` in the ```control``` file:
+```
+ TURBULENCE_MODEL       k_eps_zeta_f
+```
+
+As mentioned above, the case is homogeneous in streamwise and spanwise direction
+and driven by a pressure drop.  A way to prescribe the point for monitoring
+plane, pressure drops and mass fluxes in characteristic planes was already
+described [above](#demo_parallel_proc_setting_mass_fluxes).  For this case, we
+define monitoring planes in the geometrical center of the computational domain
+and set the mass flux to 0.2, which gives Re number of roughly 13'000.
+```
+ POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
+ MASS_FLOW_RATES                0.2  0.0  0.0
+```
+
+Since we seek a steady solution for this case, we do not care about the accuracy
+in time.  We set a relativelly large time step and enough time steps until a
+steady solution is reached:
+```
+ TIME_STEP                   1.0
+ NUMBER_OF_TIME_STEPS     3000
+```
+
+Both of these RANS cases (with stretched and with uniform grid) have a small
+number of cells and run really fast.  Visualization of the streamwise velocity
+and turbulent kinetic energy in paraview looks like this:
+
+<img src="Documentation/Manual/Figures/channel_rans_results.png" width="900"/>
+
+Although it is nice to see such three-dimensional fields in color, for direct
+comparison against experiemnts or DNS data, plots of profiles with selected
+flow quantities are more useful.  For this case, profiles are computed and
+saved from a user function and saved in file ```chan-res-plus-ts003000.dat```.
+When profiles for streamwise velocity, turbulent kinetic energy, _uw_ stress
+and turbulent kinetic energy dissipation are extracted from this file and
+plotted against DNS data from [Kim et al.](https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/abs/turbulence-statistics-in-fully-developed-channel-flow-at-low-reynolds-number/308DCF387F4488D6A0FB189D8206DF7B), they look like this:
+
+<img src="Documentation/Manual/Figures/channel_rans_compare_dns.png" width="900"/>
+
+Both results obtained on uniform grid (blue lines) and stretched grid (red
+lines) compare well against DNS results.
+
+> **_Note:_** The version of ```User_Mod_Save_Results``` used for these two
+cases was written only for parallel runs, for cases without heat transfer and
+for k-ε-ζ-f turbulence model.  This was done for the sake of simplicity.  You
+can find more elaborate version of ```User_Mod_Save_Results``` in [following
+section](#bench_plate_channel_les) as well as in other channel flow cases
+in directory ```[root]/Tests/...```.
 
 ### LES computation of a channel flow <a name="bench_plate_channel_les"> </a>
 
@@ -3098,7 +3301,7 @@ initial stages of turbulence development.
 
 ### Comparing against experiments <a name="bench_cases_matrix_comparing"> </a>
 
-To compare resutls against measurements, we wrote a user function and placed
+To compare results against measurements, we wrote a user function and placed
 it in ```User_Mod_Beginning_Of_Simulation```.  Its source resides in
 ```[root]/Tests/Manual/Matrix/User_Mod```.  This function will, after _Process_
 starts and reads the backup file, extract profiles in locations specified by
@@ -4389,4 +4592,3 @@ from the precursor domain should be put under scrutiny themselves; is mesh
 fine enough, did we use proper physical models, is the domain large enough in
 periodic directions, are some of the questions which should be seriously
 addressed.
-
