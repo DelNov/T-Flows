@@ -12,7 +12,7 @@
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: n_prob, pl, i, count, s, c1, c2, fu
+  integer                   :: n_prob, pl, i, s, c1, c2, fu
   character(SL)             :: res_name
   real, allocatable         :: z_p(:),                              &
                                um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
@@ -61,11 +61,10 @@
   ! Read the number of searching intervals 
   read(9,*) n_prob
   allocate(z_p(n_prob*2))
-  allocate(ind(n_prob*2))
 
   ! Read the intervals positions
   do pl=1,n_prob
-    read(9,*) ind(pl), z_p(pl) 
+    read(9,*) z_p(pl)
   end do
   close(9)
 
@@ -83,8 +82,6 @@
 
   allocate(rad_1(n_prob));   rad_1   = 0.0
   allocate(n_count(n_prob)); n_count = 0
-
-  count = 0
 
   if(Flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p=0.0
@@ -146,8 +143,6 @@
 
     call Comm_Mod_Global_Sum_Real(rm_p(pl))
     call Comm_Mod_Global_Sum_Real(tm_p(pl))
-
-    count = count + n_count(pl)
   end do
 
   do i = 1, n_prob

@@ -8,22 +8,21 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
+  integer,     intent(in) :: ts     ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: n_prob, pl, i, count, s, c, idumm, k, fu
+  integer                   :: n_prob, pl, i, ind, s, c, k, fu
   character(SL)             :: coord_name, res_name, ext
   real, allocatable         :: z_p(:),                              &
                                um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
                                v1_p(:), v2_p(:), v3_p(:),           &
                                v4_p(:), v5_p(:), v6_p(:),           &
-                               zm_p(:), rad_1(:),                   &
-                               ind(:)
+                               zm_p(:), rad_1(:)
   integer, allocatable      :: n_p(:), n_count(:)
   real                      :: r, r1, r2, u_aver, u_rad, u_tan, lnum
-  integer                   :: ts     ! time step
   logical                   :: there
 !==============================================================================!
 
@@ -41,24 +40,6 @@
 
   u_aver = 1.14
 
-  inquire(file='rad_coordinate.dat', exist=there ) 
-  if(.not.there) then
-    if(this_proc < 2) then
-      print *, "#==========================================================="
-      print *, "# In order to extract profiles and write them in ascii files"
-      print *, "# the code has to read cell-faces coordinates "
-      print *, "# in wall-normal direction in the ascii file 'case_name'.1D."
-      print *, "# The file format should be as follows:"
-      print *, "# 10  ! number of cells + 1"
-      print *, "# 1 0.0"
-      print *, "# 2 0.1"
-      print *, "# 3 0.2"
-      print *, "# ... "
-      print *, "#-----------------------------------------------------------"
-    end if
-    return
-  end if
-
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
   call File % Open_For_Reading_Ascii(coord_name, fu)
@@ -66,11 +47,10 @@
   ! Read the number of searching intervals
   read(fu,*) n_prob
   allocate(z_p(n_prob*2))
-  allocate(ind(n_prob*2))
 
   ! Read the intervals positions
   do pl=1,n_prob
-    read(fu,*) ind(pl), z_p(pl)
+    read(fu,*) ind,  z_p(pl)
   end do
   close(fu)
 
@@ -86,7 +66,6 @@
   allocate(zm_p(n_prob));  zm_p = 0.0
 
   allocate(n_count(n_prob)); n_count=0
-  count = 0
 
   if(Flow % heat_transfer) then
     allocate(tm_p(n_prob));   tm_p = 0.0
@@ -188,8 +167,6 @@
       call Comm_Mod_Global_Sum_Real(v3_p(pl))
       call Comm_Mod_Global_Sum_Real(v4_p(pl))
       call Comm_Mod_Global_Sum_Real(v5_p(pl))
-
-      count = count + n_count(pl) 
 
       if(Flow % heat_transfer) then
         call Comm_Mod_Global_Sum_Real(tm_p(pl))
