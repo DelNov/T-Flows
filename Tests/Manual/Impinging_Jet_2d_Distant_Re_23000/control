@@ -23,7 +23,6 @@
 #-----------------
 # Physical models
 #-----------------
-
  MASS_DENSITY           1.0
  THERMAL_CONDUCTIVITY   1.4e-4
  DYNAMIC_VISCOSITY      1.0e-4
@@ -47,7 +46,6 @@
  ADVECTION_SCHEME_FOR_ENERGY        smart
  ADVECTION_SCHEME_FOR_TURBULENCE    smart
 
- POTENTIAL_INITIALIZATION           yes
  GRADIENT_METHOD_FOR_PRESSURE       gauss_theorem
 
 #------------------------
@@ -55,14 +53,13 @@
 #------------------------
  LINEAR_SOLVERS                     petsc
  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER          1.e-5
+ TOLERANCE_FOR_MOMENTUM_SOLVER          1.e-7
  TOLERANCE_FOR_PRESSURE_SOLVER          1.e-5
  TOLERANCE_FOR_TURBULENCE_SOLVER        1.e-5
  TOLERANCE_FOR_ENERGY_SOLVER            1.e-7
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER   120
 
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
-
 
 #--------------------
 # Initial conditions
