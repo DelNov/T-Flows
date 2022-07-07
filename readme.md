@@ -25,11 +25,18 @@
         1. [Compiling for parallel runs](#demo_parallel_proc_compiling)
         2. [Creating and dividing the grid](#demo_parallel_proc_dividing)
         3. [Running the simulation in parallel](#demo_parallel_proc_running)
-7. [PETSc solvers](#link_petsc)
+7. [Inflows and outflows](#demo_inflows_and_outflows)
+    1. [Inflows](#demo_inflows)
+        1. [Flat velocity profile](#demo_inflows_flat)
+        2. [Prescribed velocity profile](#demo_inflows_parabolic)
+        3. [Synthetic eddies](#demo_inflows_eddies)
+        4. [Turbulent precursor domain](#demo_inflows_turbulent)
+    2. [Outflows](#demo_outflows)
+8. [PETSc solvers](#link_petsc)
     1. [Compiling PETSc](#link_petsc_compiling)
     2. [Linking T-Flows with PETSc](#link_petsc_tflows)
     3. [Using PETSc](#link_petsc_using)
-8. [Benchmark cases](#bench_cases)
+9. [Benchmark cases](#bench_cases)
     1. [Laminar flow over a flat plate](#bench_flat_plate)
         1. [Pre-processing](#bench_flat_plate_pre)
         2. [Processing - running the case](#bench_flat_plate_run)
@@ -43,6 +50,10 @@
         1. [RANS computation of a channel flow](#bench_plate_channel_rans)
         2. [LES computation of a channel flow](#bench_plate_channel_les)
     4. [Round impinging jet and heat transfer](#bench_cases_jet)
+        1. [Compiling the sub-programs](#bench_cases_jet_compiling)
+        2. [Converting and dividing the mesh](#bench_cases_jet_converting)
+        3. [Running the simulation](#bench_case_jet_running)
+        4. [Comparing against experiments](#bench_h_case_jet_comparing)
     5. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
         2. [Running the case](#bench_cases_matrix_running)
@@ -54,12 +65,6 @@
         4. [Checking the initial condition](#bench_cases_buble_checking)
         5. [Final solution and benchmarking](#bench_cases_buble_final)
     7. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
-9. [Inflows and outflows](#demo_inflows)
-    1. [Flat velocity profile](#demo_inflows_flat)
-    2. [Prescribed velocity profile](#demo_inflows_parabolic)
-    3. [Synthetic eddies](#demo_inflows_eddies)
-    4. [Precursor domain](#demo_inflows_precursor)
-    5. [Turbulent precursor domain](#demo_inflows_turbulent)
 
 # Introduction <a name="intro"></a>
 
@@ -177,7 +182,7 @@ its other names become available on your system as aliases.
 # User requirements <a name="user_req"></a>
 
 There is no point in denying that successful use of a software package depends
-on the quality, robustness and intuitivity of the software itself, but also on
+on the quality, robustness and intuitiveness of the software itself, but also on
 the user's previous experience.  This is even more true for open source
 software, particularly open source scientific software such as T-Flows.
 In this section we list some background knowledge required from you in
@@ -2395,6 +2400,743 @@ try to do it without the script, simply by:
 For this case, it is interestng to see how the periodic directions are
 dealt with.
 
+# Inflows and outflows <a name="demo_inflows_and_outflows">
+
+## Inflows <a name="demo_inflows">
+
+The information on prescribing inflows and outflows in T-Flows might end up
+somewhat scattereed over this manual, and we believe that a dedicated section
+is needed to outline all the option you have to prescribe them.  Like the section
+[Demonstration cases](#demo_cases), what we present here is neither a benchmark,
+nor is it rigorously following best practices in fluid flow modeling, it is a
+mere demonstration of options you have to prescribe inflow and, to a lesser
+extent, outflow.
+
+To demonstrate it, we picked the flow around a cylinder, using the computational
+domain as described by [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195).
+We do not solve the same case as the authors did.  We increase the domain size
+by a factor of ten, and the Re number by a factor of 250.  In spite of the
+similarity with the computational domain used in [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195),
+the flow we will be solving here will neither be two-dimensional, nor steady.
+A sketch of the computational domain is presented here:
+
+<img src="Documentation/Manual/Figures/cylinder_domain.png" width="800"/>
+
+The case resides in the directory: ```[root]/Tests/Manual/Inflows/```.  Please
+go there and check the contensts.  It should read:
+```
+[root]/Tests/Manual/Inflows/
+├── convert.cylinder.scr
+├── convert.precursor.scr
+├── cylinder.geo
+├── precursor.geo
+├── Option_1
+│   └── control
+├── Option_2
+│   └── control
+├── Option_3
+│   └── control
+└── Option_4
+    ├── control
+    ├── control.1
+    ├── control.2
+    └── User_Mod
+        ├── End_Of_Time_Step.f90
+        └── Interface_Exchange.f90
+```
+
+Please compile the sources as explained in [Compiling the code](#compiling) and
+create links to executables as explained [here](#seek_binaries).  After that,
+generate the mesh with:
+```
+gmsh -3 cylinder.geo
+```
+and convert it to T-Flows format with:
+```
+./Convert < convert.cylinder.scr
+```
+
+If you visualize the mesh you obtain with ParaView, you should see something
+like this (only a detail around the cylinder is shown):
+
+![!](Documentation/Manual/Figures/cylinder_grid_detail.png "")
+
+As you can see, we took care that the grid around the cylinder is a hexahedral
+O-grid.  We didn't take much care about the channel walls as the main purpose
+of this section is to show you the concepts of prescribing inflow, rather than
+benchmarking the code.
+
+Should you want to run the simulations from this section in parallel, which we
+would recommend, you should also decompose the grid with:
+```
+./Divide  cylinder  4
+```
+
+> **_Note:_**  Don't go overboard with number of processors as you will end up
+communicating between processors more than computing.  A useful rule of thumb
+is to have around a hundred thousand cells per processor.  This grid has approximatelly
+300'000 cells, so four is a reasonable choice.
+
+### Flat velocity profile <a name="demo_inflows_flat"> </a>
+
+First option is to prescribe a flat velocity profile.  To do that, use the
+control file in sub-directory ```Option_1```.  We believe the best way to do
+it is to make a link to ```control``` file in ```Option_1``` directory with:
+```
+ln -i -s Option_1/control .
+```
+
+If you open it, you can see the couple of choices we made.  Time step is 0.01
+and the number of time steps 6000, resulting in a total physical simulation
+time of 60 s or one minute.
+```
+ TIME_STEP                             0.01
+ NUMBER_OF_TIME_STEPS               6000
+```
+
+> **_Note:_** A clear example why it is handy to specify number of time steps
+which are multiples of 30.  It is more likely that final simulation times would
+be in units more amenable to humans.
+
+Viscosity is 2.0e-4, resulting in Re number of 5000, which might not be
+quite turbulent, but is certainly not steady either.  We do, nonetheless, set
+the turbulence model to be LES with Smagorinsky:
+```
+ TURBULENCE_MODEL       les_smagorinsky
+```
+
+Being an LES, the simulation will be more efficient with PISO algorithm, so we
+set that next. with necessary adjustments to under-relaxation parameters:
+```
+ PRESSURE_MOMENTUM_COUPLING            piso
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   1.0
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE   1.0
+```
+and we also increase the order of accuracy of time integration to parabolic:
+```
+ TIME_INTEGRATION_SCHEME               parabolic
+```
+
+For cases with inflow and outflow, it is often useful to start from initial
+velocity field obtained from a solution to inviscid flow, which is set in
+```control``` file with:
+```
+ POTENTIAL_INITIALIZATION              yes
+```
+
+The most important for this section are the inflow and the outflow.  They are
+set with following entries in ```control``` file:
+```
+ BOUNDARY_CONDITION  in
+   TYPE              inflow
+   VARIABLES         u     v     w
+   VALUES            1.0   0.0   0.0
+
+ BOUNDARY_CONDITION  out
+   TYPE              convective
+   VARIABLES         u     v     w
+   VALUES            0.0   0.0   0.0
+```
+
+For inflow (called ```in``` in ```.geo``` file) we set the type to ```inflow```
+and specify velocity in _x_ direction to be constant and equal to one.  For
+outflow (called ```out``` in ```.geo``` file) we set the condition to be of
+type ```convective```, which is described by [Bottaro](https://www.tandfonline.com/doi/abs/10.1080/10407799008944952)
+and it should allow eddies to leave computational domain without disrupting
+the flow field inside.
+
+Other options for outflow include ```outflow``` which is a simple vanishing
+derivative condition and ```pressure``` which sets pressure at zero at the
+outflow.  For this case, given that we can expect some eddies leaving the
+domain, ```convective``` is the preferred choice.
+
+With all that explained, you can either launch the simulation with (provided
+you decomposed the grid):
+```
+mpirun -np 4 ./Process > out_01
+```
+
+Soon after the launch, it is useful to check how the initial condition looked
+like, which you can do if you visualize the file ```cylinder-ts000000.pvtu```:
+
+![!](Documentation/Manual/Figures/cylinder_initial.png "")
+
+The solution after one minute of physical time looks like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_1.png "")
+
+We can see vortex shedding, which is fine, but having flat profile at the inlet
+is hardly physical.  We can do better than that, which is the subject of the
+following sections.
+
+### Prescribed velocity profile <a name="demo_inflows_parabolic"> </a>
+
+Next option we can easily implement in T-Flows, is to prescribe the
+inlet velocity profile, specified in external file.  To try that, make a link
+to the ```control``` file in the sub-directory ```Option_2``` as:
+```
+ln -i -s Option_2/control .
+```
+
+The only section in which this control file differs from the previous one is
+the section regarding inflow boundary conditions, and in this case it reads:
+```
+ BOUNDARY_CONDITION  in
+   TYPE              inflow
+   VARIABLES         y   u
+   FILE              profile.dat
+```
+Instead of keyword ```VALUES``` under the ```VARIABLES``` we have ```FILE```,
+telling _Process_ to read the values from a file, rather than giving them
+constant values.  The file is ASCII, and it lists the values in columns,
+first of which is the coordinate, and the rest can be any variables _Process_
+might need.  In this case, it is only one velocity component, ```u```.  What
+is to be read from the file, is given in line ```VARIABLES```.  In this case,
+it will be _y_ coordinate, followed by _u_ velocities.
+
+To facilitate the prescription of this file, we placed a small utility in
+```[root]/Sources/Utilities/Parabolic.f90``` for prescribing parabolic
+velocity profile, which should be compiled with, say:
+```
+gfortran -o Parabolic Parabolic.f90
+```
+and can be invoked from command line with:
+```
+./Parabolic  x_start  x_end  bulk_velocity  n_points
+```
+Here, first and second parameter are starting and ending coordinates (not
+necessarily _x_), the desired bulk velocity and number of points over which
+you want to describe the profile.  Since we want to span the parabolic profile
+over _y_, and we know that our _y_ ranges from 0 to 4.1, we know that the
+desired bulk velocity is one, we can invoke _Parabolic_ with:
+```
+./Parabolic  0  4.1  1  31
+```
+to get:
+```
+ #==================
+ # Number of points
+ #==================
+          31
+ #=================================
+ #   Coordinate      Velocity
+ #=================================
+     0.00000E+00     0.00000E+00
+     1.36667E-01     1.93333E-01
+     2.73333E-01     3.73333E-01
+     4.10000E-01     5.40000E-01
+     5.46667E-01     6.93333E-01
+     6.83333E-01     8.33333E-01
+     8.20000E-01     9.60000E-01
+     9.56667E-01     1.07333E+00
+     1.09333E+00     1.17333E+00
+     1.23000E+00     1.26000E+00
+     1.36667E+00     1.33333E+00
+     1.50333E+00     1.39333E+00
+     1.64000E+00     1.44000E+00
+     1.77667E+00     1.47333E+00
+     1.91333E+00     1.49333E+00
+     2.05000E+00     1.50000E+00
+     2.18667E+00     1.49333E+00
+     2.32333E+00     1.47333E+00
+     2.46000E+00     1.44000E+00
+     2.59667E+00     1.39333E+00
+     2.73333E+00     1.33333E+00
+     2.87000E+00     1.26000E+00
+     3.00667E+00     1.17333E+00
+     3.14333E+00     1.07333E+00
+     3.28000E+00     9.60000E-01
+     3.41667E+00     8.33333E-01
+     3.55333E+00     6.93333E-01
+     3.69000E+00     5.40000E-01
+     3.82667E+00     3.73333E-01
+     3.96333E+00     1.93333E-01
+     4.10000E+00     0.00000E+00
+```
+which you should copy to file ```profile.dat```.
+
+> **_Note:_**  The centerline velocity, at _y_ is 2.05 is 1.5.  This is what
+you expect from parabolic velocity profile.  Centerline velocity is 3/2 times
+the bulk velocity.
+
+If you were in the case directory (```[root]/Tests/Manual/Inflows/```) you
+could have also redirect the output from profile with:
+```
+../../../Sources/Utilities/Parabolic > profile.dat
+```
+
+Clearly, the profile you prescribe in this ASCII file does not have to be
+parabolic, nor does it have to be generated with T-Flows' utility _Parabolic_.
+You could specify it from experimental or DNS data you have at your disposal.
+You only have to follow the format:
+- first non-comment line specifies the number of points
+- all the remaining lines specify values you want to prescribe in columns
+- the description of values in columns is given after the keyword ```VARIABLES```in ```control``` file.
+
+Anyhow, once you have the ```profile.dat``` in the working directory
+(```[root]/Tests/Manual/Inflows/```), you can
+launch the simulation in the same way you did for the [Flat velocity profile](#demo_inflows_flat)
+which could be:
+```
+mpirun -np 4 ./Process > out_4  &
+```
+
+The solution after one minute of physical time looks like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_2.png "")
+
+We hope you can see distribution of velocity magnitude at the inlet, which
+was constant in the previous case.  THe intensities of velocity magnitude in
+this case are higher by some 20% than in the case with flat velocity profile.
+For both cases we computed roughly three flow through times and ```convective```
+outflow seems to be handling the eddies which are leaving the domain pretty
+well.
+
+### Synthetic eddies <a name="demo_inflows_eddies"> </a>
+
+As we said in [](#), we departed from the benchmark in increasing the Re
+number by a factor of 250, so we might expect some turbulence, unsteadiness at
+the very least.  Since we run simulations in unsteady mode with LES model, why
+not adding some unsteadiness at the inlet?  Well, that is possible thanks to
+_Process_'s class ```Eddies_Mod``` which has the functionality to impose unsteady
+eddies at the inflow.  The method is heavily based on the work from
+[Jarin et al.](https://www.sciencedirect.com/science/article/pii/S0142727X06000282)
+
+The control file for the case of synthetic eddies is in sub-directory ```Option_3```.
+To use it, do the same as for previous cases, link the ```control``` file from
+that sub-directory to the current:
+```
+ln -i -s Option_3/control .
+```
+
+The only difference in that control file, compared to the one given in
+[Flat velocity profile](#demo_inflows_flat) are these line:
+```
+ SYNTHETIC_EDDIES    in
+   NUMBER_OF_EDDIES  40
+   MAX_EDDY_RADIUS   0.5
+   EDDY_INTENSITY    0.2
+```
+which instruct _Process_ to create synthetic eddies at the boundary called
+```in```, to create 40 of them with maximum radius of 0.5 (roughly 1/8 of
+the domain size in this case) and with maximum intensity of 0.2.  It is
+important to add that these eddies are _superimposed_ on whatever was given
+for the velocity values in section ```in```:
+```
+ BOUNDARY_CONDITION  in
+   TYPE              inflow
+   VARIABLES         u     v     w
+   VALUES            1.0   0.0   0.0
+```
+If we prescribed a logarithmic velocity profile there with the proper file as
+explained in [Prescribed velocity profile](#demo_inflows_parabolic), eddies would be
+imposed over that logarithmic profile.  In this case, however, the eddies will
+be superimposed over the flat velocity profile.
+
+Once the new control file is in the working directory (```[root]/Tests/Manual/Inflows/```)
+you can launch it with:
+```
+mpirun -np 4 ./Process > out_03  &
+```
+
+After a minute of simulation time, results look like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_3a.png "")
+
+We hope you can see eddies at the inlet plane, they show as orange rings with
+locally higher velocity magnitueds.  To see the evolution of the eddies, it
+would probably be good to play a movie in ParaView.
+
+A cut through solution:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_3b.png "")
+
+Shows how eddies from the inlet face (```in```) penetrate all the way to the
+cylinder.
+
+### Turbulent precursor domain <a name="demo_inflows_turbulent"> </a>
+
+Synthetic eddies are a neat way to prescribe some unsteadiness at the inflow,
+but they are artifical, synthetic, we may want more accurate prescription of
+turbulence.  To that end, we may use T-Flows' ability to solve equations in
+several domains at once, and dedicate one domain to be only the generator of
+the inflow for another.  In the case directory (```[root]/Tests/Manual/Inflows/```),
+in addition to the principal problem domain (```cylinder.geo```) we also give the
+file ```precursor.geo```, which serves that purpose - if ran through GMSH, it
+will create a precursor domain for the principal domain.
+
+As you were warned in [Conjugate heat transfer](#bench_conjugate), for two
+domains to be coupled in _Process_, they must have conforming grids at the
+interface.  The best way to go about it in GMSH, in our humble opinion, is to
+create two grids (precursor and principal) at once, creating the precursor
+domain by extruding thse inflow face.  This is a very safe way to ensure
+grid conformity at the interface.  Indeed, if you check the differences between
+``cylinder.geo```` and ```precursor.geo```, you will see they differ in two
+lines only:
+```
+diff cylinder.geo  precursor.geo
+
+9,10c9,10
+< PRECURSOR = 0;
+< CYLINDER  = 1;
+---
+> PRECURSOR = 1;
+> CYLINDER  = 0;
+```
+which tell GMSH which domain to save.  (We hope it is clear that ```.geo```
+variables ```PRECURSOR``` and ```CYLINDER``` tell gmsh whether to save the
+mesh for precursor or principal doman.
+
+Since you have already generated and converted the principal domain, now you
+should do it for the precursor too with:
+```
+gmsh -3 precursor.geo
+```
+and:
+```
+./Convert < convert.precursor.scr
+```
+As we said in [Flat velocity profile](#demo_inflows_flat), we are running this
+case in parallel, so precursor domain should be sub-divided in the same number
+of processors as principal domain was:
+```
+./Divide  precursor  4
+```
+
+> **_Note 1:_** Precursor domain is, in this case, just a channel with two
+periodic directions, _x_ and _z_.  It doesn't have inflows or outflows, it will
+be driven by a pressure drop to achieve the desired mass flux like, for example
+[Large eddy simulation over a matrix of cubes](#bench_cases_matrix).
+
+> **_Note 2:_**  Since precursor domain is usually smaller and its grid is coarser
+this may seem like an overkill or limitation.  But it is not.  _Process_ solves
+one domain after another, so if less processors were used for precursor domain,
+the remaining ones would be idle.  So, it is the only reasonable approach to use
+the same number of processors for both domains.
+
+If you visuallise both domains in ParaView (that is files ```cylinder.pvtu```
+and ```precursor.pvtu```) and show variable "Processor" it will look something
+like this:
+
+![!](Documentation/Manual/Figures/cylinder_both_partitioned.png "")
+
+showing that, although interface should be conforming, the partitioning does not
+have to be.
+
+As explained in [Conjugate heat transfer](#bench_conjugate), the way _Process_
+goes about simulating in multiple domains, is to have a control file for each
+of the domains called ```control.1```, ```control.2``` and so forth, and one
+central ```control``` file with information about coupling.  For this particular
+case, all control files are in sub-directory ```Option_4```.  To use them,
+feel free to remove any existing control files currently residing in the
+working directory and make the links:
+```
+rm -f control
+ln -i -s Option_4/control* .
+```
+
+At this point it might be worth nothing that ```control.2``` is the same as
+```control``` from ```Option_1```.  The ```control.1```, for the precursor is
+not very different from ```control.2```.  Problem domain is called
+```precursor```.
+```
+ PROBLEM_NAME        precursor
+```
+advection scheme is set to ```central``` to help maintain turbulence in the
+precursor domain
+```
+ ADVECTION_SCHEME    central
+```
+and desired mass flux is prescribed in _x_ direction:
+```
+ MASS_FLOW_RATES              16.4  0.0  0.0
+```
+
+> **_Note:_** Desired bulk velocity is 1.0, cross sectional area is
+4 x 4.1 = 16.4.  Density is not prescribed hence _Process_ will set it to 1.0,
+which makes the desired mass flow rate of 16.4.
+
+Furthermore, the point for monitoring plane has been shifted to be inside the
+precursor domain:
+```
+ POINT_FOR_MONITORING_PLANES  -6.0  0.5  0.5
+```
+and initial conditions are _not_ computed from potential field, since there are
+no inlets and outlets in this periodic domain:
+```
+ INITIAL_CONDITION
+   VARIABLES        u     v     w
+   VALUES           1.0   0.0   0.0
+```
+
+The central ```control``` file gives information on the coupling, as described
+in detail in [Conjugate heat transfer](#bench_conjugate).  In this case, it
+reads (with comments ommited):
+```
+ NUMBER_OF_DOMAINS         2
+
+ TIME_STEP                             0.01
+ NUMBER_OF_TIME_STEPS               6000
+
+ TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-3
+ MIN_SIMPLE_ITERATIONS                 2
+
+ INTERFACE_CONDITION      precursor    cylinder
+   BOUNDARY_CONDITIONS    periodic_x   in
+```
+where last two lines are important.  They tell processor that periodicity in _x_
+direction from domain ```precursor``` are coppied to the face called ```in```
+in domain ```cylinder```.
+
+However, that is not enough.  Since types of couplings between domains in a CFD
+simulation are infinite, they are dealt with through a user function.  In
+[Conjugate heat transfer](#bench_conjugate) we used the one provided with
+_Process_ by default, which couples temperatures, as presumably the most basic
+case for coupled simulations.  For velocity coupling we need a special version
+which is in sub-directory ```Option_4/User_Mod/Interface_Exchange.f90```.
+It would take us too far to explain this function in detail, but let's just say
+that it works in two steps; in the first one it gathers information from all
+domains involved and stores them in a special buffer, and in the second step
+distributes the information from one step to another.
+
+In the same directory there is another user function whose purpose is to
+introduces synthetic eddies in the precursor domain.  It is the
+```User_Mod_End_Of_Time_Step```.  These eddies are introduced to help the
+precursor domain to reach turbulent flow regime.  The eddies are formed from
+initial rigid body rotation velocity field (_u_=0; _v_=_z_-_zo_; _w_=_y_-_yo_;
+where _yo_ and _zo_ are the center of an eddy in the plane normal to streamwise
+velocity direction), which are damped by Gaussian distribution as we move
+further away from eddies centers (_xo_, _yo_ and _zo_). This may sound a bit
+fuzzy, so we make an attempt to illustrate our words in the following figure:
+
+<img src="Documentation/Manual/Figures/eddy_convolution.png" width="750"/>
+
+The graph on the left (black lines and gray shaded areas) represent rigid body
+rotation with center at (_y_=0, _z_=0).  The graph in the middle shows two
+Gaussuan curves (red lines, pink shades, darker pink the overlap) formed around
+the eddy center.  The graph on the right (blue lines, light blue shades) shows
+the convolution of the previous two functions and shows a smooth eddy whose
+center is at (_y_=0, _z_=0).
+
+The eddies are placed at random positions, random senses of rotation and random
+intensities - all within bounds of geometrically meaningful (inside domain) and
+physically ralizable (limited intensity).
+
+Coming back to the function which introduces eddies (the
+```User_Mod_End_Of_Time_Step```), it was used in cases explained above and we
+hope we don't have to give each and every detail of it.  The header and the
+arguments passed to the function in particular, were explained above and we will
+focus only on what is important to place eddies in the domain.
+
+The function is invoked at the end of each time step, but line 37 makes sure
+that eddies are not placed too frequently, only every 120 time steps:
+```
+ 37   if(mod(curr_dt, 120) .ne. 0) return
+```
+We hope that after a certain number of time steps turbulence in the
+precursor domain will be self-sustainable, so we stop introducing the eddies
+after the time step 1440:
+```
+ 40   if(curr_dt > 1440) return
+```
+
+Also, we want to restrict perturbation with eddies only in precursor domain
+which is achiveve with this line:
+```
+ 49   ! Impose eddies only in precursor domain
+ 50   if(Grid % name .ne. 'PRECURSOR') return
+```
+
+In order to place the eddies inside the domain, we must find its extents over
+nodes.  This is done in these lines:
+```
+ 57   !--------------------------------------!
+ 58   !   Size of the computational domain   !
+ 59   !                                      !
+ 60   !   This algorithm is not silly. We    !
+ 61   !   could have browsed through nodes   !
+ 62   !   only, but then we might have en-   !
+ 63   !   countered some hanging from GMSH   !
+ 64   !--------------------------------------!
+ 65   xmin = HUGE;  xmax = -HUGE
+ 66   ymin = HUGE;  ymax = -HUGE
+ 67   zmin = HUGE;  zmax = -HUGE
+ 68   do c = 1, Grid % n_cells
+ 69     do i_nod = 1, Grid % cells_n_nodes(c)
+ 70       n = Grid % cells_n(i_nod, c)
+ 71       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
+ 72       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
+ 73       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
+ 74     end do
+ 75   end do
+ 76   call Comm_Mod_Global_Min_Real(xmin)
+ 77   call Comm_Mod_Global_Min_Real(ymin)
+ 78   call Comm_Mod_Global_Min_Real(zmin)
+ 79   call Comm_Mod_Global_Max_Real(xmax)
+ 80   call Comm_Mod_Global_Max_Real(ymax)
+ 81   call Comm_Mod_Global_Max_Real(zmax)
+ 82   lx = xmax - xmin
+ 83   ly = ymax - ymin
+ 84   lz = zmax - zmin
+```
+In lines 68 - 75, we browse through all the cells, and through individual nodes
+of each cell in line 69.  Field ```Grid % cells_n_nodes(c)``` holds the number
+of nodes for each cell.  In line 70, we take the grid node index (```i_nod```
+is just to browse locally through cell) and in lines 71 - 73, we are seeking
+for minimum and maximum coordinates in each direction.  Lines 76 - 81 ensure
+we work with extrema over all processors.  Variables ```lx```, ```ly``` and
+```lz``` hold global domain dimensions.
+
+Once the domain dimensions are know, we can also set minimum and maximum size
+of the eddies:
+```
+ 86   ! Minimum and maximum size of eddies
+ 87   rmin = min(ly, lz) / 10.0
+ 88   rmax = min(ly, lz) /  5.0
+```
+We only compare eddy radius in plane orthogonal to the streamwise direction
+(assumed to be _x_ here) and that is why we only use dimension in _y_ and
+_z_ to correlate eddy sizes.
+
+This function introduces 48 eddies (hard-coded) in line 90:
+```
+ 90   !-------------------------------!
+ 91   !   Browse through all eddies   !
+ 92   !-------------------------------!
+ 93   do eddy = 1, 48
+ 94
+ 95     ! Random direction of the vortex
+ 96     call random_number(sg);
+ 97     if(sg < 0.5) then
+ 98       sg = -1.0
+ 99     else
+100       sg = +1.0
+101     end if
+102
+103     ! Determine random position of a vortex
+104     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
+105     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
+106     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
+107     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
+108
+109     ! Handle periodicity; that is: copy eddie in periodic directions
+110     xo(2:4) = xo(1)
+111     zo(2:4) = zo(1)
+112     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
+113     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
+114     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
+115     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
+116     xo(4) = xo(3)
+117     zo(4) = zo(2)
+...
+```
+Their sense of rotation is assigned randomly in lines 96 - 101, and their random
+positions (inside the domain) in lines 104 - 107.  Lines 110 - 117 take care of
+periodicity, that is, make coppies of eddies in periodic directions (here _x_
+and _z_) depending on their relative position inside the domain.
+
+We set the lenght of each eddy to be six times its radius:
+```
+119     ! Length of the eddy is six times the diameter
+120     lo = ro * 6.0
+```
+We limit eddy extents with Gaussian distribution.  The sigma coefficients
+for Gaussian distribution in direction orthogonal to the flow (_y_ and _z_) and
+parallel to the flow (_x_) is set in lines 119 and 120:
+```
+122     sig_yz = ro / 2.0
+123     sig_x  = lo / 2.0
+```
+
+> **_Note:_** The ```sigma_yz``` would be the red functions in the figure
+introduced above.
+
+Finally, in lines 123 - 162 we superimpose sytnthetic eddies over current
+velocity field.  Lines 125 - 127 take cell center coordinates from the grid
+and lines 128 and 129 compute rigid body rotation velocity components (```vc```
+and ```wc```)
+
+> **_Note:_** The ```vc``` and ```wc``` would be the black functions in the
+figure introduced above.
+
+```
+125     ! Superimpose eddies on the velocity field
+126     do dir = 1, 4
+127       do c = 1, Grid % n_cells
+128         xc = Grid % xc(c)
+129         yc = Grid % yc(c)
+130         zc = Grid % zc(c)
+131         vc = sg * ( (zc-zo(dir))/ro )
+132         wc = sg * ( (yo-yc     )/ro )
+133
+134         !--------------------------------------------+
+135         !   Gaussian distribution:                   !
+136         !                                - (x-a)^2   !
+137         !                  1           ^ ---------   !
+138         !   f(x) = ------------------ e  2 sigma^2   !
+139         !          sqrt(2 PI sigma^2)                !
+140         !                                            !
+141         !                                            !
+142         !          exp[-(x-a)^2 / (2 sigma^2)]       !
+143         !   f(x) = ---------------------------       !
+144         !              sqrt(2 PI sigma^2)            !
+145         !                                            !
+146         !          exp[-0.5 ((x-a) / sigma)^2]       !
+147         !   f(x) = ---------------------------       !
+148         !               sigma sqrt(2 PI)             !
+149         !--------------------------------------------!
+150         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+151         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+152
+153         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+154         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+155
+156         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+157         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+158
+159         ! Superimposed those fluctuations on spanwise and normal velocity comp.
+160         v % n(c) = v % n(c) + vc
+161         v % o(c) = v % o(c) + vc
+162         w % n(c) = w % n(c) + wc
+163         w % o(c) = w % o(c) + wc
+164       end do
+165     end do
+166   end do
+```
+
+If all this seems a bit complicated to you, don't worry, this same function
+works for any turbulent channel flow, so you won't be modifying it a lot.
+
+Both of these function reside in sub-directory ```Option_4/User_Mod/```.  To
+use them, you will have to re-compile _Process_ by specifying the path to that
+directory.  More specifically, from ```[root]/Sources/Process/``` run the
+command:
+```
+make clean
+make DIR_CASE=../../Tests/Manual/Inflows/Option_4/ MPI=yes
+```
+and then go back to the case directory (```[root]/Tests/Manual/Inflows/```)
+and run:
+```
+mpirun -np 4 ./Process > out_04 &
+```
+
+After a minute of simulation time, the results in the precursor and in the
+principal computational domain look like this:
+
+![!](Documentation/Manual/Figures/cylinder_final_option_4.png "")
+
+Solution in the precursor domain is periodic in streamwise and spanwise
+direction, and the leftmost plane from the precursor is coppied to the inlet
+of the principal computaional domain.  This case only demonstrates how to set
+boundary condidtion from a precursor domain.  In real application, the results
+from the precursor domain should be put under scrutiny themselves; is mesh
+fine enough, did we use proper physical models, is the domain large enough in
+periodic directions, are some of the questions which should be seriously
+addressed.
+
+## Outflows <a name="demo_outflows">
+
 # PETSc solvers <a name="link_petsc"> </a>
 
 Citing the official [PETSc](https://petsc.org/release/) pages, _PETSc, the
@@ -2903,15 +3645,15 @@ numbers. The DNS data of [Kim et al.](https://www.cambridge.org/core/journals/jo
 used here for comparison with RANS and LES solutions.
 
 The flow is bounded by two parallel flat walls separated by a distance 2h.
-Fluid flows in _x_ direction and has two homogeneous directions, _x_ and _y_, 
-meaning that the flow properties change only in the wall-normal direction 
-_z_. Reynolds number is Re = 13'000 based on the channel’s height, whereas 
+Fluid flows in _x_ direction and has two homogeneous directions, _x_ and _y_,
+meaning that the flow properties change only in the wall-normal direction
+_z_. Reynolds number is Re = 13'000 based on the channel’s height, whereas
 Reynolds number based on the friction velocity is Re<sub>τ</sub> = 590.
 
 <img src="Documentation/Manual/Figures/channel_domain.png" width="600"/>
 
 With this benchmark you will see how a turbulence models are defined in T-Flows,
-how wall is treated, basic setup of RANS and LES approaches and collecting 
+how wall is treated, basic setup of RANS and LES approaches and collecting
 statistics for scale-resolving simulations (LES in this section).
 
 ### RANS computation of a channel flow <a name="bench_plate_channel_rans"> </a>
@@ -2919,7 +3661,7 @@ statistics for scale-resolving simulations (LES in this section).
 The cases for RANS simulations of the channel flow come in two variants: a
 case with cells stretched towards the walls for low-Re number approach
 (integration down to the walls) and a case with uniform cells for high-Re
-number approach (wall functions).  Both cases are located in directory 
+number approach (wall functions).  Both cases are located in directory
 ```[root]/Manual/Channel_Re_Tau_590```, which has the following structure:
 ```
 [root]/Manual/Channel_Re_Tau_590/
@@ -3043,7 +3785,7 @@ converge for them, and you should use an unsteady approach, be it LES, unsteady
 RANS or hybrid RANS-LES. Since the turbulent channel flow does not fall into
 category of inherently unsteady flows, RANS approach is appropriate.
 
-T-Flows has several turbulence models implemented which differ in complexity 
+T-Flows has several turbulence models implemented which differ in complexity
 and level of physical description of turbulence. The default RANS model in
 T-Flows is the k-ε-ζ-f model proposed by [Hanjalic et al.](https://www.sciencedirect.com/science/article/abs/pii/S0142727X0400116X?via%3Dihub).
 The model proved to be more accurate and reliable compared to widely used
@@ -3087,7 +3829,7 @@ When profiles for streamwise velocity, turbulent kinetic energy, _uw_ stress
 and turbulent kinetic energy dissipation are extracted from this file and
 plotted against DNS data from [Kim et al.](https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/abs/turbulence-statistics-in-fully-developed-channel-flow-at-low-reynolds-number/308DCF387F4488D6A0FB189D8206DF7B), they look like this:
 
-<img src="Documentation/Manual/Figures/channel_rans_compare_dns.png" width="900"/>
+<img src="Documentation/Manual/Figures/channel_rans_compare_dns.png" width="600"/>
 
 Both results obtained on uniform grid (blue lines) and stretched grid (red
 lines) compare well against DNS results.
@@ -3103,7 +3845,394 @@ in directory ```[root]/Tests/...```.
 
 ## Round impinging jet and heat transfer <a name="bench_cases_jet"> </a>
 
+Impinging jets are challenging cases for RANS turbulence models due to
+different flow regimes present in the case (free jet region, impingement region,
+wall-jet region). The scheme of the impinging jet we are going to solve in this
+section, is shown here:
+
 <img src="Documentation/Manual/Figures/jet_domain.png" width="600"/>
+
+In the stagnation region, the occurrence of negative production of the
+turbulent kinetic energy close to the wall is out of reach of RANS models that
+are based on the eddy-viscosity concept. Hypothetically, this can be achieved
+only with the second-moment closure models. In this region, the turbulent
+kinetic energy is produced by normal straining rather than by shear as is the
+case in wall-parallel flows. The convective transport of turbulent kinetic
+energy is important, whereas in wall-parallel flows, it is usually
+insignificant. The near-wall turbulence scales are strongly affected by the jet
+turbulence and cannot be determined in terms of the wall distance. Because of
+all these effects, the impinging jets are well suited for testing the
+performance of turbulence models. [Craft et al](https://www.sciencedirect.com/science/article/pii/S0017931005802054)
+have tested k-ε and second-moment closures models for impinging jets with
+moderate success. The k-ε model significantly overpredicted the level of
+turbulent kinetic energy in the stagnation region, which caused an
+overprediction of the Nusselt number in the same region. Second-moment closure
+could improve the results, depending on the model sophistication.  However,
+none of the models were entirely successful. [Craft et al](https://www.sciencedirect.com/science/article/pii/S0017931005802054)
+oncluded that the main difficulty to accurately predict the Nusselt number came
+from the usage of the two-equation eddy-viscosity scheme adopted in all cases
+to model the near-wall sub-layer.
+
+We will use the $k-eps-zeta-f$ model for computation of the impinging jets at
+Re = 23 000, defined at the nozzle.  The distance from the nozzle to the
+impmingement plate is H = 2D.  The experimental data of [Cooper et al.](https://www.sciencedirect.com/science/article/pii/S0017931005802042)
+will be used for comparison of velocities and whereas the experiments of
+[Baughn and Shimizu](https://asmedigitalcollection.asme.org/heattransfer/article/111/4/1096/382888/Heat-Transfer-Measurements-From-a-Surface-With)
+will be used for comparison of Nusselt number. In both experiments the jet was
+issued from a fully developed pipe flow, which facilitates the computational
+representation of the experimental conditions.
+
+The case for impinging jet resides in the directory ```[root]/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000```
+whose contents read:
+```
+[root]/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000
+├── control
+├── convert.scr
+├── inlet_profile_zeta_re_23000.dat
+├── jet.neu.gz
+├── rad_coordinate.dat
+├── Results
+│   ├── nu_2d_baughn_shimizu.agr
+│   ├── nu_2d_comparison.agr
+│   ├── vel_magnitude_2d_baughn_shimizu.agr
+│   └── vel_magnitude_2d_comparison.agr
+└── User_Mod
+    ├── Save_Impinging_Jet_Nu.f90
+    ├── Save_Impinging_Jet_Profiles.f90
+    └── Save_Results.f90
+```
+The purpose of files ```control``` and ```convert.scr``` should be clear to you
+by now.  A thing which you may find novel is the file with extension
+```.neu.gz```.  That is the grid file in Fluent's legacy _neutral_ file format,
+hence the extension ```.neu```.
+
+> **_Note:_** Grids in neutral file format were created by Fluent's legacy
+mesh generator called Gambit.  Since Fluent got acquired by ANSYS, Gambit was
+dropped from the package and neutral file format became obsolete.  Since, we
+keep this file here for reproducibility of results.
+
+In addition to these, you can find the file ```rad_coordinate.dat``` which will
+be used by user functions, residing in sub-directory ```User_Mod``` during the
+execution of the program.  Sub-directory ```Results``` holds experimental
+measurements from [Baughn and Shimizu](https://asmedigitalcollection.asme.org/heattransfer/article/111/4/1096/382888/Heat-Transfer-Measurements-From-a-Surface-With).
+
+### Compiling the sub-programs <a name="bench_cases_jet_compiling"> </a>
+
+As the first step you should compile _Convert_ and _Divide_ sub-programsn in
+the way it was described in the section [Compiling sub-programs](#compiling_sub_programs).
+In addition, you wil have to compile the _Process_ with user functions pointing
+to case's directory, very similar as it was introduced [above](#demo_thermally_driven_variable).
+To be more specific, you should issue:
+```
+make clean
+make DIR_CASE=../../Tests/Manual/Impinging_Jet_2d_Distant_Re_23000 MPI=yes
+```
+to compile the _Process_ for this case.
+
+### Converting and dividing the mesh <a name="bench_cases_jet_converting"> </a>
+
+To run this case, in a Linux terminal go to directory ```[root]/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000```
+A very practical thing to do is to create links to executables in the working
+directory as it was explained [here](#seek_binaries). 
+
+Since the grid for this case comes in the gzipped format, you should first
+decompress it with:
+```
+gunzip jet.neu.gz
+```
+which will leave the file ```jet.neu``` in the current directory.  Once the grid
+file is decompressed, you must convert it to T-Flows' file format using the
+sub-program _Convert_ and the supplied scritp ```convert.scr``` like:
+```
+./Convert < convert.scr
+```
+This step should create a number of ```.vtu``` files for visualization of the
+grid and, more importantly, computational grid in T-Flows format which are
+the files ```jet.cfn``` and ```jet.dim```.
+
+Since we will run this case in parallel, using 16 processors, you should also
+decompose it from the command line with:
+```
+./Decompose jet 16
+```
+
+The entire computational domain colored by its decomposition in 16 sub-domains,
+is shown here:
+
+![!](Documentation/Manual/Figures/jet_decomposed.png "")
+
+### Running the simulation <a name="bench_case_jet_running"> </a>
+
+For this case, the _Process_ is compiled with user functions residing in
+directory ```[root]/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000/User_Mod```.
+There are three user functions, the _standard_ ```Save_Results```, and two
+additional ones: ```Save_Impinging_Jet_Nu``` and ```Save_Impinging_Jet_Profiles```.
+We call the first one _standard_ becuase it is a part of T-Flows and always
+called when T-Flows saves results.  In this case, it is a mere interface to
+two other functions:
+```
+  1 include '../User_Mod/Save_Impinging_Jet_Nu.f90'
+  2 include '../User_Mod/Save_Impinging_Jet_Profiles.f90'
+  3
+  4 !==============================================================================!
+  5   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  6 !------------------------------------------------------------------------------!
+  7 !   Calls Save_Impinging_Jet_Nu and Save_Impinging_Jet_Profile functions.      !
+  8 !------------------------------------------------------------------------------!
+  9   implicit none
+ 10 !---------------------------------[Arguments]----------------------------------!
+ 11   type(Field_Type)    :: Flow
+ 12   type(Turb_Type)     :: Turb
+ 13   type(Vof_Type)      :: Vof
+ 14   type(Swarm_Type)    :: Swarm
+ 15   integer, intent(in) :: ts     ! time step
+ 16   integer, optional   :: domain
+ 17 !==============================================================================!
+ 18
+ 19   ! Don't save if this is intial condition, nothing is developed yet
+ 20   if(ts .eq. 0) return
+ 21
+ 22   call Save_Impinging_Jet_Nu      (Turb, ts)
+ 23   call Save_Impinging_Jet_Profiles(Turb, ts)
+ 24
+ 25   end subroutine
+```
+The first of the called functions, reads the radial segments from the file
+```rad_coordinates.dat```, averages results over those segments and writes
+them in a special file called ```jet-nu-tsXXXXXX.dat```, where `XXXXXX` is
+the time step.  Withough going through each and every line of the code, let's
+just briefly explain a few sections.  
+
+Declaration of local variables which will be used for averaging results in the
+radial segments, is in lines 18-20:
+```
+ 18   real,    allocatable      :: u_s(:), v_s(:), w_s(:), t_s(:), tau_s(:), q_s(:)
+ 19   real,    allocatable      :: z_s(:), r_s(:), rad(:)
+ 20   integer, allocatable      :: n_count(:)
+```
+Here beginning of names ```u```, ```v```, ... stand for velocity components,
+temperature, wall friction, heat flux, wall distance, radii and extension
+```_s``` stands for segment.
+
+The function reads the ```rad_coordinate.dat``` in lines 40-68, checking if
+file exists (line 40) and issuing a warning message if it doesn't (lines 42-55).
+```
+ 40   inquire(file='rad_coordinate.dat', exist=there)
+ 41   if(.not.there) then
+ 42     if(this_proc < 2) then
+ 43       print *, "#=========================================================="
+ 44       print *, "# In order to extract Nusselt number profile               "
+ ...
+ ...
+ 54     end if
+ 55     return
+ 56   end if
+ 57
+ 58   call File % Open_For_Reading_Ascii('rad_coordinate.dat', fu)
+ 59
+ 60   ! Read the number of searching intervals·
+ 61   read(fu,*) n_prob
+ 62   allocate(rad(n_prob))
+ 63
+ 64   ! Read the intervals positions
+ 65   do i = 1, n_prob
+ 66     read(fu, *) rad(i)
+ 67   end do
+ 68   close(fu)
+```
+Line 58 is the standard way to open files in T-Flows.  One could use plain
+standard Fortran for that, but T-Flows' functions are encouraged because they
+come with additional checks and customizations.
+
+Lines 60-68 reveal the format and contents of file ```rad_coordinate.dat```,
+it reads number of readial cooridantes over which to perform averaging, and
+actual radial coordinate.
+
+With this data read, we perform averaging in lines 83-107:
+```
+ 83   do i = 1, n_prob - 1
+ 84     do s = 1, Grid % n_faces
+ 85       c1 = Grid % faces_c(1,s)
+ 86       c2 = Grid % faces_c(2,s)
+ 87       if(c2 < 0) then
+ 88         if(Grid % Bnd_Cond_Name(c2) .eq. 'LOWER_WALL') then
+ 89           r = sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
+ 90                    Grid % yc(c1)*Grid % yc(c1)) + TINY
+ 91           if(r < rad(i+1) .and. r > rad(i)) then
+ 92             r_s(i) = r_s(i) + sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
+ 93                                    Grid % yc(c1)*Grid % yc(c1))
+ 94             u_s(i) = u_s(i) +   u % n(c1) * Grid % xc(c1) / r  + &
+ 95                                 v % n(c1) * Grid % yc(c1) / r
+...
+...
+103             n_count(i) = n_count(i) + 1
+104           end if
+105         end if
+106       end if
+107     end do
+```
+We browse through segments (line 83), then faces (line 85), take the cells
+which surround each face (lines 85 and 86), check if the face is on a boundary
+called `LOWER_WALL` (lines 87 and 88), and then eventually if that face is
+also within the segment we want to average (line 91).  If this is all satisfied,
+the accumulation of values is performed in lines 92-102, and line 103 counting
+the number of faces in the segment.
+
+Since we intend to run this code in parallel, we should also make sure that
+the accumulation of sums is extended to all processors involved, ensured by
+lines 113-126:
+```
+113   do i = 1, n_prob
+114     call Comm_Mod_Global_Sum_Int(n_count(i))
+115
+116     call Comm_Mod_Global_Sum_Real(u_s(i))
+...
+...
+125     call Comm_Mod_Global_Sum_Real(t_s(i))
+126   end do
+
+```
+Once the sums are extend over all processors, averaged values are computed in
+lines 128-139 (not shown here) and results are eventually save to a file with
+desired file name in lines 145-167:
+```
+145   if(this_proc < 2) then
+146
+147     ! Set the file name
+148     call File % Set_Name(res_name, time_step=ts, &
+149                          appendix='-nu-utau', extension='.dat')
+150     call File % Open_For_Writing_Ascii(res_name, fu)
+151
+152     ! Write the file out
+153     write(fu, *) '# 1:Xrad, 2:Nu, 3:Utau, 4:Yplus, 5:Temp, 6:Numb of points '
+...
+...
+166     close(fu)
+167   end if
+```
+Line 145 ensures that the file is written only from one processor, lines
+148 and 149 set the file name in standard T-Flows' format.  Line 150 shows
+how to use T-Flows' standar way to open files and the rest is just plain
+Fortran which doesn't need furhter explanation.
+
+The remaining user function ```Save_Impinging_Jet_Profiles``` has a very
+similar structure as the ```Save_Impinging_Jet_Nu```, but a few differences.
+Instead of reading a file with radial coordinates, ```Save_Impinging_Jet_Profiles```
+reads a file with coordinates in $z$ direction, created during the grid
+conversion process (file ```jet.1d```).  Just like its sister it declares local
+variables for averaging the results, performs global summs over all processor
+for parallel runs, and eventually saves data for post-processing.
+
+As far as the ```control``` file is concerned, there is nothing very special
+about this case.  By trying different values of time steps and times of time
+integration, we learned that the optimum time step is 0.05, and the number
+of time steps to reach convergent results is 3600, which in the ```control```
+file looks like:
+```
+  TIME_STEP                 0.05
+  NUMBER_OF_TIME_STEPS   3600
+```
+
+We also observed that we obtain more stable results and more monitonic
+convergence of the solution procedure if Gauss' theorem is used for calculation
+of pressure gradients:
+```
+  GRADIENT_METHOD_FOR_PRESSURE       gauss_theorem
+```
+
+The highest under-relaxation factors for the SIMPLE procedure are specified
+by the following lines:
+```
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM      0.4
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE      0.4
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY        0.3
+  SIMPLE_UNDERRELAXATION_FOR_TURBULENCE    0.3
+```
+
+When specifying boundary conditions, there are two things worth mentioning.
+For the nozzle inlet, a profile of wall-normal velocity ($w$) and turbulent
+quantities are specified in the file ```inlet_profile_zeta_re_23000.dat```.
+When specifying boundary condition for the inlet, we direct T-Flows to read
+this profile file with:
+```
+  BOUNDARY_CONDITION    pipe_inlet
+    TYPE                inflow
+    VARIABLES           rz   u   v   w   t   kin   eps   zeta   f22
+    FILE                inlet_profile_zeta_re_23000.dat
+```
+The line beginning with the keyword ```VARIABLES``` tells T-Flows which
+variables are specified in the file.  The name of the file is specified in the
+line which follows beginning with the keyword ```FILE```.  We believe that
+all variable names are self-explanatory, except maybe ```rz``` which stands
+for radial coordinate (```r```) orthogonal to the $z$ plane (```z```).  More
+details on prescribing inlet profiles from files can be found in section
+[Prescribed velocity profile](#demo_inflows_parabolic).
+
+It might worth noting that the upper plane of the computation domain is actually
+defined as an inflow:
+```
+  BOUNDARY_CONDITION    top_plane
+    TYPE                inflow
+    VARIABLES           u     v     w      t      kin      eps      zeta     f22
+    VALUES              0.0   0.0  -0.01   20.0   1.0E-4   1.0E-5   6.6E-4   1.0e-4
+```
+with a velocity magnitude roughly 1% of the velocity comming through the inlet
+nozzle.  The reason for that is based on reasoning that the experiment for this
+case was conducted over an open plate, and it was innevitable that the jet
+itself would suck some of the surrounding air into the computational domain
+as we defined it.  This inlet with small intensity has negligible impact on
+the computed result, but helps the convergence procedure and natural movements
+of eddies over the lower plate.
+
+The simulation is conducted in parallel, using 16 processors:
+```
+mpirun -np 16 ./Process > out_16  &
+```
+
+We set in the control file that results are saved each 600 time steps.  A
+realization of velocity fiel after 1200 time steps (corresponding to one
+minute of physical time) looks like this:
+
+![!](Documentation/Manual/Figures/jet_velo_1200.png "")
+
+which illustrates pretty well what is happening througout the simulation.  The
+jet coming from the nozzle impinges at the lower wall, where it creates a big
+vortex which is gradually moving towards the outflow of the computational
+domain.
+
+At the time step 3600 (three minutes of physical time), the vortex left the
+domain, and all variables almost reach a steady solution.  It is not fully
+converged, but pretty close to a converged state.  The velocity field after
+3600 time steps looks like:
+
+![!](Documentation/Manual/Figures/jet_velo_3600.png "")
+
+The prominent vortex existing in previous realization has left the domain.
+
+### Comparing against experiments <a name="bench_h_case_jet_comparing"> </a>
+
+Once the simulation finishes, you should find these files in the working
+directory:
+```
+jet-0.5D-ts003600.dat
+jet-1.0D-ts003600.dat
+jet-2.5D-ts003600.dat
+jet-3.0D-ts003600.dat
+jet-nu-utau-ts003600.dat
+```
+The first four are a result of user function ```Save_Impinging_Jet_Profiles```
+and are used for comparing velocity profiles in the file ```Results/vel_magnitude_2d_baughn_shimizu.agr```.
+Once the comparison is done, the results should look like this:
+
+<img src="Documentation/Manual/Figures/jet_vel_comparison.png" width="600"/>
+
+The last file is the result of the user function ```Save_Impinging_Jet_Nu```
+and is used to compare the computed Nusselt numbers agains experiments as a
+function of radial coordinate.  Experimental results are stored in the file
+```Results/nu_2d_baughn_shimizu.agr```.  Once plotted together, the results
+should look like:
+
+<img src="Documentation/Manual/Figures/jet_nu_comparison.png" width="400"/>
 
 ## Large eddy simulation over a matrix of cubes <a name="bench_cases_matrix"> </a>
 
@@ -3117,7 +4246,7 @@ and the problen domain is sketched in this figure:
 
 There matrix entailed 16 rows and columns of cubes with the size of 15 x 15 x 15
 mm^3, mounted at a bottom wall of a channel 51 mm wide.  The pitch between the
-cubes is 60 mm.  Working fluid is air at room temperature, and LDA measurments
+cubes is 60 mm.  Working fluid is air at room temperature, and LDA measurements
 are reported by Meinders and Hanjalic for comparison against CFD simulations.
 
 Large eddy simulation approach is particularly well suited for this flow because
@@ -3129,7 +4258,7 @@ functions are amenable for this case.  On top of it, due to the fact that the
 cubes create large coherent structures which are inherently unsteady, RANS
 approach alone can't yield accurate predictions for this case.
 
-The case resides in the directiory ```[root]/Tests/Manual/Matrix_Of_Cubes/```.
+The case resides in the directory ```[root]/Tests/Manual/Matrix_Of_Cubes/```.
 if you check its contents, you will see that the following files have been
 prepared for you there:
 ```
@@ -3862,735 +4991,3 @@ results and compare them with benchmark solutions.
 
 ## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
 
-# Inflows and outflows <a name="demo_inflows">
-
-The information on prescribing inflows and outflows in T-Flows is somewhat
-scattereed over this manual, and we believe that a dedicated section is needed
-to outline all the option you have to prescribe them.  Like the section
-[Demonstration cases](#demo_cases), what we present here is neither a benchmark,
-nor is it rigorously following best practices in fluid flow modeling, it is a
-mere demonstration of options you have to prescribe inflow and, to a lesser
-extent, outflow.
-
-To demonstrate it, we picked the flow around a cylinder, using the computational
-domain as described by [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195).
-We do not solve the same case as the authors did.  We increase the domain size
-by a factor of ten, and the Re number by a factor of 250.  In spite of the
-similarity with the computational domain used in [John and Matthies](https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.195),
-the flow we will be solving here will neither be two-dimensional, nor steady.
-A sketch of the computational domain is presented here:
-
-<img src="Documentation/Manual/Figures/cylinder_domain.png" width="800"/>
-
-The case resides in the directory: ```[root]/Tests/Manual/Inflows/```.  Please
-go there and check the contensts.  It should read:
-```
-[root]/Tests/Manual/Inflows/
-├── convert.cylinder.scr
-├── convert.precursor.scr
-├── cylinder.geo
-├── precursor.geo
-├── Option_1
-│   └── control
-├── Option_2
-│   └── control
-├── Option_3
-│   └── control
-└── Option_4
-    ├── control
-    ├── control.1
-    ├── control.2
-    └── User_Mod
-        ├── End_Of_Time_Step.f90
-        └── Interface_Exchange.f90
-```
-
-Please compile the sources as explained in [Compiling the code](#compiling) and
-create links to executables as explained [here](#seek_binaries).  After that,
-generate the mesh with:
-```
-gmsh -3 cylinder.geo
-```
-and convert it to T-Flows format with:
-```
-./Convert < convert.cylinder.scr
-```
-
-If you visualize the mesh you obtain with ParaView, you should see something
-like this (only a detail around the cylinder is shown):
-
-![!](Documentation/Manual/Figures/cylinder_grid_detail.png "")
-
-As you can see, we took care that the grid around the cylinder is a hexahedral
-O-grid.  We didn't take much care about the channel walls as the main purpose
-of this section is to show you the concepts of prescribing inflow, rather than
-benchmarking the code.
-
-Should you want to run the simulations from this section in parallel, which we
-would recommend, you should also decompose the grid with:
-```
-./Divide  cylinder  4
-```
-
-> **_Note:_**  Don't go overboard with number of processors as you will end up
-communicating between processors more than computing.  A useful rule of thumb
-is to have around a hundred thousand cells per processor.  This grid has approximatelly
-300'000 cells, so four is a reasonable choice.
-
-## Flat velocity profile <a name="demo_inflows_flat"> </a>
-
-First option is to prescribe a flat velocity profile.  To do that, use the
-control file in sub-directory ```Option_1```.  We believe the best way to do
-it is to make a link to ```control``` file in ```Option_1``` directory with:
-```
-ln -i -s Option_1/control .
-```
-
-If you open it, you can see the couple of choices we made.  Time step is 0.01
-and the number of time steps 6000, resulting in a total physical simulation
-time of 60 s or one minute.
-```
- TIME_STEP                             0.01
- NUMBER_OF_TIME_STEPS               6000
-```
-
-> **_Note:_** A clear example why it is handy to specify number of time steps
-which are multiples of 30.  It is more likely that final simulation times would
-be in units more amenable to humans.
-
-Viscosity is 2.0e-4, resulting in Re number of 5000, which might not be
-quite turbulent, but is certainly not steady either.  We do, nonetheless, set
-the turbulence model to be LES with Smagorinsky:
-```
- TURBULENCE_MODEL       les_smagorinsky
-```
-
-Being an LES, the simulation will be more efficient with PISO algorithm, so we
-set that next. with necessary adjustments to under-relaxation parameters:
-```
- PRESSURE_MOMENTUM_COUPLING            piso
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   1.0
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE   1.0
-```
-and we also increase the order of accuracy of time integration to parabolic:
-```
- TIME_INTEGRATION_SCHEME               parabolic
-```
-
-For cases with inflow and outflow, it is often useful to start from initial
-velocity field obtained from a solution to inviscid flow, which is set in
-```control``` file with:
-```
- POTENTIAL_INITIALIZATION              yes
-```
-
-The most important for this section are the inflow and the outflow.  They are
-set with following entries in ```control``` file:
-```
- BOUNDARY_CONDITION  in
-   TYPE              inflow
-   VARIABLES         u     v     w
-   VALUES            1.0   0.0   0.0
-
- BOUNDARY_CONDITION  out
-   TYPE              convective
-   VARIABLES         u     v     w
-   VALUES            0.0   0.0   0.0
-```
-
-For inflow (called ```in``` in ```.geo``` file) we set the type to ```inflow```
-and specify velocity in _x_ direction to be constant and equal to one.  For
-outflow (called ```out``` in ```.geo``` file) we set the condition to be of
-type ```convective```, which is described by [Bottaro](https://www.tandfonline.com/doi/abs/10.1080/10407799008944952)
-and it should allow eddies to leave computational domain without disrupting
-the flow field inside.
-
-Other options for outflow include ```outflow``` which is a simple vanishing
-derivative condition and ```pressure``` which sets pressure at zero at the
-outflow.  For this case, given that we can expect some eddies leaving the
-domain, ```convective``` is the preferred choice.
-
-With all that explained, you can either launch the simulation with (provided
-you decomposed the grid):
-```
-mpirun -np 4 ./Process > out_01
-```
-
-Soon after the launch, it is useful to check how the initial condition looked
-like, which you can do if you visualize the file ```cylinder-ts000000.pvtu```:
-
-![!](Documentation/Manual/Figures/cylinder_initial.png "")
-
-The solution after one minute of physical time looks like this:
-
-![!](Documentation/Manual/Figures/cylinder_final_option_1.png "")
-
-We can see vortex shedding, which is fine, but having flat profile at the inlet
-is hardly physical.  We can do better than that, which is the subject of the
-following sections.
-
-## Prescribed velocity profile <a name="demo_inflows_parabolic"> </a>
-
-Next option we can easily implement in T-Flows, is to prescribe the
-inlet velocity profile, specified in external file.  To try that, make a link
-to the ```control``` file in the sub-directory ```Option_2``` as:
-```
-ln -i -s Option_2/control .
-```
-
-The only section in which this control file differs from the previous one is
-the section regarding inflow boundary conditions, and in this case it reads:
-```
- BOUNDARY_CONDITION  in
-   TYPE              inflow
-   VARIABLES         y   u
-   FILE              profile.dat
-```
-Instead of keyword ```VALUES``` under the ```VARIABLES``` we have ```FILE```,
-telling _Process_ to read the values from a file, rather than giving them
-constant values.  The file is ASCII, and it lists the values in columns,
-first of which is the coordinate, and the rest can be any variables _Process_
-might need.  In this case, it is only one velocity component, ```u```.  What
-is to be read from the file, is given in line ```VARIABLES```.  In this case,
-it will be _y_ coordinate, followed by _u_ velocities.
-
-To facilitate the prescription of this file, we placed a small utility in
-```[root]/Sources/Utilities/Parabolic.f90``` for prescribing parabolic
-velocity profile, which should be compiled with, say:
-```
-gfortran -o Parabolic Parabolic.f90
-```
-and can be invoked from command line with:
-```
-./Parabolic  x_start  x_end  bulk_velocity  n_points
-```
-Here, first and second parameter are starting and ending coordinates (not
-necessarily _x_), the desired bulk velocity and number of points over which
-you want to describe the profile.  Since we want to span the parabolic profile
-over _y_, and we know that our _y_ ranges from 0 to 4.1, we know that the
-desired bulk velocity is one, we can invoke _Parabolic_ with:
-```
-./Parabolic  0  4.1  1  31
-```
-to get:
-```
- #==================
- # Number of points
- #==================
-          31
- #=================================
- #   Coordinate      Velocity
- #=================================
-     0.00000E+00     0.00000E+00
-     1.36667E-01     1.93333E-01
-     2.73333E-01     3.73333E-01
-     4.10000E-01     5.40000E-01
-     5.46667E-01     6.93333E-01
-     6.83333E-01     8.33333E-01
-     8.20000E-01     9.60000E-01
-     9.56667E-01     1.07333E+00
-     1.09333E+00     1.17333E+00
-     1.23000E+00     1.26000E+00
-     1.36667E+00     1.33333E+00
-     1.50333E+00     1.39333E+00
-     1.64000E+00     1.44000E+00
-     1.77667E+00     1.47333E+00
-     1.91333E+00     1.49333E+00
-     2.05000E+00     1.50000E+00
-     2.18667E+00     1.49333E+00
-     2.32333E+00     1.47333E+00
-     2.46000E+00     1.44000E+00
-     2.59667E+00     1.39333E+00
-     2.73333E+00     1.33333E+00
-     2.87000E+00     1.26000E+00
-     3.00667E+00     1.17333E+00
-     3.14333E+00     1.07333E+00
-     3.28000E+00     9.60000E-01
-     3.41667E+00     8.33333E-01
-     3.55333E+00     6.93333E-01
-     3.69000E+00     5.40000E-01
-     3.82667E+00     3.73333E-01
-     3.96333E+00     1.93333E-01
-     4.10000E+00     0.00000E+00
-```
-which you should copy to file ```profile.dat```.
-
-> **_Note:_**  The centerline velocity, at _y_ is 2.05 is 1.5.  This is what
-you expect from parabolic velocity profile.  Centerline velocity is 3/2 times
-the bulk velocity.
-
-If you were in the case directory (```[root]/Tests/Manual/Inflows/```) you
-could have also redirect the output from profile with:
-```
-../../../Sources/Utilities/Parabolic > profile.dat
-```
-
-Clearly, the profile you prescribe in this ASCII file does not have to be
-parabolic, nor does it have to be generated with T-Flows' utility _Parabolic_.
-You could specify it from experimental or DNS data you have at your disposal.
-You only have to follow the format:
-- first non-comment line specifies the number of points
-- all the remaining lines specify values you want to prescribe in columns
-- the description of values in columns is given after the keyword ```VARIABLES```in ```control``` file.
-
-Anyhow, once you have the ```profile.dat``` in the working directory
-(```[root]/Tests/Manual/Inflows/```), you can
-launch the simulation in the same way you did for the [Flat velocity profile](#demo_inflows_flat)
-which could be:
-```
-mpirun -np 4 ./Process > out_4  &
-```
-
-The solution after one minute of physical time looks like this:
-
-![!](Documentation/Manual/Figures/cylinder_final_option_2.png "")
-
-We hope you can see distribution of velocity magnitude at the inlet, which
-was constant in the previous case.  THe intensities of velocity magnitude in
-this case are higher by some 20% than in the case with flat velocity profile.
-For both cases we computed roughly three flow through times and ```convective```
-outflow seems to be handling the eddies which are leaving the domain pretty
-well.
-
-## Synthetic eddies <a name="demo_inflows_eddies"> </a>
-
-As we said in [](#), we departed from the benchmark in increasing the Re
-number by a factor of 250, so we might expect some turbulence, unsteadiness at
-the very least.  Since we run simulations in unsteady mode with LES model, why
-not adding some unsteadiness at the inlet?  Well, that is possible thanks to
-_Process_'s class ```Eddies_Mod``` which has the functionality to impose unsteady
-eddies at the inflow.  The method is heavily based on the work from
-[Jarin et al.](https://www.sciencedirect.com/science/article/pii/S0142727X06000282)
-
-The control file for the case of synthetic eddies is in sub-directory ```Option_3```.
-To use it, do the same as for previous cases, link the ```control``` file from
-that sub-directory to the current:
-```
-ln -i -s Option_3/control .
-```
-
-The only difference in that control file, compared to the one given in
-[Flat velocity profile](#demo_inflows_flat) are these line:
-```
- SYNTHETIC_EDDIES    in
-   NUMBER_OF_EDDIES  40
-   MAX_EDDY_RADIUS   0.5
-   EDDY_INTENSITY    0.2
-```
-which instruct _Process_ to create synthetic eddies at the boundary called
-```in```, to create 40 of them with maximum radius of 0.5 (roughly 1/8 of
-the domain size in this case) and with maximum intensity of 0.2.  It is
-important to add that these eddies are _superimposed_ on whatever was given
-for the velocity values in section ```in```:
-```
- BOUNDARY_CONDITION  in
-   TYPE              inflow
-   VARIABLES         u     v     w
-   VALUES            1.0   0.0   0.0
-```
-If we prescribed a logarithmic velocity profile there with the proper file as
-explained in [Prescribed velocity profile](#demo_inflows_parabolic), eddies would be
-imposed over that logarithmic profile.  In this case, however, the eddies will
-be superimposed over the flat velocity profile.
-
-Once the new control file is in the working directory (```[root]/Tests/Manual/Inflows/```)
-you can launch it with:
-```
-mpirun -np 4 ./Process > out_03  &
-```
-
-After a minute of simulation time, results look like this:
-
-![!](Documentation/Manual/Figures/cylinder_final_option_3a.png "")
-
-We hope you can see eddies at the inlet plane, they show as orange rings with
-locally higher velocity magnitueds.  To see the evolution of the eddies, it
-would probably be good to play a movie in ParaView.
-
-A cut through solution:
-
-![!](Documentation/Manual/Figures/cylinder_final_option_3b.png "")
-
-Shows how eddies from the inlet face (```in```) penetrate all the way to the
-cylinder.
-
-## Turbulent precursor domain <a name="demo_inflows_turbulent"> </a>
-
-Synthetic eddies are a neat way to prescribe some unsteadiness at the inflow,
-but they are artifical, synthetic, we may want more accurate prescription of
-turbulence.  To that end, we may use T-Flows' ability to solve equations in
-several domains at once, and dedicate one domain to be only the generator of
-the inflow for another.  In the case directory (```[root]/Tests/Manual/Inflows/```),
-in addition to the principal problem domain (```cylinder.geo```) we also give the
-file ```precursor.geo```, which serves that purpose - if ran through GMSH, it
-will create a precursor domain for the principal domain.
-
-As you were warned in [Conjugate heat transfer](#bench_conjugate), for two
-domains to be coupled in _Process_, they must have conforming grids at the
-interface.  The best way to go about it in GMSH, in our humble opinion, is to
-create two grids (precursor and principal) at once, creating the precursor
-domain by extruding thse inflow face.  This is a very safe way to ensure
-grid conformity at the interface.  Indeed, if you check the differences between
-``cylinder.geo```` and ```precursor.geo```, you will see they differ in two
-lines only:
-```
-diff cylinder.geo  precursor.geo
-
-9,10c9,10
-< PRECURSOR = 0;
-< CYLINDER  = 1;
----
-> PRECURSOR = 1;
-> CYLINDER  = 0;
-```
-which tell GMSH which domain to save.  (We hope it is clear that ```.geo```
-variables ```PRECURSOR``` and ```CYLINDER``` tell gmsh whether to save the
-mesh for precursor or principal doman.
-
-Since you have already generated and converted the principal domain, now you
-should do it for the precursor too with:
-```
-gmsh -3 precursor.geo
-```
-and:
-```
-./Convert < convert.precursor.scr
-```
-As we said in [Flat velocity profile](#demo_inflows_flat), we are running this
-case in parallel, so precursor domain should be sub-divided in the same number
-of processors as principal domain was:
-```
-./Divide  precursor  4
-```
-
-> **_Note 1:_** Precursor domain is, in this case, just a channel with two
-periodic directions, _x_ and _z_.  It doesn't have inflows or outflows, it will
-be driven by a pressure drop to achieve the desired mass flux like, for example
-[Large eddy simulation over a matrix of cubes](#bench_cases_matrix).
-
-> **_Note 2:_**  Since precursor domain is usually smaller and its grid is coarser
-this may seem like an overkill or limitation.  But it is not.  _Process_ solves
-one domain after another, so if less processors were used for precursor domain,
-the remaining ones would be idle.  So, it is the only reasonable approach to use
-the same number of processors for both domains.
-
-If you visuallise both domains in ParaView (that is files ```cylinder.pvtu```
-and ```precursor.pvtu```) and show variable "Processor" it will look something
-like this:
-
-![!](Documentation/Manual/Figures/cylinder_both_partitioned.png "")
-
-showing that, although interface should be conforming, the partitioning does not
-have to be.
-
-As explained in [Conjugate heat transfer](#bench_conjugate), the way _Process_
-goes about simulating in multiple domains, is to have a control file for each
-of the domains called ```control.1```, ```control.2``` and so forth, and one
-central ```control``` file with information about coupling.  For this particular
-case, all control files are in sub-directory ```Option_4```.  To use them,
-feel free to remove any existing control files currently residing in the
-working directory and make the links:
-```
-rm -f control
-ln -i -s Option_4/control* .
-```
-
-At this point it might be worth nothing that ```control.2``` is the same as
-```control``` from ```Option_1```.  The ```control.1```, for the precursor is
-not very different from ```control.2```.  Problem domain is called
-```precursor```.
-```
- PROBLEM_NAME        precursor
-```
-advection scheme is set to ```central``` to help maintain turbulence in the
-precursor domain
-```
- ADVECTION_SCHEME    central
-```
-and desired mass flux is prescribed in _x_ direction:
-```
- MASS_FLOW_RATES              16.4  0.0  0.0
-```
-
-> **_Note:_** Desired bulk velocity is 1.0, cross sectional area is
-4 x 4.1 = 16.4.  Density is not prescribed hence _Process_ will set it to 1.0,
-which makes the desired mass flow rate of 16.4.
-
-Furthermore, the point for monitoring plane has been shifted to be inside the
-precursor domain:
-```
- POINT_FOR_MONITORING_PLANES  -6.0  0.5  0.5
-```
-and initial conditions are _not_ computed from potential field, since there are
-no inlets and outlets in this periodic domain:
-```
- INITIAL_CONDITION
-   VARIABLES        u     v     w
-   VALUES           1.0   0.0   0.0
-```
-
-The central ```control``` file gives information on the coupling, as described
-in detail in [Conjugate heat transfer](#bench_conjugate).  In this case, it
-reads (with comments ommited):
-```
- NUMBER_OF_DOMAINS         2
-
- TIME_STEP                             0.01
- NUMBER_OF_TIME_STEPS               6000
-
- TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-3
- MIN_SIMPLE_ITERATIONS                 2
-
- INTERFACE_CONDITION      precursor    cylinder
-   BOUNDARY_CONDITIONS    periodic_x   in
-```
-where last two lines are important.  They tell processor that periodicity in _x_
-direction from domain ```precursor``` are coppied to the face called ```in```
-in domain ```cylinder```.
-
-However, that is not enough.  Since types of couplings between domains in a CFD
-simulation are infinite, they are dealt with through a user function.  In
-[Conjugate heat transfer](#bench_conjugate) we used the one provided with
-_Process_ by default, which couples temperatures, as presumably the most basic
-case for coupled simulations.  For velocity coupling we need a special version
-which is in sub-directory ```Option_4/User_Mod/Interface_Exchange.f90```.
-It would take us too far to explain this function in detail, but let's just say
-that it works in two steps; in the first one it gathers information from all
-domains involved and stores them in a special buffer, and in the second step
-distributes the information from one step to another.
-
-In the same directory there is another user function whose purpose is to
-introduces synthetic eddies in the precursor domain.  It is the
-```User_Mod_End_Of_Time_Step```.  These eddies are introduced to help the
-precursor domain to reach turbulent flow regime.  The eddies are formed from
-initial rigid body rotation velocity field (_u_=0; _v_=_z_-_zo_; _w_=_y_-_yo_;
-where _yo_ and _zo_ are the center of an eddy in the plane normal to streamwise
-velocity direction), which are damped by Gaussian distribution as we move
-further away from eddies centers (_xo_, _yo_ and _zo_). This may sound a bit
-fuzzy, so we make an attempt to illustrate our words in the following figure:
-
-<img src="Documentation/Manual/Figures/eddy_convolution.png" width="750"/>
-
-The graph on the left (black lines and gray shaded areas) represent rigid body
-rotation with center at (_y_=0, _z_=0).  The graph in the middle shows two
-Gaussuan curves (red lines, pink shades, darker pink the overlap) formed around
-the eddy center.  The graph on the right (blue lines, light blue shades) shows
-the convolution of the previous two functions and shows a smooth eddy whose
-center is at (_y_=0, _z_=0).
-
-The eddies are placed at random positions, random senses of rotation and random
-intensities - all within bounds of geometrically meaningful (inside domain) and
-physically ralizable (limited intensity).
-
-Coming back to the function which introduces eddies (the
-```User_Mod_End_Of_Time_Step```), it was used in cases explained above and we
-hope we don't have to give each and every detail of it.  The header and the
-arguments passed to the function in particular, were explained above and we will
-focus only on what is important to place eddies in the domain.
-
-The function is invoked at the end of each time step, but line 37 makes sure
-that eddies are not placed too frequently, only every 120 time steps:
-```
- 37   if(mod(curr_dt, 120) .ne. 0) return
-```
-We hope that after a certain number of time steps turbulence in the
-precursor domain will be self-sustainable, so we stop introducing the eddies
-after the time step 1440:
-```
- 40   if(curr_dt > 1440) return
-```
-
-Also, we want to restrict perturbation with eddies only in precursor domain
-which is achiveve with this line:
-```
- 49   ! Impose eddies only in precursor domain
- 50   if(Grid % name .ne. 'PRECURSOR') return
-```
-
-In order to place the eddies inside the domain, we must find its extents over
-nodes.  This is done in these lines:
-```
- 57   !--------------------------------------!
- 58   !   Size of the computational domain   !
- 59   !                                      !
- 60   !   This algorithm is not silly. We    !
- 61   !   could have browsed through nodes   !
- 62   !   only, but then we might have en-   !
- 63   !   countered some hanging from GMSH   !
- 64   !--------------------------------------!
- 65   xmin = HUGE;  xmax = -HUGE
- 66   ymin = HUGE;  ymax = -HUGE
- 67   zmin = HUGE;  zmax = -HUGE
- 68   do c = 1, Grid % n_cells
- 69     do i_nod = 1, Grid % cells_n_nodes(c)
- 70       n = Grid % cells_n(i_nod, c)
- 71       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
- 72       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
- 73       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
- 74     end do
- 75   end do
- 76   call Comm_Mod_Global_Min_Real(xmin)
- 77   call Comm_Mod_Global_Min_Real(ymin)
- 78   call Comm_Mod_Global_Min_Real(zmin)
- 79   call Comm_Mod_Global_Max_Real(xmax)
- 80   call Comm_Mod_Global_Max_Real(ymax)
- 81   call Comm_Mod_Global_Max_Real(zmax)
- 82   lx = xmax - xmin
- 83   ly = ymax - ymin
- 84   lz = zmax - zmin
-```
-In lines 68 - 75, we browse through all the cells, and through individual nodes
-of each cell in line 69.  Field ```Grid % cells_n_nodes(c)``` holds the number
-of nodes for each cell.  In line 70, we take the grid node index (```i_nod```
-is just to browse locally through cell) and in lines 71 - 73, we are seeking
-for minimum and maximum coordinates in each direction.  Lines 76 - 81 ensure
-we work with extrema over all processors.  Variables ```lx```, ```ly``` and
-```lz``` hold global domain dimensions.
-
-Once the domain dimensions are know, we can also set minimum and maximum size
-of the eddies:
-```
- 86   ! Minimum and maximum size of eddies
- 87   rmin = min(ly, lz) / 10.0
- 88   rmax = min(ly, lz) /  5.0
-```
-We only compare eddy radius in plane orthogonal to the streamwise direction
-(assumed to be _x_ here) and that is why we only use dimension in _y_ and
-_z_ to correlate eddy sizes.
-
-This function introduces 48 eddies (hard-coded) in line 90:
-```
- 90   !-------------------------------!
- 91   !   Browse through all eddies   !
- 92   !-------------------------------!
- 93   do eddy = 1, 48
- 94
- 95     ! Random direction of the vortex
- 96     call random_number(sg);
- 97     if(sg < 0.5) then
- 98       sg = -1.0
- 99     else
-100       sg = +1.0
-101     end if
-102
-103     ! Determine random position of a vortex
-104     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
-105     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
-106     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
-107     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
-108
-109     ! Handle periodicity; that is: copy eddie in periodic directions
-110     xo(2:4) = xo(1)
-111     zo(2:4) = zo(1)
-112     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
-113     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
-114     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
-115     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
-116     xo(4) = xo(3)
-117     zo(4) = zo(2)
-...
-```
-Their sense of rotation is assigned randomly in lines 96 - 101, and their random
-positions (inside the domain) in lines 104 - 107.  Lines 110 - 117 take care of
-periodicity, that is, make coppies of eddies in periodic directions (here _x_
-and _z_) depending on their relative position inside the domain.
-
-We set the lenght of each eddy to be six times its radius:
-```
-119     ! Length of the eddy is six times the diameter
-120     lo = ro * 6.0
-```
-We limit eddy extents with Gaussian distribution.  The sigma coefficients
-for Gaussian distribution in direction orthogonal to the flow (_y_ and _z_) and
-parallel to the flow (_x_) is set in lines 119 and 120:
-```
-122     sig_yz = ro / 2.0
-123     sig_x  = lo / 2.0
-```
-
-> **_Note:_** The ```sigma_yz``` would be the red functions in the figure
-introduced above.
-
-Finally, in lines 123 - 162 we superimpose sytnthetic eddies over current
-velocity field.  Lines 125 - 127 take cell center coordinates from the grid
-and lines 128 and 129 compute rigid body rotation velocity components (```vc```
-and ```wc```)
-
-> **_Note:_** The ```vc``` and ```wc``` would be the black functions in the
-figure introduced above.
-
-```
-125     ! Superimpose eddies on the velocity field
-126     do dir = 1, 4
-127       do c = 1, Grid % n_cells
-128         xc = Grid % xc(c)
-129         yc = Grid % yc(c)
-130         zc = Grid % zc(c)
-131         vc = sg * ( (zc-zo(dir))/ro )
-132         wc = sg * ( (yo-yc     )/ro )
-133
-134         !--------------------------------------------+
-135         !   Gaussian distribution:                   !
-136         !                                - (x-a)^2   !
-137         !                  1           ^ ---------   !
-138         !   f(x) = ------------------ e  2 sigma^2   !
-139         !          sqrt(2 PI sigma^2)                !
-140         !                                            !
-141         !                                            !
-142         !          exp[-(x-a)^2 / (2 sigma^2)]       !
-143         !   f(x) = ---------------------------       !
-144         !              sqrt(2 PI sigma^2)            !
-145         !                                            !
-146         !          exp[-0.5 ((x-a) / sigma)^2]       !
-147         !   f(x) = ---------------------------       !
-148         !               sigma sqrt(2 PI)             !
-149         !--------------------------------------------!
-150         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-151         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-152
-153         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-154         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-155
-156         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-157         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-158
-159         ! Superimposed those fluctuations on spanwise and normal velocity comp.
-160         v % n(c) = v % n(c) + vc
-161         v % o(c) = v % o(c) + vc
-162         w % n(c) = w % n(c) + wc
-163         w % o(c) = w % o(c) + wc
-164       end do
-165     end do
-166   end do
-```
-
-If all this seems a bit complicated to you, don't worry, this same function
-works for any turbulent channel flow, so you won't be modifying it a lot.
-
-Both of these function reside in sub-directory ```Option_4/User_Mod/```.  To
-use them, you will have to re-compile _Process_ by specifying the path to that
-directory.  More specifically, from ```[root]/Sources/Process/``` run the
-command:
-```
-make clean
-make DIR_CASE=../../Tests/Manual/Inflows/Option_4/ MPI=yes
-```
-and then go back to the case directory (```[root]/Tests/Manual/Inflows/```)
-and run:
-```
-mpirun -np 4 ./Process > out_04 &
-```
-
-After a minute of simulation time, the results in the precursor and in the
-principal computational domain look like this:
-
-![!](Documentation/Manual/Figures/cylinder_final_option_4.png "")
-
-Solution in the precursor domain is periodic in streamwise and spanwise
-direction, and the leftmost plane from the precursor is coppied to the inlet
-of the principal computaional domain.  This case only demonstrates how to set
-boundary condidtion from a precursor domain.  In real application, the results
-from the precursor domain should be put under scrutiny themselves; is mesh
-fine enough, did we use proper physical models, is the domain large enough in
-periodic directions, are some of the questions which should be seriously
-addressed.
