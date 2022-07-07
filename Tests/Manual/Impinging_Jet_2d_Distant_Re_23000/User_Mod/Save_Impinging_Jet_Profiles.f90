@@ -19,7 +19,7 @@
   character(SL)             :: coord_name, res_name, ext
   real,    allocatable      :: z_p(:), zm_p(:), u_p(:),  v_p(:), w_p(:), t_p(:)
   real,    allocatable      :: kin_p(:), eps_p(:), vis_p(:), zet_p(:), f22_p(:)
-  integer, allocatable      :: n_p(:), n_count(:)
+  integer, allocatable      :: n_count(:)
   real                      :: r, r1, r2, u_rad, u_tan, lnum
 !==============================================================================!
 
@@ -49,7 +49,6 @@
   end do
   close(fu)
 
-  allocate(n_p  (n_prob));  n_p   = 0
   allocate(u_p  (n_prob));  u_p   = 0.0
   allocate(v_p  (n_prob));  v_p   = 0.0
   allocate(w_p  (n_prob));  w_p   = 0.0
