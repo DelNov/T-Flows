@@ -3103,6 +3103,8 @@ in directory ```[root]/Tests/...```.
 
 ## Round impinging jet and heat transfer <a name="bench_cases_jet"> </a>
 
+<img src="Documentation/Manual/Figures/jet_domain.png" width="600"/>
+
 ## Large eddy simulation over a matrix of cubes <a name="bench_cases_matrix"> </a>
 
 We chose the case of the flow over a surface-mounted matrix of cubes to give you
