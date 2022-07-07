@@ -1,7 +1,7 @@
 # Grace project file
 #
 @version 50125
-@page size 792, 612
+@page size 842, 595
 @page scroll 5%
 @page inout 5%
 @link page off
@@ -90,7 +90,7 @@
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Thu Jul  7 14:46:52 2022"
+@timestamp def "Thu Jul  7 14:37:55 2022"
 @with line
 @    line on
 @    line loctype view
@@ -393,6 +393,55 @@
 @    s0 errorbar riser clip length 0.100000
 @    s0 comment "Cols 1:2"
 @    s0 legend  "Exp. Baughn and Shimizu (1989)"
+@    s2 hidden false
+@    s2 type xy
+@    s2 symbol 0
+@    s2 symbol size 1.000000
+@    s2 symbol color 4
+@    s2 symbol pattern 1
+@    s2 symbol fill color 4
+@    s2 symbol fill pattern 0
+@    s2 symbol linewidth 1.0
+@    s2 symbol linestyle 1
+@    s2 symbol char 65
+@    s2 symbol char font 0
+@    s2 symbol skip 0
+@    s2 line type 1
+@    s2 line linestyle 1
+@    s2 line linewidth 2.5
+@    s2 line color 4
+@    s2 line pattern 1
+@    s2 baseline type 0
+@    s2 baseline off
+@    s2 dropline off
+@    s2 fill type 0
+@    s2 fill rule 0
+@    s2 fill color 1
+@    s2 fill pattern 1
+@    s2 avalue off
+@    s2 avalue type 2
+@    s2 avalue char size 1.000000
+@    s2 avalue font 0
+@    s2 avalue color 1
+@    s2 avalue rot 0
+@    s2 avalue format general
+@    s2 avalue prec 3
+@    s2 avalue prepend ""
+@    s2 avalue append ""
+@    s2 avalue offset 0.000000 , 0.000000
+@    s2 errorbar on
+@    s2 errorbar place both
+@    s2 errorbar color 4
+@    s2 errorbar pattern 1
+@    s2 errorbar size 1.000000
+@    s2 errorbar linewidth 1.0
+@    s2 errorbar linestyle 1
+@    s2 errorbar riser linewidth 1.0
+@    s2 errorbar riser linestyle 1
+@    s2 errorbar riser clip off
+@    s2 errorbar riser clip length 0.100000
+@    s2 comment "/home/niceno/Development/T-Flows-Has-Pressure/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000/jet-0.5D-ts003600.dat"
+@    s2 legend  "T-Flows"
 @g1 on
 @g1 hidden false
 @g1 type XY
@@ -596,6 +645,55 @@
 @    s0 errorbar riser clip length 0.100000
 @    s0 comment "Cols 1:2"
 @    s0 legend  ""
+@    s2 hidden false
+@    s2 type xy
+@    s2 symbol 0
+@    s2 symbol size 1.000000
+@    s2 symbol color 4
+@    s2 symbol pattern 1
+@    s2 symbol fill color 4
+@    s2 symbol fill pattern 0
+@    s2 symbol linewidth 1.0
+@    s2 symbol linestyle 1
+@    s2 symbol char 65
+@    s2 symbol char font 0
+@    s2 symbol skip 0
+@    s2 line type 1
+@    s2 line linestyle 1
+@    s2 line linewidth 2.5
+@    s2 line color 4
+@    s2 line pattern 1
+@    s2 baseline type 0
+@    s2 baseline off
+@    s2 dropline off
+@    s2 fill type 0
+@    s2 fill rule 0
+@    s2 fill color 1
+@    s2 fill pattern 1
+@    s2 avalue off
+@    s2 avalue type 2
+@    s2 avalue char size 1.000000
+@    s2 avalue font 0
+@    s2 avalue color 1
+@    s2 avalue rot 0
+@    s2 avalue format general
+@    s2 avalue prec 3
+@    s2 avalue prepend ""
+@    s2 avalue append ""
+@    s2 avalue offset 0.000000 , 0.000000
+@    s2 errorbar on
+@    s2 errorbar place both
+@    s2 errorbar color 4
+@    s2 errorbar pattern 1
+@    s2 errorbar size 1.000000
+@    s2 errorbar linewidth 1.0
+@    s2 errorbar linestyle 1
+@    s2 errorbar riser linewidth 1.0
+@    s2 errorbar riser linestyle 1
+@    s2 errorbar riser clip off
+@    s2 errorbar riser clip length 0.100000
+@    s2 comment "/home/niceno/Development/T-Flows-Has-Pressure/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000/jet-1.0D-ts003600.dat"
+@    s2 legend  ""
 @g2 on
 @g2 hidden false
 @g2 type XY
@@ -799,6 +897,55 @@
 @    s0 errorbar riser clip length 0.100000
 @    s0 comment "Cols 1:2"
 @    s0 legend  ""
+@    s2 hidden false
+@    s2 type xy
+@    s2 symbol 0
+@    s2 symbol size 1.000000
+@    s2 symbol color 4
+@    s2 symbol pattern 1
+@    s2 symbol fill color 4
+@    s2 symbol fill pattern 0
+@    s2 symbol linewidth 1.0
+@    s2 symbol linestyle 1
+@    s2 symbol char 65
+@    s2 symbol char font 0
+@    s2 symbol skip 0
+@    s2 line type 1
+@    s2 line linestyle 1
+@    s2 line linewidth 2.5
+@    s2 line color 4
+@    s2 line pattern 1
+@    s2 baseline type 0
+@    s2 baseline off
+@    s2 dropline off
+@    s2 fill type 0
+@    s2 fill rule 0
+@    s2 fill color 1
+@    s2 fill pattern 1
+@    s2 avalue off
+@    s2 avalue type 2
+@    s2 avalue char size 1.000000
+@    s2 avalue font 0
+@    s2 avalue color 1
+@    s2 avalue rot 0
+@    s2 avalue format general
+@    s2 avalue prec 3
+@    s2 avalue prepend ""
+@    s2 avalue append ""
+@    s2 avalue offset 0.000000 , 0.000000
+@    s2 errorbar on
+@    s2 errorbar place both
+@    s2 errorbar color 4
+@    s2 errorbar pattern 1
+@    s2 errorbar size 1.000000
+@    s2 errorbar linewidth 1.0
+@    s2 errorbar linestyle 1
+@    s2 errorbar riser linewidth 1.0
+@    s2 errorbar riser linestyle 1
+@    s2 errorbar riser clip off
+@    s2 errorbar riser clip length 0.100000
+@    s2 comment "/home/niceno/Development/T-Flows-Has-Pressure/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000/jet-2.5D-ts003600.dat"
+@    s2 legend  ""
 @g3 on
 @g3 hidden false
 @g3 type XY
@@ -1002,6 +1149,55 @@
 @    s0 errorbar riser clip length 0.100000
 @    s0 comment "/projects/des/Jet/EXP/Umag_exp0.5.dat"
 @    s0 legend  ""
+@    s2 hidden false
+@    s2 type xy
+@    s2 symbol 0
+@    s2 symbol size 1.000000
+@    s2 symbol color 4
+@    s2 symbol pattern 1
+@    s2 symbol fill color 4
+@    s2 symbol fill pattern 0
+@    s2 symbol linewidth 1.0
+@    s2 symbol linestyle 1
+@    s2 symbol char 65
+@    s2 symbol char font 0
+@    s2 symbol skip 0
+@    s2 line type 1
+@    s2 line linestyle 1
+@    s2 line linewidth 2.5
+@    s2 line color 4
+@    s2 line pattern 1
+@    s2 baseline type 0
+@    s2 baseline off
+@    s2 dropline off
+@    s2 fill type 0
+@    s2 fill rule 0
+@    s2 fill color 1
+@    s2 fill pattern 1
+@    s2 avalue off
+@    s2 avalue type 2
+@    s2 avalue char size 1.000000
+@    s2 avalue font 0
+@    s2 avalue color 1
+@    s2 avalue rot 0
+@    s2 avalue format general
+@    s2 avalue prec 3
+@    s2 avalue prepend ""
+@    s2 avalue append ""
+@    s2 avalue offset 0.000000 , 0.000000
+@    s2 errorbar on
+@    s2 errorbar place both
+@    s2 errorbar color 4
+@    s2 errorbar pattern 1
+@    s2 errorbar size 1.000000
+@    s2 errorbar linewidth 1.0
+@    s2 errorbar linestyle 1
+@    s2 errorbar riser linewidth 1.0
+@    s2 errorbar riser linestyle 1
+@    s2 errorbar riser clip off
+@    s2 errorbar riser clip length 0.100000
+@    s2 comment "/home/niceno/Development/T-Flows-Has-Pressure/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000/jet-3.0D-ts003600.dat"
+@    s2 legend  ""
 @target G0.S0
 @type xy
          0.03248       0.73727488
@@ -1025,6 +1221,115 @@
           0.2494       0.72775493
           0.2614       0.72685549
           0.2735       0.71921247
+&
+@target G0.S2
+@type xy
+        0.000109           0.0217
+        0.000351           0.0685
+        0.000647            0.124
+         0.00101            0.189
+         0.00146            0.263
+           0.002            0.347
+         0.00268            0.436
+          0.0035            0.522
+         0.00451            0.596
+         0.00574            0.647
+         0.00726            0.679
+         0.00912            0.699
+          0.0114            0.712
+          0.0142             0.72
+          0.0176            0.725
+          0.0218            0.728
+           0.027            0.729
+          0.0333            0.728
+           0.041            0.726
+          0.0505            0.723
+          0.0622            0.721
+          0.0765            0.719
+           0.094             0.72
+           0.115            0.723
+           0.142            0.731
+           0.174            0.743
+           0.214            0.757
+           0.262            0.763
+           0.322            0.744
+           0.395            0.715
+           0.475            0.682
+           0.554            0.648
+           0.631            0.623
+           0.705            0.603
+           0.777            0.588
+           0.846            0.577
+           0.913            0.567
+           0.978            0.559
+            1.04            0.551
+             1.1            0.544
+            1.16            0.538
+            1.22            0.531
+            1.27            0.525
+            1.33            0.518
+            1.38            0.512
+            1.43            0.504
+            1.48            0.497
+            1.52            0.488
+            1.57            0.479
+            1.61            0.469
+            1.66            0.458
+             1.7            0.446
+            1.74            0.432
+            1.78            0.415
+            1.81            0.396
+            1.85            0.372
+            1.89            0.341
+            1.92            0.303
+            1.95            0.253
+            1.98            0.199
+            2.01             0.16
+            2.04            0.159
+            2.06            0.156
+            2.09            0.155
+            2.12            0.154
+            2.15            0.153
+            2.19            0.153
+            2.22            0.153
+            2.25            0.152
+            2.29            0.152
+            2.33            0.152
+            2.37            0.152
+            2.41            0.152
+            2.46            0.152
+             2.5            0.151
+            2.55            0.151
+             2.6            0.151
+            2.66            0.151
+            2.71            0.151
+            2.77            0.151
+            2.83            0.151
+             2.9            0.151
+            2.97            0.151
+            3.03            0.151
+             3.1            0.151
+            3.17            0.151
+            3.23            0.151
+            3.29            0.151
+            3.34            0.151
+             3.4            0.151
+            3.45            0.151
+             3.5            0.151
+            3.54            0.151
+            3.59            0.151
+            3.63            0.152
+            3.67            0.152
+            3.71            0.152
+            3.75            0.153
+            3.78            0.153
+            3.81            0.154
+            3.85            0.154
+            3.88            0.155
+            3.91            0.157
+            3.94            0.161
+            3.96            0.166
+            3.99            0.174
 &
 @target G1.S0
 @type xy
@@ -1050,6 +1355,89 @@
           0.2614      0.063890332
           0.2735      0.046192581
 &
+@target G1.S2
+@type xy
+        0.000109           0.0183
+        0.000351           0.0588
+        0.000647            0.108
+         0.00101            0.168
+         0.00146            0.242
+           0.002             0.33
+         0.00268            0.434
+          0.0035            0.553
+         0.00451            0.683
+         0.00574            0.809
+         0.00726            0.912
+         0.00912            0.984
+          0.0114             1.03
+          0.0142             1.06
+          0.0176             1.07
+          0.0218             1.08
+           0.027             1.08
+          0.0333             1.07
+           0.041             1.05
+          0.0505             1.03
+          0.0622             0.99
+          0.0765            0.921
+           0.094            0.815
+           0.115            0.675
+           0.142            0.511
+           0.174             0.35
+           0.214            0.202
+           0.262            0.101
+           0.322           0.0453
+           0.395             0.03
+           0.475           0.0302
+           0.554           0.0306
+           0.631           0.0309
+           0.705           0.0309
+           0.777           0.0309
+           0.846            0.031
+           0.913           0.0312
+           0.978           0.0313
+            1.04           0.0315
+             1.1           0.0316
+            1.16           0.0318
+            1.22            0.032
+            1.27           0.0321
+            1.33           0.0322
+            1.38           0.0324
+            1.43           0.0325
+            1.48           0.0325
+            1.52           0.0326
+            1.57           0.0325
+            1.61           0.0325
+            1.66           0.0325
+             1.7           0.0324
+            1.74           0.0323
+            1.78           0.0322
+            1.81            0.032
+            1.85           0.0319
+            1.89           0.0317
+            1.92           0.0315
+            1.95           0.0313
+            1.98            0.031
+            2.01           0.0308
+            2.05           0.0305
+            2.09           0.0301
+            2.15           0.0295
+            2.22           0.0287
+            2.32           0.0275
+            2.46            0.026
+            2.63           0.0241
+            2.87           0.0221
+            3.19           0.0197
+            3.55           0.0178
+            3.92           0.0162
+            4.28           0.0149
+            4.64           0.0137
+               5           0.0128
+            5.37           0.0118
+            5.73           0.0109
+            6.09          0.00992
+            6.46          0.00917
+            6.82          0.00886
+&
 @target G2.S0
 @type xy
          0.03248       0.60981132
@@ -1074,6 +1462,89 @@
           0.2614      0.090683941
           0.2735       0.07731621
 &
+@target G2.S2
+@type xy
+        0.000109          0.00934
+        0.000351           0.0301
+        0.000647           0.0555
+         0.00101           0.0866
+         0.00146            0.124
+           0.002             0.17
+         0.00268            0.225
+          0.0035            0.287
+         0.00451            0.354
+         0.00574            0.415
+         0.00726            0.466
+         0.00912            0.505
+          0.0114            0.535
+          0.0142            0.558
+          0.0176            0.576
+          0.0218            0.588
+           0.027            0.595
+          0.0333            0.597
+           0.041            0.593
+          0.0505            0.582
+          0.0622            0.561
+          0.0765            0.529
+           0.094            0.481
+           0.115            0.425
+           0.142            0.355
+           0.174            0.279
+           0.214            0.201
+           0.262            0.128
+           0.322           0.0678
+           0.395           0.0322
+           0.475           0.0343
+           0.554           0.0409
+           0.631           0.0425
+           0.705           0.0422
+           0.777           0.0413
+           0.846             0.04
+           0.913           0.0386
+           0.978           0.0372
+            1.04           0.0359
+             1.1           0.0346
+            1.16           0.0334
+            1.22           0.0324
+            1.27           0.0314
+            1.33           0.0305
+            1.38           0.0298
+            1.43           0.0291
+            1.48           0.0284
+            1.52           0.0278
+            1.57           0.0272
+            1.61           0.0267
+            1.66           0.0262
+             1.7           0.0258
+            1.74           0.0253
+            1.78           0.0249
+            1.81           0.0245
+            1.85           0.0242
+            1.89           0.0238
+            1.92           0.0235
+            1.95           0.0232
+            1.98            0.023
+            2.01           0.0228
+            2.05           0.0225
+            2.09           0.0222
+            2.15           0.0218
+            2.22           0.0212
+            2.32           0.0206
+            2.46           0.0198
+            2.63           0.0189
+            2.87           0.0178
+            3.19           0.0167
+            3.55           0.0157
+            3.92           0.0149
+            4.28           0.0141
+            4.64           0.0134
+               5           0.0127
+            5.37           0.0119
+            5.73           0.0112
+            6.09           0.0102
+            6.46          0.00913
+            6.82          0.00866
+&
 @target G3.S0
 @type xy
          0.03248       0.48447375
@@ -1097,4 +1568,87 @@
           0.2494       0.14880398
           0.2614       0.13800294
           0.2735       0.11660333
+&
+@target G3.S2
+@type xy
+        0.000109          0.00787
+        0.000351           0.0254
+        0.000647           0.0469
+         0.00101           0.0733
+         0.00146            0.106
+           0.002            0.145
+         0.00268            0.191
+          0.0035            0.245
+         0.00451            0.299
+         0.00574            0.347
+         0.00726            0.385
+         0.00912            0.415
+          0.0114            0.438
+          0.0142            0.455
+          0.0176            0.468
+          0.0218            0.477
+           0.027            0.483
+          0.0333            0.485
+           0.041            0.483
+          0.0505            0.477
+          0.0622            0.465
+          0.0765            0.446
+           0.094            0.419
+           0.115            0.383
+           0.142            0.336
+           0.174            0.281
+           0.214            0.219
+           0.262            0.155
+           0.322           0.0953
+           0.395           0.0485
+           0.475           0.0303
+           0.554           0.0331
+           0.631            0.037
+           0.705           0.0387
+           0.777           0.0389
+           0.846           0.0385
+           0.913           0.0376
+           0.978           0.0367
+            1.04           0.0357
+             1.1           0.0348
+            1.16           0.0339
+            1.22            0.033
+            1.27           0.0323
+            1.33           0.0315
+            1.38           0.0308
+            1.43           0.0302
+            1.48           0.0296
+            1.52           0.0289
+            1.57           0.0283
+            1.61           0.0275
+            1.66           0.0269
+             1.7           0.0261
+            1.74           0.0259
+            1.78           0.0253
+            1.81           0.0247
+            1.85           0.0241
+            1.89           0.0235
+            1.92            0.023
+            1.95           0.0224
+            1.98           0.0219
+            2.01           0.0215
+            2.05            0.021
+            2.09           0.0205
+            2.15           0.0199
+            2.22           0.0193
+            2.32           0.0187
+            2.46            0.018
+            2.63           0.0172
+            2.87           0.0165
+            3.19           0.0157
+            3.55           0.0151
+            3.92           0.0145
+            4.28           0.0139
+            4.64           0.0133
+               5           0.0127
+            5.37            0.012
+            5.73           0.0114
+            6.09           0.0104
+            6.46          0.00926
+            6.82           0.0087
 &
