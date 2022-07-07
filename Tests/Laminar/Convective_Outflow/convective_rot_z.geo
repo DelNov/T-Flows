@@ -10,7 +10,7 @@ NZ =  20;
 NY =   3;
 
 // Angle of rotation
-ANGLE = 0.0;  // 45.0 * Pi / 180.0;
+ANGLE = 30.0 * Pi / 180.0;
 
 // The geometry is so simple that I hardly care to comment
 Point(1) = { 0, 0, 0, 1.0};
