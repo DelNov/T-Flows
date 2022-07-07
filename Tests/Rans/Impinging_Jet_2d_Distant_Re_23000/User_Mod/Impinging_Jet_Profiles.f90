@@ -1,29 +1,26 @@
 !==============================================================================!
   subroutine User_Mod_Impinging_Jet_Profiles(Turb, ts)
 !------------------------------------------------------------------------------!
-!   Subroutine reads ".1D" file created by the "Generator" or "Convert"        !
-!   and extracts profiles on several locations that corresponds with the       !
-!   experimental measurements.                                                 !
+!   Subroutine reads the .1d file with wall normal coordinates and extracts    !
+!   solutions for comparison with corresponding experimental measurements.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
   integer,     intent(in) :: ts     ! time step
+!------------------------------[Local parameters]------------------------------!
+  real, parameter :: U_AVER = 1.14
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: n_prob, pl, i, ind, s, c, k, fu
+  integer                   :: n_prob, i, c, k, fu, ind
   character(SL)             :: coord_name, res_name, ext
-  real, allocatable         :: z_p(:),                              &
-                               um_p(:), vm_p(:), wm_p(:), tm_p(:),  &
-                               v1_p(:), v2_p(:), v3_p(:),           &
-                               v4_p(:), v5_p(:), v6_p(:),           &
-                               zm_p(:), rad_1(:)
+  real,    allocatable      :: z_p(:), zm_p(:), u_p(:),  v_p(:), w_p(:), t_p(:)
+  real,    allocatable      :: kin_p(:), eps_p(:), vis_p(:), zet_p(:), f22_p(:)
   integer, allocatable      :: n_p(:), n_count(:)
-  real                      :: r, r1, r2, u_aver, u_rad, u_tan, lnum
-  logical                   :: there
+  real                      :: r, r1, r2, u_rad, u_tan, lnum
 !==============================================================================!
 
   ! Take aliases
@@ -38,37 +35,35 @@
   zeta => Turb % zeta
   f22  => Turb % f22
 
-  u_aver = 1.14
-
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
   call File % Open_For_Reading_Ascii(coord_name, fu)
 
   ! Read the number of searching intervals
   read(fu,*) n_prob
-  allocate(z_p(n_prob*2))
+  allocate(z_p(n_prob))
 
   ! Read the intervals positions
-  do pl=1,n_prob
-    read(fu,*) ind,  z_p(pl)
+  do i = 1, n_prob
+    read(fu,*) ind, z_p(i)
   end do
   close(fu)
 
-  allocate(n_p(n_prob));   n_p  = 0 
-  allocate(um_p(n_prob));  um_p = 0.0
-  allocate(vm_p(n_prob));  vm_p = 0.0
-  allocate(wm_p(n_prob));  wm_p = 0.0
-  allocate(v1_p(n_prob));  v1_p = 0.0
-  allocate(v2_p(n_prob));  v2_p = 0.0
-  allocate(v3_p(n_prob));  v3_p = 0.0
-  allocate(v4_p(n_prob));  v4_p = 0.0
-  allocate(v5_p(n_prob));  v5_p = 0.0
-  allocate(zm_p(n_prob));  zm_p = 0.0
+  allocate(n_p  (n_prob));  n_p   = 0
+  allocate(u_p  (n_prob));  u_p   = 0.0
+  allocate(v_p  (n_prob));  v_p   = 0.0
+  allocate(w_p  (n_prob));  w_p   = 0.0
+  allocate(kin_p(n_prob));  kin_p = 0.0
+  allocate(eps_p(n_prob));  eps_p = 0.0
+  allocate(vis_p(n_prob));  vis_p = 0.0
+  allocate(zet_p(n_prob));  zet_p = 0.0
+  allocate(f22_p(n_prob));  f22_p = 0.0
+  allocate(zm_p (n_prob));  zm_p  = 0.0
 
   allocate(n_count(n_prob)); n_count=0
 
   if(Flow % heat_transfer) then
-    allocate(tm_p(n_prob));   tm_p = 0.0
+    allocate(t_p(n_prob));   t_p = 0.0
   end if
 
   !-------------------------!
@@ -79,37 +74,44 @@
       r1 = 0.0
       r2 = 0.04
       lnum = 0.0
-      call File % Set_Name(res_name, time_step=ts, appendix='-0.0D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-0.0D', extension='.dat')
     else if(k .eq. 1) then
       r1 = 0.992
       r2 = 1.0
       lnum = 0.5
-      call File % Set_Name(res_name, time_step=ts, appendix='-0.5D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-0.5D', extension='.dat')
     else if(k .eq. 2) then
       r1 = 2.0
       r2 = 2.1500
       lnum = 1.0
-      call File % Set_Name(res_name, time_step=ts, appendix='-1.0D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-1.0D', extension='.dat')
     else if(k .eq. 3) then
       r1 = 2.9744
       r2 = 3.0684
       lnum = 1.5
-      call File % Set_Name(res_name, time_step=ts, appendix='-1.5D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-1.5D', extension='.dat')
     else if(k .eq. 4) then
       r1 = 3.9098
       r2 = 4.1433
       lnum = 2.0
-      call File % Set_Name(res_name, time_step=ts, appendix='-2.0D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-2.0D', extension='.dat')
     else if(k .eq. 5) then
       r1 = 0.4803200E+01
       r2 = 0.5347000E+01
       lnum = 2.5
-      call File % Set_Name(res_name, time_step=ts, appendix='-2.5D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-2.5D', extension='.dat')
     else if(k .eq. 6) then
       r1 = 0.5876600E+01
       r2 = 0.6000000E+01
       lnum = 3.0
-      call File % Set_Name(res_name, time_step=ts, appendix='-3.0D', extension='.dat')
+      call File % Set_Name(res_name, time_step=ts,  &
+                           appendix='-3.0D', extension='.dat')
     end if
 
     do i = 1, n_prob-1
@@ -118,143 +120,116 @@
         if(r > r1 .and. r < r2) then
           if(Grid % zc(c) > z_p(i) .and.  &
              Grid % zc(c) < z_p(i+1)) then
-            u_rad   = (  u % n(c)*Grid % xc(c)/r   &
-                       + v % n(c)*Grid % yc(c)/r)
-            u_tan   = (- u % n(c)*Grid % yc(c)/r   &
-                       + v % n(c)*Grid % xc(c)/r)
-            um_p(i)   = um_p(i) + sqrt(  u % n(c)**2   &
-                                       + v % n(c)**2   &
-                                       + w % n(c)**2)
-            vm_p(i)   = vm_p(i) + u_rad
-            wm_p(i)   = wm_p(i) + w % n(c)
+            u_rad  = (  u % n(c)*Grid % xc(c)/r   &
+                      + v % n(c)*Grid % yc(c)/r)
+            u_tan  = (- u % n(c)*Grid % yc(c)/r   &
+                      + v % n(c)*Grid % xc(c)/r)
+            u_p(i) = u_p(i) + sqrt(  u % n(c)**2   &
+                                   + v % n(c)**2   &
+                                   + w % n(c)**2)
+            v_p(i) = v_p(i) + u_rad
+            w_p(i) = w_p(i) + w % n(c)
 
-            if(Turb % model .eq. K_EPS) then
-              v1_p(i) = v1_p(i) + kin % n(c)
-              v2_p(i) = v2_p(i) + eps % n(c)
-              v3_p(i) = v3_p(i) + Turb % vis_t(c) / Flow % viscosity(c)
-            end if
-
-            if(Turb % model .eq. K_EPS_ZETA_F) then
-              v1_p(i)   = v1_p(i) + kin % n(c)
-              v2_p(i)   = v2_p(i) + eps % n(c)
-              v3_p(i)   = v3_p(i) + Turb % vis_t(c) / Flow % viscosity(c)
-              v4_p(i)   = v4_p(i) + zeta % n(c)
-              v5_p(i)   = v5_p(i) + f22 % n(c)
-            end if
-
-            if(Flow % heat_transfer) then
-              tm_p(i)   = tm_p(i) + T % n(c)
-            end if
+            kin_p(i) = kin_p(i) + kin % n(c)
+            eps_p(i) = eps_p(i) + eps % n(c)
+            vis_p(i) = vis_p(i) + Turb % vis_t(c) / Flow % viscosity(c)
+            zet_p(i) = zet_p(i) + zeta % n(c)
+            f22_p(i) = f22_p(i) + f22 % n(c)
+            t_p(i)   = t_p(i)   + t % n(c)
 
             zm_p(i) = zm_p(i) + Grid % zc(c)
             n_count(i) = n_count(i) + 1
+
           end if
         end if
       end do
     end do
 
-    ! Average over all processors
-    do pl=1, n_prob
-      call Comm_Mod_Global_Sum_Int(n_count(pl))
+    !---------------------------------!
+    !   Average over all processors   !
+    !---------------------------------!
+    do i = 1, n_prob
+      call Comm_Mod_Global_Sum_Int(n_count(i))
 
-      call Comm_Mod_Global_Sum_Real(um_p(pl))
-      call Comm_Mod_Global_Sum_Real(vm_p(pl))
-      call Comm_Mod_Global_Sum_Real(wm_p(pl))
-      call Comm_Mod_Global_Sum_Real(zm_p(pl))
+      call Comm_Mod_Global_Sum_Real(u_p(i))
+      call Comm_Mod_Global_Sum_Real(v_p(i))
+      call Comm_Mod_Global_Sum_Real(w_p(i))
+      call Comm_Mod_Global_Sum_Real(zm_p(i))
 
-      call Comm_Mod_Global_Sum_Real(v1_p(pl))
-      call Comm_Mod_Global_Sum_Real(v2_p(pl))
-      call Comm_Mod_Global_Sum_Real(v3_p(pl))
-      call Comm_Mod_Global_Sum_Real(v4_p(pl))
-      call Comm_Mod_Global_Sum_Real(v5_p(pl))
-
-      if(Flow % heat_transfer) then
-        call Comm_Mod_Global_Sum_Real(tm_p(pl))
-      end if
+      call Comm_Mod_Global_Sum_Real(kin_p(i))
+      call Comm_Mod_Global_Sum_Real(eps_p(i))
+      call Comm_Mod_Global_Sum_Real(vis_p(i))
+      call Comm_Mod_Global_Sum_Real(zet_p(i))
+      call Comm_Mod_Global_Sum_Real(f22_p(i))
+      call Comm_Mod_Global_Sum_Real(t_p(i))
     end do
 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        wm_p(i) = wm_p(i)/n_count(i)
-        um_p(i) = um_p(i)/n_count(i)
-        vm_p(i) = vm_p(i)/n_count(i)
-        v1_p(i) = v1_p(i)/n_count(i)
-        v2_p(i) = v2_p(i)/n_count(i)
-        v3_p(i) = v3_p(i)/n_count(i)
-        v4_p(i) = v4_p(i)/n_count(i)
-        v5_p(i) = v5_p(i)/n_count(i)
-        tm_p(i) = tm_p(i)/n_count(i)
-        zm_p(i) = zm_p(i)/n_count(i)
+        w_p(i)   = w_p(i)   / n_count(i)
+        u_p(i)   = u_p(i)   / n_count(i)
+        v_p(i)   = v_p(i)   / n_count(i)
+        kin_p(i) = kin_p(i) / n_count(i)
+        eps_p(i) = eps_p(i) / n_count(i)
+        vis_p(i) = vis_p(i) / n_count(i)
+        zet_p(i) = zet_p(i) / n_count(i)
+        f22_p(i) = f22_p(i) / n_count(i)
+        t_p(i)   = t_p(i)   / n_count(i)
+        zm_p(i)  = zm_p(i)  / n_count(i)
       end if
     end do
 
+    !-----------------------------------!
+    !   Write from one processor only   !
+    !-----------------------------------!
     if(this_proc < 2) then
 
-      ! Set the file name
-!      call File % Set_Name(res_name, time_step=ts, &
-!                 appendix='-prof', extension='.dat')
       call File % Open_For_Writing_Ascii(res_name, fu)
 
-      write(fu,'(a1,2x,a101)') '#', ' 1:Xrad, ' // &
-                                    ' 2:Umag, ' // &
-                                    ' 3:Urad, ' // &
-                                    ' 4:Uaxi, ' // &
-                                    ' 5:Kin,  ' // &
-                                    ' 6:Eps,  ' // &
-                                    ' 7:Temp, ' // &
-                                    ' 8:vis_t/viscosity, '//  &
-                                    ' 9:zeta, ' // &
-                                    '10:f22   '
+      write(fu,'(a,a)') '#', ' 1:Xrad, ',       //  &
+                             ' 2:Umag, ',       //  &
+                             ' 3:Urad, ',       //  &
+                             ' 4:Uaxi, ',       //  &
+                             ' 5:Kin,  ',       //  &
+                             ' 6:Eps,  ',       //  &
+                             ' 7:Temp, ',       //  &
+                             ' 8:Vis_t/Vis_l, ' //  &
+                             ' 9:Zeta, ',       //  &
+                             '10:F22 '
 
       do i = 1, n_prob
         if(n_count(i) .ne. 0) then
-          write(fu,'(10e11.3)') zm_p(i)/2.0,           &
-                                um_p(i)/u_aver,        &
-                                vm_p(i)/u_aver,        &
-                                wm_p(i)/u_aver,        &
-                                v1_p(i)/u_aver**2,     &
-                                v2_p(i),               &
-                                tm_p(i),               &
-                                v3_p(i),               &
-                                v4_p(i),               &
-                                v5_p(i)
+          write(fu,'(10e11.3)') zm_p(i)/2.0,         &  !  1
+                                u_p(i)/u_aver,       &  !  2
+                                v_p(i)/u_aver,       &  !  3
+                                w_p(i)/u_aver,       &  !  4
+                                kin_p(i)/u_aver**2,  &  !  5
+                                eps_p(i),            &  !  6
+                                t_p(i),              &  !  7
+                                vis_p(i),            &  !  8
+                                zet_p(i),            &  !  9
+                                f22_p(i)                ! 10
         end if
       end do
       close(fu)
     end if
 
-    do i = 1, n_prob
-      n_count(i) = 0
-      wm_p(i)    = 0.0
-      um_p(i)    = 0.0
-      vm_p(i)    = 0.0
-      v1_p(i)    = 0.0
-      v2_p(i)    = 0.0
-      v3_p(i)    = 0.0
-      v4_p(i)    = 0.0
-      v5_p(i)    = 0.0
-      tm_p(i)    = 0.0
-      zm_p(i)    = 0.0
-    end do
-    if(this_proc < 2) print *, 'Finished with profile r/D =  ', lnum
-  end do   ! end number of radius
+    n_count(:) = 0
+    w_p(:)     = 0.0
+    u_p(:)     = 0.0
+    v_p(:)     = 0.0
+    kin_p(:)   = 0.0
+    eps_p(:)   = 0.0
+    vis_p(:)   = 0.0
+    zet_p(:)   = 0.0
+    f22_p(:)   = 0.0
+    t_p(:)     = 0.0
+    zm_p(:)    = 0.0
 
-  deallocate(n_p)
-  deallocate(z_p)
-  deallocate(um_p)
-  deallocate(vm_p)
-  deallocate(wm_p)
-  deallocate(v1_p)
-  deallocate(v2_p)
-  deallocate(v3_p)
-  deallocate(v4_p)
-  deallocate(v5_p)
-  deallocate(zm_p)
-  deallocate(n_count)
-  if(Flow % heat_transfer) then
-    deallocate(tm_p)
-  end if
+    if(this_proc < 2) print *, 'Finished with profile r/D =  ', lnum
+
+  end do   ! end number of radius
 
   if(this_proc < 2) write(*,*) 'Finished with User_Impinging_Jet_Profiles'
 
-  end subroutine 
+  end subroutine
