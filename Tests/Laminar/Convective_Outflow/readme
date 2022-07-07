@@ -1,0 +1,6 @@
+convective.geo is the default geometry, flow aligned with x coordinate.
+
+convective_rot_z.geo is geometry rotated by 30 degrees in the z plane to
+test the implementation of coordinate invariant Convective_Outflow.  If
+rotated geometry is used, one should also use the enclosed User Function
+for setting bulk velocity to 1.0.
