@@ -26,8 +26,7 @@
   type(Var_Type),  pointer :: u, v, w
   type(Face_Type), pointer :: v_flux
   integer                  :: s, c1, c2
-  real                     :: fac, area_in, area_out
-  real                     :: vol_outflow, area_outflow
+  real                     :: fac, vol_outflow, area_outflow
 !==============================================================================!
 
   ! Take aliases
@@ -103,10 +102,10 @@
   !   Calculate all boundary volume fluxes; in and out   !
   !                                                      !
   !------------------------------------------------------!
-  bulk % vol_in  = 0.0
-  bulk % vol_out = 0.0
-  area_in        = 0.0
-  area_out       = 0.0
+  bulk % vol_in   = 0.0
+  bulk % vol_out  = 0.0
+  bulk % area_in  = 0.0
+  bulk % area_out = 0.0
 
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
@@ -116,29 +115,29 @@
     if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
 
       if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
-        bulk % vol_in = bulk % vol_in - v_flux % n(s)
-        area_in = area_in + Grid % s(s)
+        bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
+        bulk % area_in = bulk % area_in + Grid % s(s)
       end if
 
       if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-        bulk % vol_out = bulk % vol_out + v_flux % n(s)
-        area_out = area_out + Grid % s(s)
+        bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
+        bulk % area_out = bulk % area_out + Grid % s(s)
       end if
 
     end if
   end do
 
-  call Comm_Mod_Global_Sum_Real(bulk % vol_in)   ! not checked
-  call Comm_Mod_Global_Sum_Real(bulk % vol_out)  ! not checked
-  call Comm_Mod_Global_Sum_Real(area_in)
-  call Comm_Mod_Global_Sum_Real(area_out)
+  call Comm_Mod_Global_Sum_Real(bulk % vol_in)
+  call Comm_Mod_Global_Sum_Real(bulk % vol_out)
+  call Comm_Mod_Global_Sum_Real(bulk % area_in)
+  call Comm_Mod_Global_Sum_Real(bulk % area_out)
 
   ! Avoid divisions by zero for the cases without any fluid motion
   fac = 1.0
   if(bulk % vol_out .gt. FEMTO) fac = bulk % vol_in / (bulk % vol_out)
-  area_out = max(area_out, FEMTO)
+  bulk % area_out = max(bulk % area_out, FEMTO)
 
   !----------------------------------------------------------------------!
   !                                                                      !
@@ -206,11 +205,11 @@
            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
 
           ! Update velocity components ...
-          u % n(c2) = u % n(c2) * fac + bulk % vol_src / area_out  &
+          u % n(c2) = u % n(c2) * fac + bulk % vol_src / bulk % area_out  &
                     * Grid % sx(s) / Grid % s(s)
-          v % n(c2) = v % n(c2) * fac + bulk % vol_src / area_out  &
+          v % n(c2) = v % n(c2) * fac + bulk % vol_src / bulk % area_out  &
                     * Grid % sy(s) / Grid % s(s)
-          w % n(c2) = w % n(c2) * fac + bulk % vol_src / area_out  &
+          w % n(c2) = w % n(c2) * fac + bulk % vol_src / bulk % area_out  &
                     * Grid % sz(s) / Grid % s(s)
 
           ! ... volume flux itself ...

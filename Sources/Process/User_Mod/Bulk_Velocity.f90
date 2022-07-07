@@ -8,8 +8,21 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type) :: Flow
-  real             :: bulk_vel
+  type(Field_Type), target :: Flow
+  real                     :: bulk_vel
+!-----------------------------------[Locals]-----------------------------------!
+! type(Grid_Type), pointer :: Grid
+  type(Bulk_Type), pointer :: bulk
+  real                     :: velocity_in, velocity_out
 !==============================================================================!
+
+  ! Take alias
+  bulk => Flow % bulk
+
+  ! By default, assume all outflow is defined as convective
+  velocity_in  = bulk % vol_in / bulk % area_in
+  velocity_out = bulk % vol_in / bulk % area_out
+
+  bulk_vel = velocity_out
 
   end subroutine

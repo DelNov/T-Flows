@@ -14,9 +14,14 @@
   !---------------!
   type Bulk_Type
 
+    ! Cross-sectional areas defined by the monitoring planes
     real :: area_x  ! [m^2]
     real :: area_y  ! [m^2]
     real :: area_z  ! [m^2]
+
+    ! Inflow and outflow areas
+    real :: area_in   ! [m^2]
+    real :: area_out  ! [m^2]
 
     ! Total inflow and outflow volume flux
     real :: vol_in   ! [m^3/s]

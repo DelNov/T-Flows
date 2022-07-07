@@ -36,10 +36,16 @@
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
   call Turb % Alias_T2          (t2)
 
-  call Flow % Calculate_Fluxes(v_flux % n)
-
-  bulk_vel = sqrt(bulk % u**2 + bulk % v**2 + bulk % w**2)
-
+  !------------------------------------------------!
+  !   Compute bulk velocity via a user function.   !
+  !- - - - - - - - - - - - - - - - - - - - - - - - !
+  !   Although the default version of the called   !
+  !   function User_Mod_Bulk_Velocity should do    !
+  !   a decent job in most cases, there could be   !
+  !   some in which it is trickier to define.      !
+  !   Cases with multiple outflows come to mind,   !
+  !   or internal sinks or sources,                !
+  !------------------------------------------------!
   call User_Mod_Bulk_Velocity(Flow, bulk_vel)
 
   !------------------------!
