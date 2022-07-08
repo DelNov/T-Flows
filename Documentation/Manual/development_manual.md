@@ -223,7 +223,7 @@ the sentence (lines 2 and 4 in the above code snippet).
 
 ## Headers <a name="coding_headers"> </a>
 
-### Procedures (Subroutines and functions) <a name="coding_headers_proc"> </a>
+### Procedures (subroutines and functions) <a name="coding_headers_proc"> </a>
 
 Each procedure header contains the following sections, in exactly this order:
 - ```subroutine``` or ```function``` declaration,
@@ -399,7 +399,7 @@ continue with description of modules.
 
 ## First level modules <a name="modules_first_level"> </a>
 
-### Module Const Mod <a name="modules_first_level_const"> </a>
+### ```Const_Mod``` <a name="modules_first_level_const"> </a>
 
 Without hesitation, ```Const_Mod``` is the most essential module in the code as
 it defines constants used throughout all the T-Flows' sub-programs.  It resides
@@ -798,7 +798,7 @@ _fresh_, that is, buffers have to be _refresshed_ in a timely manner.  We will
 come to that later.  Note that _structured_ numbering is completely lost in
 individual sub-domains.
 
-#### New types <a name=modules_second_level_comm_type"> </a>
+#### New types <a name="modules_second_level_comm_type"> </a>
 
 Module ```Comm_Mod``` introduces two new types; the ```Buffer_Type```, which
 holds data fields to facilitate communication between processors, and
