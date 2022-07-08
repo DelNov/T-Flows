@@ -1406,14 +1406,14 @@ shared by [Jones et al.](https://www.netlib.org/slatec/src/isort.f) on
 Without doubt, ```Grid_Mod``` is one of the most important modules in T-Flows
 as it holds data which describes numerical grid and contains all procedures for
 accessing grid properties.  ```Grid_Mod``` is a fourth level module, and
-depends on the following first level modules:
+depends on the following lower level modules:
 - ```Const Mod```
 - ```Math Mod```
 - ```Sort Mod```
 - ```File Mod```
 - ```Comm Mod ```
 - ```Boundary Mod```
-- ```Metis Options Mod
+- ```Metis Options Mod```
 
 This dependency is graphically represented in the following figure:
 
