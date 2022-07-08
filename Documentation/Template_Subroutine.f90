@@ -30,7 +30,7 @@
   integer, parameter :: BIG = 1000
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, j, k
-  character(len=80)    :: name_in
+  character(len=SL)    :: name_in
   real, dimension(5,5) :: small_matrix
 !==============================================================================!
 
