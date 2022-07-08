@@ -29,7 +29,7 @@
   !   Comm type   !
   !               !
   !---------------!
-  type Comm_Type    ! also used inside the Grid_Type)
+  type Comm_Type    ! also used inside the Grid_Type
 
     ! Number of buffer cells
     integer :: n_buff_cells
