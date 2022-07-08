@@ -1202,7 +1202,7 @@ and are used in string comparisons.
 All data members from ```Control_Mod``` are used only inside its member
 procedures and are therefore declared as ```private```.
 
-#### Member procedures <a name="modules_third_level_control_data"> </a>
+#### Member procedures <a name="modules_third_level_control_proc"> </a>
 
 ```Control_Mod``` holds a rather big number of procedures; at the time of
 writing this manual the number stands at 152.  Owing to the big number of
