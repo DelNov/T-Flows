@@ -136,9 +136,10 @@
 
     ! Pressure velocity coupling algorithm
     integer :: p_m_coupling, i_corr, n_piso_corrections
-    logical :: piso_status
+    logical :: inside_piso_loop
     logical :: choi_correction
     logical :: gu_correction
+    logical :: report_vol_balance
 
     ! Maximum CFL and Pe numbers
     real :: cfl_max, pe_max
@@ -163,6 +164,8 @@
     real    :: gauss_tol
     integer :: gauss_miter
     integer :: least_miter
+    real    :: gauss_iters
+    integer :: gauss_calls
 
     ! Is buoyancy thermally- or density-driven?
     integer :: buoyancy
@@ -172,6 +175,9 @@
 
     ! Angular velocity
     real :: omega_x, omega_y, omega_z!, omega
+
+    ! For volume balance reporting
+    integer :: fuvbr
 
     contains
 
@@ -199,10 +205,8 @@
       procedure, private :: Grad_Gauss_Pressure
       procedure, private :: Grad_Gauss_Variable
       procedure, private :: Grad_Least_Pressure
-      procedure, private :: Grad_Least_Pressure_Correction
       procedure, private :: Grad_Least_Variable
       procedure          :: Grad_Pressure
-      procedure          :: Grad_Pressure_Correction
       procedure          :: Grad_Variable
 
       !----------------------------------!
@@ -221,11 +225,14 @@
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Fluxes
+      procedure :: Compute_Wall_Distance     ! see: Potential_Initialization
       procedure :: Potential_Initialization  ! see: Compute_Wall_Distance
       procedure :: Prandtl_Numb
       procedure :: Schmidt_Numb
       procedure :: U_Tan
-      procedure :: Compute_Wall_Distance     ! see: Potential_Initialization
+      procedure :: Report_Volume_Balance
+      procedure :: Report_Volume_Balance_Start
+      procedure :: Report_Volume_Balance_Stop
 
   end type
 
@@ -260,10 +267,8 @@
   include 'Field_Mod/Gradients/Grad_Gauss_Pressure.f90'
   include 'Field_Mod/Gradients/Grad_Gauss_Variable.f90'
   include 'Field_Mod/Gradients/Grad_Least_Pressure.f90'
-  include 'Field_Mod/Gradients/Grad_Least_Pressure_Correction.f90'
   include 'Field_Mod/Gradients/Grad_Least_Variable.f90'
   include 'Field_Mod/Gradients/Grad_Pressure.f90'
-  include 'Field_Mod/Gradients/Grad_Pressure_Correction.f90'
   include 'Field_Mod/Gradients/Grad_Variable.f90'
 
   !----------------------------------!
@@ -287,5 +292,8 @@
   include 'Field_Mod/Utilities/Schmidt_Numb.f90'
   include 'Field_Mod/Utilities/U_Tan.f90'
   include 'Field_Mod/Utilities/Compute_Wall_Distance.f90'
+  include 'Field_Mod/Utilities/Report_Volume_Balance.f90'
+  include 'Field_Mod/Utilities/Report_Volume_Balance_Start.f90'
+  include 'Field_Mod/Utilities/Report_Volume_Balance_Stop.f90'
 
   end module

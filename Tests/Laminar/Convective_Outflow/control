@@ -37,10 +37,10 @@
 #-----------------------------------------------------------
 # Numerical parameters
 #-----------------------------------------------------------
- PRESSURE_MOMENTUM_COUPLING             simple
+ PRESSURE_MOMENTUM_COUPLING             piso
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.9
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.7
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    1.0
  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.999
 
  GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem

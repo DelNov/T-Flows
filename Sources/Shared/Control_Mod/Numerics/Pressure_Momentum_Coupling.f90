@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: name  ! name of the pressure-momentum coupling algorithm
-  logical, optional :: verbose
+  character(SL), intent(out) :: name  ! simple or piso
+  logical, optional          :: verbose
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('PRESSURE_MOMENTUM_COUPLING',  &

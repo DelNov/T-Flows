@@ -4,12 +4,7 @@
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Field_Mod
-  use Turb_Mod
-  use Grid_Mod
-  use Control_Mod
-  use Vof_Mod
+  use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -27,7 +22,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type), pointer :: v_flux
   integer                  :: c1, c2, s, sc
-  real                     :: dt
+  real                     :: nx, ny, nz, bulk_vel, phi_n, dt
 !==============================================================================!
 
   ! Take aliases
@@ -41,7 +36,17 @@
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
   call Turb % Alias_T2          (t2)
 
-  call Flow % Calculate_Fluxes(v_flux % n)
+  !------------------------------------------------!
+  !   Compute bulk velocity via a user function.   !
+  !- - - - - - - - - - - - - - - - - - - - - - - - !
+  !   Although the default version of the called   !
+  !   function User_Mod_Bulk_Velocity should do    !
+  !   a decent job in most cases, there could be   !
+  !   some in which it is trickier to define.      !
+  !   Cases with multiple outflows come to mind,   !
+  !   or internal sinks or sources,                !
+  !------------------------------------------------!
+  call User_Mod_Bulk_Velocity(Flow, bulk_vel)
 
   !------------------------!
   !                        !
@@ -62,18 +67,16 @@
       ! On the boundary perform the extrapolation
       if(c2 < 0) then
         if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-          u % n(c2) = u % n(c2)                      &
-                    - ( bulk % u * u % x(c1)         &
-                      + bulk % v * u % y(c1)         &
-                      + bulk % w * u % z(c1) ) * dt
-          v % n(c2) = v % n(c2)                      &
-                    - ( bulk % u * v % x(c1)         &
-                      + bulk % v * v % y(c1)         &
-                      + bulk % w * v % z(c1) ) * dt
-          w % n(c2) = w % n(c2)                      &
-                    - ( bulk % u * w % x(c1)         &
-                      + bulk % v * w % y(c1)         &
-                      + bulk % w * w % z(c1) ) * dt
+          call Grid % Face_Normal(s, nx, ny, nz)
+
+          phi_n = u % x(c1) * nx + u % y(c1) * ny + u % z(c1) * nz
+          u % n(c2) = u % n(c2) - bulk_vel * phi_n * dt
+
+          phi_n = v % x(c1) * nx + v % y(c1) * ny + v % z(c1) * nz
+          v % n(c2) = v % n(c2) - bulk_vel * phi_n * dt
+
+          phi_n = w % x(c1) * nx + w % y(c1) * ny + w % z(c1) * nz
+          w % n(c2) = w % n(c2) - bulk_vel * phi_n * dt
         end if
       end if
     end do  ! s
@@ -122,19 +125,17 @@
         ! On the boundary perform the extrapolation
         if(c2 < 0) then
           if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-            kin % n(c2) = kin % n(c2)                       &
-                        - ( bulk % u * kin % x(c1)          &
-                          + bulk % v * kin % y(c1)          &
-                          + bulk % w * kin % z(c1) ) * dt
-            eps % n(c2) = eps % n(c2)                       &
-                        - ( bulk % u * eps % x(c1)          &
-                          + bulk % v * eps % y(c1)          &
-                          + bulk % w * eps % z(c1) ) * dt
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = kin % x(c1) * nx + kin % y(c1) * ny + kin % z(c1) * nz
+            kin % n(c2) = kin % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = eps % x(c1) * nx + eps % y(c1) * ny + eps % z(c1) * nz
+            eps % n(c2) = eps % n(c2) - bulk_vel * phi_n * dt
+
             if(Flow % heat_transfer) then
-              t2 % n(c2) = t2 % n(c2)                       &
-                          - ( bulk % u * t2 % x(c1)         &
-                            + bulk % v * t2 % y(c1)         &
-                            + bulk % w * t2 % z(c1) ) * dt
+              phi_n = t2 % x(c1) * nx + t2 % y(c1) * ny + t2 % z(c1) * nz
+              t2 % n(c2) = t2 % n(c2) - bulk_vel * phi_n * dt
             end if
           end if
         end if
@@ -185,27 +186,23 @@
         ! On the boundary perform the extrapolation
         if(c2 < 0) then
           if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-            kin % n(c2) = kin % n(c2)                       &
-                        - ( bulk % u * kin % x(c1)          &
-                          + bulk % v * kin % y(c1)          &
-                          + bulk % w * kin % z(c1) ) * dt
-            eps % n(c2) = eps % n(c2)                       &
-                        - ( bulk % u * eps % x(c1)          &
-                          + bulk % v * eps % y(c1)          &
-                          + bulk % w * eps % z(c1) ) * dt
-            f22 % n(c2) = f22 % n(c2)                       &
-                        - ( bulk % u * f22 % x(c1)          &
-                          + bulk % v * f22 % y(c1)          &
-                          + bulk % w * f22 % z(c1) ) * dt
-            zeta % n(c2) = zeta % n(c2)                     &
-                        - ( bulk % u * zeta % x(c1)         &
-                          + bulk % v * zeta % y(c1)         &
-                          + bulk % w * zeta % z(c1) ) * dt
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = kin % x(c1) * nx + kin % y(c1) * ny + kin % z(c1) * nz
+            kin % n(c2) = kin % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = eps % x(c1) * nx + eps % y(c1) * ny + eps % z(c1) * nz
+            eps % n(c2) = eps % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = f22 % x(c1) * nx + f22 % y(c1) * ny + f22 % z(c1) * nz
+            f22 % n(c2) = f22 % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = zeta % x(c1) * nx + zeta % y(c1) * ny + zeta % z(c1) * nz
+            zeta % n(c2) = zeta % n(c2) - bulk_vel * phi_n * dt
+
             if(Flow % heat_transfer) then
-              t2 % n(c2) = t2 % n(c2)                       &
-                          - ( bulk % u * t2 % x(c1)         &
-                            + bulk % v * t2 % y(c1)         &
-                            + bulk % w * t2 % z(c1) ) * dt
+              phi_n = t2 % x(c1) * nx + t2 % y(c1) * ny + t2 % z(c1) * nz
+              t2 % n(c2) = t2 % n(c2) - bulk_vel * phi_n * dt
             end if
           end if
         end if
@@ -262,39 +259,32 @@
         ! On the boundary perform the extrapolation
         if(c2 < 0) then
           if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-            uu % n(c2) = uu % n(c2)                          &
-                        - ( bulk % u * uu % x(c1)            &
-                          + bulk % v * uu % y(c1)            &
-                          + bulk % w * uu % z(c1) ) * dt
-            vv % n(c2) = vv % n(c2)                          &
-                        - ( bulk % u * vv % x(c1)            &
-                          + bulk % v * vv % y(c1)            &
-                          + bulk % w * vv % z(c1) ) * dt
-            ww % n(c2) = ww % n(c2)                          &
-                        - ( bulk % u * ww % x(c1)            &
-                          + bulk % v * ww % y(c1)            &
-                          + bulk % w * ww % z(c1) ) * dt
-            uv % n(c2) = uv % n(c2)                          &
-                        - ( bulk % u * uv % x(c1)            &
-                          + bulk % v * uv % y(c1)            &
-                          + bulk % w * uv % z(c1) ) * dt
-            uw % n(c2) = uw % n(c2)                          &
-                        - ( bulk % u * uw % x(c1)            &
-                          + bulk % v * uw % y(c1)            &
-                          + bulk % w * uw % z(c1) ) * dt
-            vw % n(c2) = vw % n(c2)                          &
-                        - ( bulk % u * vw % x(c1)            &
-                          + bulk % v * vw % y(c1)            &
-                          + bulk % w * vw % z(c1) ) * dt
-            eps % n(c2) = eps % n(c2)                        &
-                        - ( bulk % u * eps % x(c1)           &
-                          + bulk % v * eps % y(c1)           &
-                          + bulk % w * eps % z(c1) ) * dt
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = uu % x(c1) * nx + uu % y(c1) * ny + uu % z(c1) * nz
+            uu % n(c2) = uu % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = vv % x(c1) * nx + vv % y(c1) * ny + vv % z(c1) * nz
+            vv % n(c2) = vv % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = ww % x(c1) * nx + ww % y(c1) * ny + ww % z(c1) * nz
+            ww % n(c2) = ww % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = uv % x(c1) * nx + uv % y(c1) * ny + uv % z(c1) * nz
+            uv % n(c2) = uv % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = uw % x(c1) * nx + uw % y(c1) * ny + uw % z(c1) * nz
+            uw % n(c2) = uw % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = vw % x(c1) * nx + vw % y(c1) * ny + vw % z(c1) * nz
+            vw % n(c2) = vw % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = eps % x(c1) * nx + eps % y(c1) * ny + eps % z(c1) * nz
+            eps % n(c2) = eps % n(c2) - bulk_vel * phi_n * dt
+
             if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-              f22 % n(c2) = f22 % n(c2)                      &
-                          - ( bulk % u * f22 % x(c1)         &
-                            + bulk % v * f22 % y(c1)         &
-                            + bulk % w * f22 % z(c1) ) * dt
+              phi_n = f22 % x(c1) * nx + f22 % y(c1) * ny + f22 % z(c1) * nz
+              f22 % n(c2) = f22 % n(c2) - bulk_vel * phi_n * dt
             end if
           end if
         end if
@@ -347,10 +337,10 @@
         ! On the boundary perform the extrapolation
         if(c2 < 0) then
           if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-            phi % n(c2) = phi % n(c2)                      &
-                        - ( bulk % u * phi % x(c1)         &
-                          + bulk % v * phi % y(c1)         &
-                          + bulk % w * phi % z(c1) ) * dt
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = phi % x(c1) * nx + phi % y(c1) * ny + phi % z(c1) * nz
+            phi % n(c2) = phi % n(c2) - bulk_vel * phi_n * dt
           end if
         end if
       end do  ! s
@@ -394,10 +384,10 @@
         ! On the boundary perform the extrapolation
         if(c2 < 0) then
           if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
-            t % n(c2) = t % n(c2)                      &
-                      - ( bulk % u * t % x(c1)         &
-                        + bulk % v * t % y(c1)         &
-                        + bulk % w * t % z(c1) ) * dt
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = t % x(c1) * nx + t % y(c1) * ny + t % z(c1) * nz
+            t % n(c2) = t % n(c2) - bulk_vel * phi_n * dt
           end if
         end if
       end do  ! s

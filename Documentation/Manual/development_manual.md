@@ -38,7 +38,10 @@
             1. [Data members](#modules_second_level_vtk_data)
             1. [Member procedure](#modules_second_level_vtk_proc)
     3. [Third level modules](#modules_third_level)
-        1. [```Sort_Mod```](#modules_third_level_sort)
+        1. [```Control_Mod```](#modules_third_level_control)
+            1. [Data members](#modules_third_level_control_data)
+            2. [Member procedures](#modules_third_level_control_proc)
+        2. [```Sort_Mod```](#modules_third_level_sort)
             1. [Member procedures](#modules_third_level_sort_proc)
     4. [Fourth level modules](#modules_fourth_level)
         1. [```Grid_Mod```](#modules_fourth_level_grid)
@@ -57,7 +60,16 @@
             1. [New types](#modules_sixth_level_native_type)
             2. [Data members](#modules_sixth_level_native_data)
             3. [Member procedures](#modules_fourth_level_native_proc)
-   13. [Python tool for Fortran Analysis - PyFA](#modules_pyfa)
+3. [Global procedures](#global)
+    1. [```Compute_Energy```](#global_compute_energy)
+    2. [```Compute_Momentum```](#global_compute_momentum)
+    3. [```Compute_Momentum_Explicit```](#global_compute_momentum_explicit)
+    4. [```Compute_Pressure```](#global_compute_pressure)
+    5. [```Compute_Scalar```](#global_compute_energy)
+    6. [```Main_Pro```](#global_main_pro)
+    7. [```Piso_Algorithm```](#global_piso_algorithm)
+
+4. [Python tool for Fortran Analysis - PyFA](#pyfa)
 
 
 # Coding standards <a name="coding"> </a>
@@ -223,7 +235,7 @@ the sentence (lines 2 and 4 in the above code snippet).
 
 ## Headers <a name="coding_headers"> </a>
 
-### Procedures (Subroutines and functions) <a name="coding_headers_proc"> </a>
+### Procedures (subroutines and functions) <a name="coding_headers_proc"> </a>
 
 Each procedure header contains the following sections, in exactly this order:
 - ```subroutine``` or ```function``` declaration,
@@ -262,7 +274,7 @@ a header in T-Flows with all of the above sections is shown here:
  16   ..
  17 !-----------------------------------[Locals]-----------------------------------!
  18   integer              :: i, j, k
- 19   character(len=80)    :: name_in
+ 19   character(len=SL)    :: name_in
  20   real, dimension(5,5) :: small_matrix
  21 !------------------------------[Local parameters]------------------------------!
  22   integer, parameter :: BIG = 1000
@@ -279,7 +291,7 @@ a header in T-Flows with all of the above sections is shown here:
  33   !                                                     !
  34   !   Big block comments are written like sentences,    !
  35   !   first word capital, and can spread over several   !
- 36   !   lines like this very commet.                      !
+ 36   !   lines like this very comment.                     !
  37   !                                                     !
  38   !-----------------------------------------------------!
  39
@@ -288,7 +300,7 @@ a header in T-Flows with all of the above sections is shown here:
  54   !--------------------!
  55
  56   !-----------------------------------------------------!
- 57   !   Bothe big block and block comments have frames    !
+ 57   !   Both big block and block comments have frames     !
  58   !   three spaces thick to the left and to the right   !
  59   !-----------------------------------------------------!
  60                                                     !123! <- see thickness
@@ -329,43 +341,46 @@ variables. To be more precise, a module header contains:
 
 In T-Flows , a module segment looks like this:
 ```
- 1 !==============================================================================!
- 2   module Template_Mod
- 3 !------------------------------------------------------------------------------!
- 4 ! Template for a module                                                        !
- 5 !------------------------------------------------------------------------------!
- 6 !----------------------------------[Modules]-----------------------------------!
- 7   ...
- 8   ..
- 9 !------------------------------------------------------------------------------!
-10   implicit none
-11 !==============================================================================!
-12
-13   !-------------------!
-14   !   Template type   !
-15   !-------------------!
-16   type Template_Type
-17
-18   ! Declaration of member data
-19   ...
-20   ..
-21
-22   ! Declaration of member procedures
-23   contains
-24     procedure :: Allocate
-25     procedure :: Deploy
-26     procedure :: Destroy
-27
-28   end type
-29
-30   ! Inclusion of member procedures
-31   contains
-26
-27   include ’Template_Mod/Allocate.f90’
-28   ...
-29   ..
-30
-31   end module
+  1 !==============================================================================!
+  2   module Template_Mod
+  3 !------------------------------------------------------------------------------!
+  4 !   Template for a module                                                      !
+  5 !------------------------------------------------------------------------------!
+  6 !----------------------------------[Modules]-----------------------------------!
+  7   use This_Mod
+  8   use That_Mod
+  9   ...
+ 10   ..
+ 11 !------------------------------------------------------------------------------!
+ 12   implicit none
+ 13 !==============================================================================!
+ 14
+ 15   !-------------------!
+ 16   !   Template type   !
+ 17   !-------------------!
+ 18   type Template_Type
+ 19
+ 20   ! Declaration of member data
+ 21   ...
+ 22   ..
+ 23
+ 24   ! Declaration of member procedures
+ 25   contains
+ 26     procedure          :: Allocate
+ 27     procedure          :: Deploy
+ 28     procedure          :: Destroy
+ 29     procedure, private :: Use_Only_From_Here
+ 30
+ 31   end type
+ 32
+ 33   ! Inclusion of member procedures
+ 34   contains
+ 35
+ 36   include ’Template_Mod/Allocate.f90’
+ 37   ...
+ 38   ..
+ 39
+ 40   end module
 ```
 
 Module header starts and ends with a double dashed comment (lines 1 and 11
@@ -399,7 +414,7 @@ continue with description of modules.
 
 ## First level modules <a name="modules_first_level"> </a>
 
-### Module Const Mod <a name="modules_first_level_const"> </a>
+### ```Const_Mod``` <a name="modules_first_level_const"> </a>
 
 Without hesitation, ```Const_Mod``` is the most essential module in the code as
 it defines constants used throughout all the T-Flows' sub-programs.  It resides
@@ -408,7 +423,7 @@ in ```[root]/Sources/Shared/``` directory.
 > **_Note:_** The notion of ```[root]``` is described in [User Manual](#readme.md)
 
 ```Const_Mod``` does not use any other module, which leaves it on the first
-level. It also doesn’t contain any procedures, since these constants are
+level. It also doesn't contain any procedures, since these constants are
 supposed to be used globally, by most other modules and subroutines.
 Currently, the following constants are defined:
 
@@ -421,8 +436,8 @@ include ```U```, ```V``` and ```W``` for velocity components, ```P``` and
 - ```DL``` double string length, set to 160
 - ```QL``` quadruple string length, set to 320
 - ```MSI``` maximum number of strings (tokens) in a line
-- ```DP``` lenght of double precision numbers in bytes, hence 8
-- ```SP``` lenght of single precision numbers in bytes, hence 4
+- ```DP``` length of double precision numbers in bytes, hence 8
+- ```SP``` length of single precision numbers in bytes, hence 4
 - ```IP``` integer precision defined on the run, based on compiler options
 - ```LP``` precision of logicals, set to be equal to ```IP``` since that what
 Fortran standard prescribes
@@ -535,10 +550,12 @@ Example:
 5     print *, ’# Strings a and b differ in less than three characters ’
 6   end if
 ```
-> **_Note:_** Although this is a string comparison function, it resides in the
+
+> **_Note 1:_** Although this is a string comparison function, it resides in the
 ```Math_Mod``` since it is base on the mathematical algorithm developed by
 Vladimir Levenstein in 1965.
-> **_Note:_** ```Approx_String``` is used inside the ```Control_Mod``` to check
+
+> **_Note 2:_** ```Approx_String``` is used inside the ```Control_Mod``` to check
 user input and warn for possible typing errors.
 
 - ```Cross_Product``` is a function which returns a vector (cross) product of
@@ -570,7 +587,7 @@ better choice. Arguments sent to this function are the same as for
 Gaussian elimination with partial pivoting.  Its main use is for the solution
 of small systems, say up to 6 × 6.  The procedure is sequential and performed
 locally inside a sub-domain.  Don't get tempted to use it for solution of, for
-exaple, pressure correction equation, because it will just hang or crash.
+example, pressure correction equation, because it will just hang or crash.
 The code implemented in this procedure is heavily based on the code distributed
 with the book by Kincaid and Cheney, [Numerical Analysis: Mathematics of
 Scientific Computing](https://web.ma.utexas.edu/CNA/NMC7/sample.html).
@@ -628,7 +645,7 @@ of individual tokens in the line ```whole```
 > **_Note:_** The ```Tokenizer_Type``` is heavily used when parsing input from
 external grid files, or commands from the ```control``` file.  The maximum line
 length for the ```whole``` is ```QL``` (defined as 320 in ```Const_Mod```) to
-accomodate very long lines which are sometimes read from GMSH grid files.
+accommodate very long lines which are sometimes read from GMSH grid files.
 
 Another type being introduced here is ```File_Type```, which forms an object
 holding only its member procedures.
@@ -656,7 +673,7 @@ holds no file extensions and if it is formed from more than one word they are
 separated by underscores. Typical examples are: ```channel_flow```,
 ```impinging_jet```, ```rising bubble```, etc.  Dimension of the
 ```problem_name``` array is ```MD``` defined in ```Const_Mod``` as maximum number
-of problem domains which can be solved simultaneosly.
+of problem domains which can be solved simultaneously.
 
 > **_Note 1:_** since for simulations in multiple domains, each grid is stored
 in a separate file, it should be no wonder why there are ```problem name```
@@ -667,7 +684,7 @@ is an array of strings with dimension ```MD```.
 here and is _not_ used for file formation at all.  It is used to print info on
 particular grid on the terminal (hence, upper case is more visible), but also
 to interact between domains for multi-domain simulations (in the upper case it
-resembles unchangable parameters).
+resembles unchangeable parameters).
 
 #### Member procedures <a name="modules_second_level_file_proc"> </a>
 
@@ -798,13 +815,13 @@ _fresh_, that is, buffers have to be _refresshed_ in a timely manner.  We will
 come to that later.  Note that _structured_ numbering is completely lost in
 individual sub-domains.
 
-#### New types <a name=modules_second_level_comm_type"> </a>
+#### New types <a name="modules_second_level_comm_type"> </a>
 
 Module ```Comm_Mod``` introduces two new types; the ```Buffer_Type```, which
 holds data fields to facilitate communication between processors, and
 ```Comm_Type```, a class holding communicator's member functions.
 
-```Buffer_Type``` is short enought that we can give it in full:
+```Buffer_Type``` is short enough that we can give it in full:
 ```
   type Buffer_Type
     integer              :: n_items
@@ -822,8 +839,8 @@ buffer values are stored before exchanging them between processors.  To see
 their usage, please see ```[root]/Shared/Grid_Mod/Exchange_Cells_Real.f90```.
 The final field, ```o_buff(:)``` can be used to check if a call to function
 which exchanges real values was needed.  This was implemented to avoid too
-frequent calles to buffer refreshment.   If you are interested in this
-functionlity, please check ```[root]/Shared/Grid_Mod/Exchange_Cells_Real.f90```
+frequent calls to buffer refreshment.   If you are interested in this
+functionality, please check ```[root]/Shared/Grid_Mod/Exchange_Cells_Real.f90```
 to see more details.
 
 If we take a look at the above figure with an example of simple domain (grid)
@@ -839,10 +856,10 @@ to the ```Comm_Mod```, since it is essentially a class holding all parallel
 functionality.  In addition to functions, it does introduce a few data members:
 
 - ```n_buff_cells``` holds the number of buffer cells.  For the figure with two
-domains showb above, ```n_buff_cells``` will be 35 in both processors. (Count
+domains shown above, ```n_buff_cells``` will be 35 in both processors. (Count
 pink cells on the left and green cells on the right to make sure.)
 
-- ```cell_proc(:)``` an integer array holding processir number for each cell.
+- ```cell_proc(:)``` an integer array holding processor number for each cell.
 If you take a look at the above sub-grids again, you can notice that each
 sub-grid has 140 cells.  However, 105 cells are _inside_ cells, computed in
 current processor and 35 cells are _buffer_ cells.  Array ```cell_proc(:)```
@@ -1022,7 +1039,7 @@ constants are defined:
 
 - ```SYMMETRY``` identifies symmetry boundary condition.
 
-- ```CONVECT``` stands for convective outflow boundary condition introduce by
+- ```CONVECT``` stands for convective outflow boundary condition introduced by
 [Bottaro](https://www.tandfonline.com/doi/abs/10.1080/10407799008944952)
 
 - ```WALLFL``` identifies wall with specified flux of dependent variables
@@ -1049,7 +1066,7 @@ BOUNDARY_CONDITION     RIGHT
 The first one, ```TOP```, will become ```WALLFL``` in _Process_.  The latter
 one, ```RIGHT``` will be ```WALL```.
 
-- ```PRESSURE``` another type of outlflow condition; zero gradient for all
+- ```PRESSURE``` another type of outflow condition; zero gradient for all
 variables except pressure, whose value is assumed to be zero in the linear
 solver.  After the solution for pressure (pressure correction to be exact)
 the pressure correction and pressure are normalized in a way that average
@@ -1064,7 +1081,7 @@ constants in T-Flows' modules.
 
 ### ```Vtk_Mod``` <a name="modules_second_level_vtk"> </a>
 
-The module ```Vtk_Mod``` is simular in its scope to
+The module ```Vtk_Mod``` is similar in its scope to
 ```Metis_Options_Mod```](#modules_first_level_metis) in the sense that all of
 its data members are parameters used while creating ```.vtu``` files, and the
 only procedure it has, is to change one or two variables depending on the
@@ -1148,6 +1165,81 @@ can see that these identifiers are used inside a ```.vtu``` file.
 
 ## Third level modules <a name="modules_third_level"> </a>
 
+### ```Control_Mod``` <a name="modules_third_level_control"> </a>
+
+```Control_Mod``` contains all the functionality to read the ```control```
+files, which are essential for controlling a simulation with T-Flows and its
+definition resides in directory ```[root]/Sources/Shared```.  Just as
+a reminder, if simulation is performed on one domain only, only one
+```control``` file is used.  If there are more domains, there is one central
+(root) control file, and a separate control file for each of the domain which
+are named ```control.1```, ```control.2``` and so forth.  The simulations over
+multiple domains are described in [User Manual](#readme.md).
+Since ```Control_Mod``` uses [```Math_Mod```](#modules_second_level_math),
+[```File_Mod```](#modules_second_level_file) and [```Comm_Mod```](#modules_second_level_comm),
+all of which are second level modules, ```Comm_Mod``` is a third level module.
+
+> **_Note:_** Don't mix up multiple _domains_ with multiple _sub-domains_ used
+in parallel runs.  Multiple domains are used for problems with conjugate heat
+transfer or precursor domains for generating inflow, for example.
+
+#### Data members <a name="modules_third_level_control_data"> </a>
+
+- ```control_file_unit``` holds the current control file unit (handle) and
+can point (be equal to) either ```root_control_file_unit``` or any of the
+```dom_control_file_unit(MD)```s.
+- ```root_control_file_unit``` holds root control file unit (handle)
+- ```dom_control_file_unit(MD)``` holds control units for each of the domains
+involved in simulation, for cases when a simulation is performed over multiple
+domains.
+
+In addition to the above, there are three other data members introduced with
+```Control_Mod``` and they are:
+- ```n_similar```
+- ```similar(128)```
+and are used in string comparisons.
+
+All data members from ```Control_Mod``` are used only inside its member
+procedures and are therefore declared as ```private```.
+
+#### Member procedures <a name="modules_third_level_control_proc"> </a>
+
+```Control_Mod``` holds a rather big number of procedures; at the time of
+writing this manual the number stands at 152.  Owing to the big number of
+procedures, they are classified in different groups, and consequently stored
+in different sub-directories of the ```Control_Mod```:
+
+- ```Basic_Functions``` holds procedures which serve for basic functionality of
+the control file manipulation and browsing.
+
+Procedures in all the remaining sub-directories, serve to read _one particular_
+keyword from the ```control``` file.  These sub-directories are:
+- ```Input_Output``` procedures used in performing I/O from T-Flows, such as
+reading of problem name, backup name, saving frequency and alike;
+- ```Native``` holds procedures for reading control parameters for _native_
+linear solvers such as solver tolerances, maximum number of iterations and
+so forth;
+- ```Numerics``` with procedures for reading parameters related to numerical
+discretization schemes such as advection schemes, gradient methods,
+under-relaxation factors; and finally:
+- ```Physics``` holding procedures which read parameters related to physical
+models.
+
+The naming of procedures in the last four directory closely follows the names
+of the keywords.  For example, procedure ```Control_Mod_Problem_Name``` reads
+keyword ```PROBLEM_NAME```; procedure ```Control_Mod_Turbulence_Model``` reads
+keyword ```TURBULENCE_MODEL```, and so forth.  All control keywords are listed
+in the file ```[root]/Documents/all_control_keywords``` which holds several
+sections corresponding exactly to the sub-directory names within
+```Control_Mod``` directory.  Given that there are more than 150 procedures
+within the ```Control_Mod``` and given that their description is outlined in
+the ```[root]/Documents/all_control_keywords```, we are not going to describe
+them in more details here.
+
+If you ever decide you have to introduce new keywords into T-Flows, you should
+a dedicated procedure for reading it inside the ```Control_Mod``` and you should
+also update the file ```[root]/Documents/all_control_keywords```.
+
 ### ```Sort_Mod``` <a name="modules_third_level_sort"> </a>
 
 As the name implies, ```Sort_Mod``` contains sorting procedures.  It introduces
@@ -1174,7 +1266,7 @@ to analyze:
 ../../../../Sources/Shared/Swap_Mod.f90
 ../../../../Sources/Shared/Math_Mod.f90
 ```
-and invoked _PyFA_ from ```[root]/Documentaion/Manual/Figures/Diagrams/``` with
+and invoked _PyFA_ from ```[root]/Documentation/Manual/Figures/Diagrams/``` with
 ```
 ./PyFA.py -s sort.src
 ```
@@ -1188,7 +1280,7 @@ process.  You first run just with a list of Fortran sources and see what you
 get (file ```diagram.fig```).  From that point on, you can fine-tune by editing
 the files ```diagram.ij```, ```diagram.xy``` and ```diagram.d``` whose purpose
 is to to change logical positions (```ij```) of modules, change their absolute
-positons (```xy```) or level of details (```d```) you want for each module. For
+positions (```xy```) or level of details (```d```) you want for each module. For
 the diagram you see above, we used the command:
 ```
 ./PyFA.py -s sort.src -xy sort.xy
@@ -1298,7 +1390,7 @@ by more than one real array (all starting with ```Two_Real_``` and
 ```Three_Real_```) are prone to round off errors from the outset.
 In order to make their outcomes more predictable, we heavily use
 ```Math % Approx_Real``` and ```Math % Smaller_Real``` inside them, which
-improves their behaviour quite a bit.
+improves their behavior quite a bit.
 
 Most of the procedures in ```Sort_Mod``` are derived from the
 [Quicksort](https://dl.acm.org/doi/10.1145/366622.366644) algorithm shared by
@@ -1314,14 +1406,14 @@ shared by [Jones et al.](https://www.netlib.org/slatec/src/isort.f) on
 Without doubt, ```Grid_Mod``` is one of the most important modules in T-Flows
 as it holds data which describes numerical grid and contains all procedures for
 accessing grid properties.  ```Grid_Mod``` is a fourth level module, and
-depends on the following first level modules:
+depends on the following lower level modules:
 - ```Const Mod```
 - ```Math Mod```
 - ```Sort Mod```
 - ```File Mod```
 - ```Comm Mod ```
 - ```Boundary Mod```
-- ```Metis Options Mod
+- ```Metis Options Mod```
 
 This dependency is graphically represented in the following figure:
 
@@ -1338,7 +1430,7 @@ more numerical oriented modules (such as ```Matrix_Mod```, ```Solver_Mod```,
 modules (such as ```Const_Mod```, ```Math_Mod``` and ```Sort_Mod```).  It is,
 as if all the modules from the first three levels came together to form
 ```Grid_Mod```, which then spreads above towards discretization, numerical
-solution, phyiscal models and algorithms.  Owing to its close ties with
+solution, physical models and algorithms.  Owing to its close ties with
 ```Comm_Mod```, ```Grid_Mod``` also brings important parallel functionality
 (buffer refreshment in particular) to the modules on levels above it.
 
@@ -1348,9 +1440,9 @@ solution, phyiscal models and algorithms.  Owing to its close ties with
 
 ### Member procedures  <a name="modules_fourth_level_grid_proc">  </a>
 
-# Fifth level modules <a name="modules_fifth_level"
+# Fifth level modules <a name="modules_fifth_level"> </a>
 
-## ```Matrix_Mod```  <a name="modules_fifth_level_matrix">  </a>
+## ```Matrix_Mod``` <a name="modules_fifth_level_matrix">  </a>
 
 Matrices from systems of linear algebraic equations stemming from discretization
 of conservation equation over a given computational grid are stored in module
@@ -1369,7 +1461,7 @@ The module ```Matrix_Mod``` introduces one new type, the ```Matrix_Type```,
 which facilitates storage of matrices in compressed row format.
 ```Matrix_Type``` has the following data records:
 
-- ```pnt grid``` pointer to the grid for which the matrix is defined
+- ```pnt_grid``` pointer to the grid for which the matrix is defined
 
 - ```nonzero``` number of non-zero entries in the matrix
 
@@ -1381,7 +1473,8 @@ coefficients based only on geometrical characteristics of the grid.
 properties.)
 
 - ```sav(:)``` array of saved entries from momentum conservation discretization.
-It is needed for discretization of pressure equation.
+It is needed for discretization of pressure equation with cell-centered finite
+volume method.
 
 - ```row(:)``` index of the beginning of each row
 
@@ -1421,7 +1514,7 @@ created. It acts pretty much as a _constructor_ for ```Matrix_Type```.
 
 ## ```Vector_Mod```  <a name="modules_fifth_level_vector">  </a>
 
-Just like ```Matrix_Mod```, ```Vector_Mod``` was introdced to assist solution
+Just like ```Matrix_Mod```, ```Vector_Mod``` was introduced to assist solution
 of linear algebraic equations stemming from discretization of conservation
 equation over a given computational grid.  It is used by
 [```Native_Mod```](#modules_sixth_level_native) and other modules related to
@@ -1444,7 +1537,7 @@ enough to be introduced in full:
   end type
 ```
 It has following two records:
-- ```pnt grid``` pointer to the grid for which the vector is defined
+- ```pnt_grid``` pointer to the grid for which the vector is defined
 
 - ```val(:)``` array of size nonzero which stores vector entries
 
@@ -1459,6 +1552,23 @@ created.
 > **_Note:_** Such a practice, to have a module (or type) procedure with
 ```Allocate``` or ```Create``` in the name, which takes its own type to
 allocate memory for it while storing pointer to an object from which it was
-derived, is very simular to what was used in ```Matrix_Mod```, and in many
+derived, is very similar to what was used in ```Matrix_Mod```, and in many
 other modules which follow.
 
+# Global procedures <a name="global"> </a>
+
+## ```Compute_Energy``` <a name="global_compute_energy"> </a>
+
+## ```Compute_Momentum``` <a name="global_compute_momentum"> </a>
+
+## ```Compute_Momentum_Explicit``` <a name="global_compute_momentum_explicit"> </a>
+
+## ```Compute_Pressure``` <a name="global_compute_pressure"> </a>
+
+## ```Compute_Scalar``` <a name="global_compute_scalar"> </a>
+
+## ```Main_Pro``` <a name="global_main_pro"> </a>
+
+## ```Piso_Algorithm``` <a name="global_piso_algorithm"> </a>
+
+# Python tool for Fortran Analysis - PyFA <a name="pyfa"> </a>

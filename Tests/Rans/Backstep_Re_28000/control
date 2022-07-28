@@ -2,12 +2,12 @@ Problem
  PROBLEM_NAME    backstep
 
 Time integration
- NUMBER_OF_TIME_STEPS                 2400
- TIME_STEP                            0.05
+ NUMBER_OF_TIME_STEPS              5000
+ TIME_STEP                            0.001
 
 Saving intervals
- RESULTS_SAVE_INTERVAL   600
- BACKUP_SAVE_INTERVAL    600
+ RESULTS_SAVE_INTERVAL   1000
+ BACKUP_SAVE_INTERVAL    1000
 # LOAD_BACKUP_NAME   backstep-ts000647.backup
 
 
@@ -28,7 +28,7 @@ Physics
  HEAT_TRANSFER          yes
  MASS_DENSITY           1.0
  THERMAL_CONDUCTIVITY   2.2e-5
- DYNAMIC_VISCOSITY      1.567E-5
+ DYNAMIC_VISCOSITY      1.567e-5
  HEAT_CAPACITY          1.0
  TURBULENCE_MODEL       k_eps_zeta_f
 

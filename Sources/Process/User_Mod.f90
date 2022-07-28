@@ -25,6 +25,7 @@
   include 'User_Mod/Beginning_Of_Iteration.f90'
   include 'User_Mod/Beginning_Of_Simulation.f90'
   include 'User_Mod/Beginning_Of_Time_Step.f90'
+  include 'User_Mod/Bulk_Velocity.f90'
   include 'User_Mod/Calculate_Mean.f90'
   include 'User_Mod/End_Of_Compute_Energy.f90'
   include 'User_Mod/End_Of_Compute_Momentum.f90'

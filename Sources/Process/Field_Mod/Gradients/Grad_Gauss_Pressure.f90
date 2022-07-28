@@ -22,17 +22,15 @@
   ! Take alias
   Grid => Flow % pnt_grid
 
-  ! Extrapolation to boundaries
+  !--------------------------------------!
+  !   Initialization of c_at_bnd array   !
+  !--------------------------------------!
+  c_at_bnd(:) = NO
+  c_cnt(:)    = 0
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .ne. PRESSURE) then
-        p % n(c2) = p % n(c1) + p % x(c1) * Grid % dx(s)  &
-                              + p % y(c1) * Grid % dy(s)  &
-                              + p % z(c1) * Grid % dz(s)
-      end if
-    end if
+    if(c2 < 0) c_at_bnd(c1) = YES
   end do
 
   ! Initialize with some gradients with the most robust and reliable tool
@@ -46,7 +44,6 @@
   !           This step will leave the boundary cells surrounded by    !
   !           other boundary cells unchanged (reset to zero, really)   !
   !--------------------------------------------------------------------!
-  c_cnt(:) = 0
   do c = 1, Grid % n_cells
 
     ! Cell is at the boundary, intervene here
@@ -56,7 +53,6 @@
       p % x(c) = 0.0
       p % y(c) = 0.0
       p % z(c) = 0.0
-      c_cnt(c) = 0    ! probably not needed, initialized above
 
       ! Browse through this cell's faces
       do i_fac = 1, Grid % cells_n_faces(c)

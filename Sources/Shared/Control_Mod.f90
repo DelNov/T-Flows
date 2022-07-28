@@ -9,13 +9,13 @@
 !==============================================================================!
 
   ! Control file unit
-  integer :: control_file_unit          ! current control file unit
-  integer :: root_control_file_unit     ! root control file unit
-  integer :: dom_control_file_unit(MD)  ! domain control file units
+  integer, private :: control_file_unit          ! current control file unit
+  integer, private :: root_control_file_unit     ! root control file unit
+  integer, private :: dom_control_file_unit(MD)  ! domain control file units
 
   ! Number of presumably misstyped keywords followed by their list
-  integer       :: n_similar =  0
-  character(SL) :: similar(128)
+  integer,       private :: n_similar =  0
+  character(SL), private :: similar(128)
 
   contains
 
@@ -136,6 +136,7 @@
     include 'Control_Mod/Numerics/Min_Simple_Iterations.f90'
     include 'Control_Mod/Numerics/Number_Of_Piso_Corrections.f90'
     include 'Control_Mod/Numerics/Pressure_Momentum_Coupling.f90'
+    include 'Control_Mod/Numerics/Report_Volume_Balance.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90'
     include 'Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90'

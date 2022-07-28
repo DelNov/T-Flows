@@ -34,12 +34,15 @@
 
   if( Flow % p_m_coupling .eq. PISO) then
     call Control_Mod_Number_Of_Piso_Corrections(Flow % n_piso_corrections)
-    Flow % piso_status = .false.
+    Flow % inside_piso_loop = .false.
   end if
 
   ! Improvements to Rhie and Chow method (Choi, Gu)
   call Control_Mod_Choi_Correction(Flow % choi_correction, .false.)
   call Control_Mod_Gu_Correction  (Flow % gu_correction,   .false.)
+
+  ! Report volume balance (in a separate file)
+  call Control_Mod_Report_Volume_Balance(Flow % report_vol_balance, .false.)
 
   !----------------------------------!
   !   Gradient computation methods   !
@@ -50,7 +53,6 @@
   call Control_Mod_Max_Gauss_Gradients_Iterations(Flow % gauss_miter, .false.)
   call Control_Mod_Max_Least_Squares_Gradients_Iterations(Flow % least_miter,  &
                                                           .false.)
-
   !-------------------------!
   !   Related to momentum   !
   !-------------------------!

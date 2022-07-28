@@ -24,24 +24,23 @@
     real, allocatable :: q(:)              ! flux of the variable
     real              :: sigma             ! sigma
     real              :: res               ! residual after lin. solver
-    real              :: units(5)          ! mass, length, time,
-                                           ! temperature, angle
+
     ! Boundary cell type (important for scalars, since they
     ! can have different boundary conditions at the walls)
     integer, allocatable :: bnd_cond_type(:)
 
     ! Parameters for numerical solution of the variable
-    character(SL)     :: solver          ! solver
-    character(SL)     :: prec            ! preconditioner
-    character(SL)     :: prec_opts(MSI)  ! preconditioner options
-    integer           :: adv_scheme      ! advection scheme
-    integer           :: grad_method     ! gradient computation method
-    real              :: blend           ! blending (1.0 central; 0.0 upwind)
-    integer           :: td_scheme       ! time-disretization
-    real              :: tol             ! linear solver tolerance
-    real              :: urf             ! under-relaxation factor
-    integer           :: mniter          ! max number of iterations for variable
-    integer           :: eniter          ! executed number of iterations for var
+    character(SL) :: solver          ! solver
+    character(SL) :: prec            ! preconditioner
+    character(SL) :: prec_opts(MSI)  ! preconditioner options
+    integer       :: adv_scheme      ! advection scheme
+    integer       :: grad_method     ! gradient computation method
+    real          :: blend           ! blending (1.0 central; 0.0 upwind)
+    integer       :: td_scheme       ! time-disretization
+    real          :: tol             ! linear solver tolerance
+    real          :: urf             ! under-relaxation factor
+    integer       :: mniter          ! max number of iterations for variable
+    integer       :: eniter          ! executed number of iterations for var
   end type
 
   contains
