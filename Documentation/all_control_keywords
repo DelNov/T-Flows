@@ -112,8 +112,8 @@
   MASS_DENSITY                             |         1.0                   |   physical property
   MASS_FLOW_RATES                          |         0.0,  0.0,  0.0       |   any triplet of real numbers
   MASS_TRANSFER                            |         no                    |   yes
+  MAX_PARTICLES                            |         0                     |   any number >= 0
   NUMBER_OF_DOMAINS                        |         1                     |   from 1 to 4
-  NUMBER_OF_PARTICLES                      |         0                     |   any number >= 0
   NUMBER_OF_PHASES                         |         1                     |   2
   NUMBER_OF_SCALARS                        |         0                     |   any integer up to 36
   NUMBER_OF_SWARM_SUBSTEPS                 |        60                     |   depends on the time step taken

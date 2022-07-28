@@ -34,7 +34,7 @@
  SWARM_DIAMETER                                 3.66356E-03
  SWARM_DENSITY                               1000
  NUMBER_OF_SWARM_SUB_STEPS                      2
- NUMBER_OF_PARTICLES                       100000
+ MAX_PARTICLES                             100000
  SWARM_COEFFICIENT_OF_RESTITUTION               1.0
 
 #-------------------

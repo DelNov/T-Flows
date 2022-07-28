@@ -26,7 +26,7 @@
 
  MASS_DENSITY                         1.0
  DYNAMIC_VISCOSITY                    1.8e-5
- NUMBER_OF_PARTICLES                 16
+ MAX_PARTICLES                       16
  SWARM_DENSITY                     1000.0
  SWARM_DIAMETER                       2.5e-5
  SWARM_COEFFICIENT_OF_RESTITUTION     0.0

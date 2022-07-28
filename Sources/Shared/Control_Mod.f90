@@ -202,8 +202,8 @@
     include 'Control_Mod/Physics/Potential_Initialization.f90'
 
     ! Multiphase
+    include 'Control_Mod/Physics/Max_Particles.f90'
     include 'Control_Mod/Physics/Number_Of_Phases.f90'
-    include 'Control_Mod/Physics/Number_Of_Particles.f90'
     include 'Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90'
     include 'Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90'
     include 'Control_Mod/Physics/Swarm_Density.f90'

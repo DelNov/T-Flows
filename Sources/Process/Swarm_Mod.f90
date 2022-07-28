@@ -26,7 +26,8 @@
     type(Turb_Type),  pointer :: pnt_turb  ! Turb field for which it is defined
     type(Vof_Type),   pointer :: pnt_vof   ! vof, for three-phase situations
 
-    integer                          :: n_particles = 0
+    integer                          :: max_particles = 0  ! read from control
+    integer                          :: n_particles   = 0
     type(Particle_Type), allocatable :: Particle(:)
 
     ! Density of this swarm

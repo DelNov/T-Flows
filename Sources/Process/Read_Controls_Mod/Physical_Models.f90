@@ -265,9 +265,9 @@
 
   if(Flow % with_particles) then
 
-    call Control_Mod_Number_Of_Particles(Swarm % n_particles, verbose = .true.)
-    call Control_Mod_Swarm_Density      (Swarm % density,     verbose = .true.)
-    call Control_Mod_Swarm_Diameter     (Swarm % diameter,    verbose = .true.)
+    call Control_Mod_Max_Particles (Swarm % max_particles, verbose = .true.)
+    call Control_Mod_Swarm_Density (Swarm % density,       verbose = .true.)
+    call Control_Mod_Swarm_Diameter(Swarm % diameter,      verbose = .true.)
 
     call Control_Mod_Swarm_Coefficient_Of_Restitution(Swarm % rst,         &
                                                       verbose = .true.)

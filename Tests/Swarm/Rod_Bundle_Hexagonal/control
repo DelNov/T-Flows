@@ -36,7 +36,7 @@ NUMBER_OF_TIME_STEPS   24000
  SWARM_DIAMETER                               5.0e-04
  SWARM_DENSITY                                1.0e+03
  NUMBER_OF_SWARM_SUB_STEPS                   12
- NUMBER_OF_PARTICLES                        256
+ MAX_PARTICLES                              256
  SWARM_COEFFICIENT_OF_RESTITUTION             1.00
  STARTING_TIME_STEP_FOR_SWARM_COMPUTATION   3000
 

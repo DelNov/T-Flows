@@ -44,7 +44,7 @@
                    'particle_real_data',             &
                     Swr % r_work(1 : Swr % N_R_VARS*Swr % n_particles))
 
-    ! Pack Particle data in arrays
+    ! Unpack particle data from arrays
     do k = 1, Swr % n_particles
 
       ! Take aliases for the Particle

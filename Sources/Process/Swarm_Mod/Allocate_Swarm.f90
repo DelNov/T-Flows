@@ -14,6 +14,8 @@
   integer :: k, nb, nc
 !==============================================================================!
 
+  if( .not. Flow % with_particles) return
+
   ! Take aliases to object particle Flow around
   Swarm % pnt_flow => Flow
   Swarm % pnt_grid => Flow % pnt_grid
@@ -21,8 +23,17 @@
   Swarm % pnt_vof  => Vof
 
   ! Allocate memory for all of them
-  if(Swarm % n_particles > 0) then
-    allocate(Swarm % Particle(Swarm % n_particles))
+  if(Swarm % max_particles > 0) then
+    allocate(Swarm % Particle(Swarm % max_particles))
+  else
+    if(this_proc < 2) then
+      print *, '# ERROR!  You are attempting a simulation with'
+      print *, '# particles but max number of particles is zero.'
+      print *, '# Did you set the parameter MAX_PARTICLES in control file?'
+      print *, '# This error is critical.  Exiting!'
+      call Comm_Mod_End
+      stop
+    end if
   end if
 
   ! Allocate logical array if cell holds particles
@@ -30,14 +41,14 @@
   Swarm % cell_has_particles(:) = .false.
 
   ! Allocate memory for working arrays
-  allocate(Swarm % i_work(Swarm % n_particles * Swarm % N_I_VARS))
-  allocate(Swarm % l_work(Swarm % n_particles * Swarm % N_L_VARS))
-  allocate(Swarm % r_work(Swarm % n_particles * Swarm % N_R_VARS))
+  allocate(Swarm % i_work(Swarm % max_particles * Swarm % N_I_VARS))
+  allocate(Swarm % l_work(Swarm % max_particles * Swarm % N_L_VARS))
+  allocate(Swarm % r_work(Swarm % max_particles * Swarm % N_R_VARS))
 
   !------------------------------!
   !   Initialize all particles   !
   !------------------------------!
-  do k = 1, Swarm % n_particles
+  do k = 1, Swarm % max_particles
     call Swarm % Particle(k) % Initialize_Particle(Flow, Swarm % diameter,  &
                                                          Swarm % density)
   end do
