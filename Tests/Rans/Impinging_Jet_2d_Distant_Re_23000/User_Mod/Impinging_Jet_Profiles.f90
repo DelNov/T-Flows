@@ -186,15 +186,15 @@
 
       call File % Open_For_Writing_Ascii(res_name, fu)
 
-      write(fu,'(a,a)') '#', ' 1:Xrad, ',       //  &
-                             ' 2:Umag, ',       //  &
-                             ' 3:Urad, ',       //  &
-                             ' 4:Uaxi, ',       //  &
-                             ' 5:Kin,  ',       //  &
-                             ' 6:Eps,  ',       //  &
-                             ' 7:Temp, ',       //  &
+      write(fu,'(a,a)') '#', ' 1:Xrad, '        //  &
+                             ' 2:Umag, '        //  &
+                             ' 3:Urad, '        //  &
+                             ' 4:Uaxi, '        //  &
+                             ' 5:Kin,  '        //  &
+                             ' 6:Eps,  '        //  &
+                             ' 7:Temp, '        //  &
                              ' 8:Vis_t/Vis_l, ' //  &
-                             ' 9:Zeta, ',       //  &
+                             ' 9:Zeta, '        //  &
                              '10:F22 '
 
       do i = 1, n_prob
