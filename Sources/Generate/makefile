@@ -10,6 +10,7 @@
 FORTRAN ?= gnu
 DEBUG   ?= no
 REAL    ?= double
+OPENMP  ?= no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -77,9 +78,8 @@ ifeq ($(FORTRAN), gnu)
     OPT_F_COMP += -fdefault-real-8
   endif
   ifeq ($(OPENMP), yes)
-    OPT_COMP += -fopenmp
+    OPT_F_COMP += -fopenmp
   endif
-  OPT_LINK = $(OPT_COMP)
 endif
 
 # Fortran == intel
@@ -101,7 +101,6 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(OPENMP), yes)
     OPT_COMP += -fopenmp
   endif
-  OPT_LINK = $(OPT_COMP)
 endif
 
 # Fortran == nvidia
@@ -120,9 +119,8 @@ ifeq ($(FORTRAN), nvidia)
     OPT_F_COMP += -r8
   endif
   ifeq ($(OPENMP), yes)
-    OPT_COMP += -fopenmp
+    OPT_F_COMP += -fopenmp
   endif
-  OPT_LINK = $(OPT_COMP)
 endif
 
 #-----------------------------------------------------------
