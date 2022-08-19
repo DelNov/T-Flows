@@ -19,10 +19,15 @@
   ! Take alias
   bulk => Flow % bulk
 
-  ! By default, assume all outflow is defined as convective
-  velocity_in  = bulk % vol_in / bulk % area_in
-  velocity_out = bulk % vol_in / bulk % area_out
+  ! Set some initial value
+  bulk_vel = 0.0
 
-  bulk_vel = velocity_out
+  ! By default, assume all outflow is defined as convective
+  if(bulk % area_in > TINY) then
+    velocity_in  = bulk % vol_in / bulk % area_in
+    velocity_out = bulk % vol_in / bulk % area_out
+
+    bulk_vel = velocity_out
+  end if
 
   end subroutine
