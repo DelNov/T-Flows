@@ -36,14 +36,11 @@
   !-------------------!
   if(n .eq. 24001) then     ! should be after the Flow is developed
 
+    ! Track maximum number of particles
+    Swarm % n_particles = Swarm % max_particles
+
     ! Browsing through all introduced particles
     do k = 1, Swarm % n_particles
-
-        ! Initalizing particle position (already initialized in
-        ! Swarm_Mod_Allocate)
-        Swarm % particle(k) % x_n = 0.0
-        Swarm % particle(k) % y_n = 0.0
-        Swarm % particle(k) % z_n = 0.0
 
         ! Generating random locations for particle
         call random_number(c1)
@@ -51,9 +48,9 @@
         call random_number(c3)
 
         ! Initalizing particle position
-        Swarm % particle(k) % x_n = (L1 * c1) + Swarm % particle(k) % x_n
-        Swarm % particle(k) % y_n = (L2 * c2) + Swarm % particle(k) % y_n
-        Swarm % particle(k) % z_n = (L3 * c3) + Swarm % particle(k) % z_n
+        Swarm % particle(k) % x_n = (L1 * c1)
+        Swarm % particle(k) % y_n = (L2 * c2)
+        Swarm % particle(k) % z_n = (L3 * c3)
 
         ! you essentially moved them a lot (from 0, 0, 0)
         Swarm % particle(k) % cell = 0
