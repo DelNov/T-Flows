@@ -12,32 +12,29 @@
   integer, intent(in)      :: n         ! time step
   real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
-  integer :: k, n_parts_in_buffers
-  real    :: dx
+  type(Grid_Type), pointer :: Grid
+  integer                  :: k, n_parts_in_buffers, c
+  real                     :: dx, rx, ry, rz
 !==============================================================================!
 
-  !-------------------!
-  !   1st time step   !
-  !-------------------!
+  ! Take alias(es)
+  Grid => Flow % pnt_grid
+
+  !----------------------!
+  !   1201st time step   !
+  !----------------------!
   if(n .eq. 1201) then     ! should be after the flow is developed
+
+    ! Compute all particles
+    Swarm % n_particles = Swarm % max_particles
 
     ! Place the particles where you want them
     do k = 1, Swarm % n_particles
-
-      ! Placing particles (only at the 1st time step)
       dx = 20 * (k - 1)
-
-      Swarm % particle(k) % x_n = -0.00375 + dx * 2.5e-5
-      Swarm % particle(k) % y_n = 0.0599999
-      Swarm % particle(k) % z_n = 0.0
-
-      Swarm % particle(k) % x_o = Swarm % particle(k) % x_n
-      Swarm % particle(k) % y_o = Swarm % particle(k) % y_n
-      Swarm % particle(k) % z_o = Swarm % particle(k) % z_n
-
-      ! Searching for the closest cell and node to place the moved particle
-      call Swarm % Particle(k) % Find_Nearest_Cell(n_parts_in_buffers)
-      call Swarm % Particle(k) % Find_Nearest_Node()
+      call Swarm % Particle(k) % Insert_At(-0.00375 + dx * 2.5e-5,  &
+                                            0.0399999,              &
+                                            0.0,                    &
+                                            n_parts_in_buffers)
     end do
 
   end if
