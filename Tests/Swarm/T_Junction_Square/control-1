@@ -1,15 +1,17 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME     t_junction
- HEAT_TRANSFER    no
+ PROBLEM_NAME       t_junction
+ HEAT_TRANSFER      no
 
- NUMBER_OF_TIME_STEPS    1200
+ NUMBER_OF_TIME_STEPS      1200
 
- RESULTS_SAVE_INTERVAL    120
- BACKUP_SAVE_INTERVAL     600
+ RESULTS_SAVE_INTERVAL      120
+ BACKUP_SAVE_INTERVAL       600
+ SAVE_INITIAL_CONDITION      no
+ SAVE_RESULTS_AT_BOUNDARIES  no
 
- TIME_STEP                  0.001
+ TIME_STEP                  1.0e-3
 
 #-------------------
 # Monitoring points 
@@ -22,23 +24,19 @@
 #-----------------
 # Physical models
 #-----------------
-
- MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.8e-5
+ MASS_DENSITY                         1.0
+ DYNAMIC_VISCOSITY                    1.8e-5
 
  TURBULENCE_MODEL       none
 
 #----------------------
 # Numerical parameters
 #----------------------
+ PRESSURE_MOMENTUM_COUPLING             piso
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.5
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.5
 
- PRESSURE_MOMENTUM_COUPLING    simple
-
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
-
- TIME_INTEGRATION_SCHEME  linear
-
+ TIME_INTEGRATION_SCHEME          linear
  ADVECTION_SCHEME_FOR_MOMENTUM    upwind
 
 #------------------------
@@ -49,8 +47,9 @@
  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- MIN_SIMPLE_ITERATIONS                   6
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER    666
+ MIN_SIMPLE_ITERATIONS                   3
+ MAX_ITERATIONS_FOR_MOMENTUM_SOLVER     33
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER    333
 
 #--------------------
 # Initial conditions

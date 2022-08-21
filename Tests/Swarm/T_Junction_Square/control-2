@@ -1,16 +1,20 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME     t_junction
- HEAT_TRANSFER    no
+ PROBLEM_NAME       t_junction
+ HEAT_TRANSFER      no
+ PARTICLE_TRACKING  yes
 
- NUMBER_OF_TIME_STEPS    3600
+ NUMBER_OF_TIME_STEPS      3600
 
- RESULTS_SAVE_INTERVAL    120
- BACKUP_SAVE_INTERVAL     600
+ RESULTS_SAVE_INTERVAL      120
+ SWARM_SAVE_INTERVAL          6
+ BACKUP_SAVE_INTERVAL       600
+ SAVE_INITIAL_CONDITION      no
+ SAVE_RESULTS_AT_BOUNDARIES  no
 
  LOAD_BACKUP_NAME        t_junction-ts001200.backup
- TIME_STEP                  0.001
+ TIME_STEP               1.0e-4
 
 #-------------------
 # Monitoring points 
@@ -23,27 +27,24 @@
 #-----------------
 # Physical models
 #-----------------
-
  MASS_DENSITY                         1.0
  DYNAMIC_VISCOSITY                    1.8e-5
  MAX_PARTICLES                       16
  SWARM_DENSITY                     1000.0
  SWARM_DIAMETER                       2.5e-5
  SWARM_COEFFICIENT_OF_RESTITUTION     0.0
+# NUMBER_OF_SWARM_SUBSTEPS           120
 
  TURBULENCE_MODEL       none
 
 #----------------------
 # Numerical parameters
 #----------------------
+ PRESSURE_MOMENTUM_COUPLING             piso
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.5
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.5
 
- PRESSURE_MOMENTUM_COUPLING    simple
-
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
-
- TIME_INTEGRATION_SCHEME  linear
-
+ TIME_INTEGRATION_SCHEME          linear
  ADVECTION_SCHEME_FOR_MOMENTUM    upwind
 
 #------------------------
@@ -55,7 +56,8 @@
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
  MIN_SIMPLE_ITERATIONS                   1
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER    666
+ MAX_ITERATIONS_FOR_MOMENTUM_SOLVER     33
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER    333
 
 #--------------------
 # Initial conditions
