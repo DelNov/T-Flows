@@ -13,9 +13,7 @@
   real,             intent(in) :: time   ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
-  integer                  :: c, i, j, k, n_parts_in_buffers
-  real                     :: x, y, z, dy, dz, my, mz
-  real                     :: rx, ry, rz
+  integer                  :: k, n_parts_in_buffers
   real                     :: c1, c2, c3   ! random variables
 !------------------------------[Local parameters]------------------------------!
   real, parameter :: L1 = 6.28  ! streamwise
@@ -26,14 +24,9 @@
   ! Take alias(es)
   Grid => Flow % pnt_grid
 
-  ! Random variables
-  c1 = 1.0
-  c2 = 1.0
-  c3 = 1.0
-
-  !-------------------!
-  !   1st time step   !
-  !-------------------!
+  !-----------------------!
+  !   24001st time step   !
+  !-----------------------!
   if(n .eq. 24001) then     ! should be after the Flow is developed
 
     ! Track maximum number of particles
@@ -42,56 +35,12 @@
     ! Browsing through all introduced particles
     do k = 1, Swarm % n_particles
 
-        ! Generating random locations for particle
-        call random_number(c1)
-        call random_number(c2)
-        call random_number(c3)
-
-        ! Initalizing particle position
-        Swarm % particle(k) % x_n = (L1 * c1)
-        Swarm % particle(k) % y_n = (L2 * c2)
-        Swarm % particle(k) % z_n = (L3 * c3)
-
-        ! you essentially moved them a lot (from 0, 0, 0)
-        Swarm % particle(k) % cell = 0
-        Swarm % particle(k) % node = 0
-        Swarm % particle(k) % proc = 0
-        Swarm % particle(k) % buff = 0
-
-        Swarm % particle(k) % x_o = Swarm % particle(k) % x_n
-        Swarm % particle(k) % y_o = Swarm % particle(k) % y_n
-        Swarm % particle(k) % z_o = Swarm % particle(k) % z_n
-
-        ! Searching for the closest cell and node to place the moved particle
-        call Swarm % Particle(k) % Find_Nearest_Cell(n_parts_in_buffers)
-        call Swarm % Particle(k) % Find_Nearest_Node()
-
-        c = Swarm % particle(k) % cell
-
-        ! Set initial particle velocities
-        rx = Swarm % particle(k) % x_n - Grid % xc(c)
-        ry = Swarm % particle(k) % y_n - Grid % yc(c)
-        rz = Swarm % particle(k) % z_n - Grid % zc(c)
-
-        ! Compute velocities at the particle position from velocity gradients
-        Swarm % particle(k) % u    &
-           = Flow % u % n(c)       &  ! u velocity at the new time step (% n)
-           + Flow % u % x(c) * rx  &  ! u % x is gradient du/dx
-           + Flow % u % y(c) * ry  &  ! u % y is gradient du/dy
-           + Flow % u % z(c) * rz     ! u % x is gradient du/dz
-
-        Swarm % particle(k) % v    &
-           = Flow % v % n(c)       &  ! v velocity at the new time step (% n)
-           + Flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
-           + Flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
-           + Flow % v % z(c) * rz     ! v % x is gradient dv/dz
-
-        Swarm % particle(k) % w    &
-           = Flow % w % n(c)       &  ! w velocity at the new time step (% n)
-           + Flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
-           + Flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
-           + Flow % w % z(c) * rz     ! w % x is gradient dw/dz
-
+      ! Generating random locations for particle
+      call random_number(c1)
+      call random_number(c2)
+      call random_number(c3)
+      call Swarm % Particle(k) % Insert_At(L1*c1, L2*c2, L3*c3,  &
+                                           n_parts_in_buffers)
     end do
   end if
 
