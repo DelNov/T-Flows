@@ -40,7 +40,8 @@
       call random_number(c2)
       call random_number(c3)
       call Swarm % Particle(k) % Insert_At(L1*c1, L2*c2, L3*c3,  &
-                                           n_parts_in_buffers)
+                                           n_parts_in_buffers,   &
+                                           Flow=Flow)
     end do
   end if
 

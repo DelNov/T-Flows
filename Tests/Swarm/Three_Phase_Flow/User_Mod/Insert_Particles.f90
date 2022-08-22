@@ -12,16 +12,12 @@
   integer, intent(in)      :: n     ! time step
   real,    intent(in)      :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: i, j, k, p, n_parts_in_buffers, c
-  real                     :: x, y, z, xo, yo, zo, xn, yn, zn
-  real                     :: dx, dy, dz, mx, my, mz
-  real                     :: rx_o, ry_o, rz_o
+  integer :: i, j, k, p, n_parts_in_buffers, c
+  real    :: x, y, z, xo, yo, zo, xn, yn, zn
+  real    :: dx, dy, dz, mx, my, mz
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NI = 25, NJ = 25, NK = 2
 !==============================================================================!
-
-  Grid => Flow % pnt_grid
 
   !----------------------------------------------------!
   !   Initialize particles only in the 1st time step   !
@@ -56,17 +52,10 @@
           my = 0
           call random_number(mx);  mx = (mx - 0.5) * dx * 0.8
           call random_number(my);  my = (my - 0.5) * dy * 0.8
-          Swarm % Particle(p) % x_n = x + mx
-          Swarm % Particle(p) % y_n = y + my
-          Swarm % Particle(p) % z_n = z
 
-          Swarm % Particle(p) % x_o = Swarm % Particle(p) % x_n
-          Swarm % Particle(p) % y_o = Swarm % Particle(p) % y_n
-          Swarm % Particle(p) % z_o = Swarm % Particle(p) % z_n
-
-          ! Searching for the closest cell and node to place the moved particle
-          call Swarm % Particle(p) % Find_Nearest_Cell(n_parts_in_buffers)
-          call Swarm % Particle(p) % Find_Nearest_Node()
+          call Swarm % Particle(p) % Insert_At(x+mx, y+my, z,       &
+                                               n_parts_in_buffers,  &
+                                               Vof=Vof)
 
           ! Cell is invalid
           if(Swarm % Particle(p) % cell .eq. -1) then
@@ -79,19 +68,6 @@
             stop
           end if
 
-          ! Index of the closest cell for interpolation
-          c = Swarm % Particle(p) % cell
-
-          ! Vector connecting new particle position and cell center
-          rx_o = Swarm % Particle(p) % x_o - Grid % xc(c)
-          ry_o = Swarm % Particle(p) % y_o - Grid % yc(c)
-          rz_o = Swarm % Particle(p) % z_o - Grid % zc(c)
-
-          ! Value of smoothed vof at the old position
-          Swarm % Particle(p) % smooth_o = Vof % smooth % n(c)         &
-                                         + Vof % smooth % x(c) * rx_o  &
-                                         + Vof % smooth % y(c) * ry_o  &
-                                         + Vof % smooth % z(c) * rz_o
         end do
       end do
     end do

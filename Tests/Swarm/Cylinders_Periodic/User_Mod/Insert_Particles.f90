@@ -39,7 +39,9 @@
         call random_number(my);  my = (my - 0.5) * dy * 0.4
         call random_number(mz);  mz = (mz - 0.5) * dz * 0.4
 
-        call Swarm % Particle(i) % Insert_At(x, y+my, z+mz, n_parts_in_buffers)
+        call Swarm % Particle(i) % Insert_At(x, y+my, z+mz,       &
+                                             n_parts_in_buffers,  &
+                                             Flow=Flow)
       end do
     end do
 

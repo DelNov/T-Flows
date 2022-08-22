@@ -1,20 +1,20 @@
 !==============================================================================!
-  subroutine Insert_At(Particle, x, y, z, n_parts_in_buffers)
+  subroutine Insert_At(Particle, x, y, z, n_parts_in_buffers, Flow, Vof)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Particle_Type) :: Particle
-  real,    intent(in)  :: x, y, z
-  integer              :: n_parts_in_buffers
+  class(Particle_Type)       :: Particle
+  real,    intent(in)        :: x, y, z
+  integer                    :: n_parts_in_buffers
+  type(Field_Type), optional :: Flow
+  type(Vof_Type),   optional :: Vof
 !----------------------------------[Locals]------------------------------------!
-  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
   real                      :: rx, ry, rz
   integer                   :: c
 !==============================================================================!
 
   ! Store the grid pointer
-  Flow => Particle % pnt_flow
   Grid => Particle % pnt_grid
 
   Particle % x_n = x
@@ -40,23 +40,34 @@
   rz = Particle % z_n - Grid % zc(c)
 
   ! Compute velocities at the particle position from velocity gradients
-  Particle % u               &
-     = Flow % u % n(c)       &  ! u velocity at the new time step (% n)
-     + Flow % u % x(c) * rx  &  ! u % x is gradient du/dx
-     + Flow % u % y(c) * ry  &  ! u % y is gradient du/dy
-     + Flow % u % z(c) * rz     ! u % x is gradient du/dz
+  if(present(Flow)) then
+    Particle % u               &
+       = Flow % u % n(c)       &  ! u velocity at the new time step (% n)
+       + Flow % u % x(c) * rx  &  ! u % x is gradient du/dx
+       + Flow % u % y(c) * ry  &  ! u % y is gradient du/dy
+       + Flow % u % z(c) * rz     ! u % x is gradient du/dz
 
-  Particle % v               &
-     = Flow % v % n(c)       &  ! v velocity at the new time step (% n)
-     + Flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
-     + Flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
-     + Flow % v % z(c) * rz     ! v % x is gradient dv/dz
+    Particle % v               &
+       = Flow % v % n(c)       &  ! v velocity at the new time step (% n)
+       + Flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
+       + Flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
+       + Flow % v % z(c) * rz     ! v % x is gradient dv/dz
 
-  Particle % w               &
-     = Flow % w % n(c)       &  ! w velocity at the new time step (% n)
-     + Flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
-     + Flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
-     + Flow % w % z(c) * rz     ! w % x is gradient dw/dz
+    Particle % w               &
+       = Flow % w % n(c)       &  ! w velocity at the new time step (% n)
+       + Flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
+       + Flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
+       + Flow % w % z(c) * rz     ! w % x is gradient dw/dz
+  end if
+
+  ! Value of smoothed vof at the old position
+  if(present(Vof)) then
+    Particle % smooth_n = Vof % smooth % n(c)       &
+                        + Vof % smooth % x(c) * rx  &
+                        + Vof % smooth % y(c) * ry  &
+                        + Vof % smooth % z(c) * rz
+    Particle % smooth_o = Particle % smooth_n
+  end if
 
   ! Or move back against velocity?
   Particle % x_o = Particle % x_n

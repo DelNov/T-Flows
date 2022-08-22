@@ -34,7 +34,8 @@
       call Swarm % Particle(k) % Insert_At(-0.00375 + dx * 2.5e-5,  &
                                             0.0399999,              &
                                             0.0,                    &
-                                            n_parts_in_buffers)
+                                            n_parts_in_buffers,     &
+                                            Flow=Flow)
     end do
 
   end if

@@ -47,7 +47,9 @@
 
     ! First Particle in the center
     k = n_old + 1
-    call Swarm % Particle(k) % Insert_At(0.0, 0.0999, 0.0, n_parts_in_buffers)
+    call Swarm % Particle(k) % Insert_At(0.0, 0.0999, 0.0,    &
+                                         n_parts_in_buffers,  &
+                                         Flow=Flow)
 
     d_r = 0.009 / (n_rows - 2)
 
@@ -62,7 +64,9 @@
         z = r * sin(theta)
 
         k = k + 1
-        call Swarm % Particle(k) % Insert_At(x, 0.0999, z, n_parts_in_buffers)
+        call Swarm % Particle(k) % Insert_At(x, 0.0999, z,        &
+                                             n_parts_in_buffers,  &
+                                             Flow=Flow)
       end do
     end do
 
