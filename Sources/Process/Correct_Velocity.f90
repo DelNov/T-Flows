@@ -88,18 +88,6 @@
     end if
   end do
 
-  if(Flow % has_pressure) then
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-          b(c1) = 0.0
-        end if
-      end if
-    end do
-  end if
-
   ! In case of mass transfer, also add
   ! volume change due to mass transfer
   call Vof % Mass_Transfer_Pressure_Source(b)
