@@ -25,7 +25,7 @@
   !-------------------------------------!
   Swarm % cell_has_particles(:) = .false.  ! assume no cells has particles
 
-  Part => Swarm % particle(k)
+  Part => Swarm % Particle(k)
   if(Part % proc .eq. this_proc) then
     Swarm % cell_has_particles(Part % cell) = .true.
   end if
@@ -47,7 +47,7 @@
       !------------------------------!
       if( Swarm % cell_has_particles(c1) ) then
 
-        Part => Swarm % particle(k)
+        Part => Swarm % Particle(k)
 
         if(Part % proc .eq. this_proc) then
 
@@ -103,7 +103,7 @@
       !------------------------------!
       if( Swarm % cell_has_particles(c2) ) then
 
-        Part => Swarm % particle(k)
+        Part => Swarm % Particle(k)
 
         if(Part % proc .eq. this_proc) then
 
