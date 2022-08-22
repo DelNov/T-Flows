@@ -4,10 +4,10 @@
  PROBLEM_NAME     rod_tet_dual
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS    3600
- RESULTS_SAVE_INTERVAL    30
- BACKUP_SAVE_INTERVAL    600
- TIME_STEP               0.003
+ NUMBER_OF_TIME_STEPS    3600
+ RESULTS_SAVE_INTERVAL     30
+ BACKUP_SAVE_INTERVAL     600
+ TIME_STEP                  0.003
 
 #-------------------
 # Monitoring points 
@@ -32,26 +32,23 @@ NUMBER_OF_TIME_STEPS    3600
 #----------------
 # Swarm related
 #----------------
- PARTICLE_TRACKING                          yes
+ PARTICLE_TRACKING                            yes
  SWARM_DIAMETER                               5.0e-04
  SWARM_DENSITY                                1.0e+03
  NUMBER_OF_SWARM_SUB_STEPS                   12
  MAX_PARTICLES                              256
  SWARM_COEFFICIENT_OF_RESTITUTION             1.00
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    300
+ STARTING_TIME_STEP_FOR_SWARM_COMPUTATION   300
 
 #----------------------
 # Numerical parameters
 #----------------------
-
- PRESSURE_MOMENTUM_COUPLING    simple
-
+ PRESSURE_MOMENTUM_COUPLING             simple
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER     250
 
- TIME_INTEGRATION_SCHEME  linear
-
+ TIME_INTEGRATION_SCHEME          linear
  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
 
 #------------------------

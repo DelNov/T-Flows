@@ -3,12 +3,13 @@
 #----------
  PROBLEM_NAME        cavity
  HEAT_TRANSFER       no
-INTERFACE_TRACKING yes
+ INTERFACE_TRACKING  yes
  TRACK_FRONT         yes
 
  NUMBER_OF_TIME_STEPS    1200
 
  RESULTS_SAVE_INTERVAL      5
+ SWARM_SAVE_INTERVAL        5
  BACKUP_SAVE_INTERVAL    3000
 
 #-----------------------------------------------------
