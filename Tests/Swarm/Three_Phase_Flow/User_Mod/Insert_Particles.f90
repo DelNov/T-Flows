@@ -96,6 +96,11 @@
       end do
     end do
 
+    !--------------------------------------------------!
+    !   Update number of particles in the simulation   !
+    !--------------------------------------------------!
+    Swarm % n_particles = p
+
   end if
 
   end subroutine

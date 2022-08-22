@@ -47,9 +47,7 @@
 
     ! First Particle in the center
     k = n_old + 1
-    Swarm % Particle(k) % x_n =  0.0
-    Swarm % Particle(k) % y_n =  0.0999
-    Swarm % Particle(k) % z_n =  0.0
+    call Swarm % Particle(k) % Insert_At(0.0, 0.0999, 0.0, n_parts_in_buffers)
 
     d_r = 0.009 / (n_rows - 2)
 
@@ -64,9 +62,7 @@
         z = r * sin(theta)
 
         k = k + 1
-        Swarm % Particle(k) % x_n = x
-        Swarm % Particle(k) % y_n = 0.0999
-        Swarm % Particle(k) % z_n = z
+        call Swarm % Particle(k) % Insert_At(x, 0.0999, z, n_parts_in_buffers)
       end do
     end do
 
@@ -85,50 +81,9 @@
       end if
     end if
 
-    do k = n_old + 1, n_new
-
-      ! You essentially moved them a lot (from 0, 0, 0)
-      Swarm % Particle(k) % cell = 0
-      Swarm % Particle(k) % node = 0
-      Swarm % Particle(k) % proc = 0
-      Swarm % Particle(k) % buff = 0
-
-      Swarm % Particle(k) % x_o = Swarm % Particle(k) % x_n
-      Swarm % Particle(k) % y_o = Swarm % Particle(k) % y_n
-      Swarm % Particle(k) % z_o = Swarm % Particle(k) % z_n
-
-      ! Searching for the closest cell and node to place the moved Particle
-      call Swarm % Particle(k) % Find_Nearest_Cell(n_parts_in_buffers)
-      call Swarm % Particle(k) % Find_Nearest_Node()
-
-      c = Swarm % Particle(k) % cell
-
-      ! Set initial Particle velocities
-      rx = Swarm % Particle(k) % x_n - Grid % xc(c)
-      ry = Swarm % Particle(k) % y_n - Grid % yc(c)
-      rz = Swarm % Particle(k) % z_n - Grid % zc(c)
-
-      ! Compute velocities at the Particle position from velocity gradients
-      Swarm % Particle(k) % u    &
-         = Flow % u % n(c)       &  ! u velocity at the new time step (% n)
-         + Flow % u % x(c) * rx  &  ! u % x is gradient du/dx
-         + Flow % u % y(c) * ry  &  ! u % y is gradient du/dy
-         + Flow % u % z(c) * rz     ! u % x is gradient du/dz
-
-      Swarm % Particle(k) % v    &
-         = Flow % v % n(c)       &  ! v velocity at the new time step (% n)
-         + Flow % v % x(c) * rx  &  ! v % x is gradient dv/dx
-         + Flow % v % y(c) * ry  &  ! v % y is gradient dv/dy
-         + Flow % v % z(c) * rz     ! v % x is gradient dv/dz
-
-      Swarm % Particle(k) % w    &
-         = Flow % w % n(c)       &  ! w velocity at the new time step (% n)
-         + Flow % w % x(c) * rx  &  ! w % x is gradient dw/dx
-         + Flow % w % y(c) * ry  &  ! w % y is gradient dw/dy
-         + Flow % w % z(c) * rz     ! w % x is gradient dw/dz
-
-    end do
-
+    !------------------------------------!
+    !   Update the number of particles   !
+    !------------------------------------!
     Swarm % n_particles = n_new
 
   end if

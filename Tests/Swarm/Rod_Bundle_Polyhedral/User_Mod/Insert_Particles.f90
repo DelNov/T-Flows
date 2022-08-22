@@ -45,19 +45,15 @@
 
         call random_number(my);  my = (my - 0.5) * dy * 0.4
         call random_number(mz);  mz = (mz - 0.5) * dz * 0.4
-        Swarm % Particle(i) % x_n = x
-        Swarm % Particle(i) % y_n = y + my
-        Swarm % Particle(i) % z_n = z + mz
 
-        Swarm % Particle(i) % x_o = Swarm % Particle(k) % x_n
-        Swarm % Particle(i) % y_o = Swarm % Particle(k) % y_n
-        Swarm % Particle(i) % z_o = Swarm % Particle(k) % z_n
-
-        ! Searching for the closest cell and node to place the moved particle
-        call Swarm % Particle(i) % Find_Nearest_Cell(n_parts_in_buffers)
-        call Swarm % Particle(i) % Find_Nearest_Node()
+        call Swarm % Particle(i) % Insert_At(x, y+my, z+mz, n_parts_in_buffers)
       end do
     end do
+
+    !--------------------------------------------------!
+    !   Update number of particles in the simulation   !
+    !--------------------------------------------------!
+    Swarm % n_particles = i
 
   end if
 

@@ -72,10 +72,12 @@
 
     contains
       procedure :: Initialize_Particle
+      procedure :: Insert_At
 
   end type
 
   contains
   include 'Particle_Mod/Initialize_Particle.f90'
+  include 'Particle_Mod/Insert_At.f90'
 
   end module
