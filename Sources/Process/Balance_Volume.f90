@@ -107,27 +107,59 @@
   bulk % area_in  = 0.0
   bulk % area_out = 0.0
 
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  !---------------------------------------------------------------!
+  !   This works better if domain features pressure outflow ...   !
+  !---------------------------------------------------------------!
+  if(Flow % has_pressure) then
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
 
-    ! Volume flux at the boundary face
-    if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+      ! Volume flux at the boundary face
+      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
-        bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
-        bulk % area_in = bulk % area_in + Grid % s(s)
+        if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW   .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+          if(v_flux % n(s) > 0.0) then
+            bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
+            bulk % area_out = bulk % area_out + Grid % s(s)
+          else
+            bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
+            bulk % area_in = bulk % area_in + Grid % s(s)
+          end if
+        end if
+
       end if
+    end do
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-        bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
-        bulk % area_out = bulk % area_out + Grid % s(s)
+  !-----------------------------------------------------------------------!
+  !   ... but this variant works better for all other types of outflows   !
+  !-----------------------------------------------------------------------!
+  else
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+
+      ! Volume flux at the boundary face
+      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+
+        if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
+          bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
+          bulk % area_in = bulk % area_in + Grid % s(s)
+        end if
+
+        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+          bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
+          bulk % area_out = bulk % area_out + Grid % s(s)
+        end if
+
       end if
-
-    end if
-  end do
+    end do
+  end if
 
   call Comm_Mod_Global_Sum_Real(bulk % vol_in)
   call Comm_Mod_Global_Sum_Real(bulk % vol_out)
