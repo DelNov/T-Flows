@@ -241,7 +241,7 @@
   end do
 
   ! Save initial condition
-  if(first_dt .eq. 0) then
+  if(first_dt .eq. 0 .and. Results % initial) then
     call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
                                 Flow, Turb, Vof, Swarm, exit_now)
   end if
