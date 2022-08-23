@@ -52,6 +52,14 @@
                                 m_12_f, m_13_f, m_23_f,              &
                                 shear_test)
 
+  ! Set all helping arrays to zero (important here)
+  u_f   (:) = 0.0;  v_f   (:) = 0.0;  w_f   (:) = 0.0
+  uu_f  (:) = 0.0;  vv_f  (:) = 0.0;  ww_f  (:) = 0.0
+  uv_f  (:) = 0.0;  uw_f  (:) = 0.0;  vw_f  (:) = 0.0
+  m_11_f(:) = 0.0;  m_22_f(:) = 0.0;  m_33_f(:) = 0.0
+  m_12_f(:) = 0.0;  m_13_f(:) = 0.0;  m_23_f(:) = 0.0
+  shear_test(-nb:nc) = 0.0
+
   ! Take aliases
   Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
