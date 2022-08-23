@@ -28,10 +28,10 @@
   call Flow % Alias_Momentum(u, v, w)
   call Sol % Alias_Native   (A, b)
 
-  call Work % Connect_Real_Cell(cross)
-
   ! If wall distance was calculated, get out of here
   if(Grid % wall_dist(1) > 0.0) return
+
+  call Work % Connect_Real_Cell(cross)
 
   if(this_proc < 2) then
     print '(a)',      ' # Computing wall distance ...'
