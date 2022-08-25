@@ -235,7 +235,7 @@
       c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
-      if (c2 < 0) then
+      if(Grid % comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
