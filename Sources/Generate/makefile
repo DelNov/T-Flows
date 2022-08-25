@@ -53,8 +53,47 @@ endif
 #   Note: Changes only when support to a new Fortran compiler is added.
 #-------------------------------------------------------------------------
 
+# Fortran == intel
+ifeq ($(FORTRAN), intel)
+  ifeq ($(FCOMP),)
+    FC = ifort
+  else
+    FC = $(FCOMP)
+  endif
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
+                 -debug all -fpe-all=0 -traceback
+  else
+    OPT_F_COMP = -module $(DIR_MODULE) -O3
+  endif
+  ifeq ($(REAL), double)
+    OPT_F_COMP += -r8
+  endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -qopenmp
+  endif
+
+# Fortran == nvidia
+else ifeq ($(FORTRAN), nvidia)
+  ifeq ($(FCOMP),)
+    FC = nvfortran
+  else
+    FC = $(FCOMP)
+  endif
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g
+  else
+    OPT_F_COMP = -module $(DIR_MODULE) -O3
+  endif
+  ifeq ($(REAL), double)
+    OPT_F_COMP += -r8
+  endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -mp
+  endif
+
 # Fortran == gnu
-ifeq ($(FORTRAN), gnu)
+else
   ifeq ($(FCOMP),)
     FC = gfortran
   else
@@ -76,47 +115,6 @@ ifeq ($(FORTRAN), gnu)
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
-  endif
-  ifeq ($(OPENMP), yes)
-    OPT_F_COMP += -fopenmp
-  endif
-endif
-
-# Fortran == intel
-ifeq ($(FORTRAN), intel)
-  ifeq ($(FCOMP),)
-    FC = ifort
-  else
-    FC = $(FCOMP)
-  endif
-  ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
-                 -debug all -fpe-all=0 -traceback
-  else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3
-  endif
-  ifeq ($(REAL), double)
-    OPT_F_COMP += -r8
-  endif
-  ifeq ($(OPENMP), yes)
-    OPT_COMP += -fopenmp
-  endif
-endif
-
-# Fortran == nvidia
-ifeq ($(FORTRAN), nvidia)
-  ifeq ($(FCOMP),)
-    FC = nvfortran
-  else
-    FC = $(FCOMP)
-  endif
-  ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g
-  else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3
-  endif
-  ifeq ($(REAL), double)
-    OPT_F_COMP += -r8
   endif
   ifeq ($(OPENMP), yes)
     OPT_F_COMP += -fopenmp
