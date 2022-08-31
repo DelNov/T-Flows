@@ -11,10 +11,10 @@
   integer              :: c, c2, s, s1, s2, max_n_cells
   integer, allocatable :: cell_list(:)
   real                 :: x1, x2, y1, y2, z1, z2
-
-! Just for checking, erase this later
-! integer :: i_cel
-! real    :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
+! Just for checking, see sections at the end of the procedure
+! integer              :: i_cel
+! real                 :: xn, xc, yn, yc, zn, zc, max_del, min_del, del
+! real, allocatable    :: n_cells(:)
 !==============================================================================!
 
   ! Allocate memory for node coordinates
@@ -47,6 +47,7 @@
     ! Allocate memory for cells surrounding each node
     if(run .eq. 1) then
       max_n_cells = maxval(Grid % nodes_n_cells)
+      call Comm_Mod_Global_Max_Int(max_n_cells)
       allocate(Grid % nodes_c(1:max_n_cells, 1:Grid % n_nodes))
       allocate(cell_list(max_n_cells*2));  cell_list(:) = 0
     end if
@@ -122,7 +123,7 @@
 !   end do
 ! end do
 
-! ! Check #2, erase this later
+! ! Check #2
 ! max_del = -HUGE
 ! min_del = +HUGE
 !
@@ -146,6 +147,15 @@
 ! end do
 !
 ! print *, '# Checking: min and max del: ', min_del, max_del
+! stop
+
+! ! Check #3
+! allocate(n_cells(Grid % n_nodes));
+! n_cells(1:Grid % n_nodes) = Grid % nodes_n_cells(1:Grid % n_nodes)
+! call Grid % Save_Debug_Vtu("n-cells",                &
+!                            scalar_node = n_cells,    &
+!                            scalar_name = "n_cells")
+! call Comm_Mod_End
 ! stop
 
   end subroutine
