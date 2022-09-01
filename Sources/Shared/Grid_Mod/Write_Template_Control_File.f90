@@ -58,9 +58,9 @@
     write(fu,'(a)') '    TYPE             wall  (or: '  //  &
                     'inflow / outflow / pressure / convective)'
     write(fu,'(a)') '    VARIABLES        u     v     w     t    '  //  &
-                                   'kin    eps    zeta     f22'
+                                   'kin   eps    zeta   f22'
     write(fu,'(a)') '    VALUES           0.0   0.0   0.0   10   '  //  &
-                                   '1e-2   1e-3   6.6e-2   1e-3'
+                                   '0.0   1e-3   0.0    1e-3'
     write(fu,'(a1)', advance='no') CR
   end do
 
