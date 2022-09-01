@@ -25,6 +25,16 @@
   !---------------------------------------------------!
 
   if(Turb % model .eq. K_EPS) then
+
+    ! Calculate turbulent scalar fluxes
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
+      if(Flow % n_scalars > 0) then
+        call Turb % Calculate_Stress     ()
+        call Turb % Calculate_Scalar_Flux(sc)
+      end if
+    end do
+
     call Calculate_Shear_And_Vorticity(Flow)
     call Turb % Time_And_Length_Scale(Grid)
 
@@ -66,10 +76,10 @@
 
     call Turb % Compute_F22(Sol, curr_dt, ini, Turb % f22)
     call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % zeta)
-    ! For some cases, it helps to start with turbulent viscosity
-    ! computed with plain k-eps the full k-eps-zeta-f is engaged.
-    ! Particularly for cases with mild pressure drops such as
-    ! channel, pipe flows and flows in fuel rod bundles
+
+    ! For some cases, it is beneficial to start simulations with
+    ! turbulent viscosity computed with k-eps.  Particularly for
+    ! cases with mild pressure drops such as channel, pipe flows
     if(curr_dt < 10) then
       call Turb % Vis_T_K_Eps()
     else
