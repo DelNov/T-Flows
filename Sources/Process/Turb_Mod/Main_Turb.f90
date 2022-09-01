@@ -64,14 +64,15 @@
       call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % t2)
     end if
 
-    ! For some cases, it helps to start with the little of k-eps
-    ! before the full k-eps-zeta-f is engaged.  Particularly for
-    ! cases with mild pressure drops such as channel, pipe flows
+    call Turb % Compute_F22(Sol, curr_dt, ini, Turb % f22)
+    call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % zeta)
+    ! For some cases, it helps to start with turbulent viscosity
+    ! computed with plain k-eps the full k-eps-zeta-f is engaged.
+    ! Particularly for cases with mild pressure drops such as
+    ! channel, pipe flows and flows in fuel rod bundles
     if(curr_dt < 10) then
       call Turb % Vis_T_K_Eps()
     else
-      call Turb % Compute_F22(Sol, curr_dt, ini, Turb % f22)
-      call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % zeta)
       call Turb % Vis_T_K_Eps_Zeta_F()
     end if
 
