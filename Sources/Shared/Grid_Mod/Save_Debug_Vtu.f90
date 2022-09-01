@@ -55,9 +55,12 @@
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
-  ! ... because I am almost invariantly sending cell data here)
-  allocate(values_cell(-Grid % n_bnd_cells:Grid % n_cells));
-  values_cell(:) = 0.0
+  ! If inside cells (such as the b array) or other scalar cells are present
+  ! allocate memory for values_cell (which subsequently take either of them)
+  if(present(inside_cell) .or. present(scalar_cell)) then
+    allocate(values_cell(-Grid % n_bnd_cells:Grid % n_cells));
+    values_cell(:) = 0.0
+  end if
 
   if(present(inside_cell)) then
     values_cell(1:Grid % n_cells) = inside_cell(1:Grid % n_cells)
@@ -68,6 +71,11 @@
     values_name = scalar_name
   else
     ! An error trap here would be lovely
+  end if
+
+  ! Fetch the name for node-based variables
+  if(present(scalar_node)) then
+    values_name = scalar_name
   end if
 
   ! Set initial value for inside (which, if .true., means plotting inside cells)
@@ -507,6 +515,10 @@
        present(inside_cell)) then
       write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
                               ' Name="'// trim(values_name)  // '"/>'
+    end if
+    if(present(scalar_node)) then
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
+                              ' Name="'// trim(scalar_name)  // '"/>'
     end if
     if(present(vector_cell)) then
       write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
