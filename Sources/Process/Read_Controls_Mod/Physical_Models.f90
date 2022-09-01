@@ -224,6 +224,12 @@
     call Turb % Const_Spalart_Allmaras()
   end if
 
+  if(Turb % model .eq. LES_DYNAMIC .or.  &
+     Turb % model .eq. LES_SMAGORINSKY) then
+    call Turb % Const_Les()
+  end if
+
+  !------------------------------------!
   !------------------------------------!
   !                                    !
   !   Pressure drops and mass fluxes   !

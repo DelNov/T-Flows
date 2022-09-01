@@ -154,6 +154,7 @@
       procedure :: Const_Hanjalic_Jakirlic
       procedure :: Const_K_Eps
       procedure :: Const_K_Eps_Zeta_F
+      procedure :: Const_Les
       procedure :: Const_Manceau_Hanjalic
       procedure :: Const_Spalart_Allmaras
 
@@ -289,6 +290,7 @@
   include 'Turb_Mod/Const_Hanjalic_Jakirlic.f90'
   include 'Turb_Mod/Const_K_Eps.f90'
   include 'Turb_Mod/Const_K_Eps_Zeta_F.f90'
+  include 'Turb_Mod/Const_Les.f90'
   include 'Turb_Mod/Const_Manceau_Hanjalic.f90'
   include 'Turb_Mod/Const_Spalart_Allmaras.f90'
 
