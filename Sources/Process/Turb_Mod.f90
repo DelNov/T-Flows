@@ -115,9 +115,6 @@
     real, allocatable :: alpha_l(:)  ! ratio of length scales
     real, allocatable :: alpha_u(:)  ! ratio of velocity scales
 
-    ! For LES you need to know nearest wall cell
-    integer, allocatable :: nearest_wall_cell(:)
-
     ! Variable holding the turbulence model; its variant and statistics
     integer :: model
     integer :: model_variant   ! STABILIZED or NONE
@@ -183,7 +180,7 @@
       procedure, private :: Vis_T_K_Eps
       procedure, private :: Vis_T_K_Eps_Zeta_F
       procedure, private :: Vis_T_Rsm
-      procedure, private :: Vis_T_Smagorinsky
+      procedure, private :: Vis_T_Subgrid
       procedure, private :: Vis_T_Spalart_Allmaras
       procedure, private :: Vis_T_Wale
 
@@ -191,7 +188,6 @@
       procedure, private :: Ebf_Scalar
       procedure          :: Prandtl_Turb
 
-      procedure :: Find_Nearest_Wall_Cell
       procedure :: Y_Plus_Rough_Walls
       procedure :: Tau_Wall_Log_Law
       procedure :: U_Plus_Log_Law
@@ -267,7 +263,7 @@
   include 'Turb_Mod/Main_Turb.f90'
 
   ! The constructor-like
-  include 'Turb_Mod/Allocate.f90'
+  include 'Turb_Mod/Allocate_Turb.f90'
 
   include 'Turb_Mod/Alias_K_Eps.f90'
   include 'Turb_Mod/Alias_K_Eps_Zeta_F.f90'
@@ -319,7 +315,7 @@
   include 'Turb_Mod/Vis_T_K_Eps.f90'
   include 'Turb_Mod/Vis_T_K_Eps_Zeta_F.f90'
   include 'Turb_Mod/Vis_T_Rsm.f90'
-  include 'Turb_Mod/Vis_T_Smagorinsky.f90'
+  include 'Turb_Mod/Vis_T_Subgrid.f90'
   include 'Turb_Mod/Vis_T_Spalart_Allmaras.f90'
   include 'Turb_Mod/Vis_T_Wale.f90'
 
@@ -328,9 +324,7 @@
   include 'Turb_Mod/Ebf_Scalar.f90'
   include 'Turb_Mod/Prandtl_Turb.f90'
 
-  include 'Turb_Mod/Find_Nearest_Wall_Cell.f90'
   include 'Turb_Mod/Y_Plus_Rough_Walls.f90'
-
   include 'Turb_Mod/Tau_Wall_Log_Law.f90'
   include 'Turb_Mod/U_Plus_Log_Law.f90'
   include 'Turb_Mod/Time_And_Length_Scale.f90'

@@ -12,18 +12,18 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: A_POW = 8.3
+  integer, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: fd    ! damping function
-  real                      :: hwn   ! Grid step size in wall-normal direction 
+  real                      :: hwn   ! grid step size in wall-normal direction 
   real                      :: hmax
-  real                      :: cw, u_ff
-  real                      :: dw
-  real                      :: lf_wm
-  real                      :: kappa
+  real                      :: cw, u_tan, u_tau, dw, lf_wm, kappa, dely, nu
 !==============================================================================!
 
   ! Take aliases
@@ -38,7 +38,9 @@
   cw    = 0.15 ! emperical constant [Shur 2008]
   kappa = 0.41
 
-  ! Calculate model's eddy viscosity
+  !----------------------------!
+  !   Model's eddy viscosity   !
+  !----------------------------!
   do c = 1, Grid % n_cells
 
     hmax = Turb % h_max(c)
@@ -48,22 +50,22 @@
     ! Wall-modeled LES length scale
     lf_wm = min(max(cw*dw,cw*hmax,hwn),hmax)
 
-    ! If(nearest_wall_cell(c) .ne. 0) is needed for parallel
-    ! version since the subdomains which do not "touch" wall
-    ! has nearest_wall_cell(c) = 0. 
-    if(Turb % nearest_wall_cell(c) .ne. 0) then
-      u_ff = sqrt( Flow % viscosity(c)  &
-                  * sqrt(  u % n(Turb % nearest_wall_cell(c)) ** 2   &
-                         + v % n(Turb % nearest_wall_cell(c)) ** 2   &
-                         + w % n(Turb % nearest_wall_cell(c)) ** 2)  &
-                 / (Grid % wall_dist(Turb % nearest_wall_cell(c))+TINY) )
-      Turb % y_plus(c) = Grid % wall_dist(c) * u_ff / Flow % viscosity(c)
+    nu   = Flow % viscosity(c) / Flow % density(c)
+    dely = Grid % wall_dist(c)
 
-      ! Piomelli damping function
-      fd = 1.0 - exp(-(Turb % y_plus(c)/25.0)**3)
-    else
-      fd = 1.0
-    end if
+    ! Tangential velocity.  Here it assumed that, as you approach the
+    ! wall, the tangential velocity component is dominant and that the
+    ! magnitude of velocity is close to tangential component.
+    u_tan = sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2)
+
+    ! Calculate u_tau, y+ and perform Van Driest damping
+    u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+    Turb % y_plus(c) = Grid % wall_dist(c) * u_tau / Flow % viscosity(c)
+
+    ! Piomelli damping function
+    fd = 1.0 - exp(-(Turb % y_plus(c)/25.0)**3)
+
+    ! Final SGS viscosity
     Turb % vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2)  &
                     * Flow % shear(c) * fd
 

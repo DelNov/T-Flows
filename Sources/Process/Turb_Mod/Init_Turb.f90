@@ -32,7 +32,7 @@
     if(Turb % model .eq. LES_WALE) then
       call Turb % Vis_T_Wale()
     end if
-    call Turb % Vis_T_Smagorinsky()
+    call Turb % Vis_T_Subgrid()
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then

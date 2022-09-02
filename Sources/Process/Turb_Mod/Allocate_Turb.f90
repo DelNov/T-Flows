@@ -360,10 +360,7 @@
   !-----------------------!
   if(Turb % model .eq. LES_SMAGORINSKY) then
 
-    allocate(Turb % nearest_wall_cell(-nb:nc))
-    Turb % nearest_wall_cell = 0
-
-    ! Other variables such as time scale, length scale and production
+    ! Variables such as time scale, length scale and production
     allocate(Turb % t_scale (-nb:nc));  Turb % t_scale = 0.
     allocate(Turb % l_scale (-nb:nc));  Turb % l_scale = 0.
     allocate(Turb % vis_t   (-nb:nc));  Turb % vis_t   = 0.
@@ -414,9 +411,6 @@
   !   Hybrid_Les_Prandtl model   !
   !------------------------------!
   if(Turb % model .eq. HYBRID_LES_PRANDTL) then
-
-    allocate(Turb % nearest_wall_cell(-nb:nc))
-    Turb % nearest_wall_cell = 0
 
     ! Dynamic Smagorinsky constant for particle SGS models
     allocate(Turb % c_dyn(-nb:nc));  Turb % c_dyn = 0.

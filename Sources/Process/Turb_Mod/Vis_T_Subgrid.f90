@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vis_T_Smagorinsky(Turb)
+  subroutine Vis_T_Subgrid(Turb)
 !------------------------------------------------------------------------------!
 !   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
@@ -10,14 +10,16 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: A_POW = 8.3
+  integer, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: nx, ny, nz
-  real                      :: cs, lf, u_tau_l, u_f, nc2
-  real                      :: u_tan, a_pow, b_pow, nu, dely
+  real                      :: cs, lf, u_tau, nc2, u_tan, nu, dely
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !==============================================================================!
 
@@ -40,20 +42,19 @@
     do c = 1, Grid % n_cells
       lf = Grid % vol(c)**ONE_THIRD
 
-      ! if(nearest_wall_cell(c) .ne. 0) is needed for parallel version
-      ! since the subdomains which do not "touch" wall
-      ! has nearest_wall_cell(c) = 0.
-      if(Turb % nearest_wall_cell(c) .ne. 0) then
-        u_f = sqrt( Flow % viscosity(c)                                &
-                    * sqrt(  u % n(Turb % nearest_wall_cell(c)) ** 2   &
-                           + v % n(Turb % nearest_wall_cell(c)) ** 2   &
-                           + w % n(Turb % nearest_wall_cell(c)) ** 2)  &
-                   / (Grid % wall_dist(Turb % nearest_wall_cell(c))+TINY) )
-        Turb % y_plus(c) = Grid % wall_dist(c) * u_f / Flow % viscosity(c)
-        cs = c_smag * (1.0 - exp(-Turb % y_plus(c) / 25.0))
-      else
-        cs = c_smag
-      end if
+      nu   = Flow % viscosity(c) / Flow % density(c)
+      dely = Grid % wall_dist(c)
+
+      ! Tangential velocity.  Here it assumed that, as you approach the
+      ! wall, the tangential velocity component is dominant and that the
+      ! magnitude of velocity is close to tangential component.
+      u_tan = sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2)
+
+      ! Calculate u_tau, y+ and perform Van Driest damping
+      u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+      Turb % y_plus(c) = Grid % wall_dist(c) * u_tau / Flow % viscosity(c)
+      cs = c_smag * (1.0 - exp(-Turb % y_plus(c) / 25.0))
+
       Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
                       * (cs*cs)            &  ! cs^2
@@ -68,6 +69,7 @@
                       * Turb % c_dyn(c)    &  ! c_dynamic
                       * Flow % shear(c)
     end do
+
   else if(Turb % model .eq. LES_WALE) then
     do c = 1, Grid % n_cells
       lf = Grid % vol(c)**ONE_THIRD
@@ -125,17 +127,15 @@
 
         u_tan = Flow % U_Tan(s)
 
-        a_pow = 8.3
-        b_pow = 1.0/7.0
         nu = Flow % viscosity(c1) / Flow % density(c1)
         dely = Grid % wall_dist(c1)
 
-        ! Calculate u_tau_l
-        u_tau_l = ( u_tan/a_pow * (nu/dely)**b_pow ) ** (1.0/(1.0+b_pow))
+        ! Calculate u_tau
+        u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
 
         ! Calculate y+
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
-                                   u_tau_l,               &
+                                   u_tau,                 &
                                    Grid % wall_dist(c1),  &
                                    kin_vis,               &
                                    z_o)
@@ -145,10 +145,9 @@
                                Turb % y_plus(c1),     &
                                z_o)
 
+        ! Effective viscosity above and below 11.18 threshold
         if(Turb % y_plus(c1)  >=  11.81) then
-
-          ! This one is effective viscosity
-          Turb % vis_w(c1) = Flow % density(c1) * u_tau_l * u_tau_l * dely  &
+          Turb % vis_w(c1) = Flow % density(c1) * u_tau * u_tau * dely  &
                            / abs(u_tan)
         else
           Turb % vis_w(c1) = Flow % viscosity(c1)                &
@@ -157,7 +156,7 @@
         end if
 
         if(Flow % heat_transfer) then
-          u_plus = u_tan / u_tau_l
+          u_plus = u_tan / u_tau
 
           pr_t = Turb % Prandtl_Turb(c1)
           pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
@@ -180,7 +179,7 @@
         end if
 
         if(Flow % n_scalars > 0) then
-          u_plus = u_tan / u_tau_l
+          u_plus = u_tan / u_tau
 
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
           beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                   &

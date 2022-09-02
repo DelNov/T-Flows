@@ -186,13 +186,6 @@
     ! Prepare ...
     call Bulk_Mod_Monitoring_Planes_Areas(Flow(d) % bulk, Grid(d))
 
-    ! This should somehow be in Main_Turb
-    if( (Turb(d) % model .eq. LES_SMAGORINSKY     .or.   &
-         Turb(d) % model .eq. HYBRID_LES_PRANDTL) .and.  &
-         .not. read_backup(d)) then
-      call Turb(d) % Find_Nearest_Wall_Cell()
-    end if
-
     ! Print the areas of monitoring planes
     call Bulk_Mod_Print_Areas(Flow(d) % bulk)
 
