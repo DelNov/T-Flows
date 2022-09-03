@@ -75,6 +75,7 @@
       ! Update inertia in the first cell (not complete)
       cell_inertia % x (c1) = cell_inertia % x (c1) + ix
       cell_inertia % y (c1) = cell_inertia % y (c1) + iy
+      cell_inertia % z (c1) = cell_inertia % z (c1) + iz
 
     end do  ! i_nod
 
@@ -98,6 +99,7 @@
         ! Update inertia in the second cell (not complete, continue)
         cell_inertia % x (c2) = cell_inertia % x (c2) + ix
         cell_inertia % y (c2) = cell_inertia % y (c2) + iy
+        cell_inertia % z (c2) = cell_inertia % z (c2) + iz
 
       end do  ! i_nod
     end if
@@ -111,6 +113,12 @@
   call Grid % Save_Debug_Vtu('ix',                            &
                              scalar_cell = cell_inertia % x,  &
                              scalar_name = 'Cell Inertia X')
+  call Grid % Save_Debug_Vtu('iy',                            &
+                             scalar_cell = cell_inertia % y,  &
+                             scalar_name = 'Cell Inertia Y')
+  call Grid % Save_Debug_Vtu('iz',                            &
+                             scalar_cell = cell_inertia % z,  &
+                             scalar_name = 'Cell Inertia Z')
 
   stop
 
