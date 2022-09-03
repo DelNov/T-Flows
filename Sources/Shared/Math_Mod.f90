@@ -28,6 +28,7 @@
       procedure :: Invert_3x3_Matrix
       procedure :: Rotate_Vector
       procedure :: Smaller_Real
+      procedure :: Tet_Inertia
       procedure :: Tet_Volume
 
   end type
@@ -50,6 +51,7 @@
   include 'Math_Mod/Invert_3x3_Matrix.f90'
   include 'Math_Mod/Rotate_Vector.f90'
   include 'Math_Mod/Smaller_Real.f90'
+  include 'Math_Mod/Tet_Inertia.f90'
   include 'Math_Mod/Tet_Volume.f90'
 
   end module
