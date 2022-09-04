@@ -3,6 +3,7 @@
                                   inside_cell, inside_name,               &
                                   scalar_cell, scalar_node, scalar_name,  &
                                   vector_cell, vector_node, vector_name,  &
+                                  tensor_cell, tensor_node, tensor_name,  &
                                   plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
@@ -25,21 +26,42 @@
 !                                                                              !
 !   - vector_node (and vector_name) are for vector variables defined on nodes. !
 !     They shouldn't be defined at the same time as vector_cell.               !
+!                                                                              !
+!   - tensor_cell (and tensor_name) are for tensor variables defined on both   !
+!     boundary and inside cell, like Reynolds stresses or inertia moments.     !
+!     They should not be defined at the same time as tensor_node.              !
+!                                                                              !
+!   - tensor_node (and tensor_name) are for tensor variables defined on nodes. !
+!     They shouldn't be defined at the same time as tensor_cell.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)       :: Grid
-  character(*)           :: append
+  class(Grid_Type) :: Grid
+  character(*)     :: append
+
+  ! Inside cells (like source term in linear system of equations)
   real,         optional :: inside_cell(1:Grid % n_cells)
   character(*), optional :: inside_name
+
+  ! Scalars
   real,         optional :: scalar_cell( -Grid % n_bnd_cells  &
                                          :Grid % n_cells)
   real,         optional :: scalar_node(1:Grid % n_nodes)
   character(*), optional :: scalar_name
+
+  ! Vectors
   real,         optional :: vector_cell( -Grid % n_bnd_cells  &
                                          :Grid % n_cells, 3)
   real,         optional :: vector_node(1:Grid % n_nodes, 3)
   character(*), optional :: vector_name
+
+  ! Tensor (in order: 11, 22, 33, 12, 13, 23)
+  real,         optional :: tensor_cell( -Grid % n_bnd_cells  &
+                                         :Grid % n_cells, 6)
+  real,         optional :: tensor_node(1:Grid % n_nodes, 6)
+  character(*), optional :: tensor_name
+
+  ! Parameter to plot inside
   logical,      optional :: plot_inside
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)       :: data_size
@@ -217,8 +239,10 @@
   !----------------!
   !   Point data   !
   !----------------!
-  if(present(scalar_node) .or. present(vector_node)) then
-    write(fu) IN_3 // '<PointData Scalars="scalars" vectors="velocity">' // LF
+  if(     present(scalar_node)  &
+     .or. present(vector_node)  &
+     .or. present(tensor_node)) then
+    write(fu) IN_3 // '<PointData">' // LF
   end if
 
   ! Additional node-based scalar array
@@ -244,7 +268,21 @@
     data_offset = data_offset + SP + Grid % n_nodes * RP * 3  ! prepare for next
   end if
 
-  if(present(scalar_node) .or. present(vector_node)) then
+  ! Additional node-based tensor array
+  if(present(tensor_node)) then
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//floatp             //  &
+                      ' Name="'// trim(tensor_name) // '"'   //  &
+                      ' NumberOfComponents="6"'              //  &
+                      ' format="appended"'                   //  &
+                      ' offset="' // trim(str1)       //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + Grid % n_nodes * RP * 6  ! prepare for next
+  end if
+
+  if(     present(scalar_node)  &
+     .or. present(vector_node)  &
+     .or. present(tensor_node)) then
     write(fu) IN_3 // '</PointData>' // LF
   end if
 
@@ -253,7 +291,7 @@
   !   Cell data   !
   !               !
   !---------------!
-  write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
+  write(fu) IN_3 // '<CellData>' // LF
 
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
@@ -286,6 +324,18 @@
                       ' offset="' // trim(str1)       //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + nc * RP * 3  ! prepare for next
+  end if
+
+  ! Additional cell tensor
+  if(present(tensor_cell)) then
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//floatp             //  &
+                      ' Name="'// trim(tensor_name) // '"'   //  &
+                      ' NumberOfComponents="6"'              //  &
+                      ' format="appended"'                   //  &
+                      ' offset="' // trim(str1)       //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + nc * RP * 6  ! prepare for next
   end if
 
   !------------!
@@ -450,6 +500,15 @@
     end do
   end if
 
+  if(present(tensor_node)) then
+    data_size = int(Grid % n_nodes * RP * 6, SP)
+    write(fu) data_size
+    do n = 1, Grid % n_nodes
+      write(fu) tensor_node(n, 1), tensor_node(n, 2), tensor_node(n, 3),  &
+                tensor_node(n, 4), tensor_node(n, 5), tensor_node(n, 6)
+    end do
+  end if
+
   !---------------!
   !   Cell data   !
   !---------------!
@@ -476,6 +535,15 @@
     write(fu) data_size
     do c = cs, ce
       write(fu) vector_cell(c, 1), vector_cell(c, 2), vector_cell(c, 3)
+    end do
+  end if
+
+  if(present(tensor_cell)) then
+    data_size = int(nc * RP * 6, SP)
+    write(fu) data_size
+    do c = cs, ce
+      write(fu) tensor_cell(c, 1), tensor_cell(c, 2), tensor_cell(c, 3),  &
+                tensor_cell(c, 4), tensor_cell(c, 5), tensor_cell(c, 6)
     end do
   end if
 
