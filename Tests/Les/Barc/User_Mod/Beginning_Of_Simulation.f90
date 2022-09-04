@@ -76,6 +76,9 @@
       cell_inertia % x (c1) = cell_inertia % x (c1) + ix
       cell_inertia % y (c1) = cell_inertia % y (c1) + iy
       cell_inertia % z (c1) = cell_inertia % z (c1) + iz
+      cell_inertia % xy(c1) = cell_inertia % xy(c1) + ixy
+      cell_inertia % xz(c1) = cell_inertia % xz(c1) + ixz
+      cell_inertia % yz(c1) = cell_inertia % yz(c1) + iyz
 
     end do  ! i_nod
 
@@ -100,6 +103,9 @@
         cell_inertia % x (c2) = cell_inertia % x (c2) + ix
         cell_inertia % y (c2) = cell_inertia % y (c2) + iy
         cell_inertia % z (c2) = cell_inertia % z (c2) + iz
+        cell_inertia % xy(c2) = cell_inertia % xy(c2) + ixy
+        cell_inertia % xz(c2) = cell_inertia % xz(c2) + ixz
+        cell_inertia % yz(c2) = cell_inertia % yz(c2) + iyz
 
       end do  ! i_nod
     end if
@@ -107,18 +113,30 @@
   end do
   print *, '# Cell inertia calculated !'
 
+  !--------------------------------------------------!
+  !   Check the computed cells' moments of inertia   !
+  !--------------------------------------------------!
+  call Grid % Save_Debug_Vtu('cell-inertia',                       &
+                             tensor_cell = (/cell_inertia % x,     &
+                                             cell_inertia % y,     &
+                                             cell_inertia % z,     &
+                                             cell_inertia % xy,    &
+                                             cell_inertia % xz,    &
+                                             cell_inertia % yz/),  &
+                             tensor_name = 'Cell Inertia')
+
   !----------------------------------------------------------------!
   !   Check the computed components of cells' moments of inertia   !
   !----------------------------------------------------------------!
-  call Grid % Save_Debug_Vtu('ix',                            &
-                             scalar_cell = cell_inertia % x,  &
-                             scalar_name = 'Cell Inertia X')
-  call Grid % Save_Debug_Vtu('iy',                            &
-                             scalar_cell = cell_inertia % y,  &
-                             scalar_name = 'Cell Inertia Y')
-  call Grid % Save_Debug_Vtu('iz',                            &
-                             scalar_cell = cell_inertia % z,  &
-                             scalar_name = 'Cell Inertia Z')
+  ! call Grid % Save_Debug_Vtu('ix',                            &
+  !                            scalar_cell = cell_inertia % x,  &
+  !                            scalar_name = 'Cell Inertia X')
+  ! call Grid % Save_Debug_Vtu('iy',                            &
+  !                            scalar_cell = cell_inertia % y,  &
+  !                            scalar_name = 'Cell Inertia Y')
+  ! call Grid % Save_Debug_Vtu('iz',                            &
+  !                            scalar_cell = cell_inertia % z,  &
+  !                            scalar_name = 'Cell Inertia Z')
 
   stop
 
