@@ -577,7 +577,7 @@
     write(fu,'(a,a)') IN_2, '</PPoints>'
 
     ! Data section is not mandatory, but very useful
-    write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
+    write(fu,'(a,a)') IN_2, '<PCellData>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="Processor"/>'
     if(present(scalar_cell) .or.  &
        present(inside_cell)) then

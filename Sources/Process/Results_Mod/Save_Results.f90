@@ -280,9 +280,9 @@
   !                                 !
   !---------------------------------!
   if(n_proc > 1 .and. this_proc .eq. 1)  then
-    write(f8) IN_3 // '<PCellData Scalars="scalars" vectors="velocity">' // LF
+    write(f8) IN_3 // '<PCellData>' // LF
   end if
-  write(f9) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
+  write(f9) IN_3 // '<CellData>' // LF
 
   !----------------!
   !                !

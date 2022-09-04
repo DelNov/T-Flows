@@ -156,7 +156,7 @@
     !---------------!
 
     ! Beginning of cell data
-    write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+    write(fu,'(a,a)') IN_3, '<CellData>'
 
     !-------------------------------------!
     !   Number of neighbouring elements   !

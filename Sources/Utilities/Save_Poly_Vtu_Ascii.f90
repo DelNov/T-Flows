@@ -185,7 +185,7 @@
   !---------------!
   !   Cell data   !
   !---------------!
-  write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+  write(fu,'(a,a)') IN_3, '<CellData>'
 
   ! Processor i.d.
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &

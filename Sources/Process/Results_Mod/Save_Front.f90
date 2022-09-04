@@ -210,9 +210,9 @@
 
   ! Beginning of cell data
   if(this_proc .eq. 1) then
-    write(f8) IN_3 // '<PCellData Scalars="scalars" vectors="velocity">'  // LF
+    write(f8) IN_3 // '<PCellData>'  // LF
   end if
-  write(f9,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+  write(f9,'(a,a)') IN_3, '<CellData>'
 
   !-------------------------------------!
   !   Number of neighbouring elements   !

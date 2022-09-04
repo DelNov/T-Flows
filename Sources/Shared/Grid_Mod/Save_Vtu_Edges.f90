@@ -69,7 +69,7 @@
 
   ! Now write all edges' offsets
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp//  &
-                          'Name="offsets" format="ascii">'
+                          ' Name="offsets" format="ascii">'
   edge_offset = 0
   do c = 1, Grid % n_edges
     edge_offset = edge_offset + 2
@@ -92,7 +92,7 @@
   !   Edge data   !
   !               !
   !---------------!
-  write(fu,'(a,a)') IN_3, '<CellData Scalars="scalars" vectors="velocity">'
+  write(fu,'(a,a)') IN_3, '<CellData>'
 
   if(present(edge_data)) then
     write(fu,'(a,a)') IN_4, '<DataArray type='//intp//  &

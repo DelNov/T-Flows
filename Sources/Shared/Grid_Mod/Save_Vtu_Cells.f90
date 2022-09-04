@@ -138,7 +138,7 @@
   !---------------!
   !   Cell data   !
   !---------------!
-  write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
+  write(fu) IN_3 // '<CellData>' // LF
 
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
@@ -377,7 +377,7 @@
     write(fu,'(a,a)') IN_2, '</PPoints>'
 
     ! Data section is not mandatory, but very useful
-    write(fu,'(a,a)') IN_2, '<PCellData Scalars="scalars" vectors="velocity">'
+    write(fu,'(a,a)') IN_2, '<PCellData>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
                             ' Name="Processor"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &

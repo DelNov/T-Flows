@@ -121,7 +121,7 @@
   !---------------!
   !   Face data   !
   !---------------!
-  write(fu) IN_3 // '<CellData Scalars="scalars" vectors="velocity">' // LF
+  write(fu) IN_3 // '<CellData>' // LF
 
   ! Boundary conditions
   write(str1, '(i0.0)') data_offset
