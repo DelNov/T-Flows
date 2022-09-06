@@ -80,13 +80,17 @@
     end do
   end if
 
+  !-------------------------------------------------!
+  !   Modification of turbulent viscosity due to    !
+  !   buoyancy according to Eidson, T., JFM, 1985   !
+  !-------------------------------------------------!
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = 1, Grid % n_cells
-      nc2 = - Flow % beta * (  Flow % grav_x * t % x(c)   &
-                             + Flow % grav_y * t % y(c)   &
-                             + Flow % grav_z * t % z(c))
+      nc2 = max(- Flow % beta * (  Flow % grav_x * t % x(c)   &
+                                 + Flow % grav_y * t % y(c)   &
+                                 + Flow % grav_z * t % z(c)), 0.0)
       Turb % vis_t(c) = Turb % vis_t(c)            &
-             * max(1 - 2.5 * nc2 / (Flow % shear(c) + TINY), 0.0)
+                      * sqrt(1 + 2.5 * nc2 / (Flow % shear(c)**2 + TINY))
     end do
   end if
 
