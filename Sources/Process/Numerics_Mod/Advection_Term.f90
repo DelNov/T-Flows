@@ -52,7 +52,7 @@
       call Numerics_Mod_Advection_Scheme(phif, s, phi, phi_min, phi_max, v_flux)
     end if
 
-    ! Compute advection term (non-conservative form)
+    ! Compute advection term (volume-conservative form)
     if(c2 > 0) then
       advect(c1) = advect(c1) - v_flux(s) * phif * coef(c1)
       advect(c2) = advect(c2) + v_flux(s) * phif * coef(c2)
