@@ -113,6 +113,14 @@
   end do
   print *, '# Cell inertia calculated !'
 
+  ! Refresh buffers for M % sav before discretizing for pressure
+  call Grid % Exchange_Cells_Real(cell_inertia % x )
+  call Grid % Exchange_Cells_Real(cell_inertia % y )
+  call Grid % Exchange_Cells_Real(cell_inertia % z )
+  call Grid % Exchange_Cells_Real(cell_inertia % xy)
+  call Grid % Exchange_Cells_Real(cell_inertia % xz)
+  call Grid % Exchange_Cells_Real(cell_inertia % yz)
+
   !--------------------------------------------------!
   !   Check the computed cells' moments of inertia   !
   !--------------------------------------------------!
@@ -138,6 +146,7 @@
   !                            scalar_cell = cell_inertia % z,  &
   !                            scalar_name = 'Cell Inertia Z')
 
+  call Comm_Mod_End
   stop
 
   end subroutine
