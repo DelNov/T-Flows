@@ -593,6 +593,11 @@
                               ' NumberOfComponents="3"'      //  &
                               ' Name="'// trim(vector_name)  // '"/>'
     end if
+    if(present(tensor_cell)) then
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
+                              ' NumberOfComponents="6"'      //  &
+                              ' Name="'// trim(tensor_name)  // '"/>'
+    end if
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
