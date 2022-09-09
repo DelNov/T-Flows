@@ -50,68 +50,74 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
-      xf(i_nod) = Grid % xn(Grid % faces_n(i_nod,s))
-      yf(i_nod) = Grid % yn(Grid % faces_n(i_nod,s))
-      zf(i_nod) = Grid % zn(Grid % faces_n(i_nod,s))
-    end do
+    ! Focus only on cells inside the current processr, no buffer cells at all
+    if(Grid % comm % cell_proc(c1) .eq. this_proc .and.  &
+       Grid % comm % cell_proc(c2) .eq. this_proc) then
 
-    ! First cell
-    x_cell_1 = Grid % xc(c1)
-    y_cell_1 = Grid % yc(c1)
-    z_cell_1 = Grid % zc(c1)
+      do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
+        xf(i_nod) = Grid % xn(Grid % faces_n(i_nod,s))
+        yf(i_nod) = Grid % yn(Grid % faces_n(i_nod,s))
+        zf(i_nod) = Grid % zn(Grid % faces_n(i_nod,s))
+      end do
 
-    ! Browse through faces's nodes and add tetrahedron by tetrahedron
-    do i_nod = 1, Grid % faces_n_nodes(s)
-      j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
-
-      call Math % Tet_Inertia(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
-                              xf(i_nod),    yf(i_nod),    zf(i_nod),     &
-                              xf(j_nod),    yf(j_nod),    zf(j_nod),     &
-                              x_cell_1,     y_cell_1,     z_cell_1,      &
-                              ix, iy, iz, ixy, ixz, iyz,                 &
-                              around_node = 4)
-
-      ! Update inertia in the first cell (not complete)
-      cell_inertia % x (c1) = cell_inertia % x (c1) + ix
-      cell_inertia % y (c1) = cell_inertia % y (c1) + iy
-      cell_inertia % z (c1) = cell_inertia % z (c1) + iz
-      cell_inertia % xy(c1) = cell_inertia % xy(c1) + ixy
-      cell_inertia % xz(c1) = cell_inertia % xz(c1) + ixz
-      cell_inertia % yz(c1) = cell_inertia % yz(c1) + iyz
-
-    end do  ! i_nod
-
-    ! Second cell
-    if(c2 > 0) then
-      x_cell_2 = Grid % xc(c1) + Grid % dx(s)
-      y_cell_2 = Grid % yc(c1) + Grid % dy(s)
-      z_cell_2 = Grid % zc(c1) + Grid % dz(s)
+      ! First cell
+      x_cell_1 = Grid % xc(c1)
+      y_cell_1 = Grid % yc(c1)
+      z_cell_1 = Grid % zc(c1)
 
       ! Browse through faces's nodes and add tetrahedron by tetrahedron
       do i_nod = 1, Grid % faces_n_nodes(s)
         j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
 
         call Math % Tet_Inertia(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
-                                xf(j_nod),    yf(j_nod),    zf(j_nod),     &
                                 xf(i_nod),    yf(i_nod),    zf(i_nod),     &
-                                x_cell_2,     y_cell_2,     z_cell_2,      &
+                                xf(j_nod),    yf(j_nod),    zf(j_nod),     &
+                                x_cell_1,     y_cell_1,     z_cell_1,      &
                                 ix, iy, iz, ixy, ixz, iyz,                 &
                                 around_node = 4)
 
-        ! Update inertia in the second cell (not complete, continue)
-        cell_inertia % x (c2) = cell_inertia % x (c2) + ix
-        cell_inertia % y (c2) = cell_inertia % y (c2) + iy
-        cell_inertia % z (c2) = cell_inertia % z (c2) + iz
-        cell_inertia % xy(c2) = cell_inertia % xy(c2) + ixy
-        cell_inertia % xz(c2) = cell_inertia % xz(c2) + ixz
-        cell_inertia % yz(c2) = cell_inertia % yz(c2) + iyz
+        ! Update inertia in the first cell (not complete)
+        cell_inertia % x (c1) = cell_inertia % x (c1) + ix
+        cell_inertia % y (c1) = cell_inertia % y (c1) + iy
+        cell_inertia % z (c1) = cell_inertia % z (c1) + iz
+        cell_inertia % xy(c1) = cell_inertia % xy(c1) + ixy
+        cell_inertia % xz(c1) = cell_inertia % xz(c1) + ixz
+        cell_inertia % yz(c1) = cell_inertia % yz(c1) + iyz
 
       end do  ! i_nod
+
+      ! Second cell
+      if(c2 > 0) then
+        x_cell_2 = Grid % xc(c1) + Grid % dx(s)
+        y_cell_2 = Grid % yc(c1) + Grid % dy(s)
+        z_cell_2 = Grid % zc(c1) + Grid % dz(s)
+
+        ! Browse through faces's nodes and add tetrahedron by tetrahedron
+        do i_nod = 1, Grid % faces_n_nodes(s)
+          j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
+
+          call Math % Tet_Inertia(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
+                                  xf(j_nod),    yf(j_nod),    zf(j_nod),     &
+                                  xf(i_nod),    yf(i_nod),    zf(i_nod),     &
+                                  x_cell_2,     y_cell_2,     z_cell_2,      &
+                                  ix, iy, iz, ixy, ixz, iyz,                 &
+                                  around_node = 4)
+
+          ! Update inertia in the second cell (not complete, continue)
+          cell_inertia % x (c2) = cell_inertia % x (c2) + ix
+          cell_inertia % y (c2) = cell_inertia % y (c2) + iy
+          cell_inertia % z (c2) = cell_inertia % z (c2) + iz
+          cell_inertia % xy(c2) = cell_inertia % xy(c2) + ixy
+          cell_inertia % xz(c2) = cell_inertia % xz(c2) + ixz
+          cell_inertia % yz(c2) = cell_inertia % yz(c2) + iyz
+
+        end do  ! i_nod
+      end if
+
     end if
 
   end do
-  print *, '# Cell inertia calculated !'
+  if(this_proc < 2) print *, '# Cell inertia calculated !'
 
   ! Refresh buffers for M % sav before discretizing for pressure
   call Grid % Exchange_Cells_Real(cell_inertia % x )
