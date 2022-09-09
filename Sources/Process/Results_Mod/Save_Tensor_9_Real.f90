@@ -7,7 +7,7 @@
                                 fs, fp,                  &
                                 data_offset, sweep)
 !------------------------------------------------------------------------------!
-!   Writes one real symmetric tensor defined over cells.                       !
+!   Writes one real non-symmetric tensor defined over cells.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
