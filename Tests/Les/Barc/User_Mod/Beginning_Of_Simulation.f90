@@ -25,13 +25,13 @@
   !--------------------------------------------------!
   !   Check the computed cells' moments of inertia   !
   !--------------------------------------------------!
-  call Grid % Save_Debug_Vtu('cell-inertia',               &
-                             tensor_cell = (/Grid % xx,    &
-                                             Grid % yy,    &
-                                             Grid % zz,    &
-                                             Grid % xy,    &
-                                             Grid % xz,    &
-                                             Grid % yz/),  &
+  call Grid % Save_Debug_Vtu('cell-inertia',                &
+                             tensor_cell = (/Grid % ixx,    &
+                                             Grid % iyy,    &
+                                             Grid % izz,    &
+                                             Grid % ixy,    &
+                                             Grid % ixz,    &
+                                             Grid % iyz/),  &
                              tensor_name = 'Cell Inertia')
 
   call Comm_Mod_End
