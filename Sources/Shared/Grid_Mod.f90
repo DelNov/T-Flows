@@ -59,6 +59,9 @@
     ! Cell volumes
     real, allocatable :: vol(:)
 
+    ! Cells' tensor of inertia
+    real, allocatable :: ixx(:), iyy(:), izz(:), ixy(:), ixz(:), iyz(:)
+
     ! Fractional cell volumes around faces
     real, allocatable :: dv1(:)
     real, allocatable :: dv2(:)
@@ -181,6 +184,7 @@
       procedure :: Bnd_Cond_Ranges
       procedure :: Bounding_Box
       procedure :: Calculate_Cell_Centers
+      procedure :: Calculate_Cell_Inertia
       procedure :: Calculate_Cell_Volumes
       procedure :: Calculate_Face_Centers
       procedure :: Calculate_Face_Geometry
@@ -230,6 +234,7 @@
   include 'Grid_Mod/Bnd_Cond_Ranges.f90'
   include 'Grid_Mod/Bounding_Box.f90'
   include 'Grid_Mod/Calculate_Cell_Centers.f90'
+  include 'Grid_Mod/Calculate_Cell_Inertia.f90'
   include 'Grid_Mod/Calculate_Cell_Volumes.f90'
   include 'Grid_Mod/Calculate_Face_Centers.f90'
   include 'Grid_Mod/Calculate_Face_Geometry.f90'

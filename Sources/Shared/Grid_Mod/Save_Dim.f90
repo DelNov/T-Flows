@@ -64,6 +64,22 @@
     end if
   end do
 
+  !--------------------------!
+  !   Cell inertia tensors   !
+  !--------------------------!
+  do var = 1, 6
+    do c = 1, Grid % n_cells
+      if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+        if(var .eq. 1) write(fu) Grid % ixx(Grid % old_c(c))
+        if(var .eq. 2) write(fu) Grid % iyy(Grid % old_c(c))
+        if(var .eq. 3) write(fu) Grid % izz(Grid % old_c(c))
+        if(var .eq. 4) write(fu) Grid % ixy(Grid % old_c(c))
+        if(var .eq. 5) write(fu) Grid % ixz(Grid % old_c(c))
+        if(var .eq. 6) write(fu) Grid % iyz(Grid % old_c(c))
+      end if
+    end do
+  end do
+
   !-----------!
   !   Faces   !
   !-----------!

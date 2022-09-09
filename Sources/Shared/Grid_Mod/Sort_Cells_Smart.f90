@@ -104,5 +104,11 @@
   call Sort % Real_By_Index(Grid % n_cells, Grid % yc (1), Grid % new_c(1))
   call Sort % Real_By_Index(Grid % n_cells, Grid % zc (1), Grid % new_c(1))
   call Sort % Real_By_Index(Grid % n_cells, Grid % vol(1), Grid % new_c(1))
+  call Sort % Real_By_Index(Grid % n_cells, Grid % ixx(1), Grid % new_c(1))
+  call Sort % Real_By_Index(Grid % n_cells, Grid % iyy(1), Grid % new_c(1))
+  call Sort % Real_By_Index(Grid % n_cells, Grid % izz(1), Grid % new_c(1))
+  call Sort % Real_By_Index(Grid % n_cells, Grid % ixy(1), Grid % new_c(1))
+  call Sort % Real_By_Index(Grid % n_cells, Grid % ixz(1), Grid % new_c(1))
+  call Sort % Real_By_Index(Grid % n_cells, Grid % iyz(1), Grid % new_c(1))
 
   end subroutine

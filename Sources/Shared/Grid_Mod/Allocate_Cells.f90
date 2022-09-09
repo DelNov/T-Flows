@@ -24,6 +24,14 @@
   allocate(Grid % wall_dist     (-nb:nc));  Grid % wall_dist     (:) = 0.0
   allocate(Grid % cell_near_wall(-nb:nc));  Grid % cell_near_wall(:) = .false.
 
+  ! Memory for cells' inertia tensors
+  allocate(Grid % ixx(-nb:nc));  Grid % ixx(:) = 0.0
+  allocate(Grid % iyy(-nb:nc));  Grid % iyy(:) = 0.0
+  allocate(Grid % izz(-nb:nc));  Grid % izz(:) = 0.0
+  allocate(Grid % ixy(-nb:nc));  Grid % ixy(:) = 0.0
+  allocate(Grid % ixz(-nb:nc));  Grid % ixz(:) = 0.0
+  allocate(Grid % iyz(-nb:nc));  Grid % iyz(:) = 0.0
+
   ! Cells' nodes and neigboring cells
   allocate(Grid % cells_n(MAX_CELLS_N_NODES, -nb:nc));  Grid % cells_n(:,:) = 0
   allocate(Grid % cells_f(MAX_CELLS_N_FACES, -nb:nc));  Grid % cells_f(:,:) = 0

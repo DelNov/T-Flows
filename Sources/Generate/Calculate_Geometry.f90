@@ -378,6 +378,11 @@
     print *, '# Cell volumes calculated !'
   end if
 
+  !------------------------------------!
+  !   Calculate cell inertia tensors   !
+  !------------------------------------!
+  call Grid % Calculate_Cell_Inertia()
+
   !------------------------------------------------------------!
   !   Calculate the interpolation factors for the cell faces   !
   !------------------------------------------------------------!

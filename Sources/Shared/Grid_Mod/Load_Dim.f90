@@ -34,6 +34,13 @@
   read(fu) (Grid % wall_dist(c), c = -Grid % n_bnd_cells, Grid % n_cells)
   read(fu) (Grid % vol(c), c = 1, Grid % n_cells)
 
+  read(fu) (Grid % ixx(c), c = 1, Grid % n_cells)
+  read(fu) (Grid % iyy(c), c = 1, Grid % n_cells)
+  read(fu) (Grid % izz(c), c = 1, Grid % n_cells)
+  read(fu) (Grid % ixy(c), c = 1, Grid % n_cells)
+  read(fu) (Grid % ixz(c), c = 1, Grid % n_cells)
+  read(fu) (Grid % iyz(c), c = 1, Grid % n_cells)
+
   read(fu) (Grid % sx(s), s = 1, Grid % n_faces + Grid % n_shadows)
   read(fu) (Grid % sy(s), s = 1, Grid % n_faces + Grid % n_shadows)
   read(fu) (Grid % sz(s), s = 1, Grid % n_faces + Grid % n_shadows)
