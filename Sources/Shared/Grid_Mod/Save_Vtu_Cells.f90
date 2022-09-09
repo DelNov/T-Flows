@@ -143,7 +143,7 @@
   ! Processor i.d.
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="Processor"'              //  &
+                    ' Name="Grid Processor"'         //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -152,7 +152,7 @@
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="GridNumberOfNodes"'      //  &
+                    ' Name="Grid Number Of Nodes"'   //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -161,7 +161,7 @@
   ! Wall distance
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="GridWallDistance"'       //  &
+                    ' Name="Grid Wall Distance"'     //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -170,7 +170,7 @@
   ! Cell volume
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="GridCellVolume"'         //  &
+                    ' Name="Grid Cell Volume"'       //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -379,11 +379,11 @@
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
-                            ' Name="Processor"/>'
+                            ' Name="Grid Processor"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
-                            ' Name="GridWallDistance"/>'
+                            ' Name="Grid Wall Distance"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
-                            ' Name="GridCellVolume"/>'
+                            ' Name="Grid Cell Volume"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
