@@ -655,17 +655,11 @@
 !                                        plot_inside,                        &
 !                                        Turb % p_t2(c_f:c_l),               &
 !                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Turbulent Heat Flux X [K m/s]",     &
-                                        plot_inside,                         &
-                                        Turb % ut % n(c_f:c_l),              &
-                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Turbulent Heat Flux Y [K m/s]",     &
-                                        plot_inside,                         &
-                                        Turb % vt % n(c_f:c_l),              &
-                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Turbulent Heat Flux Z [K m/s]",     &
-                                        plot_inside,                         &
-                                        Turb % wt % n(c_f:c_l),              &
+        call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",     &
+                                        plot_inside,                       &
+                                        Turb % ut % n(c_f:c_l),            &
+                                        Turb % vt % n(c_f:c_l),            &
+                                        Turb % wt % n(c_f:c_l),            &
                                         f8, f9, data_offset, run)
 !        call Results % Save_Scalar_Real("Turbulent Quantity Alpha L",     &
 !                                        plot_inside,                      &
@@ -729,42 +723,21 @@
     ! Reynolds stress models
     if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
        Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Results % Save_Scalar_Real("Reynolds Stress XX [m^2/s^2]",  &
-                                      plot_inside,                     &
-                                      Turb % uu % n(c_f:c_l),          &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Reynolds Stress YY [m^2/s^2]",  &
-                                      plot_inside,                     &
-                                      Turb % vv % n(c_f:c_l),          &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Reynolds Stress ZZ [m^2/s^2]",  &
-                                      plot_inside,                     &
-                                      Turb % ww % n(c_f:c_l),          &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Reynolds Stress XY [m^2/s^2]",  &
-                                      plot_inside,                     &
-                                      Turb % uv % n(c_f:c_l),          &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Reynolds Stress XZ [m^2/s^2]",  &
-                                      plot_inside,                     &
-                                      Turb % uw % n(c_f:c_l),          &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Reynolds Stress YZ [m^2/s^2]",  &
-                                      plot_inside,                     &
-                                      Turb % vw % n(c_f:c_l),          &
-                                      f8, f9, data_offset, run)
+      call Results % Save_Tensor_6_Real("Reynolds Stress [m^2/s^2]",  &
+                                        plot_inside,                  &
+                                        Turb % uu % n(c_f:c_l),       &
+                                        Turb % vv % n(c_f:c_l),       &
+                                        Turb % ww % n(c_f:c_l),       &
+                                        Turb % uv % n(c_f:c_l),       &
+                                        Turb % uw % n(c_f:c_l),       &
+                                        Turb % vw % n(c_f:c_l),       &
+                                        f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Scalar_Real("Turbulent Heat Flux X [K m/s]",  &
-                                        plot_inside,                      &
-                                        Turb % ut % n(c_f:c_l),           &
-                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Turbulent Heat Flux Y [K m/s]",  &
-                                        plot_inside,                      &
-                                        Turb % vt % n(c_f:c_l),           &
-                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Turbulent Heat Flux Z [K m/s]",  &
-                                        plot_inside,                      &
-                                        Turb % wt % n(c_f:c_l),           &
+        call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",  &
+                                        plot_inside,                    &
+                                        Turb % ut % n(c_f:c_l),         &
+                                        Turb % vt % n(c_f:c_l),         &
+                                        Turb % wt % n(c_f:c_l),         &
                                         f8, f9, data_offset, run)
       end if
     end if
@@ -791,30 +764,15 @@
         save_05(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
         save_06(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
       end do
-      call Results % Save_Scalar_Real("Mean Reynolds Stress XX [m^s/s^2]",  &
-                                      plot_inside,                          &
-                                      save_01(c_f:c_l),                     &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Mean Reynolds Stress YY [m^s/s^2]",  &
-                                      plot_inside,                          &
-                                      save_02(c_f:c_l),                     &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Mean Reynolds Stress ZZ [m^s/s^2]",  &
-                                      plot_inside,                          &
-                                      save_03(c_f:c_l),                     &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Mean Reynolds Stress XY [m^s/s^2]",  &
-                                      plot_inside,                          &
-                                      save_04(c_f:c_l),                     &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Mean Reynolds Stress XZ [m^s/s^2]",  &
-                                      plot_inside,                          &
-                                      save_05(c_f:c_l),                     &
-                                      f8, f9, data_offset, run)
-      call Results % Save_Scalar_Real("Mean Reynolds Stress YZ [m^s/s^2]",  &
-                                      plot_inside,                          &
-                                      save_06(c_f:c_l),                     &
-                                      f8, f9, data_offset, run)
+      call Results % Save_Tensor_6_Real("Mean Reynolds Stress [m^s/s^2]",  &
+                                        plot_inside,                       &
+                                        save_01(c_f:c_l),                  &
+                                        save_02(c_f:c_l),                  &
+                                        save_03(c_f:c_l),                  &
+                                        save_04(c_f:c_l),                  &
+                                        save_05(c_f:c_l),                  &
+                                        save_06(c_f:c_l),                  &
+                                        f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
         call Results % Save_Scalar_Real("Mean Temperature [K]",           &
                                         plot_inside,                      &
@@ -834,17 +792,11 @@
                                         plot_inside,                           &
                                         phi_save(c_f:c_l),                     &
                                         f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Mean Turbulent Heat Flux X [K m/s]",  &
-                                        plot_inside,                           &
-                                        save_01(c_f:c_l),                      &
-                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Mean Turbulent Heat Flux Y [K m/s]",  &
-                                        plot_inside,                           &
-                                        save_02(c_f:c_l),                      &
-                                        f8, f9, data_offset, run)
-        call Results % Save_Scalar_Real("Mean Turbulent Heat Flux Z [K m/s]",  &
-                                        plot_inside,                           &
-                                        save_03(c_f:c_l),                      &
+        call Results % Save_Vector_Real("Mean Turbulent Heat Flux [K m/s]",  &
+                                        plot_inside,                         &
+                                        save_01(c_f:c_l),                    &
+                                        save_02(c_f:c_l),                    &
+                                        save_03(c_f:c_l),                    &
                                         f8, f9, data_offset, run)
       end if
 
