@@ -729,8 +729,8 @@
                                         Turb % vv % n(c_f:c_l),       &
                                         Turb % ww % n(c_f:c_l),       &
                                         Turb % uv % n(c_f:c_l),       &
-                                        Turb % uw % n(c_f:c_l),       &
                                         Turb % vw % n(c_f:c_l),       &
+                                        Turb % uw % n(c_f:c_l),       &
                                         f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
         call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",  &
@@ -761,8 +761,8 @@
         save_02(c1) = Turb % vv_res(c1) - Turb % v_mean(c1) * Turb % v_mean(c1)
         save_03(c1) = Turb % ww_res(c1) - Turb % w_mean(c1) * Turb % w_mean(c1)
         save_04(c1) = Turb % uv_res(c1) - Turb % u_mean(c1) * Turb % v_mean(c1)
-        save_05(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
-        save_06(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
+        save_05(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
+        save_06(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
       end do
       call Results % Save_Tensor_6_Real("Mean Reynolds Stress [m^s/s^2]",  &
                                         plot_inside,                       &
