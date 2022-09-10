@@ -22,7 +22,7 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  integer, save              :: total_cells, fu
+  integer, save              :: total_cells
   real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
   character(SL)              :: solver
