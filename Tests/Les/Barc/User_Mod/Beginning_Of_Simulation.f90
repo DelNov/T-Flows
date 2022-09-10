@@ -32,6 +32,7 @@
                                              Grid % ixy,    &
                                              Grid % ixz,    &
                                              Grid % iyz/),  &
+                             tensor_comp = 6,               &
                              tensor_name = 'Cell Inertia')
 
   call Comm_Mod_End
