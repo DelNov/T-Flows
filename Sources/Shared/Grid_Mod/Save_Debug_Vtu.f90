@@ -4,6 +4,7 @@
                                   scalar_cell, scalar_node, scalar_name,  &
                                   vector_cell, vector_node, vector_name,  &
                                   tensor_cell, tensor_node, tensor_name,  &
+                                  tensor_comp,                            &
                                   plot_inside)
 !------------------------------------------------------------------------------!
 !   Writes: name.vtu, name.faces.vtu, name.shadow.vtu                          !
@@ -33,6 +34,13 @@
 !                                                                              !
 !   - tensor_node (and tensor_name) are for tensor variables defined on nodes. !
 !     They shouldn't be defined at the same time as tensor_cell.               !
+!                                                                              !
+!   - tensor_comp is number of tensor components, can be six for symmetric     !
+!     tensors or nine for non-symmetric tensors                                !
+!                                                                              !
+!   Notes:                                                                     !
+!   - symmetric tensors are stored in order: xx, yy, zz, xy, yz, xz            !
+!   - non-symmetric tensors are stored in order: 0 - 8, so it doesn't matter   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -57,9 +65,10 @@
 
   ! Tensor (in order: 11, 22, 33, 12, 13, 23)
   real,         optional :: tensor_cell( -Grid % n_bnd_cells  &
-                                         :Grid % n_cells, 6)
-  real,         optional :: tensor_node(1:Grid % n_nodes, 6)
+                                         :Grid % n_cells, *)
+  real,         optional :: tensor_node(1:Grid % n_nodes, *)
   character(*), optional :: tensor_name
+  integer,      optional :: tensor_comp
 
   ! Parameter to plot inside
   logical,      optional :: plot_inside
@@ -270,14 +279,15 @@
 
   ! Additional node-based tensor array
   if(present(tensor_node)) then
-    write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type='//floatp             //  &
-                      ' Name="'// trim(tensor_name) // '"'   //  &
-                      ' NumberOfComponents="6"'              //  &
-                      ' format="appended"'                   //  &
-                      ' offset="' // trim(str1)       //'">' // LF
+    write(str1, '(i0.0)') tensor_comp
+    write(str2, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//floatp                   //  &
+                      ' Name="'// trim(tensor_name) // '"'         //  &
+                      ' NumberOfComponents="' // trim(str1) // '"' //  &
+                      ' format="appended"'                         //  &
+                      ' offset="' // trim(str2) // '">'            // LF
     write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + Grid % n_nodes * RP * 6  ! prepare for next
+    data_offset = data_offset + SP + Grid % n_nodes * RP * tensor_comp
   end if
 
   if(     present(scalar_node)  &
@@ -328,14 +338,15 @@
 
   ! Additional cell tensor
   if(present(tensor_cell)) then
-    write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type='//floatp             //  &
-                      ' Name="'// trim(tensor_name) // '"'   //  &
-                      ' NumberOfComponents="6"'              //  &
-                      ' format="appended"'                   //  &
-                      ' offset="' // trim(str1)       //'">' // LF
+    write(str1, '(i0.0)') tensor_comp
+    write(str2, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//floatp                   //  &
+                      ' Name="'// trim(tensor_name) // '"'         //  &
+                      ' NumberOfComponents="' // trim(str1) // '"' //  &
+                      ' format="appended"'                         //  &
+                      ' offset="' // trim(str2) // '">'            // LF
     write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + nc * RP * 6  ! prepare for next
+    data_offset = data_offset + SP + nc * RP * tensor_comp  ! prepare for next
   end if
 
   !------------!
@@ -501,12 +512,24 @@
   end if
 
   if(present(tensor_node)) then
-    data_size = int(Grid % n_nodes * RP * 6, SP)
+    data_size = int(Grid % n_nodes * RP * tensor_comp, SP)
     write(fu) data_size
-    do n = 1, Grid % n_nodes
-      write(fu) tensor_node(n, 1), tensor_node(n, 2), tensor_node(n, 3),  &
-                tensor_node(n, 4), tensor_node(n, 5), tensor_node(n, 6)
-    end do
+
+    ! Symmetric tensor
+    if(tensor_comp .eq. 6) then
+      do n = 1, Grid % n_nodes
+        write(fu) tensor_node(n, 1), tensor_node(n, 2), tensor_node(n, 3),  &
+                  tensor_node(n, 4), tensor_node(n, 5), tensor_node(n, 6)
+      end do
+
+    ! Non-symmetric tensor
+    else if(tensor_comp .eq. 9) then
+      do n = 1, Grid % n_nodes
+        write(fu) tensor_node(n, 1), tensor_node(n, 2), tensor_node(n, 3),  &
+                  tensor_node(n, 4), tensor_node(n, 5), tensor_node(n, 6),  &
+                  tensor_node(n, 7), tensor_node(n, 8), tensor_node(n, 9)
+      end do
+    end if
   end if
 
   !---------------!
@@ -539,12 +562,24 @@
   end if
 
   if(present(tensor_cell)) then
-    data_size = int(nc * RP * 6, SP)
+    data_size = int(nc * RP * tensor_comp, SP)
     write(fu) data_size
-    do c = cs, ce
-      write(fu) tensor_cell(c, 1), tensor_cell(c, 2), tensor_cell(c, 3),  &
-                tensor_cell(c, 4), tensor_cell(c, 5), tensor_cell(c, 6)
-    end do
+
+    ! Symmetric tensor
+    if(tensor_comp .eq. 6) then
+      do c = cs, ce
+        write(fu) tensor_cell(c, 1), tensor_cell(c, 2), tensor_cell(c, 3),  &
+                  tensor_cell(c, 4), tensor_cell(c, 5), tensor_cell(c, 6)
+      end do
+
+    ! Non-symmetric tensor
+    else if(tensor_comp .eq. 9) then
+      do c = cs, ce
+        write(fu) tensor_cell(c, 1), tensor_cell(c, 2), tensor_cell(c, 3),  &
+                  tensor_cell(c, 4), tensor_cell(c, 5), tensor_cell(c, 6),  &
+                  tensor_cell(c, 7), tensor_cell(c, 7), tensor_cell(c, 9)
+      end do
+    end if
   end if
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
@@ -594,9 +629,10 @@
                               ' Name="'// trim(vector_name)  // '"/>'
     end if
     if(present(tensor_cell)) then
-      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp    //  &
-                              ' NumberOfComponents="6"'      //  &
-                              ' Name="'// trim(tensor_name)  // '"/>'
+      write(str1, '(i0.0)') tensor_comp
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp                  //  &
+                              ' NumberOfComponents="' // trim(str1) // '"' //  &
+                              ' Name="'// trim(tensor_name) // '"/>'
     end if
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
