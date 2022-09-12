@@ -39,8 +39,18 @@
 !     tensors or nine for non-symmetric tensors                                !
 !                                                                              !
 !   Notes:                                                                     !
-!   - symmetric tensors are stored in order: xx, yy, zz, xy, yz, xz            !
-!   - non-symmetric tensors are stored in order: 0 - 8, so it doesn't matter   !
+!   - symmetric tensors are stored in order: xx, yy, zz, xy, yz, xz:           !
+!                                                                              !
+!     | xx xy xz |   | 1 4 6 |                                                 !
+!     |    yy yz | = |   2 5 |                                                 !
+!     |       zz |   |     3 |                                                 !
+!                                                                              !
+!   - non-symmetric tensors are stored in this order, explicitly defined:      !
+!                                                                              !
+!     | xx xy xz |   | 1 2 3 |                                                 !
+!     | yx yy yz | = | 4 5 6 |                                                 !
+!     | zx zy zz |   | 7 8 9 |                                                 !
+!                                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -281,11 +291,28 @@
   if(present(tensor_node)) then
     write(str1, '(i0.0)') tensor_comp
     write(str2, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type='//floatp                   //  &
-                      ' Name="'// trim(tensor_name) // '"'         //  &
-                      ' NumberOfComponents="' // trim(str1) // '"' //  &
-                      ' format="appended"'                         //  &
-                      ' offset="' // trim(str2) // '">'            // LF
+    if(tensor_comp .eq. 6) then
+      write(fu) IN_4 // '<DataArray type='//floatp                   //  &
+                        ' Name="'// trim(tensor_name) // '"'         //  &
+                        ' NumberOfComponents="' // trim(str1) // '"' //  &
+                        ' format="appended"'                         //  &
+                        ' offset="' // trim(str2) // '">'            // LF
+    else
+      write(fu) IN_4 // '<DataArray type='//floatp                   //  &
+                        ' Name="'// trim(tensor_name) // '"'         //  &
+                        ' NumberOfComponents="' // trim(str1) // '"' //  &
+                        ' ComponentName0="XX"'                       //  &
+                        ' ComponentName1="XY"'                       //  &
+                        ' ComponentName2="XZ"'                       //  &
+                        ' ComponentName3="YX"'                       //  &
+                        ' ComponentName4="YY"'                       //  &
+                        ' ComponentName5="YZ"'                       //  &
+                        ' ComponentName6="ZX"'                       //  &
+                        ' ComponentName7="ZY"'                       //  &
+                        ' ComponentName8="ZZ"'                       //  &
+                        ' format="appended"'                         //  &
+                        ' offset="' // trim(str2) // '">'            // LF
+    end if
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + Grid % n_nodes * RP * tensor_comp
   end if
@@ -340,11 +367,28 @@
   if(present(tensor_cell)) then
     write(str1, '(i0.0)') tensor_comp
     write(str2, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type='//floatp                   //  &
-                      ' Name="'// trim(tensor_name) // '"'         //  &
-                      ' NumberOfComponents="' // trim(str1) // '"' //  &
-                      ' format="appended"'                         //  &
-                      ' offset="' // trim(str2) // '">'            // LF
+    if(tensor_comp .eq. 6) then
+      write(fu) IN_4 // '<DataArray type='//floatp                   //  &
+                        ' Name="'// trim(tensor_name) // '"'         //  &
+                        ' NumberOfComponents="' // trim(str1) // '"' //  &
+                        ' format="appended"'                         //  &
+                        ' offset="' // trim(str2) // '">'            // LF
+    else
+      write(fu) IN_4 // '<DataArray type='//floatp                   //  &
+                        ' Name="'// trim(tensor_name) // '"'         //  &
+                        ' NumberOfComponents="' // trim(str1) // '"' //  &
+                        ' ComponentName0="XX"'                       //  &
+                        ' ComponentName1="XY"'                       //  &
+                        ' ComponentName2="XZ"'                       //  &
+                        ' ComponentName3="YX"'                       //  &
+                        ' ComponentName4="YY"'                       //  &
+                        ' ComponentName5="YZ"'                       //  &
+                        ' ComponentName6="ZX"'                       //  &
+                        ' ComponentName7="ZY"'                       //  &
+                        ' ComponentName8="ZZ"'                       //  &
+                        ' format="appended"'                         //  &
+                        ' offset="' // trim(str2) // '">'            // LF
+    end if
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + nc * RP * tensor_comp  ! prepare for next
   end if
@@ -630,9 +674,24 @@
     end if
     if(present(tensor_cell)) then
       write(str1, '(i0.0)') tensor_comp
-      write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp                  //  &
-                              ' NumberOfComponents="' // trim(str1) // '"' //  &
-                              ' Name="'// trim(tensor_name) // '"/>'
+      if(tensor_comp .eq. 6) then
+        write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp                //  &
+                                ' NumberOfComponents="'//trim(str1) // '"' //  &
+                                ' Name="'// trim(tensor_name) // '"/>'
+      else
+        write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp                //  &
+                                ' NumberOfComponents="'//trim(str1) // '"' //  &
+                                ' Name="'// trim(tensor_name) // '"'       //  &
+                                ' ComponentName0="XX"'                     //  &
+                                ' ComponentName1="XY"'                     //  &
+                                ' ComponentName2="XZ"'                     //  &
+                                ' ComponentName3="YX"'                     //  &
+                                ' ComponentName4="YY"'                     //  &
+                                ' ComponentName5="YZ"'                     //  &
+                                ' ComponentName6="ZX"'                     //  &
+                                ' ComponentName7="ZY"'                     //  &
+                                ' ComponentName8="ZZ"' // '/>'             // LF
+      end if
     end if
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
