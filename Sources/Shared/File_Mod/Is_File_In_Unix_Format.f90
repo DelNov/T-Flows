@@ -1,10 +1,11 @@
 !==============================================================================!
-  logical function File_Mod_Is_File_In_Unix_Format(file_name)
+  logical function Is_File_In_Unix_Format(File, file_name)
 !------------------------------------------------------------------------------!
 !   Find out if file is written in Unix (or Windows) format.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(File_Type) :: File
   character(len=*) :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   integer    :: file_size, file_unit, i
@@ -31,9 +32,9 @@
 
   ! Depending on number of occurences of sequence 13, 10, guess the format
   if(cnt_13_10 .lt. 5) then
-    File_Mod_Is_File_In_Unix_Format = .true.
+    Is_File_In_Unix_Format = .true.
   else
-    File_Mod_Is_File_In_Unix_Format = .false.
+    Is_File_In_Unix_Format = .false.
   end if
 
   end function
