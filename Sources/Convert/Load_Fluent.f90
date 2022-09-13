@@ -11,24 +11,26 @@
   type(Grid_Type) :: Grid
   character(SL)   :: file_name
 !-----------------------------------[Locals]-----------------------------------!
-  character(SL)        :: one_token
-  character(1)         :: one_char
-  integer              :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
-  integer              :: n_cells, n_bnd_cells, n_faces, n_nodes
-  integer              :: n_face_nodes, n_cells_zone
-  integer              :: c, c1, c2, s, n, fu, i, l, pos
-  integer              :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
-  integer              :: cell_type, zone_type
-  integer              :: cell_f, cell_l, side_f, side_l, node_f, node_l
-  integer              :: all_nodes(1024)       ! all cell's nodes
-  integer              :: n_face_sect           ! number of face sections
-  integer              :: face_sect_pos(2048)   ! where did Fluent store it
-  integer              :: face_sect_bnd(2048)   ! where does T-Flows store it
-  integer              :: n_bnd_cond            ! number of boundary conditions
-  logical              :: this_sect_bnd         ! .true. if bnd cond section
-  logical              :: the_end               ! end of file reached?
-  logical              :: ascii                 ! is file in ascii format?
-  integer, allocatable :: cell_visited_from(:)
+  character(SL)          :: one_token
+  character(1)           :: one_char
+  integer(DP)            :: offset
+  integer                :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
+  integer                :: n_cells, n_bnd_cells, n_faces, n_nodes
+  integer                :: n_face_nodes, n_cells_zone
+  integer                :: c, c1, c2, s, n, fu, i, l, pos, length
+  integer                :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
+  integer                :: cell_type, zone_type
+  integer                :: cell_f, cell_l, side_f, side_l, node_f, node_l
+  integer                :: all_nodes(1024)       ! all cell's nodes
+  integer                :: n_face_sect           ! number of face sections
+  integer                :: face_sect_pos(2048)   ! where did Fluent store it
+  integer                :: face_sect_bnd(2048)   ! where does T-Flows store it
+  integer                :: n_bnd_cond            ! number of boundary conditions
+  logical                :: this_sect_bnd         ! .true. if bnd cond section
+  logical                :: the_end               ! end of file reached?
+  logical                :: ascii                 ! is file in ascii format?
+  integer,   allocatable :: cell_visited_from(:), cell_types(:)
+  character, allocatable :: very_long_line(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
@@ -419,18 +421,38 @@
         !----------------------------------!
         else
 
-6         continue
+          n_cells_zone = cell_l - cell_f + 1  ! this was read above
 
           if(ascii) then
-            call File % Read_Line(fu, remove='('//')')
-          else
-            line % n_tokens = 1  ! a bit of a dirty trick
+            ! Find out the line length
+            offset = ftell(fu)                ! mark offset
+            length = File % Line_Length(fu)   ! read the line
+            call fseek(fu, offset, 0)         ! go back
+
+            ! Allocate helping arrays
+            allocate(very_long_line(length))    ! allocate very long line
+            allocate(cell_types(n_cells_zone))  ! allocate cell types
+
+            ! Read the very long line
+            read(fu) very_long_line
+
+            ! Browse the very long line and read cell types from it
+            c = 0                                  ! cell counter
+            do i = 1, length                       ! thrugh entire long line
+              if(ichar(very_long_line(i)) .ge. ichar('0') .and.  &
+                 ichar(very_long_line(i)) .le. ichar('9')) then
+                c = c + 1                          ! increase cell count
+                read(very_long_line(i), '(i1)') &
+                     cell_types(c)                 ! read cell types
+              end if
+            end do
+            ! At this point: c .eq. n_cells_zone; maybe check it?
           end if
 
-          do i = 1, line % n_tokens
+          do c = 1, n_cells_zone
 
             if(ascii) then
-              read(line % tokens(i), *) cell_type
+              cell_type = cell_types(c)
             else
               call File % Read_Binary_Int4_Array(fu, 1)
               cell_type = int4_array(1)
@@ -485,9 +507,6 @@
               stop
             end if
           end do
-
-          ! Did you reach the end of this secion?
-          if(n_cells < cell_l) goto 6
 
         end if  ! end of the mixed zone, also end of both zones
 
