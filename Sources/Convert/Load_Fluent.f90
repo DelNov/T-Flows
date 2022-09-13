@@ -364,6 +364,7 @@
           print '(a34,i9,a4,i9)', ' # Found a uniform cell zone from:',  &
                                   cell_f, ' to:', cell_l
         end if
+        if(.not. ascii) read(fu) one_char  ! read "("
 
         !------------------------------------!
         !   You are reading a uniform zone   !
