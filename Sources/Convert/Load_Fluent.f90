@@ -124,11 +124,13 @@
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Reading face data to find number of boundary cells       '
   print '(a60)', ' #----------------------------------------------------------'
-  n_face_sect = 0
-  n_bnd_cond  = 0
-  n_bnd_cells = 0
-  n_faces     = 0
-  the_end     = .false.
+  face_sect_pos(:) = 0
+  face_sect_bnd(:) = 0
+  n_face_sect      = 0
+  n_bnd_cond       = 0
+  n_bnd_cells      = 0
+  n_faces          = 0
+  the_end          = .false.
   rewind(fu)
   do while(n_faces < Grid % n_faces .and. .not. the_end)
     call File % Read_Line(fu, reached_end=the_end)
@@ -473,8 +475,8 @@
                 Grid % polyhedral = .true.
               end if
               n_poly = n_poly + 1
-              Grid % cells_n_nodes(n_cells) = 0
-              Grid % cells_n_faces(n_cells) = 0
+              Grid % cells_n_nodes(n_cells) = -1
+              Grid % cells_n_faces(n_cells) = -1
 
             else
               print *, '# ERROR: Unsupported cell type', cell_type

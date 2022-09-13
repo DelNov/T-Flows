@@ -78,7 +78,9 @@
 
   ! Some mesh generators (Gmsh for sure) can leave duplicate
   ! nodes in the grid. Check it and eliminate them with this
-  call Grid(1) % Merge_Duplicate_Nodes()
+  if(file_format .eq. 'GMSH') then
+    call Grid(1) % Merge_Duplicate_Nodes()
+  end if
 
   !---------------------------------------------------!
   !                                                   !
