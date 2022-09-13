@@ -655,11 +655,11 @@
 !                                        plot_inside,                        &
 !                                        Turb % p_t2(c_f:c_l),               &
 !                                        f8, f9, data_offset, run)
-        call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",     &
-                                        plot_inside,                       &
-                                        Turb % ut % n(c_f:c_l),            &
-                                        Turb % vt % n(c_f:c_l),            &
-                                        Turb % wt % n(c_f:c_l),            &
+        call Results % Save_Vector_Real("Turbulent Heat Flux [K m/s]",  &
+                                        plot_inside,                    &
+                                        Turb % ut % n(c_f:c_l),         &
+                                        Turb % vt % n(c_f:c_l),         &
+                                        Turb % wt % n(c_f:c_l),         &
                                         f8, f9, data_offset, run)
 !        call Results % Save_Scalar_Real("Turbulent Quantity Alpha L",     &
 !                                        plot_inside,                      &
@@ -723,6 +723,8 @@
     ! Reynolds stress models
     if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
        Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+
+      ! Note: follows the order in which Paraview stores tensors
       call Results % Save_Tensor_6_Real("Reynolds Stress [m^2/s^2]",  &
                                         plot_inside,                  &
                                         Turb % uu % n(c_f:c_l),       &
@@ -756,6 +758,8 @@
       save_04(:) = 0.0
       save_05(:) = 0.0
       save_06(:) = 0.0
+
+      ! Note: follows the order in which Paraview stores tensors
       do c1 = c_f, c_l
         save_01(c1) = Turb % uu_res(c1) - Turb % u_mean(c1) * Turb % u_mean(c1)
         save_02(c1) = Turb % vv_res(c1) - Turb % v_mean(c1) * Turb % v_mean(c1)
