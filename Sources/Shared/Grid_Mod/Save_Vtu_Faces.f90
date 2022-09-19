@@ -125,10 +125,10 @@
 
   ! Boundary conditions
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="BoundaryConditions"'     //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '<DataArray type='//intp           //  &
+                    ' Name="Grid Boundary Conditions"' //  &
+                    ' format="appended"'               //  &
+                    ' offset="' // trim(str1) //'">'   // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
@@ -146,7 +146,7 @@
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="GridNumberOfNodes"'      //  &
+                    ' Name="Grid Number Of Nodes"'   //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -155,7 +155,7 @@
   ! Surface vectors
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="GridSurfaceVectors"'     //  &
+                    ' Name="Grid Surface Vectors"'   //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -165,7 +165,7 @@
   ! Surface normals
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="GridSurfaceNormals"'     //  &
+                    ' Name="Grid Surface Normals"'   //  &
                     ' NumberOfComponents="3"'        //  &
                     ' format="appended"'             //  &
                     ' offset="' // trim(str1) //'">' // LF
@@ -174,11 +174,11 @@
 
   ! Connection vectors
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="GridConnectionVectors"'  //  &
-                    ' NumberOfComponents="3"'        //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '<DataArray type='//floatp         //  &
+                    ' Name="Grid Connection Vectors"'  //  &
+                    ' NumberOfComponents="3"'          //  &
+                    ' format="appended"'               //  &
+                    ' offset="' // trim(str1) //'">'   // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + (s_l-s_f+1) * RP * 3  ! prepare for next
 

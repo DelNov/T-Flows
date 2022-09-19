@@ -641,21 +641,21 @@
           ! Case when c1 is a boundary cell
           if(c1 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
-            Grid % faces_c(1, n_faces) = c2
-            Grid % faces_c(2, n_faces) = -n_bnd_cells
+            Grid % faces_c(1, s) = c2
+            Grid % faces_c(2, s) = -n_bnd_cells
             Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Case when c2 is a boundary cell
           else if(c2 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
-            Grid % faces_c(1, n_faces) = c1
-            Grid % faces_c(2, n_faces) = -n_bnd_cells
+            Grid % faces_c(1, s) = c1
+            Grid % faces_c(2, s) = -n_bnd_cells
             Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Neither c1 nor c2 are boundary cells
           else
-            Grid % faces_c(1, n_faces) = min(c1, c2)
-            Grid % faces_c(2, n_faces) = max(c1, c2)
+            Grid % faces_c(1, s) = min(c1, c2)
+            Grid % faces_c(2, s) = max(c1, c2)
 
           end if
 
@@ -707,6 +707,18 @@
   end do
   print *, '# No duplicate nodes in face data found, good!'
 
+  !----------------------------------------!
+  !   Check for duplicate cells in faces   !
+  !----------------------------------------!
+  do s = 1, Grid % n_faces
+    if(Grid % faces_c(1, s) .eq. Grid % faces_c(2, s)) then
+      print *, '# ERROR!  Duplicate cells in face: ', s
+      print *, '# This error is critical, exiting! '
+      stop
+    end if
+  end do
+  print *, '# No duplicate cells in face data found, good!'
+
   !--------------------------------!
   !                                !
   !                                !
@@ -718,13 +730,13 @@
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Reconstructing cells (determining their nodes)           '
   print '(a60)', ' #----------------------------------------------------------'
-  allocate(cell_visited_from(Grid % n_cells));  cell_visited_from(:) = 0
+  allocate(cell_visited_from(Grid % n_cells));
+  cell_visited_from(:) = 0
 
   !---------------------------------------------!
   !   Handle all boundary cells to start with   !
   !---------------------------------------------!
   do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
 
     ! It is a boundary cell, just copy nodes
@@ -787,6 +799,20 @@
 
     end do  ! through c1 and c2
   end do  ! through faces
+
+  !------------------------------------------!
+  !   Check if all cells have been visited   !
+  !------------------------------------------!
+  do c = 1, Grid % n_cells
+    if(Grid % cells_n_nodes(c) .ge. 4 .and.  &
+       Grid % cells_n_nodes(c) .le. 8) then
+      if(cell_visited_from(c) .eq. 0) then
+        print *, '# ERROR: Some cells have not been visited!'
+        print *, '# This error is critical.  Exiting now.!'
+        stop
+      end if
+    end if
+  end do
 
   !---------------------------------------------------!
   !                                                   !
