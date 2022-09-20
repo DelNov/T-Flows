@@ -56,7 +56,7 @@
     type(Var_Type) :: pp   ! [N/m^2] = [kg/m/s^2]
     type(Var_Type) :: pot  ! pressure-like potential for initial velocity field
 
-    ! Wall distance
+    ! Wall distance used for computation from partial differential equation
     type(Var_Type) :: wall_dist
 
     ! Internal forces on the fluid.
