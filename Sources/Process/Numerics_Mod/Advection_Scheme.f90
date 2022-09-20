@@ -12,19 +12,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real           :: phi_f, phi_f_c, phi_f_u
-  integer        :: s
-  type(Var_Type) :: phi
-  real           :: phi_min(-phi % pnt_grid % n_bnd_cells:  &
-                             phi % pnt_grid % n_cells)
-  real           :: phi_max(-phi % pnt_grid % n_bnd_cells:  &
-                             phi % pnt_grid % n_cells)
-  real           :: flux(phi % pnt_grid % n_faces)
+  real                       :: phi_f
+  integer,        intent(in) :: s
+  type(Var_Type), intent(in) :: phi
+  real,           intent(in) :: phi_min(-phi % pnt_grid % n_bnd_cells:  &
+                                phi % pnt_grid % n_cells)
+  real,           intent(in) :: phi_max(-phi % pnt_grid % n_bnd_cells:  &
+                                phi % pnt_grid % n_cells)
+  real,           intent(in) :: flux(phi % pnt_grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: c1, c2, c, d
   real                     :: fj ! flow oriented interpolation factor
   real                     :: g_d, g_u, alfa, beta1, beta2 
+  real                     :: phi_f_c, phi_f_u
   real                     :: phij, phi_u, phi_star, rj, sign, gamma_c, beta
 !==============================================================================!
 !
