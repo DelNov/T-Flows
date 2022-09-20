@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Write_Vars(Monitor, curr_dt, Flow)
+  subroutine Write_Vars(Monitor, Flow, curr_dt)
 !------------------------------------------------------------------------------!
 !   This is to write down variavles in monitoring points.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Monitor_Type) :: Monitor
-  integer, intent(in) :: curr_dt
   type(Field_Type)    :: Flow
+  integer, intent(in) :: curr_dt
 !-----------------------------------[Locals]-----------------------------------!
   integer :: m, c, sc, fu
 !==============================================================================!

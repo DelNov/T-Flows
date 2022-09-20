@@ -176,7 +176,7 @@
     end if
 
     ! Initialize monitoring points
-    call Monitor(d) % Initialize(Grid(d), read_backup(d), domain=d)
+    call Monitor(d) % Initialize(Flow(d), read_backup(d), domain=d)
 
     ! Plane for calcution of overall mass fluxes
     call Control_Mod_Point_For_Monitoring_Planes(Flow(d) % bulk % xp,  &
@@ -382,7 +382,7 @@
       call Control_Mod_Switch_To_Domain(d)
 
       ! Write the values in monitoring points
-      call Monitor(d) % Write_Vars(curr_dt, Flow(d))
+      call Monitor(d) % Write_Vars(Flow(d), curr_dt)
 
       ! Calculate mean values
       call Turb(d) % Calculate_Mean(n_stat_t, curr_dt)

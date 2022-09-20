@@ -1,23 +1,26 @@
 !==============================================================================!
-  subroutine Initialize(Monitor, Grid, restart, domain)
+  subroutine Initialize(Monitor, Flow, restart, domain)
 !------------------------------------------------------------------------------!
 !   This is to read the control file and set up Monitoring points.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Monitor_Type)     :: Monitor
-  type(Grid_Type), target :: Grid
-  logical                 :: restart
-  integer,       optional :: domain
+  class(Monitor_Type)      :: Monitor
+  type(Field_Type), target :: Flow
+  logical                  :: restart
+  integer,        optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: c, m, n, l
-  real              :: curr_dist, min_dist_all
-  character(SL)     :: mon_file_name
-  character(SL)     :: point_name
-  real, allocatable :: min_dist(:)
-  real              :: xyz(3), def(3)
+  type(Grid_Type), pointer :: Grid
+  integer                  :: c, m, n, l, sc
+  real                     :: curr_dist, min_dist_all
+  character(SL)            :: mon_file_name
+  character(SL)            :: point_name
+  real,        allocatable :: min_dist(:)
+  real                     :: xyz(3), def(3)
 !==============================================================================!
 
+  ! Take alias for grid
+  Grid => Flow % pnt_grid
   Monitor % pnt_grid => Grid
 
   ! Read number of Monitoring points from control file
@@ -106,11 +109,32 @@
                                              Monitor % file_unit(m))
       endif
 
-      write(Monitor % file_unit(m), '(a24, 3f16.6)')   &
+      write(Monitor % file_unit(m), '(a20, 3f16.6)')   &
             '# Monitoring point:',                     &
             Grid % xc( Monitor % cell(m) ),            &
             Grid % yc( Monitor % cell(m) ),            &
             Grid % zc( Monitor % cell(m) )
+      write(Monitor % file_unit(m), '(a11, 4a15)', advance='no')   &
+            '#         ',                                          &
+            ' U                 ',                                 &
+            ' V                 ',                                 &
+            ' W                 ',                                 &
+            ' P                 '
+
+      ! If heat transfer, write temperature too
+      if(Flow % heat_transfer) then
+        write(Monitor % file_unit(m), '(a15)', advance='no')   &
+              ' T                 '
+      end if
+
+      do sc = 1, Flow % n_scalars
+        write(Monitor % file_unit(m), '(a1,a4,a10)', advance='no')   &
+              ' ', Flow % scalar(sc) % name, '          '
+      end do
+
+      ! End the line
+      write(Monitor % file_unit(m),'(a)')  ' '
+
 
     end if
 
