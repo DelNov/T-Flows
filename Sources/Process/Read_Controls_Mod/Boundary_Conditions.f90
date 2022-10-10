@@ -137,7 +137,7 @@
       !                                             !
       !---------------------------------------------!
       call Control_Mod_Read_Char_Item_On('TYPE', 'WALL', bc_type_name, .false.)
-      call To_Upper_Case(bc_type_name)
+      call String % To_Upper_Case(bc_type_name)
 
       ! Copy boundary conditions which were given for the Grid
       if( bc_type_name .eq. 'INFLOW') then
@@ -179,7 +179,7 @@
       !----------------------------------------------!
       call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .false.)
       do i = 1, nks
-        call To_Upper_Case(keys(i))
+        call String % To_Upper_Case(keys(i))
       end do
 
       !-----------------------------------------------------------------!

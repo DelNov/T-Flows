@@ -13,7 +13,7 @@
 !==============================================================================!
 
   work = Grid % name
-  call To_Lower_Case(work)
+  call String % To_Lower_Case(work)
   call File % Open_For_Writing_Ascii("control_template_for_"//trim(work), fu)
 
   write(fu,'(a)') '#-----------------------------------------------------------'
@@ -30,7 +30,7 @@
   write(fu,'(a1)', advance='no') CR
 
   work = Grid % name
-  call To_Lower_Case(work)
+  call String % To_Lower_Case(work)
   write(fu,'(a)') '#-----------------------------------------------------------'
   write(fu,'(a)') '# Problem name must be specified and corresponds to the'
   write(fu,'(a)') '# base name (without extensions) of the grid file used.'
@@ -53,7 +53,7 @@
 
   do j = 1, Grid % n_bnd_cond
     work = Grid % bnd_cond % name(j)
-    call To_Lower_Case(work)
+    call String % To_Lower_Case(work)
     write(fu,'(a,a)') '  BOUNDARY_CONDITION ', trim(work)
     write(fu,'(a)') '    TYPE             wall  (or: '  //  &
                     'inflow / outflow / pressure / convective)'

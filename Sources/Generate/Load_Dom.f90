@@ -43,7 +43,7 @@
   read(line % tokens(1), *) problem_name(1)
 
   Grid % name = problem_name(1)
-  call To_Upper_Case(Grid % name)
+  call String % To_Upper_Case(Grid % name)
 
   call File % Set_Name(domain_name, extension='.dom')
   call File % Open_For_Reading_Ascii(domain_name, fu)
@@ -316,13 +316,13 @@
       read(line % tokens(1),*)       dum
       read(line % tokens(2),'(A4)')  &
            dom % regions(n) % face
-      call To_Upper_Case(dom % regions(n) % face)
+      call String % To_Upper_Case(dom % regions(n) % face)
     end if
 
     call File % Read_Line(fu)
     read(line % tokens(1), *) dom % regions(n) % block
     read(line % tokens(2), *) dom % regions(n) % name
-    call To_Upper_Case(dom % regions(n) % name)
+    call String % To_Upper_Case(dom % regions(n) % name)
 
     ! if( dom % blocks(b_cond(n,7)) % points(0) .eq. -1 ) then
     !   call Swap_Int( dom % regions(n) % is,dom % regions(n) % js )
@@ -373,7 +373,7 @@
     do n = 1, ref % n_regions(l)
       call File % Read_Line(fu)
       read(line % tokens(3),*) answer
-      call To_Upper_Case(answer)
+      call String % To_Upper_Case(answer)
       ref % region(l,n) % shape = -1
       if(answer .eq. 'RECTANGLE') ref % region(l,n) % shape = RECTANGLE
       if(answer .eq. 'ELIPSOID')  ref % region(l,n) % shape = ELIPSOID
@@ -415,8 +415,8 @@
       smr % in_y(n) = .true.
       smr % in_z(n) = .true.
     else if(line % n_tokens .eq. 3) then
-      call To_Upper_Case(line % tokens(2))
-      call To_Upper_Case(line % tokens(3))
+      call String % To_Upper_Case(line % tokens(2))
+      call String % To_Upper_Case(line % tokens(3))
       if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
       if( line % tokens(3) .eq. 'X' )  smr % in_x(n) = .true.
       if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
@@ -424,7 +424,7 @@
       if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
       if( line % tokens(3) .eq. 'Z' )  smr % in_z(n) = .true.
     else if(line % n_tokens .eq. 2) then
-      call To_Upper_Case(line % tokens(2))
+      call String % To_Upper_Case(line % tokens(2))
       if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
       if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
       if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.

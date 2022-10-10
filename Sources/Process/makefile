@@ -288,8 +288,7 @@ SRC_F_FUN = Balance_Volume.f90                 \
             Rhie_And_Chow.f90                  \
             Update_Boundary_Values.f90
 
-SRC_F_FUN += To_Lower_Case.f90  \
-             To_Upper_Case.f90
+SRC_F_FUN += 
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions
@@ -352,7 +351,8 @@ include makefile_explicit_dependencies
 #---------------------
 clean:
 	@echo -n Removing objects and modules ...
-	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod \
+	       $(DIR_MODULE)/*.f90 $(PROGRAM_FILE)
 	@echo done
 	@echo -n Removing links to sources in case directory ...
 	@rm -f $(DIR_USER)/*.f90

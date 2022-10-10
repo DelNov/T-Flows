@@ -6,8 +6,6 @@
   class(Grid_Type)    :: Grid
   integer, intent(in) :: nf    ! number of faces in the grid
   integer, intent(in) :: ns    ! number of shadow faces in the grid
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: s
 !==============================================================================!
 
   ! Store the number of faces for the Grid

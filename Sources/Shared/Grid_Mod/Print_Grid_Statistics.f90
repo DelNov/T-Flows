@@ -1,10 +1,9 @@
 !==============================================================================!
-  subroutine Print_Grid_Statistics(Grid, bounding_box)
+  subroutine Print_Grid_Statistics(Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)  :: Grid
-  logical, optional :: bounding_box
+  class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, s, n_cells, n_bnd_cells, n_faces, n_shadows
   integer :: n_tri, n_quad, n_tet, n_pyr, n_wed, n_hex, n_polg, n_polh

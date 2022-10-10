@@ -45,7 +45,7 @@
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
   call Turb % Alias_T2          (t2)
 
-  call To_Upper_Case(update)
+  call String % To_Upper_Case(update)
 
   if(update .ne. 'MOMENTUM'   .and.  &
      update .ne. 'TURBULENCE' .and.  &

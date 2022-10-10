@@ -25,7 +25,7 @@
   print *, '# (xy, yz, zx or skip)'
   print *, '#-------------------------------'
   read(*,*) answer
-  call To_Upper_Case(answer)
+  call String % To_Upper_Case(answer)
   if(answer .eq. 'SKIP') return
 
   n_prob = 0

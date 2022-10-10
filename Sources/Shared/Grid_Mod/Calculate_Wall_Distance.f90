@@ -38,7 +38,7 @@
   print *, '#------------------------------------------------------------------'
   call File % Read_Line(5)
   answer = line % tokens(1)
-  call To_Upper_Case(answer)
+  call String % To_Upper_Case(answer)
 
   !-----------------------------------------------------!
   !   User wants to skip calculation of wall distance   !

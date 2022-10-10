@@ -7,10 +7,9 @@
 !   Sij = 1/2 ( dUi/dXj + dUj/dXi )                                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Comm_Mod
-  use Turb_Mod
-  use Field_Mod,  only: Field_Type
-  use Grid_Mod,   only: Grid_Type
+  use Field_Mod, only: Field_Type
+  use Grid_Mod,  only: Grid_Type
+  use Var_Mod,   only: Var_Type
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

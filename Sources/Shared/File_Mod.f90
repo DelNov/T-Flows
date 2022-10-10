@@ -14,6 +14,17 @@
 
   character(SL) :: problem_name(MD)
 
+  !-----------------!
+  !   String type   !
+  !-----------------!
+  type String_Type
+
+    contains
+      procedure :: To_Lower_Case
+      procedure :: To_Upper_Case
+
+  end type
+
   !--------------------!
   !   Tokenizer type   !
   !--------------------!
@@ -45,6 +56,7 @@
 
   end type
 
+  type(String_Type)    :: String
   type(Tokenizer_Type) :: line
   type(File_Type)      :: File
 
@@ -69,5 +81,7 @@
   include 'File_Mod/Read_Binary_Real4_Array.f90'
   include 'File_Mod/Read_Binary_Real8_Array.f90'
   include 'File_Mod/Read_Line.f90'
+  include 'File_Mod/To_Lower_Case.f90'
+  include 'File_Mod/To_Upper_Case.f90'
 
   end module

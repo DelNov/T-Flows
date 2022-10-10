@@ -14,9 +14,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
-  integer         :: n_buff_layers  ! number of buffer layers
+  integer         :: n_buff_layers  ! number of buffer layers, keep it here
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n, s, c1, c2, sub, subo, i_nod, i_fac, ss, sr, nn !exp:, lev
+  integer :: c, n, s, c1, c2, sub, subo, i_nod, ss, sr, nn !exp:, lev
   integer :: nn_sub      ! number of nodes in the subdomain
   integer :: nc_sub      ! number of cells in the subdomain
   integer :: nf_sub      ! number of faces in the subdomain

@@ -85,7 +85,7 @@
           call Control_Mod_Read_Strings_On('BOUNDARY_CONDITIONS',  &
                                            keys, nks, .false.)
           do k = 1, nks
-            call To_Upper_Case(keys(k))
+            call String % To_Upper_Case(keys(k))
           end do
 
           !---------------------------------------!

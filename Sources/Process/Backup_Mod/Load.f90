@@ -31,7 +31,7 @@
   call Control_Mod_Load_Backup_Name(name_in)
 
   answer = name_in
-  call To_Upper_Case(answer)
+  call String % To_Upper_Case(answer)
 
   backup = .true.
   if(answer .eq. 'SKIP') then

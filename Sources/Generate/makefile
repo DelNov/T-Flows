@@ -167,9 +167,7 @@ SRC_F_MOD += Point_Mod.f90    \
 
 # Sources for all shared functions
 SRC_F_FUN = Probe_1d_Nodes.f90  \
-            Probe_2d.f90        \
-            To_Lower_Case.f90   \
-            To_Upper_Case.f90
+            Probe_2d.f90
 
 # Local functions are added one by one ...
 SRC_F_FUN += Calculate_Geometry.f90  \
@@ -232,4 +230,5 @@ include makefile_explicit_dependencies
 #   Explicit target
 #---------------------
 clean:
-	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod \
+	      $(DIR_MODULE)/*.f90 $(PROGRAM_FILE)

@@ -146,8 +146,7 @@ SRC_F_MOD = Const_Mod.f90          \
 #---------------
 
 # Sources for all shared functions
-SRC_F_FUN = To_Lower_Case.f90  \
-            To_Upper_Case.f90
+SRC_F_FUN = 
 
 # Local functions are added one by one ...
 SRC_F_FUN += Save_Subdomains.f90  \
@@ -208,4 +207,5 @@ include makefile_explicit_dependencies
 #   Explicit target
 #---------------------
 clean:
-	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod \
+	      $(DIR_MODULE)/*.f90 $(PROGRAM_FILE)

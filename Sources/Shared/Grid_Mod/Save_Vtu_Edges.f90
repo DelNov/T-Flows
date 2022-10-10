@@ -8,7 +8,7 @@
   class(Grid_Type)  :: Grid
   integer, optional :: edge_data(Grid % n_edges)
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, edge_offset, fu
+  integer       :: c, n, edge_offset, fu
   character(SL) :: name_out
 !==============================================================================!
 
