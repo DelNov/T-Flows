@@ -1,0 +1,20 @@
+!==============================================================================!
+  subroutine Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
+!------------------------------------------------------------------------------!
+!   Purpose: Solve transport equation for scalar (such as temperature)         !
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use User_Mod
+  use Work_Mod
+!------------------------------------------------------------------------------!
+  implicit none
+!-----------------------------------[Arguments]--------------------------------!
+  type(Field_Type),    target :: Flow
+  type(Turb_Type),     target :: Turb
+  type(Vof_Type),      target :: Vof
+  type(Solver_Type),   target :: Sol
+  integer, intent(in)         :: curr_dt
+  integer, intent(in)         :: ini
+!==============================================================================!
+
+  end subroutine

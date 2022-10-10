@@ -1,0 +1,33 @@
+!==============================================================================!
+  subroutine Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
+!------------------------------------------------------------------------------!
+!   Initialize dependent variables.  (It is a bit of a mess still)             !
+!                                                                              !
+!   It is important to remember that this procedure is called only if backup   !
+!   file wasn't read.  Hence, if you initialize something here which should    !
+!   be kept after restart, it should be stored in backup file.
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+  use File_Mod
+  use Field_Mod,   only: Field_Type
+  use Comm_Mod
+  use Turb_Mod
+  use Swarm_Mod
+  use Grid_Mod
+  use Bulk_Mod
+  use User_Mod
+  use Control_Mod
+  use Vof_Mod
+  use Numerics_Mod
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  type(Field_Type), target :: Flow
+  type(Turb_Type),  target :: Turb
+  type(Vof_Type)           :: Vof
+  type(Swarm_Type)         :: Swarm
+  type(Solver_Type)        :: Sol
+!==============================================================================!
+
+  end subroutine
