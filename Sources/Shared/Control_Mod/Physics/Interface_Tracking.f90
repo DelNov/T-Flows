@@ -12,7 +12,7 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('INTERFACE_TRACKING', 'no', val, verbose)
-  call To_Upper_Case(val)
+  call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
     track_int = .true.

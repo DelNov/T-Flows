@@ -11,6 +11,6 @@
 
   call Control_Mod_Read_Char_Item('PRESSURE_MOMENTUM_COUPLING',  &
                                    'simple', name, verbose = .true.)
-  call To_Upper_Case(name)
+  call String % To_Upper_Case(name)
 
   end subroutine

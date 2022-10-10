@@ -13,7 +13,7 @@
 
   call Control_Mod_Read_Char_Item('POTENTIAL_INITIALIZATION', 'no',  &
                                    val, verbose)
-  call To_Upper_Case(val)
+  call String % To_Upper_Case(val)
 
   select case(val)
 

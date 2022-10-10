@@ -25,7 +25,7 @@
     call File % Read_Line(control_file_unit, reached_end)
     if(reached_end) goto 1
 
-    call To_Upper_Case(line % tokens(2))
+    call String % To_Upper_Case(line % tokens(2))
 
     ! First keyword is "BOUNDARY_CONDITION", ...
     ! ... second is boundary condition name

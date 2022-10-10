@@ -9,7 +9,7 @@
 
   call Control_Mod_Read_Char_Item('SOLVER_FOR_VOF', 'cg',  &
                                    val, verbose)
-  call To_Lower_Case(val)
+  call String % To_Lower_Case(val)
 
   if( val.ne.'bicg' .and. val.ne.'cgs' .and. val.ne.'cg') then
     if(this_proc < 2) then

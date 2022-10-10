@@ -22,7 +22,7 @@
                                   'incomplete_cholesky',               &
                                    val,                                &
                                    verbose)
-  call To_Lower_Case(val)
+  call String % To_Lower_Case(val)
 
   ! Check validity of the input
   if( val.ne.'none'                .and.  &

@@ -11,6 +11,6 @@
 
   call Control_Mod_Read_Char_Item('TURBULENT_HEAT_FLUX_MODEL', 'SGDH',  &
                                    val, verbose)
-  call To_Upper_Case(val)
+  call String % To_Upper_Case(val)
 
   end subroutine

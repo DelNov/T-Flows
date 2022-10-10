@@ -12,6 +12,6 @@
   call Control_Mod_Read_Char_Item('GRADIENT_METHOD_FOR_PRESSURE',  &
                                   'least_squares',                 &
                                    scheme_name, verbose)
-  call To_Upper_Case(scheme_name)
+  call String % To_Upper_Case(scheme_name)
 
   end subroutine

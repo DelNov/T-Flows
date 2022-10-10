@@ -11,7 +11,7 @@
 
   call Control_Mod_Read_Char_Item('SAVE_RESULTS_AT_BOUNDARIES', 'yes',  &
                                    val, verbose)
-  call To_Upper_Case(val)
+  call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
     save_results_bnd = .true.

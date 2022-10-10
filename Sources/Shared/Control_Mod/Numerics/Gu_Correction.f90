@@ -10,7 +10,7 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('GU_CORRECTION', 'no', val, verbose)
-  call To_Upper_Case(val)
+  call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
     gu_correction = .true.
