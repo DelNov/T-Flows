@@ -5,6 +5,21 @@
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Calculate_Geometry.h90'
+    include 'Create_Dual.h90'
+    include 'Find_Faces.h90'
+    include 'Find_Parents.h90'
+    include 'Guess_Format.h90'
+    include 'Grid_Topology.h90'
+    include 'Insert_Buildings.h90'
+    include 'Load_Fluent.h90'
+    include 'Load_Gambit.h90'
+    include 'Load_Gmsh.h90'
+    include 'Logo_Con.h90'
+    include '../Shared/Probe_1d_Nodes.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid(2)        ! grid to be converted and its dual
   character(SL)   :: answer
@@ -41,11 +56,11 @@
   problem_name(1) = file_name(1:p-1)
 
   Grid(1) % name = problem_name(1)
-  call To_Upper_Case(Grid(1) % name)
+  call String % To_Upper_Case(Grid(1) % name)
   city = .false.
   if(l > 10) then
     app_up = problem_name(1)(l-7:l-4)
-    call To_Upper_Case(app_up)
+    call String % To_Upper_Case(app_up)
     if(app_up .eq. 'CITY') city = .true.
   end if
 
@@ -67,7 +82,7 @@
 
   ! Sort cells in height first thing after reading	    
   if(city) then
-    call Insert_Buildings(grid)
+    call Insert_Buildings(Grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
@@ -92,7 +107,7 @@
   print *, '#-------------------------------------------------'
   call File % Read_Line(5)
   answer = line % tokens(1)
-  call To_Upper_Case(answer)
+  call String % To_Upper_Case(answer)
 
   n_grids = 1
   if(answer .eq. 'YES') n_grids = 2

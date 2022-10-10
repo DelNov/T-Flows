@@ -10,6 +10,14 @@
   use Swap_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Calculate_Geometry.h90'
+    include 'Load_Dom.h90'
+    include 'Logo_Gen.h90'
+    include '../Shared/Probe_1d_Nodes.h90'
+    include '../Shared/Probe_2d.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Domain_Type)  :: dom       ! domain to be used
   type(Grid_Type)    :: Grid      ! Grid which will be generated

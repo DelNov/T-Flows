@@ -7,6 +7,10 @@
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Allocate_Memory.h90'
+  end interface
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
   character(SL)   :: file_name
@@ -502,7 +506,7 @@
 
   do i = 1, n_bnd_sect
     Grid % bnd_cond % name(i) = phys_names(i)
-    call To_Upper_Case(Grid % bnd_cond % name(i))
+    call String % To_Upper_Case(Grid % bnd_cond % name(i))
   end do
 
   !------------------------------------!

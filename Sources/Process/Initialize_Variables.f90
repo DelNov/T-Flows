@@ -28,8 +28,10 @@
   type(Vof_Type)           :: Vof
   type(Swarm_Type)         :: Swarm
   type(Solver_Type)        :: Sol
-!----------------------------------[Calling]-----------------------------------!
-  integer :: Key_Ind
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Key_Ind.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Bulk_Type),  pointer :: bulk
@@ -37,7 +39,7 @@
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type),  pointer :: v_flux
-  real, contiguous, pointer :: u_mean(:), v_mean(:), w_mean(:)
+  real,             pointer :: u_mean(:), v_mean(:), w_mean(:)
   integer                   :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                   :: n_wall, n_inflow, n_outflow, n_symmetry,  &
                                n_heated_wall, n_pressure, n_convect
@@ -92,7 +94,7 @@
 
     ! Input is valid, turn keys to upper case
     do i = 1, nks
-      call To_Upper_Case(keys(i))
+      call String % To_Upper_Case(keys(i))
     end do
 
     ! Check if there is file specified
@@ -225,7 +227,7 @@
 
       ! Input is valid, turn keys to upper case
       do i = 1, nks
-        call To_Upper_Case(keys(i))
+        call String % To_Upper_Case(keys(i))
       end do
 
       call Control_Mod_Read_Real_Array_On('VALUES', vals(1), nvs, .true.)
@@ -246,7 +248,7 @@
 
       ! Input is valid, turn keys to upper case
       do i = 1, nks
-        call To_Upper_Case(keys(i))
+        call String % To_Upper_Case(keys(i))
       end do
 
       do c = 1, Grid % n_cells

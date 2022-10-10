@@ -8,6 +8,11 @@
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Logo_Div.h90'
+    include 'Save_Subdomains.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid           ! grid to be divided
   integer         :: n_sub

@@ -14,10 +14,12 @@
   use File_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Triangle_Area_Z.h90'
+  end interface
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
-!----------------------------------[Calling]-----------------------------------!
-  real :: Triangle_Area_Z
 !-----------------------------------[Locals]-----------------------------------!
 
   ! Facet type
@@ -254,7 +256,7 @@
       do dir = 1, 6
         if(Grid % cells_bnd_color(dir, c) .ne. 0) then
           bc_name = trim(Grid % bnd_cond % name(Grid % cells_bnd_color(dir, c)))
-          call To_Upper_Case(bc_name)
+          call String % To_Upper_Case(bc_name)
           if(bc_name(1:8) .eq. 'BUILDING' .or.  &
              bc_name      .eq. 'GROUND') then
 
@@ -398,7 +400,7 @@
     do dir = 1, 6
       if(Grid % cells_bnd_color(dir, c) .ne. 0) then
         bc_name = trim(Grid % bnd_cond % name(Grid % cells_bnd_color(dir, c)))
-        call To_Upper_Case(bc_name)
+        call String % To_Upper_Case(bc_name)
         if(bc_name(1:8) .eq. 'BUILDING') then
           read(bc_name(10:12), *) height
 !          height = height / 1000.0
@@ -420,7 +422,7 @@
   cell_in_chimney(:) = 0
   do bc = 1, Grid % n_bnd_cond
     bc_name = trim(Grid % bnd_cond % name(bc))
-    call To_Upper_Case(bc_name)
+    call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
 
       read(bc_name(9:11), *)  height
@@ -486,7 +488,7 @@
   ! Find ground b.c. number (only used to eliminate BUILDING_000)
   do bc = 1, Grid % n_bnd_cond
     bc_name = trim(Grid % bnd_cond % name(bc))
-    call To_Upper_Case(bc_name)
+    call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'GROUND') then
       ground_bc = bc
     end if
@@ -495,7 +497,7 @@
   ! Eliminate building_000 b.c.
   do bc = 1, Grid % n_bnd_cond
     bc_name = trim(Grid % bnd_cond % name(bc))
-    call To_Upper_Case(bc_name)
+    call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'BUILDING_000') then
       do c = 1, Grid % n_cells
         do dir = 1, 6
@@ -510,7 +512,7 @@
   cnt   = 0
   do bc = 1, Grid % n_bnd_cond
     bc_name = trim(Grid % bnd_cond % name(bc))
-    call To_Upper_Case(bc_name)
+    call String % To_Upper_Case(bc_name)
     if(bc_name(1:8) .ne. 'BUILDING') then
       cnt = cnt + 1
       Grid % bnd_cond % name(cnt) = Grid % bnd_cond % name(bc)
@@ -654,7 +656,7 @@
 
   do bc = 1, Grid % n_bnd_cond
     bc_name = trim(Grid % bnd_cond % name(bc))
-    call To_Upper_Case(bc_name)
+    call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
 
       read(bc_name(13:15), *) chimney  ! this is, in essence, building number

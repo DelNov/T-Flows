@@ -13,6 +13,11 @@
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Balance_Volume.h90'
+    include 'Rhie_And_Chow.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
@@ -22,8 +27,6 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  integer, save              :: total_cells
-  real                       :: total_source
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
   character(SL)              :: solver
 !==============================================================================!
@@ -113,7 +116,7 @@
   !   Compute volume fluxes at internal   !
   !    faces with Rhie and Chow method    !
   !---------------------------------------!
-  call Rhie_And_Chow(Flow, Vof, Sol)
+  call Rhie_And_Chow(Flow, Vof, Sol % Nat)
 
   !-----------------------------------------------!
   !   Update pressure r.h.s. with volume fluxes   !

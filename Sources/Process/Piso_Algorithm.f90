@@ -14,6 +14,12 @@
   type(Solver_Type), target :: Sol
   integer, intent(in)       :: curr_dt   ! current time step
   integer, intent(in)       :: ini       ! current inner iteration
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Compute_Momentum.h90'
+    include 'Compute_Pressure.h90'
+    include 'Correct_Velocity.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w

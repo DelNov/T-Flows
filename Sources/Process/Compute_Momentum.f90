@@ -14,6 +14,11 @@
   type(Solver_Type),   target :: Sol
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Compute_Momentum_Explicit.h90'
+    include 'Update_Boundary_Values.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk

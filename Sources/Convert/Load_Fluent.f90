@@ -7,9 +7,15 @@
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Allocate_Memory.h90'
+  end interface
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
   character(SL)   :: file_name
+!----------------------------------[Calling]-----------------------------------!
+  integer(DP) :: ftell
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)          :: one_token
   character(1)           :: one_char
@@ -338,8 +344,13 @@
 
   ! Initialize all cell counters
   n_cells = 0
-  n_tri   = 0;  n_quad  = 0;  n_tet = 0
-  n_hexa  = 0;  n_pyra  = 0;  n_wed = 0
+  n_tri   = 0
+  n_quad  = 0
+  n_tet   = 0
+  n_hexa  = 0
+  n_pyra  = 0
+  n_wed   = 0
+  n_poly  = 0
   the_end = .false.
 
   rewind(fu)
@@ -1073,7 +1084,7 @@
         do n = 1, 2048
           if(face_sect_bnd(n) .ne. 0) then
             if(face_sect_pos(n) .eq. pos) then
-              call To_Upper_Case(one_token)
+              call String % To_Upper_Case(one_token)
               Grid % bnd_cond % name(face_sect_bnd(n)) = one_token
             end if
           end if

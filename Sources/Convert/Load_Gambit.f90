@@ -7,6 +7,10 @@
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Allocate_Memory.h90'
+  end interface
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
   character(SL)   :: file_name
@@ -162,7 +166,7 @@
   do j = 1, n_bnd_sect
     call File % Read_Line(fu)        ! BOUNDARY CONDITIONS
     call File % Read_Line(fu)
-    call To_Upper_Case(  line % tokens(1)  )
+    call String % To_Upper_Case(  line % tokens(1)  )
     Grid % bnd_cond % name(j) = line % tokens(1)
     read(line % tokens(3),'(i8)') dum1
     do i = 1, dum1
