@@ -1,19 +1,20 @@
 !==============================================================================!
-  subroutine To_Lower_Case(string)
+  subroutine To_Upper_Case(String, char_array)
 !------------------------------------------------------------------------------!
-!   Transforms string to lowercase.                                            !
+!   Transforms String to uppercase.                                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*) :: string
+  class(String_Type) :: String
+  character(len=*)   :: char_array
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
 !==============================================================================!
 
-  do i = 1, len_trim(string)
-    value = ichar(string(i:i))
-    if(value >= 65 .and. value <= 90) then
-      string(i:i) = char(value+32)
+  do i = 1, len_trim(char_array)
+    value = ichar(char_array(i:i))
+    if (value >= 97 .and. value <= 122) then
+      char_array(i:i) = char(value-32)
     end if
   end do
 
