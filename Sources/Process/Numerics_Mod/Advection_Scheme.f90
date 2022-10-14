@@ -24,9 +24,9 @@
   type(Grid_Type), pointer :: Grid
   integer                  :: c1, c2, c, d
   real                     :: fj ! flow oriented interpolation factor
-  real                     :: g_d, g_u, alfa, beta1, beta2 
+  real                     :: g_d, g_u, alfa, beta1, beta2, denom
   real                     :: phi_f_c, phi_f_u
-  real                     :: phij, phi_u, phi_star, rj, sign, gamma_c, beta
+  real                     :: phij, phi_u, phi_star, rj, sgn, gamma_c, beta
 !==============================================================================!
 !
 !               Flux > 0
@@ -57,15 +57,15 @@
   c2 = Grid % faces_c(2,s)
 
   if(flux(s) > 0.0) then ! goes from c1 to c2
-    fj   = 1.0 - Grid % f(s)
-    c    = c1
-    d    = c2
-    sign = +1.0
+    fj  = 1.0 - Grid % f(s)
+    c   = c1
+    d   = c2
+    sgn = +1.0
   else ! flux(s) < 0.0   ! goes from c2 to c1
-    fj = Grid % f(s)
-    c    = c2
-    d    = c1
-    sign = -1.0
+    fj  = Grid % f(s)
+    c   = c2
+    d   = c1
+    sgn = -1.0
   end if
 
   if(flux(s) > 0.0) then
@@ -80,7 +80,11 @@
 
   phi_u = max( phi_min(c), min(phi_star, phi_max(c)) )
 
-  rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-16 )
+  denom = phi % n(d) - phi % n(c)
+  if( abs(denom) < FEMTO ) then
+    denom = denom + sign(FEMTO, denom)  ! to avoid changing sign
+  endif
+  rj = (phi % n(c) - phi_u) / denom
 
   g_d = 0.5 * fj * (1.0+fj)
   g_u = 0.5 * fj * (1.0-fj)
@@ -89,7 +93,6 @@
     phij = fj
 
   else if(phi % adv_scheme .eq. QUICK) then
-    rj = ( phi % n(c) - phi_u ) / ( phi % n(d) - phi % n(c) + 1.0e-12 )
     alfa = 0.0
     phij = (g_d - alfa) + (g_u + alfa) * rj
 
@@ -118,15 +121,15 @@
     return
 
   else if(phi % adv_scheme .eq. BLENDED) then
-    phi_f_c = phi % n(c) + fj * sign * (phi % n(c2)-phi % n(c1))  ! central part
-    phi_f_u = phi % n(c)                                          ! upwind part
+    phi_f_c = phi % n(c) + fj * sgn * (phi % n(c2)-phi % n(c1))  ! central part
+    phi_f_u = phi % n(c)                                         ! upwind part
     ! Blended value
     phi_f   =        phi % blend  * phi_f_c   &
             + (1.0 - phi % blend) * phi_f_u
     return
   end if
 
-  phi_f = phi % n(c) + phij * sign * (phi % n(c2)-phi % n(c1))
+  phi_f = phi % n(c) + phij * sgn * (phi % n(c2)-phi % n(c1))
 
   if(phi % adv_scheme .eq. GAMMA) then
     beta = 0.1
