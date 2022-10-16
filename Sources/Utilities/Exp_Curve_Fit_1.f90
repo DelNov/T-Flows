@@ -9,11 +9,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MAX_ITER  = 5000
-  real,    parameter :: TOLERANCE = 1.0e-8
+  integer, parameter :: MAX_ITER   = 5000
+  integer, parameter :: PLT_POINTS = 1000
+  real,    parameter :: TOLERANCE  = 1.0e-8
 !-----------------------------------[Locals]-----------------------------------!
   integer :: k
-  real    :: x0, x1, x2, y0, y1, y2
+  real    :: x, y, x0, x1, x2, y0, y1, y2
   real    :: dx1, dx2, cx1, cx2, dy1, dy2, dydx1, dydx2
   real    :: y_min, y_max, a_coef, a_coef1, a_coef2, b_coef
   real    :: c_coef, c_coef0, c_coef1, c_coef2, y1c, y2c
@@ -25,7 +26,9 @@
 !==============================================================================!
 
   !----------------------------------------!
+  !                                        !
   !   Hard-code the desired three points   !
+  !                                        !
   !----------------------------------------!
   x0 = 0.0
   y0 = 0.5
@@ -41,8 +44,10 @@
   print *, 'x2, y2, ', x2, y2
 
   !------------------------------------------!
+  !                                          !
   !   Scale x axis in order to avoid large   !
   !    number in expression for deviation    !
+  !                                          !
   !------------------------------------------!
   x_scale = max(abs(x0), abs(x1), abs(x2))
 
@@ -72,7 +77,9 @@
   y_max = max(y0, y1, y2)
 
   !--------------------------------------!
+  !                                      !
   !   First estimation of coefficients   !
+  !                                      !
   !--------------------------------------!
 
   ! First estimation of b coef.
@@ -101,8 +108,10 @@
   y2c    = (y2 - c_coef)/(y1 - c_coef)
 
   !-------------------------------------------------------!
+  !                                                       !
   !   New estimaton of c_coef by forcing that c_coef is   !
   !   not falling into the range defined by y0 and y2.    !
+  !                                                       !
   !-------------------------------------------------------!
   c_coef = c_coef/abs(c_coef) * min(abs(y0),abs(y2))
 
@@ -195,7 +204,9 @@
   write(*,*) 'c_coef after fine tunning ', c_coef
 
   !-----------------------------------------------------------------------!
+  !                                                                       !
   !   Now we finalize the coefficients by using the least-square method   !
+  !                                                                       !
   !-----------------------------------------------------------------------!
 
   if(c_coef > y_max) then
@@ -234,5 +245,36 @@
   print *, 'a_coef new is ', a_coef
   print *, 'b_coef new is ', b_coef
   print *, 'c_coef new is ', c_coef
+
+  !----------------------------------------!
+  !                                        !
+  !   Write out the results for checking   !
+  !                                        !
+  !----------------------------------------!
+  x0 = x0 * x_scale
+  x1 = x1 * x_scale
+  x2 = x2 * x_scale
+
+  !-----------------------------------!
+  !   Write out results for xmgrace   !
+  !-----------------------------------!
+  open(9, file='points.dat')
+  write(9,*) x0, y0
+  write(9,*) x1, y1
+  write(9,*) x2, y2
+  close(9)
+  print *, 'Created points.dat'
+
+  !-----------------------------------!
+  !   Write out results for xmgrace   !
+  !-----------------------------------!
+  open(9, file='curve.dat')
+  do k = 0, PLT_POINTS
+    x = x0 + (x2-x0)/real(PLT_POINTS) * k
+    y = a_coef * exp(b_coef * x) + c_coef
+    write(9,*) x, y
+  end do
+  close(9)
+  print *, 'Created curves.dat'
 
   end program
