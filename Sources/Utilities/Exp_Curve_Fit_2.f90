@@ -35,7 +35,7 @@
   integer, parameter :: MAX_ITER   =   64
   integer, parameter :: PLT_POINTS = 1024
   integer, parameter :: N_SAMPLES  =    8
-  real,    parameter :: TOLERANCE  =    1.0e-8
+  real,    parameter :: REL_TOLER  =    1.0e-3
   logical, parameter :: DEBUG      = .true.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
@@ -49,10 +49,10 @@
   x0 = 0.0
   y0 = 0.5
 
-  x1 = 0.005e-6
+  x1 = 0.005
   y1 = -5.3244798523939757E-004
 
-  x2 = 0.015e-6
+  x2 = 0.015
   y2 = -8.8180312077764597E-002
 
   print *, 'x0, y0, ', x0, y0
@@ -112,11 +112,16 @@
   !--------------------------------------------------!
   do i = 1, MAX_ITER
 
+    if(DEBUG) print *, '------------------------'
+    if(DEBUG) print *, 'Iteration: ', i
+    if(DEBUG) print *, '------------------------'
+
     ! Compute errors for the entire range of samples
     do k = 1, N_SAMPLES
       e_array(k) = (exp(b_array(k)*x1) - 1.0)   &
                  / (exp(b_array(k)*x2) - 1.0)   &
                  - d
+      if(DEBUG) print *, b_array(k), e_array(k)
     end do
 
     ! Find the two samples which change the sign in error and set
@@ -130,7 +135,8 @@
 1   continue
 
     ! Check if desired tolerance has been reached
-    if(abs(b_array(1) - b_array(N_SAMPLES)) < TOLERANCE) goto 2
+    if(  abs(b_array(1) - b_array(N_SAMPLES))  &
+       < abs(b_array(1) + b_array(N_SAMPLES)) * REL_TOLER) goto 2
 
   end do
 
