@@ -35,6 +35,9 @@
   print *, 'x1, y1, ', x1, y1
   print *, 'x2, y2, ', x2, y2
 
+  !---------------------------------------------------!
+  !   Fit Exponential Function Through Three Points   !
+  !---------------------------------------------------!
   call Math % Fit_Exponential_Function_Through_Three_Points(x0, y0,  &
                                                             x1, y1,  &
                                                             x2, y2,  &
