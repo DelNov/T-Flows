@@ -18,18 +18,20 @@
   type Math_Type
 
     contains
-      procedure :: Approx_Real
-      procedure :: Approx_String
-      procedure :: Cross_Product
-      procedure :: Distance
-      procedure :: Distance_Squared
-      procedure :: Gaussian_Elimination
-      procedure :: Harmonic_Mean
-      procedure :: Invert_3x3_Matrix
-      procedure :: Rotate_Vector
-      procedure :: Smaller_Real
-      procedure :: Tet_Inertia
-      procedure :: Tet_Volume
+      procedure          :: Approx_Real
+      procedure          :: Approx_String
+      procedure          :: Cross_Product
+      procedure          :: Distance
+      procedure          :: Distance_Squared
+      procedure          :: Fit_Exponential_Function_Through_Three_Points
+      procedure          :: Gaussian_Elimination
+      procedure          :: Harmonic_Mean
+      procedure          :: Invert_3x3_Matrix
+      procedure          :: Rotate_Vector
+      procedure, private :: Set_Array_Range
+      procedure          :: Smaller_Real
+      procedure          :: Tet_Inertia
+      procedure          :: Tet_Volume
 
   end type
 
@@ -46,10 +48,12 @@
   include 'Math_Mod/Cross_Product.f90'
   include 'Math_Mod/Distance.f90'
   include 'Math_Mod/Distance_Squared.f90'
+  include 'Math_Mod/Fit_Exponential_Function_Through_Three_Points.f90'
   include 'Math_Mod/Gaussian_Elimination.f90'
   include 'Math_Mod/Harmonic_Mean.f90'
   include 'Math_Mod/Invert_3x3_Matrix.f90'
   include 'Math_Mod/Rotate_Vector.f90'
+  include 'Math_Mod/Set_Array_Range.f90'
   include 'Math_Mod/Smaller_Real.f90'
   include 'Math_Mod/Tet_Inertia.f90'
   include 'Math_Mod/Tet_Volume.f90'
