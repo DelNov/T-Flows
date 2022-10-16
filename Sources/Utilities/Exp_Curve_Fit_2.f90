@@ -1,27 +1,48 @@
 !==============================================================================!
+  subroutine Set_Range(n, minv, maxv, array)
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  integer, intent(in)  :: n
+  real   , intent(in)  :: minv, maxv
+  real,    intent(out) :: array(n)
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: i
+  real    :: delta
+!==============================================================================!
+
+  array(1) = minv
+  array(n) = maxv
+  delta = (maxv-minv) / real(n-1.0)
+  do i = 1, n
+    array(i) = minv + delta * (i-1)
+  end do
+
+  end subroutine
+
+!==============================================================================!
   program Exp_Curve_Fit
 !------------------------------------------------------------------------------!
 !   The program fits exponential curve of the form:                            !
 !                                                                              !
 !   y = a * exp(b*x) + c                                                       !
 !                                                                              !
-!   through three specified points                                             !
+!   through three specified points.  It is assumed, however, that coordinate   !
+!   system starts at zero.  Like, the wall starts at zero.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MAX_ITER  = 5000
-  real,    parameter :: TOLERANCE = 1.0e-8
+  integer, parameter :: MAX_ITER   =   64
+  integer, parameter :: PLT_POINTS = 1024
+  integer, parameter :: N_SAMPLES  =    8
+  real,    parameter :: RANGE_MIN  =   -1.0e+5
+  real,    parameter :: RANGE_MAX  =   +1.0e+5
+  real,    parameter :: TOLERANCE  =    1.0e-8
+  logical, parameter :: DEBUG      = .true.
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: k
-  real    :: x0, x1, x2, y0, y1, y2, x0_old, x1_old, x2_old
-  real    :: dx1, dx2, cx1, cx2, dy1, dy2, dydx1, dydx2
-  real    :: y_min, y_max, a_coef, a_coef1, a_coef2, b_coef
-  real    :: c_coef, c_coef0, c_coef1, c_coef2, y1c, y2c
-  real    :: growth_fac1, growth_fac2, aver_gf, deviation
-  real    :: deviation_old, c_coef_fine, ee1, ee2
-  real    :: s_x, s_y, s_xy, s_x2, x_avg, y_avg, slope, const
-  real    :: y0_ls, y1_ls, y2_ls, deno, sign_coef, delta_c
-  real    :: c_coef_old, dev_test, x_scale, delta_c_scale
+  integer :: i, j, k
+  real    :: x, y, x0, y0, x1, y1, x2, y2
+  real    :: a, b, c, d, b_array(N_SAMPLES), e_array(N_SAMPLES)
 !==============================================================================!
 
   !----------------------------------------!
@@ -40,197 +61,135 @@
   print *, 'x1, y1, ', x1, y1
   print *, 'x2, y2, ', x2, y2
 
-  !------------------------------------------!
-  !   Scale x axis in order to avoid large   !
-  !    number in expression for deviation    !
-  !------------------------------------------!
-  x_scale = max(x0, x1, x2) - min(x0, x1, x2)
+  !------------------------------------------------!
+  !   Since x0 is zero, at x0:                     !
+  !                                                !
+  !   y0 = a + c  or                               !
+  !   c  = y0 - a                                  !
+  !   y = a * exp(b*x) + y0 - a                    !
+  !   y = y0 + a * (exp(b*x) - 1)                  !
+  !                                                !
+  !   Dividing equations at x1 and x2:             !
+  !                                                !
+  !   y1 = y0 + a * (exp(b*x1) - 1)                !
+  !   y2 = y0 + a * (exp(b*x2) - 1)                !
+  !                                                !
+  !   y1 - y0 = a * (exp(b*x1) - 1)                !
+  !   y2 - y0 = a * (exp(b*x2) - 1)                !
+  !                                                !
+  !   we get:                                      !
+  !                                                !
+  !   y1 - y0   exp(b*x1) - 1                      !
+  !   ------- = -------------                      !
+  !   y2 - y0   exp(b*x2) - 1                      !
+  !                                                !
+  !   or:                                          !
+  !        exp(b*x1) - 1              y1 - y0      !
+  !   d =  -------------  where:  d = -------      !
+  !        exp(b*x2) - 1              y2 - y0      !
+  !                                                !
+  !   The last expression will be used in Newton   !
+  !   Raphson like iterations (within samples) to  !
+  !   minimize the error:                          !
+  !                                                !
+  !        exp(b*x1) - 1                           !
+  !   e =  -------------  - d                      !
+  !        exp(b*x2) - 1                           !
+  !------------------------------------------------!
 
-  x0_old = x0
-  x1_old = x1
-  x2_old = x2
+  ! Calculate coefficient d
+  d = (y1 - y0) / (y2 - y0)
 
-  x0 = 0.0
-  x1 = (x1_old - x0_old) / x_scale
-  x2 = (x2_old - x0_old) / x_scale
+  if(DEBUG) print *, 'd = ', d
 
-  dx1 = x1 - x0
-  dx2 = x2 - x1
+  ! Set initial range for b
+  call Set_Range(N_SAMPLES, RANGE_MIN, RANGE_MAX, b_array)
 
-  dy1 = y1 - y0
-  dy2 = y2 - y1
+  !--------------------------------------------------!
+  !                                                  !
+  !   Browse throut Newton-Raphson like iterations   !
+  !                                                  !
+  !--------------------------------------------------!
+  do i = 1, MAX_ITER
 
-  cx1 = 0.5*(x0+x1)
-  cx2 = 0.5*(x1+x2)
+    ! Compute errors for the entire range of samples
+    do k = 1, N_SAMPLES
+      e_array(k) = (exp(b_array(k)*x1) - 1.0)   &
+                 / (exp(b_array(k)*x2) - 1.0)   &
+                 - d
+    end do
 
-  dydx1 = dy1/dx1
-  dydx2 = dy2/dx2
+    ! Find the two samples which change the sign in error and set
+    ! them as new bounding values for array of coefficitens b
+    do j = 2, N_SAMPLES
+      if(e_array(j-1) * e_array(j) < 0.0) then
+        call Set_Range(N_SAMPLES, b_array(j-1), b_array(j), b_array)
+        goto 1
+      end if
+    end do
+1   continue
 
-  y_min = min(y0, y1, y2)
-  y_max = max(y0, y1, y2)
+    ! Check if desired tolerance has been reached
+    if(abs(b_array(1) - b_array(N_SAMPLES)) < TOLERANCE) goto 2
 
-  !--------------------------------------!
-  !   First estimation of coefficients   !
-  !--------------------------------------!
-
-  ! First estimation of b coef.
-  b_coef = log(abs(dydx2/dydx1)) / (cx2 - cx1)
-
-  ! First estimation of a coef.
-  a_coef1 = dy1 / (exp(b_coef*x1) - exp(b_coef*x0))
-  a_coef2 = dy2 / (exp(b_coef*x2) - exp(b_coef*x1))
-
-  a_coef  = 0.5 * (a_coef1 + a_coef2)
-
-  print *, 'First approx a = ', a_coef
-  print *, 'First approx b = ', b_coef
-
-  ! First estimation of c coef.
-  c_coef0 = y0 - a_coef * exp(b_coef*x0)
-  c_coef1 = y1 - a_coef * exp(b_coef*x1)
-  c_coef2 = y2 - a_coef * exp(b_coef*x2)
-
-  c_coef     = (c_coef0 + c_coef1 + c_coef2) / 3.0
-  c_coef_old = c_coef
-
-  print *, 'First approx c = ', c_coef
-
-  y1c    = (y1 - c_coef)/(y0 - c_coef)
-  y2c    = (y2 - c_coef)/(y1 - c_coef)
-
-  !-------------------------------------------------------!
-  !   New estimaton of c_coef by forcing that c_coef is   !
-  !   not falling into the range defined by y0 and y2.    !
-  !-------------------------------------------------------!
-  c_coef = c_coef/abs(c_coef) * min(abs(y0),abs(y2))
-
-  if(max(abs(dy1/dx1),  &
-         abs(dy2/dx2)) / x_scale < 50.0) then
-    delta_c_scale = 0.001
-
-  else if(max(abs(dy1/dx1),                         &
-              abs(dy2/dx2)) / x_scale > 50.0 .and.  &
-          max(abs(dy1/dx1),                         &
-              abs(dy2/dx2)) / x_scale < 400) then
-    delta_c_scale = 0.00001
-  else
-    delta_c_scale = 0.000001
-  end if
-
-  if(a_coef > 0.0) then
-    delta_c = - abs(c_coef) * delta_c_scale
-  else
-    delta_c =   abs(c_coef) * delta_c_scale
-  end if
-
-  c_coef = c_coef + delta_c
-
-  write(*,*) 'New estimation of c_coef ', c_coef
-
-  ! Fine tunning of c coef.
-  y1c = (y1 - c_coef) /(y0 - c_coef)
-  y2c = (y2 - c_coef) /(y1 - c_coef)
-
-  ee1 = log(y1c)
-  ee2 = log(y2c)
-
-  growth_fac1 = exp(ee1/dx1)
-  growth_fac2 = exp(ee2/dx2)
-
-  aver_gf = ee1 + ee2
-
-  b_coef  = aver_gf / (x2 - x0)
-  write(*,*) 'New estimation of b_coef ', b_coef
-
-  aver_gf = exp(aver_gf/(x2 - x0))
-
-  deviation_old = (abs(aver_gf - growth_fac1)  &
-                 + abs(aver_gf - growth_fac2))
-
-  c_coef_old = c_coef
-
-  do k = 1, MAX_ITER
-    c_coef_old = c_coef
-    c_coef     = c_coef + delta_c
-
-    y1c = ((y1 - c_coef)/(y0 - c_coef))
-    y2c = ((y2 - c_coef)/(y1 - c_coef))
-
-    ee1 = log(y1c)
-    ee2 = log(y2c)
-
-    growth_fac1 = exp(ee1/dx1)
-    growth_fac2 = exp(ee2/dx2)
-
-    aver_gf = ee1 + ee2
-    b_coef  = aver_gf / (x2 - x0)
-
-    aver_gf = exp(aver_gf/(x2 - x0))
-
-    deviation = (abs(aver_gf - growth_fac1)   &
-               + abs(aver_gf - growth_fac2))
-
-!   print *, 'new dev ', deviation, 'old dev ', deviation_old
-
-    dev_test = deviation_old
-
-    if(deviation < deviation_old) then
-      deviation_old = deviation
-      c_coef_fine = c_coef
-    end if
-
-    if(abs(dev_test - deviation_old) < TOLERANCE) then
-      if(k == 1) c_coef_fine = c_coef
-      print *, 'Converged in ', k, ' iterations'
-      goto 1
-    end if
   end do
 
-1 continue
+2 continue
+  if(DEBUG) print *, 'Converged in ', i, 'iterations'
+  b = 0.5 * (b_array(1) + b_array(N_SAMPLES))
 
-  c_coef = c_coef_fine
+  !-------------------------------------------!
+  !   At this point, coefficient b is known   !
+  !   and we can compute a from:              !
+  !                                           !
+  !   y2 - y0 = a * (exp(b*x2) - 1)           !
+  !                                           !
+  !   or:                                     !
+  !           y2 - y0                         !
+  !   a = ---------------                     !
+  !       (exp(b*x2) - 1)                     !
+  !                                           !
+  !-------------------------------------------!
+  a = y2 - y0 / (exp(b*x2) - 1.0)
 
-  write(*,*) 'c_coef after fine tunning ', c_coef
+  !------------------------------------------------!
+  !   We established before that:                  !
+  !                                                !
+  !   y0 = a + c  or:                              !
+  !                                                !
+  !   c = y0 - a                                   !
+  !------------------------------------------------!
+  c = y0 - a
 
-  !-----------------------------------------------------------------------!
-  !   Now we finalize the coefficients by using the least-square method   !
-  !-----------------------------------------------------------------------!
+  !----------------------------------------------!
+  !                                              !
+  !   At this point, coefficients are computed   !
+  !                                              !
+  !----------------------------------------------!
+  print *, 'a_coef new is ', a
+  print *, 'b_coef new is ', b
+  print *, 'c_coef new is ', c
 
-  if(c_coef > y_max) then
-    y0_ls = log(c_coef - y0)
-    y1_ls = log(c_coef - y1)
-    y2_ls = log(c_coef - y2)
-    sign_coef = -1.0
-  else
-    y0_ls = log(y0 - c_coef)
-    y1_ls = log(y1 - c_coef)
-    y2_ls = log(y2 - c_coef)
-    sign_coef = 1.0
-  end if
+  !-----------------------------------!
+  !   Write out results for xmgrace   !
+  !-----------------------------------!
+  open(9, file='points.dat')
+  write(9,*) x0, y0
+  write(9,*) x1, y1
+  write(9,*) x2, y2
+  close(9)
+  print *, 'Created points.dat'
 
-  y0_ls = log(abs(y0 - c_coef))
-  y1_ls = log(abs(y1 - c_coef))
-  y2_ls = log(abs(y2 - c_coef))
-
-  s_x   = x0 + x1 + x2
-  s_y   = y0_ls + y1_ls + y2_ls
-  s_xy  = x0*y0_ls + x1*y1_ls + x2*y2_ls
-  s_x2  = x0**2 + x1**2 + x2**2
-
-  x_avg = s_x / 3.0
-  y_avg = s_y / 3.0
-
-  deno = 3.0*s_x2 - s_x**2
-
-  slope = (3.0*s_xy -s_x*s_y) / deno
-  const = y_avg - (slope*x_avg)
-
-  a_coef = sign_coef * exp(const)
-  b_coef = slope / x_scale
-  c_coef = c_coef
-
-  print *, 'a_coef new is ', a_coef
-  print *, 'b_coef new is ', b_coef
-  print *, 'c_coef new is ', c_coef
+  !-----------------------------------!
+  !   Write out results for xmgrace   !
+  !-----------------------------------!
+  open(9, file='curve.dat')
+  do k = 0, PLT_POINTS
+    x = x0 + (x2-x0)/real(PLT_POINTS) * k
+    y = a * exp(b * x) + c
+    write(9,*) x, y
+  end do
+  close(9)
+  print *, 'Created curves.dat'
 
   end program
