@@ -55,7 +55,6 @@
   real, intent(out) :: a, b, c
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_ITER   =   64
-  integer, parameter :: PLT_POINTS = 1024
   integer, parameter :: N_SAMPLES  =    8
   real,    parameter :: REL_TOLER  =    1.0e-3
 !-----------------------------------[Locals]-----------------------------------!
