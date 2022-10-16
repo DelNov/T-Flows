@@ -35,8 +35,6 @@
   integer, parameter :: MAX_ITER   =   64
   integer, parameter :: PLT_POINTS = 1024
   integer, parameter :: N_SAMPLES  =    8
-  real,    parameter :: RANGE_MIN  =   -1.0e+5
-  real,    parameter :: RANGE_MAX  =   +1.0e+5
   real,    parameter :: TOLERANCE  =    1.0e-8
   logical, parameter :: DEBUG      = .true.
 !-----------------------------------[Locals]-----------------------------------!
@@ -51,10 +49,10 @@
   x0 = 0.0
   y0 = 0.5
 
-  x1 = 0.005
+  x1 = 0.005e-6
   y1 = -5.3244798523939757E-004
 
-  x2 = 0.015
+  x2 = 0.015e-6
   y2 = -8.8180312077764597E-002
 
   print *, 'x0, y0, ', x0, y0
@@ -103,7 +101,9 @@
   if(DEBUG) print *, 'd = ', d
 
   ! Set initial range for b
-  call Set_Range(N_SAMPLES, RANGE_MIN, RANGE_MAX, b_array)
+  call Set_Range(N_SAMPLES, -100.0/abs(x2),  &
+                            +100.0/abs(x2),  &
+                            b_array)
 
   !--------------------------------------------------!
   !                                                  !
