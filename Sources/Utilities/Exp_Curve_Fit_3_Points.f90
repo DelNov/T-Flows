@@ -1,3 +1,6 @@
+  include 'Const_Mod.f90'
+  include 'Math_Mod.f90'
+
 !==============================================================================!
   program Exp_Curve_Fit
 !------------------------------------------------------------------------------!
@@ -5,9 +8,6 @@
 !                                                                              !
 !   y = a * exp(b*x) + c                                                       !
 !                                                                              !
-!   Compile with:                                                              !
-!   gfortran -c ../Shared/Math_Mod.f90                                         !
-!   gfortran -o exp_fit Math_Mod.o Exp_Curve_Fit_2.f90                         !
 !------------------------------------------------------------------------------!
   use Math_Mod
 !------------------------------------------------------------------------------!
@@ -15,13 +15,13 @@
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: PLT_POINTS = 1000
 !-----------------------------------[Locals]-----------------------------------!
-  real    :: x, y, x0, y0, x1, y1, x2, y2, a, b, c
+  real    :: x, y, x0, y0, x1, y1, x2, y2, a, b, c, dy_dx_0
   integer :: k
 !==============================================================================!
 
-  !----------------------------------------!
-  !   Hard-code the desired three points   !
-  !----------------------------------------!
+  !----------------------------------!
+  !   Hard-code the desired values   !
+  !----------------------------------!
   x0 = 0.0
   y0 = 0.5
 
@@ -31,21 +31,33 @@
   x2 = 0.015
   y2 = -8.8180312077764597E-002
 
-  print *, 'x0, y0, ', x0, y0
-  print *, 'x1, y1, ', x1, y1
-  print *, 'x2, y2, ', x2, y2
+  print *, '--------------'
+  print *, 'Initial values'
+  print *, '--------------'
+  print *, 'dy/dx at 0 is unknown!'
+  print *, 'x0, y0     : ', x0, y0
+  print *, 'x1, y1     : ', x1, y1
+  print *, 'x2, y2     : ', x2, y2
 
   !---------------------------------------------------!
-  !   Fit Exponential Function Through Three Points   !
+  !   Fit exponential function through three points   !
   !---------------------------------------------------!
-  call Math % Fit_Exponential_Function_Through_Three_Points(x0, y0,  &
-                                                            x1, y1,  &
-                                                            x2, y2,  &
-                                                            a, b, c)
+  call Math % Fit_Exp_Three_Points(dy_dx_0,  &
+                                   x0, y0,   &
+                                   x1, y1,   &
+                                   x2, y2,   &
+                                   a, b, c)
 
-  print *, 'a_coef new is ', a
-  print *, 'b_coef new is ', b
-  print *, 'c_coef new is ', c
+  print *, '---------------'
+  print *, 'Computed values'
+  print *, '---------------'
+  print *, 'a_coef        : ', a
+  print *, 'b_coef        : ', b
+  print *, 'c_coef        : ', c
+  print *, 'dy/dx at 0 is ', dy_dx_0
+  print *, 'x0, y0     : ', x0, y0
+  print *, 'x1, y1     : ', x1, y1
+  print *, 'x2, y2     : ', x2, y2
 
   !-----------------------------------!
   !   Write out results for xmgrace   !
