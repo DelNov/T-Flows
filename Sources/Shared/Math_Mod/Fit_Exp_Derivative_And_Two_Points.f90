@@ -73,7 +73,7 @@
   integer, parameter :: MAX_ITER  = 64
   integer, parameter :: N_SAMPLES =  8
   real,    parameter :: REL_TOLER =  1.0e-3
-  logical, parameter :: DEBUG     = .true.
+  logical, parameter :: DEBUG     = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
   real    :: x, y, d, b_array(N_SAMPLES), e_array(N_SAMPLES), b_denom

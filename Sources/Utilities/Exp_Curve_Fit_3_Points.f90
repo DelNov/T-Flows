@@ -1,6 +1,3 @@
-  include 'Const_Mod.f90'
-  include 'Math_Mod.f90'
-
 !==============================================================================!
   program Exp_Curve_Fit
 !------------------------------------------------------------------------------!
@@ -8,6 +5,12 @@
 !                                                                              !
 !   y = a * exp(b*x) + c                                                       !
 !                                                                              !
+!   Compilation:                                                               !
+!                                                                              !
+!   gfortran -c ../Shared/Const_Mod.f90                                        !
+!   gfortran -c ../Shared/Math_Mod.f90                                         !
+!   gfortran -c Exp_Curve_Fit_2_Points.f90                                     !
+!   gfortran -o exp_3 Const_Mod.o Math_Mod.o Exp_Curve_Fit_3_Points.o          !
 !------------------------------------------------------------------------------!
   use Math_Mod
 !------------------------------------------------------------------------------!
