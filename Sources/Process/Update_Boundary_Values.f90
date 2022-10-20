@@ -26,13 +26,16 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   character(*)             :: update
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: EXTRAPOLATE_TEMPERATURE_EXPONENTIALLY = .true.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: c1, c2, s, sc
-  real                     :: kin_vis, u_tau
+  integer                  :: c0, c1, c2, i_fac, s, s1, sc
+  real                     :: kin_vis, u_tau, dt_dn
+  real                     :: a, b, c  ! exponential coefficients, redundant
 !==============================================================================!
 
   ! Take aliases
@@ -219,11 +222,12 @@
 
   !-------------------!
   !                   !
-  !   Heat transfer   !
+  !   Heat transfer   !  =--> the old way
   !                   !
   !-------------------!
   if( (update .eq. 'ENERGY' .or. update .eq. 'ALL') .and.  &
-      Flow % heat_transfer ) then
+      Flow % heat_transfer                          .and.  &
+      .not. EXTRAPOLATE_TEMPERATURE_EXPONENTIALLY) then
 
     ! Initialize variables for global heat transfer
     Flow % heat        = 0.0     ! [W]
@@ -260,6 +264,135 @@
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * Flow % conductivity(c1)  &
                       / Grid % wall_dist(c1)
+          end if
+
+        end if
+
+        ! Integrate heat and heated area
+        Flow % heat = Flow % heat + t % q(c2) * Grid % s(s)
+        if(abs(t % q(c2)) > TINY) then
+          Flow % heated_area = Flow % heated_area + Grid % s(s)
+        end if
+
+        if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .or.    &
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
+          t % n(c2) = t % n(c1)
+        end if
+
+      end if ! c2 < 0
+    end do ! s = 1, Grid % n_faces
+
+    !-----------------------------------------------!
+    !   Integrate (summ) heated area, and heat up   !
+    !-----------------------------------------------!
+    call Comm_Mod_Global_Sum_Real(Flow % heat)
+    call Comm_Mod_Global_Sum_Real(Flow % heated_area)
+    Flow % heat_flux = Flow % heat / max(Flow % heated_area, TINY)
+
+  end if  ! update energy and heat transfer
+
+  !-------------------!
+  !                   !
+  !   Heat transfer   !  =--> the new way
+  !                   !
+  !-------------------!
+  if( (update .eq. 'ENERGY' .or. update .eq. 'ALL') .and.  &
+      Flow % heat_transfer                          .and.  &
+      EXTRAPOLATE_TEMPERATURE_EXPONENTIALLY) then
+
+    ! Initialize variables for global heat transfer
+    Flow % heat        = 0.0     ! [W]
+    Flow % heat_flux   = 0.0     ! [W/m^2]
+    Flow % heated_area = 0.0     ! [m^2]
+
+    ! Find "off the wall" cell c0
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+
+      if(Grid % comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+        if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL .or.  &
+           Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
+          do i_fac = 1, Grid % cells_n_faces(c1)
+            s1 = Grid % cells_f(i_fac, c1)  ! side around c1
+            if(s1 .ne. s) then
+
+              ! Find the cell on the side opposite of wall cell c2
+              c0 = Grid % faces_c(1,s1) + Grid % faces_c(2,s1) - c1
+
+              ! Use wall distace criterion to tell if this is proper cell
+              if(Grid % wall_dist(c0) > 1.25 * Grid % wall_dist(c1)) goto 1
+            end if
+          end do
+        end if
+      end if
+
+      ! At this point, c0 is known
+1     continue
+
+      ! On the boundary perform the extrapolation
+      if(Grid % comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+
+        ! Wall temperature or heat fluxes for k-eps-zeta-f
+        ! and high-re k-eps models. 
+        if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
+           Turb % model .eq. HYBRID_LES_RANS .or.  &
+           Turb % model .eq. LES_DYNAMIC     .or.  &
+           Turb % model .eq. LES_WALE        .or.  &
+           Turb % model .eq. K_EPS) then
+          if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
+
+            dt_dn = t % q(c2) / Turb % con_w(c1)
+
+            ! Compute t % n(c2) by exponential fit
+            call Math % Fit_Exp_Derivative_And_Two_Points(  &
+                        dt_dn,                              &
+                        Grid % wall_dist(c2), t % n(c2),    &
+                        Grid % wall_dist(c1), t % n(c1),    &
+                        Grid % wall_dist(c0), t % n(c0),    &
+                        a, b, c)  ! redundant
+
+          else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
+
+            ! Compute dt/dn at the wall by exponential fit
+            call Math % Fit_Exp_Three_Points(               &
+                        dt_dn,                              &
+                        Grid % wall_dist(c2), t % n(c2),    &
+                        Grid % wall_dist(c1), t % n(c1),    &
+                        Grid % wall_dist(c0), t % n(c0),    &
+                        a, b, c)  ! redundant
+
+            t % q(c2) = dt_dn * Turb % con_w(c1)
+
+          end if
+
+        ! Wall temperature or heat fluxes for other trubulence models
+        else
+          if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
+
+            dt_dn = t % q(c2) / Flow % conductivity(c1)
+
+            ! Compute t % n(c2) by exponential fit
+            call Math % Fit_Exp_Derivative_And_Two_Points(  &
+                        dt_dn,                              &
+                        Grid % wall_dist(c2), t % n(c2),    &
+                        Grid % wall_dist(c1), t % n(c1),    &
+                        Grid % wall_dist(c0), t % n(c0),    &
+                        a, b, c)  ! redundant
+
+          else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
+
+            ! Compute dt/dn at the wall by exponential fit
+            call Math % Fit_Exp_Three_Points(               &
+                        dt_dn,                              &
+                        Grid % wall_dist(c2), t % n(c2),    &
+                        Grid % wall_dist(c1), t % n(c1),    &
+                        Grid % wall_dist(c0), t % n(c0),    &
+                        a, b, c)  ! redundant
+
+            t % q(c2) = dt_dn * Flow % conductivity(c1)
+
           end if
 
         end if
