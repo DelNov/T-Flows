@@ -99,9 +99,9 @@
   !                !
   !----------------!
   if(this_proc .eq. 1) then
-    write(f8) IN_3 // '<PPointData Scalars="scalars" vectors="velocity">' // LF
+    write(f8) IN_3 // '<PPointData>' // LF
   end if
-  write(f9,'(a,a)') IN_3, '<PointData Scalars="scalars" vectors="velocity">'
+  write(f9,'(a,a)') IN_3, '<PointData>'
 
   !--------------------!
   !   Particle i.d.s   !
@@ -268,7 +268,7 @@
   !-------------------------!
   if(this_proc .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//floatp                 //  &
-                      ' Name="ElementCoordinates'                 //  &
+                      ' Name="ElementCoordinates"'                //  &
                       ' NumberOfComponents="3" format="ascii"/>'  // LF
   end if
   write(f9,'(4a)') IN_4,                            &
