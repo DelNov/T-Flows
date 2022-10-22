@@ -76,7 +76,7 @@
   logical, parameter :: DEBUG     = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
-  real    :: x, y, d, b_array(N_SAMPLES), e_array(N_SAMPLES), b_denom
+  real    :: d, b_array(N_SAMPLES), e_array(N_SAMPLES)
 !==============================================================================!
 
   !-----------------------------!

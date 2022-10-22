@@ -64,7 +64,7 @@
   logical, parameter :: DEBUG     = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
-  real    :: x, y, d, b_array(N_SAMPLES), e_array(N_SAMPLES)
+  real    :: d, b_array(N_SAMPLES), e_array(N_SAMPLES)
 !==============================================================================!
 
   !-----------------------------!
