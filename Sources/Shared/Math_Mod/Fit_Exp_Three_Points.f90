@@ -53,7 +53,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Math_Type)  :: Math
   real, intent(out) :: dy_dx_0  ! unknown
-  real, intent(out) :: x0, y0   ! x0 is zero, y0 prescribed
+  real, intent(in)  :: x0, y0   ! x0 is zero, y0 prescribed
   real, intent(in)  :: x1, y1   ! prescribed
   real, intent(in)  :: x2, y2   ! prescribed
   real, intent(out) :: a, b, c
