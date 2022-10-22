@@ -79,7 +79,7 @@
     !   Point data   !
     !                !
     !----------------!
-    write(fu,'(a,a)') IN_3, '<PointData Scalars="scalars" vectors="velocity">'
+    write(fu,'(a,a)') IN_3, '<PointData>'
 
     !--------------------!
     !   Particle i.d.s   !
