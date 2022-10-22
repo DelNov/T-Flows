@@ -71,8 +71,8 @@ ifeq ($(FORTRAN), intel)
     FC = $(FCOMP)
   endif
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn all -check all \
-                 -debug all -fpe-all=0 -traceback
+    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn -warn all,noexternal  \
+                 -check all -debug all -fpe-all=0 -traceback
   else
     OPT_F_COMP = -module $(DIR_MODULE) -O3
   endif
