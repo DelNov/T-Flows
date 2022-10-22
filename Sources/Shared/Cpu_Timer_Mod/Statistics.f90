@@ -49,13 +49,13 @@
     line( 1:160) = ' '
     line( 1+I:63+I) =   &
                '#=============================================================#'
-    print *, trim(line)
+    print '(a96)', trim(line)
     line( 1+I:63+I) =   &
                '#                    CPU usage statistics                     #'
-    print *, trim(line)
+    print '(a96)', trim(line)
     line( 1+I:63+I) =   &
                '#-------------------------------------------------------------#'
-    print *, trim(line)
+    print '(a96)', trim(line)
     line( 1:160) = ' '
     line( 1+I:30+I) = '#            Total CPU time:  '
 
@@ -70,16 +70,16 @@
     write(line(37+I:38+I), '(i2.2)')  seconds
     write(line(40+I:50+I),  '(a11)') '[hhh:mm:ss]'
     line(63+I:63+I) = '#'
-    print *, trim(line)
+    print '(a96)', trim(line)
     line( 1+I:63+I) =  &
                '#-------------------------------------------+-----------------#'
-    print *, trim(line)
+    print '(a96)', trim(line)
     line( 1+I:63+I) =  &
                '#       Description of the activity:        |   Spent time:   #'
-    print *, trim(line)
+    print '(a96)', trim(line)
     line( 1+I:63+I) =   &
                '#-------------------------------------------+-----------------#'
-    print *, trim(line)
+    print '(a96)', trim(line)
 
     do f=1, Cpu_Timer % n_funct
       line( 1:160) = ' '
@@ -92,12 +92,12 @@
       write(line(50+I:55+I), '(f6.2)') Cpu_Timer % funct_time(f)  &
                                        / total_time * 100.0
       line(57+I:57+I) = '%'
-      print *, trim(line)
+      print '(a96)', trim(line)
     end do
 
     line( 1+I:63+I) =  &
                '#-------------------------------------------+-----------------#'
-    print *, trim(line)
+    print '(a96)', trim(line)
     print *, ''
 
   end if
