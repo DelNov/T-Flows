@@ -20,6 +20,8 @@
   integer             :: c, dir
 !==============================================================================!
 
+  call Cpu_Timer % Start('Load_Gambit')
+
   call File % Open_For_Reading_Ascii(file_name, fu)
 
   !------------------------------------------!
@@ -182,5 +184,7 @@
   call Grid % Print_Bnd_Cond_List()
 
   close(fu)
+
+  call Cpu_Timer % Stop('Load_Gambit')
 
   end subroutine

@@ -30,6 +30,9 @@
   logical         :: city
 !==============================================================================!
 
+  ! Initialize program profler
+  call Cpu_Timer % Start('Main')
+
   ! Open with a logo
   call Logo_Con
 
@@ -189,5 +192,9 @@
     end if
 
   end do
+
+  ! Finalize program profler
+  call Cpu_Timer % Stop('Main')
+  call Cpu_Timer % Statistics(indent=1)
 
   end program

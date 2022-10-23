@@ -101,6 +101,8 @@
 !                                                                              !
 !==============================================================================!
 
+  call Cpu_Timer % Start('Calculate_Geometry')
+
   ! An error trap for c1 and c2
   do s = 1, Grid % n_faces
     if(Grid % faces_c(2,s) > 0) then
@@ -736,5 +738,7 @@
   call Grid % Calculate_Face_Interpolation()
 
   print *, '# Interpolation factors calculated !'
+
+  call Cpu_Timer % Stop('Calculate_Geometry')
 
   end subroutine

@@ -35,6 +35,8 @@
   include 'Cells_Faces_Nodes.f90'
 !==============================================================================!
 
+  call Cpu_Timer % Start('Find_Faces')
+
   allocate(face_n1(Grid % n_cells*6))
   allocate(face_n2(Grid % n_cells*6))
   allocate(face_n3(Grid % n_cells*6))
@@ -179,5 +181,7 @@
   deallocate(face_cell)
   deallocate(starts)
   deallocate(ends)
+
+  call Cpu_Timer % Stop('Find_Faces')
 
   end subroutine

@@ -32,6 +32,8 @@
   integer, parameter :: MSH_PYRA  = 7
 !==============================================================================!
 
+  call Cpu_Timer % Start('Load_Gmsh')
+
   ! Open the file in binary mode, because it just might be
   call File % Open_For_Reading_Binary(file_name, fu)
 
@@ -517,5 +519,7 @@
   call Grid % Print_Bnd_Cond_List()
 
   close(fu)
+
+  call Cpu_Timer % Stop('Load_Gmsh')
 
   end subroutine
