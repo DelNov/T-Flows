@@ -12,6 +12,8 @@
   character(SL) :: name_out
 !==============================================================================!
 
+  call Cpu_Timer % Start('Save_Dim')
+
   !----------------------!
   !                      !
   !   Create .dim file   !
@@ -129,5 +131,7 @@
   write(fu) Grid % per_z
 
   close(fu)
+
+  call Cpu_Timer % Stop('Save_Dim')
 
   end subroutine

@@ -15,6 +15,8 @@
   real          :: mag
 !==============================================================================!
 
+  call Cpu_Timer % Start('Save_Vtu_Faces')
+
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
@@ -299,5 +301,7 @@
   write(fu) IN_0 // '</VTKFile>' // LF
 
   close(fu)
+
+  call Cpu_Timer % Stop('Save_Vtu_Faces')
 
   end subroutine

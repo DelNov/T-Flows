@@ -18,6 +18,8 @@
   character(SL) :: name_out
 !==============================================================================!
 
+  call Cpu_Timer % Start('Save_Cfn')
+
   !----------------------!
   !                      !
   !   Create .cfn file   !
@@ -305,5 +307,7 @@
   end do
 
   close(fu)
+
+  call Cpu_Timer % Stop('Save_Cfn')
 
   end subroutine

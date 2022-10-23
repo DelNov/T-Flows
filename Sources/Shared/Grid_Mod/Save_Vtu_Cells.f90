@@ -16,6 +16,8 @@
   character(DL*2) :: str1, str2
 !==============================================================================!
 
+  call Cpu_Timer % Start('Save_Vtu_Cells')
+
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
@@ -399,5 +401,7 @@
     close(fu)
 
   end if
+
+  call Cpu_Timer % Stop('Save_Vtu_Cells')
 
   end subroutine
