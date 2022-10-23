@@ -130,6 +130,7 @@ OPT_LINK = $(OPT_F_COMP)
 
 # Modules in shared directories
 SRC_F_MOD = Const_Mod.f90          \
+            Cpu_Timer_Mod.f90      \
             Comm_Mod_Seq.f90       \
             Math_Mod.f90           \
             File_Mod.f90           \
