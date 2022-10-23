@@ -447,7 +447,7 @@
   end do
 
   call Cpu_Timer % Stop('Main')
-  call Cpu_Timer % Statistics
+  call Cpu_Timer % Statistics(indent=33)
 
   !--------------------------!
   !   Finalize the solvers   !
