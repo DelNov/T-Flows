@@ -16,11 +16,11 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid           ! grid to be divided
   integer         :: n_sub
-  real            :: start, finish  ! variables to time the program
+  real            :: p_start, p_end  ! variables to time the program
   character(SL)   :: arg
 !==============================================================================!
 
-  call cpu_time(start)
+  call cpu_time(p_start)
 
   call Logo_Div
 
@@ -65,7 +65,7 @@
 
   call Save_Subdomains(Grid, 1)  ! Number of buffer levels is hard-coded now
 
-  call cpu_time(finish)
-  print '(a10,f14.3,a9)', ' # Time = ', finish-start, ' seconds.'
+  call cpu_time(p_end)
+  print '(a10,f14.3,a9)', ' # Time = ', p_end-p_start, ' seconds.'
 
   end program
