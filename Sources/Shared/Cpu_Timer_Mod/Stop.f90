@@ -1,21 +1,23 @@
 !==============================================================================!
   subroutine Stop(Cpu_Timer, f_name)
 !------------------------------------------------------------------------------!
+!   Stops a function by her name                                               !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Cpu_Timer_Type), target :: Cpu_Timer
   character(len=*)              :: f_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: f
+  integer :: i_fun
 !==============================================================================!
 
-  !-------------------------------------!
-  !   Find which function is stopping   !
-  !-------------------------------------!
+  !----------------------------------------------------------!
+  !   Find the rank (number) of function which is stopping   !
+  !----------------------------------------------------------!
 
   ! Browse through stored functions
-  do f = 1, Cpu_Timer % n_funct
-    if(f_name .eq. Cpu_Timer % funct_name(f)) then
+  do i_fun = 1, Cpu_Timer % n_functions
+    if(f_name .eq. Cpu_Timer % funct_name(i_fun)) then
       goto 2
     end if
   end do
@@ -32,14 +34,11 @@
   !-------------------------------------------------------------!
   !   Update the time for the function which is being stopped   !
   !-------------------------------------------------------------!
+  call Cpu_Timer % Update_By_Rank(i_fun)
 
-  ! Store the last time which was recorded
-  Cpu_Timer % time_prev = Cpu_Timer % time_curr
-
-  ! Refresh the value of time_curr
-  call cpu_time(Cpu_Timer % time_curr)
-
-  Cpu_Timer % funct_time(f) = Cpu_Timer % funct_time(f)  &
-                            + Cpu_Timer % time_curr - Cpu_Timer % time_prev
+  !-------------------------------------------------------!
+  !   Restart the function which was previously running   !
+  !-------------------------------------------------------!
+  Cpu_Timer % currently_running = Cpu_Timer % previously_running
 
   end subroutine

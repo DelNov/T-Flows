@@ -13,18 +13,19 @@
   !--------------------!
   type Cpu_Timer_Type
 
-    integer, private :: n_funct   =    0
-    integer, private :: new_funct =    0
-    integer, private :: old_funct =    0
+    integer, private :: n_functions        = 0
+    integer, private :: currently_running  = 0
+    integer, private :: previously_running = 0
 
     character(DL), private :: funct_name(MAX_FUNCT)
-    real,          private :: funct_time(MAX_FUNCT)  ! accumulated time
-    real,          private :: time_prev, time_curr
+    real(DP),      private :: funct_time(MAX_FUNCT)  ! accumulated time
+    real(DP),      private :: time_prev, time_curr
 
     contains
-      procedure :: Start
-      procedure :: Statistics
-      procedure :: Stop
+      procedure          :: Start
+      procedure          :: Statistics
+      procedure          :: Stop
+      procedure, private :: Update_By_Rank
 
   end type
 
@@ -39,5 +40,6 @@
   include 'Cpu_Timer_Mod/Start.f90'
   include 'Cpu_Timer_Mod/Statistics.f90'
   include 'Cpu_Timer_Mod/Stop.f90'
+  include 'Cpu_Timer_Mod/Update_By_Rank.f90'
 
   end module
