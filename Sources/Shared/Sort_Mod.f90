@@ -45,10 +45,10 @@
 
   end type
 
-  !-------------------------------------------!
-  !   Create one instance of Cpu_Timer type   !
-  !       for all other modules to use        !
-  !-------------------------------------------!
+  !--------------------------------------!
+  !   Create one instance of Sort type   !
+  !     for all other modules to use     !
+  !--------------------------------------!
   type(Sort_Type) :: Sort
 
   contains
