@@ -14,14 +14,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
   character(SL)   :: file_name
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MSH_TRI   = 2
-  integer, parameter :: MSH_QUAD  = 3
-  integer, parameter :: MSH_TETRA = 4
-  integer, parameter :: MSH_HEXA  = 5
-  integer, parameter :: MSH_WEDGE = 6
-  integer, parameter :: MSH_PYRA  = 7
-  integer, parameter :: SEEK_SET  = 0
 !-----------------------------------[Locals]-----------------------------------!
   integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
   integer                    :: n_memb, n_tags, n_crvs, n_nods
@@ -31,7 +23,13 @@
   integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
   character(SL), allocatable :: phys_names(:)
   logical                    :: ascii                 ! is file in ascii format?
-  integer(DP)                :: pos_names, pos_entis, pos_nodes, pos_elems
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: MSH_TRI   = 2
+  integer, parameter :: MSH_QUAD  = 3
+  integer, parameter :: MSH_TETRA = 4
+  integer, parameter :: MSH_HEXA  = 5
+  integer, parameter :: MSH_WEDGE = 6
+  integer, parameter :: MSH_PYRA  = 7
 !==============================================================================!
 
   call Profiler % Start('Load_Gmsh')
@@ -45,7 +43,7 @@
   Grid % polyhedral = .false.
 
   !------------------------------!
-  !   Check format of the file   !
+  !   Check format fo the file   !
   !------------------------------!
   rewind(fu)
   do
@@ -64,31 +62,26 @@
   if(line % tokens(2) .eq. '1') ascii = .false.
   ! Line which follows contains some crap, but who cares?
 
-  !------------------------------------------------------!
-  !   Find positions of important sections in the file   !
-  !------------------------------------------------------!
-  print *,'# Searching for offsets'
-  rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$PhysicalNames') call ftell(fu, pos_names)
-    if(line % tokens(1) .eq. '$Entities')      call ftell(fu, pos_entis)
-    if(line % tokens(1) .eq. '$Nodes')         call ftell(fu, pos_nodes)
-    if(line % tokens(1) .eq. '$Elements') then
-      call ftell(fu, pos_elems)
-      exit
-    end if
-  end do
+  !----------------------------------------------!
+  !                                              !
+  !                                              !
+  !   Read number of nodes, cells, blocks, ...   !
+  !                                              !
+  !                                              !
+  !----------------------------------------------!
 
   !-------------------------------------------------!
   !                                                 !
   !   Read number of blocks and boundary sections   !
   !                                                 !
   !-------------------------------------------------!
-  call fseek(fu, pos_names, SEEK_SET)
-
   n_blocks   = 0
   n_bnd_sect = 0
+  rewind(fu)
+  do
+    call File % Read_Line(fu)
+    if(line % tokens(1) .eq. '$PhysicalNames') exit
+  end do
   call File % Read_Line(fu)
   read(line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
@@ -111,8 +104,11 @@
   !   Read number of nodes   !
   !                          !
   !--------------------------!
-  call fseek(fu, pos_nodes, SEEK_SET)
-
+  rewind(fu)
+  do
+    call File % Read_Line(fu)
+    if(line % tokens(1) .eq. '$Nodes') exit
+  end do
   if(ascii) then
     call File % Read_Line(fu)
     read(line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
@@ -127,8 +123,11 @@
   !   Read number of elements (0D - 3D)  !
   !                                      !
   !--------------------------------------!
-  call fseek(fu, pos_elems, SEEK_SET)
-
+  rewind(fu)
+  do
+    call File % Read_Line(fu)
+    if(line % tokens(1) .eq. '$Elements') exit
+  end do
   if(ascii) then
     call File % Read_Line(fu)
     read(line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
@@ -147,7 +146,11 @@
   do run = 1, 2  ! in the first run find max index
     if(run .eq. 1) s_tag_max = 0
 
-    call fseek(fu, pos_entis, SEEK_SET)
+    rewind(fu)
+    do
+      call File % Read_Line(fu)
+      if(line % tokens(1) .eq. '$Entities') exit
+    end do
     if(ascii) then
       call File % Read_Line(fu)
       read(line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
@@ -257,10 +260,13 @@
   !   Count the inner and boundary cells   !
   !                                        !
   !----------------------------------------!
-  call fseek(fu, pos_elems, SEEK_SET)
-
   Grid % n_bnd_cells = 0
   Grid % n_cells     = 0
+  rewind(fu)
+  do
+    call File % Read_Line(fu)
+    if(line % tokens(1) .eq. '$Elements') exit
+  end do
 
   !-------------------------------!
   !   Read the number of groups   !
@@ -341,10 +347,14 @@
   !   Read boundary conditions for individual cells   !
   !                                                   !
   !---------------------------------------------------!
-  call fseek(fu, pos_elems, SEEK_SET)
-
   allocate(n_bnd_cells(n_bnd_sect))
   n_bnd_cells(:) = 0
+
+  rewind(fu)
+  do
+    call File % Read_Line(fu)
+    if(line % tokens(1) .eq. '$Elements') exit
+  end do
 
   !-------------------------------!
   !   Read the number of groups   !
@@ -425,7 +435,11 @@
   !   Read the nodal coordinates   !
   !                                !
   !--------------------------------!
-  call fseek(fu, pos_nodes, SEEK_SET)
+  rewind(fu)
+  do
+    call File % Read_Line(fu)
+    if(line % tokens(1) .eq. '$Nodes') exit
+  end do
 
   !-------------------------------!
   !   Read the number of groups   !
