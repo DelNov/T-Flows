@@ -18,7 +18,7 @@
   character(SL) :: name_out
 !==============================================================================!
 
-  call Cpu_Timer % Start('Save_Cfn')
+  call Profiler % Start('Save_Cfn')
 
   !----------------------!
   !                      !
@@ -308,6 +308,6 @@
 
   close(fu)
 
-  call Cpu_Timer % Stop('Save_Cfn')
+  call Profiler % Stop('Save_Cfn')
 
   end subroutine

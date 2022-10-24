@@ -25,7 +25,7 @@
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt
 !==============================================================================!
 
-  call Cpu_Timer % Start('Correct_Velocity')
+  call Profiler % Start('Correct_Velocity')
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -140,6 +140,6 @@
   ! User function
   call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 
-  call Cpu_Timer % Stop('Correct_Velocity')
+  call Profiler % Stop('Correct_Velocity')
 
   end subroutine

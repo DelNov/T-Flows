@@ -4,7 +4,7 @@
 !   Definition of variables used for all turbulence modelling paradigms.       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Cpu_Timer_Mod
+  use Profiler_Mod
   use Info_Mod
   use Numerics_Mod
   use Work_Mod

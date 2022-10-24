@@ -8,8 +8,8 @@
   integer :: n         ! time step
   real    :: sim_time  ! simulation time
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: hours, minutes, seconds
-  real    :: wall_time                ! number of seconds of wall-clock time
+  integer  :: hours, minutes, seconds
+  real(DP) :: wall_time                ! number of seconds of wall-clock time
 !==============================================================================!
 
   ! Update current system clock and wall time

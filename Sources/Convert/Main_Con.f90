@@ -31,7 +31,7 @@
 !==============================================================================!
 
   ! Initialize program profler
-  call Cpu_Timer % Start('Main')
+  call Profiler % Start('Main')
 
   ! Open with a logo
   call Logo_Con
@@ -194,7 +194,7 @@
   end do
 
   ! Finalize program profler
-  call Cpu_Timer % Stop('Main')
-  call Cpu_Timer % Statistics(indent=1)
+  call Profiler % Stop('Main')
+  call Profiler % Statistics(indent=1)
 
   end program

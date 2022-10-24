@@ -88,7 +88,7 @@
 !     cu*, cv*, cw*  [kgm/s^2]      [N]                                        !
 !==============================================================================!
 
-  call Cpu_Timer % Start('Compute_Momentum (without solvers)')
+  call Profiler % Start('Compute_Momentum (without solvers)')
 
   call Work % Connect_Real_Cell(cross)
 
@@ -364,7 +364,7 @@
       ! Under-relax the equations
       call Numerics_Mod_Under_Relax(ui, M, b)
 
-      call Cpu_Timer % Start('Linear_Solver_For_Momentum')
+      call Profiler % Start('Linear_Solver_For_Momentum')
 
       ! Call linear solver
       call Sol % Run(ui % solver,     &
@@ -379,7 +379,7 @@
                      ui % res,        &
                      norm = vel_max)
 
-      call Cpu_Timer % Stop('Linear_Solver_For_Momentum')
+      call Profiler % Stop('Linear_Solver_For_Momentum')
 
       ! Fill the info screen up
       if (Flow % p_m_coupling == SIMPLE) then
@@ -402,6 +402,6 @@
 
   call Work % Disconnect_Real_Cell(cross)
 
-  call Cpu_Timer % Stop('Compute_Momentum (without solvers)')
+  call Profiler % Stop('Compute_Momentum (without solvers)')
 
   end subroutine

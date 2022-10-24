@@ -4,7 +4,7 @@
 !   Looks boundary cells' parents for meshes in which they are not given       !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Cpu_Timer_Mod
+  use Profiler_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -22,7 +22,7 @@
   include 'Cells_Faces_Nodes.f90'
 !==============================================================================!
 
-  call Cpu_Timer % Start('Find_Parents')
+  call Profiler % Start('Find_Parents')
 
   print *, '#================================================='
   print *, '# Parent information not given in the input file!'
@@ -192,6 +192,6 @@
 
   end do  ! bc
 
-  call Cpu_Timer % Stop('Find_Parents')
+  call Profiler % Stop('Find_Parents')
 
   end subroutine

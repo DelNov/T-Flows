@@ -40,7 +40,7 @@
   end if
 
   ! OK, you are rading a backup, you may as well time it
-  call Cpu_Timer % Start('Backup_Mod_Load')
+  call Profiler % Start('Backup_Mod_Load')
 
   inquire(file=trim(name_in), exist=present )
   if(.not.present) then
@@ -397,6 +397,6 @@
   ! Close backup file
   call Comm % Close_File(fh)
 
-  call Cpu_Timer % Stop('Backup_Mod_Load')
+  call Profiler % Stop('Backup_Mod_Load')
 
   end subroutine

@@ -28,7 +28,7 @@
 
   call Work % Connect_Real_Node(phi_n)
 
-  call Cpu_Timer % Start('Creating_Surface_From_Vof_Function')
+  call Profiler % Start('Creating_Surface_From_Vof_Function')
 
   ! Take aliases
   Grid => Surf % pnt_grid
@@ -184,7 +184,7 @@
   call Surf % Calculate_Element_Centroids()
   call Surf % Calculate_Element_Normals()
 
-  call Cpu_Timer % Stop('Creating_Surface_From_Vof_Function')
+  call Profiler % Stop('Creating_Surface_From_Vof_Function')
 
   call Work % Disconnect_Real_Node(phi_n)
 

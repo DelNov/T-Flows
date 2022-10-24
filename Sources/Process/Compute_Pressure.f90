@@ -54,7 +54,7 @@
 !
 !==============================================================================!
 
-  call Cpu_Timer % Start('Compute_Pressure (without solvers)')
+  call Profiler % Start('Compute_Pressure (without solvers)')
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -192,7 +192,7 @@
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
-  call Cpu_Timer % Start('Linear_Solver_For_Pressure')
+  call Profiler % Start('Linear_Solver_For_Pressure')
 
   ! Set singularity to the matrix
   if(.not. Flow % has_pressure) then
@@ -217,7 +217,7 @@
     call Sol % Remove_Singular(A)
   end if
 
-  call Cpu_Timer % Stop('Linear_Solver_For_Pressure')
+  call Profiler % Stop('Linear_Solver_For_Pressure')
 
   if (Flow % p_m_coupling == SIMPLE) then
     call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
@@ -255,6 +255,6 @@
   ! Volume balance reporting
   call Flow % Report_Volume_Balance_Stop()
 
-  call Cpu_Timer % Stop('Compute_Pressure (without solvers)')
+  call Profiler % Stop('Compute_Pressure (without solvers)')
 
   end subroutine

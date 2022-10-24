@@ -162,7 +162,7 @@
   ! Underrelax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
-  call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start('Linear_Solver_For_Turbulence')
 
   ! Call linear solver to solve the equations
   call Sol % Run(phi % solver,     &
@@ -176,7 +176,7 @@
                  phi % tol,        &
                  phi % res)
 
-  call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then

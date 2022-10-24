@@ -12,7 +12,7 @@
   character(SL) :: name_out
 !==============================================================================!
 
-  call Cpu_Timer % Start('Save_Vtu_Edges')
+  call Profiler % Start('Save_Vtu_Edges')
 
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
@@ -123,6 +123,6 @@
   !---------------------!
   close(fu)
 
-  call Cpu_Timer % Stop('Save_Vtu_Edges')
+  call Profiler % Stop('Save_Vtu_Edges')
 
   end subroutine

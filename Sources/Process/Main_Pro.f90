@@ -52,7 +52,7 @@
 !==============================================================================!
 
   ! Initialize program profler
-  call Cpu_Timer % Start('Main')
+  call Profiler % Start('Main')
 
   ! Initialize control file names
   root_control = 'control'             ! root control file name
@@ -446,8 +446,8 @@
     call User_Mod_Before_Exit(Grid(d))
   end do
 
-  call Cpu_Timer % Stop('Main')
-  call Cpu_Timer % Statistics(indent=33)
+  call Profiler % Stop('Main')
+  call Profiler % Statistics(indent=33)
 
   !--------------------------!
   !   Finalize the solvers   !

@@ -24,7 +24,7 @@
   integer                    :: s, c, c1, c2, fu, corr
 !==============================================================================!
 
-  call Cpu_Timer % Start('Compute_Vof (without solvers)')
+  call Profiler % Start('Compute_Vof (without solvers)')
 
   call User_Mod_Beginning_Of_Compute_Vof(Vof, Sol, curr_dt)
 
@@ -254,6 +254,6 @@
 
   call User_Mod_End_Of_Compute_Vof(Vof, Sol, curr_dt)
 
-  call Cpu_Timer % Stop('Compute_Vof (without solvers)')
+  call Profiler % Stop('Compute_Vof (without solvers)')
 
   end subroutine

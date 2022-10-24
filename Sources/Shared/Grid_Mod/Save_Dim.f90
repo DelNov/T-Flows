@@ -12,7 +12,7 @@
   character(SL) :: name_out
 !==============================================================================!
 
-  call Cpu_Timer % Start('Save_Dim')
+  call Profiler % Start('Save_Dim')
 
   !----------------------!
   !                      !
@@ -132,6 +132,6 @@
 
   close(fu)
 
-  call Cpu_Timer % Stop('Save_Dim')
+  call Profiler % Stop('Save_Dim')
 
   end subroutine

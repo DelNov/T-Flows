@@ -51,7 +51,7 @@
   integer, parameter :: FACE_POLY  = 5  ! just a guess
 !==============================================================================!
 
-  call Cpu_Timer % Start('Load_Fluent')
+  call Profiler % Start('Load_Fluent')
 
   ! Open the file in binary mode, because it could be mixed
   call File % Open_For_Reading_Binary(file_name, fu)
@@ -1098,6 +1098,6 @@
 
   close(fu)
 
-  call Cpu_Timer % Stop('Load_Fluent')
+  call Profiler % Stop('Load_Fluent')
 
   end subroutine

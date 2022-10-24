@@ -11,7 +11,7 @@
   type(Grid_Type), pointer :: Grid
 !==============================================================================!
 
-  call Cpu_Timer % Start('Grad_Least_Variable')
+  call Profiler % Start('Grad_Least_Variable')
 
   ! Take alias
   Grid => Flow % pnt_grid
@@ -29,6 +29,6 @@
   call Grid % Exchange_Cells_Real(var % y)
   call Grid % Exchange_Cells_Real(var % z)
 
-  call Cpu_Timer % Stop('Grad_Least_Variable')
+  call Profiler % Stop('Grad_Least_Variable')
 
   end subroutine

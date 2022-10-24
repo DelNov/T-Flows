@@ -61,7 +61,7 @@
 !   heat flux                   Flow % heat_flux  [W/m^2]
 !==============================================================================!
 
-  call Cpu_Timer % Start('Compute_Energy (without solvers)')
+  call Profiler % Start('Compute_Energy (without solvers)')
 
   call Work % Connect_Real_Cell(cap_dens, q_int, q_turb, cross)
 
@@ -272,7 +272,7 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(t, A, b)
 
-  call Cpu_Timer % Start('Linear_Solver_For_Energy')
+  call Profiler % Start('Linear_Solver_For_Energy')
 
   ! Call linear solver to solve the equations
   call Sol % Run(t % solver,     &
@@ -286,7 +286,7 @@
                  t % tol,        &
                  t % res)
 
-  call Cpu_Timer % Stop('Linear_Solver_For_Energy')
+  call Profiler % Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
@@ -306,6 +306,6 @@
 
   call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb, cross)
 
-  call Cpu_Timer % Stop('Compute_Energy (without solvers)')
+  call Profiler % Stop('Compute_Energy (without solvers)')
 
   end subroutine

@@ -5,8 +5,7 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Cpu_Timer_Mod
-  use Comm_Mod
+  use Profiler_Mod
   use File_Mod
   use Boundary_Mod
   use Vtk_Mod

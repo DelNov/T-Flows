@@ -34,7 +34,7 @@
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
 
-  call Cpu_Timer % Start('Save_Vtu_Results')
+  call Profiler % Start('Save_Vtu_Results')
 
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
@@ -1037,6 +1037,6 @@
                                    save_04, save_05, save_06)
   call Work % Disconnect_Real_Cell(var_ins, v2_calc, kin_vis_t, phi_save)
 
-  call Cpu_Timer % Stop('Save_Vtu_Results')
+  call Profiler % Stop('Save_Vtu_Results')
 
   end subroutine

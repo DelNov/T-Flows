@@ -42,7 +42,7 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  call Cpu_Timer % Start('Compute_Turbulence (without solvers)')
+  call Profiler % Start('Compute_Turbulence (without solvers)')
 
   call Work % Connect_Real_Cell(phi_x, phi_y, phi_z, cross,       &
                                 u1uj_phij, u2uj_phij, u3uj_phij,  &
@@ -310,7 +310,7 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
-  call Cpu_Timer % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start('Linear_Solver_For_Turbulence')
 
   ! Call linear solver to solve the equations
   call Sol % Run(phi % solver,     &
@@ -324,7 +324,7 @@
                  phi % tol,        &
                  phi % res)
 
-  call Cpu_Timer % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop('Linear_Solver_For_Turbulence')
 
   ! Print info on the screen
   if( phi % name .eq. 'UU' )   &
@@ -368,6 +368,6 @@
                                    u1uj_phij, u2uj_phij, u3uj_phij,  &
                                    u1uj_phij_x, u2uj_phij_y, u3uj_phij_z)
 
-  call Cpu_Timer % Stop('Compute_Turbulence (without solvers)')
+  call Profiler % Stop('Compute_Turbulence (without solvers)')
 
   end subroutine

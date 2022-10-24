@@ -17,7 +17,7 @@
   real, contiguous, pointer :: phi_f_n(:), phi_f_o(:)
 !==============================================================================!
 
-  call Cpu_Timer % Start('Grad_Gauss_Variable')
+  call Profiler % Start('Grad_Gauss_Variable')
 
   call Work % Connect_Real_Face(phi_f_n, phi_f_o)
 
@@ -70,6 +70,6 @@
 
   call Work % Disconnect_Real_Face(phi_f_n, phi_f_o)
 
-  call Cpu_Timer % Stop('Grad_Gauss_Variable')
+  call Profiler % Stop('Grad_Gauss_Variable')
 
   end subroutine

@@ -25,7 +25,7 @@
   include 'Cells_Faces_Nodes.f90'
 !==============================================================================!
 
-  call Cpu_Timer % Start('Grid_Topology')
+  call Profiler % Start('Grid_Topology')
 
   !------------------------------!
   !   Count the boundary cells   !
@@ -133,6 +133,6 @@
   print '(a38,i9)', '# Number of boundary cells:          ', Grid % n_bnd_cells
   print '(a38,i9)', '# Number of faces on the boundary:   ', Grid % n_faces
 
-  call Cpu_Timer % Stop('Grid_Topology')
+  call Profiler % Stop('Grid_Topology')
 
   end subroutine

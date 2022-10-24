@@ -4,7 +4,7 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Cpu_Timer_Mod
+  use Profiler_Mod
   use Field_Mod
   use Vert_Mod
   use Elem_Mod

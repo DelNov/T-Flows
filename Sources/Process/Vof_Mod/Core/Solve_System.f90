@@ -23,7 +23,7 @@
   ! Get solver
   call Control_Mod_Solver_For_Vof(solver)
 
-  call Cpu_Timer % Start('Linear_Solver_For_Vof')
+  call Profiler % Start('Linear_Solver_For_Vof')
 
   ! Call linear solver to solve the equations
   call Sol % Run(fun % solver,     &
@@ -37,7 +37,7 @@
                  fun % tol,        &
                  fun % res)
 
-  call Cpu_Timer % Stop('Linear_Solver_For_Vof')
+  call Profiler % Stop('Linear_Solver_For_Vof')
 
   if(.not. Flow % heat_transfer) then
     call Info_Mod_Iter_Fill_At(1, 6, fun % name, fun % eniter, fun % res)

@@ -14,7 +14,7 @@
   character(SL)        :: answer
 !==============================================================================!
 
-  call Cpu_Timer % Start('Calculate_Wall_Distance')
+  call Profiler % Start('Calculate_Wall_Distance')
 
   !------------------------------------------------------------------!
   !   Calculate distance from the cell center to the nearest wall.   !
@@ -108,6 +108,6 @@
     deallocate(wall_colors)
   end if
 
-  call Cpu_Timer % Stop('Calculate_Wall_Distance')
+  call Profiler % Stop('Calculate_Wall_Distance')
 
   end subroutine

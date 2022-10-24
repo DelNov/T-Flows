@@ -37,7 +37,7 @@
   real, contiguous,  pointer :: u_f(:), v_f(:), w_f(:)
 !==============================================================================!
 
-  call Cpu_Timer % Start('Rhie_And_Chow')
+  call Profiler % Start('Rhie_And_Chow')
 
   call Work % Connect_Real_Cell(u_c, v_c, w_c, v_m, t_m, pst_x, pst_y, pst_z)
   call Work % Connect_Real_Face(pst_d, u_f, v_f, w_f)
@@ -234,6 +234,6 @@
   call Work % Disconnect_Real_Cell(u_c, v_c, w_c, v_m, t_m, pst_x, pst_y, pst_z)
   call Work % Disconnect_Real_Face(pst_d, u_f, v_f, w_f)
 
-  call Cpu_Timer % Stop('Rhie_And_Chow')
+  call Profiler % Stop('Rhie_And_Chow')
 
   end subroutine

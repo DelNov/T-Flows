@@ -22,7 +22,7 @@
   integer(DP)              :: d
 !==============================================================================!
 
-  call Cpu_Timer % Start('Backup_Mod_Save')
+  call Profiler % Start('Backup_Mod_Save')
 
   ! Take aliases
   Grid => Fld % pnt_grid
@@ -378,6 +378,6 @@
   ! Close backup file
   call Comm % Close_File(fh)
 
-  call Cpu_Timer % Stop('Backup_Mod_Save')
+  call Profiler % Stop('Backup_Mod_Save')
 
   end subroutine

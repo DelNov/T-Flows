@@ -206,7 +206,7 @@ else
 endif
 
 # Modules in shared directory
-SRC_F_MOD += Cpu_Timer_Mod.f90      \
+SRC_F_MOD += Profiler_Mod.f90       \
              Math_Mod.f90           \
              Swap_Mod.f90           \
              Sort_Mod.f90           \

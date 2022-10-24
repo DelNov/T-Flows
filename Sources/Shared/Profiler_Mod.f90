@@ -1,5 +1,5 @@
 !==============================================================================!
-  module Cpu_Timer_Mod
+  module Profiler_Mod
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
 !------------------------------------------------------------------------------!
@@ -9,17 +9,19 @@
   integer, parameter :: MAX_FUNCT = 2048
 
   !--------------------!
-  !   Cpu_Timer type   !
+  !   Profiler type   !
   !--------------------!
-  type Cpu_Timer_Type
+  type Profiler_Type
 
     integer, private :: n_functions        = 0
     integer, private :: currently_running  = 0
     integer, private :: previously_running = 0
 
     character(DL), private :: funct_name(MAX_FUNCT)
+    integer(DP),   private :: i_time_prev            ! system clock at prev
+    integer(DP),   private :: i_time_curr            ! system clock at current
+    integer(DP),   private :: sys_count_rate
     real(DP),      private :: funct_time(MAX_FUNCT)  ! accumulated time
-    real(DP),      private :: time_prev, time_curr
 
     contains
       procedure          :: Start
@@ -29,17 +31,17 @@
 
   end type
 
-  !-------------------------------------------!
-  !   Create one instance of Cpu_Timer type   !
-  !       for all other modules to use        !
-  !-------------------------------------------!
-  type(Cpu_Timer_Type) :: Cpu_Timer
+  !------------------------------------------!
+  !   Create one instance of Profiler type   !
+  !       for all other modules to use       !
+  !------------------------------------------!
+  type(Profiler_Type) :: Profiler
 
   contains
 
-  include 'Cpu_Timer_Mod/Start.f90'
-  include 'Cpu_Timer_Mod/Statistics.f90'
-  include 'Cpu_Timer_Mod/Stop.f90'
-  include 'Cpu_Timer_Mod/Update_By_Rank.f90'
+  include 'Profiler_Mod/Start.f90'
+  include 'Profiler_Mod/Statistics.f90'
+  include 'Profiler_Mod/Stop.f90'
+  include 'Profiler_Mod/Update_By_Rank.f90'
 
   end module

@@ -27,7 +27,7 @@
   include 'Front_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
-  call Cpu_Timer % Start('Creating_Front_From_Vof_Function')
+  call Profiler % Start('Creating_Front_From_Vof_Function')
 
   call Work % Connect_Real_Node(phi_n)
 
@@ -220,7 +220,7 @@
 
   call Work % Disconnect_Real_Node(phi_n)
 
-  call Cpu_Timer % Stop('Creating_Front_From_Vof_Function')
+  call Profiler % Stop('Creating_Front_From_Vof_Function')
 
   return
 
