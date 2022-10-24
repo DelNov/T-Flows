@@ -20,7 +20,7 @@
   character(SL)   :: arg
 !==============================================================================!
 
-  call cpu_time(p_start)
+  call cpu_time(p_start)  ! remark: cpu_time doesn't work with OPENMP
 
   call Logo_Div
 
@@ -65,7 +65,7 @@
 
   call Save_Subdomains(Grid, 1)  ! Number of buffer levels is hard-coded now
 
-  call cpu_time(p_end)
+  call cpu_time(p_end)  ! remark: cpu_time doesn't work with OPENMP
   print '(a10,f14.3,a9)', ' # Time = ', p_end-p_start, ' seconds.'
 
   end program
