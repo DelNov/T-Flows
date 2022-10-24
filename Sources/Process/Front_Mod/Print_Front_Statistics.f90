@@ -116,13 +116,13 @@
     line( 1:160) = ' '
     line( 1+T:63+T) =   &
                '#=============================================================#'
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:63+T) =   &
                '#                  Interface mesh statistics                  #'
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:63+T) =   &
                '#-------------------------------------------------------------#'
-    print *, trim(line)
+    print '(a)', trim(line)
 
     ! Number of elements (1), vertices (2) and sides (3)
     do item = 1, 3
@@ -136,12 +136,12 @@
       if(item.eq.2) write(line(32+T:37+T), '(i6)') n_verts_tot
       if(item.eq.3) line( 5+T: 5+T+20) = 'Number of sides:    '
       if(item.eq.3) write(line(32+T:37+T), '(i6)') n_sides_tot
-      print *, trim(line)
+      print '(a)', trim(line)
     end do
 
     line( 1+T:63+T) =  &
                '#-------------------------------------------------------------#'
-    print *, trim(line)
+    print '(a)', trim(line)
 
     ! Maximum (1) and minimum (2) element area
     ! Maximum (3) and minimum (4) side length
@@ -166,12 +166,12 @@
       if(item.eq.6) write(line(36+T:47+T), '(1pe12.5)') max_rat
       if(item.eq.7) line( 5+T: 5+T+33) = 'Minimum side ratio in element: '
       if(item.eq.7) write(line(36+T:47+T), '(1pe12.5)') min_rat
-      print *, trim(line)
+      print '(a)', trim(line)
     end do
 
     line( 1+T:63+T) =  &
                '#-------------------------------------------------------------#'
-    print *, trim(line)
+    print '(a)', trim(line)
 
     ! Number of neighbours
     do item = nne_s, nne_e
@@ -183,13 +183,13 @@
       write(line(33+T:34+T), '(i2)') item
       write(line(48+T:53+T), '(f6.2)') nne(item) / nv_tot * 100.0
       line(55+T:55+T) = '%'
-      print *, trim(line)
+      print '(a)', trim(line)
     end do
 
     line( 1+T:63+T) =  &
                '#-------------------------------------------------------------#'
-    print *, trim(line)
-    print *, ''
+    print '(a)', trim(line)
+    print '(a)', ''
 
   end if
 
