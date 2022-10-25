@@ -26,7 +26,7 @@
     end do
   end do
 
-  print *, '# Error message form Generator'
+  print *, '# ERROR in Generator'
   print *, '# You tried to define the line', n1, n2, ' but it'
   print *, '# doesn''t exists in the block specifications.'
   print *, '# Exiting !'

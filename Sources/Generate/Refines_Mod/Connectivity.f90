@@ -124,7 +124,7 @@
   !   Is there enough allocated memory   !
   !--------------------------------------!
   if( Grid % n_faces  > Grid % max_n_faces ) then
-    print *, '# Error message from Generator'
+    print *, '# ERROR in Generator'
     print *, '# The number sides is: ',              Grid % n_faces
     print *, '# There is space available only for:', Grid % max_n_faces
     print *, '# Increase the number of faces in .dom file'

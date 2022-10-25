@@ -168,7 +168,7 @@
       else if(Prim % edges_fb(1,Prim % n_edges) .ne. 0) then
         Prim % edges_fb(2,Prim % n_edges) = full_edge_fb(e)
       else
-        print *, 'ERROR'
+        print *, '# ERROR'
       end if
     end if
 
