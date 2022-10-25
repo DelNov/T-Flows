@@ -3,6 +3,10 @@
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use User_Mod
+  use Work_Mod
+!------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
   type(Field_Type),    target :: Flow
@@ -14,14 +18,13 @@
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
-  type(Var_Type),    pointer :: ut, vt, wt
   type(Face_Type),   pointer :: v_flux
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   integer                    :: c, s, c1, c2
   real                       :: a12, a21, con_eff
   real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, dt
-  real, contiguous,  pointer :: cap_dens(:), q_int(:), q_turb(:)
+  real, contiguous,  pointer :: cap_dens(:), q_int(:), q_turb(:), cross(:)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -49,8 +52,6 @@
 !   temperature                 t % n             [K]
 !   right hand s.               b                 [J/s]
 !   Turb. thermal conductivity  con_t_f           [W/(m K)]
-!   Turb. hear flux             ut                [(m K)/s]
-!   Turb. hear flux             ut_x_cap_dens_s   [J/(m^2 s)]
 !   Turb. stress                t_stress          [J/s]
 !   Turb. viscosity             vis_t             [kg/(m s)]
 !
@@ -59,9 +60,9 @@
 !   heat flux                   Flow % heat_flux  [W/m^2]
 !==============================================================================!
 
-  call Cpu_Timer % Start('Compute_Energy (without solvers)')
+  call Profiler % Start('Compute_Energy (without solvers)')
 
-  call Work % Connect_Real_Cell(cap_dens, q_int, q_turb)
+  call Work % Connect_Real_Cell(cap_dens, q_int, q_turb, cross)
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -69,7 +70,8 @@
   dt     =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
-  call Sol % Alias_Solver      (A, b)
+  call Sol % Alias_Native   (A, b)
+
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
@@ -184,9 +186,9 @@
     end if
 
     ! Cross diffusion part
-    t % c(c1) = t % c(c1) + f_ex - f_im
+    cross(c1) = cross(c1) + f_ex - f_im
     if(c2 > 0) then
-      t % c(c2) = t % c(c2) - f_ex + f_im
+      cross(c2) = cross(c2) - f_ex + f_im
     end if
 
     ! Put the influence of turbulent heat fluxes explicitly in the system
@@ -224,11 +226,11 @@
   !   cross diffusion, and heat from interface   !
   !----------------------------------------------!
   do c = 1, Grid % n_cells
-    if(t % c(c) >= 0) then
-      b(c)  = b(c) + t % c(c)
+    if(cross(c) >= 0) then
+      b(c)  = b(c) + cross(c)
     else
       A % val(A % dia(c)) = A % val(A % dia(c))  &
-                          - t % c(c) / (t % n(c) + MICRO)
+                          - cross(c) / (t % n(c) + MICRO)
     end if
     b(c) = b(c) + q_turb(c)
   end do
@@ -279,16 +281,18 @@
   call Numerics_Mod_Under_Relax(t, A, b)
 
   ! Call linear solver to solve the equations
-  call Cpu_Timer % Start('Linear_Solver_For_Energy')
-  call Sol % Bicg(A,            &
-                  t % n,        &
-                  b,            &
-                  t % precond,  &
-                  t % mniter,   &
-                  t % eniter,   &
-                  t % tol,      &
-                  t % res)
-  call Cpu_Timer % Stop('Linear_Solver_For_Energy')
+  call Profiler % Start('Linear_Solver_For_Energy')
+  call Sol % Run(t % solver,     &
+                 t % prec,       &
+                 t % prec_opts,  &
+                 A,              &
+                 t % n,          &
+                 b,              &
+                 t % mniter,     &
+                 t % eniter,     &
+                 t % tol,        &
+                 t % res)
+  call Profiler % Stop('Linear_Solver_For_Energy')
 
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
@@ -306,8 +310,8 @@
   ! User function
   call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
 
-  call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb)
+  call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb, cross)
 
-  call Cpu_Timer % Stop('Compute_Energy (without solvers)')
+  call Profiler % Stop('Compute_Energy (without solvers)')
 
   end subroutine
