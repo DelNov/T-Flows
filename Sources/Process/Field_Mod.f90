@@ -117,6 +117,9 @@
     real :: t_ref  ! [K]
     real :: beta   ! [1/K]
 
+    ! Exponential extrapolation of temperature to the walls
+    logical :: exp_temp_wall
+
     ! Scalars (like chemical species for example)
     integer                     :: n_scalars
     type(Var_Type), allocatable :: scalar(:)

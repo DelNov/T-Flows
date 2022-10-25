@@ -60,6 +60,7 @@
   call Control_Mod_Reference_Temperature       (Flow % t_ref,    .true.)
   call Control_Mod_Volume_Expansion_Coefficient(Flow % beta,     .true.)
   call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
+  call Control_Mod_Extrapolate_Temperature_Exp (Flow % exp_temp_wall, .true.)
 
   !---------------------------!
   !                           !

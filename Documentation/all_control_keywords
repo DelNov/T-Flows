@@ -104,6 +104,7 @@
   ANGULAR_VELOCITY_VECTOR                  |         0.0,  0.0,  0.0       |   any triplet of real numbers
   BUOYANCY                                 |         none                  |   thermal density
   DYNAMIC_VISCOSITY                        |         0.01                  |   physical property, any real number
+  EXTRAPOLATE_TEMPERATURE_EXP              |         no                    |   yes
   GRAVITATIONAL_VECTOR                     |         0.0,  0.0,  0.0       |   any triplet of real numbers
   HEAT_CAPACITY                            |         1.0                   |   any real number
   HEAT_TRANSFER                            |         no                    |   yes

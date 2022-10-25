@@ -3,8 +3,7 @@
                                   dy_dx_0,  &  ! unknown
                                   x0, y0,   &  ! x0=0, y0 is prescribed
                                   x1, y1,   &  ! prescribed
-                                  x2, y2,   &  ! prescribed
-                                  a, b, c)     ! unknown
+                                  x2, y2)      ! prescribed
 !------------------------------------------------------------------------------!
 !   This subroutine fits exponential curve of the form:                        !
 !                                                                              !
@@ -56,7 +55,6 @@
   real, intent(in)  :: x0, y0   ! x0 is zero, y0 prescribed
   real, intent(in)  :: x1, y1   ! prescribed
   real, intent(in)  :: x2, y2   ! prescribed
-  real, intent(out) :: a, b, c
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_ITER  = 64
   integer, parameter :: N_SAMPLES =  8
@@ -64,7 +62,7 @@
   logical, parameter :: DEBUG     = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
-  real    :: d, b_array(N_SAMPLES), e_array(N_SAMPLES)
+  real    :: a, b, c, d, b_array(N_SAMPLES), e_array(N_SAMPLES)
 !==============================================================================!
 
   !-----------------------------!

@@ -227,4 +227,7 @@
     include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90'
     include 'Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90'
 
+    ! Extrapolation to walls
+    include 'Control_Mod/Physics/Extrapolate_Temperature_Exp.f90'
+
   end module
