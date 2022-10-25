@@ -104,10 +104,6 @@
 
         ebf = Turb % Ebf_Momentum(c1)
 
-        if(Grid % Bnd_Cond_Type(c2) .eq. WALL) &
-        t % q(c2) = abs(Turb % con_w(c1)*(t % n(c1) &
-                    - t % n(c2))/Grid % wall_dist(c1))
-
         p_t2_wall  = Flow % density(c1)                                        &
                      * abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1))) &
                      * c_mu_theta5*sqrt(abs(t2 % n(c1))) &

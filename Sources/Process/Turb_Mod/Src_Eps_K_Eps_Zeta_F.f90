@@ -101,22 +101,6 @@
                                    kin_vis,               &
                                    z_o)
 
-        Turb % tau_wall(c1) = Turb % Tau_Wall_Log_Law(               &
-                                              Flow % density(c1),    &
-                                              u_tau,                 &
-                                              u_tan,                 &
-                                              Grid % wall_dist(c1),  &
-                                              Turb % y_plus(c1),     &
-                                              z_o)
-
-        u_tau_new = sqrt(Turb % tau_wall(c1) / Flow % density(c1))
-
-        Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
-                                   u_tau_new,             &
-                                   Grid % wall_dist(c1),  &
-                                   kin_vis,               &
-                                   z_o)
-
         eps_int = 2.0 * kin_vis * kin % n(c1)  &
                 / Grid % wall_dist(c1)**2
 
