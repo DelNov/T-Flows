@@ -94,9 +94,13 @@
   end do
 
   ! Cells' nodes
-  read(fu) ((Grid % cells_n(n, c),                     &
-             n = 1, abs(Grid % cells_n_nodes(c))),     &
-             c = -Grid % n_bnd_cells, Grid % n_cells)
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    call Adjust_First_Dim(abs(Grid % cells_n_nodes(c)),  &
+                          Grid % cells_n)
+    do n = 1, abs(Grid % cells_n_nodes(c))
+      read(fu) Grid % cells_n(n, c)
+    end do
+  end do
 
   ! Error trap for cells' nodes
   do c = -Grid % n_bnd_cells, Grid % n_cells
@@ -126,9 +130,12 @@
   end do
 
   ! Cells' faces
-  read(fu) ((Grid % cells_f(s, c),             &
-             s = 1, Grid % cells_n_faces(c)),  &
-             c = -Grid % n_bnd_cells, Grid % n_cells)
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    call Adjust_First_Dim(Grid % cells_n_faces(c), Grid % cells_f)
+    do s = 1, Grid % cells_n_faces(c)
+      read(fu) Grid % cells_f(s, c)
+    end do
+  end do
 
   ! Error trap for cells' faces
   do c = -Grid % n_bnd_cells, Grid % n_cells

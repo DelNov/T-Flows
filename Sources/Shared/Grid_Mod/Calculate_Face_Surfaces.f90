@@ -7,18 +7,25 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: s, i_nod, j_nod, n
-  real    :: xt(MAX_FACES_N_NODES), yt(MAX_FACES_N_NODES), zt(MAX_FACES_N_NODES)
+  integer           :: s, i_nod, j_nod, m, n
+  real, allocatable :: xf(:), yf(:), zf(:)
 !==============================================================================!
 
+  ! Allocate memory for face's node coordinates
+  m = size(Grid % faces_n, 1)
+  allocate(xf(m))
+  allocate(yf(m))
+  allocate(zf(m))
+
+  ! Do the actual calculation
   do s = 1, Grid % n_faces
 
     ! Copy face node coordinates to a local array for easier handling
     do i_nod = 1, Grid % faces_n_nodes(s)  ! local node counter
       n = Grid % faces_n(i_nod, s)         ! global node number
-      xt(i_nod) = Grid % xn(n)
-      yt(i_nod) = Grid % yn(n)
-      zt(i_nod) = Grid % zn(n)
+      xf(i_nod) = Grid % xn(n)
+      yf(i_nod) = Grid % yn(n)
+      zf(i_nod) = Grid % zn(n)
     end do
 
     ! Cell face components
@@ -29,11 +36,11 @@
       j_nod = i_nod + 1
       if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
       Grid % sx(s) = Grid % sx(s)  &
-                   + (yt(j_nod) - yt(i_nod)) * (zt(j_nod) + zt(i_nod))
+                   + (yf(j_nod) - yf(i_nod)) * (zf(j_nod) + zf(i_nod))
       Grid % sy(s) = Grid % sy(s)  &
-                   + (zt(j_nod) - zt(i_nod)) * (xt(j_nod) + xt(i_nod))
+                   + (zf(j_nod) - zf(i_nod)) * (xf(j_nod) + xf(i_nod))
       Grid % sz(s) = Grid % sz(s)  &
-                   + (xt(j_nod) - xt(i_nod)) * (yt(j_nod) + yt(i_nod))
+                   + (xf(j_nod) - xf(i_nod)) * (yf(j_nod) + yf(i_nod))
     end do
     Grid % sx(s) = 0.5 * Grid % sx(s)
     Grid % sy(s) = 0.5 * Grid % sy(s)

@@ -414,6 +414,7 @@
         c = new(c)         ! use T-Flows numbering
 
         Grid % cells_n_nodes(c) = n_nods
+        call Adjust_First_Dim(n_nods, Grid % cells_n)
         Grid % cells_n(1:n_nods, c) = int8_array(2:n_nods+1)
 
       end if

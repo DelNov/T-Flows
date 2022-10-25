@@ -55,6 +55,8 @@
           Grid % cells_n(4,-Grid % n_bnd_cells) = Grid % cells_n(hex(j,4),i)
 
           Grid % faces_n_nodes(Grid % n_faces) = 4
+          call Adjust_First_Dim(4, Grid % faces_n)
+          call Adjust_First_Dim(4, Grid % cells_n)
           Grid % faces_n(1:4, Grid % n_faces)  =   &
           Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
@@ -68,6 +70,8 @@
             Grid % cells_n(4,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,4),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 4
+            call Adjust_First_Dim(4, Grid % faces_n)
+            call Adjust_First_Dim(4, Grid % cells_n)
             Grid % faces_n(1:4, Grid % n_faces)  =   &
             Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
@@ -78,6 +82,8 @@
             Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(wed(j,3),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 3
+            call Adjust_First_Dim(3, Grid % faces_n)
+            call Adjust_First_Dim(3, Grid % cells_n)
             Grid % faces_n(1:3, Grid % n_faces)  =   &
             Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
@@ -91,6 +97,8 @@
             Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(tet(j,3),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 3
+            call Adjust_First_Dim(3, Grid % faces_n)
+            call Adjust_First_Dim(3, Grid % cells_n)
             Grid % faces_n(1:3, Grid % n_faces)  =   &
             Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
@@ -105,6 +113,8 @@
             Grid % cells_n(4,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,4),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 4
+            call Adjust_First_Dim(4, Grid % faces_n)
+            call Adjust_First_Dim(4, Grid % cells_n)
             Grid % faces_n(1:4, Grid % n_faces)  =   &
             Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
@@ -115,6 +125,8 @@
             Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(pyr(j,3),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 3
+            call Adjust_First_Dim(3, Grid % faces_n)
+            call Adjust_First_Dim(3, Grid % cells_n)
             Grid % faces_n(1:3, Grid % n_faces)  =   &
             Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if

@@ -11,24 +11,24 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: BIG     = 2147483647  ! Euler's prime number
+  logical, parameter :: VERBOSE = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, n, c, c1, c2, n_bc, color
+  integer              :: s, m, n, c, c1, c2, n_bc, color
   integer, allocatable :: old_nn  (:)
   integer, allocatable :: old_shad(:)
   integer, allocatable :: old_nods(:,:)
   real,    allocatable :: old_bxyz(:,:)
   integer, allocatable :: criteria(:,:)
-  integer, parameter   :: BIG     = 2147483647  ! Euler's prime number
-  logical, parameter   :: VERBOSE = .false.
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: M = MAX_FACES_N_NODES
 !==============================================================================!
 
   ! Allocate memory
+  m = size(Grid % faces_n, 1)
   allocate(criteria(Grid % n_faces, 3))  ! 2nd ind smaller for memory alignemnt
   allocate(old_nn  (   Grid % n_faces))  ! old number of nodes
   allocate(old_shad(   Grid % n_faces))
-  allocate(old_nods(M, Grid % n_faces))
+  allocate(old_nods(m, Grid % n_faces))
   allocate(old_bxyz(3,-Grid % n_bnd_cells:-1))
 
   !--------------------------------------------------------!
@@ -104,12 +104,12 @@
   !---------------------------------------------!
   do s = 1, Grid % n_faces
     old_nn  (    s) = Grid % faces_n_nodes( Grid % old_f(s))
-    old_nods(1:M,s) = Grid % faces_n  (1:M, Grid % old_f(s))
+    old_nods(1:m,s) = Grid % faces_n  (1:m, Grid % old_f(s))
     old_shad(    s) = Grid % faces_s      ( Grid % old_f(s))
   end do
   do s = 1, Grid % n_faces
     Grid % faces_n_nodes(s) = old_nn  (     s)
-    Grid % faces_n(1:M,  s) = old_nods(1:M, s)
+    Grid % faces_n(1:m,  s) = old_nods(1:m, s)
     Grid % faces_s      (s) = old_shad(     s)
   end do
 
@@ -120,7 +120,8 @@
     c2 = Grid % faces_c(2, s)
     if(c2 < 0) then
       Grid % cells_n_nodes(c2) = Grid % faces_n_nodes(s)
-      Grid % cells_n(1:M,  c2) = Grid % faces_n(1:M,  s)
+      Grid % cells_n(1:Grid % cells_n_nodes(c2), c2) =  &
+      Grid % faces_n(1:Grid % faces_n_nodes(s), s)
     end if
   end do
 

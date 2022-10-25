@@ -16,9 +16,9 @@
   allocate(Grid % faces_n_nodes(nf+ns));  Grid % faces_n_nodes(:) = 0
 
   ! Faces' nodes, neigboring cells and shadows
-  allocate(Grid % faces_n(MAX_FACES_N_NODES, nf+ns));  Grid % faces_n(:,:) = 0
-  allocate(Grid % faces_c(2,                 nf+ns));  Grid % faces_c(:,:) = 0
-  allocate(Grid % faces_s(                   nf+ns));  Grid % faces_s  (:) = 0
+  allocate(Grid % faces_n(3, nf+ns));  Grid % faces_n(:,:) = 0
+  allocate(Grid % faces_c(2, nf+ns));  Grid % faces_c(:,:) = 0
+  allocate(Grid % faces_s(   nf+ns));  Grid % faces_s  (:) = 0
 
   ! Face surface areas (si), total surface (s)
   ! and distances between cells (di)

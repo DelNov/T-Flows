@@ -12,22 +12,30 @@
   integer         :: s
   integer         :: concave_link(2, Grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, n, nn, cnt
-  real    :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
-  real    :: rp_3d(3,MAX_FACES_N_NODES), np_3d(3,MAX_FACES_N_NODES)
-  real    :: rp_2d(2,MAX_FACES_N_NODES)
-  real    :: sorting(MAX_FACES_N_NODES)  ! sorting criterion
-  integer :: order(MAX_FACES_N_NODES)    ! carry-on array with indices
-  integer :: max_loc(2), conc_n
-  real    :: conc_xn, conc_yn, conc_zn
-  real    :: prod(3), prod_mag, angles(MAX_FACES_N_NODES, MAX_FACES_N_NODES)
-  real    :: sumang, criter
-! integer :: k, ni, nj, nk, min_loc
-! real    :: vec_ji(3), vec_jk(3), mag_ji, mag_jk, dot_prod
+  integer              :: i, j, m, n, nn, cnt
+  real                 :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
+  integer              :: max_loc(2), conc_n
+  real                 :: conc_xn, conc_yn, conc_zn
+  real                 :: prod(3), prod_mag
+  real                 :: sumang, criter
+  real,    allocatable :: rp_2d(:,:), rp_3d(:,:), np_3d(:,:), sorting(:)
+  real,    allocatable :: angles(:,:)
+  integer, allocatable :: order(:)
+! integer              :: k, ni, nj, nk, min_loc
+! real                 :: vec_ji(3), vec_jk(3), mag_ji, mag_jk, dot_prod
 !==============================================================================!
 
   ! Take alias
   nn = Grid % faces_n_nodes(s)
+
+  ! Allocate memory
+  m = size(Grid % faces_n, 1)
+  allocate(rp_2d(2,  m))
+  allocate(rp_3d(3,  m))
+  allocate(np_3d(3,  m))
+  allocate(sorting  (m))
+  allocate(order    (m))
+  allocate(angles(m, m))
 
   !---------------------------------------------------------------!
   !   A way to deal with concave faces.  Mark its concave node,   !

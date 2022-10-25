@@ -26,6 +26,9 @@
   integer            :: c         ! cell counter
 !==============================================================================!
 
+  ! Initialize program profler
+  call Profiler % Start('Main')
+
   ! Open with a logo
   call Logo_Gen
 
@@ -110,5 +113,9 @@
 
   ! Write something on the screen
   call Print_Grid_Statistics(Grid)
+
+  ! Finalize program profler
+  call Profiler % Stop('Main')
+  call Profiler % Statistics(indent=1)
 
   end program

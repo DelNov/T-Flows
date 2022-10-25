@@ -146,6 +146,7 @@
               if(Grid % cells_n_nodes(c1) .eq. 5) fn = pyr
               if(Grid % cells_n_nodes(c1) .eq. 6) fn = wed
               if(Grid % cells_n_nodes(c1) .eq. 8) fn = hex
+              call Adjust_First_Dim(6, Grid % cells_c)  ! i_fac goes to 6
               do i_fac = 1, 6
                 if(Grid % cells_c(i_fac, c1) .eq. 0  .and.   & ! not set yet
                     ( max( match_nodes(fn(i_fac, 1)),0 ) + &

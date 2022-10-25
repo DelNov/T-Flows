@@ -288,7 +288,8 @@ SRC_F_FUN = Balance_Volume.f90                 \
             Rhie_And_Chow.f90                  \
             Update_Boundary_Values.f90
 
-SRC_F_FUN += 
+# Sources for all shared functions
+SRC_F_FUN += Adjust_First_Dim.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions

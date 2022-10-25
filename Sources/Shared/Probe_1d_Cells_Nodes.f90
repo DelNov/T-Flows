@@ -20,6 +20,8 @@
   logical       :: isit
 !==============================================================================!
 
+  call Profiler % Start('Probe_1d_Cells_Nodes')
+
   print *, '#==========================================='
   print *, '# Creating 1d file with the node '
   print *, '# coordinates in non-homogeneous directions '
@@ -29,7 +31,10 @@
   print *, '# -------------------------------------------'
   read(*,*) answer
   call To_Upper_Case(answer)
-  if(answer .eq. 'SKIP') return
+  if(answer .eq. 'SKIP') then
+    call Profiler % Stop('Probe_1d_Cells_Nodes')
+    return
+  end if
 
   n_prob = 0
   zp(:)  = 0.0
@@ -88,6 +93,7 @@
       if(n_prob .eq. 16384) then
         print *, '# Probe 1d: Not a 1d (channel flow) problem.'
         isit = .false.
+        call Profiler % Stop('Probe_1d_Cells_Nodes')
         return
       end if
     end do
@@ -112,5 +118,7 @@
   end do
 
   close(fu)
+
+  call Profiler % Stop('Probe_1d_Cells_Nodes')
 
   end subroutine

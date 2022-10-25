@@ -167,7 +167,8 @@ SRC_F_MOD += Point_Mod.f90    \
 #---------------
 
 # Sources for all shared functions
-SRC_F_FUN = Probe_1d_Nodes.f90  \
+SRC_F_FUN = Adjust_First_Dim.f90  \
+            Probe_1d_Nodes.f90    \
             Probe_2d.f90
 
 # Local functions are added one by one ...
