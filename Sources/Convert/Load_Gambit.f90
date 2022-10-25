@@ -17,7 +17,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: i, j, n_blocks, n_bnd_sect, dum1, dum2, fu
   integer,allocatable :: temp(:)
-  integer             :: c, dir
+  integer             :: c, dir, nodes(8)
 !==============================================================================!
 
   call Profiler % Start('Load_Gambit')
@@ -128,7 +128,12 @@
   do i = 1, Grid % n_cells
     read(fu,'(i8,1x,i2,1x,i2,1x,7i8:/(15x,7i8:))') dum1, dum2, &
            Grid % cells_n_nodes(i),                           &
-          (Grid % cells_n(j,i), j = 1, Grid % cells_n_nodes(i))
+          (nodes(j), j = 1, Grid % cells_n_nodes(i))
+
+    call Adjust_First_Dim(Grid % cells_n_nodes(i), Grid % cells_n)
+    do j = 1, Grid % cells_n_nodes(i)
+      Grid % cells_n(j, i) = nodes(j)
+    end do
 
     ! Nodes 3,4 and 7,8 should be swapped for hexahedral
     ! cells to be compatible with writing in vtu format
