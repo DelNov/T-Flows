@@ -285,6 +285,7 @@
 
     ! Form Dual's faces' nodes
     Dual % faces_n_nodes(f_d) = cnt
+    call Adjust_First_Dim(cnt, Dual % faces_n)
     Dual % faces_n(1:cnt,f_d) = n_d_list(1:cnt)
 
     ! Copy node coordinates
@@ -313,6 +314,7 @@
 
       ! Add extra node to Dual's faces' nodes
       Dual % faces_n_nodes(f_d) = cnt + 1
+      call Adjust_First_Dim(cnt + 1, Dual % faces_n)
       Dual % faces_n(cnt + 1:cnt + 1, f_d) = d_nn
 
       ! Copy extra node coordinates
@@ -398,6 +400,7 @@
           ! Additional boundary cell in the Dual grid
           b_d  = curr_b_d - node_data(n_p)
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
+          call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
           Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = cell_to_node(c)
           Dual % bnd_cond % color(b_d) = bc
 
@@ -535,6 +538,8 @@
     !----------------------------------------------------!
     Dual % cells_n_faces(c1) = Dual % cells_n_faces(c1) + 1
     Dual % cells_n_faces(c2) = Dual % cells_n_faces(c2) + 1
+    call Adjust_First_Dim(Dual % cells_n_faces(c1), Dual % cells_f)
+    call Adjust_First_Dim(Dual % cells_n_faces(c2), Dual % cells_f)
     Dual % cells_f(Dual % cells_n_faces(c1), c1) = s
     Dual % cells_f(Dual % cells_n_faces(c2), c2) = s
 
@@ -550,6 +555,7 @@
         if(n1 .eq. n) goto 1
       end do  ! j_nod
       Dual % cells_n_nodes(c1) = Dual % cells_n_nodes(c1) + 1
+      call Adjust_First_Dim(Dual % cells_n_nodes(c1), Dual % cells_n)
       Dual % cells_n(Dual % cells_n_nodes(c1), c1) = n
 1     continue
 
@@ -559,6 +565,7 @@
         if(n2 .eq. n) goto 2
       end do  ! j_nod
       Dual % cells_n_nodes(c2) = Dual % cells_n_nodes(c2) + 1
+      call Adjust_First_Dim(Dual % cells_n_nodes(c2), Dual % cells_n)
       Dual % cells_n(Dual % cells_n_nodes(c2), c2) = n
 2     continue
 

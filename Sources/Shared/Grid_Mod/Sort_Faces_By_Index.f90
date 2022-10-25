@@ -8,13 +8,15 @@
   class(Grid_Type) :: Grid
   integer          :: n, indx(n)
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: i
+  integer              :: i, m
   integer, allocatable :: work_1(:)
   integer, allocatable :: work_2(:,:)
 !==============================================================================!
 
-  allocate(work_1                   (n))
-  allocate(work_2(MAX_FACES_N_NODES, n))
+  m = size(Grid % faces_n, 1)
+
+  allocate(work_1   (n))
+  allocate(work_2(m, n))
 
   ! Sort number of nodes in a face
   do i = 1, n
@@ -26,12 +28,10 @@
 
   ! Sort faces_n
   do i = 1, n
-    work_2(1:MAX_FACES_N_NODES, indx(i)) =  &
-      Grid % faces_n(1:MAX_FACES_N_NODES, i)
+    work_2(1:m, indx(i)) = Grid % faces_n(1:m, i)
   end do
   do i = 1, n
-    Grid % faces_n(1:MAX_FACES_N_NODES, i) =  &
-      work_2(1:MAX_FACES_N_NODES, i)
+    Grid % faces_n(1:m, i) = work_2(1:m, i)
   end do
 
   ! Sort faces_c

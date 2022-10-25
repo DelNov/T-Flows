@@ -18,6 +18,8 @@
   character(SL) :: answer
 !==============================================================================!
 
+  call Profiler % Start('Probe_2d')
+
   print *, '#==============================='
   print *, '# Looking for homogeneous plane '
   print *, '#-------------------------------'
@@ -26,7 +28,10 @@
   print *, '#-------------------------------'
   read(*,*) answer
   call String % To_Upper_Case(answer)
-  if(answer .eq. 'SKIP') return
+  if(answer .eq. 'SKIP') then
+    call Profiler % Stop('Probe_2d')
+    return
+  end if
 
   n_prob = 0
   zp(:)  = 0.0
@@ -66,6 +71,7 @@
 
     if(n_prob .eq. 32768) then
       print *, '# Probe 2D: Not a 2D problem.'
+      call Profiler % Stop('Probe_2d')
       return
     end if
 1 end do
@@ -85,5 +91,7 @@
   end do
 
   close(fu)
+
+  call Profiler % Stop('Probe_2d')
 
   end subroutine

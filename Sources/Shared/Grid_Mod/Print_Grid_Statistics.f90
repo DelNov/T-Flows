@@ -81,8 +81,7 @@
     if(n_polg > 0)  print '(a,i9)',  ' #   polygons:       ', n_polg
     if(n_polg > 0) then
       print '(a)', ' #'
-      print '(a,i3,a,i0.0,a)', ' # Maximum nodes in polygon:    ',  &
-            max_n_polg, '  (of possible ', MAX_FACES_N_NODES, ')'
+      print '(a,i3,a,i0.0,a)', ' # Maximum nodes in polygon:    ', max_n_polg
     end if
   end if
 
@@ -157,8 +156,7 @@
 
     if(n_polh > 0) then
       print '(a)', ' #'
-      print '(a,i3,a,i0.0,a)', ' # Maximum nodes in polyhedron: ',  &
-            max_n_polh, '  (of possible ', MAX_CELLS_N_NODES, ')'
+      print '(a,i3,a,i0.0,a)', ' # Maximum nodes in polyhedron: ', max_n_polh
     end if
   end if
 

@@ -100,6 +100,8 @@
 !                                                                              !
 !==============================================================================!
 
+  call Profiler % Start('Calculate_Geometry')
+
   ! Copy face-node numbering for faces
   ! (Note that it is the same as for blocks here in Generator)
   fn = hex_block
@@ -389,5 +391,7 @@
   if(real_run) then
     call Grid % Calculate_Face_Interpolation()
   end if
+
+  call Profiler % Stop('Calculate_Geometry')
 
   end subroutine

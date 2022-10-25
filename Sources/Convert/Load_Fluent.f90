@@ -610,6 +610,7 @@
               call File % Read_Line(fu)
               read(line % tokens(1), *) n_face_nodes
               Grid % faces_n_nodes(s) = n_face_nodes
+              call Adjust_First_Dim(n_face_nodes, Grid % faces_n)
               do i_nod = 1, n_face_nodes
                 read(line % tokens(1+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
@@ -756,6 +757,7 @@
     if(c2 .lt. 0) then
       n = Grid % faces_n_nodes(s)
       Grid % cells_n_nodes(c2) = n
+      call Adjust_First_Dim(n, Grid % cells_n)
       Grid % cells_n(1:n, c2)  = Grid % faces_n(1:n, s)
     end if
   end do
@@ -1015,6 +1017,7 @@
       ! Perform a unique sort to remove duplicates
       call Sort % Unique_Int(all_nodes(1:n), n)
 
+      call Adjust_First_Dim(n, Grid % cells_n)
       Grid % cells_n(1:n, c)  = all_nodes(1:n)
       Grid % cells_n_nodes(c) = -n
 

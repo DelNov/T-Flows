@@ -27,7 +27,9 @@
   !   Count the boundary cells   !
   !                              !
   !------------------------------!
-  Grid % n_bnd_cells = 0
+  Grid % n_bnd_cells = 0                     ! initialize nuber of bnd cells
+  call Adjust_First_Dim(24, Grid % cells_c)  ! adjust dimension of cells_c
+
   do c = 1, Grid % n_cells
     do m = 1, 24   ! neighbour cells
       if(Grid % cells_c(m,c) < 0) then
@@ -46,7 +48,9 @@
   !   Create the array with   !
   !   information on faces    !
   !---------------------------!
-  Grid % n_faces = 0     ! initialize the number of sides
+  Grid % n_faces = 0                        ! initialize the number of sides
+  call Adjust_First_Dim(4, Grid % faces_n)  ! adjust dimension of cells_c
+
   do run = 1, 2
 
     do c1 = 1, Grid % n_cells

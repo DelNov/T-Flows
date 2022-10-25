@@ -10,17 +10,24 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s, i_nod, j_nod
-  real    :: xf(MAX_FACES_N_NODES), yf(MAX_FACES_N_NODES), zf(MAX_FACES_N_NODES)
-  real    :: x_cell_1, y_cell_1, z_cell_1
-  real    :: x_cell_2, y_cell_2, z_cell_2
+  integer           :: c1, c2, s, i_nod, j_nod, m
+  real              :: x_cell_1, y_cell_1, z_cell_1
+  real              :: x_cell_2, y_cell_2, z_cell_2
+  real, allocatable :: xf(:), yf(:), zf(:)
 !==============================================================================!
+
+  ! Allocate memory for face's node coordinates
+  m = size(Grid % faces_n, 1)
+  allocate(xf(m))
+  allocate(yf(m))
+  allocate(zf(m))
 
   ! (Re)initialize cell volumes
   Grid % vol(:) = 0.0
   Grid % dv1(:) = 0.0
   Grid % dv2(:) = 0.0
 
+  ! Calculate volumes
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)

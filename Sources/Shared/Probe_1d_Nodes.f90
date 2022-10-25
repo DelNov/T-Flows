@@ -4,9 +4,10 @@
 !   This subroutine finds the coordinate of nodes in non-homogeneous           !
 !   direction and write them in file name.1d                                   !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
   use File_Mod
   use Math_Mod
-  use Grid_Mod, only: Grid_Type
+  use Grid_Mod, only: Grid_Type, Profiler
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -20,6 +21,8 @@
   logical       :: isit
 !==============================================================================!
 
+  call Profiler % Start('Probe_1d_Nodes')
+
   print *, '#==========================================='
   print *, '# Creating 1d file with the node '
   print *, '# coordinates in non-homogeneous directions '
@@ -29,7 +32,10 @@
   print *, '# -------------------------------------------'
   read(*,*) answer
   call String % To_Upper_Case(answer)
-  if(answer .eq. 'SKIP') return
+  if(answer .eq. 'SKIP') then
+    call Profiler % Stop('Probe_1d_Nodes')
+    return
+  end if
 
   n_prob = 0
   zp    = 0.0
@@ -95,5 +101,7 @@
   end do
 
   close(fu)
+
+  call Profiler % Stop('Probe_1d_Nodes')
 
   end subroutine

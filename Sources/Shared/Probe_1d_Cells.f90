@@ -20,13 +20,18 @@
   character(SL) :: answer
 !==============================================================================!
 
+  call Profiler % Start('Probe_1d_Cells')
+
   print *, '#================================================='
   print *, '# Looking for non-homogeneous directions '
   print *, '# Insert non-homogeneous direction (x,y,z or skip)'
   print *, '#-------------------------------------------------'
   read(*,*) answer
   call To_Upper_Case(answer)
-  if(answer .eq. 'SKIP') return
+  if(answer .eq. 'SKIP') then
+    call Profiler % Stop('Probe_1d_Cells')
+    return
+  end if
 
   n_prob = 0
   zp(:)  = 0.0
@@ -56,6 +61,7 @@
     if(n_prob .eq. 16384) then
       print *, '# Probe 1D: Not a 1D (channel flow) problem.'
       isit = .false.
+      call Profiler % Stop('Probe_1d_Cells')
       return
     end if
 1 end do
@@ -77,5 +83,7 @@
   end do
 
   close(fu)
+
+  call Profiler % Stop('Probe_1d_Cells')
 
   end subroutine

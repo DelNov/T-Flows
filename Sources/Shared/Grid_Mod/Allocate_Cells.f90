@@ -32,10 +32,10 @@
   allocate(Grid % ixz(-nb:nc));  Grid % ixz(:) = 0.0
   allocate(Grid % iyz(-nb:nc));  Grid % iyz(:) = 0.0
 
-  ! Cells' nodes and neigboring cells
-  allocate(Grid % cells_n(MAX_CELLS_N_NODES, -nb:nc));  Grid % cells_n(:,:) = 0
-  allocate(Grid % cells_f(MAX_CELLS_N_FACES, -nb:nc));  Grid % cells_f(:,:) = 0
-  allocate(Grid % cells_c(MAX_CELLS_N_CELLS, -nb:nc));  Grid % cells_c(:,:) = 0
+  ! Allocate as litle as possible
+  allocate(Grid % cells_n(4, -nb:nc));  Grid % cells_n(:,:) = 0
+  allocate(Grid % cells_f(4, -nb:nc));  Grid % cells_f(:,:) = 0
+  allocate(Grid % cells_c(4, -nb:nc));  Grid % cells_c(:,:) = 0
 
   allocate(Grid % cells_bnd_face(-nb:-1));  Grid % cells_bnd_face(:) = 0
 
