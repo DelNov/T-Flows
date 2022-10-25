@@ -22,6 +22,8 @@
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
 
+  call Profiler % Start('Compute_Wall_Distance')
+
   ! Take aliases
   Grid => Flow % pnt_grid
   phi  => Flow % wall_dist
@@ -29,7 +31,10 @@
   call Sol % Alias_Native   (A, b)
 
   ! If wall distance was calculated, get out of here
-  if(Grid % wall_dist(1) > 0.0) return
+  if(Grid % wall_dist(1) > 0.0) then 
+    call Profiler % Stop('Compute_Wall_Distance')
+    return
+  end if
 
   call Work % Connect_Real_Cell(cross)
 
@@ -259,5 +264,7 @@
   Grid % wall_dist(:) = phi % n(:)
 
   call Work % Disconnect_Real_Cell(cross)
+
+  call Profiler % Stop('Compute_Wall_Distance')
 
   end subroutine

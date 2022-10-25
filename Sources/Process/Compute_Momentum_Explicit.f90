@@ -21,6 +21,8 @@
   real, contiguous,  pointer :: sum_neigh(:)
 !==============================================================================!
 
+  call Profiler % Start('Compute_Momentum_Explicit')
+
   call Work % Connect_Real_Cell(sum_neigh)
 
   ! Take aliases
@@ -54,5 +56,7 @@
   end if
 
   call Work % Disconnect_Real_Cell(sum_neigh)
+
+  call Profiler % Stop('Compute_Momentum_Explicit')
 
   end subroutine
