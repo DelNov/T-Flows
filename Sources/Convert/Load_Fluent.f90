@@ -620,6 +620,7 @@
               call File % Read_Binary_Int4_Array(fu, 1)
               n_face_nodes = int4_array(1)
               call File % Read_Binary_Int4_Array(fu, n_face_nodes)
+              call Adjust_First_Dim(n_face_nodes, Grid % faces_n)
               do i_nod = 1, n_face_nodes
                 Grid % faces_n(i_nod, s) = int4_array(i_nod)
               end do
