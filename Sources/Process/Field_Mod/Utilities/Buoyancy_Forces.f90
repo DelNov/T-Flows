@@ -92,7 +92,10 @@
     call Flow % Interpolate_To_Faces_Harmonic(dens_f, Flow % density)
 
     ! ... then substract the reference density from them all
-    dens_f(:) = dens_f(:) - Flow % dens_ref
+    ! Note: dens_f(:) = dens_f(:) - Flow % dens_ref doesn't work for Intel
+    do s = 1, Grid % n_faces
+      dens_f(s) = dens_f(s) - Flow % dens_ref
+    end do
   end if
 
   !--------------------!

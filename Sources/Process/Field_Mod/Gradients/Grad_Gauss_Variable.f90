@@ -35,8 +35,10 @@
   !-------------------------------!
   do iter = 1, Flow % gauss_miter
 
-    ! Save the old iteration
-    phi_f_o(:) = phi_f_n(:)
+    ! Save the old iteration (phi_f_o(:) = phi_f_n(:) doesn't work for Intel)
+    do s = 1, Grid % n_faces
+      phi_f_o(s) = phi_f_n(s)
+    end do
 
     ! Estimate values at faces from the
     ! values in cells and last gradients
