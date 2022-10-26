@@ -9,13 +9,13 @@
   real              :: x0, delx, t, dt, ddt, pr, xi
   real              :: x(0:1000)
   real              :: w
-  character(len=20) :: file1 
+  character(len=20) :: file1
 !==============================================================================!
 
   x0=0.0
- 
+
   print *, 'Distance: '
-  read(*,*)  delx 
+  read(*,*)  delx
   print *, 'Weigth: '
   read(*,*)  w
   print *, 'Number of cells: '
@@ -41,14 +41,14 @@
   else
     case = 0
     if     ((w  >  -0.5).and.(w <=  -0.25)) then
-      pr = 1.0 - abs(0.5 - abs(w))    
+      pr = 1.0 - abs(0.5 - abs(w))
       case = 1
     else if((w >=  -0.75).and.(w  <  -0.5)) then
-      pr = 1.0 - abs(0.5 - abs(w))            
+      pr = 1.0 - abs(0.5 - abs(w))
       case = 2
     else
       pr = -w
-      case = 3 
+      case = 3
     endif
 
     do i=1,n
@@ -61,7 +61,7 @@
         x(i) = x0 + delx - (tanh(xi*atanh(pr))/pr)*delx
       elseif(case .eq. 3) then
         x(i) = x0 + 0.5*(1.0+tanh(xi*atanh(pr))/pr)*delx
-      endif 
+      endif
     end do
 
   endif
@@ -79,15 +79,15 @@
 
   file1 = 'fileout'
 
-  open(3,file=file1) 
-  
+  open(3,file=file1)
+
   do i = 1, n
-  
-   write(3,*) 0.5*(x(i)+x(i-1)) 
+
+   write(3,*) 0.5*(x(i)+x(i-1))
 
   end do
 
   close (3)
- 
-  end program 
+
+  end program
 
