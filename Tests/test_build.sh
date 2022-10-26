@@ -25,8 +25,8 @@ set -e
 
 # Compilation flags used in makefiles
 FCOMP="gnu"
-# Conduct tests with DEBUG=yes
 DEBUG="no"
+OPENMP="yes"
 
 # Variable MODE can be set to "interactive" or "noninteractive", depending if
 # the script is ran in interactive mode (without command line options) or in
@@ -405,17 +405,19 @@ function clean_compile {
   make clean >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG MPI=$2"
+    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
     make \
       FORTRAN=$FCOMP \
       DEBUG=$DEBUG \
+      OPENMP=$OPENMP \
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG MPI=$2 DIR_CASE=$3"
+    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
     make \
       FORTRAN=$FCOMP \
       DEBUG=$DEBUG \
+      OPENMP=$OPENMP \
       MPI=$2 \
       DIR_CASE=$3 >> $FULL_LOG 2>&1
     success=$?
