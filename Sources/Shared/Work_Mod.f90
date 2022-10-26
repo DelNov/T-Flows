@@ -40,21 +40,32 @@
     type(Int_Pointer_Type), allocatable :: i_face(:)
     type(Int_Pointer_Type), allocatable :: i_node(:)
 
-    integer :: last_r_cell
-    integer :: last_r_face
-    integer :: last_r_node
+    ! Floating "pointers" for all arrays
+    integer, private :: last_r_cell
+    integer, private :: last_r_face
+    integer, private :: last_r_node
 
-    integer :: last_i_cell
-    integer :: last_i_face
-    integer :: last_i_node
+    integer, private :: last_i_cell
+    integer, private :: last_i_face
+    integer, private :: last_i_node
 
-    integer :: max_r_cell = 0
-    integer :: max_r_face = 0
-    integer :: max_r_node = 0
+    ! Maximum number of used arrays
+    integer, private :: max_r_cell = 0
+    integer, private :: max_r_face = 0
+    integer, private :: max_r_node = 0
 
-    integer :: max_i_cell = 0
-    integer :: max_i_face = 0
-    integer :: max_i_node = 0
+    integer, private :: max_i_cell = 0
+    integer, private :: max_i_face = 0
+    integer, private :: max_i_node = 0
+
+    ! Requested number of used arrays
+    integer, private :: req_r_cell = 0
+    integer, private :: req_r_face = 0
+    integer, private :: req_r_node = 0
+
+    integer, private :: req_i_cell = 0
+    integer, private :: req_i_face = 0
+    integer, private :: req_i_node = 0
 
     contains
       procedure, private :: Allocate_Int_Cell
@@ -76,6 +87,7 @@
       procedure          :: Disconnect_Real_Cell
       procedure          :: Disconnect_Real_Face
       procedure          :: Disconnect_Real_Node
+      procedure          :: Finalize_Work
 
   end type
 
@@ -102,5 +114,6 @@
   include 'Work_Mod/Disconnect_Real_Cell.f90'
   include 'Work_Mod/Disconnect_Real_Face.f90'
   include 'Work_Mod/Disconnect_Real_Node.f90'
+  include 'Work_Mod/Finalize_Work.f90'
 
   end module

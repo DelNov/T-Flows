@@ -15,6 +15,14 @@
   integer          :: in  ! number of integer node arrays
 !==============================================================================!
 
+  Work % req_r_cell = rc
+  Work % req_r_face = rf
+  Work % req_r_node = rn
+
+  Work % req_i_cell = ic
+  Work % req_i_face = if
+  Work % req_i_node = in
+
   call Work % Allocate_Real_Cell(Grid, rc)
   call Work % Allocate_Real_Face(Grid, rf)
   call Work % Allocate_Real_Node(Grid, rn)

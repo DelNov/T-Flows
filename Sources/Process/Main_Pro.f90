@@ -111,7 +111,7 @@
   call Control_Mod_Switch_To_Root()
 
   ! Allocate memory for working arrays
-  call Work % Allocate_Work(Grid, rc=30, rf=6, rn=12, ic=4, if=6, in=1)
+  call Work % Allocate_Work(Grid, rc=12, rf=6, rn=2, ic=4, if=6, in=2)
 
   ! Initialize first and current and read the last time step
   curr_dt  = 0
@@ -446,6 +446,9 @@
     call User_Mod_Before_Exit(Grid(d))
   end do
 
+  ! Looks a bit ugly: call Work % Finalize_Work()
+
+  ! Finalize the program profler
   call Profiler % Stop('Main')
   call Profiler % Statistics(indent=33)
 
