@@ -173,9 +173,12 @@
   end do
 
   ! Faces' nodes
-  read(fu) ((Grid % faces_n(n, s),             &
-             n = 1, Grid % faces_n_nodes(s)),  &
-             s = 1, Grid % n_faces + Grid % n_shadows)
+  do s = 1, Grid % n_faces + Grid % n_shadows
+    call Adjust_First_Dim(Grid % faces_n_nodes(s), Grid % faces_n)
+    do n = 1, Grid % faces_n_nodes(s)
+      read(fu) Grid % faces_n(n, s)
+    end do
+  end do
 
   ! Error trap for faces' nodes
   do s = 1, Grid % n_faces + Grid % n_shadows
