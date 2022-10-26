@@ -23,8 +23,19 @@ set -e
 # }
 # trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
+#-------------------------------------
 # Compilation flags used in makefiles
-FCOMP="gnu"
+#-------------------------------------
+
+# GNU compiler
+# gnu: FORTRAN="gnu"
+# gnu: FCOMP=""
+# gnu: DEBUG="no"
+# gnu: OPENMP="yes"
+
+# Intel compiler (python is messed up with Intel, don't plot for now)
+FORTRAN="intel"
+FCOMP="mpiifort"
 DEBUG="no"
 OPENMP="yes"
 
@@ -405,17 +416,19 @@ function clean_compile {
   make clean >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
     make \
-      FORTRAN=$FCOMP \
+      FORTRAN=$FORTRAN \
+      FCOMP=$FCOMP \
       DEBUG=$DEBUG \
       OPENMP=$OPENMP \
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    elog "make FORTRAN=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
     make \
-      FORTRAN=$FCOMP \
+      FORTRAN=$FORTRAN \
+      FCOMP=$FCOMP \
       DEBUG=$DEBUG \
       OPENMP=$OPENMP \
       MPI=$2 \
@@ -1409,12 +1422,15 @@ function process_full_length_test {
       tail -n1))"
 
     # Launching matplotlib scripts only in interacive mode
+    # and if FORTRAN is set to gnu
     if [ $MODE == "interactive" ]; then
-      launch_matplotlib \
-        "$5" \
-        readme_python_matplotlib_script \
-        "$last_results_plus_dat_file" \
-        "result_plus_"$2""
+      if [ $FORTRAN == "gnu" ]; then
+        launch_matplotlib \
+          "$5" \
+          readme_python_matplotlib_script \
+          "$last_results_plus_dat_file" \
+          "result_plus_"$2""
+      fi
     fi
   else
     elog "Warning: file "$name_in_div"-res-plus-ts??????.dat does not exist"
@@ -1531,9 +1547,11 @@ function process_accuracy_test {
   done # for loop
 
   if [ $MODE -eq "interactive" ]; then
-    launch_matplotlib \
-      "$path"/Results \
-      readme_python_matplotlib_script "" ""
+    if [ $FORTRAN == "gnu" ]; then
+      launch_matplotlib \
+        "$path"/Results \
+        readme_python_matplotlib_script "" ""
+    fi
   fi
 }
 
@@ -1654,6 +1672,8 @@ else
     echo "#"
     echo "#   T-Flows testing"
     echo "#"
+    echo "#--------------------------------------------------------------------"
+    echo "#   Fortran set to: " $FORTRAN
     echo "#--------------------------------------------------------------------"
     echo ""
     echo "  Chose the type of test you want to perform:"
