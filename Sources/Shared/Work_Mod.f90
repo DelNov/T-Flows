@@ -48,6 +48,14 @@
     integer :: last_i_face
     integer :: last_i_node
 
+    integer :: max_r_cell = 0
+    integer :: max_r_face = 0
+    integer :: max_r_node = 0
+
+    integer :: max_i_cell = 0
+    integer :: max_i_face = 0
+    integer :: max_i_node = 0
+
     contains
       procedure, private :: Allocate_Int_Cell
       procedure, private :: Allocate_Int_Face
