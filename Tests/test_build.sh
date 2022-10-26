@@ -27,17 +27,17 @@ set -e
 # Compilation flags used in makefiles
 #-------------------------------------
 
-# GNU compiler
-# gnu: FORTRAN="gnu"
-# gnu: FCOMP=""
-# gnu: DEBUG="no"
-# gnu: OPENMP="yes"
-
-# Intel compiler (python is messed up with Intel, don't plot for now)
-FORTRAN="intel"
-FCOMP="mpiifort"
+# Set default compiler to GNU
+FORTRAN="gnu"
+FCOMP=""
 DEBUG="no"
 OPENMP="yes"
+
+# Intel compiler (python is messed up with Intel, don't plot for now)
+# FORTRAN="intel"
+# FCOMP="mpiifort"
+# DEBUG="no"
+# OPENMP="yes"
 
 # Variable MODE can be set to "interactive" or "noninteractive", depending if
 # the script is ran in interactive mode (without command line options) or in
@@ -60,6 +60,7 @@ MODE="undefined"
 # - Laminar cases.
 # - Rans cases
 # - Multi domain cases
+# - Elbows from Fluent
 # - Volume of fluid cases
 # - Swarm cases (particle tracking
 # - LES cases
@@ -87,6 +88,9 @@ RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 
 MULTDOM_BACKSTEP_DIR=Laminar/Copy_Inlet
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
+
+ELBOW_ASCII_DIR=Functionality/Meshes/Ansys/Elbow_Ascii
+ELBOW_BINARY_DIR=Functionality/Meshes/Ansys/Elbow_Binary
 
 VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
@@ -183,6 +187,8 @@ ALL_CONVERT_TESTS=( \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$LES_PIPE_DIR" \
+                   "$ELBOW_ASCII_DIR" \
+                   "$ELBOW_BINARY_DIR" \
                    )
 DONE_CONVERT_TESTS=0
 
@@ -403,10 +409,10 @@ function clean_compile {
   # $2 = MPI = yes/no
   # $3 = DIR_CASE path
 
-  if [ -z "${1+xxx}" ]; then 
+  if [ -z "${1+xxx}" ]; then
     elog "Directory with sources is not set at all"
     exit 1
-  elif [ -z "${2+xxx}" ]; then 
+  elif [ -z "${2+xxx}" ]; then
     elog "MPI flag is not set at all"
     exit 1
   fi
@@ -1643,6 +1649,19 @@ function chose_test {
     make_clean $DIVI_DIR
     make_clean $PROC_DIR
   fi
+  if [ $option -eq 11 ]; then
+    if [ $FORTRAN == "gnu" ]; then
+      FORTRAN="intel"
+      FCOMP="mpiifort"
+      DEBUG="no"
+      OPENMP="yes"
+    elif [ $FORTRAN == "intel" ]; then
+      FORTRAN="gnu"
+      FCOMP=""
+      DEBUG="no"
+      OPENMP="yes"
+    fi
+  fi
 
 }
 
@@ -1674,6 +1693,13 @@ else
     echo "#"
     echo "#--------------------------------------------------------------------"
     echo "#   Fortran set to: " $FORTRAN
+    if [ $FORTRAN == "intel" ]; then
+    echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+    echo "#   Remark: Intel Fortran comes with its own Python suite which does"
+    echo "#           not have the matplotlib and this script can't plot pngs."
+    echo "#           If you are desperate to see the plots, use the GNU"
+    echo "#           compiler.  Don't forget to purge the Intel environment."
+    fi
     echo "#--------------------------------------------------------------------"
     echo ""
     echo "  Chose the type of test you want to perform:"
@@ -1689,6 +1715,7 @@ else
     echo "  8. Process accuracy test"
     echo "  9. Perform all tests"
     echo " 10. Clean all test directories"
+    echo " 11. Change the compiler"
     echo ""
     read -p "  Enter the desired type of test: " option
     chose_test $option
