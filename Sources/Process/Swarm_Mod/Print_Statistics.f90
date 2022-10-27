@@ -14,7 +14,7 @@
   real                         :: max_cfl, max_re, max_st
   character(DL)                :: line
 !-----------------------------[Local parameters]-------------------------------!
-  integer, parameter :: T=38  ! indent
+  integer, parameter :: T=39  ! indent
 !==============================================================================!
 
   ! Take aliases for the Swarm
@@ -70,52 +70,52 @@
   if(this_proc < 2) then
     line( 1:160) = ' '
     line( 1+T:52+T) = ' #================================================#'
-    print *, trim(line)
-    line( 1+T:52+T) = ' #                   Swarm statistics             #'
-    print *, trim(line)
+    print '(a)', trim(line)
+    line( 1+T:52+T) = ' #                Swarm statistics                #'
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #------------------------------------------------#'
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #  Total number of particles     :               #'
     write(line(37+T:42+T),'(i6)') Swarm % n_particles
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #  Number of active particles    :               #'
     write(line(37+T:42+T),'(i6)') Swarm % n_particles - n_dep - n_esc
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #  Number of deposited particles :               #'
     write(line(37+T:42+T),'(i6)') n_dep
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #  Number of escaped particles   :               #'
     write(line(37+T:42+T),'(i6)') n_esc
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #  Total number of reflections   :               #'
     write(line(37+T:48+T),'(1pe12.1)') real(n_ref)
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #================================================#'
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #     Characteristic non-dimensional numbers     #'
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #          (average and maximum values)          #'
-    print *, trim(line)
+    print '(a)', trim(line)
     line( 1+T:52+T) = ' #------------------------------------------------#'
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #    Courant number   :                          #'
     write(line(26+T:48+T),'(2(1pe11.3))') avg_cfl, max_cfl
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #    Reynolds number  :                          #'
     write(line(26+T:48+T),'(2(1pe11.3))') avg_re,  max_re
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #    Stokes number    :                          #'
     write(line(26+T:48+T),'(2(1pe11.3))') avg_st,  max_st
-    print *, trim(line)
+    print '(a)', trim(line)
 
     line( 1+T:52+T) = ' #------------------------------------------------#'
-    print *, trim(line)
+    print '(a)', trim(line)
   end if
 
   end subroutine
