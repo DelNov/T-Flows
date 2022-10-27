@@ -47,15 +47,24 @@
   p_mean => Turb % p_mean;  t_mean => Turb % t_mean;  q_mean => Turb % q_mean
 
   ! Time averaged modeled quantities
-  kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
-  zeta_mean => Turb % zeta_mean;  f22_mean  => Turb % f22_mean
+  if(Turb % model .eq. K_EPS) then
+    kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
+  end if
+
+  if(Turb % model .eq. K_EPS_ZETA_F) then
+    kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
+    zeta_mean => Turb % zeta_mean;  f22_mean  => Turb % f22_mean
+  end if
 
   ! Time-averaged modelled Reynolds stresses and heat fluxes
-  uu_mean => Turb % uu_mean;  vv_mean => Turb % vv_mean
-  ww_mean => Turb % ww_mean;  uv_mean => Turb % uv_mean
-  vw_mean => Turb % vw_mean;  uw_mean => Turb % uw_mean
-  ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
-  wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+  if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+     Turb % model .eq. RSM_MANCEAU_HANJALIC) then
+    uu_mean => Turb % uu_mean;  vv_mean => Turb % vv_mean
+    ww_mean => Turb % ww_mean;  uv_mean => Turb % uv_mean
+    vw_mean => Turb % vw_mean;  uw_mean => Turb % uw_mean
+    ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
+    wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+  end if
 
   ! Resolved Reynolds stresses and heat fluxes
   uu_res => Turb % uu_res;  vv_res => Turb % vv_res;  ww_res => Turb % ww_res
@@ -97,14 +106,14 @@
         wt_res(c) = (wt_res(c) * real(n) + w % n(c) * t % n(c)) / real(n+1)
       end if
 
-      if(Turb % model .eq. K_EPS                 .or.  &
-         Turb % model .eq. K_EPS_ZETA_F          .or.  &
-         Turb % model .eq. HYBRID_LES_RANS       .or.  &
-         Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-         Turb % model .eq. RSM_MANCEAU_HANJALIC ) then
+      ! Resolved turbulent heat fluxes
+      if(Flow % heat_transfer) then
+        if(Turb % model .eq. K_EPS                 .or.  &
+           Turb % model .eq. K_EPS_ZETA_F          .or.  &
+           Turb % model .eq. HYBRID_LES_RANS       .or.  &
+           Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
+           Turb % model .eq. RSM_MANCEAU_HANJALIC ) then
 
-        ! Resolved turbulent heat fluxes
-        if(Flow % heat_transfer) then
           t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
           ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c)) / real(n+1)
           vt_mean(c) = (vt_mean(c) * real(n) + vt % n(c)) / real(n+1)

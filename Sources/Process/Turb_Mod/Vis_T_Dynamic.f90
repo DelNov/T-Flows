@@ -58,7 +58,7 @@
   uv_f  (:) = 0.0;  uw_f  (:) = 0.0;  vw_f  (:) = 0.0
   m_11_f(:) = 0.0;  m_22_f(:) = 0.0;  m_33_f(:) = 0.0
   m_12_f(:) = 0.0;  m_13_f(:) = 0.0;  m_23_f(:) = 0.0
-  shear_test(-nb:nc) = 0.0
+  shear_test(:) = 0.0
 
   ! Take aliases
   Flow => Turb % pnt_flow
