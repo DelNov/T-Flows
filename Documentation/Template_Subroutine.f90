@@ -7,9 +7,9 @@
 !   beyond that, the code will look terrible when printed, and you do want     !
 !   to analyze printed text for better concentration.                          !
 !                                                                              !
-!   Also note that indentation is by 2!  Subroutine name starts at column 2,   !
-!   coding starts in the same column, and next levels of indentation at 4,     !
-!   6, 8, etc.                                                                 !
+!   Also note that indentation is by 2!  Subroutine name starts at column 3,   !
+!   coding starts in the same column, and next levels of indentation at 5,     !
+!   7, 9, etc.                                                                 !
 !                                                                              !
 !   Note that there is a separator before the function header (this section)   !
 !   and line which introduces modules.  If not, the characters "[Modules]"     !
