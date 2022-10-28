@@ -400,9 +400,60 @@ function make_clean {
 }
 
 #------------------------------------------------------------------------------#
+# user_compile
+#------------------------------------------------------------------------------#
+function user_compile {
+  # $1 = dir
+  # $2 = MPI = yes/no
+  # $3 = DIR_CASE path
+
+  if [ -z "${1+xxx}" ]; then
+    elog "Directory with sources is not set at all"
+    exit 1
+  elif [ -z "${2+xxx}" ]; then
+    elog "MPI flag is not set at all"
+    exit 1
+  fi
+
+  cd $1
+  elog "User compile in:" "$1"
+  rm -f User_Mod/*.f90 >> $FULL_LOG 2>&1
+  git checkout User_Mod/*.f90 >> $FULL_LOG 2>&1
+
+  if [ -z "${3+xxx}" ]; then
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
+    make \
+      FORTRAN=$FORTRAN \
+      FCOMP=$FCOMP \
+      DEBUG=$DEBUG \
+      OPENMP=$OPENMP \
+      MPI=$2 >> $FULL_LOG 2>&1
+    success=$?
+  else
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
+    make \
+      FORTRAN=$FORTRAN \
+      FCOMP=$FCOMP \
+      DEBUG=$DEBUG \
+      OPENMP=$OPENMP \
+      MPI=$2 \
+      DIR_CASE=$3 >> $FULL_LOG 2>&1
+    success=$?
+  fi
+
+  time_in_seconds
+
+  cd - > /dev/null
+  return $success
+  if [ $success -eq 0 ]; then
+    elog "User compile passed."
+  else
+    elog "User compile in " $1 " failed!"
+  fi
+}
+
+#------------------------------------------------------------------------------#
 # clean_compile
-#
-# return success
 #------------------------------------------------------------------------------#
 function clean_compile {
   # $1 = dir
@@ -799,7 +850,7 @@ function process_backup_test {
 
   # BEGIN:---------------------------------------#
   elog "np=1, MPI=no, start from 0, make a backup"
-  clean_compile $PROC_DIR no # dir MPI
+  user_compile $PROC_DIR no # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -846,7 +897,7 @@ function process_backup_test {
 
   # BEGIN:----------------------------------------------#
   elog "np=1, MPI=yes, load from backup(produced by seq)"
-  clean_compile $PROC_DIR yes # dir MPI
+  user_compile $PROC_DIR yes # dir MPI
 
   launch_process par 1
   #------------------------------------------------:END #
@@ -909,7 +960,7 @@ function process_backup_test {
 
   # BEGIN:------------------------------------------#
   elog "np=1, MPI=yes, backup=(produced by par.np=2)"
-  clean_compile $PROC_DIR no # dir MPI
+  user_compile $PROC_DIR no # dir MPI
   launch_process par 1
   #--------------------------------------------:END #
 
@@ -1060,7 +1111,7 @@ function process_save_exit_now_test {
 
   # BEGIN:---------------------------------------#
   elog "np=1, MPI=no, start from 0, make a backup"
-  clean_compile $PROC_DIR no # dir MPI
+  user_compile $PROC_DIR no # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -1109,11 +1160,11 @@ function process_save_exit_now_test {
     #-----------------------------------------------:END #
 
     if [ "$i" = 1 ]; then
-      clean_compile $PROC_DIR no
+      user_compile $PROC_DIR no
     elif [ "$i" = 2 ]; then
-      clean_compile $PROC_DIR yes
+      user_compile $PROC_DIR yes
     elif [ "$i" = 3 ]; then
-      clean_compile $PROC_DIR yes
+      user_compile $PROC_DIR yes
     fi
 
     elog "#   Forcing to save: save_now"
@@ -1288,7 +1339,7 @@ function process_compilation_test {
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
 
-  clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+  user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   # Restore control
   if [ $n_dom -eq 1 ]; then
@@ -1375,7 +1426,7 @@ function process_full_length_test {
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
-  clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+  user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -1530,7 +1581,7 @@ function process_accuracy_test {
     # rel_dir to User_Mod/ from Process/
     rel_dir=$(realpath --relative-to="$PROC_DIR" "$path")
 
-    clean_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+    user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
     launch_process par $nproc_in_div
 
@@ -1686,6 +1737,13 @@ else
   MODE="interactive"
   while [ 0 -eq 0 ]; do
 
+    # Clean all the source directories, just in case something was there
+    make_clean $GENE_DIR
+    make_clean $CONV_DIR
+    make_clean $DIVI_DIR
+    make_clean $PROC_DIR
+
+    # Throw the menu
     echo ""
     echo "#===================================================================="
     echo "#"
@@ -1696,9 +1754,12 @@ else
     if [ $FORTRAN == "intel" ]; then
     echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "#   Remark: Intel Fortran comes with its own Python suite which does"
-    echo "#           not have the matplotlib and this script can't plot pngs."
-    echo "#           If you are desperate to see the plots, use the GNU"
-    echo "#           compiler.  Don't forget to purge the Intel environment."
+    echo "#           not have the matplotlib and, consequently, this script"
+    echo "#           can't plot PNGs."
+    echo "#"
+    echo "#           If you are desperate to see the PNG plots, use the GNU"
+    echo "#           compiler.  In that case, purge the Intel environment."
+    echo "#           to get rid of the Python from Intel compiler."
     fi
     echo "#--------------------------------------------------------------------"
     echo ""
