@@ -17,7 +17,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
   integer                    :: n_memb, n_tags, n_crvs, n_nods
-  integer                    :: i, j, c, dim, p_tag, s_tag, type, fu
+  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu
   integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
   integer, allocatable       :: n(:), new(:)
   integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
@@ -405,7 +405,9 @@
 
         Grid % cells_n_nodes(c) = n_nods
         call Adjust_First_Dim(n_nods, Grid % cells_n)
-        read(line % tokens(2:n_nods+1), *) Grid % cells_n(1:n_nods, c)
+        do k = 1, n_nods
+          read(line % tokens(k+1), *) Grid % cells_n(k, c)
+        end do
 
       else  ! it is in binary format
 
@@ -416,7 +418,9 @@
 
         Grid % cells_n_nodes(c) = n_nods
         call Adjust_First_Dim(n_nods, Grid % cells_n)
-        Grid % cells_n(1:n_nods, c) = int8_array(2:n_nods+1)
+        do k = 1, n_nods
+          Grid % cells_n(k, c) = int8_array(k+1)
+        end do
 
       end if
 
