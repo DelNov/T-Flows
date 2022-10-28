@@ -452,7 +452,7 @@
 
   ! Finalize the program profler
   call Profiler % Stop('Main')
-  call Profiler % Statistics(indent=33)
+  call Profiler % Statistics(indent=34)
 
   !--------------------------!
   !   Finalize the solvers   !
