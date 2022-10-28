@@ -13,12 +13,12 @@
 
   print *, '#=================='
   print *, '# Number of points '
-  print *, '#=================='
+  print *, '#------------------'
   print *, n
 
   print *, '#================================='
   print *, '#   Coordinate      Velocity'
-  print *, '#================================='
+  print *, '#---------------------------------'
 
   ! Distance between two nodes
   dr = r / (n-1)
@@ -42,8 +42,7 @@
     end if
   end do
 
+  ! Print integral
   print *, '# Bulk velocity is: ', integral / area
-
-  ! Compute integral
 
   end program

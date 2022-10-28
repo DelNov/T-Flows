@@ -1,6 +1,8 @@
 !==============================================================================!
   program Parabolic
 !------------------------------------------------------------------------------!
+!  Creates a parabolic velocity profile useful for laminar inflows             !
+!                                                                              !
 !  Compile with: gfortran -o Parabolic Parabolic.f90                           !
 !------------------------------------------------------------------------------!
   implicit none
@@ -30,12 +32,12 @@
 
   print *, '#=================='
   print *, '# Number of points '
-  print *, '#=================='
+  print *, '#------------------'
   print *, n
 
   print *, '#================================='
   print *, '#   Coordinate      Velocity'
-  print *, '#================================='
+  print *, '#---------------------------------'
 
   ! distance between two nodes
   lx = (x_e - x_s)
@@ -60,8 +62,7 @@
     end if
   end do
 
+  ! Print integral
   print *, '# Bulk velocity is: ', integral / area
-
-  ! Compute integral
 
   end program

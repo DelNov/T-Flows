@@ -12,9 +12,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: error, n_proc, this_proc, n, i
+  integer              :: error, n_proc, this_proc, n, i
   integer, allocatable :: seeds(:)
-  real    :: numbah
+  real                 :: numbah
 !==============================================================================!
 
   ! Initialize MPI
