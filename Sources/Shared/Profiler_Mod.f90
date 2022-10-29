@@ -8,9 +8,9 @@
 
   integer, parameter :: MAX_FUNCT = 2048
 
-  !--------------------!
+  !-------------------!
   !   Profiler type   !
-  !--------------------!
+  !-------------------!
   type Profiler_Type
 
     integer, private :: n_functions        = 0
