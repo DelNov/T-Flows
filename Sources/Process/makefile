@@ -72,9 +72,9 @@ ifeq ($(FORTRAN), intel)
   endif
   ifeq ($(DEBUG), yes)
     OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -warn -warn all,noexternal  \
-                 -check all -debug all -fpe-all=0 -traceback
+                 -check all -debug all -fpe-all=0 -traceback -cpp
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3
+    OPT_F_COMP = -module $(DIR_MODULE) -O3 -cpp
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8

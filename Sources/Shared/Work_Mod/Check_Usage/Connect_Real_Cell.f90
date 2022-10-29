@@ -14,6 +14,8 @@
                                          a14(:), a15(:), a16(:)
 !==============================================================================!
 
+  call Profiler % Start('Work_Mod')
+
   Work % last_r_cell = Work % last_r_cell + 1
   Work % max_r_cell  = max(Work % max_r_cell, Work % last_r_cell)
   a01 => Work % r_cell(Work % last_r_cell) % ptr
@@ -24,6 +26,7 @@
     a02 => Work % r_cell(Work % last_r_cell) % ptr
     a02(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -33,6 +36,7 @@
     a03 => Work % r_cell(Work % last_r_cell) % ptr
     a03(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -42,6 +46,7 @@
     a04 => Work % r_cell(Work % last_r_cell) % ptr
     a04(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -51,6 +56,7 @@
     a05 => Work % r_cell(Work % last_r_cell) % ptr
     a05(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -60,6 +66,7 @@
     a06 => Work % r_cell(Work % last_r_cell) % ptr
     a06(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -69,6 +76,7 @@
     a07 => Work % r_cell(Work % last_r_cell) % ptr
     a07(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -78,6 +86,7 @@
     a08 => Work % r_cell(Work % last_r_cell) % ptr
     a08(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -87,6 +96,7 @@
     a09 => Work % r_cell(Work % last_r_cell) % ptr
     a09(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -96,6 +106,7 @@
     a10 => Work % r_cell(Work % last_r_cell) % ptr
     a10(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -105,6 +116,7 @@
     a11 => Work % r_cell(Work % last_r_cell) % ptr
     a11(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -114,6 +126,7 @@
     a12 => Work % r_cell(Work % last_r_cell) % ptr
     a12(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -123,6 +136,7 @@
     a13 => Work % r_cell(Work % last_r_cell) % ptr
     a13(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -132,6 +146,7 @@
     a14 => Work % r_cell(Work % last_r_cell) % ptr
     a14(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -141,6 +156,7 @@
     a15 => Work % r_cell(Work % last_r_cell) % ptr
     a15(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -150,6 +166,7 @@
     a16 => Work % r_cell(Work % last_r_cell) % ptr
     a16(:) = 0.0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
