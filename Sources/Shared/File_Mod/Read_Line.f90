@@ -74,7 +74,11 @@
   !----------------------------------------!
   call Line % Parse()
 
-  ! Error trap, if here, you reached the end of file
+  return
+
+  !------------------------------------------------------!
+  !   Error trap, if here, you reached the end of file   !
+  !------------------------------------------------------!
 2 if(present(reached_end)) then
     reached_end = .true.
   end if

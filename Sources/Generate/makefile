@@ -144,6 +144,7 @@ SRC_F_MOD = Const_Mod.f90          \
             String_Mod.f90         \
             Tokenizer_Mod.f90      \
             Comm_Mod_Seq.f90       \
+            Message_Mod.f90        \
             Profiler_Mod.f90       \
             Math_Mod.f90           \
             File_Mod.f90           \

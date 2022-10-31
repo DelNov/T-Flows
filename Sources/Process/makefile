@@ -208,6 +208,7 @@ endif
 
 # Modules in shared directory
 SRC_F_MOD += Tokenizer_Mod.f90      \
+             Message_Mod.f90        \
              Profiler_Mod.f90       \
              Math_Mod.f90           \
              Swap_Mod.f90           \

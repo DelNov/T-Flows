@@ -629,6 +629,24 @@ $(DIR_OBJECT)/Gen_Mod.o:\
 $(DIR_SHARED)/Gen_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thin_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thin_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thick_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thick_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Dashed_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Dashed_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
 # Dependencies for: ./Boundary_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Boundary_Mod.o:\
@@ -737,6 +755,18 @@ $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Boundary_Mod.o 
 
 #---------------------------------------------------
+# Dependencies for: ./Message_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Message_Mod.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod_Seq.f90 \
+$(DIR_SHARED)/Comm_Mod_Par.f90 \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Vtk_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vtk_Mod.o:\
@@ -787,10 +817,10 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 # Dependencies for: ./File_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/File_Mod.o:\
-$(DIR_OBJECT)/Tokenizer_Mod.o \
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_OBJECT)/String_Mod.o \
 $(DIR_SHARED)/String_Mod/*.f90 \
+$(DIR_OBJECT)/Message_Mod.o \
+$(DIR_SHARED)/Message_Mod/*.f90 \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
