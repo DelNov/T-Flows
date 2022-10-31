@@ -111,12 +111,6 @@
   ! Store the number of boundary conditions
   Grid % n_bnd_cond  = n_bnd
 
-  print *, '#==================================================='
-  print *, '# Found following boundary conditions:'
-  print *, '#---------------------------------------------------'
-  do n = 1, Grid % n_bnd_cond
-    print *, '# ', trim(Grid % bnd_cond % name(n))
-  end do
-  print *, '#---------------------------------------------------'
+  call Grid % Print_Bnd_Cond_List()
 
   end subroutine
