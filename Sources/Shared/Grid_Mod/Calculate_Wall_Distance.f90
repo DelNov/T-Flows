@@ -25,19 +25,17 @@
   Grid % wall_dist = HUGE
 
   call Print_Bnd_Cond_List(Grid)
-  print *, '#=================================================================='
-  print *, '# Calculating distance from the walls                              '
-  print *, '#------------------------------------------------------------------'
-  print *, '# Type ordinal number(s) of wall or wall_flux boundary condition(s)'
-  print *, '# from the boundary condition list (see above) separated by space. '
-  print *, '# Cells'' centers distances to the nearest wall will be calculated '
-  print *, '# for the listed wall boundary(s).                                 '
-  print *, '#                                                                  '
-  print *, '# This is needed for RANS and HYBRID turbulence models as well as  '
-  print *, '# for proper initialization with potential pressure-like field.    '
-  print *, '#                                                                  '
-  print *, '# Type skip to skip this and set wall distance to -1.0 everywhere. '
-  print *, '#------------------------------------------------------------------'
+  call Message % Print_Framed_Text(60,                                        &
+    'Calculating distance from the walls                               ',     &
+    'Type ordinal number(s) of wall or wall_flux boundary condition(s) '  //  &
+    'from the boundary condition list (see above) separated by space.  '  //  &
+    'Cells'' centers distances to the nearest wall will be calculated  '  //  &
+    'for the listed wall boundary(s). \n \n                            '  //  &
+    'This is needed for RANS and HYBRID turbulence models, for proper  '  //  &
+    'initialization with potential pressure-like field, but also for   '  //  &
+    'problems in multiple domains, such as conjugate heat transfer.    '  //  &
+    '\n \n                                                             '  //  &
+    'Type "skip" to skip this and set wall distance to -1.0 everywhere.')
   call File % Read_Line(5)
   answer = Line % tokens(1)
   call String % To_Upper_Case(answer)
@@ -103,7 +101,7 @@
       end if
     end do
 
-    print *, '# Distance to the wall calculated !'
+    print '(a)', ' # Distance to the wall calculated !'
 
     deallocate(wall_colors)
   end if

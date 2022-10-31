@@ -118,10 +118,10 @@
   !-----------------------------------!
   f_avg = f_avg / real(cnt)
   r_avg = r_avg / real(cnt)
-  print *, '#================================================================'
-  print *, '# Face interpolation factors have been calculated'
-  print *, '# Factors closer to 0.5 and shifts closer to 0.0 are better'
-  print *, '#----------------------------------------------------------------'
+  call Message % Print_Framed_Text(54,                              &
+           'Face interpolation factors have been calculated',       &
+           'It is useful to keep in mind that factors closer '  //  &
+           'to 0.5 and shifts closer to 0.0 are better')
   print '(a19,es12.5)', ' # Minimum factor: ', f_min
   print '(a19,es12.5)', ' # Maximum factor: ', f_max
   print '(a19,es12.5)', ' # Average factor: ', f_avg
