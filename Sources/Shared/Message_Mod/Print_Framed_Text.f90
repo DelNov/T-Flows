@@ -8,13 +8,17 @@
   character(*), intent(in) :: header_text
   character(*), intent(in) :: message_text
 !-----------------------------------[Locals]-----------------------------------!
+  integer       :: w
   character(DL) :: line
 !==============================================================================!
+
+  ! Adjust width, if necessary
+  w = max(width, len_trim(header_text)+3)
 
   !------------------------------!
   !   Write the top line first   !
   !------------------------------!
-  call Msg % Thick_Line(width)
+  call Msg % Thick_Line(w)
 
   !----------------------!
   !   Write the header   !  (you should check it is not too long)
@@ -25,17 +29,17 @@
     write(line(4:len_trim(header_text)+5), '(a)')  trim(header_text)
     print '(a)', trim(line)
 
-    call Msg % Dashed_Line(width)
+    call Msg % Dashed_Line(w)
   end if
 
   !-----------------------------------------------------------!
   !   Write the message text wrapping it into desired width   !
   !-----------------------------------------------------------!
-  call Msg % Print_Plain_Text(width, message_text)
+  call Msg % Print_Plain_Text(w, message_text)
 
   !--------------------------------!
   !   Write the bottom line last   !
   !--------------------------------!
-  call Msg % Thin_Line(width)
+  call Msg % Thin_Line(w)
 
   end subroutine
