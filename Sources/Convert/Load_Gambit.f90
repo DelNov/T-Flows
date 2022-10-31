@@ -36,8 +36,8 @@
     call File % Read_Line(fu)
 
     ! At line containing: "NUMNP NELEM NGRPS NBSETS NDFCD NDFVL" jump out
-    if(line % n_tokens .eq. 6) then
-      if(line % tokens(1) .eq. 'NUMNP') then
+    if(Line % n_tokens .eq. 6) then
+      if(Line % tokens(1) .eq. 'NUMNP') then
         goto 1
       end if
     end if
@@ -49,10 +49,10 @@
 1 continue
   call File % Read_Line(fu)
 
-  read(line % tokens(1),*) Grid % n_nodes
-  read(line % tokens(2),*) Grid % n_cells
-  read(line % tokens(3),*) n_blocks
-  read(line % tokens(4),*) n_bnd_sect
+  read(Line % tokens(1),*) Grid % n_nodes
+  read(Line % tokens(2),*) Grid % n_cells
+  read(Line % tokens(3),*) n_blocks
+  read(Line % tokens(4),*) n_bnd_sect
 
   print '(a38,i9)', '# Total number of nodes:             ', Grid % n_nodes
   print '(a38,i9)', '# Total number of cells:             ', Grid % n_cells
@@ -65,11 +65,11 @@
   Grid % n_bnd_cells = 0
   do
     call File % Read_Line(fu)
-    if( line % tokens(1) .eq. 'BOUNDARY' ) then
+    if( Line % tokens(1) .eq. 'BOUNDARY' ) then
       do j = 1, n_bnd_sect
         if(j>1) call File % Read_Line(fu) ! BOUNDARY CONDITIONS
         call File % Read_Line(fu)
-        read(line % tokens(3),*) dum1
+        read(Line % tokens(3),*) dum1
         Grid % n_bnd_cells = Grid % n_bnd_cells + dum1 
         do i = 1, dum1
           read(fu,*) c, dum2, dir
@@ -91,8 +91,8 @@
     call File % Read_Line(fu)
 
     ! At line containing: "ENDOFSECTION" jump out
-    if(line % n_tokens .eq. 1) then
-      if(line % tokens(1) .eq. 'ENDOFSECTION') then
+    if(Line % n_tokens .eq. 1) then
+      if(Line % tokens(1) .eq. 'ENDOFSECTION') then
         goto 3
       end if
     end if
@@ -115,9 +115,9 @@
   call File % Read_Line(fu)          ! NODAL COORDINATES
   do i = 1, Grid % n_nodes
     call File % Read_Line(fu)
-    read(line % tokens(2),*) Grid % xn(i)
-    read(line % tokens(3),*) Grid % yn(i)
-    read(line % tokens(4),*) Grid % zn(i)
+    read(Line % tokens(2),*) Grid % xn(i)
+    read(Line % tokens(3),*) Grid % yn(i)
+    read(Line % tokens(4),*) Grid % zn(i)
   end do
   call File % Read_Line(fu)          ! ENDOFSECTION
 
@@ -157,7 +157,7 @@
   do j = 1, n_blocks
     call File % Read_Line(fu)                 ! ELEMENT GROUP
     call File % Read_Line(fu)
-    read(line % tokens(4),'(i10)') dum1       ! number of cells in this group
+    read(Line % tokens(4),'(i10)') dum1       ! number of cells in this group
     call File % Read_Line(fu)                 ! block*
     call File % Read_Line(fu)                 ! 0
     read(fu,'(10i8)') (temp(i), i = 1, dum1)  ! read all cells in the group
@@ -173,9 +173,9 @@
   do j = 1, n_bnd_sect
     call File % Read_Line(fu)        ! BOUNDARY CONDITIONS
     call File % Read_Line(fu)
-    call String % To_Upper_Case(  line % tokens(1)  )
-    Grid % bnd_cond % name(j) = line % tokens(1)
-    read(line % tokens(3),'(i8)') dum1
+    call String % To_Upper_Case(Line % tokens(1))
+    Grid % bnd_cond % name(j) = Line % tokens(1)
+    read(Line % tokens(3),'(i8)') dum1
     do i = 1, dum1
       read(fu,*) c, dum2, dir
       Grid % cells_bnd_color(dir,c) = j

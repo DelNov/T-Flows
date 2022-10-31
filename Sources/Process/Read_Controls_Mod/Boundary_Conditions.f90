@@ -328,7 +328,7 @@
 
         call File % Open_For_Reading_Ascii(name_prof(1), fu)
         call File % Read_Line(fu)
-        read(line % tokens(1),*) n_points  ! number of points
+        read(Line % tokens(1),*) n_points  ! number of points
 
         !---------------------------------!
         !   Allocate memory for profile   !
@@ -341,7 +341,7 @@
         do m = 1, n_points
           call File % Read_Line(fu)
           do i = 1, nks
-            read(line % tokens(i), *) prof(m,i)
+            read(Line % tokens(i), *) prof(m,i)
           end do
         end do
         close(fu)

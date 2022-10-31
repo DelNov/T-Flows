@@ -25,21 +25,21 @@
     call File % Read_Line(control_file_unit, reached_end)
     if(reached_end) goto 1
 
-    call String % To_Upper_Case(line % tokens(2))
+    call String % To_Upper_Case(Line % tokens(2))
 
     ! First keyword is "BOUNDARY_CONDITION", ...
     ! ... second is boundary condition name
-    if(line % tokens(1) .eq. trim(keyword_1) .and.  &
-       line % tokens(2) .eq. trim(keyword_2)) then
+    if(Line % tokens(1) .eq. trim(keyword_1) .and.  &
+       Line % tokens(2) .eq. trim(keyword_2)) then
       found = .true.
       return
 
     ! Keywords not found, try to see if there is similar, maybe there was a typo
     else
       call Control_Mod_Similar_Warning(trim(keyword_1),         &
-                                       trim(line % tokens(1)))
+                                       trim(Line % tokens(1)))
       call Control_Mod_Similar_Warning(trim(keyword_2),         &
-                                       trim(line % tokens(2)),  &
+                                       trim(Line % tokens(2)),  &
                                        key_type='boundary condition')
     end if
   end do

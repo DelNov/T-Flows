@@ -24,14 +24,14 @@
     if(reached_end) goto 1
 
     ! Found the correct keyword
-    if(line % tokens(1) .eq. trim(keyword)) then
+    if(Line % tokens(1) .eq. trim(keyword)) then
       found = .true.
       return
 
     ! Keyword not found, try to see if there is similar, maybe it was a typo
     else
       call Control_Mod_Similar_Warning(trim(keyword),           &
-                                       trim(line % tokens(1)))
+                                       trim(Line % tokens(1)))
     end if
 
   end do

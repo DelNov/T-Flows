@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Read_Line(File, un, reached_end, remove)
 !------------------------------------------------------------------------------!
-!   Reads a line from a file unit un and discards if it is comment.            !
+!   Reads a Line from a file unit un and discards if it is comment.            !
 !   In addition, it breaks the line in tokens (individual strings).            !
 !------------------------------------------------------------------------------!
   implicit none
@@ -11,7 +11,7 @@
   logical,      optional :: reached_end
   character(*), optional :: remove
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: i, j, l, n
+  integer       :: i, j, n
   integer(1)    :: byte
   character(6)  :: format = '(a000)'
   character(SL) :: fmtd
@@ -25,81 +25,54 @@
     reached_end = .false.
   end if
 
-  ! Take the number of characters to be removed from the line
+  ! Take the number of characters to be removed from the Line
   n = 0;  if(present(remove)) n = len_trim(remove)
 
-  !-----------------------------------!
-  !  Read the whole line into whole   !
-  !-----------------------------------!
+  !------------------------------------!
+  !   Read the whole Line into whole   !
+  !------------------------------------!
   inquire(unit=un, formatted=fmtd)
 1 continue
   if(fmtd .eq. 'YES') then
     write(format(3:5), '(i3.3)') QL
-    read(un, format, end=2) line % whole
+    read(un, format, end=2) Line % whole
   else
-    line % whole = ''
+    Line % whole = ''
     do i = 1, QL
       read(un, end=2) byte
       if(byte .eq. 10) exit
-      if(byte .ne. 13) line % whole(i:i) = char(byte)
+      if(byte .ne. 13) Line % whole(i:i) = char(byte)
     end do
   end if
 
   ! Remove unwanted characters from it (if n .eq. 0, it won't do it)
   do j = 1, n
-    do i = 1, len_trim(line % whole)
-      if( line % whole(i:i) .eq. remove(j:j) ) then
-        line % whole(i:i) = ' '
+    do i = 1, len_trim(Line % whole)
+      if( Line % whole(i:i) .eq. remove(j:j) ) then
+        Line % whole(i:i) = ' '
       end if
     end do
   end do
 
-  ! Shift the whole line to the left (remove leading spaces)
-  line % whole = adjustl(line % whole)
-
-  !--------------------!
-  !  Skip empty lines  !
-  !--------------------!
-  if( line % whole .eq. '' ) goto 1 ! see: man ascii
+  ! Shift the whole Line to the left (remove leading spaces)
+  Line % whole = adjustl(Line % whole)
 
   !----------------------!
-  !  Skip comment lines  !
+  !   Skip empty lines   !
   !----------------------!
-  if( trim(line % whole(1:1)) .eq. '!' .or.               &
-      trim(line % whole(1:1)) .eq. '#' .or.               &
-      trim(line % whole(1:1)) .eq. '%' ) goto 1
+  if( Line % whole .eq. '' ) goto 1 ! see: man ascii
 
-  ! Fetch the first and the last character
-  l = len_trim(line % whole)
-  line % first = line % whole(1:1)
-  line % last  = line % whole(l:l)
+  !------------------------!
+  !   Skip comment lines   !
+  !------------------------!
+  if( trim(Line % whole(1:1)) .eq. '!' .or.               &
+      trim(Line % whole(1:1)) .eq. '#' .or.               &
+      trim(Line % whole(1:1)) .eq. '%' ) goto 1
 
-  !--------------------------------------!
-  !  Parse tokens. This is somehow cool  !
-  !--------------------------------------!
-  line % n_tokens = 0
-  if(line % whole(1:1) >= '!') then
-    line % n_tokens = 1
-    line % s(1)=1
-  end if
-  do i=1,QL-2
-    if( line % whole(i:  i  ) <  '!' .and.  &
-        line % whole(i+1:i+1) >= '!') then
-      line % n_tokens = line % n_tokens + 1
-      line % s(line % n_tokens) = i+1
-    end if
-    if( line % whole(i  :i  ) >= '!' .and.  &
-        line % whole(i+1:i+1) <  '!') then
-      line % e(line % n_tokens) = i
-    end if
-  end do
-
-  ! Chop them up
-  do i = 1, line % n_tokens
-    line % tokens(i) = line % whole(line % s(i) : line % e(i))
-  end do
-
-  return
+  !----------------------------------------!
+  !   Parse tokens. This is somehow cool   !
+  !----------------------------------------!
+  call Line % Parse()
 
   ! Error trap, if here, you reached the end of file
 2 if(present(reached_end)) then

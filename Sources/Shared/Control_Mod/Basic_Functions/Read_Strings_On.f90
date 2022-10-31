@@ -24,18 +24,18 @@
   if(reached_end) goto 1
 
   ! Found the correct keyword
-  if(line % tokens(1) .eq. trim(keyword)) then
+  if(Line % tokens(1) .eq. trim(keyword)) then
 
-    do i=2, line % n_tokens
-      read(line % tokens(i), *) values(i-1)
+    do i=2, Line % n_tokens
+      read(Line % tokens(i), *) values(i-1)
     end do
-    n = line % n_tokens - 1
+    n = Line % n_tokens - 1
     return 
 
   ! Keyword not found, try to see if there is similar, maybe it was a typo
   ! (Tokens 2 and on hold variable names, they are too short to be checked)
   else
-    call Control_Mod_Similar_Warning( keyword, trim(line % tokens(1)) )
+    call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
   end if
 
   !--------------------------------------------!

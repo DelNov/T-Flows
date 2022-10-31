@@ -40,7 +40,7 @@
   print *, '# Input problem name: (without extension)'
   print *, '#----------------------------------------'
   call File % Read_Line(5)
-  read(line % tokens(1), *) problem_name(1)
+  read(Line % tokens(1), *) problem_name(1)
 
   Grid % name = problem_name(1)
   call String % To_Upper_Case(Grid % name)
@@ -52,9 +52,9 @@
   !   Max. number of nodes (cells), boundary faces and cell faces   !
   !-----------------------------------------------------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) Grid % max_n_nodes
-  read(line % tokens(2), *) Grid % max_n_bnd_cells
-  read(line % tokens(3), *) Grid % max_n_faces
+  read(Line % tokens(1), *) Grid % max_n_nodes
+  read(Line % tokens(2), *) Grid % max_n_bnd_cells
+  read(Line % tokens(3), *) Grid % max_n_faces
 
   !---------------------!
   !   Allocate memory   !
@@ -91,22 +91,22 @@
   !   Corners   !
   !-------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) dom % n_points  ! number of points
+  read(Line % tokens(1), *) dom % n_points  ! number of points
 
   call Domain_Mod_Allocate_Points(dom, dom % n_points)
 
   do i = 1, dom % n_points
     call File % Read_Line(fu)
-    read(line % tokens(2),*) dom % points(i) % x
-    read(line % tokens(3),*) dom % points(i) % y
-    read(line % tokens(4),*) dom % points(i) % z
+    read(Line % tokens(2),*) dom % points(i) % x
+    read(Line % tokens(3),*) dom % points(i) % y
+    read(Line % tokens(4),*) dom % points(i) % z
   end do
 
   !------------!
   !   Blocks   !
   !------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) dom % n_blocks  ! number of blocks
+  read(Line % tokens(1), *) dom % n_blocks  ! number of blocks
 
   call Domain_Mod_Allocate_Blocks(dom, dom % n_blocks)
 
@@ -120,18 +120,18 @@
     dom % blocks(b) % corners(0)=1       ! suppose it is properly oriented
 
     call File % Read_Line(fu)
-    read(line % tokens(2),*) dom % blocks(b) % resolutions(1)
-    read(line % tokens(3),*) dom % blocks(b) % resolutions(2)
-    read(line % tokens(4),*) dom % blocks(b) % resolutions(3)
+    read(Line % tokens(2),*) dom % blocks(b) % resolutions(1)
+    read(Line % tokens(3),*) dom % blocks(b) % resolutions(2)
+    read(Line % tokens(4),*) dom % blocks(b) % resolutions(3)
 
     call File % Read_Line(fu)
-    read(line % whole, *)               &  ! block weights
+    read(Line % whole, *)               &  ! block weights
          dom % blocks(b) % weights(1),  &
          dom % blocks(b) % weights(2),  &
          dom % blocks(b) % weights(3)
 
     call File % Read_Line(fu)
-    read(line % whole, *)                                             &
+    read(Line % whole, *)                                             &
          dom % blocks(b) % corners(1), dom % blocks(b) % corners(2),  &
          dom % blocks(b) % corners(3), dom % blocks(b) % corners(4),  &
          dom % blocks(b) % corners(5), dom % blocks(b) % corners(6),  &
@@ -184,16 +184,16 @@
   !   or with just a weighting factor.           !
   !----------------------------------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) dom % n_lines  ! number of defined dom % lines
+  read(Line % tokens(1), *) dom % n_lines  ! number of defined dom % lines
 
   call Domain_Mod_Allocate_Lines(dom, dom % n_lines)
 
   do l=1, dom % n_lines
     call File % Read_Line(fu)
 
-    read(line % tokens(1),*) npnt
-    read(line % tokens(2),*) dom % lines(l) % points(1)
-    read(line % tokens(3),*) dom % lines(l) % points(2)
+    read(Line % tokens(1),*) npnt
+    read(Line % tokens(2),*) dom % lines(l) % points(1)
+    read(Line % tokens(3),*) dom % lines(l) % points(2)
 
     call Domain_Mod_Find_Line(dom,                         &
                               dom % lines(l) % points(1),  &
@@ -209,15 +209,15 @@
     if(npnt > 0) then
       do n=1,dom % lines(l) % resolution
         call File % Read_Line(fu)
-        read(line % tokens(2),*) dom % lines(l) % x(n)
-        read(line % tokens(3),*) dom % lines(l) % y(n)
-        read(line % tokens(4),*) dom % lines(l) % z(n)
+        read(Line % tokens(2),*) dom % lines(l) % x(n)
+        read(Line % tokens(3),*) dom % lines(l) % y(n)
+        read(Line % tokens(4),*) dom % lines(l) % z(n)
       end do
 
     ! Weight factor
     else
       call File % Read_Line(fu)
-      read(line % tokens(1), *) dom % lines(l) % weight
+      read(Line % tokens(1), *) dom % lines(l) % weight
     end if
 
   end do
@@ -237,17 +237,17 @@
   !   Surfaces   !
   !--------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) nsurf     ! number of defined surfaces
+  read(Line % tokens(1), *) nsurf     ! number of defined surfaces
 
   do s = 1, nsurf
     call File % Read_Line(fu)
-    read(line % whole,*) dum, n1, n2, n3, n4
+    read(Line % whole,*) dum, n1, n2, n3, n4
     call Domain_Mod_Find_Surface(dom, n1, n2, n3, n4, b, i_fac)
     print *, '# block: ', b, ' surf: ', i_fac
     n = (b-1)*6 + i_fac         ! surface number
 
     call File % Read_Line(fu)
-    read(line % whole, *) dom % blocks(b) % face_weights(i_fac,1),  &
+    read(Line % whole, *) dom % blocks(b) % face_weights(i_fac,1),  &
                           dom % blocks(b) % face_weights(i_fac,2),  &
                           dom % blocks(b) % face_weights(i_fac,2)
   end do
@@ -295,7 +295,7 @@
   !   Boundary conditions and materials   !
   !---------------------------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) dom % n_regions  ! number of regions (can be bnd.
+  read(Line % tokens(1), *) dom % n_regions  ! number of regions (can be bnd.
                                              ! conditions or materials)
 
   call Domain_Mod_Allocate_Regions(dom, dom % n_regions)
@@ -304,24 +304,24 @@
     dom % regions(n) % face=''
 
     call File % Read_Line(fu)
-    if(line % n_tokens .eq. 7) then
-      read(line % whole,*)  dum,            &
+    if(Line % n_tokens .eq. 7) then
+      read(Line % whole,*)  dum,            &
                    dom % regions(n) % is,   &
                    dom % regions(n) % js,   &
                    dom % regions(n) % ks,   &
                    dom % regions(n) % ie,   &
                    dom % regions(n) % je,   &
                    dom % regions(n) % ke
-    else if(line % n_tokens .eq. 2) then
-      read(line % tokens(1),*)       dum
-      read(line % tokens(2),'(A4)')  &
+    else if(Line % n_tokens .eq. 2) then
+      read(Line % tokens(1),*)       dum
+      read(Line % tokens(2),'(A4)')  &
            dom % regions(n) % face
       call String % To_Upper_Case(dom % regions(n) % face)
     end if
 
     call File % Read_Line(fu)
-    read(line % tokens(1), *) dom % regions(n) % block
-    read(line % tokens(2), *) dom % regions(n) % name
+    read(Line % tokens(1), *) dom % regions(n) % block
+    read(Line % tokens(2), *) dom % regions(n) % name
     call String % To_Upper_Case(dom % regions(n) % name)
 
     ! if( dom % blocks(b_cond(n,7)) % points(0) .eq. -1 ) then
@@ -335,17 +335,17 @@
   !   Periodic boundaries   !
   !-------------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *)  n_periodic_cond  ! number of periodic boundaries
+  read(Line % tokens(1), *)  n_periodic_cond  ! number of periodic boundaries
   print '(a38,i7)', '# Number of periodic boundaries:     ', n_periodic_cond
 
   allocate (periodic_cond(n_periodic_cond,8))
 
   do n=1,n_periodic_cond
     call File % Read_Line(fu)
-    read(line % whole, *) dum, periodic_cond(n,1), periodic_cond(n,2),  &
+    read(Line % whole, *) dum, periodic_cond(n,1), periodic_cond(n,2),  &
                                periodic_cond(n,3), periodic_cond(n,4)
     call File % Read_Line(fu)
-    read(line % whole, *)      periodic_cond(n,5), periodic_cond(n,6),  &
+    read(Line % whole, *)      periodic_cond(n,5), periodic_cond(n,6),  &
                                periodic_cond(n,7), periodic_cond(n,8)
   end do
 
@@ -353,13 +353,13 @@
   !   Copy boundaries   !
   !---------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *)  dumi  ! used to be number of copy boundaries
+  read(Line % tokens(1), *)  dumi  ! used to be number of copy boundaries
 
   !-----------------------------------!
   !   Refinement levels and regions   !
   !-----------------------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) ref % n_levels     ! number of refinement levels
+  read(Line % tokens(1), *) ref % n_levels     ! number of refinement levels
   print '(a38,i7)', '# Number of refinement levels:       ', ref % n_levels
 
   call Refines_Mod_Allocate_Levels(ref, ref % n_levels)
@@ -367,12 +367,12 @@
   do l = 1, ref % n_levels
     print *, '# Level: ', l
     call File % Read_Line(fu)
-    read(line % tokens(2), *) ref % n_regions(l)
+    read(Line % tokens(2), *) ref % n_regions(l)
 
     ! Browse through regions in level "l"
     do n = 1, ref % n_regions(l)
       call File % Read_Line(fu)
-      read(line % tokens(3),*) answer
+      read(Line % tokens(3),*) answer
       call String % To_Upper_Case(answer)
       ref % region(l,n) % shape = -1
       if(answer .eq. 'RECTANGLE') ref % region(l,n) % shape = RECTANGLE
@@ -384,7 +384,7 @@
       end if
 
       call File % Read_Line(fu)
-      read(line % whole, *)                      &
+      read(Line % whole, *)                      &
                 ref % region(l,n) % pnt(1) % x,  &
                 ref % region(l,n) % pnt(1) % y,  &
                 ref % region(l,n) % pnt(1) % z,  &
@@ -398,7 +398,7 @@
   !   Smoothing regions   !
   !-----------------------!
   call File % Read_Line(fu)
-  read(line % tokens(1), *) smr % n_smooths  ! number of smoothing regions
+  read(Line % tokens(1), *) smr % n_smooths  ! number of smoothing regions
 
   print '(a38,i7)', '# Number of (non)smoothing regions:  ', smr % n_smooths
 
@@ -409,34 +409,34 @@
     smr % in_y(n) = .false.
     smr % in_z(n) = .false.
     call File % Read_Line(fu)
-    read(line % tokens(1), *) dumi    ! this line is probably not needed
-    if(line % n_tokens .eq. 4) then   ! smoothing in three directions
+    read(Line % tokens(1), *) dumi    ! this Line is probably not needed
+    if(Line % n_tokens .eq. 4) then   ! smoothing in three directions
       smr % in_x(n) = .true.
       smr % in_y(n) = .true.
       smr % in_z(n) = .true.
-    else if(line % n_tokens .eq. 3) then
-      call String % To_Upper_Case(line % tokens(2))
-      call String % To_Upper_Case(line % tokens(3))
-      if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
-      if( line % tokens(3) .eq. 'X' )  smr % in_x(n) = .true.
-      if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
-      if( line % tokens(3) .eq. 'Y' )  smr % in_y(n) = .true.
-      if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
-      if( line % tokens(3) .eq. 'Z' )  smr % in_z(n) = .true.
-    else if(line % n_tokens .eq. 2) then
-      call String % To_Upper_Case(line % tokens(2))
-      if( line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
-      if( line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
-      if( line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
+    else if(Line % n_tokens .eq. 3) then
+      call String % To_Upper_Case(Line % tokens(2))
+      call String % To_Upper_Case(Line % tokens(3))
+      if( Line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
+      if( Line % tokens(3) .eq. 'X' )  smr % in_x(n) = .true.
+      if( Line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
+      if( Line % tokens(3) .eq. 'Y' )  smr % in_y(n) = .true.
+      if( Line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
+      if( Line % tokens(3) .eq. 'Z' )  smr % in_z(n) = .true.
+    else if(Line % n_tokens .eq. 2) then
+      call String % To_Upper_Case(Line % tokens(2))
+      if( Line % tokens(2) .eq. 'X' )  smr % in_x(n) = .true.
+      if( Line % tokens(2) .eq. 'Y' )  smr % in_y(n) = .true.
+      if( Line % tokens(2) .eq. 'Z' )  smr % in_z(n) = .true.
     end if
 
     ! Read the coordinates of the (non)smoothed region
     call File % Read_Line(fu)
-    read(line % whole, *) smr % iters(n),  &
+    read(Line % whole, *) smr % iters(n),  &
                           smr % relax(n)
 
     call File % Read_Line(fu)
-    read(line % whole, *) smr % x_min(n),   &
+    read(Line % whole, *) smr % x_min(n),   &
                           smr % y_min(n),   &
                           smr % z_min(n),   &
                           smr % x_max(n),   &

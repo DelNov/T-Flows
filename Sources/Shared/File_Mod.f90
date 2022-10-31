@@ -5,38 +5,19 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
+  use String_Mod
+  use Tokenizer_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MAX_TOKENS = QL / 2
-  integer, parameter :: MAX_ITEMS  = 2048
+  integer, parameter :: MAX_ITEMS = 2048
 !==============================================================================!
 
   character(SL) :: problem_name(MD)
 
-  !-----------------!
-  !   String type   !
-  !-----------------!
-  type String_Type
-
-    contains
-      procedure :: To_Lower_Case
-      procedure :: To_Upper_Case
-
-  end type
-
-  !--------------------!
-  !   Tokenizer type   !
-  !--------------------!
-  type Tokenizer_Type
-    character(QL) :: whole               ! whole string
-    character(SL) :: tokens(MAX_TOKENS)  ! tokens
-    integer       :: n_tokens            ! number of tokens
-    integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
-                     e(MAX_TOKENS)       ! ... and ends
-    character(1)  :: first, last         ! first and last characters in whole
-  end type
-
+  !---------------!
+  !   File type   !
+  !---------------!
   type File_Type
 
     contains
@@ -56,8 +37,7 @@
 
   end type
 
-  type(String_Type)    :: String
-  type(Tokenizer_Type) :: line
+  type(Tokenizer_Type) :: Line
   type(File_Type)      :: File
 
   integer(SP) :: int4_array(MAX_ITEMS)
@@ -81,7 +61,5 @@
   include 'File_Mod/Read_Binary_Real4_Array.f90'
   include 'File_Mod/Read_Binary_Real8_Array.f90'
   include 'File_Mod/Read_Line.f90'
-  include 'File_Mod/To_Lower_Case.f90'
-  include 'File_Mod/To_Upper_Case.f90'
 
   end module

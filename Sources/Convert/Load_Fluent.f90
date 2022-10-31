@@ -82,9 +82,9 @@
   rewind(fu)
   do while(Grid % n_nodes .eq. 0)
     call File % Read_Line(fu)
-    if(line % n_tokens > 1) then
-      if(line % tokens(1) .eq. '(10' .and. line % tokens(2) .eq. '(0') then
-        read(line % tokens(4), '(z160)') Grid % n_nodes
+    if(Line % n_tokens > 1) then
+      if(Line % tokens(1) .eq. '(10' .and. Line % tokens(2) .eq. '(0') then
+        read(Line % tokens(4), '(z160)') Grid % n_nodes
         print '(a34,i9)', ' # Number of nodes in header:     ', Grid % n_nodes
       end if
     end if
@@ -100,9 +100,9 @@
   rewind(fu)
   do while(Grid % n_cells .eq. 0)
     call File % Read_Line(fu)
-    if(line % n_tokens > 1) then
-      if(line % tokens(1) .eq. '(12' .and. line % tokens(2) .eq. '(0') then
-        read(line % tokens(4), '(z160)') Grid % n_cells
+    if(Line % n_tokens > 1) then
+      if(Line % tokens(1) .eq. '(12' .and. Line % tokens(2) .eq. '(0') then
+        read(Line % tokens(4), '(z160)') Grid % n_cells
         print '(a34,i9)', ' # Number of cells in header:     ', Grid % n_cells
       end if
     end if
@@ -118,9 +118,9 @@
   rewind(fu)
   do while(Grid % n_faces .eq. 0)
     call File % Read_Line(fu)
-    if(line % n_tokens > 1) then
-      if(line % tokens(1) .eq. '(13' .and. line % tokens(2) .eq. '(0') then
-        read(line % tokens(4), '(z160)') Grid % n_faces
+    if(Line % n_tokens > 1) then
+      if(Line % tokens(1) .eq. '(13' .and. Line % tokens(2) .eq. '(0') then
+        read(Line % tokens(4), '(z160)') Grid % n_faces
         print '(a34,i9)', ' # Number of faces in header:     ', Grid % n_faces
       end if
     end if
@@ -144,33 +144,33 @@
   rewind(fu)
   do while(n_faces < Grid % n_faces .and. .not. the_end)
     call File % Read_Line(fu, reached_end=the_end)
-    if(line % n_tokens > 1) then
+    if(Line % n_tokens > 1) then
 
       !----------------------------------------------------------!
       !   Does the line mark the beginning of face-based data?   !
       !   13) is for ascii and 2013) for binary formatted data   !
       !----------------------------------------------------------!
-      if( (line % tokens(1) .eq. '(13' .or. line % tokens(1) .eq. '(2013')  &
-         .and. line % tokens(2) .ne. '(0') then
+      if( (Line % tokens(1) .eq. '(13' .or. Line % tokens(1) .eq. '(2013')  &
+         .and. Line % tokens(2) .ne. '(0') then
 
         ! Store the format of this section
         ascii = .true.
-        if(line % tokens(1) .eq. '(2013') ascii = .false.
+        if(Line % tokens(1) .eq. '(2013') ascii = .false.
 
         ! Fetch start and ending face
-        read(line % tokens(3), '(z160)') side_f  ! first face
-        read(line % tokens(4), '(z160)') side_l  ! last face
+        read(Line % tokens(3), '(z160)') side_f  ! first face
+        read(Line % tokens(4), '(z160)') side_l  ! last face
 
         ! Increase the counter for face sections
         n_face_sect = n_face_sect + 1
 
         ! Store this face section position in the Fluent's mesh
-        one_token = line % tokens(2)
+        one_token = Line % tokens(2)
         l = len_trim(one_token)
         read(one_token(2:l), '(z16)') face_sect_pos(n_face_sect)
 
         ! Take the cell type of this zone
-        one_token = line % tokens(6)
+        one_token = Line % tokens(6)
         read(one_token(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
@@ -181,7 +181,7 @@
         end if
 
         ! End the line if needed, just read one left bracket '('
-        if(line % last .ne. '(') then
+        if(Line % last .ne. '(') then
           if(ascii)       call File % Read_Line(fu)
           if(.not. ascii) read(fu) one_char
         end if
@@ -198,9 +198,9 @@
              zone_type .eq. FACE_POLY) then
             if(ascii) then
               call File % Read_Line(fu)
-              read(line % tokens(1), *) n_face_nodes
-              read(line % tokens(1+n_face_nodes+1), '(z160)') c1
-              read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+              read(Line % tokens(1), *) n_face_nodes
+              read(Line % tokens(1+n_face_nodes+1), '(z160)') c1
+              read(Line % tokens(1+n_face_nodes+2), '(z160)') c2
             else
               call File % Read_Binary_Int4_Array(fu, 1)
               n_face_nodes = int4_array(1)
@@ -216,8 +216,8 @@
             if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
             if(ascii) then
               call File % Read_Line(fu)
-              read(line % tokens(0+n_face_nodes+1), '(z160)') c1
-              read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+              read(Line % tokens(0+n_face_nodes+1), '(z160)') c1
+              read(Line % tokens(0+n_face_nodes+2), '(z160)') c2
             else
               call File % Read_Binary_Int4_Array(fu, n_face_nodes)
               call File % Read_Binary_Int4_Array(fu, 2)
@@ -286,25 +286,25 @@
   rewind(fu)
   do while(n_nodes < Grid % n_nodes .and. .not. the_end)
     call File % Read_Line(fu)
-    if(line % n_tokens > 1) then
+    if(Line % n_tokens > 1) then
 
       !----------------------------------------------------------!
       !   Does the line mark the beginning of node-based data?   !
       !   10) is for ascii and 3010) for binary formatted data   !
       !----------------------------------------------------------!
-      if( (line % tokens(1) .eq. '(10' .or. line % tokens(1) .eq. '(3010')  &
-         .and. line % tokens(2) .ne. '(0') then
-        read(line % tokens(3), '(z160)') node_f  ! first node
-        read(line % tokens(4), '(z160)') node_l  ! last node
+      if( (Line % tokens(1) .eq. '(10' .or. Line % tokens(1) .eq. '(3010')  &
+         .and. Line % tokens(2) .ne. '(0') then
+        read(Line % tokens(3), '(z160)') node_f  ! first node
+        read(Line % tokens(4), '(z160)') node_l  ! last node
         print '(a34,i9,a4,i9)', ' # Found a node zone from:        ',  &
                                 node_f, ' to:', node_l
 
         ! Store the format of this section
         ascii = .true.
-        if(line % tokens(1) .eq. '(3010') ascii = .false.
+        if(Line % tokens(1) .eq. '(3010') ascii = .false.
 
-        ! End the line if needed
-        if(line % last .ne. '(') then
+        ! End the Line if needed
+        if(Line % last .ne. '(') then
           if(ascii)       call File % Read_Line(fu)
           if(.not. ascii) read(fu) one_char
         end if
@@ -314,9 +314,9 @@
           n_nodes = n_nodes + 1
           if(ascii) then
             call File % Read_Line(fu)
-            read(line % tokens(1), *)  Grid % xn(n)
-            read(line % tokens(2), *)  Grid % yn(n)
-            read(line % tokens(3), *)  Grid % zn(n)
+            read(Line % tokens(1), *)  Grid % xn(n)
+            read(Line % tokens(2), *)  Grid % yn(n)
+            read(Line % tokens(3), *)  Grid % zn(n)
           else
             call File % Read_Binary_Real8_Array(fu, 3)
             Grid % xn(n) = real8_array(1)
@@ -358,20 +358,20 @@
   rewind(fu)
   do while(n_cells < Grid % n_cells .and. .not. the_end)
     call File % Read_Line(fu, reached_end=the_end)
-    if(line % n_tokens > 1) then
-      if( (line % tokens(1) .eq. '(12' .or. line % tokens(1) .eq. '(2012')  &
-         .and. line % tokens(2) .ne. '(0') then
+    if(Line % n_tokens > 1) then
+      if( (Line % tokens(1) .eq. '(12' .or. Line % tokens(1) .eq. '(2012')  &
+         .and. Line % tokens(2) .ne. '(0') then
 
         ! Store the format of this section
         ascii = .true.
-        if(line % tokens(1) .eq. '(2012') ascii = .false.
+        if(Line % tokens(1) .eq. '(2012') ascii = .false.
 
         ! Fetch first and last cell
-        read(line % tokens(3), '(z160)') cell_f  ! first cell
-        read(line % tokens(4), '(z160)') cell_l  ! last cell
+        read(Line % tokens(3), '(z160)') cell_f  ! first cell
+        read(Line % tokens(4), '(z160)') cell_l  ! last cell
 
         ! Check if the zone is mixed (listing all cell types)
-        read(line % tokens(6)(1:1), '(z1)') zone_type
+        read(Line % tokens(6)(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed cell zone from:  ',  &
                                   cell_f, ' to:', cell_l
@@ -437,21 +437,21 @@
           n_cells_zone = cell_l - cell_f + 1  ! this was read above
 
           if(ascii) then
-            ! Find out the line length
+            ! Find out the Line length
             offset = ftell(fu)                ! mark offset
-            length = File % Line_Length(fu)   ! read the line
+            length = File % Line_Length(fu)   ! read the Line
             call fseek(fu, offset, 0)         ! go back
 
             ! Allocate helping arrays
-            allocate(very_long_line(length))    ! allocate very long line
+            allocate(very_long_line(length))    ! allocate very long Line
             allocate(cell_types(n_cells_zone))  ! allocate cell types
 
-            ! Read the very long line
+            ! Read the very long Line
             read(fu) very_long_line
 
-            ! Browse the very long line and read cell types from it
+            ! Browse the very long Line and read cell types from it
             c = 0                                  ! cell counter
-            do i = 1, length                       ! thrugh entire long line
+            do i = 1, length                       ! thrugh entire long Line
               if(ichar(very_long_line(i)) .ge. ichar('0') .and.  &
                  ichar(very_long_line(i)) .le. ichar('9')) then
                 c = c + 1                          ! increase cell count
@@ -560,28 +560,28 @@
   rewind(fu)
   do while(n_faces < Grid % n_faces .and. .not. the_end)
     call File % Read_Line(fu, reached_end=the_end)
-    if(line % n_tokens > 1) then
+    if(Line % n_tokens > 1) then
 
       !----------------------------------------------------------!
-      !   Does the line mark the beginning of face-based data?   !
+      !   Does the Line mark the beginning of face-based data?   !
       !   13) is for ascii and 2013) for binary formatted data   !
       !----------------------------------------------------------!
-      if( (line % tokens(1) .eq. '(13' .or. line % tokens(1) .eq. '(2013')  &
-         .and. line % tokens(2) .ne. '(0') then
+      if( (Line % tokens(1) .eq. '(13' .or. Line % tokens(1) .eq. '(2013')  &
+         .and. Line % tokens(2) .ne. '(0') then
 
         ! Store the format of this section
         ascii = .true.
-        if(line % tokens(1) .eq. '(2013') ascii = .false.
+        if(Line % tokens(1) .eq. '(2013') ascii = .false.
 
         ! Fetch first and last face
-        read(line % tokens(3), '(z160)') side_f  ! first face
-        read(line % tokens(4), '(z160)') side_l  ! last face
+        read(Line % tokens(3), '(z160)') side_f  ! first face
+        read(Line % tokens(4), '(z160)') side_l  ! last face
 
         ! Increase the counter for face sections
         n_face_sect = n_face_sect + 1
 
         ! Take the cell type of this zone
-        one_token = line % tokens(6)
+        one_token = Line % tokens(6)
         read(one_token(1:1), '(z1)') zone_type
         if(zone_type .eq. MIXED_ZONE) then
           print '(a34,i9,a4,i9)', ' # Found a mixed face zone from:  ',  &
@@ -591,8 +591,8 @@
                                   side_f, ' to:', side_l
         end if
 
-        ! End the line if needed
-        if(line % last .ne. '(') then
+        ! End the Line if needed
+        if(Line % last .ne. '(') then
           if(ascii)       call File % Read_Line(fu)
           if(.not. ascii) read(fu) one_char
         end if
@@ -608,14 +608,14 @@
              zone_type .eq. FACE_POLY) then
             if(ascii) then
               call File % Read_Line(fu)
-              read(line % tokens(1), *) n_face_nodes
+              read(Line % tokens(1), *) n_face_nodes
               Grid % faces_n_nodes(s) = n_face_nodes
               call Adjust_First_Dim(n_face_nodes, Grid % faces_n)
               do i_nod = 1, n_face_nodes
-                read(line % tokens(1+i_nod), '(z160)') Grid % faces_n(i_nod, s)
+                read(Line % tokens(1+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
-              read(line % tokens(1+n_face_nodes+1), '(z160)') c1
-              read(line % tokens(1+n_face_nodes+2), '(z160)') c2
+              read(Line % tokens(1+n_face_nodes+1), '(z160)') c1
+              read(Line % tokens(1+n_face_nodes+2), '(z160)') c2
             else
               call File % Read_Binary_Int4_Array(fu, 1)
               n_face_nodes = int4_array(1)
@@ -636,10 +636,10 @@
             if(ascii) then
               call File % Read_Line(fu)
               do i_nod = 1, n_face_nodes
-                read(line % tokens(0+i_nod), '(z160)') Grid % faces_n(i_nod, s)
+                read(Line % tokens(0+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
-              read(line % tokens(0+n_face_nodes+1), '(z160)') c1
-              read(line % tokens(0+n_face_nodes+2), '(z160)') c2
+              read(Line % tokens(0+n_face_nodes+1), '(z160)') c1
+              read(Line % tokens(0+n_face_nodes+2), '(z160)') c2
             else
               call File % Read_Binary_Int4_Array(fu, n_face_nodes)
               do i_nod = 1, n_face_nodes
@@ -1071,20 +1071,20 @@
   the_end = .false.
   do while(.not. the_end)
     call File % Read_Line(fu, reached_end=the_end)
-    if(.not. the_end .and. line % n_tokens > 1) then
-      if(line % tokens(1) .eq. '(39' .or.  &
-         line % tokens(1) .eq. '(45') then
+    if(.not. the_end .and. Line % n_tokens > 1) then
+      if(Line % tokens(1) .eq. '(39' .or.  &
+         Line % tokens(1) .eq. '(45') then
 
         ! Extract this face section position in the Fluent's mesh
-        one_token = line % tokens(2)
+        one_token = Line % tokens(2)
         l = len_trim(one_token)
         read(one_token(2:l), '(i16)') pos
 
         ! Extract boundary condition name
-        if(index(line % tokens(4), ')') .ne. 0) then  ! ')' is in the string
-          one_token = line % tokens(4)(1:index(line % tokens(4), ')')-1)
+        if(index(Line % tokens(4), ')') .ne. 0) then  ! ')' is in the string
+          one_token = Line % tokens(4)(1:index(Line % tokens(4), ')')-1)
         else
-          one_token = line % tokens(4)
+          one_token = Line % tokens(4)
         end if
 
         do n = 1, 2048

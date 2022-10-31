@@ -48,10 +48,10 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$MeshFormat') exit
+    if(Line % tokens(1) .eq. '$MeshFormat') exit
   end do
   call File % Read_Line(fu)
-  if(line % tokens(1) .ne. '4.1') then
+  if(Line % tokens(1) .ne. '4.1') then
     print *, '# ERROR in Load_Gmsh: files in version 4.1 are supported!'
     print *, '# This error is criticial.  Exiting!'
     stop
@@ -59,7 +59,7 @@
 
   ! My guess is that second tokens says it is binary (1) or not (0)
   ascii = .true.
-  if(line % tokens(2) .eq. '1') ascii = .false.
+  if(Line % tokens(2) .eq. '1') ascii = .false.
   ! Line which follows contains some crap, but who cares?
 
   !----------------------------------------------!
@@ -80,21 +80,21 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$PhysicalNames') exit
+    if(Line % tokens(1) .eq. '$PhysicalNames') exit
   end do
   call File % Read_Line(fu)
-  read(line % tokens(1), *) n_sect
+  read(Line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
   allocate(p_tag_corr(n_sect * 65536))  ! allocate more than needed because
                                         ! it's all very messy in .msh files
   do i = 1, n_sect
     call File % Read_Line(fu)
-    read(line % tokens(2), *) j
-    if(line % tokens(1) .eq. '2') n_bnd_sect = n_bnd_sect + 1
-    if(line % tokens(1) .eq. '3') n_blocks   = n_blocks   + 1
-    read(line % tokens(2), *) j  ! section number; neglect
-    if(line % tokens(1) .eq. '2') then
-      read(line % tokens(3), *) phys_names(n_bnd_sect)
+    read(Line % tokens(2), *) j
+    if(Line % tokens(1) .eq. '2') n_bnd_sect = n_bnd_sect + 1
+    if(Line % tokens(1) .eq. '3') n_blocks   = n_blocks   + 1
+    read(Line % tokens(2), *) j  ! section number; neglect
+    if(Line % tokens(1) .eq. '2') then
+      read(Line % tokens(3), *) phys_names(n_bnd_sect)
       p_tag_corr(j) = n_bnd_sect
     end if
   end do
@@ -107,11 +107,11 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$Nodes') exit
+    if(Line % tokens(1) .eq. '$Nodes') exit
   end do
   if(ascii) then
     call File % Read_Line(fu)
-    read(line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
+    read(Line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     Grid % n_nodes = int8_array(4)
@@ -126,11 +126,11 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$Elements') exit
+    if(Line % tokens(1) .eq. '$Elements') exit
   end do
   if(ascii) then
     call File % Read_Line(fu)
-    read(line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
+    read(Line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_elem = int8_array(4)
@@ -149,14 +149,14 @@
     rewind(fu)
     do
       call File % Read_Line(fu)
-      if(line % tokens(1) .eq. '$Entities') exit
+      if(Line % tokens(1) .eq. '$Entities') exit
     end do
     if(ascii) then
       call File % Read_Line(fu)
-      read(line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
-      read(line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
-      read(line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
-      read(line % tokens(4), *) n_e_3d  ! number of 3D entities (volumes)
+      read(Line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
+      read(Line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
+      read(Line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
+      read(Line % tokens(4), *) n_e_3d  ! number of 3D entities (volumes)
     else
       call File % Read_Binary_Int8_Array(fu, 4)
       n_e_0d = int8_array(1)  ! number of 0D entities (points)
@@ -212,12 +212,12 @@
 
       if(ascii) then
         call File % Read_Line(fu)
-        read(line % tokens(1), *) s_tag          ! surface tag
-        read(line % tokens(8), *) n_tags         ! for me this was 1 or 0
+        read(Line % tokens(1), *) s_tag          ! surface tag
+        read(Line % tokens(8), *) n_tags         ! for me this was 1 or 0
         do j = 1, n_tags                         ! browse physical tags ...
-          read(line % tokens(8+j), *) p_tag      ! ... and read them
+          read(Line % tokens(8+j), *) p_tag      ! ... and read them
         end do
-        read(line % tokens(9+n_tags), *) n_crvs  ! number of bounding curves
+        read(Line % tokens(9+n_tags), *) n_crvs  ! number of bounding curves
       else
         ! Surface's tag
         call File % Read_Binary_Int4_Array (fu, 1)
@@ -265,7 +265,7 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$Elements') exit
+    if(Line % tokens(1) .eq. '$Elements') exit
   end do
 
   !-------------------------------!
@@ -273,7 +273,7 @@
   !-------------------------------!
   if(ascii) then
     call File % Read_Line(fu)
-    read(line % tokens(1),*) n_grps
+    read(Line % tokens(1),*) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_grps = int8_array(1)
@@ -287,10 +287,10 @@
     ! Read dim, s_tag, type and n_memb <--= this is what you actually need!
     if(ascii) then
       call File % Read_Line(fu)
-      read(line % tokens(1), *) dim     ! dimension of the element
-      read(line % tokens(2), *) s_tag   ! element tag
-      read(line % tokens(3), *) type    ! element type
-      read(line % tokens(4), *) n_memb  ! number of members in the group
+      read(Line % tokens(1), *) dim     ! dimension of the element
+      read(Line % tokens(2), *) s_tag   ! element tag
+      read(Line % tokens(3), *) type    ! element type
+      read(Line % tokens(4), *) n_memb  ! number of members in the group
     else
       call File % Read_Binary_Int4_Array(fu, 3)
       dim   = int4_array(1)  ! dimension of the element
@@ -304,7 +304,7 @@
     do j = 1, n_memb
       if(ascii) then
         call File % Read_Line(fu)
-        read(line % tokens(1), *) c     ! Gmsh cell number
+        read(Line % tokens(1), *) c     ! Gmsh cell number
       else
         ! Element tag
         call File % Read_Binary_Int8_Array(fu, 1)
@@ -353,7 +353,7 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$Elements') exit
+    if(Line % tokens(1) .eq. '$Elements') exit
   end do
 
   !-------------------------------!
@@ -361,7 +361,7 @@
   !-------------------------------!
   if(ascii) then
     call File % Read_Line(fu)
-    read(line % tokens(1),*) n_grps
+    read(Line % tokens(1),*) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_grps = int8_array(1)
@@ -375,10 +375,10 @@
     ! Read dim, s_tag, type and n_memb
     if(ascii) then
       call File % Read_Line(fu)
-      read(line % tokens(1), *) dim     ! dimension of the element
-      read(line % tokens(2), *) s_tag   ! element tag
-      read(line % tokens(3), *) type    ! element type
-      read(line % tokens(4), *) n_memb  ! number of members in the group
+      read(Line % tokens(1), *) dim     ! dimension of the element
+      read(Line % tokens(2), *) s_tag   ! element tag
+      read(Line % tokens(3), *) type    ! element type
+      read(Line % tokens(4), *) n_memb  ! number of members in the group
     else
       call File % Read_Binary_Int4_Array(fu, 3)
       dim   = int4_array(1)  ! dimension of the element
@@ -400,13 +400,13 @@
     do j = 1, n_memb
       if(ascii) then
         call File % Read_Line(fu)
-        read(line % tokens(1), *) c  ! fetch Gmsh cell number
+        read(Line % tokens(1), *) c  ! fetch Gmsh cell number
         c = new(c)                   ! use T-Flows numbering
 
         Grid % cells_n_nodes(c) = n_nods
         call Adjust_First_Dim(n_nods, Grid % cells_n)
         do k = 1, n_nods
-          read(line % tokens(k+1), *) Grid % cells_n(k, c)
+          read(Line % tokens(k+1), *) Grid % cells_n(k, c)
         end do
 
       else  ! it is in binary format
@@ -444,7 +444,7 @@
   rewind(fu)
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. '$Nodes') exit
+    if(Line % tokens(1) .eq. '$Nodes') exit
   end do
 
   !-------------------------------!
@@ -452,7 +452,7 @@
   !-------------------------------!
   if(ascii) then
     call File % Read_Line(fu)
-    read(line % tokens(1),*) n_grps
+    read(Line % tokens(1),*) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_grps = int8_array(1)
@@ -464,7 +464,7 @@
   do i = 1, n_grps
     if(ascii) then
       call File % Read_Line(fu)
-      read(line % tokens(4),*) n_memb  ! fetch number of members
+      read(Line % tokens(4),*) n_memb  ! fetch number of members
     else
       call File % Read_Binary_Int4_Array(fu, 3)
       call File % Read_Binary_Int8_Array(fu, 1)
@@ -476,7 +476,7 @@
     if(ascii) then
       do j = 1, n_memb
         call File % Read_Line(fu)
-        read(line % tokens(1),*) n(j)
+        read(Line % tokens(1),*) n(j)
       end do
     else
       do j = 1, n_memb                 ! fetch all node numbers
@@ -489,9 +489,9 @@
     if(ascii) then
       do j = 1, n_memb
         call File % Read_Line(fu)    ! read node coordinates
-        read(line % tokens(1),*) Grid % xn(n(j))
-        read(line % tokens(2),*) Grid % yn(n(j))
-        read(line % tokens(3),*) Grid % zn(n(j))
+        read(Line % tokens(1),*) Grid % xn(n(j))
+        read(Line % tokens(2),*) Grid % yn(n(j))
+        read(Line % tokens(3),*) Grid % zn(n(j))
       end do
     else
       do j = 1, n_memb

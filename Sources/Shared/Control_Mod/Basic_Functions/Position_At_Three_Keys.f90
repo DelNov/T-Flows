@@ -32,9 +32,9 @@
 
     ! First keyword is "INTERFACE_CONDITION", ...
     ! ... second and third are two problem names
-    if(line % tokens(1) .eq. trim(keyword_1) .and.  &
-       line % tokens(2) .eq. trim(keyword_2) .and.  &
-       line % tokens(3) .eq. trim(keyword_3)) then
+    if(Line % tokens(1) .eq. trim(keyword_1) .and.  &
+       Line % tokens(2) .eq. trim(keyword_2) .and.  &
+       Line % tokens(3) .eq. trim(keyword_3)) then
       found = .true.
       return
 

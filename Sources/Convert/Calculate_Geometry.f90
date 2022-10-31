@@ -134,11 +134,11 @@
     print *, '# (or skip to keep as is): '
     print *, '#-----------------------------------------'
     call File % Read_Line(5)
-    answer = line % tokens(1)
+    answer = Line % tokens(1)
     call String % To_Upper_Case(answer)
 
     if( answer .ne. 'SKIP' ) then
-      read(line % tokens(1), *) factor
+      read(Line % tokens(1), *) factor
       print '(a,es10.3)', ' # Scaling geometry by factor: ', factor
       Grid % xn(:) = Grid % xn(:) * factor
       Grid % yn(:) = Grid % yn(:) * factor
@@ -280,7 +280,7 @@
       print *, '# Type skip if there is none !                                 '
       print *, '#--------------------------------------------------------------'
       call File % Read_Line(5)
-      answer = line % tokens(1)
+      answer = Line % tokens(1)
       call String % To_Upper_Case(answer)
 
       if( answer .eq. 'SKIP' ) then
@@ -288,7 +288,7 @@
         exit
       end if
 
-      read(line % tokens(1), *) color_per
+      read(Line % tokens(1), *) color_per
       if( color_per > Grid % n_bnd_cond ) then
         print *, '# Critical error: boundary condition ', color_per,  &
                    ' doesn''t exist!'

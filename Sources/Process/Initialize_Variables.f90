@@ -113,7 +113,7 @@
       ! number of points
       call File % Read_Line(fu)
 
-      read(line % tokens(1), *) n_points
+      read(Line % tokens(1), *) n_points
 
       if (this_proc < 2) print '(a,i0,2a)', " # Reading ", nks, &
         " columns in file " , trim(keys_file(1))
@@ -128,7 +128,7 @@
       do m = 1, n_points
         call File % Read_Line(fu)
         do i = 1, nks
-          read(line % tokens(i), *) prof(m, i)
+          read(Line % tokens(i), *) prof(m, i)
         end do
       end do
       close(fu)

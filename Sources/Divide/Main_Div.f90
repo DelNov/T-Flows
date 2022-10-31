@@ -43,7 +43,7 @@
 
     print *, '# Input problem name: (without extension)'
     call File % Read_Line(5)
-    read(line % tokens(1), *)  problem_name(1)
+    read(Line % tokens(1), *)  problem_name(1)
 
     print *, '# Number of subdomains:'
     read(*,*)  n_sub

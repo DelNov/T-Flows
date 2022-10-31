@@ -141,6 +141,8 @@ OPT_LINK = $(OPT_F_COMP)
 
 # Modules in shared directories
 SRC_F_MOD = Const_Mod.f90          \
+            String_Mod.f90         \
+            Tokenizer_Mod.f90      \
             Comm_Mod_Seq.f90       \
             Profiler_Mod.f90       \
             Math_Mod.f90           \

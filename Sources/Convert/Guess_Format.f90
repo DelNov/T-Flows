@@ -30,7 +30,7 @@
     rewind(fu)
     do l = 1, 64
       call File % Read_Line(fu)
-      if(line % tokens(1) .eq. '(10') then
+      if(Line % tokens(1) .eq. '(10') then
         file_format = 'FLUENT'
         print *, '#================================='   // &
                  '=================================='
@@ -50,7 +50,7 @@
     rewind(fu)
     do l = 1, 64
       call File % Read_Line(fu)
-      if(line % tokens(1) .eq. '$MeshFormat') then
+      if(Line % tokens(1) .eq. '$MeshFormat') then
         file_format = 'GMSH'
         print *, '#================================='   // &
                  '=================================='
@@ -70,9 +70,9 @@
     rewind(fu)
     do l = 1, 64
       call File % Read_Line(fu)
-      if(line % tokens(1) .eq. 'NUMNP' .and.  &
-         line % tokens(2) .eq. 'NELEM' .and.  &
-         line % tokens(3) .eq. 'NGRPS') then
+      if(Line % tokens(1) .eq. 'NUMNP' .and.  &
+         Line % tokens(2) .eq. 'NELEM' .and.  &
+         Line % tokens(3) .eq. 'NGRPS') then
         file_format = 'GAMBIT'
         print *, '#================================='   // &
                  '=================================='

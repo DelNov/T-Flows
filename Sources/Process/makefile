@@ -195,8 +195,9 @@ endif
 #   Modules
 #-------------
 
-# Const is the lowest level module
-SRC_F_MOD = Const_Mod.f90
+# Const and String are the lowest level modules
+SRC_F_MOD = Const_Mod.f90   \
+            String_Mod.f90
 
 # Conditional support for MPI communication
 ifeq ($(MPI), yes)
@@ -206,7 +207,8 @@ else
 endif
 
 # Modules in shared directory
-SRC_F_MOD += Profiler_Mod.f90       \
+SRC_F_MOD += Tokenizer_Mod.f90      \
+             Profiler_Mod.f90       \
              Math_Mod.f90           \
              Swap_Mod.f90           \
              Sort_Mod.f90           \

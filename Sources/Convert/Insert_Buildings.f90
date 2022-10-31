@@ -100,8 +100,8 @@
   cnt = 0
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. 'endsolid') exit
-    if(line % tokens(1) .eq. 'facet') cnt = cnt + 1
+    if(Line % tokens(1) .eq. 'endsolid') exit
+    if(Line % tokens(1) .eq. 'facet') cnt = cnt + 1
   end do
   print '(a38,i9)', '# Number of facets on the ground:    ', cnt
 
@@ -121,15 +121,15 @@
   cnt = 0
   do
     call File % Read_Line(fu)
-    if(line % tokens(1) .eq. 'endsolid') exit
-    if(line % tokens(1) .eq. 'facet') then
+    if(Line % tokens(1) .eq. 'endsolid') exit
+    if(Line % tokens(1) .eq. 'facet') then
       cnt = cnt + 1
       call File % Read_Line(fu)                ! 'outer loop'
       do v = 1, 3
         call File % Read_Line(fu)              ! 'vertex 1, 2 and 3'
-        read(line % tokens(2), *) ground % facet(cnt) % x(v)
-        read(line % tokens(3), *) ground % facet(cnt) % y(v)
-        read(line % tokens(4), *) ground % facet(cnt) % z(v)
+        read(Line % tokens(2), *) ground % facet(cnt) % x(v)
+        read(Line % tokens(3), *) ground % facet(cnt) % y(v)
+        read(Line % tokens(4), *) ground % facet(cnt) % z(v)
         x_max = max(x_max, ground % facet(cnt) % x(v))
         x_min = min(x_min, ground % facet(cnt) % x(v))
         y_max = max(y_max, ground % facet(cnt) % y(v))

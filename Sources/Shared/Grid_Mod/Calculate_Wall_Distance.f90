@@ -39,7 +39,7 @@
   print *, '# Type skip to skip this and set wall distance to -1.0 everywhere. '
   print *, '#------------------------------------------------------------------'
   call File % Read_Line(5)
-  answer = line % tokens(1)
+  answer = Line % tokens(1)
   call String % To_Upper_Case(answer)
 
   !-----------------------------------------------------!
@@ -54,10 +54,10 @@
   !----------------------------------!
   else
 
-    n_wall_colors = line % n_tokens
+    n_wall_colors = Line % n_tokens
     allocate(wall_colors(n_wall_colors))
     do b = 1, n_wall_colors
-      read(line % tokens(b), *) wall_colors(b)
+      read(Line % tokens(b), *) wall_colors(b)
     end do
 
     processed_cells = 0
