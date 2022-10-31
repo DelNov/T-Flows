@@ -13,7 +13,7 @@
   integer, allocatable, dimension(:,:) :: t
 !==============================================================================!
 
-  call Profiler % Start('Adjust_First_Dim')
+  ! Don't: call Profiler % Start('Adjust_First_Dim'), it kills performance
 
   n_old = size  (a, 1)
   l_old = lbound(a, 2)
@@ -28,6 +28,6 @@
     deallocate(t)
   end if
 
-  call Profiler % Stop('Adjust_First_Dim')
+  ! Don't: call Profiler % Stop('Adjust_First_Dim', it kills performance)
 
   end subroutine
