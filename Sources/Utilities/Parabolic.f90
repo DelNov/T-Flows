@@ -1,9 +1,9 @@
 !==============================================================================!
   program Parabolic
 !------------------------------------------------------------------------------!
-!  Creates a parabolic velocity profile useful for laminar inflows             !
+!   Creates a parabolic velocity profile useful for laminar inflows            !
 !                                                                              !
-!  Compile with: gfortran -o Parabolic Parabolic.f90                           !
+!   Compile with: gfortran -o Parabolic Parabolic.f90                          !
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
