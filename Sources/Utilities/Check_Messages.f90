@@ -7,6 +7,7 @@
 !   gfortran -c ../Shared/Const_Mod.f90                                        !
 !   gfortran -c ../Shared/Tokenizer_Mod.f90                                    !
 !   gfortran -c ../Shared/Comm_Mod_Seq.f90                                     !
+!   gfortran -c ../Shared/Message_Mod.f90                                      !
 !   gfortran -o check_msg *.o Check_Messages.f90                               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
@@ -15,7 +16,7 @@
   implicit none
 !==============================================================================!
 
-  call Message % Print_Plain_Text(69,                                     &
+  call Message % Print_Plain_Text(39,                                     &
                                "This is a box with plain text ... "   //  &
                                "This is a box with plain text ... "   //  &
                                "This is a box with plain text ... "   //  &
