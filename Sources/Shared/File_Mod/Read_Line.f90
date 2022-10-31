@@ -13,11 +13,11 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i, j, n
   integer(1)    :: byte
-  character(6)  :: format = '(a000)'
+  character(7)  :: format = '(a0000)'
   character(SL) :: fmtd
 !==============================================================================!
 !   A comment is each line which begins with "!", "#" or "%".                  !
-!   Input line must not exceed QL characters in length (defined in Const_Mod)  !
+!   Input line must not exceed MAX_TOKENS*2 characters in length               !
 !------------------------------------------------------------------------------!
 
   ! If present, assumed the end of file has not been reached
@@ -34,11 +34,11 @@
   inquire(unit=un, formatted=fmtd)
 1 continue
   if(fmtd .eq. 'YES') then
-    write(format(3:5), '(i3.3)') QL
+    write(format(3:6), '(i4.4)') MAX_TOKENS*2
     read(un, format, end=2) Line % whole
   else
     Line % whole = ''
-    do i = 1, QL
+    do i = 1, MAX_TOKENS*2
       read(un, end=2) byte
       if(byte .eq. 10) exit
       if(byte .ne. 13) Line % whole(i:i) = char(byte)

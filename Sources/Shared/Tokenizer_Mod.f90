@@ -8,20 +8,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MAX_TOKENS = QL / 2
+  integer, parameter :: MAX_TOKENS = 2048
 !==============================================================================!
 
   !--------------------!
   !   Tokenizer type   !
   !--------------------!
   type Tokenizer_Type
-    character(QL) :: whole               ! whole string
-    character(SL) :: tokens(MAX_TOKENS)  ! tokens
-    integer       :: n_tokens            ! number of tokens
-    integer       :: s(MAX_TOKENS),  &   ! tokens starts ...
-                     e(MAX_TOKENS)       ! ... and ends
-    character(1)  :: first, last         ! first and last characters in whole
-
+    character(MAX_TOKENS*2) :: whole               ! whole string
+    character(SL)           :: tokens(MAX_TOKENS)  ! tokens
+    integer                 :: n_tokens            ! number of tokens
+    integer                 :: s(MAX_TOKENS),  &   ! tokens starts ...
+                               e(MAX_TOKENS)       ! ... and ends
+    character(1)            :: first, last         ! the first and last ...
+                                                   ! character in the whole
     contains
       procedure :: Parse
 

@@ -19,7 +19,7 @@
     Tok % n_tokens = 1
     Tok % s(1)=1
   end if
-  do i=1,QL-2
+  do i = 1, MAX_TOKENS*2 - 2
     if( Tok % whole(i:  i  ) <  '!' .and.  &
         Tok % whole(i+1:i+1) >= '!') then
       Tok % n_tokens = Tok % n_tokens + 1
