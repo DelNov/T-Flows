@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Calculate_Geometry(Grid, real_run)
 !------------------------------------------------------------------------------!
-!   Calculates geometrical quantities of the Grid.                             !
+!   Calculates geometrical quantities of the grid.                             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Gen_Mod
@@ -12,11 +12,8 @@
   type(Grid_Type)     :: Grid
   logical, intent(in) :: real_run
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, m, i_nod, j_nod, s, n_per, nn, nf
-  real    :: xt(4), yt(4), zt(4)
-  real    :: x_cell_tmp, y_cell_tmp, z_cell_tmp
-  real    :: xs2, ys2, zs2
-  real    :: t, tot_surf
+  integer :: c, c1, c2, m, s, n_per, nn, nf
+  real    :: xs2, ys2, zs2, t, tot_surf
   integer :: fn(6,4)
 !------------------------------------------------------------------------------!
   include 'Block_Numbering.f90'
@@ -102,6 +99,17 @@
 
   call Profiler % Start('Calculate_Geometry')
 
+  ! An error trap for c1 and c2
+  do s = 1, Grid % n_faces
+    if(Grid % faces_c(2,s) > 0) then
+      if(Grid % faces_c(1,s) > Grid % faces_c(2,s)) then
+        call Message % Print_Error(60,                                  &
+                 'This shoulnd''t have happened at real face! \n '  //  &
+                 'This error is critical.  Exiting now.!')
+      end if
+    end if
+  end do
+
   ! Copy face-node numbering for faces
   ! (Note that it is the same as for blocks here in Generator)
   fn = hex_block
@@ -125,61 +133,21 @@
   call Grid % Calculate_Cell_Centers()
 
   !-----------------------------------------------------!
-  !   Calculate:                                        !
-  !      components of cell faces, cell face centers.   !
-  !-----------------------------------------------------!
-  !   => depends on: xn, yn, zn                         !
-  !   <= gives:      sx, sy, sz, xf, yf, zf             !
-  !-----------------------------------------------------!
-  do s = 1, Grid % n_faces
-    do i_nod = 1, Grid % faces_n_nodes(s)  ! for quadrilateral an triangular faces
-      xt(i_nod) = Grid % xn(Grid % faces_n(i_nod,s))
-      yt(i_nod) = Grid % yn(Grid % faces_n(i_nod,s))
-      zt(i_nod) = Grid % zn(Grid % faces_n(i_nod,s))
-    end do
+  !----------------------------------!
+  !   Calculate face surface areas   !
+  !----------------------------------!
+  !   => depends on: xn, yn, zn      !
+  !   <= gives:      sx, sy, sz      !
+  !----------------------------------!
+  call Grid % Calculate_Face_Surfaces()
 
-    ! Cell side components
-    if( Grid % faces_n_nodes(s) .eq. 4 ) then
-      Grid % sx(s)= 0.5 * ((yt(2)-yt(1))  &
-                         * (zt(2)+zt(1))  &
-                         + (yt(3)-yt(2))  &
-                         * (zt(2)+zt(3))  &
-                         + (yt(4)-yt(3))  &
-                         * (zt(3)+zt(4))  &
-                         + (yt(1)-yt(4))  &
-                         * (zt(4)+zt(1)) )
-      Grid % sy(s)= 0.5 * ((zt(2)-zt(1))  &
-                         * (xt(2)+xt(1))  &
-                         + (zt(3)-zt(2))  &
-                         * (xt(2)+xt(3))  &
-                         + (zt(4)-zt(3))  &
-                         * (xt(3)+xt(4))  &
-                         + (zt(1)-zt(4))  &
-                         * (xt(4)+xt(1)) )
-      Grid % sz(s)= 0.5 * ((xt(2)-xt(1))  &
-                         * (yt(2)+yt(1))  &
-                         + (xt(3)-xt(2))  &
-                         * (yt(2)+yt(3))  &
-                         + (xt(4)-xt(3))  &
-                         * (yt(3)+yt(4))  &
-                         + (xt(1)-xt(4))  &
-                         * (yt(4)+yt(1)) )
-    else
-      print *, '# Compute_Grid_Geometry: something horrible has happened !'
-      stop
-    end if
-
-    ! Barycenters
-    if(Grid % faces_n_nodes(s) .eq. 4) then
-      Grid % xf(s) = (   xt(1)+xt(2)          &
-                       + xt(3)+xt(4) ) / 4.0
-      Grid % yf(s) = (   yt(1)+yt(2)          &
-                       + yt(3)+yt(4) ) / 4.0
-      Grid % zf(s) = (   zt(1)+zt(2)          &
-                       + zt(3)+zt(4) ) / 4.0
-    end if
-
-  end do ! through faces
+  !--------------------------------!
+  !   Calculate the face centers   !
+  !--------------------------------!
+  !   => depends on: xn, yn, zn    !
+  !   <= gives:      xf, yf, zf    !
+  !--------------------------------!
+  call Grid % Calculate_Face_Centers()
 
   !--------------------------------------!
   !   Calculate boundary cell centers    !
@@ -191,27 +159,27 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    tot_surf = sqrt(Grid % sx(s)*Grid % sx(s) +  &
-                    Grid % sy(s)*Grid % sy(s) +  &
-                    Grid % sz(s)*Grid % sz(s))
+    tot_surf = sqrt(Grid % sx(s)*Grid % sx(s)    &
+                  + Grid % sy(s)*Grid % sy(s)    &
+                  + Grid % sz(s)*Grid % sz(s) )
 
-    if(c2  < 0) then
-      t = (   Grid % sx(s) * (Grid % xf(s)-Grid % xc(c1))           &
-            + Grid % sy(s) * (Grid % yf(s)-Grid % yc(c1))           &
-            + Grid % sz(s) * (Grid % zf(s)-Grid % zc(c1)) ) / tot_surf
+    if(c2 < 0) then
+      t = (   Grid % sx(s) * (Grid % xf(s) - Grid % xc(c1))        &
+            + Grid % sy(s) * (Grid % yf(s) - Grid % yc(c1))        &
+            + Grid % sz(s) * (Grid % zf(s) - Grid % zc(c1)) ) / tot_surf
       Grid % xc(c2) = Grid % xc(c1) + Grid % sx(s)*t / tot_surf
       Grid % yc(c2) = Grid % yc(c1) + Grid % sy(s)*t / tot_surf
       Grid % zc(c2) = Grid % zc(c1) + Grid % sz(s)*t / tot_surf
     end if
   end do ! through faces
 
-  !---------------------------------------------!
-  !   Find the faces on the periodic boundary   !
-  !---------------------------------------------!
-  !   => depends on: xc,yc,zc,sx,sy,sz          !
-  !   <= gives:      dx,dy,dz                   !
-  !---------------------------------------------!
   if(real_run) then
+    !---------------------------------------------!
+    !   Find the faces on the periodic boundary   !
+    !---------------------------------------------!
+    !   => depends on: xc,yc,zc,sx,sy,sz          !
+    !   <= gives:      dx,dy,dz                   !
+    !---------------------------------------------!
 
     ! Initialize variables for Grid periodicity   
     n_per = 0
@@ -306,62 +274,16 @@
     print '(a38,f8.3)', '# Periodicity in x direction         ', Grid % per_x
     print '(a38,f8.3)', '# Periodicity in y direction         ', Grid % per_y
     print '(a38,f8.3)', '# Periodicity in z direction         ', Grid % per_z
-  end if
 
-  !----------------------------------!
-  !   Calculate the cell volumes     !
-  !----------------------------------!
-  !   => depends on: xc,yc,zc,       !
-  !                  dx,dy,dz,       !
-  !                  xsp, ysp, zsp   !
-  !   <= gives:      volume          !
-  !----------------------------------!
-  if(real_run) then
-    do c = 1, Grid % n_cells
-      Grid % vol(c) = 0.0
-    end do
-
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-
-      do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
-        xt(i_nod) = Grid % xn(Grid % faces_n(i_nod,s))
-        yt(i_nod) = Grid % yn(Grid % faces_n(i_nod,s))
-        zt(i_nod) = Grid % zn(Grid % faces_n(i_nod,s))
-      end do
-
-      ! First cell
-      x_cell_tmp = Grid % xc(c1)
-      y_cell_tmp = Grid % yc(c1)
-      z_cell_tmp = Grid % zc(c1)
-      do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
-        j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
-
-        Grid % vol(c1) = Grid % vol(c1)                                  &
-          + Math % Tet_Volume(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
-                              xt(i_nod),    yt(i_nod),    zt(i_nod),     &
-                              xt(j_nod),    yt(j_nod),    zt(j_nod),     &
-                              x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
-      end do  ! i_nod
-
-      ! Second cell
-      if(c2 > 0) then
-        x_cell_tmp = Grid % xc(c2) + Grid % dx(s)
-        y_cell_tmp = Grid % yc(c2) + Grid % dy(s)
-        z_cell_tmp = Grid % zc(c2) + Grid % dz(s)
-        do i_nod = 1, Grid % faces_n_nodes(s)  ! for all face types
-          j_nod = i_nod + 1;  if(j_nod > Grid % faces_n_nodes(s)) j_nod = 1
-
-          Grid % vol(c2) = Grid % vol(c2)                                  &
-            - Math % Tet_Volume(Grid % xf(s), Grid % yf(s), Grid % zf(s),  &
-                                xt(i_nod),    yt(i_nod),    zt(i_nod),     &
-                                xt(j_nod),    yt(j_nod),    zt(j_nod),     &
-                                x_cell_tmp,   y_cell_tmp,   z_cell_tmp)
-        end do  ! i_nod
-      end if
-
-    end do
+    !----------------------------------!
+    !   Calculate the cell volumes     !
+    !----------------------------------!
+    !   => depends on: xc,yc,zc,       !
+    !                  dx,dy,dz,       !
+    !                  xsp, ysp, zsp   !
+    !   <= gives:      vol             !
+    !----------------------------------!
+    call Grid % Calculate_Cell_Volumes()
 
     Grid % min_vol =  HUGE
     Grid % max_vol = -HUGE
@@ -378,17 +300,15 @@
     print '(a45,es12.5)', ' # Total domain volume is:                   ',  &
           Grid % tot_vol
     print *, '# Cell volumes calculated !'
-  end if
 
-  !------------------------------------!
-  !   Calculate cell inertia tensors   !
-  !------------------------------------!
-  call Grid % Calculate_Cell_Inertia()
+    !------------------------------------!
+    !   Calculate cell inertia tensors   !
+    !------------------------------------!
+    call Grid % Calculate_Cell_Inertia()
 
-  !------------------------------------------------------------!
-  !   Calculate the interpolation factors for the cell faces   !
-  !------------------------------------------------------------!
-  if(real_run) then
+    !------------------------------------------------------------!
+    !   Calculate the interpolation factors for the cell faces   !
+    !------------------------------------------------------------!
     call Grid % Calculate_Face_Interpolation()
   end if
 

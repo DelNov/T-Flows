@@ -8,14 +8,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type) :: Grid
-  integer         :: ask
+  type(Grid_Type)     :: Grid
+  integer, intent(in) :: ask
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b, i, j
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
   integer              :: color_per, n_per, number_faces
   real                 :: xs2, ys2, zs2
-  real                 :: t, sur_tot, dis, min_dis, max_dis
+  real                 :: t, tot_surf, dis, min_dis, max_dis
   real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
   real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
   integer, allocatable :: b_face(:)
@@ -107,9 +107,9 @@
   do s = 1, Grid % n_faces
     if(Grid % faces_c(2,s) > 0) then
       if(Grid % faces_c(1,s) > Grid % faces_c(2,s)) then
-        print *, '# TROUBLE: this shoulnd''t have happened at real face!'
-        print *, '# This error is critical.  Exiting now.!'
-        stop
+        call Message % Print_Error(60,                                  &
+                 'This shoulnd''t have happened at real face! \n '  //  &
+                 'This error is critical.  Exiting now.!')
       end if
     end if
   end do
@@ -192,17 +192,17 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    sur_tot = sqrt(  Grid % sx(s)*Grid % sx(s)  &
-                   + Grid % sy(s)*Grid % sy(s)  &
-                   + Grid % sz(s)*Grid % sz(s) )
+    tot_surf = sqrt(Grid % sx(s)*Grid % sx(s)    &
+                  + Grid % sy(s)*Grid % sy(s)    &
+                  + Grid % sz(s)*Grid % sz(s) )
 
     if(c2 < 0) then
-      t = (   Grid % sx(s)*(Grid % xf(s) - Grid % xc(c1))        &
-            + Grid % sy(s)*(Grid % yf(s) - Grid % yc(c1))        &
-            + Grid % sz(s)*(Grid % zf(s) - Grid % zc(c1)) ) / sur_tot
-      Grid % xc(c2) = Grid % xc(c1) + Grid % sx(s)*t / sur_tot
-      Grid % yc(c2) = Grid % yc(c1) + Grid % sy(s)*t / sur_tot
-      Grid % zc(c2) = Grid % zc(c1) + Grid % sz(s)*t / sur_tot
+      t = (   Grid % sx(s) * (Grid % xf(s) - Grid % xc(c1))        &
+            + Grid % sy(s) * (Grid % yf(s) - Grid % yc(c1))        &
+            + Grid % sz(s) * (Grid % zf(s) - Grid % zc(c1)) ) / tot_surf
+      Grid % xc(c2) = Grid % xc(c1) + Grid % sx(s)*t / tot_surf
+      Grid % yc(c2) = Grid % yc(c1) + Grid % sy(s)*t / tot_surf
+      Grid % zc(c2) = Grid % zc(c1) + Grid % sz(s)*t / tot_surf
       if(bou_cen .eq. 1) then
         Grid % xc(c2) = Grid % xf(s)
         Grid % yc(c2) = Grid % yf(s)
@@ -736,8 +736,6 @@
   !   Calculate the interpolation factors for the cell faces   !
   !------------------------------------------------------------!
   call Grid % Calculate_Face_Interpolation()
-
-  print *, '# Interpolation factors calculated !'
 
   call Profiler % Stop('Calculate_Geometry')
 
