@@ -15,7 +15,7 @@
   ! _assert_(w <= DL)
 
   line = ' '
-  do i = 2, w+1, 2
+  do i = 3, w+1, 2
     write(line(i:i), '(a1)')  '-'
   end do
 
