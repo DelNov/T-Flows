@@ -23,6 +23,7 @@
   integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
   character(SL), allocatable :: phys_names(:)
   logical                    :: ascii                 ! is file in ascii format?
+  logical                    :: the_end               ! did it reach the end
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MSH_TRI   = 2
   integer, parameter :: MSH_QUAD  = 3
@@ -52,9 +53,10 @@
   end do
   call File % Read_Line(fu)
   if(Line % tokens(1) .ne. '4.1') then
-    print *, '# ERROR in Load_Gmsh: files in version 4.1 are supported!'
-    print *, '# This error is criticial.  Exiting!'
-    stop
+    call Message % Print_Error(60,                                      &
+             " Only Gmsh .msh files in version 4.1 are supported!"  //  &
+             " \n I can't continue with this file, exiting!",           &
+             in_file=__FILE__, on_line=__LINE__)
   end if
 
   ! My guess is that second tokens says it is binary (1) or not (0)
@@ -77,10 +79,18 @@
   !-------------------------------------------------!
   n_blocks   = 0
   n_bnd_sect = 0
+  the_end    = .false.
   rewind(fu)
   do
-    call File % Read_Line(fu)
+    call File % Read_Line(fu, reached_end=the_end)
     if(Line % tokens(1) .eq. '$PhysicalNames') exit
+    if(the_end) then
+      call Message % Print_Error(60,                                        &
+        "This is bad.  PhysicalNames don't seem to be defined in the "  //  &
+        ".msh file.  Maybe you forgot to define boundary conditions  "  //  &
+        "(called physical groups) in Gmsh?",                                &
+        in_file=__FILE__, on_line=__LINE__)
+    end if
   end do
   call File % Read_Line(fu)
   read(Line % tokens(1), *) n_sect
@@ -244,9 +254,10 @@
         end if
       end if
       if(n_tags > 1) then
-        print *, '# ERROR in Load_Gmsh @ s_tag: ', s_tag
-        print *, '# More than one boundary condition per entity - not allowed!'
-        stop
+        call Message % Print_Error(50,                                  &
+               " More than one boundary condition per entity. \n "  //  &
+               " It is not supported in this verion of T-Flows!",       &
+               in_file=__FILE__, on_line=__LINE__)
       end if
     end do
     if(run .eq. 1) then

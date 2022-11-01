@@ -33,11 +33,10 @@
   print *, '# Number of inside cells:   ', Grid % n_cells
 
   if(Grid % n_cells .eq. 0) then
-    print *, '# Number of cells inside the domain is zero'
-    print *, '# Are you sure you meshed the domain in 3D?'
-    print *, '# Exiting!'
-    print *, '#-------------------------------------------------'
-    stop
+    call Message % Print_Error(50,                          &
+      "Number of cells inside the domain is zero. \n "  //  &
+      "Are you sure you meshed the domain in 3D?",          &
+      in_file=__FILE__, on_line=__LINE__)
   end if
 
   allocate(is_node_bnd(Grid % n_nodes));    is_node_bnd(:)   = .false.
