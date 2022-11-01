@@ -1,27 +1,24 @@
 !==============================================================================!
   subroutine Vis_T_Tensorial(Turb)
-  				! DELETED: Vof, Swarm, curr_dt, time
 !------------------------------------------------------------------------------!
 !   Calculates the non-linear, tensorial "viscosity", and the associated SGS   !
 !   stress tensor.                                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type),     target :: Turb
+  class(Turb_Type), target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Field_Type),  pointer :: Flow
+  type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   integer                   :: c
   real                      :: ixp, iyp, izp, ixyp, ixzp, iyzp
-  ! Variable names should be all in small leters,
-  ! unless they are classes like Flow, Grid, Turb ...
-  real                      :: du_dx, du_dy, du_dz,  &   ! line should be max 80
-                               dv_dx, dv_dy, dv_dz,  &
-                               dw_dx, dw_dy, dw_dz
-  real                      :: sgv_x , sgv_y , sgv_z ,     &   ! line should be max 80
-                               sgv_xy, sgv_yx, sgv_xz,  &
-                               sgv_zx, sgv_yz, sgv_zy
+  real                      :: du_dx, du_dy, du_dz
+  real                      :: dv_dx, dv_dy, dv_dz
+  real                      :: dw_dx, dw_dy, dw_dz
+  real                      :: sgv_x , sgv_y , sgv_z
+  real                      :: sgv_xy, sgv_yx, sgv_xz
+  real                      :: sgv_zx, sgv_yz, sgv_zy
 !------------------------------------------------------------------------------!
 !                                                                              !
 !   nii_ki = (1/2*Vol) * I'_kh * dUi/dxh                                       !
@@ -55,7 +52,6 @@
   Turb % tau_33 = 0.0
 
   do c = 1, Grid % n_cells
-    ! Take aliases
     ixp = ( 0.5 * (  Grid % ixx (c)  &
                    - Grid % iyy (c)  &
                    - Grid % izz (c) ) )     ! I'xx         (I'11)
@@ -69,7 +65,7 @@
     ixzp = Grid % ixz (c)              ! I'xz = I'zx  (I'13 = I'31)
     iyzp = Grid % iyz (c)              ! I'yz = I'zy  (I'23 = I'32)
 
-    du_dx = u % x(c)  ! dU/dx    ¿Podría estar aquí el error? Por estar cogiendo el gradiente de un campo de velocidad que no sea el correcto (presumiblemente)
+    du_dx = u % x(c)  ! dU/dx
     du_dy = u % y(c)  ! dU/dy
     du_dz = u % z(c)  ! dU/dz
     dv_dx = v % x(c)  ! dV/dx
@@ -108,85 +104,82 @@
                                                      + iyzp * dv_dy  &
                                                      + izp  * dv_dz )
 
-    ! Since we're at it, we may as well construct the subgrid STRESS tensor too
-      ! Take aliases
-      sgv_x  = Turb % ten_turb_11 (c)
-      sgv_y  = Turb % ten_turb_22 (c)
-      sgv_z  = Turb % ten_turb_33 (c)
-      sgv_xy = Turb % ten_turb_12 (c)
-      sgv_yx = Turb % ten_turb_21 (c)
-      sgv_xz = Turb % ten_turb_13 (c)
-      sgv_zx = Turb % ten_turb_31 (c)
-      sgv_yz = Turb % ten_turb_23 (c)
-      sgv_zy = Turb % ten_turb_32 (c)
+    ! Since we're at it, we may as well construct the subgrid stress tensor too
+    sgv_x  = Turb % ten_turb_11 (c)
+    sgv_y  = Turb % ten_turb_22 (c)
+    sgv_z  = Turb % ten_turb_33 (c)
+    sgv_xy = Turb % ten_turb_12 (c)
+    sgv_yx = Turb % ten_turb_21 (c)
+    sgv_xz = Turb % ten_turb_13 (c)
+    sgv_zx = Turb % ten_turb_31 (c)
+    sgv_yz = Turb % ten_turb_23 (c)
+    sgv_zy = Turb % ten_turb_32 (c)
 
-      ! Now actually build the thing
-      Turb % tau_11 (c)    = (- sgv_x  * du_dx - sgv_x  * du_dx)  &
-                           + (- sgv_yx * du_dy - sgv_yx * du_dy)  &
-                           + (- sgv_zx * du_dz - sgv_zx * du_dz)
+    ! Now actually build the thing
+    Turb % tau_11 (c)    = (- sgv_x  * du_dx - sgv_x  * du_dx)  &
+                         + (- sgv_yx * du_dy - sgv_yx * du_dy)  &
+                         + (- sgv_zx * du_dz - sgv_zx * du_dz)
 
-      Turb % tau_22 (c)    = (- sgv_xy * dv_dx - sgv_xy * dv_dx)  &
-                           + (- sgv_y  * dv_dy - sgv_y  * dv_dy)  &
-                           + (- sgv_zy * dv_dz - sgv_zy * dv_dz)
+    Turb % tau_22 (c)    = (- sgv_xy * dv_dx - sgv_xy * dv_dx)  &
+                         + (- sgv_y  * dv_dy - sgv_y  * dv_dy)  &
+                         + (- sgv_zy * dv_dz - sgv_zy * dv_dz)
 
-      Turb % tau_33 (c)    = (- sgv_xz * dw_dx - sgv_xz * dw_dx)  &
-                           + (- sgv_yz * dw_dy - sgv_yz * dw_dy)  &
-                           + (- sgv_z  * dw_dz - sgv_z  * dw_dz)
+    Turb % tau_33 (c)    = (- sgv_xz * dw_dx - sgv_xz * dw_dx)  &
+                         + (- sgv_yz * dw_dy - sgv_yz * dw_dy)  &
+                         + (- sgv_z  * dw_dz - sgv_z  * dw_dz)
 
-      Turb % tau_12 (c)    = (- sgv_xy * du_dx - sgv_x  * dv_dx)  &
-                           + (- sgv_y  * du_dy - sgv_yx * dv_dy)  &
-                           + (- sgv_zy * du_dz - sgv_zx * dv_dz)
+    Turb % tau_12 (c)    = (- sgv_xy * du_dx - sgv_x  * dv_dx)  &
+                         + (- sgv_y  * du_dy - sgv_yx * dv_dy)  &
+                         + (- sgv_zy * du_dz - sgv_zx * dv_dz)
 
-      Turb % tau_21 (c)    = (- sgv_x  * dv_dx - sgv_xy * du_dx)  &
-                           + (- sgv_yx * dv_dy - sgv_y  * du_dy)  &
-                           + (- sgv_zx * dv_dz - sgv_zy * du_dz)
+    Turb % tau_21 (c)    = (- sgv_x  * dv_dx - sgv_xy * du_dx)  &
+                         + (- sgv_yx * dv_dy - sgv_y  * du_dy)  &
+                         + (- sgv_zx * dv_dz - sgv_zy * du_dz)
 
-      Turb % tau_13 (c)    = (- sgv_xz * du_dx - sgv_x  * dw_dx)  &
-                           + (- sgv_yz * du_dy - sgv_yx * dw_dy)  &
-                           + (- sgv_z  * du_dz - sgv_zx * dw_dz)
+    Turb % tau_13 (c)    = (- sgv_xz * du_dx - sgv_x  * dw_dx)  &
+                         + (- sgv_yz * du_dy - sgv_yx * dw_dy)  &
+                         + (- sgv_z  * du_dz - sgv_zx * dw_dz)
 
-      Turb % tau_31 (c)    = (- sgv_x  * dw_dx - sgv_xz * du_dx)  &
-                           + (- sgv_yx * dw_dy - sgv_yz * du_dy)  &
-                           + (- sgv_zx * dw_dz - sgv_z  * du_dz)
+    Turb % tau_31 (c)    = (- sgv_x  * dw_dx - sgv_xz * du_dx)  &
+                         + (- sgv_yx * dw_dy - sgv_yz * du_dy)  &
+                         + (- sgv_zx * dw_dz - sgv_z  * du_dz)
 
-      Turb % tau_23 (c)    = (- sgv_xz * dv_dx - sgv_xy * dw_dx)  &
-                           + (- sgv_yz * dv_dy - sgv_y  * dw_dy)  &
-                           + (- sgv_z  * dv_dz - sgv_zy * dw_dz)
+    Turb % tau_23 (c)    = (- sgv_xz * dv_dx - sgv_xy * dw_dx)  &
+                         + (- sgv_yz * dv_dy - sgv_y  * dw_dy)  &
+                         + (- sgv_z  * dv_dz - sgv_zy * dw_dz)
 
-      Turb % tau_32 (c)    = (- sgv_xy * dw_dx - sgv_xz * dv_dx)  &
-                           + (- sgv_y  * dw_dy - sgv_yz * dv_dy)  &
-                           + (- sgv_zy * dw_dz - sgv_z  * dv_dz)
+    Turb % tau_32 (c)    = (- sgv_xy * dw_dx - sgv_xz * dv_dx)  &
+                         + (- sgv_y  * dw_dy - sgv_yz * dv_dy)  &
+                         + (- sgv_zy * dw_dz - sgv_z  * dv_dz)
 
   end do
-  
+
   ! Call Save_Debug_Vtu to check if the tensors are calculated properly
-    
-  print *, 'SGS non-linear viscosity and stress tensors calculated'
-                             
-  call Grid % Save_Debug_Vtu('NEW-niiSGS_ij',                      &
-                             tensor_cell = (/Turb % ten_turb_11,     &
-                                             Turb % ten_turb_12,     &
-                                             Turb % ten_turb_13,     &
-                                             Turb % ten_turb_21,    &
-                                             Turb % ten_turb_22,    &
-                                             Turb % ten_turb_23,    &
-                                             Turb % ten_turb_31,    &
-                                             Turb % ten_turb_32,    &
-                                             Turb % ten_turb_33/),  &
-                             tensor_comp = 9,                  &
-                             tensor_name = 'Nonlinear Turbulent Viscosity Tensor')
-                             
-  call Grid % Save_Debug_Vtu('NEW-tauSGS_ij',                         &
-                             tensor_cell = (/Turb % tau_11,     &
-                                             Turb % tau_12,     &
-                                             Turb % tau_13,     &
-                                             Turb % tau_21,    &
-                                             Turb % tau_22,    &
-                                             Turb % tau_23,    &
-                                             Turb % tau_31,    &
-                                             Turb % tau_32,    &
-                                             Turb % tau_33/),  &
-                             tensor_comp = 9,                     &
-                             tensor_name = 'Nonlinear Turbulent Viscosity Tensor')
+  ! print *, 'SGS non-linear viscosity and stress tensors calculated'
+  ! call Grid % Save_Debug_Vtu('new-nii-sgs-ij',                  &
+  !                        tensor_cell = (/Turb % ten_turb_11,    &
+  !                                        Turb % ten_turb_12,    &
+  !                                        Turb % ten_turb_13,    &
+  !                                        Turb % ten_turb_21,    &
+  !                                        Turb % ten_turb_22,    &
+  !                                        Turb % ten_turb_23,    &
+  !                                        Turb % ten_turb_31,    &
+  !                                        Turb % ten_turb_32,    &
+  !                                        Turb % ten_turb_33/),  &
+  !                        tensor_comp = 9,                       &
+  !                        tensor_name = 'Nonlinear Turbulent Viscosity Tensor')
+
+  ! call Grid % Save_Debug_Vtu('new-tau-sgs-ij',             &
+  !                        tensor_cell = (/Turb % tau_11,    &
+  !                                        Turb % tau_12,    &
+  !                                        Turb % tau_13,    &
+  !                                        Turb % tau_21,    &
+  !                                        Turb % tau_22,    &
+  !                                        Turb % tau_23,    &
+  !                                        Turb % tau_31,    &
+  !                                        Turb % tau_32,    &
+  !                                        Turb % tau_33/),  &
+  !                        tensor_comp = 9,                  &
+  !                        tensor_name = 'Nonlinear Stress Tensor')
 
   end subroutine
