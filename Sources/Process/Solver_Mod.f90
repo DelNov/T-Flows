@@ -36,12 +36,12 @@
 
   contains
 
-  include 'Solver_Mod/Alias_Native.f90'
-  include 'Solver_Mod/Create_Solver.f90'
-  include 'Solver_Mod/End.f90'
-  include 'Solver_Mod/Linear_Solvers_Code.f90'
-  include 'Solver_Mod/Remove_Singular.f90'
-  include 'Solver_Mod/Run.f90'
-  include 'Solver_Mod/Set_Singular.f90'
+#   include "Solver_Mod/Alias_Native.f90"
+#   include "Solver_Mod/Create_Solver.f90"
+#   include "Solver_Mod/End.f90"
+#   include "Solver_Mod/Linear_Solvers_Code.f90"
+#   include "Solver_Mod/Remove_Singular.f90"
+#   include "Solver_Mod/Run.f90"
+#   include "Solver_Mod/Set_Singular.f90"
 
   end module

@@ -115,46 +115,46 @@
 
   contains
 
-  !----------------------------------------!
-  !   Procedures to advance vof function   !
-  !----------------------------------------!
-  include 'Vof_Mod/Core/Allocate_Vof.f90'
-  include 'Vof_Mod/Core/Main_Vof.f90'
-  include 'Vof_Mod/Core/Compute_Vof.f90'
-  include 'Vof_Mod/Core/Discretize.f90'
-  include 'Vof_Mod/Core/Correct_Beta.f90'
-  include 'Vof_Mod/Core/Max_Courant_Number.f90'
-  include 'Vof_Mod/Core/Predict_Beta.f90'
-  include 'Vof_Mod/Core/Solve_System.f90'
+    !----------------------------------------!
+    !   Procedures to advance vof function   !
+    !----------------------------------------!
+#   include "Vof_Mod/Core/Allocate_Vof.f90"
+#   include "Vof_Mod/Core/Main_Vof.f90"
+#   include "Vof_Mod/Core/Compute_Vof.f90"
+#   include "Vof_Mod/Core/Discretize.f90"
+#   include "Vof_Mod/Core/Correct_Beta.f90"
+#   include "Vof_Mod/Core/Max_Courant_Number.f90"
+#   include "Vof_Mod/Core/Predict_Beta.f90"
+#   include "Vof_Mod/Core/Solve_System.f90"
 
-  !------------------------------------------!
-  !   Procedures helping to prepare smooth   !
-  !   (convoluted) variant of vof function   !
-  !   for eventual estimation of curvature   !
-  !------------------------------------------!
-  include 'Vof_Mod/Curvature/Curvature_Csf.f90'
-  include 'Vof_Mod/Curvature/Smooth_Curvature.f90'
-  include 'Vof_Mod/Curvature/Smooth_For_Curvature_Csf.f90'
-  include 'Vof_Mod/Curvature/Smooth_Scalar.f90'
+    !------------------------------------------!
+    !   Procedures helping to prepare smooth   !
+    !   (convoluted) variant of vof function   !
+    !   for eventual estimation of curvature   !
+    !------------------------------------------!
+#   include "Vof_Mod/Curvature/Curvature_Csf.f90"
+#   include "Vof_Mod/Curvature/Smooth_Curvature.f90"
+#   include "Vof_Mod/Curvature/Smooth_For_Curvature_Csf.f90"
+#   include "Vof_Mod/Curvature/Smooth_Scalar.f90"
 
-  !----------------------------------------------!
-  !   Procedures to be called by other modules   !
-  !----------------------------------------------!
-  include 'Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90'
-  include 'Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90'
-  include 'Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90'
-  include 'Vof_Mod/Utilities/Grad_Variable_With_Front.f90'
-  include 'Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90'
-  include 'Vof_Mod/Utilities/Mass_Transfer_Estimate.f90'
-  include 'Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90'
-  include 'Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90'
-  include 'Vof_Mod/Utilities/Surface_Tension_Force.f90'
-  include 'Vof_Mod/Utilities/Update_Physical_Properties.f90'
+    !----------------------------------------------!
+    !   Procedures to be called by other modules   !
+    !----------------------------------------------!
+#   include "Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90"
+#   include "Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90"
+#   include "Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90"
+#   include "Vof_Mod/Utilities/Grad_Variable_With_Front.f90"
+#   include "Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90"
+#   include "Vof_Mod/Utilities/Mass_Transfer_Estimate.f90"
+#   include "Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90"
+#   include "Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90"
+#   include "Vof_Mod/Utilities/Surface_Tension_Force.f90"
+#   include "Vof_Mod/Utilities/Update_Physical_Properties.f90"
 
-  !------------------------------------!
-  !   User functions for this module   !
-  !------------------------------------!
-  include 'User_Mod/Beginning_Of_Compute_Vof.f90'
-  include 'User_Mod/End_Of_Compute_Vof.f90'
+    !------------------------------------!
+    !   User functions for this module   !
+    !------------------------------------!
+#   include "User_Mod/Beginning_Of_Compute_Vof.f90"
+#   include "User_Mod/End_Of_Compute_Vof.f90"
 
   end module

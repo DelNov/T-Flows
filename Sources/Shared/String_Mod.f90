@@ -22,7 +22,7 @@
 
   contains
 
-  include 'String_Mod/To_Lower_Case.f90'
-  include 'String_Mod/To_Upper_Case.f90'
+#   include "String_Mod/To_Lower_Case.f90"
+#   include "String_Mod/To_Upper_Case.f90"
 
   end module

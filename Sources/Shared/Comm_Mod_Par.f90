@@ -106,52 +106,52 @@
 
   contains
 
-  ! Three basic ones are non-member
-  include 'Comm_Mod/Parallel/Start.f90'
-  include 'Comm_Mod/Parallel/Wait.f90'
-  include 'Comm_Mod/Parallel/End.f90'
+    ! Three basic ones are non-member
+#   include "Comm_Mod/Parallel/Start.f90"
+#   include "Comm_Mod/Parallel/Wait.f90"
+#   include "Comm_Mod/Parallel/End.f90"
 
-  ! File management
-  include 'Comm_Mod/Parallel/Close_File.f90'
-  include 'Comm_Mod/Parallel/Open_File_Read.f90'
-  include 'Comm_Mod/Parallel/Open_File_Write.f90'
-  include 'Comm_Mod/Parallel/Read_Int.f90'
-  include 'Comm_Mod/Parallel/Read_Int_Array.f90'
-  include 'Comm_Mod/Parallel/Read_Log.f90'
-  include 'Comm_Mod/Parallel/Read_Log_Array.f90'
-  include 'Comm_Mod/Parallel/Read_Bnd_Real.f90'
-  include 'Comm_Mod/Parallel/Read_Cell_Real.f90'
-  include 'Comm_Mod/Parallel/Read_Real.f90'
-  include 'Comm_Mod/Parallel/Read_Real_Array.f90'
-  include 'Comm_Mod/Parallel/Read_Text.f90'
-  include 'Comm_Mod/Parallel/Write_Int.f90'
-  include 'Comm_Mod/Parallel/Write_Int_Array.f90'
-  include 'Comm_Mod/Parallel/Write_Log.f90'
-  include 'Comm_Mod/Parallel/Write_Log_Array.f90'
-  include 'Comm_Mod/Parallel/Write_Bnd_Real.f90'
-  include 'Comm_Mod/Parallel/Write_Cell_Real.f90'
-  include 'Comm_Mod/Parallel/Write_Real.f90'
-  include 'Comm_Mod/Parallel/Write_Real_Array.f90'
-  include 'Comm_Mod/Parallel/Write_Text.f90'
+    ! File management
+#   include "Comm_Mod/Parallel/Close_File.f90"
+#   include "Comm_Mod/Parallel/Open_File_Read.f90"
+#   include "Comm_Mod/Parallel/Open_File_Write.f90"
+#   include "Comm_Mod/Parallel/Read_Int.f90"
+#   include "Comm_Mod/Parallel/Read_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Read_Log.f90"
+#   include "Comm_Mod/Parallel/Read_Log_Array.f90"
+#   include "Comm_Mod/Parallel/Read_Bnd_Real.f90"
+#   include "Comm_Mod/Parallel/Read_Cell_Real.f90"
+#   include "Comm_Mod/Parallel/Read_Real.f90"
+#   include "Comm_Mod/Parallel/Read_Real_Array.f90"
+#   include "Comm_Mod/Parallel/Read_Text.f90"
+#   include "Comm_Mod/Parallel/Write_Int.f90"
+#   include "Comm_Mod/Parallel/Write_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Write_Log.f90"
+#   include "Comm_Mod/Parallel/Write_Log_Array.f90"
+#   include "Comm_Mod/Parallel/Write_Bnd_Real.f90"
+#   include "Comm_Mod/Parallel/Write_Cell_Real.f90"
+#   include "Comm_Mod/Parallel/Write_Real.f90"
+#   include "Comm_Mod/Parallel/Write_Real_Array.f90"
+#   include "Comm_Mod/Parallel/Write_Text.f90"
 
-  ! Global communicatins are better of as non-members
-  include 'Comm_Mod/Parallel/Global_Lor_Log_Array.f90'
-  include 'Comm_Mod/Parallel/Global_Max_Real.f90'
-  include 'Comm_Mod/Parallel/Global_Min_Real.f90'
-  include 'Comm_Mod/Parallel/Global_Max_Int.f90'
-  include 'Comm_Mod/Parallel/Global_Min_Int.f90'
-  include 'Comm_Mod/Parallel/Global_Sum_Int.f90'
-  include 'Comm_Mod/Parallel/Global_Sum_Int_Array.f90'
-  include 'Comm_Mod/Parallel/Global_Sum_Real.f90'
-  include 'Comm_Mod/Parallel/Global_Sum_Real_Array.f90'
+    ! Global communicatins are better of as non-members
+#   include "Comm_Mod/Parallel/Global_Lor_Log_Array.f90"
+#   include "Comm_Mod/Parallel/Global_Max_Real.f90"
+#   include "Comm_Mod/Parallel/Global_Min_Real.f90"
+#   include "Comm_Mod/Parallel/Global_Max_Int.f90"
+#   include "Comm_Mod/Parallel/Global_Min_Int.f90"
+#   include "Comm_Mod/Parallel/Global_Sum_Int.f90"
+#   include "Comm_Mod/Parallel/Global_Sum_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Global_Sum_Real.f90"
+#   include "Comm_Mod/Parallel/Global_Sum_Real_Array.f90"
 
-  ! Messaging
-  include 'Comm_Mod/Parallel/Create_New_Types.f90'
-  include 'Comm_Mod/Parallel/Exchange_Int_Array.f90'
-  include 'Comm_Mod/Parallel/Exchange_Log_Array.f90'
-  include 'Comm_Mod/Parallel/Exchange_Real_Array.f90'
-  include 'Comm_Mod/Parallel/Sendrecv_Int_Arrays.f90'
-  include 'Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90'
-  include 'Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90'
+    ! Messaging
+#   include "Comm_Mod/Parallel/Create_New_Types.f90"
+#   include "Comm_Mod/Parallel/Exchange_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Exchange_Log_Array.f90"
+#   include "Comm_Mod/Parallel/Exchange_Real_Array.f90"
+#   include "Comm_Mod/Parallel/Sendrecv_Int_Arrays.f90"
+#   include "Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90"
+#   include "Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90"
 
   end module

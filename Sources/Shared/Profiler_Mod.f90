@@ -39,9 +39,9 @@
 
   contains
 
-  include 'Profiler_Mod/Start.f90'
-  include 'Profiler_Mod/Statistics.f90'
-  include 'Profiler_Mod/Stop.f90'
-  include 'Profiler_Mod/Update_By_Rank.f90'
+#   include "Profiler_Mod/Start.f90"
+#   include "Profiler_Mod/Statistics.f90"
+#   include "Profiler_Mod/Stop.f90"
+#   include "Profiler_Mod/Update_By_Rank.f90"
 
   end module

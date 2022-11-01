@@ -48,15 +48,15 @@
 
   contains
 
-  include 'Native_Mod/Bicg.f90'
-  include 'Native_Mod/Cg.f90'
-  include 'Native_Mod/Cgs.f90'
-  include 'Native_Mod/Create_Native.f90'
-  include 'Native_Mod/Normalized_Root_Mean_Square.f90'
-  include 'Native_Mod/Prec_Form.f90'
-  include 'Native_Mod/Prec_Solve.f90'
-  include 'Native_Mod/Residual_Vector.f90'
-  include 'Native_Mod/Root_Mean_Square.f90'
-  include 'Native_Mod/Solve_Native.f90'
+#   include "Native_Mod/Bicg.f90"
+#   include "Native_Mod/Cg.f90"
+#   include "Native_Mod/Cgs.f90"
+#   include "Native_Mod/Create_Native.f90"
+#   include "Native_Mod/Normalized_Root_Mean_Square.f90"
+#   include "Native_Mod/Prec_Form.f90"
+#   include "Native_Mod/Prec_Solve.f90"
+#   include "Native_Mod/Residual_Vector.f90"
+#   include "Native_Mod/Root_Mean_Square.f90"
+#   include "Native_Mod/Solve_Native.f90"
 
-  end module 
+  end module
