@@ -147,7 +147,7 @@
   TRACK_SURFACE                            |         no                    |   yes (option for vof only)
   TURBULENCE_MODEL                         |         none                  |   k_eps, k_eps_zeta_f, les_smagorinsky,
                                            |                               |   hybrid_les_prandtl, les_dynamic,
-                                           |                               |   les_wale, dns, des_spalart,
+                                           |                               |   les_wale, les_tvm, dns, des_spalart,
                                            |                               |   spalart_allmaras, rsm_hanjalic_jakirlic,
                                            |                               |   rsm_manceau_hanjalic, hybrid_les_rans
   TURBULENCE_MODEL_VARIANT                 |         high_re               |   low_re
