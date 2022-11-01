@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Print_Error(Msg, width, message_text,  &
-                              in_file, at_line)
+                              in_file, on_line)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -8,7 +8,7 @@
   integer, intent(in)           :: width
   character(*)                  :: message_text
   character(*),        optional :: in_file
-  integer, intent(in), optional :: at_line
+  integer, intent(in), optional :: on_line
 !-----------------------------------[Locals]-----------------------------------!
   type(Tokenizer_Type) :: Tok
   integer              :: w
@@ -18,9 +18,9 @@
   !-------------------------------!
   !   Form the header for error   !
   !-------------------------------!
-  if(present(in_file) .and. present(at_line)) then
+  if(present(in_file) .and. present(on_line)) then
     write(header_text, '(a,i3)')  "ERROR in file: " // in_file //  &
-                                  " at line: ", at_line
+                                  " at line: ", on_line
   else
     write(header_text, '(a,i3)')  "ERROR!"
   end if
