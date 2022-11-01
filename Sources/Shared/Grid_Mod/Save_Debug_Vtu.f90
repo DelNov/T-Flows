@@ -621,7 +621,7 @@
       do c = cs, ce
         write(fu) tensor_cell(c, 1), tensor_cell(c, 2), tensor_cell(c, 3),  &
                   tensor_cell(c, 4), tensor_cell(c, 5), tensor_cell(c, 6),  &
-                  tensor_cell(c, 7), tensor_cell(c, 7), tensor_cell(c, 9)
+                  tensor_cell(c, 7), tensor_cell(c, 8), tensor_cell(c, 9)
       end do
     end if
   end if

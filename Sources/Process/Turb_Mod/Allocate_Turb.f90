@@ -567,6 +567,90 @@
     end if ! Turb % statistics
 
   end if ! LES_DYNAMIC
+  
+  !-----------------------------------------------------------------------------------------------------------------------------------------------------------------YVES
+
+  !-------------------------------!
+  !   Tensorial viscosity model   !
+  !-------------------------------!
+  if(Turb % model .eq. LES_TVM) then
+
+    ! Variables such as time scale, length scale and production
+    allocate(Turb % t_scale (-nb:nc));  Turb % t_scale = 0.
+    allocate(Turb % l_scale (-nb:nc));  Turb % l_scale = 0.
+    allocate(Turb % vis_t   (-nb:nc));  Turb % vis_t   = 0.
+    allocate(Turb % vis_w   (-nb:nc));  Turb % vis_w   = 0.  ! wall visc
+    allocate(Turb % p_kin   (-nb:nc));  Turb % p_kin   = 0.
+
+    ! Tensorial turbulent viscosity
+    allocate(Turb % ten_turb_11 (-nb:nc));  Turb % ten_turb_11 = 0.
+    allocate(Turb % ten_turb_12 (-nb:nc));  Turb % ten_turb_12 = 0.
+    allocate(Turb % ten_turb_13 (-nb:nc));  Turb % ten_turb_13 = 0.
+    allocate(Turb % ten_turb_21 (-nb:nc));  Turb % ten_turb_21 = 0.
+    allocate(Turb % ten_turb_22 (-nb:nc));  Turb % ten_turb_22 = 0.
+    allocate(Turb % ten_turb_23 (-nb:nc));  Turb % ten_turb_23 = 0.
+    allocate(Turb % ten_turb_31 (-nb:nc));  Turb % ten_turb_31 = 0.
+    allocate(Turb % ten_turb_32 (-nb:nc));  Turb % ten_turb_32 = 0.
+    allocate(Turb % ten_turb_33 (-nb:nc));  Turb % ten_turb_33 = 0.
+
+    ! Turbulent stress tensor
+    allocate(Turb % tau_11      (-nb:nc));  Turb % tau_11      = 0.
+    allocate(Turb % tau_12      (-nb:nc));  Turb % tau_12      = 0.
+    allocate(Turb % tau_13      (-nb:nc));  Turb % tau_13      = 0.
+    allocate(Turb % tau_21      (-nb:nc));  Turb % tau_21      = 0.
+    allocate(Turb % tau_22      (-nb:nc));  Turb % tau_22      = 0.
+    allocate(Turb % tau_23      (-nb:nc));  Turb % tau_23      = 0.
+    allocate(Turb % tau_31      (-nb:nc));  Turb % tau_31      = 0.
+    allocate(Turb % tau_32      (-nb:nc));  Turb % tau_32      = 0.
+    allocate(Turb % tau_33      (-nb:nc));  Turb % tau_33      = 0.
+
+    ! Directional face stresses
+!    allocate(Turb % tau_k1      (-nb:nc));  Turb % tau_k1      = 0.  !------------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"
+!    allocate(Turb % tau_k2      (-nb:nc));  Turb % tau_k2      = 0.  !------------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"
+!    allocate(Turb % tau_k3      (-nb:nc));  Turb % tau_k3      = 0.  !------------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"
+
+    if(Flow % heat_transfer) then
+
+      call Var_Mod_Allocate_New_Only(Turb % ut, Grid, 'UT')
+      call Var_Mod_Allocate_New_Only(Turb % vt, Grid, 'VT')
+      call Var_Mod_Allocate_New_Only(Turb % wt, Grid, 'WT')
+      allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.  ! wall cond
+
+    end if ! Flow % heat_transfer
+
+    if(Turb % statistics) then
+
+      ! Time-averaged velocities (and temperature)
+      allocate(Turb % u_mean(-nb:nc));  Turb % u_mean = 0.
+      allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
+      allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
+      allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
+      if(Flow % heat_transfer) then
+        allocate(Turb % t_mean(-nb:nc));  Turb % t_mean = 0.
+        allocate(Turb % q_mean(-nb:nc));  Turb % q_mean = 0.
+      end if
+
+      ! Resolved Reynolds stresses
+      allocate(Turb % uu_res(-nb:nc));  Turb % uu_res = 0.
+      allocate(Turb % vv_res(-nb:nc));  Turb % vv_res = 0.
+      allocate(Turb % ww_res(-nb:nc));  Turb % ww_res = 0.
+      allocate(Turb % uv_res(-nb:nc));  Turb % uv_res = 0.
+      allocate(Turb % vw_res(-nb:nc));  Turb % vw_res = 0.
+      allocate(Turb % uw_res(-nb:nc));  Turb % uw_res = 0.
+
+      ! Resolved turbulent heat fluxes
+      if(Flow % heat_transfer) then
+        allocate(Turb % t2_res(-nb:nc));  Turb % t2_res = 0.
+        allocate(Turb % ut_res(-nb:nc));  Turb % ut_res = 0.
+        allocate(Turb % vt_res(-nb:nc));  Turb % vt_res = 0.
+        allocate(Turb % wt_res(-nb:nc));  Turb % wt_res = 0.
+      end if ! Flow % heat_transfer
+
+    end if ! Turb % statistics
+
+  end if ! LES_TVM
+
+  !-----------------------------------------------------------------------------------------------------------------------------------------------------------------YVES
 
   !---------------------------------!
   !   Direct numerical simulation   !

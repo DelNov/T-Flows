@@ -137,11 +137,11 @@
   ! Final expression for tensor components
   vol = abs(Math % Tet_Volume(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4))
 
-  i_x  = i_x  * vol /  60.0
-  i_y  = i_y  * vol /  60.0
-  i_z  = i_z  * vol /  60.0
-  i_xy = i_xy * vol / 120.0
-  i_xz = i_xz * vol / 120.0
-  i_yz = i_yz * vol / 120.0
+  i_x  = i_x  * vol /  60.0 * 6
+  i_y  = i_y  * vol /  60.0 * 6
+  i_z  = i_z  * vol /  60.0 * 6
+  i_xy = i_xy * vol / 120.0 * 6
+  i_xz = i_xz * vol / 120.0 * 6
+  i_yz = i_yz * vol / 120.0 * 6
 
   end subroutine
