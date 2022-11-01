@@ -35,7 +35,7 @@
     if(Turb % model .eq. LES_SMAGORINSKY    .or.  &
        Turb % model .eq. LES_DYNAMIC        .or.  &
        Turb % model .eq. LES_WALE           .or.  &
-       Turb % model .eq. LES_TVM            .or.  &  !--------------------------------------------------------------------------------------------------------------YVES
+       Turb % model .eq. LES_TVM            .or.  &
        Turb % model .eq. HYBRID_LES_PRANDTL .or.  &
        Turb % model .eq. HYBRID_LES_RANS    .or.  &
        Turb % model .eq. DES_SPALART        .or.  &

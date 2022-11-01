@@ -24,8 +24,7 @@
 
   if(Turb % model .eq. LES_SMAGORINSKY .or.  &
      Turb % model .eq. LES_DYNAMIC     .or.  &
-     Turb % model .eq. LES_WALE) then  !     .or.  &
-!     Turb % model .eq. LES_TVM) then  !-----------------------------------------------------------------------------------------------------------------------------YVES
+     Turb % model .eq. LES_WALE) then
     call Calculate_Shear_And_Vorticity(Flow)
     if(Turb % model .eq. LES_DYNAMIC) then
       call Turb % Vis_T_Dynamic()
@@ -33,16 +32,12 @@
     if(Turb % model .eq. LES_WALE) then
       call Turb % Vis_T_Wale()
     end if
-!    if(Turb % model .eq. LES_TVM) then  !---------------------------------------------------------------------------------------------------------------------------YVES
-!      call Turb % Vis_T_Tensorial()  !------------------------------------------------------------------------------------------------------------------------------YVES
-!    end if  !-------------------------------------------------------------------------------------------------------------------------------------------------------YVES
     call Turb % Vis_T_Subgrid()
   end if
-  
-    if(Turb % model .eq. LES_TVM) then  !---------------------------------------------------------------------------------------------------------------------------YVES
-      call Turb % Vis_T_Tensorial()  !------------------------------------------------------------------------------------------------------------------------------YVES
-!      call Calculate_Shear_And_Vorticity(Flow)  !-------------------------------------------------------------------------------------------------------Should we? YVES
-    end if  !-------------------------------------------------------------------------------------------------------------------------------------------------------YVES
+
+  if(Turb % model .eq. LES_TVM) then
+    call Turb % Vis_T_Tensorial()
+  end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
     call Calculate_Shear_And_Vorticity(Flow)

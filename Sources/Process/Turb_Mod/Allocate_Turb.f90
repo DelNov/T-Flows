@@ -567,8 +567,6 @@
     end if ! Turb % statistics
 
   end if ! LES_DYNAMIC
-  
-  !-----------------------------------------------------------------------------------------------------------------------------------------------------------------YVES
 
   !-------------------------------!
   !   Tensorial viscosity model   !
@@ -603,11 +601,6 @@
     allocate(Turb % tau_31      (-nb:nc));  Turb % tau_31      = 0.
     allocate(Turb % tau_32      (-nb:nc));  Turb % tau_32      = 0.
     allocate(Turb % tau_33      (-nb:nc));  Turb % tau_33      = 0.
-
-    ! Directional face stresses
-!    allocate(Turb % tau_k1      (-nb:nc));  Turb % tau_k1      = 0.  !------------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"
-!    allocate(Turb % tau_k2      (-nb:nc));  Turb % tau_k2      = 0.  !------------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"
-!    allocate(Turb % tau_k3      (-nb:nc));  Turb % tau_k3      = 0.  !------------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"
 
     if(Flow % heat_transfer) then
 
@@ -649,8 +642,6 @@
     end if ! Turb % statistics
 
   end if ! LES_TVM
-
-  !-----------------------------------------------------------------------------------------------------------------------------------------------------------------YVES
 
   !---------------------------------!
   !   Direct numerical simulation   !

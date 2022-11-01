@@ -92,7 +92,7 @@
     ! Turbulent viscosity
     real, allocatable :: vis_t(:) ! [kg/(m s)]
 
-    ! Tensorial turbulent viscosity (for LES_TVM)  -----------------------------------------------------------------------------------------------------------------YVES
+    ! Tensorial turbulent viscosity (for LES_TVM)
     real, allocatable :: ten_turb_11(:), ten_turb_12(:), ten_turb_13(:)
     real, allocatable :: ten_turb_21(:), ten_turb_22(:), ten_turb_23(:)
     real, allocatable :: ten_turb_31(:), ten_turb_32(:), ten_turb_33(:)
@@ -101,9 +101,6 @@
     real, allocatable :: tau_11(:), tau_12(:), tau_13(:)
     real, allocatable :: tau_21(:), tau_22(:), tau_23(:)
     real, allocatable :: tau_31(:), tau_32(:), tau_33(:)
-    
-    ! Directional face stresses (for LES_TVM)
-!    real, allocatable :: tau_k1(:), tau_k2(:), tau_k3(:)  !----------------I reckon "tau_ki" can be local variables of "Face_Stress.f90"---------------------------YVES
 
     ! Effective turbulent viscosity
     real, allocatable :: vis_t_eff(:) ! [kg/(m s)]
@@ -201,7 +198,7 @@
       procedure, private :: Vis_T_Subgrid
       procedure, private :: Vis_T_Spalart_Allmaras
       procedure, private :: Vis_T_Wale
-      procedure, private :: Vis_T_Tensorial  !----------------------------------------------------------------------------------------------------------------------YVES
+      procedure, private :: Vis_T_Tensorial
 
       procedure, private :: Ebf_Momentum
       procedure, private :: Ebf_Scalar
@@ -219,30 +216,30 @@
   ! (Prime numbers starting from 30000)
   integer, parameter :: NO_TURBULENCE_MODEL   = 30011
   integer, parameter :: DNS                   = 30013
-  integer, parameter :: LES_WALE              = 30029
+  integer, parameter :: LES_SMAGORINSKY       = 30029
   integer, parameter :: LES_DYNAMIC           = 30047
-  integer, parameter :: LES_SMAGORINSKY       = 30059
-  integer, parameter :: LES_TVM               = 30187  !---------------------------------------------------------------------------------------------------------YVES
-  integer, parameter :: K_EPS                 = 30071
-  integer, parameter :: K_EPS_ZETA_F          = 30089
-  integer, parameter :: DES_SPALART           = 30091
-  integer, parameter :: SPALART_ALLMARAS      = 30097
-  integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30103
-  integer, parameter :: RSM_MANCEAU_HANJALIC  = 30109
-  integer, parameter :: HYBRID_LES_RANS       = 30113
-  integer, parameter :: HYBRID_LES_PRANDTL    = 30119
+  integer, parameter :: LES_WALE              = 30059
+  integer, parameter :: LES_TVM               = 30071
+  integer, parameter :: K_EPS                 = 30089
+  integer, parameter :: K_EPS_ZETA_F          = 30091
+  integer, parameter :: DES_SPALART           = 30097
+  integer, parameter :: SPALART_ALLMARAS      = 30103
+  integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30109
+  integer, parameter :: RSM_MANCEAU_HANJALIC  = 30113
+  integer, parameter :: HYBRID_LES_RANS       = 30119
+  integer, parameter :: HYBRID_LES_PRANDTL    = 30133
 
   ! Turbulence wall treatment
-  integer, parameter :: STABILIZED = 30133
+  integer, parameter :: STABILIZED = 30137
 
   ! Turbulent heat flux scheme
-  integer, parameter :: SGDH = 30137
-  integer, parameter :: GGDH = 30139
-  integer, parameter :: AFM  = 30161
+  integer, parameter :: SGDH = 30139
+  integer, parameter :: GGDH = 30161
+  integer, parameter :: AFM  = 30169
 
   ! Switching criteria for hybrid LES/RANS
-  integer, parameter :: SWITCH_DISTANCE = 30169
-  integer, parameter :: SWITCH_VELOCITY = 30181
+  integer, parameter :: SWITCH_DISTANCE = 30181
+  integer, parameter :: SWITCH_VELOCITY = 30187
 
   !--------------------------------!
   !   Turbulence model constants   !
@@ -338,7 +335,7 @@
   include 'Turb_Mod/Vis_T_Subgrid.f90'
   include 'Turb_Mod/Vis_T_Spalart_Allmaras.f90'
   include 'Turb_Mod/Vis_T_Wale.f90'
-  include 'Turb_Mod/Vis_T_Tensorial.f90'  !-------------------------------------------------------------------------------------------------------------------------YVES
+  include 'Turb_Mod/Vis_T_Tensorial.f90'
 
   ! Other subroutines ellipitic blending, turbulent Prandtl number
   include 'Turb_Mod/Ebf_Momentum.f90'
