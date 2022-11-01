@@ -96,6 +96,8 @@
       Turb % model = RSM_MANCEAU_HANJALIC
     case('HYBRID_LES_RANS')
       Turb % model = HYBRID_LES_RANS
+    case('LES_TVM')  !----------------------------------------------------------------------------------------------------------------------------------------------YVES
+      Turb % model = LES_TVM  !-------------------------------------------------------------------------------------------------------------------------------------YVES
 
     case default
       if(this_proc < 2) then
@@ -141,6 +143,7 @@
   if((Turb % model .eq. LES_SMAGORINSKY         .or.   &
       Turb % model .eq. LES_DYNAMIC             .or.   &
       Turb % model .eq. LES_WALE                .or.   &
+      Turb % model .eq. LES_TVM                 .or.   &  !---------------------------------------------------------------------------------------------------------YVES
       Turb % model .eq. DNS                     .or.   &
       Turb % model .eq. DES_SPALART             .or.   &
       Turb % model .eq. HYBRID_LES_PRANDTL      .or.   &

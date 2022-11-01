@@ -15,6 +15,7 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   integer                   :: c1, c2
   real                      :: uu_f, vv_f, ww_f, uv_f, uw_f, vw_f
+  real                      :: tau_k1, tau_k2, tau_k3  !------------------------------------------------------------------------------------------------------------YVES
 !==============================================================================!
 
   ! Take alias
@@ -53,4 +54,28 @@
     end if
   end if
 
+  !-----------------------------------------------------------------------------------------------------------------------------------------------------------------YVES
+  
+  if(Turb % model .eq. LES_TVM) then
+  
+    if(ui % name .eq. 'U') then
+      tau_k1 = Grid % fw(s) * Turb % tau_11(c1) + (1.0-Grid % fw(s)) * Turb % tau_11(c2)
+      tau_k2 = Grid % fw(s) * Turb % tau_12(c1) + (1.0-Grid % fw(s)) * Turb % tau_12(c2)
+      tau_k3 = Grid % fw(s) * Turb % tau_13(c1) + (1.0-Grid % fw(s)) * Turb % tau_13(c2)
+    else if(ui % name .eq. 'V') then
+      tau_k1 = Grid % fw(s) * Turb % tau_21(c1) + (1.0-Grid % fw(s)) * Turb % tau_21(c2)
+      tau_k2 = Grid % fw(s) * Turb % tau_22(c1) + (1.0-Grid % fw(s)) * Turb % tau_22(c2)
+      tau_k3 = Grid % fw(s) * Turb % tau_23(c1) + (1.0-Grid % fw(s)) * Turb % tau_23(c2)
+    else if(ui % name .eq. 'W') then
+      tau_k1 = Grid % fw(s) * Turb % tau_31(c1) + (1.0-Grid % fw(s)) * Turb % tau_31(c2)
+      tau_k2 = Grid % fw(s) * Turb % tau_32(c1) + (1.0-Grid % fw(s)) * Turb % tau_32(c2)
+      tau_k3 = Grid % fw(s) * Turb % tau_33(c1) + (1.0-Grid % fw(s)) * Turb % tau_33(c2)
+    end if
+    f_stress =  - (  tau_k1 * Grid % sx(s)  &
+                   + tau_k2 * Grid % sy(s)  &
+                   + tau_k3 * Grid % sz(s) )
+  end if
+  
+  !-----------------------------------------------------------------------------------------------------------------------------------------------------------------YVES
+  
   end subroutine
