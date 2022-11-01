@@ -37,7 +37,7 @@
     !-------------------------------------------------!
     !   Keep on filling up this line, it still fits   !
     !-------------------------------------------------!
-    if(nex_p < width .and. Tok % tokens(i) .ne. '\n') then
+    if(nex_p < width+2 .and. Tok % tokens(i) .ne. '\n') then
       write(line(cur_p:nex_p), '(a)')  trim(Tok % tokens(i)) // ' '
 
     !---------------------------------------------------------!
