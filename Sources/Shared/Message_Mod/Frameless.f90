@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Print_Plain_Text(Msg, width, message_text)
+  subroutine Frameless(Msg, width, message_text)
 !---------------------------------[Arguments]----------------------------------!
   class(Message_Type)      :: Msg
   integer,      intent(in) :: width
@@ -22,7 +22,7 @@
   ! Initialize the line
   line      = ' '
   line(2:2) = '#'
-  cur_p = 4
+  cur_p = 4        ! starts at 4 to allow for one leading space in the output
 
   !-----------------------------------------------------!
   !                                                     !
@@ -36,8 +36,9 @@
 
     !-------------------------------------------------!
     !   Keep on filling up this line, it still fits   !
+    !   (+3 here is to compensate you started at 4)   !
     !-------------------------------------------------!
-    if(nex_p < width+2 .and. Tok % tokens(i) .ne. '\n') then
+    if(nex_p < width + 3 .and. Tok % tokens(i) .ne. '\n') then
       write(line(cur_p:nex_p), '(a)')  trim(Tok % tokens(i)) // ' '
 
     !---------------------------------------------------------!

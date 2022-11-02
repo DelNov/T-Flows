@@ -118,7 +118,7 @@
   !-----------------------------------!
   f_avg = f_avg / real(cnt)
   r_avg = r_avg / real(cnt)
-  call Message % Print_Framed_Text(54,                              &
+  call Message % Framed(54,                                         &
            'Face interpolation factors have been calculated',       &
            'It is useful to keep in mind that factors closer '  //  &
            'to 0.5 and shifts closer to 0.0 are better')

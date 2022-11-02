@@ -53,10 +53,10 @@
   end do
   call File % Read_Line(fu)
   if(Line % tokens(1) .ne. '4.1') then
-    call Message % Print_Error(60,                                      &
+    call Message % Error(60,                                            &
              " Only Gmsh .msh files in version 4.1 are supported!"  //  &
              " \n I can't continue with this file, exiting!",           &
-             in_file=__FILE__, on_line=__LINE__)
+             file=__FILE__, line=__LINE__)
   end if
 
   ! My guess is that second tokens says it is binary (1) or not (0)
@@ -85,11 +85,11 @@
     call File % Read_Line(fu, reached_end=the_end)
     if(Line % tokens(1) .eq. '$PhysicalNames') exit
     if(the_end) then
-      call Message % Print_Error(60,                                        &
+      call Message % Error(60,                                              &
         "This is bad.  PhysicalNames don't seem to be defined in the "  //  &
         ".msh file.  Maybe you forgot to define boundary conditions  "  //  &
         "(called physical groups) in Gmsh?",                                &
-        in_file=__FILE__, on_line=__LINE__)
+        file=__FILE__, line=__LINE__)
     end if
   end do
   call File % Read_Line(fu)
@@ -254,10 +254,10 @@
         end if
       end if
       if(n_tags > 1) then
-        call Message % Print_Error(50,                                  &
+        call Message % Error(50,                                        &
                " More than one boundary condition per entity. \n "  //  &
                " It is not supported in this verion of T-Flows!",       &
-               in_file=__FILE__, on_line=__LINE__)
+               file=__FILE__, line=__LINE__)
       end if
     end do
     if(run .eq. 1) then

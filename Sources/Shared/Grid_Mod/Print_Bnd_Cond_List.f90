@@ -39,7 +39,7 @@
   !-------------------------------!
   !   Call the Message function   !
   !-------------------------------!
-  call Message % Print_Framed_Text(20,                        &
+  call Message % Framed(20,                                   &
     "Grid currently has the following boundary conditions:",  &
     bnd_cond_list(1:ll))
 

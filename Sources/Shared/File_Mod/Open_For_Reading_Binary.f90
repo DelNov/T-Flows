@@ -20,18 +20,16 @@
   ! File doesn't exist
   if(.not. file_exists) then
     if(.not. present(processor)) then
-      print *, '#============================================='
-      print *, '# File: "', trim(name_i), '" doesn''t exist!'
-      print *, '# This error is critical. Exiting!'
-      print *, '#---------------------------------------------'
-      stop
+      call Message % Error(60, "File: " // trim(name_i)    //   &
+                               " doesn't exist!"           //   &
+                               " This error is critical."  //   &
+                               " Exiting!")
     else
       if(processor < 2) then
-        print *, '#============================================='
-        print *, '# File: "', trim(name_i), '" doesn''t exist!'
-        print *, '# This error is critical. Exiting!'
-        print *, '#---------------------------------------------'
-        stop
+        call Message % Error(60, "File: " // trim(name_i)    //   &
+                                 " doesn't exist!"           //   &
+                                 " This error is critical."  //   &
+                                 " Exiting!")
       end if
     end if
   end if

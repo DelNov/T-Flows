@@ -107,9 +107,10 @@
   do s = 1, Grid % n_faces
     if(Grid % faces_c(2,s) > 0) then
       if(Grid % faces_c(1,s) > Grid % faces_c(2,s)) then
-        call Message % Print_Error(60,                                  &
-                 'This shoulnd''t have happened at real face! \n '  //  &
-                 'This error is critical.  Exiting now.!')
+        call Message % Error(60,                                       &
+                 "This shoulnd't have happened at real face! \n "  //  &
+                 "This error is critical.  Exiting now.!",             &
+                 file=__FILE__, line=__LINE__)
       end if
     end if
   end do

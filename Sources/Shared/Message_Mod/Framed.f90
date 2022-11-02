@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Print_Framed_Text(Msg, width, header_text, message_text)
+  subroutine Framed(Msg, width, header_text, message_text)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -35,7 +35,7 @@
   !-----------------------------------------------------------!
   !   Write the message text wrapping it into desired width   !
   !-----------------------------------------------------------!
-  call Msg % Print_Plain_Text(w, message_text)
+  call Msg % Frameless(w, message_text)
 
   !--------------------------------!
   !   Write the bottom line last   !

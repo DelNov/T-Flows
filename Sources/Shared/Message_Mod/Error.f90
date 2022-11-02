@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Print_Error(Msg, width, message_text,  &
-                              in_file, on_line)
+  subroutine Error(Msg, width, message_text, file, line)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Message_Type)           :: Msg
   integer, intent(in)           :: width
   character(*)                  :: message_text
-  character(*),        optional :: in_file
-  integer, intent(in), optional :: on_line
+  character(*),        optional :: file
+  integer, intent(in), optional :: line
 !-----------------------------------[Locals]-----------------------------------!
   type(Tokenizer_Type) :: Tok
   integer              :: w
@@ -18,9 +17,9 @@
   !-------------------------------!
   !   Form the header for error   !
   !-------------------------------!
-  if(present(in_file) .and. present(on_line)) then
-    write(header_text, '(a,i3)')  "ERROR in file: " // in_file //  &
-                                  " at line: ", on_line
+  if(present(file) .and. present(line)) then
+    write(header_text, '(a,i3)')  "ERROR in file: " // file //  &
+                                  " on line: ", line
   else
     write(header_text, '(a,i3)')  "ERROR!"
   end if
@@ -31,7 +30,7 @@
   !-----------------------------------!
   !   Print the body of the message   !
   !-----------------------------------!
-  call Msg % Print_Framed_Text(w, header_text, message_text)
+  call Msg % Framed(w, header_text, message_text)
 
   !----------------------------------------!
   !   Errors are critical by definitiion   !

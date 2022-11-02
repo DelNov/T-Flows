@@ -44,14 +44,14 @@
   contains
 
 #   include "Results_Mod/Main_Results.f90"
-#   include "Results_Mod/Save_Results.f90"        ! binary
+#   include "Results_Mod/Save_Results.f90"
 #   include "Results_Mod/Save_Front.f90"
-#   include "Results_Mod/Save_Scalar_Int.f90"     ! binary
-#   include "Results_Mod/Save_Scalar_Real.f90"    ! binary
+#   include "Results_Mod/Save_Scalar_Int.f90"
+#   include "Results_Mod/Save_Scalar_Real.f90"
 #   include "Results_Mod/Save_Swarm.f90"
-#   include "Results_Mod/Save_Tensor_6_Real.f90"  ! binary
-#   include "Results_Mod/Save_Tensor_9_Real.f90"  ! binary
-#   include "Results_Mod/Save_Vector_Real.f90"    ! binary
+#   include "Results_Mod/Save_Tensor_6_Real.f90"
+#   include "Results_Mod/Save_Tensor_9_Real.f90"
+#   include "Results_Mod/Save_Vector_Real.f90"
 #   include "Results_Mod/Save_Surf.f90"
 #   include "Results_Mod/Time_To_Save.f90"
 #   include "Results_Mod/Time_To_Save_Swarm.f90"

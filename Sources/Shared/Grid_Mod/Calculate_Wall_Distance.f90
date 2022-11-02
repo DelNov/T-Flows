@@ -25,7 +25,7 @@
   Grid % wall_dist = HUGE
 
   call Print_Bnd_Cond_List(Grid)
-  call Message % Print_Framed_Text(60,                                        &
+  call Message % Framed(60,                                                   &
     'Calculating distance from the walls                               ',     &
     'Type ordinal number(s) of wall or wall_flux boundary condition(s) '  //  &
     'from the boundary condition list (see above) separated by space.  '  //  &

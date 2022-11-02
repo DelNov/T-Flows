@@ -17,10 +17,10 @@
 
     contains
       procedure, private :: Dashed_Line
-      procedure          :: Print_Error
-      procedure          :: Print_Framed_Text
-      procedure          :: Print_Plain_Text
-      procedure          :: Print_Warning
+      procedure          :: Error
+      procedure          :: Framed
+      procedure          :: Frameless
+      procedure          :: Warning
       procedure, private :: Thick_Line
       procedure, private :: Thin_Line
 
@@ -31,10 +31,10 @@
   contains
 
 #   include "Message_Mod/Dashed_Line.f90"
-#   include "Message_Mod/Print_Error.f90"
-#   include "Message_Mod/Print_Framed_Text.f90"
-#   include "Message_Mod/Print_Plain_Text.f90"
-#   include "Message_Mod/Print_Warning.f90"
+#   include "Message_Mod/Error.f90"
+#   include "Message_Mod/Framed.f90"
+#   include "Message_Mod/Frameless.f90"
+#   include "Message_Mod/Warning.f90"
 #   include "Message_Mod/Thick_Line.f90"
 #   include "Message_Mod/Thin_Line.f90"
 
