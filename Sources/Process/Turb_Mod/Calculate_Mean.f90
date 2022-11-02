@@ -49,11 +49,21 @@
   ! Time averaged modeled quantities
   if(Turb % model .eq. K_EPS) then
     kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
+    if(Flow % heat_transfer) then
+      ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
+      wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+    end if
   end if
 
-  if(Turb % model .eq. K_EPS_ZETA_F) then
+  ! Time averaged modeled quantities
+  if(Turb % model .eq. K_EPS_ZETA_F  .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
     kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
     zeta_mean => Turb % zeta_mean;  f22_mean  => Turb % f22_mean
+    if(Flow % heat_transfer) then
+      ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
+      wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+    end if
   end if
 
   ! Time-averaged modelled Reynolds stresses and heat fluxes
@@ -62,8 +72,10 @@
     uu_mean => Turb % uu_mean;  vv_mean => Turb % vv_mean
     ww_mean => Turb % ww_mean;  uv_mean => Turb % uv_mean
     vw_mean => Turb % vw_mean;  uw_mean => Turb % uw_mean
-    ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
-    wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+    if(Flow % heat_transfer) then
+      ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
+      wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+    end if
   end if
 
   ! Resolved Reynolds stresses and heat fluxes
@@ -104,10 +116,8 @@
         ut_res(c) = (ut_res(c) * real(n) + u % n(c) * t % n(c)) / real(n+1)
         vt_res(c) = (vt_res(c) * real(n) + v % n(c) * t % n(c)) / real(n+1)
         wt_res(c) = (wt_res(c) * real(n) + w % n(c) * t % n(c)) / real(n+1)
-      end if
 
-      ! Resolved turbulent heat fluxes
-      if(Flow % heat_transfer) then
+        ! Resolved turbulent heat fluxes
         if(Turb % model .eq. K_EPS                 .or.  &
            Turb % model .eq. K_EPS_ZETA_F          .or.  &
            Turb % model .eq. HYBRID_LES_RANS       .or.  &
