@@ -82,15 +82,6 @@ $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Petsc_Mod_Fake.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Petsc_Mod_Fake.o:\
-Petsc_Mod_True.f90 \
-Petsc_Mod_Fake.f90 \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Info_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Info_Mod.o:\
@@ -151,15 +142,6 @@ $(DIR_OBJECT)/Face_Mod.o \
 Face_Mod/*.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Petsc_Mod_True.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Petsc_Mod_True.o:\
-Petsc_Mod_True.f90 \
-Petsc_Mod_Fake.f90 \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Compute_Energy.f90
@@ -405,8 +387,8 @@ User_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Solver_Mod.o:\
 Solver_Mod/*.f90 \
-Petsc_Mod_True.f90 \
-Petsc_Mod_Fake.f90 
+$(DIR_OBJECT)/Petsc_Mod.o \
+Petsc_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vert_Mod.f90
@@ -550,6 +532,14 @@ $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_OBJECT)/Comm_Mod.o \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Petsc_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Petsc_Mod.o:\
+Petsc_Mod/*/*.f90 \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vof_Mod.f90

@@ -28,6 +28,7 @@ PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
 # Initialize variables to pass on to preprocessor
+# It later adds T_FLOWS_MPI and T_FLOWS_PETSC
 PASS_ON =
 
 $(info #=======================================================================)
@@ -131,10 +132,13 @@ OPT_C_COMP = -cpp
 #   Additional options to compile with PETSc
 #----------------------------------------------
 ifneq ($(PETSC_DIR),)
+  PASS_ON += -DT_FLOWS_PETSC=1
   OPT_F_COMP += -I ${PETSC_DIR}/include
   OPT_F_COMP += -I ${PETSC_DIR}/${PETSC_ARCH}/include
   OPT_C_COMP += -I ${PETSC_DIR}/include
   OPT_C_COMP += -I ${PETSC_DIR}/${PETSC_ARCH}/include
+else
+  PASS_ON += -DT_FLOWS_PETSC=0
 endif
 
 #-----------------------------------------------------------
@@ -229,24 +233,18 @@ SRC_F_MOD = Const_Mod.f90          \
             Work_Mod.f90
 
 # Sources for modules in the local directory
-SRC_F_MOD += Point_Mod.f90       \
-             Bulk_Mod.f90        \
-             Var_Mod.f90         \
-             Face_Mod.f90        \
-             Vert_Mod.f90        \
-             Elem_Mod.f90        \
-             Side_Mod.f90        \
-             Matrix_Mod.f90      \
-             Vector_Mod.f90      \
-             Native_Mod.f90
-ifneq ($(PETSC_DIR),)
-  SRC_F_MOD += Petsc_Mod_True.f90
-  SRC_C_FUN = C_Petsc_Interface_True.c
-else
-  SRC_F_MOD += Petsc_Mod_Fake.f90
-  SRC_C_FUN = C_Petsc_Interface_Fake.c
-endif
-SRC_F_MOD += Solver_Mod.f90         \
+SRC_F_MOD += Point_Mod.f90          \
+             Bulk_Mod.f90           \
+             Var_Mod.f90            \
+             Face_Mod.f90           \
+             Vert_Mod.f90           \
+             Elem_Mod.f90           \
+             Side_Mod.f90           \
+             Matrix_Mod.f90         \
+             Vector_Mod.f90         \
+             Native_Mod.f90         \
+             Petsc_Mod.f90          \
+             Solver_Mod.f90         \
              Numerics_Mod.f90       \
              Field_Mod.f90          \
              Front_Mod.f90          \
@@ -263,6 +261,8 @@ SRC_F_MOD += Solver_Mod.f90         \
              Backup_Mod.f90         \
              Results_Mod.f90        \
              Read_Controls_Mod.f90
+
+SRC_C_FUN = C_Petsc_Interface.c
 
 #---------------
 #   Functions
