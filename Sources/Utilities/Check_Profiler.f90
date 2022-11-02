@@ -1,11 +1,11 @@
 !==============================================================================!
 !   Compilation:                                                               !
 !                                                                              !
-!   gfortran -fdefault-real-8 -c ../Shared/Const_Mod.f90                       !
-!   gfortran -fdefault-real-8 -c ../Shared/Comm_Mod_Seq.f90                    !
-!   gfortran -fdefault-real-8 -c ../Shared/Profiler_Mod.f90                    !
-!   gfortran -o prof -fdefault-real-8  Const_Mod.o Comm_Mod.o Profiler_Mod.o \ !
-!             Check_Profiler.f90                                               !
+!   gfortran -fdefault-real-8 -c -cpp ../Shared/Const_Mod.f90                  !
+!   gfortran -fdefault-real-8 -c -cpp ../Shared/Comm_Mod_Seq.f90               !
+!   gfortran -fdefault-real-8 -c -cpp ../Shared/Profiler_Mod.f90               !
+!   gfortran -o prof -fdefault-real-8 -cpp Const_Mod.o Comm_Mod_Seq.o  \       !
+!                                          Profiler_Mod.o Check_Profiler.f90   !
 !------------------------------------------------------------------------------!
 
 !==============================================================================!
