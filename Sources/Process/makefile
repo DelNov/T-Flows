@@ -27,6 +27,8 @@ VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
+# Initialize variables to pass on to preprocessor
+PASS_ON =
 
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
@@ -140,13 +142,26 @@ endif
 #-----------------------------------------------------------
 OPT_LINK = $(OPT_F_COMP)
 
+#-----------------------
+#   MPI related stuff
+#-----------------------
+
 # Use here your command for mpi fortran compiler:
+# (This is actually not too good, because not all
+# compiler vendors have MPI wrapper named mpif90)
 ifeq ($(MPI), yes)
   ifeq ($(FCOMP),)
     FC = mpif90
   else
     FC = $(FCOMP)
   endif
+endif
+
+# Variable T_FLOWS_MPI is passed on to compilers
+ifeq ($(MPI), yes)
+  PASS_ON += -DT_FLOWS_MPI=1
+else
+  PASS_ON += -DT_FLOWS_MPI=0
 endif
 
 #------------------------------------------------------
@@ -195,31 +210,23 @@ endif
 #   Modules
 #-------------
 
-# Const and String are the lowest level modules
-SRC_F_MOD = Const_Mod.f90   \
-            String_Mod.f90
-
-# Conditional support for MPI communication
-ifeq ($(MPI), yes)
-  SRC_F_MOD += Comm_Mod_Par.f90
-else
-  SRC_F_MOD += Comm_Mod_Seq.f90
-endif
-
 # Modules in shared directory
-SRC_F_MOD += Tokenizer_Mod.f90      \
-             Message_Mod.f90        \
-             Profiler_Mod.f90       \
-             Math_Mod.f90           \
-             Swap_Mod.f90           \
-             Sort_Mod.f90           \
-             File_Mod.f90           \
-             Control_Mod.f90        \
-             Vtk_Mod.f90            \
-             Boundary_Mod.f90       \
-             Metis_Options_Mod.f90  \
-             Grid_Mod.f90           \
-             Work_Mod.f90
+SRC_F_MOD = Const_Mod.f90          \
+            String_Mod.f90         \
+            Comm_Mod.f90           \
+            Tokenizer_Mod.f90      \
+            Message_Mod.f90        \
+            Profiler_Mod.f90       \
+            Math_Mod.f90           \
+            Swap_Mod.f90           \
+            Sort_Mod.f90           \
+            File_Mod.f90           \
+            Control_Mod.f90        \
+            Vtk_Mod.f90            \
+            Boundary_Mod.f90       \
+            Metis_Options_Mod.f90  \
+            Grid_Mod.f90           \
+            Work_Mod.f90
 
 # Sources for modules in the local directory
 SRC_F_MOD += Point_Mod.f90       \
@@ -239,33 +246,22 @@ else
   SRC_F_MOD += Petsc_Mod_Fake.f90
   SRC_C_FUN = C_Petsc_Interface_Fake.c
 endif
-SRC_F_MOD += Solver_Mod.f90      \
-             Numerics_Mod.f90    \
-             Field_Mod.f90       \
-             Front_Mod.f90       \
-             Surf_Mod.f90        \
-             Info_Mod.f90        \
-             Eddies_Mod.f90      \
-             Monitor_Mod.f90     \
-             Turb_Mod.f90        \
-             Vof_Mod.f90         \
-             Particle_Mod.f90    \
-             Swarm_Mod.f90       \
-             Interface_Mod.f90
-
-# User_Mod should come before Results_Mod
-SRC_F_MOD += User_Mod.f90
-
-# Backup_Mod should come close to the end because it uses all other modules
-# Note the conditional support for MPI communication
-ifeq ($(MPI), yes)
-  SRC_F_MOD += Backup_Mod_Par.f90
-else
-  SRC_F_MOD += Backup_Mod_Seq.f90
-endif
-
-# Results_Mod must be last.
-SRC_F_MOD += Results_Mod.f90       \
+SRC_F_MOD += Solver_Mod.f90         \
+             Numerics_Mod.f90       \
+             Field_Mod.f90          \
+             Front_Mod.f90          \
+             Surf_Mod.f90           \
+             Info_Mod.f90           \
+             Eddies_Mod.f90         \
+             Monitor_Mod.f90        \
+             Turb_Mod.f90           \
+             Vof_Mod.f90            \
+             Particle_Mod.f90       \
+             Swarm_Mod.f90          \
+             Interface_Mod.f90      \
+             User_Mod.f90           \
+             Backup_Mod.f90         \
+             Results_Mod.f90        \
              Read_Controls_Mod.f90
 
 #---------------
@@ -321,17 +317,17 @@ MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 # Fortran modules
 $(DIR_OBJECT)/%.o: %.f90 %/*.f90
 	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
 
 # Fortran functions
 $(DIR_OBJECT)/%.o: %.f90
 	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
 
 # C functions
 $(DIR_OBJECT)/%.o: %.c
 	@echo $(CC) $<
-	@$(CC) $(OPT_C_COMP) -c -o $@ $<
+	@$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
 
 #-----------------------------------
 #   Rule to build main program

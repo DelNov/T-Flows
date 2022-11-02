@@ -4,7 +4,9 @@
 !   Module for MPI functionality.                                              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Mpi_f08
+# if T_FLOWS_MPI == 1
+    use Mpi_f08
+# endif
   use Const_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -53,8 +55,13 @@
     integer(SP), allocatable :: cell_map(:)
     integer(SP), allocatable :: bnd_cell_map(:)
 
-    type(Mpi_Datatype), private :: cell_map_type
-    type(Mpi_Datatype), private :: bnd_cell_map_type
+#   if T_FLOWS_MPI == 1
+      type(Mpi_Datatype), private :: cell_map_type
+      type(Mpi_Datatype), private :: bnd_cell_map_type
+#   else
+      integer, private :: cell_map_type
+      integer, private :: bnd_cell_map_type
+#   endif
 
     ! Number of processors per node and processor i.d.s for each node
     type(Buffer_Type), allocatable :: cells_send(:)
@@ -100,12 +107,19 @@
   integer :: n_proc     ! number of processors
 
   ! These communication types will depend on precision
+#if T_FLOWS_MPI == 1
   type(Mpi_Datatype) :: comm_type_int
   type(Mpi_Datatype) :: comm_type_log
   type(Mpi_Datatype) :: comm_type_real
+#else
+  integer :: comm_type_int
+  integer :: comm_type_log
+  integer :: comm_type_real
+#endif
 
   contains
 
+# if T_FLOWS_MPI == 1
     ! Three basic ones are non-member
 #   include "Comm_Mod/Parallel/Start.f90"
 #   include "Comm_Mod/Parallel/Wait.f90"
@@ -153,5 +167,54 @@
 #   include "Comm_Mod/Parallel/Sendrecv_Int_Arrays.f90"
 #   include "Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90"
 #   include "Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90"
+# else
+    ! Three basic ones are non-member
+#   include "Comm_Mod/Sequential/Start.f90"
+#   include "Comm_Mod/Sequential/Wait.f90"
+#   include "Comm_Mod/Sequential/End.f90"
+
+    ! File management
+#   include "Comm_Mod/Sequential/Close_File.f90"
+#   include "Comm_Mod/Sequential/Open_File_Read.f90"
+#   include "Comm_Mod/Sequential/Open_File_Write.f90"
+#   include "Comm_Mod/Sequential/Read_Int.f90"
+#   include "Comm_Mod/Sequential/Read_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Read_Log.f90"
+#   include "Comm_Mod/Sequential/Read_Log_Array.f90"
+#   include "Comm_Mod/Sequential/Read_Bnd_Real.f90"
+#   include "Comm_Mod/Sequential/Read_Cell_Real.f90"
+#   include "Comm_Mod/Sequential/Read_Real.f90"
+#   include "Comm_Mod/Sequential/Read_Real_Array.f90"
+#   include "Comm_Mod/Sequential/Read_Text.f90"
+#   include "Comm_Mod/Sequential/Write_Int.f90"
+#   include "Comm_Mod/Sequential/Write_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Write_Log.f90"
+#   include "Comm_Mod/Sequential/Write_Log_Array.f90"
+#   include "Comm_Mod/Sequential/Write_Bnd_Real.f90"
+#   include "Comm_Mod/Sequential/Write_Cell_Real.f90"
+#   include "Comm_Mod/Sequential/Write_Real.f90"
+#   include "Comm_Mod/Sequential/Write_Real_Array.f90"
+#   include "Comm_Mod/Sequential/Write_Text.f90"
+
+    ! Global communicatins are better of as non-members
+#   include "Comm_Mod/Sequential/Global_Lor_Log_Array.f90"
+#   include "Comm_Mod/Sequential/Global_Max_Real.f90"
+#   include "Comm_Mod/Sequential/Global_Min_Real.f90"
+#   include "Comm_Mod/Sequential/Global_Max_Int.f90"
+#   include "Comm_Mod/Sequential/Global_Min_Int.f90"
+#   include "Comm_Mod/Sequential/Global_Sum_Int.f90"
+#   include "Comm_Mod/Sequential/Global_Sum_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Global_Sum_Real.f90"
+#   include "Comm_Mod/Sequential/Global_Sum_Real_Array.f90"
+
+    ! Messaging
+#   include "Comm_Mod/Sequential/Create_New_Types.f90"
+#   include "Comm_Mod/Sequential/Exchange_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Exchange_Log_Array.f90"
+#   include "Comm_Mod/Sequential/Exchange_Real_Array.f90"
+#   include "Comm_Mod/Sequential/Sendrecv_Int_Arrays.f90"
+#   include "Comm_Mod/Sequential/Sendrecv_Log_Arrays.f90"
+#   include "Comm_Mod/Sequential/Sendrecv_Real_Arrays.f90"
+# endif
 
   end module

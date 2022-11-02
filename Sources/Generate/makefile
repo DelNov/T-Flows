@@ -10,7 +10,8 @@
 FORTRAN ?= gnu
 DEBUG   ?= no
 REAL    ?= double
-OPENMP  ?= no
+OPENMP  ?= yes
+MPI      = no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -22,6 +23,9 @@ VPATH = $(DIR_SHARED):.
 # Program name (This should hardly change)
 PROGRAM_NAME = Generate
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
+
+# Initialize variables to pass on to preprocessor
+PASS_ON =
 
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
@@ -126,6 +130,17 @@ endif
 #-----------------------------------------------------------
 OPT_LINK = $(OPT_F_COMP)
 
+#-----------------------
+#   MPI related stuff
+#-----------------------
+
+# Variable T_FLOWS_MPI is passed on to compilers
+ifeq ($(MPI), yes)
+  PASS_ON += -DT_FLOWS_MPI=1
+else
+  PASS_ON += -DT_FLOWS_MPI=0
+endif
+
 #------------------------------------------------------
 #   List of sources for modules and functions
 #------------------------------------------------------
@@ -143,7 +158,7 @@ OPT_LINK = $(OPT_F_COMP)
 SRC_F_MOD = Const_Mod.f90          \
             String_Mod.f90         \
             Tokenizer_Mod.f90      \
-            Comm_Mod_Seq.f90       \
+            Comm_Mod.f90           \
             Message_Mod.f90        \
             Profiler_Mod.f90       \
             Math_Mod.f90           \
@@ -207,12 +222,12 @@ MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 # Fortran modules
 $(DIR_OBJECT)/%.o: %.f90 %/*.f90
 	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
 
 # Fortran functions
 $(DIR_OBJECT)/%.o: %.f90
 	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) -c -o $@ $<
+	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
 
 #-----------------------------------
 #   Rule to build main program
