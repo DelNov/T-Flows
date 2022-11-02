@@ -35,7 +35,7 @@
                               zeta_p(:), f22_p(:), uw_mod_p(:),        &
                               ww_mod_p(:), y_plus_p(:), vis_t_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
-  real                     :: ubulk, error, re, cf_dean, cf, u_tau_p
+  real                     :: ubulk, err, re, cf_dean, cf, u_tau_p
   real                     :: visc_const, dens_const
   logical                  :: there
 !==============================================================================!
@@ -249,7 +249,7 @@
   re = dens_const * ubulk * 2.0 / visc_const
   cf_dean = 0.073*(re)**(-0.25)
   cf      = u_tau_p**2/(0.5*ubulk**2)
-  error   = abs(cf_dean - cf)/cf_dean * 100.0
+  err     = abs(cf_dean - cf)/cf_dean * 100.0
 
   write(fu1,'(a1,(a12,e12.6))')  &
   '#', 'Ubulk    = ', ubulk 
@@ -262,7 +262,7 @@
   write(fu1,'(a1,(a12,f12.6))')  &
   '#', 'Utau     = ', u_tau_p 
   write(fu1,'(a1,(a12,f12.6,a2,a22))') & 
-  '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
+  '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
 
 
   write(fu2,'(a1,(a12,e12.6))')  &
@@ -276,7 +276,7 @@
   write(fu2,'(a1,(a12,f12.6))')  &
   '#', 'Utau     = ', u_tau_p 
   write(fu2,'(a1,(a12,f12.6,a2,a22))') & 
-  '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
+  '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
 
   write(fu1,'(a1,2x,a105)') '#',  ' 1) z,'                                //  &
                                   ' 2) u mean,'                           //  &

@@ -34,7 +34,7 @@
                               t2_p(:), ut_p(:), vt_p(:), wt_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
-  real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
+  real                     :: ubulk, err, re, cf_dean, cf, pr, u_tau_p
   real                     :: dens_const, visc_const, capa_const, cond_const
   logical                  :: there
 !==============================================================================!
@@ -279,7 +279,7 @@
     re = dens_const * ubulk * 2.0 / visc_const
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
-    error   = abs(cf_dean - cf)/cf_dean * 100.0
+    err     = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
     write(i,'(a1,(a12,e12.6))')  &
@@ -291,7 +291,7 @@
     write(i,'(a1,(a12,f12.6))')  &
     '#', 'Utau     = ', u_tau_p 
     write(i,'(a1,(a12,f12.6,a2,a22))') & 
-    '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
+    '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
     if(Flow % heat_transfer) then
       write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
     end if
