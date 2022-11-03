@@ -17,6 +17,9 @@
   interface
     include '../Shared/Adjust_First_Dim.h90'
   end interface
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: INWARDS  = -1  ! for faces wrapping cells, can ...
+  integer, parameter :: OUTWARDS = +1  ! ... be pointing inwards or outwards
 !==============================================================================!
 
   !---------------!
@@ -81,6 +84,9 @@
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
+
+    ! Orientation (INWARDS, or OUTWARDS) of faces sourrounding the cells
+    integer, allocatable :: cells_f_orient(:,:)
 
     ! Weights for interpolation from nodes
     real, allocatable :: weight_n2c(:,:)
