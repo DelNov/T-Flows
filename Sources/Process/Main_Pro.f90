@@ -114,6 +114,9 @@
   call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=6,  n_r_node=2,  &
                                   n_i_cell= 4,  n_i_face=6,  n_i_node=2)
 
+!Uncomment to try cell extraction  ! Isoap, extract cell 10 from the Grid(1)
+!Uncomment to try cell extraction  call Polyhedron % Create_From_Grid_Cell(Grid(1), 10)
+
   ! Initialize first and current and read the last time step
   curr_dt  = 0
   first_dt = 0

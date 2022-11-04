@@ -3,14 +3,21 @@
 !------------------------------------------------------------------------------!
 !   This module is to deal with single polyhedron as used in Isoap "library"   !
 !   More details here: https://data.mendeley.com/datasets/4rcf98s74c           !
+!                                                                              !
+!   Conditional compilation allows to test Isoap outside of T-Flows.           !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
 # if T_FLOWS_COMPILATION == 1
     use Grid_Mod
+    use Work_Mod
 # endif
+  use Iso_Polygons_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  integer, parameter :: MAX_ISOAP_FACES = 200
+  integer, parameter :: MAX_ISOAP_VERTS = 240
 
   !---------------------!
   !   Polyhedron type   !
@@ -27,7 +34,7 @@
 
     contains
 #     if T_FLOWS_COMPILATION == 1
-!       procedure          :: Create_From_Grid_Cell  ! for coupling with VOF
+        procedure        :: Create_From_Grid_Cell  ! for coupling with VOF
 #     endif
       procedure          :: Create_Complexcell
       procedure          :: Create_Cube
@@ -52,8 +59,15 @@
 
   end type
 
+  ! Singleton type Polyhedron and Iso_Polygons objects
+  type(Polyhedron_Type)   :: Polyhedron
+  type(Iso_Polygons_Type) :: Iso_Polygons
+
   contains
 
+#   if T_FLOWS_COMPILATION == 1
+#   include "Polyhedron_Mod/Create_From_Grid_Cell.f90"
+#   endif
 #   include "Polyhedron_Mod/Create_Complexcell.f90"
 #   include "Polyhedron_Mod/Create_Cube.f90"
 #   include "Polyhedron_Mod/Create_Cutcube.f90"

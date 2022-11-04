@@ -8,10 +8,10 @@
   integer, intent(in)    :: ifile
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: ip, is, iv, ndata, npoly
-  character(len=12) :: filename
+  character(len=14) :: filename
 !==============================================================================!
 
-  write(filename,'("geo",i5.5,".vtk")') ifile
+  write(filename,'("geo",i7.7,".vtk")') ifile
 
   open(11, file=filename)
   write(11,'(a26)')     '# vtk DataFile Version 2.0'

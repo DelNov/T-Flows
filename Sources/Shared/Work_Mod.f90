@@ -95,6 +95,7 @@
 
   end type
 
+  ! Singleton object Work
   type(Work_Type) :: Work
 
   contains

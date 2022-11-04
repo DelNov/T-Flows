@@ -93,7 +93,12 @@ Field_Mod/*/*.f90
 # Dependencies for: ./Polyhedron_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Polyhedron_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
 Polyhedron_Mod/*.f90 \
+$(DIR_OBJECT)/Iso_Polygons_Mod.o \
+Iso_Polygons_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
@@ -207,6 +212,9 @@ Vert_Mod/*.f90 \
 $(DIR_OBJECT)/Side_Mod.o \
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Isoap_Mod.o \
+Isoap_Mod/*.f90 \
+Isoap_Mod/Dim_Polyhedron.h \
 Front_Mod/readme \
 Front_Mod/Find_Connectivity_Old.F \
 Front_Mod/*.f90 \
@@ -263,8 +271,6 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/Isoap_Mod.o:\
 $(DIR_OBJECT)/Polyhedron_Mod.o \
 Polyhedron_Mod/*.f90 \
-$(DIR_OBJECT)/Iso_Polygons_Mod.o \
-Iso_Polygons_Mod/*.f90 \
 Isoap_Mod/*.f90 \
 Isoap_Mod/Dim_Polyhedron.h 
 
