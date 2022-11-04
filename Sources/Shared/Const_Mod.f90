@@ -33,9 +33,6 @@
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!
-  real,    parameter :: HUGE     = 1.e+30
-  real,    parameter :: TINY     = 1.e-30
-  integer, parameter :: HUGE_INT = 2147483647
 
   ! Big and small numbers in metric system
   real, parameter :: PETA  = 1.e+15
@@ -48,6 +45,10 @@
   real, parameter :: NANO  = 1.e-9
   real, parameter :: PICO  = 1.e-12
   real, parameter :: FEMTO = 1.e-15
+
+  real,    parameter :: HUGE     = PETA
+  real,    parameter :: TINY     = FEMTO
+  integer, parameter :: HUGE_INT = 2147483647
 
   ! Archimedes’ constant
   real, parameter :: PI = 3.14159265359

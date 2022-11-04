@@ -83,7 +83,7 @@
     !---------------------------------------------------------------!
     !   Iso-surface extraction: this is the core of the algorithm   !
     !---------------------------------------------------------------!
-    call Isoap(Pol, Iso)
+    call Isoap % Main_Isoap(Pol, Iso)
 
     !-------------------------------------------------------!
     !   Print the iso-polygons to the file 'iso00000.vtk'   !

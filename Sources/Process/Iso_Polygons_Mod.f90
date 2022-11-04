@@ -23,6 +23,9 @@
 
   end type
 
+  ! Singleton type Iso_Polygons object
+  type(Iso_Polygons_Type) :: Iso_Polygons
+
   contains
 
 #   include "Iso_Polygons_Mod/Plot_Iso_Polygons_Vtk.f90"

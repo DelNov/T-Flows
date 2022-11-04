@@ -21,10 +21,8 @@
   integer                    :: v, n_vert, n_verts_in_buffers, i_nod
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3)
+  real                       :: surf_v(3), phi_cell_min, phi_cell_max
   real, contiguous, pointer  :: phi_n(:)
-!------------------------------------------------------------------------------!
-  include 'Front_Mod/Edge_Numbering.f90'
 !==============================================================================!
 
   call Profiler % Start('Creating_Front_From_Vof_Function')
@@ -45,10 +43,10 @@
   call Front % Initialize_Front()
   call Flow % Interpolate_Cells_To_Nodes(sharp % n, phi_n(1:nn))
 
-! call Grid % Save_Debug_Vtu('phi_c',               &
-!                            scalar_cell=phi % n,   &
+! call Grid % Save_Debug_Vtu('phi_c',                 &
+!                            scalar_cell=sharp % n,   &
 !                            scalar_name='phi_c')
-!
+
 ! call Grid % Save_Debug_Vtu('phi_n',             &
 !                            scalar_node=phi_n,   &
 !                            scalar_name='phi_n')
@@ -89,91 +87,109 @@
   !                                                            !
   !------------------------------------------------------------!
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
-
-    n_vert = 0
-
-    ! Fetch the edges for this cell
-    if(Grid % cells_n_nodes(c) .eq. 4) en = edg_tet
-    if(Grid % cells_n_nodes(c) .eq. 5) en = edg_pyr
-    if(Grid % cells_n_nodes(c) .eq. 6) en = edg_wed
-    if(Grid % cells_n_nodes(c) .eq. 8) en = edg_hex
-
-    !------------------------------------------------------!
-    !   Browse through edges to find intersection points   !
-    !------------------------------------------------------!
-    do j = 1, 12  ! max number of edges
-      n1 = Grid % cells_n( en(j,1), c )
-      n2 = Grid % cells_n( en(j,2), c )
-
-      phi1 = phi_n(n1)
-      phi2 = phi_n(n2)
-
-      ! There is a vertex between these two edges
-      if( ((phi2 - 0.5) * (0.5 - phi1)) >= MICRO ) then
-        n_cells_v(c) = n_cells_v(c) + 1
-
-        nv = nv + 1
-
-        n_vert = n_vert + 1
-
-        xn1 = Grid % xn(n1)
-        yn1 = Grid % yn(n1)
-        zn1 = Grid % zn(n1)
-
-        xn2 = Grid % xn(n2)
-        yn2 = Grid % yn(n2)
-        zn2 = Grid % zn(n2)
-
-        w1 = abs(phi2 - 0.5) / abs(phi2 - phi1)
-        w2 = 1.0 - w1
-
-        ! All vertices have to be stored
-        Vert(nv) % x_n = xn1*w1 + xn2*w2
-        Vert(nv) % y_n = yn1*w1 + yn2*w2
-        Vert(nv) % z_n = zn1*w1 + zn2*w2
-
-      end if
-
-    end do  ! through edges
-
-    !---------------------------------!
-    !   Some points have been found   !
-    !---------------------------------!
-    if(n_vert > 2) then
-
-      ! Surface vector
-      surf_v(1) = smooth % x(c)
-      surf_v(2) = smooth % y(c)
-      surf_v(3) = smooth % z(c)
-
-      ! If valid elements were formed (last parameter: enforce_triangles)
-      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v)
-      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v, .false.)
-      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v, .false.)
-      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v, .false.)
-      if(n_vert .eq. 7) then
-        print *, '# ERROR: seven vertices in an intersection!'
-        stop
-
-      end if
-
-      ! Store at which cell the surface resides
-      Elem(ne) % cell = c
-
+    phi_cell_min =  HUGE
+    phi_cell_max = -HUGE
+    do i_nod = 1, Grid % cells_n_nodes(c)
+      n = Grid % cells_n(i_nod, c)
+      phi_cell_min = min(phi_cell_min, phi_n(n))
+      phi_cell_max = max(phi_cell_max, phi_n(n))
+    end do
+    if(phi_cell_min <= 0.5 .and. phi_cell_max >= 0.5) then
+      call Isoap % Extract_Iso_Polygons(Grid, c, phi_n)
     end if
-
   end do
 
-  if(verbose) then
-    ne_tot = ne
-    nv_tot = nv
-    call Comm_Mod_Global_Sum_Int(ne_tot)
-    call Comm_Mod_Global_Sum_Int(nv_tot)
-    if(this_proc < 2) then
-      print '(a40,i8)', ' # Cummulative number of elements found:', ne_tot
-      print '(a40,i8)', ' # Cummulative number of vertices found:', nv_tot
-    end if
-  end if
+!old:  !------------------------------------------------------------!
+!old:  !                                                            !
+!old:  !   Browse through all cells in search of surface vertices   !
+!old:  !                                                            !
+!old:  !------------------------------------------------------------!
+!old:  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+!old:
+!old:    n_vert = 0
+!old:
+!old:    ! Fetch the edges for this cell
+!old:    if(Grid % cells_n_nodes(c) .eq. 4) en = edg_tet
+!old:    if(Grid % cells_n_nodes(c) .eq. 5) en = edg_pyr
+!old:    if(Grid % cells_n_nodes(c) .eq. 6) en = edg_wed
+!old:    if(Grid % cells_n_nodes(c) .eq. 8) en = edg_hex
+!old:
+!old:    !------------------------------------------------------!
+!old:    !   Browse through edges to find intersection points   !
+!old:    !------------------------------------------------------!
+!old:    do j = 1, 12  ! max number of edges
+!old:      n1 = Grid % cells_n( en(j,1), c )
+!old:      n2 = Grid % cells_n( en(j,2), c )
+!old:
+!old:      phi1 = phi_n(n1)
+!old:      phi2 = phi_n(n2)
+!old:
+!old:      ! There is a vertex between these two edges
+!old:      if( ((phi2 - 0.5) * (0.5 - phi1)) >= MICRO ) then
+!old:        n_cells_v(c) = n_cells_v(c) + 1
+!old:
+!old:        nv = nv + 1
+!old:
+!old:        n_vert = n_vert + 1
+!old:
+!old:        xn1 = Grid % xn(n1)
+!old:        yn1 = Grid % yn(n1)
+!old:        zn1 = Grid % zn(n1)
+!old:
+!old:        xn2 = Grid % xn(n2)
+!old:        yn2 = Grid % yn(n2)
+!old:        zn2 = Grid % zn(n2)
+!old:
+!old:        w1 = abs(phi2 - 0.5) / abs(phi2 - phi1)
+!old:        w2 = 1.0 - w1
+!old:
+!old:        ! All vertices have to be stored
+!old:        Vert(nv) % x_n = xn1*w1 + xn2*w2
+!old:        Vert(nv) % y_n = yn1*w1 + yn2*w2
+!old:        Vert(nv) % z_n = zn1*w1 + zn2*w2
+!old:
+!old:      end if
+!old:
+!old:    end do  ! through edges
+!old:
+!old:    !---------------------------------!
+!old:    !   Some points have been found   !
+!old:    !---------------------------------!
+!old:    if(n_vert > 2) then
+!old:
+!old:      ! Surface vector
+!old:      surf_v(1) = smooth % x(c)
+!old:      surf_v(2) = smooth % y(c)
+!old:      surf_v(3) = smooth % z(c)
+!old:
+!old:      ! If valid elements were formed (last parameter: enforce_triangles)
+!old:      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v)
+!old:      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v, .false.)
+!old:      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v, .false.)
+!old:      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v, .false.)
+!old:      if(n_vert .eq. 7) then
+!old:        print *, '# ERROR: seven vertices in an intersection!'
+!old:        stop
+!old:
+!old:      end if
+!old:
+!old:      ! Store at which cell the surface resides
+!old:      Elem(ne) % cell = c
+!old:
+!old:    end if
+!old:
+!old:  end do
+!old:
+!old:  if(verbose) then
+!old:    ne_tot = ne
+!old:    nv_tot = nv
+!old:    call Comm_Mod_Global_Sum_Int(ne_tot)
+!old:    call Comm_Mod_Global_Sum_Int(nv_tot)
+!old:    if(this_proc < 2) then
+!old:      print '(a40,i8)', ' # Cummulative number of elements found:', ne_tot
+!old:      print '(a40,i8)', ' # Cummulative number of vertices found:', nv_tot
+!old:    end if
+!old:  end if
 
   !-----------------------!
   !                       !

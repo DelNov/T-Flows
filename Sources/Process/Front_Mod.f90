@@ -56,15 +56,11 @@
       procedure :: Find_Front_Elements
       procedure :: Find_Sides
       procedure :: Find_Vertex_Elements
-      procedure :: Handle_3_Points
-      procedure :: Handle_4_Points
-      procedure :: Handle_5_Points
-      procedure :: Handle_6_Points
       procedure :: Initialize_Front
       procedure :: Mark_Cells_And_Faces
       procedure :: Place_Front_At_Value
       procedure :: Print_Front_Statistics
-      ! procedure :: Save_Front
+      ! procedure :: Save_Debug_Front_Vtu
 
   end type
 
@@ -80,14 +76,10 @@
 #   include "Front_Mod/Find_Front_Elements.f90"
 #   include "Front_Mod/Find_Sides.f90"
 #   include "Front_Mod/Find_Vertex_Elements.f90"
-#   include "Front_Mod/Handle_3_Points.f90"
-#   include "Front_Mod/Handle_4_Points.f90"
-#   include "Front_Mod/Handle_5_Points.f90"
-#   include "Front_Mod/Handle_6_Points.f90"
 #   include "Front_Mod/Initialize_Front.f90"
 #   include "Front_Mod/Mark_Cells_And_Faces.f90"
 #   include "Front_Mod/Place_Front_At_Value.f90"
 #   include "Front_Mod/Print_Front_Statistics.f90"
-!   include "Front_Mod/Save_Front.f90"
+!   include "Front_Mod/Save_Debug_Front_Vtu.f90"
 
   end module
