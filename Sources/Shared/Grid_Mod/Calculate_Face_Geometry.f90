@@ -249,6 +249,7 @@
   !   Find if faces around cells are oriented inwards or outwards   !
   !-----------------------------------------------------------------!
   do c = 1, Grid % n_cells
+    call Adjust_First_Dim(Grid % cells_n_faces(c), Grid % cells_f_orient)
     do i_fac = 1, Grid % cells_n_faces(c)  ! browse through faces of the cell
       s  = Grid % cells_f(i_fac, c)        ! take face's true number
       c1 = Grid % faces_c(1,s)
