@@ -6,13 +6,6 @@
 !                                                                              !
 !   Conditional compilation allows to test Isoap outside of T-Flows.           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-# if T_FLOWS_COMPILATION == 1
-    use Grid_Mod
-    use Work_Mod
-# endif
-  use Iso_Polygons_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
@@ -33,9 +26,6 @@
     real                                 :: phiiso
 
     contains
-#     if T_FLOWS_COMPILATION == 1
-        procedure        :: Create_From_Grid_Cell  ! for coupling with VOF
-#     endif
       procedure          :: Create_Complexcell
       procedure          :: Create_Cube
       procedure          :: Create_Cutcube
@@ -59,15 +49,11 @@
 
   end type
 
-  ! Singleton type Polyhedron and Iso_Polygons objects
-  type(Polyhedron_Type)   :: Polyhedron
-  type(Iso_Polygons_Type) :: Iso_Polygons
+  ! Singleton type Polyhedron objects
+  type(Polyhedron_Type) :: Polyhedron
 
   contains
 
-#   if T_FLOWS_COMPILATION == 1
-#   include "Polyhedron_Mod/Create_From_Grid_Cell.f90"
-#   endif
 #   include "Polyhedron_Mod/Create_Complexcell.f90"
 #   include "Polyhedron_Mod/Create_Cube.f90"
 #   include "Polyhedron_Mod/Create_Cutcube.f90"

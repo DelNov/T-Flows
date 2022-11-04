@@ -22,7 +22,8 @@
 ! NISO     = number of iso-polygons                                   !
 !---------------------------------------------------------------------!
 !---------------------------------------------------------------------!
-  SUBROUTINE ISOPOL(IA,        &
+  SUBROUTINE ISOPOL(ISOAP,     &
+                    IA,        &
                     IPIA0,     &
                     IPIA1,     &
                     IPV,       &
@@ -37,6 +38,7 @@
 !---------------------------------------------------------------------!
   INCLUDE "Isoap_Mod/Dim_Polyhedron.h"  ! holds NS and NV
 !---------------------------------------------------------------------!
+  CLASS(ISOAP_TYPE)    :: ISOAP
   INTEGER, INTENT(IN)  :: IA(NV)
   INTEGER, INTENT(OUT) :: IPIA0(NV)
   INTEGER, INTENT(OUT) :: IPIA1(NV)

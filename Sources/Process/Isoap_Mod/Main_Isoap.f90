@@ -22,12 +22,13 @@
 ! NISO     = number of iso-polygons                                   !
 ! VERTISO  = coordinates of the iso vertices                          !      
 !---------------------------------------------------------------------!
-  SUBROUTINE ISOAP(POLYHEDRON, ISO_POLYGONS)
+  SUBROUTINE MAIN_ISOAP(ISOAP, POLYHEDRON, ISO_POLYGONS)
 !---------------------------------------------------------------------!
   IMPLICIT NONE
 !---------------------------------------------------------------------!
   INCLUDE "Isoap_Mod/Dim_Polyhedron.h"  ! holds NS and NV
 !---------------------------------------------------------------------!
+  CLASS(ISOAP_TYPE)               :: ISOAP
   TYPE(POLYHEDRON_TYPE),   TARGET :: POLYHEDRON
   TYPE(ISO_POLYGONS_TYPE), TARGET :: ISO_POLYGONS
 !---------------------------------------------------------------------!
@@ -76,6 +77,7 @@
      DO IV=1,NIPV(IS)
         IP=IPV(IS,IV)
         IF(IA(IP).EQ.(-1)) THEN
+           print *, phi(ip)
            IF(PHI(IP).GT.PHIISO) THEN
               IA(IP)=1
               ICONTP=ICONTP+1
@@ -88,7 +90,7 @@
   END DO
   IF(ICONTP.NE.0.AND.ICONTN.NE.0) THEN
 !* Insert and arrange the iso-vertices
-     CALL ISOPOL(IA,IPIA0,IPIA1,IPV,IPVISO,ISOEFACE,NIPV,  &
+     CALL ISOAP % ISOPOL(IA,IPIA0,IPIA1,IPV,IPVISO,ISOEFACE,NIPV,  &
           NIPVISO,NISO,NTS)
 !* Iso-vertices positioning by linear interpolation
      DO IS=1,NISO
