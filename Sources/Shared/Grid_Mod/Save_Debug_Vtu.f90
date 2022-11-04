@@ -261,7 +261,7 @@
   if(     present(scalar_node)  &
      .or. present(vector_node)  &
      .or. present(tensor_node)) then
-    write(fu) IN_3 // '<PointData">' // LF
+    write(fu) IN_3 // '<PointData>' // LF
   end if
 
   ! Additional node-based scalar array

@@ -30,6 +30,10 @@
       procedure :: Calculate_Curvatures_From_Verts
       procedure :: Find_Boundaries
       procedure :: Find_Surf_Elements
+      procedure :: Handle_3_Points
+      procedure :: Handle_4_Points
+      procedure :: Handle_5_Points
+      procedure :: Handle_6_Points
       procedure :: Improve_Mesh_Quality
       procedure :: Initialize_Surf
       procedure :: Place_Surf_At_Value
@@ -55,6 +59,10 @@
 #   include "Surf_Mod/Calculate_Curvatures_From_Verts.f90"
 #   include "Surf_Mod/Find_Boundaries.f90"
 #   include "Surf_Mod/Find_Surf_Elements.f90"
+#   include "Surf_Mod/Handle_3_Points.f90"
+#   include "Surf_Mod/Handle_4_Points.f90"
+#   include "Surf_Mod/Handle_5_Points.f90"
+#   include "Surf_Mod/Handle_6_Points.f90"
 #   include "Surf_Mod/Improve_Mesh_Quality.f90"
 #   include "Surf_Mod/Initialize_Surf.f90"
 #   include "Surf_Mod/Place_Surf_At_Value.f90"

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Handle_5_Points(Front, surf_v, enforce_triangles)
+  subroutine Handle_5_Points(Surf, surf_v, enforce_triangles)
 !------------------------------------------------------------------------------!
 !   Surface intersects cell at five points                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  real                      :: surf_v(3)
-  logical                   :: enforce_triangles
+  class(Surf_Type), target :: Surf
+  real                     :: surf_v(3)
+  logical                  :: enforce_triangles
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)
@@ -19,10 +19,10 @@
 !=============================================================================!
 
   ! Take aliases
-  nv   => Front % n_verts
-  ne   => Front % n_elems
-  Vert => Front % Vert
-  Elem => Front % Elem
+  nv   => Surf % n_verts
+  ne   => Surf % n_elems
+  Vert => Surf % Vert
+  Elem => Surf % Elem
 
   permutations = reshape((/ &
     0, 1, 2, 3, 4,  &

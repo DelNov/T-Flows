@@ -1,20 +1,18 @@
 !==============================================================================!
-  subroutine Create_From_Grid_Cell(Polyhedron, Grid, cell)
+  subroutine Extract_Iso_Polygons(Isoap, Grid, cell, phi_n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Polyhedron
-  type(Grid_Type)        :: Grid
-  integer, intent(in)    :: cell
+  class(Isoap_Type)   :: Isoap
+  type(Grid_Type)     :: Grid
+  integer, intent(in) :: cell
+  real                :: phi_n(:)
 !-----------------------------------[Locals]-----------------------------------!
   logical, save                :: first_visit = .true.
   integer, contiguous, pointer :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
   integer                      :: i_nod, i_fac, l_nod, s, n, faces_n_nodes
 !==============================================================================!
-
-  PRINT *, 'Number of cells: ', Grid % n_cells
-  PRINT *, 'Cell           : ', cell
 
   call Work % Connect_Int_Node(local_node)  ! this also sets it to zero
 
@@ -33,16 +31,22 @@
     allocate(Iso_Polygons % face_index   (MAX_ISOAP_VERTS))
     allocate(Iso_Polygons % polys_n_verts(MAX_ISOAP_FACES))
     allocate(Iso_Polygons % verts_xyz    (MAX_ISOAP_VERTS, 3))
+
+    first_visit = .false.
   end if
 
   !------------------------------------------------!
   !   (Re)initialize Polyhedron and Iso_Polygons   !
   !------------------------------------------------!
+  Polyhedron % n_nodes            = 0
+  Polyhedron % n_faces            = 0
   Polyhedron % faces_n_nodes(:)   = 0
   Polyhedron % faces_n      (:,:) = 0
   Polyhedron % nodes_xyz    (:,:) = 0.0
   Polyhedron % phi          (:)   = 0.0
+  Polyhedron % phiiso             = 0.5
 
+  Iso_Polygons % n_polys            = 0
   Iso_Polygons % polys_v      (:,:) = 0
   Iso_Polygons % face_index   (:)   = 0
   Iso_Polygons % polys_n_verts(:)   = 0
@@ -54,9 +58,9 @@
   Polyhedron % n_faces = Grid % cells_n_faces(cell)
   Polyhedron % n_nodes = abs(Grid % cells_n_nodes(cell))  ! < 0 for polyhedral
 
-  !--------------------------------------------------------!
-  !   Find local node indices and copy their coordinates   !
-  !--------------------------------------------------------!
+  !----------------------------------------------------------------------!
+  !   Find local node indices and copy their coordinates and nodal phi   !
+  !----------------------------------------------------------------------!
   l_nod = 0                                 ! initialize local node count
   do i_nod = 1, Grid % cells_n_nodes(cell)  ! local (to cell) node number
 
@@ -69,6 +73,9 @@
     Polyhedron % nodes_xyz(l_nod,1) = Grid % xn(n)
     Polyhedron % nodes_xyz(l_nod,2) = Grid % yn(n)
     Polyhedron % nodes_xyz(l_nod,3) = Grid % zn(n)
+
+    ! Since you are here, copy the nodal phi values as well
+    Polyhedron % phi(l_nod) = phi_n(n)
   end do
 
   !------------------------------------------------------!
@@ -88,7 +95,7 @@
     ! They might be in the wrong order, correct if needed
     ! (If the face is oriented inwards to current cell,
     ! the nodes have to sorted in reverse order.)
-    if(Grid % cells_f_orient(i_fac, cell) .eq. INWARDS) then
+    if(Grid % cells_f_orient(i_fac, cell) .eq. OUTWARDS) then
       call Sort % Reverse_Order_Int(local_face_nodes(1:faces_n_nodes))
     end if
 
@@ -98,11 +105,13 @@
                    = local_face_nodes(1:faces_n_nodes)
   end do
 
-  ! Plot extracted cell
+  ! Plot extracted cell first, in case things go wrong
   call Polyhedron % Plot_Polyhedron_Vtk(cell)
 
-  call Message % Error(40, "Regular stop during development",  &
-                       file=__FILE__, line=__LINE__)
+  call Isoap % Main_Isoap(Polyhedron, Iso_Polygons)
+
+  ! Plot extracted polygons
+  call Iso_Polygons % Plot_Iso_Polygons_Vtk(cell)
 
   call Work % Disconnect_Int_Node(local_node)
 
