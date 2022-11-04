@@ -90,6 +90,21 @@ $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Polyhedron_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Polyhedron_Mod.o:\
+Polyhedron_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Iso_Polygons_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Iso_Polygons_Mod.o:\
+Iso_Polygons_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Read_Controls_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Read_Controls_Mod.o:\
@@ -241,6 +256,17 @@ $(DIR_OBJECT)/Logo_Pro.o:\
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Isoap_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Isoap_Mod.o:\
+$(DIR_OBJECT)/Polyhedron_Mod.o \
+Polyhedron_Mod/*.f90 \
+$(DIR_OBJECT)/Iso_Polygons_Mod.o \
+Iso_Polygons_Mod/*.f90 \
+Isoap_Mod/*.f90 \
+Isoap_Mod/Dim_Polyhedron.h 
 
 #---------------------------------------------------
 # Dependencies for: ./User_Mod.f90
@@ -582,6 +608,16 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 Face_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Isoap_Mod/Isopol.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Isopol.o:
+
+#---------------------------------------------------
+# Dependencies for: ./Isoap_Mod/Isoap.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Isoap.o:
 
 #---------------------------------------------------
 # Dependencies for: ./Sort_Mod.f90

@@ -27,9 +27,13 @@ VPATH = $(DIR_SHARED):$(DIR_TURBUL):$(DIR_SWARM):.
 PROGRAM_NAME = Process
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
-# Initialize variables to pass on to preprocessor
-# It later adds T_FLOWS_MPI and T_FLOWS_PETSC
-PASS_ON =
+#----------------------------------------------------------
+#   Initialize variables to pass on to preprocessor with
+#   variable T_FLOWS_COMPILATION which, if set to one,
+#   means unit is compiled from T-Flow
+#   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
+#----------------------------------------------------------
+PASS_ON = -DT_FLOWS_COMPILATION=1
 
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
@@ -247,6 +251,9 @@ SRC_F_MOD += Point_Mod.f90          \
              Solver_Mod.f90         \
              Numerics_Mod.f90       \
              Field_Mod.f90          \
+             Polyhedron_Mod.f90     \
+             Iso_Polygons_Mod.f90   \
+             Isoap_Mod.f90          \
              Front_Mod.f90          \
              Surf_Mod.f90           \
              Info_Mod.f90           \

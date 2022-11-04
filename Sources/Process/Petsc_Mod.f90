@@ -20,7 +20,7 @@
     use PetscVec,   only: tVec
     use PetscMat,   only: tMat
     use PetscKSP,   only: tKSP, tPC
-#endif
+# endif
   use Native_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -48,10 +48,10 @@
       type(PetscInt), allocatable :: o_nnz(:)  ! off-diag. stencil width per cell
       type(PetscErrorCode)        :: err
       type(PetscEnum)             :: reason
-#else
+#   else
       ! Fake Petsc-related variables
       type(Matrix_Type) :: A         ! sparse matrix
-#endif
+#   endif
 
 #   if T_FLOWS_PETSC == 1
       ! Global cell numbering for PETSc, which is
@@ -68,18 +68,18 @@
 # if T_FLOWS_PETSC == 1
     logical, parameter :: PETSC_ACTIVE = .true.
     integer, parameter :: OUT_OF_ITS   = -3      ! KSP_DIVERGED_ITS
-#else
+# else
     logical, parameter :: PETSC_ACTIVE = .false.
-#endif
+# endif
 
   contains
 
 # if T_FLOWS_PETSC == 1
 #   include "Petsc_Mod/True/Create_Petsc.f90"
 #   include "Petsc_Mod/True/Solve_Petsc.f90"
-#else
+# else
 #   include "Petsc_Mod/Fake/Create_Petsc.f90"
 #   include "Petsc_Mod/Fake/Solve_Petsc.f90"
-#endif
+# endif
 
   end module

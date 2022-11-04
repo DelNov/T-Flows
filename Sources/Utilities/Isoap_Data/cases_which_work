@@ -1,0 +1,7 @@
+# The cases listed here gave the same result in the original and the new version
+
+phi -> Data/phi-cube-07
+./Check_Isoap 1 0 0.0
+
+phi -> Data/phi-scube-01
+./Check_Isoap 104 0 0.0
