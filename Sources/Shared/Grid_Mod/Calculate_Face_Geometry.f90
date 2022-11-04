@@ -248,27 +248,37 @@
   !-----------------------------------------------------------------!
   !   Find if faces around cells are oriented inwards or outwards   !
   !-----------------------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+
+    ! Even Grid % cells_f_orient are initially allocated with very low dimension
     call Adjust_First_Dim(Grid % cells_n_faces(c), Grid % cells_f_orient)
+
     do i_fac = 1, Grid % cells_n_faces(c)  ! browse through faces of the cell
       s  = Grid % cells_f(i_fac, c)        ! take face's true number
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      ! Face orientation (see above) and surface vector point
-      ! from c1 to c2.  So, if c1 is equal to c, it means that
-      ! the relative surface i_fac to c is pointing outwards
-      if(c1 .eq. c) then
-        Grid % cells_f_orient(i_fac, c) = OUTWARDS
-      else if(c2 .eq. c) then
-        Grid % cells_f_orient(i_fac, c) = INWARDS
-      else
-        call Message % Error(40,                          &
-                "Something is seriously wrong with "  //  &
-                "face to cell connectivity.",             &
-                file=__FILE__, line=__LINE__)
-      end if
-    end do
-  end do
+      ! Skip the shadow faces, no reliable
+      ! information on c1 and c2 on them
+      if(s .lt. Grid % n_faces - Grid % n_shadows) then
+
+        ! Face orientation (see above) and surface vector point
+        ! from c1 to c2.  So, if c1 is equal to c, it means that
+        ! the relative surface i_fac to c is pointing outwards
+        if(c1 .eq. c) then
+          Grid % cells_f_orient(i_fac, c) = OUTWARDS
+        else if(c2 .eq. c) then
+          Grid % cells_f_orient(i_fac, c) = INWARDS
+        else
+          call Message % Error(40,                          &
+                  "Something is seriously wrong with "  //  &
+                  "face to cell connectivity.",             &
+                  file=__FILE__, line=__LINE__)
+        end if
+
+      end if  ! face is not a shadow face
+
+    end do  ! through cell's face
+  end do    ! through cells
 
   end subroutine
