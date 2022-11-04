@@ -48,8 +48,8 @@
   !----------------------------------------------!
 
   !------------------------------------------------------!
-  !                                                      ! 
-  !   First level comments are written like sentences,   ! 
+  !                                                      !
+  !   First level comments are written like sentences,   !
   !   first word capital, and can spread over several    !
   !   lines like this very commet.                       !
   !                                                      !
@@ -76,7 +76,7 @@
     c1 = Grid % faces_c(1, s)  ! they are too small to qualify as sentences
     c2 = Grid % faces_c(1, s)  ! keep them two columns apart from the last ...
                                ! column with the code
-
+                            !12! <- see distance from the last command
   end do
 
   end subroutine

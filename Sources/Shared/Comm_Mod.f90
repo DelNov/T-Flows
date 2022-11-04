@@ -13,9 +13,7 @@
 !==============================================================================!
 
   !-----------------!
-  !                 !
   !   Buffer type   !
-  !                 !
   !-----------------!
   type Buffer_Type
     integer              :: n_items
@@ -27,9 +25,7 @@
   end type
 
   !---------------!
-  !               !
   !   Comm type   !
-  !               !
   !---------------!
   type Comm_Type    ! also used inside the Grid_Type
 

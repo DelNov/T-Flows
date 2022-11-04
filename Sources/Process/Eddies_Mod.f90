@@ -16,9 +16,7 @@
   integer, parameter :: MAX_TURBULENT_PLANES = 64
 
   !---------------!
-  !               !
-  !   Eddy type   !
-  !               !
+  !   Eddy type   !  =-->  this is used to describe a single eddy
   !---------------!
   type Eddy_Type
     real :: x, y, z  ! eddy's position
@@ -29,9 +27,7 @@
   end type
 
   !-----------------!
-  !                 !
-  !   Eddies type   !
-  !                 !
+  !   Eddies type   !  =--> this is used to describe many eddies
   !-----------------!
   type Eddies_Type
 
@@ -65,9 +61,7 @@
   end type
 
   !--------------------------------------!
-  !                                      !
   !   Synthtetic turbulence plane type   !
-  !                                      !
   !--------------------------------------!
   type Turb_Plane_Type
     integer           :: n_planes
