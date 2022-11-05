@@ -55,7 +55,7 @@
     min_dist(:) = +HUGE
     max_dist(:) = -HUGE
     do c = 1, Grid % n_cells
-      do i_nod = 1, Grid % cells_n_nodes(c)
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
         n = Grid % cells_n(i_nod, c)
 
         min_dist(c)= min(dist_node(n), min_dist(c))

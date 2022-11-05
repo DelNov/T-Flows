@@ -34,7 +34,7 @@
   xmin =  HUGE; ymin =  HUGE; zmin =  HUGE;
   xmax = -HUGE; ymax = -HUGE; zmax = -HUGE;
 
-  do nod = 1, Grid % cells_n_nodes(c)
+  do nod = 1, abs(Grid % cells_n_nodes(c))
     xmin = min(xmin, Grid % xn(Grid % cells_n(nod,c)))
     ymin = min(ymin, Grid % yn(Grid % cells_n(nod,c)))
     zmin = min(zmin, Grid % zn(Grid % cells_n(nod,c)))
