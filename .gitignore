@@ -19,6 +19,7 @@
 *.7z
 *.backup
 *.1d
+*genmod.f90
 Binaries/*
 Tests/**/Generate
 Tests/**/Convert
