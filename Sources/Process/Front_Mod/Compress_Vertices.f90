@@ -27,9 +27,11 @@
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
         if(Elem(e) % v(i_ver) .eq. Elem(e) % v(j_ver)) then
-          print '(a)',      ' # ERROR in the beginning of Compress_Vertices'
-          print '(a,i6,a)', ' # element ', e, ' has some duplicate vertices'
-          stop
+          call Message % Error(44,                                    &
+                               "Error in the sanity check for  "  //  &
+                               "elements. \n  Some element(s)  "  //  &
+                               "have duplicate vertices.",            &
+                               file=__FILE__, line=__LINE__)
         end if
       end do
     end do
@@ -116,9 +118,11 @@
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
         if(Elem(e) % v(i_ver) .eq. Elem(e) % v(j_ver)) then
-          print '(a)',      ' # ERROR in the end of Compress_Vertices'
-          print '(a,i6,a)', ' # element ', e, ' has some duplicate vertices'
-          stop
+          call Message % Error(44,                                          &
+                               "Error in the final sanity check for  "  //  &
+                               "elements. \n  Some element(s)        "  //  &
+                               "have duplicate vertices.",                  &
+                               file=__FILE__, line=__LINE__)
         end if
       end do
     end do
