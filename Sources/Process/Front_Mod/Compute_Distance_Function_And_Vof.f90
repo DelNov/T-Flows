@@ -42,12 +42,12 @@
 
     ! Make a list of nodes surrounding the nearest cell
     n_cnt = 0  ! initialize node count
-    do j_nod = 1, Grid % cells_n_nodes(d)
+    do j_nod = 1, abs(Grid % cells_n_nodes(d))
       n = Grid % cells_n(j_nod, d)
 
       do i_cel = 1, Grid % nodes_n_cells(n)
         c = Grid % nodes_c(i_cel, n)
-        do i_nod = 1, Grid % cells_n_nodes(c)
+        do i_nod = 1, abs(Grid % cells_n_nodes(c))
           n_cnt = n_cnt + 1
           node_list(n_cnt) = Grid % cells_n(i_nod, c)
         end do
