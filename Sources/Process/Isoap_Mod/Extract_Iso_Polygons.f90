@@ -11,7 +11,8 @@
   logical, save                :: first_visit = .true.
   integer, contiguous, pointer :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer                      :: i_nod, i_fac, l_nod, s, n, faces_n_nodes
+  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
+  integer                      :: s, n, faces_n_nodes
 !==============================================================================!
 
   call Work % Connect_Int_Node(local_node)  ! this also sets it to zero
@@ -108,6 +109,9 @@
   ! Plot extracted cell first, in case things go wrong
   call Polyhedron % Plot_Polyhedron_Vtk(cell)
 
+  !------------------------------!
+  !   Call the Isoap algorithm   !
+  !------------------------------!
   call Isoap % Main_Isoap(Polyhedron, Iso_Polygons)
 
   ! Plot extracted polygons
