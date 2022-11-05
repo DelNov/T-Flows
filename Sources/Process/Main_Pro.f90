@@ -103,8 +103,10 @@
     call Grid(d) % Load_Dim(this_proc, domain=d)
     call Grid(d) % Calculate_Face_Geometry()
 
+    ! Find communication patterns
     call Grid(d) % Form_Cells_Comm()
     call Grid(d) % Form_Maps()
+    call Grid(d) % Determine_Face_Orientation()
   end do
 
   ! Out of domain loop - go back to root
