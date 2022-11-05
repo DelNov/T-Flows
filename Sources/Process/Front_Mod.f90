@@ -17,9 +17,8 @@
   !--------------------------------!
   !   A few important parameters   !
   !--------------------------------!
-  integer, parameter   :: MAX_ELEMENT_VERTICES =      6
-  integer, parameter   :: MAX_SURFACE_VERTICES = 131072
-  integer, parameter   :: MAX_SURFACE_ELEMENTS = 131072
+  integer, parameter :: MAX_SURFACE_VERTICES = 131072
+  integer, parameter :: MAX_SURFACE_ELEMENTS = 131072
 
   !----------------!
   !   Front type   !
