@@ -77,7 +77,6 @@
      DO IV=1,NIPV(IS)
         IP=IPV(IS,IV)
         IF(IA(IP).EQ.(-1)) THEN
-           print *, phi(ip)
            IF(PHI(IP).GT.PHIISO) THEN
               IA(IP)=1
               ICONTP=ICONTP+1
