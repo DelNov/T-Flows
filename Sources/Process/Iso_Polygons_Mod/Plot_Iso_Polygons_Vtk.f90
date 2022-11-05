@@ -15,7 +15,7 @@
   open(11, file=filename)
 
   write(11,'(a26)')     '# vtk DataFile Version 2.0'
-  write(11,'(a6,i5.5)') 'File: ', ifile
+  write(11,'(a6,i7.7)') 'File: ', ifile
   write(11,'(a5)')      'ASCII'
   write(11,*)           ' '
   write(11,'(a16)')     'DATASET POLYDATA'
