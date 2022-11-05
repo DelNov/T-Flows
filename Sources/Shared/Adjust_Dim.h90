@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine Adjust_First_Dim(n_new, a)
+  subroutine Adjust_Dim(n_new, a)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(in)                  :: n_new        ! new dimension
-  integer, allocatable, dimension(:,:) :: a
+  integer, intent(in)                :: n_new        ! new dimension
+  integer, allocatable, dimension(:) :: a
 !==============================================================================!
 
   end subroutine

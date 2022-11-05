@@ -158,13 +158,6 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Adjust_First_Dim.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Adjust_First_Dim.o:\
-$(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Message_Mod/Dashed_Line.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Dashed_Line.o:\

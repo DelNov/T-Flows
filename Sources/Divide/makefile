@@ -165,7 +165,8 @@ SRC_F_MOD = Const_Mod.f90          \
 #---------------
 
 # Sources for all shared functions
-SRC_F_FUN = Adjust_First_Dim.f90
+SRC_F_FUN = Adjust_Dim.f90        \
+            Adjust_First_Dim.f90
 
 # Local functions are added one by one ...
 SRC_F_FUN += Save_Subdomains.f90  \
