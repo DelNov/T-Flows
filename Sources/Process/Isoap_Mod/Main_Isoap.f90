@@ -46,9 +46,11 @@
   REAL   , POINTER                 :: PHIISO
   REAL   , POINTER, DIMENSION(:,:) :: VERTISO   ! (NV,3)
   REAL   , POINTER, DIMENSION(:,:) :: VERTP     ! (NV,3)
+  INTEGER, POINTER, DIMENSION(:)   :: IPIA0
+  INTEGER, POINTER, DIMENSION(:)   :: IPIA1
 
 !* These are local variables
-  INTEGER IA(NV),ICONTN,ICONTP,IP,IP0,IP1,IPIA0(NV),IPIA1(NV),IS,IV
+  INTEGER IA(NV),ICONTN,ICONTP,IP,IP0,IP1,IS,IV
 !---------------------------------------------------------------------!
 
 !* Transfer the pointers before all
@@ -64,6 +66,8 @@
   NIPVISO  => ISO_POLYGONS % POLYS_N_VERTS  ! original: NIPVISO
   NISO     => ISO_POLYGONS % N_POLYS        ! original: NISO
   VERTISO  => ISO_POLYGONS % VERTS_XYZ      ! original: VERTISO
+  IPIA0    => ISO_POLYGONS % B_NODE_1
+  IPIA1    => ISO_POLYGONS % B_NODE_2
 
 !* Continue as it used to be
   ICONTP=0

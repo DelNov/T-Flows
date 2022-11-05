@@ -14,12 +14,6 @@
   implicit none
 !==============================================================================!
 
-  !--------------------------------!
-  !   A few important parameters   !
-  !--------------------------------!
-  integer, parameter :: MAX_SURFACE_VERTICES = 131072
-  integer, parameter :: MAX_SURFACE_ELEMENTS = 131072
-
   !----------------!
   !   Front type   !
   !----------------!
@@ -34,6 +28,10 @@
     type(Vert_Type), allocatable :: Vert(:)
     type(Elem_Type), allocatable :: elem(:)
     type(Side_Type), allocatable :: side(:)
+
+    ! Bounding nodes for each vertex (derives from Isoap usage)
+    integer, allocatable :: b_node_1(:)
+    integer, allocatable :: b_node_2(:)
 
     ! Is the mesh divided among processors (like in Front_Type)
     ! or is it shared among all of them (like in Surf_Type)

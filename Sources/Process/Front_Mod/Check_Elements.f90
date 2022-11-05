@@ -37,7 +37,6 @@
     end do
 
     if( sum_cd / sum_ijk .ne. 2 ) then
-      print *, '# ERROR in forming elements'' neighbours!'
 
       print *, '# Element: ', e
       print *, '# Element''s node coordinates read:'
@@ -60,12 +59,15 @@
       c = Elem(e) % cell
       print *, '# At cell: ', c
       print *, '# Cell''s node coordinates read:'
-      do i_nod = 1, Grid % cells_n_nodes(c)
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
         n = Grid % cells_n(i_nod, c)
         print '(i8, 99es15.5)', n, Grid % xn(n), Grid % yn(n), Grid % zn(n)
       end do
 
-      stop
+      call Message % Error(44,                                                &
+                           "Error in forming elements' neighbours. \n "  //  &
+                           "See more info above.",                           &
+                           file=__FILE__, line=__LINE__)
     end if
   end do
 

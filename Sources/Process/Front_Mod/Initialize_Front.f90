@@ -13,7 +13,7 @@
   !-----------------------------!
   !   Initialize all elements   !
   !-----------------------------!
-  do e = 1, MAX_SURFACE_ELEMENTS
+  do e = 1, size(Front % Elem, 1)
     call Front % Elem(e) % Initialize_Elem()
   end do
   Front % n_elems = 0
@@ -21,7 +21,7 @@
   !-----------------------------!
   !   Initialize all vertices   !
   !-----------------------------!
-  do v = 1, MAX_SURFACE_VERTICES
+  do v = 1, size(Front % Vert, 1)
     call Front % Vert(v) % Initialize_Vert(Front % pnt_grid)
     Front % Vert(v) % trapped = .true.
   end do
@@ -30,7 +30,7 @@
   !--------------------------!
   !   Initialize all sides   !
   !--------------------------!
-  do s = 1, MAX_SURFACE_ELEMENTS * 3
+  do s = 1, size(Front % side, 1)
     Front % side(s) % a        = 0
     Front % side(s) % b        = 0
     Front % side(s) % c        = 0

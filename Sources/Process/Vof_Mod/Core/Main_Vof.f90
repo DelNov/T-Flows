@@ -52,7 +52,6 @@
     !--------------------!
     if(Vof % track_front) then
       call Vof % Front % Place_Front_At_Value(Vof % fun,     &
-                                              Vof % smooth,  &
                                               .false.)  ! don't print messages
       call Vof % Front % Print_Front_Statistics()
     end if

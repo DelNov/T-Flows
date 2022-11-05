@@ -13,7 +13,7 @@
   !-----------------------------!
   !   Initialize all elements   !
   !-----------------------------!
-  do e = 1, MAX_SURFACE_ELEMENTS
+  do e = 1, size(Surf % Elem, 1)
     call Surf % Elem(e) % Initialize_Elem()
   end do
   Surf % n_elems = 0
@@ -21,7 +21,7 @@
   !-----------------------------!
   !   Initialize all vertices   !
   !-----------------------------!
-  do v = 1, MAX_SURFACE_VERTICES
+  do v = 1, size(Surf % Vert, 1)
     call Surf % Vert(v) % Initialize_Vert(Surf % pnt_grid)
     Surf % Vert(v) % trapped = .true.
   end do
@@ -30,7 +30,7 @@
   !--------------------------!
   !   Initialize all sides   !
   !--------------------------!
-  do s = 1, MAX_SURFACE_ELEMENTS * 3
+  do s = 1, size(Surf % side, 1)
     Surf % side(s) % a        = 0
     Surf % side(s) % b        = 0
     Surf % side(s) % c        = 0

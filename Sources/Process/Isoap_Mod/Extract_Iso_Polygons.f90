@@ -32,6 +32,8 @@
     allocate(Iso_Polygons % face_index   (MAX_ISOAP_VERTS))
     allocate(Iso_Polygons % polys_n_verts(MAX_ISOAP_FACES))
     allocate(Iso_Polygons % verts_xyz    (MAX_ISOAP_VERTS, 3))
+    allocate(Iso_Polygons % b_node_1     (MAX_ISOAP_VERTS))
+    allocate(Iso_Polygons % b_node_2     (MAX_ISOAP_VERTS))
 
     first_visit = .false.
   end if
@@ -52,6 +54,8 @@
   Iso_Polygons % face_index   (:)   = 0
   Iso_Polygons % polys_n_verts(:)   = 0
   Iso_Polygons % verts_xyz    (:,:) = 0.0
+  Iso_Polygons % b_node_1     (:)   = 0
+  Iso_Polygons % b_node_2     (:)   = 0
 
   !---------------------------------------!
   !   Extract number of nodes and faces   !
@@ -62,8 +66,8 @@
   !----------------------------------------------------------------------!
   !   Find local node indices and copy their coordinates and nodal phi   !
   !----------------------------------------------------------------------!
-  l_nod = 0                                 ! initialize local node count
-  do i_nod = 1, Grid % cells_n_nodes(cell)  ! local (to cell) node number
+  l_nod = 0                                      ! initialize local node count
+  do i_nod = 1, abs(Grid % cells_n_nodes(cell))  ! local (to cell) node number
 
     ! Form local node indices
     n = Grid % cells_n(i_nod, cell)         ! global (to grid) node number
@@ -107,7 +111,7 @@
   end do
 
   ! Plot extracted cell first, in case things go wrong
-  call Polyhedron % Plot_Polyhedron_Vtk(cell)
+  ! call Polyhedron % Plot_Polyhedron_Vtk(cell)
 
   !------------------------------!
   !   Call the Isoap algorithm   !
@@ -115,7 +119,7 @@
   call Isoap % Main_Isoap(Polyhedron, Iso_Polygons)
 
   ! Plot extracted polygons
-  call Iso_Polygons % Plot_Iso_Polygons_Vtk(cell)
+  ! call Iso_Polygons % Plot_Iso_Polygons_Vtk(cell)
 
   call Work % Disconnect_Int_Node(local_node)
 

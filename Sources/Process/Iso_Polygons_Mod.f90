@@ -17,6 +17,8 @@
     integer, allocatable, dimension(:,:) :: polys_v        ! ipviso  (ns,nv)
     real,    allocatable, dimension(:,:) :: verts_xyz      ! vertiso (nv,3)
     integer, allocatable, dimension(:)   :: face_index     ! isoeface(nv)
+    integer, allocatable, dimension(:)   :: b_node_1       ! ipia0
+    integer, allocatable, dimension(:)   :: b_node_2       ! ipia1
 
     contains
       procedure :: Plot_Iso_Polygons_Vtk

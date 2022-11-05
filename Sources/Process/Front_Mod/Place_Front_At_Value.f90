@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Place_Front_At_Value(Front, sharp, smooth, verbose)
+  subroutine Place_Front_At_Value(Front, sharp, verbose)
 !------------------------------------------------------------------------------!
 !   Places surface where variable phi has value 0.5                            !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Front_Type), target :: Front
   type(Var_Type),    target :: sharp
-  type(Var_Type),    target :: smooth
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -15,13 +14,14 @@
   type(Vert_Type),   pointer :: Vert(:)
   type(Elem_Type),   pointer :: Elem(:)
   integer,           pointer :: nv, ne
-  integer                    :: nv_tot, ne_tot
+  integer                    :: nv_tot, ne_tot, n_iso
   integer, allocatable       :: n_cells_v(:)
   integer                    :: c, j, n1, n2, nb, nc, n, nn
-  integer                    :: v, n_vert, n_verts_in_buffers, i_nod
+  integer                    :: v, n_vert, n_verts_in_buffers
+  integer                    :: i_nod, i_ver, i_iso
   integer                    :: en(12,2)  ! edge numbering
   real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
-  real                       :: surf_v(3), phi_cell_min, phi_cell_max
+  real                       :: phi_cell_min, phi_cell_max
   real, contiguous, pointer  :: phi_n(:)
 !==============================================================================!
 
@@ -56,7 +56,7 @@
   !    "exactly" 0.5, change them a little bit    !
   !-----------------------------------------------!
   do c = 1, nc
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       if(Math % Approx_Real(phi_n(n), 0.5)) then
         if(sharp % n(c) < sharp % o(c)) then
@@ -67,12 +67,6 @@
       end if
     end do
   end do
-
-  !---------------------------------------------!
-  !   Take gradients from the smooth function   !
-  !   These might be already computed - check   !
-  !---------------------------------------------!
-  call Flow % Grad_Variable(smooth)
 
   allocate(n_cells_v(Grid % n_cells))
   n_cells_v(:) = 0
@@ -89,107 +83,48 @@
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     phi_cell_min =  HUGE
     phi_cell_max = -HUGE
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       phi_cell_min = min(phi_cell_min, phi_n(n))
       phi_cell_max = max(phi_cell_max, phi_n(n))
     end do
     if(phi_cell_min <= 0.5 .and. phi_cell_max >= 0.5) then
+
+      !------------------------------!
+      !   Call the Isoap algorithm   !
+      !------------------------------!
       call Isoap % Extract_Iso_Polygons(Grid, c, phi_n)
+
+      !------------------------------------------------------!
+      !   Store results from Isoap into T-Flows' variables   !
+      !------------------------------------------------------!
+      do i_iso = 1, Iso_Polygons % n_polys
+
+        ! Increase element's count
+        ne = ne + 1
+
+        Elem(ne) % cell = c
+
+        Elem(ne) % nv = Iso_Polygons % polys_n_verts(i_iso)
+
+        ! Store elements vertices
+        do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
+          Elem(ne) % v(i_ver) = nv + Iso_Polygons % polys_v(i_iso, i_ver)
+        end do
+
+        ! Fetch coordinates and bounding nodes of new iso-polygon
+        do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
+          nv = nv + 1
+          Vert(nv) % x_n = Iso_Polygons % verts_xyz(i_ver, 1)
+          Vert(nv) % y_n = Iso_Polygons % verts_xyz(i_ver, 2)
+          Vert(nv) % z_n = Iso_Polygons % verts_xyz(i_ver, 3)
+
+          Front % b_node_1(nv) = Iso_Polygons % b_node_1(i_ver)
+          Front % b_node_2(nv) = Iso_Polygons % b_node_2(i_ver)
+        end do
+      end do
     end if
   end do
-
-!old:  !------------------------------------------------------------!
-!old:  !                                                            !
-!old:  !   Browse through all cells in search of surface vertices   !
-!old:  !                                                            !
-!old:  !------------------------------------------------------------!
-!old:  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
-!old:
-!old:    n_vert = 0
-!old:
-!old:    ! Fetch the edges for this cell
-!old:    if(Grid % cells_n_nodes(c) .eq. 4) en = edg_tet
-!old:    if(Grid % cells_n_nodes(c) .eq. 5) en = edg_pyr
-!old:    if(Grid % cells_n_nodes(c) .eq. 6) en = edg_wed
-!old:    if(Grid % cells_n_nodes(c) .eq. 8) en = edg_hex
-!old:
-!old:    !------------------------------------------------------!
-!old:    !   Browse through edges to find intersection points   !
-!old:    !------------------------------------------------------!
-!old:    do j = 1, 12  ! max number of edges
-!old:      n1 = Grid % cells_n( en(j,1), c )
-!old:      n2 = Grid % cells_n( en(j,2), c )
-!old:
-!old:      phi1 = phi_n(n1)
-!old:      phi2 = phi_n(n2)
-!old:
-!old:      ! There is a vertex between these two edges
-!old:      if( ((phi2 - 0.5) * (0.5 - phi1)) >= MICRO ) then
-!old:        n_cells_v(c) = n_cells_v(c) + 1
-!old:
-!old:        nv = nv + 1
-!old:
-!old:        n_vert = n_vert + 1
-!old:
-!old:        xn1 = Grid % xn(n1)
-!old:        yn1 = Grid % yn(n1)
-!old:        zn1 = Grid % zn(n1)
-!old:
-!old:        xn2 = Grid % xn(n2)
-!old:        yn2 = Grid % yn(n2)
-!old:        zn2 = Grid % zn(n2)
-!old:
-!old:        w1 = abs(phi2 - 0.5) / abs(phi2 - phi1)
-!old:        w2 = 1.0 - w1
-!old:
-!old:        ! All vertices have to be stored
-!old:        Vert(nv) % x_n = xn1*w1 + xn2*w2
-!old:        Vert(nv) % y_n = yn1*w1 + yn2*w2
-!old:        Vert(nv) % z_n = zn1*w1 + zn2*w2
-!old:
-!old:      end if
-!old:
-!old:    end do  ! through edges
-!old:
-!old:    !---------------------------------!
-!old:    !   Some points have been found   !
-!old:    !---------------------------------!
-!old:    if(n_vert > 2) then
-!old:
-!old:      ! Surface vector
-!old:      surf_v(1) = smooth % x(c)
-!old:      surf_v(2) = smooth % y(c)
-!old:      surf_v(3) = smooth % z(c)
-!old:
-!old:      ! If valid elements were formed (last parameter: enforce_triangles)
-!old:      if(n_vert .eq. 3) call Front % Handle_3_Points(surf_v)
-!old:      if(n_vert .eq. 4) call Front % Handle_4_Points(surf_v, .false.)
-!old:      if(n_vert .eq. 5) call Front % Handle_5_Points(surf_v, .false.)
-!old:      if(n_vert .eq. 6) call Front % Handle_6_Points(surf_v, .false.)
-!old:      if(n_vert .eq. 7) then
-!old:        print *, '# ERROR: seven vertices in an intersection!'
-!old:        stop
-!old:
-!old:      end if
-!old:
-!old:      ! Store at which cell the surface resides
-!old:      Elem(ne) % cell = c
-!old:
-!old:    end if
-!old:
-!old:  end do
-!old:
-!old:  if(verbose) then
-!old:    ne_tot = ne
-!old:    nv_tot = nv
-!old:    call Comm_Mod_Global_Sum_Int(ne_tot)
-!old:    call Comm_Mod_Global_Sum_Int(nv_tot)
-!old:    if(this_proc < 2) then
-!old:      print '(a40,i8)', ' # Cummulative number of elements found:', ne_tot
-!old:      print '(a40,i8)', ' # Cummulative number of vertices found:', nv_tot
-!old:    end if
-!old:  end if
 
   !-----------------------!
   !                       !

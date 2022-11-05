@@ -27,6 +27,9 @@
   allocate(Front % Vert(Grid % n_cells))
   allocate(Front % side(Grid % n_cells * 3))
 
+  allocate(Front % b_node_1(Grid % n_cells));  Front % b_node_1(:) = 0
+  allocate(Front % b_node_2(Grid % n_cells));  Front % b_node_2(:) = 0
+
   if(Flow % mass_transfer) then
     nb   =  Grid % n_bnd_cells
     nc   =  Grid % n_cells
