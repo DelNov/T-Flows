@@ -159,7 +159,11 @@ OPT_LINK = $(OPT_F_COMP)
 # compiler vendors have MPI wrapper named mpif90)
 ifeq ($(MPI), yes)
   ifeq ($(FCOMP),)
-    FC = mpif90
+    ifeq ($(FORTRAN), intel)
+      FC = mpiifort
+    else
+      FC = mpif90
+    endif
   else
     FC = $(FCOMP)
   endif
