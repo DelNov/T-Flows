@@ -21,9 +21,9 @@ include '../User_Mod/Vof_Interface_Ellipsoid.f90'
 !==============================================================================!
 
   ! Take aliases
-  Grid  => Flow % pnt_grid
-  fun   => Vof % fun
-  dt    => Flow % dt
+  Grid => Flow % pnt_grid
+  fun  => Vof % fun
+  dt   => Flow % dt
 
   !---------------------------------!
   !   Initialize the VOF function   !
@@ -50,18 +50,13 @@ include '../User_Mod/Vof_Interface_Ellipsoid.f90'
   ! Set old values to be the same as new ones
   fun % o(:) = fun % n(:)
 
-  !--------------------------------!
-  !   Initialize front if needed   !
-  !--------------------------------!
-  !@ if(Vof % track_front) then
-  !@   call Vof % Surf % Allocate_Surf(Flow)
-  !@   call Vof % Surf % Place_At_Var_Value(Vof % fun,  &
-  !@                                        Sol,        &
-  !@                                        0.5,        &
-  !@                                        .true.)  ! don't print messages
-  !@   call Vof % Surf % Calculate_Curvatures_From_Elems()
-  !@   call Vof % Surf % Compute_Distance_Function_And_Vof(Vof % dist_func,  &
-  !@                                                       Vof % fun)
-  !@ end if
+  !--------------------!
+  !   Create a front   !
+  !--------------------!
+  if(Vof % track_front) then
+    call Vof % Front % Place_Front_At_Value(Vof % fun,     &
+                                            .false.)  ! don't print messages
+    call Vof % Front % Print_Front_Statistics()
+  end if
 
   end subroutine
