@@ -16,7 +16,7 @@
   integer,           pointer :: nv, ne
   integer                    :: nv_tot, ne_tot, n_iso
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, j, n1, n2, nb, nc, n, nn
+  integer                    :: c, i, j, n1, n2, nb, nc, n, nn
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: i_nod, i_ver, i_iso
   integer                    :: en(12,2)  ! edge numbering
@@ -114,15 +114,22 @@
 
         ! Fetch coordinates and bounding nodes of new iso-polygon
         do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
-          nv = nv + 1
-          Vert(nv) % x_n = Iso_Polygons % verts_xyz(i_ver, 1)
-          Vert(nv) % y_n = Iso_Polygons % verts_xyz(i_ver, 2)
-          Vert(nv) % z_n = Iso_Polygons % verts_xyz(i_ver, 3)
+          i = Iso_Polygons % polys_v(i_iso, i_ver)
 
-          Front % b_node_1(nv) = Iso_Polygons % b_node_1(i_ver)
-          Front % b_node_2(nv) = Iso_Polygons % b_node_2(i_ver)
+          Vert(nv+i) % x_n = Iso_Polygons % verts_xyz(i, 1)
+          Vert(nv+i) % y_n = Iso_Polygons % verts_xyz(i, 2)
+          Vert(nv+i) % z_n = Iso_Polygons % verts_xyz(i, 3)
+
+          Front % b_node_1(nv+i) = Iso_Polygons % b_node_1(i)
+          Front % b_node_2(nv+i) = Iso_Polygons % b_node_2(i)
         end do
+      end do    ! through new polygons
+
+      ! Update the number of new vertices
+      do i_iso = 1, Iso_Polygons % n_polys
+        nv = nv + Iso_Polygons % polys_n_verts(i_iso)
       end do
+
     end if
   end do
 
