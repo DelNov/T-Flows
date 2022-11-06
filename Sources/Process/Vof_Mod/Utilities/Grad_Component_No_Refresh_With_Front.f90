@@ -47,7 +47,7 @@
     dz_c2 = Grid % dz(s)
 
     ! If face is at the front, reduce the extents of the stencil
-    if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
       dphi1 = phif - phi(c1)
       dphi2 = phi(c2) - phif
       dx_c1 = Grid % xs(s) - Grid % xc(c1)

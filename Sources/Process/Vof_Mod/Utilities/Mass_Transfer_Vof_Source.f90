@@ -33,7 +33,7 @@
   ! - if gas is 1 and liquid 2 => l-g =  1 => source > 0
   ! - if gas is 2 and liquid 1 => l-g = -1 => source < 0
   do c = 1, Grid % n_cells
-    e = Vof % Front % cell_at_elem(c)  ! Front element
+    e = Vof % Front % elem_in_cell(c)  ! Front element
 
     ! As Yohei and Lubomir ademantly told me - you divide with the density
     ! of the phase for "which you are solving".  And you are solving for

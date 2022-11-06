@@ -29,7 +29,7 @@
 
   ! Integrated added volume over all cells, avoiding buffer cells
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
-    e = Vof % Front % cell_at_elem(c)  ! front element
+    e = Vof % Front % elem_in_cell(c)  ! front element
     if(e .ne. 0) then
 
       ! Unit: kg/s * m^3/kg = m^3/s

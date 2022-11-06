@@ -177,7 +177,7 @@
     !      and add heat transferred to the interface      !
     !-----------------------------------------------------!
     if(Flow % mass_transfer) then
-      if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+      if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
         a12  = 0.0
         a21  = 0.0
         f_ex = 0.0  ! included in q_int

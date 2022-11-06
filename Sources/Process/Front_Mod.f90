@@ -38,8 +38,8 @@
     logical :: mesh_divided
 
     ! Front to static Grid connectivity
-    integer, allocatable :: cell_at_elem(:)
-    integer, allocatable :: face_at_elem(:,:)
+    integer, allocatable :: elem_in_cell(:)
+    integer, allocatable :: elems_at_face(:,:)
 
     contains
 

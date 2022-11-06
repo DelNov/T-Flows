@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Allocate_Front(Front, Flow)
 !------------------------------------------------------------------------------!
-!   Surface genesis                                                            !
+!   Memory allocation for front                                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -35,14 +35,11 @@
   Front % b_node_1(:) = 0
   Front % b_node_2(:) = 0
 
-  if(Flow % mass_transfer) then
-    nb   =  Grid % n_bnd_cells
-    nc   =  Grid % n_cells
-    nf   =  Grid % n_faces
-
-    allocate(Front % cell_at_elem(-nb:nc)); Front % cell_at_elem(-nb:nc) = 0
-    allocate(Front % face_at_elem(  2,nf)); Front % face_at_elem(  :, :) = 0
-  end if
+  nb =  Grid % n_bnd_cells
+  nc =  Grid % n_cells
+  nf =  Grid % n_faces
+  allocate(Front % elem_in_cell (-nb:nc));  Front % elem_in_cell (:)   = 0
+  allocate(Front % elems_at_face  (2,nf));  Front % elems_at_face(:,:) = 0
 
   ! Initialize front's local variables
   call Front % Initialize_Front()

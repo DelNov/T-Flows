@@ -14,12 +14,11 @@
   type(Vert_Type),   pointer :: Vert(:)
   type(Elem_Type),   pointer :: Elem(:)
   integer,           pointer :: nv, ne
-  integer                    :: nv_tot, ne_tot, n_iso
+  integer                    :: nv_tot, ne_tot
   integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, i, j, n1, n2, nb, nc, n, nn
-  integer                    :: v, n_vert, n_verts_in_buffers
+  integer                    :: c, i, nb, nc, n, nn
+  integer                    :: v, n_verts_in_buffers
   integer                    :: i_nod, i_ver, i_iso
-  real                       :: phi1, phi2
   real                       :: phi_cell_min, phi_cell_max
   real, contiguous, pointer  :: phi_n(:)
 !==============================================================================!

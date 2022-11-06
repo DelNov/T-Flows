@@ -43,13 +43,13 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
 
       Vof % q_int(1,s) = 0.0
       Vof % q_int(2,s) = 0.0
 
       do i_ele = 1, 2
-        e = Vof % Front % face_at_elem(i_ele, s)
+        e = Vof % Front % elems_at_face(i_ele, s)
         if(e .ne. 0) then
 
           ! Take conductivities from each side of the interface
@@ -75,13 +75,13 @@
 
       ! Accumulate sources in the cells surroundig the face
       ! Unit: W * kg/J = kg / s
-      if(Vof % Front % cell_at_elem(c1) .ne. 0) then
+      if(Vof % Front % elem_in_cell(c1) .ne. 0) then
         Vof % m_dot(c1) =  Vof % m_dot(c1)                       &
                         + (Vof % q_int(2,s) - Vof % q_int(1,s))  &
                         / 2.26e+6
       end if
 
-      if(Vof % Front % cell_at_elem(c2) .ne. 0) then
+      if(Vof % Front % elem_in_cell(c2) .ne. 0) then
         Vof % m_dot(c2) =  Vof % m_dot(c2)                       &
                         + (Vof % q_int(2,s) - Vof % q_int(1,s))  &
                         / 2.26e+6
