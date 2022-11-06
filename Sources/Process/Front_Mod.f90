@@ -57,7 +57,7 @@
       procedure :: Mark_Cells_And_Faces
       procedure :: Place_Front_At_Value
       procedure :: Print_Front_Statistics
-      ! procedure :: Save_Debug_Front_Vtu
+      procedure :: Save_Debug_Front_Vtu
 
   end type
 
@@ -77,6 +77,6 @@
 #   include "Front_Mod/Mark_Cells_And_Faces.f90"
 #   include "Front_Mod/Place_Front_At_Value.f90"
 #   include "Front_Mod/Print_Front_Statistics.f90"
-!   include "Front_Mod/Save_Debug_Front_Vtu.f90"
+#   include "Front_Mod/Save_Debug_Front_Vtu.f90"
 
   end module

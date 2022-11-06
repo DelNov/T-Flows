@@ -19,8 +19,7 @@
   integer                    :: c, i, j, n1, n2, nb, nc, n, nn
   integer                    :: v, n_vert, n_verts_in_buffers
   integer                    :: i_nod, i_ver, i_iso
-  integer                    :: en(12,2)  ! edge numbering
-  real                       :: phi1, phi2, xn1, yn1, zn1, xn2, yn2, zn2, w1, w2
+  real                       :: phi1, phi2
   real                       :: phi_cell_min, phi_cell_max
   real, contiguous, pointer  :: phi_n(:)
 !==============================================================================!
@@ -175,6 +174,8 @@
   !                                                                 !
   !-----------------------------------------------------------------!
   call Front % Mark_Cells_And_Faces(sharp)
+
+  ! call Front % Save_Debug_Front_Vtu(0)  ! 0 is for time step
 
   call Work % Disconnect_Real_Node(phi_n)
 

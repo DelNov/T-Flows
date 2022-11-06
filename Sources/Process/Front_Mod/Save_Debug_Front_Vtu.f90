@@ -9,7 +9,9 @@
   integer                   :: time_step
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
+  type(Grid_Type), pointer :: Grid
   integer                  :: v, e     ! vertex and element counters
+  integer                  :: s, n_int
   integer                  :: offset, fu
   character(SL)            :: name_out
 !-----------------------------[Local parameters]-------------------------------!
@@ -21,6 +23,9 @@
   character(len= 8)  :: IN_4 = '        '
   character(len=10)  :: IN_5 = '          '
 !==============================================================================!
+
+  ! Take alias
+  Grid => Front % pnt_grid
 
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
@@ -232,6 +237,92 @@
     write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
     write(fu,'(a,a)') IN_0, '</VTKFile>'
     close(fu)
+
+    !------------------------------------!
+    !                                    !
+    !   Create .intersections.vtu file   !
+    !                                    !
+    !------------------------------------!
+
+    ! Count number of intersections in a very simple way
+    n_int = 0
+    do s = 1, Grid % n_faces
+      if(.not. Math % Approx_Real(Grid % xs(s), 0.0) .and.  &
+         .not. Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
+         .not. Math % Approx_Real(Grid % zs(s), 0.0)) then
+        n_int = n_int + 1
+      end if
+    end do
+    print *, '# Number of intersecton = ', n_int
+
+    call File % Set_Name(name_out,                    &
+                         time_step=time_step,         &
+                         appendix ='-intersections',  &
+                         extension='.vtu')
+    call File % Open_For_Writing_Ascii(name_out, fu)
+
+    !------------!
+    !            !
+    !   Header   !
+    !            !
+    !------------!
+    write(fu,'(a,a)') IN_0, '<?xml version="1.0"?>'
+    write(fu,'(a,a)') IN_0, '<VTKFile type="UnstructuredGrid" version="0.1" '//&
+                            'byte_order="LittleEndian">'
+    write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
+
+    write(fu,'(a,a,i0.0,a)')   &
+                IN_2, '<Piece NumberOfPoints="', n_int,  &
+                           '" NumberOfCells="0">'
+
+    !-------------------------------!
+    !                               !
+    !   Intersections coordinates   !
+    !                               !
+    !-------------------------------!
+    write(fu,'(a,a)') IN_3, '<Points>'
+    write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
+                            ' NumberOfComponents="3"'   //  &
+                            ' format="ascii">'
+    do s = 1, Grid % n_faces
+      if(.not. Math % Approx_Real(Grid % xs(s), 0.0) .and.   &
+         .not. Math % Approx_Real(Grid % ys(s), 0.0) .and.   &
+         .not. Math % Approx_Real(Grid % zs(s), 0.0)) then
+        write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')       &
+                    IN_5, Grid % xs(s), Grid % ys(s), Grid % zs(s)
+      end if
+    end do
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+    write(fu,'(a,a)') IN_3, '</Points>'
+
+    !-----------!
+    !           !
+    !   Cells   !
+    !           !
+    !-----------!
+    write(fu,'(a,a)') IN_3, '<Cells>'
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
+                            ' Name="connectivity"'    //  &
+                           ' format="ascii">'
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="offsets"' //  &
+                           ' format="ascii">'
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+    write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="types"' //  &
+                           ' format="ascii">'
+    write(fu,'(a,a)') IN_4, '</DataArray>'
+    write(fu,'(a,a)') IN_3, '</Cells>'
+
+    !------------!
+    !            !
+    !   Footer   !
+    !            !
+    !------------!
+    write(fu,'(a,a)') IN_2, '</Piece>'
+    write(fu,'(a,a)') IN_1, '</UnstructuredGrid>'
+    write(fu,'(a,a)') IN_0, '</VTKFile>'
+    close(fu)
+
 ! end if
 
   end subroutine
