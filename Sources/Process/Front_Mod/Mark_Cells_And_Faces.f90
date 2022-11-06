@@ -14,6 +14,7 @@
   integer                   :: i_ver, j_ver, i, j, n_fac, n_int
   real                      :: nx, ny, nz, l, lx, ly, lz, dsc, phi_c1, phi_c2
   real                      :: vec_i(3), vec_j(3), vec_ixj(3), xs, ys, zs
+  character(SL)             :: line1, line2, line3
 !==============================================================================!
 
   ! Take aliases
@@ -152,11 +153,13 @@
     end do    ! through faces
 
     if(Front % n_elems .ne. n_fac) then
-      print *, '# It seems that not all face intersections have been found!'
-      print *, '# Front % n_elems = ', Front % n_elems
-      print *, '# n_fac           = ', n_fac
-      print *, '# This error is critical, stopping!'
-      stop
+      write(line1, '(a)')    " It seems that not all face "  //  &
+                             " intersections have been found! \n "
+      write(line2, '(a,i6)') " Front % n_elems = ", Front % n_elems
+      write(line3, '(a,i6)') " n_fac           = ", n_fac
+      call Message % Warning(60, line1 // line2 // line3,  &
+                             file=__FILE__, line=__LINE__)
+
     end if
 
   end if      ! mass transfer
