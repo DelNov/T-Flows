@@ -16,9 +16,8 @@
   type(Var_Type),   pointer :: fun
   type(Front_Type), pointer :: Front
   real, contiguous, pointer :: beta_f(:)
-  integer                   :: c, c1, c2, s, l, g, e
+  integer                   :: c, c1, c2, s, l, g
   real                      :: upwd1, upwd2, upwd3, a0
-  real                      :: fun_int, x_int, y_int, z_int, w_c1
 !==============================================================================!
 
   ! Take aliases
