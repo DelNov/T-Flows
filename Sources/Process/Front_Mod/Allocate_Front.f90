@@ -23,12 +23,17 @@
   Front % mesh_divided = .true.
 
   ! Allocate memory
-  allocate(Front % Elem(Grid % n_cells))
-  allocate(Front % Vert(Grid % n_cells))
-  allocate(Front % side(Grid % n_cells * 3))
+  allocate(Front % Elem(max(Grid % n_cells,    &
+                            Grid % n_nodes)))
+  allocate(Front % Vert(max(Grid % n_cells,    &
+                            Grid % n_nodes)))
+  allocate(Front % side(max(Grid % n_cells,    &
+                            Grid % n_nodes) * 3))
 
-  allocate(Front % b_node_1(Grid % n_cells));  Front % b_node_1(:) = 0
-  allocate(Front % b_node_2(Grid % n_cells));  Front % b_node_2(:) = 0
+  allocate(Front % b_node_1(max(Grid % n_cells, Grid % n_nodes)));
+  allocate(Front % b_node_2(max(Grid % n_cells, Grid % n_nodes)));
+  Front % b_node_1(:) = 0
+  Front % b_node_2(:) = 0
 
   if(Flow % mass_transfer) then
     nb   =  Grid % n_bnd_cells
