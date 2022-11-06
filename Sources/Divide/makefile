@@ -23,8 +23,18 @@ VPATH = $(DIR_SHARED):.
 PROGRAM_NAME = Divide
 PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 
-# Initialize variables to pass on to preprocessor
-PASS_ON =
+#----------------------------------------------------------
+#   Initialize variables to pass on to preprocessor with
+#   variable T_FLOWS_COMPILATION which, if set to one,
+#   means unit is compiled from T-Flow
+#   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
+#----------------------------------------------------------
+PASS_ON = -DT_FLOWS_COMPILATION=1
+ifeq ($(DEBUG), yes)
+  PASS_ON += -DT_FLOWS_DEBUG=1
+else
+  PASS_ON += -DT_FLOWS_DEBUG=0
+endif
 
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
@@ -148,6 +158,7 @@ SRC_F_MOD = Const_Mod.f90          \
             String_Mod.f90         \
             Tokenizer_Mod.f90      \
             Comm_Mod.f90           \
+            Assert_Mod.f90         \
             Message_Mod.f90        \
             Profiler_Mod.f90       \
             Math_Mod.f90           \

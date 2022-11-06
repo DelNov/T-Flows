@@ -174,7 +174,7 @@
   !-----------------------------------------------------------------!
   call Front % Mark_Cells_And_Faces(sharp)
 
-  ! call Front % Save_Debug_Front_Vtu(0)  ! 0 is for time step
+  call Front % Save_Debug_Front_Vtu(0)  ! 0 is for time step
 
   call Work % Disconnect_Real_Node(phi_n)
 

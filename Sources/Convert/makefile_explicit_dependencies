@@ -1,26 +1,4 @@
 #---------------------------------------------------
-# Dependencies for: ./N_Bnd_Cells_In_Color.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/N_Bnd_Cells_In_Color.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Calculate_Geometry.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Calculate_Geometry.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Logo_Con.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Logo_Con.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
 # Dependencies for: ./Main_Con.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Con.o:\
@@ -36,33 +14,16 @@ $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
-# Dependencies for: ./N_Edges_In_Bnd_Color.f90
+# Dependencies for: ./Guess_Format.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/N_Edges_In_Bnd_Color.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_OBJECT)/Guess_Format.o:\
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./N_Nodes_In_Bnd_Color.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/N_Nodes_In_Bnd_Color.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Allocate_Memory.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Allocate_Memory.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Load_Gambit.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Load_Gambit.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
@@ -76,9 +37,47 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./N_Sharp_Corners.f90
+# Dependencies for: ./Logo_Con.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/N_Sharp_Corners.o:\
+$(DIR_OBJECT)/Logo_Con.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Load_Gambit.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Load_Gambit.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Load_Fluent.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Load_Fluent.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Find_Faces.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Find_Faces.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./N_Edges_In_Bnd_Color.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/N_Edges_In_Bnd_Color.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Calculate_Geometry.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Calculate_Geometry.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
@@ -92,16 +91,51 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Guess_Format.f90
+# Dependencies for: ./Sort_Face_Nodes.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Guess_Format.o:\
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
+$(DIR_OBJECT)/Sort_Face_Nodes.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Load_Fluent.f90
+# Dependencies for: ./N_Sharp_Corners.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Load_Fluent.o:\
+$(DIR_OBJECT)/N_Sharp_Corners.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./N_Sharp_Edges.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/N_Sharp_Edges.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./N_Bnd_Cells_In_Color.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/N_Bnd_Cells_In_Color.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Allocate_Memory.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Allocate_Memory.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Find_Parents.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Find_Parents.o:\
+$(DIR_OBJECT)/Profiler_Mod.o \
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
@@ -122,24 +156,6 @@ $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
-# Dependencies for: ./Find_Parents.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Find_Parents.o:\
-$(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./N_Sharp_Edges.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/N_Sharp_Edges.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Grid_Topology.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Grid_Topology.o:\
@@ -148,20 +164,83 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Find_Faces.f90
+# Dependencies for: ./Gen_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Find_Faces.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_OBJECT)/Gen_Mod.o:\
+$(DIR_SHARED)/Gen_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Sort_Face_Nodes.f90
+# Dependencies for: ./Message_Mod/Thin_Line.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Sort_Face_Nodes.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 
+$(DIR_OBJECT)/Thin_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thick_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thick_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Dashed_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Dashed_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Comm_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Comm_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Boundary_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Boundary_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Math_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Math_Mod.o:\
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Control_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Control_Mod.o:\
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./String_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/String_Mod.o:\
+$(DIR_SHARED)/String_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Profiler_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Profiler_Mod.o:\
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Assert_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Assert_Mod.o:\
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Sort_Mod.f90
@@ -188,65 +267,10 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Grid_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Grid_Mod.o:\
-$(DIR_OBJECT)/Vtk_Mod.o \
-$(DIR_SHARED)/Vtk_Mod/*.f90 \
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Metis_Options_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Boundary_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./File_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/File_Mod.o:\
-$(DIR_OBJECT)/String_Mod.o \
-$(DIR_SHARED)/String_Mod/*.f90 \
-$(DIR_OBJECT)/Message_Mod.o \
-$(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Control_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Control_Mod.o:\
-$(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Profiler_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Profiler_Mod.o:\
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Swap_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Swap_Mod.o:\
 $(DIR_SHARED)/Swap_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./String_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/String_Mod.o:\
-$(DIR_SHARED)/String_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_2d.f90
@@ -261,6 +285,36 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Grid_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Grid_Mod.o:\
+$(DIR_OBJECT)/Vtk_Mod.o \
+$(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Profiler_Mod.o \
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Metis_Options_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_OBJECT)/Boundary_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Message_Mod.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Vtk_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vtk_Mod.o:\
@@ -268,52 +322,14 @@ $(DIR_SHARED)/Vtk_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
-# Dependencies for: ./Comm_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Comm_Mod.o:\
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Tokenizer_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Tokenizer_Mod.o:\
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
 # Dependencies for: ./Work_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Work_Mod.o:\
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod/Dashed_Line.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Dashed_Line.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod/Thin_Line.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Thin_Line.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod/Thick_Line.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Thick_Line.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Boundary_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Boundary_Mod.o:\
-$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_1d_Cells_Nodes.f90
@@ -330,28 +346,22 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Message_Mod.f90
+# Dependencies for: ./Tokenizer_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Message_Mod.o:\
-$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_OBJECT)/Tokenizer_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Math_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Math_Mod.o:\
-$(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
-# Dependencies for: ./Gen_Mod.f90
+# Dependencies for: ./File_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Gen_Mod.o:\
-$(DIR_SHARED)/Gen_Mod/*.f90 
+$(DIR_OBJECT)/File_Mod.o:\
+$(DIR_OBJECT)/String_Mod.o \
+$(DIR_SHARED)/String_Mod/*.f90 \
+$(DIR_OBJECT)/Message_Mod.o \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_1d_Cells.f90

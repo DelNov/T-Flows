@@ -34,6 +34,11 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
+ifeq ($(DEBUG), yes)
+  PASS_ON += -DT_FLOWS_DEBUG=1
+else
+  PASS_ON += -DT_FLOWS_DEBUG=0
+endif
 
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
@@ -226,6 +231,7 @@ endif
 SRC_F_MOD = Const_Mod.f90          \
             String_Mod.f90         \
             Comm_Mod.f90           \
+            Assert_Mod.f90         \
             Tokenizer_Mod.f90      \
             Message_Mod.f90        \
             Profiler_Mod.f90       \

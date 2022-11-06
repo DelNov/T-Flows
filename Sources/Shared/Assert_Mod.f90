@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Calculate_Geometry(Grid, ask)
+  module Assert_Mod
 !------------------------------------------------------------------------------!
-!   Calculates geometrical quantities of the grid.                             !
+!   Definition of assertion in T-Flows.  In unit which uses it, "Assert.h"     !
+!   should also be included.                                                   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-!------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: ask
+  use Comm_Mod
 !==============================================================================!
 
-  end subroutine
+  contains
+
+#   include "Assert_Mod/Handle_Assert.f90"
+
+  end module
+

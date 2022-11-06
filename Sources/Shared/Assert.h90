@@ -1,0 +1,9 @@
+!==============================================================================!
+!   Definition of assertion in T-Flows.  It should be used in conjuction with  !
+!   Assert_Mod.  Variable T_FLOWS_DEBUG is passed from the makefile            !
+!------------------------------------------------------------------------------!
+# if T_FLOWS_DEBUG == 1
+#   define Assert(X) call Handle_Assert(.not.(X), #X, __FILE__, __LINE__)
+# else
+#   define Assert(X)
+# endif
