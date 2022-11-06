@@ -9,8 +9,10 @@
 #-------------------------------------
 FORTRAN ?= gnu
 DEBUG   ?= no
+ASSERT  ?= yes
 REAL    ?= double
-MPI      = no
+MPI     ?= no
+OPENMP  ?= no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -31,16 +33,17 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
 ifeq ($(DEBUG), yes)
-  PASS_ON += -DT_FLOWS_DEBUG=1
+  PASS_ON += -DT_FLOWS_ASSERT=1
 else
-  PASS_ON += -DT_FLOWS_DEBUG=0
+  PASS_ON += -DT_FLOWS_ASSERT=0
 endif
 
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN))
+$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes>                      )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes>         )
+$(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <REAL=double/single>                                           )
 $(info #                                                                       )
 $(info # Note: The first item, for each of the options above, is the default.  )
@@ -49,6 +52,7 @@ $(info # Examples:                                                             )
 $(info #   make              - compile with gnu compiler                       )
 $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
+$(info #   make ASSERT=no    - compile without assert with gnu compiler        )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------
@@ -81,6 +85,9 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -qopenmp
+  endif
 
 # Fortran == nvidia
 else ifeq ($(FORTRAN), nvidia)
@@ -96,6 +103,9 @@ else ifeq ($(FORTRAN), nvidia)
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
+  endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -mp
   endif
 
 # Fortran == gnu

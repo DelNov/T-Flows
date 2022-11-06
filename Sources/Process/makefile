@@ -9,8 +9,10 @@
 #-------------------------------------
 FORTRAN ?= gnu
 DEBUG   ?= no
+ASSERT  ?= yes
 REAL    ?= double
 MPI     ?= no
+OPENMP  ?= yes
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -35,19 +37,19 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
 ifeq ($(DEBUG), yes)
-  PASS_ON += -DT_FLOWS_DEBUG=1
+  PASS_ON += -DT_FLOWS_ASSERT=1
 else
-  PASS_ON += -DT_FLOWS_DEBUG=0
+  PASS_ON += -DT_FLOWS_ASSERT=0
 endif
 
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <MPI=no/yes>         )
-$(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/...>                    )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=no/yes>      )
+$(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
-$(info #        <REAL=double/single>                                           )
+$(info #        <REAL=double/single> <MPI=no/yes>                              )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
@@ -91,6 +93,9 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -qopenmp
+  endif
 
 # Fortran == nvidia
 else ifeq ($(FORTRAN), nvidia)
@@ -106,6 +111,9 @@ else ifeq ($(FORTRAN), nvidia)
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
+  endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -mp
   endif
 
 # Fortran == gnu
