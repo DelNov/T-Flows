@@ -11,8 +11,8 @@
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
-  integer                  :: e, v, n_vert, i_ver, j_ver, nv_tot
-  real,    allocatable     :: xv(:), yv(:), zv(:)
+  integer                  :: e, v, n_vert, i, j, i_ver, j_ver, nv_tot
+  real,    allocatable     :: min_dist, tol, xv(:), yv(:), zv(:)
   integer, allocatable     :: ni(:), new_n(:), n1(:), n2(:)
 !==============================================================================!
 
@@ -22,11 +22,31 @@
   Vert => Front % Vert
   Elem => Front % Elem
 
+  ! Find minimum distance between elements' nodes
+  ! (This is illustration of vulnerability of this
+  ! approach.  I should use b_node_1 and b_node_2)
+  min_dist = HUGE
+  do e = 1, ne
+    do i_ver = 1, Elem(e) % nv-1
+      do j_ver = i_ver+1, Elem(e) % nv
+        i = Elem(e) % v(i_ver)
+        j = Elem(e) % v(j_ver)
+        min_dist = min(min_dist, norm2( (/Vert(i) % x_n-vert(j) % x_n,   &
+                                          Vert(i) % y_n-Vert(j) % y_n,   &
+                                          Vert(i) % z_n-Vert(j) % z_n/) ))
+      end do
+    end do
+  end do
+  call Comm_Mod_Global_Min_Real(min_dist)
+  tol = min_dist * 0.1
+
   ! Check sanity of the elements so far
   do e = 1, ne
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
-        if(Elem(e) % v(i_ver) .eq. Elem(e) % v(j_ver)) then
+        i = Elem(e) % v(i_ver)
+        j = Elem(e) % v(j_ver)
+        if(i .eq. j) then
           call Message % Error(44,                                    &
                                "Error in the sanity check for  "  //  &
                                "elements. \n  Some element(s)  "  //  &
@@ -67,17 +87,17 @@
     n_vert = 1
     new_n(1) = n_vert
     do v = 2, nv
-      if(.not. Math % Approx_Real(xv(v), xv(v-1), NANO)) then
+      if(.not. Math % Approx_Real(xv(v), xv(v-1), tol)) then
         n_vert = n_vert + 1
 
       ! xi(v) .eq. xi(v-1)
       else
-        if(.not. Math % Approx_Real(yv(v), yv(v-1), NANO)) then
+        if(.not. Math % Approx_Real(yv(v), yv(v-1), tol)) then
           n_vert = n_vert + 1
 
         ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
         else
-          if(.not. Math % Approx_Real(zv(v), zv(v-1), NANO)) then
+          if(.not. Math % Approx_Real(zv(v), zv(v-1), tol)) then
             n_vert = n_vert + 1
           else
             Assert(n1(ni(v)) .eq. n1(ni(v-1)))
@@ -127,7 +147,9 @@
   do e = 1, ne
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
-        if(Elem(e) % v(i_ver) .eq. Elem(e) % v(j_ver)) then
+        i = Elem(e) % v(i_ver)
+        j = Elem(e) % v(j_ver)
+        if(i .eq. j) then
           call Message % Error(44,                                          &
                                "Error in the final sanity check for  "  //  &
                                "elements. \n  Some element(s)        "  //  &
