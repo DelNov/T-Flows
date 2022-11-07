@@ -37,9 +37,9 @@
     end do
   end do
 
-  !-----------------------------------------!
-  !   Count compressed number of vertices   !
-  !-----------------------------------------!
+  !----------------------------------------!
+  !   Sort vertices by their coordinates   !
+  !----------------------------------------!
   if(nv > 0) then
     allocate(xv(nv));     xv    = 0.0
     allocate(yv(nv));     yv    = 0.0
@@ -60,17 +60,30 @@
     call Sort % Three_Real_Carry_Int(xv, yv, zv, ni)
   end if
 
+  !-------------------------------------------------------------!
+  !   Compressed the vertices which fall on top of each other   !
+  !-------------------------------------------------------------!
   if(nv > 0) then
     n_vert = 1
     new_n(1) = n_vert
     do v = 2, nv
-      if(.not. Math % Approx_Real(xv(v), xv(v-1), NANO) .and.  &
-         .not. Math % Approx_Real(yv(v), yv(v-1), NANO) .and.  &
-         .not. Math % Approx_Real(zv(v), zv(v-1), NANO)) then
+      if(.not. Math % Approx_Real(xv(v), xv(v-1), NANO)) then
         n_vert = n_vert + 1
+
+      ! xi(v) .eq. xi(v-1)
       else
-        Assert(n1(ni(v)) .eq. n1(ni(v-1)))
-        Assert(n2(ni(v)) .eq. n2(ni(v-1)))
+        if(.not. Math % Approx_Real(yv(v), yv(v-1), NANO)) then
+          n_vert = n_vert + 1
+
+        ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
+        else
+          if(.not. Math % Approx_Real(zv(v), zv(v-1), NANO)) then
+            n_vert = n_vert + 1
+          else
+            Assert(n1(ni(v)) .eq. n1(ni(v-1)))
+            Assert(n2(ni(v)) .eq. n2(ni(v-1)))
+          end if
+        end if
       end if
       new_n(v) = n_vert
     end do
