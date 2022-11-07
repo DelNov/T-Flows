@@ -9,18 +9,19 @@
   type(Var_Type),    target :: sharp
   logical                   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: Grid
-  type(Field_Type),  pointer :: Flow
-  type(Vert_Type),   pointer :: Vert(:)
-  type(Elem_Type),   pointer :: Elem(:)
-  integer,           pointer :: nv, ne
-  integer                    :: nv_tot, ne_tot
-  integer, allocatable       :: n_cells_v(:)
-  integer                    :: c, i, nb, nc, n, nn
-  integer                    :: v, n_verts_in_buffers
-  integer                    :: i_nod, i_ver, i_iso
-  real                       :: phi_cell_min, phi_cell_max
-  real, contiguous, pointer  :: phi_n(:)
+  type(Polyhedron_Type),   pointer :: Pol
+  type(Iso_Polygons_Type), pointer :: Iso
+  type(Grid_Type),         pointer :: Grid
+  type(Field_Type),        pointer :: Flow
+  type(Vert_Type),         pointer :: Vert(:)
+  type(Elem_Type),         pointer :: Elem(:)
+  integer,                 pointer :: nv, ne
+  integer                          :: nv_tot, ne_tot
+  integer                          :: c, i, nb, nc, n, nn
+  integer                          :: v, n_verts_in_buffers
+  integer                          :: i_nod, i_ver, i_iso
+  real                             :: phi_cell_min, phi_cell_max
+  real, contiguous,        pointer :: phi_n(:)
 !==============================================================================!
 
   call Profiler % Start('Creating_Front_From_Vof_Function')
@@ -28,6 +29,8 @@
   call Work % Connect_Real_Node(phi_n)
 
   ! Take aliases
+  Pol  => Polyhedron
+  Iso  => Iso_Polygons
   Grid => Front % pnt_grid
   Flow => Front % pnt_flow
   nv   => Front % n_verts
@@ -66,9 +69,6 @@
     end do
   end do
 
-  allocate(n_cells_v(Grid % n_cells))
-  n_cells_v(:) = 0
-
   ! Find vertices in each cell
   nv = 0
   ne = 0
@@ -96,36 +96,36 @@
       !------------------------------------------------------!
       !   Store results from Isoap into T-Flows' variables   !
       !------------------------------------------------------!
-      do i_iso = 1, Iso_Polygons % n_polys
+      do i_iso = 1, Iso % n_polys
 
         ! Increase element's count
         ne = ne + 1
 
         Elem(ne) % cell = c
 
-        Elem(ne) % nv = Iso_Polygons % polys_n_verts(i_iso)
+        Elem(ne) % nv = Iso % polys_n_verts(i_iso)
 
         ! Store elements vertices
-        do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
-          Elem(ne) % v(i_ver) = nv + Iso_Polygons % polys_v(i_iso, i_ver)
+        do i_ver = 1, Iso % polys_n_verts(i_iso)
+          Elem(ne) % v(i_ver) = nv + Iso % polys_v(i_iso, i_ver)
         end do
 
         ! Fetch coordinates and bounding nodes of new iso-polygon
-        do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
-          i = Iso_Polygons % polys_v(i_iso, i_ver)
+        do i_ver = 1, Iso % polys_n_verts(i_iso)
+          i = Iso % polys_v(i_iso, i_ver)
 
-          Vert(nv+i) % x_n = Iso_Polygons % verts_xyz(i, 1)
-          Vert(nv+i) % y_n = Iso_Polygons % verts_xyz(i, 2)
-          Vert(nv+i) % z_n = Iso_Polygons % verts_xyz(i, 3)
+          Vert(nv+i) % x_n = Iso % verts_xyz(i, 1)
+          Vert(nv+i) % y_n = Iso % verts_xyz(i, 2)
+          Vert(nv+i) % z_n = Iso % verts_xyz(i, 3)
 
-          Front % b_node_1(nv+i) = Iso_Polygons % b_node_1(i)
-          Front % b_node_2(nv+i) = Iso_Polygons % b_node_2(i)
+          Front % b_node_1(nv+i) = Pol % global_node(Iso % b_node_1(i))
+          Front % b_node_2(nv+i) = Pol % global_node(Iso % b_node_2(i))
         end do
       end do    ! through new polygons
 
       ! Update the number of new vertices
-      do i_iso = 1, Iso_Polygons % n_polys
-        nv = nv + Iso_Polygons % polys_n_verts(i_iso)
+      do i_iso = 1, Iso % n_polys
+        nv = nv + Iso % polys_n_verts(i_iso)
       end do
 
     end if
