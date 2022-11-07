@@ -13,7 +13,7 @@
   integer,         pointer :: nv, ne
   integer                  :: e, v, n_vert, i_ver, j_ver, nv_tot
   real,    allocatable     :: xv(:), yv(:), zv(:)
-  integer, allocatable     :: ni(:), new_n(:)
+  integer, allocatable     :: ni(:), new_n(:), n1(:), n2(:)
 !==============================================================================!
 
   ! Take aliases
@@ -37,11 +37,16 @@
     end do
   end do
 
+  !-----------------------------------------!
+  !   Count compressed number of vertices   !
+  !-----------------------------------------!
   if(nv > 0) then
     allocate(xv(nv));     xv    = 0.0
     allocate(yv(nv));     yv    = 0.0
     allocate(zv(nv));     zv    = 0.0
     allocate(ni(nv));     ni    = 0
+    allocate(n1(nv));     n1    = 0
+    allocate(n2(nv));     n2    = 0
     allocate(new_n(nv));  new_n = 0
 
     do v = 1, nv
@@ -49,31 +54,23 @@
       yv(v) = Vert(v) % y_n
       zv(v) = Vert(v) % z_n
       ni(v) = v
+      n1(v) = min(Front % b_node_1(v), Front % b_node_2(v))
+      n2(v) = max(Front % b_node_1(v), Front % b_node_2(v))
     end do
     call Sort % Three_Real_Carry_Int(xv, yv, zv, ni)
   end if
 
-  !-----------------------------------------!
-  !   Count compressed number of vertices   !
-  !-----------------------------------------!
   if(nv > 0) then
     n_vert = 1
     new_n(1) = n_vert
     do v = 2, nv
-      if(.not. Math % Approx_Real(xv(v), xv(v-1), NANO)) then
+      if(.not. Math % Approx_Real(xv(v), xv(v-1), NANO) .and.  &
+         .not. Math % Approx_Real(yv(v), yv(v-1), NANO) .and.  &
+         .not. Math % Approx_Real(zv(v), zv(v-1), NANO)) then
         n_vert = n_vert + 1
-
-      ! xi(v) .eq. xi(v-1)
       else
-        if(.not. Math % Approx_Real(yv(v), yv(v-1), NANO)) then
-          n_vert = n_vert + 1
-
-        ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
-        else
-          if(.not. Math % Approx_Real(zv(v), zv(v-1), NANO)) then
-            n_vert = n_vert + 1
-          end if
-        end if
+        Assert(n1(ni(v)) .eq. n1(ni(v-1)))
+        Assert(n2(ni(v)) .eq. n2(ni(v-1)))
       end if
       new_n(v) = n_vert
     end do
