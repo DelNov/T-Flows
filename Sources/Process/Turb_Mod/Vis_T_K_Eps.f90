@@ -127,6 +127,12 @@
           pr_t = Turb % Prandtl_Turb(c1)
           beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
                * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
+          ! According to Toparlar et al. 2019 paper
+          ! "CFD simulation of the near-neutral atmospheric boundary layer:
+          ! New temperature inlet profile consistent with wall functions"
+
+          if(Turb % rough_walls) beta = 0.0
+
           ebf = Turb % Ebf_Scalar(c1, pr)
           Turb % con_w(c1) =    Turb % y_plus(c1)                         &
                               * Flow % viscosity(c1)                      &
@@ -139,8 +145,7 @@
           sc   = Flow % Schmidt_Numb(c1)            ! laminar Schmidt number
           beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                     &
                * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
-          ebf  = 0.01 * (sc * Turb % y_plus(c1)**4                  &
-               / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          ebf = Turb % Ebf_Scalar(c1, pr)
           Turb % diff_w(c1) =  Turb % y_plus(c1)                    &
                * (Flow % viscosity(c1)/Flow % density(c1))          &
                / (  Turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &

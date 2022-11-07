@@ -10,7 +10,7 @@
   real             :: coef    ! Prandtl number (maybe even Shmidt number)
 !==============================================================================!
 
-  Ebf_Scalar = 0.01 * (coef * Turb % y_plus(c) ** 4  &
+  Ebf_Scalar = 0.01 * ((coef * Turb % y_plus(c)) ** 4  &
              / ((1.0 + 5.0 * coef**3 * Turb % y_plus(c)) + TINY))
 
   end function
