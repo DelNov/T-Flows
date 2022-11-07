@@ -24,8 +24,10 @@
     real,    allocatable, dimension(:,:) :: nodes_xyz      ! vertp(nv,3)
     real,    allocatable, dimension(:)   :: phi            ! (nv)
     real                                 :: phiiso
+    integer, allocatable, dimension(:)   :: global_node(:)
 
     contains
+      procedure          :: Allocate_Polyhedron
       procedure          :: Create_Complexcell
       procedure          :: Create_Cube
       procedure          :: Create_Cutcube
@@ -50,10 +52,11 @@
   end type
 
   ! Singleton type Polyhedron objects
-  type(Polyhedron_Type) :: Polyhedron
+  type(Polyhedron_Type), target :: Polyhedron
 
   contains
 
+#   include "Polyhedron_Mod/Allocate_Polyhedron.f90"
 #   include "Polyhedron_Mod/Create_Complexcell.f90"
 #   include "Polyhedron_Mod/Create_Cube.f90"
 #   include "Polyhedron_Mod/Create_Cutcube.f90"

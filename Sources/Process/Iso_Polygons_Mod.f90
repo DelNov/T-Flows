@@ -21,15 +21,17 @@
     integer, allocatable, dimension(:)   :: b_node_2       ! ipia1
 
     contains
+      procedure :: Allocate_Iso_Polygons
       procedure :: Plot_Iso_Polygons_Vtk
 
   end type
 
   ! Singleton type Iso_Polygons object
-  type(Iso_Polygons_Type) :: Iso_Polygons
+  type(Iso_Polygons_Type), target :: Iso_Polygons
 
   contains
 
+#   include "Iso_Polygons_Mod/Allocate_Iso_Polygons.f90"
 #   include "Iso_Polygons_Mod/Plot_Iso_Polygons_Vtk.f90"
 
   end module
