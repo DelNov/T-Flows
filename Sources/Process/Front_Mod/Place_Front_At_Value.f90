@@ -44,13 +44,13 @@
   call Front % Initialize_Front()
   call Flow % Interpolate_Cells_To_Nodes(sharp % n, phi_n(1:nn))
 
-! call Grid % Save_Debug_Vtu('phi_c',                 &
-!                            scalar_cell=sharp % n,   &
-!                            scalar_name='phi_c')
+  ! call Grid % Save_Debug_Vtu('phi_c',                 &
+  !                            scalar_cell=sharp % n,   &
+  !                            scalar_name='phi_c')
 
-! call Grid % Save_Debug_Vtu('phi_n',             &
-!                            scalar_node=phi_n,   &
-!                            scalar_name='phi_n')
+  ! call Grid % Save_Debug_Vtu('phi_n',             &
+  !                            scalar_node=phi_n,   &
+  !                            scalar_name='phi_n')
 
   !-----------------------------------------------!
   !   This is a bit ad-hoc - if some points are   !
@@ -61,9 +61,9 @@
       n = Grid % cells_n(i_nod, c)
       if(Math % Approx_Real(phi_n(n), 0.5)) then
         if(sharp % n(c) < sharp % o(c)) then
-          phi_n(n) = 0.5 - MILI
+          phi_n(n) = phi_n(n) - MILI
         else
-          phi_n(n) = 0.5 + MILI
+          phi_n(n) = phi_n(n) + MILI
         end if
       end if
     end do
