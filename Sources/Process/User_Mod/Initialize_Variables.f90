@@ -21,15 +21,17 @@
   ! Remove the following 12 lines in real Lagrangian tracking simulations
   if(Flow % with_interface) then
     if(this_proc < 2) then
-      print *, '#======================================================' //  &
-               '======================================================='
-      print *, '# WARNING: You are running a Volume of Fluid simulation' //  &
-               'with the default version of Initialize_Variables.'
-      print *, '# You have probably forgotten to compile Process with '  //  &
-               'DIR_CASE=<full_or_relative_path_to_case> directive.'
-      print *, '#------------------------------------------------------' //  &
-               '-------------------------------------------------------'
+      print '(a)','#======================================================' // &
+                  '======================================================='
+      print '(a)','# ERROR: You are running a Volume of Fluid simulation'   // &
+                  'with the default version of Initialize_Variables.'
+      print '(a)','# You have probably forgotten to compile Process with '  // &
+                  'DIR_CASE=<full_or_relative_path_to_case> directive.'
+      print '(a)','#------------------------------------------------------' // &
+                  '-------------------------------------------------------'
     end if
+    call Comm_Mod_End
+    stop
   end if
 
   end subroutine
