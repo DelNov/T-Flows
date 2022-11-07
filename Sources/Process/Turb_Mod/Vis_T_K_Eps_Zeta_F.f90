@@ -146,8 +146,8 @@
 
           if(Turb % rough_walls) beta = 0.0
 
-          ebf = 0.01 * (sc * Turb % y_plus(c1)**4                 &
-              / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          ebf = Turb % Ebf_Scalar(c1, pr)
+
           Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
               / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
