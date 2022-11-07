@@ -12,7 +12,7 @@
   type(Elem_Type), pointer :: Elem(:)
   integer,         pointer :: nv, ne
   integer                  :: e, v, n_vert, i, j, i_ver, j_ver, nv_tot
-  real,    allocatable     :: min_dist, tol, xv(:), yv(:), zv(:)
+  real,    allocatable     :: xv(:), yv(:), zv(:)
   integer, allocatable     :: ni(:), new_n(:), n1(:), n2(:)
 !==============================================================================!
 
@@ -22,25 +22,9 @@
   Vert => Front % Vert
   Elem => Front % Elem
 
-  ! Find minimum distance between elements' nodes
-  ! (This is illustration of vulnerability of this
-  ! approach.  I should use b_node_1 and b_node_2)
-  min_dist = HUGE
-  do e = 1, ne
-    do i_ver = 1, Elem(e) % nv-1
-      do j_ver = i_ver+1, Elem(e) % nv
-        i = Elem(e) % v(i_ver)
-        j = Elem(e) % v(j_ver)
-        min_dist = min(min_dist, norm2( (/Vert(i) % x_n-vert(j) % x_n,   &
-                                          Vert(i) % y_n-Vert(j) % y_n,   &
-                                          Vert(i) % z_n-Vert(j) % z_n/) ))
-      end do
-    end do
-  end do
-  call Comm_Mod_Global_Min_Real(min_dist)
-  tol = min_dist * 0.1
-
-  ! Check sanity of the elements so far
+  !-----------------------------------------!
+  !   Check sanity of the elements so far   !
+  !-----------------------------------------!
   do e = 1, ne
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
@@ -70,40 +54,30 @@
     allocate(new_n(nv));  new_n = 0
 
     do v = 1, nv
+      ! Store vertex coordinates ...
       xv(v) = Vert(v) % x_n
       yv(v) = Vert(v) % y_n
       zv(v) = Vert(v) % z_n
+
+      ! ... vertex numbers ...
       ni(v) = v
+
+      ! ... and nodes from which the vertex was created
       n1(v) = min(Front % b_node_1(v), Front % b_node_2(v))
       n2(v) = max(Front % b_node_1(v), Front % b_node_2(v))
     end do
-    call Sort % Three_Real_Carry_Int(xv, yv, zv, ni)
+    call Sort % Two_Int_Carry_Int(n1, n2, ni)
   end if
 
-  !-------------------------------------------------------------!
-  !   Compressed the vertices which fall on top of each other   !
-  !-------------------------------------------------------------!
+  !-----------------------------------------------------------!
+  !   Compress the vertices which fall on top of each other   !
+  !-----------------------------------------------------------!
   if(nv > 0) then
     n_vert = 1
     new_n(1) = n_vert
     do v = 2, nv
-      if(.not. Math % Approx_Real(xv(v), xv(v-1), tol)) then
+      if( (n1(v) .ne. n1(v-1)) .or. (n2(v) .ne. n2(v-1)) ) then
         n_vert = n_vert + 1
-
-      ! xi(v) .eq. xi(v-1)
-      else
-        if(.not. Math % Approx_Real(yv(v), yv(v-1), tol)) then
-          n_vert = n_vert + 1
-
-        ! xi(v) .eq. xi(v-1) and yi(v) .eq. yi(v-1)
-        else
-          if(.not. Math % Approx_Real(zv(v), zv(v-1), tol)) then
-            n_vert = n_vert + 1
-          else
-            Assert(n1(ni(v)) .eq. n1(ni(v-1)))
-            Assert(n2(ni(v)) .eq. n2(ni(v-1)))
-          end if
-        end if
       end if
       new_n(v) = n_vert
     end do
@@ -111,21 +85,20 @@
     n_vert = 0
   end if
 
-  !----------------------------------------!
-  !   Copy compressed vertex coordinates   !
-  !----------------------------------------!
-  do v = 1, nv
-    Vert(new_n(v)) % x_n = xv(v)
-    Vert(new_n(v)) % y_n = yv(v)
-    Vert(new_n(v)) % z_n = zv(v)
-  end do
-
-  !--------------------------------!
-  !   Correct elements' vertices   !
-  !--------------------------------!
+  !----------------------------------------------------------!
+  !   Correct vertices' coordinates and elements' vertices   !
+  !----------------------------------------------------------!
   if(nv > 0) then
     call Sort % Int_Carry_Int(ni, new_n)
 
+    ! Coordinates
+    do v = 1, nv
+      Vert(new_n(v)) % x_n = xv(v)
+      Vert(new_n(v)) % y_n = yv(v)
+      Vert(new_n(v)) % z_n = zv(v)
+    end do
+
+    ! Vertices
     do e = 1, ne
       do i_ver = 1, Elem(e) % nv
         Elem(e) % v(i_ver) = new_n(Elem(e) % v(i_ver))
@@ -133,7 +106,9 @@
     end do
   end if
 
-  ! Store compressed number of vertices
+  !--------------------------------------------!
+  !   Work out compressed number of vertices   !
+  !--------------------------------------------!
   nv     = n_vert
   nv_tot = n_vert
   if(Front % mesh_divided) then
@@ -143,7 +118,9 @@
     print '(a40,i8)', ' # Compressed number of vertices:       ', nv_tot
   end if
 
-  ! Check sanity of the elements in the end
+  !---------------------------------------------!
+  !   Check sanity of the elements in the end   !
+  !---------------------------------------------!
   do e = 1, ne
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
