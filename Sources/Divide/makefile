@@ -39,7 +39,7 @@ else
 endif
 
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)
+$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes>         )
