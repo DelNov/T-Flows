@@ -96,7 +96,9 @@
   !-------------!
   !   r2 = r1   !
   !-------------!
-  r2(1:ni) = r1(1:ni)
+  do i = 1, ni
+    r2(i) = r1(i)
+  end do
 
   !---------------!
   !               !
@@ -112,12 +114,16 @@
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
-      u1(1:ni) = r1(1:ni)
-      u2(1:ni) = u1(1:ni)
+      do i = 1, ni
+        u1(i) = r1(i)
+        u2(i) = u1(i)
+      end do
     else
       beta = rho / rho_old
-      u1(1:ni) = r1(1:ni) + beta *  q1(1:ni)
-      u2(1:ni) = u1(1:ni) + beta * (q1(1:ni) + beta*u2(1:ni))
+      do i = 1, ni
+        u1(i) = r1(i) + beta *  q1(i)
+        u2(i) = u1(i) + beta * (q1(i) + beta*u2(i))
+      end do
     end if
 
     !---------------------!
@@ -148,18 +154,24 @@
     !-------------------------!
     !   q1 = u1 - alfa * v2   !
     !-------------------------!
-    q1(1:ni) = u1(1:ni) - alfa * v2(1:ni)
+    do i = 1, ni
+      q1(i) = u1(i) - alfa * v2(i)
+    end do
 
     !-------------------------!
     !   solve Mp1 = u1 + q1   !
     !-------------------------!
-    u1_plus_q1(1:ni) = u1(1:ni) + q1(1:ni)
+    do i = 1, ni
+      u1_plus_q1(i) = u1(i) + q1(i)
+    end do
     call Nat % Prec_Solve(ni, A, D, p1(1:nt), u1_plus_q1(1:nt), prec)
 
     !---------------------!
     !   x = x + alfa p1   !
     !---------------------!
-    x(1:ni) = x(1:ni) + alfa * p1(1:ni)
+    do i = 1, ni
+      x(i) = x(i) + alfa * p1(i)
+    end do
 
     !---------------!
     !   q2 = A p1   !
@@ -176,7 +188,9 @@
     !---------------------!
     !   r = r - alfa q2   !
     !---------------------!
-    r1(1:ni) = r1(1:ni) - alfa * q2(1:ni)
+    do i = 1, ni
+      r1(i) = r1(i) - alfa * q2(i)
+    end do
 
     !-----------------------!
     !   Check convergence   !

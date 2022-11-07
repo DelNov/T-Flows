@@ -151,9 +151,11 @@
   call Flow % Grad_Component(Vof % ny(-nb:nc), 2, div_y(-nb:nc))
   call Flow % Grad_Component(Vof % nz(-nb:nc), 3, div_z(-nb:nc))
 
-  Vof % curv(-nb:nc) = Vof % curv(-nb:nc) - div_x(-nb:nc)
-  Vof % curv(-nb:nc) = Vof % curv(-nb:nc) - div_y(-nb:nc)
-  Vof % curv(-nb:nc) = Vof % curv(-nb:nc) - div_z(-nb:nc)
+  do c = -nb, nc
+    Vof % curv(c) = Vof % curv(c) - div_x(c)
+    Vof % curv(c) = Vof % curv(c) - div_y(c)
+    Vof % curv(c) = Vof % curv(c) - div_z(c)
+  end do
 
   call Grid % Exchange_Cells_Real(Vof % curv)
 

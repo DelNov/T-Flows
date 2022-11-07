@@ -94,7 +94,9 @@
   !-----------!
   !   p = r   !
   !-----------!
-  p1(1:ni) = r1(1:ni)
+  do i = 1, ni
+    p1(i) = r1(i)
+  end do
 
   !---------------!
   !               !
@@ -116,10 +118,14 @@
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
-      p1(1:ni) = q1(1:ni)
+      do i = 1, ni
+        p1(i) = q1(i)
+      end do
     else
       beta = rho / rho_old
-      p1(1:ni) = q1(1:ni) + beta * p1(1:ni)
+      do i = 1, ni
+        p1(i) = q1(i) + beta * p1(i)
+      end do
     end if
 
     !------------!
@@ -145,8 +151,10 @@
     !   x = x + alfa p    !
     !   r = r - alfa Ap   !
     !---------------------!
-    x (1:ni) = x (1:ni) + alfa * p1(1:ni)
-    r1(1:ni) = r1(1:ni) - alfa * q1(1:ni)
+    do i = 1, ni
+      x (i) = x (i) + alfa * p1(i)
+      r1(i) = r1(i) - alfa * q1(i)
+    end do
 
     !-----------------------!
     !   Check convergence   !
