@@ -50,7 +50,7 @@
       procedure :: Calculate_Element_Normals
       procedure :: Check_Elements
       procedure :: Clean_Front
-      procedure :: Compress_Vertices
+      procedure :: Compress_Front_Vertices
       procedure :: Compute_Distance_Function_And_Vof
       procedure :: Find_Front_Elements
       procedure :: Find_Sides
@@ -70,7 +70,7 @@
 #   include "Front_Mod/Calculate_Element_Normals.f90"
 #   include "Front_Mod/Check_Elements.f90"
 #   include "Front_Mod/Clean.f90"
-#   include "Front_Mod/Compress_Vertices.f90"
+#   include "Front_Mod/Compress_Front_Vertices.f90"
 #   include "Front_Mod/Compute_Distance_Function_And_Vof.f90"
 #   include "Front_Mod/Find_Front_Elements.f90"
 #   include "Front_Mod/Find_Sides.f90"

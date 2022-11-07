@@ -28,6 +28,7 @@
       procedure :: Calculate_Curvatures_From_Edges
       procedure :: Calculate_Curvatures_From_Elems
       procedure :: Calculate_Curvatures_From_Verts
+      procedure :: Compress_Surf_Vertices
       procedure :: Find_Boundaries
       procedure :: Find_Surf_Elements
       procedure :: Handle_3_Points
@@ -57,6 +58,7 @@
 #   include "Surf_Mod/Calculate_Curvatures_From_Edges.f90"
 #   include "Surf_Mod/Calculate_Curvatures_From_Elems.f90"
 #   include "Surf_Mod/Calculate_Curvatures_From_Verts.f90"
+#   include "Surf_Mod/Compress_Surf_Vertices.f90"
 #   include "Surf_Mod/Find_Boundaries.f90"
 #   include "Surf_Mod/Find_Surf_Elements.f90"
 #   include "Surf_Mod/Handle_3_Points.f90"

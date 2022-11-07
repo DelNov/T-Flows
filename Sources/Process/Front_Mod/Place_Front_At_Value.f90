@@ -136,7 +136,7 @@
   !   Compress vertices   !
   !                       !
   !-----------------------!
-  call Front % Compress_Vertices(verbose)
+  call Front % Compress_Front_Vertices(verbose)
 
   !---------------------------------!
   !                                 !

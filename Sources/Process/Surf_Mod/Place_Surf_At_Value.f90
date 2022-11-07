@@ -149,7 +149,7 @@
   !   Compress vertices   !
   !                       !
   !-----------------------!
-  call Surf % Compress_Vertices(verbose)
+  call Surf % Compress_Surf_Vertices(verbose)
 
   !---------------------------------!
   !                                 !
