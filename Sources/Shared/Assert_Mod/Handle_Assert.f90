@@ -13,10 +13,10 @@
 
   if(fail) then
     write(numb, '(i16)') line
-    print *, 'Assertion ',       text,                 &
-             ' failed in file ', file,                 &
-             ' at line ',        trim(adjustl(numb)),  &
-             '.'
+    print '(a)', 'Assertion ',       text,                 &
+                 ' failed in file ', file,                 &
+                 ' at line ',        trim(adjustl(numb)),  &
+                 '.'
     call Comm_Mod_End
     stop
   end if
