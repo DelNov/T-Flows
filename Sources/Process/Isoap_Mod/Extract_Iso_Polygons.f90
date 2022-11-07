@@ -17,23 +17,13 @@
 
   call Work % Connect_Int_Node(local_node)  ! this also sets it to zero
 
-  !---------------------------------------------!
-  !   On the first visit, allocate Polyhedron   !
-  !---------------------------------------------!
+  !-------------------------------------------------------------------------!
+  !   On the first visit, allocate memory for polyhedron and iso-polygons   !
+  !-------------------------------------------------------------------------!
   if(first_visit) then
-    ! Allocate Polyhedron
-    allocate(Polyhedron % faces_n_nodes(MAX_ISOAP_FACES))
-    allocate(Polyhedron % faces_n      (MAX_ISOAP_FACES, MAX_ISOAP_VERTS))
-    allocate(Polyhedron % nodes_xyz    (MAX_ISOAP_VERTS, 3))
-    allocate(Polyhedron % phi          (MAX_ISOAP_FACES))
 
-    ! Allocate iso-polygons
-    allocate(Iso_Polygons % polys_v      (MAX_ISOAP_FACES, MAX_ISOAP_VERTS));
-    allocate(Iso_Polygons % face_index   (MAX_ISOAP_VERTS))
-    allocate(Iso_Polygons % polys_n_verts(MAX_ISOAP_FACES))
-    allocate(Iso_Polygons % verts_xyz    (MAX_ISOAP_VERTS, 3))
-    allocate(Iso_Polygons % b_node_1     (MAX_ISOAP_VERTS))
-    allocate(Iso_Polygons % b_node_2     (MAX_ISOAP_VERTS))
+    call Polyhedron   % Allocate_Polyhedron  (MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
+    call Iso_Polygons % Allocate_Iso_Polygons(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
 
     first_visit = .false.
   end if
@@ -48,6 +38,7 @@
   Polyhedron % nodes_xyz    (:,:) = 0.0
   Polyhedron % phi          (:)   = 0.0
   Polyhedron % phiiso             = 0.5
+  Polyhedron % global_node  (:)   = 0
 
   Iso_Polygons % n_polys            = 0
   Iso_Polygons % polys_v      (:,:) = 0
@@ -79,8 +70,9 @@
     Polyhedron % nodes_xyz(l_nod,2) = Grid % yn(n)
     Polyhedron % nodes_xyz(l_nod,3) = Grid % zn(n)
 
-    ! Since you are here, copy the nodal phi values as well
-    Polyhedron % phi(l_nod) = phi_n(n)
+    ! Since you are here, copy the nodal phi values and global node numbers
+    Polyhedron % phi        (l_nod) = phi_n(n)
+    Polyhedron % global_node(l_nod) = n
   end do
 
   !------------------------------------------------------!
