@@ -12,7 +12,7 @@
   type(Grid_Type),  pointer :: Grid
   integer                   :: c1, c2, e, s, n_fac
   real                      :: phi_c1, phi_c2, w1, w2
-  character(SL)             :: line1, line2, line3
+! character(SL)             :: line1, line2, line3
 !==============================================================================!
 
   ! Take aliases
@@ -75,14 +75,14 @@
   end do    ! through faces
 
   ! This check probably doesn't make a hell of a lot of sense
-  if(Front % n_elems .ne. n_fac) then
-    write(line1, '(a)')    " It seems that not all face "  //  &
-                           " intersections have been found! \n "
-    write(line2, '(a,i6)') " Front % n_elems = ", Front % n_elems
-    write(line3, '(a,i6)') " n_fac           = ", n_fac
-    call Message % Warning(60, line1 // line2 // line3,  &
-                           file=__FILE__, line=__LINE__)
-
-  end if
+  ! if(Front % n_elems .ne. n_fac) then
+  !   write(line1, '(a)')    " It seems that not all face "  //  &
+  !                          " intersections have been found! \n "
+  !   write(line2, '(a,i6)') " Front % n_elems = ", Front % n_elems
+  !   write(line3, '(a,i6)') " n_fac           = ", n_fac
+  !   call Message % Warning(60, line1 // line2 // line3,  &
+  !                          file=__FILE__, line=__LINE__)
+  !
+  ! end if
 
   end subroutine
