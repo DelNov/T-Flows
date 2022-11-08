@@ -23,8 +23,6 @@ Eddies_Mod/*.f90
 $(DIR_OBJECT)/Particle_Mod.o:\
 $(DIR_OBJECT)/Vof_Mod.o \
 Vof_Mod/*/*.f90 \
-$(DIR_OBJECT)/Vert_Mod.o \
-Vert_Mod/*.f90 \
 Particle_Mod/*.f90 
 
 #---------------------------------------------------
@@ -49,24 +47,11 @@ Point_Mod/*.f90
 # Dependencies for: ./Read_Controls_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Read_Controls_Mod.o:\
-$(DIR_OBJECT)/Vof_Mod.o \
-Vof_Mod/*/*.f90 \
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
 Read_Controls_Mod/*.f90 \
-$(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Eddies_Mod.o \
-Eddies_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
+Eddies_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Swarm_Mod.f90
@@ -114,18 +99,12 @@ $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 Surf_Mod/readme \
 $(DIR_OBJECT)/Surf_Mod.o \
-Surf_Mod/*.f90 \
-Front_Mod/readme \
-$(DIR_OBJECT)/Front_Mod.o \
-Front_Mod/*.f90 
+Surf_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./User_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/User_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 User_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
@@ -162,23 +141,8 @@ Field_Mod/*/*.f90
 # Dependencies for: ./Main_Pro.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Pro.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/User_Mod.o \
-User_Mod/*.f90 \
-$(DIR_OBJECT)/Results_Mod.o \
-Results_Mod/*.f90 \
-$(DIR_OBJECT)/Read_Controls_Mod.o \
-Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
-Process_Mod/*.f90 \
-$(DIR_OBJECT)/Monitor_Mod.o \
-Monitor_Mod/*.f90 \
-$(DIR_OBJECT)/Eddies_Mod.o \
-Eddies_Mod/*.f90 \
-$(DIR_OBJECT)/Backup_Mod.o \
-Backup_Mod/*.f90 
+Process_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Surf_Mod/Place_Surf_At_Value.f90
@@ -224,8 +188,6 @@ $(DIR_OBJECT)/Front_Mod.o:\
 $(DIR_OBJECT)/Vert_Mod.o \
 Vert_Mod/*.f90 \
 $(DIR_OBJECT)/Side_Mod.o \
-$(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
 Isoap_Mod/readme \
 $(DIR_OBJECT)/Isoap_Mod.o \
 Isoap_Mod/*.f90 \
@@ -334,9 +296,15 @@ $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
+$(DIR_OBJECT)/Results_Mod.o \
+Results_Mod/*.f90 \
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
 Process_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Monitor_Mod.o \
+Monitor_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
@@ -357,14 +325,7 @@ Bulk_Mod/*.f90
 # Dependencies for: ./Turb_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Turb_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 
 
@@ -372,17 +333,10 @@ Info_Mod/*.f90
 # Dependencies for: ./Field_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Field_Mod.o:\
-$(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
 Field_Mod/*/*.f90 \
 $(DIR_OBJECT)/Face_Mod.o \
 Face_Mod/*.f90 \
@@ -508,9 +462,7 @@ $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./String_Mod.f90

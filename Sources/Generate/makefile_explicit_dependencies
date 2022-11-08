@@ -29,14 +29,8 @@ $(DIR_SHARED)/Gen_Mod/*.f90
 # Dependencies for: ./Main_Gen.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Gen.o:\
-$(DIR_OBJECT)/Swap_Mod.o \
-$(DIR_SHARED)/Swap_Mod/*.f90 \
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Smooths_Mod.o \
-Smooths_Mod/*.f90 \
-$(DIR_OBJECT)/Refines_Mod.o \
-Refines_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
@@ -45,9 +39,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Generate_Mod.o \
 Generate_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Domain_Mod.o \
-Domain_Mod/*.f90 
+$(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Smooths_Mod.f90
@@ -154,9 +146,7 @@ $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./String_Mod.f90

@@ -1,6 +1,9 @@
 !==============================================================================!
   module Convert_Mod
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Grid_Mod
+!------------------------------------------------------------------------------!
 !   Collection of functions used in the Convert program.  In honesty, it was   !
 !   introduced to get rid of the Fortran header files with interfaces which,   !
 !   in effect, was needed for Intel compiler to work in the debug mode.        !

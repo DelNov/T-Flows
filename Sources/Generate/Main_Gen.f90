@@ -6,10 +6,6 @@
 !   Block structured mesh generation and unstructured cell refinement.         !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Domain_Mod
-  use Smooths_Mod
-  use Refines_Mod
-  use Swap_Mod
   use Generate_Mod
 !------------------------------------------------------------------------------!
   implicit none

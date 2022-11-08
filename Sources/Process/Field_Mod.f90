@@ -6,10 +6,7 @@
 !   differentiate into numerical and physica parts.                            !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Profiler_Mod
-  use Var_Mod
   use Face_Mod
-  use Grid_Mod
   use Bulk_Mod
   use Solver_Mod
   use Numerics_Mod

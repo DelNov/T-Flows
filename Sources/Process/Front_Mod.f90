@@ -6,7 +6,6 @@
 !   Module for Lagrangian particle tracking                                    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Profiler_Mod
   use Field_Mod
   use Vert_Mod
   use Elem_Mod

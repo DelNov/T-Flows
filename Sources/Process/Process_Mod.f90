@@ -8,7 +8,9 @@
 !   in effect, was needed for Intel compiler to work in the debug mode.        !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use User_Mod
+  use Results_Mod
+  use Read_Controls_Mod
+  use Monitor_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -52,8 +54,5 @@
 #   include "Process_Mod/Piso_Algorithm.f90"
 #   include "Process_Mod/Rhie_And_Chow.f90"
 #   include "Process_Mod/Update_Boundary_Values.f90"
-
-    ! The key is used by more than one module see also the Process_Mod
-#   include "Key_Ind.f90"
 
   end module

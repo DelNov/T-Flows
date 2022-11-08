@@ -4,8 +4,7 @@
 !   Definition of variables used for all VOF multiphase modelling              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Front_Mod
-  use Surf_Mod
+  use Surf_Mod  ! inherited from Front_Mod
   use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none

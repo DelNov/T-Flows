@@ -7,13 +7,7 @@
 !   Besides, being inside a module will enforce argument checking.             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod,    only: Field_Type
-  use Var_Mod,      only: Var_Type
-  use Vof_Mod,      only: Vof_Type
-  use Turb_Mod
   use Swarm_Mod
-  use Control_Mod
-  use Numerics_Mod
   use Eddies_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -47,8 +41,6 @@
 #   include "Read_Controls_Mod/Petsc_Solvers.f90"
 #   include "Read_Controls_Mod/Physical_Models.f90"
 #   include "Read_Controls_Mod/Physical_Properties.f90"
-
-    ! The key is used by more than one module see also the Process_Mod
 #   include "Key_Ind.f90"
 
   end module
