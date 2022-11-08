@@ -72,8 +72,6 @@ $(DIR_SHARED)/Gen_Mod/*.f90
 # Dependencies for: ./Generate_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Generate_Mod.o:\
-$(DIR_OBJECT)/Swap_Mod.o \
-$(DIR_SHARED)/Swap_Mod/*.f90 \
 $(DIR_OBJECT)/Smooths_Mod.o \
 Smooths_Mod/*.f90 \
 $(DIR_OBJECT)/Refines_Mod.o \
