@@ -1,5 +1,9 @@
 #!/bin/bash
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 #------------------------------------------------------------------------------#
 # Print_usage
 #------------------------------------------------------------------------------#
@@ -56,7 +60,7 @@ extract_hierarchy() {
     local full_path_you_seek=$(find . -name $module_file_you_seek)
   fi
 
-  # This command counts numbe of occurrences of modules name in the result of
+  # This command counts number of occurrences of modules name in the result of
   # command find. If it is more than one, the same file is in more directories
   n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$module_name_you_seek")
   if [ $n -gt 1 ]; then
@@ -68,20 +72,23 @@ extract_hierarchy() {
     exit
   fi
 
+  #-----------------------------------------------------
+  #   Storing results of the grep command in an array
+  #-----------------------------------------------------
+  local used_modules=($(grep '\ \ use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
+
   #------------------------------------------------------------------
   #   Print out the name of the module you are currently analysing
   #------------------------------------------------------------------
   echo "-----------------------------------------------------------------------------------------------------------------------"
-  echo "${indent}"$module_name_you_seek "("$this_level")"
+  if [ ! -z "$used_modules" ]; then
+    echo -e "${RED}${indent}"+ $module_name_you_seek "("$this_level")${NC}"
+  else
+    echo -e "${GREEN}${indent}"⨯ $module_name_you_seek "("$this_level")${NC}"
+  fi
 
   # Increase indend for the next level by appending spaces to it
   local indent="${indent}"'           '
-
-  #-----------------------------------------------------
-  #   Storing results of the grep command in an array
-  #   (This creates no output)
-  #-----------------------------------------------------
-  local used_modules=($(grep '\ \ use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
 
   #--------------------------------------------------------
   #   If the list of used modules in not empty, carry on
@@ -90,7 +97,7 @@ extract_hierarchy() {
 
     # Print the modules you have found here
     for module in ${used_modules[*]}; do
-      echo "${indent}"$module
+      echo "${indent}"• $module
     done
 
     # Print the files you will want to seek next
