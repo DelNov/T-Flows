@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Backup_Mod_Load(Fld, Swr, Tur, Vof, time, time_step, backup)
+  subroutine Backup_Mod_Load(Fld, Tur, Vof, Swr, time, time_step, backup)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Fld
-  type(Swarm_Type), target :: Swr
   type(Turb_Type),  target :: Tur
   type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: Swr
   real                     :: time            ! time of simulation
   integer                  :: time_step       ! current time step
   logical                  :: backup, present

@@ -1,20 +1,14 @@
 #include "../Shared/Assert.h90"
 
 !==============================================================================!
-  program Divisor
+  program Divide_Prog
 !------------------------------------------------------------------------------!
 !   Divides the domain in equaly balanced subdomains.                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use File_Mod
-  use Grid_Mod
+  use Divide_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Interfaces]---------------------------------!
-  interface
-    include 'Logo_Div.h90'
-    include 'Save_Subdomains.h90'
-  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid           ! grid to be divided
   integer         :: n_sub
@@ -24,7 +18,7 @@
 
   call cpu_time(p_start)  ! remark: cpu_time doesn't work with OPENMP
 
-  call Logo_Div
+  call Divide % Logo_Div()
 
   !-------------------------------------------!
   !   User specified command line arguments   !
@@ -67,7 +61,7 @@
 
   call Grid % Decompose(n_sub)
 
-  call Save_Subdomains(Grid, 1)  ! Number of buffer levels is hard-coded now
+  call Divide % Save_Subdomains(Grid, 1)  ! number of buffer levels hard-coded
 
   call cpu_time(p_end)  ! remark: cpu_time doesn't work with OPENMP
   print '(a10,f14.3,a9)', ' # Time = ', p_end-p_start, ' seconds.'

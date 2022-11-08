@@ -185,6 +185,9 @@ SRC_F_MOD = Const_Mod.f90          \
             Sort_Mod.f90           \
             Grid_Mod.f90
 
+# Modules in the local directory
+SRC_F_MOD += Convert_Mod.f90
+
 #---------------
 #   Functions
 #---------------
@@ -195,26 +198,7 @@ SRC_F_FUN = Adjust_Dim.f90        \
             Probe_1d_Nodes.f90
 
 # Local functions are added one by one ...
-SRC_F_FUN += Allocate_Memory.f90       \
-             Calculate_Geometry.f90    \
-             Create_Dual.f90           \
-             Find_Faces.f90            \
-             Find_Parents.f90          \
-             Grid_Topology.f90         \
-             Guess_Format.f90          \
-             Insert_Buildings.f90      \
-             Load_Fluent.f90           \
-             Load_Gambit.f90           \
-             Load_Gmsh.f90             \
-             Logo_Con.f90              \
-             N_Bnd_Cells_In_Color.f90  \
-             N_Edges_In_Bnd_Color.f90  \
-             N_Nodes_In_Bnd_Color.f90  \
-             N_Sharp_Corners.f90       \
-             N_Sharp_Edges.f90         \
-             Sort_Face_Nodes.f90       \
-             Triangle_Area_Z.f90       \
-             Main_Con.f90
+SRC_F_FUN += Main_Con.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions

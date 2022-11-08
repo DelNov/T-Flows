@@ -26,19 +26,6 @@ $(DIR_OBJECT)/Gen_Mod.o \
 $(DIR_SHARED)/Gen_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Load_Dom.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Load_Dom.o:\
-$(DIR_OBJECT)/Swap_Mod.o \
-$(DIR_SHARED)/Swap_Mod/*.f90 \
-$(DIR_OBJECT)/Smooths_Mod.o \
-Smooths_Mod/*.f90 \
-$(DIR_OBJECT)/Refines_Mod.o \
-Refines_Mod/*.f90 \
-$(DIR_OBJECT)/Domain_Mod.o \
-Domain_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Main_Gen.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Gen.o:\
@@ -55,15 +42,12 @@ $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 \
+$(DIR_OBJECT)/Generate_Mod.o \
+Generate_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Domain_Mod.o \
-Domain_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+Domain_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Smooths_Mod.f90
@@ -85,25 +69,33 @@ $(DIR_OBJECT)/Gen_Mod.o \
 $(DIR_SHARED)/Gen_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Calculate_Geometry.f90
+# Dependencies for: ./Generate_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Calculate_Geometry.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 
+$(DIR_OBJECT)/Generate_Mod.o:\
+$(DIR_OBJECT)/Swap_Mod.o \
+$(DIR_SHARED)/Swap_Mod/*.f90 \
+$(DIR_OBJECT)/Smooths_Mod.o \
+Smooths_Mod/*.f90 \
+$(DIR_OBJECT)/Refines_Mod.o \
+Refines_Mod/*.f90 \
+Generate_Mod/*.f90 \
+$(DIR_OBJECT)/Domain_Mod.o \
+Domain_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Generate_Mod/Load_Dom.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Load_Dom.o:
+
+#---------------------------------------------------
+# Dependencies for: ./Generate_Mod/Calculate_Geometry.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Calculate_Geometry.o:
 
 #---------------------------------------------------
 # Dependencies for: ./Region_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Region_Mod.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Logo_Gen.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Logo_Gen.o:\
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
@@ -257,8 +249,8 @@ $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
 $(DIR_SHARED)/Message_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vtk_Mod.f90

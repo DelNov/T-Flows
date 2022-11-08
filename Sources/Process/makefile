@@ -285,7 +285,8 @@ SRC_F_MOD += Point_Mod.f90          \
              User_Mod.f90           \
              Backup_Mod.f90         \
              Results_Mod.f90        \
-             Read_Controls_Mod.f90
+             Read_Controls_Mod.f90  \
+             Process_Mod.f90
 
 SRC_C_FUN = C_Petsc_Interface.c
 
@@ -294,23 +295,7 @@ SRC_C_FUN = C_Petsc_Interface.c
 #---------------
 
 # Sources for all functions in the local directory
-SRC_F_FUN = Balance_Volume.f90                 \
-            Calculate_Shear_And_Vorticity.f90  \
-            Calculate_Vorticity.f90            \
-            Compute_Energy.f90                 \
-            Compute_Momentum_Explicit.f90      \
-            Compute_Momentum.f90               \
-            Compute_Pressure.f90               \
-            Compute_Scalar.f90                 \
-            Convective_Outflow.f90             \
-            Correct_Velocity.f90               \
-            Initialize_Variables.f90           \
-            Key_Ind.f90                        \
-            Logo_Pro.f90                       \
-            Main_Pro.f90                       \
-            Piso_Algorithm.f90                 \
-            Rhie_And_Chow.f90                  \
-            Update_Boundary_Values.f90
+SRC_F_FUN = Main_Pro.f90
 
 # Sources for all shared functions
 SRC_F_FUN += Adjust_Dim.f90        \

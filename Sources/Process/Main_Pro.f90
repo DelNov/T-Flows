@@ -1,5 +1,7 @@
+#include "../Shared/Assert.h90"
+
 !==============================================================================!
-  program Processor
+  program Process_Prog
 !---------------------------------[Modules]------------------------------------!
   use Eddies_Mod
   use Work_Mod
@@ -8,21 +10,9 @@
   use Results_Mod
   use Read_Controls_Mod
   use Monitor_Mod
+  use Process_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Interfaces]---------------------------------!
-  interface
-    include 'Compute_Energy.h90'
-    include 'Compute_Momentum.h90'
-    include 'Compute_Pressure.h90'
-    include 'Compute_Scalar.h90'
-    include 'Convective_Outflow.h90'
-    include 'Correct_Velocity.h90'
-    include 'Initialize_Variables.h90'
-    include 'Logo_Pro.h90'
-    include 'Piso_Algorithm.h90'
-    include 'Update_Boundary_Values.h90'
-  end interface
 !----------------------------------[Locals]------------------------------------!
   character(len=7)      :: root_control    = 'control'
   character(len=9)      :: dom_control(MD) = 'control.d'
@@ -72,7 +62,7 @@
   !--------------------------------!
   !   Splash out the logo screen   !
   !--------------------------------!
-  call Logo_Pro()
+  call Process % Logo_Pro()
 
   !-----------------------!
   !   Open control file   !
@@ -173,12 +163,13 @@
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
-    call Backup_Mod_Load(Flow(d), Swarm(d), Turb(d), Vof(d),  &
+    call Backup_Mod_Load(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                          time, first_dt, read_backup(d))
 
     ! Initialize variables
     if(.not. read_backup(d)) then
-      call Initialize_Variables(Flow(d), Turb(d), Vof(d), Swarm(d), Sol(d))
+      call Process % Initialize_Variables(Flow(d), Turb(d),  &
+                                          Vof(d), Swarm(d), Sol(d))
     end if
 
     if(Flow(d) % with_interface) then
@@ -292,7 +283,7 @@
 
       ! Interface tracking
       if(Flow(d) % with_interface) then
-        call Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'VOF')
+        call Process % Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'VOF')
         call Vof(d) % Main_Vof(Flow(d), Turb(d), Sol(d), curr_dt)
         call Vof(d) % Update_Physical_Properties()
       end if
@@ -328,17 +319,22 @@
 
         call Info_Mod_Iter_Fill(ini)
 
+        ! Future? call Process % Simple_Step(Flow(d), Turb(d), Vof(d),  &
+        ! Future?                            Sol(d), curr_dt, ini)
+
         ! Compute velocity gradients
         call Flow(d) % Grad_Variable(Flow(d) % u)
         call Flow(d) % Grad_Variable(Flow(d) % v)
         call Flow(d) % Grad_Variable(Flow(d) % w)
 
         ! All three velocity components one after another
-        call Compute_Momentum(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
-        call Compute_Pressure(Flow(d), Vof(d), Sol(d), curr_dt, ini)
-        call Correct_Velocity(Flow(d), Vof(d), Sol(d), curr_dt, ini)
+        call Process % Compute_Momentum(Flow(d), Turb(d), Vof(d),  &
+                                        Sol(d), curr_dt, ini)
+        call Process % Compute_Pressure(Flow(d), Vof(d), Sol(d), curr_dt, ini)
+        call Process % Correct_Velocity(Flow(d), Vof(d), Sol(d), curr_dt, ini)
 
-        call Piso_Algorithm(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
+        call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d),  &
+                                      Sol(d), curr_dt, ini)
 
         call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
 
@@ -347,17 +343,18 @@
 
         ! Energy (practically temperature)
         if(Flow(d) % heat_transfer) then
-          call Compute_Energy(Flow(d), Turb(d), Vof(d), Sol(d), curr_dt, ini)
+          call Process % Compute_Energy(Flow(d), Turb(d), Vof(d),  &
+                                        Sol(d), curr_dt, ini)
         end if
 
         ! Passive scalars
         do sc = 1, Flow(d) % n_scalars
-          call Compute_Scalar(Flow(d), Turb(d), Vof(d), Sol(d),  &
-                              curr_dt, ini, sc)
+          call Process % Compute_Scalar(Flow(d), Turb(d), Vof(d),  &
+                                        Sol(d), curr_dt, ini, sc)
         end do
 
         ! Update the values at boundaries
-        call Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'ALL')
+        call Process % Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'ALL')
 
         ! End of the current iteration
         call Info_Mod_Iter_Print(d)
@@ -383,7 +380,7 @@
 1   continue
 
     do d = 1, n_dom
-      call Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
+      call Process % Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
     end do
 
     do d = 1, n_dom

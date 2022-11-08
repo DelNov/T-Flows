@@ -1,7 +1,7 @@
 #include "../Shared/Assert.h90"
 
 !==============================================================================!
-  program Generator
+  program Generate_Prog
 !------------------------------------------------------------------------------!
 !   Block structured mesh generation and unstructured cell refinement.         !
 !------------------------------------------------------------------------------!
@@ -10,13 +10,11 @@
   use Smooths_Mod
   use Refines_Mod
   use Swap_Mod
+  use Generate_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Interfaces]---------------------------------!
   interface
-    include 'Calculate_Geometry.h90'
-    include 'Load_Dom.h90'
-    include 'Logo_Gen.h90'
     include '../Shared/Probe_1d_Nodes.h90'
     include '../Shared/Probe_2d.h90'
   end interface
@@ -32,12 +30,12 @@
   call Profiler % Start('Main')
 
   ! Open with a logo
-  call Logo_Gen
+  call Generate % Logo_Gen()
 
   !-------------------------!
   !   Read the input file   !
   !-------------------------!
-  call Load_Dom(dom, smooths, refines, Grid)
+  call Generate % Load_Dom(dom, smooths, refines, Grid)
 
   !-----------------------!
   !   Handle the domain   !
@@ -51,12 +49,12 @@
   !   From this point on, domain   !
   !   should not be used anymore   !
   !--------------------------------!
-  call Refines_Mod_Connectivity(refines, Grid, .false.)  ! trial run
-  call Calculate_Geometry      (Grid,          .false.)
-  call Smooths_Mod_Grid        (smooths, Grid)
-  call Refines_Mod_Mark_Cells  (refines, Grid)
-  call Refines_Mod_Connectivity(refines, Grid, .true.)   ! real run
-  call Calculate_Geometry      (Grid,          .true.)
+  call Refines_Mod_Connectivity     (refines, Grid, .false.)  ! trial run
+  call Generate % Calculate_Geometry(Grid,          .false.)
+  call Smooths_Mod_Grid             (smooths, Grid)
+  call Refines_Mod_Mark_Cells       (refines, Grid)
+  call Refines_Mod_Connectivity     (refines, Grid, .true.)   ! real run
+  call Generate % Calculate_Geometry(Grid,          .true.)
 
   call Grid % Sort_Cells_Smart       ()
   call Grid % Sort_Faces_Smart       ()

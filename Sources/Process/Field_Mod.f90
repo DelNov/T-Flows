@@ -290,6 +290,7 @@
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
 #   include "Field_Mod/Utilities/Buoyancy_Forces.f90"
 #   include "Field_Mod/Utilities/Calculate_Fluxes.f90"
+#   include "Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90"
 #   include "Field_Mod/Utilities/Potential_Initialization.f90"
 #   include "Field_Mod/Utilities/Prandtl_Numb.f90"
 #   include "Field_Mod/Utilities/Schmidt_Numb.f90"
@@ -298,5 +299,6 @@
 #   include "Field_Mod/Utilities/Report_Volume_Balance.f90"
 #   include "Field_Mod/Utilities/Report_Volume_Balance_Start.f90"
 #   include "Field_Mod/Utilities/Report_Volume_Balance_Stop.f90"
+
 
   end module
