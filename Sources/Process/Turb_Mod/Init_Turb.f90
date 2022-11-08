@@ -19,7 +19,6 @@
 
   if(Turb % model .eq. DES_SPALART) then
     call Calculate_Shear_And_Vorticity(Flow)
-    call Calculate_Vorticity (Flow)
   end if
 
   if(Turb % model .eq. LES_SMAGORINSKY .or.  &

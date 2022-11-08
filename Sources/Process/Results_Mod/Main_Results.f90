@@ -33,7 +33,7 @@
      Info_Mod_Time_To_Exit()) then
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
-      call Backup_Mod_Save(Flow(d), Swarm(d), Turb(d), Vof(d),  &
+      call Backup_Mod_Save(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                            time, curr_dt, domain=d)
     end do
   end if

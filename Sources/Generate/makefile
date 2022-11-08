@@ -186,13 +186,14 @@ SRC_F_MOD = Const_Mod.f90          \
             Grid_Mod.f90
 
 # Modules in the local directory
-SRC_F_MOD += Point_Mod.f90    \
-             Line_Mod.f90     \
-             Block_Mod.f90    \
-             Region_Mod.f90   \
-             Smooths_Mod.f90  \
-             Refines_Mod.f90  \
-             Domain_Mod.f90
+SRC_F_MOD += Point_Mod.f90     \
+             Line_Mod.f90      \
+             Block_Mod.f90     \
+             Region_Mod.f90    \
+             Smooths_Mod.f90   \
+             Refines_Mod.f90   \
+             Domain_Mod.f90    \
+             Generate_Mod.f90
 
 #---------------
 #   Functions
@@ -205,10 +206,7 @@ SRC_F_FUN = Adjust_Dim.f90        \
             Probe_2d.f90
 
 # Local functions are added one by one ...
-SRC_F_FUN += Calculate_Geometry.f90  \
-             Load_Dom.f90            \
-             Logo_Gen.f90            \
-             Main_Gen.f90            \
+SRC_F_FUN += Main_Gen.f90            \
              Print_Grid_Statistics.f90
 
 #----------------------------------------------------------------------

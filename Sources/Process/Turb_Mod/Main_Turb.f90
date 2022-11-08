@@ -121,7 +121,6 @@
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
     call Calculate_Shear_And_Vorticity(Flow)
-    call Calculate_Vorticity(Flow)
 
     call Turb % Compute_Variable(Sol, curr_dt, ini, Turb % vis)
     call Turb % Vis_T_Spalart_Allmaras()

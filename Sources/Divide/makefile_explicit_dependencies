@@ -1,35 +1,25 @@
 #---------------------------------------------------
-# Dependencies for: ./Logo_Div.f90
+# Dependencies for: ./Divide_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Logo_Div.o:\
+$(DIR_OBJECT)/Divide_Mod.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+Divide_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Main_Div.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Div.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_OBJECT)/Divide_Mod.o \
+Divide_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Save_Subdomains.f90
+# Dependencies for: ./Divide_Mod/Logo_Div.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Save_Subdomains.o:\
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
+$(DIR_OBJECT)/Logo_Div.o:\
+$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Gen_Mod.f90
@@ -167,9 +157,7 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Boundary_Mod.o \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_OBJECT)/Boundary_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Message_Mod.f90

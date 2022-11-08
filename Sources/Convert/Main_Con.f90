@@ -1,25 +1,15 @@
 #include "../Shared/Assert.h90"
 
 !==============================================================================!
-  program Convert
+  program Convert_Prog
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
+  use Convert_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Interfaces]---------------------------------!
   interface
-    include 'Calculate_Geometry.h90'
-    include 'Create_Dual.h90'
-    include 'Find_Faces.h90'
-    include 'Find_Parents.h90'
-    include 'Guess_Format.h90'
-    include 'Grid_Topology.h90'
-    include 'Insert_Buildings.h90'
-    include 'Load_Fluent.h90'
-    include 'Load_Gambit.h90'
-    include 'Load_Gmsh.h90'
-    include 'Logo_Con.h90'
     include '../Shared/Probe_1d_Nodes.h90'
   end interface
 !-----------------------------------[Locals]-----------------------------------!
@@ -36,7 +26,7 @@
   call Profiler % Start('Main')
 
   ! Open with a logo
-  call Logo_Con
+  call Convert % Logo_Con()
 
   print *, '#================================================================'
   print *, '# Enter the name of the grid file you are importing (with ext.):'
@@ -48,7 +38,7 @@
   !   Make an educated guess of the file format   !
   !                                               !
   !-----------------------------------------------!
-  call Guess_Format(file_name, file_format)
+  call Convert % Guess_Format(file_name, file_format)
 
   !-------------------------------------------!
   !                                           !
@@ -75,25 +65,25 @@
   !                                        !
   !----------------------------------------!
   if(file_format .eq. 'FLUENT') then
-    call Load_Fluent(Grid(1), file_name)
+    call Convert % Load_Fluent(Grid(1), file_name)
   end if
   if(file_format .eq. 'GAMBIT') then
-    call Load_Gambit(Grid(1), file_name)
+    call Convert % Load_Gambit(Grid(1), file_name)
   end if
   if(file_format .eq. 'GMSH') then
-    call Load_Gmsh(Grid(1), file_name)
-    call Find_Parents(Grid(1))
+    call Convert % Load_Gmsh(Grid(1), file_name)
+    call Convert % Find_Parents(Grid(1))
   end if
 
   ! Sort cells in height first thing after reading	    
   if(city) then
-    call Insert_Buildings(Grid(1))
+    call Convert % Insert_Buildings(Grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
-    call Grid_Topology(Grid(1))
-    call Find_Faces   (Grid(1))
+    call Convert % Grid_Topology(Grid(1))
+    call Convert % Find_Faces   (Grid(1))
   end if
 
   ! Some mesh generators (Gmsh for sure) can leave duplicate
@@ -131,13 +121,13 @@
       if(g .eq. 2) print *, '# Processing the second (dual) grid'
       print *,              '#                                    '
       print *,              '#--------------------------------------'
-      if(g .eq. 2) call Create_Dual(Grid(1), Grid(2))
+      if(g .eq. 2) call Convert % Create_Dual(Grid(1), Grid(2))
     end if
 
     !--------------------------------------!
     !   Calculate geometrical quantities   !
     !--------------------------------------!
-    call Calculate_Geometry(Grid(g), g-n_grids)  ! if zero, ask questions
+    call Convert % Calculate_Geometry(Grid(g), g-n_grids)  ! if zero, ask
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
     ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart

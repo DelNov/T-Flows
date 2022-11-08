@@ -23,10 +23,14 @@
   real,    optional    :: norm     ! normalization
 !==============================================================================!
 
+  ! Just to avoid compiler's warning
+  niter   = 0
+  fin_res = 0.0
+
   if(this_proc < 2) then
-    print *, '# This version was compiled without PETSc, '  //  &
-             'and yet they were specified in the control file.'
-    print *, '# This error is critical, exiting. Fix the control file.'
+    print '(a)', ' # This version was compiled without PETSc, '  //  &
+                  'and yet they were specified in the control file.'
+    print '(a)', ' # This error is critical, exiting. Fix the control file.'
   end if
 
   call Comm_Mod_End

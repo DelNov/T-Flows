@@ -5,13 +5,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type)      :: Rc
-  type(Field_Type),       target :: Flow
-  type(Turb_Type),        target :: Turb
-  type(Vof_Type),         target :: Vof
-  type(Turb_Plane_Type)          :: turb_planes
-!----------------------------------[Calling]-----------------------------------!
-  integer :: Key_Ind
+  class(Read_Controls_Type)         :: Rc
+  type(Field_Type),          target :: Flow
+  type(Turb_Type),           target :: Turb
+  type(Vof_Type),            target :: Vof
+  type(Turb_Plane_Type)             :: turb_planes
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, p, fun
