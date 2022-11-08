@@ -27,7 +27,7 @@ print_usage() {
 #------------------------------------------------------------------------------#
 # Browse through all directories looking for module dependencies
 #------------------------------------------------------------------------------#
-print_function() {
+extract_hierarchy() {
 
   #-----------------------
   #   Handle parameters
@@ -98,7 +98,7 @@ print_function() {
 
       # Pick only standard T-Flows modules: extension _Mod
       if [[ "$module" == *"_Mod"* ]]; then
-        print_function "$module" $2 $3
+        extract_hierarchy "$module" $2 $3
       fi
     done
   fi
@@ -110,7 +110,7 @@ print_function() {
 if [ $3 ]; then
   echo $2
   if [ $2 == "-e" ]; then
-    print_function $1 $2 $3
+    extract_hierarchy $1 $2 $3
   else
     print_usage
   fi
@@ -120,7 +120,7 @@ if [ $3 ]; then
 #  Use the names without extension - say Grid_Mod, Convert_Mod ...
 #---------------------------------------------------------------------
 elif [ $1 ]; then
-  print_function $1
+  extract_hierarchy $1
 
 #-----------------------------------------------------------------------
 #  Wrong number of command line argument is sent - describe the usage
