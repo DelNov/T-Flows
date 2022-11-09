@@ -34,6 +34,32 @@ print_usage() {
   echo "#----------------------------------------------------------------------"
 }
 
+glo_procedure=""
+glo_module=""
+
+#------------------------------------------------------------------------------#
+# Sets $glo_procedure and $glo_module
+#------------------------------------------------------------------------------#
+extract_procedure_and_module() {
+
+  full_name=$1
+
+  if [[ "$full_name" == *"%"* ]]; then
+
+    # The following three lines would work for:
+    # Profiler%Start()
+    # Grid(d)%Calculate()
+    glo_module=$(cut -d %  -f 1 <<< $full_name)
+    glo_module=$(cut -d \( -f 1 <<< $glo_module)
+    glo_procedure=$(cut -d %  -f 2 <<< $full_name)
+    glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
+
+  else
+    glo_module=""  # empty string (maybe none or Shared?)
+    glo_procedure=$(cut -d \( -f 1 <<< $full_name)
+  fi
+}
+
 #------------------------------------------------------------------------------#
 # Browse through all directories looking for module dependencies
 #------------------------------------------------------------------------------#
@@ -89,17 +115,9 @@ extract_call_graph() {
     # At this point, $called procedures has a form like: Profiler%Start('Main')
     # From this mess, extract the module name and the procedure element wise
     for proc in "${!called_procedures[@]}"; do
-      if [[ ${called_procedures[proc]} == *"%"* ]]; then
-#       echo "MODERN PROCEDURE " ${called_procedures[$proc]}
-        called_modules[$proc]=$(cut -d %  -f 1 <<< ${called_procedures[$proc]})
-        called_modules[$proc]=$(cut -d \( -f 1 <<< ${called_modules[$proc]})
-        called_procedures[$proc]=$(cut -d %  -f 2 <<< ${called_procedures[$proc]})
-        called_procedures[$proc]=$(cut -d \( -f 1 <<< ${called_procedures[$proc]})
-      else
-#       echo "OLD FASHIONED OR GLOBAL FUNCITON " ${called_procedures[$proc]}
-        called_modules[$proc]=""  # empty string (maybe Shared?)
-        called_procedures[$proc]=$(cut -d \( -f 1 <<< ${called_procedures[$proc]})
-      fi
+      extract_procedure_and_module ${called_procedures[proc]}  # sets $glo_procedure and $glo_module
+      called_modules[$proc]=$glo_module
+      called_procedures[$proc]=$glo_procedure
     done
 
     #------------------------------------------------------------------
@@ -123,29 +141,17 @@ extract_call_graph() {
       # Print the procedures which are called from here
       for proc in "${!called_procedures[@]}"; do
         if [ ${called_modules[proc]} ]; then
-#         echo ${called_procedures[proc]} " @ " ${called_modules[proc]}
           echo -e "${indent}"• ${called_procedures[proc]}" \t (from: "${called_modules[proc]}")"
         else
           echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${NC}" \t (global or external)"
-#         echo ${called_procedures[proc]}
         fi
-      done
 
-      exit
-
-      # Print the modules you have found here
-      for procedure in ${called_procedures[*]}; do
-        echo "${indent}"• $procedure
-      done
-
-      # Print the files you will want to seek next
-      for procedure in ${called_procedures[*]}; do
-
-        echo "ABOUT TO MAKE RECURSIVE CALL FOR " $procedure " " $called_module
+        echo "ABOUT TO MAKE RECURSIVE CALL FOR ${called_procedures[proc]} ${called_modules[proc]}"
+        exit
 
         # Avoid standard T-Flows modules: extension _Mod
-        if [[ ! "$procedure" == *"_Mod"* ]]; then
-          extract_call_graph "$procedure" "$called_module"
+        if [[ ! "${called_procedures[proc]}" == *"_Mod"* ]]; then
+          extract_call_graph ${called_procedures[proc]} ${called_modules[proc]}
         fi
       done
     fi
