@@ -125,6 +125,11 @@ extract_call_graph() {
     local called_procedures=($(grep '\ \ call' $full_path_you_seek | awk '{print $2$3$4}' | tr -d ,))
     local called_modules=$called_procedures   # just to declare
 
+    echo "FETHED PROCEDURES:"
+    for proc in "${!called_procedures[@]}"; do
+      echo ${called_procedures[proc]}
+    done
+
     # At this point, $called procedures has a form like: Profiler%Start('Main')
     # From this mess, extract the module name and the procedure element wise
     for proc in "${!called_procedures[@]}"; do
