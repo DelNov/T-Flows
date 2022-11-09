@@ -46,7 +46,7 @@ extract_procedure_and_module() {
 
   if [[ "$full_name" == *"%"* ]]; then
 
-    # The following three lines would work for:
+    # The following four lines would work for:
     # Profiler%Start()
     # Grid(d)%Calculate() ...
     glo_module=$(cut -d %  -f 1 <<< $full_name)
@@ -61,9 +61,18 @@ extract_procedure_and_module() {
       glo_module=""  # empty string (maybe none or Shared?)
     fi
 
+  elif [[ "$full_name" == *"_Mod_"* ]]; then
+
+    # This contraption is for friend functions like Comm_Mod_End
+    glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')
+    glo_procedure=$full_name
+
   else
+
+    # This is for global functions and external functions like Probe_1d
     glo_module=""  # empty string (maybe none or Shared?)
     glo_procedure=$(cut -d \( -f 1 <<< $full_name)
+
   fi
 }
 
@@ -129,7 +138,7 @@ extract_call_graph() {
     #------------------------------------------------------------------
     echo "-----------------------------------------------------------------------------------------------------------------------"
     if [ ! -z "$called_procedures" ]; then
-      echo -e ${YELLOW}"${indent}"+ $procedure_name_you_seek "("$this_level")"${NC}
+      echo -e ${YELLOW}"${indent}"+ $procedure_name_you_seek "("$this_level")"${NC}" calls: ""\t $module_in_which_you_seek"
     else
       echo -e ${GREEN}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${NC}
     fi
