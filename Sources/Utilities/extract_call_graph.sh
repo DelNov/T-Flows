@@ -48,11 +48,18 @@ extract_procedure_and_module() {
 
     # The following three lines would work for:
     # Profiler%Start()
-    # Grid(d)%Calculate()
+    # Grid(d)%Calculate() ...
     glo_module=$(cut -d %  -f 1 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
     glo_procedure=$(cut -d %  -f 2 <<< $full_name)
     glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
+
+    # ... but get messed up for this
+    # system_clock(Profiler % i_time_curr)
+    if [[ "$glo_procedure" == *")"* ]]; then
+      glo_procedure=$glo_module
+      glo_module=""  # empty string (maybe none or Shared?)
+    fi
 
   else
     glo_module=""  # empty string (maybe none or Shared?)
@@ -68,7 +75,6 @@ extract_call_graph() {
   #-----------------------
   #   Handle parameters
   #-----------------------
-  echo "ENTERED EXTRACT WITH PARAMETERS: " $1 $2
 
   # First parameter is the procedure name you seek
   procedure_name_you_seek="$1"
@@ -90,9 +96,7 @@ extract_call_graph() {
   fi
 
   # If the definition of this procedure is found, carry on
-  echo $full_path_you_seek
   if [ $full_path_you_seek ]; then
-    echo "Found something!"
 
     # This command counts number of occurrences of modules name in the result of
     # command find. If it is more than one, the same file is in more directories
@@ -146,17 +150,14 @@ extract_call_graph() {
           echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${NC}" \t (global or external)"
         fi
 
-        echo "ABOUT TO MAKE RECURSIVE CALL FOR ${called_procedures[proc]} ${called_modules[proc]}"
-        exit
-
         # Avoid standard T-Flows modules: extension _Mod
-        if [[ ! "${called_procedures[proc]}" == *"_Mod"* ]]; then
-          extract_call_graph ${called_procedures[proc]} ${called_modules[proc]}
-        fi
+        # if [[ ! "${called_procedures[proc]}" != *"_Mod"* ]]; then
+        extract_call_graph ${called_procedures[proc]} ${called_modules[proc]}
+        # fi
       done
     fi
-  else
-    echo "Found nothing"
+# else
+#   echo "Found nothing"
   fi
 }
 
