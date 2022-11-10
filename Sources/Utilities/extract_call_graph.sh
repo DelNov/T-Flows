@@ -81,8 +81,10 @@ extract_procedure_and_module() {
           "$pattern" == "()%()"     ||     \
           "$pattern" == "()%("      ||     \
           "$pattern" == "%(%)"      ||     \
+          "$pattern" == "%(%"       ||     \
           "$pattern" == "%(()"      ||     \
           "$pattern" == "%(%%"      ||     \
+          "$pattern" == "%(%()%)"   ||     \
           "$pattern" == "%(%%)"     ||     \
           "$pattern" == "%(%())"    ||     \
           "$pattern" == "%(%%())"   ||     \
@@ -103,6 +105,9 @@ extract_procedure_and_module() {
           "$pattern" == "()"        ||       \
           "$pattern" == "("         ||       \
           "$pattern" == ""          ||       \
+          "$pattern" == "((%())"    ||       \
+          "$pattern" == "(%()%%"    ||       \
+          "$pattern" == "(%()%()"   ||       \
           "$pattern" == "(%()%())"  ||       \
           "$pattern" == "(%()%)"    ||       \
           "$pattern" == "(()())"    ||       \
