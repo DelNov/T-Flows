@@ -78,11 +78,15 @@ extract_hierarchy() {
   #------------------------------------------------------------------
   #   Print out the name of the module you are currently analysing
   #------------------------------------------------------------------
-  echo "-----------------------------------------------------------------------------------------------------------------------"
   if [ ! -z "$used_modules" ]; then
-    echo -e "${RED}${indent}"+ $module_name_you_seek "("$this_level")${NC}"
+    if [ $this_level -lt 2 ]; then
+      echo "-----------------------------------------------------------------"
+      echo -e "${RED}${indent}"• $module_name_you_seek "("$this_level")${NC}"
+    else
+      echo -e "${indent}"• $module_name_you_seek "("$this_level")"
+    fi
   else
-    echo -e "${GREEN}${indent}"⨯ $module_name_you_seek "("$this_level")${NC}"
+    echo -e "${LIGHT_CYAN}${indent}"⨯ $module_name_you_seek "("$this_level")${NC}"
   fi
 
   # Increase indend for the next level by appending spaces to it
@@ -95,11 +99,11 @@ extract_hierarchy() {
 
     # Print the modules you have found here
     for mod in "${!used_modules[@]}"; do
-      echo "${indent}"• ${used_modules[mod]}
-    done
-
-    # Print the files you will want to seek next
-    for mod in "${!used_modules[@]}"; do
+#->      echo "${indent}"• ${used_modules[mod]}
+#->    done
+#->
+#->    # Print the files you will want to seek next
+#->    for mod in "${!used_modules[@]}"; do
 
       #-------------------------------------------------------#
       #                                                       #

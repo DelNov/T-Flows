@@ -163,6 +163,7 @@ extract_call_graph() {
 
       # Print the procedures which are called from here
       for proc in "${!called_procedures[@]}"; do
+
         if [ ${called_modules[proc]} ]; then
           echo -e "${indent}"• ${called_procedures[proc]}" \t (from: "${called_modules[proc]}")"
         else
