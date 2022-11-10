@@ -169,10 +169,12 @@ extract_call_graph() {
           echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${NC}" \t (global or external)"
         fi
 
-        # Avoid standard T-Flows modules: extension _Mod
-        # if [[ ! "${called_procedures[proc]}" != *"_Mod"* ]]; then
+        #-------------------------------------------------------#
+        #                                                       #
+        #   The very important recursive call to its own self   #
+        #                                                       #
+        #-------------------------------------------------------#
         extract_call_graph ${called_procedures[proc]} ${called_modules[proc]}
-        # fi
       done
     fi
 # else

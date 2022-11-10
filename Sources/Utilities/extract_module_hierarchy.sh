@@ -101,8 +101,12 @@ extract_hierarchy() {
     # Print the files you will want to seek next
     for module in ${used_modules[*]}; do
 
-      # Pick only standard T-Flows modules: extension _Mod
-      if [[ "$module" == *"_Mod"* ]]; then
+      #-------------------------------------------------------#
+      #                                                       #
+      #   The very important recursive call to its own self   #
+      #                                                       #
+      #-------------------------------------------------------#
+      if [[ "$module" == *"_Mod"* ]]; then   # only standard T-Flows modules
         extract_hierarchy "$module" $2 $3
       fi
     done
