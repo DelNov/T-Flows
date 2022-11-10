@@ -100,7 +100,7 @@ extract_call_graph() {
   #   Get the full path of the module you seek   #
   #----------------------------------------------#
   if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
-    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek | grep $exclude_dir)
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek | grep -v $exclude_dir)
   elif [ $exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $exclude_dir)
   elif [ $module_in_which_you_seek ]; then
