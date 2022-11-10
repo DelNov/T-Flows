@@ -45,35 +45,73 @@ extract_procedure_and_module() {
 
   full_name=$1
 
-  if [[ "$full_name" == *"%"* ]]; then
+  # It rarely gets cooler than this: extract the calling function pattern :-)
+  pattern="${full_name//[^%^(^)]}"
 
-    # The following four lines would work for:
-    # Profiler%Start()
-    # Grid(d)%Calculate() ...
+  # This should take care of Comm_Mod_Friendly_Function
+  if [[ "$pattern" == "" || "$full_name" == *"_Mod_"* ]]; then
+    glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')"_Mod"
+    glo_procedure=$(echo $full_name | awk -F '_Mod_' '{print $2}')
+    glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
+
+  # Take care of cases such as Grid%Comm%Sendrecv_Real_Arrays
+  elif [[ "$pattern" == "%%" ]]; then
+    glo_module=$(cut -d % -f 2 <<< $full_name)
+    glo_module=$(cut -d \( -f 1 <<< $glo_module)
+    glo_procedure=$(cut -d % -f 3 <<< $full_name)
+    glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
+
+  # Likes of Profiler%Start() and Grid(d)%Calculate() ...
+  # Profiler%Update_By_Rank(Profiler%previously_running)
+  elif [[ "$pattern" == "%()"       ||     \
+          "$pattern" == "%("        ||     \
+          "$pattern" == "%(())"     ||     \
+          "$pattern" == "()%()"     ||     \
+          "$pattern" == "()%("      ||     \
+          "$pattern" == "%(%)"      ||     \
+          "$pattern" == "%(()"      ||     \
+          "$pattern" == "%(%%"      ||     \
+          "$pattern" == "%(%%)"     ||     \
+          "$pattern" == "%(%())"    ||     \
+          "$pattern" == "%(%%())"   ||     \
+          "$pattern" == "%((%)"     ||     \
+          "$pattern" == "%((%))"    ||     \
+          "$pattern" == "%(%%()"    ||     \
+          "$pattern" == "%(%%())"   ||     \
+          "$pattern" == "%(%()%()"  ||     \
+          "$pattern" == "%(()%)" ]]; then
     glo_module=$(cut -d %  -f 1 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
     glo_procedure=$(cut -d %  -f 2 <<< $full_name)
     glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
 
-    # ... but get messed up for this
-    # system_clock(Profiler % i_time_curr)
-    if [[ "$glo_procedure" == *")"* ]]; then
-      glo_procedure=$glo_module
-      glo_module=""  # empty string (maybe none or Shared?)
-    fi
-
-  elif [[ "$full_name" == *"_Mod_"* ]]; then
-
-    # This contraption is for friend functions like Comm_Mod_End
-    glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')
-    glo_procedure=$full_name
-
-  else
-
-    # This is for global functions and external functions like Probe_1d
-    glo_module=""  # empty string (maybe none or Shared?)
+  # This is for global functions and external functions like Probe_1d()
+  # or system_clock(count_rate=Profiler%sys_count_rate)
+  elif [[ "$pattern" == "(())"      ||       \
+          "$pattern" == "()"        ||       \
+          "$pattern" == "("         ||       \
+          "$pattern" == ""          ||       \
+          "$pattern" == "(%()%())"  ||       \
+          "$pattern" == "(%()%)"    ||       \
+          "$pattern" == "(()())"    ||       \
+          "$pattern" == "(%)" ]]; then
+    glo_module="" # empty string (maybe none or Shared?)
     glo_procedure=$(cut -d \( -f 1 <<< $full_name)
 
+  # or Comm_Mod_Global_Sum_Real(Profiler%funct_time(i_fun))
+  elif [[ "$pattern" == "(%())" ]]; then
+    glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')"_Mod"
+    glo_procedure=$(echo $full_name | awk -F '_Mod_' '{print $2}')
+    glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
+
+  elif [[ "$pattern" == ")%()" ]]; then
+    echo "Warning: complex pattern 'call' is not in the beginning"
+    echo "Full name is: " $full_name
+
+  else
+    echo "Unknown pattern: ", $pattern
+    echo "in             : ", $full_name
+    exit
   fi
 }
 
@@ -91,7 +129,7 @@ extract_call_graph() {
   procedure_file_you_seek="$procedure_name_you_seek"".f90"
 
   # Second parameter is the module in which the procedure resides
-  module_in_which_you_seek="$2"
+  local module_in_which_you_seek="$2"
 
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
@@ -102,7 +140,7 @@ extract_call_graph() {
   if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek | grep -v $exclude_dir)
   elif [ $exclude_dir ]; then
-    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $exclude_dir)
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep -v $exclude_dir)
   elif [ $module_in_which_you_seek ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek)
   else
@@ -127,18 +165,30 @@ extract_call_graph() {
     #-----------------------------------------------------
     #   Storing results of the grep command in an array
     #-----------------------------------------------------
-    local called_procedures=($(grep '\ \ call' $full_path_you_seek | awk '{print $2$3$4}' | tr -d ,))
+    local called_procedures=($(grep '\ \ call' $full_path_you_seek | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
     local called_modules=$called_procedures   # just to declare
-
-    echo "FETHED PROCEDURES:"
-    for proc in "${!called_procedures[@]}"; do
-      echo ${called_procedures[proc]}
-    done
 
     # At this point, $called procedures has a form like: Profiler%Start('Main')
     # From this mess, extract the module name and the procedure element wise
     for proc in "${!called_procedures[@]}"; do
       extract_procedure_and_module ${called_procedures[proc]}  # sets $glo_procedure and $glo_module
+
+      # Typical substitues:
+      if [ ! "$glo_module" == "" ]; then
+        if [   "$glo_module" == "Msg" ];       then glo_module="Message_Mod";   fi
+        if [   "$glo_module" == "Message" ];   then glo_module="Message_Mod";   fi
+        if [   "$glo_module" == "Tok" ];       then glo_module="Tokenizer_Mod"; fi
+        if [   "$glo_module" == "Line" ];      then glo_module="Tokenizer_Mod"; fi
+        if [   "$glo_module" == "Vof" ];       then glo_module="Vof_Mod";       fi
+        if [   "$glo_module" == "Grid" ];      then glo_module="Grid_Mod";      fi
+        if [   "$glo_module" == "Comm" ];      then glo_module="Comm_Mod";      fi
+        if [   "$glo_module" == "Sort" ];      then glo_module="Sort_Mod";      fi
+        if [   "$glo_module" == "Flow" ];      then glo_module="Field_Mod";     fi
+        if [   "$glo_module" == "File" ];      then glo_module="File_Mod";      fi
+        if [   "$glo_module" == "Profiler" ];  then glo_module="Profiler_Mod";  fi
+        if [   "$glo_module" == "Convert" ];   then glo_module="Convert_Mod";   fi
+        if [   "$glo_module" == "String" ];    then glo_module="String_Mod";    fi
+      fi
       called_modules[$proc]=$glo_module
       called_procedures[$proc]=$glo_procedure
     done
@@ -148,9 +198,9 @@ extract_call_graph() {
     #------------------------------------------------------------------
     echo "-----------------------------------------------------------------------------------------------------------------------"
     if [ ! -z "$called_procedures" ]; then
-      echo -e ${YELLOW}"${indent}"+ $procedure_name_you_seek "("$this_level")"${NC}" calls: ""\t $module_in_which_you_seek"
+      echo -e ${YELLOW}"${indent}"+ $procedure_name_you_seek "("$this_level")"${NC}" calls: ""\t check: $module_in_which_you_seek"
     else
-      echo -e ${GREEN}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${NC}
+      echo -e ${GREEN}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${NC}"\t check: $module_in_which_you_seek"
     fi
 
     # Increase indend for the next level by appending 6 spaces to it
