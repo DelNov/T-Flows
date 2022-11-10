@@ -15,20 +15,21 @@ tabs 60
 #------------------------------------------------------------------------------#
 print_usage() {
   echo "#======================================================================"
-  echo "# Utility for extraction of module hierarchy/dependencies"
+  echo "# Utility for extract call graphs from T-Flows"
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/seek_procedure_hierarcy.sh <Target_Mod> [-e <Exclude_Dir>]"
+  echo "# ./Utilities/extract_call_graph.sh <Source> [-f <Force_Dir>]"
   echo "#"
-  echo "# where Target_Mod is the module name for which you want to perform"
-  echo "# the analysis, such as: Grid_Mod, Convert_Mod, Generate_Mod, hence"
-  echo "# case sensitive, with the _Mod suffix, without the .f90 extension."
+  echo "# where Source  is the procedure name for which you want to perform"
+  echo "# the analysis, such as: Main_Con, Compute_Energy, Main_Div, hence"
+  echo "# case sensitive, without the .f90 extension."
   echo "#"
   echo "# In cases where the same module name is used in more than one direc-"
   echo "# tory, you can use the second (always -e) and the third argument to "
   echo "# exclude some directories from the search.  At the time of writing "
-  echo "# this, only Point_Mod is defined in Generate and in Process."
+  echo "# this, Allocate_Cells is defined in Grid_Mod and Refines_Mod, but ."
+  echo "# there could be more such examples."
   echo "#"
   echo "# NOTE: The script is supposed to be executed from: T-Flows/Sources!"
   echo "#----------------------------------------------------------------------"
@@ -77,7 +78,7 @@ extract_procedure_and_module() {
 }
 
 #------------------------------------------------------------------------------#
-# Browse through all directories looking for module dependencies
+# Browse through all directories looking for a call graph
 #------------------------------------------------------------------------------#
 extract_call_graph() {
 
@@ -98,26 +99,30 @@ extract_call_graph() {
   #----------------------------------------------#
   #   Get the full path of the module you seek   #
   #----------------------------------------------#
-  if [ $module_in_which_you_seek ]; then
+  if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek | grep $exclude_dir)
+  elif [ $exclude_dir ]; then
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $exclude_dir)
+  elif [ $module_in_which_you_seek ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek)
   else
     local full_path_you_seek=$(find . -name $procedure_file_you_seek)
   fi
 
+  # This command counts number of occurrences of modules name in the result of
+  # command find. If it is more than one, the same file is in more directories
+  n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$procedure_name_you_seek")
+  if [ $n -gt 1 ]; then
+    echo "Ambiguity: procedure "$procedure_name_you_seek" found in more than one directory, here is the list:"
+    for path in ${full_path_you_seek[*]}; do
+      echo $path
+    done
+    echo "Exclude all but one directory with the command line argument -e <directory>"
+    exit
+  fi
+
   # If the definition of this procedure is found, carry on
   if [ $full_path_you_seek ]; then
-
-    # This command counts number of occurrences of modules name in the result of
-    # command find. If it is more than one, the same file is in more directories
-    n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$procedure_name_you_seek")
-    if [ $n -gt 1 ]; then
-      echo "Ambiguity: procedure "$procedure_name_you_seek" found in more than one directory, here is the list:"
-      for path in ${full_path_you_seek[*]}; do
-        echo $path
-      done
-      echo "Exclude all but one directory with the command line argument -e <directory>"
-      exit
-    fi
 
     #-----------------------------------------------------
     #   Storing results of the grep command in an array
@@ -175,11 +180,25 @@ extract_call_graph() {
   fi
 }
 
+#------------------------------------------------------------------------------
+#  Three command line arguments are sent - process the second and pass them on
+#------------------------------------------------------------------------------
+if [ $3 ]; then
+  if [ $2 == "-e" ]; then
+    exclude_dir=""
+    if [ "$3" ]; then
+      exclude_dir="$3"
+    fi
+    extract_call_graph $1
+  else
+    print_usage
+  fi
+
 #---------------------------------------------------------------------
 #  One command line argument is sent - must be the procedure name
 #  Use the names without extension - say Grid_Mod, Convert_Mod ...
 #---------------------------------------------------------------------
-if [ $1 ]; then
+elif [ $1 ]; then
   extract_call_graph $1
 
 #-----------------------------------------------------------------------
