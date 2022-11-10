@@ -94,20 +94,20 @@ extract_hierarchy() {
   if [ ! -z "$used_modules" ]; then
 
     # Print the modules you have found here
-    for module in ${used_modules[*]}; do
-      echo "${indent}"• $module
+    for mod in "${!used_modules[@]}"; do
+      echo "${indent}"• ${used_modules[mod]}
     done
 
     # Print the files you will want to seek next
-    for module in ${used_modules[*]}; do
+    for mod in "${!used_modules[@]}"; do
 
       #-------------------------------------------------------#
       #                                                       #
       #   The very important recursive call to its own self   #
       #                                                       #
       #-------------------------------------------------------#
-      if [[ "$module" == *"_Mod"* ]]; then   # only standard T-Flows modules
-        extract_hierarchy "$module" $2 $3
+      if [[ "${used_modules[mod]}" == *"_Mod"* ]]; then   # only standard T-Flows modules
+        extract_hierarchy "${used_modules[mod]}" $2 $3
       fi
     done
   fi
