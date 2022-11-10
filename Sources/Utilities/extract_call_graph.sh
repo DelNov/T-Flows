@@ -224,9 +224,9 @@ extract_call_graph() {
 
       # It is in a module, print her LIGHT_GREEN
       if [ $module_in_which_you_seek ]; then
-        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t check: $module_in_which_you_seek"
+        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t (from: $module_in_which_you_seek)"
       else
-        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t check: $module_in_which_you_seek"
+        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t (from: $module_in_which_you_seek)"
       fi
     else
       echo -e ${LIGHT_BLACK}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t check: $module_in_which_you_seek"
@@ -243,9 +243,7 @@ extract_call_graph() {
       # Print the procedures which are called from here
       for proc in "${!called_procedures[@]}"; do
 
-        if [ ${called_modules[proc]} ]; then
-          echo -e "${indent}"• ${called_procedures[proc]}" \t (from: "${called_modules[proc]}")"
-        else
+        if [ ! ${called_modules[proc]} ]; then
           echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (global or external)"
         fi
 
