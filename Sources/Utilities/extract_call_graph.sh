@@ -177,8 +177,19 @@ extract_call_graph() {
     #-----------------------------------------------------
     #   Storing results of the grep command in an array
     #-----------------------------------------------------
-    local called_procedures=($(grep '\ \ call' $full_path_you_seek | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
+    local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
+
     local called_modules=$called_procedures   # just to declare
+
+    # echo "FETCHED PROCEDURES:"
+    # Correct the lines in which call was not the first comman, something
+    # like: if(some_condition_is_met) call The_Function_You_Seek
+    for proc in "${!called_procedures[@]}"; do
+      first_four=${called_procedures[proc]:0:4}
+      if [[ "$first_four" == "call" ]]; then   # call was not the first statement in the line
+        called_procedures[proc]=$(awk -F'call ?' '{print $2}' <<< ${called_procedures[proc]})
+      fi
+    done
 
     # At this point, $called procedures has a form like: Profiler%Start('Main')
     # From this mess, extract the module name and the procedure element wise
