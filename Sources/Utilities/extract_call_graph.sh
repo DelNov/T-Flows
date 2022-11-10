@@ -1,12 +1,24 @@
 #!/bin/bash
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-PURPLE='\033[0;35m'
-LIGHT_CYAN='\033[1;36m'
-LIGHT_PURPLE='\033[1;35m'
-NC='\033[0m' # No Color
+BLACK='\U001B[30m'
+RED='\U001B[31m'
+GREEN='\U001B[32m'
+YELLOW='\U001B[33m'
+BLUE='\U001B[34m'
+MAGENTA='\U001B[35m'
+CYAN='\U001B[36m'
+WHITE='\U001B[37m'
+RESET='\U001B[0m'
+
+LIGHT_BLACK='\U001B[30;1m'
+LIGHT_RED='\U001B[31;1m'
+LIGHT_GREEN='\U001B[32;1m'
+LIGHT_YELLOW='\U001B[33;1m'
+LIGHT_BLUE='\U001B[34;1m'
+LIGHT_MAGENTA='\U001B[35;1m'
+LIGHT_CYAN='\U001B[36;1m'
+LIGHT_WHITE='\U001B[37;1m'
+RESET='\U001B[0m'
 
 tabs 60
 
@@ -198,9 +210,15 @@ extract_call_graph() {
     #------------------------------------------------------------------
     echo "-----------------------------------------------------------------------------------------------------------------------"
     if [ ! -z "$called_procedures" ]; then
-      echo -e ${YELLOW}"${indent}"+ $procedure_name_you_seek "("$this_level")"${NC}" calls: ""\t check: $module_in_which_you_seek"
+
+      # It is in a module, print her LIGHT_GREEN
+      if [ $module_in_which_you_seek ]; then
+        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t check: $module_in_which_you_seek"
+      else
+        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t check: $module_in_which_you_seek"
+      fi
     else
-      echo -e ${GREEN}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${NC}"\t check: $module_in_which_you_seek"
+      echo -e ${LIGHT_BLACK}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t check: $module_in_which_you_seek"
     fi
 
     # Increase indend for the next level by appending 6 spaces to it
@@ -217,7 +235,7 @@ extract_call_graph() {
         if [ ${called_modules[proc]} ]; then
           echo -e "${indent}"• ${called_procedures[proc]}" \t (from: "${called_modules[proc]}")"
         else
-          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${NC}" \t (global or external)"
+          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (global or external)"
         fi
 
         #-------------------------------------------------------#
