@@ -86,7 +86,7 @@ extract_hierarchy() {
   fi
 
   # Increase indend for the next level by appending spaces to it
-  local indent="${indent}"'           '
+  local indent="${indent}"'     '
 
   #--------------------------------------------------------
   #   If the list of used modules in not empty, carry on
