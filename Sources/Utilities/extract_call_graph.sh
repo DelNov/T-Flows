@@ -219,17 +219,23 @@ extract_call_graph() {
     #------------------------------------------------------------------
     #   Print out the name of the module you are currently analysing
     #------------------------------------------------------------------
-    echo "-----------------------------------------------------------------------------------------------------------------------"
     if [ ! -z "$called_procedures" ]; then
 
       # It is in a module, print her LIGHT_GREEN
       if [ $module_in_which_you_seek ]; then
-        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t (from: $module_in_which_you_seek)"
+        echo "${indent}""-----------------------------------------------------------------------------------"
+        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t $module_in_which_you_seek"
+
+      # If it is a global or external function, print it in light cyan
       else
-        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t (from: $module_in_which_you_seek)"
+        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t $module_in_which_you_seek"
       fi
     else
-      echo -e ${LIGHT_BLACK}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t check: $module_in_which_you_seek"
+      if [ $module_in_which_you_seek ]; then
+        echo -e ${LIGHT_BLACK}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
+      else
+        echo -e ${LIGHT_RED}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
+      fi
     fi
 
     # Increase indend for the next level by appending 6 spaces to it
@@ -243,8 +249,10 @@ extract_call_graph() {
       # Print the procedures which are called from here
       for proc in "${!called_procedures[@]}"; do
 
+        # This seems to be the only place from which you can print
+        # non-member / external functions which don't make any calls.  Period!
         if [ ! ${called_modules[proc]} ]; then
-          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (global or external)"
+          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (global | external | end of line)"  "mods: " ${called_modules[proc]}
         fi
 
         #-------------------------------------------------------#
@@ -255,8 +263,6 @@ extract_call_graph() {
         extract_call_graph ${called_procedures[proc]} ${called_modules[proc]}
       done
     fi
-# else
-#   echo "Found nothing"
   fi
 }
 
