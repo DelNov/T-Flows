@@ -2,6 +2,10 @@
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+PURPLE='\033[0;35m'
+LIGHT_CYAN='\033[1;36m'
+LIGHT_PURPLE='\033[1;35m'
 NC='\033[0m' # No Color
 
 #------------------------------------------------------------------------------#
@@ -9,11 +13,11 @@ NC='\033[0m' # No Color
 #------------------------------------------------------------------------------#
 print_usage() {
   echo "#======================================================================"
-  echo "# Utility for extraction of module hierarchy/dependencies"
+  echo "# Utility for extraction of module hierarchy/dependencies from T-Flows"
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/seek_module_hierarcy.sh <Target_Mod> [-e <Exclude_Dir>]"
+  echo "# ./Utilities/extract_module_hierarchy.sh <Target_Mod> [-e <Exclude_Dir>]"
   echo "#"
   echo "# where Target_Mod is the module name for which you want to perform"
   echo "# the analysis, such as: Grid_Mod, Convert_Mod, Generate_Mod, hence"
@@ -44,12 +48,6 @@ extract_hierarchy() {
   # Second parameter is the level at which you currently are
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
-
-  # Third parameter is present
-  exclude_dir=""
-  if [ "$3" ]; then
-    exclude_dir="$3"
-  fi
 
   #----------------------------------------------#
   #   Get the full path of the module you seek   #
@@ -111,13 +109,16 @@ extract_hierarchy() {
   fi
 }
 
-#------------------------------------------------------------------------------
-#  Three command line arguments are sent - check the second and pass them on
-#------------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+#  Three command line arguments are sent - process the second and carry on
+#----------------------------------------------------------------------------
 if [ $3 ]; then
-  echo $2
   if [ $2 == "-e" ]; then
-    extract_hierarchy $1 $2 $3
+    exclude_dir=""
+    if [ "$3" ]; then
+      exclude_dir="$3"
+    fi
+    extract_hierarchy $1
   else
     print_usage
   fi
