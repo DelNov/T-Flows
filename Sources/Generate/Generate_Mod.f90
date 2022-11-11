@@ -22,6 +22,7 @@
       procedure :: Calculate_Geometry
       procedure :: Load_Dom
       procedure :: Logo_Gen
+      procedure :: Print_Grid_Statistics
   end type
 
   type(Generate_Type) :: Generate
@@ -31,5 +32,6 @@
 #   include "Generate_Mod/Calculate_Geometry.f90"
 #   include "Generate_Mod/Load_Dom.f90"
 #   include "Generate_Mod/Logo_Gen.f90"
+#   include "Generate_Mod/Print_Grid_Statistics.f90"
 
   end module

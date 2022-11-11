@@ -41,9 +41,9 @@
   read(fu) Grid % polyhedral
 
   ! Allocate memory =--> carefull, there is no checking!
-  call Allocate_Nodes(Grid, Grid % n_nodes)
-  call Allocate_Cells(Grid, Grid % n_cells, Grid % n_bnd_cells)
-  call Allocate_Faces(Grid, Grid % n_faces, Grid % n_shadows)
+  call Grid % Allocate_Nodes(Grid % n_nodes)
+  call Grid % Allocate_Cells(Grid % n_cells, Grid % n_bnd_cells)
+  call Grid % Allocate_Faces(Grid % n_faces, Grid % n_shadows)
 
   ! Boundary conditions' keys
   ! (Go from zero for faces which are not at the boundary)

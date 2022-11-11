@@ -29,10 +29,12 @@
   call Work % Connect_Real_Cell(p1, q1, r1, p2, q2, r2)
 
   ! Take some aliases
-  D => Nat % D
-  nt = A % pnt_grid % n_cells
-  ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
-  nb = A % pnt_grid % n_bnd_cells
+  Grid => Nat % pnt_grid
+  D    => Nat % D
+
+  nt = Grid % n_cells
+  ni = Grid % n_cells - Grid % comm % n_buff_cells
+  nb = Grid % n_bnd_cells
 
   res = 0.0
 
@@ -136,8 +138,8 @@
     !   q = A   p   !
     !   q~= A^T p~  !  don't have A^T
     !---------------!
-    call A % pnt_grid % Exchange_Cells_Real(p1(-nb:ni))
-    call A % pnt_grid % Exchange_Cells_Real(p2(-nb:ni))
+    call Grid % Exchange_Cells_Real(p1(-nb:ni))
+    call Grid % Exchange_Cells_Real(p2(-nb:ni))
     do i = 1, ni
       q1(i) = 0.0
       q2(i) = 0.0
@@ -195,7 +197,7 @@
   !-------------------------------------------!
   !   Refresh the solution vector's buffers   !
   !-------------------------------------------!
-  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+  call Grid % Exchange_Cells_Real(x(-nb:ni))
 
   !-----------------------------!
   !   De-normalize the system   !

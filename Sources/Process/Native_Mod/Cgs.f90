@@ -18,6 +18,7 @@
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: D
+  type(Grid_Type),   pointer :: Grid
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter
@@ -31,10 +32,12 @@
                                 u1, u2, v2, u1_plus_q1)
 
   ! Take some aliases
+  Grid => Nat % pnt_grid
   D => Nat % D
-  nt = A % pnt_grid % n_cells
-  ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
-  nb = A % pnt_grid % n_bnd_cells
+
+  nt = Grid % n_cells
+  ni = Grid % n_cells - Grid % comm % n_buff_cells
+  nb = Grid % n_bnd_cells
 
   res = 0.0
 
@@ -134,7 +137,7 @@
     !--------------!
     !   v2 = Ap2   !
     !--------------!
-    call A % pnt_grid % Exchange_Cells_Real(p2(-nb:ni))
+    call Grid % Exchange_Cells_Real(p2(-nb:ni))
     do i = 1, ni
       v2(i) = 0.0
       do j = A % row(i), A % row(i+1)-1
@@ -176,7 +179,7 @@
     !---------------!
     !   q2 = A p1   !
     !---------------!
-    call A % pnt_grid % Exchange_Cells_Real(p1(-nb:ni))
+    call Grid % Exchange_Cells_Real(p1(-nb:ni))
     do i = 1, ni
       q2(i) = 0.0
       do j = A % row(i), A % row(i+1)-1
@@ -221,7 +224,7 @@
   !-------------------------------------------!
   !   Refresh the solution vector's buffers   !
   !-------------------------------------------!
-  call A % pnt_grid % Exchange_Cells_Real(x(-nb:ni))
+  call Grid % Exchange_Cells_Real(x(-nb:ni))
 
   !-----------------------------!
   !   De-normalize the system   !

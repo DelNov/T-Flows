@@ -23,9 +23,9 @@
   call Grid % Exchange_Cells_Real(var % n)
 
   ! Compute individual gradients without refreshing buffers
-  call Grad_Component_No_Refresh_With_Front(Vof, var % n, 1, var % x, phif)
-  call Grad_Component_No_Refresh_With_Front(Vof, var % n, 2, var % y, phif)
-  call Grad_Component_No_Refresh_With_Front(Vof, var % n, 3, var % z, phif)
+  call Vof % Grad_Component_No_Refresh_With_Front(var % n, 1, var % x, phif)
+  call Vof % Grad_Component_No_Refresh_With_Front(var % n, 2, var % y, phif)
+  call Vof % Grad_Component_No_Refresh_With_Front(var % n, 3, var % z, phif)
 
   ! Refresh buffers for gradient components
   call Grid % Exchange_Cells_Real(var % x)
