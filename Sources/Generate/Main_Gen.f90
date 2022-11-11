@@ -108,7 +108,7 @@
   call Probe_2d(Grid)
 
   ! Write something on the screen
-  call Generate % Print_Grid_Statistics(Grid)
+  call Generate % Print_Generate_Statistics(Grid)
 
   ! Finalize program profler
   call Profiler % Stop('Main')

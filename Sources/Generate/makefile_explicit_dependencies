@@ -51,16 +51,6 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Print_Grid_Statistics.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Print_Grid_Statistics.o:\
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Generate_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Generate_Mod.o:\
@@ -68,6 +58,11 @@ $(DIR_OBJECT)/Smooths_Mod.o \
 Smooths_Mod/*.f90 \
 $(DIR_OBJECT)/Refines_Mod.o \
 Refines_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Gen_Mod.o \
+$(DIR_SHARED)/Gen_Mod/*.f90 \
 Generate_Mod/*.f90 \
 $(DIR_OBJECT)/Domain_Mod.o \
 Domain_Mod/*.f90 
@@ -81,6 +76,16 @@ $(DIR_OBJECT)/Load_Dom.o:
 # Dependencies for: ./Generate_Mod/Calculate_Geometry.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Calculate_Geometry.o:
+
+#---------------------------------------------------
+# Dependencies for: ./Generate_Mod/Print_Generate_Statistics.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Print_Generate_Statistics.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
+$(DIR_SHARED)/Grid_Mod/*.f90 \
+$(DIR_OBJECT)/Gen_Mod.o \
+$(DIR_SHARED)/Gen_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Region_Mod.f90

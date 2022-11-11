@@ -9,7 +9,7 @@
  BACKUP_SAVE_INTERVAL    300
  TIME_STEP               0.01
 
-# LOAD_BACKUP_NAME   backstep_orthogonal-ts000001.backup
+#LOAD_BACKUP_NAME backstep_orthogonal-ts000001.backup
 
 #-------------------
 # Monitoring points 
@@ -26,7 +26,7 @@
  DYNAMIC_VISCOSITY      1.0e-3
  HEAT_CAPACITY          1.0
 
- TURBULENCE_MODEL       none
+TURBULENCE_MODEL none
 
 #----------------------
 # Numerical parameters
@@ -79,3 +79,5 @@
     TYPE                convective
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
+INTERFACE_TRACKING no
+PARTICLE_TRACKING no

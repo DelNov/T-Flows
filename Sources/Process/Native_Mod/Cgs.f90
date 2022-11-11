@@ -33,7 +33,7 @@
 
   ! Take some aliases
   Grid => Nat % pnt_grid
-  D => Nat % D
+  D    => Nat % D
 
   nt = Grid % n_cells
   ni = Grid % n_cells - Grid % comm % n_buff_cells

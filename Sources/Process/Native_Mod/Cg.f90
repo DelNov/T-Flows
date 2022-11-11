@@ -18,6 +18,7 @@
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: D
+  type(Grid_Type),   pointer :: Grid
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter
@@ -30,7 +31,7 @@
 
   ! Take some aliases
   Grid => Nat % pnt_grid
-  D => Nat % D
+  D    => Nat % D
 
   nt = Grid % n_cells
   ni = Grid % n_cells - Grid % comm % n_buff_cells

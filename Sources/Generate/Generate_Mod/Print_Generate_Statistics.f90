@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Print_Grid_Statistics(Generate, Grid)
+  subroutine Print_Generate_Statistics(Generate, Grid)
 !------------------------------------------------------------------------------!
 !   Prints some statistical data about the Grid on the standard output.        !
 !------------------------------------------------------------------------------!
@@ -16,7 +16,7 @@
 !==============================================================================!
 
   print 1, '#================================================'
-  print 1, '# Grid statistics                                '
+  print 1, '# Generated grid statistics                      '
   print 1, '#------------------------------------------------'
   print 2, '# Number of nodes         :', Grid % n_nodes
   print 2, '# Number of cells         :', Grid % n_cells

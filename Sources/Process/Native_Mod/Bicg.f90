@@ -18,6 +18,7 @@
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: D
+  type(Grid_Type),   pointer :: Grid
   integer                    :: nt, ni, nb
   real                       :: alfa, beta, rho, rho_old, bnrm2, res
   integer                    :: i, j, k, iter

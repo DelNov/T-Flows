@@ -206,8 +206,7 @@ SRC_F_FUN = Adjust_Dim.f90        \
             Probe_2d.f90
 
 # Local functions are added one by one ...
-SRC_F_FUN += Main_Gen.f90            \
-             Print_Grid_Statistics.f90
+SRC_F_FUN += Main_Gen.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions
