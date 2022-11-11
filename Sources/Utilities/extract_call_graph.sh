@@ -67,7 +67,9 @@ extract_procedure_and_module() {
     glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
 
   # Take care of cases such as Grid%Comm%Sendrecv_Real_Arrays
-  elif [[ "$pattern" == "%%" ]]; then
+  elif [[ "$pattern" == "%%"    ||     \
+          "$pattern" == "%%("   ||     \
+          "$pattern" == "%%()" ]]; then
     glo_module=$(cut -d % -f 2 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
     glo_procedure=$(cut -d % -f 3 <<< $full_name)
@@ -82,6 +84,7 @@ extract_procedure_and_module() {
           "$pattern" == "()%("      ||     \
           "$pattern" == "%(%)"      ||     \
           "$pattern" == "%(%"       ||     \
+          "$pattern" == "%(()())"   ||     \
           "$pattern" == "%(()"      ||     \
           "$pattern" == "%(%%"      ||     \
           "$pattern" == "%(%()%)"   ||     \
@@ -93,6 +96,7 @@ extract_procedure_and_module() {
           "$pattern" == "%(%%()"    ||     \
           "$pattern" == "%(%%())"   ||     \
           "$pattern" == "%(%()%()"  ||     \
+          "$pattern" == "%(()()())" ||     \
           "$pattern" == "%(()%)" ]]; then
     glo_module=$(cut -d %  -f 1 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
@@ -103,6 +107,7 @@ extract_procedure_and_module() {
   # or system_clock(count_rate=Profiler%sys_count_rate)
   elif [[ "$pattern" == "(())"      ||       \
           "$pattern" == "()"        ||       \
+          "$pattern" == "(()"       ||       \
           "$pattern" == "("         ||       \
           "$pattern" == ""          ||       \
           "$pattern" == "((%())"    ||       \
@@ -126,9 +131,9 @@ extract_procedure_and_module() {
     echo "Full name is: " $full_name
 
   else
-    echo "Unknown pattern: ", $pattern
-    echo "in             : ", $full_name
-    exit
+    echo "Unknown pattern: " $pattern
+    echo "in             : " $full_name
+#   exit
   fi
 }
 
@@ -148,20 +153,37 @@ extract_call_graph() {
   # Second parameter is the module in which the procedure resides
   local module_in_which_you_seek="$2"
 
+  #   Level counters - these are used to indent the tree
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
 
-  #----------------------------------------------#
-  #   Get the full path of the module you seek   #
-  #----------------------------------------------#
+  #-----------------------------------------------------------------------------
+  #   Get the full path of the module you seek
+  #
+  #   Some typical directories are excluded from here.  For example, sources
+  #   in "Seqential" part of the Comm_Mod are just empty hooks, no one in
+  #   the sane mind will be interested in analyzing them.
+  #-----------------------------------------------------------------------------
   if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
-    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek | grep -v $exclude_dir)
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep $module_in_which_you_seek  \
+                                     | grep -v No_Checking             \
+                                     | grep -v Sequential              \
+                                     | grep -v $exclude_dir)
   elif [ $exclude_dir ]; then
-    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep -v $exclude_dir)
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep -v No_Checking             \
+                                     | grep -v Sequential              \
+                                     | grep -v $exclude_dir)
   elif [ $module_in_which_you_seek ]; then
-    local full_path_you_seek=$(find . -name $procedure_file_you_seek | grep $module_in_which_you_seek)
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep -v No_Checking             \
+                                     | grep -v Sequential              \
+                                     | grep $module_in_which_you_seek)
   else
-    local full_path_you_seek=$(find . -name $procedure_file_you_seek)
+    local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep -v No_Checking             \
+                                     | grep -v Sequential)
   fi
 
   # This command counts number of occurrences of modules name in the result of
@@ -173,7 +195,7 @@ extract_call_graph() {
       echo $path
     done
     echo "Exclude all but one directory with the command line argument -e <directory>"
-    exit
+#   exit
   fi
 
   # If the definition of this procedure is found, carry on
@@ -203,19 +225,21 @@ extract_call_graph() {
 
       # Typical substitues:
       if [ ! "$glo_module" == "" ]; then
-        if [   "$glo_module" == "Msg" ];       then glo_module="Message_Mod";   fi
-        if [   "$glo_module" == "Message" ];   then glo_module="Message_Mod";   fi
-        if [   "$glo_module" == "Tok" ];       then glo_module="Tokenizer_Mod"; fi
-        if [   "$glo_module" == "Line" ];      then glo_module="Tokenizer_Mod"; fi
-        if [   "$glo_module" == "Vof" ];       then glo_module="Vof_Mod";       fi
-        if [   "$glo_module" == "Grid" ];      then glo_module="Grid_Mod";      fi
-        if [   "$glo_module" == "Comm" ];      then glo_module="Comm_Mod";      fi
-        if [   "$glo_module" == "Sort" ];      then glo_module="Sort_Mod";      fi
-        if [   "$glo_module" == "Flow" ];      then glo_module="Field_Mod";     fi
-        if [   "$glo_module" == "File" ];      then glo_module="File_Mod";      fi
-        if [   "$glo_module" == "Profiler" ];  then glo_module="Profiler_Mod";  fi
-        if [   "$glo_module" == "Convert" ];   then glo_module="Convert_Mod";   fi
-        if [   "$glo_module" == "String" ];    then glo_module="String_Mod";    fi
+        if [ "$glo_module" == "Msg" ];      then glo_module="Message_Mod";   fi
+        if [ "$glo_module" == "Message" ];  then glo_module="Message_Mod";   fi
+        if [ "$glo_module" == "Tok" ];      then glo_module="Tokenizer_Mod"; fi
+        if [ "$glo_module" == "Line" ];     then glo_module="Tokenizer_Mod"; fi
+        if [ "$glo_module" == "Vof" ];      then glo_module="Vof_Mod";       fi
+        if [ "$glo_module" == "Grid" ];     then glo_module="Grid_Mod";      fi
+        if [ "$glo_module" == "Comm" ];     then glo_module="Comm_Mod";      fi
+        if [ "$glo_module" == "Sort" ];     then glo_module="Sort_Mod";      fi
+        if [ "$glo_module" == "Flow" ];     then glo_module="Field_Mod";     fi
+        if [ "$glo_module" == "File" ];     then glo_module="File_Mod";      fi
+        if [ "$glo_module" == "Profiler" ]; then glo_module="Profiler_Mod";  fi
+        if [ "$glo_module" == "Convert" ];  then glo_module="Convert_Mod";   fi
+        if [ "$glo_module" == "String" ];   then glo_module="String_Mod";    fi
+        if [ "$glo_module" == "Sol" ];      then glo_module="Solver_Mod";    fi
+        if [ "$glo_module" == "Nat" ];      then glo_module="Native_Mod";    fi
       fi
       called_modules[$proc]=$glo_module
       called_procedures[$proc]=$glo_procedure
