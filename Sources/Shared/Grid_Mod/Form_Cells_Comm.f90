@@ -79,7 +79,7 @@
   !   Allocate memory for matrix with needed cells   !
   !--------------------------------------------------!
   n_max_buff_cells = Grid % Comm % n_buff_cells
-  call comm_mod_global_max_int(n_max_buff_cells)
+  call Comm_Mod_Global_Max_Int(n_max_buff_cells)
   allocate(need_cell(n_max_buff_cells, n_proc));  need_cell(:,:) = 0
   allocate(from_proc(n_max_buff_cells, n_proc));  from_proc(:,:) = 0
 
