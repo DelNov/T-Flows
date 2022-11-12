@@ -58,18 +58,29 @@ extract_procedure_and_module() {
   full_name=$1
 
   # It rarely gets cooler than this: extract the calling function pattern :-)
-  pattern="${full_name//[^%^(^)]}"
+  pattern="${full_name//[^%()]}"
+
+  # But it gets even better after all - patterns
+  # can be characterized by four first characters
+  first_one=${pattern:0:1}
+  first_two=${pattern:0:2}
+  first_four=${pattern:0:4}
 
   # This should take care of Comm_Mod_Friendly_Function
-  if [[ "$pattern" == "" || "$full_name" == *"_Mod_"* ]]; then
+  if [[                                   \
+        "$pattern"   == ""            ||  \
+        "$full_name" == *"_Mod_"*         \
+     ]]; then
     glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')"_Mod"
     glo_procedure=$(echo $full_name | awk -F '_Mod_' '{print $2}')
     glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
 
   # Take care of cases such as Grid%Comm%Sendrecv_Real_Arrays
-  elif [[ "$pattern" == "%%"    ||     \
-          "$pattern" == "%%("   ||     \
-          "$pattern" == "%%()" ]]; then
+  # Front%Elem(e)%Initialize_Elem()
+  elif [[                                 \
+          "$first_two"  == "%%"    ||     \
+          "$first_four" == "%()%"         \
+       ]]; then
     glo_module=$(cut -d % -f 2 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
     glo_procedure=$(cut -d % -f 3 <<< $full_name)
@@ -77,27 +88,10 @@ extract_procedure_and_module() {
 
   # Likes of Profiler%Start() and Grid(d)%Calculate() ...
   # Profiler%Update_By_Rank(Profiler%previously_running)
-  elif [[ "$pattern" == "%()"       ||     \
-          "$pattern" == "%("        ||     \
-          "$pattern" == "%(())"     ||     \
-          "$pattern" == "()%()"     ||     \
-          "$pattern" == "()%("      ||     \
-          "$pattern" == "%(%)"      ||     \
-          "$pattern" == "%(%"       ||     \
-          "$pattern" == "%(()())"   ||     \
-          "$pattern" == "%(()"      ||     \
-          "$pattern" == "%(%%"      ||     \
-          "$pattern" == "%(%()%)"   ||     \
-          "$pattern" == "%(%%)"     ||     \
-          "$pattern" == "%(%())"    ||     \
-          "$pattern" == "%(%%())"   ||     \
-          "$pattern" == "%((%)"     ||     \
-          "$pattern" == "%((%))"    ||     \
-          "$pattern" == "%(%%()"    ||     \
-          "$pattern" == "%(%%())"   ||     \
-          "$pattern" == "%(%()%()"  ||     \
-          "$pattern" == "%(()()())" ||     \
-          "$pattern" == "%(()%)" ]]; then
+  elif [[                                 \
+          "$first_two"  == "%("    ||     \
+          "$first_four" == "()%("         \
+       ]]; then
     glo_module=$(cut -d %  -f 1 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
     glo_procedure=$(cut -d %  -f 2 <<< $full_name)
@@ -105,18 +99,10 @@ extract_procedure_and_module() {
 
   # This is for global functions and external functions like Probe_1d()
   # or system_clock(count_rate=Profiler%sys_count_rate)
-  elif [[ "$pattern" == "(())"      ||       \
-          "$pattern" == "()"        ||       \
-          "$pattern" == "(()"       ||       \
-          "$pattern" == "("         ||       \
-          "$pattern" == ""          ||       \
-          "$pattern" == "((%())"    ||       \
-          "$pattern" == "(%()%%"    ||       \
-          "$pattern" == "(%()%()"   ||       \
-          "$pattern" == "(%()%())"  ||       \
-          "$pattern" == "(%()%)"    ||       \
-          "$pattern" == "(()())"    ||       \
-          "$pattern" == "(%)" ]]; then
+  elif [[                                 \
+          "$first_one" == "("      ||     \
+          "$first_one" == ""              \
+       ]]; then
     glo_module="" # empty string (maybe none or Shared?)
     glo_procedure=$(cut -d \( -f 1 <<< $full_name)
 
@@ -136,6 +122,12 @@ extract_procedure_and_module() {
 #   exit
   fi
 }
+
+ignore_1="Comm_Mod"
+ignore_2="Message_Mod"
+ignore_3="Work_Mod"
+ignore_4="Profiler_Mod"  # not sure about this one
+ignore_5="String_Mod"    # not sure about this one
 
 #------------------------------------------------------------------------------#
 # Browse through all directories looking for a call graph
@@ -167,23 +159,47 @@ extract_call_graph() {
   if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                      | grep $module_in_which_you_seek  \
+                                     | grep -v $ignore_1               \
+                                     | grep -v $ignore_2               \
+                                     | grep -v $ignore_3               \
+                                     | grep -v $ignore_4               \
+                                     | grep -v $ignore_5               \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
+                                     | grep -v Fake                    \
                                      | grep -v $exclude_dir)
   elif [ $exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep -v $ignore_1               \
+                                     | grep -v $ignore_2               \
+                                     | grep -v $ignore_3               \
+                                     | grep -v $ignore_4               \
+                                     | grep -v $ignore_5               \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
+                                     | grep -v Fake                    \
                                      | grep -v $exclude_dir)
   elif [ $module_in_which_you_seek ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep $module_in_which_you_seek  \
+                                     | grep -v $ignore_1               \
+                                     | grep -v $ignore_2               \
+                                     | grep -v $ignore_3               \
+                                     | grep -v $ignore_4               \
+                                     | grep -v $ignore_5               \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
-                                     | grep $module_in_which_you_seek)
+                                     | grep -v Fake)
   else
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+                                     | grep -v $ignore_1               \
+                                     | grep -v $ignore_2               \
+                                     | grep -v $ignore_3               \
+                                     | grep -v $ignore_4               \
+                                     | grep -v $ignore_5               \
                                      | grep -v No_Checking             \
-                                     | grep -v Sequential)
+                                     | grep -v Sequential              \
+                                     | grep -v Fake)
   fi
 
   # This command counts number of occurrences of modules name in the result of
@@ -194,8 +210,9 @@ extract_call_graph() {
     for path in ${full_path_you_seek[*]}; do
       echo $path
     done
-    echo "Exclude all but one directory with the command line argument -e <directory>"
-#   exit
+    echo "Exclude all but one directory with "  \
+         "the command line argument -e <directory>"
+    exit
   fi
 
   # If the definition of this procedure is found, carry on
@@ -204,7 +221,8 @@ extract_call_graph() {
     #-----------------------------------------------------
     #   Storing results of the grep command in an array
     #-----------------------------------------------------
-    local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
+    local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek  \
+                               | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
 
     local called_modules=$called_procedures   # just to declare
 
@@ -253,11 +271,11 @@ extract_call_graph() {
       # It is in a module, print her LIGHT_GREEN
       if [ $module_in_which_you_seek ]; then
         echo "${indent}""-----------------------------------------------------------------------------------"
-        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t $module_in_which_you_seek"
+        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
 
       # If it is a global or external function, print it in light cyan
       else
-        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}" calls: ""\t $module_in_which_you_seek"
+        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
       fi
     else
       if [ $module_in_which_you_seek ]; then
@@ -281,7 +299,7 @@ extract_call_graph() {
         # This seems to be the only place from which you can print
         # non-member / external functions which don't make any calls.  Period!
         if [ ! ${called_modules[proc]} ]; then
-          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (global | external | end of line)"  "mods: " ${called_modules[proc]}
+          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (glo./ext.)"
         fi
 
         #-------------------------------------------------------#
