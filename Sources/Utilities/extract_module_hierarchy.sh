@@ -62,16 +62,18 @@ extract_hierarchy() {
   local this_level=`expr $next_level - 1`
 
   if [ "$this_level" -eq 0 ]; then
-    echo "#==============================================================="
+    echo "#======================================================================="
     echo "# Extracting module hierarchy for "$module_name_you_seek
     echo "#"
     echo "# Legend:"
     echo "#"
-    echo "# Modules which use other modules:"
-    echo -e "# ""${LIGHT_CYAN}${indent}"• Higher_Level_Mod "(level)${RESET}"
-    echo "# Modules which don't use any other modules:"
-    echo -e "# ""${LIGHT_BLACK}${indent}"⨯ Lower_Level_Mod "(level)${RESET}"
-    echo "#---------------------------------------------------------------"
+    echo -n "# - modules using other modules:    "
+    echo -e "${LIGHT_CYAN}${indent}"• Higher_Level_Mod "(level)${RESET}"
+    echo -n "#                                   "
+    echo -e "${WHITE}${indent}"• Lower_Level_Mod "(level)${RESET}"
+    echo -n "# - modules not using any other:    "
+    echo -e "${LIGHT_BLACK}${indent}"⨯ Not_A_User_Mod "(level)${RESET}"
+    echo "#-----------------------------------------------------------------------"
   fi
 
   #----------------------------------------------#
@@ -105,7 +107,13 @@ extract_hierarchy() {
   #------------------------------------------------------------------
   if [ ! -z "$used_modules" ]; then
     if [ $this_level -lt 2 ]; then
-      echo "-----------------------------------------------------------------"
+      printf "%s" "$indent"
+      local end=`expr 12 - $this_level`
+      for (( c=1; c<=$end; c++ ))
+      do
+        echo -n "------"
+      done
+      echo ""
       echo -e "${LIGHT_CYAN}${indent}"• $module_name_you_seek "("$this_level")${RESET}"
     else
       echo -e "${indent}"• $module_name_you_seek "("$this_level")"

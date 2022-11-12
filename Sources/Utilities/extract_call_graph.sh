@@ -150,12 +150,20 @@ extract_call_graph() {
   local this_level=`expr $next_level - 1`
 
   if [ "$this_level" -eq 0 ]; then
-    echo "#==============================================================="
-    echo "# Extracting calling graph for "$procedure_name_you_seek
+    echo "#======================================================================="
+    echo "# Extracting module hierarchy for "$procedure_name_you_seek
     echo "#"
-    echo "# Legend:"
+    echo "# Procedures are designated as follows:"
     echo "#"
-    echo "#---------------------------------------------------------------"
+    echo -n "# - members calling others:    "
+    echo -e "${LIGHT_GREEN}"• Member_Caller" (level)${RESET}       Module_Mod"
+    echo -n "# - members not calling any:   "
+    echo -e "${LIGHT_BLACK}"⨯ Member_Mute" (level)${RESET}         Module_Mod"
+    echo -n "# - glob/ext calling others:   "
+    echo -e "${LIGHT_CYAN}"• Global_Caller"                 ${RESET}"
+    echo -n "# - glob/ext not calling any:  "
+    echo -e "${LIGHT_RED}"⨯ Global_Mute"                   ${RESET}"
+    echo "#-----------------------------------------------------------------------"
   fi
 
   #-----------------------------------------------------------------------------
@@ -279,7 +287,13 @@ extract_call_graph() {
 
       # It is in a module, print her LIGHT_GREEN
       if [ $module_in_which_you_seek ]; then
-        echo "${indent}""-----------------------------------------------------------------------------------"
+        printf "%s" "$indent"
+        local end=`expr 12 - $this_level`
+        for (( c=1; c<=$end; c++ ))
+        do
+          echo -n "------"
+        done
+        echo ""
         echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
 
       # If it is a global or external function, print it in light cyan
