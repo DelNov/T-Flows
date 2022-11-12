@@ -149,6 +149,15 @@ extract_call_graph() {
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
 
+  if [ "$this_level" -eq 0 ]; then
+    echo "#==============================================================="
+    echo "# Extracting calling graph for "$procedure_name_you_seek
+    echo "#"
+    echo "# Legend:"
+    echo "#"
+    echo "#---------------------------------------------------------------"
+  fi
+
   #-----------------------------------------------------------------------------
   #   Get the full path of the module you seek
   #

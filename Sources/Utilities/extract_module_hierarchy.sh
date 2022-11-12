@@ -61,6 +61,19 @@ extract_hierarchy() {
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
 
+  if [ "$this_level" -eq 0 ]; then
+    echo "#==============================================================="
+    echo "# Extracting module hierarchy for "$module_name_you_seek
+    echo "#"
+    echo "# Legend:"
+    echo "#"
+    echo "# Modules which use other modules:"
+    echo -e "# ""${LIGHT_CYAN}${indent}"• Higher_Level_Mod "(level)${RESET}"
+    echo "# Modules which don't use any other modules:"
+    echo -e "# ""${LIGHT_BLACK}${indent}"⨯ Lower_Level_Mod "(level)${RESET}"
+    echo "#---------------------------------------------------------------"
+  fi
+
   #----------------------------------------------#
   #   Get the full path of the module you seek   #
   #----------------------------------------------#
