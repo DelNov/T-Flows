@@ -114,7 +114,7 @@ extract_hierarchy() {
     echo "#======================================================================="
     echo "# Extracting module hierarchy for "$module_name_you_seek
     echo "#"
-    echo "# Legend:"
+    echo "# Modules are designated as follows:"
     echo "#"
     echo -n "# - modules using other modules:    "
     echo -e "${glo_color_mu}${indent}"• Using_Others_Mod "(level)${RESET}"
@@ -123,71 +123,86 @@ extract_hierarchy() {
     echo "#-----------------------------------------------------------------------"
   fi
 
-  #----------------------------------------------#
-  #   Get the full path of the module you seek   #
-  #----------------------------------------------#
-  if [ $glo_exclude_dir ]; then
-    local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $glo_exclude_dir)
-  else
-    local full_path_you_seek=$(find . -name $module_file_you_seek)
-  fi
+  #---------------------------------------------------------------------
+  #   Is the module you are currently analyzing on the excluded list?
+  #---------------------------------------------------------------------
+  if [[ ! "$glo_ignore_mod" == *"$module_name_you_seek"* ]]; then
 
-  # This command counts number of occurrences of modules name in the result of
-  # command find. If it is more than one, the same file is in more directories
-  n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$module_name_you_seek")
-  if [ $n -gt 1 ]; then
-    echo "Ambiguity: module "$module_name_you_seek" found in more than one directory, here is the list:"
-    for path in ${full_path_you_seek[*]}; do
-      echo $path
-    done
-    echo "Exclude all but one directory with the command line argument -e <directory>"
-    exit
-  fi
+    #----------------------------------------------
+    #   Get the full path of the module you seek
+    #----------------------------------------------
+    if [ $glo_exclude_dir ]; then
+      local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $glo_exclude_dir)
+    else
+      local full_path_you_seek=$(find . -name $module_file_you_seek)
+    fi
 
-  #-----------------------------------------------------
-  #   Storing results of the grep command in an array
-  #-----------------------------------------------------
-  local used_modules=($(grep '\ \ use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
+    #--------------------------------
+    #   If there is anything to do
+    #--------------------------------
+    if [ "$full_path_you_seek" ]; then
 
-  #------------------------------------------------------------------
-  #   Print out the name of the module you are currently analysing
-  #------------------------------------------------------------------
-  if [ "$used_modules" ]; then
-    print_separator "$indent" $this_level
-    print_line "$indent"                 \
-               $glo_color_mu             \
-               "• "                      \
-               $module_name_you_seek     \
-               $this_level
-  else
-    print_line "$indent"                 \
-               $glo_color_mn             \
-               "⨯ "                      \
-               $module_name_you_seek     \
-               $this_level
-  fi
-
-  # Increase indend for the next level by appending spaces to it
-  local indent="${indent}"$glo_indent
-
-  #--------------------------------------------------------
-  #   If the list of used modules in not empty, carry on
-  #--------------------------------------------------------
-  if [ "$used_modules" ]; then
-
-    # Print the modules you have found here
-    for mod in "${!used_modules[@]}"; do
-
-      #-------------------------------------------------------#
-      #                                                       #
-      #   The very important recursive call to its own self   #
-      #                                                       #
-      #-------------------------------------------------------#
-      if [[ "${used_modules[mod]}" == *"_Mod"* ]]; then   # only standard T-Flows modules
-        extract_hierarchy "${used_modules[mod]}" $2 $3
+      # This command counts number of occurrences of modules name in
+      # the result of command find. If it is more than one, the same
+      # file is in more directories
+      n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$module_name_you_seek")
+      if [ $n -gt 1 ]; then
+        echo "Ambiguity: module "$module_name_you_seek" found in more than one directory, here is the list:"
+        for path in ${full_path_you_seek[*]}; do
+          echo $path
+        done
+        echo "Exclude all but one directory with the command line argument -e <directory>"
+        exit
       fi
-    done
-  fi
+
+      #-----------------------------------------------------
+      #   Storing results of the grep command in an array
+      #-----------------------------------------------------
+      local used_modules=($(grep '\ \ use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
+
+      #------------------------------------------------------------------
+      #   Print out the name of the module you are currently analysing
+      #------------------------------------------------------------------
+      if [ "$used_modules" ]; then
+        print_separator "$indent" $this_level
+        print_line "$indent"                 \
+                   $glo_color_mu             \
+                   "• "                      \
+                   $module_name_you_seek     \
+                   $this_level
+      else
+        print_line "$indent"                 \
+                   $glo_color_mn             \
+                   "⨯ "                      \
+                   $module_name_you_seek     \
+                   $this_level
+      fi
+
+      # Increase indend for the next level by appending spaces to it
+      local indent="${indent}"$glo_indent
+
+      #--------------------------------------------------------
+      #   If the list of used modules in not empty, carry on
+      #--------------------------------------------------------
+      if [ "$used_modules" ]; then
+
+        # Print the modules you have found here
+        for mod in "${!used_modules[@]}"; do
+
+          #-------------------------------------------------------#
+          #                                                       #
+          #   The very important recursive call to its own self   #
+          #                                                       #
+          #-------------------------------------------------------#
+          if [[ "${used_modules[mod]}" == *"_Mod"* ]]; then   # only standard T-Flows modules
+            extract_hierarchy "${used_modules[mod]}" $2 $3
+          fi
+        done
+      fi
+
+    fi  # if the paths is found (was not excluded by grep -v ...
+
+  fi  # if this module is not ignored
 }
 
 #------------------------------------------------------------------------
@@ -222,6 +237,7 @@ while [[ $# -gt 0 ]]; do
       shift # past value
       ;;    # part of the case construct
     --default)
+      current_opt=$1
       default=yes
       shift # past argument
       ;;    # part of the case construct
@@ -230,7 +246,7 @@ while [[ $# -gt 0 ]]; do
       exit 1
       ;;    # part of the case construct
     *)
-      if [ "$current_opt" == "-e" ]; then
+      if [ "$current_opt" == "-i" ]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
