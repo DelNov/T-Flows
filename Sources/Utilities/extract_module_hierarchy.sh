@@ -23,9 +23,15 @@ RESET='\U001B[0m'
 #------------------------------------------------------------------------------#
 #   Global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
-glo_indent="   "    # six characters wide
-glo_separate="---"  # six characters wide, should be the same as glo_indent
-glo_out_width=72    # should be multiple of indent and separator widhts
+
+# The following four affect the width of the output
+glo_indent="      "    # six characters wide
+glo_separate="------"  # six characters wide, should be the same as glo_indent
+glo_out_width=72       # should be multiple of indent and separator widhts
+
+# The following lines desribe the color scheme
+glo_color_mu=$LIGHT_CYAN       # module users other
+glo_color_mn=$GREEN            # module not using others
 
 #==============================================================================#
 #   Print the separator line
@@ -42,6 +48,21 @@ print_separator() {
     echo -n $glo_separate
   done
   echo ""
+}
+
+#==============================================================================#
+#   Print a line
+#------------------------------------------------------------------------------#
+print_line() {
+
+  ind=$1     # indentation
+  color=$2   # color
+  bullet=$3  # shape of the bullet
+  proced=$4  # procedure
+  lev=$5     # level
+  module=$6  # module
+
+  echo -e "$ind"${color}"$bullet""$proced"" ($lev)"${RESET}"\t ""$module"
 }
 
 #==============================================================================#
@@ -92,11 +113,9 @@ extract_hierarchy() {
     echo "# Legend:"
     echo "#"
     echo -n "# - modules using other modules:    "
-    echo -e "${LIGHT_CYAN}${indent}"• Higher_Level_Mod "(level)${RESET}"
-    echo -n "#                                   "
-    echo -e "${WHITE}${indent}"• Lower_Level_Mod "(level)${RESET}"
+    echo -e "${glo_color_mu}${indent}"• Using_Others_Mod "(level)${RESET}"
     echo -n "# - modules not using any other:    "
-    echo -e "${LIGHT_BLACK}${indent}"⨯ Not_A_User_Mod "(level)${RESET}"
+    echo -e "${glo_color_mn}${indent}"⨯ Not_Using_Any_Mod "(level)${RESET}"
     echo "#-----------------------------------------------------------------------"
   fi
 
@@ -129,15 +148,19 @@ extract_hierarchy() {
   #------------------------------------------------------------------
   #   Print out the name of the module you are currently analysing
   #------------------------------------------------------------------
-  if [ ! -z "$used_modules" ]; then
-    if [ $this_level -lt 99 ]; then
-      print_separator "$indent" $this_level
-      echo -e "${LIGHT_CYAN}${indent}"• $module_name_you_seek "("$this_level")${RESET}"
-    else
-      echo -e "${indent}"• $module_name_you_seek "("$this_level")"
-    fi
+  if [ "$used_modules" ]; then
+    print_separator "$indent" $this_level
+    print_line "$indent"                 \
+               $glo_color_mu             \
+               "• "                      \
+               $module_name_you_seek     \
+               $this_level
   else
-    echo -e "${LIGHT_BLACK}${indent}"⨯ $module_name_you_seek "("$this_level")${RESET}"
+    print_line "$indent"                 \
+               $glo_color_mn             \
+               "⨯ "                      \
+               $module_name_you_seek     \
+               $this_level
   fi
 
   # Increase indend for the next level by appending spaces to it
@@ -146,7 +169,7 @@ extract_hierarchy() {
   #--------------------------------------------------------
   #   If the list of used modules in not empty, carry on
   #--------------------------------------------------------
-  if [ ! -z "$used_modules" ]; then
+  if [ "$used_modules" ]; then
 
     # Print the modules you have found here
     for mod in "${!used_modules[@]}"; do

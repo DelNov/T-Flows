@@ -23,10 +23,28 @@ RESET='\U001B[0m'
 #------------------------------------------------------------------------------#
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
+
+# The following four affect the width of the output
 tabs 60
 glo_indent="      "    # six characters wide
 glo_separate="------"  # six characters wide, should be the same as glo_indent
 glo_out_width=72       # should be multiple of indent and separator widhts
+
+# The following six affect which modules will be ignored
+# (This should be over-ruled with a command line option)
+glo_ignore_1="Comm_Mod"
+glo_ignore_2="Message_Mod"
+glo_ignore_3="Work_Mod"
+glo_ignore_4="Profiler_Mod"   # not sure about this one
+glo_ignore_5="String_Mod"     # not sure about this one
+glo_ignore_6="Tokenizer_Mod"  # not sure about this one
+
+# The following lines desribe the color scheme
+glo_color_mc=$LIGHT_GREEN      # member caller
+glo_color_mm=$GREEN            # member mute
+glo_color_gc=$LIGHT_YELLOW     # global caller
+glo_color_gm=$YELLOW           # global mute
+glo_color_ex=$BLUE             # external
 
 #==============================================================================#
 #   Print the separator line
@@ -43,6 +61,25 @@ print_separator() {
     echo -n $glo_separate
   done
   echo ""
+}
+
+#==============================================================================#
+#   Print a line
+#------------------------------------------------------------------------------#
+print_line() {
+
+  ind=$1     # indentation
+  color=$2   # color
+  bullet=$3  # shape of the bullet
+  proced=$4  # procedure
+  lev=$5     # level
+  module=$6  # module
+
+  if [ "$lev" ]; then
+    echo -e "$ind"${color}"$bullet""$proced"" ($lev)"${RESET}"\t ""$module"
+  else
+    echo -e "$ind"${color}"$bullet""$proced"${RESET}"\t ""$module"
+  fi
 }
 
 #==============================================================================#
@@ -146,12 +183,6 @@ extract_procedure_and_module() {
   fi
 }
 
-ignore_1="Comm_Mod"
-ignore_2="Message_Mod"
-ignore_3="Work_Mod"
-ignore_4="Profiler_Mod"  # not sure about this one
-ignore_5="String_Mod"    # not sure about this one
-
 #------------------------------------------------------------------------------#
 # Browse through all directories looking for a call graph
 #------------------------------------------------------------------------------#
@@ -179,13 +210,15 @@ extract_call_graph() {
     echo "# Procedures are designated as follows:"
     echo "#"
     echo -n "# - members calling others:    "
-    echo -e "${LIGHT_GREEN}"• Member_Caller" (level)${RESET}       Module_Mod"
+    echo -e "${glo_color_mc}"• Member_Caller" (level)${RESET}       Module_Mod"
     echo -n "# - members not calling any:   "
-    echo -e "${LIGHT_BLACK}"⨯ Member_Mute" (level)${RESET}         Module_Mod"
-    echo -n "# - glob/ext calling others:   "
-    echo -e "${LIGHT_CYAN}"• Global_Caller"                 ${RESET}"
-    echo -n "# - glob/ext not calling any:  "
-    echo -e "${LIGHT_RED}"⨯ Global_Mute"                   ${RESET}"
+    echo -e "${glo_col_mm}"⨯ Member_Mute" (level)${RESET}         Module_Mod"
+    echo -n "# - global calling others:     "
+    echo -e "${glo_color_gc}"• Global_Caller"${RESET}"
+    echo -n "# - global not calling any:    "
+    echo -e "${glo_color_gm}"⨯ Global_Mute  "${RESET}"
+    echo -n "# - external procedure:        "
+    echo -e "${glo_color_ex}"External"${RESET}"
     echo "#-----------------------------------------------------------------------"
   fi
 
@@ -199,22 +232,24 @@ extract_call_graph() {
   if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                      | grep $module_in_which_you_seek  \
-                                     | grep -v $ignore_1               \
-                                     | grep -v $ignore_2               \
-                                     | grep -v $ignore_3               \
-                                     | grep -v $ignore_4               \
-                                     | grep -v $ignore_5               \
+                                     | grep -v $glo_ignore_1           \
+                                     | grep -v $glo_ignore_2           \
+                                     | grep -v $glo_ignore_3           \
+                                     | grep -v $glo_ignore_4           \
+                                     | grep -v $glo_ignore_5           \
+                                     | grep -v $glo_ignore_6           \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
                                      | grep -v Fake                    \
                                      | grep -v $exclude_dir)
   elif [ $exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                     | grep -v $ignore_1               \
-                                     | grep -v $ignore_2               \
-                                     | grep -v $ignore_3               \
-                                     | grep -v $ignore_4               \
-                                     | grep -v $ignore_5               \
+                                     | grep -v $glo_ignore_1           \
+                                     | grep -v $glo_ignore_2           \
+                                     | grep -v $glo_ignore_3           \
+                                     | grep -v $glo_ignore_4           \
+                                     | grep -v $glo_ignore_5           \
+                                     | grep -v $glo_ignore_6           \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
                                      | grep -v Fake                    \
@@ -222,21 +257,23 @@ extract_call_graph() {
   elif [ $module_in_which_you_seek ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                      | grep $module_in_which_you_seek  \
-                                     | grep -v $ignore_1               \
-                                     | grep -v $ignore_2               \
-                                     | grep -v $ignore_3               \
-                                     | grep -v $ignore_4               \
-                                     | grep -v $ignore_5               \
+                                     | grep -v $glo_ignore_1           \
+                                     | grep -v $glo_ignore_2           \
+                                     | grep -v $glo_ignore_3           \
+                                     | grep -v $glo_ignore_4           \
+                                     | grep -v $glo_ignore_5           \
+                                     | grep -v $glo_ignore_6           \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
                                      | grep -v Fake)
   else
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                     | grep -v $ignore_1               \
-                                     | grep -v $ignore_2               \
-                                     | grep -v $ignore_3               \
-                                     | grep -v $ignore_4               \
-                                     | grep -v $ignore_5               \
+                                     | grep -v $glo_ignore_1           \
+                                     | grep -v $glo_ignore_2           \
+                                     | grep -v $glo_ignore_3           \
+                                     | grep -v $glo_ignore_4           \
+                                     | grep -v $glo_ignore_5           \
+                                     | grep -v $glo_ignore_6           \
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
                                      | grep -v Fake)
@@ -306,22 +343,42 @@ extract_call_graph() {
     #------------------------------------------------------------------
     #   Print out the name of the module you are currently analysing
     #------------------------------------------------------------------
-    if [ ! -z "$called_procedures" ]; then
+    if [ "$called_procedures" ]; then
 
-      # It is in a module, print her LIGHT_GREEN
+      # It is in a module, print her $glo_color_mc
       if [ $module_in_which_you_seek ]; then
         print_separator "$indent" $this_level
-        echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
+        print_line "$indent"                 \
+                   $glo_color_mc             \
+                   "• "                      \
+                   $procedure_name_you_seek  \
+                   $this_level               \
+                   $module_in_which_you_seek
 
       # If it is a global or external function, print it in light cyan
       else
-        echo -e ${LIGHT_CYAN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
+        print_line "$indent"                 \
+                   $glo_color_gc             \
+                   "• "                      \
+                   $procedure_name_you_seek  \
+                   $this_level               \
+                   "global"
       fi
     else
       if [ $module_in_which_you_seek ]; then
-        echo -e ${LIGHT_BLACK}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
+        print_line "$indent"                 \
+                   $glo_color_mm             \
+                   "⨯ "                      \
+                   $procedure_name_you_seek  \
+                   $this_level               \
+                   $module_in_which_you_seek
       else
-        echo -e ${LIGHT_RED}"${indent}"⨯ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
+        print_line "$indent"                 \
+                   $glo_color_gm             \
+                   "⨯ "                      \
+                   $procedure_name_you_seek  \
+                   $this_level               \
+                   "global"
       fi
     fi
 
@@ -331,15 +388,25 @@ extract_call_graph() {
     #-------------------------------------------------------------
     #   If the list of called procedures in not empty, carry on
     #-------------------------------------------------------------
-    if [ ! -z "$called_procedures" ]; then
+    if [ "$called_procedures" ]; then
 
       # Print the procedures which are called from here
       for proc in "${!called_procedures[@]}"; do
 
         # This seems to be the only place from which you can print
         # non-member / external functions which don't make any calls.  Period!
+        # Yet, at this point you can't tell one from another, and that's why
+        # another call to find is done here
         if [ ! ${called_modules[proc]} ]; then
-          echo -e "${indent}"• ${LIGHT_CYAN}${called_procedures[proc]}${RESET}" \t (glo./ext.)"
+          internal=$(find . -type f -name ${called_procedures[proc]}".f90")
+          if [ ! "$internal" ]; then
+            print_line "$indent"                   \
+                       $glo_color_ex               \
+                       "⨯ "                        \
+                       ${called_procedures[proc]}  \
+                       ""                          \
+                       "external"
+          fi
         fi
 
         #-------------------------------------------------------#
