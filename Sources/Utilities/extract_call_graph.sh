@@ -177,7 +177,7 @@ extract_procedure_and_module() {
     glo_module="" # empty string (maybe none or Shared?)
     glo_procedure=$(cut -d \( -f 1 <<< $full_name)
 
-  elif [[ "$pattern" == ")%()" ]]; then
+  elif [[ $pattern == ")%()" ]]; then
     echo "Warning: complex pattern 'call' is not in the beginning"
     echo "Full name is: " $full_name
     exit
@@ -232,8 +232,8 @@ extract_call_graph() {
   #---------------------------------------------------------------------
   #   Is the module you are currently analyzing on the excluded list?
   #---------------------------------------------------------------------
-  if [[ ! "$glo_ignore_mod" == *"$module_in_which_you_seek"* ]] ||  \
-     [[ ! "$module_in_which_you_seek" ]]; then
+  if [[ ! $glo_ignore_mod == *$module_in_which_you_seek* ]] ||  \
+     [[ ! $module_in_which_you_seek ]]; then
 
     #-----------------------------------------------------------------------------
     #   Get the full path of the module you seek
@@ -297,7 +297,7 @@ extract_call_graph() {
       # like: if(some_condition_is_met) call The_Function_You_Seek
       for proc in "${!called_procedures[@]}"; do
         first_four=${called_procedures[proc]:0:4}
-        if [[ "$first_four" == "call" ]]; then   # call was not the first statement in the line
+        if [[ $first_four == "call" ]]; then   # call was not the first statement in the line
           called_procedures[proc]=$(awk -F'call ?' '{print $2}' <<< ${called_procedures[proc]})
         fi
       done

@@ -200,7 +200,7 @@ extract_hierarchy() {
           #-------------------------------------------------------#
 
           # Only standard T-Flows modules
-          if [[ "${used_modules[mod]}" == *"_Mod"* ]]; then
+          if [[ ${used_modules[mod]} == *_Mod* ]]; then
             extract_hierarchy "${used_modules[mod]}" $2 $3
           fi
         done
