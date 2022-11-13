@@ -20,6 +20,9 @@ LIGHT_CYAN='\U001B[36;1m'
 LIGHT_WHITE='\U001B[37;1m'
 RESET='\U001B[0m'
 
+# List of analyzed units, to avoid duplication
+analyzed_units=""
+
 #------------------------------------------------------------------------------#
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
@@ -333,21 +336,29 @@ extract_call_graph() {
       done
 
       #------------------------------------------------------------------
+      #   Form the current procedure / module combination for the unit
+      #------------------------------------------------------------------
+      if [[ $module_in_which_you_seek ]]; then
+        local current_unit="$procedure_name_you_seek@$module_in_which_you_seek "
+      else
+        local current_unit="$procedure_name_you_seek@global "
+      fi
+
+      #------------------------------------------------------------------
       #   Print out the name of the module you are currently analysing
       #------------------------------------------------------------------
       if [[ $called_procedures ]]; then
 
-        # It is in a module, print her $glo_color_mc
         if [[ $module_in_which_you_seek ]]; then
-          print_separator "$indent" $this_level
+          if [[ $analyzed_units != *$current_unit* ]]; then
+            print_separator "$indent" $this_level
+          fi
           print_line "$indent"                 \
                      $glo_color_mc             \
                      "• "                      \
                      $procedure_name_you_seek  \
                      $this_level               \
                      $module_in_which_you_seek
-
-        # If it is a global or external function, print it in light cyan
         else
           print_line "$indent"                 \
                      $glo_color_gc             \
@@ -357,7 +368,6 @@ extract_call_graph() {
                      "global"
         fi
       else
-
         if [[ $module_in_which_you_seek ]]; then
           print_line "$indent"                 \
                      $glo_color_mm             \
@@ -373,6 +383,17 @@ extract_call_graph() {
                      $this_level               \
                      "global"
         fi
+      fi
+
+      #-----------------------------------------------------
+      #   If current units was analyzed, get out of here.
+      #   Oterwise, update the list of units and continue
+      #-----------------------------------------------------
+      if [[ $analyzed_units == *$current_unit* ]]; then
+        return
+      fi
+      if [[ $analyzed_units != *$current_unit* ]]; then
+        analyzed_units=$analyzed_units" $current_unit"
       fi
 
       # Increase indend for the next level by appending 6 spaces to it
@@ -471,4 +492,5 @@ done
 
 echo $glo_ignore_mod
 extract_call_graph $name
+# echo $analyzed_units
 # echo "default = ${default}"
