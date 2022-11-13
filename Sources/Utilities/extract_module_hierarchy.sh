@@ -114,7 +114,7 @@ extract_hierarchy() {
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
 
-  if [ "$this_level" -eq 0 ]; then
+  if [[ $this_level == 0 ]]; then
     echo "#======================================================================="
     echo "# Extracting module hierarchy for "$module_name_you_seek
     echo "#"
@@ -130,12 +130,12 @@ extract_hierarchy() {
   #---------------------------------------------------------------------
   #   Is the module you are currently analyzing on the excluded list?
   #---------------------------------------------------------------------
-  if [[ ! "$glo_ignore_mod" == *"$module_name_you_seek"* ]]; then
+  if [[ ! $glo_ignore_mod == *$module_name_you_seek* ]]; then
 
     #----------------------------------------------
     #   Get the full path of the module you seek
     #----------------------------------------------
-    if [ $glo_exclude_dir ]; then
+    if [[ $glo_exclude_dir ]]; then
       local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $glo_exclude_dir)
     else
       local full_path_you_seek=$(find . -name $module_file_you_seek)
@@ -144,13 +144,13 @@ extract_hierarchy() {
     #--------------------------------
     #   If there is anything to do
     #--------------------------------
-    if [ "$full_path_you_seek" ]; then
+    if [[ $full_path_you_seek ]]; then
 
       # This command counts number of occurrences of modules name in
       # the result of command find. If it is more than one, the same
       # file is in more directories
       n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$module_name_you_seek")
-      if [ $n -gt 1 ]; then
+      if [[ $n > 1 ]]; then
         echo "Ambiguity: module "$module_name_you_seek" found in more than one directory, here is the list:"
         for path in ${full_path_you_seek[*]}; do
           echo $path
@@ -167,7 +167,7 @@ extract_hierarchy() {
       #------------------------------------------------------------------
       #   Print out the name of the module you are currently analysing
       #------------------------------------------------------------------
-      if [ "$used_modules" ]; then
+      if [[ $used_modules ]]; then
         print_separator "$indent" $this_level
         print_line "$indent"                 \
                    $glo_color_mu             \
@@ -188,7 +188,7 @@ extract_hierarchy() {
       #--------------------------------------------------------
       #   If the list of used modules in not empty, carry on
       #--------------------------------------------------------
-      if [ "$used_modules" ]; then
+      if [[ $used_modules ]]; then
 
         # Print the modules you have found here
         for mod in "${!used_modules[@]}"; do
@@ -198,7 +198,9 @@ extract_hierarchy() {
           #   The very important recursive call to its own self   #
           #                                                       #
           #-------------------------------------------------------#
-          if [[ "${used_modules[mod]}" == *"_Mod"* ]]; then   # only standard T-Flows modules
+
+          # Only standard T-Flows modules
+          if [[ "${used_modules[mod]}" == *"_Mod"* ]]; then
             extract_hierarchy "${used_modules[mod]}" $2 $3
           fi
         done
@@ -213,7 +215,7 @@ extract_hierarchy() {
 #------------------------------------------------------------------------
 #   Wrong number of command line argument is sent - describe the usage
 #------------------------------------------------------------------------
-if [ ! "$1" ]; then
+if [[ ! $1 ]]; then
   print_usage
 fi
 
@@ -227,7 +229,7 @@ shift
 
 current_opt=""
 
-while [[ $# -gt 0 ]]; do
+while [[ $# > 0 ]]; do
   case $1 in
     -i)
       current_opt=$1
@@ -251,7 +253,7 @@ while [[ $# -gt 0 ]]; do
       exit 1
       ;;    # part of the case construct
     *)
-      if [ "$current_opt" == "-i" ]; then
+      if [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
