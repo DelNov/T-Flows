@@ -29,9 +29,9 @@ analyzed_units=""
 
 # The following four affect the width of the output
 tabs 60
-glo_indent="      "    # six characters wide
-glo_separate="------"  # six characters wide, should be the same as glo_indent
-glo_out_width=72       # should be multiple of indent and separator widhts
+glo_indent="    "    # four characters wide
+glo_separate="----"  # four characters wide, should be the same as glo_indent
+glo_out_width=72     # should be multiple of indent and separator widhts
 
 # The following lines desribe the color scheme
 glo_color_mc=$LIGHT_GREEN      # member caller
