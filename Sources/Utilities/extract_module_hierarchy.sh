@@ -25,13 +25,16 @@ RESET='\U001B[0m'
 #------------------------------------------------------------------------------#
 
 # The following four affect the width of the output
-glo_indent="      "    # six characters wide
-glo_separate="------"  # six characters wide, should be the same as glo_indent
+glo_indent="    "      # four characters wide
+glo_separate="----"    # four characters wide, should be the same as glo_indent
 glo_out_width=72       # should be multiple of indent and separator widhts
 
 # The following lines desribe the color scheme
 glo_color_mu=$LIGHT_CYAN       # module users other
 glo_color_mn=$GREEN            # module not using others
+
+# Global list of directories to be excluded from the search
+glo_exclude_dir=""
 
 #==============================================================================#
 #   Print the separator line
@@ -87,6 +90,7 @@ print_usage() {
   echo "#"
   echo "# NOTE: The script is supposed to be executed from: T-Flows/Sources!"
   echo "#----------------------------------------------------------------------"
+  exit
 }
 
 #------------------------------------------------------------------------------#
@@ -122,8 +126,8 @@ extract_hierarchy() {
   #----------------------------------------------#
   #   Get the full path of the module you seek   #
   #----------------------------------------------#
-  if [ $exclude_dir ]; then
-    local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $exclude_dir)
+  if [ $glo_exclude_dir ]; then
+    local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $glo_exclude_dir)
   else
     local full_path_you_seek=$(find . -name $module_file_you_seek)
   fi
@@ -186,31 +190,56 @@ extract_hierarchy() {
   fi
 }
 
-#----------------------------------------------------------------------------
-#  Three command line arguments are sent - process the second and carry on
-#----------------------------------------------------------------------------
-if [ $3 ]; then
-  if [ $2 == "-e" ]; then
-    exclude_dir=""
-    if [ "$3" ]; then
-      exclude_dir="$3"
-    fi
-    extract_hierarchy $1
-  else
-    print_usage
-  fi
-
-#---------------------------------------------------------------------
-#  One command line argument is sent - must be the module name
-#  Use the names without extension - say Grid_Mod, Convert_Mod ...
-#---------------------------------------------------------------------
-elif [ $1 ]; then
-  extract_hierarchy $1
-
-#-----------------------------------------------------------------------
-#  Wrong number of command line argument is sent - describe the usage
-#-----------------------------------------------------------------------
-else
+#------------------------------------------------------------------------
+#   Wrong number of command line argument is sent - describe the usage
+#------------------------------------------------------------------------
+if [ ! "$1" ]; then
   print_usage
 fi
 
+#-----------------------------------------------
+#   Parse command line options like a pro :-)
+#-----------------------------------------------
+
+# Fetch the name and shift on
+name=$1
+shift
+
+current_opt=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -i)
+      current_opt=$1
+      glo_ignore_mod=$glo_ignore_mod" $2"
+      shift # past argument
+      shift # past value
+      ;;    # part of the case construct
+    -e)
+      current_opt=$1
+      glo_exclude_dir=$2
+      shift # past argument
+      shift # past value
+      ;;    # part of the case construct
+    --default)
+      default=yes
+      shift # past argument
+      ;;    # part of the case construct
+    -*)
+      echo "Unknown option $1"
+      exit 1
+      ;;    # part of the case construct
+    *)
+      if [ "$current_opt" == "-e" ]; then
+        glo_ignore_mod=$glo_ignore_mod" $1"
+      else
+        echo "Unknown option $1"
+        exit 1
+      fi
+      shift # past argument
+      ;;    # part of the case construct
+  esac
+done
+
+extract_hierarchy $name
+# echo "default = ${default}"

@@ -46,6 +46,9 @@ glo_color_gc=$LIGHT_YELLOW     # global caller
 glo_color_gm=$YELLOW           # global mute
 glo_color_ex=$BLUE             # external
 
+# Global list of directories to be excluded from the search
+glo_exclude_dir=""
+
 #==============================================================================#
 #   Print the separator line
 #------------------------------------------------------------------------------#
@@ -229,7 +232,7 @@ extract_call_graph() {
   #   in "Seqential" part of the Comm_Mod are just empty hooks, no one in
   #   the sane mind will be interested in analyzing them.
   #-----------------------------------------------------------------------------
-  if [ $module_in_which_you_seek ] && [ $exclude_dir ]; then
+  if [ $module_in_which_you_seek ] && [ $glo_exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                      | grep $module_in_which_you_seek  \
                                      | grep -v $glo_ignore_1           \
@@ -241,8 +244,8 @@ extract_call_graph() {
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
                                      | grep -v Fake                    \
-                                     | grep -v $exclude_dir)
-  elif [ $exclude_dir ]; then
+                                     | grep -v $glo_exclude_dir)
+  elif [ $glo_exclude_dir ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                      | grep -v $glo_ignore_1           \
                                      | grep -v $glo_ignore_2           \
@@ -253,7 +256,7 @@ extract_call_graph() {
                                      | grep -v No_Checking             \
                                      | grep -v Sequential              \
                                      | grep -v Fake                    \
-                                     | grep -v $exclude_dir)
+                                     | grep -v $glo_exclude_dir)
   elif [ $module_in_which_you_seek ]; then
     local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                      | grep $module_in_which_you_seek  \
@@ -420,31 +423,56 @@ extract_call_graph() {
   fi
 }
 
-#------------------------------------------------------------------------------
-#  Three command line arguments are sent - process the second and pass them on
-#------------------------------------------------------------------------------
-if [ $3 ]; then
-  if [ $2 == "-e" ]; then
-    exclude_dir=""
-    if [ "$3" ]; then
-      exclude_dir="$3"
-    fi
-    extract_call_graph $1
-  else
-    print_usage
-  fi
-
-#---------------------------------------------------------------------
-#  One command line argument is sent - must be the procedure name
-#  Use the names without extension - say Grid_Mod, Convert_Mod ...
-#---------------------------------------------------------------------
-elif [ $1 ]; then
-  extract_call_graph $1
-
-#-----------------------------------------------------------------------
-#  Wrong number of command line argument is sent - describe the usage
-#-----------------------------------------------------------------------
-else
+#------------------------------------------------------------------------
+#   Wrong number of command line argument is sent - describe the usage
+#------------------------------------------------------------------------
+if [ ! "$1" ]; then
   print_usage
 fi
 
+#-----------------------------------------------
+#   Parse command line options like a pro :-)
+#-----------------------------------------------
+
+# Fetch the name and shift on
+name=$1
+shift
+
+current_opt=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -i)
+      current_opt=$1
+      glo_ignore_mod=$glo_ignore_mod" $2"
+      shift # past argument
+      shift # past value
+      ;;    # part of the case construct
+    -e)
+      current_opt=$1
+      glo_exclude_dir=$2
+      shift # past argument
+      shift # past value
+      ;;    # part of the case construct
+    --default)
+      default=yes
+      shift # past argument
+      ;;    # part of the case construct
+    -*)
+      echo "Unknown option $1"
+      exit 1
+      ;;    # part of the case construct
+    *)
+      if [ "$current_opt" == "-e" ]; then
+        glo_ignore_mod=$glo_ignore_mod" $1"
+      else
+        echo "Unknown option $1"
+        exit 1
+      fi
+      shift # past argument
+      ;;    # part of the case construct
+  esac
+done
+
+extract_call_graph $name
+# echo "default = ${default}"
