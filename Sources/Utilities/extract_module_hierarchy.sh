@@ -51,7 +51,8 @@ print_separator() {
     echo -n $glo_separate
   done
   echo ""
-}
+
+}  # print_separator
 
 #==============================================================================#
 #   Print a line
@@ -66,7 +67,8 @@ print_line() {
   module=$6  # module
 
   echo -e "$ind"${color}"$bullet""$proced"" ($lev)"${RESET}"\t ""$module"
-}
+
+}  # print_line
 
 #==============================================================================#
 # Print_usage
@@ -88,10 +90,12 @@ print_usage() {
   echo "# exclude some directories from the search.  At the time of writing "
   echo "# this, only Point_Mod is defined in Generate and in Process."
   echo "#"
-  echo "# NOTE: The script is supposed to be executed from: T-Flows/Sources!"
+  echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
+          "T-Flows/Sources!" ${RESET}
   echo "#----------------------------------------------------------------------"
   exit
-}
+
+}  # print_usage
 
 #------------------------------------------------------------------------------#
 # Browse through all directories looking for module dependencies
@@ -203,7 +207,8 @@ extract_hierarchy() {
     fi  # if the paths is found (was not excluded by grep -v ...
 
   fi  # if this module is not ignored
-}
+
+}  # extract_hierarchy
 
 #------------------------------------------------------------------------
 #   Wrong number of command line argument is sent - describe the usage
