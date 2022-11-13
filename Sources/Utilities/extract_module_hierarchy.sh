@@ -21,6 +21,30 @@ LIGHT_WHITE='\U001B[37;1m'
 RESET='\U001B[0m'
 
 #------------------------------------------------------------------------------#
+#   Global variables affecting the looks of the output
+#------------------------------------------------------------------------------#
+glo_indent="   "    # six characters wide
+glo_separate="---"  # six characters wide, should be the same as glo_indent
+glo_out_width=72    # should be multiple of indent and separator widhts
+
+#==============================================================================#
+#   Print the separator line
+#------------------------------------------------------------------------------#
+print_separator() {
+
+  ind=$1  # current indentation
+  lev=$2  # current level
+
+  printf "%s" "$ind"
+  end=`expr $glo_out_width / ${#glo_separate} - $lev`
+  for (( c=1; c<=$end; c++ ))
+  do
+    echo -n $glo_separate
+  done
+  echo ""
+}
+
+#==============================================================================#
 # Print_usage
 #------------------------------------------------------------------------------#
 print_usage() {
@@ -106,14 +130,8 @@ extract_hierarchy() {
   #   Print out the name of the module you are currently analysing
   #------------------------------------------------------------------
   if [ ! -z "$used_modules" ]; then
-    if [ $this_level -lt 2 ]; then
-      printf "%s" "$indent"
-      local end=`expr 12 - $this_level`
-      for (( c=1; c<=$end; c++ ))
-      do
-        echo -n "------"
-      done
-      echo ""
+    if [ $this_level -lt 99 ]; then
+      print_separator "$indent" $this_level
       echo -e "${LIGHT_CYAN}${indent}"• $module_name_you_seek "("$this_level")${RESET}"
     else
       echo -e "${indent}"• $module_name_you_seek "("$this_level")"
@@ -123,7 +141,7 @@ extract_hierarchy() {
   fi
 
   # Increase indend for the next level by appending spaces to it
-  local indent="${indent}"'      '
+  local indent="${indent}"$glo_indent
 
   #--------------------------------------------------------
   #   If the list of used modules in not empty, carry on
@@ -132,11 +150,6 @@ extract_hierarchy() {
 
     # Print the modules you have found here
     for mod in "${!used_modules[@]}"; do
-#->      echo "${indent}"• ${used_modules[mod]}
-#->    done
-#->
-#->    # Print the files you will want to seek next
-#->    for mod in "${!used_modules[@]}"; do
 
       #-------------------------------------------------------#
       #                                                       #

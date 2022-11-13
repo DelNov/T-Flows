@@ -20,9 +20,32 @@ LIGHT_CYAN='\U001B[36;1m'
 LIGHT_WHITE='\U001B[37;1m'
 RESET='\U001B[0m'
 
-tabs 60
-
 #------------------------------------------------------------------------------#
+#   Settings and global variables affecting the looks of the output
+#------------------------------------------------------------------------------#
+tabs 60
+glo_indent="      "    # six characters wide
+glo_separate="------"  # six characters wide, should be the same as glo_indent
+glo_out_width=72       # should be multiple of indent and separator widhts
+
+#==============================================================================#
+#   Print the separator line
+#------------------------------------------------------------------------------#
+print_separator() {
+
+  ind=$1  # current indentation
+  lev=$2  # current level
+
+  printf "%s" "$ind"
+  end=`expr $glo_out_width / ${#glo_separate} - $lev`
+  for (( c=1; c<=$end; c++ ))
+  do
+    echo -n $glo_separate
+  done
+  echo ""
+}
+
+#==============================================================================#
 # Print_usage
 #------------------------------------------------------------------------------#
 print_usage() {
@@ -50,7 +73,7 @@ print_usage() {
 glo_procedure=""
 glo_module=""
 
-#------------------------------------------------------------------------------#
+#==============================================================================#
 # Sets $glo_procedure and $glo_module
 #------------------------------------------------------------------------------#
 extract_procedure_and_module() {
@@ -287,13 +310,7 @@ extract_call_graph() {
 
       # It is in a module, print her LIGHT_GREEN
       if [ $module_in_which_you_seek ]; then
-        printf "%s" "$indent"
-        local end=`expr 12 - $this_level`
-        for (( c=1; c<=$end; c++ ))
-        do
-          echo -n "------"
-        done
-        echo ""
+        print_separator "$indent" $this_level
         echo -e ${LIGHT_GREEN}"${indent}"+ $procedure_name_you_seek "("$this_level")"${RESET}"\t $module_in_which_you_seek"
 
       # If it is a global or external function, print it in light cyan
@@ -309,7 +326,7 @@ extract_call_graph() {
     fi
 
     # Increase indend for the next level by appending 6 spaces to it
-    local indent="${indent}"'      '
+    local indent="${indent}"$glo_indent
 
     #-------------------------------------------------------------
     #   If the list of called procedures in not empty, carry on
