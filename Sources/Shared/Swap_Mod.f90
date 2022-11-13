@@ -8,7 +8,7 @@
 
   contains
 
-#   include "Swap_Mod/Int.f90"
-#   include "Swap_Mod/Real.f90"
+#   include "Swap_Mod/Swap_Int.f90"
+#   include "Swap_Mod/Swap_Real.f90"
 
   end module
