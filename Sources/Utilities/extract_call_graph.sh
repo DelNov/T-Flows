@@ -30,15 +30,6 @@ glo_indent="      "    # six characters wide
 glo_separate="------"  # six characters wide, should be the same as glo_indent
 glo_out_width=72       # should be multiple of indent and separator widhts
 
-# The following six affect which modules will be ignored
-# (This should be over-ruled with a command line option)
-glo_ignore_1="Comm_Mod"
-glo_ignore_2="Message_Mod"
-glo_ignore_3="Work_Mod"
-glo_ignore_4="Profiler_Mod"   # not sure about this one
-glo_ignore_5="String_Mod"     # not sure about this one
-glo_ignore_6="Tokenizer_Mod"  # not sure about this one
-
 # The following lines desribe the color scheme
 glo_color_mc=$LIGHT_GREEN      # member caller
 glo_color_mm=$GREEN            # member mute
@@ -48,6 +39,9 @@ glo_color_ex=$BLUE             # external
 
 # Global list of directories to be excluded from the search
 glo_exclude_dir=""
+# glo_ignore_mod="Comm_Mod Message_Mod Work_Mod Profiler_Mod String_Mod Tokenizer_Mod"
+# glo_ignore_mod="Comm_Mod Message_Mod Work_Mod String_Mod Tokenizer_Mod"
+glo_ignore_mod=""
 
 #==============================================================================#
 #   Print the separator line
@@ -64,7 +58,8 @@ print_separator() {
     echo -n $glo_separate
   done
   echo ""
-}
+
+}  # print_separator
 
 #==============================================================================#
 #   Print a line
@@ -78,12 +73,13 @@ print_line() {
   lev=$5     # level
   module=$6  # module
 
-  if [ "$lev" ]; then
+  if [[ $lev ]]; then
     echo -e "$ind"${color}"$bullet""$proced"" ($lev)"${RESET}"\t ""$module"
   else
     echo -e "$ind"${color}"$bullet""$proced"${RESET}"\t ""$module"
   fi
-}
+
+}  # print_line
 
 #==============================================================================#
 # Print_usage
@@ -106,9 +102,12 @@ print_usage() {
   echo "# this, Allocate_Cells is defined in Grid_Mod and Refines_Mod, but ."
   echo "# there could be more such examples."
   echo "#"
-  echo "# NOTE: The script is supposed to be executed from: T-Flows/Sources!"
+  echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
+          "T-Flows/Sources!" ${RESET}
   echo "#----------------------------------------------------------------------"
-}
+  exit
+
+}  # print_usage
 
 glo_procedure=""
 glo_module=""
@@ -122,6 +121,14 @@ extract_procedure_and_module() {
 
   # It rarely gets cooler than this: extract the calling function pattern :-)
   pattern="${full_name//[^%()]}"
+
+  # Take care of the lines in which call is not the first statement
+  if [[ ${#pattern} == 1 ]]; then
+    if [[ ${pattern:0:1} == "%" || ${pattern:0:1} == ")" ]]; then
+      full_name=$(awk -F'call ?' '{print $2}' <<< ${called_procedures[proc]})
+      pattern="${full_name//[^%()]}"
+    fi
+  fi
 
   # But it gets even better after all - patterns
   # can be characterized by four first characters
@@ -152,6 +159,7 @@ extract_procedure_and_module() {
   # Likes of Profiler%Start() and Grid(d)%Calculate() ...
   # Profiler%Update_By_Rank(Profiler%previously_running)
   elif [[                                 \
+          "$first_one"  == "%"     ||     \
           "$first_two"  == "%("    ||     \
           "$first_four" == "()%("         \
        ]]; then
@@ -169,22 +177,18 @@ extract_procedure_and_module() {
     glo_module="" # empty string (maybe none or Shared?)
     glo_procedure=$(cut -d \( -f 1 <<< $full_name)
 
-  # or Comm_Mod_Global_Sum_Real(Profiler%funct_time(i_fun))
-  elif [[ "$pattern" == "(%())" ]]; then
-    glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')"_Mod"
-    glo_procedure=$(echo $full_name | awk -F '_Mod_' '{print $2}')
-    glo_procedure=$(cut -d \( -f 1 <<< $glo_procedure)
-
   elif [[ "$pattern" == ")%()" ]]; then
     echo "Warning: complex pattern 'call' is not in the beginning"
     echo "Full name is: " $full_name
+    exit
 
   else
     echo "Unknown pattern: " $pattern
     echo "in             : " $full_name
-#   exit
+    exit
   fi
-}
+
+}  # extract_procedure_and_module
 
 #------------------------------------------------------------------------------#
 # Browse through all directories looking for a call graph
@@ -206,7 +210,7 @@ extract_call_graph() {
   local next_level=`expr $next_level + 1`
   local this_level=`expr $next_level - 1`
 
-  if [ "$this_level" -eq 0 ]; then
+  if [[ $this_level == 0 ]]; then
     echo "#======================================================================="
     echo "# Extracting module hierarchy for "$procedure_name_you_seek
     echo "#"
@@ -238,51 +242,27 @@ extract_call_graph() {
     #   in "Seqential" part of the Comm_Mod are just empty hooks, no one in
     #   the sane mind will be interested in analyzing them.
     #-----------------------------------------------------------------------------
-    if [ $module_in_which_you_seek ] && [ $glo_exclude_dir ]; then
+    if [[ $module_in_which_you_seek ]] && [[ $glo_exclude_dir ]]; then
       local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                        | grep $module_in_which_you_seek  \
-                                       | grep -v $glo_ignore_1           \
-                                       | grep -v $glo_ignore_2           \
-                                       | grep -v $glo_ignore_3           \
-                                       | grep -v $glo_ignore_4           \
-                                       | grep -v $glo_ignore_5           \
-                                       | grep -v $glo_ignore_6           \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake                    \
                                        | grep -v $glo_exclude_dir)
-    elif [ $glo_exclude_dir ]; then
+    elif [[ $glo_exclude_dir ]]; then
       local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                       | grep -v $glo_ignore_1           \
-                                       | grep -v $glo_ignore_2           \
-                                       | grep -v $glo_ignore_3           \
-                                       | grep -v $glo_ignore_4           \
-                                       | grep -v $glo_ignore_5           \
-                                       | grep -v $glo_ignore_6           \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake                    \
                                        | grep -v $glo_exclude_dir)
-    elif [ $module_in_which_you_seek ]; then
+    elif [[ $module_in_which_you_seek ]]; then
       local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
                                        | grep $module_in_which_you_seek  \
-                                       | grep -v $glo_ignore_1           \
-                                       | grep -v $glo_ignore_2           \
-                                       | grep -v $glo_ignore_3           \
-                                       | grep -v $glo_ignore_4           \
-                                       | grep -v $glo_ignore_5           \
-                                       | grep -v $glo_ignore_6           \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake)
     else
       local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                       | grep -v $glo_ignore_1           \
-                                       | grep -v $glo_ignore_2           \
-                                       | grep -v $glo_ignore_3           \
-                                       | grep -v $glo_ignore_4           \
-                                       | grep -v $glo_ignore_5           \
-                                       | grep -v $glo_ignore_6           \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake)
@@ -291,7 +271,7 @@ extract_call_graph() {
     # This command counts number of occurrences of modules name in the result of
     # command find. If it is more than one, the same file is in more directories
     n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$procedure_name_you_seek")
-    if [ $n -gt 1 ]; then
+    if [[ $n > 1 ]]; then
       echo "Ambiguity: procedure "$procedure_name_you_seek" found in more than one directory, here is the list:"
       for path in ${full_path_you_seek[*]}; do
         echo $path
@@ -302,7 +282,7 @@ extract_call_graph() {
     fi
 
     # If the definition of this procedure is found, carry on
-    if [ $full_path_you_seek ]; then
+    if [[ $full_path_you_seek ]]; then
 
       #-----------------------------------------------------
       #   Storing results of the grep command in an array
@@ -325,7 +305,9 @@ extract_call_graph() {
       # At this point, $called procedures has a form like: Profiler%Start('Main')
       # From this mess, extract the module name and the procedure element wise
       for proc in "${!called_procedures[@]}"; do
-        extract_procedure_and_module ${called_procedures[proc]}  # sets $glo_procedure and $glo_module
+
+        # Set $glo_procedure and $glo_module
+        extract_procedure_and_module ${called_procedures[proc]}
 
         # Typical substitues:
         if [ ! "$glo_module" == "" ]; then
@@ -347,15 +329,16 @@ extract_call_graph() {
         fi
         called_modules[$proc]=$glo_module
         called_procedures[$proc]=$glo_procedure
+
       done
 
       #------------------------------------------------------------------
       #   Print out the name of the module you are currently analysing
       #------------------------------------------------------------------
-      if [ "$called_procedures" ]; then
+      if [[ $called_procedures ]]; then
 
         # It is in a module, print her $glo_color_mc
-        if [ $module_in_which_you_seek ]; then
+        if [[ $module_in_which_you_seek ]]; then
           print_separator "$indent" $this_level
           print_line "$indent"                 \
                      $glo_color_mc             \
@@ -374,7 +357,8 @@ extract_call_graph() {
                      "global"
         fi
       else
-        if [ $module_in_which_you_seek ]; then
+
+        if [[ $module_in_which_you_seek ]]; then
           print_line "$indent"                 \
                      $glo_color_mm             \
                      "⨯ "                      \
@@ -397,7 +381,7 @@ extract_call_graph() {
       #-------------------------------------------------------------
       #   If the list of called procedures in not empty, carry on
       #-------------------------------------------------------------
-      if [ "$called_procedures" ]; then
+      if [[ $called_procedures ]]; then
 
         # Print the procedures which are called from here
         for proc in "${!called_procedures[@]}"; do
@@ -406,9 +390,9 @@ extract_call_graph() {
           # non-member / external functions which don't make any calls.  Period!
           # Yet, at this point you can't tell one from another, and that's why
           # another call to find is done here
-          if [ ! ${called_modules[proc]} ]; then
+          if [[ ! ${called_modules[proc]} ]]; then
             internal=$(find . -type f -name ${called_procedures[proc]}".f90")
-            if [ ! "$internal" ]; then
+            if [[ ! $internal ]]; then
               print_line "$indent"                   \
                          $glo_color_ex               \
                          "⨯ "                        \
@@ -430,12 +414,13 @@ extract_call_graph() {
     fi  # if the paths is found (was not excluded by grep -v ...
 
   fi  # not on the ignore list
-}
+
+}  # extract_call_graph
 
 #------------------------------------------------------------------------
 #   Wrong number of command line argument is sent - describe the usage
 #------------------------------------------------------------------------
-if [ ! "$1" ]; then
+if [[ ! $1 ]]; then
   print_usage
 fi
 
@@ -449,7 +434,7 @@ shift
 
 current_opt=""
 
-while [[ $# -gt 0 ]]; do
+while [[ $# > 0 ]]; do
   case $1 in
     -i)
       current_opt=$1
@@ -473,7 +458,7 @@ while [[ $# -gt 0 ]]; do
       exit 1
       ;;    # part of the case construct
     *)
-      if [ "$current_opt" == "-i" ]; then
+      if [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
