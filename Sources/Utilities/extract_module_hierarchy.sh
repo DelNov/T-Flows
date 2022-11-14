@@ -37,6 +37,7 @@ glo_color_mn=$GREEN            # module not using others
 #   Some other global variables needed for functionality
 #------------------------------------------------------------------------------#
 glo_exclude_dir=""  # global list of directories to be excluded from the search
+analyzed_units=""   # list of analyzed units, to avoid duplication
 
 #==============================================================================#
 #   Print the separator line
@@ -179,7 +180,9 @@ extract_hierarchy() {
       #   Print out the name of the module you are currently analysing
       #------------------------------------------------------------------
       if [[ $used_modules ]]; then
-        print_separator "$indent" $this_level
+        if [[ $analyzed_units != *$module_name_you_seek* ]]; then
+          print_separator "$indent" $this_level
+        fi
         print_line "$indent"                 \
                    $glo_color_mu             \
                    "• "                      \
@@ -193,6 +196,18 @@ extract_hierarchy() {
                    $this_level
       fi
 
+      #-----------------------------------------------------
+      #   If current units was analyzed, get out of here.
+      #   Oterwise, update the list of units and continue
+      #-----------------------------------------------------
+      if [[ $analyzed_units == *$module_name_you_seek* ]]; then
+        return
+      fi
+      if [[ $analyzed_units != *module_name_you_seek* ]]; then
+        analyzed_units=$analyzed_units" $module_name_you_seek"
+      fi
+
+      # Increase indend for the next level by appending 6 spaces to it
       # Increase indend for the next level by appending spaces to it
       local indent="${indent}"$glo_indent
 
@@ -276,4 +291,5 @@ while [[ $# > 0 ]]; do
 done
 
 extract_hierarchy $name
+echo $analyzed_units
 # echo "default = ${default}"
