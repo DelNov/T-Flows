@@ -37,11 +37,9 @@ glo_color_gc=$LIGHT_YELLOW     # global caller
 glo_color_gm=$YELLOW           # global mute
 glo_color_ex=$BLUE             # external
 
-# Global list of directories to be excluded from the search
-glo_exclude_dir=""
-# glo_ignore_mod="Comm_Mod Message_Mod Work_Mod Profiler_Mod String_Mod Tokenizer_Mod"
-# glo_ignore_mod="Comm_Mod Message_Mod Work_Mod String_Mod Tokenizer_Mod"
-glo_ignore_mod=""
+glo_exclude_dir=""   # directory to be excluded from the search
+glo_expand_all="no"  # are you expanding them all?
+glo_ignore_mod=""    # global list of modules to ignore
 
 #------------------------------------------------------------------------------#
 #   Some other global variables needed for functionality
@@ -104,6 +102,10 @@ print_usage() {
   echo -e "# case sensitive, ${RED}without${RESET} the .f90 extension."
   echo "#"
   echo "# Valid options are:"
+  echo "#"
+  echo "# -a"
+  echo "#"
+  echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
   echo "# -i <list of modules to ignore>"
   echo "#"
@@ -333,6 +335,8 @@ extract_call_graph() {
           if [ "$glo_module" == "Results" ];  then glo_module="Results_Mod";   fi
           if [ "$glo_module" == "Process" ];  then glo_module="Process_Mod";   fi
           if [ "$glo_module" == "Convert" ];  then glo_module="Convert_Mod";   fi
+          if [ "$glo_module" == "Divide" ];   then glo_module="Divide_Mod";    fi
+          if [ "$glo_module" == "Convert" ];  then glo_module="Convert_Mod";   fi
           if [ "$glo_module" == "String" ];   then glo_module="String_Mod";    fi
           if [ "$glo_module" == "Sol" ];      then glo_module="Solver_Mod";    fi
           if [ "$glo_module" == "Nat" ];      then glo_module="Native_Mod";    fi
@@ -400,7 +404,9 @@ extract_call_graph() {
         return
       fi
       if [[ $analyzed_units != *$current_unit* ]]; then
-        analyzed_units=$analyzed_units" $current_unit"
+        if [[ $glo_expand_all == "no" ]]; then
+          analyzed_units=$analyzed_units" $current_unit"
+        fi
       fi
 
       # Increase indend for the next level by appending 6 spaces to it
@@ -464,27 +470,42 @@ current_opt=""
 
 while [[ $# > 0 ]]; do
   case $1 in
-    -i)
+    # All - expand all, don't contract already analyzed units
+    -a)
       current_opt=$1
-      glo_ignore_mod=$glo_ignore_mod" $2"
-      shift # past argument
-      shift # past value
-      ;;    # part of the case construct
+      glo_expand_all="yes"
+      shift  # past argument
+      ;;     # part of the case construct
+
+    # Exclude - takes only one argument
     -e)
       current_opt=$1
       glo_exclude_dir=$2
-      shift # past argument
-      shift # past value
-      ;;    # part of the case construct
+      shift  # past argument
+      shift  # past value
+      ;;     # part of the case construct
+
+    # Ignore - accumulates arguments
+    -i)
+      current_opt=$1
+      glo_ignore_mod=$glo_ignore_mod" $2"
+      shift  # past argument
+      shift  # past value
+      ;;     # part of the case construct
+
+    # Still don't have use for this, but is not asking for food, so keep it
     --default)
       current_opt=$1
       default=yes
-      shift # past argument
-      ;;    # part of the case construct
+      shift  # past argument
+      ;;     # part of the case construct
+
     -*)
       echo "Unknown option $1"
       exit 1
-      ;;    # part of the case construct
+      ;;     # part of the case construct
+
+    # Accumulates additonal strings to glo_ignore
     *)
       if [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
@@ -492,8 +513,8 @@ while [[ $# > 0 ]]; do
         echo "Unknown option $1"
         exit 1
       fi
-      shift # past argument
-      ;;    # part of the case construct
+      shift  # past argument
+      ;;     # part of the case construct
   esac
 done
 

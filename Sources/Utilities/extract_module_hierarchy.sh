@@ -21,10 +21,11 @@ LIGHT_WHITE='\U001B[37;1m'
 RESET='\U001B[0m'
 
 #------------------------------------------------------------------------------#
-#   Global variables affecting the looks of the output
+#   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
 
 # The following four affect the width of the output
+tabs 60
 glo_indent="    "      # four characters wide
 glo_separate="----"    # four characters wide, should be the same as glo_indent
 glo_out_width=72       # should be multiple of indent and separator widhts
@@ -33,11 +34,14 @@ glo_out_width=72       # should be multiple of indent and separator widhts
 glo_color_mu=$LIGHT_CYAN       # module users other
 glo_color_mn=$GREEN            # module not using others
 
+glo_exclude_dir=""   # directory to be excluded from the search
+glo_expand_all="no"  # are you expanding them all?
+glo_ignore_mod=""    # global list of modules to ignore
+
 #------------------------------------------------------------------------------#
 #   Some other global variables needed for functionality
 #------------------------------------------------------------------------------#
-glo_exclude_dir=""  # global list of directories to be excluded from the search
-analyzed_units=""   # list of analyzed units, to avoid duplication
+analyzed_units=""    # list of analyzed units, to avoid duplication
 
 #==============================================================================#
 #   Print the separator line
@@ -90,6 +94,10 @@ print_usage() {
           "${RED}without${RESET} the .f90 extension."
   echo "#"
   echo "# Valid options are:"
+  echo "#"
+  echo "# -a"
+  echo "#"
+  echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
   echo "# -e <directory to exclude>"
   echo "#"
@@ -204,7 +212,9 @@ extract_hierarchy() {
         return
       fi
       if [[ $analyzed_units != *module_name_you_seek* ]]; then
-        analyzed_units=$analyzed_units" $module_name_you_seek"
+        if [[ $glo_expand_all == "no" ]]; then
+          analyzed_units=$analyzed_units" $module_name_you_seek"
+        fi
       fi
 
       # Increase indend for the next level by appending 6 spaces to it
@@ -257,27 +267,42 @@ current_opt=""
 
 while [[ $# > 0 ]]; do
   case $1 in
-    -i)
+    # All - expand all, don't contract already analyzed units
+    -a)
       current_opt=$1
-      glo_ignore_mod=$glo_ignore_mod" $2"
-      shift # past argument
-      shift # past value
-      ;;    # part of the case construct
+      glo_expand_all="yes"
+      shift  # past argument
+      ;;     # part of the case construct
+
+    # Exclude - takes only one argument
     -e)
       current_opt=$1
       glo_exclude_dir=$2
-      shift # past argument
-      shift # past value
-      ;;    # part of the case construct
+      shift  # past argument
+      shift  # past value
+      ;;     # part of the case construct
+
+    # Ignore - accumulates arguments
+    -i)
+      current_opt=$1
+      glo_ignore_mod=$glo_ignore_mod" $2"
+      shift  # past argument
+      shift  # past value
+      ;;     # part of the case construct
+
+    # Still don't have use for this, but is not asking for food, so keep it
     --default)
       current_opt=$1
       default=yes
-      shift # past argument
-      ;;    # part of the case construct
+      shift  # past argument
+      ;;     # part of the case construct
+
     -*)
       echo "Unknown option $1"
       exit 1
-      ;;    # part of the case construct
+      ;;     # part of the case construct
+
+    # Accumulates additonal strings to glo_ignore
     *)
       if [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
@@ -285,11 +310,11 @@ while [[ $# > 0 ]]; do
         echo "Unknown option $1"
         exit 1
       fi
-      shift # past argument
-      ;;    # part of the case construct
+      shift  # past argument
+      ;;     # part of the case construct
   esac
 done
 
 extract_hierarchy $name
-echo $analyzed_units
+# echo $analyzed_units
 # echo "default = ${default}"
