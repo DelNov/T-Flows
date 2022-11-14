@@ -20,9 +20,6 @@ LIGHT_CYAN='\U001B[36;1m'
 LIGHT_WHITE='\U001B[37;1m'
 RESET='\U001B[0m'
 
-# List of analyzed units, to avoid duplication
-analyzed_units=""
-
 #------------------------------------------------------------------------------#
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
@@ -45,6 +42,13 @@ glo_exclude_dir=""
 # glo_ignore_mod="Comm_Mod Message_Mod Work_Mod Profiler_Mod String_Mod Tokenizer_Mod"
 # glo_ignore_mod="Comm_Mod Message_Mod Work_Mod String_Mod Tokenizer_Mod"
 glo_ignore_mod=""
+
+#------------------------------------------------------------------------------#
+#   Some other global variables needed for functionality
+#------------------------------------------------------------------------------#
+analyzed_units=""   # list of analyzed units, to avoid duplication
+glo_procedure=""    # result from extract_procedure_and_module
+glo_module=""       # result from extract_procedure_and_module
 
 #==============================================================================#
 #   Print the separator line
@@ -93,17 +97,19 @@ print_usage() {
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/extract_call_graph.sh <Source> [-f <Force_Dir>]"
+  echo "# ./Utilities/extract_call_graph.sh <Source> [options]"
   echo "#"
-  echo "# where Source  is the procedure name for which you want to perform"
+  echo "# where Source is the procedure name for which you want to perform"
   echo "# the analysis, such as: Main_Con, Compute_Energy, Main_Div, hence"
-  echo "# case sensitive, without the .f90 extension."
+  echo -e "# case sensitive, ${RED}without${RESET} the .f90 extension."
   echo "#"
-  echo "# In cases where the same module name is used in more than one direc-"
-  echo "# tory, you can use the second (always -e) and the third argument to "
-  echo "# exclude some directories from the search.  At the time of writing "
-  echo "# this, Allocate_Cells is defined in Grid_Mod and Refines_Mod, but ."
-  echo "# there could be more such examples."
+  echo "# Valid options are:"
+  echo "#"
+  echo "# -i <list of modules to ignore>"
+  echo "#"
+  echo "#    You may want to exclude some of the smaller modules, such as"
+  echo "#    Comm_Mod, Message_Mod, Work_Mod, Profiler_Mod, String_Mod,"
+  echo "#    Tokenizer_Mod to reduce the amoun of information printed."
   echo "#"
   echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
           "T-Flows/Sources!" ${RESET}
@@ -111,9 +117,6 @@ print_usage() {
   exit
 
 }  # print_usage
-
-glo_procedure=""
-glo_module=""
 
 #==============================================================================#
 # Sets $glo_procedure and $glo_module
@@ -140,9 +143,9 @@ extract_procedure_and_module() {
   first_four=${pattern:0:4}
 
   # This should take care of Comm_Mod_Friendly_Function
-  if [[                                   \
-        "$pattern"   == ""            ||  \
-        "$full_name" == *"_Mod_"*         \
+  if [[                                 \
+        $pattern   == ""            ||  \
+        $full_name == *"_Mod_"*         \
      ]]; then
     glo_module=$(echo $full_name | awk -F '_Mod_' '{print $1}')"_Mod"
     glo_procedure=$(echo $full_name | awk -F '_Mod_' '{print $2}')
@@ -150,9 +153,9 @@ extract_procedure_and_module() {
 
   # Take care of cases such as Grid%Comm%Sendrecv_Real_Arrays
   # Front%Elem(e)%Initialize_Elem()
-  elif [[                                 \
-          "$first_two"  == "%%"    ||     \
-          "$first_four" == "%()%"         \
+  elif [[                               \
+          $first_two  == "%%"    ||     \
+          $first_four == "%()%"         \
        ]]; then
     glo_module=$(cut -d % -f 2 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
@@ -161,10 +164,11 @@ extract_procedure_and_module() {
 
   # Likes of Profiler%Start() and Grid(d)%Calculate() ...
   # Profiler%Update_By_Rank(Profiler%previously_running)
-  elif [[                                 \
-          "$first_one"  == "%"     ||     \
-          "$first_two"  == "%("    ||     \
-          "$first_four" == "()%("         \
+  elif [[                               \
+          $first_one  == "%"     ||     \
+          $first_two  == "%("    ||     \
+          $first_two  == ")%"    ||     \
+          $first_four == "()%("         \
        ]]; then
     glo_module=$(cut -d %  -f 1 <<< $full_name)
     glo_module=$(cut -d \( -f 1 <<< $glo_module)
@@ -173,9 +177,9 @@ extract_procedure_and_module() {
 
   # This is for global functions and external functions like Probe_1d()
   # or system_clock(count_rate=Profiler%sys_count_rate)
-  elif [[                                 \
-          "$first_one" == "("      ||     \
-          "$first_one" == ""              \
+  elif [[                               \
+          $first_one == "("      ||     \
+          $first_one == ""              \
        ]]; then
     glo_module="" # empty string (maybe none or Shared?)
     glo_procedure=$(cut -d \( -f 1 <<< $full_name)
@@ -235,7 +239,7 @@ extract_call_graph() {
   #---------------------------------------------------------------------
   #   Is the module you are currently analyzing on the excluded list?
   #---------------------------------------------------------------------
-  if [[ ! $glo_ignore_mod == *$module_in_which_you_seek* ]] ||  \
+  if [[ $glo_ignore_mod != *$module_in_which_you_seek* ]] ||  \
      [[ ! $module_in_which_you_seek ]]; then
 
     #-----------------------------------------------------------------------------
@@ -275,7 +279,8 @@ extract_call_graph() {
     # command find. If it is more than one, the same file is in more directories
     n=$(echo "$full_path_you_seek" | tr " " "\n" | grep -c "$procedure_name_you_seek")
     if [[ $n > 1 ]]; then
-      echo "Ambiguity: procedure "$procedure_name_you_seek" found in more than one directory, here is the list:"
+      echo "Ambiguity: procedure "$procedure_name_you_seek
+           "found in more than one directory, here is the list:"
       for path in ${full_path_you_seek[*]}; do
         echo $path
       done
@@ -325,6 +330,8 @@ extract_call_graph() {
           if [ "$glo_module" == "Flow" ];     then glo_module="Field_Mod";     fi
           if [ "$glo_module" == "File" ];     then glo_module="File_Mod";      fi
           if [ "$glo_module" == "Profiler" ]; then glo_module="Profiler_Mod";  fi
+          if [ "$glo_module" == "Results" ];  then glo_module="Results_Mod";   fi
+          if [ "$glo_module" == "Process" ];  then glo_module="Process_Mod";   fi
           if [ "$glo_module" == "Convert" ];  then glo_module="Convert_Mod";   fi
           if [ "$glo_module" == "String" ];   then glo_module="String_Mod";    fi
           if [ "$glo_module" == "Sol" ];      then glo_module="Solver_Mod";    fi
@@ -492,5 +499,4 @@ done
 
 echo $glo_ignore_mod
 extract_call_graph $name
-# echo $analyzed_units
 # echo "default = ${default}"
