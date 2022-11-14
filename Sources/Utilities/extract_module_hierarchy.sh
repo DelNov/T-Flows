@@ -33,8 +33,10 @@ glo_out_width=72       # should be multiple of indent and separator widhts
 glo_color_mu=$LIGHT_CYAN       # module users other
 glo_color_mn=$GREEN            # module not using others
 
-# Global list of directories to be excluded from the search
-glo_exclude_dir=""
+#------------------------------------------------------------------------------#
+#   Some other global variables needed for functionality
+#------------------------------------------------------------------------------#
+glo_exclude_dir=""  # global list of directories to be excluded from the search
 
 #==============================================================================#
 #   Print the separator line
@@ -79,16 +81,25 @@ print_usage() {
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/extract_module_hierarchy.sh <Target_Mod> [-e <Exclude_Dir>]"
+  echo "# ./Utilities/extract_module_hierarchy.sh <Target_Mod> [options]"
   echo "#"
   echo "# where Target_Mod is the module name for which you want to perform"
   echo "# the analysis, such as: Grid_Mod, Convert_Mod, Generate_Mod, hence"
-  echo "# case sensitive, with the _Mod suffix, without the .f90 extension."
+  echo -e "# case sensitive, ${RED}with${RESET} the _Mod suffix,"\
+          "${RED}without${RESET} the .f90 extension."
   echo "#"
-  echo "# In cases where the same module name is used in more than one direc-"
-  echo "# tory, you can use the second (always -e) and the third argument to "
-  echo "# exclude some directories from the search.  At the time of writing "
-  echo "# this, only Point_Mod is defined in Generate and in Process."
+  echo "# Valid options are:"
+  echo "#"
+  echo "# -e <directory to exclude>"
+  echo "#"
+  echo "#    In cases where the same module name is used in more than one"
+  echo "#    directory, use this option to exclude one from the search."
+  echo "#"
+  echo "# -i <list of modules to ignore>"
+  echo "#"
+  echo "#    You may want to exclude some of the smaller modules, such as"
+  echo "#    Comm_Mod, Message_Mod, Work_Mod, Profiler_Mod, String_Mod,"
+  echo "#    Tokenizer_Mod to reduce the amoun of information printed."
   echo "#"
   echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
           "T-Flows/Sources!" ${RESET}
