@@ -17,9 +17,9 @@
   !   System Clock type   !
   !-----------------------!
   type System_Clock_Type
-    integer :: cnt            ! system clock count rate
-    integer :: ini, cur       ! system clock initial and current rate
-    real    :: wall_time_max  ! maximum wall time
+    integer(DP) :: cnt            ! system clock count rate
+    integer(DP) :: ini, cur       ! system clock initial and current rate
+    real(DP)    :: wall_time_max  ! maximum wall time
   end type
 
   !--------------------!
