@@ -110,6 +110,8 @@
   !   Main loop to fill the faces_c structure   !
   !                                             !
   !---------------------------------------------!
+  call Adjust_First_Dim(6, Grid % cells_c)  ! i_fac goes to 6
+  call Adjust_First_Dim(4, Grid % faces_n)  ! i_nod goes to 4
   do n3 = 1, cnt
     if(starts(n3) .ne. ends(n3)) then
       do i1=starts(n3),ends(n3)
@@ -145,7 +147,6 @@
               if(Grid % cells_n_nodes(c1) .eq. 5) fn = PYR
               if(Grid % cells_n_nodes(c1) .eq. 6) fn = WED
               if(Grid % cells_n_nodes(c1) .eq. 8) fn = HEX
-              call Adjust_First_Dim(6, Grid % cells_c)  ! i_fac goes to 6
               do i_fac = 1, 6
                 if(Grid % cells_c(i_fac, c1) .eq. 0  .and.   & ! not set yet
                     ( max( match_nodes(fn(i_fac, 1)),0 ) + &
