@@ -321,25 +321,27 @@ extract_call_graph() {
 
         # Typical substitues:
         if [[ $glo_module != "" ]]; then
-          if [[ $glo_module == "Msg" ]];      then glo_module=Message_Mod;   fi
-          if [[ $glo_module == "Message" ]];  then glo_module=Message_Mod;   fi
-          if [[ $glo_module == "Tok" ]];      then glo_module=Tokenizer_Mod; fi
-          if [[ $glo_module == "Line" ]];     then glo_module=Tokenizer_Mod; fi
-          if [[ $glo_module == "Vof" ]];      then glo_module=Vof_Mod;       fi
-          if [[ $glo_module == "Grid" ]];     then glo_module=Grid_Mod;      fi
           if [[ $glo_module == "Comm" ]];     then glo_module=Comm_Mod;      fi
-          if [[ $glo_module == "Sort" ]];     then glo_module=Sort_Mod;      fi
-          if [[ $glo_module == "Flow" ]];     then glo_module=Field_Mod;     fi
-          if [[ $glo_module == "File" ]];     then glo_module=File_Mod;      fi
-          if [[ $glo_module == "Profiler" ]]; then glo_module=Profiler_Mod;  fi
-          if [[ $glo_module == "Results" ]];  then glo_module=Results_Mod;   fi
-          if [[ $glo_module == "Process" ]];  then glo_module=Process_Mod;   fi
+          if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
           if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
           if [[ $glo_module == "Divide" ]];   then glo_module=Divide_Mod;    fi
-          if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
-          if [[ $glo_module == "String" ]];   then glo_module=String_Mod;    fi
-          if [[ $glo_module == "Sol" ]];      then glo_module=Solver_Mod;    fi
+          if [[ $glo_module == "File" ]];     then glo_module=File_Mod;      fi
+          if [[ $glo_module == "Flow" ]];     then glo_module=Field_Mod;     fi
+          if [[ $glo_module == "Grid" ]];     then glo_module=Grid_Mod;      fi
+          if [[ $glo_module == "Line" ]];     then glo_module=Tokenizer_Mod; fi
+          if [[ $glo_module == "Message" ]];  then glo_module=Message_Mod;   fi
+          if [[ $glo_module == "Msg" ]];      then glo_module=Message_Mod;   fi
           if [[ $glo_module == "Nat" ]];      then glo_module=Native_Mod;    fi
+          if [[ $glo_module == "Process" ]];  then glo_module=Process_Mod;   fi
+          if [[ $glo_module == "Profiler" ]]; then glo_module=Profiler_Mod;  fi
+          if [[ $glo_module == "Results" ]];  then glo_module=Results_Mod;   fi
+          if [[ $glo_module == "Sol" ]];      then glo_module=Solver_Mod;    fi
+          if [[ $glo_module == "Sort" ]];     then glo_module=Sort_Mod;      fi
+          if [[ $glo_module == "String" ]];   then glo_module=String_Mod;    fi
+          if [[ $glo_module == "Tok" ]];      then glo_module=Tokenizer_Mod; fi
+          if [[ $glo_module == "Turb" ]];     then glo_module=Turb_Mod;      fi
+          if [[ $glo_module == "Vof" ]];      then glo_module=Vof_Mod;       fi
+          if [[ $glo_module == "Work" ]];     then glo_module=Work_Mod;      fi
         fi
         called_modules[$proc]=$glo_module
         called_procedures[$proc]=$glo_procedure
