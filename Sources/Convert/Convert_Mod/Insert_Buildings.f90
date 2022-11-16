@@ -330,9 +330,9 @@
   !   Set sorting criteria   !
   !--------------------------!
   do c = 1, Grid % n_cells
-    criteria(c, 1) = nint(Grid % xc(c) * GIGA)
-    criteria(c, 2) = nint(Grid % yc(c) * GIGA)
-    criteria(c, 3) = nint(Grid % zc(c) * GIGA)
+    criteria(c, 1) = nint(Grid % xc(c) * MEGA)
+    criteria(c, 2) = nint(Grid % yc(c) * MEGA)
+    criteria(c, 3) = nint(Grid % zc(c) * MEGA)
     old_c(c)       = c
   end do
 
