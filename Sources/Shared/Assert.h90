@@ -3,7 +3,11 @@
 !   Assert_Mod.  Variable T_FLOWS_ASSERT is passed from the makefile           !
 !------------------------------------------------------------------------------!
 # if T_FLOWS_ASSERT == 1
-#   define Assert(X) call Handle_Assert(.not.(X), #X, __FILE__, __LINE__)
+#   if __GFORTRAN__ == 1
+#     define Assert(X) call Handle_Assert(.not.(X), "X", __FILE__, __LINE__)
+#   else
+#     define Assert(X) call Handle_Assert(.not.(X), #X, __FILE__, __LINE__)
+#   endif
 # else
 #   define Assert(X)
 # endif

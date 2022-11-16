@@ -32,7 +32,7 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
-ifeq ($(DEBUG), yes)
+ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1
 else
   PASS_ON += -DT_FLOWS_ASSERT=0
