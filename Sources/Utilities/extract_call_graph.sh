@@ -299,15 +299,12 @@ extract_call_graph() {
       #-----------------------------------------------------
       local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek  \
                                  | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
-
       local called_modules=$called_procedures   # just to declare
 
-      # echo "FETCHED PROCEDURES:"
       # Correct the lines in which call was not the first comman, something
       # like: if(some_condition_is_met) call The_Function_You_Seek
       for proc in "${!called_procedures[@]}"; do
-        first_four=${called_procedures[proc]:0:4}
-        if [[ $first_four == "call" ]]; then   # call was not the first statement in the line
+        if [[ ${called_procedures[proc]} == *"call"* ]]; then  # call exists
           called_procedures[proc]=$(awk -F'call ?' '{print $2}' <<< ${called_procedures[proc]})
         fi
       done
@@ -331,6 +328,7 @@ extract_call_graph() {
           if [[ $glo_module == "Sort" ]];     then glo_module=Sort_Mod;      fi
           if [[ $glo_module == "Flow" ]];     then glo_module=Field_Mod;     fi
           if [[ $glo_module == "File" ]];     then glo_module=File_Mod;      fi
+          if [[ $glo_module == "Turb" ]];     then glo_module=Turb_Mod;      fi
           if [[ $glo_module == "Profiler" ]]; then glo_module=Profiler_Mod;  fi
           if [[ $glo_module == "Results" ]];  then glo_module=Results_Mod;   fi
           if [[ $glo_module == "Process" ]];  then glo_module=Process_Mod;   fi
