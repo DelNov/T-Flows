@@ -228,13 +228,13 @@ extract_call_graph() {
     echo -n "# - members calling others:    "
     echo -e "${glo_color_mc}"• Member_Caller" (level)${RESET}       Module_Mod"
     echo -n "# - members not calling any:   "
-    echo -e "${glo_col_mm}"⨯ Member_Mute" (level)${RESET}         Module_Mod"
+    echo -e "${glo_color_mm}"⨯ Member_Mute" (level)${RESET}         Module_Mod"
     echo -n "# - global calling others:     "
     echo -e "${glo_color_gc}"• Global_Caller"${RESET}"
     echo -n "# - global not calling any:    "
     echo -e "${glo_color_gm}"⨯ Global_Mute  "${RESET}"
     echo -n "# - external procedure:        "
-    echo -e "${glo_color_ex}"External"${RESET}"
+    echo -e "${glo_color_ex}"⨯ External"${RESET}"
     echo "#-----------------------------------------------------------------------"
   fi
 

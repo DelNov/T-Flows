@@ -346,7 +346,7 @@ $(DIR_OBJECT)/%.o: %.c
 #   Note: Should not be modified.
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ)
-	@echo Linking "\033[0;32m $(PETSC_LIB) $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
+	@echo -e Linking "\033[0;32m $(PETSC_LIB) $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
 	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB) $(PETSC_LIB)
 
 #--------------------------------------------------------------------

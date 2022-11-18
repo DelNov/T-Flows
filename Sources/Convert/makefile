@@ -239,7 +239,7 @@ $(DIR_OBJECT)/%.o: %.f90
 #   Note: Should not be modified.
 #-----------------------------------
 $(PROGRAM_FILE): $(OBJ)
-	@echo Linking "\033[0;32m $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
+	@echo -e Linking "\033[0;32m $(METIS_LIB) $(PROGRAM_FILE) \033[0m"
 	@$(FC) $(OPT_LINK) -o $(PROGRAM_FILE) $(OBJ) $(METIS_LIB)
 
 #--------------------------------------------------------------------
