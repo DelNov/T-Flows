@@ -16,6 +16,7 @@
   logical, parameter :: VERBOSE = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, m, n, c, c1, c2, n_bc, color
+  integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
   integer, allocatable :: old_nn  (:)
   integer, allocatable :: old_shad(:)
   integer, allocatable :: old_nods(:,:)
@@ -179,5 +180,29 @@
                      Grid % bnd_cond % color_e_cell(color)
     end do
   end if
+
+  !--------------------------------------------!
+  !   Find out distance between cell indices   !
+  !--------------------------------------------!
+  max_diff_1 = 0
+  max_diff_2 = 0
+  do s = 1, Grid % n_faces  ! + Grid % n_shadows
+    c1_s1 = Grid % faces_c(1, s)
+    c2_s1 = Grid % faces_c(2, s)
+    if(c2_s1 > 0) then
+      max_diff_1 = max((c2_s1 - c1_s1), max_diff_1)
+      if(s < Grid % n_faces) then
+        c1_s2 = Grid % faces_c(1, s+1)
+        c2_s2 = Grid % faces_c(2, s+1)
+        max_diff_2 = max(abs(c1_s1 - c1_s2), max_diff_2)
+        if(c2_s1 > 0) then
+          max_diff_2 = max(abs(c2_s1 - c2_s2), max_diff_2)
+        end if
+      end if
+    end if
+  end do
+  print '(a)',    ' # In Sort_Faces_Smart'
+  print '(a,i9)', ' # Maximum cell difference at single face:   ', max_diff_1
+  print '(a,i9)', ' # Maximum cell difference betwen two faces: ', max_diff_2
 
   end subroutine

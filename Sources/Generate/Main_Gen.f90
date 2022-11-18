@@ -52,7 +52,7 @@
   call Refines_Mod_Connectivity     (refines, Grid, .true.)   ! real run
   call Generate % Calculate_Geometry(Grid,          .true.)
 
-  call Grid % Sort_Cells_Smart       ()
+  call Grid % Sort_Cells_Smarter     ()
   call Grid % Sort_Faces_Smart       ()
   call Grid % Calculate_Wall_Distance()
   call Grid % Find_Cells_Faces       ()
