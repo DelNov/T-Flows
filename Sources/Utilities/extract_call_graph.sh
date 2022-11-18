@@ -299,15 +299,12 @@ extract_call_graph() {
       #-----------------------------------------------------
       local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek  \
                                  | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
-
       local called_modules=$called_procedures   # just to declare
 
-      # echo "FETCHED PROCEDURES:"
       # Correct the lines in which call was not the first comman, something
       # like: if(some_condition_is_met) call The_Function_You_Seek
       for proc in "${!called_procedures[@]}"; do
-        first_four=${called_procedures[proc]:0:4}
-        if [[ $first_four == "call" ]]; then   # call was not the first statement in the line
+        if [[ ${called_procedures[proc]} == *"call"* ]]; then  # call exists
           called_procedures[proc]=$(awk -F'call ?' '{print $2}' <<< ${called_procedures[proc]})
         fi
       done
@@ -323,21 +320,29 @@ extract_call_graph() {
         if [[ $glo_module != "" ]]; then
           if [[ $glo_module == "Comm" ]];     then glo_module=Comm_Mod;      fi
           if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
-          if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
           if [[ $glo_module == "Divide" ]];   then glo_module=Divide_Mod;    fi
+          if [[ $glo_module == "Elem" ]];     then glo_module=Elem_Mod;      fi
           if [[ $glo_module == "File" ]];     then glo_module=File_Mod;      fi
           if [[ $glo_module == "Flow" ]];     then glo_module=Field_Mod;     fi
+          if [[ $glo_module == "Front" ]];    then glo_module=Front_Mod;     fi
           if [[ $glo_module == "Grid" ]];     then glo_module=Grid_Mod;      fi
           if [[ $glo_module == "Line" ]];     then glo_module=Tokenizer_Mod; fi
+          if [[ $glo_module == "Math" ]];     then glo_module=Math_Mod;      fi
           if [[ $glo_module == "Message" ]];  then glo_module=Message_Mod;   fi
+          if [[ $glo_module == "Metis" ]];    then glo_module=Metis_Mod;     fi
+          if [[ $glo_module == "Monitor" ]];  then glo_module=Monitor_Mod;   fi
           if [[ $glo_module == "Msg" ]];      then glo_module=Message_Mod;   fi
           if [[ $glo_module == "Nat" ]];      then glo_module=Native_Mod;    fi
+          if [[ $glo_module == "Particle" ]]; then glo_module=Particle_Mod;  fi
+          if [[ $glo_module == "Pet" ]];      then glo_module=Petsc_Mod;     fi
           if [[ $glo_module == "Process" ]];  then glo_module=Process_Mod;   fi
           if [[ $glo_module == "Profiler" ]]; then glo_module=Profiler_Mod;  fi
           if [[ $glo_module == "Results" ]];  then glo_module=Results_Mod;   fi
           if [[ $glo_module == "Sol" ]];      then glo_module=Solver_Mod;    fi
           if [[ $glo_module == "Sort" ]];     then glo_module=Sort_Mod;      fi
           if [[ $glo_module == "String" ]];   then glo_module=String_Mod;    fi
+          if [[ $glo_module == "Surf" ]];     then glo_module=Surf_Mod;      fi
+          if [[ $glo_module == "Swarm" ]];    then glo_module=Swarm_Mod;     fi
           if [[ $glo_module == "Tok" ]];      then glo_module=Tokenizer_Mod; fi
           if [[ $glo_module == "Turb" ]];     then glo_module=Turb_Mod;      fi
           if [[ $glo_module == "Vof" ]];      then glo_module=Vof_Mod;       fi
