@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Sort_Cells_Smart(Grid)
+  subroutine Sort_Cells_Smarter(Grid)
 !------------------------------------------------------------------------------!
-!   Sorts cells by their geometrical positions.                                !
+!   Sorts cells with METIS library                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,7 +16,7 @@
   integer, allocatable :: old_nf   (:)       ! old number of faces (per cell)
   integer, allocatable :: old_faces(:,:)     ! old faces list per cell
   integer, allocatable :: old_cells(:,:)     ! old cells list per cell
-  real,    allocatable :: xc(:), yc(:), zc(:)
+  integer, allocatable :: perm(:), iperm(:)  ! result of permutations
 !==============================================================================!
 
   mcc = size(Grid % cells_c, 1)
@@ -29,9 +29,8 @@
   allocate(old_cells(mcc ,Grid % n_cells));  old_cells(:,:) = 0
   allocate(old_nf        (Grid % n_cells));  old_nf   (:)   = 0
   allocate(old_faces(mcf, Grid % n_cells));  old_faces(:,:) = 0
-  allocate(xc            (Grid % n_cells));  xc       (:)   = 0.0
-  allocate(yc            (Grid % n_cells));  yc       (:)   = 0.0
-  allocate(zc            (Grid % n_cells));  zc       (:)   = 0.0
+  allocate(perm          (Grid % n_cells));  perm     (:)   = 0
+  allocate(iperm         (Grid % n_cells));  iperm    (:)   = 0
 
   !------------------------!
   !   Store cells' nodes   !
@@ -45,26 +44,23 @@
     old_cells(1:mcc, c) = Grid % cells_c(1:mcc, c)
   end do
 
-  !--------------------------!
-  !   Set sorting criteria   !
-  !--------------------------!
-  do c = 1, Grid % n_cells
-    xc(c) = Grid % xc(c)
-    yc(c) = Grid % yc(c)
-    zc(c) = Grid % zc(c)
-    Grid % old_c(c) = c
-  end do
+  call Metis % Create_Metis(Grid % faces_c, 1)
 
-  !--------------------------------------------------!
-  !   Sort new numbers according to three criteria   !
-  !--------------------------------------------------!
-  call Sort % Three_Real_Carry_Int(xc(1:Grid % n_cells),  &
-                                   yc(1:Grid % n_cells),  &
-                                   zc(1:Grid % n_cells),  &
-                                   Grid % old_c(1:Grid % n_cells))
+  Metis % options = -1                        ! Initialize all to default
+  Metis % options(METIS_OPTION_DBGLVL) = 0
+
+  call Metis_NodeNd(Metis % n_verts,       &  !  1. (in), int      nvtxs
+                    Metis % row,           &  !  2. (in), int(:)   xadj
+                    Metis % col,           &  !  3. (in), int(:)   adjncy
+                    Metis % vert_weights,  &  !  4. (in), int(:)   vwgt
+                    Metis % options,       &  !  5. (in), int(:)   options
+                    perm(:),               &  !  6. (out) int(:)   perm
+                    iperm(:))                 !  7. (out) int(:)   iperm
+
   ! This is a bit of a bluff
   do c = 1, Grid % n_cells
-    Grid % new_c(Grid % old_c(c)) = c
+    Grid % new_c(c) = perm(c) + 1
+    print *, c, perm(c)
   end do
 
   !----------------------------------!
