@@ -427,11 +427,13 @@
           ! This node_to_face was stored in the previous step
           f_d = node_to_face(n_p)
           Dual % faces_n_nodes(f_d) = Dual % faces_n_nodes(f_d) + 1
+          call Adjust_First_Dim(Dual % faces_n_nodes(f_d), Dual % faces_n)
           Dual % faces_n(Dual % faces_n_nodes(f_d), f_d) = edge_to_node(e)
 
           ! This node_to_cell was stored in the previous step
           b_d = node_to_cell(n_p)
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
+          call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
           Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = edge_to_node(e)
         end do  ! i_nod for edge, goes from 1 to 2
 
@@ -462,9 +464,11 @@
               Dual % zn(n_d) = Prim % zn(n_p)
 
               Dual % faces_n_nodes(f_d) = Dual % faces_n_nodes(f_d) + 1
+              call Adjust_First_Dim(Dual % faces_n_nodes(f_d), Dual % faces_n)
               Dual % faces_n(Dual % faces_n_nodes(f_d), f_d) = n_d
 
               Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
+              call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
               Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = n_d
 
               ! Mark that the face has been injected a sharp corner

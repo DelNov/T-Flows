@@ -202,6 +202,8 @@
       procedure :: Time_And_Length_Scale
       procedure :: Roughness_Coefficient
 
+      procedure :: Les
+
   end type
 
   ! Parameters describing turbulence model choice
@@ -339,5 +341,7 @@
 #   include "Turb_Mod/U_Plus_Log_Law.f90"
 #   include "Turb_Mod/Time_And_Length_Scale.f90"
 #   include "Turb_Mod/Roughness_Coefficient.f90"
+
+#   include "Turb_Mod/Les.f90"
 
   end module

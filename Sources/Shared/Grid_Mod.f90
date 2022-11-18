@@ -11,7 +11,7 @@
   use File_Mod
   use Boundary_Mod
   use Vtk_Mod
-  use Metis_Options_Mod
+  use Metis_Mod
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
