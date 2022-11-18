@@ -11,7 +11,7 @@
   use File_Mod
   use Boundary_Mod
   use Vtk_Mod
-  use Metis_Options_Mod
+  use Metis_Mod
   use Sort_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -223,7 +223,6 @@
       procedure :: Save_Vtu_Faces
       procedure :: Sort_Cells_By_Index
       procedure :: Sort_Cells_Smart
-      procedure :: Sort_Cells_Smarter
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_Smart
       procedure :: Write_Template_Control_File
@@ -275,7 +274,6 @@
 #   include "Grid_Mod/Save_Vtu_Faces.f90"
 #   include "Grid_Mod/Sort_Cells_By_Index.f90"
 #   include "Grid_Mod/Sort_Cells_Smart.f90"
-#   include "Grid_Mod/Sort_Cells_Smarter.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sort_Faces_Smart.f90"
 #   include "Grid_Mod/Write_Template_Control_File.f90"
