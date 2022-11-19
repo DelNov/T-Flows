@@ -1,6 +1,6 @@
 # Blender v2.75 (sub 0) OBJ File: 'lowpolytree.blend'
 # www.blender.org
-mtllib lowpolytree.mtl
+mtllib tree_forrest.mtl
 o Cylinder
 v -0.005440 -0.809443 -0.939428
 v 0.019167 3.227034 0.022684
