@@ -2,6 +2,11 @@
 !   Definition of assertion in T-Flows.  It should be used in conjuction with  !
 !   Assert_Mod.  Variable T_FLOWS_ASSERT is passed from the makefile           !
 !------------------------------------------------------------------------------!
+
+! This is file name without a path, not sure if it should be used
+# define __F__ __FILE__(index(__FILE__,'/',back=.true.)+1:len(__FILE__))
+
+! Definition of Assert
 # if T_FLOWS_ASSERT == 1
 #   if __GFORTRAN__ == 1
 #     define Assert(X) call Handle_Assert(.not.(X), "X", __FILE__, __LINE__)
