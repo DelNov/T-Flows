@@ -287,7 +287,9 @@
   write(fu) data_size
   do s = s_f, s_l
     mag = sqrt(Grid % sx(s)**2 + Grid % sy(s)**2 + Grid % sz(s)**2)
-    write(fu) Grid % sx(s) / mag, Grid % sy(s) / mag, Grid % sz(s) / mag
+    write(fu) Grid % sx(s) / (mag+TINY),  &
+              Grid % sy(s) / (mag+TINY),  &
+              Grid % sz(s) / (mag+TINY)
   end do
 
   ! Connection vectors
