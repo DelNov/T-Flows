@@ -46,7 +46,7 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=no/yes>      )
+$(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
 $(info #        <REAL=double/single> <MPI=no/yes>                              )
@@ -124,18 +124,18 @@ else
     FC = $(FCOMP)
   endif
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g -cpp                                 \
-                 -ffixed-line-length-80 -fcheck=all -fwhole-file -fbacktrace  \
-                 -ffpe-trap=invalid,zero,overflow -fimplicit-none             \
-                 -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries     \
-                 -Wc-binding-type -Wcharacter-truncation -Wline-truncation    \
-                 -Wconversion -finit-real=nan    -Wintrinsics-std             \
-                 -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow            \
-                 -Wintrinsic-shadow -Wunused-parameter -Walign-commons        \
-                 -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all       \
+    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g -cpp                                  \
+                 -ffree-line-length-none -fcheck=all -fwhole-file -fbacktrace  \
+                 -ffpe-trap=invalid,zero,overflow -fimplicit-none              \
+                 -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries      \
+                 -Wc-binding-type -Wcharacter-truncation -Wline-truncation     \
+                 -Wconversion -finit-real=nan    -Wintrinsics-std              \
+                 -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow             \
+                 -Wintrinsic-shadow -Wunused-parameter -Walign-commons         \
+                 -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all        \
                  -Wtarget-lifetime -Wpedantic -fstack-check
   else
-    OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp
+    OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp -ffree-line-length-none
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
