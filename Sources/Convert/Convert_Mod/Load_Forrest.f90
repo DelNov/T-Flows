@@ -97,6 +97,12 @@
 
   close(fu)
 
+  ! Scale the single tree by forrest height
+  Grid(1) % zn(:) = Grid(1) % zn - f_min_z
+  Grid(1) % xn(:) = Grid(1) % xn * (f_max_z - f_min_z)
+  Grid(1) % yn(:) = Grid(1) % yn * (f_max_z - f_min_z)
+  Grid(1) % zn(:) = Grid(1) % zn * (f_max_z - f_min_z)
+
   !---------------------!
   !   Place the seeds   !
   !---------------------!
@@ -131,7 +137,7 @@
       min_dist = min(min_dist, Math % Distance(t_x(t1), t_y(t1), 0.0,  &
                                                t_x(t2), t_y(t2), 0.0))
     end do
-    if(min_dist < max(delta_x, delta_y)) then
+    if(min_dist < 0.7 * max(delta_x, delta_y)) then
       attempts = attempts + 1
       if(attempts > 1000 * n_trees) goto 4
         n_trees = t1 - 1
