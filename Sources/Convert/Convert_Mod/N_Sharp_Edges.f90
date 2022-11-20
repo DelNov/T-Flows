@@ -4,9 +4,6 @@
 !   Counts and marks (with edge_data) edges at sharp boundaries and            !
 !   in between different boundary conditions.                                  !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert

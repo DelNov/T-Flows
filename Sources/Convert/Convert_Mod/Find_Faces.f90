@@ -16,9 +16,6 @@
 !           already face-based, thus one will not need to find faces in them.  !
 !   Note 3: This is called before geometrical quantities are calculated.       !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert

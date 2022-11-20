@@ -13,9 +13,6 @@
 !   Grid % faces_n       - list of each boundary face's nodes                  !
 !   Grid % faces_c       - a pair of cells surrounding each boundary face      !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert
