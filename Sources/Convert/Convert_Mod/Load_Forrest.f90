@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid(2)    ! Grid(1) holds the tree
+  type(Grid_Type)     :: Grid(2)    ! Grid(1) holds the single normalized tree
   character(SL)       :: file_name
 !-----------------------------------[Locals]-----------------------------------!
 
@@ -22,7 +22,7 @@
   end type
 
   type(Forrest_Type) :: forrest
-  integer            :: fu, s, n, i_nod, v, fac
+  integer            :: fu, s, n, i_nod, v, fac, attempts
   integer            :: n_trees, t1, t2, t, n0, n1, n2
   real               :: f_min_x, f_max_x, f_min_y, f_max_y, f_min_z, f_max_z
   real               :: delta_x, delta_y, min_dist, tmp
@@ -48,7 +48,7 @@
     if(Line % tokens(1) .eq. 'endsolid') exit
     if(Line % tokens(1) .eq. 'facet') forrest % n_facets = forrest % n_facets + 1
   end do
-  print '(a38,i9)', ' # Number of facets on the forrest: ', forrest % n_facets
+  print '(a,i9)', ' # Number of facets on the forrest: ', forrest % n_facets
 
   allocate(forrest % facet(forrest % n_facets))
 
@@ -110,17 +110,20 @@
   n_trees = floor(   (0.5 * (f_max_x - f_min_x) / delta_x)  &
                    * (0.5 * (f_max_x - f_min_x) / delta_x)  &
                    * 1.333 )
-  print '(a,i9,a)', ' # Planting ', n_trees, ' trees'
+  print '(a,i4,a)', ' # Attempting to plant ', n_trees, ' trees'
 
   ! Allocate memory for trees' coordinates
   allocate(t_x(n_trees));  t_x(:) = 0.0
   allocate(t_y(n_trees));  t_y(:) = 0.0
 
   ! Place individual trees ...
+  attempts = 0
   do t1 = 1, n_trees
 3   continue
-    call random_number(tmp);  t_x(t1) = f_min_x + tmp * (f_max_x - f_min_x)
-    call random_number(tmp);  t_y(t1) = f_min_y + tmp * (f_max_y - f_min_y)
+    call random_number(tmp);  t_x(t1) = f_min_x + delta_x / 2.0  &
+                                      + tmp * (f_max_x - f_min_x - delta_x)
+    call random_number(tmp);  t_y(t1) = f_min_y + delta_y / 2.0  &
+                                      + tmp * (f_max_y - f_min_y - delta_y)
 
     ! ... making sure they are not too close to one another
     min_dist = HUGE
@@ -129,13 +132,20 @@
                                                t_x(t2), t_y(t2), 0.0))
     end do
     if(min_dist < max(delta_x, delta_y)) then
+      attempts = attempts + 1
+      if(attempts > 1000 * n_trees) goto 4
+        n_trees = t1 - 1
       goto 3
+    else
+      attempts = 0
     end if
   end do
+4 continue
+  print '(a,i4,a)', ' # Eventually planted  ', n_trees, ' trees'
 
-  !-----------------------------------------------!
-  !   Plant the trees, one by one, into Grid(2)   !
-  !-----------------------------------------------!
+  !------------------------------------------------------------------!
+  !   Plant the trees, one by one, by copying Grid(1) into Grid(2)   !
+  !------------------------------------------------------------------!
   Grid(2) % n_nodes = Grid(1) % n_nodes * n_trees
   Grid(2) % n_faces = Grid(1) % n_faces * n_trees
   Grid(2) % name    = Grid(1) % name
@@ -153,8 +163,11 @@
     end do
     n1 = t * Grid(1) % n_nodes + 1
     n2 = t * Grid(1) % n_nodes + Grid(1) % n_nodes
+
     Grid(2) % xn(n1:n2) = Grid(1) % xn(1:Grid(1) % n_nodes) + t_x(t+1)
     Grid(2) % yn(n1:n2) = Grid(1) % yn(1:Grid(1) % n_nodes) + t_y(t+1)
+
+    ! Randomize the height a little bit
     call random_number(tmp)
     tmp = 0.9 + 0.2 * tmp
     Grid(2) % zn(n1:n2) = Grid(1) % zn(1:Grid(1) % n_nodes) * tmp
