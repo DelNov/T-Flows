@@ -86,6 +86,31 @@
     end do
   end if
 
+  !-----------------------------------------!
+  !   Check if it is Gambit's file format   !
+  !-----------------------------------------!
+  if(file_format .eq. 'UNKNOWN') then
+    rewind(fu)
+
+    ! Skip three lines ... there could be "matlib"
+    ! line and there are at least three vertice
+    do l = 1, 3
+      call File % Read_Line(fu)
+    end do
+    call File % Read_Line(fu)
+    if(Line % tokens(1) .eq. 'v') then
+      file_format = 'OBJ'
+      print *, '#=================================='   // &
+               '==================================='
+      print *, '# Based on the contents, you are re'   // &
+               'ading Wavefront''s .obj file format'
+      print *, '#----------------------------------'   // &
+               '-----------------------------------'
+      goto 1  ! exit wouldn't work here
+    end if
+  end if
+1 continue
+
   close(fu)
 
   !----------------------------!

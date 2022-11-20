@@ -27,9 +27,9 @@
   ! Open with a logo
   call Convert % Logo_Con()
 
-  print *, '#================================================================'
-  print *, '# Enter the name of the grid file you are importing (with ext.):'
-  print *, '#----------------------------------------------------------------'
+  print '(a)', ' #========================================================'
+  print '(a)', ' # Enter the grid file name you are importing (with ext.):'
+  print '(a)', ' #--------------------------------------------------------'
   read(*,*) file_name
 
   !-----------------------------------------------!
@@ -73,6 +73,26 @@
     call Convert % Load_Gmsh(Grid(1), file_name)
     call Convert % Find_Parents(Grid(1))
   end if
+  if(file_format .eq. 'OBJ') then
+
+    ! Read the single tree
+    call Convert % Load_Obj(Grid(1), file_name)
+    call Grid(1) % Save_Vtu_Faces()
+
+    print '(a)', ' #========================================================'
+    print '(a)', ' # Enter STL forrest file name to plant trees (with ext.):'
+    print '(a)', ' #--------------------------------------------------------'
+    read(*,*) file_name
+
+    ! Read the forrest STL file and plant the trees
+    call Convert % Load_Forrest(Grid, file_name)
+    call Grid(2) % Save_Vtu_Faces()
+
+    ! Finalize program profler
+    call Profiler % Stop('Main')
+    call Profiler % Statistics(indent=1)
+    stop
+  end if
 
   ! Sort cells in height first thing after reading	    
   if(city) then
@@ -96,9 +116,9 @@
   !   Decide if you are going for dual grid as well   !
   !                                                   !
   !---------------------------------------------------!
-  print *, '#================================================='
-  print *, '# Would you like to create a dual grid? (yes/no)'
-  print *, '#-------------------------------------------------'
+  print '(a)', ' #================================================='
+  print '(a)', ' # Would you like to create a dual grid? (yes/no)'
+  print '(a)', ' #-------------------------------------------------'
   call File % Read_Line(5)
   answer = Line % tokens(1)
   call String % To_Upper_Case(answer)
@@ -114,12 +134,12 @@
   do g = 1, n_grids
 
     if(n_grids .eq. 2) then
-      print *,              '#======================================'
-      print *,              '#                                      '
-      if(g .eq. 1) print *, '# Processing the first (primal) grid'
-      if(g .eq. 2) print *, '# Processing the second (dual) grid'
-      print *,              '#                                    '
-      print *,              '#--------------------------------------'
+      print '(a)',              ' #======================================'
+      print '(a)',              ' #                                      '
+      if(g .eq. 1) print '(a)', ' # Processing the first (primal) grid'
+      if(g .eq. 2) print '(a)', ' # Processing the second (dual) grid'
+      print '(a)',              ' #                                    '
+      print '(a)',              ' #--------------------------------------'
       if(g .eq. 2) call Convert % Create_Dual(Grid(1), Grid(2))
     end if
 
