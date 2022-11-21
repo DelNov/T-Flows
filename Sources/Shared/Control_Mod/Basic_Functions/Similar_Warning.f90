@@ -14,9 +14,12 @@
   logical :: found
 !==============================================================================!
 
-  ! Make monitoring points an exception
+  ! Make monitoring points and porosity zones exceptions
   if(len_trim(keyword) .eq. 20) then
     if(keyword(1:16) .eq. 'MONITORING_POINT') return
+  end if
+  if(len_trim(keyword) .eq. 17) then
+    if(keyword(1:13) .eq. 'POROUS_REGION') return
   end if
 
   !----------------------------------------------!

@@ -277,6 +277,7 @@ SRC_F_MOD += Point_Mod.f90          \
              Info_Mod.f90           \
              Eddies_Mod.f90         \
              Monitor_Mod.f90        \
+             Porosity_Mod.f90       \
              Turb_Mod.f90           \
              Vof_Mod.f90            \
              Particle_Mod.f90       \

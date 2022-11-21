@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Process, Flow, Turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Momentum(Process, Flow, Turb, Vof, Por, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -10,6 +10,7 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
+  type(Porosity_Type), target :: Por
   integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
@@ -302,7 +303,7 @@
     !----------------------------------------!
     !   All other terms defined by the user  !
     !----------------------------------------!
-    call User_Mod_Force(Flow, ui, M, fi)
+    call User_Mod_Force(Flow, Por, ui, M, fi)
 
     !-----------------------------------------------------------!
     !   Copy forces from current component to right hand side   !

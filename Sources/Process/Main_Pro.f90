@@ -19,6 +19,7 @@
   type(Solver_Type)     :: Sol(MD)         ! native and PETSc linear solvers
   type(Turb_Plane_Type) :: turb_planes(MD) ! holder for synthetic turbulences
   type(Monitor_Type)    :: monitor(MD)     ! monitors
+  type(Porosity_Type)   :: Por(MD)         ! porosity
   type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
   real                  :: time            ! physical time of the simulation
   integer               :: first_dt        ! first time step in this run
@@ -175,6 +176,8 @@
     ! Initialize monitoring points
     call Monitor(d) % Initialize(Flow(d), read_backup(d), domain=d)
 
+    call Por(d) % Create_Porosity(Grid(d))
+
     ! Plane for calcution of overall mass fluxes
     call Control_Mod_Point_For_Monitoring_Planes(Flow(d) % bulk % xp,  &
                                                  Flow(d) % bulk % yp,  &
@@ -321,12 +324,12 @@
         call Flow(d) % Grad_Variable(Flow(d) % w)
 
         ! All three velocity components one after another
-        call Process % Compute_Momentum(Flow(d), Turb(d), Vof(d),  &
+        call Process % Compute_Momentum(Flow(d), Turb(d), Vof(d), Por(d),  &
                                         Sol(d), curr_dt, ini)
         call Process % Compute_Pressure(Flow(d), Vof(d), Sol(d), curr_dt, ini)
         call Process % Correct_Velocity(Flow(d), Vof(d), Sol(d), curr_dt, ini)
 
-        call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d),  &
+        call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d), Por(d),  &
                                       Sol(d), curr_dt, ini)
 
         call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
