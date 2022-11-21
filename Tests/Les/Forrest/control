@@ -1,102 +1,81 @@
-#-----------------------------------------------------------
-# This is a minimum control file for T-Flows for the domain
-# "domain"
-#
-# One can use it as a staring point for defining entries
-# in T-Flows' control file.  These files are created at
-# the end of each call to Conver or Generate sub-programs.
-#
-# Each line starting with a # is, obviously, a comment.
-# Lines starting with ! or % are also skipped as comments.
-#-----------------------------------------------------------
+#----------
+# Prologue
+#----------
+ PROBLEM_NAME    domain
+ HEAT_TRANSFER   no
 
-#-----------------------------------------------------------
-# Problem name must be specified and corresponds to the
-# base name (without extensions) of the grid file used.
-#-----------------------------------------------------------
-  PROBLEM_NAME        domain
+ TIME_STEP                                   0.5
+ NUMBER_OF_TIME_STEPS                      14400   (this is two hours)
+ STARTING_TIME_STEP_FOR_TURB_STATISTICS     7200   (this is one hour)
+ RESULTS_SAVE_INTERVAL                       600   (five minutes)
+ BACKUP_SAVE_INTERVAL                        600
 
-#-----------------------------------------------------------
-# Boundary conditions also must be specified and are
-# listed here, for this grid, with some dummy values
-#
-# T-Flows neglects what it doesn't need to read, so in
-# the lines below, only "wall" will be read as the type of
-# boundary conditions, everything in () braces is skipped.
-#
-# The same holds for the values listed.  If simulation is
-# laminar or LES, T-Flows will skip the values for "k",
-# "eps", "zeta" and "f22"
-#-----------------------------------------------------------
-  BOUNDARY_CONDITION bottom
-    TYPE             wall  (or: inflow / outflow / pressure / convective)
-    VARIABLES        u     v     w     t    kin   eps    zeta   f22
-    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
+# Switched from superbee to central after 3600 time steps (half an hour)
+ LOAD_BACKUP_NAME   domain-ts003600.backup
 
-  BOUNDARY_CONDITION top
-    TYPE             wall  (or: inflow / outflow / pressure / convective)
-    VARIABLES        u     v     w     t    kin   eps    zeta   f22
-    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
-
-#-----------------------------------------------------------
-# And, that's it, what is listed above is the bare minimum.
-# If nothing else is prescribed, T-Flows will take default
-# values as documented in Documents/all_control_keywords.
-#
-# Clearly, such a simulation wouldn't be very useful, so
-# in the following are some of the most essential options
-# for the control file. Simply uncomment what you need.
-#
-# All the entries (except the sub-entries such as: TYPE,
-# VARIABLES/VALUES after each of the BOUNDARY_CONDITION
-# can be inserted in any order.  T-Flows will take whatever
-# it needs, whenever it needs it.  The entire boundary
-# section may as well be at he end of the file.
-#-----------------------------------------------------------
-
-#-----------------------------------------------------------
-# Time stepping
-#-----------------------------------------------------------
-! TIME_STEP                 0.001
-! NUMBER_OF_TIME_STEPS   1200
-! RESULTS_SAVE_INTERVAL   300  (how often will it save)
-
-#-----------------------------------------------------------
-# Physical properties
-#-----------------------------------------------------------
-! MASS_DENSITY           1.0
-! THERMAL_CONDUCTIVITY   1.4e-4
-! DYNAMIC_VISCOSITY      1.0e-4
-! HEAT_CAPACITY          1.0
-
-#-----------------------------------------------------------
+#-------------------
 # Monitoring points
-#-----------------------------------------------------------
-! NUMBER_OF_MONITORING_POINTS  4
-!   MONITORING_POINT_001       0.0  0.0  2.0
-!   MONITORING_POINT_002       0.0  0.0  2.5
-!   MONITORING_POINT_003       0.0  0.0  3.0
-!   MONITORING_POINT_004       0.0  0.0  3.5
-! POINT_FOR_MONITORING_PLANES  0.17  0.17  1.51
+#-------------------
+ NUMBER_OF_MONITORING_POINTS    2
+ MONITORING_POINT_001           10.5  10.5  11.0
+ MONITORING_POINT_002           10.5  10.5  59.0
+ POINT_FOR_MONITORING_PLANES    10.5  10.5  10.5
 
-#-----------------------------------------------------------
-# Initial condition
-#
-# These are very simular to BOUNDARY_CONDITION section above
-# and also here sub-entries VARIABLES and VALUES must be
-# specified in the given order.
-#-----------------------------------------------------------
-! INITIAL_CONDITION
-!   VARIABLES        u     v     w     t    kin    eps    zeta     f22
-!   VALUES           0.0   0.0   0.0   10   1e-2   1e-3   6.6e-2   1e-3
+#-----------------
+# Physical models
+#-----------------
+ MASS_DENSITY           1.2
+ DYNAMIC_VISCOSITY      1.8e-5
+ HEAT_CAPACITY          1006.0
 
-#-----------------------------------------------------------
-# For flows with inlets and outlets, initialization by a
-# pressure-like potential field could prove to be useful
-#-----------------------------------------------------------
-!  POTENTIAL_INITIALIZATION     yes
+ TURBULENCE_MODEL       les_dynamic
 
-#-----------------------------------------------------------
-# For more customizations, check the file:
-# Documents/all_control_keywords.
-#-----------------------------------------------------------
+ MASS_FLOW_RATES     13824.0  0.0   0.0
+
+#----------------
+# Porous regions
+#----------------
+  NUMBER_OF_POROUS_REGIONS  1
+    POROUS_REGION_001
+      STL_FILE    forrest.stl
+
+#----------------------
+# Numerical parameters
+#----------------------
+ PRESSURE_MOMENTUM_COUPLING    piso
+
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.95
+
+ MIN_SIMPLE_ITERATIONS         1
+
+ TIME_INTEGRATION_SCHEME  parabolic
+
+# Switched from superbee to central after 3600 time steps (half an hour)
+ ADVECTION_SCHEME_FOR_MOMENTUM    central
+
+ PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
+
+ TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-4
+ TOLERANCE_FOR_PRESSURE_SOLVER     1.e-4
+ TOLERANCE_FOR_SIMPLE_ALGORITHM    1.e-3
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w
+    VALUES              1.0   0.0   0.0
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION    bottom
+    TYPE                wall
+    VARIABLES           u     v     w     z_o
+    VALUES              0.0   0.0   0.0   0.02
+
+  BOUNDARY_CONDITION    top
+    TYPE                symmetry
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
