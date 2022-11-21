@@ -10,8 +10,7 @@
  RESULTS_SAVE_INTERVAL                       600   (five minutes)
  BACKUP_SAVE_INTERVAL                        600
 
-# Switched from superbee to central after 3600 time steps (half an hour)
- LOAD_BACKUP_NAME   domain-ts003600.backup
+#  LOAD_BACKUP_NAME   domain-ts003600.backup
 
 #-------------------
 # Monitoring points
@@ -51,8 +50,7 @@
 
  TIME_INTEGRATION_SCHEME  parabolic
 
-# Switched from superbee to central after 3600 time steps (half an hour)
- ADVECTION_SCHEME_FOR_MOMENTUM    central
+ ADVECTION_SCHEME_FOR_MOMENTUM    superbee
 
  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
 
