@@ -21,10 +21,12 @@ Eddies_Mod/*.f90
 # Dependencies for: ./Porosity_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Porosity_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Stl_Mod.o \
+Stl_Mod/*.f90 \
 Porosity_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Control_Mod/*.f90 
@@ -396,6 +398,14 @@ Iso_Polygons_Mod/*.f90 \
 Isoap_Mod/readme \
 Isoap_Mod/*.f90 \
 Isoap_Mod/Dim_Polyhedron.h 
+
+#---------------------------------------------------
+# Dependencies for: ./Stl_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Stl_Mod.o:\
+Stl_Mod/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Matrix_Mod.f90

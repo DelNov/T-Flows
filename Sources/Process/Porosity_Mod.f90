@@ -5,41 +5,27 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Control_Mod
+  use Stl_Mod
   use Work_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
-
-
-  !---------------------------------!
-  !   Facet (in an STL file) type   !
-  !---------------------------------!
-  type Facet_Type
-    real :: x(3), y(3), z(3)  ! vertex's coordinates
-    real :: xc,   yc,   zc    ! facet's centroid
-    real :: nx,   ny,   nz    ! normal vector
-  end type
-
-  !--------------!
-  !   Stl type   !
-  !--------------!
-  type Stl_Type
-    integer                       :: n_facets
-    type(Facet_Type), allocatable :: facet(:)
-  end type
 
   !------------------------!
   !   Porous region type   !
   !------------------------!
   type Porous_Region_Type
 
-    ! Convex STL file which defines the porosity shape (must be convex)
-    character(SL) :: stl_file
+    ! Each region is defined by one convex STL object ...
+    type(Stl_Type) :: stl
+
+    ! ... which, in turn, is defined in a file
+    character(SL)  :: stl_name
 
     ! Porosity coefficients
-    real :: c1_x = 0.0, c2_x = 0.0;
-    real :: c1_y = 0.0, c2_y = 0.0;
-    real :: c1_z = 0.0, c2_z = 0.0;
+    real :: c1_x = 0.0, c2_x = 0.0
+    real :: c1_y = 0.0, c2_y = 0.0
+    real :: c1_z = 0.0, c2_z = 0.0
 
     ! Store porosity for all cells
     logical, allocatable :: cell_porous(:)
