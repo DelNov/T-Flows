@@ -33,6 +33,11 @@
 
     contains
       procedure          :: Allocate_Polyhedron
+#     if T_FLOWS_COMPILATION == 1
+      procedure, private :: Calculate_Cell_Centroid
+      procedure          :: Calculate_Cell_Volume
+      procedure, private :: Calculate_Face_Centroid
+#     endif
       procedure          :: Create_Complexcell
       procedure          :: Create_Cube
       procedure          :: Create_Cutcube
@@ -65,6 +70,11 @@
   contains
 
 #   include "Polyhedron_Mod/Allocate_Polyhedron.f90"
+#   if T_FLOWS_COMPILATION == 1
+#   include "Polyhedron_Mod/Calculate_Cell_Centroid.f90"
+#   include "Polyhedron_Mod/Calculate_Cell_Volume.f90"
+#   include "Polyhedron_Mod/Calculate_Face_Centroid.f90"
+#   endif
 #   include "Polyhedron_Mod/Create_Complexcell.f90"
 #   include "Polyhedron_Mod/Create_Cube.f90"
 #   include "Polyhedron_Mod/Create_Cutcube.f90"
