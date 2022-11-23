@@ -6,6 +6,11 @@
 !                                                                              !
 !   Conditional compilation allows to test Isoap outside of T-Flows.           !
 !------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+# if T_FLOWS_COMPILATION == 1
+  use Work_Mod
+# endif
+!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
@@ -43,6 +48,9 @@
       procedure          :: Create_Sicosahedron
       procedure          :: Create_Tetrahedron
       procedure          :: Create_Zigzagcell
+#     if T_FLOWS_COMPILATION == 1
+      procedure          :: Extract_From_Grid
+#     endif
       procedure, private :: Func_1
       procedure, private :: Func_2
       procedure, private :: Func_3
@@ -72,6 +80,9 @@
 #   include "Polyhedron_Mod/Create_Sicosahedron.f90"
 #   include "Polyhedron_Mod/Create_Tetrahedron.f90"
 #   include "Polyhedron_Mod/Create_Zigzagcell.f90"
+#   if T_FLOWS_COMPILATION == 1
+#   include "Polyhedron_Mod/Extract_From_Grid.f90"
+#   endif
 #   include "Polyhedron_Mod/Func_1.f90"
 #   include "Polyhedron_Mod/Func_2.f90"
 #   include "Polyhedron_Mod/Func_3.f90"
