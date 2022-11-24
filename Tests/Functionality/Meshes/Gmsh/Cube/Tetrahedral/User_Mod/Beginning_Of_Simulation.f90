@@ -35,7 +35,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer     :: Grid
   type(Stl_Type)               :: Sphere
-  integer                      :: cut_count
+  integer                      :: cut_count, new_faces_n_nodes
   real                         :: tot_vol, cel_vol, di
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
   real                         :: p1(3), p2(3), p3(3)
@@ -43,7 +43,7 @@
   real                         :: f(3), n(3), l(3)
   integer                      :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
   logical                      :: ij_cut_flag, has_point_five
-  integer, allocatable         :: ij_cut(:,:)
+  integer, allocatable         :: ij_cut(:,:), new_faces_n(:)
   real,    allocatable         :: x_ij_int(:)
   real,    allocatable         :: y_ij_int(:)
   real,    allocatable         :: z_ij_int(:)
@@ -51,6 +51,7 @@
 
   ! Allocate local memory
   allocate(ij_cut(MAX_ISOAP_VERTS,MAX_ISOAP_VERTS))
+  allocate(new_faces_n(MAX_ISOAP_VERTS))
   allocate(x_ij_int(MAX_ISOAP_VERTS))
   allocate(y_ij_int(MAX_ISOAP_VERTS))
   allocate(z_ij_int(MAX_ISOAP_VERTS))
@@ -123,12 +124,19 @@
       !----------------------------------------!
       do s = 1, Polyhedron % n_faces
 
+        new_faces_n_nodes = 0  ! initalize number of nodes in new face
+        new_faces_n(:)    = 0  ! initialize new face's node list to zero
+
         ! Browse nodes in circular direction
         do i_nod = 1, Polyhedron % faces_n_nodes(s)
           j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
 
           i = Polyhedron % faces_n(s, i_nod)
           j = Polyhedron % faces_n(s, j_nod)
+
+          ! Plain copy of the old node (i) to new face's nodes
+          new_faces_n_nodes = new_faces_n_nodes + 1
+          new_faces_n(new_faces_n_nodes) = i  ! just copy "i"
 
           !---------------------------------------------------!
           !   The connection between i and j wasn't cut yet   !
@@ -193,11 +201,18 @@
           end if  ! ij_cut == 0
 
         end do  ! through nodes of the face
+
+        ! Now when all the nodes have been browsed, reform the
+        ! face, I mean overwrite the old one with the new one
+        Polyhedron % faces_n_nodes(s) = new_faces_n_nodes
+        Polyhedron % faces_n(s, 1:new_faces_n_nodes)  &
+                  = new_faces_n(1:new_faces_n_nodes)
+
       end do    ! through polyhedron faces
     end do      ! through STL facets
 
     if(cut_count .ge. 1) then
-      print *, '# Saving cell ', c
+      print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
       call Polyhedron % Plot_Polyhedron_Vtk(c)
     end if
 
