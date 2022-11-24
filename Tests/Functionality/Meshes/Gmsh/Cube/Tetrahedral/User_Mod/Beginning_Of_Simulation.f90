@@ -16,13 +16,15 @@
   type(Grid_Type), pointer     :: Grid
   type(Stl_Type)               :: Sphere
   integer, contiguous, pointer :: cut_count(:)
+  integer                      :: n_cut_stl
+  integer                      :: cut_stl(1024)
   real                         :: tot_vol, cel_vol, di
   real                         :: tet_1, tet_2, tet_3, tet_4, tet_5
   real                         :: px1, py1, pz1, px2, py2, pz2, px3, py3, pz3
   real                         :: qxi, qyi, qzi, qxj, qyj, qzj
   real                         :: xf, yf, zf, nx, ny, nz, lx, ly, lz
-  integer                      :: c, s, f, i, j, i_nod, j_nod
-  logical                      :: ij_cut
+  integer                      :: c, s, f, i, j, i_nod, j_nod, i_fac, run
+  logical                      :: ij_cut, has_point_five
   integer, allocatable         :: ij_visited(:,:)
   real,    allocatable         :: x_ij_int(:)
   real,    allocatable         :: y_ij_int(:)
@@ -78,6 +80,8 @@
 
     Polyhedron % phi(1:Polyhedron % n_nodes) = 0.5
 
+    n_cut_stl  = 0
+    cut_stl(:) = 0
     do f = 1, Sphere % n_facets
 
       ! STL vertex coordinates
@@ -114,98 +118,100 @@
 
           if(ij_visited(i,j) == 0) then
 
-          ij_cut = .false.
+            ij_cut = .false.
 
-          qxi = Polyhedron % nodes_xyz(i, 1)
-          qyi = Polyhedron % nodes_xyz(i, 2)
-          qzi = Polyhedron % nodes_xyz(i, 3)
+            qxi = Polyhedron % nodes_xyz(i, 1)
+            qyi = Polyhedron % nodes_xyz(i, 2)
+            qzi = Polyhedron % nodes_xyz(i, 3)
 
-          qxj = Polyhedron % nodes_xyz(j, 1)
-          qyj = Polyhedron % nodes_xyz(j, 2)
-          qzj = Polyhedron % nodes_xyz(j, 3)
+            qxj = Polyhedron % nodes_xyz(j, 1)
+            qyj = Polyhedron % nodes_xyz(j, 2)
+            qzj = Polyhedron % nodes_xyz(j, 3)
 
-          ! SignedVolume(q1,p1,p2,p3)
-          tet_1 = Math % Tet_Volume(qxi, qyi, qzi,   &
-                                    px1, py1, pz1,   &
-                                    px2, py2, pz2,   &
-                                    px3, py3, pz3)
-
-          ! SignedVolume(q2,p1,p2,p3)
-          tet_2 = Math % Tet_Volume(qxj, qyj, qzj,   &
-                                    px1, py1, pz1,   &
-                                    px2, py2, pz2,   &
-                                    px3, py3, pz3)
-
-          ! tet_1 andn tet_2 have different signs
-          if(tet_1 * tet_2 < 0.0) then
-
-            ! SignedVolume(q1,q2,p1,p2)
-            tet_3 = Math % Tet_Volume(qxi, qyi, qzi,   &
-                                      qxj, qyj, qzj,   &
+            ! Signed volume (q1,p1,p2,p3)
+            tet_1 = Math % Tet_Volume(qxi, qyi, qzi,   &
                                       px1, py1, pz1,   &
-                                      px2, py2, pz2)
-
-            ! SignedVolume(q1,q2,p2,p3)
-            tet_4 = Math % Tet_Volume(qxi, qyi, qzi,   &
-                                      qxj, qyj, qzj,   &
                                       px2, py2, pz2,   &
                                       px3, py3, pz3)
-            if(tet_3 * tet_4 > 0.0) then
 
-              ! SignedVolume(q1,q2,p3,p1)
-              tet_5 = Math % Tet_Volume(qxi, qyi, qzi,   &
+            ! Signed volume (q2,p1,p2,p3)
+            tet_2 = Math % Tet_Volume(qxj, qyj, qzj,   &
+                                      px1, py1, pz1,   &
+                                      px2, py2, pz2,   &
+                                      px3, py3, pz3)
+
+            ! tet_1 andn tet_2 have different signs
+            if(tet_1 * tet_2 < 0.0) then
+
+              ! Signed volume (q1,q2,p1,p2)
+              tet_3 = Math % Tet_Volume(qxi, qyi, qzi,   &
                                         qxj, qyj, qzj,   &
-                                        px3, py3, pz3,   &
-                                        px1, py1, pz1)
+                                        px1, py1, pz1,   &
+                                        px2, py2, pz2)
 
-              if(tet_3 < 0.0 .and. tet_4 < 0.0 .and. tet_5 < 0.0) then
-                ij_cut = .true.
-              end if  ! tet_3, tet_4 and tet_5 have the same sign
-              if(tet_3 > 0.0 .and. tet_4 > 0.0 .and. tet_5 > 0.0) then
-                ij_cut = .true.
-              end if  ! tet_3, tet_4 and tet_5 have the same sign
+              ! Signed volume (q1,q2,p2,p3)
+              tet_4 = Math % Tet_Volume(qxi, qyi, qzi,   &
+                                        qxj, qyj, qzj,   &
+                                        px2, py2, pz2,   &
+                                        px3, py3, pz3)
+              if(tet_3 * tet_4 > 0.0) then
 
-            end if  ! tet_3 and tet_4 have the same sign
+                ! Signed volume (q1,q2,p3,p1)
+                tet_5 = Math % Tet_Volume(qxi, qyi, qzi,   &
+                                          qxj, qyj, qzj,   &
+                                          px3, py3, pz3,   &
+                                          px1, py1, pz1)
 
-          end if  ! tet_1 and tet_2 have different signs
+                if(tet_3 < 0.0 .and. tet_4 < 0.0 .and. tet_5 < 0.0) then
+                  ij_cut = .true.
+                end if  ! tet_3, tet_4 and tet_5 have the same sign
+                if(tet_3 > 0.0 .and. tet_4 > 0.0 .and. tet_5 > 0.0) then
+                  ij_cut = .true.
+                end if  ! tet_3, tet_4 and tet_5 have the same sign
 
-          ! There was a cut_count in between i and j
-          if(ij_cut) then
-            cut_count(c) = cut_count(c) + 1
+              end if  ! tet_3 and tet_4 have the same sign
 
-            ! Vector connecting nodes i and j
-            lx = qxj - qxi
-            ly = qyj - qyi
-            lz = qzj - qzi
+            end if  ! tet_1 and tet_2 have different signs
 
-            ! Distance from i to a point on the plane
-            ! (I picked center of the facet)
-            di = (  (xf - qxi) * nx     &
-                  + (yf - qyi) * ny     &
-                  + (zf - qzi) * nz  )  &
-               / (lx * nx + ly * ny + lz * nz)
+            ! There was a cut_count in between i and j
+            if(ij_cut) then
+              cut_count(c) = cut_count(c) + 1
+              n_cut_stl = n_cut_stl + 1
+              cut_stl(n_cut_stl) = f
 
-            ! Intersection point
-            x_ij_int(cut_count(c)) = qxi + di * lx
-            y_ij_int(cut_count(c)) = qyi + di * ly
-            z_ij_int(cut_count(c)) = qzi + di * lz
+              ! Vector connecting nodes i and j
+              lx = qxj - qxi
+              ly = qyj - qyi
+              lz = qzj - qzi
 
-            ! Mark nodes which are on either side of interface ...
-            ! ... using the scalar product with STL facet centre
-            if( nx*(qxi-xf) + ny*(qyi-yf) + nz*(qzi-zf) > 0.0 ) then
-              Polyhedron % phi(i) = 1.0
-            else
-              Polyhedron % phi(i) = 0.0
-            end if
-            if( nx*(qxj-xf) + ny*(qyj-yf) + nz*(qzj-zf) > 0.0 ) then
-              Polyhedron % phi(j) = 1.0
-            else
-              Polyhedron % phi(j) = 0.0
-            end if
+              ! Distance from i to a point on the plane
+              ! (I picked center of the facet)
+              di = (  (xf - qxi) * nx     &
+                    + (yf - qyi) * ny     &
+                    + (zf - qzi) * nz  )  &
+                 / (lx * nx + ly * ny + lz * nz)
 
-            ij_visited(i,j) = cut_count(c)
-            ij_visited(j,i) = cut_count(c)
-          end if   ! .not. visited
+              ! Intersection point
+              x_ij_int(cut_count(c)) = qxi + di * lx
+              y_ij_int(cut_count(c)) = qyi + di * ly
+              z_ij_int(cut_count(c)) = qzi + di * lz
+
+              ! Mark nodes which are on either side of interface ...
+              ! ... using the scalar product with STL facet centre
+              if( nx*(qxi-xf) + ny*(qyi-yf) + nz*(qzi-zf) > 0.0 ) then
+                Polyhedron % phi(i) = 1.0
+              else
+                Polyhedron % phi(i) = 0.0
+              end if
+              if( nx*(qxj-xf) + ny*(qyj-yf) + nz*(qzj-zf) > 0.0 ) then
+                Polyhedron % phi(j) = 1.0
+              else
+                Polyhedron % phi(j) = 0.0
+              end if
+
+              ij_visited(i,j) = cut_count(c)
+              ij_visited(j,i) = cut_count(c)
+            end if   ! .not. visited
 
           end if  ! ij_cut
 
@@ -213,9 +219,56 @@
 
       end do    ! through polyhedron faces
 
+
     end do  ! through STL facets
 
+!@    !----------------------------------------------------------!
+!@    !   Color the remaining polyhedron nodes by a flood fill   !
+!@    !----------------------------------------------------------!
+!@    do run = 1, Polyhedron % n_faces
+!@
+!@      has_point_five = .false.
+!@
+!@      do s = 1, Polyhedron % n_faces
+!@        do i_nod = 1, Polyhedron % faces_n_nodes(s)
+!@          j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
+!@
+!@          i = Polyhedron % faces_n(s, i_nod)
+!@          j = Polyhedron % faces_n(s, j_nod)
+!@
+!@          if( Math % Approx_Real(Polyhedron % phi(i), 0.5) ) then
+!@            has_point_five = .true.
+!@            if( Math % Approx_Real(Polyhedron % phi(j), 0.0) ) then
+!@              Polyhedron % phi(i) = 0.0
+!@            end if
+!@            if( Math % Approx_Real(Polyhedron % phi(j), 1.0) ) then
+!@              Polyhedron % phi(i) = 1.0
+!@            end if
+!@          end if
+!@
+!@          if( Math % Approx_Real(Polyhedron % phi(j), 0.5) ) then
+!@            has_point_five = .true.
+!@            if( Math % Approx_Real(Polyhedron % phi(i), 0.0) ) then
+!@              Polyhedron % phi(j) = 0.0
+!@            end if
+!@            if( Math % Approx_Real(Polyhedron % phi(i), 1.0) ) then
+!@              Polyhedron % phi(j) = 1.0
+!@            end if
+!@          end if
+!@
+!@        end do  ! i, j, nodes
+!@      end do    ! s, faces of polyhedron
+!@
+!@      ! Exit if there is nothing left to color
+!@      if(.not. has_point_five) then
+!@        goto 1
+!@      end if
+!@
+!@    end do  ! run
+!@1   continue
+
     if(cut_count(c) .ge. 1) call Polyhedron % Plot_Polyhedron_Vtk(c)
+    if(cut_count(c) .ge. 1) print *, c, cut_count(c), n_cut_stl, cut_stl(1:n_cut_stl)
   end do  ! through cells
 
   call Work % Disconnect_Int_Cell(cut_count)
