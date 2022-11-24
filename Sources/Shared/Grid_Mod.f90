@@ -7,6 +7,7 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Assert_Mod
   use Profiler_Mod
   use File_Mod
   use Boundary_Mod
