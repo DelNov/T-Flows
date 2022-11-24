@@ -24,8 +24,8 @@
   real                         :: qxi, qyi, qzi, qxj, qyj, qzj
   real                         :: xf, yf, zf, nx, ny, nz, lx, ly, lz
   integer                      :: c, s, f, i, j, i_nod, j_nod, i_fac, run
-  logical                      :: ij_cut, has_point_five
-  integer, allocatable         :: ij_visited(:,:)
+  logical                      :: ij_cut_flag, has_point_five
+  integer, allocatable         :: ij_cut(:,:)
   real,    allocatable         :: x_ij_int(:)
   real,    allocatable         :: y_ij_int(:)
   real,    allocatable         :: z_ij_int(:)
@@ -34,7 +34,7 @@
   call Work % Connect_Int_Cell(cut_count)
 
   ! Allocate local memory
-  allocate(ij_visited(MAX_ISOAP_VERTS,MAX_ISOAP_VERTS))
+  allocate(ij_cut(MAX_ISOAP_VERTS,MAX_ISOAP_VERTS))
   allocate(x_ij_int(MAX_ISOAP_VERTS))
   allocate(y_ij_int(MAX_ISOAP_VERTS))
   allocate(z_ij_int(MAX_ISOAP_VERTS))
@@ -105,7 +105,7 @@
       ny = Sphere % ny(f)
       nz = Sphere % nz(f)
 
-      ij_visited(:,:) = 0
+      ij_cut(:,:) = 0
 
       do s = 1, Polyhedron % n_faces
 
@@ -116,9 +116,9 @@
           i = Polyhedron % faces_n(s, i_nod)
           j = Polyhedron % faces_n(s, j_nod)
 
-          if(ij_visited(i,j) == 0) then
+          if(ij_cut(i,j) == 0) then
 
-            ij_cut = .false.
+            ij_cut_flag = .false.
 
             qxi = Polyhedron % nodes_xyz(i, 1)
             qyi = Polyhedron % nodes_xyz(i, 2)
@@ -163,10 +163,10 @@
                                           px1, py1, pz1)
 
                 if(tet_3 < 0.0 .and. tet_4 < 0.0 .and. tet_5 < 0.0) then
-                  ij_cut = .true.
+                  ij_cut_flag = .true.
                 end if  ! tet_3, tet_4 and tet_5 have the same sign
                 if(tet_3 > 0.0 .and. tet_4 > 0.0 .and. tet_5 > 0.0) then
-                  ij_cut = .true.
+                  ij_cut_flag = .true.
                 end if  ! tet_3, tet_4 and tet_5 have the same sign
 
               end if  ! tet_3 and tet_4 have the same sign
@@ -174,7 +174,7 @@
             end if  ! tet_1 and tet_2 have different signs
 
             ! There was a cut_count in between i and j
-            if(ij_cut) then
+            if(ij_cut_flag) then
               cut_count(c) = cut_count(c) + 1
               n_cut_stl = n_cut_stl + 1
               cut_stl(n_cut_stl) = f
@@ -209,11 +209,11 @@
                 Polyhedron % phi(j) = 0.0
               end if
 
-              ij_visited(i,j) = cut_count(c)
-              ij_visited(j,i) = cut_count(c)
+              ij_cut(i,j) = cut_count(c)
+              ij_cut(j,i) = cut_count(c)
             end if   ! .not. visited
 
-          end if  ! ij_cut
+          end if  ! ij_cut_flag
 
         end do  ! through nodes of the face
 
@@ -222,50 +222,55 @@
 
     end do  ! through STL facets
 
-!@    !----------------------------------------------------------!
-!@    !   Color the remaining polyhedron nodes by a flood fill   !
-!@    !----------------------------------------------------------!
-!@    do run = 1, Polyhedron % n_faces
-!@
-!@      has_point_five = .false.
-!@
-!@      do s = 1, Polyhedron % n_faces
-!@        do i_nod = 1, Polyhedron % faces_n_nodes(s)
-!@          j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
-!@
-!@          i = Polyhedron % faces_n(s, i_nod)
-!@          j = Polyhedron % faces_n(s, j_nod)
-!@
-!@          if( Math % Approx_Real(Polyhedron % phi(i), 0.5) ) then
-!@            has_point_five = .true.
-!@            if( Math % Approx_Real(Polyhedron % phi(j), 0.0) ) then
-!@              Polyhedron % phi(i) = 0.0
-!@            end if
-!@            if( Math % Approx_Real(Polyhedron % phi(j), 1.0) ) then
-!@              Polyhedron % phi(i) = 1.0
-!@            end if
-!@          end if
-!@
-!@          if( Math % Approx_Real(Polyhedron % phi(j), 0.5) ) then
-!@            has_point_five = .true.
-!@            if( Math % Approx_Real(Polyhedron % phi(i), 0.0) ) then
-!@              Polyhedron % phi(j) = 0.0
-!@            end if
-!@            if( Math % Approx_Real(Polyhedron % phi(i), 1.0) ) then
-!@              Polyhedron % phi(j) = 1.0
-!@            end if
-!@          end if
-!@
-!@        end do  ! i, j, nodes
-!@      end do    ! s, faces of polyhedron
-!@
-!@      ! Exit if there is nothing left to color
-!@      if(.not. has_point_five) then
-!@        goto 1
-!@      end if
-!@
-!@    end do  ! run
-!@1   continue
+    !----------------------------------------------------------!
+    !   Color the remaining polyhedron nodes by a flood fill   !
+    !----------------------------------------------------------!
+    do run = 1, Polyhedron % n_faces
+
+      has_point_five = .false.
+
+      do s = 1, Polyhedron % n_faces
+        do i_nod = 1, Polyhedron % faces_n_nodes(s)
+          j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
+
+          i = Polyhedron % faces_n(s, i_nod)
+          j = Polyhedron % faces_n(s, j_nod)
+
+          ! Try not to spread across interface
+          if(ij_cut(i,j) == 0) then
+
+            if( Math % Approx_Real(Polyhedron % phi(i), 0.5) ) then
+              has_point_five = .true.
+              if( Math % Approx_Real(Polyhedron % phi(j), 0.0) ) then
+                Polyhedron % phi(i) = 0.0
+              end if
+              if( Math % Approx_Real(Polyhedron % phi(j), 1.0) ) then
+                Polyhedron % phi(i) = 1.0
+              end if
+            end if
+
+            if( Math % Approx_Real(Polyhedron % phi(j), 0.5) ) then
+              has_point_five = .true.
+              if( Math % Approx_Real(Polyhedron % phi(i), 0.0) ) then
+                Polyhedron % phi(j) = 0.0
+              end if
+              if( Math % Approx_Real(Polyhedron % phi(i), 1.0) ) then
+                Polyhedron % phi(j) = 1.0
+              end if
+            end if
+
+          end if
+
+        end do  ! i, j, nodes
+      end do    ! s, faces of polyhedron
+
+      ! Exit if there is nothing left to color
+      if(.not. has_point_five) then
+        goto 1
+      end if
+
+    end do  ! run
+1   continue
 
     if(cut_count(c) .ge. 1) call Polyhedron % Plot_Polyhedron_Vtk(c)
     if(cut_count(c) .ge. 1) print *, c, cut_count(c), n_cut_stl, cut_stl(1:n_cut_stl)
