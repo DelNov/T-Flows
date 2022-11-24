@@ -82,19 +82,31 @@
     if(Grid % faces_s(s) .ne. 0) then
       sh = Grid % faces_s(s)
 
-      if(abs(Grid % xc(c2) - Grid % xc(c1) ) > 1.5 * abs(Grid % dx(s))) then
-        if(Grid % xc(c2) > Grid % xc(c1))                      &
-          Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 1
+      if(abs(Grid % dx(s)) > PICO) then
+        if(abs(Grid % xc(c2) - Grid % xc(c1) ) > 1.5 * abs(Grid % dx(s))) then
+          if(Grid % xc(c2) > Grid % xc(c1)) then
+            Assert(Grid % faces_s(s) > 0)
+            Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 1
+          end if
+        end if
       end if
 
-      if(abs(Grid % yc(c2) - Grid % yc(c1) ) > 1.5 * abs(Grid % dy(s))) then
-        if(Grid % yc(c2) > Grid % yc(c1))                      &
-          Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 2
+      if(abs(Grid % dy(s)) > PICO) then
+        if(abs(Grid % yc(c2) - Grid % yc(c1) ) > 1.5 * abs(Grid % dy(s))) then
+          if(Grid % yc(c2) > Grid % yc(c1)) then
+            Assert(Grid % faces_s(s) > 0)
+            Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 2
+          end if
+        end if
       end if
 
-      if(abs(Grid % zc(c2) - Grid % zc(c1) ) > 1.5 * abs(Grid % dz(s))) then
-        if(Grid % zc(c2) > Grid % zc(c1))                      &
-          Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 3
+      if(abs(Grid % dz(s)) > PICO) then
+        if(abs(Grid % zc(c2) - Grid % zc(c1) ) > 1.5 * abs(Grid % dz(s))) then
+          if(Grid % zc(c2) > Grid % zc(c1)) then
+            Assert(Grid % faces_s(s) > 0)
+            Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 3
+          end if
+        end if
       end if
 
     end if

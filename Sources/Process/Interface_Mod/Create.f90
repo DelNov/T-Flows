@@ -107,10 +107,12 @@
 
           ! On periodic faces of domain 1
           do s = 1, Grid(d1) % n_faces
-            c1 = Grid(d1) % faces_c(1,s)
-            if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
-               Grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
-              n1 = n1 + 1
+            if(Grid(d1) % faces_s(s) > 0) then  ! only if it has a shadow
+              c1 = Grid(d1) % faces_c(1,s)
+              if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
+                 Grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
+                n1 = n1 + 1
+              end if
             end if
           end do
           inter(d1, d2) % n1_sub = n1
@@ -130,10 +132,12 @@
 
           ! On periodic faces
           do s = 1, Grid(d2) % n_faces
-            c1 = Grid(d2) % faces_c(1,s)
-            if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
-               Grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
-              n2 = n2 + 1
+            if(Grid(d2) % faces_s(s) > 0) then  ! only if it has a shadow
+              c1 = Grid(d2) % faces_c(1,s)
+              if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
+                 Grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
+                n2 = n2 + 1
+              end if
             end if
           end do
           inter(d1, d2) % n2_sub = n2
@@ -218,17 +222,19 @@
           do s = 1, Grid(d1) % n_faces
             c1 = Grid(d1) % faces_c(1,s)
             c2 = Grid(d1) % faces_c(2,s)
-            if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
-               Grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
-              n1 = n1 + 1
-              pos = n1
-              if(n_proc > 1) pos = pos + off_1(this_proc)
-              ic_1(pos) = c1
-              ib_1(pos) = c2
-              ip_1(pos) = this_proc
-              xf_1(pos) = Grid(d1) % xf(s)
-              yf_1(pos) = Grid(d1) % yf(s)
-              zf_1(pos) = Grid(d1) % zf(s)
+            if(Grid(d1) % faces_s(s) > 0) then  ! only if it has a shadow
+              if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
+                 Grid(d1) % comm % cell_proc(c1) .eq. this_proc) then
+                n1 = n1 + 1
+                pos = n1
+                if(n_proc > 1) pos = pos + off_1(this_proc)
+                ic_1(pos) = c1
+                ib_1(pos) = c2
+                ip_1(pos) = this_proc
+                xf_1(pos) = Grid(d1) % xf(s)
+                yf_1(pos) = Grid(d1) % yf(s)
+                zf_1(pos) = Grid(d1) % zf(s)
+              end if
             end if
           end do
 
@@ -254,17 +260,19 @@
           do s = 1, Grid(d2) % n_faces
             c1 = Grid(d2) % faces_c(1,s)
             c2 = Grid(d2) % faces_c(2,s)
-            if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
-               Grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
-              n2 = n2 + 1
-              pos = n2
-              if(n_proc > 1) pos = pos + off_2(this_proc)
-              ic_2(pos) = c1
-              ib_2(pos) = c2
-              ip_2(pos) = this_proc
-              xf_2 (pos) = Grid(d2) % xf(s)
-              yf_2 (pos) = Grid(d2) % yf(s)
-              zf_2 (pos) = Grid(d2) % zf(s)
+            if(Grid(d2) % faces_s(s) > 0) then  ! only if it has a shadow
+              if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
+                 Grid(d2) % comm % cell_proc(c1) .eq. this_proc) then
+                n2 = n2 + 1
+                pos = n2
+                if(n_proc > 1) pos = pos + off_2(this_proc)
+                ic_2(pos) = c1
+                ib_2(pos) = c2
+                ip_2(pos) = this_proc
+                xf_2 (pos) = Grid(d2) % xf(s)
+                yf_2 (pos) = Grid(d2) % yf(s)
+                zf_2 (pos) = Grid(d2) % zf(s)
+              end if
             end if
           end do
 
