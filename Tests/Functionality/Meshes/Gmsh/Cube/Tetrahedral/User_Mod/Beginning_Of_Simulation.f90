@@ -35,7 +35,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer     :: Grid
   type(Stl_Type)               :: Sphere
-  integer, contiguous, pointer :: cut_count(:)
+  integer                      :: cut_count
   real                         :: tot_vol, cel_vol, di
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
   real                         :: p1(3), p2(3), p3(3)
@@ -48,8 +48,6 @@
   real,    allocatable         :: y_ij_int(:)
   real,    allocatable         :: z_ij_int(:)
 !==============================================================================!
-
-  call Work % Connect_Int_Cell(cut_count)
 
   ! Allocate local memory
   allocate(ij_cut(MAX_ISOAP_VERTS,MAX_ISOAP_VERTS))
@@ -92,12 +90,19 @@
   !------------------------------!
   call Sphere % Create_From_File("sphere.stl")
 
-  cut_count(:) = 0
+  !------------------------------!
+  !   Browse through cells ...   !
+  !------------------------------!
   do c = 1, Grid % n_cells
-    call Polyhedron % Extract_From_Grid(Grid, c)
 
+    cut_count = 0
+
+    call Polyhedron % Extract_From_Grid(Grid, c)
     Polyhedron % phi(1:Polyhedron % n_nodes) = 0.5
 
+    !----------------------------------------!
+    !   Then browse through STL facets ...   !
+    !----------------------------------------!
     do fac = 1, Sphere % n_facets
 
       ! STL vertex coordinates
@@ -113,6 +118,9 @@
 
       ij_cut(:,:) = 0
 
+      !----------------------------------------!
+      !   Then browse through STL facets ...   !
+      !----------------------------------------!
       do s = 1, Polyhedron % n_faces
 
         ! Browse nodes in circular direction
@@ -151,7 +159,7 @@
 
             ! Yes, i and j cross the face !
             if(ij_cut_flag) then
-              cut_count(c) = cut_count(c) + 1
+              cut_count = cut_count + 1
 
               ! Vector connecting nodes i and j
               l = qj - qi
@@ -161,9 +169,9 @@
               di = dot_product(f-qi, n) / dot_product(l, n)
 
               ! Intersection point
-              x_ij_int(cut_count(c)) = qi(1) + di * l(1)
-              y_ij_int(cut_count(c)) = qi(2) + di * l(2)
-              z_ij_int(cut_count(c)) = qi(3) + di * l(3)
+              x_ij_int(cut_count) = qi(1) + di * l(1)
+              y_ij_int(cut_count) = qi(2) + di * l(2)
+              z_ij_int(cut_count) = qi(3) + di * l(3)
 
               ! Mark nodes which are on either side of interface ...
               ! ... using the scalar product with STL facet centre
@@ -178,8 +186,8 @@
                 Polyhedron % phi(j) = 0.0
               end if
 
-              ij_cut(i,j) = cut_count(c)
-              ij_cut(j,i) = cut_count(c)
+              ij_cut(i,j) = cut_count
+              ij_cut(j,i) = cut_count
             end if   ! ij_cut_flag
 
           end if  ! ij_cut == 0
@@ -188,14 +196,12 @@
       end do    ! through polyhedron faces
     end do      ! through STL facets
 
-    if(cut_count(c) .ge. 1) then
+    if(cut_count .ge. 1) then
       print *, '# Saving cell ', c
       call Polyhedron % Plot_Polyhedron_Vtk(c)
     end if
 
   end do  ! through cells
-
-  call Work % Disconnect_Int_Cell(cut_count)
 
   ! Exit gracefully
   call Comm_Mod_End
