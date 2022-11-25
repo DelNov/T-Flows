@@ -40,12 +40,10 @@
   real                     :: f(3), n(3), l(3)
   integer                  :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
   logical                  :: ij_cut_flag, has_one_point_five
-  integer, allocatable     :: ij_cut(:,:), new_faces_n(:)
+  integer                  :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
+  integer                  :: ij_fac(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
+  integer                  :: new_faces_n(MAX_ISOAP_VERTS)
 !==============================================================================!
-
-  ! Allocate local memory
-  allocate(ij_cut(MAX_ISOAP_VERTS,MAX_ISOAP_VERTS))
-  allocate(new_faces_n(MAX_ISOAP_VERTS))
 
   ! Take alias(es)
   Grid => Flow % pnt_grid
@@ -109,6 +107,7 @@
       n(1)=Sphere % nx(fac);  n(2)=Sphere % ny(fac);  n(3)=Sphere % nz(fac)
 
       ij_cut(:,:) = 0
+      ij_fac(:,:) = 0
 
       !----------------------------------------!
       !   Then browse through STL facets ...   !
@@ -181,6 +180,9 @@
               ij_cut(i,j) = Polyhedron % n_nodes
               ij_cut(j,i) = Polyhedron % n_nodes
 
+              ! Store from which face is the node added
+              ij_fac(i,j) = s
+
               ! Add this new bloody node to the list of nodes in the face
               new_faces_n_nodes = new_faces_n_nodes + 1
               new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
@@ -212,6 +214,9 @@
             ! But still, you have to add it to the face list
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
+
+            ! Store from which face is the node added
+            ij_fac(i,j) = s
 
           end if  ! ij_cut == 0
 
@@ -277,6 +282,26 @@
 
     end do  ! run
 1   continue
+
+    !-------------------------!
+    !   Make a little check   !
+    !-------------------------!
+    if(cut_count .ge. 1) then
+      do s = 1, Polyhedron % n_faces
+        do i_nod = 1, Polyhedron % faces_n_nodes(s)
+          j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
+
+          i = Polyhedron % faces_n(s, i_nod)
+          j = Polyhedron % faces_n(s, j_nod)
+
+          if(ij_cut(i,j) > 0) then  ! make check only for edges which are cut
+            if(ij_fac(i,j) .eq. ij_fac(j,i)) then
+              print *, '# Big trouble!', i, j, ij_fac(i,j)
+            end if
+          end if
+        end do
+      end do
+    end if
 
     if(cut_count .ge. 1) then
       print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
