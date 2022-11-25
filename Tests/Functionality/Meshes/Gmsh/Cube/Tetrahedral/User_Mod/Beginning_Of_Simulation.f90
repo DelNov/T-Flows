@@ -35,13 +35,11 @@
   integer                  :: cut_count, new_faces_n_nodes
   real                     :: tot_vol, cel_vol, di
   real                     :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                     :: p1(3), p2(3), p3(3)
-  real                     :: qi(3), qj(3)
-  real                     :: f(3), n(3), l(3)
+  real                     :: p1(3), p2(3), p3(3), qi(3), qj(3)
+  real                     :: f(3), n(3), l(3), xyz_new(3)
   integer                  :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
   logical                  :: ij_cut_flag, has_one_point_five
   integer                  :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
-  integer                  :: ij_fac(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
   integer                  :: new_faces_n(MAX_ISOAP_VERTS)
 !==============================================================================!
 
@@ -107,7 +105,6 @@
       n(1)=Sphere % nx(fac);  n(2)=Sphere % ny(fac);  n(3)=Sphere % nz(fac)
 
       ij_cut(:,:) = 0
-      ij_fac(:,:) = 0
 
       !----------------------------------------!
       !   Then browse through STL facets ...   !
@@ -172,16 +169,13 @@
                                       = qi(1:3) + di * l(1:3)
               Polyhedron % phi(Polyhedron % n_nodes) = 0.5
               ! Polyhedron % phi(Polyhedron % n_nodes) = MEGA
-              PRINT '(a,i2,a,a,i2,a,i2)',                                     &
-                       ' # Inserting new node (', Polyhedron % n_nodes, ')',  &
-                       ' between nodes: ', i, ' and ', j
+              ! PRINT '(a,i2,a,a,i2,a,i2)',                                     &
+              !          ' # Inserting new node (', Polyhedron % n_nodes, ')',  &
+              !          ' between nodes: ', i, ' and ', j
 
               ! Store new node which is added to intersection
               ij_cut(i,j) = Polyhedron % n_nodes
               ij_cut(j,i) = Polyhedron % n_nodes
-
-              ! Store from which face is the node added
-              ij_fac(i,j) = s
 
               ! Add this new bloody node to the list of nodes in the face
               new_faces_n_nodes = new_faces_n_nodes + 1
@@ -206,17 +200,14 @@
           !---------------------------------------------------!
           else  ! ij_cut(i,j) .ne 0
 
-            PRINT '(a,i2,a,a,i2,a,i2)',                        &
-                     ' #     The node (', ij_cut(i,j), ')',    &
-                     ' iss already inserted between nodes: ',  &
-                     i, ' and ', j
+            ! PRINT '(a,i2,a,a,i2,a,i2)',                        &
+            !          ' #     The node (', ij_cut(i,j), ')',    &
+            !          ' iss already inserted between nodes: ',  &
+            !          i, ' and ', j
 
             ! But still, you have to add it to the face list
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
-
-            ! Store from which face is the node added
-            ij_fac(i,j) = s
 
           end if  ! ij_cut == 0
 
@@ -284,6 +275,9 @@
       end do  ! run
     end if
 1   continue
+
+    if(cut_count .ge. 1) then
+    end if
 
     if(cut_count .ge. 1) then
       print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
