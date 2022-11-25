@@ -29,6 +29,11 @@
   type(Swarm_Type),    target :: Swarm
   integer, intent(in)         :: curr_dt  ! time step
   real,    intent(in)         :: time     ! physical time
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: UNDEFINED = 15
+  integer, parameter :: LOW       =  0
+  integer, parameter :: HIGH      = 10
+  integer, parameter :: MEDIUM    =  5
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Stl_Type)           :: Sphere
@@ -92,7 +97,7 @@
     cut_count = 0
 
     call Polyhedron % Extract_From_Grid(Grid, c)
-    Polyhedron % phi(1:Polyhedron % n_nodes) = 1.5
+    Polyhedron % phi_int(1:Polyhedron % n_nodes) = UNDEFINED
 
     !----------------------------------------!
     !   Then browse through STL facets ...   !
@@ -173,8 +178,7 @@
               Polyhedron % n_nodes = Polyhedron % n_nodes + 1
               Polyhedron % nodes_xyz(Polyhedron % n_nodes, 1:3)  &
                                       = qi(1:3) + di * l(1:3)
-              Polyhedron % phi(Polyhedron % n_nodes) = 0.5
-              ! Polyhedron % phi(Polyhedron % n_nodes) = MEGA
+              Polyhedron % phi_int(Polyhedron % n_nodes) = MEDIUM
               ! print '(a,i2,a,a,i2,a,i2)',                                     &
               !          ' # Inserting new node (', Polyhedron % n_nodes, ')',  &
               !          ' between nodes: ', i, ' and ', j
@@ -190,14 +194,14 @@
               ! Mark nodes which are on either side of interface ...
               ! ... using the scalar product with STL facet centre
               if( dot_product(n, qi-f) > 0.0 ) then
-                Polyhedron % phi(i) = 1.0
+                Polyhedron % phi_int(i) = HIGH
               else
-                Polyhedron % phi(i) = 0.0
+                Polyhedron % phi_int(i) = LOW
               end if
               if( dot_product(n, qj-f) > 0.0 ) then
-                Polyhedron % phi(j) = 1.0
+                Polyhedron % phi_int(j) = HIGH
               else
-                Polyhedron % phi(j) = 0.0
+                Polyhedron % phi_int(j) = LOW
               end if
             end if   ! ij_cut_flag
 
@@ -245,26 +249,26 @@
 
             ! Try not to spread across interface - if either i or j are
             ! newly formed nodes, their neighbours are alread set.
-            if( .not. Math % Approx_Real(Polyhedron % phi(i), 0.5) .and.  &
-                .not. Math % Approx_Real(Polyhedron % phi(j), 0.5) ) then
+            if( Polyhedron % phi_int(i) .ne. MEDIUM .and.  &
+                Polyhedron % phi_int(j) .ne. MEDIUM ) then
 
-              if( Math % Approx_Real(Polyhedron % phi(i), 1.5) ) then
+              if( Polyhedron % phi_int(i) .eq. UNDEFINED ) then
                 has_one_point_five = .true.
-                if( Math % Approx_Real(Polyhedron % phi(j), 0.0) ) then
-                  Polyhedron % phi(i) = 0.0
+                if( Polyhedron % phi_int(j) .eq. LOW ) then
+                  Polyhedron % phi_int(i) = LOW
                 end if
-                if( Math % Approx_Real(Polyhedron % phi(j), 1.0) ) then
-                  Polyhedron % phi(i) = 1.0
+                if( Polyhedron % phi_int(j) .eq. HIGH ) then
+                  Polyhedron % phi_int(i) = HIGH
                 end if
               end if
 
-              if( Math % Approx_Real(Polyhedron % phi(j), 1.5) ) then
+              if( Polyhedron % phi_int(j) .eq. UNDEFINED ) then
                 has_one_point_five = .true.
-                if( Math % Approx_Real(Polyhedron % phi(i), 0.0) ) then
-                  Polyhedron % phi(j) = 0.0
+                if( Polyhedron % phi_int(i) .eq. LOW ) then
+                  Polyhedron % phi_int(j) = LOW
                 end if
-                if( Math % Approx_Real(Polyhedron % phi(i), 1.0) ) then
-                  Polyhedron % phi(j) = 1.0
+                if( Polyhedron % phi_int(i) .eq. HIGH ) then
+                  Polyhedron % phi_int(j) = HIGH
                 end if
               end if
 
@@ -307,6 +311,8 @@
         Pol1 % nodes_xyz(i,1:3) = Polyhedron % nodes_xyz(i,1:3)
         Pol0 % phi      (i)     = Polyhedron % phi      (i)
         Pol1 % phi      (i)     = Polyhedron % phi      (i)
+        Pol0 % phi_int  (i)     = Polyhedron % phi_int  (i)
+        Pol1 % phi_int  (i)     = Polyhedron % phi_int  (i)
       end do
 
       !-----------------!
@@ -319,7 +325,7 @@
         ! Browse nodes in circular direction
         do i_nod = 1, Pol0 % faces_n_nodes(s)
           i = Pol0 % faces_n(s, i_nod)
-          if( Pol0 % phi(i) < 0.50001) then
+          if( Pol0 % phi_int(i) .le. MEDIUM ) then
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
           end if
@@ -342,7 +348,7 @@
         ! Browse nodes in circular direction
         do i_nod = 1, Pol1 % faces_n_nodes(s)
           i = Pol1 % faces_n(s, i_nod)
-          if( Pol1 % phi(i) > 0.49999) then
+          if( Pol1 % phi_int(i) .ge. MEDIUM) then
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
           end if
@@ -357,6 +363,11 @@
     end if
 
     if(cut_count .ge. 1) then
+      do i = 1, Polyhedron % n_nodes
+        Polyhedron % phi(i) = real(Polyhedron % phi_int(i)) / real(HIGH)
+        Pol0       % phi(i) = real(Pol0       % phi_int(i)) / real(HIGH)
+        Pol1       % phi(i) = real(Pol1       % phi_int(i)) / real(HIGH)
+      end do
       print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
       ! call Polyhedron % Plot_Polyhedron_Vtk(c)
       call Pol0 % Plot_Polyhedron_Vtk("pol0", c)
