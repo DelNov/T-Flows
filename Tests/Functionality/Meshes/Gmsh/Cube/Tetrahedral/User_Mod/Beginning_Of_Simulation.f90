@@ -7,15 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   real, intent(in) :: p1(3), p2(3), p3(3), p4(3)
 !==============================================================================!
-
   Sgn_Volume = (   (  (p2(2)-p1(2))*(p3(3)-p1(3))                      &
                     - (p3(2)-p1(2))*(p2(3)-p1(3)) ) * (p4(1)-p1(1)) +  &
                    (  (p3(1)-p1(1))*(p2(3)-p1(3))                      &
                     - (p2(1)-p1(1))*(p3(3)-p1(3)) ) * (p4(2)-p1(2)) +  &
                    (  (p2(1)-p1(1))*(p3(2)-p1(2))                      &
-                    - (p3(1)-p1(1))*(p2(2)-p1(2)) ) * (p4(3)-p1(3)) )  &
-             / 6.0
-
+                    - (p3(1)-p1(1))*(p2(2)-p1(2)) ) * (p4(3)-p1(3)) ) / 6.0
   end function
 
 !==============================================================================!
@@ -33,28 +30,22 @@
   integer, intent(in)         :: curr_dt  ! time step
   real,    intent(in)         :: time     ! physical time
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer     :: Grid
-  type(Stl_Type)               :: Sphere
-  integer                      :: cut_count, new_faces_n_nodes
-  real                         :: tot_vol, cel_vol, di
-  real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                         :: p1(3), p2(3), p3(3)
-  real                         :: qi(3), qj(3)
-  real                         :: f(3), n(3), l(3)
-  integer                      :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
-  logical                      :: ij_cut_flag, has_point_five
-  integer, allocatable         :: ij_cut(:,:), new_faces_n(:)
-  real,    allocatable         :: x_ij_int(:)
-  real,    allocatable         :: y_ij_int(:)
-  real,    allocatable         :: z_ij_int(:)
+  type(Grid_Type), pointer :: Grid
+  type(Stl_Type)           :: Sphere
+  integer                  :: cut_count, new_faces_n_nodes
+  real                     :: tot_vol, cel_vol, di
+  real                     :: vol_1, vol_2, vol_3, vol_4, vol_5
+  real                     :: p1(3), p2(3), p3(3)
+  real                     :: qi(3), qj(3)
+  real                     :: f(3), n(3), l(3)
+  integer                  :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
+  logical                  :: ij_cut_flag, has_point_five
+  integer, allocatable     :: ij_cut(:,:), new_faces_n(:)
 !==============================================================================!
 
   ! Allocate local memory
   allocate(ij_cut(MAX_ISOAP_VERTS,MAX_ISOAP_VERTS))
   allocate(new_faces_n(MAX_ISOAP_VERTS))
-  allocate(x_ij_int(MAX_ISOAP_VERTS))
-  allocate(y_ij_int(MAX_ISOAP_VERTS))
-  allocate(z_ij_int(MAX_ISOAP_VERTS))
 
   ! Take alias(es)
   Grid => Flow % pnt_grid
@@ -177,9 +168,21 @@
               di = dot_product(f-qi, n) / dot_product(l, n)
 
               ! Intersection point
-              x_ij_int(cut_count) = qi(1) + di * l(1)
-              y_ij_int(cut_count) = qi(2) + di * l(2)
-              z_ij_int(cut_count) = qi(3) + di * l(3)
+              Polyhedron % n_nodes = Polyhedron % n_nodes + 1
+              Polyhedron % nodes_xyz(Polyhedron % n_nodes, 1:3)  &
+                                      = qi(1:3) + di * l(1:3)
+              ! Polyhedron % phi(Polyhedron % n_nodes) = MEGA
+              PRINT '(a,i2,a,a,i2,a,i2)',                                     &
+                       ' # Inserting new node (', Polyhedron % n_nodes, ')',  &
+                       ' between nodes: ', i, ' and ', j
+
+              ! Store new node which is added to intersection
+              ij_cut(i,j) = Polyhedron % n_nodes
+              ij_cut(j,i) = Polyhedron % n_nodes
+
+              ! Add this new bloody node to the list of nodes in the face
+              new_faces_n_nodes = new_faces_n_nodes + 1
+              new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
 
               ! Mark nodes which are on either side of interface ...
               ! ... using the scalar product with STL facet centre
@@ -193,10 +196,21 @@
               else
                 Polyhedron % phi(j) = 0.0
               end if
-
-              ij_cut(i,j) = cut_count
-              ij_cut(j,i) = cut_count
             end if   ! ij_cut_flag
+
+          !---------------------------------------------------!
+          !   The connection between i and j was cut before   !
+          !---------------------------------------------------!
+          else  ! ij_cut(i,j) .ne 0
+
+            PRINT '(a,i2,a,a,i2,a,i2)',                        &
+                     ' #     The node (', ij_cut(i,j), ')',    &
+                     ' iss already inserted between nodes: ',  &
+                     i, ' and ', j
+
+            ! But still, you have to add it to the face list
+            new_faces_n_nodes = new_faces_n_nodes + 1
+            new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
 
           end if  ! ij_cut == 0
 
