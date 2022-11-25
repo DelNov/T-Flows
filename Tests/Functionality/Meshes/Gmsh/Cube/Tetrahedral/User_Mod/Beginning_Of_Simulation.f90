@@ -39,7 +39,7 @@
   real                     :: qi(3), qj(3)
   real                     :: f(3), n(3), l(3)
   integer                  :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
-  logical                  :: ij_cut_flag, has_point_five
+  logical                  :: ij_cut_flag, has_one_point_five
   integer, allocatable     :: ij_cut(:,:), new_faces_n(:)
 !==============================================================================!
 
@@ -90,7 +90,7 @@
     cut_count = 0
 
     call Polyhedron % Extract_From_Grid(Grid, c)
-    Polyhedron % phi(1:Polyhedron % n_nodes) = 0.5
+    Polyhedron % phi(1:Polyhedron % n_nodes) = 1.5
 
     !----------------------------------------!
     !   Then browse through STL facets ...   !
@@ -171,6 +171,7 @@
               Polyhedron % n_nodes = Polyhedron % n_nodes + 1
               Polyhedron % nodes_xyz(Polyhedron % n_nodes, 1:3)  &
                                       = qi(1:3) + di * l(1:3)
+              Polyhedron % phi(Polyhedron % n_nodes) = 0.5
               ! Polyhedron % phi(Polyhedron % n_nodes) = MEGA
               PRINT '(a,i2,a,a,i2,a,i2)',                                     &
                        ' # Inserting new node (', Polyhedron % n_nodes, ')',  &
@@ -224,6 +225,58 @@
 
       end do    ! through polyhedron faces
     end do      ! through STL facets
+
+    !----------------------------------------------------------!
+    !   Color the remaining polyhedron nodes by a flood fill   !
+    !----------------------------------------------------------!
+    do run = 1, Polyhedron % n_faces
+
+      has_one_point_five = .false.
+
+      do s = 1, Polyhedron % n_faces
+        do i_nod = 1, Polyhedron % faces_n_nodes(s)
+          j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
+
+          i = Polyhedron % faces_n(s, i_nod)
+          j = Polyhedron % faces_n(s, j_nod)
+
+          ! Try not to spread across interface - if either i or j are
+          ! newly formed nodes, their neighbours are alread set.
+          if( .not. Math % Approx_Real(Polyhedron % phi(i), 0.5) .and.  &
+              .not. Math % Approx_Real(Polyhedron % phi(j), 0.5) ) then
+
+            if( Math % Approx_Real(Polyhedron % phi(i), 1.5) ) then
+              has_one_point_five = .true.
+              if( Math % Approx_Real(Polyhedron % phi(j), 0.0) ) then
+                Polyhedron % phi(i) = 0.0
+              end if
+              if( Math % Approx_Real(Polyhedron % phi(j), 1.0) ) then
+                Polyhedron % phi(i) = 1.0
+              end if
+            end if
+
+            if( Math % Approx_Real(Polyhedron % phi(j), 1.5) ) then
+              has_one_point_five = .true.
+              if( Math % Approx_Real(Polyhedron % phi(i), 0.0) ) then
+                Polyhedron % phi(j) = 0.0
+              end if
+              if( Math % Approx_Real(Polyhedron % phi(i), 1.0) ) then
+                Polyhedron % phi(j) = 1.0
+              end if
+            end if
+
+          end if
+
+        end do  ! i, j, nodes
+      end do    ! s, faces of polyhedron
+
+      ! Exit if there is nothing left to color
+      if(.not. has_one_point_five) then
+        goto 1
+      end if
+
+    end do  ! run
+1   continue
 
     if(cut_count .ge. 1) then
       print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
