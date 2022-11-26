@@ -8,7 +8,6 @@
   integer, intent(in)    :: cell
   real,    optional      :: phi_n(:)
 !-----------------------------------[Locals]-----------------------------------!
-  logical, save                :: first_visit = .true.
   integer, contiguous, pointer :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
   integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
@@ -17,12 +16,11 @@
 
   call Work % Connect_Int_Node(local_node)  ! this also sets it to zero
 
-  !-------------------------------------------------------------------------!
-  !   On the first visit, allocate memory for polyhedron and iso-polygons   !
-  !-------------------------------------------------------------------------!
-  if(first_visit) then
+  !----------------------------------------------------------------------!
+  !   If not done yet, allocate memory for polyhedron and iso-polygons   !
+  !----------------------------------------------------------------------!
+  if(.not. Polyhedron % allocated) then
     call Polyhedron % Allocate_Polyhedron(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
-    first_visit = .false.
   end if
 
   !------------------------------------------------!

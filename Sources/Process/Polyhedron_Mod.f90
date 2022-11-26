@@ -22,6 +22,7 @@
   !---------------------!
   type Polyhedron_Type
 
+    logical                              :: allocated = .false.
     integer                              :: n_nodes        ! ntp
     integer                              :: n_faces        ! nts
     integer, allocatable, dimension(:)   :: faces_n_nodes  ! nipv (ns)
@@ -38,6 +39,7 @@
       procedure, private :: Calculate_Cell_Centroid
       procedure          :: Calculate_Cell_Volume
       procedure, private :: Calculate_Face_Centroid
+      procedure          :: Create_From_Polyhedron
 #     endif
       procedure          :: Create_Complexcell
       procedure          :: Create_Cube
@@ -75,6 +77,7 @@
 #   include "Polyhedron_Mod/Calculate_Cell_Centroid.f90"
 #   include "Polyhedron_Mod/Calculate_Cell_Volume.f90"
 #   include "Polyhedron_Mod/Calculate_Face_Centroid.f90"
+#   include "Polyhedron_Mod/Create_From_Polyhedron.f90"
 #   endif
 #   include "Polyhedron_Mod/Create_Complexcell.f90"
 #   include "Polyhedron_Mod/Create_Cube.f90"

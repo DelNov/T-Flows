@@ -16,5 +16,6 @@
   allocate(Pol % phi          (n_nodes))
   allocate(Pol % phi_int      (n_nodes))
   allocate(Pol % global_node  (n_nodes))
+  Pol % allocated = .true.
 
   end subroutine

@@ -54,10 +54,6 @@
   ! Take alias(es)
   Grid => Flow % pnt_grid
 
-  ! Allocate memory for new polyhedrons
-  call Pol0 % Allocate_Polyhedron(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
-  call Pol1 % Allocate_Polyhedron(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
-
   !-------------------------------------------------------------!
   !   Calculate and report integral volume in traditional way   !
   !-------------------------------------------------------------!
@@ -298,24 +294,8 @@
       !-------------------------------------!
       !   First just copy the polyhedrons   !
       !-------------------------------------!
-      Pol0 % n_nodes = Polyhedron % n_nodes
-      Pol1 % n_nodes = Polyhedron % n_nodes
-      Pol0 % n_faces = Polyhedron % n_faces
-      Pol1 % n_faces = Polyhedron % n_faces
-      do s = 1, Polyhedron % n_faces
-        Pol0 % faces_n_nodes(s) = Polyhedron % faces_n_nodes(s)
-        Pol1 % faces_n_nodes(s) = Polyhedron % faces_n_nodes(s)
-        Pol0 % faces_n(s,:)     = Polyhedron % faces_n(s,:)
-        Pol1 % faces_n(s,:)     = Polyhedron % faces_n(s,:)
-      end do
-      do i = 1, Polyhedron % n_nodes
-        Pol0 % nodes_xyz(i,1:3) = Polyhedron % nodes_xyz(i,1:3)
-        Pol1 % nodes_xyz(i,1:3) = Polyhedron % nodes_xyz(i,1:3)
-        Pol0 % phi      (i)     = Polyhedron % phi      (i)
-        Pol1 % phi      (i)     = Polyhedron % phi      (i)
-        Pol0 % phi_int  (i)     = Polyhedron % phi_int  (i)
-        Pol1 % phi_int  (i)     = Polyhedron % phi_int  (i)
-      end do
+      call Pol0 % Create_From_Polyhedron(Polyhedron)
+      call Pol1 % Create_From_Polyhedron(Polyhedron)
 
       !-----------------!
       !   Create Pol0   !
