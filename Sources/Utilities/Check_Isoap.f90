@@ -41,7 +41,7 @@
   if(command_argument_count() .ne. 3) then
     print *, 'Correct invocation:'
     print *, ''
-    print *, './test <icell_geom> <ifunc> <phiiso>'
+    print *, './test <icell_geom> <ifunc> <phi_iso>'
     print *, ''
     print *, 'Where arguments passed to test, mean the following:'
     print *, ''
@@ -70,7 +70,7 @@
     call get_command_argument(2, arg)
     read(arg, *) ifunc
     call get_command_argument(3, arg)
-    read(arg, *) Pol % phiiso
+    read(arg, *) Pol % phi_iso
 
     call Pol % Pick_A_Test_Case(icellgeom, ifunc)
 
@@ -78,7 +78,7 @@
     !   Print the polyhedral cell to the file 'geo00000.vtk'   !
     !----------------------------------------------------------!
     ifile = 0
-    call Pol % Plot_Polyhedron_Vtk(ifile)
+    call Pol % Plot_Polyhedron_Vtk("geo", ifile)
 
     !---------------------------------------------------------------!
     !   Iso-surface extraction: this is the core of the algorithm   !
