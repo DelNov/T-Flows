@@ -166,7 +166,6 @@
 
             ! Yes, i and j cross the face !
             if(ij_cut_flag) then
-              cut_count = cut_count + 1
 
               ! Vector connecting nodes i and j
               l = qj - qi
@@ -174,6 +173,8 @@
               ! Distance from i to a point on the plane
               ! (I picked center of the facet)
               di = dot_product(f-qi, n) / dot_product(l, n)
+
+              cut_count = cut_count + 1
 
               ! Intersection point
               Polyhedron % n_nodes = Polyhedron % n_nodes + 1
@@ -236,7 +237,7 @@
     !----------------------------------------------------------!
     !   Color the remaining polyhedron nodes by a flood fill   !
     !----------------------------------------------------------!
-    if(cut_count .gt. 1) then
+    if(cut_count .gt. 2) then
       do run = 1, Polyhedron % n_faces
 
         has_one_point_five = .false.
@@ -292,7 +293,7 @@
     !   This is tough ... try to skip nodes with value 0.0 and 1.0   !
     !                                                                !
     !----------------------------------------------------------------!
-    if(cut_count .ge. 1) then
+    if(cut_count .gt. 2) then
 
       !-------------------------------------!
       !   First just copy the polyhedrons   !
@@ -464,14 +465,14 @@
 
     end if  ! cut count
 
-    if(cut_count .ge. 1) then
+    if(cut_count .gt. 2) then
       do i = 1, Polyhedron % n_nodes
         Polyhedron % phi(i) = real(Polyhedron % phi_int(i)) / real(HIGH)
         Pol0       % phi(i) = real(Pol0       % phi_int(i)) / real(HIGH)
         Pol1       % phi(i) = real(Pol1       % phi_int(i)) / real(HIGH)
       end do
       print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
-      if(cut_count .eq. 2) call Polyhedron % Plot_Polyhedron_Vtk("geo", c)
+      ! call Polyhedron % Plot_Polyhedron_Vtk("geo", c)
       call Pol0 % Plot_Polyhedron_Vtk("pol0", c)
       call Pol1 % Plot_Polyhedron_Vtk("pol1", c)
     end if
