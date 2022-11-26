@@ -1,21 +1,21 @@
 !==============================================================================!
-  subroutine Plot_Iso_Polygons_Vtk(Iso, ifile)
+  subroutine Plot_Iso_Polygons_Vtk(Iso, rank)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Iso_Polygons_Type) :: Iso
-  integer, intent(in)      :: ifile
+  integer, intent(in)      :: rank
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i, ip, is, iv
   integer           :: npoly, ndata, ntp
   character(len=80) :: filename  ! don't use SL for separate compilation
 !==============================================================================!
 
-  write(filename,'("iso-",i7.7,".vtk")') ifile
+  write(filename,'("iso-",i7.7,".vtk")') rank
   open(11, file=filename)
 
   write(11,'(a26)')     '# vtk DataFile Version 2.0'
-  write(11,'(a6,i7.7)') 'File: ', ifile
+  write(11,'(a6,i7.7)') 'File: ', rank
   write(11,'(a5)')      'ASCII'
   write(11,*)           ' '
   write(11,'(a16)')     'DATASET POLYDATA'
