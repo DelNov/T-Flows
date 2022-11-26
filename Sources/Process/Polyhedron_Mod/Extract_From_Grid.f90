@@ -34,7 +34,8 @@
   Polyhedron % faces_n      (:,:) = 0
   Polyhedron % nodes_xyz    (:,:) = 0.0
   Polyhedron % phi          (:)   = 0.0
-  Polyhedron % phiiso             = 0.5
+  Polyhedron % phi_int      (:)   = 0
+  Polyhedron % phi_iso            = 0.5
   Polyhedron % global_node  (:)   = 0
 
   !---------------------------------------!

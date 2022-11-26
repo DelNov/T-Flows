@@ -60,7 +60,7 @@
   NTS      => POLYHEDRON % N_FACES          ! original: NTS
   VERTP    => POLYHEDRON % NODES_XYZ        ! original: VERTP
   PHI      => POLYHEDRON % PHI
-  PHIISO   => POLYHEDRON % PHIISO
+  PHIISO   => POLYHEDRON % PHI_ISO
   IPVISO   => ISO_POLYGONS % POLYS_V        ! original: IPVISO
   ISOEFACE => ISO_POLYGONS % FACE_INDEX     ! original: ISOEFACE
   NIPVISO  => ISO_POLYGONS % POLYS_N_VERTS  ! original: NIPVISO

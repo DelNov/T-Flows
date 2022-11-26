@@ -28,7 +28,8 @@
     integer, allocatable, dimension(:,:) :: faces_n        ! ipv  (ns,nv)
     real,    allocatable, dimension(:,:) :: nodes_xyz      ! vertp(nv,3)
     real,    allocatable, dimension(:)   :: phi            ! (nv)
-    real                                 :: phiiso
+    integer, allocatable, dimension(:)   :: phi_int        ! (nv)
+    real                                 :: phi_iso
     integer, allocatable, dimension(:)   :: global_node(:)
 
     contains

@@ -36,7 +36,7 @@
 
   print *, 'icellgeom:', icellgeom
   print *, 'ifunc:',     ifunc
-  print *, 'phiiso:',    Pol % phiiso
+  print *, 'phiiso:',    Pol % phi_iso
 
   if(icellgeom .lt. 1 .or. icellgeom .gt. 110 .or. (icellgeom.gt.5.and.  &
        icellgeom.lt.101)) then
