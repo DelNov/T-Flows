@@ -9,6 +9,7 @@
 *.mod
 *.cgns
 *.vtu
+*.vtk
 *.com
 *.pvtu
 *.restart
