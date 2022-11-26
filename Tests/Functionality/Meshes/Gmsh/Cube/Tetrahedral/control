@@ -1,7 +1,1 @@
-  PROBLEM_NAME        cube_tet_dual
-
-  BOUNDARY_CONDITION all_walls
-    TYPE             wall  (or: inflow / outflow / pressure / convective)
-    VARIABLES        u     v     w     t    kin   eps    zeta   f22
-    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
-
+control_structured
