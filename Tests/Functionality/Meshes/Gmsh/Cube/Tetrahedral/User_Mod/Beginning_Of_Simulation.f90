@@ -39,7 +39,7 @@
   type(Stl_Type)           :: Sphere
   type(Polyhedron_Type)    :: Pol0
   type(Polyhedron_Type)    :: Pol1
-  integer                  :: cut_count, new_faces_n_nodes
+  integer                  :: cut_count, new_faces_n_nodes, n_combo, cc, next_n
   real                     :: tot_vol, cel_vol, di
   real                     :: vol_1, vol_2, vol_3, vol_4, vol_5
   real                     :: p1(3), p2(3), p3(3), qi(3), qj(3)
@@ -48,6 +48,7 @@
   logical                  :: ij_cut_flag, has_one_point_five
   integer                  :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
   integer                  :: new_faces_n(MAX_ISOAP_VERTS)
+  integer                  :: combos(MAX_ISOAP_FACES, 2)
 !==============================================================================!
 
   ! Take alias(es)
@@ -337,6 +338,56 @@
         Pol0 % faces_n(s,1:new_faces_n_nodes)  &
            = new_faces_n(1:new_faces_n_nodes)
       end do    ! through polyhedron faces
+      ! What if there is a face without any nodes at MEDIUM?
+      ! Well, faces_n_nodes will be zero for that face
+
+      !-----------------------------------!
+      !   Try to re-create missing face   !
+      !-----------------------------------!
+      n_combo     = 0
+      combos(:,:) = 0
+      do s = 1, Pol0 % n_faces
+        do i_nod = 1, Pol0 % faces_n_nodes(s)
+          j_nod = i_nod + 1; if(j_nod > Pol0 % faces_n_nodes(s)) j_nod = 1
+
+          i = Pol0 % faces_n(s, i_nod)
+          j = Pol0 % faces_n(s, j_nod)
+
+          if( Pol0 % phi_int(i) .eq. MEDIUM .and.  &
+              Pol0 % phi_int(j) .eq. MEDIUM ) then
+            n_combo = n_combo + 1
+            combos(n_combo, 1) = i
+            combos(n_combo, 2) = j
+            ! PRINT *, 'COMBO ', COMBOS(n_COMBO, :)
+          end if
+        end do
+      end do
+
+      if(n_combo > 0) then
+
+        ! First two nodes are just coppied
+        new_faces_n(1) = combos(1, 1)
+        new_faces_n(2) = combos(1, 2)
+        new_faces_n_nodes = 2
+        next_n = new_faces_n(new_faces_n_nodes)
+4       continue
+        do cc = 2, n_combo
+          if(combos(cc, 1) .eq. next_n) then
+            next_n = combos(cc, 2)
+            if(next_n .eq. new_faces_n(1)) goto 5  ! you closed the circle
+            new_faces_n_nodes = new_faces_n_nodes + 1
+            new_faces_n(new_faces_n_nodes) = next_n
+            goto 4
+          end if
+        end do
+5       continue
+
+        ! Add the face now
+        Pol0 % n_faces       = Pol0 % n_faces + 1
+        Pol0 % faces_n_nodes(Pol0 % n_faces) = new_faces_n_nodes
+        Pol0 % faces_n(Pol0 % n_faces, 1:new_faces_n_nodes)  &
+                         = new_faces_n(1:new_faces_n_nodes)
+      end if
 
       !-----------------!
       !   Create Pol1   !
@@ -360,7 +411,58 @@
         Pol1 % faces_n(s,1:new_faces_n_nodes)  &
            = new_faces_n(1:new_faces_n_nodes)
       end do    ! through polyhedron faces
-    end if
+      ! What if there is a face without any nodes at MEDIUM?
+      ! Well, faces_n_nodes will be zero for that face
+
+      !-----------------------------------!
+      !   Try to re-create missing face   !
+      !-----------------------------------!
+      n_combo     = 0
+      combos(:,:) = 0
+      do s = 1, Pol1 % n_faces
+        do i_nod = 1, Pol1 % faces_n_nodes(s)
+          j_nod = i_nod + 1; if(j_nod > Pol1 % faces_n_nodes(s)) j_nod = 1
+
+          i = Pol1 % faces_n(s, i_nod)
+          j = Pol1 % faces_n(s, j_nod)
+
+          if( Pol1 % phi_int(i) .eq. MEDIUM .and.  &
+              Pol1 % phi_int(j) .eq. MEDIUM ) then
+            n_combo = n_combo + 1
+            combos(n_combo, 1) = i
+            combos(n_combo, 2) = j
+            ! PRINT *, 'COMBO ', COMBOS(n_COMBO, :)
+          end if
+        end do
+      end do
+
+      if(n_combo > 0) then
+
+        ! First two nodes are just coppied
+        new_faces_n(1) = combos(1, 1)
+        new_faces_n(2) = combos(1, 2)
+        new_faces_n_nodes = 2
+        next_n = new_faces_n(new_faces_n_nodes)
+6       continue
+        do cc = 2, n_combo
+          if(combos(cc, 1) .eq. next_n) then
+            next_n = combos(cc, 2)
+            if(next_n .eq. new_faces_n(1)) goto 7  ! you closed the circle
+            new_faces_n_nodes = new_faces_n_nodes + 1
+            new_faces_n(new_faces_n_nodes) = next_n
+            goto 6
+          end if
+        end do
+7       continue
+
+        ! Add the face now
+        Pol1 % n_faces       = Pol1 % n_faces + 1
+        Pol1 % faces_n_nodes(Pol1 % n_faces) = new_faces_n_nodes
+        Pol1 % faces_n(Pol1 % n_faces, 1:new_faces_n_nodes)  &
+                         = new_faces_n(1:new_faces_n_nodes)
+      end if
+
+    end if  ! cut count
 
     if(cut_count .ge. 1) then
       do i = 1, Polyhedron % n_nodes
@@ -369,7 +471,7 @@
         Pol1       % phi(i) = real(Pol1       % phi_int(i)) / real(HIGH)
       end do
       print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
-      ! call Polyhedron % Plot_Polyhedron_Vtk(c)
+      if(cut_count .eq. 2) call Polyhedron % Plot_Polyhedron_Vtk("geo", c)
       call Pol0 % Plot_Polyhedron_Vtk("pol0", c)
       call Pol1 % Plot_Polyhedron_Vtk("pol1", c)
     end if
