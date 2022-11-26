@@ -8,10 +8,10 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i, ip, is, iv
   integer           :: npoly, ndata, ntp
-  character(len=14) :: filename
+  character(len=80) :: filename  ! don't use SL for separate compilation
 !==============================================================================!
 
-  write(filename,'("iso",i7.7,".vtk")') ifile
+  write(filename,'("iso-",i7.7,".vtk")') ifile
   open(11, file=filename)
 
   write(11,'(a26)')     '# vtk DataFile Version 2.0'
