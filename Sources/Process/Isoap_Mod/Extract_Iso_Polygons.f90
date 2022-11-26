@@ -9,13 +9,10 @@
   real                :: phi_n(:)
 !-----------------------------------[Locals]-----------------------------------!
   logical, save                :: first_visit = .true.
-  integer, contiguous, pointer :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
   integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
   integer                      :: s, n, faces_n_nodes
 !==============================================================================!
-
-  call Work % Connect_Int_Node(local_node)  ! this also sets it to zero
 
   !-------------------------------------------------------------------------!
   !   On the first visit, allocate memory for polyhedron and iso-polygons   !
@@ -51,7 +48,5 @@
 
   ! Plot extracted polygons
   ! call Iso_Polygons % Plot_Iso_Polygons_Vtk(cell)
-
-  call Work % Disconnect_Int_Node(local_node)
 
   end subroutine
