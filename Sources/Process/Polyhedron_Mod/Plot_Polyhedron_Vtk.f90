@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Plot_Polyhedron_Vtk(Pol, ifile)
+  subroutine Plot_Polyhedron_Vtk(Pol, head, ifile)
 !------------------------------------------------------------------------------!
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Polyhedron_Type) :: Pol
+  character(*)           :: head
   integer, intent(in)    :: ifile
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: ip, is, iv, ndata, npoly
-  character(len=14) :: filename
+  character(len=80) :: filename  ! don't use SL for separate compilation
 !==============================================================================!
 
-  write(filename,'("geo",i7.7,".vtk")') ifile
+  write(filename,'(a,"-",i7.7,".vtk")') trim(head), ifile
 
   open(11, file=filename)
   write(11,'(a26)')     '# vtk DataFile Version 2.0'
