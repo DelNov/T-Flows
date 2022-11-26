@@ -60,6 +60,13 @@
      write(11,'(f12.6)') Pol % phi(ip)
   end do
 
+  ! Write out the cell number (couldn't do it at cell/polygon)
+  write(11,'(a18)')    'SCALARS cell int 1'
+  write(11,'(a20)')    'LOOKUP_TABLE default'
+  do ip = 1, Pol % n_nodes
+     write(11,'(i9)') rank
+  end do
+
   ! Write out node indices
   write(11,'(a18)')    'SCALARS node int 1'
   write(11,'(a20)')    'LOOKUP_TABLE default'
