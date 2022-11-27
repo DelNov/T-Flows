@@ -39,10 +39,11 @@
   type(Stl_Type)           :: Sphere
   type(Polyhedron_Type)    :: Pol0
   type(Polyhedron_Type)    :: Pol1
+  real, pointer, contiguous :: vof_nod(:), vof_cel(:)
   integer                  :: cut_count, new_faces_n_nodes, n_combo, cc, next_n
   real                     :: tot_vol, cel_vol, di
   real                     :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                     :: p1(3), p2(3), p3(3), qi(3), qj(3)
+  real                     :: p1(3), p2(3), p3(3), qi(3), qj(3), qn(3)
   real                     :: f(3), n(3), l(3), xyz_new(3)
   integer                  :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
   logical                  :: ij_cut_flag, has_one_point_five
@@ -50,6 +51,9 @@
   integer                  :: new_faces_n(MAX_ISOAP_VERTS)
   integer                  :: combos(MAX_ISOAP_FACES, 2)
 !==============================================================================!
+
+  call Work % Connect_Real_Node(vof_nod)
+  call Work % Connect_Real_Cell(vof_cel)
 
   ! Take alias(es)
   Grid => Flow % pnt_grid
@@ -85,6 +89,70 @@
   !                              !
   !------------------------------!
   call Sphere % Create_From_File("sphere.stl")
+
+  !-----------------------!
+  !   Find vof in nodes   !
+  !-----------------------!
+  do i = 1, Grid % n_nodes
+
+    vof_nod(i) = 0  ! assume node is in the stl
+
+    do fac = 1, Sphere % n_facets
+
+      ! STL vertex coordinates
+      p1(1)=Sphere % x(1,fac); p1(2)=Sphere % y(1,fac); p1(3)=Sphere % z(1,fac)
+      p2(1)=Sphere % x(2,fac); p2(2)=Sphere % y(2,fac); p2(3)=Sphere % z(2,fac)
+      p3(1)=Sphere % x(3,fac); p3(2)=Sphere % y(3,fac); p3(3)=Sphere % z(3,fac)
+
+      ! STL facet centroid
+      f = (p1+p2+p3)/3.0
+
+      ! STL facet normal
+      n(1)=Sphere % nx(fac);  n(2)=Sphere % ny(fac);  n(3)=Sphere % nz(fac)
+
+      if(dot_product(f, n) < 0.0) then
+        PRINT *, 'OUCH, THE ORIENTATION oF THE NORMAL IS WRONG'
+      end if
+
+      ! Vector connecting facet centroid with the node
+      qn(1) = Grid % xn(i) - f(1)
+      qn(2) = Grid % yn(i) - f(2)
+      qn(3) = Grid % zn(i) - f(3)
+
+      ! First time this product is positive, node is outside of STL
+      if(dot_product(qn, n) > 0) then
+        vof_nod(i) = vof_nod(i) + 1.0
+      end if
+    end do
+
+    vof_nod(i) = vof_nod(i) / real(Sphere % n_facets)
+    if(vof_nod(i) < 0.01) then
+      vof_nod(i) = 0.0
+    else
+      vof_nod(i) = 1.0
+    end if
+  end do
+
+
+  call Grid % Save_Debug_Vtu(append="vof_nod",       &
+                             scalar_node=vof_nod,    &
+                             scalar_name="vof_nod")
+
+  !-----------------------!
+  !   Find vof in cells   !
+  !-----------------------!
+  do c = 1, Grid % n_cells
+    vof_cel(c) = 0.0
+    do i_nod = 1, Grid % cells_n_nodes(c)
+      i = Grid % cells_n(i_nod, c)
+      vof_cel(c) = vof_cel(c) + vof_nod(i)
+    end do
+    vof_cel(c) = vof_cel(c) / real(Grid % cells_n_nodes(c))
+  end do
+  ! Exchange is needed here
+  call Grid % Save_Debug_Vtu(append="vof_cel",       &
+                             scalar_cell=vof_cel,    &
+                             scalar_name="vof_cel")
 
   !------------------------------!
   !   Browse through cells ...   !
@@ -458,6 +526,9 @@
     end if
 
   end do  ! through cells
+
+  call Work % Disconnect_Real_Node(vof_nod)
+  call Work % Disconnect_Real_Cell(vof_cel)
 
   ! Exit gracefully
   call Comm_Mod_End
