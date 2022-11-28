@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Extract_From_Grid(Polyhedron, Grid, cell, phi_n)
+  subroutine Extract_From_Grid(Pol, Grid, cell, phi_n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Polyhedron
+  class(Polyhedron_Type) :: Pol
   type(Grid_Type)        :: Grid
   integer, intent(in)    :: cell
   real,    optional      :: phi_n(:)
@@ -19,28 +19,27 @@
   !----------------------------------------------------------------------!
   !   If not done yet, allocate memory for polyhedron and iso-polygons   !
   !----------------------------------------------------------------------!
-  if(.not. Polyhedron % allocated) then
-    call Polyhedron % Allocate_Polyhedron(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
+  if(.not. Pol % allocated) then
+    call Pol % Allocate_Polyhedron(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
   end if
 
-  !------------------------------------------------!
-  !   (Re)initialize Polyhedron and Iso_Polygons   !
-  !------------------------------------------------!
-  Polyhedron % n_nodes            = 0
-  Polyhedron % n_faces            = 0
-  Polyhedron % faces_n_nodes(:)   = 0
-  Polyhedron % faces_n      (:,:) = 0
-  Polyhedron % nodes_xyz    (:,:) = 0.0
-  Polyhedron % phi          (:)   = 0.0
-  Polyhedron % phi_int      (:)   = 0
-  Polyhedron % phi_iso            = 0.5
-  Polyhedron % global_node  (:)   = 0
+  !-------------------------------!
+  !   (Re)initialize Polyhedron   !
+  !-------------------------------!
+  Pol % n_nodes            = 0
+  Pol % n_faces            = 0
+  Pol % faces_n_nodes(:)   = 0
+  Pol % faces_n      (:,:) = 0
+  Pol % nodes_xyz    (:,:) = 0.0
+  Pol % phi          (:)   = 0.0
+  Pol % phi_iso            = 0.5
+  Pol % global_node  (:)   = 0
 
   !---------------------------------------!
   !   Extract number of nodes and faces   !
   !---------------------------------------!
-  Polyhedron % n_faces = Grid % cells_n_faces(cell)
-  Polyhedron % n_nodes = abs(Grid % cells_n_nodes(cell))  ! < 0 for polyhedral
+  Pol % n_faces = Grid % cells_n_faces(cell)
+  Pol % n_nodes = abs(Grid % cells_n_nodes(cell))  ! < 0 for polyhedral
 
   !----------------------------------------------------------------------!
   !   Find local node indices and copy their coordinates and nodal phi   !
@@ -54,15 +53,15 @@
     local_node(n) = l_nod                   ! store local node number
 
     ! Copy node coordinates to polyhedron
-    Polyhedron % nodes_xyz(l_nod,1) = Grid % xn(n)
-    Polyhedron % nodes_xyz(l_nod,2) = Grid % yn(n)
-    Polyhedron % nodes_xyz(l_nod,3) = Grid % zn(n)
+    Pol % nodes_xyz(l_nod,1) = Grid % xn(n)
+    Pol % nodes_xyz(l_nod,2) = Grid % yn(n)
+    Pol % nodes_xyz(l_nod,3) = Grid % zn(n)
 
     ! Since you are here, copy the nodal phi values and global node numbers
     if(present(phi_n)) then
-      Polyhedron % phi(l_nod) = phi_n(n)
+      Pol % phi(l_nod) = phi_n(n)
     end if
-    Polyhedron % global_node(l_nod) = n
+    Pol % global_node(l_nod) = n
   end do
 
   !------------------------------------------------------!
@@ -87,13 +86,13 @@
     end if
 
     ! Store everything in polyhedron
-    Polyhedron % faces_n_nodes(i_fac) = faces_n_nodes
-    Polyhedron % faces_n      (i_fac, 1:faces_n_nodes)  &
-                   = local_face_nodes(1:faces_n_nodes)
+    Pol % faces_n_nodes(i_fac) = faces_n_nodes
+    Pol % faces_n      (i_fac, 1:faces_n_nodes)  &
+            = local_face_nodes(1:faces_n_nodes)
   end do
 
   ! Plot extracted cell first, in case things go wrong
-  ! call Polyhedron % Plot_Polyhedron_Vtk(cell)
+  ! call Pol % Plot_Polyhedron_Vtk(cell)
 
   call Work % Disconnect_Int_Node(local_node)
 
