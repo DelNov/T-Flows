@@ -16,5 +16,6 @@
   allocate(Iso % verts_xyz    (n_nodes, 3))
   allocate(Iso % b_node_1     (n_nodes))
   allocate(Iso % b_node_2     (n_nodes))
+  Iso % allocated = .true.
 
   end subroutine

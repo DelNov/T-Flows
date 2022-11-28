@@ -19,6 +19,7 @@
     integer, allocatable, dimension(:)   :: face_index     ! isoeface(nv)
     integer, allocatable, dimension(:)   :: b_node_1       ! ipia0
     integer, allocatable, dimension(:)   :: b_node_2       ! ipia1
+    logical                              :: allocated = .false.
 
     contains
       procedure :: Allocate_Iso_Polygons

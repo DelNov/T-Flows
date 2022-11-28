@@ -8,18 +8,16 @@
   integer, intent(in) :: cell
   real                :: phi_n(:)
 !-----------------------------------[Locals]-----------------------------------!
-  logical, save                :: first_visit = .true.
-  integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
-  integer                      :: s, n, faces_n_nodes
+  integer :: local_face_nodes(MAX_ISOAP_VERTS)
+  integer :: i_nod, i_fac, i_ver, i_iso, l_nod
+  integer :: s, n, faces_n_nodes
 !==============================================================================!
 
   !-------------------------------------------------------------------------!
   !   On the first visit, allocate memory for polyhedron and iso-polygons   !
   !-------------------------------------------------------------------------!
-  if(first_visit) then
+  if(.not. Iso_Polygons % allocated) then
     call Iso_Polygons % Allocate_Iso_Polygons(MAX_ISOAP_FACES, MAX_ISOAP_VERTS)
-    first_visit = .false.
   end if
 
   !------------------------!
