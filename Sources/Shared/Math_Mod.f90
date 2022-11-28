@@ -19,6 +19,7 @@
 
     contains
       procedure          :: Approx_Real
+      procedure          :: Approx_Three_Reals
       procedure          :: Approx_String
       procedure          :: Cross_Product
       procedure          :: Distance
@@ -47,6 +48,7 @@
   contains
 
 #   include "Math_Mod/Approx_Real.f90"
+#   include "Math_Mod/Approx_Three_Reals.f90"
 #   include "Math_Mod/Approx_String.f90"
 #   include "Math_Mod/Cross_Product.f90"
 #   include "Math_Mod/Distance.f90"
