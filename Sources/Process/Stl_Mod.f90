@@ -18,10 +18,14 @@
 
     contains
       procedure :: Create_From_File
+      procedure :: Facet_Coords
+      procedure :: Facet_Normal
 
   end type
 
   contains
 #   include "Stl_Mod/Create_From_File.f90"
+#   include "Stl_Mod/Facet_Coords.f90"
+#   include "Stl_Mod/Facet_Normal.f90"
 
   end module

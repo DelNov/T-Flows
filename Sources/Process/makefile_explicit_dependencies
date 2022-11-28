@@ -363,6 +363,9 @@ Bulk_Mod/*.f90
 # Dependencies for: ./Polyhedron_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Polyhedron_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
 Polyhedron_Mod/*.f90 
 
 #---------------------------------------------------
@@ -388,9 +391,6 @@ $(DIR_SHARED)/Control_Mod/*.f90
 # Dependencies for: ./Isoap_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Isoap_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
 $(DIR_OBJECT)/Polyhedron_Mod.o \
 Polyhedron_Mod/*.f90 \
 $(DIR_OBJECT)/Iso_Polygons_Mod.o \
@@ -576,7 +576,9 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Boundary_Mod.o 
+$(DIR_OBJECT)/Boundary_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Message_Mod.f90
