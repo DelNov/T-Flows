@@ -14,7 +14,6 @@
   allocate(Pol % faces_n      (n_faces, n_nodes))
   allocate(Pol % nodes_xyz    (n_nodes, 3))
   allocate(Pol % phi          (n_nodes))
-  allocate(Pol % phi_int      (n_nodes))
   allocate(Pol % global_node  (n_nodes))
   Pol % allocated = .true.
 

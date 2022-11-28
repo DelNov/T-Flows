@@ -25,7 +25,6 @@
   Destination % faces_n      (:,:) = 0
   Destination % nodes_xyz    (:,:) = 0.0
   Destination % phi          (:)   = 0.0
-  Destination % phi_int      (:)   = 0
   Destination % phi_iso            = 0.5
   Destination % global_node  (:)   = 0
 
@@ -42,7 +41,6 @@
   do i = 1, Source % n_nodes
     Destination % nodes_xyz  (i,1:3) = Source % nodes_xyz  (i,1:3)
     Destination % phi        (i)     = Source % phi        (i)
-    Destination % phi_int    (i)     = Source % phi_int    (i)
     Destination % global_node(i)     = Source % global_node(i)
   end do
 

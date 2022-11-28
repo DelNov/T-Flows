@@ -22,16 +22,15 @@
   !---------------------!
   type Polyhedron_Type
 
-    logical                              :: allocated = .false.
     integer                              :: n_nodes        ! ntp
     integer                              :: n_faces        ! nts
     integer, allocatable, dimension(:)   :: faces_n_nodes  ! nipv (ns)
     integer, allocatable, dimension(:,:) :: faces_n        ! ipv  (ns,nv)
     real,    allocatable, dimension(:,:) :: nodes_xyz      ! vertp(nv,3)
     real,    allocatable, dimension(:)   :: phi            ! (nv)
-    integer, allocatable, dimension(:)   :: phi_int        ! (nv)
     real                                 :: phi_iso
     integer, allocatable, dimension(:)   :: global_node(:)
+    logical                              :: allocated = .false.
 
     contains
       procedure          :: Allocate_Polyhedron
@@ -67,7 +66,7 @@
 
   end type
 
-  ! Singleton type Polyhedron objects
+  ! Singleton type Polyhedron object
   type(Polyhedron_Type), target :: Polyhedron
 
   contains
