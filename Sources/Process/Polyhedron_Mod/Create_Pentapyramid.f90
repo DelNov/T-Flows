@@ -61,4 +61,4 @@
   Pol % faces_n(6,2) = 1
   Pol % faces_n(6,3) = 6
 
-  end
+  end subroutine

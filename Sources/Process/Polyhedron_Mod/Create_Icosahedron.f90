@@ -64,7 +64,7 @@
   Pol % nodes_xyz(i,2) = -t/a
   Pol % nodes_xyz(i,3) = -1.0/a
   do is = 1,Pol % n_faces
-     Pol % faces_n_nodes(is) = 3
+    Pol % faces_n_nodes(is) = 3
   end do
   is = 1
   i = 1
@@ -207,4 +207,4 @@
   i = i+1
   Pol % faces_n(is,i) = 6
 
-  end
+  end subroutine

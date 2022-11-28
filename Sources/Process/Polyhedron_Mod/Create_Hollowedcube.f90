@@ -47,11 +47,11 @@
   Pol % faces_n(6,3) = 8
   Pol % faces_n(6,4) = 7
   do is = 1,6
-     do iv = 1,4
-        iv2 = 4-iv+1
-        Pol % faces_n(is+6,iv) = Pol % faces_n(is,iv2)+8
-     end do
-     Pol % faces_n_nodes(is+6) = 4
+    do iv = 1,4
+      iv2 = 4-iv+1
+      Pol % faces_n(is+6,iv) = Pol % faces_n(is,iv2)+8
+    end do
+    Pol % faces_n_nodes(is+6) = 4
   end do
 
   !       7/----------/3
@@ -113,4 +113,4 @@
   Pol % nodes_xyz(16,2) = d1-d14
   Pol % nodes_xyz(16,3) = d1-d14
 
-  end
+  end subroutine

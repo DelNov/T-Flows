@@ -42,38 +42,38 @@
 
   ! Face centroid
   do is = 1,Pol % n_faces
-     xc = 0.0
-     yc = 0.0
-     zc = 0.0
-     do iv = 1,Pol % faces_n_nodes(is)
-        ip = Pol % faces_n(is,iv)
-        xc = xc+Pol % nodes_xyz(ip,1)
-        yc = yc+Pol % nodes_xyz(ip,2)
-        zc = zc+Pol % nodes_xyz(ip,3)
-     end do
-     ntp0 = ntp0+1
-     Pol % nodes_xyz(ntp0,1) = xc/Pol % faces_n_nodes(is)+a*xns(is)
-     Pol % nodes_xyz(ntp0,2) = yc/Pol % faces_n_nodes(is)+a*yns(is)
-     Pol % nodes_xyz(ntp0,3) = zc/Pol % faces_n_nodes(is)+a*zns(is)
+    xc = 0.0
+    yc = 0.0
+    zc = 0.0
+    do iv = 1,Pol % faces_n_nodes(is)
+      ip = Pol % faces_n(is,iv)
+      xc = xc+Pol % nodes_xyz(ip,1)
+      yc = yc+Pol % nodes_xyz(ip,2)
+      zc = zc+Pol % nodes_xyz(ip,3)
+    end do
+    ntp0 = ntp0+1
+    Pol % nodes_xyz(ntp0,1) = xc/Pol % faces_n_nodes(is)+a*xns(is)
+    Pol % nodes_xyz(ntp0,2) = yc/Pol % faces_n_nodes(is)+a*yns(is)
+    Pol % nodes_xyz(ntp0,3) = zc/Pol % faces_n_nodes(is)+a*zns(is)
 
-     do iv = 1,Pol % faces_n_nodes(is)
-        iv2 = iv+1
-        if(iv .eq. Pol % faces_n_nodes(is)) iv2 = 1
-        nts0 = nts0+1
-        Pol % faces_n_nodes(nts0) = 3
-        Pol % faces_n(nts0,1) = Pol % faces_n(is,iv)
-        Pol % faces_n(nts0,2) = Pol % faces_n(is,iv2)
-        Pol % faces_n(nts0,3) = ntp0
-     end do
+    do iv = 1,Pol % faces_n_nodes(is)
+      iv2 = iv+1
+      if(iv .eq. Pol % faces_n_nodes(is)) iv2 = 1
+      nts0 = nts0+1
+      Pol % faces_n_nodes(nts0) = 3
+      Pol % faces_n(nts0,1) = Pol % faces_n(is,iv)
+      Pol % faces_n(nts0,2) = Pol % faces_n(is,iv2)
+      Pol % faces_n(nts0,3) = ntp0
+    end do
   end do
 
   Pol % n_faces = nts0-ntsi
   do is = 1,Pol % n_faces
-     Pol % faces_n_nodes(is) = Pol % faces_n_nodes(ntsi+is)
-     do iv = 1,Pol % faces_n_nodes(is)
-        Pol % faces_n(is,iv) = Pol % faces_n(ntsi+is,iv)
-     end do
+    Pol % faces_n_nodes(is) = Pol % faces_n_nodes(ntsi+is)
+    do iv = 1,Pol % faces_n_nodes(is)
+      Pol % faces_n(is,iv) = Pol % faces_n(ntsi+is,iv)
+    end do
   end do
   Pol % n_nodes = ntp0
 
-  end
+  end subroutine

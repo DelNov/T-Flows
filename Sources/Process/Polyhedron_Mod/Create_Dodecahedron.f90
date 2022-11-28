@@ -97,7 +97,7 @@
   Pol % nodes_xyz(i,2) = -b
   Pol % nodes_xyz(i,3) = -c
   do is = 1,Pol % n_faces
-     Pol % faces_n_nodes(is) = 5
+    Pol % faces_n_nodes(is) = 5
   end do
   is = 1
   i = 1
@@ -232,4 +232,4 @@
   i = i+1
   Pol % faces_n(is,i) = 12
 
-  end
+  end subroutine
