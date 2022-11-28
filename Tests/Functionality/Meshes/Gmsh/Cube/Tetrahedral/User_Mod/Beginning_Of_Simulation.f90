@@ -30,170 +30,232 @@
   integer, intent(in)         :: curr_dt  ! time step
   real,    intent(in)         :: time     ! physical time
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: UNDEFINED = 15
-  integer, parameter :: LOW       =  0
-  integer, parameter :: HIGH      = 10
-  integer, parameter :: MEDIUM    =  5
+  integer, parameter :: NO  = 0
+  integer, parameter :: YES = 1
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  type(Stl_Type)           :: Sphere
-  type(Polyhedron_Type)    :: Pol0
-  type(Polyhedron_Type)    :: Pol1
-  real, pointer, contiguous :: vof_nod(:), vof_cel(:)
-  integer                  :: cut_count, new_faces_n_nodes, n_combo, cc, next_n
-  real                     :: tot_vol, cel_vol, di
-  real                     :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                     :: p1(3), p2(3), p3(3), qi(3), qj(3), qn(3)
-  real                     :: f(3), n(3), l(3), xyz_new(3)
-  integer                  :: c, s, fac, i, j, i_nod, j_nod, i_fac, run
-  logical                  :: ij_cut_flag, has_one_point_five
-  integer                  :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
-  integer                  :: new_faces_n(MAX_ISOAP_VERTS)
-  integer                  :: combos(MAX_ISOAP_FACES, 2)
+  type(Grid_Type), pointer     :: Grid
+  type(Stl_Type)               :: Stl
+  type(Polyhedron_Type)        :: Pol(0:1)
+  real,    pointer, contiguous :: vof_at_nodes(:), vof_in_cells(:)
+  real,    pointer, contiguous :: dis_nod_dom(:), dis_nod(:)
+  integer, pointer, contiguous :: dis_nod_cnt(:), cut_cel(:)
+  integer                      :: c, s, i_nod, j_nod, i, j, k1, k2, m
+  integer                      :: i_iso, i_ver, i_fac, fac, n_cut_facets
+  integer                      :: cut_facets(1024)
+  real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
+  real                         :: cell_vol, cel0_vol, tot_vol
+  real                         :: p1(3), p2(3), p3(3), qi(3), qj(3), qn(3)
+  real                         :: f(3), n(3), l(3)
+  integer                      :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
+  integer                      :: new_faces_n_nodes
+  integer                      :: new_faces_n(MAX_ISOAP_VERTS)
 !==============================================================================!
 
-  call Work % Connect_Real_Node(vof_nod)
-  call Work % Connect_Real_Cell(vof_cel)
+  call Work % Connect_Int_Node(dis_nod_cnt)
+  call Work % Connect_Real_Node(vof_at_nodes, dis_nod, dis_nod_dom)
+  call Work % Connect_Int_Cell(cut_cel)
+  call Work % Connect_Real_Cell(vof_in_cells)
 
   ! Take alias(es)
   Grid => Flow % pnt_grid
 
-  !-------------------------------------------------------------!
-  !   Calculate and report integral volume in traditional way   !
-  !-------------------------------------------------------------!
-  tot_vol = 0.0
-  do c = 1, Grid % n_cells
-    tot_vol = tot_vol + Grid % vol(c)
-  end do
-  print '(a, f12.5)', ' # Total volume from Grid is: ', tot_vol
-
-  do c = 1, Grid % n_cells
-    call Polyhedron % Extract_From_Grid(Grid, c)
-    ! if(mod(c,100) .eq. 0) call Polyhedron % Plot_Polyhedron_Vtk(c)
-  end do
-
-  !---------------------------------------!
-  !   Calculate individual cell volumes   !
-  !---------------------------------------!
-  tot_vol = 0.0
-  do c = 1, Grid % n_cells
-    call Polyhedron % Extract_From_Grid(Grid, c)
-    call Polyhedron % Calculate_Cell_Volume(cel_vol)
-    tot_vol = tot_vol + cel_vol
-  end do
-  print '(a, f12.5)', ' # Total volume from Polyhedron is: ', tot_vol
-
-  !------------------------------!
-  !                              !
-  !   Now comes the real stuff   !
-  !                              !
-  !------------------------------!
-  call Sphere % Create_From_File("sphere.stl")
+  !-----------------------!
+  !   Read the STL file   !
+  !-----------------------!
+  call Stl % Create_From_File("sphere.stl")
 
   !-----------------------!
   !   Find vof in nodes   !
   !-----------------------!
   do i = 1, Grid % n_nodes
 
-    vof_nod(i) = 0  ! assume node is in the stl
+    vof_at_nodes(i) = 0  ! assume node is in the stl
 
-    do fac = 1, Sphere % n_facets
+    do fac = 1, Stl % n_facets
 
-      ! STL vertex coordinates
-      p1(1)=Sphere % x(1,fac); p1(2)=Sphere % y(1,fac); p1(3)=Sphere % z(1,fac)
-      p2(1)=Sphere % x(2,fac); p2(2)=Sphere % y(2,fac); p2(3)=Sphere % z(2,fac)
-      p3(1)=Sphere % x(3,fac); p3(2)=Sphere % y(3,fac); p3(3)=Sphere % z(3,fac)
-
-      ! STL facet centroid
-      f = (p1+p2+p3)/3.0
-
-      ! STL facet normal
-      n(1)=Sphere % nx(fac);  n(2)=Sphere % ny(fac);  n(3)=Sphere % nz(fac)
-
-      if(dot_product(f, n) < 0.0) then
-        PRINT *, 'OUCH, THE ORIENTATION oF THE NORMAL IS WRONG'
-      end if
+      f = Stl % Facet_Coords(fac)
+      n = Stl % Facet_Normal(fac)
 
       ! Vector connecting facet centroid with the node
-      qn(1) = Grid % xn(i) - f(1)
-      qn(2) = Grid % yn(i) - f(2)
-      qn(3) = Grid % zn(i) - f(3)
+      qn(1:3) = (/Grid % xn(i)-f(1), Grid % yn(i)-f(2), Grid % zn(i)-f(3)/)
 
       ! First time this product is positive, node is outside of STL
       if(dot_product(qn, n) > 0) then
-        vof_nod(i) = vof_nod(i) + 1.0
+        vof_at_nodes(i) = vof_at_nodes(i) + 1.0
       end if
     end do
 
-    vof_nod(i) = vof_nod(i) / real(Sphere % n_facets)
-    if(vof_nod(i) < 0.01) then
-      vof_nod(i) = 0.0
+    vof_at_nodes(i) = vof_at_nodes(i) / real(Stl % n_facets)
+    if(vof_at_nodes(i) < 0.01) then
+      vof_at_nodes(i) = 0.0
     else
-      vof_nod(i) = 1.0
+      vof_at_nodes(i) = 1.0
     end if
   end do
-
-
-  call Grid % Save_Debug_Vtu(append="vof_nod",       &
-                             scalar_node=vof_nod,    &
-                             scalar_name="vof_nod")
+  call Grid % Save_Debug_Vtu(append="vof_at_nodes",       &
+                             scalar_node=vof_at_nodes,    &
+                             scalar_name="vof_at_nodes")
 
   !-----------------------!
   !   Find vof in cells   !
   !-----------------------!
   do c = 1, Grid % n_cells
-    vof_cel(c) = 0.0
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    vof_in_cells(c) = 0.0
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       i = Grid % cells_n(i_nod, c)
-      vof_cel(c) = vof_cel(c) + vof_nod(i)
+      vof_in_cells(c) = vof_in_cells(c) + vof_at_nodes(i)
     end do
-    vof_cel(c) = vof_cel(c) / real(Grid % cells_n_nodes(c))
+    vof_in_cells(c) = vof_in_cells(c) / real(abs(Grid % cells_n_nodes(c)))
   end do
   ! Exchange is needed here
-  call Grid % Save_Debug_Vtu(append="vof_cel",       &
-                             scalar_cell=vof_cel,    &
-                             scalar_name="vof_cel")
+  call Grid % Save_Debug_Vtu(append="vof_in_cells_tentative",  &
+                             scalar_cell=vof_in_cells,         &
+                             scalar_name="vof_in_cells")
 
-  !------------------------------!
-  !   Browse through cells ...   !
-  !------------------------------!
+  !--------------------------!
+  !   Browse through cells   !
+  !--------------------------!
   do c = 1, Grid % n_cells
 
-    cut_count = 0
+    n_cut_facets  = 0  ! how many facets cut in this cell
+    cut_facets(:) = 0
+    cut_cel(c) = NO
 
-    call Polyhedron % Extract_From_Grid(Grid, c)
-    Polyhedron % phi_int(1:Polyhedron % n_nodes) = UNDEFINED
+    !---------------------------------------------------------------!
+    !   Browse through cells' nodes to find out if cells were cut   !
+    !   (Not really all the cuts are detected in this way.  But     !
+    !    it is OK, it misses only indents into edges)               !
+    !---------------------------------------------------------------!
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
+      i = Grid % cells_n(i_nod, c)
 
-    !----------------------------------------!
-    !   Then browse through STL facets ...   !
-    !----------------------------------------!
-    do fac = 1, Sphere % n_facets
+      qi(1:3) = (/Grid % xc(c), Grid % yc(c), Grid % zc(c)/)
+      qj(1:3) = (/Grid % xn(i), Grid % yn(i), Grid % zn(i)/)
 
-      ! STL vertex coordinates
-      p1(1)=Sphere % x(1,fac); p1(2)=Sphere % y(1,fac); p1(3)=Sphere % z(1,fac)
-      p2(1)=Sphere % x(2,fac); p2(2)=Sphere % y(2,fac); p2(3)=Sphere % z(2,fac)
-      p3(1)=Sphere % x(3,fac); p3(2)=Sphere % y(3,fac); p3(3)=Sphere % z(3,fac)
+      do fac = 1, Stl % n_facets
 
-      ! STL facet centroid
-      f = (p1+p2+p3)/3.0
+        ! STL vertex coordinates
+        p1(1:3) = (/Stl % x(1,fac), Stl % y(1,fac), Stl % z(1,fac)/)
+        p2(1:3) = (/Stl % x(2,fac), Stl % y(2,fac), Stl % z(2,fac)/)
+        p3(1:3) = (/Stl % x(3,fac), Stl % y(3,fac), Stl % z(3,fac)/)
 
-      ! STL facet normal
-      n(1)=Sphere % nx(fac);  n(2)=Sphere % ny(fac);  n(3)=Sphere % nz(fac)
+        ! Do i and j cross STL facet?
+        vol_1 = Sgn_Volume(qi, p1, p2, p3)
+        vol_2 = Sgn_Volume(qj, p1, p2, p3)
+        ! vol_1 and vol_2 have different signs
+        if(vol_1 * vol_2 < 0.0) then
+          vol_3 = Sgn_Volume(qi, qj, p1, p2)
+          vol_4 = Sgn_Volume(qi, qj, p2, p3)
+          ! vol_3 and vol_3 have the same sign
+          if(vol_3 * vol_4 > 0.0) then
+            vol_5 = Sgn_Volume(qi, qj, p3, p1)
+            ! vol_3, vol_4 and vol_5 have the same sign
+            if( (vol_3 < 0.0 .and. vol_4 < 0.0 .and. vol_5 < 0.0) .or.  &
+                (vol_3 > 0.0 .and. vol_4 > 0.0 .and. vol_5 > 0.0) ) then
+              n_cut_facets = n_cut_facets + 1
+              cut_facets(n_cut_facets) = fac
+              cut_cel(c) = YES
+            end if
+          end if  ! vol_3 and vol_4 have the same sign
+        end if  ! vol_1 and vol_2 have different signs
 
+      end do  ! STL facets
+    end do    ! cells' nodes
+
+    !----------------------------------------------!
+    !   If cell was cut, calculate distance from   !
+    !      each of its nodes to the interface      !
+    !----------------------------------------------!
+    if(n_cut_facets > 0) then  ! and cut_cel(c) .eq. YES
+
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        i = Grid % cells_n(i_nod, c)
+
+        dis_nod(i) = 0.0
+
+        ! Node coordinates
+        qn(1:3) = (/Grid % xn(i), Grid % yn(i), Grid % zn(i)/)
+
+        ! Accumulate distance to the STL facets
+        do i_fac = 1, n_cut_facets
+          fac = cut_facets(i_fac)
+          f   = Stl % Facet_Coords(fac)
+          n   = Stl % Facet_Normal(fac)
+          dis_nod(i) = dis_nod(i) + dot_product(qn-f, n)
+        end do
+      end do
+
+      ! Average the distances from all STL facets
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        i = Grid % cells_n(i_nod, c)
+        dis_nod(i) = dis_nod(i) / real(n_cut_facets)
+      end do
+
+      ! Add this local, cell-wise distances to that of the domain
+      ! (This could be done together with the loop above this)
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        i = Grid % cells_n(i_nod, c)
+        dis_nod_dom(i) = dis_nod_dom(i) + dis_nod(i)
+        dis_nod_cnt(i) = dis_nod_cnt(i) + 1
+      end do
+
+    end if
+  end do    ! through cells
+
+  !------------------------------------------------------!
+  !   Equalize distance at nodes for the entire domain   !
+  !------------------------------------------------------!
+  do i = 1, Grid % n_nodes
+    if(dis_nod_cnt(i) > 0) then
+      dis_nod_dom(i) = dis_nod_dom(i) / real(dis_nod_cnt(i))
+    else
+      dis_nod_dom(i) = 0.0
+    end if
+  end do
+
+  ! See what you have at this moment
+  call Grid % Save_Debug_Vtu(append="dis_nod_dom",       &
+                             scalar_node=dis_nod_dom,    &
+                             scalar_name="dis_nod_dom")
+
+  ! Set dis_nod_dom to usable values
+  do i = 1, Grid % n_nodes
+    dis_nod_dom(i) = dis_nod_dom(i) + 0.5
+  end do
+
+  !------------------------------------!
+  !                                    !
+  !   Browse through cut cells again   !
+  !                                    !
+  !------------------------------------!
+  do c = 1, Grid % n_cells
+    if( cut_cel(c) .eq. YES ) then
+
+      !------------------------!
+      !   Extract polyhedron   !
+      !------------------------!
+      call Polyhedron % Extract_From_Grid(Grid, c, dis_nod_dom)
+      call Polyhedron % Plot_Polyhedron_Vtk("dis_nod_dom", c)
+
+      !------------------------------!
+      !   Call the Isoap algorithm   !
+      !------------------------------!
+      call Isoap % Extract_Iso_Polygons(Grid, c, dis_nod_dom)
+      call Iso_Polygons % Plot_Iso_Polygons_Vtk(c)
+
+      !--------------------------------!
+      !   Add new vertices for faces   !
+      !--------------------------------!
       ij_cut(:,:) = 0
-
-      !----------------------------------------!
-      !   Then browse through STL facets ...   !
-      !----------------------------------------!
       do s = 1, Polyhedron % n_faces
 
         new_faces_n_nodes = 0  ! initalize number of nodes in new face
         new_faces_n(:)    = 0  ! initialize new face's node list to zero
 
-        ! Browse nodes in circular direction
         do i_nod = 1, Polyhedron % faces_n_nodes(s)
           j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
 
+          ! Two nodes at polyhedron
           i = Polyhedron % faces_n(s, i_nod)
           j = Polyhedron % faces_n(s, j_nod)
 
@@ -201,181 +263,65 @@
           new_faces_n_nodes = new_faces_n_nodes + 1
           new_faces_n(new_faces_n_nodes) = i  ! just copy "i"
 
-          !---------------------------------------------------!
-          !   The connection between i and j wasn't cut yet   !
-          !---------------------------------------------------!
-          if(ij_cut(i,j) == 0) then
+          IF(ISO_POLYGONS % N_POLYS > 1) PRINT *, 'CHECK CELL: ', C
+          do i_iso = 1, Iso_Polygons % n_polys
+            do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
+              m = Iso_Polygons % polys_v(i_iso, i_ver)
 
-            qi(1:3) = Polyhedron % nodes_xyz(i, 1:3)
-            qj(1:3) = Polyhedron % nodes_xyz(j, 1:3)
+              k1 = Iso_Polygons % b_node_1(m)
+              k2 = Iso_Polygons % b_node_2(m)
 
-            ! Do i and j cross STL facet?
-            ij_cut_flag = .false.
-            vol_1 = Sgn_Volume(qi, p1, p2, p3)
-            vol_2 = Sgn_Volume(qj, p1, p2, p3)
-            ! vol_1 and vol_2 have different signs
-            if(vol_1 * vol_2 < 0.0) then
-              vol_3 = Sgn_Volume(qi, qj, p1, p2)
-              vol_4 = Sgn_Volume(qi, qj, p2, p3)
-              ! vol_3 and vol_3 have the same sign
-              if(vol_3 * vol_4 > 0.0) then
-                vol_5 = Sgn_Volume(qi, qj, p3, p1)
-                ! vol_3, vol_4 and vol_5 have the same sign
-                if( (vol_3 < 0.0 .and. vol_4 < 0.0 .and. vol_5 < 0.0) .or.  &
-                    (vol_3 > 0.0 .and. vol_4 > 0.0 .and. vol_5 > 0.0) ) then
-                  ij_cut_flag = .true.
+              if(k1 == i .and. k2 == j .or.  &
+                 k1 == j .and. k2 == i) then
+                ! PRINT *, Iso_Polygons % verts_xyz(m, 1:3)
+
+                ! Node hasn't been added yet, add it to the polygon
+                if(ij_cut(j,i) .eq. 0) then
+                  Polyhedron % n_nodes = Polyhedron % n_nodes + 1
+                  Polyhedron % nodes_xyz(Polyhedron % n_nodes, 1:3)   &
+                                 = Iso_Polygons % verts_xyz(m, 1:3)
+                  Polyhedron % phi(Polyhedron % n_nodes) = 0.5
+
+                  new_faces_n_nodes = new_faces_n_nodes + 1
+                  new_faces_n(new_faces_n_nodes) = Polyhedron % n_nodes
+
+                  ij_cut(i,j) = Polyhedron % n_nodes
+
+                ! Node has already been added, don't add the node,
+                ! but add it to the list of nodes in this face
+                else
+                  new_faces_n_nodes = new_faces_n_nodes + 1
+                  new_faces_n(new_faces_n_nodes) = ij_cut(j,i)
                 end if
-              end if  ! vol_3 and vol_4 have the same sign
-            end if  ! vol_1 and vol_2 have different signs
 
-            ! Yes, i and j cross the face !
-            if(ij_cut_flag) then
-
-              ! Vector connecting nodes i and j
-              l = qj - qi
-
-              ! Distance from i to a point on the plane
-              ! (I picked center of the facet)
-              di = dot_product(f-qi, n) / dot_product(l, n)
-
-              cut_count = cut_count + 1
-
-              ! Intersection point
-              Polyhedron % n_nodes = Polyhedron % n_nodes + 1
-              Polyhedron % nodes_xyz(Polyhedron % n_nodes, 1:3)  &
-                                      = qi(1:3) + di * l(1:3)
-              Polyhedron % phi_int(Polyhedron % n_nodes) = MEDIUM
-              ! print '(a,i2,a,a,i2,a,i2)',                                     &
-              !          ' # Inserting new node (', Polyhedron % n_nodes, ')',  &
-              !          ' between nodes: ', i, ' and ', j
-
-              ! Store new node which is added to intersection
-              ij_cut(i,j) = Polyhedron % n_nodes
-              ij_cut(j,i) = Polyhedron % n_nodes
-
-              ! Add this new bloody node to the list of nodes in the face
-              new_faces_n_nodes = new_faces_n_nodes + 1
-              new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
-
-              ! Mark nodes which are on either side of interface ...
-              ! ... using the scalar product with STL facet centre
-              if( dot_product(n, qi-f) > 0.0 ) then
-                Polyhedron % phi_int(i) = HIGH
-              else
-                Polyhedron % phi_int(i) = LOW
               end if
-              if( dot_product(n, qj-f) > 0.0 ) then
-                Polyhedron % phi_int(j) = HIGH
-              else
-                Polyhedron % phi_int(j) = LOW
-              end if
-            end if   ! ij_cut_flag
+            end do
+          end do
 
-          !---------------------------------------------------!
-          !   The connection between i and j was cut before   !
-          !---------------------------------------------------!
-          else  ! ij_cut(i,j) .ne 0
-
-            ! print '(a,i2,a,a,i2,a,i2)',                        &
-            !          ' #     The node (', ij_cut(i,j), ')',    &
-            !          ' iss already inserted between nodes: ',  &
-            !          i, ' and ', j
-
-            ! But still, you have to add it to the face list
-            new_faces_n_nodes = new_faces_n_nodes + 1
-            new_faces_n(new_faces_n_nodes) = ij_cut(i,j)
-
-          end if  ! ij_cut == 0
-
-        end do  ! through nodes of the face
+        end do  ! i_nod
 
         ! Now when all the nodes have been browsed, reform the
         ! face, I mean overwrite the old one with the new one
         Polyhedron % faces_n_nodes(s) = new_faces_n_nodes
         Polyhedron % faces_n(s, 1:new_faces_n_nodes)  &
                   = new_faces_n(1:new_faces_n_nodes)
+        call Polyhedron % Plot_Polyhedron_Vtk("geo", c)
 
-      end do    ! through polyhedron faces
-    end do      ! through STL facets
+      end do  ! s
 
-    !----------------------------------------------------------!
-    !   Color the remaining polyhedron nodes by a flood fill   !
-    !----------------------------------------------------------!
-    if(cut_count .gt. 2) then
-      do run = 1, Polyhedron % n_faces
+      !------------------------------!
+      !   Create Pol(0) and Pol(1)   !
+      !------------------------------!
+      call Pol(0) % Create_From_Polyhedron(Polyhedron)
 
-        has_one_point_five = .false.
-
-        do s = 1, Polyhedron % n_faces
-          do i_nod = 1, Polyhedron % faces_n_nodes(s)
-            j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
-
-            i = Polyhedron % faces_n(s, i_nod)
-            j = Polyhedron % faces_n(s, j_nod)
-
-            ! Try not to spread across interface - if either i or j are
-            ! newly formed nodes, their neighbours are alread set.
-            if( Polyhedron % phi_int(i) .ne. MEDIUM .and.  &
-                Polyhedron % phi_int(j) .ne. MEDIUM ) then
-
-              if( Polyhedron % phi_int(i) .eq. UNDEFINED ) then
-                has_one_point_five = .true.
-                if( Polyhedron % phi_int(j) .eq. LOW ) then
-                  Polyhedron % phi_int(i) = LOW
-                end if
-                if( Polyhedron % phi_int(j) .eq. HIGH ) then
-                  Polyhedron % phi_int(i) = HIGH
-                end if
-              end if
-
-              if( Polyhedron % phi_int(j) .eq. UNDEFINED ) then
-                has_one_point_five = .true.
-                if( Polyhedron % phi_int(i) .eq. LOW ) then
-                  Polyhedron % phi_int(j) = LOW
-                end if
-                if( Polyhedron % phi_int(i) .eq. HIGH ) then
-                  Polyhedron % phi_int(j) = HIGH
-                end if
-              end if
-
-            end if
-
-          end do  ! i, j, nodes
-        end do    ! s, faces of polyhedron
-
-        ! Exit if there is nothing left to color
-        if(.not. has_one_point_five) then
-          goto 1
-        end if
-
-      end do  ! run
-    end if
-1   continue
-
-    !----------------------------------------------------------------!
-    !                                                                !
-    !   This is tough ... try to skip nodes with value 0.0 and 1.0   !
-    !                                                                !
-    !----------------------------------------------------------------!
-    if(cut_count .gt. 2) then
-
-      !-------------------------------------!
-      !   First just copy the polyhedrons   !
-      !-------------------------------------!
-      call Pol0 % Create_From_Polyhedron(Polyhedron)
-      call Pol1 % Create_From_Polyhedron(Polyhedron)
-
-      !-----------------!
-      !   Create Pol0   !
-      !-----------------!
-      do s = 1, Pol0 % n_faces
-        new_faces_n_nodes = 0  ! initalize number of nodes in new face
-        new_faces_n(:)    = 0  ! initialize new face's node list to zero
+      do s = 1, Pol(0) % n_faces
+        new_faces_n_nodes = 0
+        new_faces_n(:)    = 0
 
         ! Browse nodes in circular direction
-        do i_nod = 1, Pol0 % faces_n_nodes(s)
-          i = Pol0 % faces_n(s, i_nod)
-          if( Pol0 % phi_int(i) .le. MEDIUM ) then
+        do i_nod = 1, Pol(0) % faces_n_nodes(s)
+          i = Pol(0) % faces_n(s, i_nod)
+          if( Pol(0) % phi(i) < 0.5+MICRO ) then
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
           end if
@@ -383,154 +329,56 @@
 
         ! Now when all the nodes have been browsed, reform the
         ! face, I mean overwrite the old one with the new one
-        Pol0 % faces_n_nodes(s) = new_faces_n_nodes
-        Pol0 % faces_n(s,1:new_faces_n_nodes)  &
+        Pol(0) % faces_n_nodes(s) = new_faces_n_nodes  ! copy number of nodes
+        Pol(0) % faces_n(s,1:new_faces_n_nodes)  &     ! copy the list of nodes
            = new_faces_n(1:new_faces_n_nodes)
       end do    ! through polyhedron faces
-      ! What if there is a face without any nodes at MEDIUM?
+      ! What if there is a face without any nodes between 0 and 0.5+MICRO?
       ! Well, faces_n_nodes will be zero for that face
 
-      !-----------------------------------!
-      !   Try to re-create missing face   !
-      !-----------------------------------!
-      n_combo     = 0
-      combos(:,:) = 0
-      do s = 1, Pol0 % n_faces
-        do i_nod = 1, Pol0 % faces_n_nodes(s)
-          j_nod = i_nod + 1; if(j_nod > Pol0 % faces_n_nodes(s)) j_nod = 1
+      call Pol(0) % Plot_Polyhedron_Vtk("pol0_hollow", c)
 
-          i = Pol0 % faces_n(s, i_nod)
-          j = Pol0 % faces_n(s, j_nod)
+      ! Try to add the missing face
+      new_faces_n_nodes = 0
+      new_faces_n(:)    = 0
+      do i_iso = 1, Iso_Polygons % n_polys
+        do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
+          m = Iso_Polygons % polys_v(i_iso, i_ver)
+          do i = 1, Pol(0) % n_nodes
+            if(Math % Approx_Three_Reals(                   &
+                        Iso_Polygons % verts_xyz(m, 1:3),   &
+                              Pol(0) % nodes_xyz(i, 1:3))) then
+              new_faces_n_nodes = new_faces_n_nodes + 1
+              new_faces_n(new_faces_n_nodes) = i
+            end if  ! node/vert match
+          end do  ! i
+        end do    ! i_ver
+      end do      ! i_iso
+      Pol(0) % n_faces = Pol(0) % n_faces + 1        ! one more face
+      s = Pol(0) % n_faces                           ! to shorten the syntax
+      Pol(0) % faces_n_nodes(s) = new_faces_n_nodes  ! copy number of nodes
+      Pol(0) % faces_n(s,1:new_faces_n_nodes)  &     ! copy the list of nodes
+         = new_faces_n(1:new_faces_n_nodes)
 
-          if( Pol0 % phi_int(i) .eq. MEDIUM .and.  &
-              Pol0 % phi_int(j) .eq. MEDIUM ) then
-            n_combo = n_combo + 1
-            combos(n_combo, 1) = i
-            combos(n_combo, 2) = j
-            ! PRINT *, 'COMBO ', COMBOS(n_COMBO, :)
-          end if
-        end do
-      end do
+      call Pol(0) % Plot_Polyhedron_Vtk("pol0_full", c)
 
-      if(n_combo > 0) then
+      ! Calculate volume of the Pol(0)
+      call Pol(0)     % Calculate_Cell_Volume(cel0_vol)
+      call Polyhedron % Calculate_Cell_Volume(cell_vol)
+      vof_in_cells(c) = (cell_vol - cel0_vol) / (cell_vol)
 
-        ! First two nodes are just coppied
-        new_faces_n(1) = combos(1, 1)
-        new_faces_n(2) = combos(1, 2)
-        new_faces_n_nodes = 2
-        next_n = new_faces_n(new_faces_n_nodes)
-4       continue
-        do cc = 2, n_combo
-          if(combos(cc, 1) .eq. next_n) then
-            next_n = combos(cc, 2)
-            if(next_n .eq. new_faces_n(1)) goto 5  ! you closed the circle
-            new_faces_n_nodes = new_faces_n_nodes + 1
-            new_faces_n(new_faces_n_nodes) = next_n
-            goto 4
-          end if
-        end do
-5       continue
+    end if  ! cut_cel(c) .eq. YES
+  end do
 
-        ! Add the face now
-        Pol0 % n_faces       = Pol0 % n_faces + 1
-        Pol0 % faces_n_nodes(Pol0 % n_faces) = new_faces_n_nodes
-        Pol0 % faces_n(Pol0 % n_faces, 1:new_faces_n_nodes)  &
-                         = new_faces_n(1:new_faces_n_nodes)
-      end if
+  ! Exchange is needed here
+  call Grid % Save_Debug_Vtu(append="vof_in_cells_final",  &
+                             scalar_cell=vof_in_cells,     &
+                             scalar_name="vof_in_cells")
 
-      !-----------------!
-      !   Create Pol1   !
-      !-----------------!
-      do s = 1, Pol1 % n_faces
-        new_faces_n_nodes = 0  ! initalize number of nodes in new face
-        new_faces_n(:)    = 0  ! initialize new face's node list to zero
+  call Work % Disconnect_Int_Node(dis_nod_cnt)
+  call Work % Disconnect_Real_Node(vof_at_nodes, dis_nod, dis_nod_dom)
+  call Work % Disconnect_Real_Cell(vof_in_cells)
 
-        ! Browse nodes in circular direction
-        do i_nod = 1, Pol1 % faces_n_nodes(s)
-          i = Pol1 % faces_n(s, i_nod)
-          if( Pol1 % phi_int(i) .ge. MEDIUM) then
-            new_faces_n_nodes = new_faces_n_nodes + 1
-            new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
-          end if
-        end do  ! through nodes of the face
-
-        ! Now when all the nodes have been browsed, reform the
-        ! face, I mean overwrite the old one with the new one
-        Pol1 % faces_n_nodes(s) = new_faces_n_nodes
-        Pol1 % faces_n(s,1:new_faces_n_nodes)  &
-           = new_faces_n(1:new_faces_n_nodes)
-      end do    ! through polyhedron faces
-      ! What if there is a face without any nodes at MEDIUM?
-      ! Well, faces_n_nodes will be zero for that face
-
-      !-----------------------------------!
-      !   Try to re-create missing face   !
-      !-----------------------------------!
-      n_combo     = 0
-      combos(:,:) = 0
-      do s = 1, Pol1 % n_faces
-        do i_nod = 1, Pol1 % faces_n_nodes(s)
-          j_nod = i_nod + 1; if(j_nod > Pol1 % faces_n_nodes(s)) j_nod = 1
-
-          i = Pol1 % faces_n(s, i_nod)
-          j = Pol1 % faces_n(s, j_nod)
-
-          if( Pol1 % phi_int(i) .eq. MEDIUM .and.  &
-              Pol1 % phi_int(j) .eq. MEDIUM ) then
-            n_combo = n_combo + 1
-            combos(n_combo, 1) = i
-            combos(n_combo, 2) = j
-            ! PRINT *, 'COMBO ', COMBOS(n_COMBO, :)
-          end if
-        end do
-      end do
-
-      if(n_combo > 0) then
-
-        ! First two nodes are just coppied
-        new_faces_n(1) = combos(1, 1)
-        new_faces_n(2) = combos(1, 2)
-        new_faces_n_nodes = 2
-        next_n = new_faces_n(new_faces_n_nodes)
-6       continue
-        do cc = 2, n_combo
-          if(combos(cc, 1) .eq. next_n) then
-            next_n = combos(cc, 2)
-            if(next_n .eq. new_faces_n(1)) goto 7  ! you closed the circle
-            new_faces_n_nodes = new_faces_n_nodes + 1
-            new_faces_n(new_faces_n_nodes) = next_n
-            goto 6
-          end if
-        end do
-7       continue
-
-        ! Add the face now
-        Pol1 % n_faces       = Pol1 % n_faces + 1
-        Pol1 % faces_n_nodes(Pol1 % n_faces) = new_faces_n_nodes
-        Pol1 % faces_n(Pol1 % n_faces, 1:new_faces_n_nodes)  &
-                         = new_faces_n(1:new_faces_n_nodes)
-      end if
-
-    end if  ! cut count
-
-    if(cut_count .gt. 2) then
-      do i = 1, Polyhedron % n_nodes
-        Polyhedron % phi(i) = real(Polyhedron % phi_int(i)) / real(HIGH)
-        Pol0       % phi(i) = real(Pol0       % phi_int(i)) / real(HIGH)
-        Pol1       % phi(i) = real(Pol1       % phi_int(i)) / real(HIGH)
-      end do
-      print *, '# Saving cell ', c, ' with ', cut_count, ' cuts'
-      ! call Polyhedron % Plot_Polyhedron_Vtk("geo", c)
-      call Pol0 % Plot_Polyhedron_Vtk("pol0", c)
-      call Pol1 % Plot_Polyhedron_Vtk("pol1", c)
-    end if
-
-  end do  ! through cells
-
-  call Work % Disconnect_Real_Node(vof_nod)
-  call Work % Disconnect_Real_Cell(vof_cel)
-
-  ! Exit gracefully
   call Comm_Mod_End
   stop
 
