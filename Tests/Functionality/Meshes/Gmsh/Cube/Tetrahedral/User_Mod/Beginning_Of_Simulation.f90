@@ -40,10 +40,10 @@
   real,    pointer, contiguous :: dis_nod_dom(:), dis_nod(:)
   integer, pointer, contiguous :: dis_nod_cnt(:), cut_cel(:)
   integer                      :: c, s, i_nod, j_nod, i, j, k1, k2, m
-  integer                      :: i_iso, i_ver, i_fac, fac, n_cut_facets
+  integer                      :: i_iso, i_ver, i_fac, fac, p, n_cut_facets
   integer                      :: cut_facets(1024)
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                         :: cell_vol, cel0_vol, tot_vol
+  real                         :: cell_vol, cel0_vol, cel1_vol
   real                         :: p1(3), p2(3), p3(3), qi(3), qj(3), qn(3)
   real                         :: f(3), n(3), l(3)
   integer                      :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
@@ -312,60 +312,70 @@
       !------------------------------!
       !   Create Pol(0) and Pol(1)   !
       !------------------------------!
-      call Pol(0) % Create_From_Polyhedron(Polyhedron)
+      do p = 0, 1
+        call Pol(p) % Create_From_Polyhedron(Polyhedron)
 
-      do s = 1, Pol(0) % n_faces
+        do s = 1, Pol(p) % n_faces
+          new_faces_n_nodes = 0
+          new_faces_n(:)    = 0
+
+          ! Browse nodes in circular direction
+          do i_nod = 1, Pol(p) % faces_n_nodes(s)
+            i = Pol(p) % faces_n(s, i_nod)
+            if( p .eq. 0 .and. Pol(p) % phi(i) < 0.5+MICRO .or.  &
+                p .eq. 1 .and. Pol(p) % phi(i) > 0.5-MICRO) then
+              new_faces_n_nodes = new_faces_n_nodes + 1
+              new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
+            end if
+          end do  ! through nodes of the face
+
+          ! Now when all the nodes have been browsed, reform the
+          ! face, I mean overwrite the old one with the new one
+          Pol(p) % faces_n_nodes(s) = new_faces_n_nodes ! copy number of nodes
+          Pol(p) % faces_n(s,1:new_faces_n_nodes)  &    ! copy the list of nodes
+               = new_faces_n(1:new_faces_n_nodes)
+        end do    ! through polyhedron faces
+        ! What if there is a face without any nodes between 0 and 0.5+MICRO?
+        ! Well, faces_n_nodes will be zero for that face
+
+        if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_hollow", c)
+        if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_hollow", c)
+
+        ! Try to add the missing face
         new_faces_n_nodes = 0
         new_faces_n(:)    = 0
-
-        ! Browse nodes in circular direction
-        do i_nod = 1, Pol(0) % faces_n_nodes(s)
-          i = Pol(0) % faces_n(s, i_nod)
-          if( Pol(0) % phi(i) < 0.5+MICRO ) then
-            new_faces_n_nodes = new_faces_n_nodes + 1
-            new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
-          end if
-        end do  ! through nodes of the face
-
-        ! Now when all the nodes have been browsed, reform the
-        ! face, I mean overwrite the old one with the new one
-        Pol(0) % faces_n_nodes(s) = new_faces_n_nodes  ! copy number of nodes
-        Pol(0) % faces_n(s,1:new_faces_n_nodes)  &     ! copy the list of nodes
+        do i_iso = 1, Iso_Polygons % n_polys
+          do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
+            m = Iso_Polygons % polys_v(i_iso, i_ver)
+            do i = 1, Pol(p) % n_nodes
+              if(Math % Approx_Three_Reals(                   &
+                          Iso_Polygons % verts_xyz(m, 1:3),   &
+                            Pol(p) % nodes_xyz(i, 1:3))) then
+                new_faces_n_nodes = new_faces_n_nodes + 1
+                new_faces_n(new_faces_n_nodes) = i
+              end if  ! node/vert match
+            end do  ! i
+          end do    ! i_ver
+        end do      ! i_iso
+        Pol(p) % n_faces = Pol(p) % n_faces + 1        ! one more face
+        s = Pol(p) % n_faces                           ! to shorten the syntax
+        Pol(p) % faces_n_nodes(s) = new_faces_n_nodes  ! copy number of nodes
+        Pol(p) % faces_n(s,1:new_faces_n_nodes)  &     ! copy the list of nodes
            = new_faces_n(1:new_faces_n_nodes)
-      end do    ! through polyhedron faces
-      ! What if there is a face without any nodes between 0 and 0.5+MICRO?
-      ! Well, faces_n_nodes will be zero for that face
 
-      call Pol(0) % Plot_Polyhedron_Vtk("pol0_hollow", c)
-
-      ! Try to add the missing face
-      new_faces_n_nodes = 0
-      new_faces_n(:)    = 0
-      do i_iso = 1, Iso_Polygons % n_polys
-        do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
-          m = Iso_Polygons % polys_v(i_iso, i_ver)
-          do i = 1, Pol(0) % n_nodes
-            if(Math % Approx_Three_Reals(                   &
-                        Iso_Polygons % verts_xyz(m, 1:3),   &
-                              Pol(0) % nodes_xyz(i, 1:3))) then
-              new_faces_n_nodes = new_faces_n_nodes + 1
-              new_faces_n(new_faces_n_nodes) = i
-            end if  ! node/vert match
-          end do  ! i
-        end do    ! i_ver
-      end do      ! i_iso
-      Pol(0) % n_faces = Pol(0) % n_faces + 1        ! one more face
-      s = Pol(0) % n_faces                           ! to shorten the syntax
-      Pol(0) % faces_n_nodes(s) = new_faces_n_nodes  ! copy number of nodes
-      Pol(0) % faces_n(s,1:new_faces_n_nodes)  &     ! copy the list of nodes
-         = new_faces_n(1:new_faces_n_nodes)
-
-      call Pol(0) % Plot_Polyhedron_Vtk("pol0_full", c)
+        if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_full", c)
+        if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_full", c)
+      end do  ! through p
 
       ! Calculate volume of the Pol(0)
       call Pol(0)     % Calculate_Cell_Volume(cel0_vol)
+      call Pol(1)     % Calculate_Cell_Volume(cel1_vol)
       call Polyhedron % Calculate_Cell_Volume(cell_vol)
-      vof_in_cells(c) = (cell_vol - cel0_vol) / (cell_vol)
+      if(cel0_vol > cel0_vol) then
+        vof_in_cells(c) = (cell_vol - cel0_vol) / (cell_vol)
+      else
+        vof_in_cells(c) = cel1_vol / (cell_vol)
+      end if
 
     end if  ! cut_cel(c) .eq. YES
   end do
