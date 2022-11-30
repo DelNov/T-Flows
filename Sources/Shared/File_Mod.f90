@@ -22,6 +22,8 @@
     contains
       procedure :: Append_For_Writing_Ascii
       procedure :: Delete
+      procedure :: Is_In_Binary_Format
+      procedure :: Is_In_Unix_Format
       procedure :: Line_Length
       procedure :: Open_For_Reading_Ascii
       procedure :: Open_For_Reading_Binary
@@ -48,7 +50,8 @@
 
 #   include "File_Mod/Append_For_Writing_Ascii.f90"
 #   include "File_Mod/Delete.f90"
-#   include "File_Mod/Is_File_In_Unix_Format.f90"
+#   include "File_Mod/Is_In_Binary_Format.f90"
+#   include "File_Mod/Is_In_Unix_Format.f90"
 #   include "File_Mod/Line_Length.f90"
 #   include "File_Mod/Set_Name.f90"
 #   include "File_Mod/Open_For_Reading_Ascii.f90"

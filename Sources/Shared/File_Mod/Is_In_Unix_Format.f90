@@ -1,5 +1,5 @@
 !==============================================================================!
-  logical function Is_File_In_Unix_Format(File, file_name)
+  logical function Is_In_Unix_Format(File, file_name)
 !------------------------------------------------------------------------------!
 !   Find out if file is written in Unix (or Windows) format.                   !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
   inquire(file=file_name, size=file_size)
 
   ! Open the file in binary mode
-  call File % Open_For_Reading_Binary(file_name, file_unit)
+  call File % Open_For_Reading_Binary(file_name, file_unit, verbose=.false.)
 
   ! Read a few lines to guess how are new lines being formed
   ! Sequence 13, 10 is used by Windows for line termination
@@ -31,10 +31,11 @@
   end do
 
   ! Depending on number of occurences of sequence 13, 10, guess the format
+  close(file_unit)
   if(cnt_13_10 .lt. 5) then
-    Is_File_In_Unix_Format = .true.
+    Is_In_Unix_Format = .true.
   else
-    Is_File_In_Unix_Format = .false.
+    Is_In_Unix_Format = .false.
   end if
 
   end function

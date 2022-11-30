@@ -41,10 +41,10 @@
 
   ! ... and write a message about it
   if(.not. present(processor)) then
-    print *, '# Reading the file: ', trim(name_i)
+    print *, '# Reading the ASCII file: ', trim(name_i)
   else
     if(processor < 2) then
-      print *, '# Reading the file: ', trim(name_i)
+      print *, '# Reading the ASCII file: ', trim(name_i)
     end if
   end if
 
