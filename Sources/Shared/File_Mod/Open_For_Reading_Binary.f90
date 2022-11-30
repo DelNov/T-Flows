@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Open_For_Reading_Binary(File, name_i, file_unit, processor)
+  subroutine Open_For_Reading_Binary(File, name_i, file_unit,  &
+                                     processor, verbose)
 !------------------------------------------------------------------------------!
 !   Opens file for reading in binary format in first available unit.           !
 !------------------------------------------------------------------------------!
@@ -9,9 +10,13 @@
   character(len=*)  :: name_i
   integer           :: file_unit
   integer, optional :: processor
+  logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: file_exists
+  logical :: verb = .true.
 !==============================================================================!
+
+  if(present(verbose)) verb = verbose
 
   ! First check if the file exists
   inquire(file  = trim(name_i),  &
@@ -43,10 +48,10 @@
 
   ! ... and write a message about it
   if(.not. present(processor)) then
-    print *, '# Reading the file: ', trim(name_i)
+    if(verb) print *, '# Reading the binary file: ', trim(name_i)
   else
     if(processor < 2) then
-      print *, '# Reading the file: ', trim(name_i)
+      if(verb) print *, '# Reading the binary file: ', trim(name_i)
     end if
   end if
 
