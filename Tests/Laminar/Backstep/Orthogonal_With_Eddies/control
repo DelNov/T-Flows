@@ -4,10 +4,11 @@
  PROBLEM_NAME     backstep_orthogonal
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS     300
-RESULTS_SAVE_INTERVAL     15
-BACKUP_SAVE_INTERVAL      60
-TIME_STEP                  0.01
+ TIME_STEP                     0.01
+ NUMBER_OF_TIME_STEPS        300
+ RESULTS_SAVE_INTERVAL        15
+ BACKUP_SAVE_INTERVAL         60
+ SAVE_RESULTS_AT_BOUNDARIES   no
 
 #LOAD_BACKUP_NAME backstep_orthogonal-ts.backup
 
