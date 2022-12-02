@@ -423,6 +423,15 @@
                                     Flow % v % n(c_f:c_l),          &
                                     Flow % w % n(c_f:c_l),          &
                                     f8, f9, data_offset, run)
+    !--------------------!
+    !   Courant number   !
+    !--------------------!
+    if(plot_inside) then
+      call Flow % Calculate_Courant_In_Cells(save_01(c_f:c_l))
+      call Results % Save_Scalar_Real("Courant Number [1]", plot_inside,  &
+                                      save_01(c_f:c_l),                   &
+                                      f8, f9, data_offset, run)
+    end if
 
     !---------------!
     !   Potential   !
@@ -715,9 +724,9 @@
       kin_vis_t(c_f:c_l) = Turb % vis_t_sgs(c_f:c_l) / Flow % viscosity(c_f:c_l)
       call Results % Save_Scalar_Real(                                      &
                                   "Sgs Eddy Over Molecular Viscosity [1]",  &
-                                      plot_inside,                          &
-                                      kin_vis_t(c_f:c_l),                   &
-                                      f8, f9, data_offset, run)
+                                  plot_inside,                              &
+                                  kin_vis_t(c_f:c_l),                       &
+                                  f8, f9, data_offset, run)
     end if
 
     ! Reynolds stress models
