@@ -331,13 +331,15 @@
   write(fu) IN_3 // '<CellData>' // LF
 
   ! Processor i.d.
-  write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="Processor"'              //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
-  write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + nc * IP  ! prepare for next
+  if(allocated(Grid % comm % cell_proc)) then
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//intp         //  &
+                      ' Name="Processor"'              //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + nc * IP  ! prepare for next
+  end if
 
   ! Additional cell scalar
   if(present(inside_cell) .or.  &
@@ -581,11 +583,13 @@
   !---------------!
 
   ! Processor i.d.
-  data_size = int(nc * IP, SP)
-  write(fu) data_size
-  do c = cs, ce
-    write(fu) Grid % comm % cell_proc(c)
-  end do
+  if(allocated(Grid % comm % cell_proc)) then
+    data_size = int(nc * IP, SP)
+    write(fu) data_size
+    do c = cs, ce
+      write(fu) Grid % comm % cell_proc(c)
+    end do
+  end if
 
   ! Additional cell data
   if(present(scalar_cell) .or.   &
@@ -631,11 +635,13 @@
 
   close(fu)
 
+
   !-----------------------!
   !                       !
   !   Create .pvtu file   !
   !                       !
   !-----------------------!
+  if(.not. allocated(Grid % comm % cell_proc)) return
 
   ! Create it only from subdomain 1, when decomposed
   if(maxval(Grid % comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
