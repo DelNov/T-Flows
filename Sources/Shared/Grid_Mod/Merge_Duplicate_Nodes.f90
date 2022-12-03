@@ -95,11 +95,4 @@
 
   end if
 
-  !-----------------------------------------!
-  !   Deallocate memory used by variables   !
-  !-----------------------------------------!
-  deallocate(xn)
-  deallocate(yn)
-  deallocate(zn)
-
   end subroutine

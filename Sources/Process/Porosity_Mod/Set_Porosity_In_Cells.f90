@@ -12,7 +12,7 @@
   type(Stl_Type)            :: stl
   character(len=SL)         :: name_out
   integer                   :: c, f, l
-  real                      :: xc, yc, zc, cx, cy, cz, dot_prod
+  real                      :: xyz(3), xc, yc, zc, cx, cy, cz, dot_prod
   real, contiguous, pointer :: por_real(:)   ! just for saving
 !==============================================================================!
 
@@ -31,18 +31,13 @@
     ! Assume cell is in the stl
     Por % region(reg) % cell_porous(c) = .true.
 
-    do f = 1, Por % region(reg) % Stl % n_facets
+    do f = 1, Por % region(reg) % Stl % n_facets()
 
       ! Compute facet's center of gravity
-      xc = (  Por % region(reg) % Stl % x(1,f)               &
-            + Por % region(reg) % Stl % x(2,f)               &
-            + Por % region(reg) % Stl % x(3,f)) * ONE_THIRD
-      yc = (  Por % region(reg) % Stl % y(1,f)               &
-            + Por % region(reg) % Stl % y(2,f)               &
-            + Por % region(reg) % Stl % y(3,f)) * ONE_THIRD
-      zc = (  Por % region(reg) % Stl % z(1,f)               &
-            + Por % region(reg) % Stl % z(2,f)               &
-            + Por % region(reg) % Stl % z(3,f)) * ONE_THIRD
+      xyz(1:3) = Por % region(reg) % Stl % Facet_Coords(f)
+      xc = xyz(1)
+      yc = xyz(2)
+      zc = xyz(3)
 
       ! Vector connecting facet centroid with cell centroid
       cx = xc - Grid % xc(c)

@@ -8,7 +8,7 @@
   class(Stl_Type) :: Stl
   character(*)    :: file_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer    :: fu, v, f, i, n
+  integer    :: fu, v, f, i_ver, n
   integer(1) :: byte
 !==============================================================================!
 
@@ -29,34 +29,44 @@
     end do
 
     call File % Read_Binary_Int4_Array(fu, 1)
-    n = int4_array(1)
+    f = int4_array(1)
 
-    Stl % n_facets = n
-    allocate(Stl % x(3, n));  Stl % x(:,:) = 0.0
-    allocate(Stl % y(3, n));  Stl % y(:,:) = 0.0
-    allocate(Stl % z(3, n));  Stl % z(:,:) = 0.0
-    allocate(Stl % nx  (n));  Stl % nx (:) = 0.0
-    allocate(Stl % ny  (n));  Stl % ny (:) = 0.0
-    allocate(Stl % nz  (n));  Stl % nz (:) = 0.0
+    Stl % n_bnd_cells = -1
+    Stl % n_cells     = f
+    Stl % n_nodes     = Stl % n_cells * 3
+    Stl % n_faces     = 0
+    Stl % n_edges     = 0
+    allocate(Stl % xn(Stl % n_nodes));  Stl % xn(:) = 0.0
+    allocate(Stl % yn(Stl % n_nodes));  Stl % yn(:) = 0.0
+    allocate(Stl % zn(Stl % n_nodes));  Stl % zn(:) = 0.0
+    allocate(Stl % nx(Stl % n_cells));  Stl % nx(:) = 0.0
+    allocate(Stl % ny(Stl % n_cells));  Stl % ny(:) = 0.0
+    allocate(Stl % nz(Stl % n_cells));  Stl % nz(:) = 0.0
+    allocate(Stl % cells_n_nodes(Stl % n_cells));  Stl % cells_n_nodes(:) = 3
+    allocate(Stl % cells_n   (3, Stl % n_cells));  Stl % cells_n(:,:)     = 0
+    allocate(Stl % new_n        (Stl % n_nodes));  Stl % new_n(:)         = 0
+    allocate(Stl % old_n        (Stl % n_nodes));  Stl % old_n(:)         = 0
 
     !------------------------------------------------!
     !   Read all facet normals, vertex coordinates   !
     !------------------------------------------------!
-    do f = 1, n
+    do f = 1, Stl % n_cells
       call File % Read_Binary_Real4_Array(fu, 3)
       Stl % nx(f) = real4_array(1)
       Stl % ny(f) = real4_array(2)
       Stl % nz(f) = real4_array(3)
-      do v = 1, 3
+      do i_ver = 1, 3
+        v = (f-1) * 3 + i_ver        ! find global vertex number ...
+        Stl % cells_n(i_ver, f) = v  ! ... and store it in cells_n
         call File % Read_Binary_Real4_Array(fu, 3)
-        Stl % x(v, f) = real4_array(1)
-        Stl % y(v, f) = real4_array(2)
-        Stl % z(v, f) = real4_array(3)
+        Stl % xn(v) = real4_array(1)
+        Stl % yn(v) = real4_array(2)
+        Stl % zn(v) = real4_array(3)
       end do
       read(fu) byte
       read(fu) byte
     end do
-    print '(a)', ' # Read all stl facets!'
+    print '(a)', ' # Read all STL facets!'
 
   !---------------------------------!
   !                                 !
@@ -76,15 +86,23 @@
       if(Line % tokens(1) .eq. 'endsolid') exit
       if(Line % tokens(1) .eq. 'facet') f = f + 1
     end do
-    print '(a,i9)', ' # Number of facets on the stl: ', f
+    print '(a,i9)', ' # Number of facets on the STL: ', f
 
-    Stl % n_facets = f
-    allocate(Stl % x(3, f));  Stl % x(:,:) = 0.0
-    allocate(Stl % y(3, f));  Stl % y(:,:) = 0.0
-    allocate(Stl % z(3, f));  Stl % z(:,:) = 0.0
-    allocate(Stl % nx  (f));  Stl % nx (:) = 0.0
-    allocate(Stl % ny  (f));  Stl % ny (:) = 0.0
-    allocate(Stl % nz  (f));  Stl % nz (:) = 0.0
+    Stl % n_bnd_cells = -1
+    Stl % n_cells     = f
+    Stl % n_nodes     = Stl % n_cells * 3
+    Stl % n_faces     = 0
+    Stl % n_edges     = 0
+    allocate(Stl % xn(Stl % n_nodes));  Stl % xn(:) = 0.0
+    allocate(Stl % yn(Stl % n_nodes));  Stl % yn(:) = 0.0
+    allocate(Stl % zn(Stl % n_nodes));  Stl % zn(:) = 0.0
+    allocate(Stl % nx(Stl % n_cells));  Stl % nx(:) = 0.0
+    allocate(Stl % ny(Stl % n_cells));  Stl % ny(:) = 0.0
+    allocate(Stl % nz(Stl % n_cells));  Stl % nz(:) = 0.0
+    allocate(Stl % cells_n_nodes(Stl % n_cells));  Stl % cells_n_nodes(:) = 3
+    allocate(Stl % cells_n   (3, Stl % n_cells));  Stl % cells_n(:,:)     = 0
+    allocate(Stl % new_n        (Stl % n_nodes));  Stl % new_n(:)         = 0
+    allocate(Stl % old_n        (Stl % n_nodes));  Stl % old_n(:)         = 0
 
     !------------------------------------------------!
     !   Read all facet normals, vertex coordinates   !
@@ -101,20 +119,29 @@
         read(Line % tokens(4), *) Stl % ny(f)
         read(Line % tokens(5), *) Stl % nz(f)
         call File % Read_Line(fu)                ! 'outer loop'
-        do v = 1, 3
+        do i_ver = 1, 3
+          v = (f-1) * 3 + i_ver        ! find global vertex number ...
+          Stl % cells_n(i_ver, f) = v  ! ... and store it in facet_v
           call File % Read_Line(fu)              ! 'vertex 1, 2 and 3'
-          read(Line % tokens(2), *) Stl % x(v, f)
-          read(Line % tokens(3), *) Stl % y(v, f)
-          read(Line % tokens(4), *) Stl % z(v, f)
+          read(Line % tokens(2), *) Stl % xn(v)
+          read(Line % tokens(3), *) Stl % yn(v)
+          read(Line % tokens(4), *) Stl % zn(v)
         end do
         call File % Read_Line(fu)                ! 'endloop'
       end if
     end do
-    print '(a)', ' # Read all stl facets!'
+    print '(a)', ' # Read all STL facets!'
 
     close(fu)
 
   end if
+
+  !------------------------------------------!
+  !                                          !
+  !   This is brave: merge duplicate nodes   !
+  !                                          !
+  !------------------------------------------!
+  call Stl % Merge_Duplicate_Nodes()
 
   end subroutine
 

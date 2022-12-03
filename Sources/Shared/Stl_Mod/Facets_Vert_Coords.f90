@@ -1,17 +1,21 @@
 !==============================================================================!
-  function Facet_Coords(Stl, fac)
+  function Facets_Vert_Coords(Stl, fac, v)
 !------------------------------------------------------------------------------!
-!   Returns facet cooridnates                                                  !
+!   Returns cooridnates of facets's vertex                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Stl_Type)     :: Stl
-  real, dimension(3)  :: Facet_Coords
+  real, dimension(3)  :: Facets_Vert_Coords
   integer, intent(in) :: fac
+  integer, intent(in) :: v
 !==============================================================================!
 
-  Facet_Coords(1) = (Stl % x(1,fac) + Stl % x(2,fac) + Stl % x(3,fac)) / 3.0
-  Facet_Coords(2) = (Stl % y(1,fac) + Stl % y(2,fac) + Stl % y(3,fac)) / 3.0
-  Facet_Coords(3) = (Stl % z(1,fac) + Stl % z(2,fac) + Stl % z(3,fac)) / 3.0
+  Assert(fac <= Stl % n_cells)
+  Assert(v <= 3)
+
+  Facets_Vert_Coords(1) = Stl % xn(Stl % cells_n(v, fac))
+  Facets_Vert_Coords(2) = Stl % yn(Stl % cells_n(v, fac))
+  Facets_Vert_Coords(3) = Stl % zn(Stl % cells_n(v, fac))
 
   end function

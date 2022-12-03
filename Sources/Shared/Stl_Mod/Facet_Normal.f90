@@ -10,6 +10,8 @@
   integer, intent(in) :: fac
 !==============================================================================!
 
+  Assert(fac <= Stl % n_cells)
+
   Facet_Normal(1) = Stl % nx(fac)
   Facet_Normal(2) = Stl % ny(fac)
   Facet_Normal(3) = Stl % nz(fac)
