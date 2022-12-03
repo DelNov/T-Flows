@@ -11,11 +11,10 @@
   integer, intent(in) :: v
 !==============================================================================!
 
-  Assert(fac <= Stl % n_cells)
   Assert(v <= 3)
 
-  Facets_Vert_Coords(1) = Stl % xn(Stl % cells_n(v, fac))
-  Facets_Vert_Coords(2) = Stl % yn(Stl % cells_n(v, fac))
-  Facets_Vert_Coords(3) = Stl % zn(Stl % cells_n(v, fac))
+  Facets_Vert_Coords(1) = Stl % xn(Stl % cells_n(v, -fac))
+  Facets_Vert_Coords(2) = Stl % yn(Stl % cells_n(v, -fac))
+  Facets_Vert_Coords(3) = Stl % zn(Stl % cells_n(v, -fac))
 
   end function

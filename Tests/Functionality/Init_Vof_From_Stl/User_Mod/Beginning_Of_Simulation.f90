@@ -62,7 +62,7 @@
   !-----------------------!
   !   Read the STL file   !
   !-----------------------!
-  call Stl % Create_From_File("sphere.stl")
+  call Stl % Create_From_File("2_spheres.stl")
 
   !-----------------------!
   !   Find vof in nodes   !
@@ -71,7 +71,7 @@
 
     vof_at_nodes(i) = 0  ! assume node is in the stl
 
-    do fac = 1, Stl % n_facets
+    do fac = 1, Stl % N_Facets()
 
       f = Stl % Facet_Coords(fac)
       n = Stl % Facet_Normal(fac)
@@ -85,7 +85,7 @@
       end if
     end do
 
-    vof_at_nodes(i) = vof_at_nodes(i) / real(Stl % n_facets)
+    vof_at_nodes(i) = vof_at_nodes(i) / real(Stl % N_Facets())
     if(vof_at_nodes(i) < 0.01) then
       vof_at_nodes(i) = 0.0
     else
@@ -132,12 +132,12 @@
       qi(1:3) = (/Grid % xc(c), Grid % yc(c), Grid % zc(c)/)
       qj(1:3) = (/Grid % xn(i), Grid % yn(i), Grid % zn(i)/)
 
-      do fac = 1, Stl % n_facets
+      do fac = 1, Stl % N_Facets()
 
         ! STL vertex coordinates
-        p1(1:3) = (/Stl % x(1,fac), Stl % y(1,fac), Stl % z(1,fac)/)
-        p2(1:3) = (/Stl % x(2,fac), Stl % y(2,fac), Stl % z(2,fac)/)
-        p3(1:3) = (/Stl % x(3,fac), Stl % y(3,fac), Stl % z(3,fac)/)
+        p1(1:3) = Stl % Facets_Vert_Coords(fac, 1)
+        p2(1:3) = Stl % Facets_Vert_Coords(fac, 2)
+        p3(1:3) = Stl % Facets_Vert_Coords(fac, 3)
 
         ! Do i and j cross STL facet?
         vol_1 = Sgn_Volume(qi, p1, p2, p3)

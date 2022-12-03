@@ -9,6 +9,6 @@
   integer         :: N_Facets
 !==============================================================================!
 
-  N_Facets = Stl % n_cells
+  N_Facets = Stl % n_bnd_cells
 
   end function
