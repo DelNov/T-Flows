@@ -91,6 +91,28 @@
       end do
     end do
 
+    ! Change the field for number of nodes
+    ! (How come I didn't do it before?)
+    Grid % n_nodes = 0
+    do c = -Grid % n_bnd_cells, Grid % n_cells     ! cells' nodes
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        n = Grid % cells_n(i_nod, c)
+        Grid % n_nodes = max(Grid % n_nodes, n)
+      end do
+    end do
+    do s = 1, Grid % n_faces                       ! faces' nodes
+      do i_nod = 1, Grid % faces_n_nodes(c)
+        n = Grid % faces_n(i_nod, s)
+        Grid % n_nodes = max(Grid % n_nodes, n)
+      end do
+    end do
+    do e = 1, Grid % n_edges                       ! edges' nodes
+      do i_nod = 1, 2
+        n = Grid % edges_n(i_nod, e)
+        Grid % n_nodes = max(Grid % n_nodes, n)
+      end do
+    end do
+
     print '(a)', ' # Done!'
 
   end if
