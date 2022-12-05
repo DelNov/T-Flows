@@ -34,7 +34,7 @@
 
     ! Stores the name of this domain
     character(SL) :: name
-    logical       :: polyhedral
+    logical       :: polyhedral = .false.
 
     ! Number of ...
     integer :: n_nodes     = 0  ! ... nodes
