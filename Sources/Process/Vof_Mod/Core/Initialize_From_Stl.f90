@@ -75,10 +75,15 @@
     write(*,'(a2,f5.0,a14,a1)', advance='no')  &
       ' #', (100.*real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
 
+    ! Node coordinates
+    qc(1) = Grid % xc(c)
+    qc(2) = Grid % yc(c)
+    qc(3) = Grid % zc(c)
+
     do fac = 1, Stl % N_Facets()
       f = Stl % Facet_Coords(fac)
-      surf_dist(c) = min(surf_dist(c), Math % Distance_Squared(  &
-        Grid % xc(c), Grid % yc(c), Grid % zc(c), f(1), f(2), f(3)))
+      n = Stl % Facet_Normal(fac)
+      surf_dist(c) = min(surf_dist(c), dot_product(qc-f, n))
     end do
 
     do i_nod = 1, abs(Grid % cells_n_nodes(c))
@@ -90,7 +95,6 @@
   end do
 
   do c = 1, Grid % n_cells
-    surf_dist(c) = sqrt(surf_dist(c))
     node_dist(c) = sqrt(node_dist(c))
   end do
   if(DEBUG) then
