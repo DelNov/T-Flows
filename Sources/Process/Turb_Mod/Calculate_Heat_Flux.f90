@@ -12,7 +12,7 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: t, ut, vt, wt, t2
   type(Var_Type),   pointer :: u, v, w
-  integer                   :: c, k, c1, c2, s
+  integer                   :: c, c1, c2, s
   real                      :: ut_log_law, vt_log_law, wt_log_law
   real                      :: nx, ny, nz, qx, qy, qz, ebf
 !==============================================================================!
