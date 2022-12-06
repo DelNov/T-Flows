@@ -1,0 +1,3 @@
+To create spheres with blender, run:
+
+blender --background --python ./spheres.py
