@@ -26,7 +26,7 @@
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NO    = 0
   integer, parameter :: YES   = 1
-  logical, parameter :: DEBUG = .false.
+  logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer     :: Grid
   type(Stl_Type)               :: Stl
@@ -39,7 +39,7 @@
   integer                      :: n_cut_facets, cut_facets(1024)
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
   real                         :: cell_vol, cel0_vol, cel1_vol
-  real                         :: p1(3), p2(3), p3(3), qi(3), qj(3), qn(3)
+  real                         :: p1(3), p2(3), p3(3), qc(3), qn(3)
   real                         :: f(3), n(3)
   integer                      :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
   integer                      :: new_faces_n_nodes, cnt_p, cnt_m
@@ -111,6 +111,7 @@
   !   the node distance for all nodes in the grid      !
   !                                                    !
   !----------------------------------------------------!
+  print '(a)', ' # Searching for cells cut by the STL facets'
   do c = 1, Grid % n_cells
 
     if(surf_dist(c) < 2.0 * node_dist(c)) then
@@ -130,12 +131,12 @@
       do i_nod = 1, abs(Grid % cells_n_nodes(c))
         i = Grid % cells_n(i_nod, c)
 
-        qi(1) = Grid % xc(c)
-        qi(2) = Grid % yc(c)
-        qi(3) = Grid % zc(c)
-        qj(1) = Grid % xn(i)
-        qj(2) = Grid % yn(i)
-        qj(3) = Grid % zn(i)
+        qc(1) = Grid % xc(c)
+        qc(2) = Grid % yc(c)
+        qc(3) = Grid % zc(c)
+        qn(1) = Grid % xn(i)
+        qn(2) = Grid % yn(i)
+        qn(3) = Grid % zn(i)
 
         do fac = 1, Stl % N_Facets()
 
@@ -145,15 +146,15 @@
           p3(1:3) = Stl % Facets_Vert_Coords(fac, 3)
 
           ! Do i and j cross STL facet?
-          vol_1 = Sgn_Volume(qi, p1, p2, p3)
-          vol_2 = Sgn_Volume(qj, p1, p2, p3)
+          vol_1 = Sgn_Volume(qc, p1, p2, p3)
+          vol_2 = Sgn_Volume(qn, p1, p2, p3)
           ! vol_1 and vol_2 have different signs
           if(vol_1 * vol_2 < 0.0) then
-            vol_3 = Sgn_Volume(qi, qj, p1, p2)
-            vol_4 = Sgn_Volume(qi, qj, p2, p3)
+            vol_3 = Sgn_Volume(qc, qn, p1, p2)
+            vol_4 = Sgn_Volume(qc, qn, p2, p3)
             ! vol_3 and vol_3 have the same sign
             if(vol_3 * vol_4 > 0.0) then
-              vol_5 = Sgn_Volume(qi, qj, p3, p1)
+              vol_5 = Sgn_Volume(qc, qn, p3, p1)
               ! vol_3, vol_4 and vol_5 have the same sign
               if( (vol_3 < 0.0 .and. vol_4 < 0.0 .and. vol_5 < 0.0) .or.  &
                   (vol_3 > 0.0 .and. vol_4 > 0.0 .and. vol_5 > 0.0) ) then
