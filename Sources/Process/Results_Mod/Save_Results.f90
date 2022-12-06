@@ -427,7 +427,7 @@
     !   Courant number   !
     !--------------------!
     if(plot_inside) then
-      call Flow % Calculate_Courant_In_Cells(save_01(c_f:c_l))
+      call Flow % Calculate_Courant_In_Cells(save_01)
       call Results % Save_Scalar_Real("Courant Number [1]", plot_inside,  &
                                       save_01(c_f:c_l),                   &
                                       f8, f9, data_offset, run)
