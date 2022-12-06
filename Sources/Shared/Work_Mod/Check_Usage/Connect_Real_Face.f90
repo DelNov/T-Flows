@@ -19,6 +19,7 @@
   Work % last_r_face = Work % last_r_face + 1
   Work % max_r_face  = max(Work % max_r_face, Work % last_r_face)
   a01 => Work % r_face(Work % last_r_face) % ptr
+  a01(:) = 0.0
 
   if(present(a02)) then
     Work % last_r_face = Work % last_r_face + 1
