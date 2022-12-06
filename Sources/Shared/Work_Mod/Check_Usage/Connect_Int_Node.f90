@@ -19,6 +19,7 @@
   Work % last_i_node = Work % last_i_node + 1
   Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
   a01 => Work % i_node(Work % last_i_node) % ptr
+  a01(:) = 0
 
   if(present(a02)) then
     Work % last_i_node = Work % last_i_node + 1

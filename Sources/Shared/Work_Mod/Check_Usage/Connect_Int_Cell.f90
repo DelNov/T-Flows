@@ -19,6 +19,7 @@
   Work % last_i_cell = Work % last_i_cell + 1
   Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
   a01 => Work % i_cell(Work % last_i_cell) % ptr
+  a01(:) = 0
 
   if(present(a02)) then
     Work % last_i_cell = Work % last_i_cell + 1

@@ -11,7 +11,8 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
-  real                      :: courant(:)  ! it is sent from 1 onwards
+  real                      :: courant(- Flow % pnt_grid % n_bnd_cells  &
+                                       : Flow % pnt_grid % n_cells)
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w
@@ -32,9 +33,9 @@
 
     ! Normalize the velocity
     u_m = norm2( (/u % n(c), v % n(c), w % n(c)/) )
-    n_x = u % n(c) / u_m
-    n_y = v % n(c) / u_m
-    n_z = w % n(c) / u_m
+    n_x = u % n(c) / (u_m + TINY)
+    n_y = v % n(c) / (u_m + TINY)
+    n_z = w % n(c) / (u_m + TINY)
 
     ! Initialize distance from each side of the velocity
     dist_pos = -HUGE
@@ -54,7 +55,7 @@
     end do
 
     ! With maximum span of the cell in the direction of velocity
-    courant(c) = u_m * Flow % dt / (abs(dist_pos) + abs(dist_neg))
+    courant(c) = u_m * Flow % dt / (abs(dist_pos) + abs(dist_neg) + TINY)
 
   end do
   call Grid % Exchange_Cells_Real(courant(-Grid % n_bnd_cells:Grid % n_cells))

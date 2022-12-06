@@ -19,6 +19,7 @@
   Work % last_r_node = Work % last_r_node + 1
   Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
   a01 => Work % r_node(Work % last_r_node) % ptr
+  a01(:) = 0.0
 
   if(present(a02)) then
     Work % last_r_node = Work % last_r_node + 1

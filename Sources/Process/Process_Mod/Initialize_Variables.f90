@@ -42,7 +42,7 @@
                                n_heated_wall, n_pressure, n_convect
   character(SL)             :: keys(128)
   character(SL)             :: keys_file(128)
-  real                      :: vals(0:128)   ! note that they start from zero!
+  character(SL)             :: vals(0:128)   ! note that they start from zero!
   real                      :: area
 
   integer                   :: n_points, k
@@ -50,12 +50,12 @@
   logical                   :: found
 
   ! Default values for initial conditions
-  real, parameter           :: u_def   = 0.0,  v_def    = 0.0,  w_def    = 0.0
-  real, parameter           :: t_def   = 0.0,  t2_def   = 0.0,  phi_def  = 0.0
-  real, parameter           :: kin_def = 0.0,  eps_def  = 0.0,  f22_def  = 0.0
-  real, parameter           :: vis_def = 0.0,  zeta_def = 0.0
-  real, parameter           :: uu_def  = 0.0,  vv_def   = 0.0,  ww_def   = 0.0
-  real, parameter           :: uv_def  = 0.0,  uw_def   = 0.0,  vw_def   = 0.0
+  character(3) :: u_def   = '0.0',  v_def    = '0.0',  w_def   = '0.0'
+  character(3) :: t_def   = '0.0',  t2_def   = '0.0',  phi_def = '0.0'
+  character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
+  character(3) :: vis_def = '0.0',  zeta_def = '0.0'
+  character(3) :: uu_def  = '0.0',  vv_def   = '0.0',  ww_def  = '0.0'
+  character(3) :: uv_def  = '0.0',  uw_def   = '0.0',  vw_def  = '0.0'
 !==============================================================================!
 
   ! Take aliases
@@ -154,48 +154,66 @@
           ! Store closest point in k
           k = minloc(dist, dim = 1)
 
-          i=Key_Ind('U',keys,nks);prof(k,0)=u_def;u%n(c)=prof(k,i)
-          i=Key_Ind('V',keys,nks);prof(k,0)=v_def;v%n(c)=prof(k,i)
-          i=Key_Ind('W',keys,nks);prof(k,0)=w_def;w%n(c)=prof(k,i)
+          i=Key_Ind('U',keys,nks); read(u_def, *)  prof(k,0); u % n(c)=prof(k,i)
+          i=Key_Ind('V',keys,nks); read(v_def, *)  prof(k,0); v % n(c)=prof(k,i)
+          i=Key_Ind('W',keys,nks); read(w_def, *)  prof(k,0); w % n(c)=prof(k,i)
 
           if(Flow % heat_transfer) then
-            i=Key_Ind('T',keys,nks);prof(k,0)=t_def;t%n(c)=prof(k,i)
+            i=Key_Ind('T',keys,nks); read(t_def,*) prof(k,0); t % n(c)=prof(k,i)
           end if
 
           if(Turb % model .eq. K_EPS) then
-            i=Key_Ind('KIN',keys,nks);prof(k,0)=kin_def; kin%n(c)=prof(k,i)
-            i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def; eps%n(c)=prof(k,i)
+            i = Key_Ind('KIN',  keys, nks)
+            read(kin_def,  *) prof(k, 0);  kin  % n(c) = prof(k, i)
+            i = Key_Ind('EPS',  keys, nks)
+            read(eps_def,  *) prof(k, 0);  eps  % n(c) = prof(k, i)
             if(Flow % heat_transfer) then
-              i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
+              i = Key_Ind('T2', keys, nks)
+              read(t2_def, *) prof(k,0);   t2 % n(c) = prof(k, i)
             end if
           end if
 
           if(Turb % model .eq. K_EPS_ZETA_F .or.  &
              Turb % model .eq. HYBRID_LES_RANS) then
-            i=Key_Ind('KIN', keys,nks);prof(k,0)=kin_def; kin %n(c)=prof(k,i)
-            i=Key_Ind('EPS', keys,nks);prof(k,0)=eps_def; eps %n(c)=prof(k,i)
-            i=Key_Ind('ZETA',keys,nks);prof(k,0)=zeta_def;zeta%n(c)=prof(k,i)
-            i=Key_Ind('F22', keys,nks);prof(k,0)=f22_def; f22 %n(c)=prof(k,i)
+            i = Key_Ind('KIN',  keys, nks)
+            read(kin_def,  *) prof(k, 0);  kin  % n(c) = prof(k, i)
+            i = Key_Ind('EPS',  keys, nks)
+            read(eps_def,  *) prof(k, 0);  eps  % n(c) = prof(k, i)
+            i = Key_Ind('ZETA', keys, nks)
+            read(zeta_def, *) prof(k, 0);  zeta % n(c) = prof(k, i)
+            i = Key_Ind('F22',  keys, nks)
+            read(f22_def,  *) prof(k, 0);  f22  % n(c) = prof(k, i)
             if(Flow % heat_transfer) then
-              i=Key_Ind('T2', keys,nks);prof(k,0)=t2_def; t2 %n(c)=prof(k,i)
+              i = Key_Ind('T2', keys, nks)
+              read(t2_def, *) prof(k,0);   t2 % n(c) = prof(k, i)
             end if
            end if
 
           if(Turb % model .eq. DES_SPALART) then
-            i=Key_Ind('VIS',keys,nks); prof(k,0)=vis_def; vis%n(c)=prof(k,i)
+            i = Key_Ind('VIS', keys, nks)
+            read(vis_def, *) prof(k, 0);  vis % n(c) = prof(k, i)
           end if
 
           if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or. &
              Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-            i=Key_Ind('UU', keys,nks);prof(k,0)=uu_def; uu %n(c)=prof(k,i)
-            i=Key_Ind('VV', keys,nks);prof(k,0)=vv_def; vv %n(c)=prof(k,i)
-            i=Key_Ind('WW', keys,nks);prof(k,0)=ww_def; ww %n(c)=prof(k,i)
-            i=Key_Ind('UV', keys,nks);prof(k,0)=uv_def; uv %n(c)=prof(k,i)
-            i=Key_Ind('UW', keys,nks);prof(k,0)=uw_def; uw %n(c)=prof(k,i)
-            i=Key_Ind('VW', keys,nks);prof(k,0)=vw_def; vw %n(c)=prof(k,i)
-            i=Key_Ind('EPS',keys,nks);prof(k,0)=eps_def;eps%n(c)=prof(k,i)
+            i = Key_Ind('UU',  keys, nks)
+            read(uu_def, *) prof(k, 0);   uu % n(c)  = prof(k, i)
+            i = Key_Ind('VV',  keys, nks)
+            read(vv_def, *) prof(k, 0);   vv % n(c)  = prof(k, i)
+            i = Key_Ind('WW',  keys, nks)
+            read(ww_def, *) prof(k, 0);   ww % n(c)  = prof(k, i)
+            i = Key_Ind('UV',  keys, nks)
+            read(uv_def, *) prof(k, 0);   uv % n(c)  = prof(k, i)
+            i = Key_Ind('UW',  keys, nks)
+            read(uw_def, *) prof(k, 0);   uw % n(c)  = prof(k, i)
+            i = Key_Ind('VW',  keys, nks)
+            read(vw_def, *) prof(k, 0);   vw % n(c)  = prof(k, i)
+            i = Key_Ind('EPS', keys, nks)
+            read(eps_def, *) prof(k, 0);  eps % n(c) = prof(k, i)
             if (Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-              i=Key_Ind('F22',keys,nks);prof(k,0)=f22_def;f22%n(c)=prof(k,i)
+              i = Key_Ind('F22', keys, nks)
+              read(f22_def, *) prof(k, 0)
+              f22 % n(c) = prof(k, i)
             end if
           end if
 
@@ -227,7 +245,7 @@
         call String % To_Upper_Case(keys(i))
       end do
 
-      call Control_Mod_Read_Real_Array_On('VALUES', vals(1), nvs, .true.)
+      call Control_Mod_Read_Strings_On('VALUES', vals(1), nvs, .true.)
 
       ! Check validity of the input
       if(nks .eq. 0 .or. nvs .eq. 0 .and. this_proc < 2) then
@@ -256,9 +274,9 @@
           w_mean(c) = 0.0
         end if
 
-        vals(0) = u_def;  u % n(c) = vals(Key_Ind('U', keys, nks))
-        vals(0) = v_def;  v % n(c) = vals(Key_Ind('V', keys, nks))
-        vals(0) = w_def;  w % n(c) = vals(Key_Ind('W', keys, nks))
+        vals(0) = u_def;  read(vals(Key_Ind('U', keys, nks)), *)  u % n(c)
+        vals(0) = v_def;  read(vals(Key_Ind('V', keys, nks)), *)  v % n(c)
+        vals(0) = w_def;  read(vals(Key_Ind('W', keys, nks)), *)  w % n(c)
 
         u % o(c)  = u % n(c)
         u % oo(c) = u % n(c)
@@ -268,7 +286,7 @@
         w % oo(c) = w % n(c)
 
         if(Flow % heat_transfer) then
-          vals(0) = t_def;  t % n(c) = vals(Key_Ind('T', keys, nks))
+          vals(0) = t_def;  read(vals(Key_Ind('T', keys, nks)), *)  t % n(c)
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
         end if
@@ -277,20 +295,20 @@
         do sc = 1, Flow % n_scalars
           phi => Flow % scalar(sc)
           vals(0) = phi_def
-          phi % n(c)  = vals(Key_Ind(phi % name, keys, nks))
+          read(vals(Key_Ind(phi % name, keys, nks)), *) phi % n(c)
           phi % o(c)  = phi % n(c)
           phi % oo(c) = phi % n(c)
         end do
 
         if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
            Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-          vals(0) = uu_def;  uu  % n(c) = vals(Key_Ind('UU',  keys, nks))
-          vals(0) = vv_def;  vv  % n(c) = vals(Key_Ind('VV',  keys, nks))
-          vals(0) = ww_def;  ww  % n(c) = vals(Key_Ind('WW',  keys, nks))
-          vals(0) = uv_def;  uv  % n(c) = vals(Key_Ind('UV',  keys, nks))
-          vals(0) = uw_def;  uw  % n(c) = vals(Key_Ind('UW',  keys, nks))
-          vals(0) = vw_def;  vw  % n(c) = vals(Key_Ind('VW',  keys, nks))
-          vals(0) = eps_def; eps % n(c) = vals(Key_Ind('EPS', keys, nks))
+          vals(0) = uu_def;  read(vals(Key_Ind('UU', keys,nks)), *)  uu  % n(c)
+          vals(0) = vv_def;  read(vals(Key_Ind('VV', keys,nks)), *)  vv  % n(c)
+          vals(0) = ww_def;  read(vals(Key_Ind('WW', keys,nks)), *)  ww  % n(c)
+          vals(0) = uv_def;  read(vals(Key_Ind('UV', keys,nks)), *)  uv  % n(c)
+          vals(0) = uw_def;  read(vals(Key_Ind('UW', keys,nks)), *)  uw  % n(c)
+          vals(0) = vw_def;  read(vals(Key_Ind('VW', keys,nks)), *)  vw  % n(c)
+          vals(0) = eps_def; read(vals(Key_Ind('EPS',keys,nks)), *)  eps % n(c)
           uu % o(c)  = uu % n(c)
           uu % oo(c) = uu % n(c)
           vv % o(c)  = vv % n(c)
@@ -304,24 +322,26 @@
           vw % o(c)  = vw % n(c)
           vw % oo(c) = vw % n(c)
           if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-            vals(0) = f22_def; f22 % n(c) = vals(Key_Ind('F22', keys, nks))
+            vals(0) = f22_def;  read(vals(Key_Ind('F22',keys,nks)),*) f22 % n(c)
             f22 % o(c)  = f22 % n(c)
             f22 % oo(c) = f22 % n(c)
           end if
         end if
 
         if(Turb % model .eq. K_EPS) then
-          vals(0) = kin_def;
-          kin % n(c) = max(0.01, vals(Key_Ind('KIN', keys, nks)))
-          vals(0) = eps_def;
-          eps % n(c) = max(0.001, vals(Key_Ind('EPS', keys, nks)))
+          vals(0) = kin_def
+          read(vals(Key_Ind('KIN', keys, nks)), *)  kin % n(c)
+          kin % n(c) = max(0.01, kin % n(c))
+          vals(0) = eps_def
+          read(vals(Key_Ind('EPS', keys, nks)), *)  eps % n(c)
+          eps % n(c) = max(0.001, eps % n(c))
           kin % o(c)  = kin % n(c)
           kin % oo(c) = kin % n(c)
           eps % o(c)  = eps % n(c)
           eps % oo(c) = eps % n(c)
           Turb % y_plus(c) = 0.001
           if(Flow % heat_transfer) then
-            vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
+            vals(0) = t2_def;  read(vals(Key_Ind('T2', keys, nks)), *) t2 % n(c)
             t2 % o(c)  = t2 % n(c)
             t2 % oo(c) = t2 % n(c)
           end if
@@ -329,10 +349,10 @@
 
         if(Turb % model .eq. K_EPS_ZETA_F .or.  &
            Turb % model .eq. HYBRID_LES_RANS) then
-          vals(0) = kin_def;  kin  % n(c) = vals(Key_Ind('KIN',  keys, nks))
-          vals(0) = eps_def;  eps  % n(c) = vals(Key_Ind('EPS',  keys, nks))
-          vals(0) = zeta_def; zeta % n(c) = vals(Key_Ind('ZETA', keys, nks))
-          vals(0) = f22_def;  f22  % n(c) = vals(Key_Ind('F22',  keys, nks))
+          vals(0) = kin_def;  read(vals(Key_Ind('KIN', keys,nks)),*) kin  % n(c)
+          vals(0) = eps_def;  read(vals(Key_Ind('EPS', keys,nks)),*) eps  % n(c)
+          vals(0) = zeta_def; read(vals(Key_Ind('ZETA',keys,nks)),*) zeta % n(c)
+          vals(0) = f22_def;  read(vals(Key_Ind('F22', keys,nks)),*) f22  % n(c)
           kin  % o(c)  = kin  % n(c)
           kin  % oo(c) = kin  % n(c)
           eps  % o(c)  = eps  % n(c)
@@ -343,7 +363,7 @@
           f22  % oo(c) = f22  % n(c)
           Turb % y_plus(c) = 0.001
           if(Flow % heat_transfer) then
-            vals(0) = t2_def;  t2 % n(c) = vals(Key_Ind('T2',  keys, nks))
+            vals(0) = t2_def;  read(vals(Key_Ind('T2',keys,nks)),*) t2 % n(c)
             t2 % o(c)  = t2 % n(c)
             t2 % oo(c) = t2 % n(c)
           end if
@@ -351,7 +371,7 @@
 
         if(Turb % model .eq. SPALART_ALLMARAS .or.  &
            Turb % model .eq. DES_SPALART) then
-          vals(0) = vis_def; vis % n(c) = vals(Key_Ind('VIS', keys, nks))
+          vals(0) = vis_def;  read(vals(Key_Ind('VIS',keys,nks)),*) vis % n(c)
           vis % o(c)  = vis % n(c)
           vis % oo(c) = vis % n(c)
         end if
