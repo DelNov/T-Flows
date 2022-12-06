@@ -19,7 +19,7 @@
   Grid => Flow % pnt_grid
 
   ! Remove the following 12 lines in real Lagrangian tracking simulations
-  if(Flow % with_interface) then
+  if(Flow % with_interface .and. .not. Vof % init_stl) then
     if(this_proc < 2) then
       print '(a)','#======================================================' // &
                   '======================================================='
