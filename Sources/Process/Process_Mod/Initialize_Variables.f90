@@ -97,9 +97,11 @@
     ! Check if there is file specified
     call Control_Mod_Read_Strings_On('FILE', keys_file, nvs, .true.)
 
-    !-----------------------------------------------!
-    !   Initial conditions is prescribed in a file  !
-    !-----------------------------------------------!
+    !------------------------------------------------!
+    !                                                !
+    !   Initial conditions is prescribed in a file   !
+    !                                                !
+    !------------------------------------------------!
     if (nvs .eq. 1) then ! word 'file' was specified
 
       if (this_proc < 2) &
@@ -107,7 +109,7 @@
 
       call File % Open_For_Reading_Ascii(keys_file(1), fu, this_proc)
 
-      ! number of points
+      ! Number of points
       call File % Read_Line(fu)
 
       read(Line % tokens(1), *) n_points
@@ -154,14 +156,31 @@
           ! Store closest point in k
           k = minloc(dist, dim = 1)
 
+          !--------------!
+          !   Momentum   !
+          !--------------!
           i=Key_Ind('U',keys,nks); read(u_def, *)  prof(k,0); u % n(c)=prof(k,i)
           i=Key_Ind('V',keys,nks); read(v_def, *)  prof(k,0); v % n(c)=prof(k,i)
           i=Key_Ind('W',keys,nks); read(w_def, *)  prof(k,0); w % n(c)=prof(k,i)
 
+          !-------------------!
+          !   Heat transfer   !
+          !-------------------!
           if(Flow % heat_transfer) then
             i=Key_Ind('T',keys,nks); read(t_def,*) prof(k,0); t % n(c)=prof(k,i)
           end if
 
+          !------------------------------!
+          !   Scalars are missing here   !
+          !------------------------------!
+
+          !-------------------------!
+          !   Vof is missing here   !
+          !-------------------------!
+
+          !--------------------------!
+          !   Turbulent quantities   !
+          !--------------------------!
           if(Turb % model .eq. K_EPS) then
             i = Key_Ind('KIN',  keys, nks)
             read(kin_def,  *) prof(k, 0);  kin  % n(c) = prof(k, i)
@@ -229,7 +248,9 @@
       end if
 
     !---------------------------------------------------!
-    !   Initial conditions is not prescribed in a file  !
+    !                                                   !
+    !   Initial conditions is NOT prescribed in a file  !
+    !                                                   !
     !---------------------------------------------------!
     else
 
@@ -274,6 +295,9 @@
           w_mean(c) = 0.0
         end if
 
+        !--------------!
+        !   Momentum   !
+        !--------------!
         vals(0) = u_def;  read(vals(Key_Ind('U', keys, nks)), *)  u % n(c)
         vals(0) = v_def;  read(vals(Key_Ind('V', keys, nks)), *)  v % n(c)
         vals(0) = w_def;  read(vals(Key_Ind('W', keys, nks)), *)  w % n(c)
@@ -285,13 +309,18 @@
         w % o(c)  = w % n(c)
         w % oo(c) = w % n(c)
 
+        !-------------------!
+        !   Heat transfer   !
+        !-------------------!
         if(Flow % heat_transfer) then
           vals(0) = t_def;  read(vals(Key_Ind('T', keys, nks)), *)  t % n(c)
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
         end if
 
-        ! Scalars
+        !-------------!
+        !   Scalars   !
+        !-------------!
         do sc = 1, Flow % n_scalars
           phi => Flow % scalar(sc)
           vals(0) = phi_def
@@ -300,6 +329,11 @@
           phi % oo(c) = phi % n(c)
         end do
 
+        !--------------------------!
+        !   Turbulent quantities   !
+        !--------------------------!
+
+        ! Reynols stress models
         if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
            Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
           vals(0) = uu_def;  read(vals(Key_Ind('UU', keys,nks)), *)  uu  % n(c)
@@ -380,6 +414,14 @@
 
     end if
 
+  end if
+
+  !---------------------------------!
+  !   Vof initialization from STL   !
+  !---------------------------------!
+  if(Flow % with_interface) then
+    read(vals(Key_Ind('VOF', keys, nks)), *)  Vof % name_stl
+    call Vof % Initialize_From_Stl()
   end if
 
   call User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)

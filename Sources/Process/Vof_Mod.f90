@@ -4,6 +4,7 @@
 !   Definition of variables used for all VOF multiphase modelling              !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Stl_Mod
   use Surf_Mod  ! inherited from Front_Mod
   use Turb_Mod
 !------------------------------------------------------------------------------!
@@ -16,6 +17,10 @@
   !               !
   !---------------!
   type Vof_Type
+
+    ! Stores the name of the STL file for initialization
+    character(SL) :: name_stl = ''
+    logical       :: init_stl = .false.    ! is it intialized from STL?
 
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
@@ -81,6 +86,7 @@
       procedure, private :: Compute_Vof
       procedure, private :: Discretize
       procedure, private :: Correct_Beta
+      procedure          :: Initialize_From_Stl
 !     procedure, private :: Find_Upstream_Phi
       procedure, private :: Max_Courant_Number
       procedure, private :: Predict_Beta
@@ -122,6 +128,7 @@
 #   include "Vof_Mod/Core/Compute_Vof.f90"
 #   include "Vof_Mod/Core/Discretize.f90"
 #   include "Vof_Mod/Core/Correct_Beta.f90"
+#   include "Vof_Mod/Core/Initialize_From_Stl.f90"
 #   include "Vof_Mod/Core/Max_Courant_Number.f90"
 #   include "Vof_Mod/Core/Predict_Beta.f90"
 #   include "Vof_Mod/Core/Solve_System.f90"
