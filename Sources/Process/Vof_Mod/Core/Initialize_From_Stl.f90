@@ -1,21 +1,4 @@
 !==============================================================================!
-  real function Sgn_Volume(p1, p2, p3, p4)
-!------------------------------------------------------------------------------!
-!   Returns the signed volume of tethraedra spanned with nodes 1 to 4          !
-!------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  real, intent(in) :: p1(3), p2(3), p3(3), p4(3)
-!==============================================================================!
-  Sgn_Volume = (   (  (p2(2)-p1(2))*(p3(3)-p1(3))                      &
-                    - (p3(2)-p1(2))*(p2(3)-p1(3)) ) * (p4(1)-p1(1)) +  &
-                   (  (p3(1)-p1(1))*(p2(3)-p1(3))                      &
-                    - (p2(1)-p1(1))*(p3(3)-p1(3)) ) * (p4(2)-p1(2)) +  &
-                   (  (p2(1)-p1(1))*(p3(2)-p1(2))                      &
-                    - (p3(1)-p1(1))*(p2(2)-p1(2)) ) * (p4(3)-p1(3)) ) / 6.0
-  end function
-
-!==============================================================================!
   subroutine Initialize_From_Stl(Vof)
 !------------------------------------------------------------------------------!
 !   Initializes VOF function from an STL file                                  !
@@ -38,7 +21,7 @@
   integer                      :: i_iso, i_ver, i_fac, fac, p
   integer                      :: n_cut_facets, cut_facets(1024)
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                         :: cell_vol, cel0_vol, cel1_vol
+  real                         :: cell_vol, cel0_vol, cel1_vol, d, d1, d2
   real                         :: p1(3), p2(3), p3(3), qc(3), qn(3)
   real                         :: f(3), n(3)
   integer                      :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
@@ -80,12 +63,14 @@
     qc(2) = Grid % yc(c)
     qc(3) = Grid % zc(c)
 
+    ! Orthogonal distance to facets
     do fac = 1, Stl % N_Facets()
       f = Stl % Facet_Coords(fac)
       n = Stl % Facet_Normal(fac)
       surf_dist(c) = min(surf_dist(c), dot_product(qc-f, n))
     end do
 
+    ! Cells internal dimensions
     do i_nod = 1, abs(Grid % cells_n_nodes(c))
       i = Grid % cells_n(i_nod, c)
       node_dist(c) = max(node_dist(c), Math % Distance_Squared(  &
@@ -118,6 +103,9 @@
   print '(a)', ' # Searching for cells cut by the STL facets'
   do c = 1, Grid % n_cells
 
+    ! Fetch cell coordinates
+    qc(1) = Grid % xc(c);  qc(2) = Grid % yc(c);  qc(3) = Grid % zc(c)
+
     if(surf_dist(c) < 2.0 * node_dist(c)) then
 
       n_cut_facets  = 0  ! how many facets cut in this cell
@@ -135,12 +123,8 @@
       do i_nod = 1, abs(Grid % cells_n_nodes(c))
         i = Grid % cells_n(i_nod, c)
 
-        qc(1) = Grid % xc(c)
-        qc(2) = Grid % yc(c)
-        qc(3) = Grid % zc(c)
-        qn(1) = Grid % xn(i)
-        qn(2) = Grid % yn(i)
-        qn(3) = Grid % zn(i)
+        ! Fetch node coordinates
+        qn(1) = Grid % xn(i);  qn(2) = Grid % yn(i);  qn(3) = Grid % zn(i)
 
         do fac = 1, Stl % N_Facets()
 
@@ -150,15 +134,15 @@
           p3(1:3) = Stl % Facets_Vert_Coords(fac, 3)
 
           ! Do i and j cross STL facet?
-          vol_1 = Sgn_Volume(qc, p1, p2, p3)
-          vol_2 = Sgn_Volume(qn, p1, p2, p3)
+          vol_1 = dot_product(Math % Cross_Product(p1-qc, p2-qc), p3-qc)
+          vol_2 = dot_product(Math % Cross_Product(p1-qn, p2-qn), p3-qn)
           ! vol_1 and vol_2 have different signs
           if(vol_1 * vol_2 < 0.0) then
-            vol_3 = Sgn_Volume(qc, qn, p1, p2)
-            vol_4 = Sgn_Volume(qc, qn, p2, p3)
+            vol_3 = dot_product(Math % Cross_Product(qn-qc, p1-qc), p2-qc)
+            vol_4 = dot_product(Math % Cross_Product(qn-qc, p2-qc), p3-qc)
             ! vol_3 and vol_3 have the same sign
             if(vol_3 * vol_4 > 0.0) then
-              vol_5 = Sgn_Volume(qc, qn, p3, p1)
+              vol_5 = dot_product(Math % Cross_Product(qn-qc, p3-qc), p1-qc)
               ! vol_3, vol_4 and vol_5 have the same sign
               if( (vol_3 < 0.0 .and. vol_4 < 0.0 .and. vol_5 < 0.0) .or.  &
                   (vol_3 > 0.0 .and. vol_4 > 0.0 .and. vol_5 > 0.0) ) then
