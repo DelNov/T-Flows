@@ -19,7 +19,7 @@
  MIN_SIMPLE_ITERATIONS       6
 
  RESULTS_SAVE_INTERVAL           1
- SAVE_INITIAL_CONDITION         no
+ SAVE_INITIAL_CONDITION        yes
  SAVE_RESULTS_AT_BOUNDARIES     no
  BACKUP_SAVE_INTERVAL         1200
 
@@ -90,13 +90,6 @@
  COMPRESION_VOF                        no
  COMPRESION_FACTOR_VOF                 1.0
  #DUAL_TIME_STEP_VOF                 yes
-
-#--------------------
-# Initial conditions  velocity was 0.05 for nice transport of vof
-#--------------------
-  INITIAL_CONDITION
-    VARIABLES           u      v     w     vof
-    VALUES              0.00  0.0   0.0   3.0
 
 #---------------------
 # Boundary conditions
