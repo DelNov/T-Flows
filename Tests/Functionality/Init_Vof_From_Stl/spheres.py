@@ -11,7 +11,7 @@ import bpy
 bpy.ops.object.delete(use_global=False, confirm=False)
 
 # Set some parameters ...
-S  = 4
+S  = 3
 P  = 0.2
 R1 = 0.19
 R2 = 0.17
