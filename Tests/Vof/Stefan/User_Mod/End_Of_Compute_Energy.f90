@@ -23,7 +23,7 @@
 
   do s = 1, Grid % n_faces
 
-    if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
 
       ! Write down Stefan's solution
       if(ini .eq. 1                            .and.  &
