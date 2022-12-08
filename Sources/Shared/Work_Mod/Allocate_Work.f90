@@ -32,4 +32,6 @@
   call Work % Allocate_Int_Face(Grid, n_i_face)
   call Work % Allocate_Int_Node(Grid, n_i_node)
 
+  Work % allocated = .true.
+
   end subroutine

@@ -14,6 +14,8 @@
                                          a14(:), a15(:), a16(:)
 !==============================================================================!
 
+  Assert(Work % allocated)
+
   call Profiler % Start('Work_Mod')
 
   Work % last_r_face = Work % last_r_face + 1

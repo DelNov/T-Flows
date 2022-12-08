@@ -1,3 +1,5 @@
+#include "../Shared/Assert.h90"
+
 #define CHECK_USAGE 1
 
 !==============================================================================!
@@ -70,6 +72,8 @@
     integer, private :: req_i_cell = 0
     integer, private :: req_i_face = 0
     integer, private :: req_i_node = 0
+
+    logical :: allocated = .false.
 
     contains
       procedure, private :: Allocate_Int_Cell
