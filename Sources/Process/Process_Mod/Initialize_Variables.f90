@@ -414,14 +414,14 @@
 
     end if
 
-  end if
+    !---------------------------------!
+    !   Vof initialization from STL   !
+    !---------------------------------!
+    if(Flow % with_interface) then
+      read(vals(Key_Ind('VOF', keys, nks)), *)  Vof % name_stl
+      call Vof % Initialize_From_Stl()
+    end if
 
-  !---------------------------------!
-  !   Vof initialization from STL   !
-  !---------------------------------!
-  if(Flow % with_interface) then
-    read(vals(Key_Ind('VOF', keys, nks)), *)  Vof % name_stl
-    call Vof % Initialize_From_Stl()
   end if
 
   call User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
