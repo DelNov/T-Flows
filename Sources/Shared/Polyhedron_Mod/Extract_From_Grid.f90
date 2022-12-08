@@ -67,8 +67,13 @@
   !------------------------------------------------------!
   !   Find local node indices for each polyhedron cell   !
   !------------------------------------------------------!
-  do i_fac = 1, Grid % cells_n_faces(cell)  ! local (to cell) face number
-    s = Grid % cells_f(i_fac, cell)         ! global (to grid) face number
+  do i_fac = 1, Grid % cells_n_faces(cell)    ! local (to cell) face number
+    s  = Grid % cells_f(i_fac, cell)          ! global (to grid) face number
+    if(Grid % faces_s(s) .ne. 0) then         ! if face has a shadow ...
+      if(Grid % faces_c(1,s) .ne. cell) then  ! ... and cell is not its c1 ...
+        s = Grid % faces_s(s)                 ! ... take the shadow instead
+      end if
+    end if
 
     ! Fetch the local node numbers for each face
     faces_n_nodes = Grid % faces_n_nodes(s)  ! number of nodes in this face
@@ -92,7 +97,7 @@
   end do
 
   ! Plot extracted cell first, in case things go wrong
-  ! call Pol % Plot_Polyhedron_Vtk(cell)
+  ! call Pol % Plot_Polyhedron_Vtk("geo", cell)
 
   call Work % Disconnect_Int_Node(local_node)
 
