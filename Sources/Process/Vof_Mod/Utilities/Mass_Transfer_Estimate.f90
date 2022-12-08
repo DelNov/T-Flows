@@ -8,9 +8,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
+  type(Var_Type),   pointer :: t
   integer                   :: e, g, l, s, c1, c2, i_ele
   real                      :: cond_1, cond_2
 !==============================================================================!
@@ -18,6 +21,7 @@
   ! Take aliases
   Grid => Vof % pnt_grid
   Flow => Vof % pnt_flow
+  t    => Flow % t
 
   ! If not a problem with mass transfer, get out of here
   if(.not. Flow % mass_transfer) return
@@ -33,7 +37,14 @@
   !    saturation temperature at the interface     !
   !------------------------------------------------!
   call Vof % Calculate_Grad_Matrix_With_Front()
-  call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
+  call Vof % Grad_Variable_With_Front(t, Vof % t_sat)
+  if(DEBUG) then
+    call Grid % Save_Debug_Vtu("grad-t",                               &
+                               scalar_cell = t % n,                    &
+                               scalar_name = "t",                      &
+                               vector_cell = (/t % x, t % y, t % z/),  &
+                               vector_name = "grad-t")
+  end if
 
   !----------------------------------------!
   !   Compute heat flux at the interface   !
@@ -61,14 +72,14 @@
           ! Compute heat fluxes from each side of the interface
           ! Units: W/(mK) * K/m * m^2 = W
           Vof % q_int(1,s) = Vof % q_int(1,s)                               &
-              + cond_1 * (  Flow % t % x(c1) * Vof % Front % elem(e) % sx   &
-                          + Flow % t % y(c1) * Vof % Front % elem(e) % sy   &
-                          + Flow % t % z(c1) * Vof % Front % elem(e) % sz)
+              + cond_1 * (  t % x(c1) * Vof % Front % elem(e) % sx   &
+                          + t % y(c1) * Vof % Front % elem(e) % sy   &
+                          + t % z(c1) * Vof % Front % elem(e) % sz)
 
           Vof % q_int(2,s) = Vof % q_int(2,s)                               &
-              + cond_2 * (  Flow % t % x(c2) * Vof % Front % elem(e) % sx   &
-                          + Flow % t % y(c2) * Vof % Front % elem(e) % sy   &
-                          + Flow % t % z(c2) * Vof % Front % elem(e) % sz)
+              + cond_2 * (  t % x(c2) * Vof % Front % elem(e) % sx   &
+                          + t % y(c2) * Vof % Front % elem(e) % sy   &
+                          + t % z(c2) * Vof % Front % elem(e) % sz)
 
         end if  ! e .ne. 0
       end do    ! i_ele

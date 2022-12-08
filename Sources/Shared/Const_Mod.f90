@@ -35,6 +35,9 @@
   !----------------------------------------!
 
   ! Big and small numbers in metric system
+  real, parameter :: YOTTA = 1.e+24
+  real, parameter :: ZETTA = 1.e+21
+  real, parameter :: EXA   = 1.e+18
   real, parameter :: PETA  = 1.e+15
   real, parameter :: TERA  = 1.e+12
   real, parameter :: GIGA  = 1.e+9
@@ -45,6 +48,9 @@
   real, parameter :: NANO  = 1.e-9
   real, parameter :: PICO  = 1.e-12
   real, parameter :: FEMTO = 1.e-15
+  real, parameter :: ATTO  = 1.e-18
+  real, parameter :: ZEPTO = 1.e-21
+  real, parameter :: YOCTO = 1.e-24
 
   real,    parameter :: HUGE     = PETA
   real,    parameter :: TINY     = FEMTO
