@@ -21,7 +21,7 @@
       procedure, private :: Dashed_Line
       procedure          :: Error
       procedure          :: Framed
-      procedure          :: Frameless
+      procedure, private :: Frameless
       procedure          :: Warning
       procedure, private :: Thick_Line
       procedure, private :: Thin_Line
