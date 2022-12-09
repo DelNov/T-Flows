@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Warning(Msg, width, message_text, file, line)
+  subroutine Warning(Msg, width, message_text, file, line, one_proc)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -8,6 +8,7 @@
   character(*)                  :: message_text
   character(*),        optional :: file
   integer, intent(in), optional :: line
+  logical,             optional :: one_proc  ! print from one processor only
 !-----------------------------------[Locals]-----------------------------------!
   type(Tokenizer_Type) :: Tok
   integer              :: w
@@ -30,6 +31,15 @@
   !-----------------------------------!
   !   Print the body of the message   !
   !-----------------------------------!
-  call Msg % Framed(w, header_text, message_text)
+  if(present(one_proc)) then
+    if(one_proc) then
+      if(this_proc < 2) call Msg % Framed(w, header_text, message_text)
+    else
+      call Msg % Framed(w, header_text, message_text)
+    end if
+  else
+    call Msg % Framed(w, header_text, message_text)
+  end if
+
 
   end subroutine

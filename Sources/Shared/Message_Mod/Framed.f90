@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Framed(Msg, width, header_text, message_text)
+  subroutine Framed(Msg, width, header_text, message_text, one_proc)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,10 +7,18 @@
   integer,      intent(in) :: width
   character(*), intent(in) :: header_text
   character(*), intent(in) :: message_text
+  logical,      optional   :: one_proc
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: w
   character(DL) :: line
 !==============================================================================!
+
+  ! Check if all processors have to print
+  if(present(one_proc)) then
+    if(one_proc) then
+      if(this_proc > 1) return
+    end if
+  end if
 
   ! Adjust width, if necessary
   w = max(width, len_trim(header_text)+3)
