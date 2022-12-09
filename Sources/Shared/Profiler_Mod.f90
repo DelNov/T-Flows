@@ -21,7 +21,7 @@
     integer(DP),   private :: i_time_prev            ! system clock at prev
     integer(DP),   private :: i_time_curr            ! system clock at current
     integer(DP),   private :: sys_count_rate
-    real(DP),      private :: funct_time(MAX_FUNCT)  ! accumulated time
+    real,          private :: funct_time(MAX_FUNCT)  ! accumulated time
 
     contains
       procedure          :: Start
