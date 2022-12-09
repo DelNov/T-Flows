@@ -9,21 +9,44 @@
   integer, intent(in) :: this_proc  ! needed if called from Processor
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, c1, c2, s, n, ss, sr, fu
+  integer       :: c, c1, c2, s, n, ss, sr, fu, real_prec
   character(SL) :: name_in
 !==============================================================================!
 
   !-------------------------------!
-  !                               !
   !     Read the file with the    !
   !   connections between cells   !
-  !                               !
   !-------------------------------!
   call File % Set_Name(name_in,              &
                        processor=this_proc,  &
                        extension='.cfn',     &
                        domain=domain)
   call File % Open_For_Reading_Binary(name_in, fu, this_proc)
+
+  !-------------------------!
+  !   Read real precision   !
+  !-------------------------!
+  read(fu) real_prec
+
+  if(real_prec .ne. RP) then
+    if(RP .eq. 8 .and. real_prec .eq. 4) then
+      call Message % Error(64,                                                 &
+                       'Input files were saved in single precision, but '   // &
+                       'this program is compiled in double. Decide in   '   // &
+                       'which precision you want to work, recompile the '   // &
+                       'programs (option REAL=double/single in make), '     // &
+                       'convert or generate the meshes again and re-run.',     &
+                       one_proc = .true.)
+    else
+      call Message % Error(64,                                                 &
+                       'Input files were saved in double precision, but '   // &
+                       'this program is compiled in single. Decide in   '   // &
+                       'which precision you want to work, recompile the '   // &
+                       'programs (option REAL=double/single in make), '     // &
+                       'convert or generate the meshes again and re-run.',     &
+                       one_proc = .true.)
+    end if
+  end if
 
   !-----------------------------------------------!
   !   Number of cells, boundary cells and faces   !

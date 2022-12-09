@@ -9,20 +9,46 @@
   integer, intent(in) :: this_proc
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu
+  integer       :: c, n, s, fu, real_prec
   character(SL) :: name_in
 !==============================================================================!
 
   !----------------------------!
-  !                            !
   !     Read the file with     !
   !   geometrical dimensions   !
-  !                            !
   !----------------------------!
   call File % Set_Name(name_in, processor=this_proc, extension='.dim',  &
                        domain=domain)
   call File % Open_For_Reading_Binary(name_in, fu, this_proc)
 
+  !-------------------------!
+  !   Read real precision   !
+  !-------------------------!
+  read(fu) real_prec
+
+  if(real_prec .ne. RP) then
+    if(RP .eq. 8 .and. real_prec .eq. 4) then
+      call Message % Error(64,                                                 &
+                       'Input files were saved in single precision, but '   // &
+                       'this program is compiled in double. Decide in   '   // &
+                       'which precision you want to work, recompile the '   // &
+                       'programs (option REAL=double/single in make), '     // &
+                       'convert or generate the meshes again and re-run.',     &
+                       one_proc = .true.)
+    else
+      call Message % Error(64,                                                 &
+                       'Input files were saved in double precision, but '   // &
+                       'this program is compiled in single. Decide in   '   // &
+                       'which precision you want to work, recompile the '   // &
+                       'programs (option REAL=double/single in make), '     // &
+                       'convert or generate the meshes again and re-run.',     &
+                       one_proc = .true.)
+    end if
+  end if
+
+  !-------------------------!
+  !   Read everything else  !
+  !-------------------------!
   read(fu) (Grid % xn(n), n = 1, Grid % n_nodes)
   read(fu) (Grid % yn(n), n = 1, Grid % n_nodes)
   read(fu) (Grid % zn(n), n = 1, Grid % n_nodes)

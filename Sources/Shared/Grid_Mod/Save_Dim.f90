@@ -15,12 +15,15 @@
   call Profiler % Start('Save_Dim')
 
   !----------------------!
-  !                      !
   !   Create .dim file   !
-  !                      !
   !----------------------!
   call File % Set_Name(name_out, processor=sub, extension='.dim')
   call File % Open_For_Writing_Binary(name_out, fu)
+
+  !-------------------------!
+  !   Save real precision   !
+  !-------------------------!
+  write(fu) RP
 
   !----------------------!
   !   Node coordinates   !

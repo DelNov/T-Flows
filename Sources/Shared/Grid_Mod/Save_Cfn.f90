@@ -21,14 +21,17 @@
   call Profiler % Start('Save_Cfn')
 
   !----------------------!
-  !                      !
   !   Create .cfn file   !
-  !                      !
   !----------------------!
   call File % Set_Name(name_out,         &
                        processor=sub,    &
                        extension='.cfn')
   call File % Open_For_Writing_Binary(name_out, fu)
+
+  !-------------------------!
+  !   Save real precision   !
+  !-------------------------!
+  write(fu) RP
 
   !-----------------------------------------------!
   !   Number of cells, boundary cells and faces   !
