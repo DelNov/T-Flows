@@ -15,8 +15,10 @@
   type(Stl_Type)               :: Stl
   type(Polyhedron_Type)        :: Pol(0:1)
   real,    pointer, contiguous :: dis_nod_dom(:), dis_nod(:)
+  real,    pointer, contiguous :: surf_dist_pos(:), surf_dist_neg(:)
   real,    pointer, contiguous :: surf_dist(:), node_dist(:)
-  integer, pointer, contiguous :: dis_nod_int(:), cut_cel(:), set_cel(:)
+  integer, pointer, contiguous :: dis_nod_int(:), cut_cel(:), glo(:)
+  integer, pointer, contiguous :: set_cel(:), set_old(:)
   integer                      :: c, s, i_nod, j_nod, i, j, k1, k2, m
   integer                      :: i_iso, i_ver, i_fac, fac, p
   integer                      :: n_cut_facets, cut_facets(1024)
@@ -30,16 +32,15 @@
   logical                      :: flooding
 !==============================================================================!
 
-  call Work % Connect_Int_Cell(cut_cel)
-  call Work % Connect_Int_Cell(set_cel)
+  call Work % Connect_Int_Cell(cut_cel, set_cel, set_old)
   call Work % Connect_Int_Node(dis_nod_int)
-  call Work % Connect_Real_Node(dis_nod)
-  call Work % Connect_Real_Node(dis_nod_dom)
-  call Work % Connect_Real_Cell(surf_dist)
+  call Work % Connect_Real_Node(dis_nod, dis_nod_dom)
+  call Work % Connect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
   call Work % Connect_Real_Cell(node_dist)
 
   ! Take alias(es)
   Grid => Vof % pnt_grid
+  glo  => Grid % Comm % cell_glo
 
   !-----------------------!
   !                       !
@@ -48,27 +49,53 @@
   !-----------------------!
   call Stl % Create_From_File(Vof % name_stl)
 
-  print '(a)', ' # Calculating distance from the STL interface'
+  if(this_proc < 2) then
+    print '(a)', ' # Calculating distance from the STL interface'
+  end if
   do c = 1, Grid % n_cells
-    surf_dist(c) = +HUGE
+    surf_dist_pos(c) = 0.0
+    surf_dist_neg(c) = 0.0
     node_dist(c) = -HUGE
   end do
 
   do c = 1, Grid % n_cells
-    write(*,'(a2,f5.0,a14,a1)', advance='no')  &
-      ' #', (100.*real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
+    if(this_proc < 2) then
+      write(*,'(a2,f5.0,a14,a1)', advance='no') ' #',  &
+           (100.*real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
+      flush(6)
+    end if
 
     ! Node coordinates
     qc(1) = Grid % xc(c)
     qc(2) = Grid % yc(c)
     qc(3) = Grid % zc(c)
 
-    ! Orthogonal distance to facets
+    ! Orthogonal distance to facets is computed in three steps:
+    ! 1. find positive distance, this
+    !    would be cells outside STL
     do fac = 1, Stl % N_Facets()
       f = Stl % Facet_Coords(fac)
       n = Stl % Facet_Normal(fac)
-      surf_dist(c) = min(surf_dist(c), dot_product(qc-f, n))
+      d = dot_product(qc-f, n)
+      if(d > 0.0) then
+        surf_dist_pos(c) = max(surf_dist_pos(c), d)
+      end if
     end do
+    ! 2. for cells which are left unmarked, hence
+    !    inside the STL find negative distance
+    if(surf_dist_pos(c) .eq. 0.0) then
+      surf_dist_neg(c) = -HUGE
+      do fac = 1, Stl % N_Facets()
+        f = Stl % Facet_Coords(fac)
+        n = Stl % Facet_Normal(fac)
+        d = dot_product(qc-f, n)
+        if(d < 0.0) then
+          surf_dist_neg(c) = max(surf_dist_neg(c), d)
+        end if
+      end do
+    end if
+    ! 3. work out the total distance
+    surf_dist(c) = max(surf_dist_pos(c), abs(surf_dist_neg(c)))
 
     ! Cells internal dimensions
     do i_nod = 1, abs(Grid % cells_n_nodes(c))
@@ -83,8 +110,16 @@
     node_dist(c) = sqrt(node_dist(c))
   end do
   if(DEBUG) then
-    call Grid % Save_Debug_Vtu(append="surf_dist",          &
-                               scalar_cell=surf_dist,       &
+    call Grid % Save_Debug_Vtu(append="surf_dist_pos",       &
+                               scalar_cell=surf_dist_pos,    &
+                               scalar_name="surf_dist_pos")
+
+    call Grid % Save_Debug_Vtu(append="surf_dist_neg",       &
+                               scalar_cell=surf_dist_neg,    &
+                               scalar_name="surf_dist_neg")
+
+    call Grid % Save_Debug_Vtu(append="surf_dist",       &
+                               scalar_cell=surf_dist,    &
                                scalar_name="surf_dist")
 
     call Grid % Save_Debug_Vtu(append="node_dist",          &
@@ -100,7 +135,7 @@
   !   the node distance for all nodes in the grid      !
   !                                                    !
   !----------------------------------------------------!
-  print '(a)', ' # Searching for cells cut by the STL facets'
+  if(this_proc < 2) print '(a)', ' # Searching for cells cut by the STL facets'
   do c = 1, Grid % n_cells
 
     ! Fetch cell coordinates
@@ -112,8 +147,11 @@
       cut_facets(:) = 0
       cut_cel(c)    = NO
 
-      write(*,'(a2,f5.0,a14,a1)', advance='no')  &
-        ' #', (100. * real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
+      if(this_proc < 2) then
+        write(*,'(a2,f5.0,a14,a1)', advance='no') ' #',  &
+             (100. * real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
+        flush(6)
+      end if
 
       !---------------------------------------------------------------!
       !   Browse through cells' nodes to find out if cells were cut   !
@@ -253,14 +291,11 @@
   !---------------------------------------!
   !   The actual flood fill starts here   !
   !---------------------------------------!
-  print '(a)', ' # Flooding ...'
+  if(this_proc < 2) write(*, '(a)', advance='no') ' # Flooding ...'
   m = 0
 1 continue
   m = m + 1
   flooding = .false.
-    write(*,'(a2,f5.0,a14,a1)', advance='no')                  &
-      ' #', (100. * real(sum(set_cel))/real(Grid % n_cells)),  &
-      ' % complete...', achar(13)
 
   do c = 1, Grid % n_cells
     if( set_cel(c) .eq. NO ) then
@@ -305,8 +340,35 @@
     end if
   end do
 
+  ! Store the old (from single processor) set_cel
+  set_old(1:Grid % n_cells) = set_cel(1:Grid % n_cells)
+
+  ! Take the set_cel and Vof % fun % n from other processors
+  call Grid % Exchange_Cells_Int (set_cel)
+  call Grid % Exchange_Cells_Real(Vof % fun % n)
+
+  ! Check if the cell has been set in another processor
+  do c = 1, Grid % n_cells
+    if( set_cel(c) .eq. YES .and. set_old(c) .eq. NO ) then
+      if(Vof % fun % n(c) < 0.01) then  ! the cell was filled with zero
+        do i_nod = 1, abs(Grid % cells_n_nodes(c))
+          i = Grid % cells_n(i_nod, c)
+          dis_nod_int(i) = -1
+        end do
+      end if
+      if(Vof % fun % n(c) > 0.99) then  ! the cell was filled with zero
+        do i_nod = 1, abs(Grid % cells_n_nodes(c))
+          i = Grid % cells_n(i_nod, c)
+          dis_nod_int(i) = +1
+        end do
+      end if
+    end if
+  end do
+
   ! Flood fill still going, go back
+  call Comm_Mod_Global_Lor_Log(flooding)
   if(flooding) goto 1
+  if(this_proc < 2) print '(a)', ' done!'
 
   ! Exchange is needed here
   if(DEBUG) then
@@ -332,7 +394,7 @@
   !-----------------------------------!
   !   Browse through cut cells only   !
   !-----------------------------------!
-  do c = 1, Grid % n_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     if( cut_cel(c) .eq. YES ) then
 
       !------------------------!
@@ -340,14 +402,16 @@
       !------------------------!
       call Polyhedron % Extract_From_Grid(Grid, c, dis_nod_dom)
       if(DEBUG) then
-        call Polyhedron % Plot_Polyhedron_Vtk("dis_nod_dom", c)
+        call Polyhedron % Plot_Polyhedron_Vtk("dis_nod_dom", glo(c))
       end if
 
       !------------------------------!
       !   Call the Isoap algorithm   !
       !------------------------------!
       call Isoap % Extract_Iso_Polygons(Grid, c, dis_nod_dom)
-      call Iso_Polygons % Plot_Iso_Polygons_Vtk(c)
+      if(DEBUG) then
+        call Iso_Polygons % Plot_Iso_Polygons_Vtk(glo(c))
+      end if
 
       !--------------------------------!
       !   Add new vertices for faces   !
@@ -379,7 +443,6 @@
 
               if(k1 == i .and. k2 == j .or.  &
                  k1 == j .and. k2 == i) then
-                ! PRINT *, Iso_Polygons % verts_xyz(m, 1:3)
 
                 ! Node hasn't been added yet, add it to the polygon
                 if(ij_cut(j,i) .eq. 0) then
@@ -412,7 +475,7 @@
         Polyhedron % faces_n(s, 1:new_faces_n_nodes)  &
                   = new_faces_n(1:new_faces_n_nodes)
         if(DEBUG) then
-          call Polyhedron % Plot_Polyhedron_Vtk("geo", c)
+          call Polyhedron % Plot_Polyhedron_Vtk("geo", glo(c))
         end if
 
       end do  ! s
@@ -447,8 +510,8 @@
         ! Well, faces_n_nodes will be zero for that face
 
         if(DEBUG) then
-          if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_hollow", c)
-          if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_hollow", c)
+          if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_hollow", glo(c))
+          if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_hollow", glo(c))
         end if
 
         ! Try to add the missing face
@@ -477,8 +540,8 @@
            = new_faces_n(1:new_faces_n_nodes)
 
         if(DEBUG) then
-          if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_full", c)
-          if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_full", c)
+          if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_full", glo(c))
+          if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_full", glo(c))
         end if
       end do  ! through p
 
@@ -536,12 +599,10 @@
   !---------------------------------!
   Vof % init_stl = .true.
 
-  call Work % Disconnect_Int_Cell(cut_cel)
-  call Work % Disconnect_Int_Cell(set_cel)
+  call Work % Disconnect_Int_Cell(cut_cel, set_cel)
   call Work % Disconnect_Int_Node(dis_nod_int)
-  call Work % Disconnect_Real_Node(dis_nod)
-  call Work % Disconnect_Real_Node(dis_nod_dom)
-  call Work % Disconnect_Real_Cell(surf_dist)
+  call Work % Disconnect_Real_Node(dis_nod, dis_nod_dom)
+  call Work % Disconnect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
   call Work % Disconnect_Real_Cell(node_dist)
 
   end subroutine
