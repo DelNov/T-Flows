@@ -14,12 +14,13 @@
   type(Grid_Type), pointer     :: Grid
   type(Stl_Type)               :: Stl
   type(Polyhedron_Type)        :: Pol(0:1)
+  real,    allocatable         :: vof_body(:,:)
   real,    pointer, contiguous :: dis_nod_dom(:), dis_nod(:)
   real,    pointer, contiguous :: surf_dist_pos(:), surf_dist_neg(:)
   real,    pointer, contiguous :: surf_dist(:), node_dist(:)
   integer, pointer, contiguous :: dis_nod_int(:), cut_cel(:), glo(:)
   integer, pointer, contiguous :: set_cel(:), set_old(:)
-  integer                      :: c, s, i_nod, j_nod, i, j, k1, k2, m
+  integer                      :: b, c, s, i_nod, j_nod, i, j, k1, k2, m
   integer                      :: i_iso, i_ver, i_fac, fac, p
   integer                      :: n_cut_facets, cut_facets(1024)
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
@@ -32,12 +33,6 @@
   logical                      :: flooding
 !==============================================================================!
 
-  call Work % Connect_Int_Cell(cut_cel, set_cel, set_old)
-  call Work % Connect_Int_Node(dis_nod_int)
-  call Work % Connect_Real_Node(dis_nod, dis_nod_dom)
-  call Work % Connect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
-  call Work % Connect_Real_Cell(node_dist)
-
   ! Take alias(es)
   Grid => Vof % pnt_grid
   glo  => Grid % Comm % cell_glo
@@ -48,6 +43,26 @@
   !                       !
   !-----------------------!
   call Stl % Create_From_File(Vof % name_stl)
+
+  allocate(vof_body(-Grid % n_bnd_cells:Grid % n_cells, Stl % n_boddies))
+
+  !--------------------------------!
+  !                                !
+  !   Browse through STL boddies   !
+  !                                !
+  !--------------------------------!
+  do b = 1, Stl % n_boddies
+
+  ! In between boddies so that they reset all to zero
+  call Work % Connect_Int_Cell(cut_cel, set_cel, set_old)
+  call Work % Connect_Int_Node(dis_nod_int)
+  call Work % Connect_Real_Node(dis_nod, dis_nod_dom)
+  call Work % Connect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
+  call Work % Connect_Real_Cell(node_dist)
+
+  if(Stl % n_boddies > 1 .and. this_proc < 2) then
+    print '(a,i3)', ' # Processing body ', b
+  end if
 
   if(this_proc < 2) then
     print '(a)', ' # Calculating distance from the STL interface'
@@ -74,24 +89,28 @@
     ! 1. find positive distance, this
     !    would be cells outside STL
     do fac = 1, Stl % N_Facets()
+      if(Stl % Facet_Body(fac) .eq. b) then
       f = Stl % Facet_Coords(fac)
       n = Stl % Facet_Normal(fac)
       d = dot_product(qc-f, n)
       if(d > 0.0) then
         surf_dist_pos(c) = max(surf_dist_pos(c), d)
       end if
+      end if  ! body
     end do
     ! 2. for cells which are left unmarked, hence
     !    inside the STL find negative distance
     if(surf_dist_pos(c) .eq. 0.0) then
       surf_dist_neg(c) = -HUGE
       do fac = 1, Stl % N_Facets()
+        if(Stl % Facet_Body(fac) .eq. b) then
         f = Stl % Facet_Coords(fac)
         n = Stl % Facet_Normal(fac)
         d = dot_product(qc-f, n)
         if(d < 0.0) then
           surf_dist_neg(c) = max(surf_dist_neg(c), d)
         end if
+        end if  ! body
       end do
     end if
     ! 3. work out the total distance
@@ -165,6 +184,7 @@
         qn(1) = Grid % xn(i);  qn(2) = Grid % yn(i);  qn(3) = Grid % zn(i)
 
         do fac = 1, Stl % N_Facets()
+          if(Stl % Facet_Body(fac) .eq. b) then
 
           ! STL vertex coordinates (this is three times slower)
           p1(1:3) = Stl % Facets_Vert_Coords(fac, 1)
@@ -190,6 +210,7 @@
               end if
             end if  ! vol_3 and vol_4 have the same sign
           end if  ! vol_1 and vol_2 have different signs
+          end if  ! body
 
         end do  ! STL facets
       end do    ! cells' nodes
@@ -300,8 +321,8 @@
   do c = 1, Grid % n_cells
     if( set_cel(c) .eq. NO ) then
 
-      flooding = .true.       ! flooding is still going on
-      Vof % fun % n(c) = 0.0  ! initialize to zero
+      flooding = .true.     ! flooding is still going on
+      vof_body(c, b) = 0.0  ! initialize to zero
 
       ! Count nodes with integer distance -1 and +1
       cnt_m = 0
@@ -314,8 +335,8 @@
 
       ! If there are more positive cell, set VOF to 1
       if(cnt_p > cnt_m) then
-        Vof % fun % n(c) = 1.0
-        set_cel(c)      = YES  ! now it is set
+        vof_body(c, b) = 1.0
+        set_cel(c)     = YES  ! now it is set
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
           i = Grid % cells_n(i_nod, c)
           dis_nod_int(i) = +1
@@ -323,8 +344,8 @@
 
       ! If there are more negative cell, set VOF to 0
       else if(cnt_p < cnt_m) then
-        Vof % fun % n(c) = 0.0  ! probably not needed, it was set to 0 above
-        set_cel(c)       = YES  ! now it is set
+        vof_body(c, b) = 0.0  ! probably not needed, it was set to 0 above
+        set_cel(c)     = YES  ! now it is set
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
           i = Grid % cells_n(i_nod, c)
           dis_nod_int(i) = -1
@@ -343,20 +364,20 @@
   ! Store the old (from single processor) set_cel
   set_old(1:Grid % n_cells) = set_cel(1:Grid % n_cells)
 
-  ! Take the set_cel and Vof % fun % n from other processors
+  ! Take the set_cel and vof_bod(:,b) from other processors
   call Grid % Exchange_Cells_Int (set_cel)
-  call Grid % Exchange_Cells_Real(Vof % fun % n)
+  call Grid % Exchange_Cells_Real(vof_body(:,b))
 
   ! Check if the cell has been set in another processor
   do c = 1, Grid % n_cells
     if( set_cel(c) .eq. YES .and. set_old(c) .eq. NO ) then
-      if(Vof % fun % n(c) < 0.01) then  ! the cell was filled with zero
+      if(vof_body(c, b) < MICRO) then  ! the cell was filled with zero
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
           i = Grid % cells_n(i_nod, c)
           dis_nod_int(i) = -1
         end do
       end if
-      if(Vof % fun % n(c) > 0.99) then  ! the cell was filled with zero
+      if(vof_body(c, b) > 1.0 - MICRO) then  ! the cell was filled with one
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
           i = Grid % cells_n(i_nod, c)
           dis_nod_int(i) = +1
@@ -370,13 +391,12 @@
   if(flooding) goto 1
   if(this_proc < 2) print '(a)', ' done!'
 
-  ! Exchange is needed here
   if(DEBUG) then
     call Grid % Save_Debug_Vtu(append="set_cel",                &
                                scalar_cell=real(set_cel, RP),   &
                                scalar_name="set_cel")
     call Grid % Save_Debug_Vtu(append="vof_tent",          &
-                               scalar_cell=Vof % fun % n,  &
+                               scalar_cell=vof_body(:,b),  &
                                scalar_name="vof_tent")
   end if
 
@@ -423,7 +443,8 @@
         new_faces_n(:)    = 0  ! initialize new face's node list to zero
 
         do i_nod = 1, Polyhedron % faces_n_nodes(s)
-          j_nod = i_nod + 1; if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
+          j_nod = i_nod + 1
+          if(j_nod > Polyhedron % faces_n_nodes(s)) j_nod = 1
 
           ! Two nodes at polyhedron
           i = Polyhedron % faces_n(s, i_nod)
@@ -493,8 +514,8 @@
           ! Browse nodes in circular direction
           do i_nod = 1, Pol(p) % faces_n_nodes(s)
             i = Pol(p) % faces_n(s, i_nod)
-            if( p .eq. 0 .and. Pol(p) % phi(i) < 0.5+MICRO .or.  &
-                p .eq. 1 .and. Pol(p) % phi(i) > 0.5-MICRO) then
+            if( p .eq. 0 .and. Pol(p) % phi(i) < 0.5 + MICRO .or.  &
+                p .eq. 1 .and. Pol(p) % phi(i) > 0.5 - MICRO) then
               new_faces_n_nodes = new_faces_n_nodes + 1
               new_faces_n  (new_faces_n_nodes) = i  ! just copy "i"
             end if
@@ -503,7 +524,7 @@
           ! Now when all the nodes have been browsed, reform the
           ! face, I mean overwrite the old one with the new one
           Pol(p) % faces_n_nodes(s) = new_faces_n_nodes ! copy number of nodes
-          Pol(p) % faces_n(s,1:new_faces_n_nodes)  &    ! copy the list of nodes
+          Pol(p) % faces_n(s,1:new_faces_n_nodes)  &    ! copy list of nodes
                = new_faces_n(1:new_faces_n_nodes)
         end do    ! through polyhedron faces
         ! What if there is a face without any nodes between 0 and 0.5+MICRO?
@@ -536,7 +557,7 @@
         Pol(p) % n_faces = Pol(p) % n_faces + 1        ! one more face
         s = Pol(p) % n_faces                           ! to shorten the syntax
         Pol(p) % faces_n_nodes(s) = new_faces_n_nodes  ! copy number of nodes
-        Pol(p) % faces_n(s,1:new_faces_n_nodes)  &     ! copy the list of nodes
+        Pol(p) % faces_n(s,1:new_faces_n_nodes)  &     ! copy list of nodes
            = new_faces_n(1:new_faces_n_nodes)
 
         if(DEBUG) then
@@ -550,16 +571,33 @@
       call Pol(1)     % Calculate_Cell_Volume(cel1_vol)
       call Polyhedron % Calculate_Cell_Volume(cell_vol)
       if(cel0_vol > cel0_vol) then
-        Vof % fun % n(c) = (cell_vol - cel0_vol) / (cell_vol)
+        vof_body(c, b) = (cell_vol - cel0_vol) / (cell_vol)
       else
-        Vof % fun % n(c) = cel1_vol / (cell_vol)
+        vof_body(c, b) = cel1_vol / (cell_vol)
       end if
 
 
     end if  ! cut_cel(c) .eq. YES
   end do
 
-  ! Exchange is needed here <---=
+  if(b .eq. 1) then
+    do c = 1, Grid % n_cells
+      Vof % fun % n(c) = vof_body(c, b)
+    end do
+  else
+    do c = 1, Grid % n_cells
+      Vof % fun % n(c) = Vof % fun % n(c) * vof_body(c, b)
+    end do
+  end if
+
+  ! In between boddies so that they reset all to zero
+  call Work % Disconnect_Int_Cell(cut_cel, set_cel, set_old)
+  call Work % Disconnect_Int_Node(dis_nod_int)
+  call Work % Disconnect_Real_Node(dis_nod, dis_nod_dom)
+  call Work % Disconnect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
+  call Work % Disconnect_Real_Cell(node_dist)
+
+  end do  ! through boddies
 
   !------------------------------------!
   !   Set the old time steps as well   !
@@ -598,11 +636,5 @@
   !                                 !
   !---------------------------------!
   Vof % init_stl = .true.
-
-  call Work % Disconnect_Int_Cell(cut_cel, set_cel)
-  call Work % Disconnect_Int_Node(dis_nod_int)
-  call Work % Disconnect_Real_Node(dis_nod, dis_nod_dom)
-  call Work % Disconnect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
-  call Work % Disconnect_Real_Cell(node_dist)
 
   end subroutine
