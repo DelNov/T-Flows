@@ -8,7 +8,7 @@
  NUMBER_OF_TIME_STEPS     600
  TIME_STEP                  0.005   # original (for finer grid) was 0.0005
 
- RESULTS_SAVE_INTERVAL    150
+ RESULTS_SAVE_INTERVAL     60
  BACKUP_SAVE_INTERVAL     300
  # LOAD_BACKUP_NAME          cavity-ts000060.backup
 
@@ -78,8 +78,8 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   3.0
+    VARIABLES           vof
+    VALUES              sphere.stl
 
 #---------------------
 # Boundary conditions

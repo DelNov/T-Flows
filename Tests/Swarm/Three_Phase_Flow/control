@@ -98,9 +98,9 @@
 #--------------------
 # Initial conditions
 #--------------------
-  INITIAL_CONDITION
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   3.0
+ INITIAL_CONDITION
+   VARIABLES           vof
+   VALUES              sphere.stl
 
 #---------------------
 # Boundary conditions
@@ -108,10 +108,10 @@
   BOUNDARY_CONDITION    wall
     TYPE                wall
     VARIABLES           u     v     w     vof     vof_c_ang
-    VALUES              0.0   0.0   0.0   0.0     90.0
+    VALUES              0.0   0.0   0.0   1.0     90.0
   BOUNDARY_CONDITION    symmetry
     TYPE                symmetry
     VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
+    VALUES              0.0   0.0   0.0   1.0
 
 #LOAD_BACKUP_NAME cavity-ts000001.backup
