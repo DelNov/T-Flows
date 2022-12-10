@@ -16,7 +16,7 @@
   type(Var_Type),   pointer :: fun
   type(Front_Type), pointer :: Front
   real, contiguous, pointer :: beta_f(:)
-  integer                   :: c, c1, c2, s, l, g
+  integer                   :: c, c1, c2, s
   real                      :: upwd1, upwd2, upwd3, a0
 !==============================================================================!
 
@@ -27,12 +27,6 @@
   fun    => Vof % fun
   beta_f => Vof % beta_f
   Front  => Vof % Front
-
-  ! Distinguish between liquid and vapor
-  l = 1; g = 2
-  if(Vof % phase_dens(g) > Vof % phase_dens(l)) then
-    l = 2; g = 1
-  end if
 
   ! Initialize matrix and right hand side
   b       = 0.0
