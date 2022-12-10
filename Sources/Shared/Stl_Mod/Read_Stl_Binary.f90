@@ -20,7 +20,7 @@
 
   call File % Read_Binary_Int4_Array(fu, 1)
   f = int4_array(1)
-  print '(a,i9)', ' # Number of facets on the STL: ', f
+  if(this_proc < 2) print '(a,i9)', ' # Number of facets on the STL: ', f
   call Stl % Allocate_Stl(f)
 
   !------------------------------------------------!
@@ -42,6 +42,6 @@
     read(fu) byte
     read(fu) byte
   end do
-  print '(a)', ' # Read all STL facets!'
+  if(this_proc < 2) print '(a)', ' # Read all STL facets!'
 
   end subroutine

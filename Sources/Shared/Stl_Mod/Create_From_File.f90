@@ -83,6 +83,11 @@
 
   end do
 
+  Stl % n_boddies = maxval(Stl % body_c)
+  if(this_proc < 2) then
+    print '(a,i3)', ' # Number of boddies in the STL file: ', Stl % n_boddies
+  end if
+
   call Stl % Save_Debug_Vtu(append="body",                   &
                             scalar_name="body",              &
                             scalar_cell=real(Stl % body_c),  &
