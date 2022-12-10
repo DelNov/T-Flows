@@ -9,7 +9,7 @@
   INTERFACE_TRACKING  yes
   INITIAL_CONDITION
     VARIABLES        vof
-    VALUES           sphere.stl
+    VALUES           spheres.stl
 
   NUMBER_OF_TIME_STEPS   0
 
