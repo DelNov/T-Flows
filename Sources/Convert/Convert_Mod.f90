@@ -42,10 +42,10 @@
   ! Singleton Convert object
   type(Convert_Type) :: Convert
 
-  !----------------------------------!
-  !   Declarations for cell shapes   !
-  !   (Was "Cells_Face_Nodes.f90")   !
-  !----------------------------------!
+  !----------------------------------------------------------------------!
+  !   Declarations for cell shapes (Was "Cells_Face_Nodes.f90" before)   !
+  !   Note that the nodes in these faces are ordered inwards the cells   !
+  !----------------------------------------------------------------------!
 
   !====================================================================!
   !                                 hex                                !
