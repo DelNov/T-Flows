@@ -2,6 +2,14 @@
   subroutine Calculate_Geometry(Generate, Grid, real_run)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
+!                                                                              !
+!   This subroutine has a sibling in Convert_Mod, with the same name.  They    !
+!   can never be quite the same, unfortunatelly, because the data they start   !
+!   with is different.                                                         !
+!                                                                              !
+!   One of the most distinct differences is the treatment of periodicity.      !
+!   Here, periodic faces are added to the existing (internal) ones, whereas    !
+!   in Convert_Mod, existing faces are turned into periodic ones.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
