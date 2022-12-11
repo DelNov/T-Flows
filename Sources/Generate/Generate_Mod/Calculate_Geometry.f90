@@ -171,6 +171,7 @@
   end do ! through faces
 
   if(real_run) then
+
     !---------------------------------------------!
     !   Find the faces on the periodic boundary   !
     !---------------------------------------------!
@@ -178,7 +179,7 @@
     !   <= gives:      dx,dy,dz                   !
     !---------------------------------------------!
 
-    ! Initialize variables for Grid periodicity   
+    ! Initialize variables for Grid periodicity
     n_per = 0
     Grid % per_x = 0.0
     Grid % per_y = 0.0
@@ -307,7 +308,7 @@
     !   Calculate the interpolation factors for the cell faces   !
     !------------------------------------------------------------!
     call Grid % Calculate_Face_Interpolation()
-  end if
+  end if  ! real_run
 
   call Profiler % Stop('Calculate_Geometry')
 
