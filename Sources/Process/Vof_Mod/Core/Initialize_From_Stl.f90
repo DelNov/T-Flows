@@ -354,7 +354,7 @@
         ! Throw an error if you come to this
         else   ! cnt_p == cnt_m
           if(cnt_p .gt. 0 .and. cnt_m .gt. 0) then
-          PRINT *, 'HOW ON EARTH?  CELL: ', C, CNT_P, CNT_M
+          PRINT *, __FILE__, __LINE__, 'HOW ON EARTH?  CELL: ', C, CNT_P, CNT_M
           end if
         end if
 
@@ -454,7 +454,9 @@
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n(new_faces_n_nodes) = i  ! just copy "i"
 
-            IF(ISO_POLYGONS % N_POLYS > 1) PRINT *, 'CHECK CELL: ', C
+            IF(ISO_POLYGONS % N_POLYS > 1) THEN
+              PRINT *, __FILE__, __LINE__, 'CHECK CELL: ', C
+            END IF
             do i_iso = 1, Iso_Polygons % n_polys
               do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
                 m = Iso_Polygons % polys_v(i_iso, i_ver)
