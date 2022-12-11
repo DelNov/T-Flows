@@ -8,6 +8,8 @@
   class(Front_Type), target :: Front
   type(Var_Type),    target :: sharp
   logical                   :: verbose
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Polyhedron_Type),   pointer :: Pol
   type(Iso_Polygons_Type), pointer :: Iso
@@ -44,13 +46,14 @@
   call Front % Initialize_Front()
   call Flow % Interpolate_Cells_To_Nodes(sharp % n, phi_n(1:nn))
 
-  ! call Grid % Save_Debug_Vtu('phi_c',                 &
-  !                            scalar_cell=sharp % n,   &
-  !                            scalar_name='phi_c')
-
-  ! call Grid % Save_Debug_Vtu('phi_n',             &
-  !                            scalar_node=phi_n,   &
-  !                            scalar_name='phi_n')
+  if(DEBUG) then
+    call Grid % Save_Debug_Vtu('phi_c',                &
+                               scalar_cell=sharp % n,  &
+                               scalar_name='phi_c')
+    call Grid % Save_Debug_Vtu('phi_n',              &
+                               scalar_node=phi_n,    &
+                               scalar_name='phi_n')
+  end if
 
   !-----------------------------------------------!
   !   This is a bit ad-hoc - if some points are   !
@@ -174,7 +177,9 @@
   !-----------------------------------------------------------------!
   call Front % Mark_Cells_And_Faces(sharp)
 
-  call Front % Save_Debug_Front_Vtu(0)  ! 0 is for time step
+  if(DEBUG) then
+    call Front % Save_Debug_Front_Vtu(0)  ! 0 is for time step
+  end if
 
   call Work % Disconnect_Real_Node(phi_n)
 
