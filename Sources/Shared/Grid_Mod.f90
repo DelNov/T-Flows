@@ -205,6 +205,7 @@
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
       procedure :: Face_Normal
+      procedure :: Faces_Surface
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
       procedure :: Form_Cells_Comm
@@ -246,6 +247,7 @@
 #   include "Grid_Mod/Calculate_Face_Geometry.f90"
 #   include "Grid_Mod/Calculate_Face_Interpolation.f90"
 #   include "Grid_Mod/Calculate_Face_Surfaces.f90"
+#   include "Grid_Mod/Calculate_Faces_Surface.f90"
 #   include "Grid_Mod/Calculate_Global_Volumes.f90"
 #   include "Grid_Mod/Calculate_Wall_Distance.f90"
 #   include "Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90"
