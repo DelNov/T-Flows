@@ -145,6 +145,7 @@
 #   include "Comm_Mod/Parallel/Write_Text.f90"
 
     ! Global communicatins are better of as non-members
+#   include "Comm_Mod/Parallel/Global_Lor_Log.f90"
 #   include "Comm_Mod/Parallel/Global_Lor_Log_Array.f90"
 #   include "Comm_Mod/Parallel/Global_Max_Real.f90"
 #   include "Comm_Mod/Parallel/Global_Min_Real.f90"
@@ -193,6 +194,7 @@
 #   include "Comm_Mod/Sequential/Write_Text.f90"
 
     ! Global communicatins are better of as non-members
+#   include "Comm_Mod/Sequential/Global_Lor_Log.f90"
 #   include "Comm_Mod/Sequential/Global_Lor_Log_Array.f90"
 #   include "Comm_Mod/Sequential/Global_Max_Real.f90"
 #   include "Comm_Mod/Sequential/Global_Min_Real.f90"
