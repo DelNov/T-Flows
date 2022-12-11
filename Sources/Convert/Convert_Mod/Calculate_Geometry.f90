@@ -572,7 +572,10 @@
   !----------------------------------------------------!
   n1 = 0
   n2 = 0
+
+  ! At this point, Grid % n_faces includes shadow faces too
   do s = 1, Grid % n_faces
+
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -585,12 +588,14 @@
 
     !----------------------------------------------------------!
     !   If it is not, change the orientations of the surface   !
+    !   (Shadow faces, which are at this point included in     !
+    !    the Grid % n_faces count, have c1 and c2 set to 0)    !
     !----------------------------------------------------------!
-    if(prod < 0) then
+    if(prod < 0 .and. c1 > 0 .and. c2 > 0) then
 
       ! Increase the counters
-      if(c2 > 0) n1 = n1 + 1
-      if(c2 < 0) n2 = n2 + 1
+      if(c2 .gt. 0) n1 = n1 + 1
+      if(c2 .lt. 0) n2 = n2 + 1
 
       ! Reverse the order of face's nodes
       n = Grid % faces_n_nodes(s)  ! number of nodes in this face
