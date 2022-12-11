@@ -9,10 +9,12 @@
   real, allocatable :: xn(:), yn(:), zn(:)
 !==============================================================================!
 
-  print '(a)',    ' #================================================'
-  print '(a)',    ' # Merging nodes if needed'
-  print '(a)',    ' #------------------------------------------------'
-  print '(a,i9)', ' # Original number of nodes:', Grid % n_nodes
+  if(this_proc < 2) then
+    print '(a)',     ' #======================================================='
+    print '(a,a,a)', ' # Merging nodes in "', trim(Grid % name), '" if needed'
+    print '(a)',     ' #-------------------------------------------------------'
+    print '(a,i9)',  ' # Original number of nodes:', Grid % n_nodes
+  end if
 
   !-----------------------------------------!
   !   Allocate memory for local variables   !
@@ -49,19 +51,25 @@
     end if
     Grid % new_n(Grid % old_n(n)) = cnt
   end do
-  print '(a,i9)', ' # Number of unique nodes:  ', cnt
+  if(this_proc < 2) then
+    print '(a,i9)', ' # Number of unique nodes:  ', cnt
+  end if
 
   ! Decide what to do based on the compressed number of nodes
   if(cnt .eq. Grid % n_nodes) then
-    print '(a)', ' # No duplicate nodes found, nothing to merge!'
+    if(this_proc < 2) then
+      print '(a)', ' # No duplicate nodes found, nothing to merge!'
+    end if
     return
 
   !---------------------------------!
   !   Do the actuall sorting work   !
   !---------------------------------!
   else
-    print '(a,i0.0,a)', ' # ', Grid % n_nodes - cnt, ' duplicate nodes' //  &
-                        ' found; compressing them now!'
+    if(this_proc < 2) then
+      print '(a,i0.0,a)', ' # ', Grid % n_nodes - cnt, ' duplicate nodes' //  &
+                          ' found; compressing them now!'
+    end if
 
     call Sort % Real_By_Index(Grid % n_nodes, Grid % xn, Grid % new_n)
     call Sort % Real_By_Index(Grid % n_nodes, Grid % yn, Grid % new_n)
@@ -113,7 +121,9 @@
       end do
     end do
 
-    print '(a)', ' # Done!'
+    if(this_proc < 2) then
+      print '(a)', ' # Done!'
+    end if
 
   end if
 
