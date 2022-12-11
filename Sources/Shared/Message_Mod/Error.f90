@@ -20,7 +20,9 @@
   !-------------------------------!
   if(present(file) .and. present(line)) then
     write(header_text, '(a,i3)')  "ERROR in file: " // file //  &
-                                  " on line: ", line
+                                  " at line: ", line
+  else if(present(file)) then
+    write(header_text, '(a,i3)')  "ERROR in file: " // file
   else
     write(header_text, '(a,i3)')  "ERROR!"
   end if
