@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME        cavity
+ PROBLEM_NAME        cavity_fine
  HEAT_TRANSFER       no
  INTERFACE_TRACKING  yes
 
@@ -10,7 +10,7 @@
 
  RESULTS_SAVE_INTERVAL     24
  BACKUP_SAVE_INTERVAL     600
-#  LOAD_BACKUP_NAME           cavity-ts000012.backup
+#  LOAD_BACKUP_NAME           cavity-ts00000X.backup
 
 #-------------------
 # Monitoring points
@@ -31,7 +31,7 @@
 
  PHASE_DENSITIES         1.0    1000.0
  PHASE_VISCOSITIES       0.1      10.0
- SURFACE_TENSION       1.96
+ SURFACE_TENSION         1.96
 
  TURBULENCE_MODEL       none
  GRAVITATIONAL_VECTOR   0.0 0.0 -0.98
@@ -60,25 +60,26 @@
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-03
  TOLERANCE_FOR_VOF_SOLVER           1.e-09
  MAX_ITERATIONS_FOR_PRESSURE_SOLVER 360
- MAX_SIMPLE_ITERATIONS              12
+ MAX_SIMPLE_ITERATIONS               12
  MAX_SMOOTHING_CYCLES_CURVATURE_VOF  12
- MAX_SMOOTHING_CYCLES_NORMAL_VOF    0
+ MAX_SMOOTHING_CYCLES_NORMAL_VOF      0
  COMPRESION_VOF                      no
- COMPRESION_FACTOR_VOF               1.0
- MIN_SIMPLE_ITERATIONS               6
+ COMPRESION_FACTOR_VOF                1.0
+ MAX_SIMPLE_ITERATIONS               12
+ MIN_SIMPLE_ITERATIONS                3
  #DUAL_TIME_STEP_VOF                 yes
 
 #--------------------
 # Initial conditions
 #--------------------
-  INITIAL_CONDITION
-    VARIABLES           u     v     w       vof
-    VALUES              0.0   0.0   0.00    3.0
+ INITIAL_CONDITION
+   VARIABLES           u     v     w     vof
+   VALUES              0.0   0.0   0.0   sphere.stl
 
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION    wall
-    TYPE                wall
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
+ BOUNDARY_CONDITION    wall
+   TYPE                wall
+   VARIABLES           u     v     w     vof
+   VALUES              0.0   0.0   0.0   0.0

@@ -73,7 +73,7 @@
 #--------------------
   INITIAL_CONDITION
     VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   3.0
+    VALUES              0.0   0.0   0.0   cylinder.stl
 
 #---------------------
 # Boundary conditions
@@ -86,4 +86,8 @@
     TYPE                symmetry
     VARIABLES           u     v     w     vof
     VALUES              0.0   0.0   0.0   0.0
+  BOUNDARY_CONDITION periodic
+    TYPE             symmetry
+    VARIABLES        u     v     w     t    kin   eps    zeta   f22
+    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
 

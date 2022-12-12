@@ -71,8 +71,8 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   2.0
+    VARIABLES           vof
+    VALUES              two_spheres.stl
 
 #---------------------
 # Boundary conditions
