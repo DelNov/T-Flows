@@ -29,7 +29,7 @@
   !   Node coordinates   !
   !----------------------!
   do var = 1, 3
-    do n=1,Grid % n_nodes
+    do n = 1, Grid % n_nodes
       if(Grid % new_n(n) > 0) then
         if(var .eq. 1) write(fu) Grid % xn(n)
         if(var .eq. 2) write(fu) Grid % yn(n)
