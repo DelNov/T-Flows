@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Determine_Face_Orientation(Grid)
 !------------------------------------------------------------------------------!
-!   Face orientation is important only for Isoap, but even that is not sure    !
+!   Face orientation is important only for Isoap, hence for VOF simulations    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
