@@ -2,6 +2,12 @@
   subroutine Determine_Face_Orientation(Grid)
 !------------------------------------------------------------------------------!
 !   Face orientation is important only for Isoap, hence for VOF simulations    !
+!                                                                              !
+!   Update on 12.12.2022: Many functions and checks have been introduced to    !
+!   mitigate the wrong orientation of faces, but I am still a bit hesitant     !
+!   to get rid of this procedure.  One thing is sure, it uses an unorthodox    !
+!   way to check surface orientation.  It would probably be better and more    !
+!   consistent if it was using Grid % Calculate_Faces_Surface.                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
