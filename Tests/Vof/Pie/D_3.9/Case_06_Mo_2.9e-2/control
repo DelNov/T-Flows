@@ -73,33 +73,24 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w       vof
-    VALUES              0.0   0.0   0.00    3.0
+    VARIABLES           u     v     w     vof
+    VALUES              0.0   0.0   0.0   sphere.stl
 
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION    top
-    TYPE                wall
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
+  BOUNDARY_CONDITION walls
+    TYPE             wall
+    VARIABLES        u     v     w     t    kin   eps    zeta   f22
+    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
 
-  BOUNDARY_CONDITION    bottom
-    TYPE                wall
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
+  BOUNDARY_CONDITION cylinder
+    TYPE             wall
+    VARIABLES        u     v     w     t    kin   eps    zeta   f22
+    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
 
-  BOUNDARY_CONDITION    cylinder
-    TYPE                wall
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
+  BOUNDARY_CONDITION cuts
+    TYPE             symmetry
+    VARIABLES        u     v     w     t    kin   eps    zeta   f22
+    VALUES           0.0   0.0   0.0   10   0.0   1e-3   0.0    1e-3
 
-  BOUNDARY_CONDITION    axe
-    TYPE                symmetry
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
-
-  BOUNDARY_CONDITION    cuts
-    TYPE                symmetry
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   0.0
