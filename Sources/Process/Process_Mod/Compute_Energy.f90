@@ -131,7 +131,7 @@
 
     if(Flow % mass_transfer) then
       if(Vof % fun % n(c1) < 0.5 .and.  &
-         Vof % fun % n(c2) < 0.5) con_eff = Vof % phase_cond(2)
+         Vof % fun % n(c2) < 0.5) con_eff = Vof % phase_cond(0)
       if(Vof % fun % n(c1) > 0.5 .and.  &
          Vof % fun % n(c2) > 0.5) con_eff = Vof % phase_cond(1)
     end if
@@ -247,7 +247,7 @@
       if(Vof % fun % n(c) > 0.5) then
         cap_dens(c) = Vof % phase_capa(1) * Vof % phase_dens(1)
       else if(Vof % fun % n(c) < 0.5) then
-        cap_dens(c) = Vof % phase_capa(2) * Vof % phase_dens(2)
+        cap_dens(c) = Vof % phase_capa(0) * Vof % phase_dens(0)
       end if
     end if
   end do

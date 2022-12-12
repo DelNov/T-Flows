@@ -1,18 +1,20 @@
 !==============================================================================!
-  subroutine Get_Gas_And_Liquid_Phase(Vof, g, l)
+  subroutine Get_Vapour_And_Liquid_Phase(Vof, vapour, liquid)
 !------------------------------------------------------------------------------!
-!   Names indices for gas and liquid to input arguments                        !
+!   Distinguish between liquid and vapor phases, based on their density        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Vof_Type), target :: Vof
-  integer                 :: g, l
+  integer                 :: vapour, liquid
 !==============================================================================!
 
-  ! Distinguish between liquid and vapor
-  l = 1; g = 2
-  if(Vof % phase_dens(g) > Vof % phase_dens(l)) then
-    l = 2; g = 1
+  ! Assume vapour is zero and liquid is one ...
+  vapour = 0; liquid = 1
+
+  ! ... and if you happened to make a wrong assumption, swap them around
+  if(Vof % phase_dens(vapour) > Vof % phase_dens(liquid)) then
+    call Swap_Int(vapour, liquid)
   end if
 
   end subroutine

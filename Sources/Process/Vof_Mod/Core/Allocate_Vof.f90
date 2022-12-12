@@ -56,10 +56,4 @@
     call Vof % Surf % Allocate_Surf(Flow)
   end if
 
-  ! Physical properties for all (two) phases
-  allocate(Vof % phase_dens(2))
-  allocate(Vof % phase_visc(2))
-  allocate(Vof % phase_capa(2))
-  allocate(Vof % phase_cond(2))
-
   end subroutine

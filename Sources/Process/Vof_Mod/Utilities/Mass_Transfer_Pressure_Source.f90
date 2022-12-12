@@ -10,7 +10,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
-  integer                   :: c, e, g, l
+  integer                   :: c, e, vapour, liquid
 !==============================================================================!
 
   ! Take aliases
@@ -20,7 +20,7 @@
   if(.not. Flow % mass_transfer) return
 
   ! Distinguish between liquid and vapor
-  call Vof % Get_Gas_And_Liquid_Phase(g, l)
+  call Vof % Get_Vapour_And_Liquid_Phase(vapour, liquid)
 
   ! Add volume over all cells, avoiding buffer cells
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
@@ -30,7 +30,7 @@
       ! Unit: kg/s * m^3/kg = m^3/s
       b(c) = b(c)                       &
            + Vof % m_dot(c)             &
-           * (1.0/Vof % phase_dens(g))
+           * (1.0/Vof % phase_dens(vapour))
 
     end if
   end do

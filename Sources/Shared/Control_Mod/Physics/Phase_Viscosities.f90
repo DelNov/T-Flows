@@ -5,15 +5,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, allocatable :: val(:)
+  real              :: val(0:1)
   logical, optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
-  real :: def(size(val))
+  real :: def(2)
 !==============================================================================!
 
   def = 1.0
 
-  call Control_Mod_Read_Real_Array('PHASE_VISCOSITIES',  &
-                                    size(val), def, val, verbose)
+  call Control_Mod_Read_Real_Array('PHASE_VISCOSITIES', 2, def, val, verbose)
 
   end subroutine

@@ -14,7 +14,7 @@
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: t
-  integer                   :: e, g, l, s, c1, c2, i_ele
+  integer                   :: e, s, c1, c2, i_ele
   real                      :: cond_1, cond_2
 !==============================================================================!
 
@@ -28,9 +28,6 @@
 
   ! Initialize mass transfer term
   Vof % m_dot(:) = 0.0
-
-  ! Distinguish between liquid and vapor
-  call Vof % Get_Gas_And_Liquid_Phase(g, l)
 
   !------------------------------------------------!
   !   Compute gradients of temperature, imposing   !
@@ -65,11 +62,15 @@
 
           ! Take conductivities from each side of the interface
           cond_1 = Vof % phase_cond(1)
-          cond_2 = Vof % phase_cond(2)
-          if(Vof % fun % n(c1) < 0.5) cond_1 = Vof % phase_cond(2)
+          cond_2 = Vof % phase_cond(0)
+          if(Vof % fun % n(c1) < 0.5) cond_1 = Vof % phase_cond(0)
           if(Vof % fun % n(c2) > 0.5) cond_2 = Vof % phase_cond(1)
 
           ! Compute heat fluxes from each side of the interface
+          ! Keep in mind that in the Stefan's case, dot product of
+          ! element's surface and face's surface is positive.  If
+          ! VOF's definition changes, I assume this would have to
+          ! be adjusted accordingly.
           ! Units: W/(mK) * K/m * m^2 = W
           Vof % q_int(1,s) = Vof % q_int(1,s)                               &
               + cond_1 * (  t % x(c1) * Vof % Front % elem(e) % sx   &

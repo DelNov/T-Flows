@@ -48,9 +48,9 @@
     real, allocatable :: surf_fx(:), surf_fy(:), surf_fz(:)  ! [N/m^3]
 
     ! Physical properties in case of multiphase flow
-    real, allocatable :: phase_visc(:), phase_dens(:)
-    real, allocatable :: phase_capa(:), phase_cond(:)
-    real              :: surface_tension
+    real :: phase_visc(0:1), phase_dens(0:1)
+    real :: phase_capa(0:1), phase_cond(0:1)
+    real :: surface_tension
 
     ! Phase change (called mass transfer to be consistent
     ! with heat transfer in the rest of the code)
@@ -108,7 +108,7 @@
       !   Procedures to be called by other modules   !
       !----------------------------------------------!
       procedure :: Calculate_Grad_Matrix_With_Front
-      procedure :: Get_Gas_And_Liquid_Phase
+      procedure :: Get_Vapour_And_Liquid_Phase
       procedure :: Grad_Component_No_Refresh_With_Front
       procedure :: Grad_Variable_With_Front
       procedure :: Mass_Transfer_Added_Volume
