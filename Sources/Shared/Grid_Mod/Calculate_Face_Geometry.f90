@@ -5,23 +5,181 @@
 !                                                                              !
 !   This subroutine is called only from Process, and it was originally used    !
 !   whenever I was lazy to change the format of .cfn (former .cns) files.      !
-!   That is very unfortunate, and I should use it as little as possible and    !
-!   never expand it.  Actually, I should try to get rid of it completelly.     !
+!   However, in the meanwhile I realized it is not so bad after all.  There    !
+!   are quantities which can be defined only in processors, for example when   !
+!   something depends on boundary conditions.                                  !
 !                                                                              !
-!   I am not quite sure, but it is conceiveable that shadow faces were         !
-!   introduced only to make sure this routine works as it should. Bad!         !
+!   More importantly, certaing integrity checks can be done only here!         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s, sh, pnt_to, pnt_from
+  integer :: c, i_fac, c1, c2, s, sh, m, n, pnt_to, pnt_from
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
-  real    :: d_s, min_d, max_d
+  real    :: d_s, min_d, max_d, dx, dy, dz, sx, sy, sz
+  integer :: fail_count
 !==============================================================================!
 
+  if(this_proc < 2) print '(a)', ' # Checking the integrity of cell faces ...'
+
+  !-----------------------------------!
+  !   Perform some integrity checks   !
+  !-----------------------------------!
+
+  ! Check integrity of internal face surfaces
+  fail_count = 0
+  do s = 1, Grid % n_faces
+    call Grid % Faces_Surface(s, sx, sy, sz)
+    if(Grid % sx(s) * sx + Grid % sy(s) * sy + Grid % sz(s) * sz < 0.0) then
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      fail_count = fail_count + 1
+    end if
+  end do
+  if(fail_count .gt. 0) call Message % Error(60,                               &
+                            'Face integrity test for internal faces failed!',  &
+                             file=__FILE__)
+
+  ! Check integrity of internal face surfaces
+  fail_count = 0
+  do sh = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
+    call Grid % Faces_Surface(sh, sx, sy, sz)
+    if(Grid % sx(sh) * sx + Grid % sy(sh) * sy + Grid % sz(sh) * sz < 0.0) then
+      fail_count = fail_count + 1
+    end if
+  end do
+  if(fail_count .gt. 0) call Message % Error(60,                             &
+                            'Face integrity test for shadow faces failed!',  &
+                             file=__FILE__)
+
+  ! Check integrity of shadow faces connectivity (1)
+  fail_count = 0
+  do s = 1, Grid % n_faces
+    sh = Grid % faces_s(s)
+    if(sh .ne. 0) then
+      if(sh .le. Grid % n_faces) fail_count = fail_count + 1
+      if(Grid % faces_c(1,s) .ne. Grid % faces_c(1,sh) .or.  &
+         Grid % faces_c(2,s) .ne. Grid % faces_c(2,sh))      &
+        fail_count = fail_count + 1
+    end if
+  end do
+  if(fail_count .gt. 0) call Message % Error(60,                        &
+                            'Shadow face connectivity test 1 failed!',  &
+                             file=__FILE__)
+
+  ! Check integrity of shadow faces connectivity (2)
+  fail_count = 0
+  do s = 1, Grid % n_faces
+    sh = Grid % faces_s(s)
+    if(sh .ne. 0) then
+      if(Grid % faces_n_nodes(s) .ne. Grid % faces_n_nodes(sh))  &
+        fail_count = fail_count + 1
+      n = Grid % faces_n_nodes(sh)
+      if(any(Grid % faces_n(1:n, s) .eq. Grid % faces_n(1:n,sh)))  &
+        fail_count = fail_count + 1
+      if(any(Grid % faces_n(1:n, sh) .le. 0))  &
+        fail_count = fail_count + 1
+    end if
+  end do
+  if(fail_count .gt. 0) call Message % Error(60,                        &
+                            'Shadow face connectivity test 2 failed!',  &
+                             file=__FILE__)
+
+  !------------------------------------------!
+  !                                          !
+  !   Check integrity of cells' enclosures   !
+  !                                          !
+  !------------------------------------------!
+  fail_count = 0
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    Assert(Grid % cells_n_faces(c) .ne. 0)
+    do i_fac = 1, Grid % cells_n_faces(c)
+
+      !-----------------------------------!
+      !   Take the face and its metrics   !
+      !-----------------------------------!
+      s = Grid % cells_f(i_fac, c)
+      Assert(s .ne. 0)               ! this is just for kicks
+      Assert(s .le. Grid % n_faces)  ! this is to remind you that there ...
+                                     ! ... are no shadow faces in cells_f
+      m = Grid % cells_n_nodes(c)
+      n = Grid % faces_n_nodes(s)
+
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      sh = Grid % faces_s(s)         ! shadow
+
+      !-------------------------------------!
+      !   Check for enclosure with shadow   !
+      !-------------------------------------!
+
+      ! If face's nodes are not among cell's nodes, it should be a shadow
+      fail_count = 0
+      if(.not. Grid % Face_In_Cell(s, c)) then
+
+        Assert(sh .ne. 0)
+        Assert(Grid % Face_In_Cell(sh, c))
+
+        ! Surface vector
+        call Grid % Faces_Surface(sh, sx, sy, sz)
+
+        ! Ray from cell center to shadow face
+        dx = Grid % xf(sh) - Grid % xc(c)
+        dy = Grid % yf(sh) - Grid % yc(c)
+        dz = Grid % zf(sh) - Grid % zc(c)
+
+        ! This test is stupid, carelessly coppied from case without shadows
+        ! because both c1 and c2 are on the same side from the shadow face
+        ! if(c .eq. c1) then                  ! (sur)face sign is good
+        !   if(dx*sx + dy*sy + dz*sz < 0.0) fail_count = fail_count + 1
+        ! else if(c .eq. c2) then             ! (sur)face sign is inverted
+        !   if(dx*sx + dy*sy + dz*sz > 0.0) fail_count = fail_count + 1
+        ! end if
+        if(dx*sx + dy*sy + dz*sz < 0.0) fail_count = fail_count + 1
+      end if
+      if(fail_count .gt. 0) call Message % Error(60,                    &
+                                'Cell enclosure with shadows failed!',  &
+                                 file=__FILE__)
+
+      !----------------------------------------!
+      !   Check for enclosure without shadow   !
+      !----------------------------------------!
+
+      ! If face's nodes are among cell's nodes, it shouldn't be a shadow
+      fail_count = 0
+      if(Grid % Face_In_Cell(s, c)) then
+
+        ! Surface vector
+        call Grid % Faces_Surface(s, sx, sy, sz)
+
+        ! Ray from cell center to face
+        dx = Grid % xf(s) - Grid % xc(c)
+        dy = Grid % yf(s) - Grid % yc(c)
+        dz = Grid % zf(s) - Grid % zc(c)
+
+        if(c .eq. c1) then                  ! (sur)face sign is good
+          if(dx*sx + dy*sy + dz*sz < 0.0) fail_count = fail_count + 1
+        else if(c .eq. c2) then             ! (sur)face sign is inverted
+          if(dx*sx + dy*sy + dz*sz > 0.0) fail_count = fail_count + 1
+        end if
+      end if
+      if(fail_count .gt. 0) call Message % Error(60,                       &
+                                'Cell enclosure without shadows failed!',  &
+                                 file=__FILE__)
+
+    end do  ! through cells' faces
+  end do    ! through cells
+  if(fail_count .gt. 0) call Message % Error(60,                       &
+                            'Cell enclosure with faces test failed!',  &
+                             file=__FILE__)
+
+  if(this_proc < 2) print '(a)', ' # All integrity tests passed'
+
   !----------------------------------------------!
+  !                                              !
   !   Calculate total surface of the cell face   !
+  !                                              !
   !----------------------------------------------!
   do s = 1, Grid % n_faces
     Grid % s(s) = sqrt(  Grid % sx(s)*Grid % sx(s)  &
@@ -30,9 +188,11 @@
   end do
 
   !-------------------------------------------------------!
+  !                                                       !
   !   Calculate the distance between neighbouring cells   !
   !    (For normal faces, including the periodic ones,    !
   !    dx, dy and dz are distanes between cell centers)   !
+  !                                                       !
   !-------------------------------------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
@@ -52,7 +212,9 @@
   end do  ! faces
 
   !---------------------------------------!
+  !                                       !
   !   Check distances stored in shadows   !
+  !                                       !
   !---------------------------------------!
   min_d = +HUGE
   max_d = -HUGE
@@ -71,9 +233,11 @@
   end if
 
   !---------------------------------------------------------!
+  !                                                         !
   !   Set up straight boundary conditions for periodicity   !
   !   (This is important for copy boundary conditions, do   !
   !        not erase this thinking it is not needed)        !
+  !                                                         !
   !---------------------------------------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
@@ -113,7 +277,9 @@
   end do
 
   !-----------------------------------------------------!
+  !                                                     !
   !   Check distances between faces and their shadows   !
+  !                                                     !
   !-----------------------------------------------------!
   min_d = +HUGE
   max_d = -HUGE
@@ -134,7 +300,9 @@
   end if
 
   !---------------------------------------------------!
+  !                                                   !
   !   Counter and check pointer to and from shadows   !
+  !                                                   !
   !---------------------------------------------------!
   pnt_to   = 0
   pnt_from = 0
@@ -150,8 +318,10 @@
   end if
 
   !--------------------------------------------!
+  !                                            !
   !   For shadows, dx, dy and dz are lengths   !
   !    of the periodic spans of the domain     !
+  !                                            !
   !--------------------------------------------!
   do s = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
     c1 = Grid % faces_c(1,s)
@@ -171,7 +341,9 @@
   end do  ! shadows
 
   !--------------------------------------------!
+  !                                            !
   !   Calculate total distance between cells   !
+  !                                            !
   !--------------------------------------------!
   do s = 1, Grid % n_faces + Grid % n_shadows
     Grid % d(s) = sqrt(  Grid % dx(s)*Grid % dx(s)     &
@@ -180,7 +352,9 @@
   end do
 
   !--------------------------------------------!
+  !                                            !
   !   Calculate weight factors for the faces   !
+  !                                            !
   !--------------------------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
@@ -197,7 +371,9 @@
   end do
 
   !------------------------------!
+  !                              !
   !   Find the near-wall cells   !
+  !                              !
   !------------------------------!
   Grid % cell_near_wall(:) = .false.
 
