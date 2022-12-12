@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2
+  integer              :: s, c, c1, c2, n
   integer              :: mcc, mcn, mcf
   integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
   integer, allocatable :: old_nn   (:)       ! old number of nodes (per cell)
@@ -79,7 +79,15 @@
 
       ! If the face changed its orientation during cell renumeration
       if(Grid % faces_c(2, s) < Grid % faces_c(1, s)) then
+
+        ! Swap c1 and c2 of course ...
         call Swap_Int(Grid % faces_c(1, s), Grid % faces_c(2, s))
+
+        ! ...but also reverse the order of face's nodes ...
+        n = Grid % faces_n_nodes(s)  ! number of nodes in this face
+        call Sort % Reverse_Order_Int(Grid % faces_n(1:n, s))
+
+        ! ... and fix the geometrical quantities
         Grid % sx(s) = -Grid % sx(s)
         Grid % sy(s) = -Grid % sy(s)
         Grid % sz(s) = -Grid % sz(s)
