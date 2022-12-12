@@ -259,6 +259,15 @@
   Grid % dy(:) = 0.0
   Grid % dz(:) = 0.0
 
+  !-----------------------------------------------------!
+  !   For polyhedral grids, faces can be messy.         !
+  !   This is the first place where they can be fixed   !
+  !-----------------------------------------------------!
+  !   => depends on:                                    !
+  !   <= gives:                                         !
+  !-----------------------------------------------------!
+  call Grid % Correct_Face_Surfaces()
+
   !--------------------------------------------!
   !   Find the faces on the periodic boundary  !
   !--------------------------------------------!

@@ -199,6 +199,7 @@
       procedure :: Calculate_Wall_Distance
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
+      procedure :: Correct_Face_Surfaces
       procedure :: Decompose
       procedure :: Determine_Face_Orientation
       procedure :: Exchange_Cells_Int
@@ -253,6 +254,7 @@
 #   include "Grid_Mod/Calculate_Wall_Distance.f90"
 #   include "Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90"
 #   include "Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90"
+#   include "Grid_Mod/Correct_Face_Surfaces.f90"
 #   include "Grid_Mod/Decompose.f90"
 #   include "Grid_Mod/Determine_Face_Orientation.f90"
 #   include "Grid_Mod/Exchange_Cells_Int.f90"
