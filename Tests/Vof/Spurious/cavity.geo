@@ -1,7 +1,7 @@
     Width = 2.0; 
     Height = 2.0;
     R = 0.4;
-    R_dx = 12.8;
+    R_dx = 12.8; // This parameter defines grid size (12.8 20.0 32.0 50.0)
     gridsize = R / R_dx;
     meshThickness = gridsize * 3.0; 
  
