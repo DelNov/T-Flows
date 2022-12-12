@@ -35,11 +35,11 @@
 # Physical models
 #-----------------
 
-# Phase 1 is liquid
- PHASE_DENSITIES        958.4         0.597
+# Phase 0 is vapor, phase 1 is liquid
+ PHASE_DENSITIES          0.597     958.4
  PHASE_VISCOSITIES        1.0e-3      1.0e-3
- PHASE_CONDUCTIVITIES     0.679       0.025
- PHASE_CAPACITIES      4216.0      2030.0
+ PHASE_CONDUCTIVITIES     0.025       0.679
+ PHASE_CAPACITIES      2030.0      4216.0
  SURFACE_TENSION        0.0
  MASS_TRANSFER          yes
  SATURATION_TEMPERATURE   10.0
@@ -90,13 +90,6 @@
  COMPRESION_VOF                        no
  COMPRESION_FACTOR_VOF                 1.0
  #DUAL_TIME_STEP_VOF                 yes
-
-#--------------------
-# Initial conditions  velocity was 0.05 for nice transport of vof
-#--------------------
-  INITIAL_CONDITION
-    VARIABLES           u      v     w     vof
-    VALUES              0.00  0.0   0.0   3.0
 
 #---------------------
 # Boundary conditions
