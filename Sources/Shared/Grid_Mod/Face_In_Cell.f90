@@ -11,7 +11,7 @@
 !==============================================================================!
 
   m = Grid % faces_n_nodes(s)
-  n = Grid % cells_n_nodes(c)
+  n = abs(Grid % cells_n_nodes(c))
 
   ! Obviously, faces_n must fit into cells_n
   Assert(m .le. n)
