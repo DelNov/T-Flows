@@ -1,9 +1,9 @@
 !==============================================================================!
-  function Face_In_Cell(Grid, s, c)
+  function Is_Face_In_Cell(Grid, s, c)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical             :: Face_In_Cell
+  logical             :: Is_Face_In_Cell
   class(Grid_Type)    :: Grid
   integer, intent(in) :: s, c
 !-----------------------------------[Locals]-----------------------------------!
@@ -27,9 +27,9 @@
 
   ! If all members from "faces_n" have been found, return true
   if(cnt .eq. m) then
-    Face_In_Cell = .true.
+    Is_Face_In_Cell = .true.
   else
-    Face_In_Cell = .false.
+    Is_Face_In_Cell = .false.
   end if
 
   end function

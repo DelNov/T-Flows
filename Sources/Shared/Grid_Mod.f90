@@ -206,7 +206,6 @@
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
-      procedure :: Face_In_Cell
       procedure :: Face_Normal
       procedure :: Faces_Surface
       procedure :: Find_Cells_Faces
@@ -214,6 +213,7 @@
       procedure :: Form_Cells_Comm
       procedure :: Form_Maps
       procedure :: Initialize_New_Numbers
+      procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
       procedure :: Load_Cfn
       procedure :: Load_Dim
@@ -262,13 +262,13 @@
 #   include "Grid_Mod/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Exchange_Cells_Real.f90"
-#   include "Grid_Mod/Face_In_Cell.f90"
 #   include "Grid_Mod/Face_Normal.f90"
 #   include "Grid_Mod/Find_Cells_Faces.f90"
 #   include "Grid_Mod/Find_Nodes_Cells.f90"
 #   include "Grid_Mod/Form_Cells_Comm.f90"
 #   include "Grid_Mod/Form_Maps.f90"
 #   include "Grid_Mod/Initialize_New_Numbers.f90"
+#   include "Grid_Mod/Is_Face_In_Cell.f90"
 #   include "Grid_Mod/Is_Point_In_Cell.f90"
 #   include "Grid_Mod/Load_Cfn.f90"
 #   include "Grid_Mod/Load_Dim.f90"

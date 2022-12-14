@@ -44,10 +44,10 @@
 
       ! If face's nodes are not among cell's nodes, it should be a shadow
       fail_count = 0
-      if(.not. Grid % Face_In_Cell(s, c)) then
+      if(.not. Grid % Is_Face_In_Cell(s, c)) then
 
         Assert(sh .ne. 0)
-        Assert(Grid % Face_In_Cell(sh, c))
+        Assert(Grid % Is_Face_In_Cell(sh, c))
 
         ! Surface vector
         call Grid % Faces_Surface(sh, sx, sy, sz)
@@ -73,7 +73,7 @@
 
       ! If face's nodes are among cell's nodes, it shouldn't be a shadow
       fail_count = 0
-      if(Grid % Face_In_Cell(s, c)) then
+      if(Grid % Is_Face_In_Cell(s, c)) then
 
         ! Surface vector
         call Grid % Faces_Surface(s, sx, sy, sz)
