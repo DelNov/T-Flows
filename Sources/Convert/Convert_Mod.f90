@@ -2,7 +2,7 @@
   module Convert_Mod
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
+  use Stl_Mod
 !------------------------------------------------------------------------------!
 !   Collection of functions used in the Convert program.  In honesty, it was   !
 !   introduced to get rid of the Fortran header files with interfaces which,   !
@@ -42,10 +42,10 @@
   ! Singleton Convert object
   type(Convert_Type) :: Convert
 
-  !----------------------------------------------------------------------!
-  !   Declarations for cell shapes (Was "Cells_Face_Nodes.f90" before)   !
-  !   Note that the nodes in these faces are ordered inwards the cells   !
-  !----------------------------------------------------------------------!
+  !----------------------------------!
+  !   Declarations for cell shapes   !
+  !   (Was "Cells_Face_Nodes.f90")   !
+  !----------------------------------!
 
   !====================================================================!
   !                                 hex                                !
