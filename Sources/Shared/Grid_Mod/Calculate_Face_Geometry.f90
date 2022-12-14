@@ -14,6 +14,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, i_fac, c1, c2, s, sh, m, n, pnt_to, pnt_from
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
@@ -91,7 +93,7 @@
   !   Check integrity of cells' enclosures   !
   !                                          !
   !------------------------------------------!
-  call Grid % Check_Cells_Closure()
+  if(DEBUG) call Grid % Check_Cells_Closure()
 
   if(this_proc < 2) print '(a)', ' # All integrity tests passed'
 

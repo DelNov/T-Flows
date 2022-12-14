@@ -12,6 +12,8 @@
   integer, allocatable :: fail_count(:)
 !==============================================================================!
 
+  call Profiler % Start('Check_Cells_Closure')
+
   !------------------------------------------!
   !                                          !
   !   Check integrity of cells' enclosures   !
@@ -103,5 +105,7 @@
                         'Cell enclosure with faces test failed!',  &
                          file=__FILE__)
   end if
+
+  call Profiler % Stop('Check_Cells_Closure')
 
   end subroutine

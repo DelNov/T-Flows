@@ -13,6 +13,8 @@
   real    :: dist_s, dist_sh
 !==============================================================================!
 
+  call Profiler % Start('Find_Cells_Faces')
+
   if(any(Grid % cells_n_faces(:) .ne. 0)) then
     print *, '# NOTE: Seems you are looking for cells'' faces'
     print *, '# although this information has already been found!'
@@ -43,5 +45,7 @@
       end if
     end do
   end do
+
+  call Profiler % Stop('Find_Cells_Faces')
 
   end subroutine
