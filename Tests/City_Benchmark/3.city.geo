@@ -2,7 +2,7 @@
 *                                                                              *
 *  Benchmark city mesh                                                         *
 *                                                                              *
-*  This script reads file "one_building.geo"                                   *
+*  This script reads file "3_building.geo"                                     *
 *                                                                              *
 *******************************************************************************/
 
@@ -16,7 +16,7 @@
 PERIODIC = 0;  // or 0
 
 // Number of layers
-N_LAYERS =  60;
+N_LAYERS = 120;
 
 // Height of the volume
 SKY_HIGH = 10.0;      // max height of the domain
@@ -78,8 +78,8 @@ Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
 //---------------------------------
 // Define all buildings' positions
 //---------------------------------
-Printf("Including file three_buildings.geo");
-Include "three_buildings.geo";
+Printf("Including file 3_buildings.geo");
+Include "3_buildings.geo";
 
 //-----------------------------------------------------------------------
 // Browse through all buildings to define points and lines defining them
