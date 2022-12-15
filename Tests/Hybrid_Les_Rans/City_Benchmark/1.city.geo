@@ -16,16 +16,21 @@
 PERIODIC = 0;  // or 0
 
 // Number of layers
-N_LAYERS = 120;
+N_LAYERS     = 35;
+N_SKY_LAYERS = 20;
 
 // Height of the volume
-SKY_HIGH = 10.0;      // max height of the domain
+SKY_HIGH    = 10.0;      // max height of the domain
+URBAN_HIGH  =  3.5;      // height 0.5 above the buildings
+
+DELTA_H_MIN = URBAN_HIGH / N_LAYERS;
+L_TARGET    = SKY_HIGH - URBAN_HIGH;
 
 // Coordinates of the problem domain (the whole piece of simulated land)
-ground_x_min =   0;
-ground_x_max =  26;
-ground_y_min =   0;
-ground_y_max =  13;
+GROUND_X_MIN =   0;
+GROUND_X_MAX =  26;
+GROUND_Y_MIN =   0;
+GROUND_Y_MAX =  13;
 
 // Coordinates of the city (where buildings will reside)
 city_x_min =   3;
@@ -65,10 +70,10 @@ HUGE                =   1.0e+3;
 //SetFactory("OpenCASCADE");
 
 Printf("Defining ground");
-Point(1) = {ground_x_min, ground_y_min, 0};
-Point(2) = {ground_x_max, ground_y_min, 0};
-Point(3) = {ground_x_max, ground_y_max, 0};
-Point(4) = {ground_x_min, ground_y_max, 0};
+Point(1) = {GROUND_X_MIN, GROUND_Y_MIN, 0};
+Point(2) = {GROUND_X_MAX, GROUND_Y_MIN, 0};
+Point(3) = {GROUND_X_MAX, GROUND_Y_MAX, 0};
+Point(4) = {GROUND_X_MIN, GROUND_Y_MAX, 0};
 Line(1) = {1, 2};
 Line(2) = {2, 3};
 Line(3) = {3, 4};
@@ -186,11 +191,53 @@ Mesh.Algorithm = 8;
 // Create volume
 //---------------
 
-Extrude {0,0, SKY_HIGH} {
+Extrude {0,0, URBAN_HIGH} {
   Surface {GROUND_SURF:GROUND_SURF+n_buildings};
   Layers {N_LAYERS};
   Recombine;
 }
+
+//--------------------------------------------
+// Progressivelly expand more towards the sky
+//--------------------------------------------
+p           = 0.99;  // initial progression
+d           = 0.05;  // initial increment in progression
+
+// Initial length
+l = DELTA_H_MIN * (1 - p^(N_SKY_LAYERS)) / (1 - p);
+Printf("Length with progression %g is %g", p, l);
+
+// Length through iterations
+For iter In{1:40}
+  If(l > L_TARGET)  // if current length is larger than the target ...
+    p = p - d;      // ... reduce the progression
+    l = DELTA_H_MIN * (1 - p^(N_SKY_LAYERS)) / (1 - p);
+    If(l < L_TARGET) d = d * 0.5; EndIf
+  EndIf
+  If(l < L_TARGET)  // if current length is smaller than the target ...
+    p = p + d;      // ... increase the progression
+    l = DELTA_H_MIN * (1 - p^(N_SKY_LAYERS)) / (1 - p);
+    If(l > L_TARGET) d = d * 0.5; EndIf
+  EndIf
+  Printf("Iteration %g; Length with progression %g is %g", iter, p, l);
+EndFor
+
+For lay In{ 1 : N_SKY_LAYERS }
+  If(lay == 1)
+    delta_cur = DELTA_H_MIN;  // current delta
+    z_cur     = URBAN_HIGH;
+  Else
+    z_cur     += delta_cur;
+    delta_cur *= p;
+  EndIf
+  Printf("Layer %g; height %g", lay, z_cur);
+  Extrude {0, 0, delta_cur} {
+    Surface{Surface In BoundingBox{-HUGE, -HUGE, z_cur-TINY,
+                                   +HUGE, +HUGE, z_cur+TINY}};
+    Layers {1};
+    Recombine;
+  }
+EndFor
 
 //------------------------------------------------------------------------------
 //
@@ -231,28 +278,28 @@ EndFor
 
 If( PERIODIC == 0 )
   Physical Surface("west")
-    = {Surface In BoundingBox{ground_x_min-TINY, -HUGE, -HUGE,
-                              ground_x_min+TINY, +HUGE, +HUGE}};
+    = {Surface In BoundingBox{GROUND_X_MIN-TINY, -HUGE, -HUGE,
+                              GROUND_X_MIN+TINY, +HUGE, +HUGE}};
   Physical Surface("east")
-    = {Surface In BoundingBox{ground_x_max-TINY, -HUGE, -HUGE,
-                              ground_x_max+TINY, +HUGE, +HUGE}};
+    = {Surface In BoundingBox{GROUND_X_MAX-TINY, -HUGE, -HUGE,
+                              GROUND_X_MAX+TINY, +HUGE, +HUGE}};
   Physical Surface("south")
-    = {Surface In BoundingBox{-HUGE, ground_y_min-TINY, -HUGE,
-                              +HUGE, ground_y_min+TINY, +HUGE}};
+    = {Surface In BoundingBox{-HUGE, GROUND_Y_MIN-TINY, -HUGE,
+                              +HUGE, GROUND_Y_MIN+TINY, +HUGE}};
   Physical Surface("north")
-    = {Surface In BoundingBox{-HUGE, ground_y_max-TINY, -HUGE,
-                              +HUGE, ground_y_max+TINY, +HUGE}};
+    = {Surface In BoundingBox{-HUGE, GROUND_Y_MAX-TINY, -HUGE,
+                              +HUGE, GROUND_Y_MAX+TINY, +HUGE}};
 Else
   Physical Surface("east-west")
-    = {Surface In BoundingBox{ground_x_min-TINY, -HUGE, -HUGE,
-                              ground_x_min+TINY, +HUGE, +HUGE}};
-    + {Surface In BoundingBox{ground_x_max-TINY, -HUGE, -HUGE,
-                              ground_x_max+TINY, +HUGE, +HUGE}};
+    = {Surface In BoundingBox{GROUND_X_MIN-TINY, -HUGE, -HUGE,
+                              GROUND_X_MIN+TINY, +HUGE, +HUGE}};
+    + {Surface In BoundingBox{GROUND_X_MAX-TINY, -HUGE, -HUGE,
+                              GROUND_X_MAX+TINY, +HUGE, +HUGE}};
   Physical Surface("north-south")
-    = {Surface In BoundingBox{-HUGE, ground_y_min-TINY, -HUGE,
-                              +HUGE, ground_y_min+TINY, +HUGE}};
-    + {Surface In BoundingBox{-HUGE, ground_y_max-TINY, -HUGE,
-                              +HUGE, ground_y_max+TINY, +HUGE}};
+    = {Surface In BoundingBox{-HUGE, GROUND_Y_MIN-TINY, -HUGE,
+                              +HUGE, GROUND_Y_MIN+TINY, +HUGE}};
+    + {Surface In BoundingBox{-HUGE, GROUND_Y_MAX-TINY, -HUGE,
+                              +HUGE, GROUND_Y_MAX+TINY, +HUGE}};
 EndIf
 Physical Surface("top")
   = {Surface In BoundingBox{-HUGE, -HUGE, SKY_HIGH-TINY,
