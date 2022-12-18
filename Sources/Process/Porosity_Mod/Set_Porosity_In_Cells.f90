@@ -70,6 +70,4 @@
 
   call Work % Disconnect_Real_Cell(por_real)
 
-  STOP
-
   end subroutine
