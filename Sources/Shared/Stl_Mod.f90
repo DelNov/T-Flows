@@ -13,10 +13,10 @@
   !   Stl type   !
   !--------------!
   type, extends(Grid_Type) :: Stl_Type
-    real,    allocatable :: nx(:), ny(:), nz(:)  ! facet normal
-    integer              :: n_boddies            ! number of boddies
-    integer, allocatable :: body_c(:)            ! body at facets
-    integer, allocatable :: body_n(:)            ! body at verticesl
+    real,    allocatable, private :: nx(:), ny(:), nz(:)  ! facet normal
+    integer                       :: n_boddies            ! number of boddies
+    integer, allocatable          :: body_c(:)            ! body at facets
+    integer, allocatable          :: body_n(:)            ! body at verticesl
 
     contains
       procedure, private :: Allocate_Stl

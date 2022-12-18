@@ -17,7 +17,7 @@
   type Porous_Region_Type
 
     ! Each region is defined by one convex STL object ...
-    type(Stl_Type) :: stl
+    type(Stl_Type) :: Stl
 
     ! ... which, in turn, is defined in a file
     character(SL)  :: stl_name
