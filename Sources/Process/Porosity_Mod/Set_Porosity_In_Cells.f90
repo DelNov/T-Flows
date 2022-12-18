@@ -9,10 +9,10 @@
   type(Grid_Type)      :: Grid
   integer, intent(in)  :: reg       ! porous region rank
 !-----------------------------------[Locals]-----------------------------------!
-  type(Stl_Type)            :: stl
   character(len=SL)         :: name_out
   integer                   :: c, f, l
-  real                      :: xyz(3), xc, yc, zc, cx, cy, cz, dot_prod
+  real                      :: xyz(3), n(3)
+  real                      :: nx, ny, nz, xc, yc, zc, cx, cy, cz, dot_prod
   real, contiguous, pointer :: por_real(:)   ! just for saving
 !==============================================================================!
 
@@ -28,25 +28,24 @@
   !-------------------------------------------!
   do c = 1, Grid % n_cells
 
-    ! Assume cell is in the stl
+    ! Assume cell is in the STL
     Por % region(reg) % cell_porous(c) = .true.
 
-    do f = 1, Por % region(reg) % Stl % n_facets()
+    do f = 1, Por % region(reg) % Stl % N_Facets()
 
       ! Compute facet's center of gravity
       xyz(1:3) = Por % region(reg) % Stl % Facet_Coords(f)
-      xc = xyz(1)
-      yc = xyz(2)
-      zc = xyz(3)
+      xc = xyz(1);  yc = xyz(2);  zc = xyz(3)
+
+      n(1:3) = Por % region(reg) % Stl % Facet_Normal(f)
+      nx = n(1);  ny = n(2);  nz = n(3)
 
       ! Vector connecting facet centroid with cell centroid
       cx = xc - Grid % xc(c)
       cy = yc - Grid % yc(c)
       cz = zc - Grid % zc(c)
 
-      dot_prod = cx * Por % region(reg) % Stl % nx(f)  &
-               + cy * Por % region(reg) % Stl % ny(f)  &
-               + cz * Por % region(reg) % Stl % nz(f)
+      dot_prod = cx * nx + cy * ny + cz * nz
 
       ! First time this is negative, cell is not in the stl
       if(dot_prod < 0) then
@@ -70,5 +69,7 @@
                              scalar_name='porosity')
 
   call Work % Disconnect_Real_Cell(por_real)
+
+  STOP
 
   end subroutine
