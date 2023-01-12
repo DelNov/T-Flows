@@ -19,6 +19,9 @@
   Grid => Vof % pnt_grid
   Flow => Vof % pnt_flow
 
+  ! Calculate gradient matrix with front (reduced stencil close to front)
+  call Vof % Calculate_Grad_Matrix_With_Front()
+
   ! Refresh buffers for variable
   call Grid % Exchange_Cells_Real(var % n)
 
@@ -31,5 +34,8 @@
   call Grid % Exchange_Cells_Real(var % x)
   call Grid % Exchange_Cells_Real(var % y)
   call Grid % Exchange_Cells_Real(var % z)
+
+  ! Recover the original gradient matrix
+  call Flow % Calculate_Grad_Matrix()
 
   end subroutine

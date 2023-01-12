@@ -295,7 +295,6 @@
   ! If mass transfer, compute gradients with saturation temperature
   else
     call Vof % Grad_Variable_With_Front(t, Vof % t_sat)
-    call Flow % Calculate_Grad_Matrix()
   end if
 
   ! User function

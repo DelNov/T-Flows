@@ -33,7 +33,6 @@
   !   Compute gradients of temperature, imposing   !
   !    saturation temperature at the interface     !
   !------------------------------------------------!
-  call Vof % Calculate_Grad_Matrix_With_Front()
   call Vof % Grad_Variable_With_Front(t, Vof % t_sat)
   if(DEBUG) then
     call Grid % Save_Debug_Vtu("grad-t",                               &
