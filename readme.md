@@ -4990,4 +4990,3 @@ rise velocity at the end of each time step.  We use tool Grace to plot the
 results and compare them with benchmark solutions.
 
 ## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
-
