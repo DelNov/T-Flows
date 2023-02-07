@@ -261,6 +261,8 @@ ALL_PROCESS_TESTS=( \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    )
+# For single test: ALL_PROCESS_TESTS=("$VOF_RISING_BUBBLE_DIR")
+
 ALL_TURBULENCE_MODELS=( \
                        "none" \
                        "none" \
@@ -284,6 +286,8 @@ ALL_TURBULENCE_MODELS=( \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
                        )
+# For single test: ALL_TURBULENCE_MODELS=("none")
+
 ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "no" \
@@ -307,6 +311,8 @@ ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "no" \
                        )
+# For single test: ALL_INTERFACE_TRACKING=("yes")
+
 ALL_PARTICLE_TRACKING=( \
                        "no" \
                        "no" \
@@ -330,6 +336,8 @@ ALL_PARTICLE_TRACKING=( \
                        "no" \
                        "no" \
                        )
+# For single test: ALL_PARTICLE_TRACKING=("no")
+
 DONE_PROCESS_TESTS=0
 
 #----------------------------------------------------------------------------
@@ -1451,6 +1459,15 @@ function process_full_length_test {
       "PARTICLE_TRACKING "$4"" \
       control."$i"
   done
+
+  # Create an stl file if python script is present
+  if [ $3 == "yes" ]; then
+    if [ -f *.py ]; then
+      python_script=$(ls -1 *.py)
+      elog "Creating stl file in blender from script:" "$python_script"
+      blender -b -P *.py >> $FULL_LOG 2>&1
+    fi
+  fi
 
   launch_process par $nproc_in_div
   #---------------------------:END #
