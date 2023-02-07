@@ -2,6 +2,11 @@
   subroutine Grad_Gauss_Pressure(Flow, p)
 !------------------------------------------------------------------------------!
 !   Tries to find pressure gradients with Gaussian in an iterative fashion.    !
+!                                                                              !
+!   Developed from this:                                                       !
+!   ../../Tests/Functionality/Gradients/User_Mod/Initialize_Variables.f90      !
+!                                                                              !
+!   Lately, the function above has evolved, maybe you should update this too   !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
