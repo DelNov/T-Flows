@@ -15,7 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: s, c1, c2
-  real                     :: dphi1, dphi2
+  real                     :: dphi1, dphi2, w1, w2
 !-----------------------------[Local parameters]-------------------------------!
   integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
                                                          4, 2, 6,  &
@@ -35,6 +35,11 @@
     dphi1 = phi(c2)-phi(c1)
     dphi2 = phi(c2)-phi(c1)
 
+    w1 = 1.0 / Grid % d(s) ** 2
+    w2 = 1.0 / Grid % d(s) ** 2
+    !w1 = 1.0
+    !w2 = 1.0
+
     ! On the boundaries
     if(c2 < 0) then
       if(Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
@@ -44,7 +49,8 @@
       phii(c1) = phii(c1)                                                 &
                + dphi1 * (  Flow % grad_c2c(MAP(i,1),c1) * Grid % dx(s)   &
                           + Flow % grad_c2c(MAP(i,2),c1) * Grid % dy(s)   &
-                          + Flow % grad_c2c(MAP(i,3),c1) * Grid % dz(s))
+                          + Flow % grad_c2c(MAP(i,3),c1) * Grid % dz(s))  &
+                       * w1  ! weight in least squares method
     end if
 
     ! Inside the domain
@@ -52,12 +58,14 @@
       phii(c1) = phii(c1)                                                 &
                + dphi1 * (  Flow % grad_c2c(MAP(i,1),c1) * Grid % dx(s)   &
                           + Flow % grad_c2c(MAP(i,2),c1) * Grid % dy(s)   &
-                          + Flow % grad_c2c(MAP(i,3),c1) * Grid % dz(s))
+                          + Flow % grad_c2c(MAP(i,3),c1) * Grid % dz(s))  &
+                       * w1  ! weight in least squares method
 
       phii(c2) = phii(c2)                                                 &
                + dphi2 * (  Flow % grad_c2c(MAP(i,1),c2) * Grid % dx(s)   &
                           + Flow % grad_c2c(MAP(i,2),c2) * Grid % dy(s)   &
-                          + Flow % grad_c2c(MAP(i,3),c2) * Grid % dz(s))
+                          + Flow % grad_c2c(MAP(i,3),c2) * Grid % dz(s))  &
+                       * w2  ! weight in least squares method
     end if
   end do
 

@@ -13,7 +13,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer  :: Grid
   integer                   :: c, c1, c2, s
-  real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
+  real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2, w1, w2
   real                      :: jac, g_inv(6)
   real, contiguous, pointer :: g1(:), g2(:), g3(:), g4(:), g5(:), g6(:)
 !==============================================================================!
@@ -51,19 +51,25 @@
     dy_c2 = Grid % dy(s)
     dz_c2 = Grid % dz(s)
 
-    Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1    ! 1,1
-    Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1    ! 2,2
-    Flow % grad_c2c(3,c1)=Flow % grad_c2c(3,c1) + dz_c1*dz_c1    ! 3,3
-    Flow % grad_c2c(4,c1)=Flow % grad_c2c(4,c1) + dx_c1*dy_c1    ! 1,2  &  2,1
-    Flow % grad_c2c(5,c1)=Flow % grad_c2c(5,c1) + dx_c1*dz_c1    ! 1,3  &  3,1
-    Flow % grad_c2c(6,c1)=Flow % grad_c2c(6,c1) + dy_c1*dz_c1    ! 2,3  &  3,2
+    ! Weights in least squares method
+    w1 = 1.0 / Grid % d(s) ** 2
+    w2 = 1.0 / Grid % d(s) ** 2
+    !w1 = 1.0
+    !w2 = 1.0
+
+    Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1*w1   ! 1,1
+    Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1*w1   ! 2,2
+    Flow % grad_c2c(3,c1)=Flow % grad_c2c(3,c1) + dz_c1*dz_c1*w1   ! 3,3
+    Flow % grad_c2c(4,c1)=Flow % grad_c2c(4,c1) + dx_c1*dy_c1*w1   ! 1,2  &  2,1
+    Flow % grad_c2c(5,c1)=Flow % grad_c2c(5,c1) + dx_c1*dz_c1*w1   ! 1,3  &  3,1
+    Flow % grad_c2c(6,c1)=Flow % grad_c2c(6,c1) + dy_c1*dz_c1*w1   ! 2,3  &  3,2
     if(c2 > 0) then  ! this is enough even for parallel
-      Flow % grad_c2c(1,c2)=Flow % grad_c2c(1,c2) + dx_c2*dx_c2  ! 1,1
-      Flow % grad_c2c(2,c2)=Flow % grad_c2c(2,c2) + dy_c2*dy_c2  ! 2,2
-      Flow % grad_c2c(3,c2)=Flow % grad_c2c(3,c2) + dz_c2*dz_c2  ! 3,3
-      Flow % grad_c2c(4,c2)=Flow % grad_c2c(4,c2) + dx_c2*dy_c2  ! 1,2  &  2,1
-      Flow % grad_c2c(5,c2)=Flow % grad_c2c(5,c2) + dx_c2*dz_c2  ! 1,3  &  3,1
-      Flow % grad_c2c(6,c2)=Flow % grad_c2c(6,c2) + dy_c2*dz_c2  ! 2,3  &  3,2
+      Flow % grad_c2c(1,c2)=Flow % grad_c2c(1,c2) + dx_c2*dx_c2*w2 ! 1,1
+      Flow % grad_c2c(2,c2)=Flow % grad_c2c(2,c2) + dy_c2*dy_c2*w2 ! 2,2
+      Flow % grad_c2c(3,c2)=Flow % grad_c2c(3,c2) + dz_c2*dz_c2*w2 ! 3,3
+      Flow % grad_c2c(4,c2)=Flow % grad_c2c(4,c2) + dx_c2*dy_c2*w2 ! 1,2  &  2,1
+      Flow % grad_c2c(5,c2)=Flow % grad_c2c(5,c2) + dx_c2*dz_c2*w2 ! 1,3  &  3,1
+      Flow % grad_c2c(6,c2)=Flow % grad_c2c(6,c2) + dy_c2*dz_c2*w2 ! 2,3  &  3,2
     end if
 
   end do
