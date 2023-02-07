@@ -22,7 +22,7 @@
   type(Grid_Type)     :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n1, n2, n3, f_nod(4)
-  integer              :: n_match, i_fac, match_nodes(-1:8)
+  integer              :: n_match, n_faces, i_fac, match_nodes(-1:8)
   integer              :: i1, i2, i_nod, cnt
   integer              :: fn(6,4)
   integer, allocatable :: face_n1(:)
@@ -107,8 +107,6 @@
   !   Main loop to fill the faces_c structure   !
   !                                             !
   !---------------------------------------------!
-  call Adjust_First_Dim(6, Grid % cells_c)  ! i_fac goes to 6
-  call Adjust_First_Dim(4, Grid % faces_n)  ! i_nod goes to 4
   do n3 = 1, cnt
     if(starts(n3) .ne. ends(n3)) then
       do i1=starts(n3),ends(n3)
@@ -140,11 +138,25 @@
             !     c1        c2      !
             !-----------------------!
             if(n_match > 2) then
-              if(Grid % cells_n_nodes(c1) .eq. 4) fn = TET
-              if(Grid % cells_n_nodes(c1) .eq. 5) fn = PYR
-              if(Grid % cells_n_nodes(c1) .eq. 6) fn = WED
-              if(Grid % cells_n_nodes(c1) .eq. 8) fn = HEX
-              do i_fac = 1, 6
+              if(Grid % cells_n_nodes(c1) .eq. 4) then
+                fn      = TET
+                n_faces = 4
+              end if
+              if(Grid % cells_n_nodes(c1) .eq. 5) then
+                fn      = PYR
+                n_faces = 5
+              end if
+              if(Grid % cells_n_nodes(c1) .eq. 6) then
+                fn      = WED
+                n_faces = 5
+              end if
+              if(Grid % cells_n_nodes(c1) .eq. 8) then
+                fn      = HEX
+                n_faces = 6
+              end if
+              call Adjust_First_Dim(n_faces, Grid % cells_c)
+              call Adjust_First_Dim(n_match, Grid % faces_n)
+              do i_fac = 1, n_faces
                 if(Grid % cells_c(i_fac, c1) .eq. 0  .and.   & ! not set yet
                     ( max( match_nodes(fn(i_fac, 1)),0 ) + &
                       max( match_nodes(fn(i_fac, 2)),0 ) + &
