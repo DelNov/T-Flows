@@ -221,6 +221,8 @@
     if(c2 < 0) c_computed(c1) = NO
   end do
 
+  call Grid % Exchange_Cells_Int(c_computed)
+
   ! Nullify gradients for cells near boundaries
   ! (where gradients are not computed properly),
   ! and initialize c_visited
@@ -238,6 +240,9 @@
   !   as there are cells which are not computed.   !
   !------------------------------------------------!
   do iter = 1, 3
+
+    ! Browse through faces to find the cells which need ...
+    ! ... updating, and accumulate gradients in them as well
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1, s)
       c2 = Grid % faces_c(2, s)
@@ -259,15 +264,21 @@
       end if
     end do
 
+    ! Browse throough cells, and calculate final values ...
+    ! ... of gradients in the cells which have been visited
     do c = 1, Grid % n_cells
       if(c_visited(c) > 0) then
         t % x(c) = t % x(c) / c_visited(c)
         t % y(c) = t % y(c) / c_visited(c)
         t % z(c) = t % z(c) / c_visited(c)
         c_visited(c)  = 0
-        c_computed(c) = YES
+        c_computed(c) = YES  ! mark it as computed for the next iteration
       end if
     end do
+    call Grid % Exchange_Cells_Real(t % x)
+    call Grid % Exchange_Cells_Real(t % y)
+    call Grid % Exchange_Cells_Real(t % z)
+
   end do    ! iter
 
   ! Save the initial guess that you got
