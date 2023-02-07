@@ -3,12 +3,16 @@
 #
 #   You can run it interactivelly with:
 #   > blender --background --python ./sphere.py
+#
+#   or:
+#   > blender -b -P ./sphere.py
 #-------------------------------------------------------------------------------
 
 import bpy
 
 # Delete initial cube in Blender
-bpy.ops.object.delete(use_global=False, confirm=False)
+while bpy.data.objects:
+  bpy.data.objects.remove(bpy.data.objects[0], do_unlink=True)
 
 # Set some parameters ...
 S  = 3
