@@ -87,8 +87,8 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   3.0
+    VARIABLES           vof
+    VALUES              cylinder.stl
 
 #---------------------
 # Boundary conditions

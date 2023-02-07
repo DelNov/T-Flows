@@ -26,3 +26,10 @@ sigma       = 15000
 rho_L+rho_G = 2.0
 
 dt < 2.255e-5
+
+
+There are xmgrace files with some histories of RMS of velocities.  These were
+obtained in old days of initialization with user functions.  Since the
+initialization has changed to STL, these have changed, and have changed for
+worse - probably because initial VOF is not fully periodic in periodic
+direction.  Still, can't keep those obsolete .ini files.
