@@ -7,12 +7,18 @@
   type(Grid_Type)        :: Grid
   integer, intent(in)    :: cell
   real,    optional      :: phi_n(:)
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
-  integer, contiguous, pointer :: local_node(:)         ! local to polyhedron
+  integer, pointer, contiguous :: glo(:)
+  integer, pointer, contiguous :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
   integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
   integer                      :: s, n, faces_n_nodes
 !==============================================================================!
+
+  ! Take alias for global cell numbers
+  glo => Grid % Comm % cell_glo
 
   call Work % Connect_Int_Node(local_node)  ! this also sets it to zero
 
@@ -97,7 +103,10 @@
   end do
 
   ! Plot extracted cell first, in case things go wrong
-  ! call Pol % Plot_Polyhedron_Vtk("geo", cell)
+  if(DEBUG) then
+    ! This will create "geo-000XXX.vtk"
+    call Pol % Plot_Polyhedron_Vtk("geo", glo(cell))
+  end if
 
   call Work % Disconnect_Int_Node(local_node)
 
