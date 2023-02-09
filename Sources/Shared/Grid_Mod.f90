@@ -20,9 +20,6 @@
   interface
     include '../Shared/Adjust_First_Dim.h90'
   end interface
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: INWARDS  = -1  ! for faces wrapping cells, can ...
-  integer, parameter :: OUTWARDS = +1  ! ... be pointing inwards or outwards
 !==============================================================================!
 
   !---------------!
@@ -87,9 +84,6 @@
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_f(:,:)
     integer, allocatable :: cells_c(:,:)
-
-    ! Orientation (INWARDS, or OUTWARDS) of faces sourrounding the cells
-    integer, allocatable :: cells_f_orient(:,:)
 
     ! Weights for interpolation from nodes
     real, allocatable :: weight_n2c(:,:)
@@ -202,7 +196,6 @@
       procedure :: Check_Cells_Closure
       procedure :: Correct_Face_Surfaces
       procedure :: Decompose
-      procedure :: Determine_Face_Orientation
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
@@ -258,7 +251,6 @@
 #   include "Grid_Mod/Correct_Face_Surfaces.f90"
 #   include "Grid_Mod/Check_Cells_Closure.f90"
 #   include "Grid_Mod/Decompose.f90"
-#   include "Grid_Mod/Determine_Face_Orientation.f90"
 #   include "Grid_Mod/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Exchange_Cells_Real.f90"

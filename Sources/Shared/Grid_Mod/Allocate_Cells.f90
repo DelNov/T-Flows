@@ -37,9 +37,6 @@
   allocate(Grid % cells_f(4, -nb:nc));  Grid % cells_f(:,:) = 0
   allocate(Grid % cells_c(4, -nb:nc));  Grid % cells_c(:,:) = 0
 
-  ! Cells' faces orientation (INWARDS or OUTWARDS)
-  allocate(Grid % cells_f_orient(4, -nb:nc));  Grid % cells_f_orient(:,:) = 0
-
   allocate(Grid % cells_bnd_face(-nb:-1));  Grid % cells_bnd_face(:) = 0
 
   ! Number of nodes, faces and cells at each cell

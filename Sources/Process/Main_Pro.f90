@@ -90,7 +90,6 @@
     ! Find communication patterns
     call Grid(d) % Form_Cells_Comm()
     call Grid(d) % Form_Maps()
-    call Grid(d) % Determine_Face_Orientation()
   end do
 
   ! Out of domain loop - go back to root

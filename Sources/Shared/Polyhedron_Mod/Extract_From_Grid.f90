@@ -15,6 +15,7 @@
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
   integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
   integer                      :: s, n, faces_n_nodes
+  real                         :: dx, dy, dz, sx, sy, sz
 !==============================================================================!
 
   ! Take alias for global cell numbers
@@ -81,6 +82,8 @@
       end if
     end if
 
+    Assert(Grid % Is_Face_In_Cell(s, cell))
+
     ! Fetch the local node numbers for each face
     faces_n_nodes = Grid % faces_n_nodes(s)  ! number of nodes in this face
     do i_nod = 1, faces_n_nodes              ! local (to face) node number
@@ -89,10 +92,16 @@
       local_face_nodes(i_nod) = l_nod        ! store in array of local nodes
     end do
 
+    call Grid % Faces_Surface(s, sx, sy, sz)
+    dx = Grid % xf(s) - Grid % xc(cell)
+    dy = Grid % yf(s) - Grid % yc(cell)
+    dz = Grid % zf(s) - Grid % zc(cell)
+
     ! They might be in the wrong order, correct if needed
-    ! (If the face is oriented inwards to current cell,
-    ! the nodes have to sorted in reverse order.)
-    if(Grid % cells_f_orient(i_fac, cell) .eq. OUTWARDS) then
+    ! (If the face is oriented outwards to current cell,
+    ! the nodes have to sorted in reverse order because
+    ! ISOAP library requies faces to point inwards)
+    if(sx*dx + sy*dy + sz*dz > 0) then
       call Sort % Reverse_Order_Int(local_face_nodes(1:faces_n_nodes))
     end if
 
