@@ -2,7 +2,7 @@
 # Prologue
 #----------
  PROBLEM_NAME        dam_2d
- INTERFACE_TRACKING  yes
+INTERFACE_TRACKING yes
 
 # sqrt(9.81/0.6) = 4.04351332383
 # if dt = 1.0 / sqrt(9.81/0.6) / 1200 = 0.0002060914;
@@ -33,7 +33,7 @@
  PHASE_DENSITIES        1.0e3   1.0e0
  PHASE_VISCOSITIES      1.0e-3  1.8e-5
  SURFACE_TENSION        0.0
- TURBULENCE_MODEL       none
+TURBULENCE_MODEL none
  GRAVITATIONAL_VECTOR   0.0 0.0 -9.81
 
  REFERENCE_DENSITY      1.0
@@ -89,3 +89,5 @@
     VARIABLES           u     v     w     vof     vof_c_ang
     VALUES              0.0   0.0   0.0   0.0     90.0
 
+#LOAD_BACKUP_NAME dam_2d-ts000001.backup
+PARTICLE_TRACKING no

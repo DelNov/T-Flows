@@ -92,6 +92,7 @@ MULTDOM_MEMBRANE_DIR=Rans/Membrane
 ELBOW_ASCII_DIR=Functionality/Meshes/Ansys/Elbow_Ascii
 ELBOW_BINARY_DIR=Functionality/Meshes/Ansys/Elbow_Binary
 
+VOF_DAM_BREAK_2D_DIR=Vof/Dam_Break_2d
 VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
 SWARM_ROD_BUNDLE_POLYHEDRAL_DIR=Swarm/Rod_Bundle_Polyhedral
@@ -163,6 +164,7 @@ ALL_GENERATE_TESTS=( \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$MULTDOM_BACKSTEP_DIR" \
+                    "$VOF_DAM_BREAK_2D_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
                     "$SWARM_VOF_THREE_PHASE_DIR" \
                     "$LES_CHANNEL_180_LONG_DIR" \
@@ -219,6 +221,7 @@ ALL_DIVIDE_TESTS=( \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
+                  "$VOF_DAM_BREAK_2D_DIR" \
                   "$VOF_RISING_BUBBLE_DIR" \
                   "$SWARM_VOF_THREE_PHASE_DIR" \
                   "$LES_CHANNEL_180_LONG_DIR" \
@@ -255,6 +258,7 @@ ALL_PROCESS_TESTS=( \
                    "$MULTDOM_BACKSTEP_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
+                   "$VOF_DAM_BREAK_2D_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
                    "$SWARM_VOF_THREE_PHASE_DIR" \
                    "$LES_PIPE_DIR" \
@@ -277,6 +281,7 @@ ALL_TURBULENCE_MODELS=( \
                        "k_eps_zeta_f" \
                        "rsm_hanjalic_jakirlic" \
                        "k_eps_zeta_f" \
+                       "none" \
                        "none" \
                        "none" \
                        "none" \
@@ -307,6 +312,7 @@ ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "yes" \
                        "yes" \
+                       "yes" \
                        "no" \
                        "no" \
                        "no" \
@@ -330,6 +336,7 @@ ALL_PARTICLE_TRACKING=( \
                        "no" \
                        "yes" \
                        "yes" \
+                       "no" \
                        "no" \
                        "yes" \
                        "no" \
