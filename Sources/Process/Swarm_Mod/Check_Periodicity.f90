@@ -88,9 +88,9 @@
             call Part % Find_Nearest_Node()
 
             ! If c2 is in the buffer, tell that particle wants to go there
-            if(Grid % comm % cell_proc(c2) .ne.  &
-               Grid % comm % cell_proc(c1)) then
-              Part % buff = Grid % comm % cell_proc(c2)
+            if(Grid % Comm % cell_proc(c2) .ne.  &
+               Grid % Comm % cell_proc(c1)) then
+              Part % buff = Grid % Comm % cell_proc(c2)
               n_parts_in_buffers = n_parts_in_buffers + 1
             end if
           end if
@@ -144,9 +144,9 @@
             call Part % Find_Nearest_Node()
 
             ! If c1 is in the buffer, tell that particle wants to go there
-            if(Grid % comm % cell_proc(c1) .ne.  &
-               Grid % comm % cell_proc(c2)) then
-              Part % buff = Grid % comm % cell_proc(c1)
+            if(Grid % Comm % cell_proc(c1) .ne.  &
+               Grid % Comm % cell_proc(c2)) then
+              Part % buff = Grid % Comm % cell_proc(c1)
               n_parts_in_buffers = n_parts_in_buffers + 1
             end if
           end if

@@ -49,7 +49,7 @@
   ! Take some aliases
   D => Nat % D
   nt = A % pnt_grid % n_cells
-  ni = A % pnt_grid % n_cells - A % pnt_grid % comm % n_buff_cells
+  ni = A % pnt_grid % n_cells - A % pnt_grid % Comm % n_buff_cells
   nb = A % pnt_grid % n_bnd_cells
 
   res = 0.0

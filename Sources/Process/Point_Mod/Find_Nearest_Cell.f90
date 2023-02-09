@@ -91,8 +91,8 @@
 
     ! If processor number in the cell is differnt than this_proc 
     ! (and Point % proc in this case) you entered the buffer
-    if(Grid % comm % cell_proc(cc) .ne. Point % proc) then
-      Point % buff = Grid % comm % cell_proc(cc)  ! store buffer process
+    if(Grid % Comm % cell_proc(cc) .ne. Point % proc) then
+      Point % buff = Grid % Comm % cell_proc(cc)  ! store buffer process
       n_parts_in_buffers = n_parts_in_buffers + 1
     end if
 
@@ -111,7 +111,7 @@
     !-----------------------------!
     !   Cells inside the domain   !
     !-----------------------------!
-    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
 
       ! Take cell centre
       xc = Grid % xc(c)

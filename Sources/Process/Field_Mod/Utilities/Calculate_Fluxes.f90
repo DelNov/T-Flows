@@ -42,7 +42,7 @@
     dens_f = Flow % density(c1) *        Grid % fw(s)  &
            + Flow % density(c2) * (1.0 - Grid % fw(s))
 
-    if(Grid % comm % cell_proc(c1) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
 
       xc1 = Grid % xc(c1)
       yc1 = Grid % yc(c1)
@@ -54,7 +54,7 @@
       ! If the flux is across a buffer face, it is summed up twice.  
       ! The variable "wgt" is here to take care of that.
       wgt = 1.0
-      if(c2 > Grid % n_cells - Grid % comm % n_buff_cells) wgt = 0.5
+      if(c2 > Grid % n_cells - Grid % Comm % n_buff_cells) wgt = 0.5
 
       !-------!
       !   X   !

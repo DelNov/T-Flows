@@ -7,21 +7,7 @@
   use Iso_C_Binding
 !------------------------------------------------------------------------------!
   implicit none
-!------------------------------------------------------------------------------!
-  integer              :: nvtxs,          &  ! number of vertices
-                          ncons,          &  ! number of constrains 
-                          nparts = 2         ! requested number of partitions
-  integer                 mopts(41)
-  type(c_ptr)          :: vwgt  =c_null_ptr, &  ! weights of the vertices
-                          vsize =c_null_ptr, &  ! size of the vertices
-                          adjwgt=c_null_ptr, &  ! weights of the edges
-                          objval=c_null_ptr     ! stores edgecut or comm. volume
-  real, allocatable    :: tpwgts(:)             ! desired weight for each partition
-  real, allocatable    :: ubvec(:)
-  integer, allocatable :: xadj  (:),      &  ! variabes for ...
-                          adjncy(:),      &  ! ... compressed row storage
-                          part  (:)          ! partition of the grid
-
+!------------------------------[Local parameters]------------------------------!
   integer, parameter :: METIS_OPTION_PTYPE     =  1
   integer, parameter :: METIS_OPTION_OBJTYPE   =  2
   integer, parameter :: METIS_OPTION_CTYPE     =  3
@@ -47,6 +33,20 @@
   integer, parameter :: METIS_OPTION_BALANCE   = 23
   integer, parameter :: METIS_OPTION_GTYPE     = 24
   integer, parameter :: METIS_OPTION_UBVEC     = 25
+!-----------------------------------[Locals]-----------------------------------!
+  integer     :: nvtxs,              &  ! number of vertices
+                 ncons,              &  ! number of constrains 
+                 nparts = 2             ! requested number of partitions
+  integer        mopts(41)
+  type(c_ptr) :: vwgt  =c_null_ptr,  &  ! weights of the vertices
+                 vsize =c_null_ptr,  &  ! size of the vertices
+                 adjwgt=c_null_ptr,  &  ! weights of the edges
+                 objval=c_null_ptr      ! stores edgecut or comm. volume
+  real,    allocatable :: tpwgts(:)          ! desired weight for each partition
+  real,    allocatable :: ubvec (:)
+  integer, allocatable :: xadj  (:),      &  ! variabes for ...
+                          adjncy(:),      &  ! ... compressed row storage
+                          part  (:)          ! partition of the grid
 !==============================================================================!
 
   nvtxs = 15

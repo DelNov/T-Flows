@@ -191,7 +191,7 @@
   write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                           'Name="Processor" format="ascii">'
   do c = 1, Grid % n_cells
-    write(fu,'(a,i9)') IN_5, Grid % comm % cell_proc(c)
+    write(fu,'(a,i9)') IN_5, Grid % Comm % cell_proc(c)
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'
 

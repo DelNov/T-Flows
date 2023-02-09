@@ -95,7 +95,7 @@
   !--------------------------!
   !   Nodes global numbers   !
   !--------------------------!
-  read(fu) (Grid % comm % node_glo(n), n = 1, Grid % n_nodes)
+  read(fu) (Grid % Comm % node_glo(n), n = 1, Grid % n_nodes)
 
   !-----------!
   !   Cells   !  (including buffer cells)
@@ -173,10 +173,10 @@
   end do
 
   ! Cells' processor ids
-  read(fu) (Grid % comm % cell_proc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
+  read(fu) (Grid % Comm % cell_proc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
 
   ! Cells' global indices
-  read(fu) (Grid % comm % cell_glo(c), c = -Grid % n_bnd_cells, Grid % n_cells)
+  read(fu) (Grid % Comm % cell_glo(c), c = -Grid % n_bnd_cells, Grid % n_cells)
 
   !-----------!
   !   Faces   !
@@ -226,8 +226,8 @@
 
     ! Check only if least one cell is in this processor
     ! (Meaning it is not a face entirelly in the buffer)
-    if(Grid % comm % cell_proc(c1) .eq. this_proc .or.  &
-       Grid % comm % cell_proc(c2) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. this_proc .or.  &
+       Grid % Comm % cell_proc(c2) .eq. this_proc) then
       if( .not. (c1.eq.0 .and. c2.eq.0) ) then
         if(Grid % faces_c(1, s) .eq. 0) then
           print *, '# ERROR: Cell one is zero at face:', s, c1, c2

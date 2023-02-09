@@ -21,7 +21,7 @@
     b    => Sol % Nat % b % val
 
     ! Compute global volume imbalance
-    src = sum(b(1:Grid % n_cells - Grid % comm % n_buff_cells))
+    src = sum(b(1:Grid % n_cells - Grid % Comm % n_buff_cells))
     call Comm_Mod_Global_Sum_Real(src)
 
     ! Print it out

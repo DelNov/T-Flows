@@ -95,7 +95,7 @@
   end do
 
   Flow % vol_res = 0.0
-  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     Flow % vol_res = max(Flow % vol_res, abs(b(c)))
   end do
   call Comm_Mod_Global_Max_Real(Flow % vol_res)

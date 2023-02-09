@@ -17,9 +17,9 @@
   allocate(Grid % yn(1:nn));  Grid % yn(:) = 0.0
   allocate(Grid % zn(1:nn));  Grid % zn(:) = 0.0
 
-  allocate(Grid % comm % node_glo(1:nn));  Grid % comm % node_glo(:) = 0
+  allocate(Grid % Comm % node_glo(1:nn));  Grid % Comm % node_glo(:) = 0
   do n = 1, nn
-    Grid % comm % node_glo(n) = n
+    Grid % Comm % node_glo(n) = n
   end do
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)

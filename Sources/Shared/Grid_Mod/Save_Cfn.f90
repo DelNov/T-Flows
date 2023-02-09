@@ -71,7 +71,7 @@
   !--------------------------!
   do n = 1, Grid % n_nodes
     if(Grid % new_n(n) > 0) then
-      write(fu) Grid % comm % node_glo(n)
+      write(fu) Grid % Comm % node_glo(n)
     end if
   end do
 
@@ -170,14 +170,14 @@
   ! Cells' processor ids
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      write(fu) Grid % comm % cell_proc(Grid % old_c(c))
+      write(fu) Grid % Comm % cell_proc(Grid % old_c(c))
     end if
   end do
 
   ! Cells' global indices
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
-      write(fu) Grid % comm % cell_glo(Grid % old_c(c))
+      write(fu) Grid % Comm % cell_glo(Grid % old_c(c))
     end if
   end do
 
@@ -253,8 +253,8 @@
 
       ! At least one cell is in this processor
       ! (Meaning it is not a face entirelly in the buffer)
-      if(Grid % comm % cell_proc(c1) .eq. sub .or.  &
-         Grid % comm % cell_proc(c2) .eq. sub) then
+      if(Grid % Comm % cell_proc(c1) .eq. sub .or.  &
+         Grid % Comm % cell_proc(c2) .eq. sub) then
         if(Grid % new_c(c2) < 0 .or. Grid % new_c(c1) < Grid % new_c(c2)) then
           write(fu) Grid % new_c(c1), Grid % new_c(c2)
         else
@@ -276,8 +276,8 @@
 
       ! Check only if least one cell is in this processor
       ! (Meaning it is not a face entirelly in the buffer)
-      if(Grid % comm % cell_proc(c1) .eq. sub .or.  &
-         Grid % comm % cell_proc(c2) .eq. sub) then
+      if(Grid % Comm % cell_proc(c1) .eq. sub .or.  &
+         Grid % Comm % cell_proc(c2) .eq. sub) then
         if(Grid % new_c(c1) .eq. 0) then
           print *, '# ERROR: Cell one is zero at face:', s
           print *, '# This error is critical.  Exiting!'

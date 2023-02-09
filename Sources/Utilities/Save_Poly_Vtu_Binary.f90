@@ -303,7 +303,7 @@
   data_size = Grid % n_cells * IP
   write(fu) data_size
   do c = 1, Grid % n_cells
-    write(fu) Grid % comm % cell_proc(c)
+    write(fu) Grid % Comm % cell_proc(c)
   end do
 
   ! Wall distance
