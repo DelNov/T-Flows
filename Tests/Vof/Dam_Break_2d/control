@@ -6,13 +6,14 @@
 
 # sqrt(9.81/0.6) = 4.04351332383
 # if dt = 1.0 / sqrt(9.81/0.6) / 1200 = 0.0002060914;
-# 1200 time steps will correspond to 1 in the thesis
-# 9600 time steps will correspond to 8 in the thesis
+#  1200 time steps will correspond to 1 in the thesis
+#  9600 time steps will correspond to 8 in the thesis
+# 12000 time steps will correspond to 8 in the thesis
  TIME_STEP               0.0002060914
 
- NUMBER_OF_TIME_STEPS        9600
- RESULTS_SAVE_INTERVAL         30
- BACKUP_SAVE_INTERVAL        1200
+ NUMBER_OF_TIME_STEPS       12000
+ RESULTS_SAVE_INTERVAL        300
+ BACKUP_SAVE_INTERVAL        3000
  SAVE_RESULTS_AT_BOUNDARIES    no
 
 #-------------------
@@ -26,7 +27,6 @@
 #-----------------
 # Physical models
 #-----------------
-
  MASS_DENSITY           1.0
  DYNAMIC_VISCOSITY      1.0
 
