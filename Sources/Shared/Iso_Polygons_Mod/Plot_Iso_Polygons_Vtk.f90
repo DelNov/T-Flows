@@ -1,9 +1,10 @@
 !==============================================================================!
-  subroutine Plot_Iso_Polygons_Vtk(Iso, rank)
+  subroutine Plot_Iso_Polygons_Vtk(Iso, head, rank)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Iso_Polygons_Type) :: Iso
+  character(*)             :: head
   integer, intent(in)      :: rank
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i, ip, is, iv, fu
@@ -11,9 +12,9 @@
   character(len=80) :: filename  ! don't use SL for separate compilation
 !==============================================================================!
 
-  write(filename,'("iso-",i7.7,".vtk")') rank
-  open(newunit=fu, file=filename)
+  write(filename,'(a,"-",i7.7,".vtk")') trim(head), rank
 
+  open(newunit=fu, file=filename)
   write(fu,'(a26)')     '# vtk DataFile Version 2.0'
   write(fu,'(a6,i7.7)') 'File: ', rank
   write(fu,'(a5)')      'ASCII'
