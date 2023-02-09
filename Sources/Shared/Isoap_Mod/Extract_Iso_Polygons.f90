@@ -32,8 +32,8 @@
   call Polyhedron % Extract_From_Grid(Grid, cell, phi_n)
 
   if(DEBUG) then
-    ! This will create "extract-000XXX.vtk"
-    call Polyhedron % Plot_Polyhedron_Vtk("extract", glo(cell))
+    ! This will create "extract-cell-000XXX.vtk"
+    call Polyhedron % Plot_Polyhedron_Vtk("extract-cell", glo(cell))
   end if
 
   !---------------------------------!
@@ -54,8 +54,8 @@
 
   ! Plot extracted polygons
   if(DEBUG) then
-     ! This will create "iso-000XXX.vtk"
-     call Iso_Polygons % Plot_Iso_Polygons_Vtk(glo(cell))
+     ! This will create "extract-iso-000XXX.vtk"
+     call Iso_Polygons % Plot_Iso_Polygons_Vtk("extract-iso", glo(cell))
   end if
 
   end subroutine
