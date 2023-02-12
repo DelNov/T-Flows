@@ -435,10 +435,10 @@
         !    of VOF, some cells happen to have multiple iso-surfaces    !
         !---------------------------------------------------------------!
         if(Iso_Polygons % n_polys > 1) then
-          print '(a,i8,g,i8,a,i8,a,i8)',  __file__,        __line__,   &
-                                         ' # check cell ', c,          &
-                                         ' in processor ', this_proc,  &
-                                         ' global cell ',  glo(c)
+          print '(4(a,i8))',  __FILE__,        __LINE__,   &
+                             ' # check cell ', c,          &
+                             ' in processor ', this_proc,  &
+                             ' global cell ',  glo(c)
           call Polyhedron % Plot_Polyhedron_Vtk("check-cell", glo(c))
           call Iso_Polygons % Plot_Iso_polygons_Vtk("check-iso", glo(c))
         end if
