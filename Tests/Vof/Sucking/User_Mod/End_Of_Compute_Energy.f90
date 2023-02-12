@@ -36,7 +36,7 @@
          Math % Approx_Real(Grid % zf(s), 0.0)) then
         write(fut, '(99(es12.4))') Grid % xc(c1), Flow % t % n(c1)
       end if
-      if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+      if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
         if(Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
            Math % Approx_Real(Grid % zs(s), 0.0)) then
           write(fut, '(99(es12.4))') Grid % xs(s), Vof % t_sat
@@ -77,7 +77,7 @@
   end if
 
   do s = 1, Grid % n_faces
-    if(any(Vof % Front % face_at_elem(1:2,s) .ne. 0)) then
+    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
 
       ! Write down Stefan's solution
       if(ini .eq. 1                            .and.  &
