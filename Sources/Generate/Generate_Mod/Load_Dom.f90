@@ -290,38 +290,38 @@
   !   Boundary conditions and materials   !
   !---------------------------------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) dom % n_regions  ! number of regions (can be bnd.
+  read(Line % tokens(1), *) dom % n_ranges   ! number of ranges (can be bnd.
                                              ! conditions or materials)
 
-  call Domain_Mod_Allocate_Regions(dom, dom % n_regions)
+  call Domain_Mod_Allocate_Ranges(dom, dom % n_ranges)
 
-  do n = 1, dom % n_regions
-    dom % regions(n) % face=''
+  do n = 1, dom % n_ranges
+    dom % ranges(n) % face=''
 
     call File % Read_Line(fu)
     if(Line % n_tokens .eq. 7) then
-      read(Line % whole,*)  dum,            &
-                   dom % regions(n) % is,   &
-                   dom % regions(n) % js,   &
-                   dom % regions(n) % ks,   &
-                   dom % regions(n) % ie,   &
-                   dom % regions(n) % je,   &
-                   dom % regions(n) % ke
+      read(Line % whole,*)  dum,           &
+                   dom % ranges(n) % is,   &
+                   dom % ranges(n) % js,   &
+                   dom % ranges(n) % ks,   &
+                   dom % ranges(n) % ie,   &
+                   dom % ranges(n) % je,   &
+                   dom % ranges(n) % ke
     else if(Line % n_tokens .eq. 2) then
       read(Line % tokens(1),*)       dum
       read(Line % tokens(2),'(A4)')  &
-           dom % regions(n) % face
-      call String % To_Upper_Case(dom % regions(n) % face)
+           dom % ranges(n) % face
+      call String % To_Upper_Case(dom % ranges(n) % face)
     end if
 
     call File % Read_Line(fu)
-    read(Line % tokens(1), *) dom % regions(n) % block
-    read(Line % tokens(2), *) dom % regions(n) % name
-    call String % To_Upper_Case(dom % regions(n) % name)
+    read(Line % tokens(1), *) dom % ranges(n) % block
+    read(Line % tokens(2), *) dom % ranges(n) % name
+    call String % To_Upper_Case(dom % ranges(n) % name)
 
     ! if( dom % blocks(b_cond(n,7)) % points(0) .eq. -1 ) then
-    !   call Swap_Int( dom % regions(n) % is,dom % regions(n) % js )
-    !   call Swap_Int( dom % regions(n) % ie,dom % regions(n) % je )
+    !   call Swap_Int( dom % ranges(n) % is,dom % ranges(n) % js )
+    !   call Swap_Int( dom % ranges(n) % ie,dom % ranges(n) % je )
     ! end if
 
   end do
@@ -350,9 +350,9 @@
   call File % Read_Line(fu)
   read(Line % tokens(1), *)  dumi  ! used to be number of copy boundaries
 
-  !-----------------------------------!
-  !   Refinement levels and regions   !
-  !-----------------------------------!
+  !----------------------------------!
+  !   Refinement levels and ranges   !
+  !----------------------------------!
   call File % Read_Line(fu)
   read(Line % tokens(1), *) ref % n_levels     ! number of refinement levels
   print '(a38,i7)', '# Number of refinement levels:       ', ref % n_levels
@@ -362,40 +362,40 @@
   do l = 1, ref % n_levels
     print *, '# Level: ', l
     call File % Read_Line(fu)
-    read(Line % tokens(2), *) ref % n_regions(l)
+    read(Line % tokens(2), *) ref % n_ranges(l)
 
-    ! Browse through regions in level "l"
-    do n = 1, ref % n_regions(l)
+    ! Browse through ranges in level "l"
+    do n = 1, ref % n_ranges(l)
       call File % Read_Line(fu)
       read(Line % tokens(3),*) answer
       call String % To_Upper_Case(answer)
-      ref % region(l,n) % shape = -1
-      if(answer .eq. 'RECTANGLE') ref % region(l,n) % shape = RECTANGLE
-      if(answer .eq. 'ELIPSOID')  ref % region(l,n) % shape = ELIPSOID
-      if(answer .eq. 'PLANE')     ref % region(l,n) % shape = PLANE
-      if(ref % region(l,n) % shape .eq. -1) then
+      ref % range(l,n) % shape = -1
+      if(answer .eq. 'RECTANGLE') ref % range(l,n) % shape = RECTANGLE
+      if(answer .eq. 'ELIPSOID')  ref % range(l,n) % shape = ELIPSOID
+      if(answer .eq. 'PLANE')     ref % range(l,n) % shape = PLANE
+      if(ref % range(l,n) % shape .eq. -1) then
         print *, 'ERROR!  Refinement shape not specified well by: ', answer
         stop
       end if
 
       call File % Read_Line(fu)
-      read(Line % whole, *)                      &
-                ref % region(l,n) % pnt(1) % x,  &
-                ref % region(l,n) % pnt(1) % y,  &
-                ref % region(l,n) % pnt(1) % z,  &
-                ref % region(l,n) % pnt(2) % x,  &
-                ref % region(l,n) % pnt(2) % y,  &
-                ref % region(l,n) % pnt(2) % z
+      read(Line % whole, *)                     &
+                ref % range(l,n) % pnt(1) % x,  &
+                ref % range(l,n) % pnt(1) % y,  &
+                ref % range(l,n) % pnt(1) % z,  &
+                ref % range(l,n) % pnt(2) % x,  &
+                ref % range(l,n) % pnt(2) % y,  &
+                ref % range(l,n) % pnt(2) % z
     end do
   end do
 
-  !-----------------------!
-  !   Smoothing regions   !
-  !-----------------------!
+  !----------------------!
+  !   Smoothing ranges   !
+  !----------------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) smr % n_smooths  ! number of smoothing regions
+  read(Line % tokens(1), *) smr % n_smooths  ! number of smoothing ranges
 
-  print '(a38,i7)', '# Number of (non)smoothing regions:  ', smr % n_smooths
+  print '(a38,i7)', '# Number of (non)smoothing ranges:  ', smr % n_smooths
 
   call Smooths_Mod_Allocate_Smooths(smr, smr % n_smooths)
 

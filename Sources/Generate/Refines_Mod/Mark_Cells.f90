@@ -17,14 +17,14 @@
 
   do lev = 1, ref % n_levels
 
-    do reg = 1, ref % n_regions(lev) 
+    do reg = 1, ref % n_ranges(lev)
 
-      x1 = ref % region(lev,reg) % pnt(1) % x
-      y1 = ref % region(lev,reg) % pnt(1) % y
-      z1 = ref % region(lev,reg) % pnt(1) % z
-      x8 = ref % region(lev,reg) % pnt(2) % x
-      y8 = ref % region(lev,reg) % pnt(2) % y
-      z8 = ref % region(lev,reg) % pnt(2) % z
+      x1 = ref % range(lev,reg) % pnt(1) % x
+      y1 = ref % range(lev,reg) % pnt(1) % y
+      z1 = ref % range(lev,reg) % pnt(1) % z
+      x8 = ref % range(lev,reg) % pnt(2) % x
+      y8 = ref % range(lev,reg) % pnt(2) % y
+      z8 = ref % range(lev,reg) % pnt(2) % z
 
       do c = 1, Grid % n_cells
         n1 = Grid % cells_n(1,c)
@@ -49,23 +49,23 @@
                     Grid % zn(n5) + Grid % zn(n6) +   &
                     Grid % zn(n7) + Grid % zn(n8))
 
-        if(ref % region(lev,reg) % shape .eq. ELIPSOID) then
+        if(ref % range(lev,reg) % shape .eq. ELIPSOID) then
           if(  ( ((x1-x0)/x8)**2 +                                  &
                  ((y1-y0)/y8)**2 +                                  &
                  ((z1-z0)/z8)**2)  < 1.0 ) then
             ref % cell_marked(c) = .true.
           end if
-        else if(ref % region(lev,reg) % shape .eq. RECTANGLE) then
+        else if(ref % range(lev,reg) % shape .eq. RECTANGLE) then
           if( (x1 < x0) .and. (x0 < x8) .and.                     &
               (y1 < y0) .and. (y0 < y8) .and.                     &
               (z1 < z0) .and. (z0 < z8) ) then
             ref % cell_marked(c) = .true.
           end if
-        else if(ref % region(lev,reg) % shape .eq. PLANE) then
+        else if(ref % range(lev,reg) % shape .eq. PLANE) then
           if( (x0-x1)*x8+(y0-y1)*y8+(z0-z1)*z8   >  0.0 ) then
             ref % cell_marked(c) = .true.
           end if
-        end if 
+        end if
       end do   ! cells
 
     end do   ! reg

@@ -36,8 +36,8 @@
     integer, allocatable :: cell_level(:)   ! cells' refinement level
     logical, allocatable :: cell_marked(:)  ! true if cell markered
 
-    integer,          allocatable :: n_regions(:)  ! number refin. regions
-    type(Shape_Type), allocatable :: region(:,:)   ! over levels & regions
+    integer,          allocatable :: n_ranges(:)  ! number refin. regions
+    type(Shape_Type), allocatable :: range(:,:)   ! over levels & regions
 
   end type
 

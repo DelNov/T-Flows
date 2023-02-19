@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Domain_Mod_Allocate_Regions(dom, n)
+  subroutine Domain_Mod_Allocate_Ranges(dom, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -7,7 +7,7 @@
   integer           :: n
 !==============================================================================!
 
-  dom % n_regions = n
-  allocate(dom % regions(n))
+  dom % n_ranges = n
+  allocate(dom % ranges(n))
 
   end subroutine

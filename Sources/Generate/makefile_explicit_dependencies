@@ -1,7 +1,7 @@
 #---------------------------------------------------
-# Dependencies for: ./Region_Mod.f90
+# Dependencies for: ./Range_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Region_Mod.o:\
+$(DIR_OBJECT)/Range_Mod.o:\
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
@@ -13,7 +13,7 @@ $(DIR_OBJECT)/Connectivity.o:
 # Dependencies for: ./Domain_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Domain_Mod.o:\
-$(DIR_OBJECT)/Region_Mod.o \
+$(DIR_OBJECT)/Range_Mod.o \
 $(DIR_OBJECT)/Point_Mod.o \
 $(DIR_OBJECT)/Line_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \

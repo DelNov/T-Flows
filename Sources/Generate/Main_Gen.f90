@@ -37,7 +37,7 @@
   !   Handle the domain   !
   !-----------------------!
   call Domain_Mod_Calculate_Node_Coordinates(dom, Grid)
-  call Domain_Mod_Distribute_Regions        (dom, Grid)
+  call Domain_Mod_Distribute_Ranges         (dom, Grid)
   call Domain_Mod_Connect_Blocks            (dom, Grid)
   call Domain_Mod_Connect_Periodicity       (dom, Grid)
 
