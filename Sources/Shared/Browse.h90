@@ -1,0 +1,13 @@
+!==============================================================================!
+!   Definition of potentially usefull macros in T-Flows.                       !
+!------------------------------------------------------------------------------!
+
+# define Browse_All_Cells(c)              do c = -Grid % n_bnd_cells, Grid % n_cells
+# define Browse_Boundary_Cells(c)         do c = -Grid % n_bnd_cells, -1
+# define Browse_Inside_Cells(c)           do c = 1, Grid % n_cells
+# define Browse_Faces(c)                  do s = 1, Grid % n_faces
+
+# define Browse_Faces_In_Color(s, color)  do s = Grid % bnd_cond % color_s_face(color), Grid % bnd_cond % color_e_face(color)
+# define End_Browse                       end do
+
+

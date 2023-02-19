@@ -12,8 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: BIG     = 2147483647  ! Euler's prime number
-  logical, parameter :: VERBOSE = .false.
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, m, n, c, c1, c2, n_bc, color
   integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
@@ -45,14 +44,10 @@
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
+    criteria(s,1) = HUGE_INT
+    if(c2 < 0) criteria(s,1) = Grid % bnd_cond % color(c2)
     criteria(s,2) = c1
     criteria(s,3) = c2
-    if(c2 > 0) then
-      criteria(s,1) = BIG  ! make sure that inside faces end up last
-    else
-      criteria(s,1) = Grid % bnd_cond % color(c2)
-      criteria(s,3) = -criteria(s,3)
-    end if
     Grid % old_f(s) = s
   end do
 
@@ -74,14 +69,19 @@
     Grid % faces_c(1,s) = criteria(s,2)
     Grid % faces_c(2,s) = criteria(s,3)
 
+    c2 = criteria(s,3)
+
     ! ... but renumber c2 if on the boundary
-    if(criteria(s,1) .ne. BIG) then         ! on the boundary
-      n_bc = n_bc + 1                       ! increase the count
-      Grid % faces_c(2,s) = -n_bc           ! set face_c properly
-      Grid % old_c(-n_bc) = -criteria(s,3)  ! store the old number
-    else
+    if(criteria(s,1) .ne. HUGE_INT) then                 ! on the boundary
+      Grid % faces_c(2,s) = -Grid % n_bnd_cells + n_bc   ! set face_c properly
+      Grid % old_c(-Grid % n_bnd_cells + n_bc) = c2      ! store the old number
+      n_bc = n_bc + 1                                    ! increase the count
     end if
+
   end do
+
+  ! Check if counting ended well
+  Assert(n_bc == Grid % n_bnd_cells)
 
   !------------------------------------------------------!
   !     Using the old boundary cell number, retreive     !
@@ -166,7 +166,7 @@
   ! Find boundary color ranges
   call Bnd_Cond_Ranges(Grid)
 
-  if(VERBOSE) then
+  if(DEBUG) then
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1, s)
       c2 = Grid % faces_c(2, s)
@@ -201,7 +201,10 @@
       end if
     end if
   end do
+
+  print '(a)',    ' #=========================================================='
   print '(a)',    ' # In Sort_Faces_Smart'
+  print '(a)',    ' #----------------------------------------------------------'
   print '(a,i9)', ' # Maximum cell difference at single face:   ', max_diff_1
   print '(a,i9)', ' # Maximum cell difference betwen two faces: ', max_diff_2
 

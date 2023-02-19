@@ -38,6 +38,8 @@
     integer, allocatable :: color(:)
     integer, allocatable :: color_s_cell(:)  ! start bnd cell for color
     integer, allocatable :: color_e_cell(:)  ! end bnd cell for color
+    integer, allocatable :: color_s_face(:)  ! start bnd cell for color
+    integer, allocatable :: color_e_face(:)  ! end bnd cell for color
 
   end type
 
