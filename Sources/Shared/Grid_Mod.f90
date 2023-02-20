@@ -39,7 +39,7 @@
     integer :: n_cells     = 0  ! ... cells
     integer :: n_faces     = 0  ! ... faces
     integer :: n_bnd_cells = 0  ! ... boundary cells
-    integer :: n_bnd_cond  = 0  ! ... boundary conditions
+    integer :: n_regions   = 0  ! ... boundary conditions
     integer :: n_shadows   = 0  ! ... shadow faces
     integer :: n_edges     = 0  ! ... edges (needed to create dual grid)
 

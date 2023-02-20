@@ -43,11 +43,11 @@
   !   Number of cells, boundary cells and faces   !
   !-----------------------------------------------!
   write(fu) nn_sub
-  write(fu) nc_sub              ! new way: add buffer cells to cells
-  write(fu) nbc_sub             ! number of boundary cells
+  write(fu) nc_sub            ! new way: add buffer cells to cells
+  write(fu) nbc_sub           ! number of boundary cells
   write(fu) nf_sub
   write(fu) ns_sub
-  write(fu) Grid % n_bnd_cond  ! number of bounary conditions
+  write(fu) Grid % n_regions  ! number of bounary conditions
 
   !-------------------------------------!
   !   Does grid have polyhedral cells   !
@@ -62,7 +62,7 @@
   !------------------------------!
   !   Boundary conditions list   !
   !------------------------------!
-  do n = 1, Grid % n_bnd_cond
+  do n = 1, Grid % n_regions
     write(fu) Grid % region % name(n)
   end do
 

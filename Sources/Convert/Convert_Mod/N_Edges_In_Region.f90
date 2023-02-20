@@ -1,5 +1,5 @@
 !==============================================================================!
-  integer function N_Edges_In_Bnd_Color(Convert, Grid, bc, edge_data)
+  integer function N_Edges_In_Region(Convert, Grid, bc, edge_data)
 !------------------------------------------------------------------------------!
 !   Counts and marks (with edge_data) edges in the given boundary color        !
 !------------------------------------------------------------------------------!
@@ -106,7 +106,7 @@
   !------------------------!
   do e = 1, Grid % n_edges
     if(Grid % edges_bc(bc, e) .gt. 0) then
-    if( sum(Grid % edges_bc(1:Grid % n_bnd_cond, e)) .gt. 1 ) then
+    if( sum(Grid % edges_bc(1:Grid % n_regions, e)) .gt. 1 ) then
       if(edge_data(e) .eq. 0) then  ! hasn't been marked yet
         cnt = cnt + 1
         edge_data(e) = 1
@@ -116,7 +116,7 @@
   end do
 
   ! Return a sum of all marked nodes
-  N_Edges_In_Bnd_Color = cnt
+  N_Edges_In_Region = cnt
 
   end function
 

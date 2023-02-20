@@ -1,38 +1,31 @@
 !==============================================================================!
-  integer function N_Nodes_In_Bnd_Color(Convert, Grid, bc, node_data)
+  integer function N_Bnd_Cells_In_Region(Convert, Grid, bc, cell_data)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with node_data) nodes in the given boundary color        !
+!   Counts and marks (with cell_data) boundary cells in given boundary color   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
   integer             :: bc
-  integer             :: node_data(Grid % n_nodes)
+  integer             :: cell_data(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, i_nod, n, cnt
+  integer :: c, cnt
 !==============================================================================!
 
   ! Nullify on entry
   cnt = 0
-  node_data(:) = 0
+  cell_data(:) = 0
 
-  ! Browse through all boundary cells and mark nodes
-  ! of those cells in the given boundary condition
   do c = -Grid % n_bnd_cells, -1
     if( Grid % region % at_cell(c) .eq. bc ) then
-      do i_nod = 1, Grid % cells_n_nodes(c)
-        n = Grid % cells_n(i_nod, c)
-        if(node_data(n) .eq. 0) then  ! hasn't been marked yet
-          cnt = cnt + 1
-          node_data(n) = cnt
-        end if
-      end do
+      cnt = cnt + 1
+      cell_data(c) = cell_data(c) + 1
     end if
   end do
 
-  ! Return a sum of all marked nodes
-  N_Nodes_In_Bnd_Color = cnt
+  ! Return a sum of all marked boundary cells
+  N_Bnd_Cells_In_Region = cnt
 
   end function
 

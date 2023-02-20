@@ -64,7 +64,7 @@
   types_file(:)      = .false.
   c_types            = 0
 
-  do bc = 1, Grid % n_bnd_cond
+  do bc = 1, Grid % n_regions
     call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',      &
                                           Grid % region % name(bc),  &
                                           found,                     &
@@ -117,7 +117,7 @@
   !------------------------------------------------!
   c_types = 0
 
-  do bc = 1, Grid % n_bnd_cond
+  do bc = 1, Grid % n_regions
 
     ! Position yourself well
     call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',      &
@@ -778,7 +778,7 @@
   !                                   !
   !-----------------------------------!
   turb_planes % n_planes = 0
-  do bc = 1, Grid % n_bnd_cond  ! imagine there are as many eddies as bcs
+  do bc = 1, Grid % n_regions  ! imagine there are as many eddies as bcs
     call Control_Mod_Position_At_Two_Keys('SYNTHETIC_EDDIES',          &
                                           Grid % region % name(bc),  &
                                           found,                       &

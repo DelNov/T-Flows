@@ -14,8 +14,8 @@
 !==============================================================================!
 
   ! Allocate memory
-  allocate(Grid % region % f_cell(0:Grid % n_bnd_cond))
-  allocate(Grid % region % l_cell(0:Grid % n_bnd_cond))
+  allocate(Grid % region % f_cell(0:Grid % n_regions))
+  allocate(Grid % region % l_cell(0:Grid % n_regions))
 
   !-------------------!
   !   Cells' ranges   !
@@ -46,7 +46,7 @@
 
   if(DEBUG) then
     write(1000, '(a)')  ' # Cell ranges'
-    do reg = 1, Grid % n_bnd_cond
+    do reg = 1, Grid % n_regions
       write(1000+this_proc,'(a,i3,i9,i9)') ' # Region: ', reg,   &
                                    Grid % region % f_cell(reg),  &
                                    Grid % region % l_cell(reg)
@@ -58,15 +58,15 @@
   !-------------------!
 
   ! Allocate memory
-  allocate(Grid % region % f_face(0:Grid % n_bnd_cond))
-  allocate(Grid % region % l_face(0:Grid % n_bnd_cond))
+  allocate(Grid % region % f_face(0:Grid % n_regions))
+  allocate(Grid % region % l_face(0:Grid % n_regions))
 
   ! Set non-realizable ranges
   Grid % region % f_face(:) = -1
   Grid % region % l_face(:) = -HUGE_INT
 
   ! Browse through colors and faces to set faces' ranges
-  do reg = 1, Grid % n_bnd_cond
+  do reg = 1, Grid % n_regions
     do s = 1, Grid % n_faces
       c2 = Grid % faces_c(2, s)
       if(Grid % region % f_cell(reg) .eq. c2) then
@@ -80,7 +80,7 @@
 
   if(DEBUG) then
     write(2000, '(a)')  ' # Face ranges'
-    do reg = 1, Grid % n_bnd_cond
+    do reg = 1, Grid % n_regions
       write(2000+this_proc,'(a,i3,i9,i9)') ' # Region: ', reg,   &
                                    Grid % region % f_face(reg),  &
                                    Grid % region % l_face(reg)
@@ -90,7 +90,7 @@
   !-----------!
   !   Check   !
   !-----------!
-  do reg = 1, Grid % n_bnd_cond
+  do reg = 1, Grid % n_regions
     Browse_Faces_In_Color(s, reg)
       c2 = Grid % faces_c(2, s)
       Assert(Grid % region % at_cell(c2) == reg)

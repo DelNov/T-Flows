@@ -56,7 +56,7 @@
   read(fu) Grid % n_bnd_cells          ! number of boundary cells
   read(fu) Grid % n_faces              ! number of faces (with buffer faces)
   read(fu) Grid % n_shadows            ! number of shadow faces
-  read(fu) Grid % n_bnd_cond           ! number of boundary conditions
+  read(fu) Grid % n_regions           ! number of boundary conditions
 
   !-------------------------------------!
   !   Does grid have polyhedral cells   !
@@ -70,8 +70,8 @@
 
   ! Boundary conditions' keys
   ! (Go from zero for faces which are not at the boundary)
-  allocate(Grid % region % name(0 : Grid % n_bnd_cond + 3))
-  allocate(Grid % region % type(0 : Grid % n_bnd_cond + 3))
+  allocate(Grid % region % name(0 : Grid % n_regions + 3))
+  allocate(Grid % region % type(0 : Grid % n_regions + 3))
 
   !-----------------!
   !   Domain name   !
@@ -81,16 +81,16 @@
   !------------------------------!
   !   Boundary conditions list   !
   !------------------------------!
-  do n = 1, Grid % n_bnd_cond
+  do n = 1, Grid % n_regions
     read(fu) Grid % region % name(n)
   end do
 
   ! The last three are reserved for perodicity
   ! and used for inlet copy boundary condition.  Don't delete these thinking
   ! they are useless.  They are assigned in Calculate_Face_Geometry
-  Grid % region % name(Grid % n_bnd_cond + 1) = 'PERIODIC_X'
-  Grid % region % name(Grid % n_bnd_cond + 2) = 'PERIODIC_Y'
-  Grid % region % name(Grid % n_bnd_cond + 3) = 'PERIODIC_Z'
+  Grid % region % name(Grid % n_regions + 1) = 'PERIODIC_X'
+  Grid % region % name(Grid % n_regions + 2) = 'PERIODIC_Y'
+  Grid % region % name(Grid % n_regions + 3) = 'PERIODIC_Z'
 
   !--------------------------!
   !   Nodes global numbers   !

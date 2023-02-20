@@ -305,7 +305,7 @@
       end if
 
       read(Line % tokens(1), *) reg_per
-      if( reg_per > Grid % n_bnd_cond ) then
+      if( reg_per > Grid % n_regions ) then
         print *, '# Critical error: boundary condition ', reg_per,  &
                    ' doesn''t exist!'
         print *, '# Exiting! '
@@ -496,7 +496,7 @@
       !------------------------------------------------------------------!
       !   Remove boundary condition with reg_per and compress the rest   !
       !------------------------------------------------------------------!
-      if(reg_per < Grid % n_bnd_cond) then
+      if(reg_per < Grid % n_regions) then
 
         ! Set the regions of boundary selected to be periodic to zero
         do c = -1, -Grid % n_bnd_cells, -1
@@ -506,7 +506,7 @@
         end do
 
         ! Shift the rest of the boundary cells
-        do b = 1, Grid % n_bnd_cond - 1
+        do b = 1, Grid % n_regions - 1
           if(b .ge. reg_per) then
 
             ! Correct the names
@@ -522,9 +522,9 @@
           end if
         end do
       else
-        Grid % region % name(Grid % n_bnd_cond) = ''
+        Grid % region % name(Grid % n_regions) = ''
       end if
-      Grid % n_bnd_cond = Grid % n_bnd_cond - 1
+      Grid % n_regions = Grid % n_regions - 1
 
     end do  ! while answer .ne. 'SKIP'
   end if    ! ask == 0

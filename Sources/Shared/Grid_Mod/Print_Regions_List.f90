@@ -18,8 +18,8 @@
   !   Form the boundary condition list   !
   !--------------------------------------!
   ll = 1
-  do j = 1, Grid % n_bnd_cond
-    if(j < Grid % n_bnd_cond) then
+  do j = 1, Grid % n_regions
+    if(j < Grid % n_regions) then
       lc = len_trim(Grid % region % name(j)) + 8
       write(reg_list(ll:ll+lc), '(i2,a2,a,a4)')  &
             j,                                   &

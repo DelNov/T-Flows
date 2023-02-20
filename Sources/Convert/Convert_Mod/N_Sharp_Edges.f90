@@ -87,7 +87,11 @@
           edge_data(e) = -1
 
         else
-          print '(A,99F12.3)', 'BAD', norm2(vec_ef(1:3)), norm_1, norm_2, dot_product(norm_1(1:3), norm_2(1:3))
+          print '(a,99f12.3)', 'BAD', norm2(vec_ef(1:3)),       &
+                                      norm_1,                   &
+                                      norm_2,                   &
+                                      dot_product(norm_1(1:3),  &
+                                      norm_2(1:3))
         end if
 
       end if
@@ -102,7 +106,7 @@
   !                                                                   !
   !-------------------------------------------------------------------!
   do e = 1, Grid % n_edges
-    if( sum(Grid % edges_bc(1:Grid % n_bnd_cond, e)) .gt. 1 ) then
+    if( sum(Grid % edges_bc(1:Grid % n_regions, e)) .gt. 1 ) then
       if(edge_data(e) .eq. 0) then  ! hasn't been marked yet
         cnt = cnt + 1
         edge_data(e) = 1

@@ -109,7 +109,7 @@
   end do  !  n_ranges
 
   ! Store the number of boundary conditions
-  Grid % n_bnd_cond = n_bnd
+  Grid % n_regions = n_bnd
 
   call Grid % Print_Regions_List()
 

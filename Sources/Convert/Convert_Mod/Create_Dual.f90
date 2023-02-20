@@ -33,7 +33,7 @@
 !==============================================================================!
 
   ! Alias(es)
-  n_bc = Prim % n_bnd_cond
+  n_bc = Prim % n_regions
 
   !-----------------------------!
   !                             !
@@ -191,9 +191,9 @@
   !    numbers and names    !
   !                         !
   !-------------------------!
-  Dual % n_bnd_cond = Prim % n_bnd_cond
-  allocate(Dual % region % name(Dual % n_bnd_cond))
-  do bc = 1, Prim % n_bnd_cond
+  Dual % n_regions = Prim % n_regions
+  allocate(Dual % region % name(Dual % n_regions))
+  do bc = 1, Prim % n_regions
     Dual % region % name(bc) = Prim % region % name(bc)
     call String % To_Upper_Case(Dual % region % name(bc))
   end do
@@ -217,9 +217,9 @@
   ! Count boundary cells (and boundary faces) for the Dual grid
   ! (Remember that nodes in Prim correspond to cells in Dual)
   Dual % n_bnd_cells = 0
-  do bc = 1, Prim % n_bnd_cond
+  do bc = 1, Prim % n_regions
     Dual % n_bnd_cells = Dual % n_bnd_cells  &
-                       + Convert % N_Nodes_In_Bnd_Color(Prim, bc, node_data)
+                       + Convert % N_Nodes_In_Region(Prim, bc, node_data)
   end do
   Dual % n_faces = Prim % n_edges  &   ! for faces inside
                  + Dual % n_bnd_cells  ! for faces on the boundary
@@ -361,14 +361,14 @@
   curr_f_d = Prim % n_edges
   curr_b_d = 0
 
-  do bc = 1, Prim % n_bnd_cond
+  do bc = 1, Prim % n_regions
 
     !-----------------------------------------------------!
     !   Call this to mark boundary cells in this region   !
     !-----------------------------------------------------!
-    dual_f_here = Convert % N_Nodes_In_Bnd_Color(Prim, bc, node_data)
-    unused      = Convert % N_Bnd_Cells_In_Color(Prim, bc, cell_data)
-    unused      = Convert % N_Edges_In_Bnd_Color(Prim, bc, edge_data)
+    dual_f_here = Convert % N_Nodes_In_Region(Prim, bc, node_data)
+    unused      = Convert % N_Bnd_Cells_In_Region(Prim, bc, cell_data)
+    unused      = Convert % N_Edges_In_Region(Prim, bc, edge_data)
 
     !-----------------------------------------!
     !   Find Dual's boundary face, and Dual   !

@@ -175,7 +175,7 @@
       end if
     end do
 
-    do reg = 1, Grid % n_bnd_cond
+    do reg = 1, Grid % n_regions
       print '(2i6)', Grid % region % f_cell(reg),  &
                      Grid % region % l_cell(reg)
     end do
