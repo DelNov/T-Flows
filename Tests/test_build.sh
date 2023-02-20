@@ -92,6 +92,7 @@ MULTDOM_MEMBRANE_DIR=Rans/Membrane
 ELBOW_ASCII_DIR=Functionality/Meshes/Ansys/Elbow_Ascii
 ELBOW_BINARY_DIR=Functionality/Meshes/Ansys/Elbow_Binary
 
+VOF_DAM_BREAK_2D_DIR=Vof/Dam_Break_2d
 VOF_RISING_BUBBLE_DIR=Vof/Rising_Bubble
 SWARM_PERIODIC_CYL_DIR=Swarm/Cylinders_Periodic
 SWARM_ROD_BUNDLE_POLYHEDRAL_DIR=Swarm/Rod_Bundle_Polyhedral
@@ -163,6 +164,7 @@ ALL_GENERATE_TESTS=( \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$MULTDOM_BACKSTEP_DIR" \
+                    "$VOF_DAM_BREAK_2D_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
                     "$SWARM_VOF_THREE_PHASE_DIR" \
                     "$LES_CHANNEL_180_LONG_DIR" \
@@ -219,6 +221,7 @@ ALL_DIVIDE_TESTS=( \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
+                  "$VOF_DAM_BREAK_2D_DIR" \
                   "$VOF_RISING_BUBBLE_DIR" \
                   "$SWARM_VOF_THREE_PHASE_DIR" \
                   "$LES_CHANNEL_180_LONG_DIR" \
@@ -255,12 +258,15 @@ ALL_PROCESS_TESTS=( \
                    "$MULTDOM_BACKSTEP_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
+                   "$VOF_DAM_BREAK_2D_DIR" \
                    "$VOF_RISING_BUBBLE_DIR" \
                    "$SWARM_VOF_THREE_PHASE_DIR" \
                    "$LES_PIPE_DIR" \
                    "$HYB_CHANNEL_HR_STRETCHED_DIR" \
                    "$HYB_CHANNEL_HR_UNIFORM_DIR" \
                    )
+# For single test: ALL_PROCESS_TESTS=("$VOF_RISING_BUBBLE_DIR")
+
 ALL_TURBULENCE_MODELS=( \
                        "none" \
                        "none" \
@@ -280,10 +286,13 @@ ALL_TURBULENCE_MODELS=( \
                        "none" \
                        "none" \
                        "none" \
+                       "none" \
                        "les_dynamic" \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
                        )
+# For single test: ALL_TURBULENCE_MODELS=("none")
+
 ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "no" \
@@ -303,10 +312,13 @@ ALL_INTERFACE_TRACKING=( \
                        "no" \
                        "yes" \
                        "yes" \
+                       "yes" \
                        "no" \
                        "no" \
                        "no" \
                        )
+# For single test: ALL_INTERFACE_TRACKING=("yes")
+
 ALL_PARTICLE_TRACKING=( \
                        "no" \
                        "no" \
@@ -325,11 +337,14 @@ ALL_PARTICLE_TRACKING=( \
                        "yes" \
                        "yes" \
                        "no" \
+                       "no" \
                        "yes" \
                        "no" \
                        "no" \
                        "no" \
                        )
+# For single test: ALL_PARTICLE_TRACKING=("no")
+
 DONE_PROCESS_TESTS=0
 
 #----------------------------------------------------------------------------
@@ -1451,6 +1466,15 @@ function process_full_length_test {
       "PARTICLE_TRACKING "$4"" \
       control."$i"
   done
+
+  # Create an stl file if python script is present
+  if [ $3 == "yes" ]; then
+    if [ -f *.py ]; then
+      python_script=$(ls -1 *.py)
+      elog "Creating stl file in blender from script:" "$python_script"
+      blender -b -P *.py >> $FULL_LOG 2>&1
+    fi
+  fi
 
   launch_process par $nproc_in_div
   #---------------------------:END #

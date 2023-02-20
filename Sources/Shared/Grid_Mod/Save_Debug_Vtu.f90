@@ -331,7 +331,7 @@
   write(fu) IN_3 // '<CellData>' // LF
 
   ! Processor i.d.
-  if(allocated(Grid % comm % cell_proc)) then
+  if(allocated(Grid % Comm % cell_proc)) then
     write(str1, '(i0.0)') data_offset
     write(fu) IN_4 // '<DataArray type='//intp         //  &
                       ' Name="Processor"'              //  &
@@ -583,11 +583,11 @@
   !---------------!
 
   ! Processor i.d.
-  if(allocated(Grid % comm % cell_proc)) then
+  if(allocated(Grid % Comm % cell_proc)) then
     data_size = int(nc * IP, SP)
     write(fu) data_size
     do c = cs, ce
-      write(fu) Grid % comm % cell_proc(c)
+      write(fu) Grid % Comm % cell_proc(c)
     end do
   end if
 
@@ -641,10 +641,10 @@
   !   Create .pvtu file   !
   !                       !
   !-----------------------!
-  if(.not. allocated(Grid % comm % cell_proc)) return
+  if(.not. allocated(Grid % Comm % cell_proc)) return
 
   ! Create it only from subdomain 1, when decomposed
-  if(maxval(Grid % comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
+  if(maxval(Grid % Comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
 
     call File% Set_Name(name_out, appendix='-'//trim(append),  &
                         extension='.pvtu')

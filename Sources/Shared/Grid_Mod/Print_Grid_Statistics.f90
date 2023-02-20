@@ -47,7 +47,7 @@
   max_n_polg = 0  ! maximum number of nodes in polygon
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1, s)
-    if(Grid % comm % cell_proc(c1) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
       n_faces = n_faces + 1
       max_n_polg = max(max_n_polg, Grid % faces_n_nodes(s))
       if(Grid % faces_s(s) .gt. s) then
@@ -90,7 +90,7 @@
   n_quad      = 0
   n_polg      = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
       n_bnd_cells = n_bnd_cells + 1
       if(Grid % cells_n_nodes(c) .eq. 3) then
         n_tri = n_tri + 1
@@ -110,7 +110,7 @@
   n_polh  = 0
   max_n_polh = 0  ! maximum number of nodes in polyhedron
   do c = 1, Grid % n_cells
-    if(Grid % comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
       n_cells = n_cells + 1
       if(Grid % cells_n_nodes(c) .eq. 4) then
         n_tet = n_tet + 1

@@ -49,7 +49,6 @@ include '../User_Mod/Vof_Interface_Box.f90'
   ! Initialize front
   if(Vof % track_front) then
     call Vof % Front % Place_Front_At_Value(Vof % fun,     &
-                                            Vof % smooth,  &
                                             .true.)  ! don't print messages
     call Vof % Front % Print_Front_Statistics()
     ! call Vof % Front % Save_Front_Debug(0)

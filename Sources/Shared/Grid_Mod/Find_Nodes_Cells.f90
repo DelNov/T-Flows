@@ -111,7 +111,7 @@
   end do
 
 ! ! Check #1, save those nodes' cells
-! do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+! do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
 !   do i_nod = 1, abs(Grid % cells_n_nodes(c))  ! local node number
 !     n = Grid % cells_n(i_nod, c)              ! global node number
 !     write(600+this_proc, '(a,i2,a,36i6)')  &
@@ -119,7 +119,7 @@
 !           ' cell list=', Grid % nodes_c(1:max_n_cells, n)
 !     write(600+this_proc, '(a,36i6)')  &
 !           '           proc=',  &
-!           Grid % comm % cell_proc(Grid % nodes_c(1:max_n_cells, n))
+!           Grid % Comm % cell_proc(Grid % nodes_c(1:max_n_cells, n))
 !   end do
 ! end do
 

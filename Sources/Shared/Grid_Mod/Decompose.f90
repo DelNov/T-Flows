@@ -46,14 +46,14 @@
   !   Save the result from the call to METIS function   !
   !-----------------------------------------------------!
   do c = 1, Grid % n_cells
-    Grid % comm % cell_proc(c) = part(c)
+    Grid % Comm % cell_proc(c) = part(c)
   end do
 
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
     if(c2 < 0) then
-      Grid % comm % cell_proc(c2) = Grid % comm % cell_proc(c1)
+      Grid % Comm % cell_proc(c2) = Grid % Comm % cell_proc(c1)
     end if
   end do
 

@@ -27,7 +27,7 @@
   !                               !
   !                               !
   !-------------------------------!
-  do sub = 1, maxval(Grid % comm % cell_proc(:))
+  do sub = 1, maxval(Grid % Comm % cell_proc(:))
 
     !------------------!
     !                  !
@@ -43,7 +43,7 @@
     !   Renumber inside cells the subdomain and mark their nodes   !
     !--------------------------------------------------------------!
     do c = 1, Grid % n_cells
-      if(Grid % comm % cell_proc(c) .eq. sub) then
+      if(Grid % Comm % cell_proc(c) .eq. sub) then
         nc_sub = nc_sub + 1       ! increase the number of cells in sub.
         Grid % new_c(c) = nc_sub  ! assign new (local) cell number 
         Grid % old_c(nc_sub) = c
@@ -58,15 +58,15 @@
     !   Also spread node marks to twin nodes   !
     !     (Find them through shadow faces)     !
     !------------------------------------------!
-    do subo = 1, maxval(Grid % comm % cell_proc(:))
+    do subo = 1, maxval(Grid % Comm % cell_proc(:))
       do s = 1, Grid % n_faces
         if(Grid % faces_s(s) > 0) then
           c1 = Grid % faces_c(1, s)
           c2 = Grid % faces_c(2, s)
-          if(Grid % comm % cell_proc(c1) .eq. sub  .and.  &
-             Grid % comm % cell_proc(c2) .eq. subo .or.   &
-             Grid % comm % cell_proc(c2) .eq. sub  .and.  &
-             Grid % comm % cell_proc(c1) .eq. subo) then
+          if(Grid % Comm % cell_proc(c1) .eq. sub  .and.  &
+             Grid % Comm % cell_proc(c2) .eq. subo .or.   &
+             Grid % Comm % cell_proc(c2) .eq. sub  .and.  &
+             Grid % Comm % cell_proc(c1) .eq. subo) then
             nn = Grid % faces_n_nodes(s)
             ss = Grid % faces_s(s)
             Grid % new_n(Grid % faces_n(1:nn, s )) = -1
@@ -79,12 +79,12 @@
     !-----------------------------!
     !   Inside cells in buffers   !
     !-----------------------------!
-    do subo = 1, maxval(Grid % comm % cell_proc(:))
+    do subo = 1, maxval(Grid % Comm % cell_proc(:))
       if(subo .ne. sub) then
 
         ! Mark cells in buffer "subo"
         do c = 1, Grid % n_cells
-          if(Grid % comm % cell_proc(c) .eq. subo) then
+          if(Grid % Comm % cell_proc(c) .eq. subo) then
             n = abs(Grid % cells_n_nodes(c))
             if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. -1) ) then
               Grid % new_c(c) = -1
@@ -106,7 +106,7 @@
 !exp:
 !exp:          ! ... and then also the cells
 !exp:          do c = 1, Grid % n_cells
-!exp:            if(Grid % comm % cell_proc(c) .eq. subo) then
+!exp:            if(Grid % Comm % cell_proc(c) .eq. subo) then
 !exp:              n = abs(Grid % cells_n_nodes(c))
 !exp:              if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. -1) ) then
 !exp:                Grid % new_c(c) = -1
@@ -117,7 +117,7 @@
 
         ! Renumber cells in buffer "subo"
         do c = 1, Grid % n_cells
-          if(Grid % comm % cell_proc(c) .eq. subo .and.  &
+          if(Grid % Comm % cell_proc(c) .eq. subo .and.  &
              Grid % new_c(c) .eq. -1) then
             nc_sub = nc_sub + 1       ! increase the number of cells in sub.
             Grid % new_c(c) = nc_sub  ! assign new (local) cell number 
@@ -140,14 +140,14 @@
     !---------------------------------------!
     !   Step 1: boundary cells in buffers   !
     !---------------------------------------!
-    do subo = 1, maxval(Grid % comm % cell_proc(:))
+    do subo = 1, maxval(Grid % Comm % cell_proc(:))
       if(subo .ne. sub) then
 
         do s = 1, Grid % n_faces
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
           if(c2 < 0) then
-            if( Grid % comm % cell_proc(c1) .eq. subo .and.  &
+            if( Grid % Comm % cell_proc(c1) .eq. subo .and.  &
                 Grid % new_c(c1) .ne. 0)  then
               nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
               Grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
@@ -166,7 +166,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if( Grid % comm % cell_proc(c1) .eq. sub )  then
+        if( Grid % Comm % cell_proc(c1) .eq. sub )  then
           nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
           Grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
           Grid % old_c(-nbc_sub) = c2
@@ -196,8 +196,8 @@
       c2 = Grid % faces_c(2,s)
 
       ! Both cells are in the domain
-      if( Grid % comm % cell_proc(c1) .eq. sub .and.  &
-          Grid % comm % cell_proc(c2) .eq. sub )  then
+      if( Grid % Comm % cell_proc(c1) .eq. sub .and.  &
+          Grid % Comm % cell_proc(c2) .eq. sub )  then
         nf_sub = nf_sub + 1
         Grid % new_f(s) = nf_sub
         Grid % old_f(nf_sub) = s
@@ -207,7 +207,7 @@
     !-------------------------------------!
     !   Step 2: Inside faces in buffers   !
     !-------------------------------------!
-    do subo = 1, maxval(Grid % comm % cell_proc(:))
+    do subo = 1, maxval(Grid % Comm % cell_proc(:))
       if(subo .ne. sub) then
 
         ! Faces half in the domain, half in the buffers
@@ -215,14 +215,14 @@
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
           if(c2 > 0) then
-            if( (Grid % comm % cell_proc(c1) .eq. sub) .and.  &
-                (Grid % comm % cell_proc(c2) .eq. subo) ) then
+            if( (Grid % Comm % cell_proc(c1) .eq. sub) .and.  &
+                (Grid % Comm % cell_proc(c2) .eq. subo) ) then
               nf_sub = nf_sub + 1
               Grid % new_f(s) = nf_sub
               Grid % old_f(nf_sub) = s
             end if
-            if( (Grid % comm % cell_proc(c2) .eq. sub) .and.  &
-                (Grid % comm % cell_proc(c1) .eq. subo) ) then
+            if( (Grid % Comm % cell_proc(c2) .eq. sub) .and.  &
+                (Grid % Comm % cell_proc(c1) .eq. subo) ) then
               nf_sub = nf_sub + 1
               Grid % new_f(s) = nf_sub
               Grid % old_f(nf_sub) = s

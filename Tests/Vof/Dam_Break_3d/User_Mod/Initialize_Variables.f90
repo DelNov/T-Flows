@@ -19,11 +19,10 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
-  type(Var_Type),   pointer :: fun
   real,             pointer :: dt
   integer                   :: c, c1, c2, s, i_probe, c_inters, n, code, i_s
   integer                   :: i, j
-  real                      :: fs, min_dist, dist, glo_dist, epsloc
+  real                      :: fs, min_dist, dist, glo_dist
 
   ! Probes for pressure
   integer, parameter        :: N_PROBE = 8
@@ -55,39 +54,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 
   ! Take aliases
   Grid  => Flow % pnt_grid
-  fun   => Vof % fun
   dt    => Flow % dt
-
-  epsloc = epsilon(epsloc)
-
-  ! Initialize the whole domain as 0.0
-  do c = 1, Grid % n_cells
-    fun % n(c) = 0.0
-  end do
-
-  ! Box
-  call Vof_Initialization_Box(Vof)
-
-  call Grid % Exchange_Cells_Real(fun % n)
-
-  ! Old value
-  fun % o(:) = fun % n(:)
-
-  ! At faces
-
-  ! At boundaries
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
-        fun % n(c2) = fun % n(c1)
-      else if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
-      else
-        fun % n(c2) = fun % n(c1)
-      end if
-    end if
-  end do
 
   ! Finding closest nodal points to probes
   ! looking only in the obstacle
@@ -123,7 +90,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
     call Comm_Mod_Global_Min_Real(glo_dist)
 
     if(.not. Math % Approx_Real( glo_dist,    &
-                                 p_dist(i_probe), epsloc)) then
+                                 p_dist(i_probe), TINY)) then
       nod_probe(i_probe) = -1
       p_dist(i_probe) = HUGE
     end if

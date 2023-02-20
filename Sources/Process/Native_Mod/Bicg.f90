@@ -34,7 +34,7 @@
   D    => Nat % D
 
   nt = Grid % n_cells
-  ni = Grid % n_cells - Grid % comm % n_buff_cells
+  ni = Grid % n_cells - Grid % Comm % n_buff_cells
   nb = Grid % n_bnd_cells
 
   res = 0.0

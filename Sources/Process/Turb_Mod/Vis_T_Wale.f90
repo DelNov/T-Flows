@@ -17,7 +17,7 @@
   real, contiguous, pointer :: sijd_sijd(:), shear2(:), vort2(:)
 !==============================================================================!
 
-  call Work % Disconnect_Real_Cell(sijd_sijd, shear2, vort2)
+  call Work % Connect_Real_Cell(sijd_sijd, shear2, vort2)
 
   ! Take aliases
   Flow => Turb % pnt_flow

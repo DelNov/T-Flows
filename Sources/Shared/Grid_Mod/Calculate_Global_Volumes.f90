@@ -14,7 +14,7 @@
   Grid % tot_vol = 0.0
 
   ! Browse through cells avoiding buffers
-  do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
+  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     Grid % tot_vol = Grid % tot_vol + Grid % vol(c)
     Grid % min_vol = min(Grid % min_vol, Grid % vol(c))
     Grid % max_vol = max(Grid % max_vol, Grid % vol(c))

@@ -42,8 +42,8 @@
         Swarm % i_work(i + 2) = Part % buff  ! where it wants to go
         Swarm % i_work(i + 3) = Part % cell
         Swarm % i_work(i + 4) = Part % node
-        Swarm % i_work(i + 5) = Grid % comm % cell_glo(Part % cell)
-        Swarm % i_work(i + 6) = Grid % comm % node_glo(Part % node)
+        Swarm % i_work(i + 5) = Grid % Comm % cell_glo(Part % cell)
+        Swarm % i_work(i + 6) = Grid % Comm % node_glo(Part % node)
 
         i = (k-1) * Swarm % N_L_VARS
         Swarm % l_work(i + 1) = Part % deposited
@@ -106,7 +106,7 @@
 
         ! Find the closest cell ...
         do c = 1, Grid % n_cells
-          if(Grid % comm % cell_glo(c) .eq. Swarm % i_work(i + 5)) then
+          if(Grid % Comm % cell_glo(c) .eq. Swarm % i_work(i + 5)) then
             Part % cell = c
             goto 1
           end if
@@ -119,7 +119,7 @@
 
         ! ... and the closest node.
         do n = 1, Grid % n_nodes
-          if(Grid % comm % node_glo(n) .eq. Swarm % i_work(i + 6)) then
+          if(Grid % Comm % node_glo(n) .eq. Swarm % i_work(i + 6)) then
             Part % node = n
             goto 2
           end if

@@ -54,7 +54,7 @@
   n_esc = 0
   n_ref = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % comm % cell_proc(c) .eq. this_proc) then  ! avoid buffer cells
+    if(Grid % Comm % cell_proc(c) .eq. this_proc) then  ! avoid buffer cells
       n_dep = n_dep + nint(Swarm % n_deposited(c))
       n_esc = n_esc + nint(Swarm % n_escaped(c))
       n_ref = n_ref + nint(Swarm % n_reflected(c))

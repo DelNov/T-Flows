@@ -48,7 +48,7 @@
         i = (k-1) * Swr % N_I_VARS
         Swr % i_work(i + 1) = Part % proc  ! where it resides
         Swr % i_work(i + 2) = Part % buff  ! where it wants to go
-        Swr % i_work(i + 3) = Grid % comm % cell_glo(Part % cell)
+        Swr % i_work(i + 3) = Grid % Comm % cell_glo(Part % cell)
 
         i = (k-1) * Swr % N_L_VARS
         Swr % l_work(i + 1) = Part % deposited

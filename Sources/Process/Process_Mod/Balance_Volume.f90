@@ -80,7 +80,7 @@
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+    if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
       if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
@@ -117,7 +117,7 @@
       c2 = Grid % faces_c(2,s)
 
       ! Volume flux at the boundary face
-      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
 
         if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW   .or.  &
            Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
@@ -144,7 +144,7 @@
       c2 = Grid % faces_c(2,s)
 
       ! Volume flux at the boundary face
-      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
 
         if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
           bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
@@ -190,7 +190,7 @@
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
-      if(c2 < 0 .and. Grid % comm % cell_proc(c1) .eq. this_proc) then
+      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
         if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
            Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then

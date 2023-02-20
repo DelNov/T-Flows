@@ -17,10 +17,10 @@
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, i_fac, c1, c2, s, sh, m, n, pnt_to, pnt_from
+  integer :: c, i_fac, c1, c2, s, sh, m, n, pnt_to, pnt_from, fail_count
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
   real    :: d_s, min_d, max_d, dx, dy, dz, sx, sy, sz
-  integer :: fail_count
+  real    :: vec1(3), vec2(3), prod(3), dist(3), surf(3)
 !==============================================================================!
 
   if(this_proc < 2) print '(a)', ' # Checking the integrity of cell faces ...'
@@ -43,7 +43,7 @@
                             'Face integrity test for internal faces failed!',  &
                              file=__FILE__)
 
-  ! Check integrity of internal face surfaces
+  ! Check integrity of shadow face surfaces
   fail_count = 0
   do sh = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
     call Grid % Faces_Surface(sh, sx, sy, sz)
@@ -95,8 +95,6 @@
   !------------------------------------------!
   if(DEBUG) call Grid % Check_Cells_Closure()
 
-  if(this_proc < 2) print '(a)', ' # All integrity tests passed'
-
   !----------------------------------------------!
   !                                              !
   !   Calculate total surface of the cell face   !
@@ -131,6 +129,31 @@
     Grid % dy(s) = yc2-yc1
     Grid % dz(s) = zc2-zc1
   end do  ! faces
+
+  ! Check integrity of faces surface and distance vectors
+  fail_count = 0
+  do s = 1, Grid % n_faces
+    dist(1) = Grid % dx(s)
+    dist(2) = Grid % dy(s)
+    dist(3) = Grid % dz(s)
+    surf(1) = Grid % sx(s)
+    surf(2) = Grid % sy(s)
+    surf(3) = Grid % sz(s)
+
+    ! Check the dot product of face surface and cell connection along the way
+    if(dot_product(dist, surf) < 0.0) then
+      fail_count = fail_count + 1
+    end if
+
+  end do
+
+  if(fail_count .gt. 0) call Message % Error(40,                            &
+                            "The face or cell connection orientation "  //  &
+                            "is wrong. The code can't continue like  "  //  &
+                            "this and will terminate now.",                 &
+                             file=__FILE__, line=__LINE__)
+
+  if(this_proc < 2) print '(a)', ' # All integrity tests passed'
 
   !---------------------------------------!
   !                                       !

@@ -135,7 +135,7 @@
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
       if(.not. Part % escaped) then
-        write(fu,'(a,i9)') IN_5, Grid % comm % cell_glo(Part % cell)
+        write(fu,'(a,i9)') IN_5, Grid % Comm % cell_glo(Part % cell)
       end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -148,7 +148,7 @@
     do k = 1, Swarm % n_particles
       Part => Swarm % Particle(k)
       if(.not. Part % escaped) then
-        write(fu,'(a,i9)') IN_5, Grid % comm % cell_glo(Part % bnd_cell)
+        write(fu,'(a,i9)') IN_5, Grid % Comm % cell_glo(Part % bnd_cell)
       end if
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'

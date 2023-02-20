@@ -2,18 +2,19 @@
 # Prologue
 #----------
  PROBLEM_NAME        dam_2d
- HEAT_TRANSFER       yes
- INTERFACE_TRACKING  yes
+INTERFACE_TRACKING yes
 
 # sqrt(9.81/0.6) = 4.04351332383
 # if dt = 1.0 / sqrt(9.81/0.6) / 1200 = 0.0002060914;
-# 1200 time steps will correspond to 1 in the thesis
-# 9600 time steps will correspond to 8 in the thesis
+#  1200 time steps will correspond to 1 in the thesis
+#  9600 time steps will correspond to 8 in the thesis
+# 12000 time steps will correspond to 8 in the thesis
  TIME_STEP               0.0002060914
 
- NUMBER_OF_TIME_STEPS     1200
- RESULTS_SAVE_INTERVAL     300
- BACKUP_SAVE_INTERVAL     1200
+ NUMBER_OF_TIME_STEPS       12000
+ RESULTS_SAVE_INTERVAL        300
+ BACKUP_SAVE_INTERVAL        3000
+ SAVE_RESULTS_AT_BOUNDARIES    no
 
 #-------------------
 # Monitoring points
@@ -26,18 +27,13 @@
 #-----------------
 # Physical models
 #-----------------
-
  MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   1.4080e-4
  DYNAMIC_VISCOSITY      1.0
- HEAT_CAPACITY          1.0
 
  PHASE_DENSITIES        1.0e3   1.0e0
  PHASE_VISCOSITIES      1.0e-3  1.8e-5
- PHASE_CONDUCTIVITIES   0.6     0.026
- PHASE_CAPACITIES       4.2e+3  1.0e+3
  SURFACE_TENSION        0.0
- TURBULENCE_MODEL       none
+TURBULENCE_MODEL none
  GRAVITATIONAL_VECTOR   0.0 0.0 -9.81
 
  REFERENCE_DENSITY      1.0
@@ -76,9 +72,9 @@
 #--------------------
 # Initial conditions
 #--------------------
-  INITIAL_CONDITION
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   3.0
+ INITIAL_CONDITION
+   VARIABLES           vof
+   VALUES              box.stl
 
 #---------------------
 # Boundary conditions
@@ -88,8 +84,10 @@
     VARIABLES           u     v     w     vof     vof_c_ang
     VALUES              0.0   0.0   0.0   0.0     90.0
 
-  BOUNDARY_CONDITION    symmetry
+  BOUNDARY_CONDITION    symm
     TYPE                symmetry
     VARIABLES           u     v     w     vof     vof_c_ang
     VALUES              0.0   0.0   0.0   0.0     90.0
 
+#LOAD_BACKUP_NAME dam_2d-ts000001.backup
+PARTICLE_TRACKING no

@@ -16,8 +16,8 @@
   if(this_proc < 2) print *, '# Initializing PETSc.'
 
   ! Total number of unknowns and unknowns in this processor only
-  Pet % m_upper = Grid % comm % nc_tot
-  Pet % m_lower = Grid % n_cells - Grid % comm % n_buff_cells
+  Pet % m_upper = Grid % Comm % nc_tot
+  Pet % m_lower = Grid % n_cells - Grid % Comm % n_buff_cells
 
   !----------------------------------------+
   !    Create global numbering for PETSc   !

@@ -7,8 +7,9 @@
 
  NUMBER_OF_TIME_STEPS     7000
 
- RESULTS_SAVE_INTERVAL    60
- BACKUP_SAVE_INTERVAL     60
+ RESULTS_SAVE_INTERVAL         60
+ BACKUP_SAVE_INTERVAL          60
+ SAVE_RESULTS_AT_BOUNDARIES    no
 
  #LOAD_BACKUP_NAME        obstacle-ts005580.backup
  TIME_STEP               1.0e-3
@@ -71,8 +72,8 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     vof
-    VALUES              0.0   0.0   0.0   3.0
+    VARIABLES           vof
+    VALUES              box.stl
 
 #---------------------
 # Boundary conditions

@@ -4,10 +4,11 @@
  PROBLEM_NAME     cylinder
  HEAT_TRANSFER    no
 
-NUMBER_OF_TIME_STEPS    3600
- RESULTS_SAVE_INTERVAL     1
- BACKUP_SAVE_INTERVAL    300
- TIME_STEP               0.1
+ NUMBER_OF_TIME_STEPS    3600
+ RESULTS_SAVE_INTERVAL      6
+ SWARM_SAVE_INTERVAL        6
+ BACKUP_SAVE_INTERVAL     300
+ TIME_STEP                0.1
 
 #-------------------
 # Monitoring points 

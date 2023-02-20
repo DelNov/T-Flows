@@ -89,7 +89,7 @@
     !   Print the iso-polygons to the file 'iso00000.vtk'   !
     !-------------------------------------------------------!
     ifile = 0
-    call Iso % Plot_Iso_Polygons_Vtk(ifile)
+    call Iso % Plot_Iso_Polygons_Vtk("iso", ifile)
 
   end if
 

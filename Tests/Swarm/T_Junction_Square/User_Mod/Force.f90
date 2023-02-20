@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Force(Flow, ui, a_matrix, b_vector)
+  subroutine User_Mod_Force(Flow, Por, ui, a_matrix, b_vector)
 !------------------------------------------------------------------------------!
 !   This procedure intrduce centrifuge-like force into the T-junction to       !
 !   prevent the flow going out through one leg only.  It seemed to have        !
@@ -7,10 +7,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type)   :: Flow
-  type(Var_Type)     :: ui        ! velocity component
-  type(Matrix_Type)  :: a_matrix  ! system matrix
-  real, dimension(:) :: b_vector  ! right hand side vector
+  type(Field_Type)    :: Flow
+  type(Porosity_Type) :: Por
+  type(Var_Type)      :: ui        ! velocity component
+  type(Matrix_Type)   :: a_matrix  ! system matrix
+  real, dimension(:)  :: b_vector  ! right hand side vector
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: c

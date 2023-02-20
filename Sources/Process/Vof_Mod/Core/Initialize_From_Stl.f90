@@ -422,15 +422,25 @@
         !------------------------!
         call Polyhedron % Extract_From_Grid(Grid, c, dis_nod_dom)
         if(DEBUG) then
-          call Polyhedron % Plot_Polyhedron_Vtk("dis_nod_dom", glo(c))
+          call Polyhedron % Plot_Polyhedron_Vtk("dis-nod-dom", glo(c))
         end if
 
         !------------------------------!
         !   Call the Isoap algorithm   !
         !------------------------------!
         call Isoap % Extract_Iso_Polygons(Grid, c, dis_nod_dom)
-        if(DEBUG) then
-          call Iso_Polygons % Plot_Iso_Polygons_Vtk(glo(c))
+
+        !---------------------------------------------------------------!
+        !   It is indeed strange that here, during the initialization   !
+        !    of VOF, some cells happen to have multiple iso-surfaces    !
+        !---------------------------------------------------------------!
+        if(Iso_Polygons % n_polys > 1) then
+          print '(4(a,i8))',  __FILE__,        __LINE__,   &
+                             ' # check cell ', c,          &
+                             ' in processor ', this_proc,  &
+                             ' global cell ',  glo(c)
+          call Polyhedron % Plot_Polyhedron_Vtk("check-cell", glo(c))
+          call Iso_Polygons % Plot_Iso_polygons_Vtk("check-iso", glo(c))
         end if
 
         !--------------------------------!
@@ -454,9 +464,6 @@
             new_faces_n_nodes = new_faces_n_nodes + 1
             new_faces_n(new_faces_n_nodes) = i  ! just copy "i"
 
-            IF(ISO_POLYGONS % N_POLYS > 1) THEN
-              PRINT *, __FILE__, __LINE__, 'CHECK CELL: ', C
-            END IF
             do i_iso = 1, Iso_Polygons % n_polys
               do i_ver = 1, Iso_Polygons % polys_n_verts(i_iso)
                 m = Iso_Polygons % polys_v(i_iso, i_ver)
@@ -498,7 +505,7 @@
           Polyhedron % faces_n(s, 1:new_faces_n_nodes)  &
                     = new_faces_n(1:new_faces_n_nodes)
           if(DEBUG) then
-            call Polyhedron % Plot_Polyhedron_Vtk("geo", glo(c))
+            call Polyhedron % Plot_Polyhedron_Vtk("cell", glo(c))
           end if
 
         end do  ! s
@@ -533,8 +540,8 @@
           ! Well, faces_n_nodes will be zero for that face
 
           if(DEBUG) then
-            if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_hollow", glo(c))
-            if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_hollow", glo(c))
+            if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0-hollow",glo(c))
+            if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1-hollow",glo(c))
           end if
 
           ! Try to add the missing face
@@ -563,8 +570,8 @@
              = new_faces_n(1:new_faces_n_nodes)
 
           if(DEBUG) then
-            if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0_full", glo(c))
-            if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1_full", glo(c))
+            if(p .eq. 0) call Pol(0) % Plot_Polyhedron_Vtk("pol0-full", glo(c))
+            if(p .eq. 1) call Pol(1) % Plot_Polyhedron_Vtk("pol1-full", glo(c))
           end if
         end do  ! through p
 
