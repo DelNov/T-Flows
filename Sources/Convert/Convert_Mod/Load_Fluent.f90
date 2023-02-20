@@ -254,7 +254,7 @@
 
   Grid % n_bnd_cells = n_bnd_cells
   Grid % n_bnd_cond  = n_bnd_cond
-  allocate(Grid % bnd_cond % name(n_bnd_cond))
+  allocate(Grid % region % name(n_bnd_cond))
 
   !--------------------------------------------!
   !                                            !
@@ -652,14 +652,14 @@
             n_bnd_cells = n_bnd_cells + 1
             Grid % faces_c(1, s) = c2
             Grid % faces_c(2, s) = -n_bnd_cells
-            Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
+            Grid % region % at_cell(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Case when c2 is a boundary cell
           else if(c2 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
             Grid % faces_c(1, s) = c1
             Grid % faces_c(2, s) = -n_bnd_cells
-            Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
+            Grid % region % at_cell(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Neither c1 nor c2 are boundary cells
           else
@@ -1085,7 +1085,7 @@
           if(face_sect_bnd(n) .ne. 0) then
             if(face_sect_pos(n) .eq. pos) then
               call String % To_Upper_Case(one_token)
-              Grid % bnd_cond % name(face_sect_bnd(n)) = one_token
+              Grid % region % name(face_sect_bnd(n)) = one_token
             end if
           end if
         end do

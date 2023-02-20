@@ -11,7 +11,7 @@
   use Assert_Mod
   use Profiler_Mod
   use File_Mod
-  use Boundary_Mod
+  use Region_Mod
   use Vtk_Mod
   use Metis_Mod
   use Sort_Mod
@@ -93,7 +93,7 @@
     integer, allocatable :: cells_bnd_face(:)
 
     ! For each cell; type of the boundary condition in a given direction
-    integer, allocatable :: cells_bnd_color(:,:)
+    integer, allocatable :: cells_bnd_region(:,:)
 
     !-------------------------!
     !  Face-based variables   !
@@ -133,7 +133,7 @@
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
 
-    type(Boundary_Type) :: bnd_cond
+    type(Region_Type) :: region
 
     !  Maximum number of cells, boundary cells and faces
     ! (Used for tentative memory allocation in Generator)
@@ -181,7 +181,6 @@
       procedure :: Allocate_Nodes
       procedure :: Bnd_Cond_Name
       procedure :: Bnd_Cond_Type
-      procedure :: Bnd_Cond_Ranges
       procedure :: Bounding_Box
       procedure :: Calculate_Cell_Centers
       procedure :: Calculate_Cell_Inertia
@@ -212,8 +211,9 @@
       procedure :: Load_Cfn
       procedure :: Load_Dim
       procedure :: Merge_Duplicate_Nodes
-      procedure :: Print_Bnd_Cond_List
+      procedure :: Print_Regions_List
       procedure :: Print_Grid_Statistics
+      procedure :: Regions_Ranges
       procedure :: Save_Cfn
       procedure :: Save_Dim
       procedure :: Save_Debug_Vtu
@@ -235,7 +235,6 @@
 #   include "Grid_Mod/Allocate_Nodes.f90"
 #   include "Grid_Mod/Bnd_Cond_Name.f90"
 #   include "Grid_Mod/Bnd_Cond_Type.f90"
-#   include "Grid_Mod/Bnd_Cond_Ranges.f90"
 #   include "Grid_Mod/Bounding_Box.f90"
 #   include "Grid_Mod/Calculate_Cell_Centers.f90"
 #   include "Grid_Mod/Calculate_Cell_Inertia.f90"
@@ -266,8 +265,9 @@
 #   include "Grid_Mod/Load_Cfn.f90"
 #   include "Grid_Mod/Load_Dim.f90"
 #   include "Grid_Mod/Merge_Duplicate_Nodes.f90"
-#   include "Grid_Mod/Print_Bnd_Cond_List.f90"
+#   include "Grid_Mod/Print_Regions_List.f90"
 #   include "Grid_Mod/Print_Grid_Statistics.f90"
+#   include "Grid_Mod/Regions_Ranges.f90"
 #   include "Grid_Mod/Save_Cfn.f90"
 #   include "Grid_Mod/Save_Dim.f90"
 #   include "Grid_Mod/Save_Debug_Vtu.f90"

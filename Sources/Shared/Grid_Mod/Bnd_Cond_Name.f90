@@ -1,16 +1,15 @@
 !==============================================================================!
-  character(SL) function Bnd_Cond_Name(Grid, bnd_cell)
+  character(SL) function Bnd_Cond_Name(Grid, cell)
 !------------------------------------------------------------------------------!
 !   Provides a shortcut to obtain boundary condition type.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid
-  integer          :: bnd_cell
+  class(Grid_Type)    :: Grid
+  integer, intent(in) :: cell
 !==============================================================================!
 
-  Bnd_Cond_Name =  &
-       Grid % bnd_cond % name(Grid % bnd_cond % color(bnd_cell))
+  Bnd_Cond_Name = Grid % region % name(Grid % region % at_cell(cell))
 
   end function
 

@@ -24,7 +24,7 @@
   !------------------------------------------------------------------!
   Grid % wall_dist = HUGE
 
-  call Print_Bnd_Cond_List(Grid)
+  call Print_Regions_List(Grid)
   call Message % Framed(60,                                                   &
     'Calculating distance from the walls                               ',     &
     'Type ordinal number(s) of wall or wall_flux boundary condition(s) '  //  &
@@ -74,8 +74,8 @@
         ' % complete...', achar(13)
 
       do b = 1, n_wall_colors
-        do c2 = Grid % bnd_cond % color_s_cell( wall_colors(b) ),  &
-                Grid % bnd_cond % color_e_cell( wall_colors(b) ),  &
+        do c2 = Grid % region % f_cell( wall_colors(b) ),  &
+                Grid % region % l_cell( wall_colors(b) ),  &
                 -1
           Grid % wall_dist(c1) =                        &
             min(Grid % wall_dist(c1),                   &

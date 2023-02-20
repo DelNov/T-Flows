@@ -25,8 +25,8 @@
     call Grid % Allocate_Faces(Grid % n_faces, 0)
   end if
 
-  allocate(Grid % bnd_cond % color(-Grid % n_bnd_cells * F:-1))
-  Grid % bnd_cond % color = 0
+  allocate(Grid % region % at_cell(-Grid % n_bnd_cells * F:-1))
+  Grid % region % at_cell = 0
 
   ! (Dirty) trick to allocate additional memory for cities
   Grid % n_bnd_cells = Grid % n_bnd_cells / F

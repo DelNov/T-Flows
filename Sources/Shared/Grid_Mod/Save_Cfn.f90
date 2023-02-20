@@ -63,7 +63,7 @@
   !   Boundary conditions list   !
   !------------------------------!
   do n = 1, Grid % n_bnd_cond
-    write(fu) Grid % bnd_cond % name(n)
+    write(fu) Grid % region % name(n)
   end do
 
   !--------------------------!
@@ -329,7 +329,7 @@
   ! Physical boundary cells
   do c = -Grid % n_bnd_cells, -1
     if(Grid % old_c(c) .ne. 0) then
-      write(fu) Grid % bnd_cond % color(Grid % old_c(c))
+      write(fu) Grid % region % at_cell(Grid % old_c(c))
     end if
   end do
 

@@ -20,7 +20,7 @@
   ! Browse through all boundary cells and mark nodes
   ! of those cells in the given boundary condition
   do c = -Grid % n_bnd_cells, -1
-    if( Grid % bnd_cond % color(c) .eq. bc ) then
+    if( Grid % region % at_cell(c) .eq. bc ) then
       do i_nod = 1, Grid % cells_n_nodes(c)
         n = Grid % cells_n(i_nod, c)
         if(node_data(n) .eq. 0) then  ! hasn't been marked yet

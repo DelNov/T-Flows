@@ -30,13 +30,14 @@
   Grid % n_faces  = 0
   do i = 1, Grid % n_cells
     do j = 1, 6
-      if(Grid % cells_bnd_color(j,i) .ne. 0) then
+      if(Grid % cells_bnd_region(j,i) .ne. 0) then
 
         Grid % n_bnd_cells = Grid % n_bnd_cells + 1
 
-        ! Grid % bnd_cond % color
-        Grid % bnd_cond % color(-Grid % n_bnd_cells) =   &
-                                                    Grid % cells_bnd_color(j,i)
+        ! Grid % region % at_cell
+        Grid % region % at_cell(-Grid % n_bnd_cells)  &
+         = Grid % cells_bnd_region(j,i)
+
         ! Faces
         Grid % n_faces = Grid % n_faces  + 1
         Grid % faces_c(1,Grid % n_faces) = i

@@ -25,11 +25,11 @@
   character(SL)            :: bc_type_name, try_str
   integer                  :: bc_type_tag
   character(SL)            :: keys(128)
-  real                     :: vals(0:128)           ! they start from zero!
-  integer                  :: types_per_color(128)  ! how many types in a color
-  character(SL)            :: types_names(128)      ! name of each type
-  logical                  :: types_file(128)       ! type specified in a file?
-  integer                  :: c_types               ! counter types
+  real                     :: vals(0:128)         ! they start from zero!
+  integer                  :: types_per_reg(128)  ! how many types in a region
+  character(SL)            :: types_names(128)    ! name of each type
+  logical                  :: types_file(128)     ! type specified in a file?
+  integer                  :: c_types             ! counter types
   integer                  :: edd_n
   real                     :: edd_r
   real                     :: edd_i
@@ -60,14 +60,14 @@
   !   Count number of types per boundary condition, total number   !
   !        of types specified, and also extract their names        !
   !----------------------------------------------------------------!
-  types_per_color(:) = 0
+  types_per_reg(:) = 0
   types_file(:)      = .false.
   c_types            = 0
 
   do bc = 1, Grid % n_bnd_cond
-    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',        &
-                                          Grid % bnd_cond % name(bc),  &
-                                          found,                       &
+    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',      &
+                                          Grid % region % name(bc),  &
+                                          found,                     &
                                           .false.)
     if(found) then
 1     continue
@@ -82,7 +82,7 @@
       call Control_Mod_Read_Char_Item_On('VARIABLES', 'VOID', try_str, .false.)
       call Control_Mod_Read_Char_Item_On('VALUES',    'VOID', try_str, .false.)
 
-      types_per_color(bc) = types_per_color(bc) + 1
+      types_per_reg(bc) = types_per_reg(bc) + 1
       c_types = c_types + 1
       types_names(c_types) = bc_type_name
 
@@ -96,7 +96,7 @@
     else
       if(this_proc < 2) then
         print *, '# ERROR!  Boundary conditions for ',  &
-                 trim(Grid % bnd_cond % name(bc)),      &
+                 trim(Grid % region % name(bc)),        &
                  ' not specified in the control file!'
         print *, '# Exiting the program.'
       end if
@@ -120,11 +120,11 @@
   do bc = 1, Grid % n_bnd_cond
 
     ! Position yourself well
-    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',        &
-                                          Grid % bnd_cond % name(bc),  &
-                                          found,                       &
+    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',      &
+                                          Grid % region % name(bc),  &
+                                          found,                     &
                                           .false.)
-    do l = 1, types_per_color(bc)
+    do l = 1, types_per_reg(bc)
 
       ! Update the counter
       c_types = c_types + 1
@@ -140,25 +140,25 @@
       ! Copy boundary conditions which were given for the Grid
       if( bc_type_name .eq. 'INFLOW') then
         bc_type_tag = INFLOW
-        Grid % bnd_cond % type(bc) = INFLOW
+        Grid % region % type(bc) = INFLOW
       else if( bc_type_name .eq. 'WALL') then
         bc_type_tag = WALL
-        Grid % bnd_cond % type(bc) = WALL
+        Grid % region % type(bc) = WALL
       else if( bc_type_name .eq. 'OUTFLOW') then
         bc_type_tag = OUTFLOW
-        Grid % bnd_cond % type(bc) = OUTFLOW
+        Grid % region % type(bc) = OUTFLOW
       else if( bc_type_name .eq. 'SYMMETRY') then
         bc_type_tag = SYMMETRY
-        Grid % bnd_cond % type(bc) = SYMMETRY
+        Grid % region % type(bc) = SYMMETRY
       else if( bc_type_name .eq. 'WALL_FLUX') then
         bc_type_tag = WALLFL
-        Grid % bnd_cond % type(bc) = WALLFL
+        Grid % region % type(bc) = WALLFL
       else if( bc_type_name .eq. 'CONVECTIVE') then
         bc_type_tag = CONVECT
-        Grid % bnd_cond % type(bc) = CONVECT
+        Grid % region % type(bc) = CONVECT
       else if( bc_type_name .eq. 'PRESSURE') then
         bc_type_tag = PRESSURE
-        Grid % bnd_cond % type(bc) = PRESSURE
+        Grid % region % type(bc) = PRESSURE
       else
         if(this_proc < 2) then
           print *, '# ERROR!  Read_Control_Boundary_Conditions: '//        &
@@ -194,7 +194,7 @@
 
         ! Distribute b.c. tags only.
         do c = -1, -Grid % n_bnd_cells, -1
-          if(Grid % bnd_cond % color(c) .eq. bc) then
+          if(Grid % region % at_cell(c) .eq. bc) then
 
             ! Temperature
             if(Flow % heat_transfer) then
@@ -202,13 +202,13 @@
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
                 if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
-                if(bc_type_tag .eq. WALLFL) Grid % bnd_cond % type(bc) = WALL
+                if(bc_type_tag .eq. WALLFL) Grid % region % type(bc) = WALL
               end if
               i = Key_Ind('Q', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
                 if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
-                if(bc_type_tag .eq. WALL) Grid % bnd_cond % type(bc) = WALLFL
+                if(bc_type_tag .eq. WALL) Grid % region % type(bc) = WALLFL
               end if
             end if
 
@@ -238,7 +238,7 @@
 
         ! Distribute b.c. values
         do c = -1, -Grid % n_bnd_cells, -1
-          if(Grid % bnd_cond % color(c) .eq. bc) then
+          if(Grid % region % at_cell(c) .eq. bc) then
 
             ! For velocity, pressure and wall roughness
             i = Key_Ind('U',   keys, nks); if(i > 0) u % b(c) = vals(i)
@@ -355,7 +355,7 @@
           do c = -1, -Grid % n_bnd_cells, -1
 
             ! Distribute b.c. types
-            if(Grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % region % at_cell(c) .eq. bc) then
 
               ! For temperature
               if(Flow % heat_transfer) then
@@ -363,13 +363,13 @@
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
                   if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
-                  if(bc_type_tag .eq. WALLFL) Grid % bnd_cond % type(bc) = WALL
+                  if(bc_type_tag .eq. WALLFL) Grid % region % type(bc) = WALL
                 end if
                 i = Key_Ind('Q', keys, nks)
                 if(i > 0) then
                   t % bnd_cond_type(c) = bc_type_tag
                   if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
-                  if(bc_type_tag .eq. WALL) Grid % bnd_cond % type(bc) = WALLFL
+                  if(bc_type_tag .eq. WALL) Grid % region % type(bc) = WALLFL
                 end if
               end if
 
@@ -388,7 +388,7 @@
             end if
 
             ! Distribute b.c. values
-            if(Grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % region % at_cell(c) .eq. bc) then
 
               dist_min = HUGE
               do m = 1, n_points
@@ -484,7 +484,7 @@
                   i = Key_Ind('F22', keys, nks); if(i>0) f22 % b(c) = prof(k,i)
                 end if
               end if
-            end if      !end if(Grid % bnd_cond % color(c) .eq. n)
+            end if      !end if(Grid % region % at_cell(c) .eq. n)
           end do        !end do c = -1, -Grid % n_bnd_cells, -1
 
         !----------------------------!
@@ -494,7 +494,7 @@
 
           do c = -1, -Grid % n_bnd_cells, -1
 
-            if(Grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % region % at_cell(c) .eq. bc) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -554,14 +554,14 @@
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
                       if(bc_type_tag .eq. WALLFL)  &
-                        Grid % bnd_cond % type(bc) = WALL
+                        Grid % region % type(bc) = WALL
                     end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) then
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
                       if(bc_type_tag .eq. WALL)  &
-                        Grid % bnd_cond % type(bc) = WALLFL
+                        Grid % region % type(bc) = WALLFL
                     end if
                   end if
 
@@ -581,7 +581,7 @@
               end do    ! m, points
             end if      ! bnd_color .eq. bc
 
-            if(Grid % bnd_cond % color(c) .eq. bc) then
+            if(Grid % region % at_cell(c) .eq. bc) then
 
               do m = 1, n_points-1
                 here = .false.
@@ -655,7 +655,7 @@
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALLFL) t % bnd_cond_type(c) = WALL
                       if(bc_type_tag .eq. WALLFL)  &
-                        Grid % bnd_cond % type(bc) = WALL
+                        Grid % region % type(bc) = WALL
                     end if
                     i = Key_Ind('Q',keys,nks)
                     if(i > 0) t % q(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
@@ -663,7 +663,7 @@
                       t % bnd_cond_type(c) = bc_type_tag
                       if(bc_type_tag .eq. WALL) t % bnd_cond_type(c) = WALLFL
                       if(bc_type_tag .eq. WALL)  &
-                        Grid % bnd_cond % type(bc) = WALLFL
+                        Grid % region % type(bc) = WALLFL
                     end if
                   end if
 
@@ -780,7 +780,7 @@
   turb_planes % n_planes = 0
   do bc = 1, Grid % n_bnd_cond  ! imagine there are as many eddies as bcs
     call Control_Mod_Position_At_Two_Keys('SYNTHETIC_EDDIES',          &
-                                          Grid % bnd_cond % name(bc),  &
+                                          Grid % region % name(bc),  &
                                           found,                       &
                                           .false.)
     if(found) then
@@ -793,7 +793,7 @@
                                edd_r,                                        &
                                edd_i,                                        &
                                Flow,                                         &
-                               Grid % bnd_cond % name(bc))
+                               Grid % region % name(bc))
     end if
   end do
   if(turb_planes % n_planes > 0 .and. this_proc < 2) then

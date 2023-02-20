@@ -242,8 +242,8 @@
     n_ground_cells = 0
     do c = 1, Grid % n_cells
       do dir = 1, 6
-        if(Grid % cells_bnd_color(dir, c) .ne. 0) then
-          bc_name = trim(Grid % bnd_cond % name(Grid % cells_bnd_color(dir, c)))
+        if(Grid % cells_bnd_region(dir, c) .ne. 0) then
+          bc_name = trim(Grid % region % name(Grid % cells_bnd_region(dir, c)))
           call String % To_Upper_Case(bc_name)
           if(bc_name(1:8) .eq. 'BUILDING' .or.  &
              bc_name      .eq. 'GROUND') then
@@ -316,7 +316,7 @@
   do c = 1, Grid % n_cells
     i_work_1(c)      = Grid % cells_n_nodes(c)
     i_work_2(1:8, c) = Grid % cells_n(1:8, c)
-    i_work_3(1:6, c) = Grid % cells_bnd_color(1:6, c)
+    i_work_3(1:6, c) = Grid % cells_bnd_region(1:6, c)
   end do
 
   !--------------------------!
@@ -346,9 +346,9 @@
   !   Do the sorting of data pertinent to cells   !
   !-----------------------------------------------!
   do c = 1, Grid % n_cells
-    Grid % cells_n_nodes       (new_c(c)) = i_work_1(c)
-    Grid % cells_n        (1:8, new_c(c)) = i_work_2(1:8, c)
-    Grid % cells_bnd_color(1:6, new_c(c)) = i_work_3(1:6, c)
+    Grid % cells_n_nodes        (new_c(c)) = i_work_1(c)
+    Grid % cells_n         (1:8, new_c(c)) = i_work_2(1:8, c)
+    Grid % cells_bnd_region(1:6, new_c(c)) = i_work_3(1:6, c)
   end do
   call Sort % Real_By_Index(Grid % n_cells, Grid % xc(1), new_c(1))
   call Sort % Real_By_Index(Grid % n_cells, Grid % yc(1), new_c(1))
@@ -386,8 +386,8 @@
   cell_in_building(:) = .false.
   do c = 1, Grid % n_cells
     do dir = 1, 6
-      if(Grid % cells_bnd_color(dir, c) .ne. 0) then
-        bc_name = trim(Grid % bnd_cond % name(Grid % cells_bnd_color(dir, c)))
+      if(Grid % cells_bnd_region(dir, c) .ne. 0) then
+        bc_name = trim(Grid % region % name(Grid % cells_bnd_region(dir, c)))
         call String % To_Upper_Case(bc_name)
         if(bc_name(1:8) .eq. 'BUILDING') then
           read(bc_name(10:12), *) height
@@ -409,7 +409,7 @@
   allocate(cell_in_chimney(Grid % n_cells))
   cell_in_chimney(:) = 0
   do bc = 1, Grid % n_bnd_cond
-    bc_name = trim(Grid % bnd_cond % name(bc))
+    bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
 
@@ -420,7 +420,7 @@
 
       do c = 1, Grid % n_cells
         do dir = 1, 6
-          if(Grid % cells_bnd_color(dir, c) .eq. bc) then
+          if(Grid % cells_bnd_region(dir, c) .eq. bc) then
             do cu = c, c + n_hor_layers - 1
               if(Grid % zc(cu) - height >= Grid % zc(c)) exit
               cell_in_chimney(cu) = chimney  ! mark cell as in this chimney
@@ -475,7 +475,7 @@
 
   ! Find ground b.c. number (only used to eliminate BUILDING_000)
   do bc = 1, Grid % n_bnd_cond
-    bc_name = trim(Grid % bnd_cond % name(bc))
+    bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'GROUND') then
       ground_bc = bc
@@ -484,13 +484,13 @@
 
   ! Eliminate building_000 b.c.
   do bc = 1, Grid % n_bnd_cond
-    bc_name = trim(Grid % bnd_cond % name(bc))
+    bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'BUILDING_000') then
       do c = 1, Grid % n_cells
         do dir = 1, 6
-          if(Grid % cells_bnd_color(dir, c) .eq. bc) then
-            Grid % cells_bnd_color(dir, c) = ground_bc
+          if(Grid % cells_bnd_region(dir, c) .eq. bc) then
+            Grid % cells_bnd_region(dir, c) = ground_bc
           end if
         end do
       end do
@@ -499,15 +499,15 @@
 
   cnt   = 0
   do bc = 1, Grid % n_bnd_cond
-    bc_name = trim(Grid % bnd_cond % name(bc))
+    bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:8) .ne. 'BUILDING') then
       cnt = cnt + 1
-      Grid % bnd_cond % name(cnt) = Grid % bnd_cond % name(bc)
+      Grid % region % name(cnt) = Grid % region % name(bc)
       do c = 1, Grid % n_cells
         do dir = 1, 6
-          if(Grid % cells_bnd_color(dir, c) .eq. bc) then
-            Grid % cells_bnd_color(dir, c) = cnt
+          if(Grid % cells_bnd_region(dir, c) .eq. bc) then
+            Grid % cells_bnd_region(dir, c) = cnt
           end if
         end do
       end do
@@ -518,11 +518,11 @@
   ! Shift all by one up (to be able to insert building walls as first)
   if(buildings_exist) then
     do bc = Grid % n_bnd_cond, 1, -1
-      Grid % bnd_cond % name(bc+1) = Grid % bnd_cond % name(bc)
+      Grid % region % name(bc+1) = Grid % region % name(bc)
       do c = 1, Grid % n_cells
         do dir = 1, 6
-          if(Grid % cells_bnd_color(dir, c) .eq. bc) then
-            Grid % cells_bnd_color(dir, c) = bc+1
+          if(Grid % cells_bnd_region(dir, c) .eq. bc) then
+            Grid % cells_bnd_region(dir, c) = bc+1
           end if
         end do
       end do
@@ -530,7 +530,7 @@
     Grid % n_bnd_cond = Grid % n_bnd_cond + 1
 
     ! Add first boundary condition for walls
-    Grid % bnd_cond % name(1) = 'BUILDING_WALLS'
+    Grid % region % name(1) = 'BUILDING_WALLS'
   end if
 
   !------------------------------------------------------------!
@@ -552,7 +552,7 @@
   do c = 1, Grid % n_cells
     i_work_1(c)      = Grid % cells_n_nodes(c)
     i_work_2(1:8, c) = Grid % cells_n(1:8, c)
-    i_work_3(1:6, c) = Grid % cells_bnd_color(1:6, c)
+    i_work_3(1:6, c) = Grid % cells_bnd_region(1:6, c)
   end do
 
   !------------------------------------------------------!
@@ -578,7 +578,7 @@
     if(new_c(c) .ne. 0) then
       Grid % cells_n_nodes       (new_c(c)) = i_work_1(c)
       Grid % cells_n        (1:8, new_c(c)) = i_work_2(1:8, c)
-      Grid % cells_bnd_color(1:6, new_c(c)) = i_work_3(1:6, c)
+      Grid % cells_bnd_region(1:6, new_c(c)) = i_work_3(1:6, c)
     end if
   end do
   Grid % n_cells = cnt
@@ -605,7 +605,7 @@
       if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
 
       do dir = 1, 6
-        if(Grid % cells_bnd_color(dir, c) .eq. 0) then
+        if(Grid % cells_bnd_region(dir, c) .eq. 0) then
 
           n_f_nod    = 0
           f_nod(1:4) = -1
@@ -626,13 +626,13 @@
                   node_on_building(f_nod(2)) .and.  &
                   node_on_building(f_nod(3)) .and.  &
                   node_on_building(f_nod(4)) ) then
-                Grid % cells_bnd_color(dir, c) = 1
+                Grid % cells_bnd_region(dir, c) = 1
               end if
             else
               if( node_on_building(f_nod(1)) .and.  &
                   node_on_building(f_nod(2)) .and.  &
                   node_on_building(f_nod(3)) ) then
-                Grid % cells_bnd_color(dir, c) = 1
+                Grid % cells_bnd_region(dir, c) = 1
               end if
             end if
           end if
@@ -643,7 +643,7 @@
   end if
 
   do bc = 1, Grid % n_bnd_cond
-    bc_name = trim(Grid % bnd_cond % name(bc))
+    bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
 
@@ -657,7 +657,7 @@
         if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
 
         do dir = 1, 6
-          if(Grid % cells_bnd_color(dir, c) .eq. 0) then
+          if(Grid % cells_bnd_region(dir, c) .eq. 0) then
 
             n_f_nod    = 0
             f_nod(1:4) = -1
@@ -678,13 +678,13 @@
                     node_on_chimney(f_nod(2)) .eq. chimney .and.  &
                     node_on_chimney(f_nod(3)) .eq. chimney .and.  &
                     node_on_chimney(f_nod(4)) .eq. chimney ) then
-                  Grid % cells_bnd_color(dir, c) = bc
+                  Grid % cells_bnd_region(dir, c) = bc
                 end if
               else
                 if( node_on_chimney(f_nod(1)) .eq. chimney .and.  &
                     node_on_chimney(f_nod(2)) .eq. chimney .and.  &
                     node_on_chimney(f_nod(3)) .eq. chimney ) then
-                  Grid % cells_bnd_color(dir, c) = bc
+                  Grid % cells_bnd_region(dir, c) = bc
                 end if
               end if
             end if

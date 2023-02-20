@@ -52,7 +52,7 @@
   write(fu,'(a)') '#-----------------------------------------------------------'
 
   do j = 1, Grid % n_bnd_cond
-    work = Grid % bnd_cond % name(j)
+    work = Grid % region % name(j)
     call String % To_Lower_Case(work)
     write(fu,'(a,a)') '  BOUNDARY_CONDITION ', trim(work)
     write(fu,'(a)') '    TYPE             wall  (or: '  //  &

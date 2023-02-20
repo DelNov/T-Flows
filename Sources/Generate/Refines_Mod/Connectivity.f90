@@ -35,8 +35,8 @@
       if(Grid % cells_c(m,c) < 0) then
         Grid % n_bnd_cells = Grid % n_bnd_cells + 1
 
-        ! Remember the boundary color, take positive value for color
-        Grid % bnd_cond % color(-Grid % n_bnd_cells) =  -Grid % cells_c(m,c)
+        ! Remember the boundary region, take positive value for region
+        Grid % region % at_cell(-Grid % n_bnd_cells) =  -Grid % cells_c(m,c)
 
         ! Put new boundary cell into place
         Grid % cells_c(m,c) = -Grid % n_bnd_cells
@@ -111,10 +111,10 @@
     do c = 1, Grid % n_cells
       do m = 1, 24   ! neighbour cells
         if(Grid % cells_c(m,c) < 0) then
-          Grid % n_bnd_cells   = Grid % n_bnd_cells + 1
+          Grid % n_bnd_cells  = Grid % n_bnd_cells + 1
 
-          ! Restore the boundary color, take positive value for color
-          Grid % cells_c(m,c)  = -Grid % bnd_cond % color(-Grid % n_bnd_cells)
+          ! Restore the boundary region, take positive value for region
+          Grid % cells_c(m,c) = -Grid % region % at_cell(-Grid % n_bnd_cells)
         end if
       end do
     end do

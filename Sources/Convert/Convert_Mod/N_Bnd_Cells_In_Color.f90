@@ -18,7 +18,7 @@
   cell_data(:) = 0
 
   do c = -Grid % n_bnd_cells, -1
-    if( Grid % bnd_cond % color(c) .eq. bc ) then
+    if( Grid % region % at_cell(c) .eq. bc ) then
       cnt = cnt + 1
       cell_data(c) = cell_data(c) + 1
     end if

@@ -250,7 +250,7 @@ SRC_F_MOD = Const_Mod.f90         \
             File_Mod.f90          \
             Control_Mod.f90       \
             Vtk_Mod.f90           \
-            Boundary_Mod.f90      \
+            Region_Mod.f90        \
             Metis_Mod.f90         \
             Grid_Mod.f90          \
             Work_Mod.f90          \

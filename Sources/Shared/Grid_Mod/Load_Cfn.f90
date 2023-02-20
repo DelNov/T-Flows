@@ -70,8 +70,8 @@
 
   ! Boundary conditions' keys
   ! (Go from zero for faces which are not at the boundary)
-  allocate(Grid % bnd_cond % name(0 : Grid % n_bnd_cond + 3))
-  allocate(Grid % bnd_cond % type(0 : Grid % n_bnd_cond + 3))
+  allocate(Grid % region % name(0 : Grid % n_bnd_cond + 3))
+  allocate(Grid % region % type(0 : Grid % n_bnd_cond + 3))
 
   !-----------------!
   !   Domain name   !
@@ -82,15 +82,15 @@
   !   Boundary conditions list   !
   !------------------------------!
   do n = 1, Grid % n_bnd_cond
-    read(fu) Grid % bnd_cond % name(n)
+    read(fu) Grid % region % name(n)
   end do
 
   ! The last three are reserved for perodicity
   ! and used for inlet copy boundary condition.  Don't delete these thinking
   ! they are useless.  They are assigned in Calculate_Face_Geometry
-  Grid % bnd_cond % name(Grid % n_bnd_cond + 1) = 'PERIODIC_X'
-  Grid % bnd_cond % name(Grid % n_bnd_cond + 2) = 'PERIODIC_Y'
-  Grid % bnd_cond % name(Grid % n_bnd_cond + 3) = 'PERIODIC_Z'
+  Grid % region % name(Grid % n_bnd_cond + 1) = 'PERIODIC_X'
+  Grid % region % name(Grid % n_bnd_cond + 2) = 'PERIODIC_Y'
+  Grid % region % name(Grid % n_bnd_cond + 3) = 'PERIODIC_Z'
 
   !--------------------------!
   !   Nodes global numbers   !
@@ -272,10 +272,10 @@
   ! Physical boundary cells (and all the faces)
   ! (This opens the oportunity to store bounary condition info in ...
   !  ... the faces thus ridding us of the "if(c2 < 0) then" checks)
-  allocate (Grid % bnd_cond % color(-Grid % n_bnd_cells-1:Grid % n_faces))
-  read(fu) (Grid % bnd_cond % color(c), c = -Grid % n_bnd_cells, -1)
+  allocate (Grid % region % at_cell(-Grid % n_bnd_cells-1:Grid % n_faces))
+  read(fu) (Grid % region % at_cell(c), c = -Grid % n_bnd_cells, -1)
 
-  call Bnd_Cond_Ranges(Grid)
+  call Regions_Ranges(Grid)
 
   close(fu)
 

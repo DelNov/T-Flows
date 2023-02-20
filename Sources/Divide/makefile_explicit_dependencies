@@ -61,7 +61,7 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Boundary_Mod.o 
+$(DIR_OBJECT)/Region_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./File_Mod.f90
@@ -166,9 +166,9 @@ $(DIR_OBJECT)/Thick_Line.o:\
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
-# Dependencies for: ./Boundary_Mod.f90
+# Dependencies for: ./Region_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Boundary_Mod.o:\
+$(DIR_OBJECT)/Region_Mod.o:\
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------

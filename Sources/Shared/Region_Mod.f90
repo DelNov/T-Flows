@@ -1,7 +1,7 @@
 !==============================================================================!
-  module Boundary_Mod
+  module Region_Mod
 !------------------------------------------------------------------------------!
-!   This is used to store boundary conditions within a Grid_Type               !
+!   This is used to store regions (boundary conditions) within a Grid_Type     !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -20,26 +20,26 @@
   integer, parameter :: WALLFL   = 10067
   integer, parameter :: PRESSURE = 10069
 
-  !-------------------!
-  !   Boundary type   !
-  !-------------------!
-  type Boundary_Type
+  !-----------------!
+  !   Region type   !
+  !-----------------!
+  type Region_Type
 
     ! Name of the boundary conditions specified in grid generation
-    ! It ranges through number of boundary conditions (aka colors)
+    ! It ranges through number of boundary conditions (aka regions)
     character(SL), allocatable :: name(:)
 
-    ! Boundary types, ranging through all colors
+    ! Boundary types, ranging through all regions
     integer, allocatable :: type(:)
 
-    ! Boundary condition color ranging through boundary cells.
+    ! Boundary condition ranging through boundary cells.
     ! Values start from one, zero is internal cell
     ! (Follows nomenclature from "../Shared/Comm_Mod_Par.f90")
-    integer, allocatable :: color(:)
-    integer, allocatable :: color_s_cell(:)  ! start bnd cell for color
-    integer, allocatable :: color_e_cell(:)  ! end bnd cell for color
-    integer, allocatable :: color_s_face(:)  ! start bnd cell for color
-    integer, allocatable :: color_e_face(:)  ! end bnd cell for color
+    integer, allocatable :: at_cell(:)  ! region at cell
+    integer, allocatable :: f_cell(:)   ! first (bnd) cell for region
+    integer, allocatable :: l_cell(:)   ! last (bnd) cell for region
+    integer, allocatable :: f_face(:)   ! first (bnd) cell for region
+    integer, allocatable :: l_face(:)   ! last (bnd) cell for region
 
   end type
 

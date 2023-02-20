@@ -59,8 +59,8 @@
   print *, '#', Grid % max_n_bnd_cells, ' boundary cells'
   print *, '#', Grid % max_n_faces,     ' cell faces'
 
-  allocate (Grid % bnd_cond % color(-Grid % max_n_bnd_cells-1:-1))
-  Grid % bnd_cond % color = 0
+  allocate (Grid % region % at_cell(-Grid % max_n_bnd_cells-1:-1))
+  Grid % region % at_cell = 0
 
   ! Variables in Grid_Mod
   call Grid % Allocate_Nodes(Grid % max_n_nodes)

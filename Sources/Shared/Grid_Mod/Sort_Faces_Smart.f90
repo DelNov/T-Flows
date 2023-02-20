@@ -14,7 +14,7 @@
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, m, n, c, c1, c2, n_bc, color
+  integer              :: s, m, n, c, c1, c2, n_bc, reg
   integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
   integer, allocatable :: old_nn  (:)
   integer, allocatable :: old_shad(:)
@@ -33,7 +33,7 @@
 
   !--------------------------------------------------------!
   !   Form the three criteria:                             !
-  !   1 - the strongest is boundary condition color; to    !
+  !   1 - the strongest is boundary condition region; to   !
   !       sort faces by boundary condition colors first    !
   !   2 - the second on the list is cell number, so that   !
   !       inside cells are later browsed in a straight-    !
@@ -45,7 +45,7 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
     criteria(s,1) = HUGE_INT
-    if(c2 < 0) criteria(s,1) = Grid % bnd_cond % color(c2)
+    if(c2 < 0) criteria(s,1) = Grid % region % at_cell(c2)
     criteria(s,2) = c1
     criteria(s,3) = c2
     Grid % old_f(s) = s
@@ -72,10 +72,10 @@
     c2 = criteria(s,3)
 
     ! ... but renumber c2 if on the boundary
-    if(criteria(s,1) .ne. HUGE_INT) then                 ! on the boundary
-      Grid % faces_c(2,s) = -Grid % n_bnd_cells + n_bc   ! set face_c properly
-      Grid % old_c(-Grid % n_bnd_cells + n_bc) = c2      ! store the old number
-      n_bc = n_bc + 1                                    ! increase the count
+    if(criteria(s,1) .ne. HUGE_INT) then                ! on the boundary
+      Grid % faces_c(2,s) = -Grid % n_bnd_cells + n_bc  ! set face_c properly
+      Grid % old_c(-Grid % n_bnd_cells + n_bc) = c2     ! store the old number
+      n_bc = n_bc + 1                                   ! increase the count
     end if
 
   end do
@@ -88,13 +88,13 @@
   !   their boundary colors and geometrical quantities   !
   !------------------------------------------------------!
   do c=-1, -Grid % n_bnd_cells, -1
-    old_nn  ( -c) = Grid % bnd_cond % color(Grid % old_c(c))  ! use old_nn ...
+    old_nn  ( -c) = Grid % region % at_cell(Grid % old_c(c))  ! use old_nn ...
     old_bxyz(1,c) = Grid % xc(Grid % old_c(c))                ! ... for colors
     old_bxyz(2,c) = Grid % yc(Grid % old_c(c))
     old_bxyz(3,c) = Grid % zc(Grid % old_c(c))
   end do
   do c=-1, -Grid % n_bnd_cells, -1
-    Grid % bnd_cond % color(c) = old_nn  (-c)
+    Grid % region % at_cell(c) = old_nn(-c)
     Grid % xc(c) = old_bxyz(1,c)
     Grid % yc(c) = old_bxyz(2,c)
     Grid % zc(c) = old_bxyz(3,c)
@@ -163,21 +163,21 @@
     end do
   end do
 
-  ! Find boundary color ranges
-  call Bnd_Cond_Ranges(Grid)
+  ! Find boundary reg ranges
+  call Regions_Ranges(Grid)
 
   if(DEBUG) then
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1, s)
       c2 = Grid % faces_c(2, s)
       if(c2 < 0) then
-        print '(4i6)', s, c1, c2, Grid % bnd_cond % color(c2)
+        print '(4i6)', s, c1, c2, Grid % region % at_cell(c2)
       end if
     end do
 
-    do color = 1, Grid % n_bnd_cond
-      print '(2i6)', Grid % bnd_cond % color_s_cell(color),  &
-                     Grid % bnd_cond % color_e_cell(color)
+    do reg = 1, Grid % n_bnd_cond
+      print '(2i6)', Grid % region % f_cell(reg),  &
+                     Grid % region % l_cell(reg)
     end do
   end if
 

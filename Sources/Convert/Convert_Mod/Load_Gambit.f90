@@ -162,17 +162,17 @@
   !   Boundary conditions   !
   !-------------------------!
   Grid % n_bnd_cond = n_bnd_sect
-  allocate(Grid % bnd_cond % name(n_bnd_sect))
+  allocate(Grid % region % name(n_bnd_sect))
 
   do j = 1, n_bnd_sect
     call File % Read_Line(fu)        ! BOUNDARY CONDITIONS
     call File % Read_Line(fu)
     call String % To_Upper_Case(Line % tokens(1))
-    Grid % bnd_cond % name(j) = Line % tokens(1)
+    Grid % region % name(j) = Line % tokens(1)
     read(Line % tokens(3),'(i8)') dum1
     do i = 1, dum1
       read(fu,*) c, dum2, dir
-      Grid % cells_bnd_color(dir,c) = j
+      Grid % cells_bnd_region(dir,c) = j
     end do
     call File % Read_Line(fu)        ! ENDOFSECTION
   end do
@@ -180,7 +180,7 @@
   !------------------------------------!
   !   Pring boundary conditions info   !
   !------------------------------------!
-  call Grid % Print_Bnd_Cond_List()
+  call Grid % Print_Regions_List()
 
   close(fu)
 

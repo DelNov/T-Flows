@@ -310,9 +310,9 @@ Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
-# Dependencies for: ./Process_Mod/Update_Boundary_Values.f90
+# Dependencies for: ./Process_Mod/Update_Region_Values.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Update_Boundary_Values.o:\
+$(DIR_OBJECT)/Update_Region_Values.o:\
 $(DIR_OBJECT)/Vof_Mod.o \
 Vof_Mod/*/*.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
@@ -426,14 +426,14 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Boundary_Mod.o \
+$(DIR_OBJECT)/Region_Mod.o \
 $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Boundary_Mod.f90
+# Dependencies for: ./Region_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Boundary_Mod.o:\
+$(DIR_OBJECT)/Region_Mod.o:\
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------

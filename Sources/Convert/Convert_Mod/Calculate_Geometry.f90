@@ -19,7 +19,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b, i, j
   integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
-  integer              :: color_per, n_per, number_faces
+  integer              :: reg_per, n_per, number_faces
   real                 :: xs2, ys2, zs2
   real                 :: t, tot_surf, dis, min_dis, max_dis
   real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
@@ -288,7 +288,7 @@
     answer = ''
     do while(answer .ne. 'SKIP')
 
-      call Grid % Print_Bnd_Cond_List()
+      call Grid % Print_Regions_List()
       n_per = 0
       print *, '#=============================================================='
       print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
@@ -300,13 +300,13 @@
       call String % To_Upper_Case(answer)
 
       if( answer .eq. 'SKIP' ) then
-        color_per = 0
+        reg_per = 0
         exit
       end if
 
-      read(Line % tokens(1), *) color_per
-      if( color_per > Grid % n_bnd_cond ) then
-        print *, '# Critical error: boundary condition ', color_per,  &
+      read(Line % tokens(1), *) reg_per
+      if( reg_per > Grid % n_bnd_cond ) then
+        print *, '# Critical error: boundary condition ', reg_per,  &
                    ' doesn''t exist!'
         print *, '# Exiting! '
         stop
@@ -322,7 +322,7 @@
       do s = 1, Grid % n_faces
         c2 = Grid % faces_c(2,s)
         if(c2 < 0) then
-          if(Grid % bnd_cond % color(c2) .eq. color_per) then
+          if(Grid % region % at_cell(c2) .eq. reg_per) then
             cnt_per = cnt_per + 1
 
             ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
@@ -354,7 +354,7 @@
       do s = 1, Grid % n_faces
         c2 = Grid % faces_c(2,s)
         if(c2 < 0) then
-          if(Grid % bnd_cond % color(c2) .eq. color_per) then
+          if(Grid % region % at_cell(c2) .eq. reg_per) then
             v_o(1) = Grid % xf(s)
             v_o(2) = Grid % yf(s)
             v_o(3) = Grid % zf(s)
@@ -465,7 +465,7 @@
       cnt_bnd = 0
       Grid % new_c = 0
       do c = -1, -Grid % n_bnd_cells, -1
-        if(Grid % bnd_cond % color(c) .ne. color_per) then
+        if(Grid % region % at_cell(c) .ne. reg_per) then
           cnt_bnd = cnt_bnd + 1
           Grid % new_c(c) = -cnt_bnd
         end if
@@ -477,7 +477,7 @@
           Grid % xc(Grid % new_c(c)) = Grid % xc(c)
           Grid % yc(Grid % new_c(c)) = Grid % yc(c)
           Grid % zc(Grid % new_c(c)) = Grid % zc(c)
-         Grid % bnd_cond % color(Grid % new_c(c)) = Grid % bnd_cond % color(c)
+         Grid % region % at_cell(Grid % new_c(c)) = Grid % region % at_cell(c)
         end if
       end do
 
@@ -493,36 +493,36 @@
       Grid % n_bnd_cells = cnt_bnd
       print *, '# Kept boundary cells: ', Grid % n_bnd_cells
 
-      !--------------------------------------------------------------------!
-      !   Remove boundary condition with color_per and compress the rest   !
-      !--------------------------------------------------------------------!
-      if(color_per < Grid % n_bnd_cond) then
+      !------------------------------------------------------------------!
+      !   Remove boundary condition with reg_per and compress the rest   !
+      !------------------------------------------------------------------!
+      if(reg_per < Grid % n_bnd_cond) then
 
-        ! Set the color of boundary selected to be periodic to zero
+        ! Set the regions of boundary selected to be periodic to zero
         do c = -1, -Grid % n_bnd_cells, -1
-          if(Grid % bnd_cond % color(c) .eq. color_per) then
-            Grid % bnd_cond % color(c) = 0
+          if(Grid % region % at_cell(c) .eq. reg_per) then
+            Grid % region % at_cell(c) = 0
           end if
         end do
 
         ! Shift the rest of the boundary cells
         do b = 1, Grid % n_bnd_cond - 1
-          if(b .ge. color_per) then
+          if(b .ge. reg_per) then
 
             ! Correct the names
-            Grid % bnd_cond % name(b) = Grid % bnd_cond % name (b+1)
+            Grid % region % name(b) = Grid % region % name (b+1)
 
-            ! Correct all boundary colors too
+            ! Correct all boundary regions too
             do c = -1, -Grid % n_bnd_cells, -1
-              if(Grid % bnd_cond % color(c) .eq. (b+1)) then
-                Grid % bnd_cond % color(c) = b
+              if(Grid % region % at_cell(c) .eq. (b+1)) then
+                Grid % region % at_cell(c) = b
               end if
             end do
 
           end if
         end do
       else
-        Grid % bnd_cond % name(Grid % n_bnd_cond) = ''
+        Grid % region % name(Grid % n_bnd_cond) = ''
       end if
       Grid % n_bnd_cond = Grid % n_bnd_cond - 1
 

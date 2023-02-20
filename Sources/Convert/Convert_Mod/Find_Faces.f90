@@ -53,7 +53,7 @@
     if(Grid % cells_n_nodes(c) .eq. 6) fn = WED
     if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
     do i_fac = 1, 6
-      if(Grid % cells_bnd_color(i_fac, c) .eq. 0) then
+      if(Grid % cells_bnd_region(i_fac, c) .eq. 0) then
 
         ! Fetch face nodes (-1 becomes HUGE_INT and it will be the biggest)
         do i_nod = 1, 4

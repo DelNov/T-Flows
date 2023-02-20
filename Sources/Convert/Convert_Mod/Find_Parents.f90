@@ -47,7 +47,7 @@
   ! Mark all nodes on the boundary
   is_node_bnd(:) = .false.
   do c2 = -Grid % n_bnd_cells, -1
-    if( Grid % bnd_cond % color(c2) .gt. 0 ) then
+    if( Grid % region % at_cell(c2) .gt. 0 ) then
       do i_nod = 1, Grid % cells_n_nodes(c2)  ! 3 or 4
         is_node_bnd( Grid % cells_n(i_nod, c2) ) = .true.
       end do
@@ -94,7 +94,7 @@
 
     cnt_f = 0
     do c2 = -Grid % n_bnd_cells, -1
-      if( Grid % bnd_cond % color(c2) .eq. bc ) then
+      if( Grid % region % at_cell(c2) .eq. bc ) then
 
         ! Increase total face count
         cnt_f = cnt_f + 1
@@ -180,7 +180,7 @@
             c1  = w1(j_fac)
             dir = w2(j_fac)
           end if
-          Grid % cells_bnd_color(dir, c1) = bc
+          Grid % cells_bnd_region(dir, c1) = bc
 
         end if
       end if

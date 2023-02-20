@@ -22,7 +22,7 @@
 
   ! This is too much memory but that's OK 
   !  (+1 is to store the default values)
-  allocate(Grid % bnd_cond % name(dom % n_ranges + 1))
+  allocate(Grid % region % name(dom % n_ranges + 1))
 
   ! Initialize number of boundary conditions
   n_bnd = 0
@@ -87,12 +87,12 @@
 
       found = .false.
       do r=1,n_bnd
-        if( Grid % bnd_cond % name(r) .eq.   &
+        if( Grid % region % name(r) .eq.   &
             dom % ranges(n) % name ) found = .true.
       end do
       if( .not. found) then
         n_bnd = n_bnd + 1
-        Grid % bnd_cond % name(n_bnd) = dom % ranges(n) % name
+        Grid % region % name(n_bnd) = dom % ranges(n) % name
       end if
 
       do i=is,ie
@@ -111,6 +111,6 @@
   ! Store the number of boundary conditions
   Grid % n_bnd_cond = n_bnd
 
-  call Grid % Print_Bnd_Cond_List()
+  call Grid % Print_Regions_List()
 
   end subroutine

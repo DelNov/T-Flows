@@ -252,7 +252,7 @@
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      write(fu) Grid % bnd_cond % color(c2)
+      write(fu) Grid % region % at_cell(c2)
     else
       write(fu) 0
     end if

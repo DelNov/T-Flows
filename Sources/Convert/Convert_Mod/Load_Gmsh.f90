@@ -430,7 +430,7 @@
       end if
 
       if(dim .eq. 2) then
-        Grid % bnd_cond % color(c) = phys_tags(s_tag)
+        Grid % region % at_cell(c) = phys_tags(s_tag)
         n_bnd_cells(phys_tags(s_tag)) = n_bnd_cells(phys_tags(s_tag)) + 1
       end if
     end do
@@ -515,11 +515,11 @@
   !                                  !
   !----------------------------------!
   Grid % n_bnd_cond = n_bnd_sect
-  allocate(Grid % bnd_cond % name(n_bnd_sect))
+  allocate(Grid % region % name(n_bnd_sect))
 
   do i = 1, n_bnd_sect
-    Grid % bnd_cond % name(i) = phys_names(i)
-    call String % To_Upper_Case(Grid % bnd_cond % name(i))
+    Grid % region % name(i) = phys_names(i)
+    call String % To_Upper_Case(Grid % region % name(i))
   end do
 
   !------------------------------------!
@@ -527,7 +527,7 @@
   !   Print boundary conditions info   !
   !                                    !
   !------------------------------------!
-  call Grid % Print_Bnd_Cond_List()
+  call Grid % Print_Regions_List()
 
   close(fu)
 
