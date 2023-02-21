@@ -19,7 +19,7 @@
   character(SL)   :: app_up
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
-  integer         :: l, p, g, n_grids
+  integer         :: s, l, p, g, n_grids
   logical         :: city
 !==============================================================================!
 
@@ -164,13 +164,15 @@
     call Grid(g) % Initialize_New_Numbers()
 
     ! Note #1 about shadows:
-    ! At this point you have grid % n_faces faces and grid % n_shadows (on top)
+    ! At this point you have Grid % n_faces faces and Grid % n_shadows (on top)
     ! and they are pointing to each other.  Besides, both real face and its
     ! shadow have the same c1 and c2, both inside cells with positive indices
     ! Real faces which do not have shadows have index "0" for shadow.
-    ! Should check like this: do s = 1, grid % n_faces + grid % n_shadows
-    ! Should check like this:   write(20, '(99i9)') s, grid % faces_s(s)
-    ! Should check like this: end do
+    do s = 1, Grid(g) % n_faces + Grid(g) % n_shadows
+      if(Grid(g) % faces_s(s) .ne. 0) then
+        Assert(Grid(g) % faces_s(Grid(g) % faces_s(s)) .eq. s)
+      end if
+    end do
     ! Similar note is in Generate, also called Note #1
 
     call Grid(g) % Print_Grid_Statistics()

@@ -19,7 +19,7 @@
   type(Grid_Type)    :: Grid      ! Grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c         ! cell counter
+  integer            :: c, s      ! cell counter
 !==============================================================================!
 
   ! Initialize program profler
@@ -71,9 +71,11 @@
   ! and they are pointing to each other.  Besides, both real face and its
   ! shadow have the same c1 and c2, both inside cells with positive indices
   ! Real faces which do not have shadows have "0" for shadow.
-  ! Checked like this: do s = 1, Grid % n_faces + Grid % n_shadows
-  ! Checked like this:   write(20, '(99i9)') s, Grid % faces_s(s)
-  ! Checked like this: end do
+  do s = 1, Grid % n_faces + Grid % n_shadows
+    if(Grid % faces_s(s) .ne. 0) then
+      Assert(Grid % faces_s(Grid % faces_s(s)) .eq. s)
+    end if
+  end do
   ! Similar note is in Convert, also called Note #1
 
   !------------------------------!
