@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, cnt
+  integer :: c, cnt, reg
 !==============================================================================!
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
 !   functions than T-Flows.  In cases a subdomain has no physical boundary     !
@@ -30,9 +30,15 @@
     end if
   end do
 
-  ! First and last cell to send
-  Grid % Comm % nb_f = Grid % n_bnd_cells
-  Grid % Comm % nb_l = Grid % n_bnd_cells - Grid % Comm % nb_sub + 1
+  ! First and last cell to send are found through regions
+  Grid % Comm % nb_l = Grid % n_bnd_cells
+  Grid % Comm % nb_f = 1
+  do reg = Boundary_Regions()
+    if(Grid % region % l_cell(reg) >= Grid % region % f_cell(reg)) then
+      Grid % Comm % nb_l = min(Grid % Comm % nb_l, -Grid % region % l_cell(reg))
+      Grid % Comm % nb_f = max(Grid % Comm % nb_f, -Grid % region % f_cell(reg))
+    end if
+  end do
 
   ! Initialize total number of cells
   Grid % Comm % nc_tot = Grid % Comm % nc_sub
@@ -97,11 +103,13 @@
     !   Boundary cell map   !
     !-----------------------!
     cnt = 0
-    do c = -Grid % Comm % nb_f, -Grid % Comm % nb_l
-      cnt = cnt + 1
-      Grid % Comm % bnd_cell_map(cnt) = int(  Grid % Comm % cell_glo(c)  &
-                                            + Grid % Comm % nb_tot, SP)
-    end do
+    do reg = Boundary_Regions()
+      do c = Grid % region % f_cell(reg), Grid % region % l_cell(reg)
+        cnt = cnt + 1
+        Grid % Comm % bnd_cell_map(cnt) = int(  Grid % Comm % cell_glo(c)  &
+                                              + Grid % Comm % nb_tot, SP)
+      end do
+    end do  ! region
 
     ! If domain has zero boundary cells, make the only
     ! (fictitious) member in the map point it to zero.
