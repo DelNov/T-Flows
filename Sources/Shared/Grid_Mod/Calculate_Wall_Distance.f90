@@ -74,9 +74,7 @@
         ' % complete...', achar(13)
 
       do b = 1, n_wall_colors
-        do c2 = Grid % region % f_cell( wall_colors(b) ),  &
-                Grid % region % l_cell( wall_colors(b) ),  &
-                -1
+        do c2 = Cells_In_Region( wall_colors(b) )
           Grid % wall_dist(c1) =                        &
             min(Grid % wall_dist(c1),                   &
                 Math % Distance_Squared(Grid % xc(c1),  &
