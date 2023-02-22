@@ -16,6 +16,10 @@
     Grid % region % f_face(Grid % n_regions),   \
     Grid % region % l_face(Grid % n_regions)
 
+# define Cells_In_Region(reg)                   \
+    Grid % region % f_cell(reg),                \
+    Grid % region % l_cell(reg)
+
 # define Cells_In_Domain()                      \
     Grid % region % f_cell(Grid % n_regions),   \
     Grid % region % l_cell(Grid % n_regions)
