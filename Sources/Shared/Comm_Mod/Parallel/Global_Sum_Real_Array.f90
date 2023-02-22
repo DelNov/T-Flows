@@ -5,23 +5,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n
-  real    :: phi(n)
+  integer, intent(in)    :: n
+  real,    intent(inout) :: phi(n)
 !-----------------------------------[Locals]-----------------------------------!
-  real,   allocatable :: phi_res(:)
-  integer             :: error
+  integer :: error
 !==============================================================================!
 
-  allocate(phi_res(n))
-
-  call Mpi_Allreduce(phi,                   & ! send buffer
-                     phi_res,               & ! recv buffer
-                     n,                     & ! length
-                     comm_type_real,        & ! datatype
-                     MPI_SUM,               & ! operation
-                     MPI_COMM_WORLD,        &
+  call Mpi_Allreduce(MPI_IN_PLACE,    & ! indicate that send and recv are same
+                     phi,             & ! send and recv buffer
+                     n,               & ! length
+                     comm_type_real,  & ! datatype
+                     MPI_SUM,         & ! operation
+                     MPI_COMM_WORLD,  &
                      error)
-
-  phi(1:n) = phi_res(1:n)
 
   end subroutine
