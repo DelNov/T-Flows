@@ -5,14 +5,24 @@
 !                                                                              !
 !   Warning: Unfortunatelly, if you change the order in which cells are        !
 !   stored here, it might have an impact on map creation for backup file.      !
+!                                                                              !
+!   Region-wise, at this point you have:                                       !
+!                                                                              !
+!   Faces:   1   2   3   4   5   6   7   8   9  10  11  12  13 14  15  16      !
+!                                                                              !
+!   Cells: -16 -15 -14 -13 -12 -11 -10  -9  -8  -7  -6  -5  -4 -3  -2  -1      !
+!                                                                              !
+!   Reg:   |<----------- 1 ----------->|<----- 2 ----->|<------ 3 ------>|     !
+!                                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Divide_Type) :: Divide
-  type(Grid_Type)    :: Grid
-  integer            :: n_buff_layers  ! number of buffer layers, keep it here
+  class(Divide_Type)  :: Divide
+  type(Grid_Type)     :: Grid
+  integer, intent(in) :: n_buff_layers  ! number of buffer layers, keep it here
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, n, s, c1, c2, sub, subo, i_nod, ss, sr, nn !exp:, lev
+  integer :: c, n, s, c1, c2, sub, subo, i_nod
+  integer :: ss, sr, nn, reg, bc_indx !exp:, lev
   integer :: nn_sub      ! number of nodes in the subdomain
   integer :: nc_sub      ! number of cells in the subdomain
   integer :: nf_sub      ! number of faces in the subdomain
@@ -133,7 +143,8 @@
     !   Boundary cells   !
     !                    !
     !--------------------!
-    nbc_sub = 0     ! number of boundary cells in subdomain
+    bc_indx = -Grid % n_bnd_cells  ! number of boundary cells in subdomain, ...
+                                   ! ... start from the smallest possible
     Grid % new_c(-Grid % n_bnd_cells:-1) = 0
     Grid % old_c(-Grid % n_bnd_cells:-1) = 0
 
@@ -143,18 +154,18 @@
     do subo = 1, maxval(Grid % Comm % cell_proc(:))
       if(subo .ne. sub) then
 
-        do s = 1, Grid % n_faces
-          c1 = Grid % faces_c(1,s)
-          c2 = Grid % faces_c(2,s)
-          if(c2 < 0) then
+        do reg = Boundary_Regions()
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+            Assert(c2 < 0)
             if( Grid % Comm % cell_proc(c1) .eq. subo .and.  &
                 Grid % new_c(c1) .ne. 0)  then
-              nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
-              Grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
-              Grid % old_c(-nbc_sub) = c2
+              Grid % new_c(c2) = bc_indx  ! new loc. number of bnd. cell
+              bc_indx = bc_indx + 1       ! increase boundary cell counter
             end if
-          end if
-        end do
+          end do   ! s
+        end do     ! region
 
       end if  ! subo .ne. sub
     end do    ! subo
@@ -162,15 +173,27 @@
     !----------------------------------------------!
     !   Step 2: boundary cells in the domain sub   !
     !----------------------------------------------!
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
+    do reg = Boundary_Regions()
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+        Assert(c2 < 0)
         if( Grid % Comm % cell_proc(c1) .eq. sub )  then
-          nbc_sub = nbc_sub + 1        ! increase n. of bnd. cells
-          Grid % new_c(c2) = -nbc_sub  ! new loc. number of bnd. cell
-          Grid % old_c(-nbc_sub) = c2
+          Grid % new_c(c2) = bc_indx  ! new loc. number of bnd. cell
+          bc_indx = bc_indx + 1       ! increase boundary cell counter
         end if
+      end do
+    end do
+
+    ! At this point, new boundary cell counters go from -Grid % n_bnd_cells
+    ! That is too low, all indices have to be increased in a way that maximum
+    ! boundary cell index is -1
+    nbc_sub = 0
+    do c = -Grid % n_bnd_cells, -1
+      if(Grid % new_c(c) .ne. 0)  then
+        Grid % new_c(c) = Grid % new_c(c) - bc_indx
+        Grid % old_c(Grid % new_c(c)) = c
+        nbc_sub = nbc_sub + 1
       end if
     end do
 
@@ -191,17 +214,19 @@
     !    If the faces in the original grid started from       !
     !    boundary faces, it should be the case here too.)     !
     !---------------------------------------------------------!
-    do s = 1, Grid % n_faces  ! + n_shadows?  probably not, shadows at the end
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    do reg = Boundary_And_Inside_Regions()  ! shadows? probably not, at the end
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-      ! Both cells are in the domain
-      if( Grid % Comm % cell_proc(c1) .eq. sub .and.  &
-          Grid % Comm % cell_proc(c2) .eq. sub )  then
-        nf_sub = nf_sub + 1
-        Grid % new_f(s) = nf_sub
-        Grid % old_f(nf_sub) = s
-      end if
+        ! Both cells are in the domain
+        if( Grid % Comm % cell_proc(c1) .eq. sub .and.  &
+            Grid % Comm % cell_proc(c2) .eq. sub )  then
+          nf_sub = nf_sub + 1
+          Grid % new_f(s) = nf_sub
+          Grid % old_f(nf_sub) = s
+        end if
+      end do
     end do
 
     !-------------------------------------!
@@ -211,24 +236,24 @@
       if(subo .ne. sub) then
 
         ! Faces half in the domain, half in the buffers
-        do s = 1, Grid % n_faces  ! + n_shadows?  naah, shadows at the end
+        do s = Faces_In_Domain()
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
-          if(c2 > 0) then
-            if( (Grid % Comm % cell_proc(c1) .eq. sub) .and.  &
-                (Grid % Comm % cell_proc(c2) .eq. subo) ) then
-              nf_sub = nf_sub + 1
-              Grid % new_f(s) = nf_sub
-              Grid % old_f(nf_sub) = s
-            end if
-            if( (Grid % Comm % cell_proc(c2) .eq. sub) .and.  &
-                (Grid % Comm % cell_proc(c1) .eq. subo) ) then
-              nf_sub = nf_sub + 1
-              Grid % new_f(s) = nf_sub
-              Grid % old_f(nf_sub) = s
-            end if
-          end if  ! c2 > 0
-        end do    ! through faces
+
+          if( (Grid % Comm % cell_proc(c1) .eq. sub) .and.  &
+              (Grid % Comm % cell_proc(c2) .eq. subo) ) then
+            nf_sub = nf_sub + 1
+            Grid % new_f(s) = nf_sub
+            Grid % old_f(nf_sub) = s
+          end if
+          if( (Grid % Comm % cell_proc(c2) .eq. sub) .and.  &
+              (Grid % Comm % cell_proc(c1) .eq. subo) ) then
+            nf_sub = nf_sub + 1
+            Grid % new_f(s) = nf_sub
+            Grid % old_f(nf_sub) = s
+          end if
+
+        end do    ! through inside faces (region 0)
 
       end if  ! subo .ne. sub
     end do    ! subo
@@ -236,23 +261,24 @@
     !------------------------------------------------!
     !   Step 3: All the remaining faces in buffers   !
     !------------------------------------------------!
-    do s = 1, Grid % n_faces  ! + n_shadows?  naah, shadows at the end
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    do reg = Boundary_And_Inside_Regions()  ! shadows? probably not, at the end
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-      ! If any of its cells have been marked for saving ...
-      if(Grid % new_c(c1) .ne. 0 .or.  &
-         Grid % new_c(c2) .ne. 0) then
+        ! If any of its cells have been marked for saving ...
+        if(Grid % new_c(c1) .ne. 0 .or.  &
+           Grid % new_c(c2) .ne. 0) then
 
-        ! ... but the face hasn't, do it now!
-        if(Grid % new_f(s) .eq. 0) then
-          nf_sub = nf_sub + 1
-          Grid % new_f(s) = nf_sub
-          Grid % old_f(nf_sub) = s
+          ! ... but the face hasn't, do it now!
+          if(Grid % new_f(s) .eq. 0) then
+            nf_sub = nf_sub + 1
+            Grid % new_f(s) = nf_sub
+            Grid % old_f(nf_sub) = s
+          end if
         end if
-
-      end if  !  new_c(c) .ne. 0
-    end do    !  c
+      end do
+    end do
 
     !--------------------------!
     !   Step 4: shadow faces   !
