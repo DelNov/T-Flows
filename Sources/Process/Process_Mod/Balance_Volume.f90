@@ -26,9 +26,11 @@
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w
   type(Face_Type), pointer :: v_flux
-  integer                  :: s, c1, c2
+  integer                  :: s, c2, reg
   real                     :: fac, vol_outflow, area_outflow
 !==============================================================================!
+
+  call Profiler % Start('Balance_Volume')
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -43,7 +45,6 @@
   !                                                        !
   !--------------------------------------------------------!
   do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
     ! Side is on the boundary
@@ -77,13 +78,11 @@
   !----------------------------------------------------------!
   vol_outflow  = 0.0
   area_outflow = 0.0
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. CONVECT) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+      do s = Faces_In_Region(reg)
 
         ! Integrate volume flux only where something does come out
         if(v_flux % n(s) > 0.0) then
@@ -92,7 +91,8 @@
 
         ! Integrate area everywhere where outflow is specified
         area_outflow = area_outflow + Grid % s(s)
-      end if
+
+      end do
     end if
   end do
   call Comm_Mod_Global_Sum_Real(vol_outflow)
@@ -112,17 +112,13 @@
   !   This works better if domain features pressure outflow ...   !
   !---------------------------------------------------------------!
   if(Flow % has_pressure) then
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
 
-      ! Volume flux at the boundary face
-      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
-
-        if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW   .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. INFLOW    .or.  &
+         Grid % region % type(reg) .eq. OUTFLOW   .or.  &
+         Grid % region % type(reg) .eq. CONVECT   .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
           if(v_flux % n(s) > 0.0) then
             bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
             bulk % area_out = bulk % area_out + Grid % s(s)
@@ -130,37 +126,32 @@
             bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
             bulk % area_in = bulk % area_in + Grid % s(s)
           end if
-        end if
-
-      end if
-    end do
+        end do    ! faces
+      end if      ! boundary conditions
+    end do        ! regions
 
   !-----------------------------------------------------------------------!
   !   ... but this variant works better for all other types of outflows   !
   !-----------------------------------------------------------------------!
   else
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-
-      ! Volume flux at the boundary face
-      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
-
-        if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. INFLOW) then
+        do s = Faces_In_Region(reg)
           bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
           bulk % area_in = bulk % area_in + Grid % s(s)
-        end if
-
-        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+        end do
+      end if    ! boundary condition
+      if(Grid % region % type(reg) .eq. OUTFLOW   .or.  &
+         Grid % region % type(reg) .eq. CONVECT   .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
           bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
           bulk % area_out = bulk % area_out + Grid % s(s)
-        end if
+        end do
+      end if    ! boundary condition
+    end do      ! regions
 
-      end if
-    end do
-  end if
+  end if  ! flow has pressure
 
   call Comm_Mod_Global_Sum_Real(bulk % vol_in)
   call Comm_Mod_Global_Sum_Real(bulk % vol_out)
@@ -187,13 +178,13 @@
   if(Math % Approx_Real(vol_outflow, 0.0, tol=FEMTO)) then
 
     bulk % vol_out = 0.0
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
-        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. OUTFLOW   .or.  &
+         Grid % region % type(reg) .eq. CONVECT   .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
 
           ! Update velocity components ...
           u % n(c2) = (bulk % vol_in + bulk % vol_src) / area_outflow  &
@@ -210,9 +201,9 @@
 
           ! ... and bulk volume out
           bulk % vol_out = bulk % vol_out + v_flux % n(s)
-        end if
-      end if
-    end do
+        end do  ! faces
+      end if    ! boundary condition
+    end do      ! region
 
     ! Holy mackrele: summ it up over all processors
     call Comm_Mod_Global_Sum_Real(bulk % vol_out)
@@ -229,13 +220,13 @@
 
     ! ... and correct all velocities
     bulk % vol_out = 0.0
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-           Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. OUTFLOW   .or.  &
+         Grid % region % type(reg) .eq. CONVECT   .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
 
           ! Update velocity components ...
           u % n(c2) = u % n(c2) * fac + bulk % vol_src / bulk % area_out  &
@@ -252,9 +243,9 @@
 
           ! ... and bulk volume out
           bulk % vol_out = bulk % vol_out + v_flux % n(s)
-        end if
-      end if
-    end do
+        end do  ! faces
+      end if    ! boundary condition
+    end do      ! regions
 
     ! Holy mackrele: summ it up over all processors
     call Comm_Mod_Global_Sum_Real(bulk % vol_out)  ! not checked
@@ -265,5 +256,7 @@
   call Grid % Exchange_Cells_Real(u % n)
   call Grid % Exchange_Cells_Real(v % n)
   call Grid % Exchange_Cells_Real(w % n)
+
+  call Profiler % Stop('Balance_Volume')
 
   end subroutine

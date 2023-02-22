@@ -175,7 +175,7 @@
       end if
     end do
 
-    do reg = 1, Grid % n_regions
+    do reg = Boundary_Regions()
       print '(2i6)', Grid % region % f_cell(reg),  &
                      Grid % region % l_cell(reg)
     end do

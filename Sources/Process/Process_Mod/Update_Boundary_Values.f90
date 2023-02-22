@@ -32,9 +32,11 @@
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: c0, c1, c2, i_fac, s, s1, sc
+  integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
   real                     :: kin_vis, u_tau, dt_dn
 !==============================================================================!
+
+  call Profiler % Start('Update_Boundary_Values')
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -68,23 +70,21 @@
   !--------------!
   if( (update .eq. 'MOMENTUM' .or. update .eq. 'ALL') ) then
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    ! On the boundary perform the extrapolation
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+         Grid % region % type(reg) .eq. PRESSURE .or.  &
+         Grid % region % type(reg) .eq. SYMMETRY) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-      ! On the boundary perform the extrapolation
-      if(c2 < 0) then
-
-        ! Extrapolate velocities on the outflow boundary
-        if( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.     &
-            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.    &
-            Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY ) then
           u % n(c2) = u % n(c1)
           v % n(c2) = v % n(c1)
           w % n(c2) = w % n(c1)
-        end if
-      end if ! c2 < 0
-    end do
+        end do  ! faces
+      end if    ! boundary condition
+    end do      ! region
 
   end if  ! update momentum
 
@@ -168,7 +168,6 @@
         if(Turb % model .eq. K_EPS_ZETA_F .or.  &
            Turb % model .eq. HYBRID_LES_RANS) then
           if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.   &
-             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.   &
              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.   &
              Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
             kin  % n(c2) = kin  % n(c1)
@@ -185,7 +184,6 @@
         ! k-epsilon
         if(Turb % model .eq. K_EPS) then
           if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
             kin % n(c2) = kin % n(c1)
@@ -199,7 +197,6 @@
         if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
            Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
           if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. CONVECT .or.  &
              Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
             uu  % n(c2) = uu  % n(c1)
             vv  % n(c2) = vv  % n(c1)
@@ -435,5 +432,7 @@
     end do ! sc = 1, Flow % n_scalars
 
   end if  ! update_scalars
+
+  call Profiler % Stop('Update_Boundary_Values')
 
   end subroutine

@@ -22,7 +22,7 @@
 
   ! Two time levels; Linear interpolation
   if(phi % td_scheme .eq. LINEAR) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       a0 = coef(c) * Grid % vol(c) / dt
       A % val(A % dia(c)) = A % val(A % dia(c)) + a0
       b(c)  = b(c) + a0 * phi % o(c)
@@ -31,7 +31,7 @@
 
   ! Three time levels; parabolic interpolation
   if(phi % td_scheme .eq. PARABOLIC) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       a0 = coef(c) * Grid % vol(c) / dt
       A % val(A % dia(c)) = A % val(A % dia(c)) + 1.5 * a0
       b(c)  = b(c) + 2.0 * a0 * phi % o(c) - 0.5 * a0 * phi % oo(c)

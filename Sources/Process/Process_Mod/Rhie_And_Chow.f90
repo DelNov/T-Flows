@@ -157,10 +157,12 @@
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
-  do s = 1, Grid % n_faces
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
     fs = Grid % f(s)
+
+    Assert(c2 > 0)
 
     ! Face is inside the domain
     if(c2 > 0) then

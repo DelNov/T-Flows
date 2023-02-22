@@ -12,7 +12,7 @@
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer  :: Grid
-  integer                   :: c, c1, c2, s
+  integer                   :: c, c1, c2, s, reg
   real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
   real                      :: jac, g_inv(6)
   real, contiguous, pointer :: g1(:), g2(:), g3(:), g4(:), g5(:), g6(:)
@@ -28,7 +28,7 @@
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
   !--------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     Flow % grad_c2c(1,c) = 0.0
     Flow % grad_c2c(2,c) = 0.0
     Flow % grad_c2c(3,c) = 0.0
@@ -40,7 +40,27 @@
   !----------------------------------------------------------------------!
   !   Compute the gradient matrix for all cells browsing through faces   !
   !----------------------------------------------------------------------!
-  do s = 1, Grid % n_faces
+
+  ! Boundary cells
+  do reg = Boundary_Regions()
+    do s = Faces_In_Region(reg)
+      c1 = Grid % faces_c(1,s)
+
+      dx_c1 = Grid % dx(s)
+      dy_c1 = Grid % dy(s)
+      dz_c1 = Grid % dz(s)
+
+      Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1  ! 1,1
+      Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1  ! 2,2
+      Flow % grad_c2c(3,c1)=Flow % grad_c2c(3,c1) + dz_c1*dz_c1  ! 3,3
+      Flow % grad_c2c(4,c1)=Flow % grad_c2c(4,c1) + dx_c1*dy_c1  ! 1,2  &  2,1
+      Flow % grad_c2c(5,c1)=Flow % grad_c2c(5,c1) + dx_c1*dz_c1  ! 1,3  &  3,1
+      Flow % grad_c2c(6,c1)=Flow % grad_c2c(6,c1) + dy_c1*dz_c1  ! 2,3  &  3,2
+    end do
+  end do
+
+  ! Faces inside the domain
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -51,27 +71,26 @@
     dy_c2 = Grid % dy(s)
     dz_c2 = Grid % dz(s)
 
-    Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1    ! 1,1
-    Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1    ! 2,2
-    Flow % grad_c2c(3,c1)=Flow % grad_c2c(3,c1) + dz_c1*dz_c1    ! 3,3
-    Flow % grad_c2c(4,c1)=Flow % grad_c2c(4,c1) + dx_c1*dy_c1    ! 1,2  &  2,1
-    Flow % grad_c2c(5,c1)=Flow % grad_c2c(5,c1) + dx_c1*dz_c1    ! 1,3  &  3,1
-    Flow % grad_c2c(6,c1)=Flow % grad_c2c(6,c1) + dy_c1*dz_c1    ! 2,3  &  3,2
-    if(c2 > 0) then  ! this is enough even for parallel
-      Flow % grad_c2c(1,c2)=Flow % grad_c2c(1,c2) + dx_c2*dx_c2  ! 1,1
-      Flow % grad_c2c(2,c2)=Flow % grad_c2c(2,c2) + dy_c2*dy_c2  ! 2,2
-      Flow % grad_c2c(3,c2)=Flow % grad_c2c(3,c2) + dz_c2*dz_c2  ! 3,3
-      Flow % grad_c2c(4,c2)=Flow % grad_c2c(4,c2) + dx_c2*dy_c2  ! 1,2  &  2,1
-      Flow % grad_c2c(5,c2)=Flow % grad_c2c(5,c2) + dx_c2*dz_c2  ! 1,3  &  3,1
-      Flow % grad_c2c(6,c2)=Flow % grad_c2c(6,c2) + dy_c2*dz_c2  ! 2,3  &  3,2
-    end if
+    Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1  ! 1,1
+    Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1  ! 2,2
+    Flow % grad_c2c(3,c1)=Flow % grad_c2c(3,c1) + dz_c1*dz_c1  ! 3,3
+    Flow % grad_c2c(4,c1)=Flow % grad_c2c(4,c1) + dx_c1*dy_c1  ! 1,2  &  2,1
+    Flow % grad_c2c(5,c1)=Flow % grad_c2c(5,c1) + dx_c1*dz_c1  ! 1,3  &  3,1
+    Flow % grad_c2c(6,c1)=Flow % grad_c2c(6,c1) + dy_c1*dz_c1  ! 2,3  &  3,2
+
+    Flow % grad_c2c(1,c2)=Flow % grad_c2c(1,c2) + dx_c2*dx_c2  ! 1,1
+    Flow % grad_c2c(2,c2)=Flow % grad_c2c(2,c2) + dy_c2*dy_c2  ! 2,2
+    Flow % grad_c2c(3,c2)=Flow % grad_c2c(3,c2) + dz_c2*dz_c2  ! 3,3
+    Flow % grad_c2c(4,c2)=Flow % grad_c2c(4,c2) + dx_c2*dy_c2  ! 1,2  &  2,1
+    Flow % grad_c2c(5,c2)=Flow % grad_c2c(5,c2) + dx_c2*dz_c2  ! 1,3  &  3,1
+    Flow % grad_c2c(6,c2)=Flow % grad_c2c(6,c2) + dy_c2*dz_c2  ! 2,3  &  3,2
 
   end do
 
   !--------------------------------!
   !   Find the inverse of matrix   !
   !--------------------------------!
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     jac = Flow % grad_c2c(1,c) * Flow % grad_c2c(2,c) * Flow % grad_c2c(3,c)  &
         - Flow % grad_c2c(1,c) * Flow % grad_c2c(6,c) * Flow % grad_c2c(6,c)  &
         - Flow % grad_c2c(4,c) * Flow % grad_c2c(4,c) * Flow % grad_c2c(3,c)  &
@@ -102,7 +121,7 @@
   end do
 
   if(DEBUG) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       g1(c) = Flow % grad_c2c(1,c)
       g2(c) = Flow % grad_c2c(2,c)
       g3(c) = Flow % grad_c2c(3,c)

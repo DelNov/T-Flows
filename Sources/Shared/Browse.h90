@@ -2,12 +2,20 @@
 !   Definition of potentially usefull macros in T-Flows.                       !
 !------------------------------------------------------------------------------!
 
-# define Browse_All_Cells(c)              do c = -Grid % n_bnd_cells, Grid % n_cells
-# define Browse_Boundary_Cells(c)         do c = -Grid % n_bnd_cells, -1
-# define Browse_Inside_Cells(c)           do c = 1, Grid % n_cells
-# define Browse_Faces(c)                  do s = 1, Grid % n_faces
+# define Boundary_Regions()                     \
+    1, Grid % n_bnd_regions
 
-# define Browse_Faces_In_Color(s, color)  do s = Grid % region % f_face(color), Grid % region % l_face(color)
-# define End_Browse                       end do
+# define Boundary_And_Inside_Regions()          \
+    1, Grid % n_regions
 
+# define Faces_In_Region(reg)                   \
+    Grid % region % f_face(reg),                \
+    Grid % region % l_face(reg)
 
+# define Faces_In_Domain()                      \
+    Grid % region % f_face(Grid % n_regions),   \
+    Grid % region % l_face(Grid % n_regions)
+
+# define Cells_In_Domain()                      \
+    Grid % region % f_cell(Grid % n_regions),   \
+    Grid % region % l_cell(Grid % n_regions)

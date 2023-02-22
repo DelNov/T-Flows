@@ -175,7 +175,7 @@
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then
       if(ini .eq. 1) then
-        do c = 1, Grid % n_cells
+        do c = Cells_In_Domain()
           ui % oo(c) = ui % o(c)
           ui % o (c) = ui % n(c)
         end do
@@ -269,7 +269,7 @@
     ! Explicit treatment for cross diffusion terms
     ! (Shouldn't theese, in an ideal world,
     !  also be treated in Rhie and Chow?)
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       fi(c) = fi(c) + cross(c)
     end do
 
@@ -289,14 +289,14 @@
     !--------------------------!
     !   Global pressure drop   !
     !--------------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       fi(c) = fi(c) + p_drop_i * Grid % vol(c)
     end do
 
     !--------------------!
     !   Buoyancy force   !
     !--------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       fi(c) = fi(c) + cell_fi(c) * Grid % vol(c)
     end do
 
@@ -310,7 +310,7 @@
     !   (Note: pressure gradients are not with other forces.    !
     !    Same is true for surface tension, see nex comments)    !
     !-----------------------------------------------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       b(c) = fi(c) - p_i(c) * Grid % vol(c)
     end do
 
@@ -321,7 +321,7 @@
     !----------------------------------------------------------------!
     if(Flow % with_interface) then
       call Vof % Surface_Tension_Force(i)
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
         b(c) = b(c) + st_i(c) * Grid % vol(c)
       end do
     end if
@@ -335,7 +335,7 @@
     !   from under-relaxation factors and Majumdar   !
     !   correction in Rhie_And_Chow is not needed    !
     !------------------------------------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       M % sav(c) = M % val(M % dia(c))
     end do
 

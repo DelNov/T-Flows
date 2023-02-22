@@ -19,7 +19,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type), pointer :: v_flux
-  integer                  :: c1, c2, s, sc
+  integer                  :: c1, c2, s, sc, reg
   real                     :: nx, ny, nz, bulk_vel, phi_n, dt
 !==============================================================================!
 
@@ -58,13 +58,11 @@
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-
-      ! On the boundary perform the extrapolation
-      if(c2 < 0) then
-        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. CONVECT) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
           call Grid % Face_Normal(s, nx, ny, nz)
 
           phi_n = u % x(c1) * nx + u % y(c1) * ny + u % z(c1) * nz
@@ -75,25 +73,24 @@
 
           phi_n = w % x(c1) * nx + w % y(c1) * ny + w % z(c1) * nz
           w % n(c2) = w % n(c2) - bulk_vel * phi_n * dt
-        end if
-      end if
-    end do  ! s
+        end do    ! face
+      end if      ! boundary condition
+    end do        ! region
 
   else      ! curr_dt <= BEGIN
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. CONVECT) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-      ! On the boundary perform the extrapolation
-      if(c2 < 0) then
-        if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
           u % n(c2) = u % n(c1)
           v % n(c2) = v % n(c1)
           w % n(c2) = w % n(c1)
-        end if
-      end if
-    end do  ! s
+        end do    ! face
+      end if      ! boundary condition
+    end do        ! region
 
   end if    ! curr_dt > BEGIN
 
@@ -116,13 +113,11 @@
         call Flow % Grad_Variable(t2)
       end if
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
             call Grid % Face_Normal(s, nx, ny, nz)
 
             phi_n = kin % x(c1) * nx + kin % y(c1) * ny + kin % z(c1) * nz
@@ -135,27 +130,26 @@
               phi_n = t2 % x(c1) * nx + t2 % y(c1) * ny + t2 % z(c1) * nz
               t2 % n(c2) = t2 % n(c2) - bulk_vel * phi_n * dt
             end if
-          end if
-        end if
-      end do  ! s
+          end do    ! face
+        end if      ! boundary condition
+      end do        ! region
 
     else      ! curr_dt <= BEGIN
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
             kin % n(c2) = kin % n(c1)
             eps % n(c2) = eps % n(c1)
             if(Flow % heat_transfer) then
               t2 % n(c2) = t2 % n(c1)
             end if
-          end if
-        end if
-      end do  ! s
+          end do    ! face
+        end if      ! boundary condition
+      end do        ! region
 
     end if    ! curr_dt > BEGIN
 
@@ -177,13 +171,12 @@
         call Flow % Grad_Variable(t2)
       end if
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
+      ! On the boundary perform the extrapolation
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
             call Grid % Face_Normal(s, nx, ny, nz)
 
             phi_n = kin % x(c1) * nx + kin % y(c1) * ny + kin % z(c1) * nz
@@ -202,19 +195,19 @@
               phi_n = t2 % x(c1) * nx + t2 % y(c1) * ny + t2 % z(c1) * nz
               t2 % n(c2) = t2 % n(c2) - bulk_vel * phi_n * dt
             end if
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     else      ! curr_dt <= BEGIN
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      ! On the boundary perform the extrapolation
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
             kin % n(c2)  = kin % n(c1)
             eps % n(c2)  = eps % n(c1)
             f22 % n(c2)  = f22 % n(c1)
@@ -222,9 +215,9 @@
             if(Flow % heat_transfer) then
               t2 % n(c2) = t2 % n(c1)
             end if
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     end if    ! curr_dt > BEGIN
 
@@ -250,13 +243,11 @@
         call Flow % Grad_Variable(f22)
       end if
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
             call Grid % Face_Normal(s, nx, ny, nz)
 
             phi_n = uu % x(c1) * nx + uu % y(c1) * ny + uu % z(c1) * nz
@@ -284,19 +275,18 @@
               phi_n = f22 % x(c1) * nx + f22 % y(c1) * ny + f22 % z(c1) * nz
               f22 % n(c2) = f22 % n(c2) - bulk_vel * phi_n * dt
             end if
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     else      ! curr_dt <= BEGIN
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
             uu % n(c2) = uu % n(c1)
             vv % n(c2) = vv % n(c1)
             ww % n(c2) = ww % n(c1)
@@ -307,9 +297,9 @@
             if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
               f22 % n(c2) = f22 % n(c1)
             end if
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     end if    ! curr_dt > BEGIN
 
@@ -328,34 +318,31 @@
 
       call Flow % Grad_Variable(phi)
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
             call Grid % Face_Normal(s, nx, ny, nz)
 
             phi_n = phi % x(c1) * nx + phi % y(c1) * ny + phi % z(c1) * nz
             phi % n(c2) = phi % n(c2) - bulk_vel * phi_n * dt
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     else      ! curr_dt <= BEGIN
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
             phi % n(c2) = phi % n(c1)
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     end if    ! curr_dt > BEGIN
 
@@ -375,33 +362,31 @@
       ! stored already in t % x, t % y and t % z, check it
       call Flow % Grad_Variable(t)
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        ! On the boundary perform the extrapolation
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
             call Grid % Face_Normal(s, nx, ny, nz)
 
             phi_n = t % x(c1) * nx + t % y(c1) * ny + t % z(c1) * nz
             t % n(c2) = t % n(c2) - bulk_vel * phi_n * dt
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     else      ! curr_dt <= BEGIN
 
-      do s = 1, Grid % n_faces
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        if(c2 < 0) then
-          if( (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) ) then
             t % n(c2) = t % n(c1)
-          end if
-        end if
-      end do  ! s
+          end do  ! face
+        end if    ! boundary condition
+      end do      ! region
 
     end if    ! curr_dt < BEGIN
 
