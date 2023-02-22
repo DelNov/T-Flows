@@ -85,7 +85,7 @@
   !------------------------------!
   !   Boundary conditions list   !
   !------------------------------!
-  do n = 1, Grid % n_bnd_regions
+  do n = Boundary_Regions()
     read(fu) Grid % region % name(n)
   end do
 

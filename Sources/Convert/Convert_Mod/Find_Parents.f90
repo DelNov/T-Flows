@@ -84,7 +84,7 @@
   !   Real work begins   !
   !----------------------!
 
-  do bc = 1, Grid % n_bnd_regions
+  do bc = Boundary_Regions()
 
     cr1(:) = HUGE_INT
     cr2(:) = HUGE_INT

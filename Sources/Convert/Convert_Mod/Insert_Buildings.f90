@@ -408,7 +408,7 @@
   n_chimneys = 0
   allocate(cell_in_chimney(Grid % n_cells))
   cell_in_chimney(:) = 0
-  do bc = 1, Grid % n_bnd_regions
+  do bc = Boundary_Regions()
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
@@ -474,7 +474,7 @@
   !-----------------------------------------------------------!
 
   ! Find ground b.c. number (only used to eliminate BUILDING_000)
-  do bc = 1, Grid % n_bnd_regions
+  do bc = Boundary_Regions()
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'GROUND') then
@@ -483,7 +483,7 @@
   end do
 
   ! Eliminate building_000 b.c.
-  do bc = 1, Grid % n_bnd_regions
+  do bc = Boundary_Regions()
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'BUILDING_000') then
@@ -498,7 +498,7 @@
   end do
 
   cnt   = 0
-  do bc = 1, Grid % n_bnd_regions
+  do bc = Boundary_Regions()
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:8) .ne. 'BUILDING') then
@@ -642,7 +642,7 @@
 
   end if
 
-  do bc = 1, Grid % n_bnd_regions
+  do bc = Boundary_Regions()
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then

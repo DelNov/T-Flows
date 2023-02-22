@@ -51,7 +51,7 @@
   write(fu,'(a)') '# "eps", "zeta" and "f22"'
   write(fu,'(a)') '#-----------------------------------------------------------'
 
-  do j = 1, Grid % n_bnd_regions
+  do j = Boundary_Regions()
     work = Grid % region % name(j)
     call String % To_Lower_Case(work)
     write(fu,'(a,a)') '  BOUNDARY_CONDITION ', trim(work)
