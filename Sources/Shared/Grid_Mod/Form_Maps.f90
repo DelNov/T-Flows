@@ -104,8 +104,10 @@
     !-----------------------!
     cnt = 0
     do reg = Boundary_Regions()
-      do c = Grid % region % f_cell(reg), Grid % region % l_cell(reg)
+      do c = Cells_In_Region(reg)
         cnt = cnt + 1
+        ! Keep in mind there that for boundary cells, cell_glo is negative, so
+        ! adding the nb_tot to all the indices, shifts them all to positive
         Grid % Comm % bnd_cell_map(cnt) = int(  Grid % Comm % cell_glo(c)  &
                                               + Grid % Comm % nb_tot, SP)
       end do
