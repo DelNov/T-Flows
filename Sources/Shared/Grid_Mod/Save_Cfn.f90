@@ -47,7 +47,7 @@
   write(fu) nbc_sub           ! number of boundary cells
   write(fu) nf_sub
   write(fu) ns_sub
-  write(fu) Grid % n_regions  ! number of bounary conditions
+  write(fu) Grid % n_bnd_regions  ! number of bounary conditions
 
   !-------------------------------------!
   !   Does grid have polyhedral cells   !
@@ -62,7 +62,7 @@
   !------------------------------!
   !   Boundary conditions list   !
   !------------------------------!
-  do n = 1, Grid % n_regions
+  do n = 1, Grid % n_bnd_regions
     write(fu) Grid % region % name(n)
   end do
 

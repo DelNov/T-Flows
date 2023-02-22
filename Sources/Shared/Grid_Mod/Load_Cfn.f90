@@ -56,7 +56,7 @@
   read(fu) Grid % n_bnd_cells          ! number of boundary cells
   read(fu) Grid % n_faces              ! number of faces (with buffer faces)
   read(fu) Grid % n_shadows            ! number of shadow faces
-  read(fu) Grid % n_regions           ! number of boundary conditions
+  read(fu) Grid % n_bnd_regions        ! number of boundary conditions
 
   !-------------------------------------!
   !   Does grid have polyhedral cells   !
@@ -70,8 +70,12 @@
 
   ! Boundary conditions' keys
   ! (Go from zero for faces which are not at the boundary)
-  allocate(Grid % region % name(0 : Grid % n_regions + 3))
-  allocate(Grid % region % type(0 : Grid % n_regions + 3))
+  Grid % n_regions = Grid % n_bnd_regions + 1   ! this is inside region
+  Grid % per_x_reg = Grid % n_bnd_regions + 2   ! for periodic_x region
+  Grid % per_y_reg = Grid % n_bnd_regions + 3   ! for periodic_x region
+  Grid % per_z_reg = Grid % n_bnd_regions + 4   ! for periodic_x region
+  allocate(Grid % region % name(Grid % n_regions + 3))
+  allocate(Grid % region % type(Grid % n_regions + 3))
 
   !-----------------!
   !   Domain name   !
@@ -81,16 +85,16 @@
   !------------------------------!
   !   Boundary conditions list   !
   !------------------------------!
-  do n = 1, Grid % n_regions
+  do n = 1, Grid % n_bnd_regions
     read(fu) Grid % region % name(n)
   end do
 
   ! The last three are reserved for perodicity
   ! and used for inlet copy boundary condition.  Don't delete these thinking
   ! they are useless.  They are assigned in Calculate_Face_Geometry
-  Grid % region % name(Grid % n_regions + 1) = 'PERIODIC_X'
-  Grid % region % name(Grid % n_regions + 2) = 'PERIODIC_Y'
-  Grid % region % name(Grid % n_regions + 3) = 'PERIODIC_Z'
+  Grid % region % name(Grid % per_x_reg) = 'PERIODIC_X'
+  Grid % region % name(Grid % per_y_reg) = 'PERIODIC_Y'
+  Grid % region % name(Grid % per_z_reg) = 'PERIODIC_Z'
 
   !--------------------------!
   !   Nodes global numbers   !
@@ -275,7 +279,7 @@
   allocate (Grid % region % at_cell(-Grid % n_bnd_cells-1:Grid % n_faces))
   read(fu) (Grid % region % at_cell(c), c = -Grid % n_bnd_cells, -1)
 
-  call Regions_Ranges(Grid)
+  call Grid % Regions_Ranges()
 
   close(fu)
 

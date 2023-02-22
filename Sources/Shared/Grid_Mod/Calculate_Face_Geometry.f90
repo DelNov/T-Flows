@@ -194,7 +194,7 @@
         if(abs(Grid % xc(c2) - Grid % xc(c1) ) > 1.5 * abs(Grid % dx(s))) then
           if(Grid % xc(c2) > Grid % xc(c1)) then
             Assert(Grid % faces_s(s) > 0)
-            Grid % region % at_cell(s) = Grid % n_regions + 1
+            Grid % region % at_cell(s) = Grid % per_x_reg
           end if
         end if
       end if
@@ -203,7 +203,7 @@
         if(abs(Grid % yc(c2) - Grid % yc(c1) ) > 1.5 * abs(Grid % dy(s))) then
           if(Grid % yc(c2) > Grid % yc(c1)) then
             Assert(Grid % faces_s(s) > 0)
-            Grid % region % at_cell(s) = Grid % n_regions + 2
+            Grid % region % at_cell(s) = Grid % per_y_reg
           end if
         end if
       end if
@@ -212,7 +212,7 @@
         if(abs(Grid % zc(c2) - Grid % zc(c1) ) > 1.5 * abs(Grid % dz(s))) then
           if(Grid % zc(c2) > Grid % zc(c1)) then
             Assert(Grid % faces_s(s) > 0)
-            Grid % region % at_cell(s) = Grid % n_regions + 3
+            Grid % region % at_cell(s) = Grid % per_z_reg
           end if
         end if
       end if

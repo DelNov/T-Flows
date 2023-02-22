@@ -514,8 +514,9 @@
   !   Copy boundary condition info   !
   !                                  !
   !----------------------------------!
-  Grid % n_regions = n_bnd_sect
-  allocate(Grid % region % name(n_bnd_sect))
+  Grid % n_bnd_regions = n_bnd_sect
+  Grid % n_regions = Grid % n_bnd_regions + 1  ! this is inside region
+  allocate(Grid % region % name(Grid % n_regions))
 
   do i = 1, n_bnd_sect
     Grid % region % name(i) = phys_names(i)

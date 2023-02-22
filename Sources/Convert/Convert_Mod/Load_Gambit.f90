@@ -161,7 +161,7 @@
   !-------------------------!
   !   Boundary conditions   !
   !-------------------------!
-  Grid % n_regions = n_bnd_sect
+  Grid % n_bnd_regions = n_bnd_sect
   allocate(Grid % region % name(n_bnd_sect))
 
   do j = 1, n_bnd_sect

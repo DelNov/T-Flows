@@ -106,7 +106,7 @@
   !                                                                   !
   !-------------------------------------------------------------------!
   do e = 1, Grid % n_edges
-    if( sum(Grid % edges_bc(1:Grid % n_regions, e)) .gt. 1 ) then
+    if( sum(Grid % edges_bc(1:Grid % n_bnd_regions, e)) .gt. 1 ) then
       if(edge_data(e) .eq. 0) then  ! hasn't been marked yet
         cnt = cnt + 1
         edge_data(e) = 1

@@ -84,7 +84,7 @@
   !   Real work begins   !
   !----------------------!
 
-  do bc = 1, Grid % n_regions
+  do bc = 1, Grid % n_bnd_regions
 
     cr1(:) = HUGE_INT
     cr2(:) = HUGE_INT

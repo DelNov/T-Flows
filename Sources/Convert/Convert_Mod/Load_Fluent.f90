@@ -25,7 +25,7 @@
   integer                :: n_face_sect           ! number of face sections
   integer                :: face_sect_pos(2048)   ! where did Fluent store it
   integer                :: face_sect_bnd(2048)   ! where does T-Flows store it
-  integer                :: n_regions            ! number of boundary conditions
+  integer                :: n_bnd_reg            ! number of boundary conditions
   logical                :: this_sect_bnd         ! .true. if bnd cond section
   logical                :: the_end               ! end of file reached?
   logical                :: ascii                 ! is file in ascii format?
@@ -131,7 +131,7 @@
   face_sect_pos(:) = 0
   face_sect_bnd(:) = 0
   n_face_sect      = 0
-  n_regions       = 0
+  n_bnd_reg        = 0
   n_bnd_cells      = 0
   n_faces          = 0
   the_end          = .false.
@@ -233,10 +233,10 @@
         if( this_sect_bnd ) then
 
           ! Increase the number of boundary condition sections and ...
-          n_regions = n_regions + 1
+          n_bnd_reg = n_bnd_reg + 1
 
           ! ... store mapping of this face section to T-Flows boundary condition
-          face_sect_bnd(n_face_sect) = n_regions
+          face_sect_bnd(n_face_sect) = n_bnd_reg
         end if
 
       end if
@@ -250,11 +250,12 @@
   end if
 
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
-  print '(a34,i9)', ' # Boundary condition sections:   ', n_regions
+  print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_reg
 
-  Grid % n_bnd_cells = n_bnd_cells
-  Grid % n_regions  = n_regions
-  allocate(Grid % region % name(n_regions))
+  Grid % n_bnd_cells   = n_bnd_cells
+  Grid % n_bnd_regions = n_bnd_reg
+  Grid % n_regions = Grid % n_bnd_regions + 1       ! this is inside region
+  allocate(Grid % region % name(Grid % n_regions))
 
   !--------------------------------------------!
   !                                            !

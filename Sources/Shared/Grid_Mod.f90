@@ -35,13 +35,17 @@
     logical       :: polyhedral = .false.
 
     ! Number of ...
-    integer :: n_nodes     = 0  ! ... nodes
-    integer :: n_cells     = 0  ! ... cells
-    integer :: n_faces     = 0  ! ... faces
-    integer :: n_bnd_cells = 0  ! ... boundary cells
-    integer :: n_regions   = 0  ! ... boundary conditions
-    integer :: n_shadows   = 0  ! ... shadow faces
-    integer :: n_edges     = 0  ! ... edges (needed to create dual grid)
+    integer :: n_nodes       = 0  ! nodes
+    integer :: n_cells       = 0  ! cells
+    integer :: n_faces       = 0  ! faces
+    integer :: n_bnd_cells   = 0  ! boundary cells
+    integer :: n_bnd_regions = 0  ! boundary conditions
+    integer :: n_regions     = 0  ! all conditions (bnd, inside, per ...)
+    integer :: n_shadows     = 0  ! shadow faces
+    integer :: n_edges       = 0  ! edges (needed to create dual grid)
+    integer :: per_x_reg     = 0  ! periodic x region
+    integer :: per_y_reg     = 0  ! periodic y region
+    integer :: per_z_reg     = 0  ! periodic z region
 
     ! Periodic span
     real :: per_x, per_y, per_z

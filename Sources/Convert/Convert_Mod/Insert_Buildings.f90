@@ -408,7 +408,7 @@
   n_chimneys = 0
   allocate(cell_in_chimney(Grid % n_cells))
   cell_in_chimney(:) = 0
-  do bc = 1, Grid % n_regions
+  do bc = 1, Grid % n_bnd_regions
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
@@ -474,7 +474,7 @@
   !-----------------------------------------------------------!
 
   ! Find ground b.c. number (only used to eliminate BUILDING_000)
-  do bc = 1, Grid % n_regions
+  do bc = 1, Grid % n_bnd_regions
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'GROUND') then
@@ -483,7 +483,7 @@
   end do
 
   ! Eliminate building_000 b.c.
-  do bc = 1, Grid % n_regions
+  do bc = 1, Grid % n_bnd_regions
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name .eq. 'BUILDING_000') then
@@ -498,7 +498,7 @@
   end do
 
   cnt   = 0
-  do bc = 1, Grid % n_regions
+  do bc = 1, Grid % n_bnd_regions
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:8) .ne. 'BUILDING') then
@@ -513,11 +513,11 @@
       end do
     end if
   end do
-  Grid % n_regions = cnt
+  Grid % n_bnd_regions = cnt
 
   ! Shift all by one up (to be able to insert building walls as first)
   if(buildings_exist) then
-    do bc = Grid % n_regions, 1, -1
+    do bc = Grid % n_bnd_regions, 1, -1
       Grid % region % name(bc+1) = Grid % region % name(bc)
       do c = 1, Grid % n_cells
         do dir = 1, 6
@@ -527,7 +527,7 @@
         end do
       end do
     end do
-    Grid % n_regions = Grid % n_regions + 1
+    Grid % n_bnd_regions = Grid % n_bnd_regions + 1
 
     ! Add first boundary condition for walls
     Grid % region % name(1) = 'BUILDING_WALLS'
@@ -642,7 +642,7 @@
 
   end if
 
-  do bc = 1, Grid % n_regions
+  do bc = 1, Grid % n_bnd_regions
     bc_name = trim(Grid % region % name(bc))
     call String % To_Upper_Case(bc_name)
     if(bc_name(1:7) .eq. 'CHIMNEY') then
