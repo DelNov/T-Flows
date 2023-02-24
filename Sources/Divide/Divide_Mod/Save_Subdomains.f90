@@ -20,6 +20,8 @@
   class(Divide_Type)  :: Divide
   type(Grid_Type)     :: Grid
   integer, intent(in) :: n_buff_layers  ! number of buffer layers, keep it here
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: MARK = -1
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, n, s, c1, c2, sub, subo, i_nod
   integer :: ss, sr, nn, reg, bc_indx !exp:, lev
@@ -59,7 +61,7 @@
         Grid % old_c(nc_sub) = c
 
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
-          Grid % new_n(Grid % cells_n(i_nod,c)) = -1
+          Grid % new_n(Grid % cells_n(i_nod,c)) = MARK
         end do
       end if
     end do
@@ -79,8 +81,8 @@
              Grid % Comm % cell_proc(c1) .eq. subo) then
             nn = Grid % faces_n_nodes(s)
             ss = Grid % faces_s(s)
-            Grid % new_n(Grid % faces_n(1:nn, s )) = -1
-            Grid % new_n(Grid % faces_n(1:nn, ss)) = -1
+            Grid % new_n(Grid % faces_n(1:nn, s )) = MARK
+            Grid % new_n(Grid % faces_n(1:nn, ss)) = MARK
           end if
         end if
       end do
@@ -96,8 +98,8 @@
         do c = 1, Grid % n_cells
           if(Grid % Comm % cell_proc(c) .eq. subo) then
             n = abs(Grid % cells_n_nodes(c))
-            if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. -1) ) then
-              Grid % new_c(c) = -1
+            if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. MARK) ) then
+              Grid % new_c(c) = MARK
             end if
           end if
         end do
@@ -107,9 +109,9 @@
 !exp:
 !exp:          ! Mark nodes on this level ...
 !exp:          do c = 1, Grid % n_cells
-!exp:            if(Grid % new_c(c) .eq. -1) then
+!exp:            if(Grid % new_c(c) .eq. MARK) then
 !exp:              do i_nod = 1, abs(Grid % cells_n_nodes(c))
-!exp:                Grid % new_n(Grid % cells_n(i_nod,c)) = -1
+!exp:                Grid % new_n(Grid % cells_n(i_nod,c)) = MARK
 !exp:              end do
 !exp:            end if
 !exp:          end do
@@ -118,8 +120,8 @@
 !exp:          do c = 1, Grid % n_cells
 !exp:            if(Grid % Comm % cell_proc(c) .eq. subo) then
 !exp:              n = abs(Grid % cells_n_nodes(c))
-!exp:              if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. -1) ) then
-!exp:                Grid % new_c(c) = -1
+!exp:              if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. MARK) ) then
+!exp:                Grid % new_c(c) = MARK
 !exp:              end if
 !exp:            end if
 !exp:          end do
@@ -128,7 +130,7 @@
         ! Renumber cells in buffer "subo"
         do c = 1, Grid % n_cells
           if(Grid % Comm % cell_proc(c) .eq. subo .and.  &
-             Grid % new_c(c) .eq. -1) then
+             Grid % new_c(c) .eq. MARK) then
             nc_sub = nc_sub + 1       ! increase the number of cells in sub.
             Grid % new_c(c) = nc_sub  ! assign new (local) cell number 
             Grid % old_c(nc_sub) = c
@@ -272,6 +274,11 @@
 
           ! ... but the face hasn't, do it now!
           if(Grid % new_f(s) .eq. 0) then
+
+            ! Neither of the cells should be in this sub, they are in buffers
+            Assert(Grid % Comm % cell_proc(c1) .ne. sub)
+            Assert(Grid % Comm % cell_proc(c2) .ne. sub)
+
             nf_sub = nf_sub + 1
             Grid % new_f(s) = nf_sub
             Grid % old_f(nf_sub) = s
@@ -313,24 +320,24 @@
     !-------------------------------------!
     Grid % new_n(1:Grid % n_nodes) = 0
 
-    !-------------------------------------------------!
-    !   Mark nodes in cells for renumbering with -1   !
-    !-------------------------------------------------!
+    !---------------------------------------------------!
+    !   Mark nodes in cells for renumbering with MARK   !
+    !---------------------------------------------------!
     do c = -Grid % n_bnd_cells, Grid % n_cells
       if(Grid % new_c(c) > 0) then
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
-          Grid % new_n(Grid % cells_n(i_nod,c)) = -1
+          Grid % new_n(Grid % cells_n(i_nod,c)) = MARK
         end do
       end if
     end do
 
-    !-------------------------------------------------!
-    !   Mark nodes in faces for renumbering with -1   !
-    !-------------------------------------------------!
+    !---------------------------------------------------!
+    !   Mark nodes in faces for renumbering with MARK   !
+    !---------------------------------------------------!
     do s = 1, Grid % n_faces + Grid % n_shadows
       if(Grid % new_f(s) > 0) then
         do i_nod = 1, Grid % faces_n_nodes(s)
-          Grid % new_n(Grid % faces_n(i_nod,s)) = -1
+          Grid % new_n(Grid % faces_n(i_nod,s)) = MARK
         end do
       end if
     end do
@@ -339,7 +346,7 @@
     !   Renumber marked nodes   !
     !---------------------------!
     do n = 1, Grid % n_nodes
-      if(Grid % new_n(n) .eq. -1) then
+      if(Grid % new_n(n) .eq. MARK) then
         nn_sub          = nn_sub + 1
         Grid % new_n(n) = nn_sub
       end if
