@@ -18,7 +18,7 @@
   type(Var_Type),   pointer :: fun
   type(Face_Type),  pointer :: v_flux
   real, contiguous, pointer :: c_d(:)
-  integer                   :: c, c1, c2, s
+  integer                   :: c, c1, c2, s, reg
   real                      :: fun_dist
 !==============================================================================!
 
@@ -36,25 +36,40 @@
 
   if(interf == 1) then
 
-    do s = 1, Grid % n_faces
+    ! Interior faces
+    do s = Faces_In_Domain()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
+      ! For c1
       fun_dist = min(max(fun % n(c1), 0.0), 1.0)
       fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
 
       c_d(c1) = c_d(c1) + fun_dist  &
               * max(-v_flux % n(s) * dt / Grid % vol(c1), 0.0)
 
-      if(c2 > 0) then
-        fun_dist = min(max(fun % n(c2), 0.0), 1.0)
+      ! For c2
+      fun_dist = min(max(fun % n(c2), 0.0), 1.0)
 
+      fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
+
+      c_d(c2) = c_d(c2) + fun_dist  &
+              * max( v_flux % n(s) * dt / Grid % vol(c2), 0.0)
+    end do
+
+    ! Boundary faces
+    do reg = Boundary_Regions()
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+
+        ! For c1
+        fun_dist = min(max(fun % n(c1), 0.0), 1.0)
         fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
 
-        c_d(c2) = c_d(c2) + fun_dist  &
-                * max( v_flux % n(s) * dt / Grid % vol(c2), 0.0)
-      end if
-    end do
+        c_d(c1) = c_d(c1) + fun_dist  &
+                * max(-v_flux % n(s) * dt / Grid % vol(c1), 0.0)
+      end do  ! faces
+    end do    ! regions
 
     ! if(Vof % phase_Change) then
     !   do c = 1, Grid % n_cells
@@ -74,17 +89,22 @@
 
   else  ! interf = 0
 
-    ! At boundaries
-    do s = 1, Grid % n_faces
+    ! Interior faces
+    do s = Faces_In_Domain()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
       c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / Grid % vol(c1), 0.0)
-
-      if(c2 > 0) then
-        c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / Grid % vol(c2), 0.0)
-      end if
+      c_d(c2) = c_d(c2) + max( v_flux % n(s) * dt / Grid % vol(c2), 0.0)
     end do
+
+    ! Boundary faces
+    do reg = Boundary_Regions()
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c_d(c1) = c_d(c1) + max(-v_flux % n(s) * dt / Grid % vol(c1), 0.0)
+      end do  ! faces
+    end do    ! regions
 
     ! if(Vof % phase_Change) then
     !   do c = 1, Grid % n_cells

@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Vof_Mod
