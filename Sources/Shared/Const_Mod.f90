@@ -54,7 +54,10 @@
 
   real,    parameter :: HUGE     = PETA
   real,    parameter :: TINY     = FEMTO
-  integer, parameter :: HUGE_INT = 2147483647
+  integer, parameter :: HUGE_INT = 1073741824  ! this is 2 ** 30
+
+  ! Euler's prime number (also the largest integer in 32 bit precision)
+  integer, parameter :: EULER    = 2147483647  ! 2 ** 31 - 1
 
   ! Archimedes’ constant
   real, parameter :: PI = 3.14159265359
