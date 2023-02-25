@@ -8,7 +8,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !------------------------------[Local parameters]------------------------------!
-  logical, parameter :: DEBUG = .false.
+  logical, parameter :: DEBUG = .true.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, reg, s, siz
 !==============================================================================!
@@ -25,7 +25,7 @@
 
   ! Set non-realizable ranges
   Grid % region % f_cell(:) = -1
-  Grid % region % l_cell(:) = -Grid % n_bnd_cells
+  Grid % region % l_cell(:) = -HUGE_INT
 
   ! Browse forward and backward to find first and last cell for each range
   do c = -Grid % n_bnd_cells, -1
