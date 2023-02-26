@@ -252,10 +252,8 @@
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
   print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_reg
 
-  Grid % n_bnd_cells   = n_bnd_cells
-  Grid % n_bnd_regions = n_bnd_reg
-  Grid % n_regions = Grid % n_bnd_regions + 1       ! this is inside region
-  allocate(Grid % region % name(Grid % n_regions))
+  Grid % n_bnd_cells = n_bnd_cells
+  call Grid % Allocate_Regions(n_bnd_reg)
 
   !--------------------------------------------!
   !                                            !

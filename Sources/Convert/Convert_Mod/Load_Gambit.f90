@@ -161,8 +161,7 @@
   !-------------------------!
   !   Boundary conditions   !
   !-------------------------!
-  Grid % n_bnd_regions = n_bnd_sect
-  allocate(Grid % region % name(n_bnd_sect))
+  call Grid % Allocate_Regions(n_bnd_sect)
 
   do j = 1, n_bnd_sect
     call File % Read_Line(fu)        ! BOUNDARY CONDITIONS

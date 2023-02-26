@@ -13,12 +13,6 @@
   integer :: c, c1, c2, reg, s, siz
 !==============================================================================!
 
-  Grid % n_regions = Grid % n_bnd_regions + 1  ! this is for inside
-
-  ! Allocate memory
-  allocate(Grid % region % f_cell(Grid % n_regions))
-  allocate(Grid % region % l_cell(Grid % n_regions))
-
   !-------------------!
   !   Cells' ranges   !
   !-------------------!
@@ -61,24 +55,36 @@
     end if
   end do
 
+  ! Buffer cells
+  reg = Grid % n_regions + 1
+  Grid % region % f_cell(reg) = Grid % n_cells + 1
+  Grid % region % l_cell(reg) = 1
+  do c = 1, Grid % n_cells
+    if(Grid % Comm % cell_proc(c) .ne. this_proc) then
+      if(c < Grid % region % f_cell(reg)) then
+        Grid % region % f_cell(reg) = c
+      end if
+      if(c > Grid % region % l_cell(reg)) then
+        Grid % region % l_cell(reg) = c
+      end if
+    end if
+  end do
+
   if(DEBUG) then
     write(1000+this_proc, '(a)')  ' # Cell ranges'
-    do reg = Boundary_And_Inside_Regions()
+    do reg = All_Regions()
       siz = Grid % region % l_cell(reg) - Grid % region % f_cell(reg) + 1
-      write(1000+this_proc,'(a,i3,i15,i15,i15,a)') ' # Region: ', reg,   &
+      write(1000+this_proc,'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
                                            Grid % region % f_cell(reg),  &
                                            Grid % region % l_cell(reg),  &
-                                           max(siz, 0)
+                                           max(siz, 0), '  ',            &
+                                           trim(Grid % region % name(reg))
     end do
   end if
 
   !-------------------!
   !   Faces' ranges   !
   !-------------------!
-
-  ! Allocate memory
-  allocate(Grid % region % f_face(Grid % n_regions))
-  allocate(Grid % region % l_face(Grid % n_regions))
 
   ! Set non-realizable ranges
   Grid % region % f_face(:) =  0
@@ -128,12 +134,13 @@
 
   if(DEBUG) then
     write(2000+this_proc, '(a)')  ' # Face ranges'
-    do reg = Boundary_And_Inside_Regions()
+    do reg = All_Regions()
       siz = Grid % region % l_face(reg) - Grid % region % f_face(reg) + 1
-      write(2000+this_proc,'(a,i3,i15,i15,i15,a)') ' # Region: ', reg,   &
+      write(2000+this_proc,'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
                                            Grid % region % f_face(reg),  &
                                            Grid % region % l_face(reg),  &
-                                           max(siz, 0)
+                                           max(siz, 0), '  ',            &
+                                           trim(Grid % region % name(reg))
     end do
   end if
 

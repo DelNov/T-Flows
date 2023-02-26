@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !------------------------------[Local parameters]------------------------------!
-  logical, parameter :: DEBUG = .false.
+  logical, parameter :: DEBUG = .true.
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, m, n, c, c1, c2, n_bc, reg
   integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
@@ -167,16 +167,18 @@
   call Regions_Ranges(Grid)
 
   if(DEBUG) then
+    print '(a)', 's, c1, c2, Grid % region % at_cell(c2)'
     do s = 1, Grid % n_faces
       c1 = Grid % faces_c(1, s)
       c2 = Grid % faces_c(2, s)
       if(c2 < 0) then
-        print '(4i6)', s, c1, c2, Grid % region % at_cell(c2)
+        print '(4i12)', s, c1, c2, Grid % region % at_cell(c2)
       end if
     end do
 
     do reg = Boundary_Regions()
-      print '(2i6)', Cells_In_Region(reg)
+      print '(a)',    'Cells_In_Region(reg)'
+      print '(2i12)',  Cells_In_Region(reg)
     end do
   end if
 

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Load_Dom(Generate, dom, smr, ref, Grid)
+  subroutine Load_Dom(Generate, Dom, smr, ref, Grid)
 !------------------------------------------------------------------------------!
 !   Reads: .dom file                                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Generate_Type) :: Generate
-  type(Domain_Type)    :: dom
+  type(Domain_Type)    :: Dom
   type(Smooths_Type)   :: smr
   type(Refines_Type)   :: ref
   type(Grid_Type)      :: Grid
@@ -86,88 +86,88 @@
   !   Corners   !
   !-------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) dom % n_points  ! number of points
+  read(Line % tokens(1), *) Dom % n_points  ! number of points
 
-  call Domain_Mod_Allocate_Points(dom, dom % n_points)
+  call Dom % Allocate_Points(Dom % n_points)
 
-  do i = 1, dom % n_points
+  do i = 1, Dom % n_points
     call File % Read_Line(fu)
-    read(Line % tokens(2),*) dom % points(i) % x
-    read(Line % tokens(3),*) dom % points(i) % y
-    read(Line % tokens(4),*) dom % points(i) % z
+    read(Line % tokens(2),*) Dom % points(i) % x
+    read(Line % tokens(3),*) Dom % points(i) % y
+    read(Line % tokens(4),*) Dom % points(i) % z
   end do
 
   !------------!
   !   Blocks   !
   !------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) dom % n_blocks  ! number of blocks
+  read(Line % tokens(1), *) Dom % n_blocks  ! number of blocks
 
-  call Domain_Mod_Allocate_Blocks(dom, dom % n_blocks)
+  call Dom % Allocate_Blocks(Dom % n_blocks)
 
   ! Initialize weights
-  do b=1, dom % n_blocks
-    dom % blocks(b) % weights      = 1.0
-    dom % blocks(b) % face_weights = 1.0
+  do b=1, Dom % n_blocks
+    Dom % blocks(b) % weights      = 1.0
+    Dom % blocks(b) % face_weights = 1.0
   end do
 
-  do b = 1, dom % n_blocks
-    dom % blocks(b) % corners(0)=1       ! suppose it is properly oriented
+  do b = 1, Dom % n_blocks
+    Dom % blocks(b) % corners(0)=1       ! suppose it is properly oriented
 
     call File % Read_Line(fu)
-    read(Line % tokens(2),*) dom % blocks(b) % resolutions(1)
-    read(Line % tokens(3),*) dom % blocks(b) % resolutions(2)
-    read(Line % tokens(4),*) dom % blocks(b) % resolutions(3)
+    read(Line % tokens(2),*) Dom % blocks(b) % resolutions(1)
+    read(Line % tokens(3),*) Dom % blocks(b) % resolutions(2)
+    read(Line % tokens(4),*) Dom % blocks(b) % resolutions(3)
 
     call File % Read_Line(fu)
     read(Line % whole, *)               &  ! block weights
-         dom % blocks(b) % weights(1),  &
-         dom % blocks(b) % weights(2),  &
-         dom % blocks(b) % weights(3)
+         Dom % blocks(b) % weights(1),  &
+         Dom % blocks(b) % weights(2),  &
+         Dom % blocks(b) % weights(3)
 
     call File % Read_Line(fu)
     read(Line % whole, *)                                             &
-         dom % blocks(b) % corners(1), dom % blocks(b) % corners(2),  &
-         dom % blocks(b) % corners(3), dom % blocks(b) % corners(4),  &
-         dom % blocks(b) % corners(5), dom % blocks(b) % corners(6),  &
-         dom % blocks(b) % corners(7), dom % blocks(b) % corners(8)
+         Dom % blocks(b) % corners(1), Dom % blocks(b) % corners(2),  &
+         Dom % blocks(b) % corners(3), Dom % blocks(b) % corners(4),  &
+         Dom % blocks(b) % corners(5), Dom % blocks(b) % corners(6),  &
+         Dom % blocks(b) % corners(7), Dom % blocks(b) % corners(8)
 
     !---------------------------!
     !   Check if the block is   !
     !     properly oriented     !
     !---------------------------!
     do n=1,8
-      xt(n) = dom % points(dom % blocks(b) % corners(n)) % x
-      yt(n) = dom % points(dom % blocks(b) % corners(n)) % y
-      zt(n) = dom % points(dom % blocks(b) % corners(n)) % z
+      xt(n) = Dom % points(Dom % blocks(b) % corners(n)) % x
+      yt(n) = Dom % points(Dom % blocks(b) % corners(n)) % y
+      zt(n) = Dom % points(Dom % blocks(b) % corners(n)) % z
     end do
 
     if(Math % Tet_Volume( xt(2),yt(2),zt(2), xt(5),yt(5),zt(5),  &
                           xt(3),yt(3),zt(3), xt(1),yt(1),zt(1) )  < 0) then
-      dom % blocks(b) % corners(0)=-1            !  It's nor properly oriented
-      call Swap_Int(dom % blocks(b) % corners(2),  &
-                    dom % blocks(b) % corners(3))
-      call Swap_Int(dom % blocks(b) % corners(6),  &
-                    dom % blocks(b) % corners(7))
-      call Swap_Real(dom % blocks(b) % weights(1),  &
-                     dom % blocks(b) % weights(2))
-      dom % blocks(b) % weights(1) = 1.0 / dom % blocks(b) % weights(1)
-      dom % blocks(b) % weights(2) = 1.0 / dom % blocks(b) % weights(2)
-      call Swap_Int(dom % blocks(b) % resolutions(1),  &
-                    dom % blocks(b) % resolutions(2))
+      Dom % blocks(b) % corners(0)=-1            !  It's nor properly oriented
+      call Swap_Int(Dom % blocks(b) % corners(2),  &
+                    Dom % blocks(b) % corners(3))
+      call Swap_Int(Dom % blocks(b) % corners(6),  &
+                    Dom % blocks(b) % corners(7))
+      call Swap_Real(Dom % blocks(b) % weights(1),  &
+                     Dom % blocks(b) % weights(2))
+      Dom % blocks(b) % weights(1) = 1.0 / Dom % blocks(b) % weights(1)
+      Dom % blocks(b) % weights(2) = 1.0 / Dom % blocks(b) % weights(2)
+      call Swap_Int(Dom % blocks(b) % resolutions(1),  &
+                    Dom % blocks(b) % resolutions(2))
       print *, 'Warning: Block ',b,' was not properly oriented'
     end if
-  end do                 ! through dom % blocks
+  end do                 ! through Dom % blocks
 
   !-----------------------------!
   !   Set the corners of each   !
   !      face of the block      !
   !-----------------------------!
-  do b = 1, dom % n_blocks
+  do b = 1, Dom % n_blocks
     do i_fac = 1, 6
       do n = 1, 4
-        dom % blocks(b) % faces(i_fac, n) =  &
-        dom % blocks(b) % corners(fn(i_fac,n))
+        Dom % blocks(b) % faces(i_fac, n) =  &
+        Dom % blocks(b) % corners(fn(i_fac,n))
       end do
     end do
   end do
@@ -179,40 +179,39 @@
   !   or with just a weighting factor.           !
   !----------------------------------------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) dom % n_lines  ! number of defined dom % lines
+  read(Line % tokens(1), *) Dom % n_lines  ! number of defined Dom % lines
 
-  call Domain_Mod_Allocate_Lines(dom, dom % n_lines)
+  call Dom % Allocate_Lines(Dom % n_lines)
 
-  do l=1, dom % n_lines
+  do l=1, Dom % n_lines
     call File % Read_Line(fu)
 
     read(Line % tokens(1),*) npnt
-    read(Line % tokens(2),*) dom % lines(l) % points(1)
-    read(Line % tokens(3),*) dom % lines(l) % points(2)
+    read(Line % tokens(2),*) Dom % lines(l) % points(1)
+    read(Line % tokens(3),*) Dom % lines(l) % points(2)
 
-    call Domain_Mod_Find_Line(dom,                         &
-                              dom % lines(l) % points(1),  &
-                              dom % lines(l) % points(2),  &
-                              dom % lines(l) % resolution)
+    call Dom % Find_Line(Dom % lines(l) % points(1),  &
+                         Dom % lines(l) % points(2),  &
+                         Dom % lines(l) % resolution)
 
     ! Does this need a more elegant solution?
-    allocate(dom % lines(l) % x( dom % lines(l) % resolution ))
-    allocate(dom % lines(l) % y( dom % lines(l) % resolution ))
-    allocate(dom % lines(l) % z( dom % lines(l) % resolution ))
+    allocate(Dom % lines(l) % x( Dom % lines(l) % resolution ))
+    allocate(Dom % lines(l) % y( Dom % lines(l) % resolution ))
+    allocate(Dom % lines(l) % z( Dom % lines(l) % resolution ))
 
     ! Point by point
     if(npnt > 0) then
-      do n=1,dom % lines(l) % resolution
+      do n=1,Dom % lines(l) % resolution
         call File % Read_Line(fu)
-        read(Line % tokens(2),*) dom % lines(l) % x(n)
-        read(Line % tokens(3),*) dom % lines(l) % y(n)
-        read(Line % tokens(4),*) dom % lines(l) % z(n)
+        read(Line % tokens(2),*) Dom % lines(l) % x(n)
+        read(Line % tokens(3),*) Dom % lines(l) % y(n)
+        read(Line % tokens(4),*) Dom % lines(l) % z(n)
       end do
 
     ! Weight factor
     else
       call File % Read_Line(fu)
-      read(Line % tokens(1), *) dom % lines(l) % weight
+      read(Line % tokens(1), *) Dom % lines(l) % weight
     end if
 
   end do
@@ -220,11 +219,11 @@
   !----------------------------------------!
   !   Copy block weights to face weights   !
   !----------------------------------------!
-  do b = 1, dom % n_blocks
+  do b = 1, Dom % n_blocks
     do i_fac = 1,6                          !  face of the block
-      dom % blocks(b) % face_weights(i_fac, 1) = dom % blocks(b) % weights(1)
-      dom % blocks(b) % face_weights(i_fac, 2) = dom % blocks(b) % weights(2)
-      dom % blocks(b) % face_weights(i_fac, 3) = dom % blocks(b) % weights(3)
+      Dom % blocks(b) % face_weights(i_fac, 1) = Dom % blocks(b) % weights(1)
+      Dom % blocks(b) % face_weights(i_fac, 2) = Dom % blocks(b) % weights(2)
+      Dom % blocks(b) % face_weights(i_fac, 3) = Dom % blocks(b) % weights(3)
     end do
   end do
 
@@ -237,14 +236,14 @@
   do s = 1, nsurf
     call File % Read_Line(fu)
     read(Line % whole,*) dum, n1, n2, n3, n4
-    call Domain_Mod_Find_Surface(dom, n1, n2, n3, n4, b, i_fac)
+    call Dom % Find_Surface(n1, n2, n3, n4, b, i_fac)
     print *, '# block: ', b, ' surf: ', i_fac
     n = (b-1)*6 + i_fac         ! surface number
 
     call File % Read_Line(fu)
-    read(Line % whole, *) dom % blocks(b) % face_weights(i_fac,1),  &
-                          dom % blocks(b) % face_weights(i_fac,2),  &
-                          dom % blocks(b) % face_weights(i_fac,2)
+    read(Line % whole, *) Dom % blocks(b) % face_weights(i_fac,1),  &
+                          Dom % blocks(b) % face_weights(i_fac,2),  &
+                          Dom % blocks(b) % face_weights(i_fac,2)
   end do
 
   !---------------------------------------!
@@ -254,10 +253,10 @@
   ! Nodes & faces
   n_nodes_check = 0
   n_faces_check = 0
-  do b = 1, dom % n_blocks
-    ni = dom % blocks(b) % resolutions(1)
-    nj = dom % blocks(b) % resolutions(2)
-    nk = dom % blocks(b) % resolutions(3)
+  do b = 1, Dom % n_blocks
+    ni = Dom % blocks(b) % resolutions(1)
+    nj = Dom % blocks(b) % resolutions(2)
+    nk = Dom % blocks(b) % resolutions(3)
     n_nodes_check=n_nodes_check + ni*nj*nk
     n_faces_check=n_faces_check + ni*nj*nk + 2*( (ni*nj)+(nj*nk)+(ni*nk) )
   end do
@@ -290,38 +289,37 @@
   !   Boundary conditions and materials   !
   !---------------------------------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) dom % n_ranges   ! number of ranges (can be bnd.
+  read(Line % tokens(1), *) Dom % n_ranges   ! number of ranges (can be bnd.
                                              ! conditions or materials)
+  call Dom % Allocate_Ranges(Dom % n_ranges)
 
-  call Domain_Mod_Allocate_Ranges(dom, dom % n_ranges)
-
-  do n = 1, dom % n_ranges
-    dom % ranges(n) % face=''
+  do n = 1, Dom % n_ranges
+    Dom % ranges(n) % face=''
 
     call File % Read_Line(fu)
     if(Line % n_tokens .eq. 7) then
       read(Line % whole,*)  dum,           &
-                   dom % ranges(n) % is,   &
-                   dom % ranges(n) % js,   &
-                   dom % ranges(n) % ks,   &
-                   dom % ranges(n) % ie,   &
-                   dom % ranges(n) % je,   &
-                   dom % ranges(n) % ke
+                   Dom % ranges(n) % is,   &
+                   Dom % ranges(n) % js,   &
+                   Dom % ranges(n) % ks,   &
+                   Dom % ranges(n) % ie,   &
+                   Dom % ranges(n) % je,   &
+                   Dom % ranges(n) % ke
     else if(Line % n_tokens .eq. 2) then
       read(Line % tokens(1),*)       dum
       read(Line % tokens(2),'(A4)')  &
-           dom % ranges(n) % face
-      call String % To_Upper_Case(dom % ranges(n) % face)
+           Dom % ranges(n) % face
+      call String % To_Upper_Case(Dom % ranges(n) % face)
     end if
 
     call File % Read_Line(fu)
-    read(Line % tokens(1), *) dom % ranges(n) % block
-    read(Line % tokens(2), *) dom % ranges(n) % name
-    call String % To_Upper_Case(dom % ranges(n) % name)
+    read(Line % tokens(1), *) Dom % ranges(n) % block
+    read(Line % tokens(2), *) Dom % ranges(n) % name
+    call String % To_Upper_Case(Dom % ranges(n) % name)
 
-    ! if( dom % blocks(b_cond(n,7)) % points(0) .eq. -1 ) then
-    !   call Swap_Int( dom % ranges(n) % is,dom % ranges(n) % js )
-    !   call Swap_Int( dom % ranges(n) % ie,dom % ranges(n) % je )
+    ! if( Dom % blocks(b_cond(n,7)) % points(0) .eq. -1 ) then
+    !   call Swap_Int( Dom % ranges(n) % is,Dom % ranges(n) % js )
+    !   call Swap_Int( Dom % ranges(n) % ie,Dom % ranges(n) % je )
     ! end if
 
   end do

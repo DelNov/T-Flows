@@ -64,18 +64,10 @@
   read(fu) Grid % polyhedral
 
   ! Allocate memory =--> carefull, there is no checking!
-  call Grid % Allocate_Nodes(Grid % n_nodes)
-  call Grid % Allocate_Cells(Grid % n_cells, Grid % n_bnd_cells)
-  call Grid % Allocate_Faces(Grid % n_faces, Grid % n_shadows)
-
-  ! Boundary conditions' keys
-  ! (Go from zero for faces which are not at the boundary)
-  Grid % n_regions = Grid % n_bnd_regions + 1   ! this is inside region
-  Grid % per_x_reg = Grid % n_bnd_regions + 2   ! for periodic_x region
-  Grid % per_y_reg = Grid % n_bnd_regions + 3   ! for periodic_x region
-  Grid % per_z_reg = Grid % n_bnd_regions + 4   ! for periodic_x region
-  allocate(Grid % region % name(Grid % n_regions + 3))
-  allocate(Grid % region % type(Grid % n_regions + 3))
+  call Grid % Allocate_Nodes  (Grid % n_nodes)
+  call Grid % Allocate_Cells  (Grid % n_cells, Grid % n_bnd_cells)
+  call Grid % Allocate_Faces  (Grid % n_faces, Grid % n_shadows)
+  call Grid % Allocate_Regions(Grid % n_bnd_regions)
 
   !-----------------!
   !   Domain name   !
@@ -88,13 +80,6 @@
   do n = Boundary_Regions()
     read(fu) Grid % region % name(n)
   end do
-
-  ! The last three are reserved for perodicity
-  ! and used for inlet copy boundary condition.  Don't delete these thinking
-  ! they are useless.  They are assigned in Calculate_Face_Geometry
-  Grid % region % name(Grid % per_x_reg) = 'PERIODIC_X'
-  Grid % region % name(Grid % per_y_reg) = 'PERIODIC_Y'
-  Grid % region % name(Grid % per_z_reg) = 'PERIODIC_Z'
 
   !--------------------------!
   !   Nodes global numbers   !
