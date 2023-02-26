@@ -3,9 +3,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid
-  integer          :: nc    ! number of cells inside
-  integer          :: nb    ! number of cells on the bounday
+  class(Grid_Type)    :: Grid
+  integer, intent(in) :: nc    ! number of cells inside
+  integer, intent(in) :: nb    ! number of cells on the bounday
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c
 !==============================================================================!
