@@ -175,7 +175,7 @@
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then
       if(ini .eq. 1) then
-        do c = Cells_In_Domain()
+        do c = Cells_In_Domain_And_Buffers()
           ui % oo(c) = ui % o(c)
           ui % o (c) = ui % n(c)
         end do
