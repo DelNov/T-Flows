@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Domain_Mod_Allocate_Lines(dom, n)
+  subroutine Allocate_Lines(Dom, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  integer           :: n
+  class(Domain_Type)  :: Dom
+  integer, intent(in) :: n
 !==============================================================================!
 
-  dom % n_lines = n
-  allocate(dom % lines(n))
+  Dom % n_lines = n
+  allocate(Dom % lines(n))
 
   end subroutine

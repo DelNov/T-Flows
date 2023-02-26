@@ -29,6 +29,21 @@
     type(Line_Type),  allocatable :: lines(:)
     type(Range_Type), allocatable :: ranges(:)
 
+    contains
+      procedure :: Allocate_Points
+      procedure :: Allocate_Blocks
+      procedure :: Allocate_Lines
+      procedure :: Allocate_Ranges
+      procedure :: Calculate_Node_Coordinates
+      procedure :: Connect_Blocks
+      procedure :: Connect_Periodicity
+      procedure :: Distribute_Nodes
+      procedure :: Distribute_Ranges
+      procedure :: Find_Line
+      procedure :: Find_Surface
+      procedure :: Is_Line_In_Block
+      procedure :: Laplace
+
   end type
 
   !---------------------------!

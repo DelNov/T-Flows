@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Domain_Mod_Allocate_Ranges(dom, n)
+  subroutine Allocate_Ranges(Dom, n)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  integer           :: n
+  class(Domain_Type)  :: Dom
+  integer, intent(in) :: n
 !==============================================================================!
 
-  dom % n_ranges = n
-  allocate(dom % ranges(n))
+  Dom % n_ranges = n
+  allocate(Dom % ranges(n))
 
   end subroutine

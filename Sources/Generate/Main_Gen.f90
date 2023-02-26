@@ -15,7 +15,7 @@
     include '../Shared/Probe_2d.h90'
   end interface
 !-----------------------------------[Locals]-----------------------------------!
-  type(Domain_Type)  :: dom       ! domain to be used
+  type(Domain_Type)  :: Dom       ! domain to be used
   type(Grid_Type)    :: Grid      ! Grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
@@ -31,15 +31,15 @@
   !-------------------------!
   !   Read the input file   !
   !-------------------------!
-  call Generate % Load_Dom(dom, smooths, refines, Grid)
+  call Generate % Load_Dom(Dom, smooths, refines, Grid)
 
   !-----------------------!
   !   Handle the domain   !
   !-----------------------!
-  call Domain_Mod_Calculate_Node_Coordinates(dom, Grid)
-  call Domain_Mod_Distribute_Ranges         (dom, Grid)
-  call Domain_Mod_Connect_Blocks            (dom, Grid)
-  call Domain_Mod_Connect_Periodicity       (dom, Grid)
+  call Dom % Calculate_Node_Coordinates(Grid)
+  call Dom % Distribute_Ranges         (Grid)
+  call Dom % Connect_Blocks            (Grid)
+  call Dom % Connect_Periodicity       (Grid)
 
   !--------------------------------!
   !   From this point on, domain   !
