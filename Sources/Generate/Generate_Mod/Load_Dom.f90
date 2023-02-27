@@ -393,7 +393,7 @@
   call File % Read_Line(fu)
   read(Line % tokens(1), *) smr % n_smooths  ! number of smoothing ranges
 
-  print '(a38,i7)', '# Number of (non)smoothing ranges:  ', smr % n_smooths
+  print '(a38,i7)', '# Number of (non)smoothing ranges:   ', smr % n_smooths
 
   call Smooths_Mod_Allocate_Smooths(smr, smr % n_smooths)
 
