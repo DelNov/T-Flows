@@ -191,8 +191,7 @@
   !    numbers and names    !
   !                         !
   !-------------------------!
-  Dual % n_bnd_regions = Prim % n_bnd_regions
-  allocate(Dual % region % name(Dual % n_bnd_regions))
+  call Dual % Allocate_Regions(Prim % n_bnd_regions)
   do bc = 1, Prim % n_bnd_regions
     Dual % region % name(bc) = Prim % region % name(bc)
     call String % To_Upper_Case(Dual % region % name(bc))
