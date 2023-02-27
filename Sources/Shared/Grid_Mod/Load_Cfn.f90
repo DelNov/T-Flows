@@ -264,7 +264,7 @@
   allocate (Grid % region % at_cell(-Grid % n_bnd_cells-1:Grid % n_faces))
   read(fu) (Grid % region % at_cell(c), c = -Grid % n_bnd_cells, -1)
 
-  call Grid % Regions_Ranges()
+  call Grid % Determine_Regions_Ranges()
 
   close(fu)
 

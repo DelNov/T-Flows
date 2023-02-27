@@ -29,9 +29,15 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #   Initialize variables to pass on to preprocessor with
 #   variable T_FLOWS_COMPILATION which, if set to one,
 #   means unit is compiled from T-Flow
-#   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
+
+#----------------------------------------------------------
+#   It soon adds T_FLOWS_PROGRAM and T_FLOWS_ASSERT and
+#   later on it adds also T_FLOWS_MPI and T_FLOWS_PETSC
+#----------------------------------------------------------
+PASS_ON += -DT_FLOWS_PROGRAM=1
+
 ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1
 else

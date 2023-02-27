@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Regions_Ranges(Grid)
+  subroutine Determine_Regions_Ranges(Grid)
 !------------------------------------------------------------------------------!
 !   Allocates memory and finds the range (first and last boundary cell)        !
 !   for each of the boundary condition region.                                 !
@@ -8,7 +8,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !------------------------------[Local parameters]------------------------------!
-  logical, parameter :: DEBUG = .true.
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, reg, s, siz
 !==============================================================================!
@@ -71,7 +71,7 @@
   end do
 
   if(DEBUG) then
-    write(1000+this_proc, '(a)')  ' # Cell ranges'
+    write(1000+this_proc, '(a,a)')  ' # Cell ranges from ', Program_Name
     do reg = All_Regions()
       siz = Grid % region % l_cell(reg) - Grid % region % f_cell(reg) + 1
       write(1000+this_proc,'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
@@ -133,7 +133,7 @@
   end do
 
   if(DEBUG) then
-    write(2000+this_proc, '(a)')  ' # Face ranges'
+    write(2000+this_proc, '(a,a)')  ' # Face ranges from ', Program_Name
     do reg = All_Regions()
       siz = Grid % region % l_face(reg) - Grid % region % f_face(reg) + 1
       write(2000+this_proc,'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &

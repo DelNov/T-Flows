@@ -36,6 +36,13 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
+
+#----------------------------------------------------------
+#   It soon adds T_FLOWS_PROGRAM and T_FLOWS_ASSERT and
+#   later on it adds also T_FLOWS_MPI and T_FLOWS_PETSC
+#----------------------------------------------------------
+PASS_ON += -DT_FLOWS_PROGRAM=4
+
 ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1
 else

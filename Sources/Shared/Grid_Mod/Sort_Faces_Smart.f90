@@ -12,7 +12,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !------------------------------[Local parameters]------------------------------!
-  logical, parameter :: DEBUG = .true.
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, m, n, c, c1, c2, n_bc, reg
   integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
@@ -164,7 +164,7 @@
   end do
 
   ! Find boundary reg ranges
-  call Regions_Ranges(Grid)
+  call Grid % Determine_Regions_Ranges()
 
   if(DEBUG) then
     print '(a)', 's, c1, c2, Grid % region % at_cell(c2)'
