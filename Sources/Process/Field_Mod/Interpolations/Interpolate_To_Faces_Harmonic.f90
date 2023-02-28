@@ -12,7 +12,7 @@
                                        Flow % pnt_grid % n_cells)
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
-  integer                  :: s, c1, c2
+  integer                  :: s, c1, c2, reg
 !==============================================================================!
 
   ! Take alias
@@ -20,18 +20,22 @@
 
   ! Refresh buffers for gradient components was here, but it is not needed
 
-  ! Perform harmonic average on all faces
-  do s = 1, Grid % n_faces
-    c1  = Grid % faces_c(1, s)
-    c2  = Grid % faces_c(2, s)
-
-    if(c2 > 0) then
-      phi_f(s) = Math % Harmonic_Mean(phi_c(c1), phi_c(c2))
-    else
+  ! Perform harmonic average for boundary faces
+  ! (Why doesn't it take care of boundary conditions? - check this!)
+  do reg = Boundary_Regions()
+    do s = Faces_In_Region(reg)
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       phi_f(s) = phi_c(c1)
-    end if
+    end do
+  end do
 
-    phi_f(s) = phi_f(s)
+  ! Perform harmonic average for inside faces
+  do s = Faces_In_Domain()
+    c1  = Grid % faces_c(1,s)
+    c2  = Grid % faces_c(2,s)
+
+    phi_f(s) = Math % Harmonic_Mean(phi_c(c1), phi_c(c2))
   end do
 
   end subroutine

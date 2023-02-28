@@ -44,22 +44,21 @@
   !     (These might not obey the volume conservation)     !
   !                                                        !
   !--------------------------------------------------------!
-  do s = 1, Grid % n_faces
-    c2 = Grid % faces_c(2,s)
-
-    ! Side is on the boundary
-    if(c2 < 0) then
-
-      if(Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. SYMMETRY) then
+      do s = Faces_In_Region(reg)
         v_flux % n(s) = 0.0
-      else
+      end do
+    else
+      do s = Faces_In_Region(reg)
+        c2 = Grid % faces_c(2,s)
+
         v_flux % n(s) = ( u % n(c2) * Grid % sx(s)     &
                         + v % n(c2) * Grid % sy(s)     &
                         + w % n(c2) * Grid % sz(s) )
-      end if
-    end if
-
-  end do
+      end do  ! faces
+    end if    ! boundary condition type
+  end do      ! regions
 
   !--------------------------------------!
   !                                      !

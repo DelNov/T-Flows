@@ -23,7 +23,7 @@
                                        Flow % pnt_grid % n_cells)
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
-  integer                  :: s, c1, c2
+  integer                  :: s, c1, c2, reg
 !==============================================================================!
 
   ! Take alias
@@ -37,23 +37,24 @@
 
   !-------------------------------------------------------!
   !   Estimate values at faces from the values in cells   !
-  !------------------------------------------------------!
-  do s = 1, Grid % n_faces
+  !-------------------------------------------------------!
 
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-
-    ! Inside
-    if(c2 > 0) then
-      phi_f(s) = Grid % f(s)         * phi_c(c1)  &
-               + (1.0 - Grid % f(s)) * phi_c(c2)
-
-    ! On the boundary cells
-    else
+  ! Perform linear average for boundary faces
+  ! (Why doesn't it take care of boundary conditions? - check this!)
+  do reg = Boundary_Regions()
+    do s = Faces_In_Region(reg)
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
       phi_f(s) = phi_c(c1)
+    end do
+  end do
 
-    end if
+  ! Perform linear average for inside faces
+  do s = Faces_In_Domain()
+    c1  = Grid % faces_c(1,s)
+    c2  = Grid % faces_c(2,s)
 
+    phi_f(s) = Grid % f(s) * phi_c(c1) + (1.0 - Grid % f(s)) * phi_c(c2)
   end do
 
   !-----------------------------------------------------!
@@ -61,32 +62,32 @@
   !-----------------------------------------------------!
   if(present(phi_x)) then
 
-    do s = 1, Grid % n_faces
-
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-
-      ! Inside
-      if(c2 > 0) then
-        phi_f(s) = phi_f(s)                                     &
-                 + Grid % f(s)                                  &
-                               * (  phi_x(c1) * Grid % rx(s)    &
-                                  + phi_y(c1) * Grid % ry(s)    &
-                                  + phi_z(c1) * Grid % rz(s) )  &
-                 + (1.0 - Grid % f(s))                          &
-                               * (  phi_x(c2) * Grid % rx(s)    &
-                                  + phi_y(c2) * Grid % ry(s)    &
-                                  + phi_z(c2) * Grid % rz(s) )
-      ! On the boundary cells
-      else
+    do reg = Boundary_Regions()
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
         phi_f(s) = phi_f(s)                                    &
                  + phi_x(c1) * (Grid % xf(s) - Grid % xc(c1))  &
                  + phi_y(c1) * (Grid % yf(s) - Grid % yc(c1))  &
                  + phi_z(c1) * (Grid % zf(s) - Grid % zc(c1))
-      end if
+      end do  ! faces
+    end do    ! all boundary regions
 
+    do s = Faces_In_Domain()
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+
+      phi_f(s) = phi_f(s)                                     &
+               + Grid % f(s)                                  &
+                             * (  phi_x(c1) * Grid % rx(s)    &
+                                + phi_y(c1) * Grid % ry(s)    &
+                                + phi_z(c1) * Grid % rz(s) )  &
+               + (1.0 - Grid % f(s))                          &
+                             * (  phi_x(c2) * Grid % rx(s)    &
+                                + phi_y(c2) * Grid % ry(s)    &
+                                + phi_z(c2) * Grid % rz(s) )
     end do
 
-  end if
+  end if  ! gradients are present
 
   end subroutine

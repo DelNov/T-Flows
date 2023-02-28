@@ -19,7 +19,7 @@
   type(Grid_Type), pointer     :: Grid
   type(Var_Type),  pointer     :: phi
   integer(SP)                  :: data_size
-  integer                      :: data_offset, cell_offset, i_fac
+  integer                      :: data_offset, cell_offset, i_fac, reg
   integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
   integer                      :: s1, s2, c1, c2, c_f, c_l
   real                         :: dist1, dist2
@@ -892,12 +892,13 @@
 
         ! Copy internal values to boundary
         var_ins(:) = 0.0
-        do s = 1, Grid % n_faces
-          c1 = Grid % faces_c(1,s)
-          c2 = Grid % faces_c(2,s)
-          if(c2 < 0) then
+        do reg = Boundary_Regions()
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
             var_ins(c2) = Turb % kin % n(c1)
-          end if
+          end do
         end do
 
         call Results % Save_Scalar_Real("T.K.E. Near Wall [m^2/s^2]",  &
@@ -907,12 +908,13 @@
 
         ! Copy internal values to boundary
         var_ins(:) = 0.0
-        do s = 1, Grid % n_faces
-          c1 = Grid % faces_c(1,s)
-          c2 = Grid % faces_c(2,s)
-          if(c2 < 0) then
+        do reg = Boundary_Regions()
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
             var_ins(c2) = Turb % y_plus(c1)
-          end if
+          end do
         end do
 
         call Results % Save_Scalar_Real("y+ Near Wall [1]",         &
@@ -924,12 +926,13 @@
           phi => Flow % scalar(sc)
           ! Copy internal values to boundary
           var_ins(:) = 0.0
-          do s = 1, Grid % n_faces
-            c1 = Grid % faces_c(1,s)
-            c2 = Grid % faces_c(2,s)
-            if(c2 < 0) then
+          do reg = Boundary_Regions()
+            do s = Faces_In_Region(reg)
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
               var_ins(c2) = phi % n(c1)
-            end if
+            end do
           end do
 
           call Results % Save_Scalar_Real("Scalar Near Wall",        &
@@ -939,12 +942,13 @@
 
           ! Copy internal values to boundary
           var_ins(:) = 0.0
-          do s = 1, Grid % n_faces
-            c1 = Grid % faces_c(1,s)
-            c2 = Grid % faces_c(2,s)
-            if(c2 < 0) then
+          do reg = Boundary_Regions()
+            do s = Faces_In_Region(reg)
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
               var_ins(c2) = phi_save(c1)  ! Turb % scalar_mean(sc, c1)
-            end if
+            end do
           end do
 
           call Results % Save_Scalar_Real("Mean Scalar Near Wall",  &
@@ -954,12 +958,13 @@
 
           ! Copy internal values to boundary
           var_ins(:) = 0.0
-          do s = 1, Grid % n_faces
-            c1 = Grid % faces_c(1,s)
-            c2 = Grid % faces_c(2,s)
-            if(c2 < 0) then
+          do reg = Boundary_Regions()
+            do s = Faces_In_Region(reg)
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
               var_ins(c2) = phi % q(c2)  ! Turb % scalar_mean(sc, c1)
-            end if
+            end do
           end do
 
           call Results % Save_Scalar_Real("Wall Scalar Flux",        &
