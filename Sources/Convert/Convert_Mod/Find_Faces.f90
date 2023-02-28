@@ -22,8 +22,8 @@
   type(Grid_Type)     :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n1, n2, n3, f_nod(4)
-  integer              :: n_match, i_fac, match_nodes(-1:8)
-  integer              :: i1, i2, i_nod, cnt
+  integer              :: n_match, i_fac, max_fac, match_nodes(-1:8)
+  integer              :: i1, i2, i_nod, max_nod, cnt
   integer              :: fn(6,4)
   integer, allocatable :: face_n1(:)
   integer, allocatable :: face_n2(:)
@@ -45,6 +45,28 @@
   allocate(ends     (Grid % n_cells*6));  ends     (:) = 0
 
   !---------------------------------------------------!
+  !   Find max number of cells' faces for this grid   !
+  !---------------------------------------------------!
+  max_fac = 0
+  do c = 1, Grid % n_cells
+    if(Grid % cells_n_nodes(c) .eq. 4) max_fac = max(max_fac, 4)
+    if(Grid % cells_n_nodes(c) .eq. 5) max_fac = max(max_fac, 5)
+    if(Grid % cells_n_nodes(c) .eq. 6) max_fac = max(max_fac, 5)
+    if(Grid % cells_n_nodes(c) .eq. 8) max_fac = max(max_fac, 6)
+  end do
+
+  !---------------------------------------------------!
+  !   Find max number of faces' nodes for this grid   !
+  !---------------------------------------------------!
+  max_nod = 0
+  do c = 1, Grid % n_cells
+    if(Grid % cells_n_nodes(c) .eq. 4) max_nod = max(max_nod, 3)
+    if(Grid % cells_n_nodes(c) .eq. 5) max_nod = max(max_nod, 4)
+    if(Grid % cells_n_nodes(c) .eq. 6) max_nod = max(max_nod, 4)
+    if(Grid % cells_n_nodes(c) .eq. 8) max_nod = max(max_nod, 4)
+  end do
+
+  !---------------------------------------------------!
   !   Fill the generic coordinates with some values   !
   !---------------------------------------------------!
   do c = 1, Grid % n_cells
@@ -52,11 +74,11 @@
     if(Grid % cells_n_nodes(c) .eq. 5) fn = PYR
     if(Grid % cells_n_nodes(c) .eq. 6) fn = WED
     if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
-    do i_fac = 1, 6
+    do i_fac = 1, max_fac
       if(Grid % cells_bnd_region(i_fac, c) .eq. 0) then
 
         ! Fetch face nodes (-1 becomes HUGE_INT and it will be the biggest)
-        do i_nod = 1, 4
+        do i_nod = 1, max_nod
           f_nod(i_nod) = HUGE_INT
           if(fn(i_fac, i_nod) > 0) then
             f_nod(i_nod) = Grid % cells_n(fn(i_fac, i_nod), c)
@@ -107,8 +129,8 @@
   !   Main loop to fill the faces_c structure   !
   !                                             !
   !---------------------------------------------!
-  call Adjust_First_Dim(6, Grid % cells_c)  ! i_fac goes to 6
-  call Adjust_First_Dim(4, Grid % faces_n)  ! i_nod goes to 4
+  call Adjust_First_Dim(max_fac, Grid % cells_c)  ! i_fac goes to max_fac
+  call Adjust_First_Dim(max_nod, Grid % faces_n)  ! i_nod goes to max_nod
   do n3 = 1, cnt
     if(starts(n3) .ne. ends(n3)) then
       do i1=starts(n3),ends(n3)
@@ -144,7 +166,7 @@
               if(Grid % cells_n_nodes(c1) .eq. 5) fn = PYR
               if(Grid % cells_n_nodes(c1) .eq. 6) fn = WED
               if(Grid % cells_n_nodes(c1) .eq. 8) fn = HEX
-              do i_fac = 1, 6
+              do i_fac = 1, max_fac
                 if(Grid % cells_c(i_fac, c1) .eq. 0  .and.   & ! not set yet
                     ( max( match_nodes(fn(i_fac, 1)),0 ) + &
                       max( match_nodes(fn(i_fac, 2)),0 ) + &
@@ -154,7 +176,7 @@
                   Grid % faces_c(1,Grid % n_faces) = c1
                   Grid % faces_c(2,Grid % n_faces) = c2
                   Grid % faces_n_nodes(Grid % n_faces) = n_match
-                  do i_nod = 1, 4
+                  do i_nod = 1, max_nod
                     if(fn(i_fac, i_nod) > 0) then
                       Grid % faces_n(i_nod,Grid % n_faces) =  &
                       Grid % cells_n(fn(i_fac, i_nod), c1)
