@@ -8,6 +8,9 @@
 # define Boundary_And_Inside_Regions()            \
     1, Grid % n_regions
 
+# define Boundary_Inside_And_Buffer_Regions()     \
+    1, Grid % n_regions + 1
+
 # define All_Regions()                            \
     1, Grid % n_bnd_regions + 5
 

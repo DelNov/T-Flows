@@ -56,9 +56,11 @@
   end do
 
   ! Buffer cells
+  ! Note: leave Grid % region % l_cell(reg) at Grid % n_cells since
+  ! it makes macro Cells_In_Domain_And_Buffers() work in sequential
   reg = Grid % n_regions + 1
   Grid % region % f_cell(reg) = Grid % n_cells + 1
-  Grid % region % l_cell(reg) = 1
+  Grid % region % l_cell(reg) = Grid % n_cells
   do c = 1, Grid % n_cells
     if(Grid % Comm % cell_proc(c) .ne. this_proc) then
       if(c < Grid % region % f_cell(reg)) then
