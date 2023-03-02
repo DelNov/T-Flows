@@ -35,7 +35,11 @@
 
   call Profiler % Start('Load_Gmsh')
 
-  ! Open the file in binary mode, because it just might be
+  !-------------------------------------------------------!
+  !                                                       !
+  !   Open the file in binary mode for initial analyzis   !
+  !                                                       !
+  !-------------------------------------------------------!
   call File % Open_For_Reading_Binary(file_name, fu)
 
   !-----------------------------------------------------------!
@@ -103,6 +107,17 @@
   ascii = .true.
   if(Line % tokens(2) .eq. '1') ascii = .false.
 
+  !------------------------------------------!
+  !                                          !
+  !   Once you know the format of the file   !
+  !     close it and open again if ASCII     !
+  !                                          !
+  !------------------------------------------!
+  if(ascii) then
+    close(fu)
+    call File % Open_For_Reading_Ascii(file_name, fu)
+  end if
+
   !----------------------------------------------!
   !                                              !
   !                                              !
@@ -153,7 +168,7 @@
   call fseek(fu, pos_nodes, 0)
 # endif
   if(ascii) then
-    call File % Read_Line(fu)
+    read(fu, *) (Line % tokens(k), k = 1, 4)
     read(Line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
   else
     call File % Read_Binary_Int8_Array(fu, 4)
@@ -173,7 +188,7 @@
   call fseek(fu, pos_elements, 0)
 # endif
   if(ascii) then
-    call File % Read_Line(fu)
+    read(fu, *) (Line % tokens(k), k = 1, 4)
     read(Line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
   else
     call File % Read_Binary_Int8_Array(fu, 4)
@@ -197,7 +212,7 @@
     call fseek(fu, pos_entities, 0)
 #   endif
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
       read(Line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
       read(Line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
@@ -215,7 +230,7 @@
     !--------------------------!
     if(ascii) then
       do i = 1, n_e_0d
-        call File % Read_Line(fu)
+        read(fu, *) Line % whole
       end do
     else
       do i = 1, n_e_0d
@@ -233,7 +248,7 @@
     !--------------------------!
     if(ascii) then
       do i = 1, n_e_1d
-        call File % Read_Line(fu)
+        read(fu, *) Line % whole
       end do
     else
       do i = 1, n_e_1d
@@ -319,8 +334,7 @@
   !   Read the number of groups   !
   !-------------------------------!
   if(ascii) then
-    call File % Read_Line(fu)
-    read(Line % tokens(1),*) n_grps
+    read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_grps = int8_array(1)
@@ -333,7 +347,7 @@
 
     ! Read dim, s_tag, type and n_memb <--= this is what you actually need!
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(1), *) dim     ! dimension of the element
       read(Line % tokens(2), *) s_tag   ! element tag
       read(Line % tokens(3), *) type    ! element type
@@ -350,8 +364,7 @@
     ! Read cell number and cell's nodes <--= this is just to carry on
     do j = 1, n_memb
       if(ascii) then
-        call File % Read_Line(fu)
-        read(Line % tokens(1), *) c     ! Gmsh cell number
+        read(fu, *) c
       else
         ! Element tag
         call File % Read_Binary_Int8_Array(fu, 1)
@@ -408,8 +421,7 @@
   !   Read the number of groups   !
   !-------------------------------!
   if(ascii) then
-    call File % Read_Line(fu)
-    read(Line % tokens(1),*) n_grps
+    read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_grps = int8_array(1)
@@ -422,7 +434,7 @@
 
     ! Read dim, s_tag, type and n_memb
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(1), *) dim     ! dimension of the element
       read(Line % tokens(2), *) s_tag   ! element tag
       read(Line % tokens(3), *) type    ! element type
@@ -447,7 +459,7 @@
     ! Read cell number and cell's nodes
     do j = 1, n_memb
       if(ascii) then
-        call File % Read_Line(fu)
+        read(fu, *) (Line % tokens(k), k = 1, 1 + n_nods)
         read(Line % tokens(1), *) c  ! fetch Gmsh cell number
         c = new(c)                   ! use T-Flows numbering
 
@@ -500,8 +512,7 @@
   !   Read the number of groups   !
   !-------------------------------!
   if(ascii) then
-    call File % Read_Line(fu)
-    read(Line % tokens(1),*) n_grps
+    read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
     n_grps = int8_array(1)
@@ -512,7 +523,7 @@
   !-------------------------------------------------------!
   do i = 1, n_grps
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(4),*) n_memb  ! fetch number of members
     else
       call File % Read_Binary_Int4_Array(fu, 3)
@@ -524,8 +535,7 @@
     ! Fetch all node numbers in the group
     if(ascii) then
       do j = 1, n_memb
-        call File % Read_Line(fu)
-        read(Line % tokens(1),*) n(j)
+        read(fu, *) n(j)
       end do
     else
       do j = 1, n_memb                 ! fetch all node numbers
@@ -537,10 +547,7 @@
     ! Fetch all node coordinates in the group
     if(ascii) then
       do j = 1, n_memb
-        call File % Read_Line(fu)    ! read node coordinates
-        read(Line % tokens(1),*) Grid % xn(n(j))
-        read(Line % tokens(2),*) Grid % yn(n(j))
-        read(Line % tokens(3),*) Grid % zn(n(j))
+        read(fu, *) Grid % xn(n(j)), Grid % yn(n(j)), Grid % zn(n(j))
       end do
     else
       do j = 1, n_memb
