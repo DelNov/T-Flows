@@ -8,8 +8,6 @@
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
-!----------------------------------[Calling]-----------------------------------!
-  integer(DP) :: ftell
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
@@ -21,7 +19,7 @@
   integer, parameter :: CELL_POLY  = 7
   integer, parameter :: FACE_TRI   = 3
   integer, parameter :: FACE_QUAD  = 4
-  integer, parameter :: FACE_POLY  = 5  ! just a guess
+  integer, parameter :: FACE_POLY  = 5  ! an educated guess, but seems good
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)          :: one_token
   character(1)           :: one_char
