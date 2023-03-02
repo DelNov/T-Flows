@@ -8,16 +8,6 @@
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
-!-----------------------------------[Locals]-----------------------------------!
-  integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
-  integer                    :: n_memb, n_tags, n_crvs, n_nods
-  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu
-  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
-  integer, allocatable       :: n(:), new(:)
-  integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
-  character(SL), allocatable :: phys_names(:)
-  logical                    :: ascii                 ! is file in ascii format?
-  logical                    :: the_end               ! did it reach the end
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MSH_TRI   = 2
   integer, parameter :: MSH_QUAD  = 3
@@ -25,12 +15,70 @@
   integer, parameter :: MSH_HEXA  = 5
   integer, parameter :: MSH_WEDGE = 6
   integer, parameter :: MSH_PYRA  = 7
+!-----------------------------------[Locals]-----------------------------------!
+  integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
+  integer                    :: n_memb, n_tags, n_crvs, n_nods, error
+  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu
+  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
+  integer, allocatable       :: n(:), new(:)
+  integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
+  character(SL), allocatable :: phys_names(:)
+  logical                    :: ascii                 ! is file in ascii format?
+  integer                    :: pos
+  integer                    :: pos_meshformat     =  12
+  integer                    :: pos_physicalnames  = -1
+  integer                    :: pos_entities       = -1
+  integer                    :: pos_nodes          = -1
+  integer                    :: pos_elements       = -1
+  integer(1)                 :: byte(0:3)
 !==============================================================================!
 
   call Profiler % Start('Load_Gmsh')
 
   ! Open the file in binary mode, because it just might be
   call File % Open_For_Reading_Binary(file_name, fu)
+
+  !-----------------------------------------------------------!
+  !   A very rudimentary way to find beginnings of sections   !
+  !-----------------------------------------------------------!
+  pos = 0
+  do
+    read(fu, end=2) byte(0);  pos = pos + 1
+    if(char(byte(0)) .eq. '$') then
+      read(fu, end=2) byte(1);  pos = pos + 1
+      read(fu, end=2) byte(2);  pos = pos + 1
+      read(fu, end=2) byte(3);  pos = pos + 1
+      if(char(byte(1)) .eq. 'E' .and.  &
+         char(byte(2)) .eq. 'n' .and.  &
+         char(byte(3)) .eq. 'd') then
+        do i = 1, MAX_TOKENS*2
+          read(fu, end=2) byte(0);  pos = pos + 1
+          if(byte(0) .eq. 10) exit
+        end do
+        Line % whole = ''
+        do i = 1, MAX_TOKENS*2
+          read(fu, end=2) byte(0);  pos = pos + 1
+          if(byte(0) .eq. 10) exit
+          if(byte(0) .ne. 13) Line % whole(i:i) = char(byte(0))
+        end do
+        if(Line % whole .eq. '$PhysicalNames') pos_physicalnames = pos
+        if(Line % whole .eq. '$Entities')      pos_entities      = pos
+        if(Line % whole .eq. '$Nodes')         pos_nodes         = pos
+        if(Line % whole .eq. '$Elements')      pos_elements      = pos
+      end if
+    end if
+  end do
+2 continue
+
+  ! Error trap
+  if(pos_physicalnames .eq. -1) then
+    call Message % Error(60,                                              &
+      "This is bad.  PhysicalNames don't seem to be defined in the "  //  &
+      ".msh file.  Maybe you forgot to define boundary conditions  "  //  &
+      "(called physical groups) in Gmsh?",                                &
+      file=__FILE__, line=__LINE__)
+  end if
+  print *, '# Broswed the file in binary format and read ', pos, ' bytes'
 
   !----------------------------------------!
   !   Gmsh can't handle polyhedral grids   !
@@ -41,10 +89,8 @@
   !   Check format fo the file   !
   !------------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$MeshFormat') exit
-  end do
+  call File % Read_Line(fu)
+  Assert(Line % tokens(1) == '$MeshFormat')
   call File % Read_Line(fu)
   if(Line % tokens(1) .ne. '4.1') then
     call Message % Error(60,                                            &
@@ -56,7 +102,6 @@
   ! My guess is that second tokens says it is binary (1) or not (0)
   ascii = .true.
   if(Line % tokens(2) .eq. '1') ascii = .false.
-  ! Line which follows contains some crap, but who cares?
 
   !----------------------------------------------!
   !                                              !
@@ -73,19 +118,12 @@
   !-------------------------------------------------!
   n_blocks   = 0
   n_bnd_sect = 0
-  the_end    = .false.
   rewind(fu)
-  do
-    call File % Read_Line(fu, reached_end=the_end)
-    if(Line % tokens(1) .eq. '$PhysicalNames') exit
-    if(the_end) then
-      call Message % Error(60,                                              &
-        "This is bad.  PhysicalNames don't seem to be defined in the "  //  &
-        ".msh file.  Maybe you forgot to define boundary conditions  "  //  &
-        "(called physical groups) in Gmsh?",                                &
-        file=__FILE__, line=__LINE__)
-    end if
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_physicalnames, 0)
+# else
+  call fseek(fu, pos_physicalnames, 0)
+# endif
   call File % Read_Line(fu)
   read(Line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
@@ -109,10 +147,11 @@
   !                          !
   !--------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Nodes') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_nodes, 0)
+# else
+  call fseek(fu, pos_nodes, 0)
+# endif
   if(ascii) then
     call File % Read_Line(fu)
     read(Line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
@@ -128,10 +167,11 @@
   !                                      !
   !--------------------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Elements') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_elements, 0)
+# else
+  call fseek(fu, pos_elements, 0)
+# endif
   if(ascii) then
     call File % Read_Line(fu)
     read(Line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
@@ -151,10 +191,11 @@
     if(run .eq. 1) s_tag_max = 0
 
     rewind(fu)
-    do
-      call File % Read_Line(fu)
-      if(Line % tokens(1) .eq. '$Entities') exit
-    end do
+#   ifdef __INTEL_COMPILER
+    error = fseek(fu, pos_entities, 0)
+#   else
+    call fseek(fu, pos_entities, 0)
+#   endif
     if(ascii) then
       call File % Read_Line(fu)
       read(Line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
@@ -268,10 +309,11 @@
   Grid % n_bnd_cells = 0
   Grid % n_cells     = 0
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Elements') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_elements, 0)
+# else
+  call fseek(fu, pos_elements, 0)
+# endif
 
   !-------------------------------!
   !   Read the number of groups   !
@@ -356,10 +398,11 @@
   n_bnd_cells(:) = 0
 
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Elements') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_elements, 0)
+# else
+  call fseek(fu, pos_elements, 0)
+# endif
 
   !-------------------------------!
   !   Read the number of groups   !
@@ -447,10 +490,11 @@
   !                                !
   !--------------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Nodes') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_nodes, 0)
+# else
+  call fseek(fu, pos_nodes, 0)
+# endif
 
   !-------------------------------!
   !   Read the number of groups   !

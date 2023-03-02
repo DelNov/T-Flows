@@ -10,6 +10,18 @@
   character(SL)       :: file_name
 !----------------------------------[Calling]-----------------------------------!
   integer(DP) :: ftell
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: MIXED_ZONE = 0
+  integer, parameter :: CELL_TRI   = 1
+  integer, parameter :: CELL_TETRA = 2
+  integer, parameter :: CELL_QUAD  = 3
+  integer, parameter :: CELL_HEXA  = 4
+  integer, parameter :: CELL_PYRA  = 5
+  integer, parameter :: CELL_WEDGE = 6
+  integer, parameter :: CELL_POLY  = 7
+  integer, parameter :: FACE_TRI   = 3
+  integer, parameter :: FACE_QUAD  = 4
+  integer, parameter :: FACE_POLY  = 5  ! just a guess
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)          :: one_token
   character(1)           :: one_char
@@ -17,7 +29,7 @@
   integer                :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
   integer                :: n_cells, n_bnd_cells, n_faces, n_nodes
   integer                :: n_face_nodes, n_cells_zone
-  integer                :: c, c1, c2, s, n, fu, i, l, pos, length
+  integer                :: c, c1, c2, s, n, fu, i, l, pos, length, error
   integer                :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
   integer                :: cell_type, zone_type
   integer                :: cell_f, cell_l, side_f, side_l, node_f, node_l
@@ -31,18 +43,6 @@
   logical                :: ascii                 ! is file in ascii format?
   integer,   allocatable :: cell_visited_from(:), cell_types(:)
   character, allocatable :: very_long_line(:)
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MIXED_ZONE = 0
-  integer, parameter :: CELL_TRI   = 1
-  integer, parameter :: CELL_TETRA = 2
-  integer, parameter :: CELL_QUAD  = 3
-  integer, parameter :: CELL_HEXA  = 4
-  integer, parameter :: CELL_PYRA  = 5
-  integer, parameter :: CELL_WEDGE = 6
-  integer, parameter :: CELL_POLY  = 7
-  integer, parameter :: FACE_TRI   = 3
-  integer, parameter :: FACE_QUAD  = 4
-  integer, parameter :: FACE_POLY  = 5  ! just a guess
 !==============================================================================!
 
   call Profiler % Start('Load_Fluent')
@@ -433,7 +433,11 @@
             ! Find out the Line length
             offset = ftell(fu)                ! mark offset
             length = File % Line_Length(fu)   ! read the Line
-            call fseek(fu, offset, 0)         ! go back
+#           ifdef __INTEL_COMPILER
+            error = fseek(fu, offset, 0)
+#           else
+            call fseek(fu, offset, 0)
+#           endif
 
             ! Allocate helping arrays
             allocate(very_long_line(length))    ! allocate very long Line

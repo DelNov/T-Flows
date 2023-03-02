@@ -1,3 +1,4 @@
+#include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
 
 !==============================================================================!
@@ -5,6 +6,9 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Stl_Mod
+# ifdef __INTEL_COMPILER
+  use Ifport              ! Intel's module for fseek and ftell
+# endif
 !------------------------------------------------------------------------------!
 !   Collection of functions used in the Convert program.  In honesty, it was   !
 !   introduced to get rid of the Fortran header files with interfaces which,   !
