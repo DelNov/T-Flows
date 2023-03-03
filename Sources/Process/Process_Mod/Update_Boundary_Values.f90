@@ -121,31 +121,19 @@
   !----------------!
   if(update .eq. 'TURBULENCE' .or. update .eq. 'ALL') then
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    !----------------------------!
+    !   Reynolds stress models   !
+    !----------------------------!
+    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-      ! On the boundary perform the extrapolation
-      if(c2 < 0) then
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. WALL .or.  &
+           Grid % region % type(reg) .eq. WALLFL) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-
-        ! Spalart Allmaras
-        if(Turb % model .eq. SPALART_ALLMARAS .or.  &
-           Turb % model .eq. DES_SPALART) then
-          if ( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-               Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-               Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
-               Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
-            vis % n(c2) = vis % n(c1)
-          end if
-        end if
-
-        ! Reynolds stress models
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-          if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
             uu  % n(c2) = 0.0
             vv  % n(c2) = 0.0
             ww  % n(c2) = 0.0
@@ -161,6 +149,43 @@
                                                      kin_vis,               &
                                                      0.0)
             if(Turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
+          end do  ! faces
+        else if(Grid % region % type(reg).eq. OUTFLOW .or.  &
+                Grid % region % type(reg).eq. PRESSURE) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
+            uu  % n(c2) = uu  % n(c1)
+            vv  % n(c2) = vv  % n(c1)
+            ww  % n(c2) = ww  % n(c1)
+            uv  % n(c2) = uv  % n(c1)
+            uw  % n(c2) = uw  % n(c1)
+            vw  % n(c2) = vw  % n(c1)
+            kin % n(c2) = kin % n(c1)
+            eps % n(c2) = eps % n(c1)
+            if(Turb % model .eq. RSM_MANCEAU_HANJALIC)  &
+              f22 % n(c2) = f22 % n(c1)
+          end do  ! faces
+        end if    ! boundary condition
+      end do      ! regions
+    end if        ! turbulence model
+
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+
+      ! On the boundary perform the extrapolation
+      if(c2 < 0) then
+
+        ! Spalart Allmaras
+        if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+           Turb % model .eq. DES_SPALART) then
+          if ( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
+               Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
+               Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
+               Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
+            vis % n(c2) = vis % n(c1)
           end if
         end if
 
@@ -194,22 +219,6 @@
           end if
         end if
 
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-            uu  % n(c2) = uu  % n(c1)
-            vv  % n(c2) = vv  % n(c1)
-            ww  % n(c2) = ww  % n(c1)
-            uv  % n(c2) = uv  % n(c1)
-            uw  % n(c2) = uw  % n(c1)
-            vw  % n(c2) = vw  % n(c1)
-            kin % n(c2) = kin % n(c1)
-            eps % n(c2) = eps % n(c1)
-            if(Turb % model .eq. RSM_MANCEAU_HANJALIC)  &
-              f22 % n(c2) = f22 % n(c1)
-          end if
-        end if
       end if ! c2 < 0
     end do
 
