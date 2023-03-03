@@ -223,6 +223,46 @@
 
   end if
 
+  !---------------------!
+  !   Spalart-Almaras   !
+  !---------------------!
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+
+    if(curr_dt > BEGIN) then
+
+      call Flow % Grad_Variable(vis)
+
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = vis % x(c1) * nx + vis % y(c1) * ny + vis % z(c1) * nz
+            vis % n(c2) = vis % n(c2) - bulk_vel * phi_n * dt
+          end do    ! face
+        end if      ! boundary condition
+      end do        ! region
+
+    else      ! curr_dt <= BEGIN
+
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
+            vis % n(c2) = vis % n(c1)
+          end do    ! face
+        end if      ! boundary condition
+      end do        ! region
+
+    end if    ! curr_dt > BEGIN
+
+  end if
+
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
