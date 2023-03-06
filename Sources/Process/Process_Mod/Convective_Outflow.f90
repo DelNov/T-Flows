@@ -15,7 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
-  type(Var_Type),  pointer :: u, v, w, t, phi
+  type(Var_Type),  pointer :: u, v, w, t, phi, vis
   type(Var_Type),  pointer :: kin, eps, zeta, f22, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type), pointer :: v_flux
@@ -33,6 +33,7 @@
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
   call Turb % Alias_T2          (t2)
+  call Turb % Alias_Vis         (vis)
 
   !------------------------------------------------!
   !   Compute bulk velocity via a user function.   !

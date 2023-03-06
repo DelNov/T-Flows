@@ -141,6 +141,7 @@
       procedure :: Alias_Heat_Fluxes
       procedure :: Alias_Stresses
       procedure :: Alias_T2
+      procedure :: Alias_Vis
 
       procedure :: Calculate_Deltas
       procedure :: Calculate_Heat_Flux
@@ -281,6 +282,7 @@
 #   include "Turb_Mod/Alias_Heat_Fluxes.f90"
 #   include "Turb_Mod/Alias_Stresses.f90"
 #   include "Turb_Mod/Alias_T2.f90"
+#   include "Turb_Mod/Alias_Vis.f90"
 
 #   include "Turb_Mod/Calculate_Deltas.f90"
 #   include "Turb_Mod/Calculate_Heat_Flux.f90"
