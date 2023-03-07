@@ -99,7 +99,7 @@
           do s = 1, Grid(d1) % n_faces
             c2 = Grid(d1) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d1) % Bnd_Cond_Name(c2) .eq. keys(1)) then
+              if(Grid(d1) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(1)) then
                 n1 = n1 + 1
               end if
             end if
@@ -109,7 +109,7 @@
           do s = 1, Grid(d1) % n_faces
             if(Grid(d1) % faces_s(s) > 0) then  ! only if it has a shadow
               c1 = Grid(d1) % faces_c(1,s)
-              if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
+              if(Grid(d1) % Bnd_Cond_Name_At_Face(s) .eq. keys(1) .and.  &
                  Grid(d1) % Comm % cell_proc(c1) .eq. this_proc) then
                 n1 = n1 + 1
               end if
@@ -124,7 +124,7 @@
           do s = 1, Grid(d2) % n_faces
             c2 = Grid(d2) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d2) % Bnd_Cond_Name(c2) .eq. keys(2)) then
+              if(Grid(d2) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(2)) then
                 n2 = n2 + 1
               end if
             end if
@@ -134,7 +134,7 @@
           do s = 1, Grid(d2) % n_faces
             if(Grid(d2) % faces_s(s) > 0) then  ! only if it has a shadow
               c1 = Grid(d2) % faces_c(1,s)
-              if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
+              if(Grid(d2) % Bnd_Cond_Name_At_Face(s) .eq. keys(2) .and.  &
                  Grid(d2) % Comm % cell_proc(c1) .eq. this_proc) then
                 n2 = n2 + 1
               end if
@@ -206,7 +206,7 @@
             c1 = Grid(d1) % faces_c(1,s)
             c2 = Grid(d1) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d1) % Bnd_Cond_Name(c2) .eq. keys(1)) then
+              if(Grid(d1) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(1)) then
                 n1 = n1 + 1
                 pos = n1
                 if(n_proc > 1) pos = pos + off_1(this_proc)
@@ -223,7 +223,7 @@
             c1 = Grid(d1) % faces_c(1,s)
             c2 = Grid(d1) % faces_c(2,s)
             if(Grid(d1) % faces_s(s) > 0) then  ! only if it has a shadow
-              if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
+              if(Grid(d1) % Bnd_Cond_Name_At_Face(s) .eq. keys(1) .and.  &
                  Grid(d1) % Comm % cell_proc(c1) .eq. this_proc) then
                 n1 = n1 + 1
                 pos = n1
@@ -244,7 +244,7 @@
             c1 = Grid(d2) % faces_c(1,s)
             c2 = Grid(d2) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d2) % Bnd_Cond_Name(c2) .eq. keys(2)) then
+              if(Grid(d2) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(2)) then
                 n2 = n2 + 1
                 pos = n2
                 if(n_proc > 1) pos = pos + off_2(this_proc)
@@ -261,7 +261,7 @@
             c1 = Grid(d2) % faces_c(1,s)
             c2 = Grid(d2) % faces_c(2,s)
             if(Grid(d2) % faces_s(s) > 0) then  ! only if it has a shadow
-              if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
+              if(Grid(d2) % Bnd_Cond_Name_At_Face(s) .eq. keys(2) .and.  &
                  Grid(d2) % Comm % cell_proc(c1) .eq. this_proc) then
                 n2 = n2 + 1
                 pos = n2

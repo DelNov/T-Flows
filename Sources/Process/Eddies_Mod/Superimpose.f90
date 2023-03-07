@@ -20,7 +20,7 @@
   Flow => eddies % pnt_flow
 
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
       Flow % u % n(c) = Flow % u % b(c)
       Flow % v % n(c) = Flow % v % b(c)
       Flow % w % n(c) = Flow % w % b(c)
@@ -49,7 +49,7 @@
 
     ! Select cell for each cell randomly
     do c = -Grid % n_bnd_cells, -1
-      if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+      if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
 
         xc = Grid % xc(c)
         yc = Grid % yc(c)

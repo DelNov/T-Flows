@@ -26,7 +26,7 @@
   ! Count boundary cells in this processor
   eddies % n_bnd_cells = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
       eddies % n_bnd_cells = eddies % n_bnd_cells + 1
     end if
   end do
@@ -63,7 +63,7 @@
 
   cnt = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
       cnt = cnt + 1
       eddies % bnd_xc(cnt + s_bnd_cell_proc(this_proc)) = Grid % xc(c)
       eddies % bnd_yc(cnt + s_bnd_cell_proc(this_proc)) = Grid % yc(c)

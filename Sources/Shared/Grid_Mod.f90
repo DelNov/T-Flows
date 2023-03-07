@@ -185,7 +185,8 @@
       procedure :: Allocate_Faces
       procedure :: Allocate_Nodes
       procedure :: Allocate_Regions
-      procedure :: Bnd_Cond_Name
+      procedure :: Bnd_Cond_Name_At_Cell
+      procedure :: Bnd_Cond_Name_At_Face
       procedure :: Bnd_Cond_Type
       procedure :: Bounding_Box
       procedure :: Calculate_Cell_Centers
@@ -240,7 +241,8 @@
 #   include "Grid_Mod/Allocate_Faces.f90"
 #   include "Grid_Mod/Allocate_Nodes.f90"
 #   include "Grid_Mod/Allocate_Regions.f90"
-#   include "Grid_Mod/Bnd_Cond_Name.f90"
+#   include "Grid_Mod/Bnd_Cond_Name_At_Cell.f90"
+#   include "Grid_Mod/Bnd_Cond_Name_At_Face.f90"
 #   include "Grid_Mod/Bnd_Cond_Type.f90"
 #   include "Grid_Mod/Bounding_Box.f90"
 #   include "Grid_Mod/Calculate_Cell_Centers.f90"

@@ -261,8 +261,11 @@
   ! Physical boundary cells (and all the faces)
   ! (This opens the oportunity to store bounary condition info in ...
   !  ... the faces thus ridding us of the "if(c2 < 0) then" checks)
-  allocate (Grid % region % at_cell(-Grid % n_bnd_cells-1:Grid % n_faces))
+  allocate (Grid % region % at_cell(-Grid % n_bnd_cells:-1))
   read(fu) (Grid % region % at_cell(c), c = -Grid % n_bnd_cells, -1)
+
+  allocate (Grid % region % at_face(1:Grid % n_faces))
+  Grid % region % at_face(1:Grid % n_faces) = 0
 
   call Grid % Determine_Regions_Ranges()
 

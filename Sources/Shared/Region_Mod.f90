@@ -42,6 +42,7 @@
     ! Values start from one, zero is internal cell
     ! (Follows nomenclature from "../Shared/Comm_Mod_Par.f90")
     integer, allocatable :: at_cell(:)  ! region at cell
+    integer, allocatable :: at_face(:)  ! region at face (for periodicity)
     integer, allocatable :: f_cell(:)   ! first (bnd) cell for region
     integer, allocatable :: l_cell(:)   ! last (bnd) cell for region
     integer, allocatable :: f_face(:)   ! first (bnd) cell for region
