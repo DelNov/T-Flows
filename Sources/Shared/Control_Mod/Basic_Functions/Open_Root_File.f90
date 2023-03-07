@@ -8,10 +8,8 @@
   character(len=*) :: file_name
 !==============================================================================!
 
-  ! Unused
-  ! control_file_name = file_name
-
-  call File % Open_For_Reading_Ascii(file_name, root_control_file_unit)
+  call File % Open_For_Reading_Ascii(file_name, root_control_file_unit,  &
+                                     processor=this_proc)
 
   ! Make root default to begin with
   control_file_unit = root_control_file_unit

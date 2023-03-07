@@ -9,6 +9,7 @@
   character(len=*) :: file_name
 !==============================================================================!
 
-  call File % Open_For_Reading_Ascii(file_name, dom_control_file_unit(dom))
+  call File % Open_For_Reading_Ascii(file_name, dom_control_file_unit(dom),  &
+                                     processor=this_proc)
 
   end subroutine
