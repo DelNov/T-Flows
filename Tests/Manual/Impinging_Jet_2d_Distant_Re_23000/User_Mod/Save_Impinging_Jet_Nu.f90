@@ -85,7 +85,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid % Bnd_Cond_Name(c2) .eq. 'LOWER_WALL') then
+        if(Grid % Bnd_Cond_Name_At_Cell(c2) .eq. 'LOWER_WALL') then
           r = sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
                    Grid % yc(c1)*Grid % yc(c1)) + TINY
           if(r < rad(i+1) .and. r > rad(i)) then

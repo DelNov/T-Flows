@@ -29,7 +29,7 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
     if(c2 < 0) then
-      if(Grid % Bnd_Cond_Name(c2) .eq. 'TOP') then
+      if(Grid % Bnd_Cond_Name_At_Cell(c2) .eq. 'TOP') then
         u % n(c2) = u % n(c1)
         v % n(c2) = v % n(c1)
         w % n(c2) = 0.0

@@ -65,7 +65,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid % Bnd_Cond_Name(c2) .eq. 'STEP') then
+        if(Grid % Bnd_Cond_Name_At_Cell(c2) .eq. 'STEP') then
           do n = 1, Grid % cells_n_nodes(c1)
             dist = sqrt(                                                    &
                   (Grid % xn(Grid % cells_n(n,c1))-x_probe(i_probe)) ** 2   &
