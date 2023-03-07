@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Fluxes(Flow, v_flux)
+  subroutine Calculate_Bulk_Fluxes(Flow, v_flux)
 !------------------------------------------------------------------------------!
 !   Calculate volume fluxes through whole domain.                              !
 !------------------------------------------------------------------------------!
@@ -25,55 +25,52 @@
   !---------------------------------------------------------------------------!
   !   Summ up volume mass fluxes [m^3/s] over all faces at monitoring plane   !
   !---------------------------------------------------------------------------!
-  do s = 1, Grid % n_faces
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
+    xc1 = Grid % xc(c1)
+    yc1 = Grid % yc(c1)
+    zc1 = Grid % zc(c1)
+    xc2 = Grid % xc(c1) + Grid % dx(s)
+    yc2 = Grid % yc(c1) + Grid % dy(s)
+    zc2 = Grid % zc(c1) + Grid % dz(s)
 
-      xc1 = Grid % xc(c1)
-      yc1 = Grid % yc(c1)
-      zc1 = Grid % zc(c1)
-      xc2 = Grid % xc(c1) + Grid % dx(s)
-      yc2 = Grid % yc(c1) + Grid % dy(s)
-      zc2 = Grid % zc(c1) + Grid % dz(s)
+    ! If the flux is across a buffer face, it is summed up twice.
+    ! The variable "wgt" is here to take care of that.
+    wgt = 1.0
+    if(Grid % Comm % cell_proc(c2) .ne. this_proc) wgt = 0.5
 
-      ! If the flux is across a buffer face, it is summed up twice.  
-      ! The variable "wgt" is here to take care of that.
-      wgt = 1.0
-      if(Grid % Comm % cell_proc(c2) .ne. this_proc) wgt = 0.5
-
-      !-------!
-      !   X   !
-      !-------!
-      if((xc1 <= bulk % xp).and.(xc2 > bulk % xp)) then
-        bulk % flux_x = bulk % flux_x + wgt * v_flux(s)
-      end if
-      if((xc2 < bulk % xp).and.(xc1 >= bulk % xp)) then
-        bulk % flux_x = bulk % flux_x - wgt * v_flux(s)
-      end if
-
-      !-------!
-      !   Y   !
-      !-------!
-      if((yc1 <= bulk % yp).and.(yc2 > bulk % yp)) then
-        bulk % flux_y = bulk % flux_y + wgt * v_flux(s)
-      end if
-      if((yc2 < bulk % yp).and.(yc1 >= bulk % yp)) then
-        bulk % flux_y = bulk % flux_y - wgt * v_flux(s)
-      end if
-
-      !-------!
-      !   Z   !
-      !-------!
-      if((zc1 <= bulk % zp).and.(zc2 > bulk % zp)) then
-        bulk % flux_z = bulk % flux_z + wgt * v_flux(s)
-      end if
-      if((zc2 < bulk % zp).and.(zc1 >= bulk % zp)) then
-        bulk % flux_z = bulk % flux_z - wgt * v_flux(s)
-      end if
-
+    !-------!
+    !   X   !
+    !-------!
+    if((xc1 <= bulk % xp).and.(xc2 > bulk % xp)) then
+      bulk % flux_x = bulk % flux_x + wgt * v_flux(s)
     end if
+    if((xc2 < bulk % xp).and.(xc1 >= bulk % xp)) then
+      bulk % flux_x = bulk % flux_x - wgt * v_flux(s)
+    end if
+
+    !-------!
+    !   Y   !
+    !-------!
+    if((yc1 <= bulk % yp).and.(yc2 > bulk % yp)) then
+      bulk % flux_y = bulk % flux_y + wgt * v_flux(s)
+    end if
+    if((yc2 < bulk % yp).and.(yc1 >= bulk % yp)) then
+      bulk % flux_y = bulk % flux_y - wgt * v_flux(s)
+    end if
+
+    !-------!
+    !   Z   !
+    !-------!
+    if((zc1 <= bulk % zp).and.(zc2 > bulk % zp)) then
+      bulk % flux_z = bulk % flux_z + wgt * v_flux(s)
+    end if
+    if((zc2 < bulk % zp).and.(zc1 >= bulk % zp)) then
+      bulk % flux_z = bulk % flux_z - wgt * v_flux(s)
+    end if
+
   end do
 
   call Comm_Mod_Global_Sum_Real(bulk % flux_x)

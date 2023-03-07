@@ -228,7 +228,7 @@
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Courant_In_Cells  ! for post-processing
-      procedure :: Calculate_Fluxes
+      procedure :: Calculate_Bulk_Fluxes
       procedure :: Compute_Wall_Distance       ! see: Potential_Initialization
       procedure :: Potential_Initialization    ! see: Compute_Wall_Distance
       procedure :: Prandtl_Numb
@@ -291,7 +291,7 @@
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
 #   include "Field_Mod/Utilities/Buoyancy_Forces.f90"
 #   include "Field_Mod/Utilities/Calculate_Courant_In_Cells.f90"
-#   include "Field_Mod/Utilities/Calculate_Fluxes.f90"
+#   include "Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90"
 #   include "Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90"
 #   include "Field_Mod/Utilities/Potential_Initialization.f90"
 #   include "Field_Mod/Utilities/Prandtl_Numb.f90"

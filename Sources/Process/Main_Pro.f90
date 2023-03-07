@@ -331,7 +331,7 @@
         call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d), Por(d),  &
                                       Sol(d), curr_dt, ini)
 
-        call Flow(d) % Calculate_Fluxes(Flow(d) % v_flux % n)
+        call Flow(d) % Calculate_Bulk_Fluxes(Flow(d) % v_flux % n)
 
         ! Deal with turbulence (if you dare ;-))
         call Turb(d) % Main_Turb(Sol(d), curr_dt, ini)
