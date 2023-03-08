@@ -55,8 +55,8 @@ $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
+$(info #        <REAL=double/single> <MPI=no/yes> <OPENMP=yes/no>              )
 $(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
-$(info #        <REAL=double/single> <MPI=no/yes>                              )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
@@ -147,6 +147,9 @@ else
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
+  endif
+  ifeq ($(OPENMP), yes)
+    OPT_F_COMP += -fopenmp
   endif
 endif
 
