@@ -17,7 +17,7 @@
   allocate(local_node(Grid % n_nodes))
   local_node(:) = 0
 
-  write(filename,'(a,"-",i7.7,".vtk")') trim(head), rank
+  write(filename,'(a,"-",i9.9,".vtk")') trim(head), rank
 
   open(newunit=fu, file=filename)
   write(fu,'(a26)')     '# vtk DataFile Version 2.0'
