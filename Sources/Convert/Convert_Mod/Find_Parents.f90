@@ -12,7 +12,7 @@
   type(Grid_Type)     :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: fn(6,4), i_fac, j_fac, i_nod, i_cel, c1, c2
-  integer              :: nodes(4), n_match, dir, bc, cnt_c, cnt_f
+  integer              :: nodes(4), n_match, n_match_tot, dir, bc, cnt_c, cnt_f
   integer              :: n_face_nodes ! number of nodes in a face
   integer              :: n_cell_faces ! number of faces in a cell
   logical, allocatable :: is_node_bnd(:)
@@ -37,7 +37,7 @@
       file=__FILE__, line=__LINE__)
   end if
 
-  allocate(is_node_bnd(Grid % n_nodes));    is_node_bnd(:)   = .false.
+  allocate(is_node_bnd  (Grid % n_nodes));  is_node_bnd(:)   = .false.
   allocate(cell_near_bnd(Grid % n_cells));  cell_near_bnd(:) = 0
 
   !--------------------------------------------------------------!
@@ -83,6 +83,7 @@
   !----------------------!
   !   Real work begins   !
   !----------------------!
+  n_match_tot = 0
 
   do bc = Boundary_Regions()
 
@@ -185,9 +186,23 @@
         end if
       end if
     end do
+
     print *, '# Number of matches: ', n_match
+    n_match_tot = n_match_tot + n_match
 
   end do  ! bc
+
+  if(n_match_tot .ne. Grid % n_bnd_cells) then
+    call Message % Error(70, 'Number of boundary cells found is not the  '//  &
+                             'same as the one prescribed boundary cells. '//  &
+                             'The probable cause for it is that some '    //  &
+                             'internal faces in Gmsh are denoted as '     //  &
+                             'boundary conditions (physical groups). '    //  &
+                             '\n \n '                                     //  &
+                             'Check the Gmsh mesh for physical groups '   //  &
+                             'and try to repair this.',                       &
+                             file=__FILE__, line=__LINE__)
+  end if
 
   call Profiler % Stop('Find_Parents')
 
