@@ -54,6 +54,7 @@
     if(Grid % cells_n_nodes(c) .eq. 6) max_fac = max(max_fac, 5)
     if(Grid % cells_n_nodes(c) .eq. 8) max_fac = max(max_fac, 6)
   end do
+  Assert(max_fac .ne. 0)
 
   !---------------------------------------------------!
   !   Find max number of faces' nodes for this grid   !
@@ -65,6 +66,7 @@
     if(Grid % cells_n_nodes(c) .eq. 6) max_nod = max(max_nod, 4)
     if(Grid % cells_n_nodes(c) .eq. 8) max_nod = max(max_nod, 4)
   end do
+  Assert(max_nod .ne. 0)
 
   !---------------------------------------------------!
   !   Fill the generic coordinates with some values   !
@@ -109,8 +111,6 @@
 
   !------------------------------------------------!
   !   Anotate cell faces with same coordinates     !
-  !   (I am afraid that this might be influenced   !
-  !      by the numerical round-off errors)        !
   !------------------------------------------------!
   cnt = 1
   starts(1) = 1
@@ -131,6 +131,8 @@
   !---------------------------------------------!
   call Adjust_First_Dim(max_fac, Grid % cells_c)  ! i_fac goes to max_fac
   call Adjust_First_Dim(max_nod, Grid % faces_n)  ! i_nod goes to max_nod
+  Assert(maxval(maxval(Grid % cells_c, dim=2), dim=1) == 0)
+
   do n3 = 1, cnt
     if(starts(n3) .ne. ends(n3)) then
       do i1=starts(n3),ends(n3)
