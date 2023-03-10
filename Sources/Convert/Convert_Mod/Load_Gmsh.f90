@@ -395,6 +395,15 @@
   print '(a38,i9)', '# Total number of boundary sections: ', n_bnd_sect
   print '(a38,i9)', '# Total number of boundary cells:    ', Grid % n_bnd_cells
 
+  if(n_bnd_sect .eq. 0) then
+    call Message % Error(60, 'No boundary sections (physical groups in  ' //  &
+                             'Gmsh) have been defined.  Convert can''t '  //  &
+                             'work with grids like that. '                //  &
+                             '\n \n '                                     //  &
+                             'Define physical groups in Gmsh and retry.',     &
+                             file=__FILE__, line=__LINE__)
+  end if
+
   !--------------------------------------------!
   !                                            !
   !   Allocate memory for Grid_Mod variables   !
