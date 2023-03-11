@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Set_Array_Range(Math, n, minv, maxv, array)
+  pure subroutine Set_Array_Range(Math, n, minv, maxv, array)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type)     :: Math
-  integer, intent(in)  :: n
-  real   , intent(in)  :: minv, maxv
-  real,    intent(out) :: array(n)
+  class(Math_Type),  intent(in)  :: Math
+  integer,           intent(in)  :: n
+  real,              intent(in)  :: minv, maxv
+  real,              intent(out) :: array(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
   real    :: delta

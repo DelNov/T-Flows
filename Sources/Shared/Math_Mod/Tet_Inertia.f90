@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Tet_Inertia(Math,                             &
-                         x_1, y_1, z_1,                    &
-                         x_2, y_2, z_2,                    &
-                         x_3, y_3, z_3,                    &
-                         x_4, y_4, z_4,                    &
-                         i_x, i_y, i_z, i_xy, i_xz, i_yz,  &
-                         around_node)
+  pure subroutine Tet_Inertia(Math,                             &
+                              x_1, y_1, z_1,                    &
+                              x_2, y_2, z_2,                    &
+                              x_3, y_3, z_3,                    &
+                              x_4, y_4, z_4,                    &
+                              i_x, i_y, i_z, i_xy, i_xz, i_yz,  &
+                              around_node)
 !------------------------------------------------------------------------------!
 !   Computes the moment of inertia for a tetrahedron defined with nodes 1 - 4. !
 !   around the centrod of tetrahedron.  If optional parameter around_node is   !
@@ -13,11 +13,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type)  :: Math
-  real, intent(in)  :: x_1, y_1, z_1, x_2, y_2, z_2
-  real, intent(in)  :: x_3, y_3, z_3, x_4, y_4, z_4
-  real, intent(out) :: i_x, i_y, i_z, i_xy, i_xz, i_yz
-  integer, optional :: around_node
+  class(Math_Type),  intent(in)  :: Math
+  real,              intent(in)  :: x_1, y_1, z_1, x_2, y_2, z_2
+  real,              intent(in)  :: x_3, y_3, z_3, x_4, y_4, z_4
+  real,              intent(out) :: i_x, i_y, i_z, i_xy, i_xz, i_yz
+  integer, optional, intent(in)  :: around_node
 !-----------------------------------[Locals]-----------------------------------!
   real :: x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4
   real :: xc, yc, zc  ! shift of the coordinates

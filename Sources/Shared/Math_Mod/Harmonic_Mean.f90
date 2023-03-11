@@ -1,12 +1,12 @@
 !==============================================================================!
-  real function Harmonic_Mean(Math, a, b)
+  pure real function Harmonic_Mean(Math, a, b)
 !------------------------------------------------------------------------------!
 !   Finds harmonic mean of two input arguments, "a" and "b"                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type) :: Math
-  real             :: a, b
+  class(Math_Type), intent(in) :: Math
+  real,             intent(in) :: a, b
 !==============================================================================!
 
   Harmonic_Mean = 2.0 / (1.0 / a + 1.0 / b)

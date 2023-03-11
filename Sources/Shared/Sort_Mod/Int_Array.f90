@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Int_Array(Sort, a)
+  pure recursive subroutine Int_Array(Sort, a)
 !------------------------------------------------------------------------------!
 !   Quick sort one integer array and carry an integer arral along              !
 !                                                                              !
@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  integer          :: a(:)
+  class(Sort_Type), intent(in)    :: Sort
+  integer,          intent(inout) :: a(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x
   integer :: i, j, n

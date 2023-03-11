@@ -1,5 +1,5 @@
 !==============================================================================!
-  logical function Smaller_Real(Math, a, b, tol)
+  pure logical function Smaller_Real(Math, a, b, tol)
 !------------------------------------------------------------------------------!
 !   Returns .true. if a is approximatelly smaller than "b", .false. otherwise. !
 !                                                                              !
@@ -8,9 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type) :: Math
-  real             :: a, b
-  real, optional   :: tol
+  class(Math_Type), intent(in) :: Math
+  real,             intent(in) :: a, b
+  real, optional,   intent(in) :: tol
 !-----------------------------------[Locals]-----------------------------------!
   real :: tolerance
 !==============================================================================!

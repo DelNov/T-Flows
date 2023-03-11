@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Two_Int(Sort, a1, a2)
+  pure recursive subroutine Two_Int(Sort, a1, a2)
 !------------------------------------------------------------------------------!
 !   Quick sort two integer arrays                                              !
 !                                                                              !
@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  integer          :: a1(:), a2(:)
+  class(Sort_Type), intent(in)    :: Sort
+  integer,          intent(inout) :: a1(:), a2(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x1, x2
   integer :: i, j, n
