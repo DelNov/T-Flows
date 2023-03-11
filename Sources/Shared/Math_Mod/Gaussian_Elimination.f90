@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Gaussian_Elimination(Math, n, a, b, x, invertible)
+  pure subroutine Gaussian_Elimination(Math, n, a, b, x, invertible)
 !------------------------------------------------------------------------------!
 !   Example of Gaussian elimination with scaled row pivoting                   !
 !                                                                              !
@@ -12,12 +12,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type)    :: Math
-  integer, intent(in) :: n
-  real, intent(inout) :: a(n,n)
-  real, intent(inout) :: b(n)
-  real, intent(inout) :: x(n)
-  logical             :: invertible
+  class(Math_Type), intent(in)    :: Math
+  integer,          intent(in)    :: n
+  real,             intent(inout) :: a(n,n)
+  real,             intent(inout) :: b(n)
+  real,             intent(inout) :: x(n)
+  logical,          intent(inout) :: invertible
 !-----------------------------------[Locals]-----------------------------------!
   real,    allocatable :: s(:)
   integer, allocatable :: p(:)

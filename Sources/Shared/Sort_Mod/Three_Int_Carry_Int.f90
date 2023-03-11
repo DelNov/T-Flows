@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Three_Int_Carry_Int(Sort, a1, a2, a3, b)
+  pure recursive subroutine Three_Int_Carry_Int(Sort, a1, a2, a3, b)
 !------------------------------------------------------------------------------!
 !   Quick sort three integer arrays and carry an integer arral along           !
 !                                                                              !
@@ -7,9 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  integer          :: a1(:), a2(:), a3(:)
-  integer          :: b(:)
+  class(Sort_Type), intent(inout) :: Sort
+  integer,          intent(inout) :: a1(:), a2(:), a3(:)
+  integer,          intent(inout) :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x1, x2, x3
   integer :: i, j, n

@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Int_Carry_Real(Sort, a, b)
+  pure recursive subroutine Int_Carry_Real(Sort, a, b)
 !------------------------------------------------------------------------------!
 !   Quick sort one integer array and carry a real arral along                  !
 !                                                                              !
@@ -7,9 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  integer          :: a(:)
-  real             :: b(:)
+  class(Sort_Type), intent(in)    :: Sort
+  integer,          intent(inout) :: a(:)
+  real,             intent(inout) :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x
   integer :: i, j, n

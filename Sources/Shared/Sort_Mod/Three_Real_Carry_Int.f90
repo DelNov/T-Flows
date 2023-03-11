@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Three_Real_Carry_Int(Sort, a1, a2, a3, b)
+  pure recursive subroutine Three_Real_Carry_Int(Sort, a1, a2, a3, b)
 !------------------------------------------------------------------------------!
 !   Quick sort three real arrays (think of three coordinates) and carry one    !
 !   integer arral along                                                        !
@@ -8,9 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  real             :: a1(:), a2(:), a3(:)
-  integer          :: b(:)
+  class(Sort_Type), intent(in)    :: Sort
+  real,             intent(inout) :: a1(:), a2(:), a3(:)
+  integer,          intent(inout) :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2, x3
   integer :: i, j, n

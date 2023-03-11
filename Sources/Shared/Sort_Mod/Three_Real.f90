@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Three_Real(Sort, a1, a2, a3)
+  pure recursive subroutine Three_Real(Sort, a1, a2, a3)
 !------------------------------------------------------------------------------!
 !   Quick sort three real arrays (think of three coordinates)                  !
 !                                                                              !
@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  real             :: a1(:), a2(:), a3(:)
+  class(Sort_Type), intent(in)    :: Sort
+  real,             intent(inout) :: a1(:), a2(:), a3(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2, x3
   integer :: i, j, n
