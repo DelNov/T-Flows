@@ -185,7 +185,8 @@
   ! Get solver
   call Control_Mod_Solver_For_Pressure(solver)
 
-  call Profiler % Start('Linear_Solver_For_Pressure')
+  call Profiler % Start(String % First_Upper(pp % solver)  //  &
+                        ' (solver for pressure)')
 
   ! Set singularity to the matrix
   if(.not. Flow % has_pressure) then
@@ -210,7 +211,8 @@
     call Sol % Remove_Singular(A)
   end if
 
-  call Profiler % Stop('Linear_Solver_For_Pressure')
+  call Profiler % Stop(String % First_Upper(pp % solver)  //  &
+                       ' (solver for pressure)')
 
   if (Flow % p_m_coupling == SIMPLE) then
     call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)

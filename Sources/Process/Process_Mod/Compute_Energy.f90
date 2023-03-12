@@ -269,7 +269,8 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(t, A, b)
 
-  call Profiler % Start('Linear_Solver_For_Energy')
+  call Profiler % Start(String % First_Upper(t % solver)  //  &
+                        ' (solver for energy)')
 
   ! Call linear solver to solve the equations
   call Sol % Run(t % solver,     &
@@ -283,7 +284,8 @@
                  t % tol,        &
                  t % res)
 
-  call Profiler % Stop('Linear_Solver_For_Energy')
+  call Profiler % Stop(String % First_Upper(t % solver)  //  &
+                       ' (solver for energy)')
 
   ! Print some info on the screen
   call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)

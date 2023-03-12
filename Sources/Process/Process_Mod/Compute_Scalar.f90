@@ -39,7 +39,7 @@
 !
 !==============================================================================!
 
-  call Profiler % Start('Compute_Scalars (without solvers)')
+  call Profiler % Start('Compute_Scalar (without solvers)')
 
   call Work % Connect_Real_Cell(q_turb, cross)
 
@@ -205,7 +205,8 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, A, b)
 
-  call Profiler % Start('Linear_Solver_For_Scalars')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for scalars)')
 
   ! Call linear solver to solve them
   call Sol % Run(phi % solver,     &
@@ -219,7 +220,8 @@
                  phi % tol,        &
                  phi % res)
 
-  call Profiler % Stop('Linear_Solver_For_Scalars')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for scalars)')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
   row = ceiling(ns/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
@@ -234,6 +236,6 @@
 
   call Work % Disconnect_Real_Cell(q_turb, cross)
 
-  call Profiler % Stop('Compute_Scalars (without solvers)')
+  call Profiler % Stop('Compute_Scalar (without solvers)')
 
   end subroutine

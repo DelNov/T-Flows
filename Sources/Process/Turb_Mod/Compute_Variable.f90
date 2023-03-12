@@ -39,7 +39,7 @@
 !                                                                              !
 !------------------------------------------------------------------------------!
 
-  call Profiler % Start('Compute_Turbulence (without solvers)')
+  call Profiler % Start('Compute_Variable (without solvers)')
 
   call Work % Connect_Real_Cell(cross)
 
@@ -240,7 +240,8 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, A, b)
 
-  call Profiler % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
   call Sol % Run(phi % solver,     &
@@ -254,7 +255,8 @@
                  phi % tol,        &
                  phi % res)
 
-  call Profiler % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for turbulence)')
 
   ! Avoid negative values for all computed turbulent quantities
   do c = 1, Grid % n_cells
@@ -295,6 +297,6 @@
 
   call Work % Disconnect_Real_Cell(cross)
 
-  call Profiler % Stop('Compute_Turbulence (without solvers)')
+  call Profiler % Stop('Compute_Variable (without solvers)')
 
   end subroutine

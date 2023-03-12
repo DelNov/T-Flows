@@ -40,6 +40,8 @@
 !     Lsc            [m]                                                       !
 !------------------------------------------------------------------------------!
 
+  call Profiler % Start('Compute_F22 (without solvers)')
+
   call Work % Connect_Real_Cell(cross)
 
   ! Take aliases
@@ -162,7 +164,8 @@
   ! Underrelax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
-  call Profiler % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
   call Sol % Run(phi % solver,     &
@@ -176,7 +179,8 @@
                  phi % tol,        &
                  phi % res)
 
-  call Profiler % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for turbulence)')
 
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then
@@ -188,5 +192,7 @@
   call Flow % Grad_Variable(phi)
 
   call Work % Disconnect_Real_Cell(cross)
+
+  call Profiler % Stop('Compute_F22 (without solvers)')
 
   end subroutine

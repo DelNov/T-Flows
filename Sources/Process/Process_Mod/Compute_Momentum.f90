@@ -358,7 +358,8 @@
       ! Under-relax the equations
       call Numerics_Mod_Under_Relax(ui, M, b)
 
-      call Profiler % Start('Linear_Solver_For_Momentum')
+      call Profiler % Start(String % First_Upper(ui % solver)  //  &
+                            ' (solver for momentum)')
 
       ! Call linear solver
       call Sol % Run(ui % solver,     &
@@ -373,7 +374,8 @@
                      ui % res,        &
                      norm = vel_max)
 
-      call Profiler % Stop('Linear_Solver_For_Momentum')
+      call Profiler % Stop(String % First_Upper(ui % solver)  //  &
+                           ' (solver for momentum)')
 
       ! Fill the info screen up
       if (Flow % p_m_coupling == SIMPLE) then
