@@ -12,7 +12,7 @@ DEBUG   ?= no
 ASSERT  ?= yes
 REAL    ?= double
 MPI     ?= no
-OPENMP  ?= yes
+OPENMP  ?= no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -55,7 +55,7 @@ $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
-$(info #        <REAL=double/single> <MPI=no/yes> <OPENMP=yes/no>              )
+$(info #        <REAL=double/single> <MPI=no/yes> <OPENMP=no/yes>              )
 $(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
 $(info #                                                                       )
 $(info # Notes:                                                                )
