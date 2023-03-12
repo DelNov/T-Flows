@@ -23,6 +23,8 @@
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
 
+  call Profiler % Start('Potential_Initialization')
+
   call Work % Connect_Real_Cell(log_dist, cross)
 
   if(this_proc < 2) then
@@ -209,6 +211,9 @@
     !                                 !
     !---------------------------------!
 
+    call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                          ' (solver for potential initialization)')
+
     ! Call linear solver to solve the equations
     call Sol % Run(phi % solver,     &
                    phi % prec,       &
@@ -220,6 +225,9 @@
                    phi % eniter,     &
                    phi % tol,        &
                    phi % res)
+
+    call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                         ' (solver for potential initialization)')
 
     if(this_proc < 2) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
@@ -326,5 +334,7 @@
   end do
 
   call Work % Disconnect_Real_Cell(log_dist, cross)
+
+  call Profiler % Stop('Potential_Initialization')
 
   end subroutine
