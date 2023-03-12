@@ -47,14 +47,14 @@
   if(this_proc < 2) then
 
     line( 1:160) = ' '
-    line( 1+indent:63+indent) =   &
-               '#=============================================================#'
+    line( 1+indent:65+indent) =   &
+             '#===============================================================#'
     print '(a)', trim(line)
-    line( 1+indent:63+indent) =   &
-               '#                    CPU usage statistics                     #'
+    line( 1+indent:65+indent) =   &
+             '#                     CPU usage statistics                      #'
     print '(a)', trim(line)
-    line( 1+indent:63+indent) =   &
-               '#-------------------------------------------------------------#'
+    line( 1+indent:65+indent) =   &
+             '#---------------------------------------------------------------#'
     print '(a)', trim(line)
     line( 1:160) = ' '
     line( 1+indent:30+indent) = '#            Total CPU time:  '
@@ -69,36 +69,36 @@
     write(line(36+indent:36+indent),   '(a1)')  ':'
     write(line(37+indent:38+indent), '(i2.2)')  seconds
     write(line(40+indent:50+indent),  '(a11)') '[hhh:mm:ss]'
-    line(63+indent:63+indent) = '#'
+    line(65+indent:65+indent) = '#'
     print '(a)', trim(line)
-    line( 1+indent:63+indent) =  &
-               '#-------------------------------------------+-----------------#'
+    line( 1+indent:65+indent) =  &
+             '#---------------------------------------------+-----------------#'
     print '(a)', trim(line)
-    line( 1+indent:63+indent) =  &
-               '#       Description of the activity:        |   Spent time:   #'
+    line( 1+indent:65+indent) =  &
+             '#        Description of the activity:         |   Spent time:   #'
     print '(a)', trim(line)
-    line( 1+indent:63+indent) =   &
-               '#-------------------------------------------+-----------------#'
+    line( 1+indent:65+indent) =   &
+             '#---------------------------------------------+-----------------#'
     print '(a)', trim(line)
 
     do i_fun = 1, Profiler % n_functions
       line( 1:160) = ' '
       line( 1+indent: 1+indent) = '#'
-      line(63+indent:63+indent) = '#'
+      line(65+indent:65+indent) = '#'
       line( 3+indent: 3+indent) = '-'
       line( 5+indent: 5+indent+len_trim(Profiler % funct_name(i_fun)))  &
-                                = Profiler % funct_name(i_fun)(1:123)
-      line(45+indent:45+indent) = '|'
+                                      = Profiler % funct_name(i_fun)(1:123)
+      line(47+indent:47+indent) = '|'
       percent_time = Profiler % funct_time(i_fun) / total_time * 100.0
-      write(line(50+indent:55+indent), '(f6.2)') percent_time
-      line(57+indent:57+indent) = '%'
+      write(line(52+indent:57+indent), '(f6.2)') percent_time
+      line(59+indent:59+indent) = '%'
       if(percent_time > 0.01) then
         print '(a)', trim(line)
       end if
     end do
 
-    line( 1+indent:63+indent) =  &
-               '#-------------------------------------------+-----------------#'
+    line( 1+indent:65+indent) =  &
+             '#---------------------------------------------+-----------------#'
     print '(a)', trim(line)
     print *, ''
 
