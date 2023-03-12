@@ -5,6 +5,9 @@
 !   really bad for tetrahedral grids with no initial values of gradients, and  !
 !   a more elaborate approach is therefore needed, which will probably be in   !
 !   Grad_Gauss_Pressure, when introduced.
+!                                                                              !
+!   With OpenMP, this procedure got a speedup of 1.6 on 1M mesh and 4 threads. !
+!   I reckon there is not so much potential for improving this, few loops.     !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
@@ -35,11 +38,6 @@
   !-------------------------------!
   do iter = 1, Flow % gauss_miter
 
-    ! Save the old iteration (phi_f_o(:) = phi_f_n(:) doesn't work for Intel)
-    do s = 1, Grid % n_faces
-      phi_f_o(s) = phi_f_n(s)
-    end do
-
     ! Estimate values at faces from the
     ! values in cells and last gradients
     call Flow % Interpolate_To_Faces_Linear(phi_f_n, phi % n,  &
@@ -48,8 +46,17 @@
     ! Update gradients from the values at faces
     call Flow % Grad_Gauss(phi_f_n, phi % x, phi % y, phi % z)
 
-    ! Take the difference between two iterations
-    res = maxval(abs(phi_f_n(:)-phi_f_o(:))) / norm
+    ! Take the difference between two iterations to find residual
+    ! and copy the new value to the old value along the way
+    res = 0.0
+    !$omp parallel do private(s) shared(phi_f_n, phi_f_o) reduction(max : res)
+    do s = 1, Grid % n_faces
+      res = max(res, abs(phi_f_n(s) - phi_f_o(s)))
+      phi_f_o(s) = phi_f_n(s)
+    end do
+    !$omp end parallel do
+
+    res = res / norm
     call Comm_Mod_Global_Max_Real(res)
 
     if(res < Flow % gauss_tol) exit
