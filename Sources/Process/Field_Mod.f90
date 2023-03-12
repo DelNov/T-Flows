@@ -201,6 +201,7 @@
       procedure          :: Grad
       procedure          :: Grad_Component
       procedure, private :: Grad_Component_No_Refresh
+      procedure, private :: Grad_Three_Components_No_Refresh
       ! procedure          :: Grad_Component_Faces_To_Cells         ! not used
       ! procedure          :: Grad_Component_Nodes_To_Cells         ! not used
       ! procedure          :: Grad_Component_Cells_To_Nodes         ! not used
@@ -264,6 +265,7 @@
 #   include "Field_Mod/Gradients/Grad.f90"
 #   include "Field_Mod/Gradients/Grad_Component.f90"
 #   include "Field_Mod/Gradients/Grad_Component_No_Refresh.f90"
+#   include "Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90"
 !   include "Field_Mod/Gradients/Grad_Component_Faces_To_Cells.f90"
 !   include "Field_Mod/Gradients/Grad_Component_Nodes_To_Cells.f90"
 !   include "Field_Mod/Gradients/Grad_Component_Cells_To_Nodes.f90"
