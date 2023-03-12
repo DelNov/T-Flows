@@ -35,7 +35,6 @@
     contains
       procedure, private :: Bicg                 ! bicg solver
       procedure, private :: Cg                   ! cg solver
-      procedure, private :: Cgs                  ! cgs solver
       procedure          :: Create_Native
       procedure, private :: Normalized_Root_Mean_Square
       procedure, private :: Prec_Form
@@ -50,7 +49,6 @@
 
 #   include "Native_Mod/Bicg.f90"
 #   include "Native_Mod/Cg.f90"
-#   include "Native_Mod/Cgs.f90"
 #   include "Native_Mod/Create_Native.f90"
 #   include "Native_Mod/Normalized_Root_Mean_Square.f90"
 #   include "Native_Mod/Prec_Form.f90"

@@ -6,29 +6,46 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type) :: Native
-  integer            :: ni
-  real               :: r(:)  ! this may be only in inner cells
-  type(Matrix_Type)  :: A
-  real               :: x(:)  ! presumably, this goes to buffer cells
-  real, optional     :: norm  ! optional number for normalization
+  class(Native_Type),        intent(in) :: Native
+  integer,                   intent(in) :: ni
+  real,                      intent(in) :: r(:)  ! this may be in inner cells
+  type(Matrix_Type), target, intent(in) :: A
+  real,                      intent(in) :: x(:)  ! this goes to buffer cells
+  real,            optional, intent(in) :: norm  ! number for normalization
 !-----------------------------------[Locals]-----------------------------------!
-  real    :: rms, x_max, x_min
-  integer :: i
+  real                          :: rms, x_max, x_min
+  integer                       :: i
+  real,    contiguous,  pointer :: a_val(:)
+  integer, contiguous,  pointer :: a_dia(:)
 !==============================================================================!
+
+  ! Take some aliases
+  a_val => A % val
+  a_dia => A % dia
 
   ! Compute rms normalizing it with main diagonal in the system matrix
   rms = 0.0
+  !$omp parallel do private(i) shared(r, a_val, a_dia) reduction(+ : rms)
   do i = 1, ni
-    rms = rms + r(i)**2 / A % val(A % dia(i))**2
+    rms = rms + r(i)**2 / a_val(a_dia(i))**2
   end do
+  !$omp end parallel do
+
   call Comm_Mod_Global_Sum_Real(rms)
   rms = sqrt(rms)
 
   ! Normalize it with absolute values of the unknown
   if(.not. present(norm)) then
-    x_min = minval(x(1:ni))
-    x_max = maxval(x(1:ni))
+    x_min = +HUGE
+    x_max = -HUGE
+    !$omp parallel do private(i) shared(x)  &
+    !$omp reduction(max : x_max)            &
+    !$omp reduction(min : x_min)
+    do i = 1, ni
+      x_min = min(x_min, x(i))
+      x_max = max(x_max, x(i))
+    end do
+    !$omp end parallel do
   else
     x_min = 0.0
     x_max = norm

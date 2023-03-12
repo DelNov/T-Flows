@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Native_Type), target :: Nat
-  type(Matrix_Type)          :: A
+  type(Matrix_Type),  target :: A
   real                       :: x(-Nat % pnt_grid % n_bnd_cells :  &
                                    Nat % pnt_grid % n_cells)
   real                       :: b( Nat % pnt_grid % n_cells)
@@ -17,21 +17,27 @@
   real                       :: fin_res  ! final residual
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type), pointer :: D
-  type(Grid_Type),   pointer :: Grid
-  integer                    :: nt, ni, nb
-  real                       :: alfa, beta, rho, rho_old, bnrm2, res
-  integer                    :: i, j, k, iter
-  real                       :: sum_a, fn
-  integer                    :: sum_n
-  real, contiguous,  pointer :: p1(:), q1(:), r1(:)
+  type(Matrix_Type),   pointer :: D
+  type(Grid_Type),     pointer :: Grid
+  integer                      :: nt, ni, nb
+  real                         :: alfa, beta, rho, rho_old, bnrm2, res
+  integer                      :: i, j, k, iter
+  real                         :: sum_a, fn
+  integer                      :: sum_n
+  real,    contiguous, pointer :: p1(:), q1(:), r1(:)
+  real,    contiguous, pointer :: a_val(:)
+  integer, contiguous, pointer :: a_col(:), a_row(:), a_dia(:)
 !==============================================================================!
 
   call Work % Connect_Real_Cell(p1, q1, r1)
 
   ! Take some aliases
-  Grid => Nat % pnt_grid
-  D    => Nat % D
+  Grid  => Nat % pnt_grid
+  D     => Nat % D
+  a_val => A % val
+  a_col => A % col
+  a_row => A % row
+  a_dia => A % dia
 
   nt = Grid % n_cells
   ni = Grid % n_cells - Grid % Comm % n_buff_cells
@@ -44,20 +50,27 @@
   !--------------------------!
   sum_a = 0.0
   sum_n = 0
+  !$omp parallel do private(i) shared(a_val, a_dia)  &
+  !$omp reduction(+ : sum_a) reduction(+ : sum_n)
   do i = 1, ni
-    sum_a = sum_a + A % val(A % dia(i))
+    sum_a = sum_a + a_val(a_dia(i))
     sum_n = sum_n + 1
   end do
+  !$omp end parallel do
+
   call Comm_Mod_Global_Sum_Real(sum_a)
   call Comm_Mod_Global_Sum_Int (sum_n)  ! this is stored somewhere, check
+
   sum_a = sum_a / sum_n
   fn = 1.0 / sum_a
+  !$omp parallel do private(i, j) shared(a_row, a_val, b, fn)
   do i = 1, nt
-    do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) * fn
+    do j = a_row(i), a_row(i+1)-1
+      a_val(j) = a_val(j) * fn
     end do
     b(i) = b(i) * fn
   end do
+  !$omp end parallel do
 
   !---------------------!
   !   Preconditioning   !
@@ -97,9 +110,11 @@
   !-----------!
   !   p = r   !
   !-----------!
+  !$omp parallel do private(i) shared(p1, r1)
   do i = 1, ni
     p1(i) = r1(i)
   end do
+  !$omp end parallel do
 
   !---------------!
   !               !
@@ -121,43 +136,57 @@
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
+      !$omp parallel do private(i) shared(p1, q1)
       do i = 1, ni
         p1(i) = q1(i)
       end do
+      !$omp end parallel do
     else
       beta = rho / rho_old
+      !$omp parallel do private(i) shared(p1, q1, beta)
       do i = 1, ni
         p1(i) = q1(i) + beta * p1(i)
       end do
+      !$omp end parallel do
     end if
 
     !------------!
     !   q = Ap   !
     !------------!
     call Grid % Exchange_Cells_Real(p1(-nb:ni))
+    !$omp parallel do private(i, j, k) shared(p1, q1, a_row, a_col, a_val)
     do i = 1, ni
       q1(i) = 0.0
-      do j = A % row(i), A % row(i+1)-1
-        k = A % col(j)
-        q1(i) = q1(i) + A % val(j) * p1(k)
+      do j = a_row(i), a_row(i+1)-1
+        k = a_col(j)
+        q1(i) = q1(i) + a_val(j) * p1(k)
       end do
     end do
+    !$omp end parallel do
 
     !------------------------!
     !   alfa = (r,z)/(p,q)   !
     !------------------------!
-    alfa = dot_product(p1(1:ni), q1(1:ni))
+    alfa = 0.0
+    !$omp parallel do private(i) shared(p1, q1) reduction(+ : alfa)
+    do i = 1, ni
+      alfa = alfa + p1(i) * q1(i)
+    end do
+    !$omp end parallel do
+
     call Comm_Mod_Global_Sum_Real(alfa)
-    alfa = rho/alfa
+    alfa = rho / alfa
 
     !---------------------!
     !   x = x + alfa p    !
     !   r = r - alfa Ap   !
     !---------------------!
+    !$omp parallel do private(i) shared(x, r1, p1, q1, alfa)
     do i = 1, ni
       x (i) = x (i) + alfa * p1(i)
       r1(i) = r1(i) - alfa * q1(i)
     end do
+    !$omp end parallel do
 
     !-----------------------!
     !   Check convergence   !
@@ -194,8 +223,8 @@
   !   De-normalize the system   !
   !-----------------------------!
   do i = 1, nt
-    do j = A % row(i), A % row(i+1)-1
-      A % val(j) = A % val(j) / fn
+    do j = a_row(i), a_row(i+1)-1
+      a_val(j) = a_val(j) / fn
     end do
     b(i) = b(i) / fn
   end do

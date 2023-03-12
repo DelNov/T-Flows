@@ -27,8 +27,6 @@
     call Nat % Bicg(A, x, b, prec, miter, niter, tol, fin_res, norm)
   else if(solver .eq. 'cg') then
     call Nat % Cg  (A, x, b, prec, miter, niter, tol, fin_res, norm)
-  else if(solver .eq. 'cgs') then
-    call Nat % Cgs (A, x, b, prec, miter, niter, tol, fin_res, norm)
   else
     print *, '# ERROR: Unknown native solver: ', solver
     print *, '# This error is critical, stopping!'

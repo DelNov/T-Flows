@@ -13,25 +13,33 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type) :: Native
-  integer            :: ni
-  type(Matrix_Type)  :: A
-  type(Matrix_Type)  :: D
-  real               :: x(:)
-  real               :: b(:)
-  character(SL)      :: prec  ! preconditioner
+  class(Native_Type),         intent(in)  :: Native
+  integer,                    intent(in)  :: ni
+  type(Matrix_Type),  target, intent(in)  :: A
+  type(Matrix_Type),  target, intent(in)  :: D
+  real,                       intent(out) :: x(:)
+  real,                       intent(in)  :: b(:)
+  character(SL),              intent(in)  :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j, k
-  real    :: sum1
+  integer                       :: i, j, k
+  real                          :: sum1
+  real,    contiguous,  pointer :: d_val(:)
+  integer, contiguous,  pointer :: d_dia(:)
 !==============================================================================!
+
+  ! Take some aliases
+  d_val => D % val
+  d_dia => D % dia
 
   !---------------------------------!
   !   1) diagonal preconditioning   !
   !---------------------------------!
   if(prec .eq. 'jacobi') then
+    !$omp parallel do private(i) shared (x, b, d_val, d_dia)
     do i = 1, ni
-      x(i) = b(i)/D % val(D % dia(i))
+      x(i) = b(i) / d_val(d_dia(i))
     end do
+    !$omp end parallel do
 
   !--------------------------------------------!
   !   2) incomplete cholesky preconditioning   !
@@ -66,9 +74,11 @@
   !   .) no preconditioning   !
   !---------------------------!
   else
+    !$omp parallel do private(i) shared (x, b)
     do i = 1, ni
       x(i) = b(i)
     end do
+    !$omp end parallel do
   end if
 
   end subroutine
