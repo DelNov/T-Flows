@@ -1,12 +1,12 @@
 !==============================================================================!
-  function Cross_Product(Math, a, b)
+  pure function Cross_Product(Math, a, b)
 !------------------------------------------------------------------------------!
 !   This is a prototype of a small module which would contain some basic       !
 !   mathematic and related functions.                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type)               :: Math
+  class(Math_Type),   intent(in) :: Math
   real, dimension(3)             :: Cross_Product
   real, dimension(3), intent(in) :: a, b
 !==============================================================================!

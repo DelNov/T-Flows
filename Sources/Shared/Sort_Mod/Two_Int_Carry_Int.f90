@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Two_Int_Carry_Int(Sort, a1, a2, b)
+  pure recursive subroutine Two_Int_Carry_Int(Sort, a1, a2, b)
 !------------------------------------------------------------------------------!
 !   Quick sort two integer arrays and carry an integer arral along             !
 !                                                                              !
@@ -7,9 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  integer          :: a1(:), a2(:)
-  integer          :: b(:)
+  class(Sort_Type), intent(in)    :: Sort
+  integer,          intent(inout) :: a1(:), a2(:)
+  integer,          intent(inout) :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x1, x2
   integer :: i, j, n

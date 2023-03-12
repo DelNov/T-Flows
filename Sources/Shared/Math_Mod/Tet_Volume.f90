@@ -1,16 +1,16 @@
 !==============================================================================!
-  real function Tet_Volume(Math,        &
-                           x1, y1, z1,  &
-                           x2, y2, z2,  &
-                           x3, y3, z3,  &
-                           x4, y4, z4)
+  pure real function Tet_Volume(Math,        &
+                                x1, y1, z1,  &
+                                x2, y2, z2,  &
+                                x3, y3, z3,  &
+                                x4, y4, z4)
 !------------------------------------------------------------------------------!
 !   Returns the volume of tethraedra spanned with nodes 1 to 4                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type) :: Math
-  real, intent(in) :: x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4
+  class(Math_Type), intent(in) :: Math
+  real,             intent(in) :: x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4
 !==============================================================================!
 !   The order of nodes matters here, so you should either be very careful to   !
 !   send the nodes in the right order (which is a bit of a nuissance) or       !

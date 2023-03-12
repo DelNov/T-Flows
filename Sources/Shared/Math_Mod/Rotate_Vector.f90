@@ -1,15 +1,15 @@
 !==============================================================================!
-  function Rotate_Vector(Math, v, k, theta)
+  pure function Rotate_Vector(Math, v, k, theta)
 !------------------------------------------------------------------------------!
 !   Rotates vector "v" around the axis "k" with angle "theta"                  !
 !   using the Rodrigues' formula.                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type)               :: Math
+  class(Math_Type),   intent(in) :: Math
   real, dimension(3)             :: Rotate_Vector
   real, dimension(3), intent(in) :: v, k
-  real                           :: theta
+  real,               intent(in) :: theta
 !-----------------------------------[Locals]-----------------------------------!
   real :: k_dot_v
   real :: k_vec_v(3)

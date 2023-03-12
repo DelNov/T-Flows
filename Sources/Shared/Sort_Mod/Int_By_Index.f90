@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Int_By_Index(Sort, n, x, indx)
+  pure subroutine Int_By_Index(Sort, n, x, indx)
 !------------------------------------------------------------------------------!
 !   Sorts integer array x according to indx.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  integer          :: n
-  integer          :: x(n)
-  integer          :: indx(n)
+  class(Sort_Type), intent(in)    :: Sort
+  integer,          intent(in)    :: n
+  integer,          intent(inout) :: x(n)
+  integer,          intent(in)    :: indx(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i
   integer, allocatable :: work(:)

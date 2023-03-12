@@ -1,13 +1,13 @@
 !==============================================================================!
-  real function Signed_Upper_Limit(Math, a, limit)
+  pure real function Signed_Upper_Limit(Math, a, limit)
 !------------------------------------------------------------------------------!
 !   Calculates an upper limit, preserving the sign                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type) :: Math
-  real             :: a
-  real, intent(in) :: limit  ! upper limit, usually a big number
+  class(Math_Type), intent(in) :: Math
+  real,             intent(in) :: a
+  real,             intent(in) :: limit  ! upper limit, usually a big number
 !==============================================================================!
 
   ! Assume it won't change

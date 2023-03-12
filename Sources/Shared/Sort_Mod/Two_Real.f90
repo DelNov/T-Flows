@@ -1,5 +1,5 @@
 !==============================================================================!
-  recursive subroutine Two_Real(Sort, a1, a2)
+  pure recursive subroutine Two_Real(Sort, a1, a2)
 !------------------------------------------------------------------------------!
 !   Quick sort two real arrays (think of three coordinates)                    !
 !                                                                              !
@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type) :: Sort
-  real             :: a1(:), a2(:)
+  class(Sort_Type), intent(in)    :: Sort
+  real,             intent(inout) :: a1(:), a2(:)
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2
   integer :: i, j, n
