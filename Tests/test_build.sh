@@ -371,7 +371,8 @@ PROC_EXE=$BINA_DIR/Process         # Process  executable
 current_time=$(date +%s)
 
 # Script logs
-FULL_LOG=$TEST_DIR/test_build.$(date +%y-%m-%d-%T).log  # script's logs file
+BRANCH_NAME=$(git branch -a | grep '\*' | awk '{print $2}')
+FULL_LOG=$TEST_DIR/test_branch_$BRANCH_NAME.$(date +%y-%m-%d-%T).log  # script's logs file
 if [ -f $FULL_LOG ]; then cp /dev/null $FULL_LOG; fi
 
 # Keep track of the last executed command
