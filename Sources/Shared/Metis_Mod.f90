@@ -36,12 +36,16 @@
                             imbalance(:)           ! allowed imbalance
 
     contains
+      procedure :: Call_Metis
       procedure :: Create_Metis
 
   end type
 
   type(Metis_Type) :: Metis
 
+  !----------------------------------------!
+  !   Handles for calls to METIS library   !
+  !----------------------------------------!
   integer, parameter :: METIS_OPTION_PTYPE     =  1
   integer, parameter :: METIS_OPTION_OBJTYPE   =  2
   integer, parameter :: METIS_OPTION_CTYPE     =  3
@@ -69,6 +73,7 @@
   integer, parameter :: METIS_OPTION_UBVEC     = 25
 
   contains
+#   include "Metis_Mod/Call_Metis.f90"
 #   include "Metis_Mod/Create_Metis.f90"
 
   end module
