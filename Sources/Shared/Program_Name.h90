@@ -3,11 +3,11 @@
 !------------------------------------------------------------------------------!
 
 # if T_FLOWS_PROGRAM == 1
-#   define Program_Name "Generate"
+#   define PROGRAM_NAME "Generate"
 # elif T_FLOWS_PROGRAM == 2
-#   define Program_Name "Divide"
+#   define PROGRAM_NAME "Divide"
 # elif T_FLOWS_PROGRAM == 3
-#   define Program_Name "Convert"
+#   define PROGRAM_NAME "Convert"
 # else
-#   define Program_Name "Process"
+#   define PROGRAM_NAME "Process"
 # endif
