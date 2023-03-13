@@ -142,41 +142,60 @@
   !---------------!
   write(fu) IN_3 // '<CellData>' // LF
 
-  ! Processor i.d.
+  ! Cell processor
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="Grid Processor"'         //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '<DataArray type='//intp            //  &
+                    ' Name="Grid Processor [1]"'        //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
+
+  ! Cell thread
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type='//intp            //  &
+                    ' Name="Grid Thread [1]"'           //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
 
   ! Number of nodes
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//intp         //  &
-                    ' Name="Grid Number Of Nodes"'   //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '<DataArray type='//intp            //  &
+                    ' Name="Grid Number Of Nodes [1]"'  //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
 
   ! Wall distance
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="Grid Wall Distance"'     //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '<DataArray type='//floatp          //  &
+                    ' Name="Grid Wall Distance [m]"'    //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * RP  ! prepare for next
 
   ! Cell volume
   write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                    ' Name="Grid Cell Volume"'       //  &
-                    ' format="appended"'             //  &
-                    ' offset="' // trim(str1) //'">' // LF
+  write(fu) IN_4 // '<DataArray type='//floatp          //  &
+                    ' Name="Grid Cell Volume [m^3]"'    //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * RP  ! prepare for next
+
+  ! Cell inertia
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type='//floatp          //  &
+                    ' Name="Grid Cell inertia [m^2]"'   //  &
+                    ' NumberOfComponents="6"'           //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_sub * RP * 6  ! prepare for next
 
   !------------!
   !            !
@@ -314,12 +333,21 @@
   !   Cell data   !
   !---------------!
 
-  ! Processor i.d.
+  ! Cell processor
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
       write(fu) Grid % Comm % cell_proc(c)
+    end if
+  end do
+
+  ! Cell thread
+  data_size = int(n_cells_sub * IP, SP)
+  write(fu) data_size
+  do c = 1, Grid % n_cells
+    if(Grid % new_c(c) .ne. 0) then
+      write(fu) Grid % cell_thread(c)
     end if
   end do
 
@@ -347,6 +375,16 @@
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
       write(fu) Grid % vol(c)
+    end if
+  end do
+
+  ! Cell inertia
+  data_size = int(n_cells_sub * RP * 6, SP)
+  write(fu) data_size
+  do c = 1, Grid % n_cells
+    if(Grid % new_c(c) .ne. 0) then
+      write(fu) Grid % ixx(c), Grid % iyy(c), Grid % izz(c),  &
+                Grid % ixy(c), Grid % iyz(c), Grid % ixz(c)
     end if
   end do
 
@@ -381,11 +419,13 @@
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
-                            ' Name="Grid Processor"/>'
+                            ' Name="Grid Processor [1]"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
+                            ' Name="Grid Thread [1]"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
-                            ' Name="Grid Wall Distance"/>'
+                            ' Name="Grid Wall Distance [m]"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
-                            ' Name="Grid Cell Volume"/>'
+                            ' Name="Grid Cell Volume [m^3]"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces

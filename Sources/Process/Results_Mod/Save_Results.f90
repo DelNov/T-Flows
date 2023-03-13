@@ -393,7 +393,7 @@
     end if
 
     !--------------------!
-    !   Processor i.d.   !
+    !   Cell processor   !
     !--------------------!
     do c1 = c_f, c_l
       int_save(c1) = Grid % Comm % cell_proc(c1)
@@ -403,6 +403,14 @@
     end do
     call Results % Save_Scalar_Int("Grid Processor [1]", plot_inside,   &
                                     int_save(c_f:c_l),                  &
+                                    f8, f9, data_offset, run)
+
+    !-----------------!
+    !   Cell thread   !
+    !-----------------!
+    int_save(c_f:c_l) = Grid % cell_thread(c_f:c_l)
+    call Results % Save_Scalar_Int("Grid Thread [1]", plot_inside,   &
+                                    int_save(c_f:c_l),               &
                                     f8, f9, data_offset, run)
 
     !-------------------!
@@ -841,6 +849,15 @@
                                     plot_inside,                   &
                                     Grid % vol(c_f:c_l),           &
                                     f8, f9, data_offset, run)
+    call Results % Save_Tensor_6_Real("Grid Cell Inertia [m^2]",   &
+                                      plot_inside,                 &
+                                      Grid % ixx(c_f:c_l),         &
+                                      Grid % iyy(c_f:c_l),         &
+                                      Grid % izz(c_f:c_l),         &
+                                      Grid % ixy(c_f:c_l),         &
+                                      Grid % iyz(c_f:c_l),         &
+                                      Grid % ixz(c_f:c_l),         &
+                                      f8, f9, data_offset, run)
     call Results % Save_Scalar_Real("Grid Wall Distance [m]",      &
                                     plot_inside,                   &
                                     Grid % wall_dist(c_f:c_l),     &
