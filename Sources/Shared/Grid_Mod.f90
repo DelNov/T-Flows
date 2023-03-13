@@ -9,6 +9,7 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Omp_Lib       ! for OpenMP functionality
   use Assert_Mod
   use Profiler_Mod
   use File_Mod
@@ -99,6 +100,10 @@
 
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_region(:,:)
+
+    ! Threads (for OpenMP and alike)
+    integer              :: n_threads
+    integer, allocatable :: cell_thread(:)
 
     !-------------------------!
     !  Face-based variables   !
