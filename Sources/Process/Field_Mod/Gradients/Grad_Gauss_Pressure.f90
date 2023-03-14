@@ -73,6 +73,7 @@
       c_visited(c) = 0
     end if
   end do
+  !$omp end parallel do
 
   ! It seems these are not needed
   !? call Grid % Exchange_Cells_Real(p % x)
