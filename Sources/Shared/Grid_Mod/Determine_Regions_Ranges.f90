@@ -11,6 +11,7 @@
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, reg, s, siz
+  integer :: last_face_only_inside, first_face_in_buffers
 !==============================================================================!
 
   !-------------------!
@@ -159,6 +160,25 @@
     Assert(c2 > 0)
   end do
 
+  !-------------!
+  !   Check 2   !
+  !-------------!
+  last_face_only_inside = 0
+  first_face_in_buffers = HUGE_INT  ! first face in buffers
+  do s = Faces_In_Domain()
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+    if(Grid % Comm % cell_proc(c1) .eq. this_proc .and.  &
+       Grid % Comm % cell_proc(c2) .eq. this_proc) then
+      last_face_only_inside = max(last_face_only_inside, s)
+    end if
+    if(Grid % Comm % cell_proc(c1) .eq. this_proc .and.  &
+       Grid % Comm % cell_proc(c2) .ne. this_proc) then
+      first_face_in_buffers = min(first_face_in_buffers, s)
+    end if
+  end do
+  Assert(last_face_only_inside < first_face_in_buffers)
+
   if(DEBUG) then
     write(2000+this_proc, '(a,a)')  ' # Face ranges from ', PROGRAM_NAME
     do reg = All_Regions()
@@ -172,7 +192,7 @@
   end if
 
   !-------------!
-  !   Check 2   !
+  !   Check 3   !
   !-------------!
   do reg = Boundary_Regions()
     do s = Faces_In_Region(reg)
