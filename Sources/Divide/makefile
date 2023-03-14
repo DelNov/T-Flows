@@ -12,7 +12,7 @@ DEBUG   ?= no
 ASSERT  ?= yes
 REAL    ?= double
 MPI     ?= no
-OPENMP  ?= no
+OMP     ?= no
 
 # Directories for objects and modules. (No need to change.)
 DIR_BINARY = ../../Binaries
@@ -50,7 +50,7 @@ $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
-$(info #        <REAL=double/single> <OPENMP=yes/no>                           )
+$(info #        <REAL=double/single> <OMP=yes/no>                              )
 $(info #                                                                       )
 $(info # Note: The first item, for each of the options above, is the default.  )
 $(info #                                                                       )
@@ -90,7 +90,7 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-  ifeq ($(OPENMP), yes)
+  ifeq ($(OMP), yes)
     OPT_F_COMP += -qopenmp
   endif
 
@@ -109,7 +109,7 @@ else ifeq ($(FORTRAN), nvidia)
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-  ifeq ($(OPENMP), yes)
+  ifeq ($(OMP), yes)
     OPT_F_COMP += -mp
   endif
 
@@ -137,7 +137,7 @@ else
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
   endif
-  ifeq ($(OPENMP), yes)
+  ifeq ($(OMP), yes)
     OPT_F_COMP += -fopenmp
   endif
 endif
