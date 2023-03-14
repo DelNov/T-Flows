@@ -151,10 +151,10 @@
     call Convert % Calculate_Geometry(Grid(g), g-n_grids)  ! if zero, ask
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
-    ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
+    ! ... faster if it is called after Grid_Mod_Sort_Faces_By_Region
     call Grid(g) % Sort_Cells_By_Coordinates()
 
-    call Grid(g) % Sort_Faces_Smart()
+    call Grid(g) % Sort_Faces_By_Region()
     if( (g-n_grids) .eq. 0) then
       call Grid(g) % Calculate_Wall_Distance()
     end if

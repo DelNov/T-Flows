@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sort_Faces_Smart(Grid)
+  subroutine Sort_Faces_By_Region(Grid)
 !------------------------------------------------------------------------------!
 !   Sorts array of faces in a smart way.  That would mean boundary faces       !
 !   first, boundary region by boundary region, then inside faces, then         !
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid
+  class(Grid_Type), intent(inout) :: Grid
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!

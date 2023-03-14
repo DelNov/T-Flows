@@ -238,7 +238,7 @@
       procedure :: Sort_Cells_By_Index
       procedure :: Sort_Cells_By_Coordinates
       procedure :: Sort_Faces_By_Index
-      procedure :: Sort_Faces_Smart
+      procedure :: Sort_Faces_By_Region
       procedure :: Write_Template_Control_File
 
   end type
@@ -297,7 +297,7 @@
 #   include "Grid_Mod/Sort_Cells_By_Index.f90"
 #   include "Grid_Mod/Sort_Cells_By_Coordinates.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"
-#   include "Grid_Mod/Sort_Faces_Smart.f90"
+#   include "Grid_Mod/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Write_Template_Control_File.f90"
 
   end module
