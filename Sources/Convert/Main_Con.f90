@@ -152,7 +152,7 @@
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
     ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
-    call Grid(g) % Sort_Cells_Smart()
+    call Grid(g) % Sort_Cells_By_Coordinates()
 
     call Grid(g) % Sort_Faces_Smart()
     if( (g-n_grids) .eq. 0) then

@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Sort_Cells_Smart(Grid)
+  subroutine Sort_Cells_By_Coordinates(Grid)
 !------------------------------------------------------------------------------!
 !   Sorts cells by their geometrical positions.                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid
+  class(Grid_Type), intent(inout) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, n
   integer              :: mcc, mcn, mcf
