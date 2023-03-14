@@ -209,6 +209,7 @@
       procedure :: Correct_Face_Surfaces
       procedure :: Decompose
       procedure :: Determine_Regions_Ranges
+      procedure :: Determine_Threads
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
@@ -268,6 +269,7 @@
 #   include "Grid_Mod/Check_Cells_Closure.f90"
 #   include "Grid_Mod/Decompose.f90"
 #   include "Grid_Mod/Determine_Regions_Ranges.f90"
+#   include "Grid_Mod/Determine_Threads.f90"
 #   include "Grid_Mod/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Exchange_Cells_Real.f90"
