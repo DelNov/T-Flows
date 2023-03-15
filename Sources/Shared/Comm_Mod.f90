@@ -36,8 +36,8 @@
     integer, allocatable :: cell_proc(:)
 
     ! Global cell and node numbers
-    integer, contiguous, pointer :: cell_glo(:)
-    integer, contiguous, pointer :: node_glo(:)
+    integer, allocatable :: cell_glo(:)
+    integer, allocatable :: node_glo(:)
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_sub   ! number of cells in subdomain
