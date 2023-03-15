@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Calculate_Face_Centroid(Pol, face, xf, yf, zf)
+  pure subroutine Calculate_Face_Centroid(Pol, face, xf, yf, zf)
 !------------------------------------------------------------------------------!
 !   Calculate face's centroid, this information is not stored in Polyhedron    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  integer, intent(in)    :: face
-  real,    intent(out)   :: xf, yf, zf
+  class(Polyhedron_Type), intent(in)  :: Pol
+  integer,                intent(in)  :: face
+  real,                   intent(out) :: xf, yf, zf
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_nod, i
 !==============================================================================!

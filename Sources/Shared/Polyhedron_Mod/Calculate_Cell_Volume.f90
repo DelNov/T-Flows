@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Calculate_Cell_Volume(Pol, vol)
+  pure subroutine Calculate_Cell_Volume(Pol, vol)
 !------------------------------------------------------------------------------!
 !   Calculate cell's volume, this information is not stored in Polyhedron      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  real, intent(out)      :: vol
+  class(Polyhedron_Type), intent(in)  :: Pol
+  real,                   intent(out) :: vol
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_nod, j_nod, i, j, s
   real    :: dv, xc, yc, zc, xf, yf, zf
@@ -17,7 +17,7 @@
 
   ! Calculate cell's centroid (maybe taking it from ...
   ! ... Grid would be easier albeit less general?)
-  call Pol % Calculate_Cell_Centroid(s, xc, yc, zc)
+  call Pol % Calculate_Cell_Centroid(xc, yc, zc)
 
   do s = 1, Pol % n_faces
 

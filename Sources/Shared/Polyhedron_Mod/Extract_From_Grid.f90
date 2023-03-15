@@ -3,10 +3,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  type(Grid_Type)        :: Grid
-  integer, intent(in)    :: cell
-  real,    optional      :: phi_n(:)
+  class(Polyhedron_Type),  intent(out) :: Pol
+  type(Grid_Type), target, intent(in)  :: Grid
+  integer,                 intent(in)  :: cell
+  real,          optional, intent(in)  :: phi_n(:)
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!

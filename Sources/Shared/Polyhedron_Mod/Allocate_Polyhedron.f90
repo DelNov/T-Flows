@@ -5,9 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  integer, intent(in)    :: n_faces
-  integer, intent(in)    :: n_nodes
+  class(Polyhedron_Type), intent(out) :: Pol
+  integer,                intent(in)  :: n_faces
+  integer,                intent(in)  :: n_nodes
 !==============================================================================!
 
   allocate(Pol % faces_n_nodes(n_faces))

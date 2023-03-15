@@ -3,10 +3,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Isoap_Type)   :: Isoap
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: cell
-  real                :: phi_n(:)
+  class(Isoap_Type),       intent(out) :: Isoap
+  type(Grid_Type), target, intent(in)  :: Grid
+  integer,                 intent(in)  :: cell
+  real,          optional, intent(in)  :: phi_n(:)
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
