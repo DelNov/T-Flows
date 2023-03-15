@@ -28,11 +28,12 @@
   !   Count buffer cells inside   !
   !-------------------------------!
   Grid % Comm % n_buff_cells = 0
-  do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .ne. this_proc) then
-      Grid % Comm % n_buff_cells =    &
-      Grid % Comm % n_buff_cells + 1
-    end if
+  do c = Cells_In_Domain()
+    Assert(Grid % Comm % cell_proc(c) .eq. this_proc)
+  end do
+  do c = Cells_In_Buffers()
+    Assert(Grid % Comm % cell_proc(c) .ne. this_proc)
+    Grid % Comm % n_buff_cells = Grid % Comm % n_buff_cells + 1
   end do
 
   !------------------------!
@@ -52,8 +53,7 @@
   !--------------------------------------------------------!
   recv_buff_cnt(:,:)   = 0
   recv_cells(:) = 0
-  do c = Grid % n_cells - Grid % Comm % n_buff_cells + 1,  &
-         Grid % n_cells
+  do c = Cells_In_Buffers()
     sub = Grid % Comm % cell_proc(c)
     recv_buff_cnt(this_proc, sub) = recv_buff_cnt(this_proc, sub) + 1
     recv_cells(c) = sub
@@ -89,13 +89,11 @@
   !    and also from which processor it is    !
   !-------------------------------------------!
   i_cel = 0
-  do c = Grid % n_cells - Grid % Comm % n_buff_cells + 1,  &
-         Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .ne. this_proc) then
-      i_cel = i_cel + 1
-      need_cell(i_cel, this_proc) = Grid % Comm % cell_glo(c)
-      from_proc(i_cel, this_proc) = Grid % Comm % cell_proc(c)
-    end if
+  do c = Cells_In_Buffers()
+    Assert(Grid % Comm % cell_proc(c) .ne. this_proc)
+    i_cel = i_cel + 1
+    need_cell(i_cel, this_proc) = Grid % Comm % cell_glo(c)
+    from_proc(i_cel, this_proc) = Grid % Comm % cell_proc(c)
   end do
 
   !----------------------------------------------!
@@ -177,7 +175,7 @@
       send_cells(:) = 0
       do i_cel = 1, n_max_buff_cells
         if(from_proc(i_cel, sub) .eq. this_proc) then
-          do c = 1, Grid % n_cells
+          do c = Cells_In_Domain()
             if(Grid % Comm % cell_glo(c) .eq. need_cell(i_cel, sub)) then
               send_cells(c) = sub                                  ! identify
               cnt = cnt + 1
@@ -191,7 +189,7 @@
                       ' cells to send to processor', sub
 
       ! This worries me.  Why should this be from -Grid % n_bnd_cells or not
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
         if(send_cells(c) .eq. sub) then
           ms = ms + 1
           Grid % Comm % cells_send(sub) % map(ms) = c
@@ -199,7 +197,7 @@
       end do
 
       ! This worries me.  Why should this be from -Grid % n_bnd_cells or not
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Buffers()
         if(recv_cells(c) .eq. sub) then
           mr = mr + 1
           Grid % Comm % cells_recv(sub) % map(mr) = c
