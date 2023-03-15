@@ -268,7 +268,6 @@
   Grid % region % at_face(1:Grid % n_faces) = 0
 
   call Grid % Determine_Regions_Ranges()
-  call Grid % Determine_Threads()
 
   close(fu)
 

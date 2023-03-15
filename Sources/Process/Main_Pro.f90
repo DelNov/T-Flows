@@ -85,6 +85,7 @@
     ! Load the finite volume Grid
     call Grid(d) % Load_Cfn(this_proc, domain=d)
     call Grid(d) % Load_Dim(this_proc, domain=d)
+    call Grid(d) % Determine_Threads()
     call Grid(d) % Calculate_Face_Geometry()
 
     ! Find communication patterns
