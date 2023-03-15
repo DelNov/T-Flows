@@ -180,11 +180,6 @@
     !------------------------------------------!
     type(Comm_Type) :: Comm
 
-    ! User arrays.  I am neither sure if this is the ...
-    ! ... best place for them nor do I need them at all?
-    integer           :: n_user_arrays
-    real, allocatable :: user_array(:,:)
-
     contains
       procedure :: Allocate_Cells
       procedure :: Allocate_Faces
@@ -235,7 +230,7 @@
       procedure :: Save_Vtu_Cells
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
-      procedure :: Sort_Cells_By_Index
+      procedure :: Sort_Cells_By_Thread
       procedure :: Sort_Cells_By_Coordinates
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
@@ -294,8 +289,8 @@
 #   include "Grid_Mod/Save_Vtu_Cells.f90"
 #   include "Grid_Mod/Save_Vtu_Edges.f90"
 #   include "Grid_Mod/Save_Vtu_Faces.f90"
-#   include "Grid_Mod/Sort_Cells_By_Index.f90"
 #   include "Grid_Mod/Sort_Cells_By_Coordinates.f90"
+#   include "Grid_Mod/Sort_Cells_By_Thread.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Write_Template_Control_File.f90"

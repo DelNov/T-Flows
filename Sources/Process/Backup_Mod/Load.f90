@@ -381,19 +381,6 @@
                                    Swr % n_reflected)
   end if
 
-  !-----------------!
-  !                 !
-  !   User arrays   !
-  !                 !
-  !-----------------!
-
-  do ua = 1, Grid % n_user_arrays
-    a_name = 'A_00'
-    write(a_name(3:4),'(I2.2)') ua
-    call Backup_Mod_Read_Cell_Real(Grid, d, vc, a_name,  &
-                                   Grid % user_array(ua, :))
-  end do
-
   ! Close backup file
   call Comm % Close_File(fh)
 

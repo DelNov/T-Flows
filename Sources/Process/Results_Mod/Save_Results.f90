@@ -994,18 +994,6 @@
     end if
 
     !----------------------!
-    !   Save user arrays   !
-    !----------------------!
-    do ua = 1, Grid % n_user_arrays
-
-      a_name = 'A_00'
-      write(a_name(3:4), '(i2.2)') ua
-      call Results % Save_Scalar_Real(a_name, plot_inside,            &
-                                      Grid % user_array(ua,c_f:c_l),  &
-                                      f8, f9, data_offset, run)
-    end do
-
-    !----------------------!
     !                      !
     !   End of cell data   !
     !                      !

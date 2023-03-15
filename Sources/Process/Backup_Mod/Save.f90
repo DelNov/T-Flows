@@ -355,19 +355,6 @@
                                     Swr % n_reflected)
   end if
 
-  !-----------------!
-  !                 !
-  !   User arrays   !
-  !                 !
-  !-----------------!
-
-  do ua = 1, Grid % n_user_arrays
-    a_name = 'A_??'
-    write(a_name(3:4),'(I2.2)') ua
-    call Backup_Mod_Write_Cell_Real(Grid, d, vc, a_name,  &
-                                    Grid % user_array(ua, :))
-  end do
-
   ! Variable count (store +1 to count its own self)
   call Backup_Mod_Write_Int(Comm, d, vc, 'variable_count', vc + 1)
 
