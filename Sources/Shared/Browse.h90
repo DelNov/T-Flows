@@ -2,34 +2,38 @@
 !   Definition of potentially usefull macros in T-Flows.                       !
 !------------------------------------------------------------------------------!
 
-# define Boundary_Regions()                       \
+# define Boundary_Regions()                        \
     1, Grid % n_bnd_regions
 
-# define Boundary_And_Inside_Regions()            \
+# define Boundary_And_Inside_Regions()             \
     1, Grid % n_regions
 
-# define Boundary_Inside_And_Buffer_Regions()     \
+# define Boundary_Inside_And_Buffer_Regions()      \
     1, Grid % n_regions + 1
 
-# define All_Regions()                            \
+# define All_Regions()                             \
     1, Grid % n_bnd_regions + 5
 
-# define Faces_In_Region(reg)                     \
-    Grid % region % f_face(reg),                  \
+# define Faces_In_Region(reg)                      \
+    Grid % region % f_face(reg),                   \
     Grid % region % l_face(reg)
 
-# define Faces_In_Domain()                        \
-    Grid % region % f_face(Grid % n_regions),     \
+# define Faces_In_Domain()                         \
+    Grid % region % f_face(Grid % n_regions),      \
     Grid % region % l_face(Grid % n_regions)
 
-# define Cells_In_Region(reg)                     \
-    Grid % region % f_cell(reg),                  \
+# define Cells_In_Region(reg)                      \
+    Grid % region % f_cell(reg),                   \
     Grid % region % l_cell(reg)
 
-# define Cells_In_Domain()                        \
-    Grid % region % f_cell(Grid % n_regions),     \
+# define Cells_In_Domain()                         \
+    Grid % region % f_cell(Grid % n_regions),      \
     Grid % region % l_cell(Grid % n_regions)
 
-# define Cells_In_Domain_And_Buffers()            \
-    Grid % region % f_cell(Grid % n_regions),     \
+# define Cells_In_Domain_And_Buffers()             \
+    Grid % region % f_cell(Grid % n_regions),      \
+    Grid % region % l_cell(Grid % n_regions + 1)
+
+# define Cells_In_Buffers()                        \
+    Grid % region % f_cell(Grid % n_regions + 1),  \
     Grid % region % l_cell(Grid % n_regions + 1)
