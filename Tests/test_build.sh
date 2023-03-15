@@ -31,13 +31,11 @@ set -e
 FORTRAN="gnu"
 FCOMP=""
 DEBUG="no"
-OPENMP="yes"
 
 # Intel compiler (python is messed up with Intel, don't plot for now)
 # FORTRAN="intel"
 # FCOMP="mpiifort"
 # DEBUG="no"
-# OPENMP="yes"
 
 # Variable MODE can be set to "interactive" or "noninteractive", depending if
 # the script is ran in interactive mode (without command line options) or in
@@ -437,21 +435,19 @@ function user_compile {
   git checkout User_Mod/*.f90 >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2"
     make \
       FORTRAN=$FORTRAN \
       FCOMP=$FCOMP \
       DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2 DIR_CASE=$3"
     make \
       FORTRAN=$FORTRAN \
       FCOMP=$FCOMP \
       DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
       MPI=$2 \
       DIR_CASE=$3 >> $FULL_LOG 2>&1
     success=$?
@@ -489,21 +485,19 @@ function clean_compile {
   make clean >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2"
     make \
       FORTRAN=$FORTRAN \
       FCOMP=$FCOMP \
       DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2 DIR_CASE=$3"
     make \
       FORTRAN=$FORTRAN \
       FCOMP=$FCOMP \
       DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
       MPI=$2 \
       DIR_CASE=$3 >> $FULL_LOG 2>&1
     success=$?
@@ -1730,12 +1724,10 @@ function chose_test {
       FORTRAN="intel"
       FCOMP="mpiifort"
       DEBUG="no"
-      OPENMP="yes"
     elif [ $FORTRAN == "intel" ]; then
       FORTRAN="gnu"
       FCOMP=""
       DEBUG="no"
-      OPENMP="yes"
     fi
   fi
 
