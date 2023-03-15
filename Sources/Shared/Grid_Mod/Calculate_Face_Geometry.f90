@@ -192,28 +192,22 @@
 
       if(abs(Grid % dx(s)) > PICO) then
         if(abs(Grid % xc(c2) - Grid % xc(c1) ) > 1.5 * abs(Grid % dx(s))) then
-          if(Grid % xc(c2) > Grid % xc(c1)) then
-            Assert(Grid % faces_s(s) > 0)
-            Grid % region % at_face(s) = Grid % per_x_reg
-          end if
+          Assert(Grid % faces_s(s) > 0)
+          Grid % region % at_face(s) = Grid % per_x_reg
         end if
       end if
 
       if(abs(Grid % dy(s)) > PICO) then
         if(abs(Grid % yc(c2) - Grid % yc(c1) ) > 1.5 * abs(Grid % dy(s))) then
-          if(Grid % yc(c2) > Grid % yc(c1)) then
-            Assert(Grid % faces_s(s) > 0)
-            Grid % region % at_face(s) = Grid % per_y_reg
-          end if
+          Assert(Grid % faces_s(s) > 0)
+          Grid % region % at_face(s) = Grid % per_y_reg
         end if
       end if
 
       if(abs(Grid % dz(s)) > PICO) then
         if(abs(Grid % zc(c2) - Grid % zc(c1) ) > 1.5 * abs(Grid % dz(s))) then
-          if(Grid % zc(c2) > Grid % zc(c1)) then
-            Assert(Grid % faces_s(s) > 0)
-            Grid % region % at_face(s) = Grid % per_z_reg
-          end if
+          Assert(Grid % faces_s(s) > 0)
+          Grid % region % at_face(s) = Grid % per_z_reg
         end if
       end if
 
