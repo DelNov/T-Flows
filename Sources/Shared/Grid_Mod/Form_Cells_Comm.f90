@@ -7,11 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: sub, ms, mr, cnt
+  integer              :: sub, ms, mr, cnt, n_fail
   integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, i_cel
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
+  real,    allocatable :: xc(:), yc(:), zc(:)
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
@@ -223,10 +224,39 @@
   !-------------------------------------!
   Grid % n_faces = Grid % n_faces - n_buff_faces
 
-  ! De-allocate locally used memory
-  deallocate(send_buff_cnt)
-  deallocate(recv_buff_cnt)
-  deallocate(send_cells)
-  deallocate(recv_cells)
+  !------------------------------------------!
+  !   Check if communication patterns work   !
+  !------------------------------------------!
+  allocate(xc(-Grid % n_bnd_cells : Grid % n_cells));  xc(:) = 0.0
+  allocate(yc(-Grid % n_bnd_cells : Grid % n_cells));  yc(:) = 0.0
+  allocate(zc(-Grid % n_bnd_cells : Grid % n_cells));  zc(:) = 0.0
+
+  do c = Cells_In_Domain()
+    xc(c) = Grid % xc(c)
+    yc(c) = Grid % yc(c)
+    zc(c) = Grid % zc(c)
+  end do
+
+  call Grid % Exchange_Cells_Real(xc)
+  call Grid % Exchange_Cells_Real(yc)
+  call Grid % Exchange_Cells_Real(zc)
+
+  n_fail = 0
+  do c = Cells_In_Buffers()
+    if( .not. ( Math % Approx_Real(xc(c), Grid % xc(c)) .and.  &
+                Math % Approx_Real(yc(c), Grid % yc(c)) .and.  &
+                Math % Approx_Real(zc(c), Grid % zc(c)) ) ) then
+      n_fail = n_fail + 1
+    end if
+  end do
+  call Comm_Mod_Global_Sum_Int(n_fail)
+  if(n_fail .gt. 0) then
+    call Message % Error(55,                                                 &
+                         'Ouch, this hurts. Formation of commuication '  //  &
+                         'patterns has failed. Hopefully, you just ran ' //  &
+                         'the simulation on fewer processor than there ' //  &
+                         'are subdomains. \n \n This error is critical.',    &
+                         file=__FILE__, line=__LINE__, one_proc=.true.)
+  end if
 
   end subroutine
