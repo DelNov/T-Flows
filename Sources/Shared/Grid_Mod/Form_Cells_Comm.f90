@@ -12,7 +12,7 @@
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
-  real,    allocatable :: xc(:), yc(:), zc(:)
+  integer, allocatable :: glo(:)  ! used for checking the communication
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
@@ -225,25 +225,17 @@
   !------------------------------------------!
   !   Check if communication patterns work   !
   !------------------------------------------!
-  allocate(xc(-Grid % n_bnd_cells : Grid % n_cells));  xc(:) = 0.0
-  allocate(yc(-Grid % n_bnd_cells : Grid % n_cells));  yc(:) = 0.0
-  allocate(zc(-Grid % n_bnd_cells : Grid % n_cells));  zc(:) = 0.0
+  allocate(glo(-Grid % n_bnd_cells : Grid % n_cells));  glo(:) = 0
 
   do c = Cells_In_Domain()
-    xc(c) = Grid % xc(c)
-    yc(c) = Grid % yc(c)
-    zc(c) = Grid % zc(c)
+    glo(c) = Grid % Comm % cell_glo(c)
   end do
 
-  call Grid % Exchange_Cells_Real(xc)
-  call Grid % Exchange_Cells_Real(yc)
-  call Grid % Exchange_Cells_Real(zc)
+  call Grid % Exchange_Cells_Int(glo)
 
   n_fail = 0
   do c = Cells_In_Buffers()
-    if( .not. ( Math % Approx_Real(xc(c), Grid % xc(c)) .and.  &
-                Math % Approx_Real(yc(c), Grid % yc(c)) .and.  &
-                Math % Approx_Real(zc(c), Grid % zc(c)) ) ) then
+    if(.not. glo(c) .eq. Grid % Comm % cell_glo(c)) then
       n_fail = n_fail + 1
     end if
   end do
