@@ -1,17 +1,25 @@
 !==============================================================================!
-  subroutine Statistics(Profiler, indent)
+  subroutine Statistics(Profiler, indent, in_seconds)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target :: Profiler
-  integer, intent(in)          :: indent     ! 34 for Main_Pro, 1 for Main_con
+  class(Profiler_Type), target  :: Profiler
+  integer,           intent(in) :: indent     ! 34 for Main_Pro, 1 for Main_con
+  logical, optional, intent(in) :: in_seconds
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i_fun
   real          :: total_time, t_temp, percent_time
   integer       :: hours, minutes, seconds
   character(DL) :: line, n_temp
-  logical       :: swap
+  logical       :: swap, in_sec
 !==============================================================================!
+
+  in_sec = .false.
+  if(present(in_seconds)) then
+    if(in_seconds) then
+      in_sec = .true.
+    end if
+  end if
 
   ! Compute average time spent in functions over all processors
   if(n_proc > 1) then
@@ -90,8 +98,13 @@
                                       = Profiler % funct_name(i_fun)(1:123)
       line(47+indent:47+indent) = '|'
       percent_time = Profiler % funct_time(i_fun) / total_time * 100.0
-      write(line(52+indent:57+indent), '(f6.2)') percent_time
-      line(59+indent:59+indent) = '%'
+      if(in_sec) then
+        write(line(52+indent:57+indent), '(f6.2)') Profiler % funct_time(i_fun)
+        line(59+indent:61+indent) = '[s]'
+      else
+        write(line(52+indent:57+indent), '(f6.2)') percent_time
+        line(59+indent:59+indent) = '%'
+      end if
       if(percent_time > 0.01) then
         print '(a)', trim(line)
       end if
