@@ -51,35 +51,8 @@
   end type
 
   contains
-  !==============================================================================!
-    integer function Get_Max_Threads(Vect)
-  !------------------------------------------------------------------------------!
-    implicit none
-  !------------------------------------------------------------------------------!
-    class(Vect_Type) :: Vect
-  !==============================================================================!
 
-    Get_Max_Threads = 1
-#   ifdef _OPENMP
-      Get_Max_Threads = omp_get_max_threads()
-#   endif
-
-    end function
-
-  !==============================================================================!
-    subroutine Set_Num_Threads(Vect, n)
-  !------------------------------------------------------------------------------!
-    implicit none
-  !------------------------------------------------------------------------------!
-    class(Vect_Type) :: Vect
-    integer, intent(in) :: n
-  !==============================================================================!
-
-#   ifdef _OPENMP
-      call omp_set_num_threads(n)
-#   endif
-
-    end subroutine
-
+#   include "Vect_Mod/Get_Max_Threads.f90"
+#   include "Vect_Mod/Set_Num_Threads.f90"
 
   end module
