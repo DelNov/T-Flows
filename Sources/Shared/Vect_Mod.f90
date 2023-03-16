@@ -38,10 +38,11 @@
     ! Desired number of threads read from control file
     integer :: d_threads
 
-    type(Region_Type) :: region
+    type(Region_Type) :: thread
 
-    ! Thread i.d. defined for each cell
+    ! Thread for each cell and face
     integer, allocatable :: cell_thread(:)
+    integer, allocatable :: face_thread(:)
 
     contains
       procedure :: Get_Max_Threads

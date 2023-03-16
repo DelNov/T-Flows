@@ -56,6 +56,9 @@
   allocate(Grid % f (nf+ns));   Grid % f (:) = 0.0
   allocate(Grid % fw(nf+ns));   Grid % fw(:) = 0.0
 
+  ! Allocate thread i.d.
+  allocate(Grid % Vect % face_thread(nf+ns));  Grid % Vect % face_thread(:) = 0
+
   ! Allocate new and old numbers (this is so often used, maybe is better here)
   allocate(Grid % new_f(nf+ns));  Grid % new_f(:) = 0
   allocate(Grid % old_f(nf+ns));  Grid % old_f(:) = 0
