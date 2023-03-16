@@ -5,15 +5,19 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type), intent(inout) :: Grid
+  class(Grid_Type), target, intent(inout) :: Grid
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, s
-  integer       :: c_f, c_l, s_f, s_l      ! first/last cell, first/last face
-  character(SL) :: st1, st2
+  type(Vect_Type), pointer :: Vect
+  integer                  :: c, s
+  integer                  :: n_cells_in, in_region, n_remains, reg
+  integer, allocatable     :: cells_in_region(:)
+  character(SL)            :: st1, st2
 !==============================================================================!
 
+  ! Take aliases
+  Vect => Grid % Vect
 
   !----------------------------!
   !   Find number of threads   !
@@ -54,50 +58,44 @@
   if(PROGRAM_NAME == "Process" .and.  &
      Grid % Vect % n_threads > 1) then
 
-    ! Set the face range to the inside faces
-    s_f = Grid % region % f_face(Grid % n_regions)
-    s_l = Grid % region % l_face(Grid % n_regions)
+    allocate(Grid % Vect % region % f_cell(Grid % Vect % n_threads))
+    allocate(Grid % Vect % region % l_cell(Grid % Vect % n_threads))
 
-    ! In case of parallel runs, you do not want the faces in buffers,
-    ! you want threads only in inside cells, not spreading to buffers
-    do s = Faces_In_Domain()
-      if(Grid % Comm % cell_proc(Grid % faces_c(2, s)) .ne. this_proc) then
-        s_l = s - 1
-        exit
-      end if
+    n_cells_in = Grid % region % l_cell(Grid % n_regions) -    &
+                 Grid % region % f_cell(Grid % n_regions) + 1
+
+    in_region = n_cells_in / Grid % Vect % n_threads
+    n_remains = mod(n_cells_in, Grid % Vect % n_threads)
+
+    allocate(cells_in_region(Grid % Vect % n_threads))
+    cells_in_region(:) = in_region
+
+    ! Add the remaining cells to the regions
+    do reg = 1, n_remains
+      cells_in_region(reg) = cells_in_region(reg) + 1
     end do
 
-    ! Check 1
-    do s = s_f, s_l
-      Assert(Grid % Comm % cell_proc(Grid % faces_c(1, s)) .eq. this_proc)
-      Assert(Grid % Comm % cell_proc(Grid % faces_c(2, s)) .eq. this_proc)
+    ! Work out starts and ends of the regions
+    Vect % region % f_cell(1) = Grid % region % f_cell(Grid % n_regions)
+    Vect % region % l_cell(1) = Vect % region % f_cell(1)  &
+                              + cells_in_region(1) - 1
+    do reg = 2, Grid % Vect % n_threads
+      Vect % region % f_cell(reg) = Vect % region % l_cell(reg-1) + 1
+      Vect % region % l_cell(reg) = Vect % region % f_cell(reg)  &
+                                + cells_in_region(reg) - 1
     end do
 
-    ! Create METIS
-    call Metis % Create_Metis(s_f, s_l, Grid % faces_c, Grid % Vect % n_threads)
-
-    ! Set some high value for threads everywhere.  In calls which follow
-    ! cells which are not in buffers will be over-written by true threads
-    Grid % Vect % cell_thread(:) = Grid % Vect % n_threads * 10
-
-    ! Set the cell range to the inside of the domain, no buffer cells here
-    c_f = Grid % region % f_cell(Grid % n_regions)
-    c_l = Grid % region % l_cell(Grid % n_regions)
-
-    ! Call METIS to assign regions to inside cells (not in buffers).  In
-    ! buffers, you should still have values you assigned a few lines above
-    call Metis % Call_Metis(Grid % Vect % n_threads,  &
-                            Grid % Vect % cell_thread(c_f:c_l))
-
-    do c = Cells_In_Domain()
-      Assert(Grid % Vect % cell_thread(c) .le. Grid % Vect % n_threads)
-    end do
-    do c = Cells_In_Buffers()
-      Assert(Grid % Vect % cell_thread(c) .gt. Grid % Vect % n_threads)
+    ! Assign cell threads (not sure if really needed)
+    do reg = 1, Vect % n_threads
+      do c = Vect % region % f_cell(reg), Vect % region % l_cell(reg)
+        Vect % cell_thread(c) = reg
+      end do
     end do
 
-    ! Now this is quite brave
-    call Grid % Sort_Cells_By_Thread()
+    ! Now this was good, but was having a hell of an impact
+    ! on communication patterns and backup files creation
+    ! call Grid % Sort_Cells_By_Thread()
+    call Grid % Save_Vtu_Faces()
 
   end if
 
