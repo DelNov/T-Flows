@@ -60,7 +60,7 @@
   !   Set sorting criteria   !
   !--------------------------!
   do c = 1, Grid % n_cells
-    thread(c) = Grid % cell_thread(c)  ! in buffers, should be > n_threads
+    thread(c) = Grid % Vect % cell_thread(c)  ! in buffers, must be > n_threads
     cell  (c) = c
     Grid % old_c(c) = c
   end do
@@ -126,20 +126,20 @@
     Grid % cells_c(1:mcc,Grid % new_c(c)) = old_cells(1:mcc, c)
   end do
   nc = Grid % n_cells  ! abbreviate the syntax
-  call Sort % Real_By_Index(nc, Grid % xc              (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % yc              (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % zc              (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % vol             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % ixx             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % iyy             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % izz             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % ixy             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % ixz             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % iyz             (1), Grid % new_c(1))
-  call Sort % Real_By_Index(nc, Grid % wall_dist       (1), Grid % new_c(1))
-  call Sort % Int_By_Index (nc, Grid % cell_thread     (1), Grid % new_c(1))
-  call Sort % Int_By_Index (nc, Grid % Comm % cell_glo (1), Grid % new_c(1))
-  call Sort % Int_By_Index (nc, Grid % Comm % cell_proc(1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % xc                (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % yc                (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % zc                (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % vol               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % ixx               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % iyy               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % izz               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % ixy               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % ixz               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % iyz               (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % wall_dist         (1), Grid % new_c(1))
+  call Sort % Int_By_Index (nc, Grid % Vect % cell_thread(1), Grid % new_c(1))
+  call Sort % Int_By_Index (nc, Grid % Comm % cell_glo   (1), Grid % new_c(1))
+  call Sort % Int_By_Index (nc, Grid % Comm % cell_proc  (1), Grid % new_c(1))
 
   !-----------------------------!
   !   Check processor numbers   !

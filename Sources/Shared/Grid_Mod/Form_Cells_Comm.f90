@@ -2,6 +2,25 @@
   subroutine Form_Cells_Comm(Grid)
 !------------------------------------------------------------------------------!
 !   Find communication patterns for cells from Process                         !
+!                                                                              !
+!   This is not the simplest procedure in T-Flows, so in this header I will    !
+!   try to explain how it works.  In a nutshell, it browses through buffer     !
+!   cells of all sub-domains and stores their global numbers as well as sub-   !
+!   domain numbers they are from (in need_cell and from_proc matrices).        !
+!   This information is distributed among all the processor by performing a    !
+!   global sum over integer arrays, and with that continues to form buffers.   !
+!                                                                              !
+!   For this procedure to work, it is essential that global cell numbers are   !
+!   the same in buffers and in inside cells from which the data is needed.     !
+!   This was the case until the moment we started sorting inside cells to be   !
+!   in different threads for vectorization.  Once that happened, an extra      !
+!   measure was taken, by sorting buffers with criteria in send_sort() and     !
+!   recv_sort().  (Though, the latter one might not be needed.)                !
+!
+!   In other words: because we are  browsing through cells in separate dom-    !
+!   ains independently, we must ensure they are in right order.  This is en-   !
+!   sured by forming send_sort() and recv_sort() and applying them order       !
+!   cells in send and receive buffers.                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -12,6 +31,7 @@
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
+  integer, allocatable :: send_sort(:), recv_sort(:)
   integer, allocatable :: glo(:)  ! used for checking the communication
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
@@ -154,6 +174,7 @@
         allocate(Grid % Comm % cells_send(sub) % i_buff(ms));
         allocate(Grid % Comm % cells_send(sub) % l_buff(ms));
         allocate(Grid % Comm % cells_send(sub) % r_buff(ms));
+        allocate(send_sort(ms));
       end if
 
       if(mr > 0) then
@@ -162,14 +183,13 @@
         allocate(Grid % Comm % cells_recv(sub) % l_buff(mr));
         allocate(Grid % Comm % cells_recv(sub) % r_buff(mr));
         allocate(Grid % Comm % cells_recv(sub) % o_buff(mr));
+        allocate(recv_sort(mr));
       end if
 
       !------------------------------------------!
       !   Form send_cells from the information   !
       !   in matrices from_proc and need_cell    !
       !------------------------------------------!
-      ms = 0
-      mr = 0
 
       cnt = 0
       send_cells(:) = 0
@@ -188,21 +208,41 @@
                       ' #   It did find    ', cnt,    &
                       ' cells to send to processor', sub
 
-      ! This worries me.  Why should this be from -Grid % n_bnd_cells or not
+      ! Browse through cells in domain to find what you have to send
+      ms = 0
       do c = Cells_In_Domain()
         if(send_cells(c) .eq. sub) then
           ms = ms + 1
           Grid % Comm % cells_send(sub) % map(ms) = c
+          send_sort(ms) = Grid % Comm % cell_glo(c)    ! store sorting criterion
         end if
       end do
 
-      ! This worries me.  Why should this be from -Grid % n_bnd_cells or not
+      ! Important link for robustness: insures that the sent cells in this
+      ! domain are ordered in the same way as receive cells in other domain
+      if(ms > 0) then
+        call Sort % Int_Carry_Int(send_sort,  &
+                                  Grid % Comm % cells_send(sub) % map)
+      end if
+
+      ! Browse through cells in buffers to find out what you need to receive
+      mr = 0
       do c = Cells_In_Buffers()
         if(recv_cells(c) .eq. sub) then
           mr = mr + 1
           Grid % Comm % cells_recv(sub) % map(mr) = c
+          recv_sort(mr) = Grid % Comm % cell_glo(c)    ! store sorting criterion
         end if
       end do
+
+      ! Important link for robustness: insures that the receive cells in this
+      ! domain are ordered in the same way as sent cells in other domain.
+      ! (Yet, this is not engaged yet since the cells in buffers has not been
+      !  fiddled with like the cells in domain due to OpenMP threading.)
+      ! if(mr > 0) then
+      !   call Sort % Int_Carry_Int(recv_sort,  &
+      !                             Grid % Comm % cells_recv(sub) % map)
+      ! end if
 
       if(DEBUG) then
         write(100*this_proc+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
@@ -212,6 +252,10 @@
       ! Store final buffer lengths
       Grid % Comm % cells_send(sub) % n_items = ms
       Grid % Comm % cells_recv(sub) % n_items = mr
+
+      ! Free sorting arrays for the next iteration
+      if(ms > 0) deallocate(send_sort)
+      if(mr > 0) deallocate(recv_sort)
 
     end if  ! sub .ne. this_proc
   end do    ! sub
@@ -241,11 +285,11 @@
   end do
   call Comm_Mod_Global_Sum_Int(n_fail)
   if(n_fail .gt. 0) then
-    call Message % Error(55,                                                 &
-                         'Ouch, this hurts. Formation of commuication '  //  &
-                         'patterns has failed. Hopefully, you just ran ' //  &
-                         'the simulation on fewer processor than there ' //  &
-                         'are subdomains. \n \n This error is critical.',    &
+    call Message % Error(55,                                                  &
+                         'Ouch, this hurts. Formation of communication '  //  &
+                         'patterns has failed. Hopefully, you just ran '  //  &
+                         'the simulation on fewer processor than there '  //  &
+                         'are subdomains. \n \n This error is critical.',     &
                          file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 

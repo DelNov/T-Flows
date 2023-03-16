@@ -65,6 +65,12 @@
 
 #   include "Control_Mod/Linear_Solvers.f90"
 
+    !-------------!
+    !   Threads   !
+    !-------------!
+
+#   include "Control_Mod/Max_Threads.f90"
+
     !--------------------!
     !   Native solvers   !
     !--------------------!

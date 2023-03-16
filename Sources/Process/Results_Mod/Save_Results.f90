@@ -408,7 +408,7 @@
     !-----------------!
     !   Cell thread   !
     !-----------------!
-    int_save(c_f:c_l) = Grid % cell_thread(c_f:c_l)
+    int_save(c_f:c_l) = Grid % Vect % cell_thread(c_f:c_l)
     call Results % Save_Scalar_Int("Grid Thread [1]", plot_inside,   &
                                     int_save(c_f:c_l),               &
                                     f8, f9, data_offset, run)

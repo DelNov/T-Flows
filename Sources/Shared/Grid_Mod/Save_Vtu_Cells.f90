@@ -347,7 +347,7 @@
   write(fu) data_size
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) Grid % cell_thread(c)
+      write(fu) Grid % Vect % cell_thread(c)
     end if
   end do
 

@@ -2,13 +2,7 @@
   subroutine Form_Maps_For_Backup(Grid)
 !------------------------------------------------------------------------------!
 !   Forms maps for parallel backup                                             !
-!------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: c, cnt, reg
-!==============================================================================!
+!                                                                              !
 !   There is an issue with this procedure, but it's more related to MPI/IO     !
 !   functions than T-Flows.  In cases a subdomain has no physical boundary     !
 !   cells, variable "nb_sub" turns out to be zero.  This, per se, should not   !
@@ -17,7 +11,17 @@
 !   length.  But they don't.  Therefore, I avoid allocation with zero size     !
 !   (max(nb_sub,1)) here and creation of new types with zero size in           !
 !   "Comm_Mod_Create_New_Types".  It is a bit of a dirty trick :-(             !
+!                                                                              !
+!   Another issue, also related to MPI, is that maps for saving must be in     !
+!   increasing order.  If you are doing only MPI that is fine, but if you      !
+!   are renumbering cells for threading with OpenMP, things get cumbersome.    !
 !------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Grid_Type) :: Grid
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: c, cnt, reg
+!==============================================================================!
 
   ! Initialize number of cells in subdomain
   Grid % Comm % nc_sub = Grid % n_cells - Grid % Comm % n_buff_cells
@@ -99,6 +103,11 @@
       Grid % Comm % cell_map(c) = int(Grid % Comm % cell_glo(c)-1, SP)
     end do
 
+    ! Maps must be in increasing order
+    do c = 2, Grid % Comm % nc_sub
+      Assert(Grid % Comm % cell_map(c) .gt. Grid % Comm % cell_map(c-1))
+    end do
+
     !-----------------------!
     !   Boundary cell map   !
     !-----------------------!
@@ -112,6 +121,11 @@
                                               + Grid % Comm % nb_tot, SP)
       end do
     end do  ! region
+
+    ! Maps must be in increasing order
+    do c = 2, Grid % Comm % nb_sub
+     Assert(Grid % Comm % bnd_cell_map(c) .gt. Grid % Comm % bnd_cell_map(c-1))
+    end do
 
     ! If domain has zero boundary cells, make the only
     ! (fictitious) member in the map point it to zero.

@@ -58,7 +58,7 @@
   end do
 
   ! Allocate thread i.d.
-  allocate(Grid % cell_thread(-nb:nc));  Grid % cell_thread(:) = 0
+  allocate(Grid % Vect % cell_thread(-nb:nc));  Grid % Vect % cell_thread(:) = 0
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
   allocate(Grid % new_c(-nb:nc));  Grid % new_c(:) = 0

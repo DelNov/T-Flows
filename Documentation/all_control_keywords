@@ -57,6 +57,7 @@
   MAX_SMOOTHING_CYCLES_CURVATURE_VOF       |         2                     |   an integer up to 5 makes sense
   MAX_SMOOTHING_CYCLES_NORMAL_VOF          |         0                     |   an integer up to 5 should be fine
   MAX_SUBSTEP_CYCLES_VOF                   |       100                     |   any integer
+  MAX_THREADS                              |         2                     |   integers, up to number of cores
   MIN_SIMPLE_ITERATIONS                    |         3                     |   any integer, but better > 2
   NORMALIZATION_FOR_ENERGY_SOLVER          |         1.0                   |   any real number, but mostly it is 1.0
   NORMALIZATION_FOR_MOMENTUM_SOLVER        |         1.0                   |   any real number, but mostly it is 1.0

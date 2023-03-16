@@ -531,6 +531,14 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Vect_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Vect_Mod.o:\
+$(DIR_OBJECT)/Region_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Profiler_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Profiler_Mod.o:\
@@ -585,6 +593,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 $(DIR_OBJECT)/Grid_Mod.o:\
 $(DIR_OBJECT)/Vtk_Mod.o \
 $(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_OBJECT)/Vect_Mod.o \
 $(DIR_OBJECT)/Sort_Mod.o \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Region_Mod.o \
@@ -595,9 +604,7 @@ $(DIR_SHARED)/Metis_Mod/*.f90 \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Stl_Mod.f90

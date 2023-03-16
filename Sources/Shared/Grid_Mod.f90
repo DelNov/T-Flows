@@ -9,8 +9,7 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Omp_Lib       ! for OpenMP functionality
-  use Assert_Mod
+  use Vect_Mod
   use Profiler_Mod
   use File_Mod
   use Region_Mod
@@ -101,10 +100,6 @@
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_region(:,:)
 
-    ! Threads (for OpenMP and alike)
-    integer              :: n_threads
-    integer, allocatable :: cell_thread(:)
-
     !-------------------------!
     !  Face-based variables   !
     !-------------------------!
@@ -175,10 +170,15 @@
     integer, allocatable :: edges_bc(:,:)  ! edges' boundary conditions
     integer, allocatable :: edges_fb(:,:)  ! edges' faces on boundaries
 
-    !------------------------------------------!
-    !   Communication class for parallel run   !
-    !------------------------------------------!
+    !-------------------------------------------!
+    !   Communication class for parallel runs   !
+    !-------------------------------------------!
     type(Comm_Type) :: Comm
+
+    !-------------------------------------------!
+    !   Vectorization class for manycore runs   !
+    !-------------------------------------------!
+    type(Vect_Type) :: Vect
 
     contains
       procedure :: Allocate_Cells
