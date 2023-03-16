@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Faces(Grid, plot_shadows, phi_f)
+  subroutine Save_Vtu_Faces(Grid, plot_shadows, real_phi_f, int_phi_f)
 !------------------------------------------------------------------------------!
 !   Writes boundary condition .faces.vtu or shadow .shadow.vtu file.           !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)  :: Grid
   logical, optional :: plot_shadows  ! plot shadow faces
-  real,    optional :: phi_f(1:Grid % n_faces)
+  real,    optional :: real_phi_f(1:Grid % n_faces)
+  integer, optional :: int_phi_f (1:Grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
   integer       :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns, fu
@@ -134,15 +135,26 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
-  ! Optional face variable
-  if(present(phi_f)) then
+  ! Optional real face variable
+  if(present(real_phi_f)) then
     write(str1, '(i0.0)') data_offset
     write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                      ' Name="FaceVariable"'           //  &
+                      ' Name="Real Face Variable"'     //  &
                       ' format="appended"'             //  &
                       ' offset="' // trim(str1) //'">' // LF
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + (s_l-s_f+1) * RP      ! prepare for next
+  end if
+
+  ! Optional integer face variable
+  if(present(int_phi_f)) then
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//intp         //  &
+                      ' Name="Integer Face Variable"'  //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
   end if
 
   ! Number of nodes
@@ -258,13 +270,23 @@
     end if
   end do
 
-  ! Optional face variable
+  ! Optional real face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
-  if(present(phi_f)) then
+  if(present(real_phi_f)) then
     data_size = int((s_l-s_f+1) * IP, SP)
     write(fu) data_size
     do s = s_f, s_l
-      write(fu) phi_f(s)
+      write(fu) real_phi_f(s)
+    end do
+  end if
+
+  ! Optional integer face variable
+  ! (Check c1 and c2 for shadow faces, seems to be something messed up)
+  if(present(int_phi_f)) then
+    data_size = int((s_l-s_f+1) * IP, SP)
+    write(fu) data_size
+    do s = s_f, s_l
+      write(fu) int_phi_f(s)
     end do
   end if
 
