@@ -110,39 +110,6 @@ HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 # MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
 # MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
 
-#----------------------------------------------------------------------------
-# All compilation tests including those with User_Mod/
-# (These are essentially most tests, but maybe not all of them
-# have the User_Mod directory, so there is some redundancy here)
-#----------------------------------------------------------------------------
-ALL_COMPILE_TESTS=( \
-                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
-                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
-                   "$LAMINAR_T_JUNCTION_DIR" \
-                   "$LAMINAR_CHANNEL_DIR" \
-                   "$RANS_BACKSTEP_05100_DIR" \
-                   "$RANS_BACKSTEP_28000_DIR" \
-                   "$RANS_CHANNEL_LR_LONG_DIR" \
-                   "$RANS_CHANNEL_LR_RSM_DIR" \
-                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
-                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
-                   "$RANS_FUEL_BUNDLE_DIR" \
-                   "$RANS_IMPINGING_JET_DIR" \
-                   "$MULTDOM_BACKSTEP_DIR" \
-                   "$MULTDOM_MEMBRANE_DIR" \
-                   "$SWARM_PERIODIC_CYL_DIR" \
-                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
-                   "$VOF_RISING_BUBBLE_DIR" \
-                   "$SWARM_VOF_THREE_PHASE_DIR" \
-                   "$LES_CHANNEL_180_LONG_DIR" \
-                   "$LES_CHANNEL_180_PERIODIC_DIR" \
-                   "$LES_PIPE_DIR" \
-                   "$LES_RB_109_DIR" \
-                   "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-                   "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-                   )
-DONE_COMPILE_TESTS=0
-
 #--------------------------------------------------------------
 # All directories to test Generate
 # (All the tests minus those which come with third party grid)
@@ -1307,6 +1274,7 @@ function launch_matplotlib {
   fi
   time_in_seconds
 }
+
 #------------------------------------------------------------------------------#
 # Individual process tests for compilation
 #------------------------------------------------------------------------------#
@@ -1361,25 +1329,6 @@ function process_compilation_test {
     unlink control
     git checkout -q control.?
   fi
-}
-
-#------------------------------------------------------------------------------#
-# All process compilation tests
-#------------------------------------------------------------------------------#
-function process_compilation_tests {
-  # $1 = dir with test
-
-  elog ""
-  elog "#======================================================================"
-  elog "#"
-  elog "#   Running Processor compilation tests"
-  elog "#"
-  elog "#----------------------------------------------------------------------"
-  echo "#   Running Processor compilation tests"
-
-  for CASE_DIR in ${ALL_COMPILE_TESTS[@]}; do
-    process_compilation_test $CASE_DIR
-  done
 }
 
 #------------------------------------------------------------------------------#
@@ -1680,46 +1629,44 @@ function chose_test {
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     divide_tests
   fi
-  if [ $option -eq 4 ]; then process_compilation_tests;    fi
-  if [ $option -eq 5 ]; then
+  if [ $option -eq 4 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_backup_tests
+  fi
+  if [ $option -eq 5 ]; then
+    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
+    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
+    process_save_exit_now_tests
   fi
   if [ $option -eq 6 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
-    process_save_exit_now_tests
-  fi
-  if [ $option -eq 7 ]; then
-    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
-    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
-    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_full_length_tests
   fi
-  if [ $option -eq 8 ]; then
+  if [ $option -eq 7 ]; then
     process_accuracy_tests
   fi
-  if [ $option -eq 9 ]; then
+  if [ $option -eq 8 ]; then
     generate_tests
     convert_tests
     divide_tests
-    process_compilation_tests
     process_backup_tests
     process_save_exit_now_tests
     process_full_length_tests
     process_accuracy_tests
   fi
-  if [ $option -eq 10 ]; then
+  if [ $option -eq 9 ]; then
     git clean -dfx $TEST_DIR/..
     make_clean $GENE_DIR
     make_clean $CONV_DIR
     make_clean $DIVI_DIR
     make_clean $PROC_DIR
   fi
-  if [ $option -eq 11 ]; then
+  if [ $option -eq 10 ]; then
     if [ $FORTRAN == "gnu" ]; then
       FORTRAN="intel"
       FCOMP="mpiifort"
@@ -1786,14 +1733,13 @@ else
     echo "  1. Generate tests"
     echo "  2. Convert tests"
     echo "  3. Divide tests"
-    echo "  4. Processor compilation tests with User_Mod"
-    echo "  5. Processor backup tests"
-    echo "  6. Processor save_now/exit_now tests"
-    echo "  7. Processor full lenght tests"
-    echo "  8. Process accuracy test"
-    echo "  9. Perform all tests"
-    echo " 10. Clean all test directories"
-    echo " 11. Change the compiler"
+    echo "  4. Processor backup tests"
+    echo "  5. Processor save_now/exit_now tests"
+    echo "  6. Processor full lenght tests"
+    echo "  7. Process accuracy test"
+    echo "  8. Perform all tests"
+    echo "  9. Clean all test directories"
+    echo " 10. Change the compiler"
     echo ""
     read -p "  Enter the desired type of test: " option
     chose_test $option
