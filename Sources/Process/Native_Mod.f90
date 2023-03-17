@@ -25,9 +25,6 @@
     ! Matrix for discretized momentum equations
     type(Matrix_Type) :: M
 
-    ! Preconditioning matrix for all variables (used inside solvers only)
-    type(Matrix_Type), private :: D
-
     ! Right-hand side for all variables
     ! (used in solvers and during discretization)
     type(Vector_Type) :: b

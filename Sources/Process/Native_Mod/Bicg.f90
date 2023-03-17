@@ -17,7 +17,6 @@
   real                       :: fin_res  ! final residual
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type),   pointer :: D
   type(Grid_Type),     pointer :: Grid
   integer                      :: nt, ni, nb
   real                         :: alfa, beta, rho, rho_old, bnrm2, res
@@ -25,15 +24,15 @@
   real                         :: sum_a, fn
   integer                      :: sum_n
   real,    contiguous, pointer :: p1(:), q1(:), r1(:), p2(:), q2(:), r2(:)
+  real,    contiguous, pointer :: d(:), d_inv(:)
   real,    contiguous, pointer :: a_val(:)
   integer, contiguous, pointer :: a_col(:), a_row(:), a_dia(:)
 !==============================================================================!
 
-  call Work % Connect_Real_Cell(p1, q1, r1, p2, q2, r2)
+  call Work % Connect_Real_Cell(p1, q1, r1, p2, q2, r2, d, d_inv)
 
   ! Take some aliases
   Grid  => Nat % pnt_grid
-  D     => Nat % D
   a_val => A % val
   a_col => A % col
   a_row => A % row
@@ -75,7 +74,7 @@
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Nat % Prec_Form(ni, A, D, prec)
+  call Nat % Prec_Form(ni, A, d(1:nt), d_inv(1:nt), prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
@@ -128,8 +127,8 @@
     !    solve M^T z~ = r~   !  don't have M^T!!!
     !    (q instead of z)    !
     !------------------------!
-    call Nat % Prec_Solve(ni, A, D, q1(1:nt), r1(1:nt), prec)
-    call Nat % Prec_Solve(ni, A, D, q2(1:nt), r2(1:nt), prec)
+    call Nat % Prec_Solve(ni, A, d(1:nt), d_inv(1:nt), q1(1:nt), r1(1:nt), prec)
+    call Nat % Prec_Solve(ni, A, d(1:nt), d_inv(1:nt), q2(1:nt), r2(1:nt), prec)
 
     !------------------!
     !   rho = (z,r~)   !
@@ -241,6 +240,6 @@
   fin_res = res
   niter   = iter
 
-  call Work % Disconnect_Real_Cell(p1, q1, r1, p2, q2, r2)
+  call Work % Disconnect_Real_Cell(p1, q1, r1, p2, q2, r2, d, d_inv)
 
   end subroutine

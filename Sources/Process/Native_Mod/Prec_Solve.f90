@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Solve(Native, ni, A, D, x, b, prec)
+  subroutine Prec_Solve(Native, ni, A, d, d_inv, x, b, prec)
 !------------------------------------------------------------------------------!
 !   Solves the preconditioning system [D]{x}={b}                               !
 !------------------------------------------------------------------------------!
@@ -16,28 +16,31 @@
   class(Native_Type),         intent(in)  :: Native
   integer,                    intent(in)  :: ni
   type(Matrix_Type),  target, intent(in)  :: A
-  type(Matrix_Type),  target, intent(in)  :: D
+  real,                       intent(in)  :: d(:)
+  real,                       intent(in)  :: d_inv(:)
   real,                       intent(out) :: x(:)
   real,                       intent(in)  :: b(:)
   character(SL),              intent(in)  :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   integer                       :: i, j, k
-  real                          :: sum1
-  real,    contiguous,  pointer :: d_val(:)
-  integer, contiguous,  pointer :: d_dia(:)
+  real                          :: sum
+  integer, contiguous,  pointer :: a_col(:), a_row(:), a_dia(:)
+  real,    contiguous,  pointer :: a_val(:)
 !==============================================================================!
 
   ! Take some aliases
-  d_val => D % val
-  d_dia => D % dia
+  a_col => A % col
+  a_row => A % row
+  a_dia => A % dia
+  a_val => A % val
 
   !---------------------------------!
   !   1) diagonal preconditioning   !
   !---------------------------------!
   if(prec .eq. 'jacobi') then
-    !$omp parallel do private(i) shared (x, b, d_val, d_dia)
+    !$omp parallel do private(i) shared (x, b, d_inv)
     do i = 1, ni
-      x(i) = b(i) / d_val(d_dia(i))
+      x(i) = b(i) * d_inv(i)
     end do
     !$omp end parallel do
 
@@ -48,26 +51,26 @@
 
     ! Forward substitutionn
     do i = 1, ni
-      sum1 = b(i)
-      do j = A % row(i),A % dia(i)-1     ! only the lower triangular
-        k = A % col(j)
-        sum1 = sum1 - A % val(j)*x(k)
+      sum = b(i)
+      do j = a_row(i), a_dia(i) - 1              ! only the lower triangular
+        k = a_col(j)
+        sum = sum - a_val(j) * x(k)
       end do
-      x(i) = sum1 * D % val(D % dia(i))  ! BUG ?
+      x(i) = sum * d(i)
     end do
 
     do i = 1, ni
-      x(i) = x(i) / ( D % val(D % dia(i)) + TINY )
+      x(i) = x(i) * d_inv(i)
     end do
 
     ! Backward substitution
     do i = ni, 1, -1
-      sum1 = x(i)
-      do j = A % dia(i)+1, A % row(i+1)-1          ! upper triangular
-        k = A % col(j)
-        if(k <= ni) sum1 = sum1 - A % val(j)*x(k)  ! avoid buffer entries
+      sum = x(i)
+      do j = a_dia(i) + 1, a_row(i+1) - 1        ! upper triangular
+        k = a_col(j)
+        if(k <= ni) sum = sum - a_val(j) * x(k)  ! avoid buffer entries
       end do
-      x(i) = sum1* D % val(D % dia(i))             ! BUG ?
+      x(i) = sum * d(i)
     end do
 
   !---------------------------!

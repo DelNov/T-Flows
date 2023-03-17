@@ -17,23 +17,21 @@
   real                       :: fin_res  ! final residual
   real, optional             :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
-  type(Matrix_Type),   pointer :: D
   type(Grid_Type),     pointer :: Grid
   integer                      :: nt, ni, nb
   real                         :: alfa, beta, rho, rho_old, bnrm2, res
   integer                      :: i, j, k, iter
   real                         :: sum_a, fn
   integer                      :: sum_n
-  real,    contiguous, pointer :: p1(:), q1(:), r1(:)
+  real,    contiguous, pointer :: p1(:), q1(:), r1(:), d(:), d_inv(:)
   real,    contiguous, pointer :: a_val(:)
   integer, contiguous, pointer :: a_col(:), a_row(:), a_dia(:)
 !==============================================================================!
 
-  call Work % Connect_Real_Cell(p1, q1, r1)
+  call Work % Connect_Real_Cell(p1, q1, r1, d, d_inv)
 
   ! Take some aliases
   Grid  => Nat % pnt_grid
-  D     => Nat % D
   a_val => A % val
   a_col => A % col
   a_row => A % row
@@ -75,7 +73,7 @@
   !---------------------!
   !   Preconditioning   !
   !---------------------!
-  call Nat % Prec_Form(ni, A, D, prec)
+  call Nat % Prec_Form(ni, A, d(1:nt), d_inv(1:nt), prec)
 
   !-----------------------------------!
   !    This is quite tricky point.    !
@@ -127,7 +125,7 @@
     !     solve Mz = r     !
     !   (q instead of z)   !
     !----------------------!
-    call Nat % Prec_Solve(ni, A, D, q1(1:nt), r1(1:nt), prec)
+    call Nat % Prec_Solve(ni, A, d(1:nt), d_inv(1:nt), q1(1:nt), r1(1:nt), prec)
 
     !-----------------!
     !   rho = (r,z)   !
@@ -232,6 +230,6 @@
   fin_res = res
   niter   = iter
 
-  call Work % Disconnect_Real_Cell(p1, q1, r1)
+  call Work % Disconnect_Real_Cell(p1, q1, r1, d, d_inv)
 
   end subroutine
