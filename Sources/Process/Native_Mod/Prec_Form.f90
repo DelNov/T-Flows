@@ -12,7 +12,7 @@
   real,                      intent(out) :: d_inv(:)
   character(SL),             intent(in)  :: prec  ! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
-  real                          :: sum1
+  real                          :: sum
   integer                       :: i, j, k
   integer, contiguous,  pointer :: a_col(:), a_row(:), a_dia(:)
   real,    contiguous,  pointer :: a_val(:)
@@ -39,13 +39,13 @@
   !--------------------------------------------!
   else if(prec .eq. 'icc') then
     do i = 1, ni
-      sum1 = a_val(a_dia(i))         ! take diaginal entry   
+      sum = a_val(a_dia(i))          ! take diaginal entry
       do j = a_row(i), a_dia(i) - 1  ! only lower traingular
         k = a_col(j)
-        sum1 = sum1 - d(k) * a_val(j) * a_val(j)
+        sum = sum - d(k) * a_val(j) * a_val(j)
       end do
-      d_inv(i) = sum1
-      d(i)     = 1.0 / sum1
+      d_inv(i) = sum
+      d(i)     = 1.0 / sum
     end do
 
   !---------------------------!
