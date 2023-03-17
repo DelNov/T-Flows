@@ -59,9 +59,11 @@
       x(i) = sum * d(i)
     end do
 
+    !$omp parallel do private(i) shared (x, d_inv)
     do i = 1, ni
       x(i) = x(i) * d_inv(i)
     end do
+    !$omp end parallel do
 
     ! Backward substitution
     do i = ni, 1, -1
