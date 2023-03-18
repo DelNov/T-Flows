@@ -130,7 +130,12 @@
     !-----------------!
     !   rho = (r,z)   !
     !-----------------!
-    rho = dot_product(r1(1:ni), q1(1:ni))
+    rho = 0.0
+    !$omp parallel do private(i) shared(q1, r1) reduction(+ : rho)
+    do i = 1, ni
+      rho = rho + q1(i) * r1(i)
+    end do
+    !$omp end parallel do
     call Comm_Mod_Global_Sum_Real(rho)
 
     if(iter .eq. 1) then
