@@ -3,8 +3,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type)       :: Nat
-  type(Grid_Type),  target :: Grid
+  class(Native_Type),       intent(out) :: Nat
+  type(Grid_Type),  target, intent(in)  :: Grid
 !==============================================================================!
 
   Nat % pnt_grid => Grid

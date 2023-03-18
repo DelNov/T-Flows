@@ -6,9 +6,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type) :: Native
-  integer            :: ni
-  real               :: r(:)  ! this may be only in inner cells
+  class(Native_Type), intent(in) :: Native
+  integer,            intent(in) :: ni
+  real,               intent(in) :: r(:)  ! this may be only in inner cells
 !-----------------------------------[Locals]-----------------------------------!
   real    :: rms
   integer :: i

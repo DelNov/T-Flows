@@ -5,17 +5,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type), target :: Nat
-  type(Matrix_Type),  target :: A
-  real                       :: x(-Nat % pnt_grid % n_bnd_cells :  &
-                                   Nat % pnt_grid % n_cells)
-  real                       :: b( Nat % pnt_grid % n_cells)
-  character(SL)              :: prec     ! preconditioner
-  integer                    :: miter    ! maximum and actual ...
-  integer                    :: niter    ! ... number of iterations
-  real                       :: tol      ! tolerance
-  real                       :: fin_res  ! final residual
-  real, optional             :: norm     ! normalization
+  class(Native_Type), target, intent(in)    :: Nat
+  type(Matrix_Type),  target, intent(in)    :: A
+  real,                       intent(out)   :: x(-Nat % pnt_grid % n_bnd_cells:&
+                                                  Nat % pnt_grid % n_cells)
+  real,                       intent(inout) :: b( Nat % pnt_grid % n_cells)
+  character(SL),              intent(in)    :: prec     ! preconditioner
+  integer,                    intent(in)    :: miter    ! maximum and actual ...
+  integer,                    intent(out)   :: niter    ! ... num. of iterations
+  real,                       intent(in)    :: tol      ! tolerance
+  real,                       intent(out)   :: fin_res  ! final residual
+  real,             optional, intent(in)    :: norm     ! normalization
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   integer                      :: nt, ni, nb
@@ -230,12 +230,14 @@
   !-----------------------------!
   !   De-normalize the system   !
   !-----------------------------!
+  !$omp parallel do private(i, j) shared(a_row, a_val, b, fn)
   do i = 1, nt
     do j = a_row(i), a_row(i+1)-1
       a_val(j) = a_val(j) / fn
     end do
     b(i) = b(i) / fn
   end do
+  !$omp end parallel do
 
   fin_res = res
   niter   = iter
