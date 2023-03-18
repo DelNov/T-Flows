@@ -8,8 +8,9 @@
 #   Default options for compilation
 #-------------------------------------
 FORTRAN ?= gnu
-DEBUG   ?= no
 ASSERT  ?= yes
+DEBUG   ?= no
+PROF    ?= no
 REAL    ?= double
 MPI     ?= no
 OMP     ?= no
@@ -45,12 +46,12 @@ else
 endif
 
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
+$(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
-$(info #        <REAL=double/single> <OMP=yes/no>                              )
+$(info #        <PROF=no/yes> <REAL=double/single> <OMP=yes/no>                )
 $(info #                                                                       )
 $(info # Note: The first item, for each of the options above, is the default.  )
 $(info #                                                                       )
@@ -70,10 +71,16 @@ ifeq ($(REAL), single)
 endif
 
 #-------------------------------------------------------------------------
+#
 #   Compiler and linker options
+#
 #-------------------------------------------------------------------------
 #   Note: Changes only when support to a new Fortran compiler is added.
 #-------------------------------------------------------------------------
+
+#-----------
+#   Intel
+#-----------
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
@@ -82,17 +89,29 @@ ifeq ($(FORTRAN), intel)
   else
     FC = $(FCOMP)
   endif
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -traceback -cpp
+    OPT_F_COMP += -O0 -g -traceback
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3 -cpp
+    OPT_F_COMP += -O2
+  endif
+  ifeq ($(PROF), yes)
+    OPT_F_COMP += -g -O2 -shared-intel -debug inline-debug-info  \
+                  -D TBB_USE_THREADING_TOOLS
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
   ifeq ($(OMP), yes)
     OPT_F_COMP += -qopenmp
+    ifeq ($(PROF), yes)
+      OPT_F_COMP += -qopenmp-link dynamic -parallel-source-info=2
+    endif
   endif
+
+#------------
+#   Nvidia
+#------------
 
 # Fortran == nvidia
 else ifeq ($(FORTRAN), nvidia)
@@ -101,10 +120,11 @@ else ifeq ($(FORTRAN), nvidia)
   else
     FC = $(FCOMP)
   endif
+  OPT_F_COMP = -module $(DIR_MODULE)
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g
+    OPT_F_COMP += -O0 -g
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3
+    OPT_F_COMP += -O3
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
@@ -113,6 +133,10 @@ else ifeq ($(FORTRAN), nvidia)
     OPT_F_COMP += -mp
   endif
 
+#---------
+#   Gnu
+#---------
+
 # Fortran == gnu
 else
   ifeq ($(FCOMP),)
@@ -120,19 +144,14 @@ else
   else
     FC = $(FCOMP)
   endif
+  OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g -cpp                                  \
-                 -ffree-line-length-none -fcheck=all -fwhole-file -fbacktrace  \
-                 -ffpe-trap=invalid,zero,overflow -fimplicit-none              \
-                 -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries      \
-                 -Wc-binding-type -Wcharacter-truncation -Wline-truncation     \
-                 -Wconversion -finit-real=nan    -Wintrinsics-std              \
-                 -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow             \
-                 -Wintrinsic-shadow -Wunused-parameter -Walign-commons         \
-                 -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all        \
-                 -Wtarget-lifetime -Wpedantic -fstack-check
+    OPT_F_COMP += -O0 -g -fcheck=all -Wunused-parameter -Wall
   else
-    OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp -ffree-line-length-none
+    OPT_F_COMP += -O3
+  endif
+  ifeq ($(PROF), yes)
+    OPT_F_COMP += -pg -g
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
