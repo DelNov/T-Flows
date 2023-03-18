@@ -98,9 +98,37 @@
                                       = Profiler % funct_name(i_fun)(1:123)
       line(47+indent:47+indent) = '|'
       percent_time = Profiler % funct_time(i_fun) / total_time * 100.0
+
+      ! Write time in elapsed seconds
       if(in_sec) then
-        write(line(52+indent:57+indent), '(f6.2)') Profiler % funct_time(i_fun)
-        line(59+indent:61+indent) = '[s]'
+        ! I stick to kiss principle here: keep it simple and stupid
+        if(Profiler % funct_time(1) < 10) then
+          write(line(53+indent:56+indent), '(f4.2)') Profiler%funct_time(i_fun)
+          line(58+indent:60+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 100) then
+          write(line(52+indent:56+indent), '(f5.2)') Profiler%funct_time(i_fun)
+          line(58+indent:60+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 1000) then
+          write(line(51+indent:56+indent), '(f6.2)') Profiler%funct_time(i_fun)
+          line(58+indent:60+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 10000) then
+          write(line(51+indent:57+indent), '(f7.2)') Profiler%funct_time(i_fun)
+          line(59+indent:61+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 100000) then
+          write(line(50+indent:57+indent), '(f8.2)') Profiler%funct_time(i_fun)
+          line(59+indent:61+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 1000000) then
+          write(line(50+indent:58+indent), '(f9.2)') Profiler%funct_time(i_fun)
+          line(60+indent:62+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 10000000) then
+          write(line(49+indent:58+indent), '(f10.2)') Profiler%funct_time(i_fun)
+          line(60+indent:62+indent) = '[s]'
+        else if(Profiler % funct_time(1) < 100000000) then
+          write(line(49+indent:59+indent), '(f11.2)') Profiler%funct_time(i_fun)
+          line(61+indent:63+indent) = '[s]'
+        end if
+
+      ! Write time in percentages
       else
         write(line(52+indent:57+indent), '(f6.2)') percent_time
         line(59+indent:59+indent) = '%'
