@@ -28,10 +28,12 @@
   else if(solver .eq. 'cg') then
     call Nat % Cg  (A, x, b, prec, miter, niter, tol, fin_res, norm)
   else
-    print *, '# ERROR: Unknown native solver: ', solver
-    print *, '# This error is critical, stopping!'
-    call Comm_Mod_End
-    stop
+    call Message % Error(64, 'Unknown native solver: '//trim(solver)  //  &
+                             '. This error is critical, exiting! '    //  &
+                             'Check the file: Documents/all_control'  //  &
+                             '_keywords to see which solvers are '    //  &
+                             'available.',                                &
+                             file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine
