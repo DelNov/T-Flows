@@ -44,12 +44,9 @@
 
   inquire(file=trim(name_in), exist=present )
   if(.not.present) then
-    if(this_proc < 2) then
-      print *, "# ERROR!  Backup file ", trim(name_in), " was not found."
-      print *, "# Exiting!"
-    end if
-    call Comm_Mod_End
-    stop
+    call Message % Error(80,                                                &
+               'Backup file '//trim(name_in)//' was not found.  Exiting!',  &
+               file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   ! Open backup file
