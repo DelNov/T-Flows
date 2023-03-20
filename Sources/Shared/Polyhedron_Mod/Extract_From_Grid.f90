@@ -13,7 +13,7 @@
   integer, pointer, contiguous :: glo(:)
   integer, pointer, contiguous :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
+  integer                      :: i_nod, i_fac, l_nod
   integer                      :: s, n, faces_n_nodes
   real                         :: dx, dy, dz, sx, sy, sz
 !==============================================================================!

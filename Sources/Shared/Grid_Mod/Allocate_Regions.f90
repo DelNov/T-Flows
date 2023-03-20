@@ -20,8 +20,6 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid
   integer, intent(in) :: nbr   ! number of boundary regions
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: n
 !==============================================================================!
 
   ! Store the number of boundary regions for the grid

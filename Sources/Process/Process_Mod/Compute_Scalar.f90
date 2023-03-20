@@ -27,6 +27,8 @@
   real                       :: phi_stress, q_exp
   real                       :: phix_f, phiy_f, phiz_f
   real, contiguous,  pointer :: q_turb(:), cross(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:

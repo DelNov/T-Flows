@@ -11,6 +11,8 @@
   integer, optional :: processor
 !-----------------------------------[Locals]-----------------------------------!
   logical :: file_exists
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   ! First check if the file exists

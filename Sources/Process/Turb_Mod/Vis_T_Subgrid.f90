@@ -11,8 +11,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: A_POW = 8.3
-  integer, parameter :: B_POW = 1.0/7.0
+  real, parameter :: A_POW = 8.3
+  real, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid

@@ -5,10 +5,14 @@
 !------------------------------------------------------------------------------!
   class(Vect_Type) :: Vect
   integer, intent(in) :: n
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Vect)
 !==============================================================================!
 
 # ifdef _OPENMP
     call omp_set_num_threads(n)
+# else
+    Unused(n)
 # endif
 
   end subroutine

@@ -13,11 +13,7 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, nc, nb
-  real                      :: wd_m, u2, v2, w2
-  real, contiguous, pointer :: wd_x(:), wd_y(:), wd_z(:)
 !==============================================================================!
-
-  call Work % Connect_Real_Cell(wd_x, wd_y, wd_z)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -77,7 +73,5 @@
 
     end do
   end if
-
-  call Work % Disconnect_Real_Cell(wd_x, wd_y, wd_z)
 
   end subroutine

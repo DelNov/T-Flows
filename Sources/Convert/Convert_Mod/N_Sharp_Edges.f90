@@ -14,6 +14,8 @@
   real    :: norm_1(3), norm_2(3)
   real    :: xs, ys, zs, xe, ye, ze
   real    :: vec_ef(3)  ! from edge to face mid-point
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   ! Nullify on entry

@@ -20,7 +20,7 @@
   type(Var_Type),  pointer     :: phi
   integer(SP)                  :: data_size
   integer                      :: data_offset, cell_offset, i_fac, reg
-  integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
+  integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, run
   integer                      :: s1, s2, c1, c2, c_f, c_l
   real                         :: dist1, dist2
   character(SL)                :: name_out_8, name_out_9, name_mean

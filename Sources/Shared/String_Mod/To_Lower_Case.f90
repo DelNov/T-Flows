@@ -9,6 +9,8 @@
   character(len=*),   intent(inout) :: char_array
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(String)
 !==============================================================================!
 
   do i = 1, len_trim(char_array)

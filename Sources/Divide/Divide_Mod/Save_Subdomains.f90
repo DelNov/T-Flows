@@ -30,6 +30,9 @@
   integer :: nf_sub      ! number of faces in the subdomain
   integer :: ns_sub      ! number of shadow faces in subdomain
   integer :: nbc_sub     ! number of boundary cells in subdomain
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Divide)
+  Unused(n_buff_layers)
 !==============================================================================!
 
   !-------------------------------!

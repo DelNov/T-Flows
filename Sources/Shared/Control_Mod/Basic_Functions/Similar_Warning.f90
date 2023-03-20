@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Similar_Warning(keyword, item, verbose, key_type)
+  subroutine Control_Mod_Similar_Warning(keyword, item, key_type)
 !------------------------------------------------------------------------------!
 !   Checks if item in the argument list is similar to a keyword.               !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   character(len=*)           :: keyword
   character(len=*)           :: item
-  logical,          optional :: verbose
   character(len=*), optional :: key_type
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n

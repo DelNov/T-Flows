@@ -21,6 +21,8 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Correct_Velocity')

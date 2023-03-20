@@ -34,8 +34,8 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 PASS_ON = -DT_FLOWS_COMPILATION=1
 
 #----------------------------------------------------------
-#   It soon adds T_FLOWS_PROGRAM and T_FLOWS_ASSERT and
-#   later on it adds also T_FLOWS_MPI and T_FLOWS_PETSC
+#   Add T_FLOWS_PROGRAM, T_FLOWS_ASSERT and T_FLOWS_DEBUG
+#   and later on it add also T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
 PASS_ON += -DT_FLOWS_PROGRAM=3
 
@@ -43,6 +43,12 @@ ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1
 else
   PASS_ON += -DT_FLOWS_ASSERT=0
+endif
+
+ifeq ($(DEBUG), yes)
+  PASS_ON += -DT_FLOWS_DEBUG=1
+else
+  PASS_ON += -DT_FLOWS_DEBUG=0
 endif
 
 $(info #=======================================================================)
@@ -147,7 +153,8 @@ else
   endif
   OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP += -O0 -g -fcheck=all -Wunused-parameter -Wall
+    OPT_F_COMP += -O0 -g -fcheck=all -Wunused-parameter -Wall  \
+                  -Wno-integer-division
   else
     OPT_F_COMP += -O3
   endif
@@ -249,12 +256,7 @@ MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 #   Note: This doesn't need editing.
 #---------------------------------------------------------
 
-# Fortran modules
-$(DIR_OBJECT)/%.o: %.f90 %/*.f90
-	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
-
-# Fortran functions
+# Fortran sources
 $(DIR_OBJECT)/%.o: %.f90
 	@echo $(FC) $<
 	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<

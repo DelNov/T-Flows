@@ -21,6 +21,19 @@
   real,    intent(in)  :: tol      ! tolerance
   real,    intent(out) :: fin_res  ! final residual
   real,    optional    :: norm     ! normalization
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Pet)
+  Unused(solver)
+  Unused(prec)
+  Unused(prec_opts)
+  Unused(A)
+  Unused(x)
+  Unused(b)
+  Unused(miter)
+  Unused(niter)
+  Unused(tol)
+  Unused(fin_res)
+  Unused(norm)
 !==============================================================================!
 
   ! Just to avoid compiler's warning

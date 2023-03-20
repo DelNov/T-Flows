@@ -1,4 +1,6 @@
+#include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Read_Controls_Mod

@@ -19,7 +19,7 @@
   Sol % solvers = Solver_Mod_Linear_Solvers_Code(name)
 
   ! Read options for native solvers first ...
-  call Rc % Native_Solvers(Flow, Turb, Vof, Sol)
+  call Rc % Native_Solvers(Flow, Turb, Vof)
 
   ! ... and follow with options for PETSc
   call Rc % Petsc_Solvers(Flow, Turb, Vof, Sol)

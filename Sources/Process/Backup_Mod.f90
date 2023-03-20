@@ -18,10 +18,10 @@
   type(Backup_Type) :: backup
 
 # if T_FLOWS_MPI == 1
-    type(Mpi_File) :: fh
-#else
-    integer :: fh
-#endif
+  type(Mpi_File) :: fh
+# else
+  integer :: fh
+# endif
 
   contains
 

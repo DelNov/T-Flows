@@ -10,9 +10,8 @@
   integer, intent(in), optional :: line
   logical,             optional :: one_proc  ! print from one processor only
 !-----------------------------------[Locals]-----------------------------------!
-  type(Tokenizer_Type) :: Tok
-  integer              :: w
-  character(DL)        :: header_text
+  integer       :: w
+  character(DL) :: header_text
 !==============================================================================!
 
   !-------------------------------!

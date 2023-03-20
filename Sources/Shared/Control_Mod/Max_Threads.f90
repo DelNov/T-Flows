@@ -11,6 +11,7 @@
   call Control_Mod_Read_Int_Item('MAX_THREADS', 2, val, verbose)
 # else
   val = 1
+  Unused(verbose)
 # endif
 
   end subroutine

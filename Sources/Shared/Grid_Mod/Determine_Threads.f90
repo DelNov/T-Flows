@@ -6,11 +6,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type), target, intent(inout) :: Grid
-!------------------------------[Local parameters]------------------------------!
-  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Vect_Type), pointer :: Vect
-  integer                  :: c, s, c1, c2, m, i_fac
+  integer                  :: c, s, m, i_fac
   integer                  :: n_cells_in, in_thread, n_remains, thr
   integer, allocatable     :: cells_in_thread(:)
   character(SL)            :: st1, st2

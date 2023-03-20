@@ -21,6 +21,8 @@
   type(Face_Type), pointer :: v_flux
   integer                  :: c1, c2, s, sc, reg
   real                     :: nx, ny, nz, bulk_vel, phi_n, dt
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   ! Take aliases

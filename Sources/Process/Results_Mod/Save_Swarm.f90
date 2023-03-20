@@ -23,6 +23,8 @@
   character(len= 6)  :: IN_3 = '      '
   character(len= 8)  :: IN_4 = '        '
   character(len=10)  :: IN_5 = '          '
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Results)
 !==============================================================================!
 
   if(Swarm % n_particles < 1) return

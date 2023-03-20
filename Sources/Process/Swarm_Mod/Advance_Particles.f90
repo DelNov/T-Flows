@@ -45,7 +45,7 @@
     call Swarm_Mod_Particle_Time_Scale(Swarm)
 
     ! Store gradients for modeled Flow quantities for Swarm
-    call Swarm_Mod_Grad_Modeled_Flow(Swarm, k)
+    call Swarm_Mod_Grad_Modeled_Flow(Swarm)
 
   end if
 
@@ -120,7 +120,7 @@
           call Swarm % Check_Periodicity(k, n_parts_in_buffers)
 
           ! Gathering Swarm statistics
-          call Swarm_Mod_Calculate_Mean(Swarm, k, n, n_stat_p, ss)
+          call Swarm_Mod_Calculate_Mean(Swarm, k, n, n_stat_p)
 
         end if  ! in this processor
       end if    ! deposited or escaped

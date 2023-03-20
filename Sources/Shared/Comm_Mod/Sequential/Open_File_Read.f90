@@ -8,6 +8,8 @@
   class(Comm_Type) :: Comm
   integer          :: fh             ! file handle
   character        :: file_name*(*)  ! file name
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   fh = 9

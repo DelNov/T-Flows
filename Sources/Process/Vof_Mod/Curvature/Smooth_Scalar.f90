@@ -15,6 +15,8 @@
   integer                   :: s, c, c1, c2, c_iter
   real                      :: fs, vol_face
   real, contiguous, pointer :: sum_vol_area(:), sum_area(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Vof)
 !==============================================================================!
 
   call Work % Connect_Real_Cell(sum_vol_area, sum_area)

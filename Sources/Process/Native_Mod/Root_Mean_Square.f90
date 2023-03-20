@@ -1,17 +1,19 @@
 !==============================================================================!
-  real function Root_Mean_Square(Native, ni, r)
+  real function Root_Mean_Square(Nat, ni, r)
 !------------------------------------------------------------------------------!
 !   Calculates root means square of vector r without normalization.            !
 !   This non-normalized variant seems to be better option for ACM.             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type), intent(in) :: Native
+  class(Native_Type), intent(in) :: Nat
   integer,            intent(in) :: ni
   real,               intent(in) :: r(:)  ! this may be only in inner cells
 !-----------------------------------[Locals]-----------------------------------!
   real    :: rms
   integer :: i
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   ! Compute rms normalizing it with main diagonal in the system matrix

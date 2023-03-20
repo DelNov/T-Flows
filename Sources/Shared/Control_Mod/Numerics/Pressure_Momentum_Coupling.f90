@@ -10,7 +10,7 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('PRESSURE_MOMENTUM_COUPLING',  &
-                                   'simple', name, verbose = .true.)
+                                   'simple', name, verbose=verbose)
   call String % To_Upper_Case(name)
 
   end subroutine

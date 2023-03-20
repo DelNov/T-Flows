@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Native_Solvers(Rc, Flow, Turb, Vof, Sol)
+  subroutine Native_Solvers(Rc, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
 !   Reads details about native solvers from control file.                      !
 !                                                                              !
@@ -14,11 +14,12 @@
   type(Field_Type),   target :: Flow
   type(Turb_Type),    target :: Turb
   type(Vof_Type),     target :: Vof
-  type(Solver_Type),  target :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi
   integer                  :: i, sc
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Rc)
 !==============================================================================!
 
   ! Take alias

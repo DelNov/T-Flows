@@ -6,6 +6,8 @@
   class(Petsc_Type)        :: Pet
   type(Native_Type)        :: Nat
   type(Grid_Type),  target :: Grid
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   Pet % pnt_grid => Grid

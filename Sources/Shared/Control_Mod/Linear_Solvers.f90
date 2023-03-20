@@ -10,7 +10,7 @@
 !==============================================================================!
 
   call Control_Mod_Read_Char_Item('LINEAR_SOLVERS',  &
-                                  'native', name, verbose = .true.)
+                                  'native', name, verbose=verbose)
   call String % To_Upper_Case(name)
 
   end subroutine

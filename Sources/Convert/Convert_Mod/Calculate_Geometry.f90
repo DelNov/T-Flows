@@ -10,24 +10,6 @@
 !   One of the most distinct differences is the treatment of periodicity.      !
 !   Here, periodic faces are created from existing (internal) ones, whereas    !
 !   in Generate_Mod, they are added to existing cells.                         !
-!------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: ask
-!-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, n1, n2, s, b, i, j
-  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
-  integer              :: reg_per, n_per, number_faces
-  real                 :: xs2, ys2, zs2
-  real                 :: t, tot_surf, dis, min_dis, max_dis
-  real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
-  real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
-  integer, allocatable :: b_face(:)
-  character(SL)        :: answer
-  real                 :: factor, prod
-!==============================================================================!
 !                                                                              !
 !                                n3                                            !
 !                 +---------------!---------------+                            !
@@ -105,6 +87,25 @@
 !     t = -----------------------------------------------------------          !
 !                           rx*sx + ry*sy + rz*sz                              !
 !                                                                              !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Convert_Type) :: Convert
+  type(Grid_Type)     :: Grid
+  integer, intent(in) :: ask
+!-----------------------------------[Locals]-----------------------------------!
+  integer              :: c, c1, c2, n, n1, n2, s, b, i, j
+  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
+  integer              :: reg_per, n_per, number_faces
+  real                 :: xs2, ys2, zs2
+  real                 :: t, tot_surf, dis, min_dis, max_dis
+  real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
+  real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
+  integer, allocatable :: b_face(:)
+  character(SL)        :: answer
+  real                 :: factor, prod
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   call Profiler % Start('Calculate_Geometry')

@@ -18,6 +18,8 @@
   logical, allocatable :: is_node_bnd(:)
   integer, allocatable :: cell_near_bnd(:)
   integer, allocatable :: cr1(:), cr2(:), cr3(:), w1(:), w2(:)  ! for sorting
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   call Profiler % Start('Find_Parents')

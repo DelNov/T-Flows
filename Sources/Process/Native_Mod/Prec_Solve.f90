@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Prec_Solve(Native, ni, A, d, d_inv, x, b, prec)
+  subroutine Prec_Solve(Nat, ni, A, d, d_inv, x, b, prec)
 !------------------------------------------------------------------------------!
 !   Solves the preconditioning system [D]{x}={b}                               !
 !------------------------------------------------------------------------------!
@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),         intent(in)  :: Native
+  class(Native_Type),         intent(in)  :: Nat
   integer,                    intent(in)  :: ni
   type(Matrix_Type),  target, intent(in)  :: A
   real,                       intent(in)  :: d(:)
@@ -26,6 +26,8 @@
   real                          :: sum
   integer, contiguous,  pointer :: a_col(:), a_row(:), a_dia(:)
   real,    contiguous,  pointer :: a_val(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   ! Take some aliases

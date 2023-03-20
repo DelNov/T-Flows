@@ -9,6 +9,8 @@
   integer          :: fh    ! file handle
   integer          :: num   ! number to read
   integer(DP)      :: disp  ! displacement in bytes
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   ! Position yourself at the right place inside the file

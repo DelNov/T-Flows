@@ -25,7 +25,6 @@
   character(SL), allocatable :: phys_names(:)
   logical                    :: ascii                 ! is file in ascii format?
   integer                    :: pos
-  integer                    :: pos_meshformat     =  12
   integer                    :: pos_physicalnames  = -1
   integer                    :: pos_entities       = -1
   integer                    :: pos_nodes          = -1
@@ -137,6 +136,7 @@
 # ifdef __INTEL_COMPILER
   error = fseek(fu, pos_physicalnames, 0)
 # else
+  error = 0
   call fseek(fu, pos_physicalnames, 0)
 # endif
   call File % Read_Line(fu)
@@ -172,7 +172,7 @@
     read(Line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    Grid % n_nodes = int8_array(4)
+    Grid % n_nodes = int(int8_array(4))
   end if
   print *,'# Number of nodes: ', Grid % n_nodes
 
@@ -192,7 +192,7 @@
     read(Line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_elem = int8_array(4)
+    n_elem = int(int8_array(4))
   end if
   allocate(new(n_elem))
   new(:) = 0
@@ -219,10 +219,10 @@
       read(Line % tokens(4), *) n_e_3d  ! number of 3D entities (volumes)
     else
       call File % Read_Binary_Int8_Array(fu, 4)
-      n_e_0d = int8_array(1)  ! number of 0D entities (points)
-      n_e_1d = int8_array(2)  ! number of 1D entities (lines)
-      n_e_2d = int8_array(3)  ! number of 2D entities (faces)
-      n_e_3d = int8_array(4)  ! number of 3D entities (volumes)
+      n_e_0d = int(int8_array(1))  ! number of 0D entities (points)
+      n_e_1d = int(int8_array(2))  ! number of 1D entities (lines)
+      n_e_2d = int(int8_array(3))  ! number of 2D entities (faces)
+      n_e_3d = int(int8_array(4))  ! number of 3D entities (volumes)
     end if
 
     !--------------------------!
@@ -286,14 +286,14 @@
         call File % Read_Binary_Real8_Array(fu, 6)
         ! Number of physical tags
         call File % Read_Binary_Int8_Array (fu, 1)
-        n_tags = int8_array(1)
+        n_tags = int(int8_array(1))
         do j = 1, n_tags  ! read the physical tags you have
           call File % Read_Binary_Int4_Array (fu, 1)
           p_tag = int4_array(1)
         end do
         ! Number of bounding curves
         call File % Read_Binary_Int8_Array (fu, 1)
-        n_crvs = int8_array(1)
+        n_crvs = int(int8_array(1))
         ! Read the bounding curves
         call File % Read_Binary_Int4_Array (fu, n_crvs)
       end if
@@ -337,7 +337,7 @@
     read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_grps = int8_array(1)
+    n_grps = int(int8_array(1))
   end if
 
   !-------------------------------------------------------------!
@@ -354,11 +354,11 @@
       read(Line % tokens(4), *) n_memb  ! number of members in the group
     else
       call File % Read_Binary_Int4_Array(fu, 3)
-      dim   = int4_array(1)  ! dimension of the element
-      s_tag = int4_array(2)  ! element tag
-      type  = int4_array(3)  ! element type
+      dim   = int4_array(1)        ! dimension of the element
+      s_tag = int4_array(2)        ! element tag
+      type  = int4_array(3)        ! element type
       call File % Read_Binary_Int8_Array(fu, 1)
-      n_memb = int8_array(1)  ! number of members in the group
+      n_memb = int(int8_array(1))  ! number of members in the group
     end if
 
     ! Read cell number and cell's nodes <--= this is just to carry on
@@ -368,7 +368,7 @@
       else
         ! Element tag
         call File % Read_Binary_Int8_Array(fu, 1)
-        c = int8_array(1)
+        c = int(int8_array(1))
         ! Node tags
         if(type .eq. MSH_TRI)   call File % Read_Binary_Int8_Array(fu, 3)
         if(type .eq. MSH_QUAD)  call File % Read_Binary_Int8_Array(fu, 4)
@@ -433,7 +433,7 @@
     read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_grps = int8_array(1)
+    n_grps = int(int8_array(1))
   end if
 
   !----------------------------------------------------------------!
@@ -454,7 +454,7 @@
       s_tag = int4_array(2)  ! element tag
       type  = int4_array(3)  ! element type
       call File % Read_Binary_Int8_Array(fu, 1)
-      n_memb = int8_array(1)  ! number of members in the group
+      n_memb = int(int8_array(1))  ! number of members in the group
     end if
 
     ! Treat different cell types now
@@ -482,13 +482,13 @@
 
         ! Element tag
         call File % Read_Binary_Int8_Array(fu, n_nods+1)
-        c = int8_array(1)  ! fetch Gmsh cell number
-        c = new(c)         ! use T-Flows numbering
+        c = int(int8_array(1))  ! fetch Gmsh cell number
+        c = new(c)              ! use T-Flows numbering
 
         Grid % cells_n_nodes(c) = n_nods
         call Adjust_First_Dim(n_nods, Grid % cells_n)
         do k = 1, n_nods
-          Grid % cells_n(k, c) = int8_array(k+1)
+          Grid % cells_n(k, c) = int(int8_array(k+1))
         end do
 
       end if
@@ -524,7 +524,7 @@
     read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_grps = int8_array(1)
+    n_grps = int(int8_array(1))
   end if
 
   !-------------------------------------------------------!
@@ -537,7 +537,7 @@
     else
       call File % Read_Binary_Int4_Array(fu, 3)
       call File % Read_Binary_Int8_Array(fu, 1)
-      n_memb = int8_array(1)
+      n_memb = int(int8_array(1))
     end if
     allocate(n(n_memb))
 
@@ -549,7 +549,7 @@
     else
       do j = 1, n_memb                 ! fetch all node numbers
         call File % Read_Binary_Int8_Array(fu, 1)
-        n(j) = int8_array(1)
+        n(j) = int(int8_array(1))
       end do
     end if
 

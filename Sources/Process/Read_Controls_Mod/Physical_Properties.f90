@@ -13,6 +13,8 @@
   type(Grid_Type), pointer :: Grid
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Rc)
 !==============================================================================!
 
   ! Take alias

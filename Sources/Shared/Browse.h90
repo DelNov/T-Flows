@@ -1,5 +1,5 @@
 !==============================================================================!
-!   Definition of potentially usefull macros in T-Flows.                       !
+!   Definition of browsing macros in T-Flows.                                  !
 !------------------------------------------------------------------------------!
 
 # define Boundary_Regions()                        \

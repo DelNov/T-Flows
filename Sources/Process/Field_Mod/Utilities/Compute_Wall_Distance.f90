@@ -15,7 +15,6 @@
   integer                    :: s, c, c1, c2, n
   real                       :: f_ex, f_im
   real                       :: phi_x_f, phi_y_f, phi_z_f
-  real                       :: vol_in_real, vol_in_fake, dist_min
   real, contiguous,  pointer :: cross(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NDT = 24       ! number of false time steps

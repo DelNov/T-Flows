@@ -22,6 +22,8 @@
   real                       :: a12, a21, con_eff, dt
   real                       :: f_ex, f_im, tx_f, ty_f, tz_f, t_stress, q_exp
   real, contiguous,  pointer :: cap_dens(:), q_int(:), q_turb(:), cross(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:

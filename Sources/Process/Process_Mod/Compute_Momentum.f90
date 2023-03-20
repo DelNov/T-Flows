@@ -32,6 +32,8 @@
   real                       :: grav_i, p_drop_i
   real                       :: ui_si, ui_di
   real, contiguous,  pointer :: cross(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !------------------------------------------------------------------------------!
 !                                                                              !
 !  Stress tensor on the face s:                                                !

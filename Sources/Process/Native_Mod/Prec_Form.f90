@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Prec_Form(Native, ni, A, d, d_inv, prec)
+  subroutine Prec_Form(Nat, ni, A, d, d_inv, prec)
 !------------------------------------------------------------------------------!
 !   Forms preconditioning matrix "D" from provided matrix "A".                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),        intent(in)  :: Native
+  class(Native_Type),        intent(in)  :: Nat
   integer,                   intent(in)  :: ni
   type(Matrix_Type), target, intent(in)  :: A
   real,                      intent(out) :: d(:)
@@ -16,6 +16,8 @@
   integer                       :: i, j, k
   integer, contiguous,  pointer :: a_col(:), a_row(:), a_dia(:)
   real,    contiguous,  pointer :: a_val(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   ! Take some aliases

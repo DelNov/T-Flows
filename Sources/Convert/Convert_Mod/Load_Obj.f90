@@ -9,11 +9,13 @@
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
 !-----------------------------------[Locals]-----------------------------------!
-  character(SL)     :: tok
-  integer           :: fu, s, n, i, i_nod
-  logical           :: the_end
-  real              :: t_min_x, t_max_x, t_min_y, t_max_y, t_min_z, t_max_z
-  real              :: x_o, y_o
+  character(SL) :: tok
+  integer       :: fu, s, n, i, i_nod
+  logical       :: the_end
+  real          :: t_min_x, t_max_x, t_min_y, t_max_y, t_min_z, t_max_z
+  real          :: x_o, y_o
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   call Profiler % Start('Load_Obj')

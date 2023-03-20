@@ -9,6 +9,11 @@
   integer          :: length
   real             :: phi(length)
   integer          :: dest         ! destination processor
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
+  Unused(length)
+  Unused(phi)
+  Unused(dest)
 !==============================================================================!
 
   end subroutine

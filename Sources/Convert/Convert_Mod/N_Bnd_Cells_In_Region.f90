@@ -11,6 +11,8 @@
   integer             :: cell_data(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, cnt
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   ! Nullify on entry

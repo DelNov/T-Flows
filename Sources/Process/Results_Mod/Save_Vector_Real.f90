@@ -21,6 +21,8 @@
   integer(SP)   :: data_size
   integer       :: c1, c2, c_f, c_l
   character(SL) :: str1
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Results)
 !==============================================================================!
 
   ! Set precision for plotting (intp and floatp variables)

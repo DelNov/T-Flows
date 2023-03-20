@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Message_Mod

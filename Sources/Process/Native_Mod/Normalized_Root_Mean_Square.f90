@@ -1,12 +1,12 @@
 !==============================================================================!
-  real function Normalized_Root_Mean_Square(Native, ni, r, A, x, norm)
+  real function Normalized_Root_Mean_Square(Nat, ni, r, A, x, norm)
 !------------------------------------------------------------------------------!
 !   Calculates root means square of vector r, normalizing it with entries      !
 !   in the system matrix (a), values of unknown (x) and optional norm.         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),        intent(in) :: Native
+  class(Native_Type),        intent(in) :: Nat
   integer,                   intent(in) :: ni
   real,                      intent(in) :: r(:)  ! this may be in inner cells
   type(Matrix_Type), target, intent(in) :: A
@@ -17,6 +17,8 @@
   integer                       :: i
   real,    contiguous,  pointer :: a_val(:)
   integer, contiguous,  pointer :: a_dia(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   ! Take some aliases

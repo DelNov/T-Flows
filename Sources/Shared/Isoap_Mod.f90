@@ -17,6 +17,9 @@
   implicit none
 !==============================================================================!
 
+  ! Parameters used inside the module
+  integer, parameter :: NS=200, NV=240
+
   !----------------!
   !   Isoap type   !
   !----------------!

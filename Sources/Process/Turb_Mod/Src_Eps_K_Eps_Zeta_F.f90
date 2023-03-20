@@ -19,9 +19,9 @@
   real                       :: u_tan, u_tau
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
-  real                       :: fa, u_tau_new, kin_vis, p_kin_int, p_kin_wf
+  real                       :: fa, kin_vis, p_kin_int, p_kin_wf
   real                       :: z_o, dia_coef_tmp
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
 !                                                                              !
@@ -44,7 +44,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow

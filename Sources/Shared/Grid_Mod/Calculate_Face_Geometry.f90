@@ -17,10 +17,10 @@
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, i_fac, c1, c2, s, sh, m, n, pnt_to, pnt_from, fail_count
+  integer :: c1, c2, s, sh, n, pnt_to, pnt_from, fail_count
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
-  real    :: d_s, min_d, max_d, dx, dy, dz, sx, sy, sz
-  real    :: vec1(3), vec2(3), prod(3), dist(3), surf(3)
+  real    :: d_s, min_d, max_d, sx, sy, sz
+  real    :: dist(3), surf(3)
 !==============================================================================!
 
   if(this_proc < 2) print '(a)', ' # Checking the integrity of cell faces ...'

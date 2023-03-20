@@ -11,9 +11,6 @@
   logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
   integer, pointer, contiguous :: glo(:)
-  integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
-  integer                      :: s, n, faces_n_nodes
 !==============================================================================!
 
   ! Take alias for global cell numbers

@@ -18,6 +18,8 @@
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name
   integer                  :: n_times, n_stat, n_stat_p
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Rc)
 !==============================================================================!
 
   ! Take aliases

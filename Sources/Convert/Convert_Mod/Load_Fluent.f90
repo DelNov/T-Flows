@@ -434,6 +434,7 @@
 #           ifdef __INTEL_COMPILER
             error = fseek(fu, offset, 0)
 #           else
+            error = 0
             call fseek(fu, offset, 0)
 #           endif
 

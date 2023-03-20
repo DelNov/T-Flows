@@ -6,6 +6,8 @@
   use Solver_Mod, only: PETSC_ACTIVE, this_proc
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type) :: Process
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   if(this_proc < 2) then

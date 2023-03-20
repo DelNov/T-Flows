@@ -9,6 +9,8 @@
   class(Math_Type),   intent(in) :: Math
   real, dimension(3)             :: Cross_Product
   real, dimension(3), intent(in) :: a, b
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Math)
 !==============================================================================!
 
   Cross_Product(1) = a(2) * b(3) - a(3) * b(2)

@@ -30,7 +30,9 @@
   real, contiguous,  pointer :: phi_x(:), phi_y(:), phi_z(:), cross(:)
   real, contiguous,  pointer :: u1uj_phij(:),   u2uj_phij(:),   u3uj_phij(:)
   real, contiguous,  pointer :: u1uj_phij_x(:), u2uj_phij_y(:), u3uj_phij_z(:)
-!==============================================================================!
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(curr_dt)
+!------------------------------------------------------------------------------!
 !                                                                              !
 !   The form of equations which are being solved:                              !
 !                                                                              !
@@ -40,7 +42,7 @@
 !    |      dt       |                |  sigma              |                  !
 !   /               /                /                     /                   !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   call Profiler % Start('Compute_Stress (without solvers)')
 

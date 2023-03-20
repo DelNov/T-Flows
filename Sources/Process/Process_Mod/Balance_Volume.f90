@@ -28,6 +28,8 @@
   type(Face_Type), pointer :: v_flux
   integer                  :: s, c2, reg
   real                     :: fac, vol_outflow, area_outflow
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Balance_Volume')

@@ -9,6 +9,8 @@
   integer          :: fh    ! file handle
   real             :: num   ! number to write out
   integer(DP)      :: disp  ! displacement in bytes
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   write(fh) num

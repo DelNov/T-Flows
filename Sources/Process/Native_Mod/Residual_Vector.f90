@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Residual_Vector(Native, ni, r, b, A, x)
+  subroutine Residual_Vector(Nat, ni, r, b, A, x)
 !------------------------------------------------------------------------------!
 !   Calculates residual vector {r} = {b} - [A]{x}                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),         intent(in)  :: Native
+  class(Native_Type),         intent(in)  :: Nat
   integer,                    intent(in)  :: ni
   real,                       intent(out) :: r(:)  ! only for inner cells
   real,                       intent(in)  :: b(:)  ! only for inner cells
@@ -15,6 +15,8 @@
   integer                      :: i, j, k
   real,    contiguous, pointer :: a_val(:)
   integer, contiguous, pointer :: a_col(:), a_row(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   ! Take some aliases

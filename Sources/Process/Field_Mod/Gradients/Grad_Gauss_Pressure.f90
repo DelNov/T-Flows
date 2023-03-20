@@ -12,7 +12,6 @@
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),     pointer :: Grid
   integer                      :: s, c, c1, c2, iter, reg
-  integer                      :: i_fac, c1_prim, c2_prim, s_prim
   integer, contiguous, pointer :: c_computed(:), c_visited(:), faces_c(:,:)
   real,    contiguous, pointer :: p_x(:), p_y(:), p_z(:)
 !------------------------------[Local parameters]------------------------------!

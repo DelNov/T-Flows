@@ -18,7 +18,6 @@
   type(Vert_Type),         pointer :: Vert(:)
   type(Elem_Type),         pointer :: Elem(:)
   integer,                 pointer :: nv, ne
-  integer                          :: nv_tot, ne_tot
   integer                          :: c, i, nb, nc, n, nn
   integer                          :: v, n_verts_in_buffers
   integer                          :: i_nod, i_ver, i_iso

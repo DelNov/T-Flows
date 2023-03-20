@@ -13,7 +13,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c, c1, c2, n, nc
   integer              :: mcc, mcn, mcf
-  integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
   integer, allocatable :: old_nn   (:)       ! old number of nodes (per cell)
   integer, allocatable :: old_nodes(:,:)     ! old nodes list per cell
   integer, allocatable :: old_nc   (:)       ! old number of cells (per cell)

@@ -24,12 +24,12 @@
   integer                      :: i_iso, i_ver, i_fac, fac, p, reg
   integer                      :: n_cut_facets, cut_facets(1024)
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                         :: cell_vol, cel0_vol, cel1_vol, d, d1, d2
+  real                         :: cell_vol, cel0_vol, cel1_vol, d
   real                         :: p1(3), p2(3), p3(3), qc(3), qn(3)
   real                         :: f(3), n(3)
   integer                      :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
   integer                      :: new_faces_n_nodes, cnt_p, cnt_m
-  integer                      :: new_faces_n(MAX_ISOAP_VERTS), processed_cells
+  integer                      :: new_faces_n(MAX_ISOAP_VERTS)
   logical                      :: flooding
 !==============================================================================!
 

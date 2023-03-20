@@ -11,6 +11,8 @@
   integer(DP)      :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   ! Set it at position disp (same as in Read counterpart)

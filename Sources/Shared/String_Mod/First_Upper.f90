@@ -10,6 +10,8 @@
   character(:),      allocatable :: char_manip
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(String)
 !==============================================================================!
 
   ! Copy the string from the argument to the local which you will manipulate

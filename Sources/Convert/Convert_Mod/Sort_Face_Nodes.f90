@@ -21,6 +21,8 @@
   integer, allocatable :: order(:)
 ! integer              :: k, ni, nj, nk, min_loc
 ! real                 :: vec_ji(3), vec_jk(3), mag_ji, mag_jk, dot_prod
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   ! Take alias

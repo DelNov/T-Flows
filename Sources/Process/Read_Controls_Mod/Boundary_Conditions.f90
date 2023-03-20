@@ -34,6 +34,8 @@
   real                     :: edd_r
   real                     :: edd_i
   logical                  :: found
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Rc)
 !==============================================================================!
 
   ! Take aliases

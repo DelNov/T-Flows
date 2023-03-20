@@ -28,7 +28,7 @@
   real                         :: f_fx, f_fy, f_fz  ! Brownian force components
   real                         :: fd_p              ! particle damping funct.
   real                         :: v2_mod_xc, v2_mod_yc, v2_mod_zc
-  real                         :: u_mod, v_mod, w_mod
+  real                         :: w_mod ! , u_mod, v_mod
 !==============================================================================!
 
   ! Take aliases for Flow

@@ -8,6 +8,8 @@
   class(Math_Type), intent(in) :: Math
   real,             intent(in) :: a
   real,             intent(in) :: limit  ! upper limit, usually a big number
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Math)
 !==============================================================================!
 
   ! Assume it won't change

@@ -9,6 +9,11 @@
   integer          :: len_s         ! send length
   real             :: phi_s(len_s)  ! send buffer
   integer          :: dest          ! destination processor
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
+  Unused(len_s)
+  Unused(phi_s)
+  Unused(dest)
 !==============================================================================!
 
   end subroutine

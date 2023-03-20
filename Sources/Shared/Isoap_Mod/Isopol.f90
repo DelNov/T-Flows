@@ -36,8 +36,6 @@
 !---------------------------------------------------------------------!
   IMPLICIT NONE
 !---------------------------------------------------------------------!
-  INCLUDE "Isoap_Mod/Dim_Polyhedron.h"  ! holds NS and NV
-!---------------------------------------------------------------------!
   CLASS(ISOAP_TYPE)    :: ISOAP
   INTEGER, INTENT(IN)  :: IA(NV)
   INTEGER, INTENT(OUT) :: IPIA0(NV)
@@ -57,6 +55,8 @@
        IPINI,IPISE(NV,2),IPMARK(NV),IPNEW,IS,IS1,ISCUT(NS),          &
        ISE(NS,NV),ISNEW,ITYPE,IV,IV1,IVISE(NS,NV),IVNEW,IVNEWT,      &
        NEDGE(NS),NINT,NIPNEW,NISCUT,NIV,NIVNEW
+!* Avoid unused warning
+    ASSOCIATE(ISOAP => ISOAP); END ASSOCIATE
 !* Determination of the faces intersected by the isosurface      
   NISCUT=0
 !* NEDGE(IS) = Number of intersected edges of the face IS

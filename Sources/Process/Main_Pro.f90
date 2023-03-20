@@ -137,7 +137,7 @@
     call Control_Mod_Switch_To_Domain(d)  ! go back to local domain's control
 
     ! Read numerical models from control file (after the memory is allocated)
-    call Read_Control % Numerical_Schemes(Flow(d), Turb(d), Vof(d), Sol(d))
+    call Read_Control % Numerical_Schemes(Flow(d), Turb(d), Vof(d))
     call Read_Control % Linear_Solvers   (Flow(d), Turb(d), Vof(d), Sol(d))
 
     call Grid(d) % Find_Nodes_Cells()

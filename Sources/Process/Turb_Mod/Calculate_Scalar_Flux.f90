@@ -16,7 +16,6 @@
   integer                   :: c, k, c1, c2, s
   real                      :: uc_log_law, vc_log_law, wc_log_law
   real                      :: nx, ny, nz, ebf
-  real                      :: uc_new, vc_new, wc_new
 !==============================================================================!
 
   ! Take aliases

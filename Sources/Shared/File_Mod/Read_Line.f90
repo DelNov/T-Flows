@@ -3,6 +3,9 @@
 !------------------------------------------------------------------------------!
 !   Reads a Line from a file unit un and discards if it is comment.            !
 !   In addition, it breaks the line in tokens (individual strings).            !
+!                                                                              !
+!   A comment is each line which begins with "!", "#" or "%".                  !
+!   Input line must not exceed MAX_TOKENS*2 characters in length               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -15,10 +18,9 @@
   integer(1)    :: byte
   character(7)  :: format = '(a0000)'
   character(SL) :: fmtd
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
-!   A comment is each line which begins with "!", "#" or "%".                  !
-!   Input line must not exceed MAX_TOKENS*2 characters in length               !
-!------------------------------------------------------------------------------!
 
   ! If present, assumed the end of file has not been reached
   if(present(reached_end)) then

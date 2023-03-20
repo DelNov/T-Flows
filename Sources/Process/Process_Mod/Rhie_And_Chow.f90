@@ -32,6 +32,8 @@
   real, contiguous,  pointer :: u_c(:), v_c(:), w_c(:), v_m(:), t_m(:)
   real, contiguous,  pointer :: pst_x(:), pst_y(:), pst_z(:), pst_d(:)
   real, contiguous,  pointer :: u_f(:), v_f(:), w_f(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Rhie_And_Chow')

@@ -34,6 +34,8 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
   real                     :: kin_vis, u_tau, dt_dn
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Update_Boundary_Values')

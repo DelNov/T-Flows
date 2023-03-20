@@ -15,7 +15,6 @@
   integer                  :: offset, fu
   character(SL)            :: name_out
 !-----------------------------[Local parameters]-------------------------------!
-  integer, parameter :: VTK_TRIANGLE = 5  ! cell shapes in VTK format
   character(len= 0)  :: IN_0 = ''         ! indentation levels
   character(len= 2)  :: IN_1 = '  '
   character(len= 4)  :: IN_2 = '    '

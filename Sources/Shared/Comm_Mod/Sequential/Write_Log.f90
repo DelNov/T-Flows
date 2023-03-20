@@ -9,6 +9,8 @@
   integer          :: fh    ! file handle
   logical          :: var   ! variable to write out
   integer(DP)      :: disp  ! displacement in bytes
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   write(fh) var

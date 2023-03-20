@@ -63,6 +63,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
   real    :: a, b, c, d, b_array(N_SAMPLES), e_array(N_SAMPLES)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(x0)  ! x0 is kept for symmetry with sister procedure
 !==============================================================================!
 
   !-----------------------------!

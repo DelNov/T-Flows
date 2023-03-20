@@ -24,10 +24,10 @@
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, j
   real                       :: u_tan, u_tau
-  real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
+  real                       :: re_t, f_mu, fa, kin_vis
   real                       :: eps_wf, eps_int, y_star, dia_coef_tmp
   real                       :: p_kin_int, p_kin_wf, ebf, z_o
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
@@ -39,7 +39,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow

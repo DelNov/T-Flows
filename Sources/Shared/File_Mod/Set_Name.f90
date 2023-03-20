@@ -22,6 +22,8 @@
   integer       :: last_pos
   integer       :: ldir, lnam, lext, lapp
   character(SL) :: rel_path, sys_comm
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   !-------------------------------------------!

@@ -15,6 +15,8 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   real, contiguous,  pointer :: sum_neigh(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Compute_Momentum_Explicit')

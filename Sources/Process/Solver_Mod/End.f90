@@ -6,6 +6,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Solver_Type) :: Sol
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Sol)
 !==============================================================================!
 
   ! Call linear solver to solve the equations

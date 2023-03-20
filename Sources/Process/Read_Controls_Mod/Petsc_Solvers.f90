@@ -24,6 +24,8 @@
   character(SL)            :: opts(MSI)
   integer                  :: i, n_opts, sc
   real                     :: tol
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Rc)
 !==============================================================================!
 
   ! If it wasn't compiled with PETSc, don't confuse a user with this
