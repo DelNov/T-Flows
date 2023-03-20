@@ -17,8 +17,8 @@
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
-  character(SL)            :: name_out, name_mean, a_name
-  integer                  :: vc, sc, ua
+  character(SL)            :: name_out, name_mean
+  integer                  :: vc, sc
   integer(DP)              :: d
 !==============================================================================!
 

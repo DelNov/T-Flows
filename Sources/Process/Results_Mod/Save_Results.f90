@@ -23,7 +23,7 @@
   integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, ua, run
   integer                      :: s1, s2, c1, c2, c_f, c_l
   real                         :: dist1, dist2
-  character(SL)                :: name_out_8, name_out_9, name_mean, a_name
+  character(SL)                :: name_out_8, name_out_9, name_mean
   character(SL)                :: str1, str2
   integer, pointer, contiguous :: int_save(:), type_save(:), offs_save(:)
   real,    pointer, contiguous :: save_01(:), save_02(:), save_03(:)

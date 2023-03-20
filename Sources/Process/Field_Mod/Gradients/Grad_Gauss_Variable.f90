@@ -15,7 +15,7 @@
   type(Var_Type),    target :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer  :: Grid
-  integer                   :: s, c, c1, c2, iter
+  integer                   :: s, iter
   real                      :: res, norm
   real, contiguous, pointer :: phi_f_n(:), phi_f_o(:)
 !==============================================================================!
