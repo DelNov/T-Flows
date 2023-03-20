@@ -10,7 +10,7 @@
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: c, c1, c2, s, n, ss, sr, fu, real_prec
-  character(SL) :: name_in
+  character(SL) :: name_in, str, str1, str2
 !==============================================================================!
 
   !-------------------------------!
@@ -97,10 +97,11 @@
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(c .ne. 0) then
       if(Grid % cells_n_nodes(c) .eq. 0) then
-        print *, '# ERROR: Number of nodes is zero at cell:', c
-        print *, '# This error is critical.  Exiting!'
-        call Comm_Mod_End
-        stop
+        write(str, '(i0.0)') c
+        call Message % Error(72,                                           &
+                   'Number of nodes is zero at cell: '//trim(str)//'. '//  &
+                   'This is critical.  Exiting!',                          &
+                   file=__FILE__, line=__LINE__)
       end if
     end if
   end do
@@ -118,10 +119,11 @@
   do c = -Grid % n_bnd_cells, Grid % n_cells
     do n = 1, abs(Grid % cells_n_nodes(c))
       if(Grid % cells_n(n, c) .eq. 0) then
-        print *, '# ERROR: Node index is zero at cell:', c
-        print *, '# This error is critical.  Exiting!'
-        call Comm_Mod_End
-        stop
+        write(str, '(i0.0)') c
+        call Message % Error(72,                                      &
+                   'Node index is zero at cell: '//trim(str)//'. '//  &
+                   'This error is critical.  Exiting!',               &
+                   file=__FILE__, line=__LINE__)
       end if
     end do
   end do
@@ -133,10 +135,11 @@
   do c = -Grid % n_bnd_cells, Grid % n_cells
     if(c .ne. 0) then
       if(Grid % cells_n_faces(c) .eq. 0) then
-        print *, '# ERROR: Number of faces is zero at cell:', c
-        print *, '# This error is critical.  Exiting!'
-        call Comm_Mod_End
-        stop
+        write(str, '(i0.0)') c
+        call Message % Error(72,                                           &
+                   'Number of faces is zero at cell: '//trim(str)//'. '//  &
+                   'This is critical.  Exiting!',                          &
+                   file=__FILE__, line=__LINE__)
       end if
     end if
   end do
@@ -153,10 +156,11 @@
   do c = -Grid % n_bnd_cells, Grid % n_cells
     do s = 1, Grid % cells_n_faces(c)
       if(Grid % cells_f(s, c) .eq. 0) then
-        print *, '# ERROR: Face index is zero at cell:', c
-        print *, '# This error is critical.  Exiting!'
-        call Comm_Mod_End
-        stop
+        write(str, '(i0.0)') c
+        call Message % Error(72,                                      &
+                   'Face index is zero at cell: '//trim(str)//'. '//  &
+                   'This error is critical.  Exiting!',               &
+                   file=__FILE__, line=__LINE__)
       end if
     end do
   end do
@@ -177,10 +181,11 @@
   ! Error trap for number of nodes for each face
   do s = 1, Grid % n_faces + Grid % n_shadows
     if(Grid % faces_n_nodes(s) .eq. 0) then
-      print *, '# ERROR: Number of nodes is zero at face:', s
-      print *, '# This error is critical.  Exiting!'
-      call Comm_Mod_End
-      stop
+      write(str, '(i0.0)') s
+      call Message % Error(72,                                           &
+                 'Number of nodes is zero at face: '//trim(str)//'. '//  &
+                 'This is critical.  Exiting!',                          &
+                 file=__FILE__, line=__LINE__)
     end if
   end do
 
@@ -196,10 +201,11 @@
   do s = 1, Grid % n_faces + Grid % n_shadows
     do n = 1, Grid % faces_n_nodes(s)
       if(Grid % faces_n(n, s) .eq. 0) then
-        print *, '# ERROR: Node index is zero at face:', s
-        print *, '# This error is critical.  Exiting!'
-        call Comm_Mod_End
-        stop
+        write(str, '(i0.0)') s
+        call Message % Error(72,                                      &
+                   'Node index is zero at face: '//trim(str)//'. '//  &
+                   'This error is critical.  Exiting!',               &
+                   file=__FILE__, line=__LINE__)
       end if
     end do
   end do
@@ -219,16 +225,22 @@
        Grid % Comm % cell_proc(c2) .eq. this_proc) then
       if( .not. (c1.eq.0 .and. c2.eq.0) ) then
         if(Grid % faces_c(1, s) .eq. 0) then
-          print *, '# ERROR: Cell one is zero at face:', s, c1, c2
-          print *, '# This error is critical.  Exiting!'
-          call Comm_Mod_End
-          stop
+          write(str,  '(i0.0)') s
+          write(str1, '(i0.0)') c1;  write(str2, '(i0.0)') c2;
+          call Message % Error(72,                                            &
+                     'Cell one is zero at face: '//trim(str)//' '//           &
+                     'surrounded by cells '//trim(str1)//' and '//trim(str2)  &
+                     //'. \n This error is critical.  Exiting!',              &
+                     file=__FILE__, line=__LINE__)
         end if
         if(Grid % faces_c(2, s) .eq. 0) then
-          print *, '# ERROR: Cell two is zero at face:', s
-          print *, '# This error is critical.  Exiting!'
-          call Comm_Mod_End
-          stop
+          write(str,  '(i0.0)') s
+          write(str1, '(i0.0)') c1;  write(str2, '(i0.0)') c2;
+          call Message % Error(72,                                            &
+                     'Cell two is zero at face: '//trim(str)//' '//           &
+                     'surrounded by cells '//trim(str1)//' and '//trim(str2)  &
+                     //'. \n This error is critical.  Exiting!',              &
+                     file=__FILE__, line=__LINE__)
         end if
       end if
     end if
@@ -241,16 +253,16 @@
   do ss = Grid % n_faces + 1, Grid % n_faces + Grid % n_shadows
     sr = Grid % faces_s(ss)  ! real face from shadow data
     if(sr .eq. 0) then
-      print *, '# ERROR: Shadow faces points to zero face'
-      print *, '# This error is critical.  Exiting!'
-      call Comm_Mod_End
-      stop
+      call Message % Error(72,                               &
+                 'Shadow face points to zero face. '   //    &
+                 'This error is critical.  Exiting!',        &
+                 file=__FILE__, line=__LINE__)
     end if
     if(Grid % faces_s(sr) .ne. ss) then
-      print *, '# ERROR: Real and shadow faces do not point to each other'
-      print *, '# This error is critical.  Exiting!'
-      call Comm_Mod_End
-      stop
+      call Message % Error(60,                                            &
+                 'Real and shadow face do not point to one another. ' //  &
+                 ' \n This error is critical.  Exiting!',                 &
+                 file=__FILE__, line=__LINE__)
     end if
   end do
 
