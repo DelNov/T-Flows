@@ -123,6 +123,7 @@ ifeq ($(FORTRAN), intel)
       OPT_F_COMP += -qopenmp-link dynamic -parallel-source-info=2
     endif
   endif
+  OPT_F_COMP_USER = $(OPT_F_COMP)
 
 #------------
 #   Nvidia
@@ -147,6 +148,7 @@ else ifeq ($(FORTRAN), nvidia)
   ifeq ($(OMP), yes)
     OPT_F_COMP += -mp
   endif
+  OPT_F_COMP_USER = $(OPT_F_COMP)
 
 #---------
 #   Gnu
@@ -161,8 +163,7 @@ else
   endif
   OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
   ifeq ($(DEBUG), yes)
-   OPT_F_COMP += -O0 -g -fcheck=all -Wunused-parameter -Wall  \
-                 -Wno-integer-division
+   OPT_F_COMP += -O0 -g -fcheck=all -Wall -Wno-integer-division
   else
     OPT_F_COMP += -O3
   endif
@@ -175,6 +176,10 @@ else
   ifeq ($(OMP), yes)
     OPT_F_COMP += -fopenmp
   endif
+  OPT_F_COMP_USER = $(OPT_F_COMP)
+  OPT_F_COMP_USER += -Wno-unused-dummy-argument
+  OPT_F_COMP_USER += -Wno-unused-variable
+
 endif
 
 # Set initial options for C compiler - this is probably not needed
@@ -229,8 +234,6 @@ endif
 #------------------------------------------------------
 #   Modules' order must obey their dependency
 #   This list should therefore be written "by hand".
-#   Note: Modules written in lower case
-#         letters are candidates for deletion.
 #------------------------------------------------------
 
 #--------------------
@@ -349,14 +352,6 @@ OBJ_F_FUN = $(SRC_F_FUN:%.f90=$(DIR_OBJECT)/%.o)
 OBJ_C_FUN = $(SRC_C_FUN:%.c=$(DIR_OBJECT)/%.o)
 OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN) $(OBJ_C_FUN)
 
-#-------------------------------------------------------
-#   List of modules currently used for target "clean"
-#-------------------------------------------------------
-#   Note: This doesn't need editing.
-#-------------------------------------------------------
-SRC_F_MOD_LOW = $(shell echo $(SRC_F_MOD) | tr A-Z a-z)
-MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
-
 #---------------------------------------------------------
 #   Default rule to build Fortran modules and functions
 #---------------------------------------------------------
@@ -372,6 +367,13 @@ $(DIR_OBJECT)/%.o: %.f90
 $(DIR_OBJECT)/%.o: %.c
 	@echo $(CC) $<
 	@$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
+
+#----------------------------------------
+#   Special rule to build User_Mod.f90
+#----------------------------------------
+$(DIR_OBJECT)/User%Mod.o: User%Mod.f90
+	@echo $(FC) $<
+	@$(FC) $(OPT_F_COMP_USER) $(PASS_ON) -c -o $@ $<
 
 #-----------------------------------
 #   Rule to build main program

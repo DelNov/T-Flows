@@ -190,8 +190,6 @@ endif
 #------------------------------------------------------
 #   Modules' order must obey their dependency
 #   This list should therefore be written "by hand".
-#   Note: Modules written in lower case
-#         letters are candidates for deletion.
 #------------------------------------------------------
 
 #-------------
@@ -241,14 +239,6 @@ SRC_F_FUN += Main_Con.f90
 OBJ_F_MOD = $(SRC_F_MOD:%.f90=$(DIR_OBJECT)/%.o)
 OBJ_F_FUN = $(SRC_F_FUN:%.f90=$(DIR_OBJECT)/%.o)
 OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
-
-#-------------------------------------------------------
-#   List of modules currently used for target "clean"
-#-------------------------------------------------------
-#   Note: This doesn't need editing.
-#-------------------------------------------------------
-SRC_F_MOD_LOW = $(shell echo $(SRC_F_MOD) | tr A-Z a-z)
-MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
 
 #---------------------------------------------------------
 #   Default rule to build Fortran modules and functions
