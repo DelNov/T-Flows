@@ -11,7 +11,6 @@ $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-Convert_Mod/untitled.geo \
 $(DIR_OBJECT)/Convert_Mod.o \
 Convert_Mod/foo.msh \
 Convert_Mod/*.f90 
@@ -26,7 +25,6 @@ $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
-Convert_Mod/untitled.geo \
 Convert_Mod/foo.msh \
 Convert_Mod/*.f90 
 
@@ -43,16 +41,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 $(DIR_OBJECT)/Find_Parents.o:\
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Isoap_Mod/Isopol.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Isopol.o:
-
-#---------------------------------------------------
-# Dependencies for: ./Isoap_Mod/Main_Isoap.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Main_Isoap.o:
 
 #---------------------------------------------------
 # Dependencies for: ./Gen_Mod.f90
@@ -245,8 +233,7 @@ $(DIR_SHARED)/Polyhedron_Mod/*.f90 \
 $(DIR_OBJECT)/Iso_Polygons_Mod.o \
 $(DIR_SHARED)/Iso_Polygons_Mod/*.f90 \
 $(DIR_SHARED)/Isoap_Mod/readme \
-$(DIR_SHARED)/Isoap_Mod/*.f90 \
-$(DIR_SHARED)/Isoap_Mod/Dim_Polyhedron.h 
+$(DIR_SHARED)/Isoap_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vtk_Mod.f90
