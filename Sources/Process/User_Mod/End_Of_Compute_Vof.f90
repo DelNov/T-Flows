@@ -19,5 +19,11 @@
   Flow => Vof  % pnt_flow
   Grid => Flow % pnt_grid
   fun  => Vof % fun
+  A    => Sol % Nat % A
+
+  if(curr_dt > 120) then
+    ! Do something
+
+  end if
 
   end subroutine

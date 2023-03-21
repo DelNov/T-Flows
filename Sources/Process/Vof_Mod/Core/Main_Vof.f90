@@ -10,6 +10,8 @@
   type(Turb_Type),     target :: Turb
   type(Solver_Type)           :: Sol
   integer, intent(in)         :: curr_dt     ! time step
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Turb)
 !==============================================================================!
 
   if(Flow % with_interface) then
