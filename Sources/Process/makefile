@@ -282,12 +282,12 @@ SRC_F_MOD = Const_Mod.f90         \
             Tokenizer_Mod.f90     \
             Message_Mod.f90       \
             Vect_Mod.f90          \
-            Profiler_Mod.f90      \
             Math_Mod.f90          \
             Swap_Mod.f90          \
             Sort_Mod.f90          \
             File_Mod.f90          \
             Control_Mod.f90       \
+            Profiler_Mod.f90      \
             Vtk_Mod.f90           \
             Metis_Mod.f90         \
             Grid_Mod.f90          \

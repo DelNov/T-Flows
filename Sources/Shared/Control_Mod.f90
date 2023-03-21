@@ -62,6 +62,9 @@
 #   include "Control_Mod/Input_Output/Results_Save_Interval.f90"
 #   include "Control_Mod/Input_Output/Swarm_Save_Interval.f90"
 
+    ! Profiler
+#   include "Control_Mod/Input_Output/Profiler_Info.f90"
+
     !--------------------!
     !   Linear solvers   !  (native (from T-Flows) or PETSc)
     !--------------------!
