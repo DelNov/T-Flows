@@ -1,22 +1,24 @@
 !==============================================================================!
-  subroutine Statistics(Profiler, indent, in_seconds)
+  subroutine Statistics(Profiler, indent)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Profiler_Type), target  :: Profiler
   integer,           intent(in) :: indent     ! 34 for Main_Pro, 1 for Main_con
-  logical, optional, intent(in) :: in_seconds
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i_fun
   real          :: total_time, t_temp, percent_time
   integer       :: hours, minutes, seconds
   character(DL) :: line, n_temp
+  character(SL) :: pinfo
   logical       :: swap, in_sec
 !==============================================================================!
 
+  ! Only Process has a control file
   in_sec = .false.
-  if(present(in_seconds)) then
-    if(in_seconds) then
+  if(PROGRAM_NAME .eq. 'Process') then
+    call Control_Mod_Profiler_Info(pinfo, verbose=.false.)
+    if(pinfo == 'SECONDS') then
       in_sec = .true.
     end if
   end if
