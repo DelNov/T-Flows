@@ -2,9 +2,23 @@
   module Const_Mod
 !------------------------------------------------------------------------------!
 !   Constants definitions for all other modules.                               !
+!                                                                              !
+!   Program name (T_FLOWS_PROGRAM) is passed from makefile of each program     !
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+# if T_FLOWS_PROGRAM == 1
+  character(8), parameter :: PROGRAM_NAME = "Generate"
+# elif T_FLOWS_PROGRAM == 2
+  character(6), parameter :: PROGRAM_NAME = "Divide"
+# elif T_FLOWS_PROGRAM == 3
+  character(7), parameter :: PROGRAM_NAME = "Convert"
+# elif T_FLOWS_PROGRAM == 4
+  character(7), parameter :: PROGRAM_NAME = "Process"
+# else
+  character(9), parameter :: PROGRAM_NAME = "Undefined"
+# endif
 
   ! Standard string length
   integer, parameter :: VL =   4  ! variable name length
