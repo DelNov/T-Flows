@@ -3,12 +3,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Message_Type)           :: Msg
-  integer, intent(in)           :: width
-  character(*)                  :: message_text
-  character(*),        optional :: file
-  integer, intent(in), optional :: line
-  logical,             optional :: one_proc  ! print from one processor only
+  class(Message_Type)                :: Msg
+  integer,                intent(in) :: width
+  character(*),           intent(in) :: message_text
+  character(*), optional, intent(in) :: file
+  integer,      optional, intent(in) :: line
+  logical,      optional, intent(in) :: one_proc  ! print from one processor
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: w
   character(DL) :: header_text

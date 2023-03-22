@@ -3,11 +3,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Message_Type)      :: Msg
-  integer,      intent(in) :: width
-  character(*), intent(in) :: header_text
-  character(*), intent(in) :: message_text
-  logical,      optional   :: one_proc
+  class(Message_Type)           :: Msg
+  integer,           intent(in) :: width
+  character(*),      intent(in) :: header_text
+  character(*),      intent(in) :: message_text
+  logical, optional, intent(in) :: one_proc
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: w
   character(DL) :: line
