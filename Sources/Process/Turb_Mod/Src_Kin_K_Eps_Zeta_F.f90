@@ -23,14 +23,14 @@
   type(Var_Type),    pointer :: kin, eps, zeta, f, ut, vt, wt, t2
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
-  integer                    :: c, c1, c2, s
+  integer                    :: c, c1, c2, s, reg
   real                       :: u_tan, u_tau
   real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d, l_rans_v
   real                       :: kin_vis
   real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
@@ -42,7 +42,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -55,13 +55,13 @@
   call Sol % Alias_Native       (A, b)
 
   ! Production source:
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     Turb % p_kin(c) = max(Turb % vis_t(c) * Flow % shear(c)**2, TINY)
     b(c) = b(c) + Turb % p_kin(c) * Grid % vol(c)
   end do
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       Turb % g_buoy(c) = -Flow % beta                    &
                         * ( Flow % grav_x * ut % n(c)    &
                           + Flow % grav_y * vt % n(c)    &
@@ -82,7 +82,7 @@
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
 
       lf = Grid % vol(c)**ONE_THIRD
 
@@ -112,7 +112,7 @@
       end if
     end do
   else  ! turbuence model will be K_EPS_ZETA_F
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       A % val(A % dia(c)) = A % val(A % dia(c))             &
                           + Flow % density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * Grid % vol(c)
@@ -123,17 +123,17 @@
   !-----------------------------------------------!
   !  Compute the sources in the near wall cells   !
   !-----------------------------------------------!
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-    if(c2 < 0) then
+        Assert(c2 < 0)
 
-      ! Kinematic viscosity
-      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
-
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+        ! Kinematic viscosity
+        kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
         z_o = Turb % Roughness_Coefficient(c1, c2)
@@ -181,14 +181,14 @@
           qy = t % q(c2) * ny
           qz = t % q(c2) * nz
 
-          ut_log_law = - Turb % con_w(c1)  &
-                     / (Flow % density(c1) * Flow % capacity(c1))   &
+          ut_log_law = - Turb % con_w(c1)                                 &
+                     / (Flow % density(c1) * Flow % capacity(c1))         &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
-          vt_log_law = - Turb % con_w(c1)  &
-                     / (Flow % density(c1) * Flow % capacity(c1))   &
+          vt_log_law = - Turb % con_w(c1)                                 &
+                     / (Flow % density(c1) * Flow % capacity(c1))         &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * ny
-          wt_log_law = - Turb % con_w(c1)  &
-                     / (Flow % density(c1) * Flow % capacity(c1))   &
+          wt_log_law = - Turb % con_w(c1)                                 &
+                     / (Flow % density(c1) * Flow % capacity(c1))         &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nz
 
           ut % n(c1) = ut % n(c1) * exp(-1.0 * ebf)  &
@@ -221,8 +221,8 @@
           b(c1)      = b(c1) + Turb % g_buoy(c1) * Grid % vol(c1)
 
         end if  ! Flow % buoyancy .eq. THERMALLY_DRIVEN
-      end if    ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
-    end if      ! c2 < 0
-  end do
+      end do    ! faces in regions
+    end if      ! region is WALL or WALLFL
+  end do        ! through regions
 
   end subroutine

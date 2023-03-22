@@ -11,12 +11,12 @@
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: c, c1, c2, s
+  integer                   :: c, c1, c2, s, reg
   real                      :: u_tan, u_tau
   real                      :: beta, pr, sc
   real                      :: u_plus, ebf, kin_vis
   real                      :: z_o
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   Production    p_kin    [m^2/s^3]   | Rate-of-strain  shear     [1/s]       !
@@ -30,7 +30,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -42,34 +42,39 @@
 
   ! Pure k-eps-zeta-f
   if(Turb % model .eq. K_EPS_ZETA_F) then
-    do c = -Grid % n_bnd_cells, Grid % n_cells
-      Turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
-                      * kin % n(c) * Turb % t_scale(c)
+    do reg = Boundary_And_Inside_Regions()
+      do c = Cells_In_Region(reg)
+        Turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
+                        * kin % n(c) * Turb % t_scale(c)
+      end do
     end do
+    call Grid % Exchange_Cells_Real(Turb % vis_t)
 
   ! Hybrid between k-eps-zeta-f and dynamic SGS model
   else if(Turb % model .eq. HYBRID_LES_RANS) then
-    do c = -Grid % n_bnd_cells, Grid % n_cells
-      Turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
-                      * kin % n(c) * Turb % t_scale(c)
-      Turb % vis_t_eff(c) = max(Turb % vis_t(c),  &
-                                Turb % vis_t_sgs(c))
+    do reg = Boundary_And_Inside_Regions()
+      do c = Cells_In_Region(reg)
+        Turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
+                        * kin % n(c) * Turb % t_scale(c)
+        Turb % vis_t_eff(c) = max(Turb % vis_t(c),  &
+                                  Turb % vis_t_sgs(c))
+      end do
     end do
+    call Grid % Exchange_Cells_Real(Turb % vis_t)
     call Grid % Exchange_Cells_Real(Turb % vis_t_eff)
 
   end if
 
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-    if(c2 < 0) then
+        Assert(c2 < 0)
 
-      ! kinematic viscosities
-      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
-
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+        kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
         z_o = Turb % Roughness_Coefficient(c1, c2)
@@ -132,7 +137,7 @@
                               * Flow % viscosity(c1)                        &
                               * Flow % capacity(c1)                         &
                       / ( Turb % y_plus(c1) * pr * exp(-1.0 * ebf)          &
-                         + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY )
+                        + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY )
         end if
 
         if(Flow % n_scalars > 0) then
@@ -154,11 +159,10 @@
               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
-      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
-    end if    ! c2 < 0
-  end do
+      end do    ! faces in regions
+    end if      ! region is WALL or WALLFL
+  end do        ! through regions
 
-  call Grid % Exchange_Cells_Real(Turb % vis_t)
   call Grid % Exchange_Cells_Real(Turb % vis_w)
   if(Flow % heat_transfer) then
     call Grid % Exchange_Cells_Real(Turb % con_w)

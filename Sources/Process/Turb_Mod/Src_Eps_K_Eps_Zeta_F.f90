@@ -15,7 +15,7 @@
   type(Var_Type),    pointer :: kin, eps, zeta, f22, ut, vt, wt
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
-  integer                    :: c, s, c1, c2, j
+  integer                    :: c, s, c1, c2, j, reg
   real                       :: u_tan, u_tau
   real                       :: e_sor, c_11e, ebf
   real                       :: eps_wf, eps_int
@@ -56,7 +56,7 @@
 
   call Turb % Time_And_Length_Scale(Grid)
 
-  do c = 1, Grid % n_cells 
+  do c = Cells_In_Domain()
     e_sor = Grid % vol(c)/(Turb % t_scale(c)+TINY)
     c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
     b(c) = b(c) + c_11e * e_sor * Turb % p_kin(c)
@@ -79,13 +79,16 @@
   !-------------------------------------------------------!
 
   ! Imposing a boundary condition on wall for eps
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0) then
-      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
-      if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+
+        Assert(c2 < 0)
+
+        kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
         z_o = Turb % Roughness_Coefficient(c1, c2)
@@ -138,8 +141,8 @@
           eps % n(c2) = 2.0 * kin_vis * kin % n(c1)  &
                       / Grid % wall_dist(c1)**2
         end if  ! y_plus(c1) < 3
-      end if    ! wall or wall_flux
-    end if      ! c2 < 0
-  end do
+      end do    ! faces in regions
+    end if      ! region is WALL or WALLFL
+  end do        ! through regions
 
   end subroutine

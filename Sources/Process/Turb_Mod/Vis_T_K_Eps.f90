@@ -23,12 +23,12 @@
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps
-  integer                   :: c1, c2, s, c
+  integer                   :: c1, c2, s, c, reg
   real                      :: pr, beta, ebf, sc
   real                      :: u_tan, u_tau
   real                      :: kin_vis, u_plus, y_star, re_t, f_mu
   real                      :: z_o
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear    [1/s]        !
@@ -42,7 +42,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -50,7 +50,7 @@
   call Flow % Alias_Momentum(u, v, w)
   call Turb % Alias_K_Eps   (kin, eps)
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
 
     ! Kinematic viscosities
     kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -68,14 +68,16 @@
     Turb % vis_t(c) = f_mu * c_mu * Flow % density(c) * kin % n(c)**2  &
                       / (eps % n(c) + TINY)
   end do
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
 
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+        Assert(c2 < 0)
 
         kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
 
@@ -152,11 +154,10 @@
                + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
-      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
-    end if    ! c2 < 0
-  end do
+      end do    ! faces in regions
+    end if      ! region is WALL or WALLFL
+  end do        ! through regions
 
-  call Grid % Exchange_Cells_Real(Turb % vis_t)
   call Grid % Exchange_Cells_Real(Turb % vis_w)
   if(Flow % heat_transfer) then
     call Grid % Exchange_Cells_Real(Turb % con_w)

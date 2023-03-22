@@ -17,7 +17,7 @@
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   In transport equation for zeta two source terms exist which have form:     !
 !                                                                              !
 !    /                                                                         !
@@ -30,7 +30,7 @@
 !   sign of term , it is placed on left or right hand side.  Second, negative  !
 !   source term is added to main diagonal left hand side coefficient matrix    !
 !   in order to increase stability of solver                                   !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -43,7 +43,7 @@
   ! sensitive to initial condition while the second one can lead to 
   ! instabilities for some cases such as Flow around cylinder. That is why we
   ! choose this particular way to the add source term.
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(curr_dt > 500) then
       b(c) = b(c) + f22 % n(c) * Grid % vol(c) * Flow % density(c)
     else
