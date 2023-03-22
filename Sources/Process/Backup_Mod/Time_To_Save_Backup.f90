@@ -1,14 +1,13 @@
 !==============================================================================!
-  logical function Time_To_Save(Results, curr_dt)
+  logical function Time_To_Save_Backup(Backup, curr_dt)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Results_Type) :: Results
-  integer             :: curr_dt  ! current time step
+  class(Backup_Type) :: Backup
+  integer            :: curr_dt  ! current time step
 !==============================================================================!
 
-  Time_To_Save = mod(curr_dt, Results % interval) .eq. 0  &
-                 .or.                                     &
-                 curr_dt .eq. 0 .and. Results % initial
+  Time_To_Save_Backup = mod(curr_dt, backup % interval) .eq. 0  &
+                            .and. .not. curr_dt .eq. 0
 
   end function

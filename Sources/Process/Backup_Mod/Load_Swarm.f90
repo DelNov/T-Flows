@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Swarm(disp, vc, Swr)
+  subroutine Load_Swarm(Backup, disp, vc, Swr)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Backup_Type)       :: Backup
+  type(Swarm_Type), target :: Swr
   integer(DP)              :: disp
   integer                  :: vc
-  type(Swarm_Type), target :: Swr
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Comm_Type),     pointer :: Comm
@@ -26,7 +27,7 @@
   !--------------------------!
 
   ! Number of particles
-  call Backup_Mod_Read_Int(Comm, disp, vc, 'n_particles', n_part)
+  call Backup % Load_Int(Comm, disp, vc, 'n_particles', n_part)
 
   Swr % i_work(:) = 0
   Swr % l_work(:) = .false.
@@ -34,15 +35,15 @@
 
   if(n_part > 0) then
     Swr % n_particles = n_part
-    call Backup_Mod_Read_Int_Array(Comm, disp, vc,   &
-                   'particle_int_data',              &
-                    Swr % i_work(1 : Swr % N_I_VARS*Swr % n_particles))
-    call Backup_Mod_Read_Log_Array(Comm, disp, vc,   &
-                   'particle_log_data',              &
-                    Swr % l_work(1 : Swr % N_L_VARS*Swr % n_particles))
-    call Backup_Mod_Read_Real_Array(Comm, disp, vc,  &
-                   'particle_real_data',             &
-                    Swr % r_work(1 : Swr % N_R_VARS*Swr % n_particles))
+    call Backup % Load_Int_Array(Comm, disp, vc,    &
+                  'particle_int_data',              &
+                  Swr % i_work(1 : Swr % N_I_VARS*Swr % n_particles))
+    call Backup % Load_Log_Array(Comm, disp, vc,    &
+                  'particle_log_data',              &
+                  Swr % l_work(1 : Swr % N_L_VARS*Swr % n_particles))
+    call Backup % Load_Real_Array(Comm, disp, vc,   &
+                  'particle_real_data',             &
+                  Swr % r_work(1 : Swr % N_R_VARS*Swr % n_particles))
 
     ! Unpack particle data from arrays
     do k = 1, Swr % n_particles

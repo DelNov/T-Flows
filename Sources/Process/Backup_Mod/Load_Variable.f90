@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Variable(disp, vc, var_name, Fld, var)
+  subroutine Load_Variable(Backup, disp, vc, var_name, Fld, var)
 !------------------------------------------------------------------------------!
 !   Reads a whole variable from backup file.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer(DP)      :: disp
-  integer          :: vc
-  character(len=*) :: var_name
-  type(Field_Type) :: Fld
-  type(Var_Type)   :: var
+  class(Backup_Type) :: Backup
+  type(Field_Type)   :: Fld
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: var_name
+  type(Var_Type)     :: var
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   type(Grid_Type), pointer :: Grid

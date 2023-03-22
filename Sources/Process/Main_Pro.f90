@@ -161,8 +161,8 @@
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
   do d = 1, n_dom
     call Control_Mod_Switch_To_Domain(d)  ! take proper control file
-    call Backup_Mod_Load(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                         time, first_dt, read_backup(d))
+    call Backup % Load(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                       time, first_dt, read_backup(d))
 
     ! Initialize variables
     if(.not. read_backup(d)) then

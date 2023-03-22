@@ -1,14 +1,15 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Variable(disp, vc, var_name, var)
+  subroutine Save_Variable(Backup, disp, vc, var_name, var)
 !------------------------------------------------------------------------------!
 !   Writes a whole variable to backup file.                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer(DP)      :: disp
-  integer          :: vc
-  character(len=*) :: var_name
-  type(Var_Type)   :: var
+  class(Backup_Type) :: Backup
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: var_name
+  type(Var_Type)     :: var
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   character(SL)            :: vn

@@ -1,18 +1,19 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Real_Array(Comm, disp, vc, arr_name, arr_value)
+  subroutine Load_Int_Array(Backup, Comm, disp, vc, arr_name, arr_value)
 !------------------------------------------------------------------------------!
-!   Reads a named real array from backup file.                                 !
+!   Reads a named integer array from backup file.                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)    :: Comm
-  integer(DP)        :: disp
-  integer            :: vc
-  character(len=*)   :: arr_name
-  real, dimension(:) :: arr_value
+  class(Backup_Type)    :: Backup
+  type(Comm_Type)       :: Comm
+  integer(DP)           :: disp
+  integer               :: vc
+  character(len=*)      :: arr_name
+  integer, dimension(:) :: arr_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
-  integer       :: vo, cnt_loop, length
+  integer       :: vs, cnt_loop, length
   integer(DP)   :: disp_loop
 !==============================================================================!
 
@@ -29,18 +30,18 @@
     cnt_loop = cnt_loop + 1
 
     call Comm % Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm % Read_Int (fh, vo, disp_loop)  ! variable offset
+    call Comm % Read_Int (fh, vs, disp_loop)  ! variable offset
 
     ! If variable is found, read it and retrun
     if(vn .eq. arr_name) then
       if(this_proc < 2) print *, '# Reading array: ', trim(vn)
-      call Comm % Read_Real_Array(fh, arr_value(1:length), disp_loop)
+      call Comm % Read_Int_Array(fh, arr_value, disp_loop)
       disp = disp_loop
       return
 
     ! If variable not found, advance the offset only
     else
-      disp_loop = disp_loop + vo
+      disp_loop = disp_loop + vs
     end if
 
     ! Check if variable is in the file
@@ -48,8 +49,8 @@
 
   end do
 
-1 if(this_proc < 2) print *, '# Array: ', trim(arr_name), ' not found!',  &
-                             'Setting the values to 0.0!'
-  arr_value(:) = 0.0
+1 if(this_proc < 2) print *, '# Array: ', trim(arr_name), ' not found! ',  &
+                             'Setting the values to 0!'
+  arr_value(:) = 0
 
   end subroutine

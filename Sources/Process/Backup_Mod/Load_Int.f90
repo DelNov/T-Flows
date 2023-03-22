@@ -1,24 +1,24 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Int_Array(Comm, disp, vc, arr_name, arr_value)
+  subroutine Load_Int(Backup, Comm, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
-!   Reads a named integer array from backup file.                              !
+!   Reads a single named integer variable from backup file.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)       :: Comm
-  integer(DP)           :: disp
-  integer               :: vc
-  character(len=*)      :: arr_name
-  integer, dimension(:) :: arr_value
+  class(Backup_Type) :: Backup
+  type(Comm_Type)    :: Comm
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: var_name
+  integer            :: var_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
-  integer       :: vs, cnt_loop, length
+  integer       :: vs, cnt_loop
   integer(DP)   :: disp_loop
 !==============================================================================!
 
   cnt_loop  = 0
   disp_loop = 0
-  length    = size(arr_value)
 
   !--------------------------------------------------------!
   !   Browse the entire file until you find the variable   !
@@ -32,9 +32,9 @@
     call Comm % Read_Int (fh, vs, disp_loop)  ! variable offset
 
     ! If variable is found, read it and retrun
-    if(vn .eq. arr_name) then
-      if(this_proc < 2) print *, '# Reading array: ', trim(vn)
-      call Comm % Read_Int_Array(fh, arr_value, disp_loop)
+    if(vn .eq. var_name) then
+      if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
+      call Comm % Read_Int(fh, var_value, disp_loop)
       disp = disp_loop
       return
 
@@ -48,8 +48,8 @@
 
   end do
 
-1 if(this_proc < 2) print *, '# Array: ', trim(arr_name), ' not found! ',  &
-                             'Setting the values to 0!'
-  arr_value(:) = 0
+1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+                             'Setting the value to 0!'
+  var_value = 0
 
   end subroutine

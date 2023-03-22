@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Log(Comm, disp, vc, var_name, var_value)
+  subroutine Load_Log(Backup, Comm, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
 !   Reads a single named logical variable from backup file.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)  :: Comm
-  integer(DP)      :: disp
-  integer          :: vc
-  character(len=*) :: var_name
-  logical          :: var_value
+  class(Backup_Type) :: Backup
+  type(Comm_Type)    :: Comm
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: var_name
+  logical            :: var_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
   integer       :: vs, cnt_loop

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Cell_Real(Grid, disp, vc, var_name, array)
+  subroutine Save_Cell_Real(Backup, Grid, disp, vc, var_name, array)
 !------------------------------------------------------------------------------!
 !   Writes a vector variable with boundary cells to backup file.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Backup_Type)      :: Backup
   type(Grid_Type), target :: Grid
   integer(DP)             :: disp
   integer                 :: vc

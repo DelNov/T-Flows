@@ -1,18 +1,19 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Int_Array(Comm, disp, vc, arr_name, arr_value)
+  subroutine Save_Real_Array(Backup, Comm, disp, vc, arr_name, arr_value)
 !------------------------------------------------------------------------------!
-!   Writes a named integer array to backup file.                               !
+!   Writes a name real array to backup file.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)       :: Comm
-  integer(DP)           :: disp
-  integer               :: vc
-  character(len=*)      :: arr_name
-  integer, dimension(:) :: arr_value
+  class(Backup_Type) :: Backup
+  type(Comm_Type)    :: Comm
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: arr_name
+  real, dimension(:) :: arr_value
 !-----------------------------------[Locals]-----------------------------------!
-  character(SL) :: vn
-  integer       :: vs, length  ! variable size
+  character(SL)   :: vn
+  integer         :: vs, length  ! variable size
 !==============================================================================!
 
   length = size(arr_value)
@@ -22,10 +23,10 @@
   ! Increase variable count
   vc = vc + 1
 
-  ! Just store one named integer array
+  ! Just store one named real number
   vn = arr_name;           call Comm % Write_Text(fh, vn, disp)
-  vs = length * IP;  call Comm % Write_Int (fh, vs, disp)
+  vs = length * RP; call Comm % Write_Int (fh, vs, disp)
 
-  call Comm % Write_Int_Array(fh, arr_value(1:length), disp)
+  call Comm % Write_Real_Array(fh, arr_value(1:length), disp)
 
   end subroutine

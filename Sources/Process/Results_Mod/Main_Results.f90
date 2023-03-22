@@ -26,23 +26,23 @@
   inquire(file='save_now', exist=save_now)
 
   ! Is it time to save the backup file?
-  if(curr_dt .eq. last_dt             .or.  &
-     save_now                         .or.  &
-     exit_now                         .or.  &
-     Backup_Mod_Time_To_Save(curr_dt) .or.  &
+  if(curr_dt .eq. last_dt                  .or.  &
+     save_now                              .or.  &
+     exit_now                              .or.  &
+     Backup % Time_To_Save_Backup(curr_dt) .or.  &
      Info_Mod_Time_To_Exit()) then
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
-      call Backup_Mod_Save(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                           time, curr_dt, domain=d)
+      call Backup % Save(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                         time, curr_dt, dom=d)
     end do
   end if
 
   ! Is it time to save results for post-processing?
-  if(curr_dt .eq. last_dt            .or.  &
-     save_now                        .or.  &
-     exit_now                        .or.  &
-     Results % Time_To_Save(curr_dt) .or.  &
+  if(curr_dt .eq. last_dt                    .or.  &
+     save_now                                .or.  &
+     exit_now                                .or.  &
+     Results % Time_To_Save_Results(curr_dt) .or.  &
      Info_Mod_Time_To_Exit()) then
 
     do d = 1, n_dom

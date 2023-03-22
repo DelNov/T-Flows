@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Swarm(disp, vc, Swr)
+  subroutine Save_Swarm(Backup, disp, vc, Swr)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Backup_Type)       :: Backup
+  type(Swarm_Type), target :: Swr
   integer(DP)              :: disp
   integer                  :: vc
-  type(Swarm_Type), target :: Swr
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Comm_Type),     pointer :: Comm
@@ -26,8 +27,7 @@
   !--------------------------!
 
   ! Number of particles
-  call Backup_Mod_Write_Int(Comm, disp, vc, 'n_particles',  &
-                                            Swr % n_particles)
+  call Backup % Save_Int(Comm, disp, vc, 'n_particles', Swr % n_particles)
 
   !----------------------------------------------!
   !   Write only if there are active particles   !
@@ -74,15 +74,15 @@
     call Comm_Mod_Global_Sum_Real_Array(Swr % n_particles * Swr % N_R_VARS,  &
                                         Swr % r_work)
 
-    call Backup_Mod_Write_Int_Array(Comm, disp, vc,   &
-                   'particle_int_data',               &
-                    Swr % i_work(1 : Swr % N_I_VARS*Swr % n_particles))
-    call Backup_Mod_Write_Log_Array(Comm, disp, vc,   &
-                   'particle_log_data',               &
-                    Swr % l_work(1 : Swr % N_L_VARS*Swr % n_particles))
-    call Backup_Mod_Write_Real_Array(Comm, disp, vc,  &
-                   'particle_real_data',              &
-                    Swr % r_work(1 : Swr % N_R_VARS*Swr % n_particles))
+    call Backup % Save_Int_Array(Comm, disp, vc,   &
+                'particle_int_data',               &
+                Swr % i_work(1 : Swr % N_I_VARS*Swr % n_particles))
+    call Backup % Save_Log_Array(Comm, disp, vc,   &
+                'particle_log_data',               &
+                Swr % l_work(1 : Swr % N_L_VARS*Swr % n_particles))
+    call Backup % Save_Real_Array(Comm, disp, vc,  &
+                'particle_real_data',              &
+                Swr % r_work(1 : Swr % N_R_VARS*Swr % n_particles))
   end if
 
   end subroutine

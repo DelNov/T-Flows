@@ -1,24 +1,24 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Log_Array(Comm, disp, vc, arr_name, arr_value)
+  subroutine Load_Real(Backup, Comm, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
-!   Reads a named integer array from backup file.                              !
+!   Reads a single named real variable from backup file.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)       :: Comm
-  integer(DP)           :: disp
-  integer               :: vc
-  character(len=*)      :: arr_name
-  logical, dimension(:) :: arr_value
+  class(Backup_Type) :: Backup
+  type(Comm_Type)    :: Comm
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: var_name
+  real               :: var_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
-  integer       :: vs, cnt_loop, length
+  integer       :: vo, cnt_loop
   integer(DP)   :: disp_loop
 !==============================================================================!
 
   cnt_loop  = 0
   disp_loop = 0
-  length    = size(arr_value)
 
   !--------------------------------------------------------!
   !   Browse the entire file until you find the variable   !
@@ -29,18 +29,18 @@
     cnt_loop = cnt_loop + 1
 
     call Comm % Read_Text(fh, vn, disp_loop)  ! variable name
-    call Comm % Read_Int (fh, vs, disp_loop)  ! variable offset
+    call Comm % Read_Int (fh, vo, disp_loop)  ! variable offset
 
     ! If variable is found, read it and retrun
-    if(vn .eq. arr_name) then
-      if(this_proc < 2) print *, '# Reading array: ', trim(vn)
-      call Comm % Read_Log_Array(fh, arr_value, disp_loop)
+    if(vn .eq. var_name) then
+      if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
+      call Comm % Read_Real(fh, var_value, disp_loop)
       disp = disp_loop
       return
 
     ! If variable not found, advance the offset only
     else
-      disp_loop = disp_loop + vs
+      disp_loop = disp_loop + vo
     end if
 
     ! Check if variable is in the file
@@ -48,8 +48,8 @@
 
   end do
 
-1 if(this_proc < 2) print *, '# Array: ', trim(arr_name), ' not found! ',  &
-                             'Setting the values to .false.!'
-  arr_value(:) = .false.
+1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+                             'Setting the value to 0.0!'
+  var_value = 0.0
 
   end subroutine

@@ -38,7 +38,7 @@
       procedure, private :: Save_Vtu_Tensor_6_Real
       procedure, private :: Save_Vtu_Tensor_9_Real
       procedure, private :: Save_Vtu_Vector_Real
-      procedure, private :: Time_To_Save
+      procedure, private :: Time_To_Save_Results
       procedure, private :: Time_To_Save_Swarm
 
   end type
@@ -57,7 +57,7 @@
 #   include "Results_Mod/Save_Vtu_Tensor_9_Real.f90"
 #   include "Results_Mod/Save_Vtu_Vector_Real.f90"
 #   include "Results_Mod/Save_Vtu_Surf.f90"
-#   include "Results_Mod/Time_To_Save.f90"
+#   include "Results_Mod/Time_To_Save_Results.f90"
 #   include "Results_Mod/Time_To_Save_Swarm.f90"
 
   end module

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Log_Array(Comm, disp, vc, arr_name, arr_value)
+  subroutine Save_Log_Array(Backup, Comm, disp, vc, arr_name, arr_value)
 !------------------------------------------------------------------------------!
 !   Writes a named logical array to backup file.                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Backup_Type)    :: Backup
   type(Comm_Type)       :: Comm
   integer(DP)           :: disp
   integer               :: vc

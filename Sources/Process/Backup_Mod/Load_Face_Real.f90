@@ -1,26 +1,28 @@
 !==============================================================================!
-  subroutine Backup_Mod_Read_Cell_Real(Grid, disp, vc, var_name, array)
+  subroutine Load_Face_Real(Backup, Grid, disp, vc, var_name, array, corr_sign)
 !------------------------------------------------------------------------------!
-!   Reads a vector variable with boundary cells from a backup file.            !
+!   Reads a vector variable with face values from a backup file.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Backup_Type)      :: Backup
   type(Grid_Type), target :: Grid
-  integer(DP)             :: disp
-  integer                 :: vc
+  integer                 :: disp, vc
   character(len=*)        :: var_name
-  real                    :: array(-Grid % n_bnd_cells:Grid % n_cells)
+  real                    :: array(Grid % n_faces)
+  logical, optional       :: corr_sign  ! for face fluxes, signs might have
+                                        ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   character(SL)            :: vn
-  integer                  :: vs, cnt_loop, nb, nc
-  integer(DP)              :: disp_loop
+  integer                  :: vs, disp_loop, cnt_loop, nf
+  integer                  :: s, c1, c2, c1g, c2g, cnt, i_sid, sg
+  real                     :: buffer
 !==============================================================================!
 
   ! Take alias
   Comm => Grid % Comm
-  nb = Grid % n_bnd_cells
-  nc = Grid % n_cells
+  nf = Grid % n_faces
 
   cnt_loop  = 0
   disp_loop = 0
@@ -39,11 +41,32 @@
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
       if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
-      call Comm % Read_Cell_Real(fh, array(1:Comm % nc_sub), disp_loop)
-      call Comm % Read_Bnd_Real (fh, array( -Comm % nb_f:  &
-                                            -Comm % nb_l),   disp_loop)
-      call Grid % Exchange_Cells_Real(array(-nb:nc))
+
+      i_sid = 1                 ! local side counter
+      do sg = 1, Comm % nf_tot  ! global side loop
+
+        ! The global value is read by all processors
+        call Comm % Read_Real(fh, buffer, disp_loop)
+
+        ! If you didn't go beyond local face map ...
+        ! ... check if this global side is present in this processor
+        if(i_sid .le. Grid % n_faces) then
+          if(Comm % face_map_dup_glo(i_sid) .eq. sg) then
+            s = Comm % face_map_dup_loc(i_sid)  ! get the local face number
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+            c1g = Grid % Comm % cell_glo(c1)
+            c2g = Grid % Comm % cell_glo(c2)
+            array(s) = buffer
+            if(c2g > 0 .and. c2g < c1g) array(s) = -buffer
+            i_sid = i_sid + 1
+          end if
+        end if
+
+      end do
+
       disp = disp_loop
+
       return
 
     ! If variable not found, advance the offset only
@@ -55,6 +78,8 @@
     if(cnt_loop >= vc) goto 1
 
   end do
+
+  return
 
 1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
                              'Setting the values to 0.0!'

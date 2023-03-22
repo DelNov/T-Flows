@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Log(Comm, disp, vc, var_name, var_value)
+  subroutine Save_Log(Backup, Comm, disp, vc, var_name, var_value)
 !------------------------------------------------------------------------------!
 !   Writes a named logical variable to backup file.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Comm_Type)  :: Comm
-  integer(DP)      :: disp
-  integer          :: vc
-  character(len=*) :: var_name
-  logical          :: var_value
+  class(Backup_Type) :: Backup
+  type(Comm_Type)    :: Comm
+  integer(DP)        :: disp
+  integer            :: vc
+  character(len=*)   :: var_name
+  logical            :: var_value
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
   integer       :: vs  ! variable size

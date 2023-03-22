@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Backup_Mod_Write_Face_Real(Grid, disp, vc, var_name, array, &
-                                        correct_sign)
+  subroutine Save_Face_Real(Backup, Grid, disp, vc, var_name, array, corr_sign)
 !------------------------------------------------------------------------------!
 !   Writes a vector variable with face values backup file.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Backup_Type)      :: Backup
   type(Grid_Type), target :: Grid
   integer(DP)             :: disp
   integer                 :: vc
   character(len=*)        :: var_name
   real                    :: array(Grid % n_faces)
-  logical, optional       :: correct_sign  ! for face fluxes, signs might have
-                                           ! to be changed (check it one day)
+  logical, optional       :: corr_sign  ! for face fluxes, signs might have
+                                        ! to be changed (check it one day)
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   character(len=80)        :: vn
