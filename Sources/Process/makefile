@@ -368,9 +368,9 @@ $(DIR_OBJECT)/%.o: %.c
 	@echo $(CC) $<
 	@$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
 
-#----------------------------------------
-#   Special rule to build User_Mod.f90
-#----------------------------------------
+# Special rule to build User_Mod.f90.
+# Note: If you don't write it as User%Mod.o, makefile will think that it
+# is the final target and would not proceed further to build the Program
 $(DIR_OBJECT)/User%Mod.o: User%Mod.f90
 	@echo $(FC) $<
 	@$(FC) $(OPT_F_COMP_USER) $(PASS_ON) -c -o $@ $<
