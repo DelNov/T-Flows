@@ -40,6 +40,9 @@
 
   end type
 
+  !-------------------------------------!
+  !   Singleton objects Line and File   !
+  !-------------------------------------!
   type(Tokenizer_Type) :: Line
   type(File_Type)      :: File
 
