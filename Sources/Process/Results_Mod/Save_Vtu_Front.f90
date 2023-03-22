@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Front(Results, Front, time_step, domain)
+  subroutine Save_Vtu_Front(Results, Front, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!

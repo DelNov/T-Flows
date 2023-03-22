@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Swarm(Results, Swarm, time_step, domain)
+  subroutine Save_Vtu_Swarm(Results, Swarm, time_step, domain)
 !------------------------------------------------------------------------------!
 !   Writes particles in VTU file format (for VisIt and Paraview)               !
 !------------------------------------------------------------------------------!

@@ -1,8 +1,8 @@
 !==============================================================================!
-  subroutine Save_Scalar_Real(Results,                &
-                              var_name, plot_inside,  &
-                              val, fs, fp,            &
-                              data_offset, sweep)
+  subroutine Save_Vtu_Scalar_Real(Results,                &
+                                  var_name, plot_inside,  &
+                                  val, fs, fp,            &
+                                  data_offset, sweep)
 !------------------------------------------------------------------------------!
 !   Writes one real scalar defined over cells.                                 !
 !------------------------------------------------------------------------------!

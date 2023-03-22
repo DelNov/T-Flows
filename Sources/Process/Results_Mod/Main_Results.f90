@@ -47,26 +47,26 @@
 
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
-      call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                  curr_dt, plot_inside=.true., domain=d)
-      call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                  curr_dt, plot_inside=.false., domain=d)
+      call Results % Save_Vtu_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                      curr_dt, plot_inside=.true., domain=d)
+      call Results % Save_Vtu_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                      curr_dt, plot_inside=.false., domain=d)
 
       if(Flow(d) % with_interface) then
         if(Vof(d) % track_front) then
-          call Results % Save_Front(Vof(d) % Front, curr_dt)
+          call Results % Save_Vtu_Front(Vof(d) % Front, curr_dt)
         end if
         if(Vof(d) % track_surface) then
-          call Results % Save_Surf(Vof(d) % surf, curr_dt)
+          call Results % Save_Vtu_Surf(Vof(d) % surf, curr_dt)
         end if
       end if
 
       ! Write results in user-customized format
-      call User_Mod_Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                 curr_dt, domain=d)
+      call User_Mod_Save_Vtu_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                     curr_dt, domain=d)
       if(Flow(d) % with_particles) then
-        call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                 curr_dt, domain=d)
+        call User_Mod_Save_Vtu_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                     curr_dt, domain=d)
       end if
 
     end do  ! through domains
@@ -82,10 +82,10 @@
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
       if(Flow(d) % with_particles) then
-        call Results % Save_Swarm(Swarm(d), curr_dt, domain=d)
+        call Results % Save_Vtu_Swarm(Swarm(d), curr_dt, domain=d)
 
-        call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                 curr_dt, domain=d)
+        call User_Mod_Save_Vtu_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                     curr_dt, domain=d)
       end if
 
     end do  ! through domains
