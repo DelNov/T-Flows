@@ -85,6 +85,7 @@ RANS_FUEL_BUNDLE_DIR=Rans/Fuel_Bundle
 RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 
 MULTDOM_BACKSTEP_DIR=Laminar/Copy_Inlet
+MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
 
 ELBOW_ASCII_DIR=Functionality/Meshes/Ansys/Elbow_Ascii
@@ -104,9 +105,6 @@ LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
 HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
-# Add compressed meshes for these:
-# MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
-# MULTDOM_COPY_INLET_DIR=Laminar/Copy_Inlet
 # MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
 # MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
 
@@ -129,6 +127,7 @@ ALL_GENERATE_TESTS=( \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$MULTDOM_BACKSTEP_DIR" \
+                    "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                     "$VOF_DAM_BREAK_2D_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
                     "$SWARM_VOF_THREE_PHASE_DIR" \
@@ -183,6 +182,7 @@ ALL_DIVIDE_TESTS=( \
                   "$RANS_FUEL_BUNDLE_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
                   "$MULTDOM_BACKSTEP_DIR" \
+                  "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
@@ -221,6 +221,7 @@ ALL_PROCESS_TESTS=( \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_BACKSTEP_DIR" \
+                   "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$VOF_DAM_BREAK_2D_DIR" \
@@ -252,6 +253,7 @@ ALL_TURBULENCE_MODELS=( \
                        "none" \
                        "none" \
                        "none" \
+                       "none" \
                        "les_dynamic" \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
@@ -259,6 +261,7 @@ ALL_TURBULENCE_MODELS=( \
 # For single test: ALL_TURBULENCE_MODELS=("none")
 
 ALL_INTERFACE_TRACKING=( \
+                       "no" \
                        "no" \
                        "no" \
                        "no" \
@@ -285,6 +288,7 @@ ALL_INTERFACE_TRACKING=( \
 # For single test: ALL_INTERFACE_TRACKING=("yes")
 
 ALL_PARTICLE_TRACKING=( \
+                       "no" \
                        "no" \
                        "no" \
                        "no" \
@@ -826,8 +830,8 @@ function process_backup_test {
   nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
 
   # BEGIN:---------------------------------------#
-  elog "np=1, MPI=no, start from 0, make a backup"
-  user_compile $PROC_DIR no # dir MPI
+  elog "np=1, MPI=yes, start from 0, make a backup"
+  user_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -856,7 +860,7 @@ function process_backup_test {
 
 
   # BEGIN:---------------------------------------------#
-  elog "np=1, MPI=no, load from backup(produced by seq)"
+  elog "np=1, MPI=yes, load from backup(produced by seq)"
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -937,7 +941,7 @@ function process_backup_test {
 
   # BEGIN:------------------------------------------#
   elog "np=1, MPI=yes, backup=(produced by par.np=2)"
-  user_compile $PROC_DIR no # dir MPI
+  user_compile $PROC_DIR yes # dir MPI
   launch_process par 1
   #--------------------------------------------:END #
 
@@ -1087,8 +1091,8 @@ function process_save_exit_now_test {
   nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
 
   # BEGIN:---------------------------------------#
-  elog "np=1, MPI=no, start from 0, make a backup"
-  user_compile $PROC_DIR no # dir MPI
+  elog "np=1, MPI=yes, start from 0, make a backup"
+  user_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(head -n1 divide."$i".scr)
@@ -1110,7 +1114,7 @@ function process_save_exit_now_test {
     elog ""
     elog "#===================================================================="
     if [ "$i" = 1 ]; then
-      elog "#   Test np=1, MPI=no"
+      elog "#   Test np=1, MPI=yes"
     fi
     if [ "$i" = 2 ]; then
       elog "#   Test np=1, MPI=yes"
@@ -1121,7 +1125,7 @@ function process_save_exit_now_test {
     elog "#--------------------------------------------------------------------"
 
     # BEGIN:---------------------------------------------#
-    elog "np=1, MPI=no, load from backup(produced by seq)"
+    elog "np=1, MPI=yes, load from backup(produced by seq)"
 
     for (( i=1; i<=$n_dom; i++ )); do
       name_in_div=$(head -n1 divide."$i".scr)
@@ -1137,7 +1141,7 @@ function process_save_exit_now_test {
     #-----------------------------------------------:END #
 
     if [ "$i" = 1 ]; then
-      user_compile $PROC_DIR no
+      user_compile $PROC_DIR yes
     elif [ "$i" = 2 ]; then
       user_compile $PROC_DIR yes
     elif [ "$i" = 3 ]; then
