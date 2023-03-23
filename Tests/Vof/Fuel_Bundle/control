@@ -4,7 +4,7 @@
  PROBLEM_NAME        fuel_bundle
  HEAT_TRANSFER       no
  INTERFACE_TRACKING  yes
- TRACK_SURFACE       yes
+ TRACK_FRONT         yes
 
  NUMBER_OF_TIME_STEPS     1200
  RESULTS_SAVE_INTERVAL      10
