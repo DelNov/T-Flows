@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Save_Swarm(Backup, disp, vc, Swr)
+  subroutine Save_Swarm(Backup, Swarm, disp, vc)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Backup_Type)       :: Backup
-  type(Swarm_Type), target :: Swr
+  type(Swarm_Type), target :: Swarm
   integer(DP)              :: disp
   integer                  :: vc
 !-----------------------------------[Locals]-----------------------------------!
@@ -17,7 +17,7 @@
 !==============================================================================!
 
   ! Take aliases
-  Grid => Swr % pnt_grid
+  Grid => Swarm % pnt_grid
   Comm => Grid % Comm
 
   !--------------------------!
@@ -27,62 +27,62 @@
   !--------------------------!
 
   ! Number of particles
-  call Backup % Save_Int(Comm, disp, vc, 'n_particles', Swr % n_particles)
+  call Backup % Save_Int(Comm, disp, vc, 'n_particles', Swarm % n_particles)
 
   !----------------------------------------------!
   !   Write only if there are active particles   !
   !----------------------------------------------!
-  if(Swr % n_particles > 0) then
+  if(Swarm % n_particles > 0) then
 
-    Swr % i_work(:) = 0
-    Swr % l_work(:) = .false.
-    Swr % r_work(:) = 0.0
+    Swarm % i_work(:) = 0
+    Swarm % l_work(:) = .false.
+    Swarm % r_work(:) = 0.0
 
     ! Pack particle data in arrays
-    do k = 1, Swr % n_particles
+    do k = 1, Swarm % n_particles
 
       ! Take aliases for the particle
-      Part => Swr % Particle(k)
+      Part => Swarm % Particle(k)
 
       if(Part % proc .eq. this_proc) then
-        i = (k-1) * Swr % N_I_VARS
-        Swr % i_work(i + 1) = Part % proc  ! where it resides
-        Swr % i_work(i + 2) = Part % buff  ! where it wants to go
-        Swr % i_work(i + 3) = Grid % Comm % cell_glo(Part % cell)
+        i = (k-1) * Swarm % N_I_VARS
+        Swarm % i_work(i + 1) = Part % proc  ! where it resides
+        Swarm % i_work(i + 2) = Part % buff  ! where it wants to go
+        Swarm % i_work(i + 3) = Grid % Comm % cell_glo(Part % cell)
 
-        i = (k-1) * Swr % N_L_VARS
-        Swr % l_work(i + 1) = Part % deposited
-        Swr % l_work(i + 2) = Part % escaped
+        i = (k-1) * Swarm % N_L_VARS
+        Swarm % l_work(i + 1) = Part % deposited
+        Swarm % l_work(i + 2) = Part % escaped
 
-        i = (k-1) * Swr % N_R_VARS
-        Swr % r_work(i + 1) = Part % x_n
-        Swr % r_work(i + 2) = Part % y_n
-        Swr % r_work(i + 3) = Part % z_n
-        Swr % r_work(i + 4) = Part % u
-        Swr % r_work(i + 5) = Part % v
-        Swr % r_work(i + 6) = Part % w
-        Swr % r_work(i + 7) = Part % d
-        Swr % r_work(i + 8) = Part % cfl
+        i = (k-1) * Swarm % N_R_VARS
+        Swarm % r_work(i + 1) = Part % x_n
+        Swarm % r_work(i + 2) = Part % y_n
+        Swarm % r_work(i + 3) = Part % z_n
+        Swarm % r_work(i + 4) = Part % u
+        Swarm % r_work(i + 5) = Part % v
+        Swarm % r_work(i + 6) = Part % w
+        Swarm % r_work(i + 7) = Part % d
+        Swarm % r_work(i + 8) = Part % cfl
       end if  ! particle on this processor
     end do
 
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (Swr % n_particles * Swr % N_I_VARS,  &
-                                        Swr % i_work)
-    call Comm_Mod_Global_Sum_Real_Array(Swr % n_particles * Swr % N_R_VARS,  &
-                                        Swr % r_work)
+    call Comm_Mod_Global_Sum_Int_Array (Swarm % n_particles*Swarm % N_I_VARS,  &
+                                        Swarm % i_work)
+    call Comm_Mod_Global_Sum_Real_Array(Swarm % n_particles*Swarm % N_R_VARS,  &
+                                        Swarm % r_work)
 
     call Backup % Save_Int_Array(Comm, disp, vc,   &
                 'particle_int_data',               &
-                Swr % i_work(1 : Swr % N_I_VARS*Swr % n_particles))
+                Swarm % i_work(1 : Swarm % N_I_VARS*Swarm % n_particles))
     call Backup % Save_Log_Array(Comm, disp, vc,   &
                 'particle_log_data',               &
-                Swr % l_work(1 : Swr % N_L_VARS*Swr % n_particles))
+                Swarm % l_work(1 : Swarm % N_L_VARS*Swarm % n_particles))
     call Backup % Save_Real_Array(Comm, disp, vc,  &
                 'particle_real_data',              &
-                Swr % r_work(1 : Swr % N_R_VARS*Swr % n_particles))
+                Swarm % r_work(1 : Swarm % N_R_VARS*Swarm % n_particles))
   end if
 
   end subroutine

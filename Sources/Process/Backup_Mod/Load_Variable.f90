@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Load_Variable(Backup, disp, vc, var_name, Fld, var)
+  subroutine Load_Variable(Backup, disp, vc, var_name, Flow, var)
 !------------------------------------------------------------------------------!
 !   Reads a whole variable from backup file.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Backup_Type) :: Backup
-  type(Field_Type)   :: Fld
+  type(Field_Type)   :: Flow
   integer(DP)        :: disp
   integer            :: vc
   character(len=*)   :: var_name
@@ -17,6 +17,8 @@
   character(SL)            :: vn
   integer                  :: vs, cnt_loop, nb, nc
   integer(DP)              :: disp_loop
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Backup)
 !==============================================================================!
 
   ! Take aliases
@@ -58,7 +60,7 @@
       call Grid % Exchange_Cells_Real(var % o(-nb:nc))
 
       ! Compute fresh gradients
-      call Fld % Grad_Variable(var)
+      call Flow % Grad_Variable(var)
 
       disp = disp_loop
       return

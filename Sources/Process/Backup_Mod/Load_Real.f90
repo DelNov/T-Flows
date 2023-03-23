@@ -15,6 +15,8 @@
   character(SL) :: vn
   integer       :: vo, cnt_loop
   integer(DP)   :: disp_loop
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Backup)
 !==============================================================================!
 
   cnt_loop  = 0

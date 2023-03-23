@@ -14,6 +14,8 @@
   type(Comm_Type), pointer :: Comm
   character(SL)            :: vn
   integer                  :: vs  ! variable size
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Backup)
 !==============================================================================!
 
   ! Take alias

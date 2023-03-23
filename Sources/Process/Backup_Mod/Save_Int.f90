@@ -14,6 +14,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: vn
   integer       :: vs  ! variable size
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Backup)
 !==============================================================================!
 
   if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
