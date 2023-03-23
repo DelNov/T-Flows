@@ -80,7 +80,7 @@
   !   Browse through all cells in search of surface vertices   !
   !                                                            !
   !------------------------------------------------------------!
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     phi_cell_min =  HUGE
     phi_cell_max = -HUGE
     do i_nod = 1, abs(Grid % cells_n_nodes(c))
