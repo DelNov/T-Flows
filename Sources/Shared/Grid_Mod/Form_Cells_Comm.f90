@@ -16,7 +16,7 @@
 !   in different threads for vectorization.  Once that happened, an extra      !
 !   measure was taken, by sorting buffers with criteria in send_sort() and     !
 !   recv_sort().  (Though, the latter one might not be needed.)                !
-!
+!                                                                              !
 !   In other words: because we are  browsing through cells in separate dom-    !
 !   ains independently, we must ensure they are in right order.  This is en-   !
 !   sured by forming send_sort() and recv_sort() and applying them order       !
@@ -36,11 +36,11 @@
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
-  if(n_proc < 2) return
+  if(Sequential_Run()) return
 
   ! Allocate memory for locally used arrays
-  allocate(send_buff_cnt(n_proc, n_proc))
-  allocate(recv_buff_cnt(n_proc, n_proc))
+  allocate(send_buff_cnt(N_Procs(), N_Procs()))
+  allocate(recv_buff_cnt(N_Procs(), N_Procs()))
   allocate(send_cells(-Grid % n_bnd_cells:Grid % n_cells))
   allocate(recv_cells(-Grid % n_bnd_cells:Grid % n_cells))
 
@@ -49,10 +49,10 @@
   !-------------------------------!
   Grid % Comm % n_buff_cells = 0
   do c = Cells_In_Domain()
-    Assert(Grid % Comm % cell_proc(c) .eq. this_proc)
+    Assert(Grid % Comm % cell_proc(c) .eq. This_Proc())
   end do
   do c = Cells_In_Buffers()
-    Assert(Grid % Comm % cell_proc(c) .ne. this_proc)
+    Assert(Grid % Comm % cell_proc(c) .ne. This_Proc())
     Grid % Comm % n_buff_cells = Grid % Comm % n_buff_cells + 1
   end do
 
@@ -75,22 +75,24 @@
   recv_cells(:) = 0
   do c = Cells_In_Buffers()
     sub = Grid % Comm % cell_proc(c)
-    recv_buff_cnt(this_proc, sub) = recv_buff_cnt(this_proc, sub) + 1
+    recv_buff_cnt(This_Proc(), sub) = recv_buff_cnt(This_Proc(), sub) + 1
     recv_cells(c) = sub
   end do
 
   if(DEBUG) then
-    do sub=1, n_proc
-      if(sub .ne. this_proc) then
-        write(100*this_proc+sub, *) '#====================================' // &
+    do sub=1, N_Procs()
+      if(sub .ne. This_Proc()) then
+        write(100*This_Proc()+sub, *)                                          &
+                                    '#====================================' // &
                                     '====================================='
-        write(100*this_proc+sub, '(a,i7,a,i7)')                    &
+        write(100*This_Proc()+sub, '(a,i7,a,i7)')                    &
               ' # There are        ', Grid % Comm % n_buff_cells,  &
-              ' buffer cells in processor ', this_proc
-        write(100*this_proc+sub, *) '#------------------------------------' // &
+              ' buffer cells in processor ', This_Proc()
+        write(100*This_Proc()+sub, *)                                          &
+                                    '#------------------------------------' // &
                                     '-------------------------------------'
-        write(100*this_proc+sub, '(a,i7,a,i7)')                       &
-              ' #   It needs       ', recv_buff_cnt(this_proc, sub),  &
+        write(100*This_Proc()+sub, '(a,i7,a,i7)')                       &
+              ' #   It needs       ', recv_buff_cnt(This_Proc(), sub),  &
               ' cells from processors     ', sub
       end if
     end do
@@ -101,8 +103,8 @@
   !--------------------------------------------------!
   n_max_buff_cells = Grid % Comm % n_buff_cells
   call Comm_Mod_Global_Max_Int(n_max_buff_cells)
-  allocate(need_cell(n_max_buff_cells, n_proc));  need_cell(:,:) = 0
-  allocate(from_proc(n_max_buff_cells, n_proc));  from_proc(:,:) = 0
+  allocate(need_cell(n_max_buff_cells, N_Procs()));  need_cell(:,:) = 0
+  allocate(from_proc(n_max_buff_cells, N_Procs()));  from_proc(:,:) = 0
 
   !-------------------------------------------!
   !   Store global number of cells you need   !
@@ -110,36 +112,36 @@
   !-------------------------------------------!
   i_cel = 0
   do c = Cells_In_Buffers()
-    Assert(Grid % Comm % cell_proc(c) .ne. this_proc)
+    Assert(Grid % Comm % cell_proc(c) .ne. This_Proc())
     i_cel = i_cel + 1
-    need_cell(i_cel, this_proc) = Grid % Comm % cell_glo(c)
-    from_proc(i_cel, this_proc) = Grid % Comm % cell_proc(c)
+    need_cell(i_cel, This_Proc()) = Grid % Comm % cell_glo(c)
+    from_proc(i_cel, This_Proc()) = Grid % Comm % cell_proc(c)
   end do
 
   !----------------------------------------------!
   !   Inform all processors about needed cells   !
   !   and from which processor are they needed   !
   !----------------------------------------------!
-  need_cell = reshape(need_cell, (/n_max_buff_cells*n_proc, 1/))
-  from_proc = reshape(from_proc, (/n_max_buff_cells*n_proc, 1/))
-  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*n_proc, need_cell)
-  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*n_proc, from_proc)
-  need_cell = reshape(need_cell, (/n_max_buff_cells, n_proc/))
-  from_proc = reshape(from_proc, (/n_max_buff_cells, n_proc/))
+  need_cell = reshape(need_cell, (/n_max_buff_cells*N_Procs(), 1/))
+  from_proc = reshape(from_proc, (/n_max_buff_cells*N_Procs(), 1/))
+  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*N_Procs(), need_cell)
+  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*N_Procs(), from_proc)
+  need_cell = reshape(need_cell, (/n_max_buff_cells, N_Procs()/))
+  from_proc = reshape(from_proc, (/n_max_buff_cells, N_Procs()/))
 
   !---------------------------------------------------------------------!
   !   Form send_buff_cnt from the information in the matrix from_proc   !
   !---------------------------------------------------------------------!
   send_buff_cnt(:,:) = 0
-  do sub = 1, n_proc
-    if(sub .ne. this_proc) then
+  do sub = 1, N_Procs()
+    if(sub .ne. This_Proc()) then
       do i_cel = 1, n_max_buff_cells
-        if(from_proc(i_cel, sub) .eq. this_proc) then
-          send_buff_cnt(this_proc, sub) = send_buff_cnt(this_proc, sub) + 1
+        if(from_proc(i_cel, sub) .eq. This_Proc()) then
+          send_buff_cnt(This_Proc(), sub) = send_buff_cnt(This_Proc(), sub) + 1
         end if
       end do
-      if(DEBUG) write(100*this_proc + sub, '(2(a,i7))')                &
-                      ' #   It should send ', send_buff_cnt(this_proc, sub),  &
+      if(DEBUG) write(100*This_Proc() + sub, '(2(a,i7))')                &
+                      ' #   It should send ', send_buff_cnt(This_Proc(), sub),  &
                       ' cells to processor        ', sub
     end if
   end do
@@ -147,27 +149,27 @@
   !--------------------------------------------------!
   !   Allocate memory for send and receive buffers   !
   !--------------------------------------------------!
-  allocate(Grid % Comm % cells_send(n_proc))
-  allocate(Grid % Comm % cells_recv(n_proc))
+  allocate(Grid % Comm % cells_send(N_Procs()))
+  allocate(Grid % Comm % cells_recv(N_Procs()))
 
   !-----------------------------------!
   !                                   !
   !   Form send and receive buffers   !
   !                                   !
   !-----------------------------------!
-  do sub = 1, n_proc
+  do sub = 1, N_Procs()
 
     ! Initialize buffer size to zero
     Grid % Comm % cells_send(sub) % n_items = 0
     Grid % Comm % cells_recv(sub) % n_items = 0
 
-    if(sub .ne. this_proc) then
+    if(sub .ne. This_Proc()) then
 
       !---------------------------------!
       !   Allocate memory for buffers   !
       !---------------------------------!
-      ms = send_buff_cnt(this_proc, sub)
-      mr = recv_buff_cnt(this_proc, sub)
+      ms = send_buff_cnt(This_Proc(), sub)
+      mr = recv_buff_cnt(This_Proc(), sub)
 
       if(ms > 0) then
         allocate(Grid % Comm % cells_send(sub) % map(ms));
@@ -194,7 +196,7 @@
       cnt = 0
       send_cells(:) = 0
       do i_cel = 1, n_max_buff_cells
-        if(from_proc(i_cel, sub) .eq. this_proc) then
+        if(from_proc(i_cel, sub) .eq. This_Proc()) then
           do c = Cells_In_Domain()
             if(Grid % Comm % cell_glo(c) .eq. need_cell(i_cel, sub)) then
               send_cells(c) = sub                                  ! identify
@@ -204,7 +206,7 @@
 
         end if
       end do
-      if(DEBUG) write(100*this_proc + sub, '(2(a,i7))')    &
+      if(DEBUG) write(100*This_Proc() + sub, '(2(a,i7))')    &
                       ' #   It did find    ', cnt,    &
                       ' cells to send to processor', sub
 
@@ -245,8 +247,8 @@
       ! end if
 
       if(DEBUG) then
-        write(100*this_proc+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
-              ' #   send/recv (', this_proc, '/', sub, ') =  ', ms, ' / ', mr
+        write(100*This_Proc()+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
+              ' #   send/recv (', This_Proc(), '/', sub, ') =  ', ms, ' / ', mr
       end if
 
       ! Store final buffer lengths
@@ -257,7 +259,7 @@
       if(ms > 0) deallocate(send_sort)
       if(mr > 0) deallocate(recv_sort)
 
-    end if  ! sub .ne. this_proc
+    end if  ! sub .ne. This_Proc()
   end do    ! sub
 
   !-------------------------------------!

@@ -37,7 +37,7 @@
 
   call Work % Connect_Real_Cell(cross)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',      ' # Computing wall distance ...'
     print '(a,i3,a)', ' # ... with ', NDT, ' fake time steps.'
     print '(a)',      ' # This might take a while, please wait'
@@ -200,7 +200,7 @@
                    phi % tol,        &
                    phi % res)
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a,i4,a,e12.4)', ' # Computed wall distance in ',  phi % eniter,  &
                               ' iterations with residual: ',    phi % res
     end if

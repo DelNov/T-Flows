@@ -19,13 +19,10 @@
     track_front = .false.
 
   else
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown state for track front: ',   &
-                trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
-
+    call Message % Error(60,                                             &
+                         'Unknown state for track front: '//trim(val)//  &
+                         '. \n This error is critical.  Exiting.',       &
+                         file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

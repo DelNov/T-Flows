@@ -9,7 +9,7 @@
 !==============================================================================!
 
   call File % Open_For_Reading_Ascii(file_name, root_control_file_unit,  &
-                                     processor=this_proc)
+                                     processor=This_Proc())
 
   ! Make root default to begin with
   control_file_unit = root_control_file_unit

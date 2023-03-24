@@ -11,7 +11,7 @@
 
   call Info_Mod_Bulk_Fill(Flow)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! String is L_LINE+2 long
     if(dom .eq. 1) then

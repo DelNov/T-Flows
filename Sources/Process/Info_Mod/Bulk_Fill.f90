@@ -8,7 +8,7 @@
   type(Field_Type) :: Flow
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Courant and Peclet numbers
     write(bulk_info % lines(1)( 27: 49),    '(a23)') 'Maximum Courant number:'

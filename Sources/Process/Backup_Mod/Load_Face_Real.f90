@@ -40,7 +40,7 @@
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
-      if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
+      if(First_Proc()) print *, '# Reading variable: ', trim(vn)
 
       i_sid = 1                 ! local side counter
       do sg = 1, Comm % nf_tot  ! global side loop
@@ -81,7 +81,7 @@
 
   return
 
-1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+1 if(First_Proc()) print *, '# Variable: ', trim(var_name), ' not found! ',  &
                              'Setting the values to 0.0!'
   array(:) = 0.0
 

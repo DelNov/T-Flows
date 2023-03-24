@@ -20,12 +20,10 @@
     save_init_cond = .false.
 
   else
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown state for save_init_cond: ', trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
-
+    call Message % Error(72,                                            &
+             'Unknown state for save initial condition: '//trim(val)//  &
+             '. \n This error is critical.  Exiting.',                  &
+             file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

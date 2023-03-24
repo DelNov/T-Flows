@@ -11,12 +11,11 @@
                                    val, verbose)
   call String % To_Lower_Case(val)
 
-  if( val.ne.'bicg' .and. val.ne.'cgs' .and. val.ne.'cg') then
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown linear solver for pressure: ', trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
+  if( val .ne. 'bicg' .and. val .ne. 'cg') then
+    call Message % Error(60,                                       &
+             'Unknown linear solver for potential: '//trim(val)//  &
+             '. \n This error is critical.  Exiting.',             &
+             file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

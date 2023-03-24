@@ -33,7 +33,7 @@
 
   ! Header
   if(sweep .eq. 1) then
-    if(n_proc > 1 .and. this_proc .eq. 1) then
+    if(Parallel_Run() .and. First_Proc()) then
       write(fs) IN_4                                  //  &
                 '<PDataArray type='//floatp           //  &
                 ' Name="' // trim(var_name) // '"/>'  // LF

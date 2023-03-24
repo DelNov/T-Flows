@@ -13,18 +13,18 @@
   call Mpi_Init(error)
 
   ! Get number of processors
-  call Mpi_Comm_Size(MPI_COMM_WORLD, n_proc, error) 
+  call Mpi_Comm_Size(MPI_COMM_WORLD, Communicator % n_processors, error)
 
   ! Get current processor number
-  call Mpi_Comm_Rank(MPI_COMM_WORLD, this_proc, error)
+  call Mpi_Comm_Rank(MPI_COMM_WORLD, Communicator % this_processor, error)
 
   ! Use Fortran counting - from 1
-  this_proc = this_proc + 1
+  Communicator % this_processor = Communicator % this_processor + 1
 
   ! But if run is sequential, set the only processor to zero
-  if(n_proc .eq. 1) then
-    n_proc = 0
-    this_proc = 0
+  if(Communicator % n_processors .eq. 1) then
+    Communicator % n_processors   = 0
+    Communicator % this_processor = 0
   endif
 
   ! Set proper types for communication
@@ -37,7 +37,7 @@
 
   ! Make sure that integers are 32-bit
   if(IP .eq. DP) then
-    if(this_proc < 2) then
+    if(Communicator % this_processor < 2) then
       print *, '# Error - 64 bit integers are not supported!'
       print *, '# This error is critical, exiting!'
       call Comm_Mod_End

@@ -8,7 +8,7 @@
   integer :: i, l
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Create frame
     do i = 1, L_LINE, L_LINE-1

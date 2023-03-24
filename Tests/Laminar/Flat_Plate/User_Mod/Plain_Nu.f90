@@ -49,7 +49,7 @@
   inquire(file='x_coordinate.dat', exist=there)
 
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "File x_coordinate.dat does not exist. Exit Plain_Nu.f90 !"
     end if
     return
@@ -215,6 +215,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) write(*,*) '# Finished with User_Plain_Nu'
+  if(First_Proc()) write(*,*) '# Finished with User_Plain_Nu'
 
   end subroutine

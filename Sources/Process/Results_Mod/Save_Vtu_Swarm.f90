@@ -54,7 +54,7 @@
   end do
 
   if(n_remaining_particles .eq. 0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# No particles remaining in the domain, nothing to save!'
     end if
     return
@@ -66,7 +66,7 @@
   !                            !
   !----------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     call File % Set_Name(name_out,             &
                          time_step=time_step,  &

@@ -59,8 +59,8 @@
 
           ! Cell is invalid
           if(Swarm % Particle(p) % cell .eq. -1) then
-            print '(a,i6,a,i6,a)', ' # PANIC: Particle ', p,          &
-                                   ' from processor ',    this_proc,  &
+            print '(a,i6,a,i6,a)', ' # PANIC: Particle ', p,            &
+                                   ' from processor ',    This_Proc(),  &
                                    ' couldn''t be located!'
             print *, '# Check initial placement of particles.'
             print *, '# This error is critical, exiting!'

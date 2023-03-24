@@ -40,13 +40,13 @@
                        extension = '.pvtu',    &
                        domain    = domain)
   call File % Set_Name(name_out_9,             &
-                       processor = this_proc,  &
+                       processor = This_Proc(),  &
                        time_step = time_step,  &
                        appendix  = '-front',   &
                        extension = '.vtu',     &
                        domain    = domain)
 
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     call File % Open_For_Writing_Binary(name_out_8, f8)
   end if
   call File % Open_For_Writing_Ascii(name_out_9, f9)
@@ -56,7 +56,7 @@
   !   Header   !
   !            !
   !------------!
-  if(this_proc .eq. 1)  then
+  if(This_Proc() .eq. 1)  then
     write(f8) IN_0 // '<?xml version="1.0"?>'              // LF
     write(f8) IN_0 // '<VTKFile type="PUnstructuredGrid">' // LF
     write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="1">' // LF
@@ -76,7 +76,7 @@
   !   Vertex coordinates   !
   !                        !
   !------------------------!
-  if(this_proc .eq. 1)  then
+  if(This_Proc() .eq. 1)  then
     write(f8) IN_3 // '<PPoints>'                                 // LF
     write(f8) IN_4 // '<PDataArray type='//floatp//''             //  &
                       ' NumberOfComponents="3" format="ascii"/>'  // LF
@@ -100,7 +100,7 @@
   !   Point data   !
   !                !
   !----------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_3 // '<PPointData>' // LF
   end if
   write(f9,'(a,a)') IN_3, '<PointData>'
@@ -108,7 +108,7 @@
   !--------------------!
   !   Particle i.d.s   !
   !--------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//intp//' Name="Index" '    //  &
                       'format="ascii"/>'                             // LF
   end if
@@ -122,7 +122,7 @@
   !--------------------------!
   !   Number of neighbours   !
   !--------------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//intp//' Name="Neighbours" '  //  &
                       'format="ascii"/>'                                // LF
   end if
@@ -136,7 +136,7 @@
   !-----------------------------!
   !   Curvatures at the nodes   !
   !-----------------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//floatp//' Name="NodeCurv" ' //  &
                       ' format="ascii"/>'                              // LF
   end if
@@ -148,7 +148,7 @@
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_3 // '</PPointData>' // LF
   end if
   write(f9,'(a,a)') IN_3, '</PointData>'
@@ -158,7 +158,7 @@
   !   Cells   !
   !           !
   !-----------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_3 // '<PCells>' // LF
     write(f8) IN_4 // '<PDataArray type='//intp//' Name="connectivity"'  //  &
                       ' format="ascii"/>'                                // LF
@@ -174,7 +174,7 @@
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
   ! Cell offsets
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//intp//' Name="offsets"'  //  &
                       ' format="ascii"/>'                           // LF
   end if
@@ -188,7 +188,7 @@
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
   ! Cell types
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//intp//' Name="types"'  //  &
                       ' format="ascii"/>'                         // LF
   end if
@@ -199,7 +199,7 @@
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_3 // '</PCells>' // LF
   end if
   write(f9,'(a,a)') IN_3, '</Cells>'
@@ -211,7 +211,7 @@
   !---------------!
 
   ! Beginning of cell data
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_3 // '<PCellData>'  // LF
   end if
   write(f9,'(a,a)') IN_3, '<CellData>'
@@ -219,7 +219,7 @@
   !-------------------------------------!
   !   Number of neighbouring elements   !
   !-------------------------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//intp//' Name="Neighbours"'  //  &
                       ' format="ascii"/>'                              // LF
   end if
@@ -233,7 +233,7 @@
   !---------------------!
   !   Surface normals   !
   !---------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//floatp                 //  &
                       ' Name="ElementNormals" '                   //  &
                       ' NumberOfComponents="3" format="ascii"/>'  // LF
@@ -252,7 +252,7 @@
   !-------------------!
   !   Element areas   !
   !-------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//floatp  //  &
                       ' Name="ElementArea" '       //  &
                       ' format="ascii"/>'          // LF
@@ -268,7 +268,7 @@
   !-------------------------!
   !   Element coordinates   !
   !-------------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//floatp                 //  &
                       ' Name="ElementCoordinates"'                //  &
                       ' NumberOfComponents="3" format="ascii"/>'  // LF
@@ -288,7 +288,7 @@
   !------------------------!
   !   Surface curvatures   !
   !------------------------!
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_4 // '<PDataArray type='//floatp  //  &
                       ' Name="ElementCurv" '       //  &
                       ' format="ascii"/>'          // LF
@@ -302,7 +302,7 @@
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
   ! End of cell data
-  if(this_proc .eq. 1) then
+  if(This_Proc() .eq. 1) then
     write(f8) IN_3 // '</PCellData>' // LF
   end if
   write(f9,'(a,a)') IN_3, '</CellData>'
@@ -312,8 +312,8 @@
   !   Footer   !
   !            !
   !------------!
-  if(this_proc .eq. 1) then
-    do n = 1, n_proc
+  if(This_Proc() .eq. 1) then
+    do n = 1, N_Procs()
       call File % Set_Name(name_out_9,             &
                            processor = n,          &
                            time_step = time_step,  &

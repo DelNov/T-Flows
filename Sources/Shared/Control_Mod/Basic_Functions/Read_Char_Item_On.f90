@@ -38,7 +38,7 @@
   !   Keyword was not found; issue a warning   !
   !--------------------------------------------!
 1 if(present(verbose)) then
-    if(verbose .and. this_proc < 2) then
+    if(verbose .and. First_Proc()) then
       print '(4a)', ' # NOTE! Could not find the keyword: ',  &
                       trim(keyword), '. Using the default: ', trim(def)
     end if

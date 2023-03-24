@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Error(Msg, width, message_text, file, line, one_proc)
+  subroutine Error(Message, width, message_text, file, line, one_proc)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Message_Type)                :: Msg
+  class(Message_Type)                :: Message
   integer,                intent(in) :: width
   character(*),           intent(in) :: message_text
   character(*), optional, intent(in) :: file
   integer,      optional, intent(in) :: line
   logical,      optional, intent(in) :: one_proc  ! print from one processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: w
+  integer       :: wd
   character(DL) :: header_text
 !==============================================================================!
 
@@ -27,19 +27,19 @@
   end if
 
   ! Adjust width, if necessary
-  w = max(width, len_trim(header_text)+3)
+  wd = max(width, len_trim(header_text)+3)
 
   !-----------------------------------!
   !   Print the body of the message   !
   !-----------------------------------!
   if(present(one_proc)) then
     if(one_proc) then
-      if(this_proc < 2) call Msg % Framed(w, header_text, message_text)
+      if(First_Proc()) call Message % Framed(wd, header_text, message_text)
     else
-      call Msg % Framed(w, header_text, message_text)
+      call Message % Framed(wd, header_text, message_text)
     end if
   else
-    call Msg % Framed(w, header_text, message_text)
+    call Message % Framed(wd, header_text, message_text)
   end if
 
   !----------------------------------------!

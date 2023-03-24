@@ -126,7 +126,7 @@
                                   x(i))
     end do
   else
-    ! if(this_proc < 2) print *, ' # Warning: linear system failed to converge!'
+    ! if(First_Proc()) print *, ' # Warning: linear system failed to converge!'
   end if
 
   end subroutine

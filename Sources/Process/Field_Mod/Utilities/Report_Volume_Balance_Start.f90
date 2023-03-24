@@ -9,9 +9,11 @@
   integer, intent(in) :: curr_dt, ini
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     if(Flow % report_vol_balance) then
-      call File % Append_For_Writing_Ascii('volume.bal', Flow % fuvbr,this_proc)
+      call File % Append_For_Writing_Ascii('volume.bal',  &
+                                           Flow % fuvbr,  &
+                                           This_Proc())
       if(Flow % p_m_coupling == PISO) then
         if(curr_dt .eq. 1 .and. ini .eq. 1 .and. Flow % i_corr .eq. 1) then
           write(Flow % fuvbr, '(a)')  '# Report on volume balance'

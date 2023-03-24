@@ -44,7 +44,7 @@
       ! Take aliases for the particle
       Part => Swarm % Particle(k)
 
-      if(Part % proc .eq. this_proc) then
+      if(Part % proc .eq. This_Proc()) then
         i = (k-1) * Swarm % N_I_VARS
         Swarm % i_work(i + 1) = Part % proc  ! where it resides
         Swarm % i_work(i + 2) = Part % buff  ! where it wants to go

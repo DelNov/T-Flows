@@ -110,7 +110,7 @@
   call Comm_Mod_Global_Sum_Real(b_volume)
 
   ! Write to file
-  if (this_proc < 2) then
+  if (First_Proc()) then
     call File % Append_For_Writing_Ascii('probe-data.dat', fu)
     write(fu,'((e16.10e2),9(2x,e16.10e2),4(2x,e16.10e2))')            &
           time, b_volume, p_probe(1:size(nod_probe)),   &

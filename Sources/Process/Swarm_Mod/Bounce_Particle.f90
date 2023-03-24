@@ -35,7 +35,7 @@
     s = Grid % cells_bnd_face(c2)  ! index of the closest boundary face
   end if
 
-  ! Debug: write(this_proc*1000+k, '(a,4i7)')  &
+  ! Debug: write(This_Proc()*1000+k, '(a,4i7)')  &
   ! Debug:                         'time, part, cell and face: ', n, k, c2, s
 
   ! If no boundary cell close, no need to stay here
@@ -119,7 +119,7 @@
       escaped = .true.
       ! Mark the particle by enlarging it big time
       Part % d = 1.0e-4
-      ! Debug: write(this_proc*1000+k, '(a,2i7,a)')  &
+      ! Debug: write(This_Proc()*1000+k, '(a,2i7,a)')  &
       ! Debug:                         'time, part ', n, k, ' is out'
     end if
 
@@ -222,7 +222,7 @@
           ! Increasing the number of particle reflections
           Swarm % n_reflected(c2) = Swarm % n_reflected(c2) + 1
 
-          ! Debug: write(this_proc*1000+k, '(a,2i7, 5(e12.4))')       &
+          ! Debug: write(This_Proc()*1000+k, '(a,2i7, 5(e12.4))')       &
           ! Debug:                         'time, part bounced at ',  &
           ! Debug:                         n, k,                      &
           ! Debug:                         xi, yi, zi, dsc_n, dsc_o

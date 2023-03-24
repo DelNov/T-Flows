@@ -232,7 +232,7 @@
         Flow(d1) % t % n(bc1) = t_int
 
         ! If not in a buffer, update accumulated variables
-        if(Grid1 % Comm % cell_proc(ic1) .eq. this_proc) then
+        if(Grid1 % Comm % cell_proc(ic1) .eq. This_Proc()) then
           mem_j_heat_acc = mem_j_heat_acc  + mem_j_heat * Grid1 % s(n)
           mem_j_diff_acc = mem_j_diff_acc  + mem_j_diff * Grid1 % s(n)
           t_int_acc      = t_int_acc       + t_int      * Grid1 % s(n)
@@ -309,7 +309,7 @@
   mem_j_heat_avg = mem_j_heat_acc / area_acc
   t_int_avg      = t_int_acc      / area_acc
   ! Control
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, 'mem_j_diff = ' , mem_j_diff_avg * 3600, ' kg/m²h'
     print *, 'mem_j_heat = ' , mem_j_heat_avg * 3600, ' kg/m²h'
     print *, 'jump condition coefficients: ', lhs_lin, lhs_fun, rhs

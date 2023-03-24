@@ -1,5 +1,9 @@
- MAX_THREADS  4
- 
+#------------------------------------------
+# A couple of things specific to this case
+#------------------------------------------
+ MAX_THREADS    4
+ PROFILER_INFO  seconds
+
 #----------
 # Prologue
 #---------
@@ -15,7 +19,7 @@
 #LOAD_BACKUP_NAME backstep_orthogonal-ts000001.backup
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
  NUMBER_OF_MONITORING_POINTS    1
    MONITORING_POINT_001         0.5  0.5  0.2
@@ -28,8 +32,6 @@
  MASS_DENSITY           1.0
  DYNAMIC_VISCOSITY      1.0e-3
  HEAT_CAPACITY          1.0
-
-TURBULENCE_MODEL none
 
 #----------------------
 # Numerical parameters
@@ -55,11 +57,6 @@ TURBULENCE_MODEL none
  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
  MIN_SIMPLE_ITERATIONS              1
 
-#--------------------
-# Initial conditions
-#--------------------
-#  POTENTIAL_INITIALIZATION   yes
-
 #---------------------
 # Boundary conditions
 #---------------------
@@ -82,5 +79,3 @@ TURBULENCE_MODEL none
     TYPE                convective
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
-INTERFACE_TRACKING no
-PARTICLE_TRACKING no

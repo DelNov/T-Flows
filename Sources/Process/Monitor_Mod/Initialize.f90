@@ -81,7 +81,7 @@
     end do
 
     ! Check if smaller distance is found on another processor
-    if(n_proc > 1) then
+    if(Parallel_Run()) then
       min_dist_all = min_dist(m)
       call Comm_Mod_Global_Min_Real(min_dist_all)
 

@@ -39,7 +39,7 @@
   inquire(file='horizontal_positions.dat', exist=there)
 
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "#============================================================"
       print *, "# In order to extract profiles and write them in ascii files "
       print *, "# the code has to read ascii file in which positions of the  "
@@ -70,11 +70,11 @@
   !------------------!
   !   Read 1d file   !
   !------------------!
-  if(this_proc < 2) print *, '# Now reading the file:', coord_name
+  if(First_Proc()) print *, '# Now reading the file:', coord_name
 
   inquire( file=coord_name, exist=there ) 
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "==========================================================="
       print *, "In order to extract profiles and write them in ascii files "
       print *, "the code has to read cell-faces coordinates                "
@@ -272,6 +272,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) print *, '# Finished with User_Backstep_Profiles'
+  if(First_Proc()) print *, '# Finished with User_Backstep_Profiles'
 
   end subroutine

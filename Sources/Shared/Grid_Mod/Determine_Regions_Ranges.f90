@@ -32,7 +32,7 @@
 
   ! Forward
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       reg = Grid % region % at_cell(c)
       if(c < Grid % region % f_cell(reg)) then
         Grid % region % f_cell(reg) = c
@@ -42,7 +42,7 @@
 
   ! Backward
   do c = -1, -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       reg = Grid % region % at_cell(c)
       if(c > Grid % region % l_cell(reg)) then
         Grid % region % l_cell(reg) = c
@@ -57,7 +57,7 @@
   Grid % region % f_cell(reg) = Grid % n_cells
   Grid % region % l_cell(reg) = 1
   do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       if(c < Grid % region % f_cell(reg)) then
         Grid % region % f_cell(reg) = c
       end if
@@ -77,7 +77,7 @@
   Grid % region % f_cell(reg) = Grid % n_cells + 1
   Grid % region % l_cell(reg) = Grid % n_cells
   do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .ne. this_proc) then
+    if(Grid % Comm % cell_proc(c) .ne. This_Proc()) then
       if(c < Grid % region % f_cell(reg)) then
         Grid % region % f_cell(reg) = c
       end if
@@ -88,10 +88,10 @@
   end do
 
   if(DEBUG) then
-    write(1000+this_proc, '(a,a)')  ' # Cell ranges from ', PROGRAM_NAME
+    write(1000+This_Proc(), '(a,a)')  ' # Cell ranges from ', PROGRAM_NAME
     do reg = All_Regions()
       siz = Grid % region % l_cell(reg) - Grid % region % f_cell(reg) + 1
-      write(1000+this_proc,'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
+      write(1000+This_Proc(),'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
                                            Grid % region % f_cell(reg),  &
                                            Grid % region % l_cell(reg),  &
                                            max(siz, 0), '  ',            &
@@ -138,15 +138,15 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
     if(c2 > 0) then  ! limit to inside faces
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .or.  &
-         Grid % Comm % cell_proc(c2) .eq. this_proc) then
+      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .or.  &
+         Grid % Comm % cell_proc(c2) .eq. This_Proc()) then
         if(s <= Grid % region % f_face(reg)) then
           Grid % region % f_face(reg) = s
         end if
         if(s >= Grid % region % l_face(reg)) then
           Grid % region % l_face(reg) = s
         end if
-        Assert(Grid % Comm % cell_proc(c1) .eq. this_proc)  ! this should hold
+        Assert(Grid % Comm % cell_proc(c1) .eq. This_Proc())  ! this should hold
       end if
     end if  ! c2 > 0
   end do
@@ -168,26 +168,26 @@
   do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(Grid % Comm % cell_proc(c1) .eq. this_proc .and.  &
-       Grid % Comm % cell_proc(c2) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and.  &
+       Grid % Comm % cell_proc(c2) .eq. This_Proc()) then
       last_face_only_inside = max(last_face_only_inside, s)
     end if
-    if(Grid % Comm % cell_proc(c1) .eq. this_proc .and.  &
-       Grid % Comm % cell_proc(c2) .ne. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and.  &
+       Grid % Comm % cell_proc(c2) .ne. This_Proc()) then
       first_face_in_buffers = min(first_face_in_buffers, s)
     end if
   end do
   Assert(last_face_only_inside < first_face_in_buffers)
 
   if(DEBUG) then
-    write(2000+this_proc, '(a,a)')  ' # Face ranges from ', PROGRAM_NAME
+    write(2000+This_Proc(), '(a,a)')  ' # Face ranges from ', PROGRAM_NAME
     do reg = All_Regions()
       siz = Grid % region % l_face(reg) - Grid % region % f_face(reg) + 1
-      write(2000+this_proc,'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
-                                           Grid % region % f_face(reg),  &
-                                           Grid % region % l_face(reg),  &
-                                           max(siz, 0), '  ',            &
-                                           trim(Grid % region % name(reg))
+      write(2000+This_Proc(),'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg,    &
+                                             Grid % region % f_face(reg),     &
+                                             Grid % region % l_face(reg),     &
+                                             max(siz, 0), '  ',               &
+                                             trim(Grid % region % name(reg))
     end do
   end if
 

@@ -67,7 +67,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -229,7 +229,7 @@
                                    / wall_p(1))  &
                                    / dens_const)
   if(u_tau_p .eq. 0.0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
     return
@@ -425,6 +425,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

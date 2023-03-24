@@ -8,7 +8,7 @@
   type(Bulk_Type) :: bulk
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     write(*,'(a7,es12.5)') ' # Ax :', bulk % area_x
     write(*,'(a7,es12.5)') ' # Ay :', bulk % area_y
     write(*,'(a7,es12.5)') ' # Az :', bulk % area_z

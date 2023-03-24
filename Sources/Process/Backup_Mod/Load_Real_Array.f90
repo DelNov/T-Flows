@@ -36,7 +36,7 @@
 
     ! If variable is found, read it and retrun
     if(vn .eq. arr_name) then
-      if(this_proc < 2) print *, '# Reading array: ', trim(vn)
+      if(First_Proc()) print *, '# Reading array: ', trim(vn)
       call Comm % Read_Real_Array(fh, arr_value(1:length), disp_loop)
       disp = disp_loop
       return
@@ -51,7 +51,7 @@
 
   end do
 
-1 if(this_proc < 2) print *, '# Array: ', trim(arr_name), ' not found!',  &
+1 if(First_Proc()) print *, '# Array: ', trim(arr_name), ' not found!',  &
                              'Setting the values to 0.0!'
   arr_value(:) = 0.0
 

@@ -24,10 +24,10 @@
   end if
 
   ! Compute average time spent in functions over all processors
-  if(n_proc > 1) then
+  if(Parallel_Run()) then
     do i_fun=1, Profiler % n_functions
       call Comm_Mod_Global_Sum_Real(Profiler % funct_time(i_fun))
-      Profiler % funct_time(i_fun) = Profiler % funct_time(i_fun) / n_proc
+      Profiler % funct_time(i_fun) = Profiler % funct_time(i_fun) / N_Procs()
     end do
   end if
 
@@ -54,7 +54,7 @@
     total_time = total_time + Profiler % funct_time(i_fun)
   end do
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     line( 1:160) = ' '
     line( 1+indent:65+indent) =   &

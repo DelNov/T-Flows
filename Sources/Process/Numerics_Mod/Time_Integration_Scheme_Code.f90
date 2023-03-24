@@ -1,12 +1,12 @@
 !==============================================================================!
-  integer function Numerics_Mod_Time_Integration_Scheme_Code(scheme_name)
+  integer function Numerics_Mod_Time_Integration_Scheme_Code(name)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL) :: scheme_name
+  character(SL) :: name
 !==============================================================================!
 
-  select case(scheme_name)
+  select case(name)
 
     case('LINEAR')
       Numerics_Mod_Time_Integration_Scheme_Code = LINEAR
@@ -16,14 +16,9 @@
       Numerics_Mod_Time_Integration_Scheme_Code = RUNGE_KUTTA_3
 
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown time-integration scheme: ',  &
-                 trim(scheme_name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-      stop
-
+      call Message % Error(60,                                    &
+               'Unknown time-integration scheme: '//trim(name)//  &
+               '. \n Exiting!', one_proc=.true.)
   end select
 
   end function

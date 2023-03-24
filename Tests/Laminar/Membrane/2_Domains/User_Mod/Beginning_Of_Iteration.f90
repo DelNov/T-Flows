@@ -142,7 +142,7 @@
                  + k_film / d_film * (t_film - t_int)) / h_d
 
           ! If not in a buffer, update accumulated variables
-          if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
+          if(Grid % Comm % cell_proc(c1) .eq. This_Proc()) then
             t_int_acc  = t_int_acc  + t_int  * Grid % s(s)
             m_evap_acc = m_evap_acc + m_evap * Grid % s(s)
             area_acc   = area_acc   + Grid % s(s)
@@ -159,7 +159,7 @@
     call Comm_Mod_Global_Sum_Real(area_acc)
     m_evap_avg = m_evap_acc / area_acc
     t_int_avg  = t_int_acc  / area_acc
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print * , 'm_evap =', m_evap_avg * 3600, ' kg/m²h '
       print * , 't_int = ', t_int_avg, 'Celsius'
     end if

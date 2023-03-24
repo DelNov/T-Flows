@@ -6,14 +6,6 @@
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: Flow
@@ -58,7 +50,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -118,7 +110,7 @@
   !do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
   !  ww_mod_p(c) =  Turb % kin_mean(c) * Turb % zeta_mean(c)
   !end do 
-  !if(this_proc < 2) then 
+  !if(First_Proc()) then 
   ! print *, "w_mod(503) = ", ww_mod_p(503)
   ! print *, "min_val_wmod = ", minval(ww_mod_p(:))
   ! print *, "max_val_wmod = ", maxval(ww_mod_p(:))
@@ -230,7 +222,7 @@
   end if
 
   if(u_tau_p < TINY) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
     return
@@ -344,6 +336,6 @@
   close(fu1)
   close(fu2)
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

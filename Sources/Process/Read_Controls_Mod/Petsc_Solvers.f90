@@ -75,7 +75,7 @@
     v % tol = tol
     w % tol = tol
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for momentum are not specified.'  //  &
                 ' Using the default values'
     end if
@@ -105,7 +105,7 @@
     Flow % pp % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % pp % tol = tol
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for pressure are not specified.'  //  &
                ' Using the default values'
     end if
@@ -131,7 +131,7 @@
     Flow % wall_dist % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % wall_dist % tol = tol
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for potential are not specified.'  //  &
                ' Using the default values'
     end if
@@ -157,7 +157,7 @@
     Flow % pot % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % pot % tol = tol
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for potential are not specified.'  //  &
                ' Using the default values'
     end if
@@ -183,7 +183,7 @@
     Vof % fun % prec_opts(1:n_opts) = opts(1:n_opts)
     Vof % fun % tol = tol
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for VOF are not specified.'  //  &
                ' Using the default values'
     end if
@@ -209,7 +209,7 @@
     t % prec_opts(1:n_opts) = opts(1:n_opts)
     t % tol = tol
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for energy are not specified.'  //  &
                ' Using the default values'
     end if
@@ -239,7 +239,7 @@
       phi % tol = tol
     end do
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for scalars are not specified.'  //  &
                ' Using the default values'
     end if
@@ -282,7 +282,7 @@
       tq % tol                 = tol
     end do
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! PETSc options for turbulence are not specified.'  //  &
                ' Using the default values'
     end if

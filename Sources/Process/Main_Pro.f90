@@ -83,8 +83,8 @@
     call Control_Mod_Problem_Name(problem_name(d))
 
     ! Load the finite volume Grid
-    call Grid(d) % Load_Cfn(this_proc, domain=d)
-    call Grid(d) % Load_Dim(this_proc, domain=d)
+    call Grid(d) % Load_Cfn(This_Proc(), domain=d)
+    call Grid(d) % Load_Dim(This_Proc(), domain=d)
 
     ! Determine threads for OpenMP runs
     call Control_Mod_Max_Threads(Grid(d) % Vect % d_threads, .true.)
@@ -436,7 +436,7 @@
 
   end do ! curr_dt until the last time step
 
-2 if(this_proc < 2) print *, '# Exiting !'
+2 if(First_Proc()) print *, '# Exiting !'
 
   do d = 1, n_dom
     ! Close monitoring files

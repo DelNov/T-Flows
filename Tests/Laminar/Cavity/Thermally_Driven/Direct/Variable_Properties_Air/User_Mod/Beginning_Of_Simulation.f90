@@ -44,7 +44,7 @@
 
   close(fu)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',        ' #============================================'
     print '(a)',        ' # Output from user function, read properties!'
     print '(a)',        ' #--------------------------------------------'

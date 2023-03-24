@@ -25,17 +25,15 @@
   call String % To_Lower_Case(val)
 
   ! Check validity of the input
-  if( val.ne.'none'                .and.  &
-      val.ne.'diagonal'            .and.  &
-      val.ne.'jacobi'              .and.  &
-      val.ne.'incomplete_cholesky' .and.  &
-      val.ne.'icc') then
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown preconditioner for the system matrix: ',  &
-               trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
+  if( val .ne. 'none'                .and.  &
+      val .ne. 'diagonal'            .and.  &
+      val .ne. 'jacobi'              .and.  &
+      val .ne. 'incomplete_cholesky' .and.  &
+      val .ne. 'icc') then
+    call Message % Error(72,                                                &
+             'Unknown preconditioner for the system matrix: '//trim(val)//  &
+             '. \n This error is critical.  Exiting.',                      &
+             file=__FILE__, line=__LINE__, one_proc=.true.)
 
   ! Use the same names as PETSc
   else

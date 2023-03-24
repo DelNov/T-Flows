@@ -42,7 +42,7 @@
   !   Keyword was not found; issue a warning   !
   !--------------------------------------------!
 1 if(present(verbose)) then
-    if(verbose .and. this_proc < 2) then
+    if(verbose .and. First_Proc()) then
       if(def .eq. HUGE_INT) then
         print '(3a,i9)', ' # NOTE! Could not find the keyword: ',  &
                           trim(keyword), '. Using the default HUGE_INT value'

@@ -4,13 +4,6 @@
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
-  use Var_Mod,   only: Var_Type
-  use Const_Mod, only: PI
-  use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target     :: Flow
@@ -79,7 +72,7 @@
 !!  nn =  n - 340000 - 1 ! since we started having particle distribution from...
 !                       ! ... n = 340001! 
 !!  if(mod(nn , 2500) .eq. 0 .or. n .eq. n_bin .and. n .le. 347500) then
-!    if(this_proc < 2) then
+!    if(First_Proc()) then
 !
 !      level = 0.0 
 !      temp  = 0 
@@ -164,7 +157,7 @@
   if(n > 1200) return
 
   ! Print a message
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Superimposing random eddies on top of velocity field!'
   end if
 

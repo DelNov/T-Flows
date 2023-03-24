@@ -22,7 +22,7 @@
   ! Take alias
   Comm => Grid % Comm
 
-  if(this_proc < 2) print *, '# Writing variable: ', trim(var_name)
+  if(First_Proc()) print *, '# Writing variable: ', trim(var_name)
 
   ! Increase variable count
   vc = vc + 1

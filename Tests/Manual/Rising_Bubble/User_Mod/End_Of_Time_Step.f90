@@ -41,7 +41,7 @@
   call Comm_Mod_Global_Sum_Real(rise_velocity)
 
   ! Write to file
-  if (this_proc < 2) then
+  if (First_Proc()) then
     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
 
     write(fu,'(4(2x,e16.10e2))') time,                   &

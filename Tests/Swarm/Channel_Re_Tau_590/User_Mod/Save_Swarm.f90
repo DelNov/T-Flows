@@ -7,15 +7,6 @@
 !   The results are then writen in files swarm_name_res.dat and                !
 !   swarm_name_res_plus.dat                                                    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
-  use Swarm_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: Flow
@@ -62,7 +53,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -243,7 +234,7 @@
                                    w_p(1)**2) / wall_p(1)))
 
   if(u_tau_p .eq. 0.0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Swarm.f90!'
     end if
     return
@@ -329,6 +320,6 @@
   close(fu1)
   close(fu2)
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Swarm.f90.'
 
   end subroutine

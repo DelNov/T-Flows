@@ -48,7 +48,7 @@
   call Comm_Mod_Global_Sum_Real(vol_in)
   vel_in = vol_in / area_in
 
-  ! if(this_proc < 2) then
+  ! if(First_Proc()) then
   !   print *, '@ User_Mod_Beginning_Of_Time_Step'
   !   print *, '@ average inflow velocity = ', vel_in
   ! end if

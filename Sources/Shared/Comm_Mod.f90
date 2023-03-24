@@ -65,6 +65,9 @@
     type(Buffer_Type), allocatable :: cells_send(:)
     type(Buffer_Type), allocatable :: cells_recv(:)
 
+    integer, private :: n_processors    ! number of processors
+    integer, private :: this_processor  ! current processor
+
     contains
 
       ! File management
@@ -101,8 +104,11 @@
 
   end type
 
-  integer :: this_proc  ! processor i.d.
-  integer :: n_proc     ! number of processors
+  !------------------------------------------------------------------------!
+  !   A big global communicator, introduced essentiall to give access to   !
+  !   private variables n_processors and this_processor to other objects   !
+  !------------------------------------------------------------------------!
+  type(Comm_Type) :: Communicator
 
   ! These communication types will depend on precision
 #if T_FLOWS_MPI == 1
@@ -116,6 +122,13 @@
 #endif
 
   contains
+
+    ! Shared pure function
+#   include "Comm_Mod/Shared/First_Proc.f90"
+#   include "Comm_Mod/Shared/N_Procs.f90"
+#   include "Comm_Mod/Shared/Parallel_Run.f90"
+#   include "Comm_Mod/Shared/Sequential_Run.f90"
+#   include "Comm_Mod/Shared/This_Proc.f90"
 
 # if T_FLOWS_MPI == 1
     ! Three basic ones are non-member

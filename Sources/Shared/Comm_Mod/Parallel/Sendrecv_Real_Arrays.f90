@@ -6,22 +6,22 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: len_s         ! send length
-  real             :: phi_s(len_s)  ! send buffer
-  integer          :: len_r         ! receive length
-  real             :: phi_r(len_r)  ! receive buffer
-  integer          :: dest          ! destination processor
+  class(Comm_Type), intent(in)  :: Comm
+  integer,          intent(in)  :: len_s         ! send length
+  real,             intent(in)  :: phi_s(len_s)  ! send buffer
+  integer,          intent(in)  :: len_r         ! receive length
+  real,             intent(out) :: phi_r(len_r)  ! receive buffer
+  integer,          intent(in)  :: dest          ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer          :: rtag, stag, error
+  integer          :: rtag, stag, error  ! tags to send and receive, error
   type(Mpi_Status) :: status
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Comm)
 !==============================================================================!
 
   ! Form send and receive tags
-  stag = (n_proc) * this_proc + dest  ! tag for sending
-  rtag = (n_proc) * dest + this_proc  ! tag for receiving
+  stag = Communicator % n_processors * Communicator % this_processor + dest
+  rtag = Communicator % n_processors * dest + Communicator % this_processor
 
   call Mpi_Sendrecv(phi_s(1),              & ! send buffer
                     len_s,                 & ! send length

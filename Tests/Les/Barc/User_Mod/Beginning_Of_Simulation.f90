@@ -17,7 +17,7 @@
 !==============================================================================!
 
   ! Make sure you compiled it
-  if(this_proc < 2) print *, '# In User_Mod_Beginning_Of_Simulation'
+  if(First_Proc()) print *, '# In User_Mod_Beginning_Of_Simulation'
 
   ! Take alias
   Grid => Flow % pnt_grid

@@ -90,7 +90,7 @@
     nuss_mean = nuss_mean / n_points
   end if
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, 't_ref       = ', Flow % t_ref
     print *, 'alfa_const  = ', alfa_const
     print *, 'ra          = ', ra

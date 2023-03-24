@@ -35,7 +35,7 @@
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
-      if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
+      if(First_Proc()) print *, '# Reading variable: ', trim(vn)
       call Comm % Read_Log(fh, var_value, disp_loop)
       disp = disp_loop
       return
@@ -50,7 +50,7 @@
 
   end do
 
-1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+1 if(First_Proc()) print *, '# Variable: ', trim(var_name), ' not found! ',  &
                              'Setting the value to false!'
   var_value = .false.
 

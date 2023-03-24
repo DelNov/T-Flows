@@ -50,12 +50,9 @@
     case('THERMAL')
       Flow % buoyancy = THERMALLY_DRIVEN
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown buoyancy model :', trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-      stop
+      call Message % Error(60,                                       &
+                           'Unknown buoyancy model: '//trim(name)//  &
+                           '.  \n Exiting!')
   end select
 
   call Control_Mod_Reference_Density           (Flow % dens_ref, .true.)
@@ -102,13 +99,9 @@
       Turb % model = LES_TVM
 
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown turbulence model :', trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-      stop
-
+      call Message % Error(60,                                         &
+                           'Unknown turbulence model: '//trim(name)//  &
+                           '.  \n Exiting!')
   end select
 
   !---------------------------------------------------------!
@@ -122,11 +115,9 @@
     else if(name .eq. 'STABILIZED') then
       Turb % model_variant = STABILIZED
     else
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown turbulence model variant: ', trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
+      call Message % Error(72,                                         &
+                   'Unknown turbulence model variant: '//trim(name)//  &
+                   '.  \n Exiting!')
     end if
   end if
 
@@ -153,7 +144,7 @@
       Turb % model .eq. K_EPS_ZETA_F)           .and.  &
      n_times > n_stat) then  ! last line covers unsteady RANS models
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# NOTE! Scale resolving simulation used; ' // &
                'turbulence statistics engaged!'
     end if
@@ -173,11 +164,9 @@
     case('AFM')
       Turb % heat_flux_model = AFM
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown turbulent heat flux model :', trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
+      call Message % Error(64,                                          &
+                   'Unknown turbulent heat flux model: '//trim(name)//  &
+                   '.  \n Exiting!')
   end select
 
   !-------------------------------------------!
@@ -191,12 +180,9 @@
       case('SWITCH_VELOCITY')
         Turb % hybrid_les_rans_switch = SWITCH_VELOCITY
       case default
-        if(this_proc < 2) then
-          print *, '# ERROR!  Unknown type of hybrid LES/RANS switch:',  &
-                   trim(name)
-          print *, '# Exiting!'
-        end if
-        call Comm_Mod_End
+        call Message % Error(72,                                            &
+                  'Unknown type of hybrid LES/RANS switch: '//trim(name)//  &
+                  '.  \n Exiting!')
     end select
   end if
 
@@ -235,7 +221,6 @@
     call Turb % Const_Les()
   end if
 
-  !------------------------------------!
   !------------------------------------!
   !                                    !
   !   Pressure drops and mass fluxes   !
@@ -299,7 +284,7 @@
     end select
 
     if(n_times > n_stat_p) then  ! last line covers unsteady RANS models
-      if(this_proc < 2) then
+      if(First_Proc()) then
         print *, '# NOTE! Lagrangian particle tracking used; ' // &
                  'swarm statistics engaged!'                   // &
                  'and particle statistics begins at:', n_stat_p

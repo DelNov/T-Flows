@@ -37,12 +37,12 @@
   !                            !
   !----------------------------!
 
-! if(this_proc < 2) then
+! if(First_Proc()) then
 
-    call File % Set_Name(name_out,               &
-                         processor = this_proc,  &
-                         time_step = time_step,  &
-                         appendix  = '-front',   &
+    call File % Set_Name(name_out,                 &
+                         processor = This_Proc(),  &
+                         time_step = time_step,    &
+                         appendix  = '-front',     &
                          extension = '.vtu')
     call File % Open_For_Writing_Ascii(name_out, fu)
 

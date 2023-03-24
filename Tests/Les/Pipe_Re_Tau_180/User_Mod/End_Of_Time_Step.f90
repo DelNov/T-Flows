@@ -36,7 +36,7 @@
   if(n > 3000) return
 
   ! Print a message
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Superimposing random eddies on top of velocity field!'
   end if
 

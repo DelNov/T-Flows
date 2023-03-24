@@ -1,32 +1,32 @@
 !==============================================================================!
-  subroutine Framed(Msg, width, header_text, message_text, one_proc)
+  subroutine Framed(Message, width, header_text, message_text, one_proc)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Message_Type)           :: Msg
+  class(Message_Type)           :: Message
   integer,           intent(in) :: width
   character(*),      intent(in) :: header_text
   character(*),      intent(in) :: message_text
   logical, optional, intent(in) :: one_proc
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: w
+  integer       :: wd
   character(DL) :: line
 !==============================================================================!
 
   ! Check if all processors have to print
   if(present(one_proc)) then
     if(one_proc) then
-      if(this_proc > 1) return
+      if(.not. First_Proc()) return
     end if
   end if
 
   ! Adjust width, if necessary
-  w = max(width, len_trim(header_text)+3)
+  wd = max(width, len_trim(header_text)+3)
 
   !------------------------------!
   !   Write the top line first   !
   !------------------------------!
-  call Msg % Thick_Line(w)
+  call Message % Thick_Line(wd)
 
   !----------------------!
   !   Write the header   !  (you should check it is not too long)
@@ -37,17 +37,17 @@
     write(line(4:len_trim(header_text)+5), '(a)')  trim(header_text)
     print '(a)', trim(line)
 
-    call Msg % Dashed_Line(w)
+    call Message % Dashed_Line(wd)
   end if
 
   !-----------------------------------------------------------!
   !   Write the message text wrapping it into desired width   !
   !-----------------------------------------------------------!
-  call Msg % Frameless(w, message_text)
+  call Message % Frameless(wd, message_text)
 
   !--------------------------------!
   !   Write the bottom line last   !
   !--------------------------------!
-  call Msg % Thin_Line(w)
+  call Message % Thin_Line(wd)
 
   end subroutine

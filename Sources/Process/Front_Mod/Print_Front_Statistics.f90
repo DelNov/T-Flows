@@ -111,7 +111,7 @@
   call Comm_Mod_Global_Max_Real(max_a)
   call Comm_Mod_Global_Min_Real(min_a)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     line( 1:160) = ' '
     line( 1+T:63+T) =   &

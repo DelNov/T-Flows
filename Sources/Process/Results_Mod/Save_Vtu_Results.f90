@@ -65,10 +65,10 @@
     c_l = -1
     if(.not. PLOT_BUFFERS) then
       do c_f = -Grid % n_bnd_cells, -1
-        if( Grid % Comm % cell_proc(c_f) .eq. this_proc) exit
+        if( Grid % Comm % cell_proc(c_f) .eq. This_Proc()) exit
       end do
       do c_l = -1, -Grid % n_bnd_cells, -1
-        if( Grid % Comm % cell_proc(c_l) .eq. this_proc) exit
+        if( Grid % Comm % cell_proc(c_l) .eq. This_Proc()) exit
       end do
     end if
   end if
@@ -113,7 +113,7 @@
                          extension='.pvtu',      &
                          domain=domain)
     call File % Set_Name(name_out_9,             &
-                         processor=this_proc,    &
+                         processor=This_Proc(),  &
                          time_step=ts,           &
                          extension='.vtu',       &
                          domain=domain)
@@ -124,14 +124,14 @@
                          extension='.pvtu',      &
                          domain=domain)
     call File % Set_Name(name_out_9,             &
-                         processor=this_proc,    &
+                         processor=This_Proc(),  &
                          time_step=ts,           &
                          appendix ='-bnd',       &
                          extension='.vtu',       &
                          domain=domain)
   end if
 
-  if(n_proc > 1 .and. this_proc .eq. 1) then
+  if(Parallel_Run() .and. First_Proc()) then
     call File % Open_For_Writing_Binary(name_out_8, f8)
   end if
   call File % Open_For_Writing_Binary(name_out_9, f9)
@@ -141,7 +141,7 @@
   !   Header   !
   !            !
   !------------!
-  if(n_proc > 1 .and. this_proc .eq. 1)  then
+  if(Parallel_Run() .and. First_Proc())  then
     write(f8) IN_0 // '<?xml version="1.0"?>'              // LF
     write(f8) IN_0 // '<VTKFile type="PUnstructuredGrid">' // LF
     write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="1">' // LF
@@ -176,7 +176,7 @@
   !-----------!
   !   Nodes   !
   !-----------!
-  if(n_proc > 1 .and. this_proc .eq. 1)  then
+  if(Parallel_Run() .and. First_Proc())  then
     write(f8) IN_3 // '<PPoints>' // LF
     write(f8) IN_4 // '<PDataArray type='//floatp  //  &
                       ' NumberOfComponents="3"/>'  // LF
@@ -279,7 +279,7 @@
   !   Results and other cell data   !
   !                                 !
   !---------------------------------!
-  if(n_proc > 1 .and. this_proc .eq. 1)  then
+  if(Parallel_Run() .and. First_Proc())  then
     write(f8) IN_3 // '<PCellData>' // LF
   end if
   write(f9) IN_3 // '<CellData>' // LF
@@ -1007,7 +1007,7 @@
     !                      !
     !----------------------!
     if(run .eq. 1) then
-      if(n_proc > 1 .and. this_proc .eq. 1) then
+      if(Parallel_Run() .and. First_Proc()) then
         write(f8) IN_3 // '</PCellData>' // LF
       end if
       write(f9) IN_3 // '</CellData>' // LF
@@ -1036,8 +1036,8 @@
   !   Footer   !
   !            !
   !------------!
-  if(n_proc > 1 .and. this_proc .eq. 1) then
-    do n = 1, n_proc
+  if(Parallel_Run() .and. First_Proc()) then
+    do n = 1, N_Procs()
       if(plot_inside) then
         call File % Set_Name(name_out_9,        &
                              processor=n,       &

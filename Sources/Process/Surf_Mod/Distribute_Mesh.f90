@@ -42,20 +42,20 @@
   !------------------------------------------------------------!
   !   Estimate number of vertices and elements per processor   !
   !------------------------------------------------------------!
-  allocate(nv_proc(n_proc)); nv_proc(:) = 0
-  allocate(ne_proc(n_proc)); ne_proc(:) = 0
+  allocate(nv_proc(N_Procs())); nv_proc(:) = 0
+  allocate(ne_proc(N_Procs())); ne_proc(:) = 0
 
-  nv_proc(this_proc) = nv
-  ne_proc(this_proc) = ne
+  nv_proc(This_Proc()) = nv
+  ne_proc(This_Proc()) = ne
 
-  call Comm_Mod_Global_Sum_Int_Array(n_proc, nv_proc)
-  call Comm_Mod_Global_Sum_Int_Array(n_proc, ne_proc)
+  call Comm_Mod_Global_Sum_Int_Array(N_Procs(), nv_proc)
+  call Comm_Mod_Global_Sum_Int_Array(N_Procs(), ne_proc)
 
-  nv_tot = sum(nv_proc(1:n_proc))
-  ne_tot = sum(ne_proc(1:n_proc))
+  nv_tot = sum(nv_proc(1:N_Procs()))
+  ne_tot = sum(ne_proc(1:N_Procs()))
 
   if(verbose) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a40,i8)', ' # Cummulative number of elements found:', ne_tot
       print '(a40,i8)', ' # Cummulative number of vertices found:', nv_tot
     end if
@@ -67,8 +67,8 @@
   n_acc_vert = 0  ! accumulated nodes
   n_acc_elem = 0  ! accumulated nodes
 
-  n_acc_vert = sum(nv_proc(1:this_proc-1))
-  n_acc_elem = sum(ne_proc(1:this_proc-1))
+  n_acc_vert = sum(nv_proc(1:This_Proc()-1))
+  n_acc_elem = sum(ne_proc(1:This_Proc()-1))
 
   ! PRINT *, 'N_ACC_VERT', THIS_PROC, N_ACC_VERT
   ! PRINT *, 'N_ACC_ELEM', THIS_PROC, N_ACC_ELEM

@@ -13,7 +13,7 @@
 
   Pet % pnt_grid => Grid
 
-  if(this_proc < 2) print *, '# Initializing PETSc.'
+  if(First_Proc()) print *, '# Initializing PETSc.'
 
   ! Total number of unknowns and unknowns in this processor only
   Pet % m_upper = Grid % Comm % nc_tot
@@ -111,7 +111,7 @@
   !-------------------------!
   call C_Petsc_Ksp_Create(Pet % ksp)
 
-  if(this_proc < 2) print *, '# Finished !'
+  if(First_Proc()) print *, '# Finished !'
 
   end subroutine
 

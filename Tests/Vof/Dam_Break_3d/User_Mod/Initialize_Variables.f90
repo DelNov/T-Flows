@@ -147,7 +147,7 @@
   ! Sort probs by height
   do i_probe = 1, N_PROBE_F
     if (allocated(probes(i_probe) % s_probe)) then
-      write(*,*) this_proc,i_probe, N_PROBE_F,c_inters
+      write(*,*) This_Proc(), i_probe, N_PROBE_F, c_inters
       call Vof_Quick_Sort(probes(i_probe) % s_probe(1:c_inters),   &
                           probes(i_probe) % s_coor(:,:), 3, 1,     &
                           size(probes(i_probe) % s_probe))

@@ -48,7 +48,7 @@
   call Comm_Mod_Global_Sum_Real(c_position)  
   call Comm_Mod_Global_Sum_Real(rise_velocity)  
 
-  if (this_proc < 2) then
+  if (First_Proc()) then
 !    !with circularity:
 !    open(unit = 70359, file='Bench-data.dat',position='APPEND')
 !      write(70359,*) b_volume, 2.0*PI/surface*sqrt(b_volume/PI),              &

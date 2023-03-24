@@ -44,7 +44,7 @@
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !
   !----------------------------------!
-  if(this_proc < 2) print *, '# Now reading the file: x_coordinate.dat ' 
+  if(First_Proc()) print *, '# Now reading the file: x_coordinate.dat ' 
   open(9, file='x_coordinate.dat')
 
   ! Read the number of probes 
@@ -214,6 +214,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) write(*,*) '# Finished with User_Backstep_Cf_St'
+  if(First_Proc()) write(*,*) '# Finished with User_Backstep_Cf_St'
 
   end subroutine

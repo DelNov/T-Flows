@@ -12,7 +12,7 @@
   real             :: res
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Update the number of lines you'll have to print in the end
     iter_info % n_user_lines = max(iter_info % n_user_lines, r)

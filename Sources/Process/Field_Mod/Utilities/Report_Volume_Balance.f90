@@ -25,7 +25,7 @@
     call Comm_Mod_Global_Sum_Real(src)
 
     ! Print it out
-    if(this_proc < 2) then
+    if(First_Proc()) then
       if(Flow % p_m_coupling == PISO) then
         write(Flow % fuvbr, '(a,i6.6,a,i3.3,a,i2.2,es13.5)')  &
                             '# ts-', curr_dt,  &

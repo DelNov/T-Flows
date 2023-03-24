@@ -34,8 +34,8 @@
   if(ts .eq. 0) return
 
   ! This version of the Save_Results works only for sequential runs
-  if(n_proc > 1) then
-    if(this_proc < 2) then
+  if(Parallel_Run()) then
+    if(First_Proc()) then
       print *, '#==========================================================='
       print *, '# This version of User_Mod_Save_Results is not intended for '
       print *, '# parallel runs.  Skipped writing of profiles in .dat file! '
@@ -70,7 +70,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -227,6 +227,6 @@
 
   close(fu)
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

@@ -56,7 +56,7 @@
   Particle % trapped   = .false.
 
   ! Set some processor number to particle
-  Particle % proc = min(1, n_proc)
-  Particle % buff = min(1, n_proc)
+  Particle % proc = min(1, N_Procs())
+  Particle % buff = min(1, N_Procs())
 
   end subroutine

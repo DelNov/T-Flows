@@ -60,11 +60,11 @@
     call Work % Connect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
     call Work % Connect_Real_Cell(node_dist)
 
-    if(Stl % n_boddies > 1 .and. this_proc < 2) then
+    if(Stl % n_boddies > 1 .and. First_Proc()) then
       print '(a,i3)', ' # Processing body ', b
     end if
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a)', ' # Calculating distance from the STL interface'
     end if
     do c = Cells_In_Domain_And_Buffers()
@@ -74,7 +74,7 @@
     end do
 
     do c = Cells_In_Domain()
-      if(this_proc < 2) then
+      if(First_Proc()) then
         write(*,'(a2,f5.0,a14,a1)', advance='no') ' #',  &
              (100.*real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
         flush(6)
@@ -158,7 +158,7 @@
     !   the node distance for all nodes in the grid      !
     !                                                    !
     !----------------------------------------------------!
-    if(this_proc < 2) print '(a)', ' # Searching for cells cut by the STL facets'
+    if(First_Proc()) print '(a)', ' # Searching for cells cut by the STL facets'
     do c = Cells_In_Domain_And_Buffers()
 
       ! Fetch cell coordinates
@@ -170,7 +170,7 @@
         cut_facets(:) = 0
         cut_cel(c)    = NO
 
-        if(this_proc < 2) then
+        if(First_Proc()) then
           write(*,'(a2,f5.0,a14,a1)', advance='no') ' #',  &
                (100. * real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
           flush(6)
@@ -316,7 +316,7 @@
     !---------------------------------------!
     !   The actual flood fill starts here   !
     !---------------------------------------!
-    if(this_proc < 2) write(*, '(a)', advance='no') ' # Flooding ...'
+    if(First_Proc()) write(*, '(a)', advance='no') ' # Flooding ...'
     m = 0
   1 continue
     m = m + 1
@@ -393,7 +393,7 @@
     ! Flood fill still going, go back
     call Comm_Mod_Global_Lor_Log(flooding)
     if(flooding) goto 1
-    if(this_proc < 2) print '(a)', ' done!'
+    if(First_Proc()) print '(a)', ' done!'
 
     if(DEBUG) then
       call Grid % Save_Debug_Vtu(append="set_cel",                &
@@ -439,9 +439,9 @@
         !    of VOF, some cells happen to have multiple iso-surfaces    !
         !---------------------------------------------------------------!
         if(Iso_Polygons % n_polys > 1) then
-          print '(4(a,i8))',  __FILE__,        __LINE__,   &
-                             ' # check cell ', c,          &
-                             ' in processor ', this_proc,  &
+          print '(4(a,i8))',  __FILE__,        __LINE__,     &
+                             ' # check cell ', c,            &
+                             ' in processor ', This_Proc(),  &
                              ' global cell ',  glo(c)
           call Polyhedron % Plot_Polyhedron_Vtk("check-cell", glo(c))
           call Iso_Polygons % Plot_Iso_polygons_Vtk("check-iso", glo(c))

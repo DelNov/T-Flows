@@ -8,7 +8,7 @@
   class(Field_Type) :: Flow
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     if(Flow % report_vol_balance) close(Flow % fuvbr)
   end if
 

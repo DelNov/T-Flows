@@ -4,13 +4,6 @@
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Var_Mod,   only: Var_Type
-  use Const_Mod, only: PI
-  use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),  target :: Flow
@@ -44,7 +37,7 @@
   t    => Flow % t
 
   ! Print a message
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Superimposing random eddies on top of velocity field!'
   end if
 

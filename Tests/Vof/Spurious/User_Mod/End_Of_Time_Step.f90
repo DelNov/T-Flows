@@ -102,7 +102,7 @@
   p_out = p_out / a_out
 
   ! Write Results
-  if (this_proc < 2) then
+  if (First_Proc()) then
     if(n .eq. 1) then
       call File % Delete('spurious.dat')
     end if
@@ -114,7 +114,7 @@
 
   !! Calculate distance to center of cylinder
   !! For normals for curvature
-  !if(this_proc <= 2) then
+  !if(This_Proc() <= 2) then
   !  dist_n = 0
   !  do c = 1, Grid % n_cells
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))

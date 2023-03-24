@@ -20,7 +20,7 @@
 
   length = size(arr_value)
 
-  if(this_proc < 2) print *, '# Writing array: ', trim(arr_name)
+  if(First_Proc()) print *, '# Writing array: ', trim(arr_name)
 
   ! Increase variable count
   vc = vc + 1

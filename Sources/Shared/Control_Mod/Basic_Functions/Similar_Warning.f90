@@ -36,7 +36,7 @@
   if( Math % Approx_String(keyword, item, 1) ) then
 
     ! Print a warning message
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *,  '#============================================='//           &
                 '============================================='
       if(.not. present(key_type)) then

@@ -16,7 +16,7 @@
   call system_clock(sys_clock % cur)
   wall_time = real(sys_clock % cur - sys_clock % ini) / real(sys_clock % cnt)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Write time step number
     write(time_info % lines(2)(55:65), '(a11)')    'Time step :'

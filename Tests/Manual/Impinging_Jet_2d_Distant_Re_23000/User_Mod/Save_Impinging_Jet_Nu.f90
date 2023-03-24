@@ -39,7 +39,7 @@
   !-----------------------------------!
   inquire(file='rad_coordinate.dat', exist=there)
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "#=========================================================="
       print *, "# In order to extract Nusselt number profile               "
       print *, "# an ascii file with cell-faces coordinates has to be read."
@@ -142,7 +142,7 @@
   !-----------------------------------!
   !   Write from one processor only   !
   !-----------------------------------!
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Set the file name
     call File % Set_Name(res_name, time_step=ts, &
@@ -166,6 +166,6 @@
     close(fu)
   end if
 
-  if(this_proc < 2) print *, '# Finished with Impinging_Jet_Nu'
+  if(First_Proc()) print *, '# Finished with Impinging_Jet_Nu'
 
   end subroutine

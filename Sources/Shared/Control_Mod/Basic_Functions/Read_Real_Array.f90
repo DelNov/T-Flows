@@ -47,7 +47,7 @@
   !   Keyword was not found; issue a warning   !
   !--------------------------------------------!
 1 if(present(verbose)) then
-    if(verbose .and. this_proc < 2) then
+    if(verbose .and. First_Proc()) then
       print '(3a,1pe9.3)', ' # NOTE! Could not find the keyword: ',  &
                             trim(keyword), '. Using the default: ', def(1)
     end if

@@ -29,12 +29,12 @@
   !-------------------------------------------------------------------!
   if(present(caller)) then
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       call File % Append_For_Writing_Ascii(  &
-                  'exchange_cells_real.log', fu, this_proc)
+                  'exchange_cells_real.log', fu, This_Proc())
     end if
 
-    do sub = 1, n_proc
+    do sub = 1, N_Procs()
       len_r = Grid % Comm % cells_recv(sub) % n_items
       do ln = 1, len_r
         c2 = Grid % Comm % cells_recv(sub) % map(ln)
@@ -48,7 +48,7 @@
   !----------------------------------!
 
   ! Fill the buffers with new values
-  do sub = 1, n_proc
+  do sub = 1, N_Procs()
     len_s = Grid % Comm % cells_send(sub) % n_items
     do ln = 1, len_s
       c1 = Grid % Comm % cells_send(sub) % map(ln)
@@ -57,7 +57,7 @@
   end do
 
   ! Exchange the values
-  do sub = 1, n_proc
+  do sub = 1, N_Procs()
     len_s = Grid % Comm % cells_send(sub) % n_items
     len_r = Grid % Comm % cells_recv(sub) % n_items
     if(len_s + len_r > 0) then
@@ -71,7 +71,7 @@
   end do
 
   ! Fill the buffers with new values
-  do sub = 1, n_proc
+  do sub = 1, N_Procs()
     len_r = Grid % Comm % cells_recv(sub) % n_items
     do ln = 1, len_r
       c2 = Grid % Comm % cells_recv(sub) % map(ln)
@@ -86,7 +86,7 @@
   if(present(caller)) then
 
     needed = NO
-    do sub = 1, n_proc
+    do sub = 1, N_Procs()
       len_r = Grid % Comm % cells_recv(sub) % n_items
       do ln = 1, len_r
         if( Grid % Comm % cells_recv(sub) % r_buff(ln) .ne. &
@@ -99,7 +99,7 @@
     ! What if it is needed on some other processor
     call Comm_Mod_Global_Max_Int(needed)
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       if(needed .eq. YES) then
         write(fu,'(a)') '# Call from: ' // caller // ' was needed!'
       else

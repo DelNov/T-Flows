@@ -29,7 +29,7 @@
   ! Initialize number of boundary cells in subdomain
   Grid % Comm % nb_sub = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       Grid % Comm % nb_sub = Grid % Comm % nb_sub + 1
     end if
   end do
@@ -61,7 +61,7 @@
   !   For run with one processor   !
   !                                !
   !--------------------------------!
-  if(n_proc < 2) then
+  if(Sequential_Run()) then
 
     !-------------------------------------!
     !   Global cell numbers for T-Flows   !

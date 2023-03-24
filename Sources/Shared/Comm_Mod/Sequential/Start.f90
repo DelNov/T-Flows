@@ -9,8 +9,8 @@
   integer, allocatable :: seeds(:)
 !==============================================================================!
 
-  this_proc = 0
-  n_proc    = 0
+  Communicator % this_processor = 0
+  Communicator % n_processors   = 0
 
   call random_seed(size = n)
   allocate(seeds(n)); seeds(:) = 12321

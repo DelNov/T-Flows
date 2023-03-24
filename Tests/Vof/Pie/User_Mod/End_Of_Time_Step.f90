@@ -67,7 +67,7 @@
   !-------------------!
   if(n > 1) then
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, 'y_pos_cen        = ', y_pos_cen
       print *, 'y_pos_cen_old    = ', y_pos_cen_old
       print *, 'rise_vel_int (1) = ', rise_vel_int
@@ -92,7 +92,7 @@
                                     rise_vel_cen
       close(fu)
 
-    end if  ! this_proc < 2
+    end if  ! First_Proc()
 
   end if  ! n > 1
 

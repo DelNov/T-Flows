@@ -46,7 +46,7 @@
   !--------------------------------------------!
 1 if(.not. found) then
     if(present(verbose)) then
-      if(verbose .and. this_proc < 2) then
+      if(verbose .and. First_Proc()) then
         print '(5a)', ' # NOTE! Could not find the line with keywords: ',  &
                       keyword_1, ', ', trim(keyword_2), ', ', trim(keyword_3), '!'
       end if

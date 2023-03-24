@@ -14,7 +14,7 @@
   !------------!
   !   Header   !
   !------------!
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',  ' #========================================================='
     print '(a)',  ' #'
     print '(3a)', ' # Grid ', trim(Grid % name), ' statistics'
@@ -27,7 +27,7 @@
   !------------------!
   call Grid % Bounding_Box(xmin, ymin, zmin, xmax, ymax, zmax)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',  ' # Bounding box:'
     print '(2(a,es10.3))', ' #   X range: ', xmin, '  to: ', xmax
     print '(2(a,es10.3))', ' #   Y range: ', ymin, '  to: ', ymax
@@ -47,7 +47,7 @@
   max_n_polg = 0  ! maximum number of nodes in polygon
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1, s)
-    if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. This_Proc()) then
       n_faces = n_faces + 1
       max_n_polg = max(max_n_polg, Grid % faces_n_nodes(s))
       if(Grid % faces_s(s) .gt. s) then
@@ -70,7 +70,7 @@
   call Comm_Mod_Global_Sum_Int(n_polg)
   call Comm_Mod_Global_Max_Int(max_n_polg)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',     ' #- - - - - - - - - - - - - - - - - - - - - - - - - - - -'
     print '(a,i9)',  ' # Number of faces:          ', n_faces
     print '(a,i9)',  ' # Number of shadows:        ', n_shadows
@@ -90,7 +90,7 @@
   n_quad      = 0
   n_polg      = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       n_bnd_cells = n_bnd_cells + 1
       if(Grid % cells_n_nodes(c) .eq. 3) then
         n_tri = n_tri + 1
@@ -110,7 +110,7 @@
   n_polh  = 0
   max_n_polh = 0  ! maximum number of nodes in polyhedron
   do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       n_cells = n_cells + 1
       if(Grid % cells_n_nodes(c) .eq. 4) then
         n_tet = n_tet + 1
@@ -139,7 +139,7 @@
   call Comm_Mod_Global_Sum_Int(n_polh)
   call Comm_Mod_Global_Max_Int(max_n_polh)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',     ' #- - - - - - - - - - - - - - - - - - - - - - - - - - - -'
     print '(a,i9)',  ' # Number of bnd. cells:  ', n_bnd_cells
     print '(a,i9)',  ' # Number of inside cells:', n_cells
@@ -160,7 +160,7 @@
     end if
   end if
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '#---------------------------------------------------------'
   end if
 

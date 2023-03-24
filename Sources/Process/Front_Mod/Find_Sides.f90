@@ -54,7 +54,7 @@
       call Comm_Mod_Global_Sum_Int(ne_tot)
       call Comm_Mod_Global_Sum_Int(ns_tot)
     end if
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a40,i8)', ' # Number of elements:                  ', ne_tot
       print '(a40,i8)', ' # Tentative number of sides:           ', ns_tot
     end if
@@ -201,7 +201,7 @@
       call Comm_Mod_Global_Sum_Int(cnt_one_tot)
     end if
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a40,i8)', ' # Compressed number of sides:          ', ns_tot
       print '(a40,i8)', ' # Sides surrounded by two elements:    ', cnt_two_tot
       print '(a40,i8)', ' # Sides surrounded by one element:     ', cnt_one_tot

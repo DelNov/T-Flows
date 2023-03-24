@@ -23,7 +23,7 @@
   real    :: dist(3), surf(3)
 !==============================================================================!
 
-  if(this_proc < 2) print '(a)', ' # Checking the integrity of cell faces ...'
+  if(First_Proc()) print '(a)', ' # Checking the integrity of cell faces ...'
 
   !-----------------------------------!
   !   Perform some integrity checks   !
@@ -153,7 +153,7 @@
                             "this and will terminate now.",                 &
                              file=__FILE__, line=__LINE__)
 
-  if(this_proc < 2) print '(a)', ' # All integrity tests passed'
+  if(First_Proc()) print '(a)', ' # All integrity tests passed'
 
   !---------------------------------------!
   !                                       !
@@ -171,7 +171,7 @@
   end do
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2 .and. Grid % n_shadows > 0) then
+  if(First_Proc() .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', ' # Minimum distance stored in shadow faces: ', min_d
     print '(a,f9.3)', ' # Maximum distance stored in shadow faces: ', max_d
   end if
@@ -232,7 +232,7 @@
   end do
   call Comm_Mod_Global_Min_Real(min_d)
   call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2 .and. Grid % n_shadows > 0) then
+  if(First_Proc() .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', ' # Minimum corrected distance at shadows:   ', min_d
     print '(a,f9.3)', ' # Maximum corrected distance at shadows:   ', max_d
   end if
@@ -251,7 +251,7 @@
     if(Grid % faces_s(s) .ne. 0) pnt_from = pnt_from + 1
   end do
   if(pnt_to .ne. pnt_from) then
-    print *, '# Pointers to and from shadows wrong in processor: ', this_proc
+    print *, '# Pointers to and from shadows wrong in processor: ', This_Proc()
     stop
   end if
 

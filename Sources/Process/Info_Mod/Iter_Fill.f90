@@ -10,7 +10,7 @@
   integer :: c
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Write basic info
     c = 1  ! a column

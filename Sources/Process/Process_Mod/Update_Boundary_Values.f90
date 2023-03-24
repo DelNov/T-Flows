@@ -58,11 +58,9 @@
      update .ne. 'ENERGY'     .and.  &
      update .ne. 'SCALARS'    .and.  &
      update .ne. 'ALL') then
-    if(this_proc < 2) then
-      print *, '# Invalid parameter in call to Update_Boundary_Values'
-    end if
-    call Comm_Mod_End
-    stop
+    call Message % Error(72,                                              &
+                         'Invalid parameter in function call. Exiting!',  &
+                         file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   !--------------!
@@ -274,7 +272,7 @@
       c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and. c2 < 0) then
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
@@ -346,7 +344,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and. c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
           do i_fac = 1, Grid % cells_n_faces(c1)
@@ -367,7 +365,7 @@
 1     continue
 
       ! On the boundary perform the extrapolation
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and. c2 < 0) then
 
         ! In the "new way" the extrapolation is
         ! independent from turbulence model

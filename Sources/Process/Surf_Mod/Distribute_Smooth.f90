@@ -17,7 +17,7 @@
   Vert => Surf % Vert
   nv   => Surf % n_verts
 
-  if(n_proc < 2) then
+  if(Sequential_Run()) then
     do v = 1, nv
       c = Surf % Vert(v) % cell  ! get nearest cell
       Surf % Vert(v) % smooth   = smooth % n(c)
@@ -36,7 +36,7 @@
 
       c = Surf % Vert(v) % cell  ! get nearest cell
       if(c > 0) then             ! if cell is in this processor
-        if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+        if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
           Surf % buff_v(v) = smooth % n(c)
           Surf % buff_x(v) = smooth % x(c)
           Surf % buff_y(v) = smooth % y(c)

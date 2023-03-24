@@ -27,7 +27,7 @@
 
   call Work % Connect_Real_Cell(log_dist, cross)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',      ' # Computing potential to initialize velocity field ...'
     print '(a,i3,a)', ' # ... with ', NDT, ' fake time steps.'
     print '(a)',      ' # This might take a while, please wait'
@@ -229,7 +229,7 @@
     call Profiler % Stop(String % First_Upper(phi % solver)  //  &
                          ' (solver for potential initialization)')
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res
     end if

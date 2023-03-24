@@ -66,7 +66,7 @@
   call Backup % Save_Real(Comm, d, vc, 'time', time)
 
   ! Number of processors
-  call Backup % Save_Int(Comm, d, vc, 'n_proc', n_proc)
+  call Backup % Save_Int(Comm, d, vc, 'n_proc', N_Procs())
 
   ! Bulk flows and pressure drops in each direction
   call Backup % Save_Real(Comm, d, vc, 'bulk_flux_x',   bulk % flux_x)
@@ -337,7 +337,7 @@
   ! Variable count (store +1 to count its own self)
   call Backup % Save_Int(Comm, d, vc, 'variable_count', vc + 1)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Wrote ', vc, ' variables!'
   end if
 

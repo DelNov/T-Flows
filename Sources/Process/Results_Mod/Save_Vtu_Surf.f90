@@ -36,7 +36,7 @@
   !                           !
   !---------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     call File % Set_Name(name_out,               &
                          time_step = time_step,  &

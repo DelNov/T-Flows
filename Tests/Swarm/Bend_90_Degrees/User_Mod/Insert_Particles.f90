@@ -73,12 +73,12 @@
     n_new = k  ! new number of particles
 
     if(n_new <= Swarm % max_particles) then
-      if(this_proc < 2) then
+      if(First_Proc()) then
         print *, '# @User_Mod_Insert_Particles: inserted',  &
                  n_new - n_old, ' particles'
       end if
     else
-      if(this_proc < 2) then
+      if(First_Proc()) then
         print *, '# @User_Mod_Insert_Particles: too many particles'
         call Comm_Mod_End
         stop

@@ -92,14 +92,14 @@
   end if
 
   if(save_now) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       open (9, file='save_now', status='old')
       close(9, status='delete')
     end if
   end if
 
   if(exit_now) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       open (9, file='exit_now', status='old')
       close(9, status='delete')
     end if

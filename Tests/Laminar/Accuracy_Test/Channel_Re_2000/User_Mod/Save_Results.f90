@@ -48,7 +48,7 @@
   !------------------!
   inquire(file=coord_name, exist=exist)
   if(.not. exist) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# Critial error: chan.1d file does not exist'
     end if
     stop
@@ -125,6 +125,6 @@
   deallocate(ind)
   deallocate(y_f)
 
-  if(this_proc < 2)  write(*,*) '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  write(*,*) '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

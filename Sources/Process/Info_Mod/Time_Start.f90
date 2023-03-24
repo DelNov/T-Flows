@@ -8,7 +8,7 @@
   integer :: i
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Create a frame
     time_info % line_lead (2*L_BOX-2 : 2*L_BOX-2) = '#'

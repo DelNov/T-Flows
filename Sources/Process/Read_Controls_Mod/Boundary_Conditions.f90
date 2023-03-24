@@ -96,14 +96,10 @@
 
       goto 1
     else
-      if(this_proc < 2) then
-        print *, '# ERROR!  Boundary conditions for ',  &
-                 trim(Grid % region % name(bc)),        &
-                 ' not specified in the control file!'
-        print *, '# Exiting the program.'
-      end if
-      call Comm_Mod_End
-      stop
+      call Message % Error(72,                                             &
+             'Boundary conditions for '//trim(Grid % region % name(bc))//  &
+             ' not specified in the control file!  \n \n  Exiting!',       &
+             file=__FILE__, line=__LINE__)
     end if
 
 2 continue
@@ -162,14 +158,10 @@
         bc_type_tag = PRESSURE
         Grid % region % type(bc) = PRESSURE
       else
-        if(this_proc < 2) then
-          print *, '# ERROR!  Read_Control_Boundary_Conditions: '//        &
-                   '# Unknown boundary condition type: ',  &
-                   bc_type_name
-          print *, '# This error is critical, exiting!'
-          call Comm_Mod_End
-          stop
-        end if
+        call Message % Error(72,                                            &
+                 'Unknown boundary condition type: '//trim(bc_type_name)//  &
+                 '. \n \n This error is critical.  Exiting!',               &
+                 file=__FILE__, line=__LINE__)
       end if
 
       !----------------------------------------------!
@@ -783,7 +775,7 @@
                                Grid % region % name(bc))
     end if
   end do
-  if(turb_planes % n_planes > 0 .and. this_proc < 2) then
+  if(turb_planes % n_planes > 0 .and. First_Proc()) then
     print *, '# Found ', turb_planes % n_planes, ' turbulent planes'
   end if
 

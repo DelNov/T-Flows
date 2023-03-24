@@ -12,7 +12,7 @@
   real             :: res
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Normal variables
     if(n_iter > -1) then  ! if n_iter .eq. -1, iterations won't be written

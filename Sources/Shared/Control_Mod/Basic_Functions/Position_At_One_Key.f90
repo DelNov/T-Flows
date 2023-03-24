@@ -41,7 +41,7 @@
   !--------------------------------------------!
 1 if(.not. found) then
     if(present(verbose)) then
-      if(verbose .and. this_proc < 2) then
+      if(verbose .and. First_Proc()) then
         print '(3a)', ' # WARING!  Could not find the line with keyword: ',  &
                       keyword, '!'
       end if

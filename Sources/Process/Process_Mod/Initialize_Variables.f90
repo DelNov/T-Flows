@@ -75,7 +75,7 @@
   call Turb % Alias_T2          (t2)
 
   area  = 0.0
-  if (this_proc < 2) print '(a,a)', ' # Grid name: ', trim(Grid % name)
+  if (First_Proc()) print '(a,a)', ' # Grid name: ', trim(Grid % name)
 
   ! Found the line where boundary condition definition is defined
   call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
@@ -106,17 +106,17 @@
     !------------------------------------------------!
     if (nvs .eq. 1) then ! word 'file' was specified
 
-      if (this_proc < 2) &
+      if (First_Proc()) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
 
-      call File % Open_For_Reading_Ascii(keys_file(1), fu, this_proc)
+      call File % Open_For_Reading_Ascii(keys_file(1), fu, This_Proc())
 
       ! Number of points
       call File % Read_Line(fu)
 
       read(Line % tokens(1), *) n_points
 
-      if (this_proc < 2) print '(a,i0,2a)', " # Reading ", nks, &
+      if (First_Proc()) print '(a,i0,2a)', " # Reading ", nks, &
         " columns in file " , trim(keys_file(1))
 
       allocate(prof(n_points, 0:nks)); prof = 0.
@@ -271,13 +271,13 @@
       call Control_Mod_Read_Strings_On('VALUES', vals(1), nvs, .true.)
 
       ! Check validity of the input
-      if(nks .eq. 0 .or. nvs .eq. 0 .and. this_proc < 2) then
+      if(nks .eq. 0 .or. nvs .eq. 0 .and. First_Proc()) then
         print '(2a)', '# Critical, for initial condition: ',        &
                       ' no values or variables have been provided'
         call Comm_Mod_End
         stop
       end if
-      if(nks .ne. nvs .and. this_proc < 2) then
+      if(nks .ne. nvs .and. First_Proc()) then
         print '(2a)', '# Critical for initial conditions, number of values ',  &
                       ' is not the same as number of provided variable names'
         call Comm_Mod_End
@@ -504,7 +504,7 @@
   !----------------------!
   !   Initializes time   !
   !----------------------!
-  if(this_proc  < 2) then
+  if(First_Proc()) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Volume inflow           : ', bulk % vol_in
       if(Flow % with_interface) then

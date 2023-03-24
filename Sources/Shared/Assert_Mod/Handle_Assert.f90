@@ -12,7 +12,7 @@
 !==============================================================================!
 
   ! Sequential run
-  if(n_proc < 2) then
+  if(Sequential_Run()) then
     if(fail) then
       write(numb, '(i16)') line
       print '(7a)', '  Assert(',         text,                 &
@@ -27,7 +27,7 @@
   else
     if(fail) then
       write(numb, '(i16)') line
-      write(proc, '(i16)') this_proc
+      write(proc, '(i16)') This_Proc()
       print '(9a)', '  Assert(',         text,                 &
                     ') failed in file ', file,                 &
                     ' at line ',         trim(adjustl(numb)),  &

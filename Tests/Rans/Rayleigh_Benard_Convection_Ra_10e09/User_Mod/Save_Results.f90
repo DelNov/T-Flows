@@ -74,7 +74,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -248,7 +248,7 @@
   open(3, file = res_name)
 
   if(Flow % heat_transfer) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,'(a1,(a12, f12.6))')'#', ' Nu1 number = ',  &
                -tz_p(1) / (t_hot - t_cold)
       write(*,'(a1,(a12, f12.6))')'#', ' Nu2 number = ',  &
@@ -302,6 +302,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

@@ -41,7 +41,7 @@
 
     ! If variable is found, read it and retrun
     if(vn .eq. var_name) then
-      if(this_proc < 2) print *, '# Reading variable: ', trim(vn)
+      if(First_Proc()) print *, '# Reading variable: ', trim(vn)
       call Comm % Read_Cell_Real(fh, array(1:Comm % nc_sub), disp_loop)
       call Comm % Read_Bnd_Real (fh, array( -Comm % nb_f:  &
                                             -Comm % nb_l),   disp_loop)
@@ -59,7 +59,7 @@
 
   end do
 
-1 if(this_proc < 2) print *, '# Variable: ', trim(var_name), ' not found! ',  &
+1 if(First_Proc()) print *, '# Variable: ', trim(var_name), ' not found! ',  &
                              'Setting the values to 0.0!'
   array(:) = 0.0
 

@@ -9,7 +9,7 @@
   real, allocatable :: xn(:), yn(:), zn(:)
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',     ' #======================================================='
     print '(a,a,a)', ' # Merging nodes in "', trim(Grid % name), '" if needed'
     print '(a)',     ' #-------------------------------------------------------'
@@ -51,13 +51,13 @@
     end if
     Grid % new_n(Grid % old_n(n)) = cnt
   end do
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a,i9)', ' # Number of unique nodes:  ', cnt
   end if
 
   ! Decide what to do based on the compressed number of nodes
   if(cnt .eq. Grid % n_nodes) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a)', ' # No duplicate nodes found, nothing to merge!'
     end if
     return
@@ -66,7 +66,7 @@
   !   Do the actuall sorting work   !
   !---------------------------------!
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a,i0.0,a)', ' # ', Grid % n_nodes - cnt, ' duplicate nodes' //  &
                           ' found; compressing them now!'
     end if
@@ -121,7 +121,7 @@
       end do
     end do
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a)', ' # Done!'
     end if
 

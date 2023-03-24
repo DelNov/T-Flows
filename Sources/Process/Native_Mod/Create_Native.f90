@@ -9,12 +9,12 @@
 
   Nat % pnt_grid => Grid
 
-  if(this_proc < 2) print *, '# Determining matrix topology.'
+  if(First_Proc()) print *, '# Determining matrix topology.'
 
   call Nat % A % Create_Matrix(Grid)
   call Nat % M % Create_Matrix(Grid)
   call Vector_Mod_Allocate(Nat % b, Grid)
 
-  if(this_proc < 2) print *, '# Finished !'
+  if(First_Proc()) print *, '# Finished !'
 
   end subroutine

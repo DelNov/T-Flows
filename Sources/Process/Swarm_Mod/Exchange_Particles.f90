@@ -21,7 +21,7 @@
   !   Exchange particle data between processors   !
   !                                               !
   !-----------------------------------------------!
-  if(n_proc > 1) then
+  if(Parallel_Run()) then
 
     Swarm % i_work(:) = 0
     Swarm % l_work(:) = .false.
@@ -36,7 +36,7 @@
       !   Pack data for sending (all processors which ...   !
       !   ... send will put data in this globall pool)      !
       !-----------------------------------------------------!
-      if(Part % proc .eq. this_proc) then
+      if(Part % proc .eq. This_Proc()) then
         i = (k-1) * Swarm % N_I_VARS
         Swarm % i_work(i + 1) = Part % proc  ! where it resides
         Swarm % i_work(i + 2) = Part % buff  ! where it wants to go
@@ -98,8 +98,8 @@
       Part % node = Swarm % i_work(i + 4)
 
       ! Particle was not in this processor but wants to enter here
-      if(Part % proc .ne. this_proc .and.  &
-         Part % buff .eq. this_proc) then
+      if(Part % proc .ne. This_Proc() .and.  &
+         Part % buff .eq. This_Proc()) then
 
         ! Set particle processor to correct value
         Part % proc = Part % buff
@@ -130,7 +130,7 @@
 
       ! Particle was not in this processor and doesn't even want to ...
       ! ... enter here or particle was in this processor but has left it
-      else if(Part % buff .ne. this_proc) then
+      else if(Part % buff .ne. This_Proc()) then
         Part % proc = Part % buff
       end if
 

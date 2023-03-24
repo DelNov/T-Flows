@@ -92,7 +92,7 @@
       if(.not. deposited .and. .not. escaped .and. .not. trapped) then
 
         ! If particle is in this processor, carry on with it
-        if(Part % proc .eq. this_proc) then
+        if(Part % proc .eq. This_Proc()) then
 
           ! Compute velocity at the particle, and move it
           ! (also calls Bounce_Particle)
@@ -148,7 +148,7 @@
     if(trapped) then
 
       ! If particle is in this processor, carry on with it
-      if(Part % proc .eq. this_proc) then
+      if(Part % proc .eq. This_Proc()) then
         call Swarm % Move_Trapped(k)
 
         ! It might have moved to a new cell

@@ -11,7 +11,7 @@
   character(len=L_LINE) :: tmp
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     if(d .eq. 1) then
       print '(a129)', iter_info % line_lead

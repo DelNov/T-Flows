@@ -42,7 +42,7 @@
   !   Keyword was not found; issue a warning   !
   !--------------------------------------------!
 1 if(present(verbose)) then
-    if(verbose .and. this_proc < 2) then
+    if(verbose .and. First_Proc()) then
       print '(a,a,a)', ' # NOTE! Could not find the keyword: ', keyword, '.'
     end if
   end if

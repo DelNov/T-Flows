@@ -181,7 +181,7 @@
     !-----------------------------------!
     !   Write from one processor only   !
     !-----------------------------------!
-    if(this_proc < 2) then
+    if(First_Proc()) then
 
       call File % Open_For_Writing_Ascii(res_name, fu)
 
@@ -225,10 +225,10 @@
     t_p(:)     = 0.0
     zm_p(:)    = 0.0
 
-    if(this_proc < 2) print *, 'Finished with profile r/D =  ', lnum
+    if(First_Proc()) print *, 'Finished with profile r/D =  ', lnum
 
   end do   ! end number of radius
 
-  if(this_proc < 2) write(*,*) 'Finished with User_Impinging_Jet_Profiles'
+  if(First_Proc()) write(*,*) 'Finished with User_Impinging_Jet_Profiles'
 
   end subroutine

@@ -66,7 +66,7 @@
   call Backup % Load_Int(Comm, d, 2048, 'variable_count', vc)
   if(vc .eq. 0) vc = 2048  ! for backward compatibility
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, "# Backup file holds ", vc, " variables."
   end if
 

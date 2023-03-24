@@ -89,7 +89,7 @@
     !--------------------------------------!
     Point % buff = Point % proc  ! assume buffer was not entered
 
-    ! If processor number in the cell is differnt than this_proc 
+    ! If processor number in the cell is differnt than This_Proc()
     ! (and Point % proc in this case) you entered the buffer
     if(Grid % Comm % cell_proc(cc) .ne. Point % proc) then
       Point % buff = Grid % Comm % cell_proc(cc)  ! store buffer process
@@ -132,15 +132,15 @@
 
     Point % cell = cc
     min_dc_glob = min_dc
-    if(n_proc > 1 .and. .not. local) then
+    if(Parallel_Run() .and. .not. local) then
       call Comm_Mod_Global_Min_Real(min_dc_glob)
     end if
 
     Point % proc = 0
     Point % buff = 0
     if( min_dc .eq. min_dc_glob ) then
-      Point % proc = this_proc
-      Point % buff = this_proc
+      Point % proc = This_Proc()
+      Point % buff = This_Proc()
     end if
 
     !--------------------!
@@ -175,7 +175,7 @@
     !   Check if point is in this processor   !
     !-----------------------------------------!
     min_db_glob = min_db
-    if(n_proc > 1 .and. .not. local) then
+    if(Parallel_Run() .and. .not. local) then
       call Comm_Mod_Global_Min_Real(min_db_glob)
     end if
 
@@ -188,7 +188,7 @@
   !     (Didn't really work)     !
   !                              !
   !------------------------------!
-  ! if(Point % proc .eq. this_proc                        &
+  ! if(Point % proc .eq. This_Proc()                      &
   !    .and. .not. Grid % Is_Point_In_Cell(Point % cell,  &
   !                                        Point % x_n,   &
   !                                        Point % y_n,   &
