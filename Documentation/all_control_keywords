@@ -131,7 +131,7 @@
   PRESSURE_DROPS                           |         0.0,  0.0,  0.0       |   any triplet of real numbers
   REFERENCE_DENSITY                        |         0.0                   |   real number > 0.0
   REFERENCE_TEMPERATURE                    |         0.0                   |   real number > 0.0
-  ROUGHNESS_COEFFICIENT                    |         0.0
+  ROUGHNESS_COEFFICIENT                    |         0.0                   |   real number >= 0.0
   ROUGH_WALLS                              |         no                    |   yes
   SATURATION_TEMPERATURE                   |       100.0                   |   depends on liquid and pressure
   SCALARS_DIFFUSIVITY                      |         1.0-6                 |   physical property, usually around 1.0e-9
