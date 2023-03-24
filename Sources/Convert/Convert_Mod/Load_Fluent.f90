@@ -8,6 +8,8 @@
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
+!----------------------------------[Calling]-----------------------------------!
+  integer :: ftell  ! needed for Nvidia compiler
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
