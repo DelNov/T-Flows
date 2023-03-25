@@ -33,7 +33,7 @@
   end do
   !$omp end parallel do
 
-  call Comm_Mod_Global_Sum_Real(rms)
+  call Global % Sum_Real(rms)
   rms = sqrt(rms)
 
   ! Normalize it with absolute values of the unknown
@@ -52,8 +52,8 @@
     x_min = 0.0
     x_max = norm
   endif
-  call Comm_Mod_Global_Min_Real(x_min)
-  call Comm_Mod_Global_Max_Real(x_max)
+  call Global % Min_Real(x_min)
+  call Global % Max_Real(x_max)
 
   ! Create a plateau for very small sources and values
   if( (x_max-x_min) < NANO .and. rms < NANO ) then

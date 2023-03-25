@@ -53,8 +53,8 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(area)
-    call Comm_Mod_Global_Sum_Real(nu)
+    call Global % Sum_Real(area)
+    call Global % Sum_Real(nu)
 
     !-------------------------------------------------!
     !   Compute averaged Nussel number and print it   !

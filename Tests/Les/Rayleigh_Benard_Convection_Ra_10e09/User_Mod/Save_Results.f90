@@ -212,36 +212,36 @@
 
   ! Average over all processors
   do pl=1, n_prob-1
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
+    call Global % Sum_Int(n_count(pl))
 
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
+    call Global % Sum_Real(wall_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(tz_p(pl))
-    call Comm_Mod_Global_Sum_Real(ti_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Real(tz_p(pl))
+    call Global % Sum_Real(ti_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
-    call Comm_Mod_Global_Sum_Real(kin_p(pl))
-    call Comm_Mod_Global_Sum_Real(kin_mod_p(pl))
-    call Comm_Mod_Global_Sum_Real(var_1(pl))
-    call Comm_Mod_Global_Sum_Real(var_2(pl))
-    call Comm_Mod_Global_Sum_Real(var_3(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uw_p(pl))
+    call Global % Sum_Real(kin_p(pl))
+    call Global % Sum_Real(kin_mod_p(pl))
+    call Global % Sum_Real(var_1(pl))
+    call Global % Sum_Real(var_2(pl))
+    call Global % Sum_Real(var_3(pl))
 
     count =  count + n_count(pl)
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(t_p(pl))
-      call Comm_Mod_Global_Sum_Real(t2_p(pl))
-      call Comm_Mod_Global_Sum_Real(t2_mod_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_mod(pl))
-      call Comm_Mod_Global_Sum_Real(vt_mod(pl))
-      call Comm_Mod_Global_Sum_Real(wt_mod(pl))
+      call Global % Sum_Real(t_p(pl))
+      call Global % Sum_Real(t2_p(pl))
+      call Global % Sum_Real(t2_mod_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
+      call Global % Sum_Real(ut_mod(pl))
+      call Global % Sum_Real(vt_mod(pl))
+      call Global % Sum_Real(wt_mod(pl))
     end if
   end do
 

@@ -73,9 +73,9 @@
 
   end do
 
-  call Comm_Mod_Global_Sum_Real(bulk % flux_x)
-  call Comm_Mod_Global_Sum_Real(bulk % flux_y)
-  call Comm_Mod_Global_Sum_Real(bulk % flux_z)
+  call Global % Sum_Real(bulk % flux_x)
+  call Global % Sum_Real(bulk % flux_y)
+  call Global % Sum_Real(bulk % flux_z)
 
   ! Bulk velocities.  Units: [kg/s] / [kg/m^3] / [m^2] = [m/s]
   bulk % u = bulk % flux_x / (bulk % area_x + TINY)

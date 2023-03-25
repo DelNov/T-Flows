@@ -63,12 +63,12 @@
     end if
   end do
 
-  call Comm_Mod_Global_Sum_Int(n_faces)
-  call Comm_Mod_Global_Sum_Int(n_shadows)
-  call Comm_Mod_Global_Sum_Int(n_tri)
-  call Comm_Mod_Global_Sum_Int(n_quad)
-  call Comm_Mod_Global_Sum_Int(n_polg)
-  call Comm_Mod_Global_Max_Int(max_n_polg)
+  call Global % Sum_Int(n_faces)
+  call Global % Sum_Int(n_shadows)
+  call Global % Sum_Int(n_tri)
+  call Global % Sum_Int(n_quad)
+  call Global % Sum_Int(n_polg)
+  call Global % Max_Int(max_n_polg)
 
   if(First_Proc()) then
     print '(a)',     ' #- - - - - - - - - - - - - - - - - - - - - - - - - - - -'
@@ -127,17 +127,17 @@
     end if
   end do
 
-  call Comm_Mod_Global_Sum_Int(n_bnd_cells)
-  call Comm_Mod_Global_Sum_Int(n_cells)
-  call Comm_Mod_Global_Sum_Int(n_tri)
-  call Comm_Mod_Global_Sum_Int(n_quad)
-  call Comm_Mod_Global_Sum_Int(n_polg)
-  call Comm_Mod_Global_Sum_Int(n_tet)
-  call Comm_Mod_Global_Sum_Int(n_pyr)
-  call Comm_Mod_Global_Sum_Int(n_wed)
-  call Comm_Mod_Global_Sum_Int(n_hex)
-  call Comm_Mod_Global_Sum_Int(n_polh)
-  call Comm_Mod_Global_Max_Int(max_n_polh)
+  call Global % Sum_Int(n_bnd_cells)
+  call Global % Sum_Int(n_cells)
+  call Global % Sum_Int(n_tri)
+  call Global % Sum_Int(n_quad)
+  call Global % Sum_Int(n_polg)
+  call Global % Sum_Int(n_tet)
+  call Global % Sum_Int(n_pyr)
+  call Global % Sum_Int(n_wed)
+  call Global % Sum_Int(n_hex)
+  call Global % Sum_Int(n_polh)
+  call Global % Max_Int(max_n_polh)
 
   if(First_Proc()) then
     print '(a)',     ' #- - - - - - - - - - - - - - - - - - - - - - - - - - - -'

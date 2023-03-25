@@ -92,9 +92,9 @@
 
   ! Average over all processors
   do i = 1, n-1
-    call Comm_Mod_Global_Sum_Int (n_count(i))
-    call Comm_Mod_Global_Sum_Real(y_p(i))
-    call Comm_Mod_Global_Sum_Real(u_p(i))
+    call Global % Sum_Int (n_count(i))
+    call Global % Sum_Real(y_p(i))
+    call Global % Sum_Real(u_p(i))
   end do
 
   call Comm_Mod_Wait

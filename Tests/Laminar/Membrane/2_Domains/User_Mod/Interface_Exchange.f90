@@ -301,10 +301,10 @@
     end do
   end do
 
-  call Comm_Mod_Global_Sum_Real(mem_j_diff_acc)
-  call Comm_Mod_Global_Sum_Real(mem_j_heat_acc)
-  call Comm_Mod_Global_Sum_Real(t_int_acc)
-  call Comm_Mod_Global_Sum_Real(area_acc)
+  call Global % Sum_Real(mem_j_diff_acc)
+  call Global % Sum_Real(mem_j_heat_acc)
+  call Global % Sum_Real(t_int_acc)
+  call Global % Sum_Real(area_acc)
   mem_j_diff_avg = mem_j_diff_acc / area_acc
   mem_j_heat_avg = mem_j_heat_acc / area_acc
   t_int_avg      = t_int_acc      / area_acc

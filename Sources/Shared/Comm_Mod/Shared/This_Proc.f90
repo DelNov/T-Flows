@@ -4,6 +4,6 @@
   implicit none
 !==============================================================================!
 
-  This_Proc = Communicator % this_processor
+  This_Proc = Global % this_processor
 
   end function

@@ -172,24 +172,24 @@
   do pl = 1, n_prob-1
 
     ! Carrier Flow
-    call Comm_Mod_Global_Sum_Int(n_count2(pl))
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Int(n_count2(pl))
+    call Global % Sum_Real(wall_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(vis_t_p (pl))
-    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
+    call Global % Sum_Real(vis_t_p (pl))
+    call Global % Sum_Real(y_plus_p(pl))
 
     ! Swarm
-    call Comm_Mod_Global_Sum_Int(n_states(pl))
-    call Comm_Mod_Global_Sum_Real(u_pp(pl))
-    call Comm_Mod_Global_Sum_Real(v_pp(pl))
-    call Comm_Mod_Global_Sum_Real(w_pp(pl))
-    call Comm_Mod_Global_Sum_Real(uu_pp(pl))
-    call Comm_Mod_Global_Sum_Real(vv_pp(pl))
-    call Comm_Mod_Global_Sum_Real(ww_pp(pl))
-    call Comm_Mod_Global_Sum_Real(uw_pp(pl))
+    call Global % Sum_Int(n_states(pl))
+    call Global % Sum_Real(u_pp(pl))
+    call Global % Sum_Real(v_pp(pl))
+    call Global % Sum_Real(w_pp(pl))
+    call Global % Sum_Real(uu_pp(pl))
+    call Global % Sum_Real(vv_pp(pl))
+    call Global % Sum_Real(ww_pp(pl))
+    call Global % Sum_Real(uw_pp(pl))
   end do
 
   call Comm_Mod_Wait

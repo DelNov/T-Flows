@@ -1,14 +1,17 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Min_Int(phi)
+  subroutine Min_Int(Global, phi)
 !------------------------------------------------------------------------------!
 !   Estimates global min among all processors.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: phi
+  class(Comm_Type), intent(in)    :: Global
+  integer,          intent(inout) :: phi
 !-----------------------------------[Locals]-----------------------------------!
   integer :: phi_new
   integer :: error
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
 !==============================================================================!
 
   call Mpi_Allreduce(phi,             & ! send buffer

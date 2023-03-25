@@ -56,8 +56,8 @@
   end do
   !$omp end parallel do
 
-  call Comm_Mod_Global_Sum_Real(sum_a)
-  call Comm_Mod_Global_Sum_Int (sum_n)  ! this is stored somewhere, check
+  call Global % Sum_Real(sum_a)
+  call Global % Sum_Int (sum_n)  ! this is stored somewhere, check
 
   sum_a = sum_a / sum_n
   fn = 1.0 / sum_a
@@ -136,7 +136,7 @@
       rho = rho + q1(i) * r1(i)
     end do
     !$omp end parallel do
-    call Comm_Mod_Global_Sum_Real(rho)
+    call Global % Sum_Real(rho)
 
     if(iter .eq. 1) then
       !$omp parallel do private(i) shared(p1, q1)
@@ -177,7 +177,7 @@
     end do
     !$omp end parallel do
 
-    call Comm_Mod_Global_Sum_Real(alfa)
+    call Global % Sum_Real(alfa)
     alfa = rho / alfa
 
     !---------------------!

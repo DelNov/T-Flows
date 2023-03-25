@@ -154,9 +154,9 @@
     end do
 
     ! Positive for evaporation, negative for condensation
-    call Comm_Mod_Global_Sum_Real(t_int_acc)
-    call Comm_Mod_Global_Sum_Real(m_evap_acc)
-    call Comm_Mod_Global_Sum_Real(area_acc)
+    call Global % Sum_Real(t_int_acc)
+    call Global % Sum_Real(m_evap_acc)
+    call Global % Sum_Real(area_acc)
     m_evap_avg = m_evap_acc / area_acc
     t_int_avg  = t_int_acc  / area_acc
     if(First_Proc()) then

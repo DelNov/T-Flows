@@ -162,29 +162,29 @@
 
   ! Average over all processors
   do pl=1, n_prob-1
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
+    call Global % Sum_Int(n_count(pl))
 
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
+    call Global % Sum_Real(wall_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(kin_p(pl))
-    call Comm_Mod_Global_Sum_Real(eps_p(pl))
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
+    call Global % Sum_Real(kin_p(pl))
+    call Global % Sum_Real(eps_p(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uw_p(pl))
 
     count =  count + n_count(pl)
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(t_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(t_p(pl))
+      call Global % Sum_Real(tt_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 
@@ -239,9 +239,9 @@
     call Comm_Mod_Wait
 
     if(Flow % heat_flux > 0.0) then
-      call Comm_Mod_Global_Min_Real(t_inf)
+      call Global % Min_Real(t_inf)
     else
-      call Comm_Mod_Global_Max_Real(t_inf)
+      call Global % Max_Real(t_inf)
     end if
 
     do s = 1, Grid % n_faces
@@ -259,9 +259,9 @@
       end if
     end do
 
-    call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_mean)
-    call Comm_Mod_Global_Sum_Int(n_points)
+    call Global % Sum_Real(t_wall)
+    call Global % Sum_Real(nu_mean)
+    call Global % Sum_Int(n_points)
 
     call Comm_Mod_Wait
 

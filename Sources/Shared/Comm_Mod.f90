@@ -102,13 +102,24 @@
       procedure :: Sendrecv_Log_Arrays
       procedure :: Sendrecv_Real_Arrays
 
+      ! Global
+      procedure :: Lor_Log
+      procedure :: Lor_Log_Array
+      procedure :: Max_Int
+      procedure :: Max_Real
+      procedure :: Min_Int
+      procedure :: Min_Real
+      procedure :: Sum_Int
+      procedure :: Sum_Int_Array
+      procedure :: Sum_Real
+      procedure :: Sum_Real_Array
   end type
 
   !------------------------------------------------------------------------!
   !   A big global communicator, introduced essentiall to give access to   !
   !   private variables n_processors and this_processor to other objects   !
   !------------------------------------------------------------------------!
-  type(Comm_Type) :: Communicator
+  type(Comm_Type) :: Global
 
   ! These communication types will depend on precision
 #if T_FLOWS_MPI == 1

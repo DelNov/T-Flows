@@ -4,6 +4,6 @@
   implicit none
 !==============================================================================!
 
-  Sequential_Run = Communicator % n_processors < 2
+  Sequential_Run = Global % n_processors < 2
 
   end function

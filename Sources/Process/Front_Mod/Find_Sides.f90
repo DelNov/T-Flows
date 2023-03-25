@@ -51,8 +51,8 @@
     ne_tot = ne
     ns_tot = n_side
     if(Front % mesh_divided) then
-      call Comm_Mod_Global_Sum_Int(ne_tot)
-      call Comm_Mod_Global_Sum_Int(ns_tot)
+      call Global % Sum_Int(ne_tot)
+      call Global % Sum_Int(ns_tot)
     end if
     if(First_Proc()) then
       print '(a40,i8)', ' # Number of elements:                  ', ne_tot
@@ -196,9 +196,9 @@
     cnt_two_tot = cnt_two
     cnt_one_tot = cnt_one
     if(Front % mesh_divided) then
-      call Comm_Mod_Global_Sum_Int(ns_tot)
-      call Comm_Mod_Global_Sum_Int(cnt_two_tot)
-      call Comm_Mod_Global_Sum_Int(cnt_one_tot)
+      call Global % Sum_Int(ns_tot)
+      call Global % Sum_Int(cnt_two_tot)
+      call Global % Sum_Int(cnt_one_tot)
     end if
 
     if(First_Proc()) then

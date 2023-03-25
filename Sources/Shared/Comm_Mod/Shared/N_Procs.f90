@@ -4,6 +4,6 @@
   implicit none
 !==============================================================================!
 
-  N_Procs = Communicator % n_processors
+  N_Procs = Global % n_processors
 
   end function

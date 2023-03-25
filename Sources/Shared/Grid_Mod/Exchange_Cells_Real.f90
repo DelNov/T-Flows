@@ -97,7 +97,7 @@
     end do
 
     ! What if it is needed on some other processor
-    call Comm_Mod_Global_Max_Int(needed)
+    call Global % Max_Int(needed)
 
     if(First_Proc()) then
       if(needed .eq. YES) then

@@ -48,10 +48,10 @@
     rise_vel_int = rise_vel_int + Flow % v % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)
-  call Comm_Mod_Global_Sum_Real(surface)
-  call Comm_Mod_Global_Sum_Real(y_pos_cen)
-  call Comm_Mod_Global_Sum_Real(rise_vel_int)
+  call Global % Sum_Real(b_volume)
+  call Global % Sum_Real(surface)
+  call Global % Sum_Real(y_pos_cen)
+  call Global % Sum_Real(rise_vel_int)
   y_pos_cen    = y_pos_cen    / b_volume
   rise_vel_int = rise_vel_int / b_volume
   rise_vel_cen = (y_pos_cen - y_pos_cen_old) / Flow % dt

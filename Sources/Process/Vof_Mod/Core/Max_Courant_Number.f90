@@ -85,7 +85,7 @@
     do c = 1, Grid % n_cells
       courant_max = max(c_d(c), courant_max)
     end do
-    call Comm_Mod_Global_Max_Real(courant_max)
+    call Global % Max_Real(courant_max)
 
   else  ! interf = 0
 

@@ -48,8 +48,8 @@
   nv_proc(This_Proc()) = nv
   ne_proc(This_Proc()) = ne
 
-  call Comm_Mod_Global_Sum_Int_Array(N_Procs(), nv_proc)
-  call Comm_Mod_Global_Sum_Int_Array(N_Procs(), ne_proc)
+  call Global % Sum_Int_Array(N_Procs(), nv_proc)
+  call Global % Sum_Int_Array(N_Procs(), ne_proc)
 
   nv_tot = sum(nv_proc(1:N_Procs()))
   ne_tot = sum(ne_proc(1:N_Procs()))
@@ -95,15 +95,15 @@
   end do
 
   ! Summ the buffer arrays for coordinates up
-  call Comm_Mod_Global_Sum_Real_Array(nv_tot, Surf % buff_x)
-  call Comm_Mod_Global_Sum_Real_Array(nv_tot, Surf % buff_y)
-  call Comm_Mod_Global_Sum_Real_Array(nv_tot, Surf % buff_z)
+  call Global % Sum_Real_Array(nv_tot, Surf % buff_x)
+  call Global % Sum_Real_Array(nv_tot, Surf % buff_y)
+  call Global % Sum_Real_Array(nv_tot, Surf % buff_z)
 
   ! Summ the buffer arrays for elements' vertices up
-  call Comm_Mod_Global_Sum_Int_Array(ne_tot, Surf % buff_i)
-  call Comm_Mod_Global_Sum_Int_Array(ne_tot, Surf % buff_j)
-  call Comm_Mod_Global_Sum_Int_Array(ne_tot, Surf % buff_k)
-  call Comm_Mod_Global_Sum_Int_Array(ne_tot, Surf % buff_n)
+  call Global % Sum_Int_Array(ne_tot, Surf % buff_i)
+  call Global % Sum_Int_Array(ne_tot, Surf % buff_j)
+  call Global % Sum_Int_Array(ne_tot, Surf % buff_k)
+  call Global % Sum_Int_Array(ne_tot, Surf % buff_n)
 
   ! Fetch coordinates from all vertices
   do j = 1, nv_tot

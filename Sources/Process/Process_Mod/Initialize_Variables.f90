@@ -473,15 +473,15 @@
     end if
   end do
 
-  call Comm_Mod_Global_Sum_Int(n_wall)
-  call Comm_Mod_Global_Sum_Int(n_inflow)
-  call Comm_Mod_Global_Sum_Int(n_outflow)
-  call Comm_Mod_Global_Sum_Int(n_symmetry)
-  call Comm_Mod_Global_Sum_Int(n_heated_wall)
-  call Comm_Mod_Global_Sum_Int(n_convect)
-  call Comm_Mod_Global_Sum_Int(n_pressure)
-  call Comm_Mod_Global_Sum_Real(bulk % vol_in)
-  call Comm_Mod_Global_Sum_Real(area)
+  call Global % Sum_Int(n_wall)
+  call Global % Sum_Int(n_inflow)
+  call Global % Sum_Int(n_outflow)
+  call Global % Sum_Int(n_symmetry)
+  call Global % Sum_Int(n_heated_wall)
+  call Global % Sum_Int(n_convect)
+  call Global % Sum_Int(n_pressure)
+  call Global % Sum_Real(bulk % vol_in)
+  call Global % Sum_Real(area)
 
   !----------------------------------------------------------------------!
   !   This parameter, has_pressure_outlet, is used in Compute_Pressure   !

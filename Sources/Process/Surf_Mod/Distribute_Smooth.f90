@@ -47,11 +47,11 @@
 
     end do
 
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_v)
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_x)
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_y)
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_z)
-    call Comm_Mod_Global_Sum_Int_Array (nv, Surf % buff_n)
+    call Global % Sum_Real_Array(nv, Surf % buff_v)
+    call Global % Sum_Real_Array(nv, Surf % buff_x)
+    call Global % Sum_Real_Array(nv, Surf % buff_y)
+    call Global % Sum_Real_Array(nv, Surf % buff_z)
+    call Global % Sum_Int_Array (nv, Surf % buff_n)
 
     do v = 1, nv
       Surf % Vert(v) % smooth   = Surf % buff_v(v) / Surf % buff_n(v)

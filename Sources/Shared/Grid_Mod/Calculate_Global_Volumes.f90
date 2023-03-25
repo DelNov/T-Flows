@@ -21,8 +21,8 @@
   end do
 
   ! Make them global (over all processors)
-  call Comm_Mod_Global_Max_Real(Grid % max_vol)
-  call Comm_Mod_Global_Min_Real(Grid % min_vol)
-  call Comm_Mod_Global_Sum_Real(Grid % tot_vol)
+  call Global % Max_Real(Grid % max_vol)
+  call Global % Min_Real(Grid % min_vol)
+  call Global % Sum_Real(Grid % tot_vol)
 
   end subroutine

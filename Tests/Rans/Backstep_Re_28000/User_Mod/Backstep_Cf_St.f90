@@ -131,30 +131,30 @@
 
   ! Average over all processors
   do pl=1, n_prob
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
-    call Comm_Mod_Global_Sum_Real(um_p(pl))
-    call Comm_Mod_Global_Sum_Real(vm_p(pl))
-    call Comm_Mod_Global_Sum_Real(wm_p(pl))
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uv_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
-    call Comm_Mod_Global_Sum_Real(vw_p(pl))
-    call Comm_Mod_Global_Sum_Real(v1_p(pl))
-    call Comm_Mod_Global_Sum_Real(v2_p(pl))
-    call Comm_Mod_Global_Sum_Real(v3_p(pl))
-    call Comm_Mod_Global_Sum_Real(v4_p(pl))
-    call Comm_Mod_Global_Sum_Real(v5_p(pl))
+    call Global % Sum_Int(n_count(pl))
+    call Global % Sum_Real(um_p(pl))
+    call Global % Sum_Real(vm_p(pl))
+    call Global % Sum_Real(wm_p(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uv_p(pl))
+    call Global % Sum_Real(uw_p(pl))
+    call Global % Sum_Real(vw_p(pl))
+    call Global % Sum_Real(v1_p(pl))
+    call Global % Sum_Real(v2_p(pl))
+    call Global % Sum_Real(v3_p(pl))
+    call Global % Sum_Real(v4_p(pl))
+    call Global % Sum_Real(v5_p(pl))
 
     count =  count + n_count(pl) 
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(tm_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(tm_p(pl))
+      call Global % Sum_Real(tt_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 

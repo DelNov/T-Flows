@@ -69,10 +69,10 @@
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (Swarm % n_particles*Swarm % N_I_VARS,  &
-                                        Swarm % i_work)
-    call Comm_Mod_Global_Sum_Real_Array(Swarm % n_particles*Swarm % N_R_VARS,  &
-                                        Swarm % r_work)
+    call Global % Sum_Int_Array (Swarm % n_particles*Swarm % N_I_VARS,  &
+                                 Swarm % i_work)
+    call Global % Sum_Real_Array(Swarm % n_particles*Swarm % N_R_VARS,  &
+                                 Swarm % r_work)
 
     call Backup % Save_Int_Array(Comm, disp, vc,   &
                 'particle_int_data',               &

@@ -164,7 +164,7 @@
           wrong_vf = 1
         end if
 
-        call Comm_Mod_Global_Sum_Int(wrong_vf)
+        call Global % Sum_Int(wrong_vf)
 
         if(wrong_vf == 0) then
           goto 1

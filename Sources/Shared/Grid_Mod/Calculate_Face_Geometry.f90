@@ -169,8 +169,8 @@
     min_d = min(min_d, d_s)
     max_d = max(max_d, d_s)
   end do
-  call Comm_Mod_Global_Min_Real(min_d)
-  call Comm_Mod_Global_Max_Real(max_d)
+  call Global % Min_Real(min_d)
+  call Global % Max_Real(max_d)
   if(First_Proc() .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', ' # Minimum distance stored in shadow faces: ', min_d
     print '(a,f9.3)', ' # Maximum distance stored in shadow faces: ', max_d
@@ -230,8 +230,8 @@
       max_d = max(max_d, d_s)
     end if
   end do
-  call Comm_Mod_Global_Min_Real(min_d)
-  call Comm_Mod_Global_Max_Real(max_d)
+  call Global % Min_Real(min_d)
+  call Global % Max_Real(max_d)
   if(First_Proc() .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', ' # Minimum corrected distance at shadows:   ', min_d
     print '(a,f9.3)', ' # Maximum corrected distance at shadows:   ', max_d

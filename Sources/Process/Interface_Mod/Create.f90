@@ -149,8 +149,8 @@
           !------------------------------------------!
           n1_tot = n1
           n2_tot = n2
-          call Comm_Mod_Global_Sum_Int(n1_tot)
-          call Comm_Mod_Global_Sum_Int(n2_tot)
+          call Global % Sum_Int(n1_tot)
+          call Global % Sum_Int(n2_tot)
 
           if(n1_tot .ne. n2_tot) then
             if(First_Proc()) then
@@ -189,8 +189,8 @@
             off_2(1:N_Procs())  = 0
             off_1(This_Proc()) = n1
             off_2(This_Proc()) = n2
-            call Comm_Mod_Global_Sum_Int_Array(N_Procs(), off_1)
-            call Comm_Mod_Global_Sum_Int_Array(N_Procs(), off_2)
+            call Global % Sum_Int_Array(N_Procs(), off_1)
+            call Global % Sum_Int_Array(N_Procs(), off_2)
 
             do p = N_Procs(), 2, -1
               off_1(p) = sum(off_1(1:p-1))
@@ -279,18 +279,18 @@
           !----------------------------------------------------------!
           !   Distribute interface coordinates over all processors   !
           !----------------------------------------------------------!
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, xf_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, yf_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, zf_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, xf_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, yf_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, zf_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ic_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ib_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ip_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ic_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ib_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ip_2(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, xf_1(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, yf_1(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, zf_1(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, xf_2(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, yf_2(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, zf_2(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ic_1(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ib_1(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ip_1(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ic_2(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ib_2(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ip_2(1:n_tot))
 
           ! Sort interfaces from domain 1 carrying
           ! information of cells surrounding it along

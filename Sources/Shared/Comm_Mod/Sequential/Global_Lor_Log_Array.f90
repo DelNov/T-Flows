@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Lor_Log_Array(n, phi)
+  subroutine Lor_Log_Array(Global, n, phi)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential runs.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n
-  logical :: phi(n)
+  class(Comm_Type), intent(in)    :: Global
+  integer,          intent(in)    :: n
+  logical,          intent(inout) :: phi(n)
 !------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
   Unused(n)
   Unused(phi)
 !==============================================================================!

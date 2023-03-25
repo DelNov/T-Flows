@@ -44,8 +44,8 @@
     end if
   end do
 
-  call Comm_Mod_Global_Sum_Real(area_in)
-  call Comm_Mod_Global_Sum_Real(vol_in)
+  call Global % Sum_Real(area_in)
+  call Global % Sum_Real(vol_in)
   vel_in = vol_in / area_in
 
   ! if(First_Proc()) then

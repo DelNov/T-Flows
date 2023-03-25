@@ -96,8 +96,8 @@
 
   end do  ! through vertices
 
-  call Comm_Mod_Global_Min_Real(min_d)
-  call Comm_Mod_Global_Max_Real(max_d)
+  call Global % Min_Real(min_d)
+  call Global % Max_Real(max_d)
 
   !----------------------------------------------------------------------!
   !   Transform the distances into what Mijail calls \phi in his paper   !

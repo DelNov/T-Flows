@@ -81,8 +81,8 @@
     p_max = max(p_max, p % n(c))
     p_min = min(p_min, p % n(c))
   end do
-  call Comm_Mod_Global_Max_Real(p_max)
-  call Comm_Mod_Global_Min_Real(p_min)
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
 
   ! Normalize pressure with the maximum of pressure difference, 
   ! value defined in control file and pressure drops.
@@ -239,8 +239,8 @@
   p_max  = maxval(p % n(1:Grid % n_cells))
   p_min  = minval(p % n(1:Grid % n_cells))
 
-  call Comm_Mod_Global_Max_Real(p_max)
-  call Comm_Mod_Global_Min_Real(p_min)
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
 
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 

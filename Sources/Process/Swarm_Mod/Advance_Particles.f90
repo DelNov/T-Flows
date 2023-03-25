@@ -127,7 +127,7 @@
     end do      ! through particles
 
     ! Exchange particles for parallel version; if needed
-    call Comm_Mod_Global_Sum_Int(n_parts_in_buffers)
+    call Global % Sum_Int(n_parts_in_buffers)
     if(n_parts_in_buffers > 0) then
       call Swarm_Mod_Exchange_Particles(Swarm)
     end if
@@ -162,7 +162,7 @@
   end do      ! through particles
 
   ! Exchange particles for parallel version; if needed
-  call Comm_Mod_Global_Sum_Int(n_parts_in_buffers)
+  call Global % Sum_Int(n_parts_in_buffers)
   if(n_parts_in_buffers > 0) then
     call Swarm_Mod_Exchange_Particles(Swarm)
   end if

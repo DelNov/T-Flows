@@ -192,11 +192,11 @@
   ! Average over all processors
   do pl=1, n_prob-1
 
-    call Comm_Mod_Global_Sum_Int(n_count2(pl))
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Int(n_count2(pl))
+    call Global % Sum_Real(wall_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
     counter2 =  counter2 + n_count2(pl)
   end do

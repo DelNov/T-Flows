@@ -102,7 +102,7 @@
   !   Allocate memory for matrix with needed cells   !
   !--------------------------------------------------!
   n_max_buff_cells = Grid % Comm % n_buff_cells
-  call Comm_Mod_Global_Max_Int(n_max_buff_cells)
+  call Global % Max_Int(n_max_buff_cells)
   allocate(need_cell(n_max_buff_cells, N_Procs()));  need_cell(:,:) = 0
   allocate(from_proc(n_max_buff_cells, N_Procs()));  from_proc(:,:) = 0
 
@@ -124,8 +124,8 @@
   !----------------------------------------------!
   need_cell = reshape(need_cell, (/n_max_buff_cells*N_Procs(), 1/))
   from_proc = reshape(from_proc, (/n_max_buff_cells*N_Procs(), 1/))
-  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*N_Procs(), need_cell)
-  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*N_Procs(), from_proc)
+  call Global % Sum_Int_Array(n_max_buff_cells*N_Procs(), need_cell)
+  call Global % Sum_Int_Array(n_max_buff_cells*N_Procs(), from_proc)
   need_cell = reshape(need_cell, (/n_max_buff_cells, N_Procs()/))
   from_proc = reshape(from_proc, (/n_max_buff_cells, N_Procs()/))
 
@@ -285,7 +285,7 @@
       n_fail = n_fail + 1
     end if
   end do
-  call Comm_Mod_Global_Sum_Int(n_fail)
+  call Global % Sum_Int(n_fail)
   if(n_fail .gt. 0) then
     call Message % Error(55,                                                  &
                          'Ouch, this hurts. Formation of communication '  //  &

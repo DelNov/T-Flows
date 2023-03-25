@@ -1,12 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Max_Int(phi)
+  subroutine Max_Int(Global, phi)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: phi
+  class(Comm_Type), intent(in)    :: Global
+  integer,          intent(inout) :: phi
 !------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
   Unused(phi)
 !==============================================================================!
 

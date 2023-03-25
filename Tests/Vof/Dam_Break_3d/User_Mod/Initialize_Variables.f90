@@ -84,7 +84,7 @@
 
   do i_probe = 1, N_PROBE
     glo_dist = p_dist(i_probe)
-    call Comm_Mod_Global_Min_Real(glo_dist)
+    call Global % Min_Real(glo_dist)
 
     if(.not. Math % Approx_Real( glo_dist,    &
                                  p_dist(i_probe), TINY)) then

@@ -53,8 +53,8 @@
   min_vfrac = minval(fun % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
   max_vfrac = maxval(fun % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
 
-  call Comm_Mod_Global_Min_Real(min_vfrac)
-  call Comm_Mod_Global_Max_Real(max_vfrac)
+  call Global % Min_Real(min_vfrac)
+  call Global % Max_Real(max_vfrac)
 
   n_tot_cells = Grid % n_cells - Grid % Comm % n_buff_cells
 
@@ -79,24 +79,24 @@
 
   end do
 
-  call Comm_Mod_Global_Sum_Real(a_vof)
+  call Global % Sum_Real(a_vof)
 
-  call Comm_Mod_Global_Sum_Int(n_tot_cells)
-  call Comm_Mod_Global_Sum_Real(u_rms)
+  call Global % Sum_Int(n_tot_cells)
+  call Global % Sum_Real(u_rms)
   u_rms = sqrt(1.0 / real(n_tot_cells) * u_rms)
 
   u_max = maxval(sum_v1(1:Grid % n_cells - Grid % Comm % n_buff_cells))
-  call Comm_Mod_Global_Max_Real(u_max)
+  call Global % Max_Real(u_max)
 
   p_max = maxval(Flow % p % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
   p_min = minval(Flow % p % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
-  call Comm_Mod_Global_Max_Real(p_max)
-  call Comm_Mod_Global_Min_Real(p_min)
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
 
-  call Comm_Mod_Global_Sum_Real(p_in)
-  call Comm_Mod_Global_Sum_Real(p_out)
-  call Comm_Mod_Global_Sum_Real(a_in)
-  call Comm_Mod_Global_Sum_Real(a_out)
+  call Global % Sum_Real(p_in)
+  call Global % Sum_Real(p_out)
+  call Global % Sum_Real(a_in)
+  call Global % Sum_Real(a_out)
 
   p_in = p_in / a_in
   p_out = p_out / a_out

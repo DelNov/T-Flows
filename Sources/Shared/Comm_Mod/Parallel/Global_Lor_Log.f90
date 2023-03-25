@@ -1,14 +1,17 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Lor_Log(phi)
+  subroutine Lor_Log(Global, phi)
 !------------------------------------------------------------------------------!
 !   Estimates logical or over all processors.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical :: phi
+  class(Comm_Type), intent(in)    :: Global
+  logical,          intent(inout) :: phi
 !-----------------------------------[Locals]-----------------------------------!
   logical :: phi_new
   integer :: error
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
 !==============================================================================!
 
   call Mpi_Allreduce(phi,             & ! send buffer

@@ -82,8 +82,8 @@
       end if
     end do
 
-    call Comm_Mod_Global_Sum_Real(nuss_mean)
-    call Comm_Mod_Global_Sum_Int(n_points)
+    call Global % Sum_Real(nuss_mean)
+    call Global % Sum_Int(n_points)
 
     call Comm_Mod_Wait
 

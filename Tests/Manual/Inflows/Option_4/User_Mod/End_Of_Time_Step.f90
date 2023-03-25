@@ -64,12 +64,12 @@
       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
     end do
   end do
-  call Comm_Mod_Global_Min_Real(xmin)
-  call Comm_Mod_Global_Min_Real(ymin)
-  call Comm_Mod_Global_Min_Real(zmin)
-  call Comm_Mod_Global_Max_Real(xmax)
-  call Comm_Mod_Global_Max_Real(ymax)
-  call Comm_Mod_Global_Max_Real(zmax)
+  call Global % Min_Real(xmin)
+  call Global % Min_Real(ymin)
+  call Global % Min_Real(zmin)
+  call Global % Max_Real(xmax)
+  call Global % Max_Real(ymax)
+  call Global % Max_Real(zmax)
   lx = xmax - xmin
   ly = ymax - ymin
   lz = zmax - zmin
@@ -161,7 +161,7 @@
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
-  call Comm_Mod_Global_Max_Real(vmax)
+  call Global % Max_Real(vmax)
   do c = 1, Grid % n_cells
     v % n(c) = v % n(c) / vmax
     v % o(c) = v % o(c) / vmax

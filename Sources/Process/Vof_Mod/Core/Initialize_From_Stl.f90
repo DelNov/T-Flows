@@ -391,7 +391,7 @@
     end do
 
     ! Flood fill still going, go back
-    call Comm_Mod_Global_Lor_Log(flooding)
+    call Global % Lor_Log(flooding)
     if(flooding) goto 1
     if(First_Proc()) print '(a)', ' done!'
 

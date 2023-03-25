@@ -47,10 +47,10 @@
     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)
-  call Comm_Mod_Global_Sum_Real(surface)
-  call Comm_Mod_Global_Sum_Real(c_position)
-  call Comm_Mod_Global_Sum_Real(rise_velocity)
+  call Global % Sum_Real(b_volume)
+  call Global % Sum_Real(surface)
+  call Global % Sum_Real(c_position)
+  call Global % Sum_Real(rise_velocity)
 
   ! Write to file
   if (First_Proc()) then

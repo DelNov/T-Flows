@@ -319,8 +319,8 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(Flow % heat)
-    call Comm_Mod_Global_Sum_Real(Flow % heated_area)
+    call Global % Sum_Real(Flow % heat)
+    call Global % Sum_Real(Flow % heated_area)
     Flow % heat_flux = Flow % heat / max(Flow % heated_area, TINY)
 
   end if  ! update energy and heat transfer
@@ -411,8 +411,8 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(Flow % heat)
-    call Comm_Mod_Global_Sum_Real(Flow % heated_area)
+    call Global % Sum_Real(Flow % heat)
+    call Global % Sum_Real(Flow % heated_area)
     Flow % heat_flux = Flow % heat / max(Flow % heated_area, TINY)
 
   end if  ! update energy and heat transfer

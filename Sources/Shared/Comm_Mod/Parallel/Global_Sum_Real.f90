@@ -1,14 +1,17 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Sum_Real(phi)
+  subroutine Sum_Real(Global, phi)
 !------------------------------------------------------------------------------!
 !   Estimates global sum over all processors.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real    :: phi
+  class(Comm_Type), intent(in)    :: Global
+  real,             intent(inout) :: phi
 !-----------------------------------[Locals]-----------------------------------!
   real    :: phi_new
   integer :: error
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
 !==============================================================================!
 
   call Mpi_Allreduce(phi,                   & ! send buffer

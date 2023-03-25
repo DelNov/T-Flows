@@ -83,7 +83,7 @@
     ! Check if smaller distance is found on another processor
     if(Parallel_Run()) then
       min_dist_all = min_dist(m)
-      call Comm_Mod_Global_Min_Real(min_dist_all)
+      call Global % Min_Real(min_dist_all)
 
       ! If there is, erase Monitoring point at this_proc 
       if(abs(min_dist_all - min_dist(m)) >= TINY) then 

@@ -172,7 +172,7 @@
     do c = -Grid % n_bnd_cells, Grid % n_cells
       vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
     end do
-    call Comm_Mod_Global_Max_Real(vel_max)
+    call Global % Max_Real(vel_max)
 
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then

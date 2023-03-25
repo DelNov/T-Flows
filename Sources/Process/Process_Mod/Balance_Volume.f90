@@ -96,8 +96,8 @@
       end do
     end if
   end do
-  call Comm_Mod_Global_Sum_Real(vol_outflow)
-  call Comm_Mod_Global_Sum_Real(area_outflow)
+  call Global % Sum_Real(vol_outflow)
+  call Global % Sum_Real(area_outflow)
 
   !------------------------------------------------------!
   !                                                      !
@@ -154,10 +154,10 @@
 
   end if  ! flow has pressure
 
-  call Comm_Mod_Global_Sum_Real(bulk % vol_in)
-  call Comm_Mod_Global_Sum_Real(bulk % vol_out)
-  call Comm_Mod_Global_Sum_Real(bulk % area_in)
-  call Comm_Mod_Global_Sum_Real(bulk % area_out)
+  call Global % Sum_Real(bulk % vol_in)
+  call Global % Sum_Real(bulk % vol_out)
+  call Global % Sum_Real(bulk % area_in)
+  call Global % Sum_Real(bulk % area_out)
 
   ! Avoid divisions by zero for the cases without any fluid motion
   fac = 1.0
@@ -207,7 +207,7 @@
     end do      ! region
 
     ! Holy mackrele: summ it up over all processors
-    call Comm_Mod_Global_Sum_Real(bulk % vol_out)
+    call Global % Sum_Real(bulk % vol_out)
 
   !-------------------------------------------------!
   !   Something is coming out from real outflows,   !
@@ -249,7 +249,7 @@
     end do      ! regions
 
     ! Holy mackrele: summ it up over all processors
-    call Comm_Mod_Global_Sum_Real(bulk % vol_out)  ! not checked
+    call Global % Sum_Real(bulk % vol_out)  ! not checked
 
   end if
 

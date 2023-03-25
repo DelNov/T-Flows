@@ -133,7 +133,7 @@
     Point % cell = cc
     min_dc_glob = min_dc
     if(Parallel_Run() .and. .not. local) then
-      call Comm_Mod_Global_Min_Real(min_dc_glob)
+      call Global % Min_Real(min_dc_glob)
     end if
 
     Point % proc = 0
@@ -176,7 +176,7 @@
     !-----------------------------------------!
     min_db_glob = min_db
     if(Parallel_Run() .and. .not. local) then
-      call Comm_Mod_Global_Min_Real(min_db_glob)
+      call Global % Min_Real(min_db_glob)
     end if
 
   end if  ! closest node is (not) known

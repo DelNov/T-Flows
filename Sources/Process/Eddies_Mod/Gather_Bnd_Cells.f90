@@ -35,7 +35,7 @@
   if(Parallel_Run()) then
     allocate(n_bnd_cells_proc(N_Procs()));  n_bnd_cells_proc(:) = 0;
     n_bnd_cells_proc(This_Proc()) = eddies % n_bnd_cells
-    call Comm_Mod_Global_Sum_Int_Array(N_Procs(), n_bnd_cells_proc)
+    call Global % Sum_Int_Array(N_Procs(), n_bnd_cells_proc)
 
     allocate(s_bnd_cell_proc(N_Procs())); s_bnd_cell_proc(:) = 0
     do n = 2, N_Procs()
@@ -47,7 +47,7 @@
 
   ! Gather coordinates from all processors
   eddies % n_bnd_cells_glo = eddies % n_bnd_cells
-  call Comm_Mod_Global_Sum_Int(eddies % n_bnd_cells_glo)
+  call Global % Sum_Int(eddies % n_bnd_cells_glo)
   if(First_Proc()) then
     print '(a,a,i6)', ' # Number of boundary cells at ',  &
                       trim(eddies % bc_name),             &
@@ -74,13 +74,13 @@
       eddies % bnd_w (cnt + s_bnd_cell_proc(This_Proc())) = Flow % w % b(c)
     end if
   end do
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_xc)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_yc)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_zc)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_wd)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_u)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_v)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_w)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_xc)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_yc)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_zc)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_wd)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_u)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_v)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_w)
 
   !-------------------------------------------------------!
   !           Find position of the inlet plane            !

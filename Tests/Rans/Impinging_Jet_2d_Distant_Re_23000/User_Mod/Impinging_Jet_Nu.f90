@@ -112,20 +112,20 @@
   !   Average over all processors   !
   !---------------------------------!
   do i = 1, n_prob
-    call Comm_Mod_Global_Sum_Int(n_count(i))
+    call Global % Sum_Int(n_count(i))
 
-    call Comm_Mod_Global_Sum_Real(u_p(i))
-    call Comm_Mod_Global_Sum_Real(v_p(i))
-    call Comm_Mod_Global_Sum_Real(w_p(i))
+    call Global % Sum_Real(u_p(i))
+    call Global % Sum_Real(v_p(i))
+    call Global % Sum_Real(w_p(i))
 
-    call Comm_Mod_Global_Sum_Real(z_p(i))
-    call Comm_Mod_Global_Sum_Real(tau_p(i))
-    call Comm_Mod_Global_Sum_Real(q_p(i))
+    call Global % Sum_Real(z_p(i))
+    call Global % Sum_Real(tau_p(i))
+    call Global % Sum_Real(q_p(i))
 
-    call Comm_Mod_Global_Sum_Real(r_p(i))
-    call Comm_Mod_Global_Sum_Real(t_p(i))
+    call Global % Sum_Real(r_p(i))
+    call Global % Sum_Real(t_p(i))
 
-!    call Comm_Mod_Global_Sum_Real_Array(8, (/u_p  (i),  &
+!    call Global % Sum_Real_Array(8, (/u_p  (i),  &
 !                                             v_p  (i),  &
 !                                             w_p  (i),  &
 !                                             z_p  (i),  &

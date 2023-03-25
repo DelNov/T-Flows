@@ -20,8 +20,8 @@
 !==============================================================================!
 
   ! Form send and receive tags
-  stag = Communicator % n_processors * Communicator % this_processor + dest
-  rtag = Communicator % n_processors * dest + Communicator % this_processor
+  stag = Global % n_processors * Global % this_processor + dest
+  rtag = Global % n_processors * dest + Global % this_processor
 
   call Mpi_Sendrecv(phi_s(1),              & ! send buffer
                     len_s,                 & ! send length

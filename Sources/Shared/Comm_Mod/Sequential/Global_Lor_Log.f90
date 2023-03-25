@@ -1,12 +1,14 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Lor_Log(phi)
+  subroutine Lor_Log(Global, phi)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential compilation.                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical :: phi
+  class(Comm_Type), intent(in)    :: Global
+  logical,          intent(inout) :: phi
 !------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
   Unused(phi)
 !==============================================================================!
 

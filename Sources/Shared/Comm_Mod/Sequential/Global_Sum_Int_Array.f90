@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Sum_Int_Array(n, phi)
+  subroutine Sum_Int_Array(Global, n, phi)
 !------------------------------------------------------------------------------!
 !   Dummy function for sequential runs.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n
-  integer :: phi(n)
+  class(Comm_Type), intent(in)    :: Global
+  integer,          intent(in)    :: n
+  integer,          intent(inout) :: phi(n)
 !------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
   Unused(n)
   Unused(phi)
 !==============================================================================!

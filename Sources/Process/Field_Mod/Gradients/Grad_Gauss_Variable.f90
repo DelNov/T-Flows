@@ -31,7 +31,7 @@
   phi_f_o(:) = 0.0
 
   norm = max(maxval(phi % n) - minval(phi % n), MICRO)
-  call Comm_Mod_Global_Max_Real(norm)
+  call Global % Max_Real(norm)
 
   !-------------------------------!
   !   Start iterative procedure   !
@@ -57,7 +57,7 @@
     !$omp end parallel do
 
     res = res / norm
-    call Comm_Mod_Global_Max_Real(res)
+    call Global % Max_Real(res)
 
     if(res < Flow % gauss_tol) exit
 

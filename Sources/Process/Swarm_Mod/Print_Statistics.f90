@@ -40,12 +40,12 @@
       max_st  = max(max_st,  Part % st)
     end if
   end do
-  call Comm_Mod_Global_Sum_Real(avg_cfl)
-  call Comm_Mod_Global_Sum_Real(avg_st)
-  call Comm_Mod_Global_Sum_Real(avg_re)
-  call Comm_Mod_Global_Max_Real(max_cfl)
-  call Comm_Mod_Global_Max_Real(max_re)
-  call Comm_Mod_Global_Max_Real(max_st)
+  call Global % Sum_Real(avg_cfl)
+  call Global % Sum_Real(avg_st)
+  call Global % Sum_Real(avg_re)
+  call Global % Max_Real(max_cfl)
+  call Global % Max_Real(max_re)
+  call Global % Max_Real(max_st)
   avg_cfl = avg_cfl / real(Swarm % n_particles)
   avg_re  = avg_re  / real(Swarm % n_particles)
   avg_st  = avg_st  / real(Swarm % n_particles)
@@ -60,9 +60,9 @@
       n_ref = n_ref + nint(Swarm % n_reflected(c))
     end if
   end do
-  call Comm_Mod_Global_Sum_Int(n_dep)
-  call Comm_Mod_Global_Sum_Int(n_esc)
-  call Comm_Mod_Global_Sum_Int(n_ref)
+  call Global % Sum_Int(n_dep)
+  call Global % Sum_Int(n_esc)
+  call Global % Sum_Int(n_ref)
 
   !-----------------------------------!
   !   Print some data on the screen   !

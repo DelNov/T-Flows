@@ -30,7 +30,7 @@
 
   nv_tot = nv
   if(Front % mesh_divided) then
-    call Comm_Mod_Global_Sum_Int(nv_tot)
+    call Global % Sum_Int(nv_tot)
   end if
 
   !--------------------------!
@@ -58,8 +58,8 @@
     max_rat = max(max_rat, max_l/min_l)
     min_rat = min(min_rat, max_l/min_l)
   end do
-  call Comm_Mod_Global_Max_Real(max_rat)
-  call Comm_Mod_Global_Min_Real(min_rat)
+  call Global % Max_Real(max_rat)
+  call Global % Min_Real(min_rat)
 
   !------------------------!
   !   Total surface area   !
@@ -69,7 +69,7 @@
     tot_area = tot_area + Elem(e) % area
   end do
   if(Front % mesh_divided) then
-    call Comm_Mod_Global_Sum_Real(tot_area)
+    call Global % Sum_Real(tot_area)
   end if
 
   !--------------------------------!
@@ -77,15 +77,15 @@
   !--------------------------------!
   nne_s = minval(Vert(1:nv) % nne)
   nne_e = maxval(Vert(1:nv) % nne)
-  call Comm_Mod_Global_Min_Int(nne_s)
-  call Comm_Mod_Global_Max_Int(nne_e)
+  call Global % Min_Int(nne_s)
+  call Global % Max_Int(nne_e)
   allocate(nne(nne_s:nne_e)); nne = 0.0
   do v = 1, nv
     nne(Vert(v) % nne) = nne(Vert(v) % nne) + 1.0
   end do
   if(Front % mesh_divided) then
     do item = nne_s, nne_e
-      call Comm_Mod_Global_Sum_Real(nne(item))
+      call Global % Sum_Real(nne(item))
     end do
   end if
 
@@ -96,20 +96,20 @@
   n_verts_tot = Front % n_verts
   n_sides_tot = Front % n_sides
   if(Front % mesh_divided) then
-    call Comm_Mod_Global_Sum_Int(n_elems_tot)
-    call Comm_Mod_Global_Sum_Int(n_verts_tot)
-    call Comm_Mod_Global_Sum_Int(n_sides_tot)
+    call Global % Sum_Int(n_elems_tot)
+    call Global % Sum_Int(n_verts_tot)
+    call Global % Sum_Int(n_sides_tot)
   end if
 
   max_l = maxval(side(1:ns) % length)
   min_l = minval(side(1:ns) % length)
-  call Comm_Mod_Global_Max_Real(max_l)
-  call Comm_Mod_Global_Min_Real(min_l)
+  call Global % Max_Real(max_l)
+  call Global % Min_Real(min_l)
 
   max_a = maxval(Elem(1:ne) % area)
   min_a = minval(Elem(1:ne) % area)
-  call Comm_Mod_Global_Max_Real(max_a)
-  call Comm_Mod_Global_Min_Real(min_a)
+  call Global % Max_Real(max_a)
+  call Global % Min_Real(min_a)
 
   if(First_Proc()) then
 

@@ -23,7 +23,7 @@
     rms = rms + r(i)**2
   end do
   !$omp end parallel do
-  call Comm_Mod_Global_Sum_Real(rms)
+  call Global % Sum_Real(rms)
   rms = sqrt(rms)
 
   Root_Mean_Square = rms

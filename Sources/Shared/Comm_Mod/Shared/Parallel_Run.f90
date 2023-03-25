@@ -4,6 +4,6 @@
   implicit none
 !==============================================================================!
 
-  Parallel_Run = Communicator % n_processors > 2
+  Parallel_Run = Global % n_processors > 2
 
   end function

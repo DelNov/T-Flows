@@ -100,7 +100,7 @@
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     Flow % vol_res = max(Flow % vol_res, abs(b(c)))
   end do
-  call Comm_Mod_Global_Max_Real(Flow % vol_res)
+  call Global % Max_Real(Flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
@@ -126,8 +126,8 @@
       Flow % pe_max  = max( Flow % pe_max,  pe_t  )
     end if
   end do
-  call Comm_Mod_Global_Max_Real(Flow % cfl_max)
-  call Comm_Mod_Global_Max_Real(Flow % pe_max)
+  call Global % Max_Real(Flow % cfl_max)
+  call Global % Max_Real(Flow % pe_max)
 
   if (Flow % p_m_coupling == SIMPLE) then
     call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, Flow % vol_res)

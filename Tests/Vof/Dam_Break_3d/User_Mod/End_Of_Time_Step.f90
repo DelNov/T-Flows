@@ -78,7 +78,7 @@
   end do
 
   do i_probe = 1, N_PROBE
-    call Comm_Mod_Global_Max_Real(h_probe(i_probe))
+    call Global % Max_Real(h_probe(i_probe))
   end do
 
   ! Pressure probes:
@@ -95,7 +95,7 @@
   end do
 
   do i_probe = 1, size(nod_probe)
-    call Comm_Mod_Global_Max_Real(p_probe(i_probe))
+    call Global % Max_Real(p_probe(i_probe))
   end do
 
   !---------------------!
@@ -107,7 +107,7 @@
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)
+  call Global % Sum_Real(b_volume)
 
   ! Write to file
   if (First_Proc()) then

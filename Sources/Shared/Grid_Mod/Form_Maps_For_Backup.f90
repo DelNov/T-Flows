@@ -47,8 +47,8 @@
   ! Initialize total number of cells
   Grid % Comm % nc_tot = Grid % Comm % nc_sub
   Grid % Comm % nb_tot = Grid % Comm % nb_sub
-  call Comm_Mod_Global_Sum_Int(Grid % Comm % nc_tot)
-  call Comm_Mod_Global_Sum_Int(Grid % Comm % nb_tot)
+  call Global % Sum_Int(Grid % Comm % nc_tot)
+  call Global % Sum_Int(Grid % Comm % nb_tot)
 
   ! Allocate memory for mapping matrices
   allocate(Grid % Comm % cell_map        (Grid % Comm % nc_sub))

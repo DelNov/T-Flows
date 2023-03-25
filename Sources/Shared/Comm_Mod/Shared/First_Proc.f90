@@ -4,6 +4,6 @@
   implicit none
 !==============================================================================!
 
-  First_Proc = Communicator % this_processor < 2
+  First_Proc = Global % this_processor < 2
 
   end function

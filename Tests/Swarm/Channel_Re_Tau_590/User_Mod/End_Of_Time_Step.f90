@@ -248,7 +248,7 @@
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
-  call Comm_Mod_Global_Max_Real(vmax)
+  call Global % Max_Real(vmax)
   do c = 1, Grid % n_cells
     v % n(c) = v % n(c) / vmax / 5.0
     v % o(c) = v % o(c) / vmax / 5.0

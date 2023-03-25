@@ -73,13 +73,13 @@
     !-----------------------!
     !   Exchange the data   !
     !-----------------------!
-    call Comm_Mod_Global_Sum_Int_Array (                   &
+    call Global % Sum_Int_Array (                          &
                   Swarm % n_particles * Swarm % N_I_VARS,  &
                   Swarm % i_work)
-    call Comm_Mod_Global_Lor_Log_Array (                   &
+    call Global % Lor_Log_Array (                          &
                   Swarm % n_particles * Swarm % N_L_VARS,  &
                   Swarm % l_work)
-    call Comm_Mod_Global_Sum_Real_Array(                   &
+    call Global % Sum_Real_Array(                          &
                   Swarm % n_particles * Swarm % N_R_VARS,  &
                   Swarm % r_work)
 

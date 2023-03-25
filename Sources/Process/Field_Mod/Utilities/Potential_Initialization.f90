@@ -268,7 +268,7 @@
     log_dist(c) = Grid % wall_dist(c)
   end do
   dist_min = minval(log_dist(1:Grid % n_cells))
-  call Comm_Mod_Global_Min_Real(dist_min)
+  call Global % Min_Real(dist_min)
 
   !------------------------------------------------------!
   !   Set distances from the wall to friendlier values   !
@@ -306,17 +306,17 @@
     c2 = Grid % faces_c(2,s)
     if(c2  < 0) then
       if(Grid % Bnd_Cond_Type( c2) .eq. INFLOW) then
-        vol_in_real = vol_in_real + ( u % n(c2)*Grid % sx(s)    &
-                                    + v % n(c2)*Grid % sy(s)    &
-                                    + w % n(c2)*Grid % sz(s) )
-        vol_in_fake = vol_in_fake + ( u % n(c1)*Grid % sx(s)    &
-                                    + v % n(c1)*Grid % sy(s)    &
-                                    + w % n(c1)*Grid % sz(s) )
+        vol_in_real = vol_in_real + ( u % n(c2) * Grid % sx(s)    &
+                                    + v % n(c2) * Grid % sy(s)    &
+                                    + w % n(c2) * Grid % sz(s) )
+        vol_in_fake = vol_in_fake + ( u % n(c1) * Grid % sx(s)    &
+                                    + v % n(c1) * Grid % sy(s)    &
+                                    + w % n(c1) * Grid % sz(s) )
       end if
     end if
   end do
-  call Comm_Mod_Global_Sum_Real(vol_in_real)
-  call Comm_Mod_Global_Sum_Real(vol_in_fake)
+  call Global % Sum_Real(vol_in_real)
+  call Global % Sum_Real(vol_in_fake)
 
   !-------------------------------------------------!
   !   Correct velocities to more realistic values   !
