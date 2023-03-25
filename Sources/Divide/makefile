@@ -126,7 +126,7 @@ else ifeq ($(FORTRAN), nvidia)
   else
     FC = $(FCOMP)
   endif
-  OPT_F_COMP = -module $(DIR_MODULE) -cpp
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp -Mbackslash
   ifeq ($(DEBUG), yes)
     OPT_F_COMP += -O0 -g
   else
