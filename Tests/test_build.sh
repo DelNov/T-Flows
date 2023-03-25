@@ -1676,6 +1676,10 @@ function chose_test {
       FCOMP="mpiifort"
       DEBUG="no"
     elif [ $FORTRAN == "intel" ]; then
+      FORTRAN="nvidia"
+      FCOMP=""
+      DEBUG="no"
+    elif [ $FORTRAN == "nvidia" ]; then
       FORTRAN="gnu"
       FCOMP=""
       DEBUG="no"
@@ -1728,6 +1732,14 @@ else
     echo "#           If you are desperate to see the PNG plots, use the GNU"
     echo "#           compiler.  In that case, purge the Intel environment."
     echo "#           to get rid of the Python from Intel compiler."
+    fi
+    if [ $FORTRAN == "nvidia" ]; then
+    echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+    echo "#   Remark: When using Nvidia Fortran, please make sure that you are"
+    echo "#           using version 4 of the OpenMPI library."
+    echo "#"
+    echo "#           For most installations, you should adjust the link mpi in"
+    echo "#           directory /opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs"
     fi
     echo "#--------------------------------------------------------------------"
     echo ""
