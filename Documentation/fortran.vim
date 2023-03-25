@@ -359,12 +359,12 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant         HYBRID_LES_RANS HYBRID_LES_PRANDTL  STABILIZED  SGDH  GGDH  AFM
   syn keyword fortranConstant         SWITCH_DISTANCE  SWITCH_VELOCITY
 " After the constants, I have alternating definitions of types and objects derived from them
-  syn keyword fortranTypeTflows       Domain_Type   Generate_Type  Convert_Type   Grid_Type
-  syn keyword fortranObjectTflows     Dom           Generate       Convert        Grid  Prim  Dual
+  syn keyword fortranTypeTflows       Domain_Type   Generate_Type  Convert_Type   Divide_Type    Grid_Type
+  syn keyword fortranObjectTflows     Dom           Generate       Convert        Divide         Grid  Prim  Dual
   syn keyword fortranTypeTflows       Math_Type     Sort_Type      File_Type      String_Type    Work_Type      Tokenizer_Type
   syn keyword fortranObjectTflows     Math          Sort           File           String         Work           Line  Tok
   syn keyword fortranTypeTflows       Comm_Type     Backup_Type    Field_Type     Turb_Type      Vof_Type       Swarm_Type
-  syn keyword fortranObjectTflows     Comm  World   Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
+  syn keyword fortranObjectTflows     Comm  Global  Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
   syn keyword fortranObjectTflows     This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
   syn keyword fortranTypeTflows       Front_Type    Surf_Type      Elem_Type      Vert_Type      Particle_Type
   syn keyword fortranObjectTflows     Front         Surf           Elem           Vert           Part
