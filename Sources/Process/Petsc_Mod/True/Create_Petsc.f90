@@ -31,18 +31,18 @@
   allocate(Pet % glo(-Grid % n_bnd_cells:Grid % n_cells))
   Pet % glo(:) = 0
 
-  if(n_proc < 2) then
+  if(Sequential_Run()) then
     Pet % glo(1:Grid % n_cells) = Grid % Comm % cell_glo(1:Grid % n_cells) - 1
   else
     start = 1  ! first row
-    allocate(all_lower_ms(n_proc));  ! allocate array for all m_lowers
-    all_lower_ms(:) = 0              ! important to initialize to zero
+    allocate(all_lower_ms(N_Procs()));  ! allocate array for all m_lowers
+    all_lower_ms(:) = 0                 ! important to initialize to zero
 
     ! Distribute m_lowers among all processors
-    all_lower_ms(this_proc) = Pet % m_lower
-    call Comm_Mod_Global_Sum_Int_Array(n_proc, all_lower_ms)
+    all_lower_ms(This_Proc()) = Pet % m_lower
+    call Comm_Mod_Global_Sum_Int_Array(N_Procs(), all_lower_ms)
 
-    start = sum(all_lower_ms(1:this_proc)) - Pet % m_lower
+    start = sum(all_lower_ms(1:This_Proc())) - Pet % m_lower
 
     ! Distribute global numbers over other processors
     do i = 1, Pet % m_lower
@@ -87,7 +87,7 @@
   do i = 1, Pet % m_lower
     do j = Nat % A % row(i), Nat % A % row(i+1)-1
       k = Nat % A % col(j)
-      if(Grid % Comm % cell_proc(k) .eq. this_proc) then
+      if(Grid % Comm % cell_proc(k) .eq. This_Proc()) then
         Pet % d_nnz(i) = Pet % d_nnz(i) + 1
       else
         Pet % o_nnz(i) = Pet % o_nnz(i) + 1
