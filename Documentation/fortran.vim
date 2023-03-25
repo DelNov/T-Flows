@@ -160,12 +160,13 @@ syn keyword fortranIntrinsicR		alog alog10 amax0 amax1 amin0 amin1 amod cabs cco
 " Intrinsics provided by some vendors
 syn keyword fortranExtraIntrinsic	algama cdabs cdcos cdexp cdlog cdsin cdsqrt cqabs cqcos cqexp cqlog cqsin cqsqrt dcmplx dconjg derf derfc dfloat dgamma dimag dlgama iqint qabs qacos qasin qatan qatan2 qcmplx qconjg qcos qcosh qdim qerf qerfc qexp qgamma qimag qlgama qlog qlog10 qmax1 qmin1 qmod qnint qsign qsin qsinh qsqrt qtan qtanh
 
-syn keyword fortranIntrinsic	abs acos aimag aint anint asin atan atan2 char cmplx conjg cos cosh exp ichar index int log log10 max min nint sign sin sinh sqrt tan tanh
-syn match fortranIntrinsic	"\<len\s*[(,]"me=s+3
-syn match fortranIntrinsic	"\<real\s*("me=s+4
-syn match fortranIntrinsic	"\<logical\s*("me=s+7
-syn match fortranType           "\<implicit\s\+real\>"
-syn match fortranType           "\<implicit\s\+logical\>"
+syn keyword fortranKeyword   abs acos aimag aint anint asin atan atan2 char cmplx conjg cos cosh exp
+syn keyword fortranKeyword   ichar index int log log10 max min nint sign sin sinh sqrt tan tanh
+syn match fortranIntrinsic   "\<len\s*[(,]"me=s+3
+syn match fortranIntrinsic   "\<real\s*("me=s+4
+syn match fortranIntrinsic   "\<logical\s*("me=s+7
+syn match fortranType        "\<implicit\s\+real\>"
+syn match fortranType        "\<implicit\s\+logical\>"
 
 "Numbers of various sorts
 " Integers
@@ -208,19 +209,19 @@ if exists("fortran_more_precise")
   syn match fortranTarget	display	"\(\<go\s*to\s*(\=\)\@11<=\(\d\+\s*,\s*\)*\d\+\>"
 endif
 
-syn keyword fortranTypeR	external
-syn keyword fortranIOR		format
-syn match fortranKeywordR	"\<continue\>"
-syn match fortranKeyword	"^\s*\d\+\s\+continue\>"
-syn match fortranKeyword  	"\<go\s*to\>"
-syn match fortranKeywordDel  	"\<go\s*to\ze\s\+.*,\s*(.*$"
-syn match fortranKeywordOb  	"\<go\s*to\ze\s*(\d\+.*$"
-syn region fortranStringR	start=+'+ end=+'+ contains=fortranContinueMark,fortranLeftMargin,fortranSerialNumber
-syn keyword fortranIntrinsicR	dim lge lgt lle llt mod
-syn keyword fortranKeywordDel	assign pause
+syn keyword fortranTypeR           external
+syn keyword fortranIOR             format
+syn match fortranKeywordR          "\<continue\>"
+syn match fortranKeyword           "^\s*\d\+\s\+continue\>"
+syn match fortranKeyword           "\<go\s*to\>"
+syn match fortranKeywordDel        "\<go\s*to\ze\s\+.*,\s*(.*$"
+syn match fortranKeywordOb         "\<go\s*to\ze\s*(\d\+.*$"
+syn region fortranStringR          start=+'+ end=+'+ contains=fortranContinueMark,fortranLeftMargin,fortranSerialNumber
+syn keyword fortranIntrinsicR      dim lge lgt lle llt mod
+syn keyword fortranKeywordDel      assign pause
 
-syn match fortranType           "\<type\>"
-syn keyword fortranType	        none
+syn match fortranType        "\<type\>"
+syn keyword fortranType      none
 
 syn keyword fortranStructure	private public intent optional
 syn keyword fortranStructure	pointer target allocatable
@@ -244,33 +245,39 @@ syn region fortranString	start=+"+ end=+"+	contains=fortranLeftMargin,fortranCon
 syn keyword fortranIO		pad position action delim readwrite
 syn keyword fortranIO		eor advance nml
 
-syn keyword fortranIntrinsic	adjustl adjustr all allocated any associated bit_size btest ceiling count cshift date_and_time digits dot_product eoshift epsilon exponent floor fraction huge iand ibclr ibits ibset ieor ior ishft ishftc lbound len_trim matmul maxexponent maxloc maxval merge minexponent minloc minval modulo mvbits nearest pack precision present product radix random_number random_seed range repeat reshape rrspacing
-syn keyword fortranIntrinsic	scale scan selected_int_kind selected_real_kind set_exponent shape size spacing spread sum system_clock tiny transpose trim ubound unpack verify
-syn match fortranIntrinsic		"\<not\>\(\s*\.\)\@!"me=s+3
-syn match fortranIntrinsic	"\<kind\>\s*[(,]"me=s+4
+syn keyword fortranKeyword   adjustl adjustr all allocated any associated bit_size btest
+syn keyword fortranKeyword   ceiling count cshift date_and_time digits dot_product eoshift
+syn keyword fortranKeyword   epsilon exponent floor fraction huge iand ibclr ibits ibset
+syn keyword fortranKeyword   ieor ior ishft ishftc lbound len_trim matmul maxexponent
+syn keyword fortranKeyword   maxloc maxval merge minexponent minloc minval modulo mvbits
+syn keyword fortranKeyword   nearest pack precision present product radix random_number
+syn keyword fortranKeyword   random_seed range repeat reshape rrspacing
+syn keyword fortranIntrinsic scale scan selected_int_kind selected_real_kind set_exponent shape size spacing spread sum system_clock tiny transpose trim ubound unpack verify
+syn match fortranIntrinsic   "\<not\>\(\s*\.\)\@!"me=s+3
+syn match fortranIntrinsic   "\<kind\>\s*[(,]"me=s+4
 
-syn match  fortranUnitHeader	"\<end\s*function"
-syn match  fortranUnitHeader	"\<end\s*interface"
-syn match  fortranUnitHeader	"\<end\s*module"
-syn match  fortranUnitHeader	"\<end\s*submodule"
-syn match  fortranUnitHeader	"\<end\s*program"
-syn match  fortranUnitHeader	"\<end\s*subroutine"
-syn match  fortranUnitHeader	"\<end\s*block"
-syn match  fortranRepeat	"\<end\s*do"
-syn match  fortranConditional	"\<end\s*where"
-syn match  fortranConditional	"\<select\s*case"
-syn match  fortranConditional	"\<end\s*select"
-syn match  fortranType	"\<end\s*type"
-syn match  fortranType	"\<in\s*out"
+syn match  fortranUnitHeader       "\<end\s*function"
+syn match  fortranUnitHeader       "\<end\s*interface"
+syn match  fortranUnitHeader       "\<end\s*module"
+syn match  fortranUnitHeader       "\<end\s*submodule"
+syn match  fortranUnitHeader       "\<end\s*program"
+syn match  fortranUnitHeader       "\<end\s*subroutine"
+syn match  fortranUnitHeader       "\<end\s*block"
+syn match  fortranRepeat           "\<end\s*do"
+syn match  fortranConditional      "\<end\s*where"
+syn match  fortranConditional      "\<select\s*case"
+syn match  fortranConditional      "\<end\s*select"
+syn match  fortranType             "\<end\s*type"
+syn match  fortranType             "\<in\s*out"
 
-syn keyword fortranType	        procedure
-syn match  fortranType	        "\<module\ze\s\+procedure\>"
-syn keyword fortranIOR		namelist
-syn keyword fortranConditionalR	while
-syn keyword fortranIntrinsicR	achar iachar transfer
+syn keyword fortranType            procedure
+syn match  fortranType             "\<module\ze\s\+procedure\>"
+syn keyword fortranIOR             namelist
+syn keyword fortranConditionalR    while
+syn keyword fortranIntrinsicR      achar iachar transfer
 
-syn keyword fortranInclude		include
-syn keyword fortranStorageClassR	sequence
+syn keyword fortranInclude         include
+syn keyword fortranStorageClassR   sequence
 
 syn match   fortranConditional	"\<end\s*if"
 syn match   fortranIO		contains=fortranOperator "\<e\(nd\|rr\)\s*=\s*\d\+"
@@ -285,120 +292,126 @@ syn keyword fortranIntrinsicR	dble dprod
 syn match   fortranOperatorR	"\.\s*[gl][et]\s*\."
 syn match   fortranOperatorR	"\.\s*\(eq\|ne\)\s*\."
 
-syn keyword fortranRepeat		forall
-syn match fortranRepeat		"\<end\s*forall"
-syn keyword fortranIntrinsic	null cpu_time
-syn match fortranType			"\<elemental\>"
-syn match fortranType			"\<pure\>"
-syn match fortranType			"\<impure\>"
-syn match fortranType           	"\<recursive\>"
+syn keyword fortranRepeat          forall
+syn match fortranRepeat            "\<end\s*forall"
+syn keyword fortranIntrinsic       null cpu_time
+syn match fortranType              "\<elemental\>"
+syn match fortranType              "\<pure\>"
+syn match fortranType              "\<impure\>"
+syn match fortranType              "\<recursive\>"
 if exists("fortran_more_precise")
   syn match fortranConstructName "\(\<end\s*forall\s\+\)\@15<=\a\w*\>"
 endif
 
 if b:fortran_dialect == "f08"
   " F2003
-  syn keyword fortranIntrinsic        command_argument_count get_command get_command_argument get_environment_variable is_iostat_end is_iostat_eor move_alloc new_line selected_char_kind same_type_as extends_type_of
+  syn keyword fortranKeyword       command_argument_count get_command get_command_argument get_environment_variable
+  syn keyword fortranKeyword       is_iostat_end is_iostat_eor move_alloc new_line selected_char_kind same_type_as
+  syn keyword fortranKeyword       extends_type_of
   " ISO_C_binding
-  syn keyword fortranConstant         c_null_char c_alert c_backspace c_form_feed c_new_line c_carriage_return c_horizontal_tab c_vertical_tab
-  syn keyword fortranConstant         c_int c_short c_long c_long_long c_signed_char c_size_t c_int8_t c_int16_t c_int32_t c_int64_t c_int_least8_t c_int_least16_t c_int_least32_t c_int_least64_t c_int_fast8_t c_int_fast16_t c_int_fast32_t c_int_fast64_t c_intmax_t C_intptr_t c_float c_double c_long_double c_float_complex c_double_complex c_long_double_complex c_bool c_char c_null_ptr c_null_funptr
-  syn keyword fortranIntrinsic        iso_c_binding c_loc c_funloc c_associated  c_f_pointer c_f_procpointer
-  syn keyword fortranType             c_ptr c_funptr
+  syn keyword fortranConstant      c_null_char c_alert c_backspace c_form_feed c_new_line c_carriage_return
+  syn keyword fortranConstant      c_horizontal_tab c_vertical_tab c_int c_short c_long c_long_long c_signed_char
+  syn keyword fortranConstant      c_size_t c_int8_t c_int16_t c_int32_t c_int64_t c_int_least8_t c_int_least16_t
+  syn keyword fortranConstant      c_int_least32_t c_int_least64_t c_int_fast8_t c_int_fast16_t c_int_fast32_t
+  syn keyword fortranConstant      c_int_fast64_t c_intmax_t C_intptr_t c_float c_double c_long_double c_float_complex
+  syn keyword fortranConstatn      c_double_complex c_long_double_complex c_bool c_char c_null_ptr c_null_funptr
+  syn keyword fortranIntrinsic     iso_c_binding c_loc c_funloc c_associated  c_f_pointer c_f_procpointer
+  syn keyword fortranType          c_ptr c_funptr
   " ISO_Fortran_env
-  syn keyword fortranConstant         iso_fortran_env character_storage_size error_unit file_storage_size input_unit iostat_end iostat_eor numeric_storage_size output_unit
+  syn keyword fortranConstant      iso_fortran_env character_storage_size error_unit file_storage_size input_unit iostat_end iostat_eor numeric_storage_size output_unit
   " IEEE_arithmetic
-  syn keyword fortranIntrinsic        ieee_arithmetic ieee_support_underflow_control ieee_get_underflow_mode ieee_set_underflow_mode
+  syn keyword fortranIntrinsic     ieee_arithmetic ieee_support_underflow_control ieee_get_underflow_mode ieee_set_underflow_mode
 
-  syn keyword fortranReadWrite	flush wait
-  syn keyword fortranIO 	      decimal round iomsg
-  syn keyword fortranType             asynchronous nopass non_overridable pass protected volatile extends import
-  syn keyword fortranType             non_intrinsic value bind deferred generic final enumerator
-  syn match fortranType               "\<abstract\>"
-  syn match fortranType               "\<class\>"
-  syn match fortranType               "\<associate\>"
-  syn match fortranType               "\<end\s*associate"
-  syn match fortranType               "\<enum\s*,\s*bind\s*(\s*c\s*)"
-  syn match fortranType               "\<end\s*enum"
-  syn match fortranConditional	"\<select\s*type"
-  syn match fortranConditional        "\<type\s*is\>"
-  syn match fortranConditional        "\<class\s*is\>"
-  syn match fortranUnitHeader         "\<abstract\s*interface\>"
-  syn match fortranOperator           "\([\|]\)"
+  syn keyword fortranReadWrite     flush wait
+  syn keyword fortranIO            decimal round iomsg
+  syn keyword fortranType          asynchronous nopass non_overridable pass protected volatile extends import
+  syn keyword fortranType          non_intrinsic value bind deferred generic final enumerator
+  syn match fortranType            "\<abstract\>"
+  syn match fortranType            "\<class\>"
+  syn match fortranType            "\<associate\>"
+  syn match fortranType            "\<end\s*associate"
+  syn match fortranType            "\<enum\s*,\s*bind\s*(\s*c\s*)"
+  syn match fortranType            "\<end\s*enum"
+  syn match fortranConditional     "\<select\s*type"
+  syn match fortranConditional     "\<type\s*is\>"
+  syn match fortranConditional     "\<class\s*is\>"
+  syn match fortranUnitHeader      "\<abstract\s*interface\>"
+  syn match fortranOperator        "\([\|]\)"
 
   " F2008
-  syn keyword fortranIntrinsic        acosh asinh atanh bessel_j0 bessel_j1 bessel_jn bessel_y0 bessel_y1 bessel_yn erf erfc erfc_scaled gamma log_gamma hypot norm2
-  syn keyword fortranIntrinsic        atomic_define atomic_ref execute_command_line leadz trailz storage_size merge_bits
-  syn keyword fortranIntrinsic        bge bgt ble blt dshiftl dshiftr findloc iall iany iparity image_index lcobound ucobound maskl maskr num_images parity popcnt poppar shifta shiftl shiftr this_image
-  syn keyword fortranIO               newunit
-  syn keyword fortranType             contiguous
-  syn keyword fortranRepeat           concurrent
+  syn keyword fortranIntrinsic     acosh asinh atanh bessel_j0 bessel_j1 bessel_jn bessel_y0 bessel_y1 bessel_yn erf erfc erfc_scaled gamma log_gamma hypot norm2
+  syn keyword fortranIntrinsic     atomic_define atomic_ref execute_command_line leadz trailz storage_size merge_bits
+  syn keyword fortranIntrinsic     bge bgt ble blt dshiftl dshiftr findloc iall iany iparity image_index lcobound ucobound maskl maskr num_images parity popcnt poppar shifta shiftl shiftr this_image
+  syn keyword fortranIO            newunit
+  syn keyword fortranType          contiguous
+  syn keyword fortranRepeat        concurrent
 
 "=====================================================================[T-Flows]=
 " T-Flows specific
-  syn match fortranTypeTflows         "\<attributes\>"
+  syn match fortranTypeTflows      "\<attributes\>"
 " Start with constants from Const_Mod:
-  syn keyword fortranConstant         PROGRAM_NAME
-  syn keyword fortranConstant         VL  SL  DL   MSI  DP  SP  IP  LP  RP
-  syn keyword fortranConstant         YOCTO  ZEPTO  ATTO  FEMTO  PICO  NANO  MICRO  MILI
-  syn keyword fortranConstant         YOTTA  ZETTA  EXA   PETA   TERA  GIGA  MEGA   KILO
-  syn keyword fortranConstant         HUGE  TINY  HUGE_INT  EULER  PI
-  syn keyword fortranConstant         ONE_THIRD  TWO_THIRDS  ONE_SIXTH
-  syn keyword fortranConstant         MD  MAX_VARS_INTERFACE
+  syn keyword fortranConstant      PROGRAM_NAME
+  syn keyword fortranConstant      VL  SL  DL   MSI  DP  SP  IP  LP  RP
+  syn keyword fortranConstant      YOCTO  ZEPTO  ATTO  FEMTO  PICO  NANO  MICRO  MILI
+  syn keyword fortranConstant      YOTTA  ZETTA  EXA   PETA   TERA  GIGA  MEGA   KILO
+  syn keyword fortranConstant      HUGE  TINY  HUGE_INT  EULER  PI
+  syn keyword fortranConstant      ONE_THIRD  TWO_THIRDS  ONE_SIXTH
+  syn keyword fortranConstant      MD  MAX_VARS_INTERFACE
 " Constants related to indentation (O think they are defined in a few places - bad!
-  syn keyword fortranConstant         IN_0  IN_1  IN_2  IN_3  IN_4  IN_5
+  syn keyword fortranConstant      IN_0  IN_1  IN_2  IN_3  IN_4  IN_5
 " Constants from Numerics_Mod
-  syn keyword fortranConstant         UPWIND  CENTRAL  LUDS  QUICK  SMART  GAMMA
-  syn keyword fortranConstant         MINMOD  BLENDED  SUPERBEE  AVL_SMART  CICSAM  STACS
-  syn keyword fortranConstant         LINEAR  PARABOLIC  RUNGE_KUTTA_3
-  syn keyword fortranConstant         SIMPLE  PISO  CHOI
-  syn keyword fortranConstant         LEAST_SQUARES  GAUSS_THEOREM
+  syn keyword fortranConstant      UPWIND  CENTRAL  LUDS  QUICK  SMART  GAMMA
+  syn keyword fortranConstant      MINMOD  BLENDED  SUPERBEE  AVL_SMART  CICSAM  STACS
+  syn keyword fortranConstant      LINEAR  PARABOLIC  RUNGE_KUTTA_3
+  syn keyword fortranConstant      SIMPLE  PISO  CHOI
+  syn keyword fortranConstant      LEAST_SQUARES  GAUSS_THEOREM
 " Constants from Turb_Mod
-  syn keyword fortranConstant         NO_TURBULENCE_MODEL  DNS  LES_SMAGORINSKY  LES_DYNAMIC
-  syn keyword fortranConstant         LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  DES_SPALART
-  syn keyword fortranConstant         SPALART_ALLMARAS  RSM_HANJALIC_JAKIRLIC  RSM_MANCEAU_HANJALIC
-  syn keyword fortranConstant         HYBRID_LES_RANS HYBRID_LES_PRANDTL  STABILIZED  SGDH  GGDH  AFM
-  syn keyword fortranConstant         SWITCH_DISTANCE  SWITCH_VELOCITY
+  syn keyword fortranConstant      NO_TURBULENCE_MODEL  DNS  LES_SMAGORINSKY  LES_DYNAMIC
+  syn keyword fortranConstant      LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  DES_SPALART
+  syn keyword fortranConstant      SPALART_ALLMARAS  RSM_HANJALIC_JAKIRLIC  RSM_MANCEAU_HANJALIC
+  syn keyword fortranConstant      HYBRID_LES_RANS HYBRID_LES_PRANDTL  STABILIZED  SGDH  GGDH  AFM
+  syn keyword fortranConstant      SWITCH_DISTANCE  SWITCH_VELOCITY
 " After the constants, I have alternating definitions of types and objects derived from them
-  syn keyword fortranTypeTflows       Domain_Type   Generate_Type  Convert_Type   Divide_Type    Grid_Type
-  syn keyword fortranObjectTflows     Dom           Generate       Convert        Divide         Grid  Prim  Dual
-  syn keyword fortranTypeTflows       Math_Type     Sort_Type      File_Type      String_Type    Work_Type      Tokenizer_Type
-  syn keyword fortranObjectTflows     Math          Sort           File           String         Work           Line  Tok
-  syn keyword fortranTypeTflows       Comm_Type     Backup_Type    Field_Type     Turb_Type      Vof_Type       Swarm_Type
-  syn keyword fortranObjectTflows     Comm  Global  Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
-  syn keyword fortranObjectTflows     This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
-  syn keyword fortranTypeTflows       Front_Type    Surf_Type      Elem_Type      Vert_Type      Particle_Type
-  syn keyword fortranObjectTflows     Front         Surf           Elem           Vert           Part
-  syn keyword fortranTypeTflows       Monitor_Type  Results_Type   Porosity_Type  Profiler_Type  Message_Type
-  syn keyword fortranObjectTflows     Monitor       Results        Por            Profiler       Message
-  syn keyword fortranTypeTflows       Var_Type
-  syn keyword fortranObjectTflows     u  v  w  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis 
-  syn keyword fortranTypeTflows       Matrix_Type   Vector_Type    Solver_Type    Native_Type    Petsc_Type     Process_Type
-  syn keyword fortranObjectTflows     A  M          vector  b      Sol            Nat            Pet            Process
+  syn keyword fortranTypeTflows    Domain_Type   Generate_Type  Convert_Type   Divide_Type    Grid_Type
+  syn keyword fortranObjectTflows  Dom           Generate       Convert        Divide         Grid  Prim  Dual
+  syn keyword fortranTypeTflows    Math_Type     Sort_Type      File_Type      String_Type    Work_Type      Tokenizer_Type
+  syn keyword fortranObjectTflows  Math          Sort           File           String         Work           Line  Tok
+  syn keyword fortranTypeTflows    Comm_Type     Backup_Type    Field_Type     Turb_Type      Vof_Type       Swarm_Type
+  syn keyword fortranObjectTflows  Comm  Global  Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
+  syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
+  syn keyword fortranTypeTflows    Front_Type    Surf_Type      Elem_Type      Vert_Type      Particle_Type
+  syn keyword fortranObjectTflows  Front         Surf           Elem           Vert           Part
+  syn keyword fortranTypeTflows    Monitor_Type  Results_Type   Porosity_Type  Profiler_Type  Message_Type
+  syn keyword fortranObjectTflows  Monitor       Results        Por            Profiler       Message
+  syn keyword fortranTypeTflows    Var_Type
+  syn keyword fortranObjectTflows  u  v  w  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis 
+  syn keyword fortranTypeTflows    Matrix_Type   Vector_Type    Solver_Type    Native_Type    Petsc_Type     Process_Type
+  syn keyword fortranObjectTflows  A  M          vector  b      Sol            Nat            Pet            Process
 "---------------------------------------------------------------------[T-Flows]-
 
 " CUDA fortran
-  syn match fortranTypeCUDA           "\<attributes\>"
-  syn keyword fortranTypeCUDA         host global device value
-  syn keyword fortranTypeCUDA         shared constant pinned texture
-  syn keyword fortranTypeCUDA         dim1 dim2 dim3 dim4
-  syn keyword fortranTypeCUDA         cudadeviceprop cuda_count_kind cuda_stream_kind
-  syn keyword fortranTypeCUDA         cudaEvent cudaFuncAttributes cudaArrayPtr
-  syn keyword fortranTypeCUDA         cudaSymbol cudaChannelFormatDesc cudaPitchedPtr
-  syn keyword fortranTypeCUDA         cudaExtent cudaMemcpy3DParms
-  syn keyword fortranTypeCUDA         cudaFuncCachePreferNone cudaFuncCachePreferShared
-  syn keyword fortranTypeCUDA         cudaFuncCachePreferL1 cudaLimitStackSize
-  syn keyword fortranTypeCUDA         cudaLimitPrintfSize cudaLimitMallocHeapSize
-  syn keyword fortranTypeCUDA         cudaSharedMemBankSizeDefault cudaSharedMemBankSizeFourByte cudaSharedMemBankSizeEightByte
-  syn keyword fortranTypeCUDA         cudaEventDefault cudaEventBlockingSync cudaEventDisableTiming
-  syn keyword fortranTypeCUDA         cudaMemcpyHostToDevice cudaMemcpyDeviceToHost
-  syn keyword fortranTypeCUDA         cudaMemcpyDeviceToDevice
-  syn keyword fortranTypeCUDA         cudaErrorNotReady cudaSuccess cudaErrorInvalidValue
-  syn keyword fortranTypeCUDA         c_devptr
+  syn match fortranTypeCUDA        "\<attributes\>"
+  syn keyword fortranTypeCUDA      host global device value
+  syn keyword fortranTypeCUDA      shared constant pinned texture
+  syn keyword fortranTypeCUDA      dim1 dim2 dim3 dim4
+  syn keyword fortranTypeCUDA      cudadeviceprop cuda_count_kind cuda_stream_kind
+  syn keyword fortranTypeCUDA      cudaEvent cudaFuncAttributes cudaArrayPtr
+  syn keyword fortranTypeCUDA      cudaSymbol cudaChannelFormatDesc cudaPitchedPtr
+  syn keyword fortranTypeCUDA      cudaExtent cudaMemcpy3DParms
+  syn keyword fortranTypeCUDA      cudaFuncCachePreferNone cudaFuncCachePreferShared
+  syn keyword fortranTypeCUDA      cudaFuncCachePreferL1 cudaLimitStackSize
+  syn keyword fortranTypeCUDA      cudaLimitPrintfSize cudaLimitMallocHeapSize
+  syn keyword fortranTypeCUDA      cudaSharedMemBankSizeDefault cudaSharedMemBankSizeFourByte cudaSharedMemBankSizeEightByte
+  syn keyword fortranTypeCUDA      cudaEventDefault cudaEventBlockingSync cudaEventDisableTiming
+  syn keyword fortranTypeCUDA      cudaMemcpyHostToDevice cudaMemcpyDeviceToHost
+  syn keyword fortranTypeCUDA      cudaMemcpyDeviceToDevice
+  syn keyword fortranTypeCUDA      cudaErrorNotReady cudaSuccess cudaErrorInvalidValue
+  syn keyword fortranTypeCUDA      c_devptr
 
-  syn match fortranStringCUDA         "blockidx%[xyz]"
-  syn match fortranStringCUDA         "blockdim%[xyz]"
-  syn match fortranStringCUDA         "griddim%[xyz]"
-  syn match fortranStringCUDA         "threadidx%[xyz]"
+  syn match fortranStringCUDA      "blockidx%[xyz]"
+  syn match fortranStringCUDA      "blockdim%[xyz]"
+  syn match fortranStringCUDA      "griddim%[xyz]"
+  syn match fortranStringCUDA      "threadidx%[xyz]"
 
   syn keyword fortranIntrinsicCUDA    warpsize syncthreads syncthreads_and syncthreads_count syncthreads_or threadfence threadfence_block threadfence_system gpu_time allthreads anythread ballot
   syn keyword fortranIntrinsicCUDA    atomicadd atomicsub atomicmax atomicmin atomicand atomicor atomicxor atomicexch atomicinc atomicdec atomiccas sizeof __shfl __shfl_up __shfl_down __shfl_xor
@@ -440,11 +453,11 @@ syn match fortranComment	excludenl "!.*$" contains=@fortranCommentGroup,@spell
 syn match fortranOpenMP		excludenl 		"^\s*!\$\(OMP\)\=&\=\s.*$"
 
 "cpp is often used with Fortran
-syn match	cPreProc		"^\s*#\s*\(define\|ifdef\)\>.*"
-syn match	cPreProc		"^\s*#\s*\(elif\|if\)\>.*"
-syn match	cPreProc		"^\s*#\s*\(ifndef\|undef\)\>.*"
-syn match	cPreCondit		"^\s*#\s*\(else\|endif\)\>.*"
-syn region	cIncluded	contained start=+"[^("]+ skip=+\\\\\|\\"+ end=+"+ contains=fortranLeftMargin,fortranContinueMark,fortranSerialNumber
+syn match  cPreProc    "^\s*#\s*\(define\|ifdef\)\>.*"
+syn match  cPreProc    "^\s*#\s*\(elif\|if\)\>.*"
+syn match  cPreProc    "^\s*#\s*\(ifndef\|undef\)\>.*"
+syn match  cPreCondit  "^\s*#\s*\(else\|endif\)\>.*"
+syn region cIncluded   contained start=+"[^("]+ skip=+\\\\\|\\"+ end=+"+ contains=fortranLeftMargin,fortranContinueMark,fortranSerialNumber
 "syn region	cIncluded	        contained start=+"[^("]+ skip=+\\\\\|\\"+ end=+"+
 syn match	cIncluded		contained "<[^>]*>"
 syn match	cInclude		"^\s*#\s*include\>\s*["<]" contains=cIncluded
@@ -513,33 +526,33 @@ endif
 " fortranBlockData
 " fortran77Loop, fortran90Loop, fortranIfBlock, fortranCase
 " fortranMultiCommentLines
-hi def link fortranKeyword 	Keyword
-hi def link fortranConstructName	Identifier
-hi def link fortranConditional	Conditional
-hi def link fortranRepeat	Repeat
-hi def link fortranTodo		Todo
-hi def link fortranContinueMark	Special
-hi def link fortranString	String
-hi def link fortranNumber	Number
-hi def link fortranBinary	Number
-hi def link fortranOctal	Number
-hi def link fortranHex  	Number
-hi def link fortranOperator	Operator
-hi def link fortranBoolean	Boolean
-hi def link fortranLabelError	Error
-hi def link fortranObsolete	Todo
-hi def link fortranType		Type
-hi def link fortranStructure	Type
-hi def link fortranStorageClass	StorageClass
+hi def link fortranKeyword         Keyword
+hi def link fortranConstructName   Identifier
+hi def link fortranConditional     Conditional
+hi def link fortranRepeat          Repeat
+hi def link fortranTodo            Todo
+hi def link fortranContinueMark    Special
+hi def link fortranString          String
+hi def link fortranNumber          Number
+hi def link fortranBinary          Number
+hi def link fortranOctal           Number
+hi def link fortranHex             Number
+hi def link fortranOperator        Operator
+hi def link fortranBoolean         Boolean
+hi def link fortranLabelError      Error
+hi def link fortranObsolete        Todo
+hi def link fortranType            Type
+hi def link fortranStructure       Type
+hi def link fortranStorageClass    StorageClass
 "=====================================================================[T-Flows]=
 " Got rid of the special group for call ...
 " hi def link fortranCall		Function
 "---------------------------------------------------------------------[T-Flows]-
-hi def link fortranUnitHeader	fortranPreCondit
-hi def link fortranReadWrite	Keyword
-hi def link fortranIO		Keyword
-hi def link fortranIntrinsic	Function
-hi def link fortranConstant	Constant
+hi def link fortranUnitHeader      fortranPreCondit
+hi def link fortranReadWrite       Keyword
+hi def link fortranIO              Keyword
+hi def link fortranIntrinsic       Function
+hi def link fortranConstant        Constant
 
 " To stop deleted & obsolescent features being highlighted as Todo items,
 " comment out the next 5 lines and uncomment the 5 lines after that
@@ -555,33 +568,33 @@ hi def link fortranKeywordDel      fortranObsolete
 "hi def link fortranKeywordDel      fortranKeyword
 
 if b:fortran_dialect == "F"
-  hi! def link fortranIntrinsicR	fortranObsolete
-  hi! def link fortranUnitHeaderR	fortranObsolete
-  hi! def link fortranTypeR		fortranObsolete
-  hi! def link fortranStorageClassR	fortranObsolete
-  hi! def link fortranOperatorR 	fortranObsolete
-  hi! def link fortranInclude   	fortranObsolete
-  hi! def link fortranLabelNumber	fortranObsolete
-  hi! def link fortranTarget	        fortranObsolete
-  hi! def link fortranFloatIll	        fortranObsolete
-  hi! def link fortranIOR		fortranObsolete
-  hi! def link fortranKeywordR	        fortranObsolete
-  hi! def link fortranStringR	        fortranObsolete
-  hi! def link fortranConditionalR	fortranObsolete
+  hi! def link fortranIntrinsicR         fortranObsolete
+  hi! def link fortranUnitHeaderR        fortranObsolete
+  hi! def link fortranTypeR              fortranObsolete
+  hi! def link fortranStorageClassR      fortranObsolete
+  hi! def link fortranOperatorR          fortranObsolete
+  hi! def link fortranInclude            fortranObsolete
+  hi! def link fortranLabelNumber        fortranObsolete
+  hi! def link fortranTarget             fortranObsolete
+  hi! def link fortranFloatIll           fortranObsolete
+  hi! def link fortranIOR                fortranObsolete
+  hi! def link fortranKeywordR           fortranObsolete
+  hi! def link fortranStringR            fortranObsolete
+  hi! def link fortranConditionalR       fortranObsolete
 else
-  hi! def link fortranIntrinsicR	fortranIntrinsic
-  hi! def link fortranUnitHeaderR	fortranPreCondit
-  hi! def link fortranTypeR		fortranType
-  hi! def link fortranStorageClassR	fortranStorageClass
-  hi! def link fortranOperatorR	        fortranOperator
-  hi! def link fortranInclude	        Include
-  hi! def link fortranLabelNumber	Special
-  hi! def link fortranTarget	        Special
-  hi! def link fortranFloatIll	        fortranFloat
-  hi! def link fortranIOR		fortranIO
-  hi! def link fortranKeywordR	        fortranKeyword
-  hi! def link fortranStringR	        fortranString
-  hi! def link fortranConditionalR	fortranConditional
+  hi! def link fortranIntrinsicR         fortranIntrinsic
+  hi! def link fortranUnitHeaderR        fortranPreCondit
+  hi! def link fortranTypeR              fortranType
+  hi! def link fortranStorageClassR      fortranStorageClass
+  hi! def link fortranOperatorR          fortranOperator
+  hi! def link fortranInclude            Include
+  hi! def link fortranLabelNumber        Special
+  hi! def link fortranTarget             Special
+  hi! def link fortranFloatIll           fortranFloat
+  hi! def link fortranIOR                fortranIO
+  hi! def link fortranKeywordR           fortranKeyword
+  hi! def link fortranStringR            fortranString
+  hi! def link fortranConditionalR       fortranConditional
 endif
 
 "=====================================================================[T-Flows]=
@@ -592,22 +605,22 @@ hi def link fortranObjectTflows    fortranIntrinsic
 "---------------------------------------------------------------------[T-Flows]-
 
 " CUDA
-hi def link fortranIntrinsicCUDA        fortranIntrinsic
-hi def link fortranTypeCUDA             fortranType
-hi def link fortranStringCUDA           fortranString
+hi def link fortranIntrinsicCUDA   fortranIntrinsic
+hi def link fortranTypeCUDA        fortranType
+hi def link fortranStringCUDA      fortranString
 
-hi def link fortranFormatSpec	Identifier
-hi def link fortranFloat	Float
-hi def link fortranPreCondit	PreCondit
-hi def link cIncluded		fortranString
-hi def link cInclude		Include
-hi def link cPreProc		PreProc
-hi def link cPreCondit		PreCondit
-hi def link fortranOpenMP       PreProc
-hi def link fortranParenError	Error
-hi def link fortranComment	Comment
-hi def link fortranSerialNumber	Todo
-hi def link fortranTab		Error
+hi def link fortranFormatSpec      Identifier
+hi def link fortranFloat           Float
+hi def link fortranPreCondit       PreCondit
+hi def link cIncluded              fortranString
+hi def link cInclude               Include
+hi def link cPreProc               PreProc
+hi def link cPreCondit             PreCondit
+hi def link fortranOpenMP          PreProc
+hi def link fortranParenError      Error
+hi def link fortranComment         Comment
+hi def link fortranSerialNumber    Todo
+hi def link fortranTab             Error
 
 " Uncomment the next line if you use extra intrinsics provided by vendors
 "hi def link fortranExtraIntrinsic	Function
