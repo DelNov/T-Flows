@@ -9,7 +9,9 @@
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
 !----------------------------------[Calling]-----------------------------------!
+# ifdef __NVCOMPILER_LLVM__
   integer :: ftell  ! needed for Nvidia compiler
+# endif
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
