@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  type(Mpi_File)   :: fh  ! file handle
+  class(Comm_Type), intent(in)    :: Comm
+  type(Mpi_File),   intent(inout) :: fh  ! file handle
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
 !------------------------[Avoid unused parent warning]-------------------------!

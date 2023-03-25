@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: fh    ! file handle
-  integer          :: num   ! number to write out
-  integer(DP)      :: disp  ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(in)    :: fh    ! file handle
+  integer,          intent(in)    :: num   ! variable to write out
+  integer(DP),      intent(inout) :: disp  ! displacement in bytes
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Comm)
 !==============================================================================!

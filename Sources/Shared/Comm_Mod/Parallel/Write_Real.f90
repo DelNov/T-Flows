@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  type(Mpi_File)   :: fh    ! file handle
-  real             :: num   ! number to write out
-  integer(DP)      :: disp  ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  type(Mpi_File),   intent(in)    :: fh    ! file handle
+  real,             intent(in)    :: num   ! number to write out
+  integer(DP),      intent(inout) :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0
 !------------------------[Avoid unused parent warning]-------------------------!

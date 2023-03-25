@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: fh           ! file handle
-  character        :: text_in*(*)  ! text to write out
-  integer(DP)      :: disp         ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(in)    :: fh           ! file handle
+  character,        intent(out)   :: text_in*(*)  ! text to read in
+  integer(DP),      intent(inout) :: disp         ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: leng
 !------------------------[Avoid unused parent warning]-------------------------!

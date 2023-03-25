@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type)      :: Comm
-  type(Mpi_File)        :: fh    ! file handle
-  integer, dimension(:) :: arr   ! array to write out
-  integer(DP)           :: disp  ! displacement in bytes
+  class(Comm_Type),      intent(in)    :: Comm
+  type(Mpi_File),        intent(in)    :: fh    ! file handle
+  integer, dimension(:), intent(in)    :: arr   ! variable to write out
+  integer(DP),           intent(inout) :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
   integer :: error = 0

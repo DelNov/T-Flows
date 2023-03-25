@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: fh  ! file handle
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(inout) :: fh  ! file handle
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Comm)
 !==============================================================================!

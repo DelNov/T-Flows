@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type)      :: Comm
-  type(Mpi_File)        :: fh    ! file handle
-  logical, dimension(:) :: arr   ! array to read
-  integer(DP)           :: disp  ! displacement in bytes
+  class(Comm_Type),      intent(in)    :: Comm
+  type(Mpi_File),        intent(in)    :: fh    ! file handle
+  logical, dimension(:), intent(out)   :: arr   ! array to read
+  integer(DP),           intent(inout) :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
   integer :: error = 0
