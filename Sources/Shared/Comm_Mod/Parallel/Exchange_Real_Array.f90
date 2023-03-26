@@ -22,15 +22,15 @@
   stag = Global % n_processors * Global % this_processor + dest
   rtag = Global % n_processors * dest + Global % this_processor
 
-  call Mpi_Sendrecv_Replace(phi(1),                & ! buffer
-                            length,                & ! length
-                            comm_type_real,        & ! datatype
-                            (dest-1),              & ! dest,
-                            stag,                  & ! sendtag,
-                            (dest-1),              & ! source,
-                            rtag,                  & ! recvtag,
-                            MPI_COMM_WORLD,        &
-                            status,                &
+  call Mpi_Sendrecv_Replace(phi(1),          & ! buffer
+                            length,          & ! length
+                            comm_type_real,  & ! datatype
+                            (dest-1),        & ! dest,
+                            stag,            & ! sendtag,
+                            (dest-1),        & ! source,
+                            rtag,            & ! recvtag,
+                            MPI_COMM_WORLD,  &
+                            status,          &
                             error)
 
   end subroutine

@@ -19,13 +19,13 @@
   ! Form send tag
   stag = (n_proc) * this_proc + dest  ! tag for sending
 
-  call Mpi_Send(phi_s(1),              & ! send buffer
-                len_s,                 & ! send length
-                comm_type_real,        & ! datatype
-                (dest-1),              & ! dest,
-                stag,                  & ! sendtag,
-                MPI_COMM_WORLD,        &
-                status,                &
+  call Mpi_Send(phi_s(1),        & ! send buffer
+                len_s,           & ! send length
+                comm_type_real,  & ! datatype
+                (dest-1),        & ! dest,
+                stag,            & ! sendtag,
+                MPI_COMM_WORLD,  &
+                status,          &
                 error)
 
   end subroutine

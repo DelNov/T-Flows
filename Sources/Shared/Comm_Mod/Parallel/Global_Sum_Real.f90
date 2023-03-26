@@ -14,12 +14,12 @@
   Unused(Global)
 !==============================================================================!
 
-  call Mpi_Allreduce(phi,                   & ! send buffer
-                     phi_new,               & ! recv buffer
-                     1,                     & ! length
-                     comm_type_real,        & ! datatype
-                     MPI_SUM,               & ! operation
-                     MPI_COMM_WORLD,        &
+  call Mpi_Allreduce(phi,             & ! send buffer
+                     phi_new,         & ! recv buffer
+                     1,               & ! length
+                     comm_type_real,  & ! datatype
+                     MPI_SUM,         & ! operation
+                     MPI_COMM_WORLD,  &
                      error)
 
   phi = phi_new

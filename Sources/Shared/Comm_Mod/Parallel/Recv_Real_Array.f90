@@ -17,13 +17,13 @@
   ! Form Receive tags
   rtag = (n_proc) * dest + this_proc  ! tag for receiving
 
-  call Mpi_Recv(phi_r(1),              & ! receive buffer
-                len_r,                 & ! receive length
-                comm_type_real,        & ! datatype
-                (dest-1),              & ! source,
-                rtag,                  & ! recvtag,
-                MPI_COMM_WORLD,        &
-                status,                &
+  call Mpi_Recv(phi_r(1),        & ! receive buffer
+                len_r,           & ! receive length
+                comm_type_real,  & ! datatype
+                (dest-1),        & ! source,
+                rtag,            & ! recvtag,
+                MPI_COMM_WORLD,  &
+                status,          &
                 error)
 
   end subroutine
