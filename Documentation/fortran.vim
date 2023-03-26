@@ -1,3 +1,60 @@
+"=====================================================================[T-Flows]=
+" The idea here is as follows:
+"
+" Expand the existing fortran syntax file which comes with vim, with code
+" contructs pertinent to T-Flow.  Ideally, that should be followed by
+" setting or selecting a colorsheme in vim, but defining a color scheme
+" seems to be a daunting task.
+"
+" Rather, fine-tuning of colors in vim is don through .vimrc file, using
+" the command highlight (typical format :highlight String ctermfg=Green)
+"
+" There is a CATCH with setting highlights in .vimrc, though: formatting
+" elements in .vimrc should NOT be set in this file!!!  (Not sure anymore)
+"
+" A sample snippet from .vimrc which worked well now follows:
+"
+" from .vimrc: "----------------------------------------------------------------
+" from .vimrc: " With the following commands, I am trying to tune color scheme
+" from .vimrc: "
+" from .vimrc: " Commands which might prove to be useful in the future
+" from .vimrc: "
+" from .vimrc: " Preprocessor directives
+" from .vimrc: " :highlight PreProc  ctermfg=Red
+" from .vimrc: "
+" from .vimrc: " Everything else:
+" from .vimrc: " :highlight Normal  ctermfg=Yellow
+" from .vimrc: "----------------------------------------------------------------
+" from .vimrc: 
+" from .vimrc: " Keyords should be Fortran commands
+" from .vimrc: highlight fortranKeyword ctermfg=Yellow
+" from .vimrc: 
+" from .vimrc: " Ghost numbers are not desirable, mark them red
+" from .vimrc: highlight fortranNumber ctermfg=Red
+" from .vimrc: highlight fortranFloat  ctermfg=Red
+" from .vimrc: 
+" from .vimrc: " Constants are better than ghost numbers, mark them blue ...
+" from .vimrc: " ... they are safer, they are in effect former ghost numbers
+" from .vimrc: highlight fortranConstant ctermfg=Blue
+" from .vimrc: 
+" from .vimrc: " Continuation lines.  I like them visible and a bit psychedelic
+" from .vimrc: highlight fortranContinueMark ctermfg=Magenta
+" from .vimrc: 
+" from .vimrc: highlight fortranString ctermfg=Gray
+" from .vimrc: 
+" from .vimrc: " Operators ... I don't know, maybe the same as keywords
+" from .vimrc: highlight fortranOperator ctermfg=Yellow
+" from .vimrc: 
+" from .vimrc: " Just Comment didn't work, fortranComment did
+" from .vimrc: highlight fortranComment ctermfg=LightBlue
+" from .vimrc: 
+" from .vimrc: " Try to over-ride Fortran objects in T-Flows
+" from .vimrc: highlight fortranObjectTflows cterm=Bold ctermfg=Green
+" from .vimrc: 
+" from .vimrc: " MPI calls in T-Flows - they are few and far in between, yet dangerous
+" from .vimrc: highlight fortranMpiTflows ctermfg=Red
+"---------------------------------------------------------------------[T-Flows]-
+
 " Vim syntax file
 " Language:	Fortran 2008 (and older: Fortran 2003, 95, 90, and 77)
 " Version:	(v104) 2021 April 06
@@ -90,43 +147,43 @@ endif
 "---------------------------------------------------------------------[T-Flows]-
 
 if b:fortran_fixed_source == 1
-  syn match fortranConstructName	"^\s\{6,}\zs\a\w*\ze\s*:"
+  syn match fortranConstructName   "^\s\{6,}\zs\a\w*\ze\s*:"
 else
-  syn match fortranConstructName	"^\s*\zs\a\w*\ze\s*:"
+  syn match fortranConstructName   "^\s*\zs\a\w*\ze\s*:"
 endif
 if exists("fortran_more_precise")
-  syn match fortranConstructName "\(\<end\s*do\s\+\)\@11<=\a\w*"
-  syn match fortranConstructName "\(\<end\s*if\s\+\)\@11<=\a\w*"
-  syn match fortranConstructName "\(\<end\s*select\s\+\)\@15<=\a\w*"
+  syn match fortranConstructName   "\(\<end\s*do\s\+\)\@11<=\a\w*"
+  syn match fortranConstructName   "\(\<end\s*if\s\+\)\@11<=\a\w*"
+  syn match fortranConstructName   "\(\<end\s*select\s\+\)\@15<=\a\w*"
 endif
 
-syn match fortranUnitHeader	"\<end\>"
-syn match fortranType		"\<character\>"
-syn match fortranType		"\<complex\>"
-syn match fortranType		"\<integer\>"
-syn match fortranType		"\<real\>"
-syn match fortranType		"\<logical\>"
-syn keyword fortranType		intrinsic
-syn match fortranType		"\<implicit\>"
-syn keyword fortranStructure	dimension
-syn keyword fortranStorageClass	parameter save
-syn match fortranUnitHeader	"\<subroutine\>"
+syn match fortranUnitHeader        "\<end\>"
+syn match fortranType              "\<character\>"
+syn match fortranType              "\<complex\>"
+syn match fortranType              "\<integer\>"
+syn match fortranType              "\<real\>"
+syn match fortranType              "\<logical\>"
+syn keyword fortranType            intrinsic
+syn match fortranType              "\<implicit\>"
+syn keyword fortranStructure       dimension
+syn keyword fortranStorageClass    parameter save
+syn match fortranUnitHeader        "\<subroutine\>"
 "=====================================================================[T-Flows]=
 " Got rid of the special group for call ...
 " syn keyword fortranCall		call
 "---------------------------------------------------------------------[T-Flows]-
-syn match fortranUnitHeader	"\<function\>"
-syn match fortranUnitHeader	"\<program\>"
-syn match fortranUnitHeader	"\<block\>"
+syn match fortranUnitHeader  "\<function\>"
+syn match fortranUnitHeader  "\<program\>"
+syn match fortranUnitHeader  "\<block\>"
 "=====================================================================[T-Flows]=
 " ... and added it (call) to the keywords
 " syn keyword fortranKeyword	return stop
 syn keyword fortranKeyword	return stop call
 "---------------------------------------------------------------------[T-Flows]-
-syn keyword fortranConditional	else then
-syn match fortranConditional	"\<if\>"
-syn match fortranConditionalOb	"\<if\s*(.*)\s*\d\+\s*,\s*\d\+\s*,\s*\d\+\s*$"
-syn match fortranRepeat		"\<do\>"
+syn keyword fortranConditional     else then
+syn match fortranConditional       "\<if\>"
+syn match fortranConditionalOb     "\<if\s*(.*)\s*\d\+\s*,\s*\d\+\s*,\s*\d\+\s*$"
+syn match fortranRepeat            "\<do\>"
 
 syn keyword fortranTodo		contained todo fixme
 
@@ -153,7 +210,8 @@ endif
 "=====================================================================[T-Flows]=
 " Removed name and file from the list below, too often used as variables
 "---------------------------------------------------------------------[T-Flows]-
-syn keyword fortranIO		access blank direct exist fmt form formatted iostat named nextrec number opened rec recl sequential status unformatted unit
+syn keyword fortranIO  access blank direct exist fmt form formatted iostat named
+syn keyword fortranIO  nextrec number opened rec recl sequential status unformatted unit
 
 syn keyword fortranIntrinsicR		alog alog10 amax0 amax1 amin0 amin1 amod cabs ccos cexp clog csin csqrt dabs dacos dasin datan datan2 dcos dcosh ddim dexp dint dlog dlog10 dmax1 dmin1 dmod dnint dsign dsin dsinh dsqrt dtan dtanh float iabs idim idint idnint ifix isign max0 max1 min0 min1 sngl
 
@@ -162,9 +220,12 @@ syn keyword fortranExtraIntrinsic	algama cdabs cdcos cdexp cdlog cdsin cdsqrt cq
 
 syn keyword fortranKeyword   abs acos aimag aint anint asin atan atan2 char cmplx conjg cos cosh exp
 syn keyword fortranKeyword   ichar index int log log10 max min nint sign sin sinh sqrt tan tanh
-syn match fortranIntrinsic   "\<len\s*[(,]"me=s+3
-syn match fortranIntrinsic   "\<real\s*("me=s+4
-syn match fortranIntrinsic   "\<logical\s*("me=s+7
+"=====================================================================[T-Flows]=
+" Changed cast functions from Intrinsic to Fortran keywords
+"---------------------------------------------------------------------[T-Flows]-
+syn match fortranKeyword     "\<len\s*[(,]"me=s+3
+syn match fortranKeyword     "\<real\s*("me=s+4
+syn match fortranKeyword     "\<logical\s*("me=s+7
 syn match fortranType        "\<implicit\s\+real\>"
 syn match fortranType        "\<implicit\s\+logical\>"
 
@@ -223,27 +284,27 @@ syn keyword fortranKeywordDel      assign pause
 syn match fortranType        "\<type\>"
 syn keyword fortranType      none
 
-syn keyword fortranStructure	private public intent optional
-syn keyword fortranStructure	pointer target allocatable
-syn keyword fortranStorageClass	in out
-syn match fortranStorageClass	"\<kind\s*="me=s+4
-syn match fortranStorageClass	"\<len\s*="me=s+3
+syn keyword fortranStructure       private public intent optional
+syn keyword fortranStructure       pointer target allocatable
+syn keyword fortranStorageClass    in out
+syn match fortranStorageClass      "\<kind\s*="me=s+4
+syn match fortranStorageClass      "\<len\s*="me=s+3
 
-syn match fortranUnitHeader	"\<module\>"
-syn match fortranUnitHeader	"\<submodule\>"
-syn keyword fortranUnitHeader	use only contains
-syn keyword fortranUnitHeader	result operator assignment
-syn match fortranUnitHeader	"\<interface\>"
-syn keyword fortranKeyword	allocate deallocate nullify cycle exit
-syn match fortranConditional	"\<select\>"
-syn keyword fortranConditional	case default where elsewhere
+syn match fortranUnitHeader        "\<module\>"
+syn match fortranUnitHeader        "\<submodule\>"
+syn keyword fortranUnitHeader      use only contains
+syn keyword fortranUnitHeader      result operator assignment
+syn match fortranUnitHeader        "\<interface\>"
+syn keyword fortranKeyword         allocate deallocate nullify cycle exit
+syn match fortranConditional       "\<select\>"
+syn keyword fortranConditional     case default where elsewhere
 
-syn match fortranOperator	"\(\(>\|<\)=\=\|==\|/=\|=\)"
-syn match fortranOperator	"=>"
+syn match fortranOperator    "\(\(>\|<\)=\=\|==\|/=\|=\)"
+syn match fortranOperator    "=>"
 
-syn region fortranString	start=+"+ end=+"+	contains=fortranLeftMargin,fortranContinueMark,fortranSerialNumber
-syn keyword fortranIO		pad position action delim readwrite
-syn keyword fortranIO		eor advance nml
+syn region fortranString     start=+"+ end=+"+	contains=fortranLeftMargin,fortranContinueMark,fortranSerialNumber
+syn keyword fortranIO        pad position action delim readwrite
+syn keyword fortranIO        eor advance nml
 
 syn keyword fortranKeyword   adjustl adjustr all allocated any associated bit_size btest
 syn keyword fortranKeyword   ceiling count cshift date_and_time digits dot_product eoshift
@@ -252,7 +313,12 @@ syn keyword fortranKeyword   ieor ior ishft ishftc lbound len_trim matmul maxexp
 syn keyword fortranKeyword   maxloc maxval merge minexponent minloc minval modulo mvbits
 syn keyword fortranKeyword   nearest pack precision present product radix random_number
 syn keyword fortranKeyword   random_seed range repeat reshape rrspacing
-syn keyword fortranIntrinsic scale scan selected_int_kind selected_real_kind set_exponent shape size spacing spread sum system_clock tiny transpose trim ubound unpack verify
+"=====================================================================[T-Flows]=
+" Changed a few more functions from Intrinsic to Fortran keywords
+"---------------------------------------------------------------------[T-Flows]-
+syn keyword fortranKeyword   scale scan selected_int_kind selected_real_kind set_exponent
+syn keyword fortranKeyword   shape size spacing spread sum system_clock tiny transpose
+syn keyword fortranKeyword   trim ubound unpack verify
 syn match fortranIntrinsic   "\<not\>\(\s*\.\)\@!"me=s+3
 syn match fortranIntrinsic   "\<kind\>\s*[(,]"me=s+4
 
@@ -279,18 +345,18 @@ syn keyword fortranIntrinsicR      achar iachar transfer
 syn keyword fortranInclude         include
 syn keyword fortranStorageClassR   sequence
 
-syn match   fortranConditional	"\<end\s*if"
-syn match   fortranIO		contains=fortranOperator "\<e\(nd\|rr\)\s*=\s*\d\+"
-syn match   fortranConditional	"\<else\s*if"
+syn match   fortranConditional     "\<end\s*if"
+syn match   fortranIO              contains=fortranOperator "\<e\(nd\|rr\)\s*=\s*\d\+"
+syn match   fortranConditional     "\<else\s*if"
 
-syn keyword fortranUnitHeaderOb	entry
-syn match fortranTypeR		display "double\s\+precision"
-syn match fortranTypeR		display "double\s\+complex"
-syn match fortranUnitHeaderR	display "block\s\+data"
-syn keyword fortranStorageClassR	common equivalence data
-syn keyword fortranIntrinsicR	dble dprod
-syn match   fortranOperatorR	"\.\s*[gl][et]\s*\."
-syn match   fortranOperatorR	"\.\s*\(eq\|ne\)\s*\."
+syn keyword fortranUnitHeaderOb    entry
+syn match fortranTypeR             display "double\s\+precision"
+syn match fortranTypeR             display "double\s\+complex"
+syn match fortranUnitHeaderR       display "block\s\+data"
+syn keyword fortranStorageClassR   common equivalence data
+syn keyword fortranIntrinsicR      dble dprod
+syn match   fortranOperatorR       "\.\s*[gl][et]\s*\."
+syn match   fortranOperatorR       "\.\s*\(eq\|ne\)\s*\."
 
 syn keyword fortranRepeat          forall
 syn match fortranRepeat            "\<end\s*forall"
@@ -300,7 +366,7 @@ syn match fortranType              "\<pure\>"
 syn match fortranType              "\<impure\>"
 syn match fortranType              "\<recursive\>"
 if exists("fortran_more_precise")
-  syn match fortranConstructName "\(\<end\s*forall\s\+\)\@15<=\a\w*\>"
+  syn match fortranConstructName   "\(\<end\s*forall\s\+\)\@15<=\a\w*\>"
 endif
 
 if b:fortran_dialect == "f08"
@@ -388,6 +454,19 @@ if b:fortran_dialect == "f08"
   syn keyword fortranTypeTflows    Matrix_Type   Vector_Type    Solver_Type    Native_Type    Petsc_Type     Process_Type
   syn keyword fortranObjectTflows  A  M          vector  b      Sol            Nat            Pet            Process
 "---------------------------------------------------------------------[T-Flows]-
+
+"==============================================================[MPI in T-Flows]=
+" Here are MPI calls from T-Flows
+" Note that they are not set in this file at all, only in the .vimrc
+  syn match fortranMpiTflows       "\<attributes\>"
+  syn keyword fortranMpiTflows     Mpi_Barrier  Mpi_Finalize  Mpi_Sendrecv_Replace
+  syn keyword fortranMpiTflows     Mpi_Allreduce  Mpi_File_Close  Mpi_File  Mpi_File_Set_View
+  syn keyword fortranMpiTflows     Mpi_Send  Mpi_Sendrecv  Mpi_Status  Mpi_Recv  Mpi_Write
+  syn keyword fortranMpiTflows     Mpi_Type_Create_Indexed_Block  Mpi_Type_Commit
+  syn keyword fortranMpiTflows     Mpi_File_Open  Mpi_File_Read
+  syn keyword fortranMpiTflows     MPI_COMM_WORLD  MPI_CHARACTER  MPI_INFO_NULL  MPI_STATUS_IGNORE  MPI_IN_PLACE
+  syn keyword fortranMpiTflows     MPI_LOR  MPI_SUM  MPI_MAX  MPI_MIN  MPI_MODE_WRONLY  MPI_MODE_CREATE
+"--------------------------------------------------------------[MPI in T-Flows]-
 
 " CUDA fortran
   syn match fortranTypeCUDA        "\<attributes\>"
@@ -602,6 +681,7 @@ endif
 hi def link fortranConstantTflows  fortranConstant
 hi def link fortranTypeTflows      fortranType
 hi def link fortranObjectTflows    fortranIntrinsic
+hi def link fortranMpiTflows       fortranIntrinsic
 "---------------------------------------------------------------------[T-Flows]-
 
 " CUDA
