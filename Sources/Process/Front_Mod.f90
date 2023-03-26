@@ -28,7 +28,7 @@
     integer                      :: n_verts
     integer                      :: n_sides
     type(Vert_Type), allocatable :: Vert(:)
-    type(Elem_Type), allocatable :: elem(:)
+    type(Elem_Type), allocatable :: Elem(:)
     type(Side_Type), allocatable :: side(:)
 
     ! Bounding nodes for each vertex (derives from Isoap usage)

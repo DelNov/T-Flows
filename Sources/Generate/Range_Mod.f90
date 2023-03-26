@@ -18,8 +18,8 @@
 
     ! Enclosing logical cooridnates
     integer :: is, ie  ! start and end in "i" direction
-    integer :: js, je  ! start and end in "i" direction
-    integer :: ks, ke  ! start and end in "i" direction
+    integer :: js, je  ! start and end in "j" direction
+    integer :: ks, ke  ! start and end in "k" direction
 
     ! On which face is it ("IMIN", "IMAC", "JMIN", ...
     character(SL) :: face

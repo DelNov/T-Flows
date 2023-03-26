@@ -22,6 +22,7 @@
   !   Convert type   !
   !------------------!
   type Convert_Type
+
     contains
       procedure :: Allocate_Memory
       procedure :: Calculate_Geometry

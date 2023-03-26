@@ -14,7 +14,7 @@
   !-----------------!
   type Smooths_Type
 
-    integer              :: n_smooths    ! number of smoothing regions
+    integer :: n_smooths    ! number of smoothing regions
 
     integer, allocatable :: iters(:)
     logical, allocatable :: in_x (:), in_y (:), in_z (:)

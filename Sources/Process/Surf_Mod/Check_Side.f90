@@ -10,26 +10,26 @@
   integer                  :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Side_Type), pointer :: side
-  type(Elem_Type), pointer :: elem(:)
+  type(Elem_Type), pointer :: Elem(:)
   integer                  :: a, b, c, d
   integer                  :: i_a, j_a, k_a, i_b, j_b, k_b, sum_a, sum_b
 !==============================================================================!
 
   side => Surf % side(s)
-  elem => Surf % elem
+  Elem => Surf % Elem
 
   a = side % a
   b = side % b
   c = side % c
   d = side % d
 
-  i_a = elem(side % ea) % v(1)
-  j_a = elem(side % ea) % v(2)
-  k_a = elem(side % ea) % v(3)
+  i_a = Elem(side % ea) % v(1)
+  j_a = Elem(side % ea) % v(2)
+  k_a = Elem(side % ea) % v(3)
 
-  i_b = elem(side % eb) % v(1)
-  j_b = elem(side % eb) % v(2)
-  k_b = elem(side % eb) % v(3)
+  i_b = Elem(side % eb) % v(1)
+  j_b = Elem(side % eb) % v(2)
+  k_b = Elem(side % eb) % v(3)
 
   sum_a = i_a + j_a + k_a - c - d - a
   sum_b = i_b + j_b + k_b - c - d - b

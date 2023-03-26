@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Save_Vtu_Surf(Results, surf, time_step)
+  subroutine Save_Vtu_Surf(Results, Surf, time_step)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Results_Type)     :: Results
-  type(Surf_Type), target :: surf
+  type(Surf_Type), target :: Surf
   integer                 :: time_step
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
@@ -28,7 +28,7 @@
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
-  if(surf % n_verts < 1) return
+  if(Surf % n_verts < 1) return
 
   !---------------------------!
   !                           !
@@ -56,8 +56,8 @@
     write(fu,'(a,a)') IN_1, '<UnstructuredGrid>'
 
     write(fu,'(a,a,i0.0,a,i0.0,a)')   &
-                IN_2, '<Piece NumberOfPoints="', surf % n_verts,  &
-                           '" NumberOfCells ="', surf % n_elems, '">'
+                IN_2, '<Piece NumberOfPoints="', Surf % n_verts,  &
+                           '" NumberOfCells ="', Surf % n_elems, '">'
 
     !------------------------!
     !                        !
@@ -68,8 +68,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                             ' NumberOfComponents'       //  &
                             '="3" format="ascii">'
-    do v = 1, surf % n_verts
-      Vert => surf % Vert(v)
+    do v = 1, Surf % n_verts
+      Vert => Surf % Vert(v)
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')                &
                   IN_5, Vert % x_n, Vert % y_n, Vert % z_n
     end do
@@ -89,7 +89,7 @@
     write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                             ' Name="Index" '          //  &
                             'format="ascii">'
-    do v = 1, surf % n_verts
+    do v = 1, Surf % n_verts
       write(fu,'(a,i9)') IN_5, v
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -100,8 +100,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                             ' Name="Neighbours" '     // &
                             'format="ascii">'
-    do v = 1, surf % n_verts
-      write(fu,'(a,i9)') IN_5, surf % Vert(v) % nne
+    do v = 1, Surf % n_verts
+      write(fu,'(a,i9)') IN_5, Surf % Vert(v) % nne
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -111,8 +111,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type='//floatp  //  &
                             ' Name="NodeCurv" '         //  &
                             ' format="ascii">'
-    do v = 1, surf % n_verts
-      Vert => surf % Vert(v)
+    do v = 1, Surf % n_verts
+      Vert => Surf % Vert(v)
       write(fu,'(a,1pe16.6e4)') IN_5, Vert % curv
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -129,12 +129,12 @@
                             ' Name="connectivity"'    //  &
                             ' format="ascii">'
     ! Cell topology
-    do e = 1, surf % n_elems
+    do e = 1, Surf % n_elems
       write(fu,'(a,3i9)')          &
          IN_5,                     &
-         surf % elem(e) % v(1)-1,  &
-         surf % elem(e) % v(2)-1,  &
-         surf % elem(e) % v(3)-1
+         Surf % Elem(e) % v(1)-1,  &
+         Surf % Elem(e) % v(2)-1,  &
+         Surf % Elem(e) % v(3)-1
     end do
 
     ! Cell offsets
@@ -142,7 +142,7 @@
     write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="offsets"' //  &
                             ' format="ascii">'
     offset = 0
-    do e = 1, surf % n_elems
+    do e = 1, Surf % n_elems
       offset = offset + 3
       write(fu,'(a,i9)') IN_5, offset
     end do
@@ -151,7 +151,7 @@
     write(fu,'(a,a)') IN_4, '</DataArray>'
     write(fu,'(a,a)') IN_4, '<DataArray type='//intp//' Name="types"' //  &
                             ' format="ascii">'
-    do e = 1, surf % n_elems
+    do e = 1, Surf % n_elems
       write(fu,'(a,i9)') IN_5, VTK_TRIANGLE
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
@@ -172,8 +172,8 @@
     write(fu,'(a,a)') IN_4, '<DataArray type='//intp  //  &
                             ' Name="Neighbours"'      //  &
                             ' format="ascii">'
-    do e = 1, surf % n_elems
-      write(fu,'(a,i9)') IN_5, surf % elem(e) % nne
+    do e = 1, Surf % n_elems
+      write(fu,'(a,i9)') IN_5, Surf % Elem(e) % nne
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -183,9 +183,9 @@
     write(fu,'(4a)') IN_4,                                                   &
                    '<DataArray type='//floatp//' Name="ElementNormals" ' //  &
                    ' NumberOfComponents="3" format="ascii">'
-    do e = 1, surf % n_elems
+    do e = 1, Surf % n_elems
       write(fu,'(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-            IN_5, surf % elem(e) % nx, surf % elem(e) % ny, surf % elem(e) % nz
+            IN_5, Surf % Elem(e) % nx, Surf % Elem(e) % ny, Surf % Elem(e) % nz
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 
@@ -195,8 +195,8 @@
     write(fu,'(4a)') IN_4,                                                &
                    '<DataArray type='//floatp//' Name="ElementCurv" ' //  &
                    ' format="ascii">'
-    do e = 1, surf % n_elems
-      write(fu,'(a,1pe16.6e4)') IN_5, surf % elem(e) % curv
+    do e = 1, Surf % n_elems
+      write(fu,'(a,1pe16.6e4)') IN_5, Surf % Elem(e) % curv
     end do
     write(fu,'(a,a)') IN_4, '</DataArray>'
 

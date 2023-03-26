@@ -169,7 +169,7 @@
                           ' format="ascii">'
   ! Cell topology
   do e = 1, Front % n_elems
-    write(f9,'(a,99i9)') IN_5, Front % elem(e) % v(1:Front % elem(e) % nv)-1
+    write(f9,'(a,99i9)') IN_5, Front % Elem(e) % v(1:Front % Elem(e) % nv)-1
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
@@ -182,7 +182,7 @@
                           ' format="ascii">'
   offset = 0
   do e = 1, Front % n_elems
-    offset = offset + Front % elem(e) % nv
+    offset = offset + Front % Elem(e) % nv
     write(f9,'(a,i9)') IN_5, offset
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
@@ -226,7 +226,7 @@
   write(f9,'(a,a)') IN_4, '<DataArray type='//intp//' Name="Neighbours"'  //  &
                           ' format="ascii">'
   do e = 1, Front % n_elems
-    write(f9,'(a,i9)') IN_5, Front % elem(e) % nne
+    write(f9,'(a,i9)') IN_5, Front % Elem(e) % nne
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
@@ -243,9 +243,9 @@
                  ' NumberOfComponents="3" format="ascii">'
   do e = 1, Front % n_elems
     write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-              IN_5, Front % elem(e) % nx,           &
-                    Front % elem(e) % ny,           &
-                    Front % elem(e) % nz
+              IN_5, Front % Elem(e) % nx,           &
+                    Front % Elem(e) % ny,           &
+                    Front % Elem(e) % nz
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
@@ -261,7 +261,7 @@
                  '<DataArray type='//floatp//' Name="ElementArea" '  //  &
                  ' format="ascii">'
   do e = 1, Front % n_elems
-    write(f9,'(a,1pe16.6e4)') IN_5, Front % elem(e) % area
+    write(f9,'(a,1pe16.6e4)') IN_5, Front % Elem(e) % area
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
@@ -279,9 +279,9 @@
                  ' NumberOfComponents="3" format="ascii">'
   do e = 1, Front % n_elems
     write(f9, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')  &
-              IN_5, Front % elem(e) % xe,           &
-                    Front % elem(e) % ye,           &
-                    Front % elem(e) % ze
+              IN_5, Front % Elem(e) % xe,           &
+                    Front % Elem(e) % ye,           &
+                    Front % Elem(e) % ze
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 
@@ -297,7 +297,7 @@
                  '<DataArray type='//floatp//' Name="ElementCurv" ' //  &
                  ' format="ascii">'
   do e = 1, Front % n_elems
-    write(f9,'(a,1pe16.6e4)') IN_5, Front % elem(e) % curv
+    write(f9,'(a,1pe16.6e4)') IN_5, Front % Elem(e) % curv
   end do
   write(f9,'(a,a)') IN_4, '</DataArray>'
 

@@ -441,23 +441,25 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
 " After the constants, I have alternating definitions of types and objects derived from them
-  syn keyword fortranTypeTflows    Domain_Type   Generate_Type  Convert_Type   Divide_Type    Grid_Type
-  syn keyword fortranObjectTflows  Dom           Generate       Convert        Divide         Grid  Prim  Dual
-  syn keyword fortranTypeTflows    Math_Type     Sort_Type      File_Type      String_Type    Work_Type      Tokenizer_Type
-  syn keyword fortranObjectTflows  Math          Sort           File           String         Work           Line  Tok
-  syn keyword fortranTypeTflows    Comm_Type     Backup_Type    Field_Type     Turb_Type      Vof_Type       Swarm_Type
-  syn keyword fortranObjectTflows  Comm  Global  Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
-  syn keyword fortranTypeTflows    Bulk_Type     Face_Type
-  syn keyword fortranObjectTflows  bulk          v_flux
+  syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type      Range_Type
+  syn keyword fortranObjectTflows  Dom            points         blocks         lines          ranges
+  syn keyword fortranTypeTflows    Generate_Type  Convert_Type   Divide_Type    Grid_Type
+  syn keyword fortranObjectTflows  Generate       Convert        Divide         Grid  Prim  Dual
+  syn keyword fortranTypeTflows    Math_Type      Sort_Type      File_Type      String_Type    Work_Type      Tokenizer_Type
+  syn keyword fortranObjectTflows  Math           Sort           File           String         Work           Line  Tok
+  syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type      Vof_Type       Swarm_Type
+  syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
+  syn keyword fortranTypeTflows    Bulk_Type      Face_Type
+  syn keyword fortranObjectTflows  bulk           v_flux
   syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
-  syn keyword fortranTypeTflows    Front_Type    Surf_Type      Elem_Type      Vert_Type      Particle_Type
-  syn keyword fortranObjectTflows  Front         Surf           Elem           Vert           Part
-  syn keyword fortranTypeTflows    Monitor_Type  Results_Type   Porosity_Type  Profiler_Type  Message_Type
-  syn keyword fortranObjectTflows  Monitor       Results        Por            Profiler       Message
+  syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type      Vert_Type      Particle_Type
+  syn keyword fortranObjectTflows  Front          Surf           Elem           side           Vert           Part
+  syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type  Message_Type
+  syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler       Message
+  syn keyword fortranTypeTflows    Matrix_Type   Vector_Type     Solver_Type    Native_Type    Petsc_Type     Process_Type
+  syn keyword fortranObjectTflows  A  M          vector          Sol            Nat            Pet            Process
   syn keyword fortranTypeTflows    Var_Type
-  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis 
-  syn keyword fortranTypeTflows    Matrix_Type   Vector_Type    Solver_Type    Native_Type    Petsc_Type     Process_Type
-  syn keyword fortranObjectTflows  A  M          vector  x  b    Sol            Nat            Pet            Process
+  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis
 "---------------------------------------------------------------------[T-Flows]-
 
 "==============================================================[MPI in T-Flows]=
