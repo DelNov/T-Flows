@@ -72,6 +72,10 @@
     end if
   end do
 
+  ! User function
+  !WRITE(*,*)"CALL User_Mod_End_Of_Correct_Velocity",this_proc
+  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
+
   !------------------------------------!
   !   Calculate the max volume error   !
   !   with the new corrected fluxes    !
@@ -138,7 +142,8 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
+  !WRITE(*,*)"CALL User_Mod_End_Of_Correct_Velocity",this_proc
+  !call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 
   call Cpu_Timer % Stop('Correct_Velocity')
 
