@@ -13,7 +13,7 @@
   real               :: x(:)  ! presumably, this goes to buffer cells
   real, optional     :: norm  ! optional number for normalization
 !-----------------------------------[Locals]-----------------------------------!
-  real    :: rms, x_max, x_min, x_max_min
+  real    :: rms, x_max, x_min
   integer :: i
 !==============================================================================!
 
@@ -44,16 +44,18 @@
   !end if
 
   ! rms = rms / (x_max - x_min + TINY)
-  ! The line above doesn't work. x_max=1.0, x_min=1.0, TINY=1e-30
-  !     -> divided by zero 
+  ! The line above doesn't work
+  ! Example: x_max=1.0, x_min=1.0, TINY=1e-30
+  !     (x_max - x_min + TINY) = 0.0
 
   ! New implementation 2023.03.21 Yohei
   ! avoid roundoff error
-  x_max_min = x_max - x_min
-  IF (x_max_min==0.0d0) THEN
-    x_max_min = x_max_min+TINY
-  ENDIF
-  rms = rms / (x_max_min)
+  !!x_max_min = x_max - x_min
+  !!IF (x_max_min==0.0d0) THEN
+  !!  x_max_min = x_max_min+TINY
+  !!ENDIF
+  !!rms = rms / (x_max_min)
+  rms = rms / max(x_max-x_min,TINY)
 
   Normalized_Root_Mean_Square = rms
 
