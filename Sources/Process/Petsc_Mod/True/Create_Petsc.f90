@@ -40,7 +40,7 @@
 
     ! Distribute m_lowers among all processors
     all_lower_ms(This_Proc()) = Pet % m_lower
-    call Comm_Mod_Global_Sum_Int_Array(N_Procs(), all_lower_ms)
+    call Global % Sum_Int_Array(N_Procs(), all_lower_ms)
 
     start = sum(all_lower_ms(1:This_Proc())) - Pet % m_lower
 
