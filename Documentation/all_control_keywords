@@ -68,6 +68,7 @@
   NORMALIZATION_FOR_TURBULENCE_SOLVER      |         1.0                   |   any real number, but mostly it is 1.0
   NUMBER_OF_PISO_CORRECTIONS               |         3                     |   any integer up to 10 is reasonable
   NUMBER_OF_TIME_STEPS                     |      1200                     |   any integer, multiples of 30 make sense
+  NUMBER_OF_SWARM_SUB_STEPS                |        12                     |   any integer, but I would say up to 20
   PRECONDITIONER_FOR_SYSTEM_MATRIX         |         incomplete_cholesky   |   diagonal, none
   PRESSURE_MOMENTUM_COUPLING               |         simple                |   piso
   REPORT_VOLUME_BALANCE                    |         no                    |   yes
