@@ -7,7 +7,6 @@
 #---------------
 # Time stepping
 #---------------
-
  TIME_STEP                  0.6
  NUMBER_OF_TIME_STEPS    1200
  RESULTS_SAVE_INTERVAL    600

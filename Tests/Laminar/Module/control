@@ -7,7 +7,7 @@
  NUMBER_OF_TIME_STEPS   1200
  RESULTS_SAVE_INTERVAL   120
  BACKUP_SAVE_INTERVAL    600
- TIME_STEP               0.01
+ TIME_STEP                 0.01
 
 # LOAD_BACKUP_NAME   backstep_orthogonal-ts000001.backup
 

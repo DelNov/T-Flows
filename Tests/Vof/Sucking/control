@@ -69,9 +69,8 @@
 
  GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
  GRADIENT_METHOD_FOR_VOF             gauss_theorem
- TOLERANCE_FOR_VOF GRADIENTS         1.0e-4
  TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-4
- MAX_ITERATIONS_FOR_GAUSS_GRADIENTS  200
+ MAX_GAUSS_GRADIENTS_ITERATIONS    200
 
 #------------------------
 # Linear solver settings
@@ -96,16 +95,16 @@
 #---------------------
   BOUNDARY_CONDITION    wall
     TYPE                inflow
-    VARIABLES           u      v     w     vof     vof_c_ang   t
-    VALUES              0.00  0.0   0.0   0.0     90.0         10.0
+    VARIABLES           u     v     w     vof     vof_c_ang   t
+    VALUES              0.0   0.0   0.0   0.0     90.0       10.0
 
   BOUNDARY_CONDITION    outlet
     TYPE                outflow
-    VARIABLES           u      v     w     vof     vof_c_ang   q
-    VALUES              0.00  0.0   0.0   0.0     90.0         0.0
+    VARIABLES           u     v     w     vof     vof_c_ang   q
+    VALUES              0.0   0.0   0.0   0.0     90.0        0.0
 
   BOUNDARY_CONDITION    symmetry
     TYPE                symmetry
-    VARIABLES           u      v     w     vof     vof_c_ang   q
-    VALUES              0.00  0.0   0.0   0.0     90.0         0.0
+    VARIABLES           u     v     w     vof     vof_c_ang   q
+    VALUES              0.0   0.0   0.0   0.0     90.0        0.0
 

@@ -4,7 +4,7 @@
  PROBLEM_NAME    domain
  HEAT_TRANSFER   no
 
- TIME_STEP                                   0.5
+ TIME_STEP                                     0.5
  NUMBER_OF_TIME_STEPS                      14400   (this is two hours)
  STARTING_TIME_STEP_FOR_TURB_STATISTICS     7200   (this is one hour)
  RESULTS_SAVE_INTERVAL                       600   (five minutes)

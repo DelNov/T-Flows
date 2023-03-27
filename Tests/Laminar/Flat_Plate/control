@@ -37,10 +37,10 @@
 # Fluid properties
 # Dry air at 27oC in SI units
 #----------------------------------------
- MASS_DENSITY           1.177
- DYNAMIC_VISCOSITY      1.846e-5
+ MASS_DENSITY                1.177
+ DYNAMIC_VISCOSITY           1.846e-5
 
- THERMAL_CONDUCTIVITY   2.6240e-2
+ THERMAL_CONDUCTIVITY        2.6240e-2
  HEAT_CAPACITY          1000.0 
 
 #----------------------------------------

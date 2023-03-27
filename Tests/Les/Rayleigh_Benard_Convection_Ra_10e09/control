@@ -64,7 +64,6 @@
     VARIABLES           u     v     w     t 
     VALUES              0.0   0.0   0.0   10.0
 
-
 #---------------------
 # Boundary conditions
 #---------------------

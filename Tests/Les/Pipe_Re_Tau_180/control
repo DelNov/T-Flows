@@ -29,8 +29,7 @@
  DYNAMIC_VISCOSITY      3.33333e-4
  HEAT_CAPACITY          1.0
 
-TURBULENCE_MODEL les_dynamic
- PERTURB_MOMENTUM    yes
+ TURBULENCE_MODEL       les_dynamic
 
  PRESSURE_DROPS     0.0  0.0  -0.0072
  MASS_FLOW_RATES    0.0  0.0  -2.8
@@ -62,7 +61,7 @@ TURBULENCE_MODEL les_dynamic
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t 
+    VARIABLES           u     v     w     t
     VALUES              0.0   0.0  -2.8   20.0
 
 #---------------------
@@ -73,5 +72,3 @@ TURBULENCE_MODEL les_dynamic
     TYPE                wall
     VARIABLES           u     v     w     q
     VALUES              0.0   0.0   0.0   0.1
-INTERFACE_TRACKING no
-PARTICLE_TRACKING no
