@@ -405,16 +405,16 @@ if b:fortran_dialect == "f08"
   syn match fortranOperator        "\([\|]\)"
 
   " F2008
-  syn keyword fortranIntrinsic     acosh asinh atanh bessel_j0 bessel_j1 bessel_jn bessel_y0 bessel_y1 bessel_yn erf erfc erfc_scaled gamma log_gamma hypot norm2
-  syn keyword fortranIntrinsic     atomic_define atomic_ref execute_command_line leadz trailz storage_size merge_bits
-  syn keyword fortranIntrinsic     bge bgt ble blt dshiftl dshiftr findloc iall iany iparity image_index lcobound ucobound maskl maskr num_images parity popcnt poppar shifta shiftl shiftr this_image
+  syn keyword fortranKeyword       acosh asinh atanh bessel_j0 bessel_j1 bessel_jn bessel_y0 bessel_y1 bessel_yn
+  syn keyword fortranKeyword       erf erfc erfc_scaled gamma log_gamma hypot norm2
+  syn keyword fortranKeyword       atomic_define atomic_ref execute_command_line leadz trailz storage_size merge_bits
+  syn keyword fortranKeyword       bge bgt ble blt dshiftl dshiftr findloc iall iany iparity image_index lcobound ucobound maskl maskr num_images parity popcnt poppar shifta shiftl shiftr this_image
   syn keyword fortranIO            newunit
   syn keyword fortranType          contiguous
   syn keyword fortranRepeat        concurrent
 
 "=====================================================================[T-Flows]=
 " T-Flows specific
-  syn match fortranTypeTflows      "\<attributes\>"
 " Start with constants from Const_Mod:
   syn keyword fortranConstant      PROGRAM_NAME
   syn keyword fortranConstant      VL  SL  DL   MSI  DP  SP  IP  LP  RP
@@ -456,16 +456,17 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Front          Surf           Elem           side           Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type  Message_Type
   syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler       Message
-  syn keyword fortranTypeTflows    Matrix_Type   Vector_Type     Solver_Type    Native_Type    Petsc_Type     Process_Type
-  syn keyword fortranObjectTflows  A  M          vector          Sol            Nat            Pet            Process
+  syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type    Petsc_Type     Process_Type
+  syn keyword fortranObjectTflows  A  M           vector         Sol            Nat            Pet            Process
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis
+" Finally, a few global functions which I don't really like in the code
+  syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
 "---------------------------------------------------------------------[T-Flows]-
 
 "==============================================================[MPI in T-Flows]=
 " Here are MPI calls from T-Flows
 " Note that they are not set in this file at all, only in the .vimrc
-  syn match fortranMpiTflows       "\<attributes\>"
   syn keyword fortranMpiTflows     Mpi_Barrier  Mpi_Finalize  Mpi_Sendrecv_Replace
   syn keyword fortranMpiTflows     Mpi_Allreduce  Mpi_File_Close  Mpi_File  Mpi_File_Set_View
   syn keyword fortranMpiTflows     Mpi_Send  Mpi_Sendrecv  Mpi_Status  Mpi_Recv  Mpi_Write
@@ -476,7 +477,6 @@ if b:fortran_dialect == "f08"
 "--------------------------------------------------------------[MPI in T-Flows]-
 
 " CUDA fortran
-  syn match fortranTypeCUDA        "\<attributes\>"
   syn keyword fortranTypeCUDA      host global device value
   syn keyword fortranTypeCUDA      shared constant pinned texture
   syn keyword fortranTypeCUDA      dim1 dim2 dim3 dim4
@@ -689,6 +689,7 @@ hi def link fortranConstantTflows  fortranConstant
 hi def link fortranTypeTflows      fortranType
 hi def link fortranObjectTflows    fortranIntrinsic
 hi def link fortranMpiTflows       fortranIntrinsic
+hi def link fortranGlobalTflows    Todo
 "---------------------------------------------------------------------[T-Flows]-
 
 " CUDA
