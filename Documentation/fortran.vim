@@ -451,7 +451,6 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur      Vof            Swarm Swr
   syn keyword fortranTypeTflows    Bulk_Type      Face_Type
   syn keyword fortranObjectTflows  bulk           v_flux
-  syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type      Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side           Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type  Message_Type
@@ -460,6 +459,12 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  A  M           vector         Sol            Nat            Pet            Process
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis
+" Items which follow are not really objects, but I don't know where else to put them
+  syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
+" Macros might need a special group of their own.
+  syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
+  syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain
+  syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
 "---------------------------------------------------------------------[T-Flows]-
@@ -689,6 +694,7 @@ hi def link fortranConstantTflows  fortranConstant
 hi def link fortranTypeTflows      fortranType
 hi def link fortranObjectTflows    fortranIntrinsic
 hi def link fortranMpiTflows       fortranIntrinsic
+hi def link fortranMacroTflows     fortranIntrinsic
 hi def link fortranGlobalTflows    Todo
 "---------------------------------------------------------------------[T-Flows]-
 
