@@ -62,11 +62,11 @@
       end if
 
       ! Write results in user-customized format
-      call User_Mod_Save_Vtu_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                     curr_dt, domain=d)
+      call User_Mod_Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                 curr_dt, domain=d)
       if(Flow(d) % with_particles) then
-        call User_Mod_Save_Vtu_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                     curr_dt, domain=d)
+        call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                 curr_dt, domain=d)
       end if
 
     end do  ! through domains
@@ -84,8 +84,8 @@
       if(Flow(d) % with_particles) then
         call Results % Save_Vtu_Swarm(Swarm(d), curr_dt, domain=d)
 
-        call User_Mod_Save_Vtu_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                     curr_dt, domain=d)
+        call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d),  &
+                                 curr_dt, domain=d)
       end if
 
     end do  ! through domains
