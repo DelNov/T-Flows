@@ -125,7 +125,7 @@
   PARTICLE_TRACKING                        |         no                    |   yes
   PHASE_DENSITIES                          |         1.0,  1.0             |   two physical properties - densities
   PHASE_VISCOSITIES                        |         1.0,  1.0             |   two viscosities for two phases
-  PHASE_CAPACITY                           |         1.0,  1.0             |   thermal capacities for two phases
+  PHASE_CAPACITIES                         |         1.0,  1.0             |   thermal capacities for two phases
   PHASE_CONDUCTIVITIES                     |         1.0,  1.0             |   thermal conductivities for two phases
   POINT_FOR_MONITORING_PLANES              |         0.0,  0.0,  0.0       |   see MONITORING_POINT above
   POTENTIAL_INITIALIZATION                 |         no                    |   yes
