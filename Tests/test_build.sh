@@ -1019,6 +1019,7 @@ function process_backup_tests {
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_manceau_hanjalic" \
+
     $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
 
   process_backup_test \
@@ -1622,38 +1623,54 @@ function chose_test {
   option=$1
 
   if [ $option -eq 0 ]; then exit 1; fi
+
+  #  1. Generate tests"
   if [ $option -eq 1 ]; then
     generate_tests
   fi
+
+  #  2. Convert tests"
   if [ $option -eq 2 ]; then
     convert_tests
   fi
+
+  #  3. Divide tests"
   if [ $option -eq 3 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     divide_tests
   fi
+
+  #  4. Processor backup tests"
   if [ $option -eq 4 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_backup_tests
   fi
+
+  #  5. Processor save_now/exit_now tests"
   if [ $option -eq 5 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_save_exit_now_tests
   fi
+
+  #  6. Processor full lenght tests"
   if [ $option -eq 6 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_full_length_tests
   fi
+
+  #  7. Process accuracy test"
   if [ $option -eq 7 ]; then
     process_accuracy_tests
   fi
+
+  #  8. Perform all tests"
   if [ $option -eq 8 ]; then
     generate_tests
     convert_tests
@@ -1663,6 +1680,8 @@ function chose_test {
     process_full_length_tests
     process_accuracy_tests
   fi
+
+  #  9. Clean all test directories"
   if [ $option -eq 9 ]; then
     git clean -dfx $TEST_DIR/..
     make_clean $GENE_DIR
@@ -1670,6 +1689,8 @@ function chose_test {
     make_clean $DIVI_DIR
     make_clean $PROC_DIR
   fi
+
+  # 10. Change the compiler"
   if [ $option -eq 10 ]; then
     if [ $FORTRAN == "gnu" ]; then
       FORTRAN="intel"
