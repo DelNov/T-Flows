@@ -17,7 +17,7 @@
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
-  integer                    :: c, s, c1, c2
+  integer                    :: c, s, c1, c2, nb, nc, reg
   real                       :: prod, diss, phi_hom, phi_wall, mag, phi_tot
   real                       :: b11, b22, b33, b12, b13, b21, b31, b23, b32
   real                       :: s11, s22, s33, s12, s13, s21, s31, s23, s32
@@ -29,7 +29,9 @@
   ! Take aliases
   Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
-  call Flow % Alias_Momentum(u, v, w)
+  nb   =  Grid % n_bnd_cells
+  nc   =  Grid % n_cells
+  call Flow % Alias_Momentum    (u, v, w)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
   call Sol % Alias_Native       (A, b)
@@ -38,7 +40,7 @@
 
   call Flow % Grad_Variable(f22)
 
-  do  c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     kin % n(c) = max(0.5*(  uu % n(c)  &
                           + vv % n(c)  &
                           + ww % n(c)), TINY)
@@ -233,7 +235,7 @@
                                 + b21*s11 + b22*s12 + b23*s13)   &
               +  g5*kin % n(c)*(  b11*v21 + b12*v22 + b13*v23    &
                                 + b21*v11 + b22*v12 + b23*v13)
- 
+
       prod = -(  uu % n(c) * v % x(c)                           &
                + uw % n(c) * v % z(c)                           &
                + uv % n(c) *(v % y(c) + u % x(c))               &
@@ -362,22 +364,24 @@
                           + c_2e * esor * Flow % density(c)
     end if
   end do
+  call Grid % Exchange_Cells_Real(kin % n(-nb:nc))
+  call Grid % Exchange_Cells_Real(Turb % p_kin(-nb:nc))
 
   if(name_phi == 'EPS') then
-    do s = 1, Grid % n_faces
-      c1=Grid % faces_c(1,s)
-      c2=Grid % faces_c(2,s)
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL .or.  &
+         Grid % region % type(reg) .eq. WALLFL) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-      ! Calculate a values of dissipation on wall
-      if(c2 < 0) then
-        kin_vis = Flow % viscosity(c1) / Flow % density(c1)
-        if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
-           Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+          ! Calculate a values of dissipation on wall
+          kin_vis = Flow % viscosity(c1) / Flow % density(c1)
           eps % n(c2) = kin_vis*(uu % n(c1) + vv % n(c1) + ww % n(c1))&
                       / Grid % wall_dist(c1)**2
-        end if   ! end if of BC=wall
-      end if    ! end if of c2<0
-    end do
+        end do  ! faces
+      end if    ! boundary condition type
+    end do      ! regions
   end if
 
   end subroutine
