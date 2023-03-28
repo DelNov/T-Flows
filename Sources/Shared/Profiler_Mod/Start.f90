@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Start(Profiler, f_name)
+  subroutine Start(Prof, f_name)
 !------------------------------------------------------------------------------!
 !   This subroutine is called whenever new function is invoked                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target :: Profiler
+  class(Profiler_Type), target :: Prof
   character(len=*)              :: f_name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_fun  ! function counter
@@ -14,8 +14,8 @@
   !---------------------------------------------------------------------------!
   !   If profiles is called for the first time, get system clock count rate   !
   !---------------------------------------------------------------------------!
-  if(Profiler % n_functions .eq. 0) then
-    call system_clock(count_rate = Profiler % sys_count_rate)
+  if(Prof % n_functs .eq. 0) then
+    call system_clock(count_rate = Prof % sys_count_rate)
   end if
 
   !-------------------------------------------------------!
@@ -28,8 +28,8 @@
   !----------------------------------------------!
   !   Check if this function was called before   !
   !----------------------------------------------!
-  do i_fun = 1, Profiler % n_functions
-    if(f_name .eq. Profiler % funct_name(i_fun)) goto 1
+  do i_fun = 1, Prof % n_functs
+    if(f_name .eq. Prof % funct_name(i_fun)) goto 1
   end do
 
   !-----------------------------------------------------------------!
@@ -37,14 +37,14 @@
   !-----------------------------------------------------------------!
 
   ! It wasn't called before, add it to the suite of analyzed function
-  Profiler % n_functions = Profiler % n_functions + 1
-  Profiler % funct_name(Profiler % n_functions) = f_name
+  Prof % n_functs = Prof % n_functs + 1
+  Prof % funct_name(Prof % n_functs) = f_name
 
   ! Initialize times spent in the new function
-  Profiler % funct_time(Profiler % n_functions) = 0.0
+  Prof % funct_time(Prof % n_functs) = 0.0
 
   ! Store currenlty running function to i_fun
-  i_fun = Profiler % n_functions
+  i_fun = Prof % n_functs
 
   !--------------------------------------------------------------------------!
   !                                                                          !
@@ -58,16 +58,16 @@
   !-----------------------------------------------------!
   !   Store the function which was previously running   !
   !-----------------------------------------------------!
-  Profiler % previously_running(i_fun) = Profiler % currently_running
+  Prof % prev_running(i_fun) = Prof % curr_running
 
   !-------------------------------------------------------------------!
   !   Update the timer in the function which was previously running   !
   !-------------------------------------------------------------------!
-  call Profiler % Update_By_Rank(Profiler % previously_running(i_fun))
+  call Prof % Update_By_Rank(Prof % prev_running(i_fun))
 
   !---------------------------------------!
   !   Set the currentl running function   !
   !---------------------------------------!
-  Profiler % currently_running = i_fun
+  Prof % curr_running = i_fun
 
   end subroutine

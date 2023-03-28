@@ -14,9 +14,9 @@
   !-------------------!
   type Profiler_Type
 
-    integer, private :: n_functions                   = 0
-    integer, private :: currently_running             = 0
-    integer, private :: previously_running(MAX_FUNCT) = 0
+    integer, private :: n_functs                = 0
+    integer, private :: curr_running            = 0
+    integer, private :: prev_running(MAX_FUNCT) = 0
 
     character(DL), private :: funct_name(MAX_FUNCT)
     integer(DP),   private :: i_time_prev            ! system clock at prev

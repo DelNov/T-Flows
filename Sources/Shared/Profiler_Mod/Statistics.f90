@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Statistics(Profiler, indent)
+  subroutine Statistics(Prof, indent)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target  :: Profiler
+  class(Profiler_Type), target  :: Prof
   integer,           intent(in) :: indent     ! 34 for Main_Pro, 1 for Main_con
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i_fun
@@ -25,23 +25,23 @@
 
   ! Compute average time spent in functions over all processors
   if(Parallel_Run()) then
-    do i_fun=1, Profiler % n_functions
-      call Global % Sum_Real(Profiler % funct_time(i_fun))
-      Profiler % funct_time(i_fun) = Profiler % funct_time(i_fun) / N_Procs()
+    do i_fun=1, Prof % n_functs
+      call Global % Sum_Real(Prof % funct_time(i_fun))
+      Prof % funct_time(i_fun) = Prof % funct_time(i_fun) / N_Procs()
     end do
   end if
 
   ! Perform bubble sort
   do
     swap = .false.
-    do i_fun=1, Profiler % n_functions-1
-      if(Profiler % funct_time(i_fun+1) > Profiler % funct_time(i_fun)) then
-        t_temp = Profiler % funct_time(i_fun)
-        n_temp = Profiler % funct_name(i_fun)
-        Profiler % funct_time(i_fun)   = Profiler % funct_time(i_fun+1)
-        Profiler % funct_name(i_fun)   = Profiler % funct_name(i_fun+1)
-        Profiler % funct_time(i_fun+1) = t_temp
-        Profiler % funct_name(i_fun+1) = n_temp
+    do i_fun=1, Prof % n_functs-1
+      if(Prof % funct_time(i_fun+1) > Prof % funct_time(i_fun)) then
+        t_temp = Prof % funct_time(i_fun)
+        n_temp = Prof % funct_name(i_fun)
+        Prof % funct_time(i_fun)   = Prof % funct_time(i_fun+1)
+        Prof % funct_name(i_fun)   = Prof % funct_name(i_fun+1)
+        Prof % funct_time(i_fun+1) = t_temp
+        Prof % funct_name(i_fun+1) = n_temp
         swap = .true.
       end if
     end do
@@ -50,8 +50,8 @@
 1 continue
 
   total_time = 0.0
-  do i_fun = 1, Profiler % n_functions
-    total_time = total_time + Profiler % funct_time(i_fun)
+  do i_fun = 1, Prof % n_functs
+    total_time = total_time + Prof % funct_time(i_fun)
   end do
 
   if(First_Proc()) then
@@ -91,42 +91,42 @@
              '#---------------------------------------------+-----------------#'
     print '(a)', trim(line)
 
-    do i_fun = 1, Profiler % n_functions
+    do i_fun = 1, Prof % n_functs
       line( 1:160) = ' '
       line( 1+indent: 1+indent) = '#'
       line(65+indent:65+indent) = '#'
       line( 3+indent: 3+indent) = '-'
-      line( 5+indent: 5+indent+len_trim(Profiler % funct_name(i_fun)))  &
-                                      = Profiler % funct_name(i_fun)(1:123)
+      line( 5+indent: 5+indent+len_trim(Prof % funct_name(i_fun)))  &
+                                      = Prof % funct_name(i_fun)(1:123)
       line(47+indent:47+indent) = '|'
-      percent_time = Profiler % funct_time(i_fun) / total_time * 100.0
+      percent_time = Prof % funct_time(i_fun) / total_time * 100.0
 
       ! Write time in elapsed seconds
       if(in_sec) then
         ! I stick to kiss principle here: keep it simple and stupid
-        if(Profiler % funct_time(1) < 10) then
-          write(line(53+indent:56+indent), '(f4.2)') Profiler%funct_time(i_fun)
+        if(Prof % funct_time(1) < 10) then
+          write(line(53+indent:56+indent), '(f4.2)') Prof % funct_time(i_fun)
           line(58+indent:60+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 100) then
-          write(line(52+indent:56+indent), '(f5.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 100) then
+          write(line(52+indent:56+indent), '(f5.2)') Prof % funct_time(i_fun)
           line(58+indent:60+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 1000) then
-          write(line(51+indent:56+indent), '(f6.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 1000) then
+          write(line(51+indent:56+indent), '(f6.2)') Prof % funct_time(i_fun)
           line(58+indent:60+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 10000) then
-          write(line(51+indent:57+indent), '(f7.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 10000) then
+          write(line(51+indent:57+indent), '(f7.2)') Prof % funct_time(i_fun)
           line(59+indent:61+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 100000) then
-          write(line(50+indent:57+indent), '(f8.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 100000) then
+          write(line(50+indent:57+indent), '(f8.2)') Prof % funct_time(i_fun)
           line(59+indent:61+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 1000000) then
-          write(line(50+indent:58+indent), '(f9.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 1000000) then
+          write(line(50+indent:58+indent), '(f9.2)') Prof % funct_time(i_fun)
           line(60+indent:62+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 10000000) then
-          write(line(49+indent:58+indent), '(f10.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 10000000) then
+          write(line(49+indent:58+indent), '(f10.2)') Prof % funct_time(i_fun)
           line(60+indent:62+indent) = '[s]'
-        else if(Profiler % funct_time(1) < 100000000) then
-          write(line(49+indent:59+indent), '(f11.2)') Profiler%funct_time(i_fun)
+        else if(Prof % funct_time(1) < 100000000) then
+          write(line(49+indent:59+indent), '(f11.2)') Prof % funct_time(i_fun)
           line(61+indent:63+indent) = '[s]'
         end if
 
