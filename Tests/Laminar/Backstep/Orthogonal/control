@@ -1,6 +1,6 @@
 #----------
 # Prologue
-#---------
+#----------
   PROBLEM_NAME     backstep_orthogonal
   HEAT_TRANSFER    no
 
@@ -8,10 +8,12 @@
   NUMBER_OF_TIME_STEPS       1200
   RESULTS_SAVE_INTERVAL        30
   BACKUP_SAVE_INTERVAL        300
-  SAVE_RESULTS_AT_BOUNDARIES   no
+  SAVE_RESULTS_AT_BOUNDARIES    no
+
+  PROFILER_INFO                 seconds
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
   NUMBER_OF_MONITORING_POINTS    1
     MONITORING_POINT_001         0.5  0.5  0.2

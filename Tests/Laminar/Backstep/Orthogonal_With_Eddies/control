@@ -8,7 +8,9 @@
   NUMBER_OF_TIME_STEPS        300
   RESULTS_SAVE_INTERVAL        15
   BACKUP_SAVE_INTERVAL         60
-  SAVE_RESULTS_AT_BOUNDARIES   no
+  SAVE_RESULTS_AT_BOUNDARIES    no
+
+  PROFILER_INFO                 seconds
 
 #-------------------
 # Monitoring points
