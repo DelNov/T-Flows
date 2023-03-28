@@ -21,7 +21,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: ut, vt, wt
-  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
+  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points, reg
   character(SL)            :: coord_name, res_name, res_name_plus
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), y_plus_p(:),  &
                               kin_p(:), eps_p(:), f22_p(:),                 &
@@ -104,7 +104,7 @@
   allocate(ind(n_prob*2))
 
   ! Read the intervals positions
-  do pl=1,n_prob
+  do pl = 1, n_prob
     read(9,*) ind(pl), z_p(pl)
   end do
   close(9)
@@ -136,7 +136,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+    do c = Cells_In_Domain()
       rad = 1.0 - Grid % wall_dist(c)
       if( rad < (z_p(i)) .and.  &
           rad > (z_p(i+1))) then
@@ -254,7 +254,7 @@
 
   if(Flow % heat_transfer) then
     d_wall = 0.0
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = t % n(c)
@@ -269,19 +269,19 @@
       call Global % Max_Real(t_inf)
     end if
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2  < 0) then
-        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL .or.  &
+         Grid % region % type(reg) .eq. WALLFL) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
           t_wall   = t_wall + t % n(c2)
           nu_mean  = nu_mean + t % q(c2) / (cond_const*(t % n(c2) - t_inf))
           n_points = n_points + 1
-        end if
-      end if
-    end do
+        end do  ! faces
+      end if    ! boundary condition type
+    end do      ! regions
 
     call Global % Sum_Real(t_wall)
     call Global % Sum_Real(nu_mean)
@@ -303,17 +303,17 @@
     cf_dean = 0.0791*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'Re       = ', dens_const * ubulk * 2.0/visc_const
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'Re_tau   = ', dens_const*u_tau_p/visc_const
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,F12.6))')  &
     '#', 'Utau     = ', u_tau_p 
-    write(i,'(a1,(a12,F12.6,a2,a22))') & 
+    write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(Flow % heat_transfer) then
       write(i,'(a1,(a12, F12.6))')'#', 'Nu number =', nu_mean 
@@ -325,30 +325,30 @@
 
     if(Turb % model .eq. K_EPS) then
       if(Flow % heat_transfer) then
-        write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
-                                     ' w,'                    //  &  !  2
-                                     ' kin, eps, uw,'         //  &  !  3, 4, 5
-                                     ' vis_t/visc_const,'   //  &  !  6
-                                     ' t, ut, vt, wt,'               !  7 - 10
+        write(i,'(a1,2x,a60)') '#',  ' r,'                    //  &    !  1
+                                     ' w,'                    //  &    !  2
+                                     ' kin, eps, uw,'         //  &    !  3, 4, 5
+                                     ' vis_t/visc_const,'     //  &    !  6
+                                     ' t, ut, vt, wt,'                 !  7 - 10
       else
-        write(i,'(a1,2X,A60)') '#', ' r,'                    //  &       !  1
-                                    ' w,'                    //  &       !  2
+        write(i,'(a1,2X,a60)') '#', ' r,'                     //  &    !  1
+                                    ' w,'                     //  &    !  2
                                     ' kin, eps, uw, vis_t/visc_const'  !  3-6
       end if
     else if(Turb % model .eq. K_EPS_ZETA_F) then
       if(Flow % heat_transfer) then
-        write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
+        write(i,'(a1,2x,a60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
                                      ' kin, eps, uw,'         //  &  !  3, 4, 5
                                      ' f22, zeta,'            //  &  !  6, 7
-                                     ' vis_t/visc_const,'   //  &  !  8 - 11
+                                     ' vis_t/visc_const,'     //  &  !  8 - 11
                                      ' t, ut, vt, wt'
       else
-        write(i,'(a1,2X,A50)') '#', ' r,'                     //  &  !  1
+        write(i,'(a1,2x,a50)') '#', ' r,'                     //  &  !  1
                                     ' w,'                     //  &  !  2
                                     ' kin, eps, uw,'          //  &  !  3, 4, 5
                                     ' f22, zeta'              //  &  !  6, 7
-                                    ' vis_t/visc_const,'           !  8
+                                    ' vis_t/visc_const,'             !  8
       end if
     end if
   end do

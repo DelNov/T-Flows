@@ -11,13 +11,13 @@
 #---------------
 # Time stepping
 #---------------
-  TIME_STEP                0.05
+  TIME_STEP                   0.05
   NUMBER_OF_TIME_STEPS     7200
-  RESULTS_SAVE_INTERVAL    600
-  BACKUP_SAVE_INTERVAL     600
+  RESULTS_SAVE_INTERVAL     600
+  BACKUP_SAVE_INTERVAL      600
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
   NUMBER_OF_MONITORING_POINTS        5
     MONITORING_POINT_001  0.0  0.99  0.5
