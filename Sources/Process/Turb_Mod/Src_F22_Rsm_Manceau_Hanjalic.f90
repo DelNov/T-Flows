@@ -14,9 +14,9 @@
   type(Var_Type),    pointer :: f22
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2
-  real                       :: sor11,  f22hg
-!==============================================================================!
+  integer                    :: s, c, c1, c2, reg
+  real                       :: sor11, f22hg
+!------------------------------------------------------------------------------!
 !                                                                              !
 !   The form of source terms are :                                             !
 !                                                                              !
@@ -44,7 +44,7 @@
 !     f22            [-]                                                       !
 !     l_scale        [m]                                                       !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -55,7 +55,7 @@
   call Turb % Time_And_Length_Scale(Grid)
 
   ! Source term f22hg
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     f22hg = 1.0
     sor11 = Grid % vol(c) / Turb % l_scale(c)**2
     A % val(A % dia(c)) = A % val(A % dia(c)) + sor11
@@ -63,17 +63,17 @@
   end do
 
   ! Source term
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-          f22 % n(c2) = 0.0
+        f22 % n(c2) = 0.0
 
-      end if   ! end if of BC=wall
-    end if    ! end if of c2<0
-  end do
+      end do  ! faces
+    end if    ! boundary condition type
+  end do      ! regions
 
   end subroutine
