@@ -1,53 +1,50 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME       membrane
- HEAT_TRANSFER      yes
-
- #LOAD_BACKUP_NAME  membrane-ts000120.backup
+  PROBLEM_NAME       membrane
+  HEAT_TRANSFER      yes
 
 #-------------------
 # Monitoring points 
 #-------------------
- NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         0.0  0.0  0.0
+  NUMBER_OF_MONITORING_POINTS    1
+    MONITORING_POINT_001         0.0  0.0  0.0
 
- POINT_FOR_MONITORING_PLANES    0.0  0.0  0.0
+  POINT_FOR_MONITORING_PLANES    0.0  0.0  0.0
 
 #-----------------
 # Physical models
 #-----------------
+  MASS_DENSITY           1.0
+  THERMAL_CONDUCTIVITY   0.025
+  DYNAMIC_VISCOSITY      0.001
+  HEAT_CAPACITY          1.0e-3
 
- MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   0.025
- DYNAMIC_VISCOSITY      0.001
- HEAT_CAPACITY          1.0e-3
-
- TURBULENCE_MODEL       none
+  TURBULENCE_MODEL       none
 
 #----------------------
 # Numerical parameters
 #----------------------
- TIME_STEP               0.01
+  TIME_STEP               0.01
 
- PRESSURE_MOMENTUM_COUPLING    simple
+  PRESSURE_MOMENTUM_COUPLING    simple
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
 
- TIME_INTEGRATION_SCHEME  linear
+  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
 
 #------------------------
 # Linear solver settings
 #------------------------
- PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER  12
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  12
 
 #--------------------
 # Initial conditions

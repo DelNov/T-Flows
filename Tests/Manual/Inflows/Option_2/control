@@ -1,66 +1,66 @@
 #--------------
 # Problem name
 #--------------
- PROBLEM_NAME        cylinder
+  PROBLEM_NAME        cylinder
 
 #---------------
 # Time stepping
 #---------------
- TIME_STEP                             0.01
- NUMBER_OF_TIME_STEPS               6000
+  TIME_STEP                             0.01
+  NUMBER_OF_TIME_STEPS               6000
 
 #---------------------
 # Physical properties
 #---------------------
- DYNAMIC_VISCOSITY      2.000e-4
+  DYNAMIC_VISCOSITY      2.000e-4
 
- TURBULENCE_MODEL       les_smagorinsky
+  TURBULENCE_MODEL       les_smagorinsky
 
- POINT_FOR_MONITORING_PLANES   6.0  0.5  0.5
+  POINT_FOR_MONITORING_PLANES   6.0  0.5  0.5
 
 #----------------------
 # Numerical parameters
 #----------------------
- PRESSURE_MOMENTUM_COUPLING            piso
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   1.0
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE   1.0
- TOLERANCE_FOR_SIMPLE_ALGORITHM        1.0e-3
- MIN_SIMPLE_ITERATIONS                 2
+  PRESSURE_MOMENTUM_COUPLING            piso
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   1.0
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE   1.0
+  TOLERANCE_FOR_SIMPLE_ALGORITHM        1.0e-3
+  MIN_SIMPLE_ITERATIONS                 2
 
- TIME_INTEGRATION_SCHEME               parabolic
+  TIME_INTEGRATION_SCHEME               parabolic
 
- GRADIENT_METHOD_FOR_PRESSURE          gauss_theorem
+  GRADIENT_METHOD_FOR_PRESSURE          gauss_theorem
 
 #--------------------------
 # Linear solver parameters
 #--------------------------
- TOLERANCE_FOR_POTENTIAL_SOLVER        1.0e-4
- TOLERANCE_FOR_WALL_DISTANCE_SOLVER    1.0e-4
+  TOLERANCE_FOR_POTENTIAL_SOLVER        1.0e-4
+  TOLERANCE_FOR_WALL_DISTANCE_SOLVER    1.0e-4
 
 #-------------------
 # Initial condition
 #-------------------
- POTENTIAL_INITIALIZATION              yes
+  POTENTIAL_INITIALIZATION              yes
 
 #---------------------
 # Boundary conditions
 #---------------------
- BOUNDARY_CONDITION  in
-   TYPE              inflow
-   VARIABLES         y   u
-   FILE              profile.dat
+  BOUNDARY_CONDITION  in
+    TYPE              inflow
+    VARIABLES         y   u
+    FILE              profile.dat
 
- BOUNDARY_CONDITION  out
-   TYPE              convective
-   VARIABLES         u     v     w
-   VALUES            0.0   0.0   0.0
+  BOUNDARY_CONDITION  out
+    TYPE              convective
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
 
- BOUNDARY_CONDITION  flat_walls
-   TYPE              wall
-   VARIABLES         u     v     w
-   VALUES            0.0   0.0   0.0
+  BOUNDARY_CONDITION  flat_walls
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
 
- BOUNDARY_CONDITION  cylinder_wall
-   TYPE              wall
-   VARIABLES         u     v     w
-   VALUES            0.0   0.0   0.0
+  BOUNDARY_CONDITION  cylinder_wall
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
