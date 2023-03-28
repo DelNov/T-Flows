@@ -1019,7 +1019,6 @@ function process_backup_tests {
   replace_line_with_first_occurence_in_file \
     "TURBULENCE_MODEL" \
     "TURBULENCE_MODEL rsm_manceau_hanjalic" \
-
     $TEST_DIR/$RANS_CHANNEL_LR_RSM_DIR/control
 
   process_backup_test \
