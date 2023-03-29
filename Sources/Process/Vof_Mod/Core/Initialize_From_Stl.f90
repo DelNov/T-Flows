@@ -355,10 +355,10 @@
             dis_nod_int(i) = -1
           end do
 
-        ! Throw an error if you come to this
+        ! Throw a warning if you come to this
         else   ! cnt_p == cnt_m
           if(cnt_p .gt. 0 .and. cnt_m .gt. 0) then
-          PRINT *, __FILE__, __LINE__, 'HOW ON EARTH?  CELL: ', C, CNT_P, CNT_M
+          ! PRINT *, __FILE__, __LINE__, DENTED CELL: ', C, CNT_P, CNT_M
           end if
         end if
 
