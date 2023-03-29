@@ -46,6 +46,10 @@
   if(Flow % mass_transfer) then
     allocate(Vof % q_int(2,nf));    Vof % q_int(1:2,1:nf) = 0.0
     allocate(Vof % m_dot(-nb:nc));  Vof % m_dot(-nb:nc)   = 0.0
+    allocate(Vof % q_0  (-nb:nc));  Vof % q_0  (-nb:nc)   = 0.0
+    allocate(Vof % q_1  (-nb:nc));  Vof % q_1  (-nb:nc)   = 0.0
+    call Var_Mod_Allocate_New_Only(Vof % t_0, Grid, 'T_0')
+    call Var_Mod_Allocate_New_Only(Vof % t_1, Grid, 'T_1')
   end if
 
   if(Vof % track_front) then

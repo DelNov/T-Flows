@@ -66,7 +66,11 @@
 
     ! Heat from phase change and index of saturated cells
     real, allocatable :: q_int(:,:)
+    real, allocatable :: q_0(:)
+    real, allocatable :: q_1(:)
     real, allocatable :: m_dot(:)         ! [kg/s]
+
+    type(Var_Type) :: t_0, t_1
 
     ! User define parameters for vof function (fun)
     real    :: courant_max_param
@@ -110,6 +114,7 @@
       !   Procedures to be called by other modules   !
       !----------------------------------------------!
       procedure :: Calculate_Grad_Matrix_With_Front
+      procedure :: Extrapolate_Normal_To_Front
       procedure :: Get_Vapour_And_Liquid_Phase
       procedure :: Grad_Component_No_Refresh_With_Front
       procedure :: Grad_Variable_With_Front
@@ -151,6 +156,7 @@
     !   Procedures to be called by other modules   !
     !----------------------------------------------!
 #   include "Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90"
+#   include "Vof_Mod/Utilities/Extrapolate_Normal_To_Front.f90"
 #   include "Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90"
 #   include "Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90"
 #   include "Vof_Mod/Utilities/Grad_Variable_With_Front.f90"

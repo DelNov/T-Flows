@@ -72,7 +72,7 @@
     !------------------------------------------------!
     !   Discretize the system for the vof function   !
     !------------------------------------------------!
-    call Vof % Discretize(A, b, dt)
+    call Vof % Discretize(A, b, dt, curr_dt)
 
     ! Solve System
     call Vof % Solve_System(Sol, b)
@@ -123,7 +123,7 @@
         !------------------------------------------------!
         !   Discretize the system for the vof function   !
         !------------------------------------------------!
-        call Vof % Discretize(A, b, dt / real(n_sub))
+        call Vof % Discretize(A, b, dt / real(n_sub), curr_dt)
 
         ! Solve System
         call Vof % Solve_System(Sol, b)

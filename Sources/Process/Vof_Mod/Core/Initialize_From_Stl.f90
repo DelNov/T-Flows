@@ -31,6 +31,9 @@
   integer                      :: new_faces_n_nodes, cnt_p, cnt_m
   integer                      :: new_faces_n(MAX_ISOAP_VERTS)
   logical                      :: flooding
+  REAL    :: DESIRED_R
+  REAL    :: MAX_R
+  INTEGER :: FU
 !==============================================================================!
 
   ! Take alias(es)
@@ -43,6 +46,33 @@
   !                       !
   !-----------------------!
   call Stl % Create_From_File(Vof % name_stl)
+
+  !----------------------------------------!
+  !                                        !
+  !   SCALE THE BUBBLE TO DESIRED RADIUS   !
+  !                                        !
+  !----------------------------------------!
+  PRINT *, 'NUMER OF NODES IN STL: ', STL % N_NODES
+
+  ! FIND THE CURRENT RADIUS IN STL FILE
+  MAX_R = 0.0
+  DO I = 1, STL % N_NODES
+    MAX_R = MAX(MAX_R, SQRT(STL % XN(I)**2 + STL % YN(I)**2 + STL % ZN(I)**2))
+  END DO
+  PRINT *, 'RADIUS OF THE IMPORTED BUBBLE: ', MAX_R
+
+  ! READ THE RADIUS YOU DESIRE
+  CALL FILE % OPEN_FOR_READING_ASCII('DESIRED_R', FU)
+  READ(FU, *)  DESIRED_R
+  CLOSE(FU)
+  PRINT *, 'DESIRED RADIUS:              : ', DESIRED_R
+
+  ! SCALE THE STL OBJECT
+  DO I = 1, STL % N_NODES
+    STL % XN(I) = STL % XN(I) * DESIRED_R / MAX_R
+    STL % YN(I) = STL % YN(I) * DESIRED_R / MAX_R
+    STL % ZN(I) = STL % ZN(I) * DESIRED_R / MAX_R
+  END DO
 
   allocate(vof_body(-Grid % n_bnd_cells:Grid % n_cells, Stl % n_boddies))
 

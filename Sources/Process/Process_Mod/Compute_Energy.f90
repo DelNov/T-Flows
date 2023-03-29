@@ -100,7 +100,7 @@
   ! If mass transfer, estimate the mass transfer due to heat fluxes,
   ! which also compute gradients with saturation temperature at interface
   else
-    call Vof % Mass_Transfer_Estimate()
+    call Vof % Mass_Transfer_Estimate(curr_dt, ini)
   end if
 
   ! Compute helping variable

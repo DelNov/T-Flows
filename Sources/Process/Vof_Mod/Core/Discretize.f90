@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Discretize(Vof, A, b, dt)
+  subroutine Discretize(Vof, A, b, dt, curr_dt)
 !------------------------------------------------------------------------------!
 !   Computes matrix coefficients for volume fraction equation                  !
 !------------------------------------------------------------------------------!
@@ -9,6 +9,7 @@
   type(Matrix_Type), target :: A
   real,              target :: b(:)
   real                      :: dt
+  integer, intent(in)       :: curr_dt
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -150,7 +151,7 @@
   !--------------------------------!
   !   Source due to phase change   !
   !--------------------------------!
-  call Vof % Mass_Transfer_Estimate()
+  call Vof % Mass_Transfer_Estimate(curr_dt, 0)
   call Vof % Mass_Transfer_Vof_Source(b)
 
   end subroutine
