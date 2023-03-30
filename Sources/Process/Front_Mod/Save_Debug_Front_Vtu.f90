@@ -13,13 +13,6 @@
   integer                  :: v, e, n, s, n_int, offset, fu
   integer,     allocatable :: n_elems(:)
   character(SL)            :: name_out
-!-----------------------------[Local parameters]-------------------------------!
-  character(len= 0)  :: IN_0 = ''         ! indentation levels
-  character(len= 2)  :: IN_1 = '  '
-  character(len= 4)  :: IN_2 = '    '
-  character(len= 6)  :: IN_3 = '      '
-  character(len= 8)  :: IN_4 = '        '
-  character(len=10)  :: IN_5 = '          '
 !==============================================================================!
 
   ! Take alias

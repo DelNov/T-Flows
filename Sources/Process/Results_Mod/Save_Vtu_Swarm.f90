@@ -16,13 +16,6 @@
   integer                      :: k, fu
   character(SL)                :: name_out
   integer                      :: n_remaining_particles
-!-----------------------------[Local parameters]-------------------------------!
-  character(len= 0)  :: IN_0 = ''           ! indentation levels
-  character(len= 2)  :: IN_1 = '  '
-  character(len= 4)  :: IN_2 = '    '
-  character(len= 6)  :: IN_3 = '      '
-  character(len= 8)  :: IN_4 = '        '
-  character(len=10)  :: IN_5 = '          '
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Results)
 !==============================================================================!
