@@ -238,6 +238,7 @@
       procedure :: Report_Volume_Balance
       procedure :: Report_Volume_Balance_Start
       procedure :: Report_Volume_Balance_Stop
+      procedure :: Volume_Average
 
   end type
 
@@ -303,5 +304,6 @@
 #   include "Field_Mod/Utilities/Report_Volume_Balance.f90"
 #   include "Field_Mod/Utilities/Report_Volume_Balance_Start.f90"
 #   include "Field_Mod/Utilities/Report_Volume_Balance_Stop.f90"
+#   include "Field_Mod/Utilities/Volume_Average.f90"
 
   end module
