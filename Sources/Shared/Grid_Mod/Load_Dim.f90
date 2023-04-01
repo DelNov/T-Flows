@@ -13,6 +13,8 @@
   character(SL) :: name_in
 !==============================================================================!
 
+  call Profiler % Start('Load_Dim')
+
   !----------------------------!
   !     Read the file with     !
   !   geometrical dimensions   !
@@ -90,5 +92,7 @@
   read(fu) Grid % per_z
 
   close(fu)
+
+  call Profiler % Stop('Load_Dim')
 
   end subroutine

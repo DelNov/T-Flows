@@ -13,6 +13,8 @@
   character(SL) :: name_in, str, str1, str2
 !==============================================================================!
 
+  call Profiler % Start('Load_Cfn')
+
   !-------------------------------!
   !     Read the file with the    !
   !   connections between cells   !
@@ -282,5 +284,7 @@
   call Grid % Determine_Regions_Ranges()
 
   close(fu)
+
+  call Profiler % Stop('Load_Cfn')
 
   end subroutine
