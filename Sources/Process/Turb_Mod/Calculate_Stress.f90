@@ -31,7 +31,7 @@
   if( Turb % model .eq. K_EPS        .or.  &
       Turb % model .eq. K_EPS_ZETA_F) then 
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       uu % n(c) = - 2. * Turb % vis_t(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
@@ -48,7 +48,7 @@
 
   else if(Turb % model .eq. HYBRID_LES_RANS) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       uu % n(c) = - 2. * Turb % vis_t_eff(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
@@ -65,7 +65,7 @@
 
   if( Turb % model .eq. K_EPS_ZETA_F .or.  &
       Turb % model .eq. HYBRID_LES_RANS) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       uu % n(c) = zeta % n(c) * kin % n(c) 
       vv % n(c) = zeta % n(c) * kin % n(c)

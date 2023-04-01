@@ -14,10 +14,10 @@
   type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
-  integer                    :: c, c1, c2, s
+  integer                    :: c, c1, c2, s, reg
   real                       :: kin_vis, p_t2_wall, ebf, u_tau
   real                       :: ut_sgdh, vt_sgdh, wt_sgdh, z_o
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
@@ -29,7 +29,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -49,7 +49,7 @@
   call Flow % Grad_Variable(t)
 
   ! Production source:
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     !-------------------------------------------------------------------!
     !   ut, vt and wt defined by AFM or GGDH could lead to divergence   !
@@ -79,17 +79,17 @@
 
   end do
 
-  ! Implementation of wall function approach for buoyancy-driven flows
+  !------------------------------------------------------------------------!
+  !   Implementation of wall function approach for buoyancy-driven flows   !
+  !------------------------------------------------------------------------!
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
-
-        ! Set up roughness coefficient 
+        ! Set up roughness coefficient
         z_o = Turb % Roughness_Coefficient(c1, c2)
 
         ! Kinematic viscosities
@@ -101,7 +101,6 @@
                                                       Grid % wall_dist(c1), &
                                                       kin_vis,              &
                                                       z_o)
-
         ebf = Turb % Ebf_Momentum(c1)
 
         p_t2_wall  = Flow % density(c1)                                        &
@@ -115,16 +114,16 @@
           Turb % p_t2(c1) = p_t2_wall
         else
           Turb % p_t2(c1) = (  Turb % p_t2(c1) * exp(-1.0 * ebf)  &
-                             + p_t2_wall * exp(-1.0/ebf))
+                                   + p_t2_wall * exp(-1.0 / ebf))
         end if
 
         b(c1) = b(c1) + Turb % p_t2(c1) * Grid % vol(c1)
 
         t2 % n(c2) = 0.0
 
-      end if  ! Grid % Bnd_Cond_Type(c2).eq.WALL or WALLFL
-    end if    ! c2 < 0
-  end do
+      end do  ! faces in regions
+    end if    ! region is WALL or WALLFL
+  end do      ! through regions
 
   end subroutine
 

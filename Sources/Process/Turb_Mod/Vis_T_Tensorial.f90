@@ -51,7 +51,7 @@
   Turb % tau_32 = 0.0
   Turb % tau_33 = 0.0
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     ixp = ( 0.5 * (  Grid % ixx (c)  &
                    - Grid % iyy (c)  &
                    - Grid % izz (c) ) )     ! I'xx         (I'11)

@@ -22,7 +22,7 @@
   call Flow % Alias_Momentum(u, v, w)
 
   if(Turb % model .eq. DES_SPALART) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       x_rat    = vis % n(c) / Flow % viscosity(c)
       f_v1     = x_rat**3/(x_rat**3 + c_v1**3)
       Turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
@@ -30,7 +30,7 @@
   end if
 
   if(Turb % model .eq. SPALART_ALLMARAS) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       x_rat = vis % n(c) / Flow % viscosity(c)
       f_v1  = x_rat**3/(x_rat**3 + c_v1**3)
       Turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)

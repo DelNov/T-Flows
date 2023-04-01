@@ -29,7 +29,7 @@
   !   SGS terms   !
   !               !
   !---------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     s11 = u % x(c)
     s22 = v % y(c)
     s33 = w % z(c)

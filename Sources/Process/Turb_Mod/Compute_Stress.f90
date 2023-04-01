@@ -70,7 +70,7 @@
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -183,7 +183,7 @@
 
   if(Turb % model_variant .ne. STABILIZED) then
     if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
@@ -209,7 +209,7 @@
                      - Flow % viscosity(c) * phi_z(c)
       end do
     else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
                      * Turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
@@ -234,7 +234,7 @@
     call Flow % Grad_Component(u2uj_phij(-nb:nc), 2, u2uj_phij_y(-nb:nc))
     call Flow % Grad_Component(u3uj_phij(-nb:nc), 3, u3uj_phij_z(-nb:nc))
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       b(c) = b(c) + (  u1uj_phij_x(c)  &
                      + u2uj_phij_y(c)  &
                      + u3uj_phij_z(c) ) * Grid % vol(c)
@@ -279,7 +279,7 @@
   !   Source term contains difference between      !
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) + cross(c)
   end do
 
@@ -358,7 +358,7 @@
   if(phi % name .eq. 'UU' .or.  &
      phi % name .eq. 'VV' .or.  &
      phi % name .eq. 'WW') then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = phi % n(c)
       if(phi % n(c) < 0.) then
         phi % n(c) = phi % o(c)

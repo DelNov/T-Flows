@@ -36,7 +36,7 @@
 
   if(Turb % model .eq. K_EPS_ZETA_F) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -55,7 +55,7 @@
     end do
 
   else if(Turb % model .eq. HYBRID_LES_RANS) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -73,7 +73,7 @@
 
   else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       kin_vis = Flow % viscosity(c) / Flow % density(c)
@@ -92,7 +92,7 @@
 
   else if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       t_1(c) = kin % n(c)/eps_l(c)
@@ -105,7 +105,7 @@
 
   else if(Turb % model .eq. K_EPS) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       t_1(c) = kin % n(c) / eps_l(c)

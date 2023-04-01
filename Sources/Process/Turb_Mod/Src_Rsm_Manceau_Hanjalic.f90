@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Src_Rsm_Manceau_Hanjalic(Turb, Sol, name_phi)
 !------------------------------------------------------------------------------!
-!   Calculate source terms for Re stresses and dissipation for 
+!   Calculate source terms for Re stresses and dissipation for                 !
 !   RSM_MANCEAU_HANJALIC model                                                 !
 !------------------------------------------------------------------------------!
   implicit none

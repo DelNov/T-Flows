@@ -134,7 +134,7 @@
 !   call Flow % Grad_Component(w % x, 3, var12y)  ! d2W/dxdz
 !   call Flow % Grad_Component(w % y, 3, var12z)  ! d2W/dydz
 !
-!   do c = 1, Grid % n_cells
+!   do c = Cells_In_Domain_And_Buffers()
 !     uxx = var1x(c)
 !     uyy = var1y(c)
 !     uzz = var1z(c)
