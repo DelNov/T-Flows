@@ -425,6 +425,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      MD  MAX_VARS_INTERFACE
 " Constants related to indentation (O think they are defined in a few places - bad!
   syn keyword fortranConstant      IN_0  IN_1  IN_2  IN_3  IN_4  IN_5
+" Constants from Info_Mod
+  syn keyword fortranConstant      L_LINE  L_BOX  MAX_USER_LINES
 " Constants from Numerics_Mod
   syn keyword fortranConstant      UPWIND  CENTRAL  LUDS  QUICK  SMART  GAMMA
   syn keyword fortranConstant      MINMOD  BLENDED  SUPERBEE  AVL_SMART  CICSAM  STACS
@@ -450,11 +452,11 @@ if b:fortran_dialect == "f08"
   syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type       Vof_Type       Swarm_Type
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur       Vof            Swarm Swr
   syn keyword fortranTypeTflows    Bulk_Type      Face_Type
-  syn keyword fortranObjectTflows  bulk           v_flux
+  syn keyword fortranObjectTflows                 v_flux
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type       Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side            Vert           Part
-  syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type   Message_Type
-  syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof  Message
+  syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type   Message_Type   Info_Type
+  syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof  Message        Info
   syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type     Petsc_Type     Process_Type
   syn keyword fortranObjectTflows  A  M           vector         Sol            Nat             Pet            Process
   syn keyword fortranTypeTflows    Var_Type
@@ -465,6 +467,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
+  syn keyword fortranMacroTflows   Assert  Unused
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
 "---------------------------------------------------------------------[T-Flows]-
