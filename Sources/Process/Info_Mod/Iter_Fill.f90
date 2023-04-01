@@ -5,7 +5,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n  ! inner iteration
+  integer, intent(in) :: n  ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c
 !==============================================================================!
@@ -14,14 +14,14 @@
 
     ! Write basic info
     c = 1  ! a column
-    write(iter_info % line_iter((c-1)*L_BOX+58 :  &
-                                (c-1)*L_BOX+67),  '(a10)') 'Iteration:'
-    write(iter_info % line_iter((c-1)*L_BOX+68 :  &
-                                (c-1)*L_BOX+70),   '(i3)') n
+    write(Info % iter % line_iter((c-1)*L_BOX+58 :  &
+                                  (c-1)*L_BOX+67),  '(a10)') 'Iteration:'
+    write(Info % iter % line_iter((c-1)*L_BOX+68 :  &
+                                  (c-1)*L_BOX+70),   '(i3)') n
 
     c = 5  ! a column
-    write(iter_info % lines(1)((c-1)*L_BOX+3 :  &
-                               (c-1)*L_BOX+7),    '(a5)') 'MASS:'
+    write(Info % iter % line(1)((c-1)*L_BOX+3 :  &
+                                (c-1)*L_BOX+7),    '(a5)') 'MASS:'
 
   end if
 

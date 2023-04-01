@@ -130,10 +130,10 @@
   call Global % Max_Real(Flow % pe_max)
 
   if (Flow % p_m_coupling == SIMPLE) then
-    call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, Flow % vol_res)
+    call Info_Mod_Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
   else
     if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, Flow % vol_res)
+      call Info_Mod_Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
     end if
   end if
 

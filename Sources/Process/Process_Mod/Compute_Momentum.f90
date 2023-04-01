@@ -381,7 +381,7 @@
 
       ! Fill the info screen up
       if (Flow % p_m_coupling == SIMPLE) then
-        call Info_Mod_Iter_Fill_At(1, i, ui % name, ui % eniter, ui % res)
+        call Info_Mod_Iter_Fill_At(1, i, ui % name, ui % res, ui % eniter)
       end if
 
     end if

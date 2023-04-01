@@ -35,9 +35,9 @@
     end do
 
     Flow % inside_piso_loop = .false.
-    call Info_Mod_Iter_Fill_At(1, 1, u % name, u % eniter, u % res)
-    call Info_Mod_Iter_Fill_At(1, 2, v % name, v % eniter, v % res)
-    call Info_Mod_Iter_Fill_At(1, 3, w % name, w % eniter, w % res)
+    call Info_Mod_Iter_Fill_At(1, 1, u % name, u % res, u % eniter)
+    call Info_Mod_Iter_Fill_At(1, 2, v % name, v % res, v % eniter)
+    call Info_Mod_Iter_Fill_At(1, 3, w % name, w % res, w % eniter)
     Flow % i_corr = 1
 
   end if

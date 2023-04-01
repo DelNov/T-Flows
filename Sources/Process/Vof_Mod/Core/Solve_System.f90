@@ -40,9 +40,9 @@
   call Profiler % Stop(String % First_Upper(fun % solver)//' (solver for VOF)')
 
   if(.not. Flow % heat_transfer) then
-    call Info_Mod_Iter_Fill_At(1, 6, fun % name, fun % eniter, fun % res)
+    call Info_Mod_Iter_Fill_At(1, 6, fun % name, fun % res, fun % eniter)
   else
-    call Info_Mod_Iter_Fill_At(2, 1, fun % name, fun % eniter, fun % res)
+    call Info_Mod_Iter_Fill_At(2, 1, fun % name, fun % res, fun % eniter)
   end if
 
   end subroutine

@@ -11,27 +11,27 @@
   if(First_Proc()) then
 
     ! Create a frame
-    time_info % line_lead (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % lines(1)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % lines(2)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % lines(3)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % lines(4)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % lines(5)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % lines(6)  (2*L_BOX-2 : 2*L_BOX-2) = '#'
-    time_info % line_trail(2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line_lead (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line(1)   (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line(2)   (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line(3)   (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line(4)   (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line(5)   (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line(6)   (2*L_BOX-2 : 2*L_BOX-2) = '#'
+    Info % time % line_trail(2*L_BOX-2 : 2*L_BOX-2) = '#'
 
-    time_info % line_lead (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % lines(1)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % lines(2)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % lines(3)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % lines(4)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % lines(5)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % lines(6)  (4*L_BOX+4 : 4*L_BOX+4) = '#'
-    time_info % line_trail(4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line_lead (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line(1)   (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line(2)   (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line(3)   (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line(4)   (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line(5)   (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line(6)   (4*L_BOX+4 : 4*L_BOX+4) = '#'
+    Info % time % line_trail(4*L_BOX+4 : 4*L_BOX+4) = '#'
 
     do i = 2*L_BOX-1, 4*L_BOX+3
-      time_info % line_lead (i:i) = '='
-      time_info % line_trail(i:i) = '-'
+      Info % time % line_lead (i:i) = '='
+      Info % time % line_trail(i:i) = '-'
     end do
 
   end if

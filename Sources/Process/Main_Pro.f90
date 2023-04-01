@@ -73,7 +73,7 @@
   !-------------------------!
   !   Initialize Info_Mod   !
   !-------------------------!
-  call Info_Mod_Start()
+  call Info_Mod_Start_Info()
 
   !--------------------!
   !   Read all grids   !

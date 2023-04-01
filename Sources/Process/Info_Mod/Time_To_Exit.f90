@@ -7,8 +7,8 @@
   implicit none
 !==============================================================================!
 
-  Info_Mod_Time_To_Exit = real(sys_clock % cur - sys_clock % ini)  &
-                        / real(sys_clock % cnt)                    &
-                        > sys_clock % wall_time_max
+  Info_Mod_Time_To_Exit = real(Info % clock % cur - Info % clock % ini)  &
+                        / real(Info % clock % cnt)                       &
+                        > Info % clock % wall_time_max
 
   end function

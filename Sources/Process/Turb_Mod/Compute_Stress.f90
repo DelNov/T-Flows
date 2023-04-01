@@ -332,19 +332,19 @@
 
   ! Print info on the screen
   if( phi % name .eq. 'UU' )   &
-    call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'VV' )   &
-    call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'WW' )   &
-    call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'UV' )   &
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'UW' )   &
-    call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'VW' )   &
-    call Info_Mod_Iter_Fill_At(3, 6, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(3, 6, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'EPS' )  &
-    call Info_Mod_Iter_Fill_At(4, 1, phi % name, phi % eniter, phi % res)
+    call Info_Mod_Iter_Fill_At(4, 1, phi % name, phi % res, phi % eniter)
 
   if(phi % name .eq. 'EPS') then
     do c= 1, Grid % n_cells

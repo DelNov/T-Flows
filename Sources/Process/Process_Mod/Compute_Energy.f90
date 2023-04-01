@@ -290,7 +290,7 @@
                        ' (solver for energy)')
 
   ! Print some info on the screen
-  call Info_Mod_Iter_Fill_At(1, 6, t % name, t % eniter, t % res)
+  call Info_Mod_Iter_Fill_At(1, 6, t % name, t % res, t % eniter)
 
   ! Gradients
   if(.not. Flow % mass_transfer) then
