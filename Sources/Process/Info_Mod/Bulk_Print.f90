@@ -5,9 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type), intent(inout) :: Info
-  type(Field_Type), intent(in)    :: Flow
-  integer,          intent(in)    :: dom, n_dom
+  class(Info_Type)             :: Info
+  type(Field_Type), intent(in) :: Flow
+  integer,          intent(in) :: dom, n_dom
 !==============================================================================!
 
   call Info % Bulk_Fill(Flow)

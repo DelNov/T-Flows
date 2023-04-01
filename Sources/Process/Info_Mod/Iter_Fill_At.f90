@@ -5,12 +5,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type),  intent(out) :: Info
-  integer,           intent(in)  :: r         ! row
-  integer,           intent(in)  :: c         ! column
-  character(len=*),  intent(in)  :: name_var
-  real,              intent(in)  :: res
-  integer, optional, intent(in)  :: n_iter    ! number of iterations
+  class(Info_Type)              :: Info
+  integer,           intent(in) :: r         ! row
+  integer,           intent(in) :: c         ! column
+  character(len=*),  intent(in) :: name_var
+  real,              intent(in) :: res
+  integer, optional, intent(in) :: n_iter    ! number of iterations
 !==============================================================================!
 
   if(First_Proc()) then

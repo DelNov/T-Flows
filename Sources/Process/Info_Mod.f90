@@ -23,7 +23,7 @@
   end type
 
   !--------------------!
-  !   Time_Info type   !
+  !   Time Info type   !
   !--------------------!
   type Time_Info_Type
     character(len=L_LINE) :: line_lead  = ''
@@ -32,7 +32,7 @@
   end type
 
   !--------------------!
-  !   Iter_Info type   !
+  !   Iter Info type   !
   !--------------------!
   type Iter_Info_Type
     integer               :: n_user_lines               = 0
@@ -44,7 +44,7 @@
   end type
 
   !--------------------!
-  !   Bulk_Info type   !
+  !   Bulk Info type   !
   !--------------------!
   type Bulk_Info_Type
     character(len=L_LINE) :: line_lead  = ''
@@ -54,6 +54,9 @@
     character(len=L_LINE) :: line(3)    = ''
   end type
 
+  !---------------!
+  !   Info type   !
+  !---------------!
   type Info_Type
     type(System_Clock_Type), private :: clock
     type(Time_Info_Type),    private :: time
@@ -80,7 +83,9 @@
 
   end type
 
+  !---------------------------------!
   !   Singletone type Info object   !
+  !---------------------------------!
   type(Info_Type) :: Info
 
   contains

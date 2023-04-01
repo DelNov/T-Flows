@@ -5,9 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type), intent(out) :: Info
-  integer,          intent(in)  :: n         ! time step
-  real,             intent(in)  :: sim_time  ! simulation time
+  class(Info_Type)    :: Info
+  integer, intent(in) :: n         ! time step
+  real,    intent(in) :: sim_time  ! simulation time
 !-----------------------------------[Locals]-----------------------------------!
   integer  :: hours, minutes, seconds
   real(DP) :: wall_time                ! number of seconds of wall-clock time

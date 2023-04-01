@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type), intent(out) :: Info
-  type(Field_Type), intent(in)  :: Flow
+  class(Info_Type)             :: Info
+  type(Field_Type), intent(in) :: Flow
 !==============================================================================!
 
   if(First_Proc()) then

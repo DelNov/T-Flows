@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type), intent(out) :: Info
-  integer,          intent(in)  :: d  ! domain
+  class(Info_Type)    :: Info
+  integer, intent(in) :: d  ! domain
 !-----------------------------------[Locals]-----------------------------------!
   integer               :: i
   character(len=L_LINE) :: tmp
