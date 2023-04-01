@@ -197,6 +197,7 @@
       procedure, private :: Vis_T_Wale
       procedure, private :: Vis_T_Tensorial
 
+      procedure, private :: Beta_Scalar
       procedure, private :: Ebf_Momentum
       procedure, private :: Ebf_Scalar
       procedure          :: Prandtl_Turb
@@ -338,6 +339,7 @@
 #   include "Turb_Mod/Vis_T_Tensorial.f90"
 
     ! Other subroutines ellipitic blending, turbulent Prandtl number
+#   include "Turb_Mod/Beta_Scalar.f90"
 #   include "Turb_Mod/Ebf_Momentum.f90"
 #   include "Turb_Mod/Ebf_Scalar.f90"
 #   include "Turb_Mod/Prandtl_Turb.f90"

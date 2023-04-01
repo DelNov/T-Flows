@@ -120,15 +120,14 @@
 
           Turb % vis_w(c1) =    Turb % y_plus(c1) * Flow % viscosity(c1)  &
                            / (  Turb % y_plus(c1) * exp(-1.0 * ebf)       &
-                              + u_plus * exp(-1.0/ebf) + TINY)
+                                         + u_plus * exp(-1.0 / ebf) + TINY)
 
         end if
 
         if(Flow % heat_transfer) then
           pr   = Flow % Prandtl_Numb(c1)
           pr_t = Turb % Prandtl_Turb(c1)
-          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
-               * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
+          beta = Turb % Beta_Scalar(pr, pr_t)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer:
           ! New temperature inlet profile consistent with wall functions"
@@ -145,13 +144,12 @@
 
         if(Flow % n_scalars > 0) then
           sc   = Flow % Schmidt_Numb(c1)            ! laminar Schmidt number
-          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                     &
-               * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
-          ebf = Turb % Ebf_Scalar(c1, pr)
+          beta = Turb % Beta_Scalar(sc, sc_t)
+          ebf  = Turb % Ebf_Scalar(c1, pr)
           Turb % diff_w(c1) =  Turb % y_plus(c1)                    &
                * (Flow % viscosity(c1)/Flow % density(c1))          &
                / (  Turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &
-               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+                  + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
       end do    ! faces in regions
