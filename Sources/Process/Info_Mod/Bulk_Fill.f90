@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Info_Mod_Bulk_Fill(Flow)
+  subroutine Bulk_Fill(Info, Flow)
 !------------------------------------------------------------------------------!
 !   Fills the info box with information to be written on the screen.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), intent(in) :: Flow
+  class(Info_Type), intent(out) :: Info
+  type(Field_Type), intent(in)  :: Flow
 !==============================================================================!
 
   if(First_Proc()) then

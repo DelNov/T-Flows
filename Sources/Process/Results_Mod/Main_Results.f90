@@ -30,7 +30,7 @@
      save_now                              .or.  &
      exit_now                              .or.  &
      Backup % Time_To_Save_Backup(curr_dt) .or.  &
-     Info_Mod_Time_To_Exit()) then
+     Info % Time_To_Exit()) then
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
       call Backup % Save(Flow(d), Turb(d), Vof(d), Swarm(d),  &
@@ -43,7 +43,7 @@
      save_now                                .or.  &
      exit_now                                .or.  &
      Results % Time_To_Save_Results(curr_dt) .or.  &
-     Info_Mod_Time_To_Exit()) then
+     Info % Time_To_Exit()) then
 
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
@@ -77,7 +77,7 @@
      save_now                              .or.  &
      exit_now                              .or.  &
      Results % Time_To_Save_Swarm(curr_dt) .or.  &
-     Info_Mod_Time_To_Exit()) then
+     Info % Time_To_Exit()) then
 
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)

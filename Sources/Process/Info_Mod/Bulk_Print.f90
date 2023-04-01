@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Info_Mod_Bulk_Print(Flow, dom, n_dom)
+  subroutine Bulk_Print(Info, Flow, dom, n_dom)
 !------------------------------------------------------------------------------!
 !   Prints information about inner iteration on the screen.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type), intent(in) :: Flow
-  integer,          intent(in) :: dom, n_dom
+  class(Info_Type), intent(inout) :: Info
+  type(Field_Type), intent(in)    :: Flow
+  integer,          intent(in)    :: dom, n_dom
 !==============================================================================!
 
-  call Info_Mod_Bulk_Fill(Flow)
+  call Info % Bulk_Fill(Flow)
 
   if(First_Proc()) then
 

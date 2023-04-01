@@ -215,10 +215,10 @@
                        ' (solver for pressure)')
 
   if (Flow % p_m_coupling == SIMPLE) then
-    call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
+    call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
   else
     if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
+      call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
     end if
   end if
 

@@ -59,6 +59,25 @@
     type(Time_Info_Type),    private :: time
     type(Iter_Info_Type),    private :: iter
     type(Bulk_Info_Type),    private :: bulk
+
+    contains
+      procedure :: Start_Info
+      procedure :: Time_To_Exit
+
+      procedure :: Time_Start
+      procedure :: Time_Fill
+      procedure :: Time_Print
+
+      procedure :: Iter_Start
+      procedure :: Iter_Fill
+      procedure :: Iter_Fill_At
+      procedure :: Iter_Fill_Scalar_At
+      procedure :: Iter_Print
+
+      procedure :: Bulk_Start
+      procedure :: Bulk_Fill
+      procedure :: Bulk_Print
+
   end type
 
   !   Singletone type Info object   !
@@ -66,7 +85,7 @@
 
   contains
 
-#   include "Info_Mod/Start.f90"
+#   include "Info_Mod/Start_Info.f90"
 #   include "Info_Mod/Time_To_Exit.f90"
 
 #   include "Info_Mod/Time_Start.f90"

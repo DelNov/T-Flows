@@ -1,9 +1,11 @@
 !==============================================================================!
-  subroutine Info_Mod_Start_Info()
+  subroutine Start_Info(Info)
 !------------------------------------------------------------------------------!
 !  Start Info_Mod by taking system count rate and initial count rate           !
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Info_Type), intent(out) :: Info
 !==============================================================================!
 
   ! Get system clock clock rate and initial clock count

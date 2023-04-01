@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Info_Mod_Iter_Print(d)
+  subroutine Iter_Print(Info, d)
 !------------------------------------------------------------------------------!
 !   Prints information about inner iteration on the screen.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(in) :: d  ! domain
+  class(Info_Type), intent(out) :: Info
+  integer,          intent(in)  :: d  ! domain
 !-----------------------------------[Locals]-----------------------------------!
   integer               :: i
   character(len=L_LINE) :: tmp
@@ -36,7 +37,7 @@
       Info % iter % lines_user(i)(7:7) = ' '  ! remove column for other domains
     end do
 
-    call Info_Mod_Iter_Start()
+    call Info % Iter_Start()
 
   end if
 

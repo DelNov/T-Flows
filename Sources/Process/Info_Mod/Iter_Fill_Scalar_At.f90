@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Info_Mod_Iter_Fill_Scalar_At(r, c, name_var, res, n_iter)
+  subroutine Iter_Fill_Scalar_At(Info, r, c, name_var, res, n_iter)
 !------------------------------------------------------------------------------!
 !   Inserts infromation at specified position in the information box.          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer,          intent(in) :: r         ! row
-  integer,          intent(in) :: c         ! column
-  character(len=*), intent(in) :: name_var
-  real,             intent(in) :: res
-  integer,          intent(in) :: n_iter    ! number of iterations
+  class(Info_Type), intent(out) :: Info
+  integer,          intent(in)  :: r         ! row
+  integer,          intent(in)  :: c         ! column
+  character(len=*), intent(in)  :: name_var
+  real,             intent(in)  :: res
+  integer,          intent(in)  :: n_iter    ! number of iterations
 !==============================================================================!
 
   if(First_Proc()) then
@@ -24,7 +25,7 @@
                                       (c-1)*L_BOX+ 7),  '(a1)')  ':'
     write(Info % iter % lines_user(r)((c-1)*L_BOX+ 8 :  &
                                       (c-1)*L_BOX+10),  '(i3)')  n_iter
-    ! Residual 
+    ! Residual
     write(Info % iter % lines_user(r)((c-1)*L_BOX+12 :  &
                                       (c-1)*L_BOX+20),  '(1pe9.3)') res
 

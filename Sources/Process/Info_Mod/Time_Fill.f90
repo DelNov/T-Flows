@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Info_Mod_Time_Fill(n, sim_time)
+  subroutine Time_Fill(Info, n, sim_time)
 !------------------------------------------------------------------------------!
 !   Fills the info box with information to be written on the screen.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(in) :: n         ! time step
-  real,    intent(in) :: sim_time  ! simulation time
+  class(Info_Type), intent(out) :: Info
+  integer,          intent(in)  :: n         ! time step
+  real,             intent(in)  :: sim_time  ! simulation time
 !-----------------------------------[Locals]-----------------------------------!
   integer  :: hours, minutes, seconds
   real(DP) :: wall_time                ! number of seconds of wall-clock time

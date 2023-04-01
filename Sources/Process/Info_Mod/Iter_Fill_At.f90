@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Info_Mod_Iter_Fill_At(r, c, name_var, res, n_iter)
+  subroutine Iter_Fill_At(Info, r, c, name_var, res, n_iter)
 !------------------------------------------------------------------------------!
 !   Inserts infromation at specified position in the information box.          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer,           intent(in) :: r         ! row
-  integer,           intent(in) :: c         ! column
-  character(len=*),  intent(in) :: name_var
-  real,              intent(in) :: res
-  integer, optional, intent(in) :: n_iter    ! number of iterations
+  class(Info_Type),  intent(out) :: Info
+  integer,           intent(in)  :: r         ! row
+  integer,           intent(in)  :: c         ! column
+  character(len=*),  intent(in)  :: name_var
+  real,              intent(in)  :: res
+  integer, optional, intent(in)  :: n_iter    ! number of iterations
 !==============================================================================!
 
   if(First_Proc()) then

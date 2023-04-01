@@ -73,7 +73,7 @@
   !-------------------------!
   !   Initialize Info_Mod   !
   !-------------------------!
-  call Info_Mod_Start_Info()
+  call Info % Start_Info()
 
   !--------------------!
   !   Read all grids   !
@@ -268,14 +268,14 @@
                                            Swarm(d), curr_dt, time)
 
       ! Start info boxes.
-      call Info_Mod_Time_Start()
-      call Info_Mod_Iter_Start()
-      call Info_Mod_Bulk_Start()
+      call Info % Time_Start()
+      call Info % Iter_Start()
+      call Info % Bulk_Start()
 
       ! Initialize and print time info box
       if(d .eq. 1) then
-        call Info_Mod_Time_Fill(curr_dt, time)
-        call Info_Mod_Time_Print()
+        call Info % Time_Fill(curr_dt, time)
+        call Info % Time_Print()
       end if
 
       ! Turbulence models initializations
@@ -317,7 +317,7 @@
         call User_Mod_Beginning_Of_Iteration(Flow(d), Turb(d), Vof(d),  &
                                              Swarm(d), curr_dt, time)
 
-        call Info_Mod_Iter_Fill(ini)
+        call Info % Iter_Fill(ini)
 
         ! Future? call Process % Simple_Step(Flow(d), Turb(d), Vof(d),  &
         ! Future?                            Sol(d), curr_dt, ini)
@@ -357,7 +357,7 @@
         call Process % Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'ALL')
 
         ! End of the current iteration
-        call Info_Mod_Iter_Print(d)
+        call Info % Iter_Print(d)
 
         ! End of iteration
         call User_Mod_End_Of_Iteration(Flow(d), Turb(d), Vof(d), Swarm(d),  &
@@ -384,7 +384,7 @@
     end do
 
     do d = 1, n_dom
-      call Info_Mod_Bulk_Print(Flow(d), d, n_dom)
+      call Info % Bulk_Print(Flow(d), d, n_dom)
     end do
 
     do d = 1, n_dom
@@ -421,7 +421,7 @@
                                 Flow, Turb, Vof, Swarm, exit_now)
 
     ! Ran more than a set wall clock time limit
-    if(Info_Mod_Time_To_Exit() .or. exit_now) then
+    if(Info % Time_To_Exit() .or. exit_now) then
       goto 2
     end if
 

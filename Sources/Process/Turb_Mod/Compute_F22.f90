@@ -186,9 +186,9 @@
 
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
+    call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
   else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % res, phi % eniter)
+    call Info % Iter_Fill_At(4, 2, phi % name, phi % res, phi % eniter)
   end if
 
   call Flow % Grad_Variable(phi)
