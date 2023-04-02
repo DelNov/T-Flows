@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Gradient_Method_For_Turbulence(scheme_name, verbose)
+  subroutine Gradient_Method_For_Turbulence(Control, scheme_name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading gradient method for turbulent quantities.                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: scheme_name
   logical, optional          :: verbose
 !==============================================================================!

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Advection_Scheme_For_Scalars(scheme_name, verbose)
+  subroutine Advection_Scheme_For_Scalars(Control, scheme_name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading turbulence model from the control file.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: scheme_name
   logical, optional          :: verbose
 !==============================================================================!

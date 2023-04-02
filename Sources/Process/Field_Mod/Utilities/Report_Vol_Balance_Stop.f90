@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Report_Volume_Balance_Stop(Flow)
+  subroutine Report_Vol_Balance_Stop(Flow)
 !------------------------------------------------------------------------------!
 !   Closes file for volume balance reporting.
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
 !==============================================================================!
 
   if(First_Proc()) then
-    if(Flow % report_vol_balance) close(Flow % fuvbr)
+    if(Flow % rep_vol_balance) close(Flow % fuvbr)
   end if
 
   end subroutine

@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Skewness_Correction_Vof(skew_corr, verbose)
+  subroutine Skewness_Correction_Vof(Control, skew_corr, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: skew_corr
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

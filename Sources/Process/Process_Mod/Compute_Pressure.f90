@@ -61,7 +61,7 @@
   call Flow % Alias_Momentum(u, v, w)
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance_Start(curr_dt, ini)
+  call Flow % Report_Vol_Balance_Start(curr_dt, ini)
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
@@ -137,7 +137,7 @@
   end do
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance(Sol, curr_dt, ini)
+  call Flow % Report_Vol_Balance(Sol, curr_dt, ini)
 
   !------------------------------------------!
   !   Cross diffusion fluxes for pressure    !
@@ -244,7 +244,7 @@
   call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance_Stop()
+  call Flow % Report_Vol_Balance_Stop()
 
   call Profiler % Stop('Compute_Pressure (without solvers)')
 

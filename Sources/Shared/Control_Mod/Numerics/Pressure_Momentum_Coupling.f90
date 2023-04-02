@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Pressure_Momentum_Coupling(name, verbose)
+  subroutine Pressure_Momentum_Coupling(Control, name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading pressure-momentum model from the control file.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: name  ! simple or piso
   logical, optional          :: verbose
 !==============================================================================!

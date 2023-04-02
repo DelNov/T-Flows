@@ -142,7 +142,7 @@
     logical :: inside_piso_loop
     logical :: choi_correction
     logical :: gu_correction
-    logical :: report_vol_balance
+    logical :: rep_vol_balance
 
     ! Maximum CFL and Pe numbers
     real :: cfl_max, pe_max
@@ -235,9 +235,9 @@
       procedure :: Prandtl_Numb
       procedure :: Schmidt_Numb
       procedure :: U_Tan
-      procedure :: Report_Volume_Balance
-      procedure :: Report_Volume_Balance_Start
-      procedure :: Report_Volume_Balance_Stop
+      procedure :: Report_Vol_Balance
+      procedure :: Report_Vol_Balance_Start
+      procedure :: Report_Vol_Balance_Stop
       procedure :: Volume_Average
 
   end type
@@ -301,9 +301,9 @@
 #   include "Field_Mod/Utilities/Schmidt_Numb.f90"
 #   include "Field_Mod/Utilities/U_Tan.f90"
 #   include "Field_Mod/Utilities/Compute_Wall_Distance.f90"
-#   include "Field_Mod/Utilities/Report_Volume_Balance.f90"
-#   include "Field_Mod/Utilities/Report_Volume_Balance_Start.f90"
-#   include "Field_Mod/Utilities/Report_Volume_Balance_Stop.f90"
+#   include "Field_Mod/Utilities/Report_Vol_Balance.f90"
+#   include "Field_Mod/Utilities/Report_Vol_Balance_Start.f90"
+#   include "Field_Mod/Utilities/Report_Vol_Balance_Stop.f90"
 #   include "Field_Mod/Utilities/Volume_Average.f90"
 
   end module

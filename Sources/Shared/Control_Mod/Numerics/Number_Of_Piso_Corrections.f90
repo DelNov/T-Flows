@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_Piso_Corrections(val, verbose)
+  subroutine Number_Of_Piso_Corrections(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   integer, intent(out) :: val
   logical, optional    :: verbose
 !==============================================================================!

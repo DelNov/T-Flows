@@ -84,6 +84,51 @@
       procedure :: Tolerance_For_Vof_Solver
       procedure :: Tolerance_For_Wall_Distance_Solver
 
+      ! Numerics
+      procedure :: Time_Step
+      procedure :: Number_Of_Time_Steps
+      procedure :: Advection_Scheme_For_Energy
+      procedure :: Advection_Scheme_For_Momentum
+      procedure :: Advection_Scheme_For_Scalars
+      procedure :: Advection_Scheme_For_Turbulence
+      procedure :: Advection_Scheme_For_Vof
+      procedure :: Blending_Coefficient_For_Energy
+      procedure :: Blending_Coefficient_For_Momentum
+      procedure :: Blending_Coefficient_For_Scalars
+      procedure :: Blending_Coefficient_For_Turbulence
+      procedure :: Blending_Coefficient_For_Vof
+      procedure :: Choi_Correction
+      procedure :: Gradient_Method_For_Energy
+      procedure :: Gradient_Method_For_Momentum
+      procedure :: Gradient_Method_For_Pressure
+      procedure :: Gradient_Method_For_Scalars
+      procedure :: Gradient_Method_For_Turbulence
+      procedure :: Gradient_Method_For_Vof
+      procedure :: Gradient_Method_For_Wall_Distance
+      procedure :: Gu_Correction
+      procedure :: Max_Gauss_Gradients_Iterations
+      procedure :: Max_Least_Squares_Gradients_Iterations
+      procedure :: Max_Simple_Iterations
+      procedure :: Min_Simple_Iterations
+      procedure :: Number_Of_Piso_Corrections
+      procedure :: Pressure_Momentum_Coupling
+      procedure :: Report_Volume_Balance
+      procedure :: Simple_Underrelaxation_For_Momentum
+      procedure :: Simple_Underrelaxation_For_Pressure
+      procedure :: Simple_Underrelaxation_For_Energy
+      procedure :: Simple_Underrelaxation_For_Scalars
+      procedure :: Simple_Underrelaxation_For_Turbulence
+      procedure :: Simple_Underrelaxation_For_Vof
+      procedure :: Time_Integration_Scheme
+      procedure :: Tolerance_For_Gauss_Gradients
+      procedure :: Tolerance_For_Simple_Algorithm
+      procedure :: Max_Correction_Cycles_Beta_Vof
+      procedure :: Max_Smoothing_Cycles_Curvature_Vof
+      procedure :: Max_Smoothing_Cycles_Normal_Vof
+      procedure :: Max_Courant_Vof
+      procedure :: Max_Substep_Cycles_Vof
+      procedure :: Skewness_Correction_Vof
+
   end type
 
   type(Control_Type) :: Control

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Gradient_Method_For_Energy(scheme_name, verbose)
+  subroutine Gradient_Method_For_Energy(Control, scheme_name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading gradient method for energy (temperature, in practice)              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: scheme_name
   logical, optional          :: verbose
 !==============================================================================!

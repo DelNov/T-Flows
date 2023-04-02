@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Correction_Cycles_Beta_Vof(val, verbose)
+  subroutine Max_Correction_Cycles_Beta_Vof(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   integer, intent(out) :: val
   logical, optional    :: verbose
 !==============================================================================!

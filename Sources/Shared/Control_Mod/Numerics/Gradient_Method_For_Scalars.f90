@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Gradient_Method_For_Scalars(scheme_name, verbose)
+  subroutine Gradient_Method_For_Scalars(Control, scheme_name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading gradient method for scalars.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: scheme_name
   logical, optional          :: verbose
 !==============================================================================!

@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Report_Volume_Balance(vol_bal, verbose)
+  subroutine Report_Volume_Balance(Control, vol_bal, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: vol_bal
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

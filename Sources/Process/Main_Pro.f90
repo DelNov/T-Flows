@@ -107,7 +107,7 @@
   ! Initialize first and current and read the last time step
   curr_dt  = 0
   first_dt = 0
-  call Control_Mod_Number_Of_Time_Steps(last_dt, verbose=.true.)
+  call Control % Number_Of_Time_Steps(last_dt, verbose=.true.)
   call Control_Mod_Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
                                                           verbose = .true.)
   call Control_Mod_Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
@@ -133,7 +133,7 @@
 
     ! Read time step from root
     call Control % Switch_To_Root()
-    call Control_Mod_Time_Step(Flow(d) % dt, verbose=.true.)
+    call Control % Time_Step(Flow(d) % dt, verbose=.true.)
     call Control % Switch_To_Domain(d)  ! go back to local domain's control
 
     ! Read numerical models from control file (after the memory is allocated)
@@ -299,9 +299,9 @@
     !   Inner-iteration loop   !
     !--------------------------!
     call Control % Switch_To_Root()
-    call Control_Mod_Max_Simple_Iterations(max_ini)
-    call Control_Mod_Min_Simple_Iterations(min_ini)
-    call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
+    call Control % Max_Simple_Iterations(max_ini)
+    call Control % Min_Simple_Iterations(min_ini)
+    call Control % Tolerance_For_Simple_Algorithm(simple_tol)
 
     do ini = 1, max_ini
 

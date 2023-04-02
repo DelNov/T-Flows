@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Advection_Scheme_For_Vof(scheme_name, verbose)
+  subroutine Advection_Scheme_For_Vof(Control, scheme_name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading advection shceme for vof from control file.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: scheme_name
   logical, optional          :: verbose
 !==============================================================================!

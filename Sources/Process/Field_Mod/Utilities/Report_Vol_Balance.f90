@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Report_Volume_Balance(Flow, Sol, curr_dt, ini)
+  subroutine Report_Vol_Balance(Flow, Sol, curr_dt, ini)
 !------------------------------------------------------------------------------!
 !   Opens file for volume balance reporting.
 !------------------------------------------------------------------------------!
@@ -14,7 +14,7 @@
   real                      :: src
 !==============================================================================!
 
-  if(Flow % report_vol_balance) then
+  if(Flow % rep_vol_balance) then
 
     ! Take aliases
     Grid => Flow % pnt_grid
