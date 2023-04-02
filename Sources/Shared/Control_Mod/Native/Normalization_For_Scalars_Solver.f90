@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Normalization_For_Scalars_Solver(val, verbose)
+  subroutine Normalization_For_Scalars_Solver(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real                :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Real_Item('NORMALIZATION_FOR_SCALARS_SOLVER',  &

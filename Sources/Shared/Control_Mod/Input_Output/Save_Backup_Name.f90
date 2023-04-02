@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Save_Backup_Name(val, verbose)
+  subroutine Save_Backup_Name(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(SL)       :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Char_Item('SAVE_BACKUP_NAME', 'skip', val, verbose)

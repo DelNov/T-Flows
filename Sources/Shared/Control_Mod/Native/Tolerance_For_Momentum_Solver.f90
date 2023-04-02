@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Tolerance_For_Momentum_Solver(val, verbose)
+  subroutine Tolerance_For_Momentum_Solver(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Real_Item('TOLERANCE_FOR_MOMENTUM_SOLVER',  &

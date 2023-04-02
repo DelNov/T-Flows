@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Vof(val, verbose)
+  subroutine Solver_For_Vof(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical, optional          :: verbose
 !==============================================================================!

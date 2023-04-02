@@ -21,6 +21,8 @@
   type Control_Type
 
     contains
+
+      ! Basic functionality (manouvering through control file)
       procedure :: Open_Domain_File
       procedure :: Open_Root_File
       procedure :: Position_At_One_Key
@@ -35,9 +37,52 @@
       procedure :: Read_Real_Item_On
       procedure :: Read_Real_Vector
       procedure :: Read_Real_Vector_On
-!     procedure :: Similar_Warning
       procedure :: Switch_To_Domain
       procedure :: Switch_To_Root
+
+      ! Input/output
+      procedure :: Read_Problem_Name
+      procedure :: Load_Backup_Name
+      procedure :: Save_Backup_Name
+      procedure :: Save_Initial_Condition
+      procedure :: Save_Results_At_Boundaries
+      procedure :: Wall_Time_Max_Hours
+      procedure :: Backup_Save_Interval
+      procedure :: Results_Save_Interval
+      procedure :: Swarm_Save_Interval
+      procedure :: Profiler_Info
+
+      ! Native solvers
+      procedure :: Max_Iterations_For_Energy_Solver
+      procedure :: Max_Iterations_For_Momentum_Solver
+      procedure :: Max_Iterations_For_Potential_Solver
+      procedure :: Max_Iterations_For_Pressure_Solver
+      procedure :: Max_Iterations_For_Scalars_Solver
+      procedure :: Max_Iterations_For_Turbulence_Solver
+      procedure :: Max_Iterations_For_Vof_Solver
+      procedure :: Max_Iterations_For_Wall_Distance_Solver
+      procedure :: Preconditioner_For_System_Matrix
+      procedure :: Solver_For_Energy
+      procedure :: Solver_For_Momentum
+      procedure :: Solver_For_Potential
+      procedure :: Solver_For_Pressure
+      procedure :: Solver_For_Scalars
+      procedure :: Solver_For_Turbulence
+      procedure :: Solver_For_Vof
+      procedure :: Solver_For_Wall_Distance
+      procedure :: Normalization_For_Momentum_Solver
+      procedure :: Normalization_For_Pressure_Solver
+      procedure :: Normalization_For_Energy_Solver
+      procedure :: Normalization_For_Scalars_Solver
+      procedure :: Normalization_For_Turbulence_Solver
+      procedure :: Tolerance_For_Momentum_Solver
+      procedure :: Tolerance_For_Potential_Solver
+      procedure :: Tolerance_For_Pressure_Solver
+      procedure :: Tolerance_For_Energy_Solver
+      procedure :: Tolerance_For_Scalars_Solver
+      procedure :: Tolerance_For_Turbulence_Solver
+      procedure :: Tolerance_For_Vof_Solver
+      procedure :: Tolerance_For_Wall_Distance_Solver
 
   end type
 
@@ -63,7 +108,6 @@
 #   include "Control_Mod/Basic_Functions/Read_Real_Item_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Vector.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Vector_On.f90"
-!   include "Control_Mod/Basic_Functions/Similar_Warning.f90"
 #   include "Control_Mod/Basic_Functions/Switch_To_Domain.f90"
 #   include "Control_Mod/Basic_Functions/Switch_To_Root.f90"
 
@@ -77,8 +121,6 @@
 #   include "Control_Mod/Input_Output/Save_Backup_Name.f90"
 #   include "Control_Mod/Input_Output/Save_Initial_Condition.f90"
 #   include "Control_Mod/Input_Output/Save_Results_At_Boundaries.f90"
-!   include "Control_Mod/Input_Output/Load_Initial_Solution_Name.f90"
-!   include "Control_Mod/Input_Output/Save_Initial_Solution_Name.f90"
 #   include "Control_Mod/Input_Output/Wall_Time_Max_Hours.f90"
 
     ! Save
@@ -109,7 +151,7 @@
 #   include "Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90"
 #   include "Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90"
 #   include "Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90"
-#   include "Control_Mod/Native/Max_Iterations_For_Presssure_Solver.f90"
+#   include "Control_Mod/Native/Max_Iterations_For_Pressure_Solver.f90"
 #   include "Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90"
 #   include "Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90"
 #   include "Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90"

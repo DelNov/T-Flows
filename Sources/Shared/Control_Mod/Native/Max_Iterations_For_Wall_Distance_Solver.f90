@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Iterations_For_Wall_Distance_Solver(val, verbose)
+  subroutine Max_Iterations_For_Wall_Distance_Solver(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   integer, intent(out) :: val
   logical, optional    :: verbose
 !==============================================================================!

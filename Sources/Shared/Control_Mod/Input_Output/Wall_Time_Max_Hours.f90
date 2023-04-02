@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Wall_Time_Max_Hours(val, verbose)
+  subroutine Wall_Time_Max_Hours(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real                :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   ! 168 hours is one week

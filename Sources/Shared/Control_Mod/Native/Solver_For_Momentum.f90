@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Momentum(val, verbose)
+  subroutine Solver_For_Momentum(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical, optional          :: verbose
 !==============================================================================!

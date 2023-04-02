@@ -13,8 +13,8 @@
   call system_clock(Info % clock % ini)
 
   ! Read maximum wall clock hours
-  call Control_Mod_Wall_Time_Max_Hours(Info % clock % wall_time_max,  &
-                                       verbose=.true.)
+  call Control % Wall_Time_Max_Hours(Info % clock % wall_time_max,  &
+                                     verbose=.true.)
 
   ! Make it in seconds
   Info % clock % wall_time_max = Info % clock % wall_time_max * 3600

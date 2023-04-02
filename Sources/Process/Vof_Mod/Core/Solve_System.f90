@@ -12,16 +12,12 @@
   type(Var_Type),    pointer :: fun
   type(Field_Type),  pointer :: Flow
   type(Matrix_Type), pointer :: A
-  character(SL)              :: solver
 !==============================================================================!
 
   ! Take aliases
   fun  => Vof % fun
   Flow => Vof % pnt_flow
   A    => Sol % Nat % A
-
-  ! Get solver
-  call Control_Mod_Solver_For_Vof(solver)
 
   call Profiler % Start(String % First_Upper(fun % solver)//' (solver for VOF)')
 

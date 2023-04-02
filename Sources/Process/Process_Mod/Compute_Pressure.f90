@@ -21,10 +21,9 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
-  character(SL)              :: solver
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !
-!   The form of equations which I am solving:
+!   The form of equations which are being solved:
 !
 !      /           /
 !     |           |
@@ -72,7 +71,7 @@
   !--------------------------------------------------!
 
   ! From control file
-  call Control_Mod_Normalization_For_Pressure_Solver(p_nor_c)
+  call Control % Normalization_For_Pressure_Solver(p_nor_c)
 
   ! Calculate pressure magnitude for normalization of pressure solution
   p_max = -HUGE
@@ -181,9 +180,6 @@
   !   In case of mass transfer, add addtional source to pressure equation   !
   !-------------------------------------------------------------------------!
   call Vof % Mass_Transfer_Pressure_Source(b)
-
-  ! Get solver
-  call Control_Mod_Solver_For_Pressure(solver)
 
   call Profiler % Start(String % First_Upper(pp % solver)  //  &
                         ' (solver for pressure)')

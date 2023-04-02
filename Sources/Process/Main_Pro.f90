@@ -80,7 +80,7 @@
   !--------------------!
   do d = 1, n_dom
     call Control % Switch_To_Domain(d)  ! take domain's d control file
-    call Control_Mod_Problem_Name(problem_name(d))
+    call Control % Read_Problem_Name(problem_name(d))
 
     ! Load the finite volume Grid
     call Grid(d) % Load_Cfn(This_Proc(), domain=d)
@@ -203,13 +203,12 @@
   !   Time loop   !
   !               !
   !---------------!
-
   call Control % Switch_To_Root()
-  call Control_Mod_Backup_Save_Interval  (backup % interval, verbose=.true.)
-  call Control_Mod_Results_Save_Interval (Results % interval, verbose=.true.)
-  call Control_Mod_Save_Initial_Condition(Results % initial,  verbose=.true.)
-  call Control_Mod_Save_Results_At_Boundaries(Results % boundary)
-  call Control_Mod_Swarm_Save_Interval(Results % interval_swarm, verbose=.true.)
+  call Control % Backup_Save_Interval  (backup % interval, verbose=.true.)
+  call Control % Results_Save_Interval (Results % interval, verbose=.true.)
+  call Control % Save_Initial_Condition(Results % initial,  verbose=.true.)
+  call Control % Save_Results_At_Boundaries(Results % boundary)
+  call Control % Swarm_Save_Interval(Results % interval_swarm, verbose=.true.)
 
   !-------------------------------------------------------!
   !   Compute wall distance - it is not saved in backup   !

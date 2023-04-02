@@ -17,7 +17,7 @@
   ! Only Process has a control file
   in_sec = .false.
   if(PROGRAM_NAME .eq. 'Process') then
-    call Control_Mod_Profiler_Info(pinfo, verbose=.false.)
+    call Control % Profiler_Info(pinfo, verbose=.false.)
     if(pinfo == 'SECONDS') then
       in_sec = .true.
     end if

@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Potential(val, verbose)
+  subroutine Solver_For_Potential(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical, optional          :: verbose
 !==============================================================================!
