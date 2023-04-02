@@ -476,12 +476,13 @@ if b:fortran_dialect == "f08"
 "==============================================================[MPI in T-Flows]=
 " Here are MPI calls from T-Flows
 " Note that they are not set in this file at all, only in the .vimrc
-  syn keyword fortranMpiTflows     Mpi_Barrier  Mpi_Finalize  Mpi_Sendrecv_Replace
-  syn keyword fortranMpiTflows     Mpi_Allreduce  Mpi_File_Close  Mpi_File  Mpi_File_Set_View
+  syn keyword fortranMpiTflows     Mpi_Init  Mpi_Comm_Size  Mpi_Comm_Rank  Mpi_Barrier  Mpi_Finalize
+  syn keyword fortranMpiTflows     Mpi_Allreduce  Mpi_File_Close  Mpi_File  Mpi_File_Set_View Mpi_Sendrecv_Replace
   syn keyword fortranMpiTflows     Mpi_Send  Mpi_Sendrecv  Mpi_Status  Mpi_Recv  Mpi_Write
   syn keyword fortranMpiTflows     Mpi_Type_Create_Indexed_Block  Mpi_Type_Commit
   syn keyword fortranMpiTflows     Mpi_File_Open  Mpi_File_Read
   syn keyword fortranMpiTflows     MPI_COMM_WORLD  MPI_CHARACTER  MPI_INFO_NULL  MPI_STATUS_IGNORE  MPI_IN_PLACE
+  syn keyword fortranMpiTflows     MPI_INTEGER  MPI_LOGICAL  MPI_DOUBLE_PRECISION  MPI_REAL
   syn keyword fortranMpiTflows     MPI_LOR  MPI_SUM  MPI_MAX  MPI_MIN  MPI_MODE_WRONLY  MPI_MODE_CREATE
 "--------------------------------------------------------------[MPI in T-Flows]-
 
