@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Linear_Solvers(Rc, Flow, Turb, Vof, Sol)
+  subroutine Solvers(Rc, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Reads which linear solvers to use, and calls appropriate branches.         !
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
 !==============================================================================!
 
   ! Linear solvers you want to use; native or PETSc
-  call Control_Mod_Linear_Solvers(name, .true.)
+  call Control % Linear_Solvers(name, .true.)
   Sol % solvers = Solver_Mod_Linear_Solvers_Code(name)
 
   ! Read options for native solvers first ...

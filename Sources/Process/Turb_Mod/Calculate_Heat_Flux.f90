@@ -30,10 +30,14 @@
   ! ... maybe this call is not needed
   call Flow % Grad_Variable(t)
 
+  ! It used to read pr_t from here, so check it just in case
+  Assert(pr_t > 0.0)
+
   !-----------------------------------------!
+  !                                         !
   !   Compute the sources in the interior   !
+  !                                         !
   !-----------------------------------------!
-  call Control_Mod_Turbulent_Prandtl_Number(pr_t)
 
   !-----------------------------------------------------------!
   !   By default turbulent heat flux is caalculated by SGDH   !
@@ -42,31 +46,28 @@
   if(Turb % heat_flux_model .eq. SGDH) then
     do c = Cells_In_Domain_And_Buffers()
       pr_t = max(Turb % Prandtl_Turb(c), TINY)
-      ut % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
-      vt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
-      wt % n(c) = - Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
+      ut % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+      vt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+      wt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
 
       if(Turb % model .eq. HYBRID_LES_RANS) then
-        ut % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                          / pr_t * t % x(c)
-        vt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                          / pr_t * t % y(c)
-        wt % n(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                          / pr_t * t % z(c)
+        ut % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % x(c)
+        vt % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % y(c)
+        wt % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % z(c)
       end if
     end do
 
   else if(Turb % heat_flux_model .eq. GGDH) then
     do c = Cells_In_Domain_And_Buffers()
-      ut % n(c) = -c_theta * Turb % t_scale(c) * (uu % n(c) * t % x(c)  +  &
-                                                  uv % n(c) * t % y(c)  +  &
-                                                  uw % n(c) * t % z(c))
-      vt % n(c) = -c_theta * Turb % t_scale(c) * (uv % n(c) * t % x(c)  +  &
-                                                  vv % n(c) * t % y(c)  +  &
-                                                  vw % n(c) * t % z(c))
-      wt % n(c) = -c_theta * Turb % t_scale(c) * (uw % n(c) * t % x(c)  +  &
-                                                  vw % n(c) * t % y(c)  +  &
-                                                  ww % n(c) * t % z(c))
+      ut % n(c) = -c_theta * Turb % t_scale(c) * (  uu % n(c) * t % x(c)   &
+                                                  + uv % n(c) * t % y(c)   &
+                                                  + uw % n(c) * t % z(c))
+      vt % n(c) = -c_theta * Turb % t_scale(c) * (  uv % n(c) * t % x(c)   &
+                                                  + vv % n(c) * t % y(c)   &
+                                                  + vw % n(c) * t % z(c))
+      wt % n(c) = -c_theta * Turb % t_scale(c) * (  uw % n(c) * t % x(c)   &
+                                                  + vw % n(c) * t % y(c)   &
+                                                  + ww % n(c) * t % z(c))
     end do
 
   else if(Turb % heat_flux_model .eq. AFM) then
@@ -104,6 +105,11 @@
     end do
   end if
 
+  !--------------------------------------!
+  !                                      !
+  !   Compute the sources at the walls   !
+  !                                      !
+  !--------------------------------------!
   if(Turb % model .eq. K_EPS        .or.  &
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then

@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Extrapolate_Temperature_Exp(temp_exp,  &
-                                                     verbose)
+  subroutine Extrapolate_Temperature_Exp(Control, temp_exp, verbose)
 !------------------------------------------------------------------------------!
 !   Reading if temprature will be extrapolated to walls exponentially          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: temp_exp
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

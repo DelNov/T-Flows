@@ -444,8 +444,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
 " After the constants, I have alternating definitions of types and objects derived from them
-  syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type
-  syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges
+  syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
+  syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges         Read_Control  Rc
   syn keyword fortranTypeTflows    Generate_Type  Convert_Type   Divide_Type    Grid_Type         Control_Type
   syn keyword fortranObjectTflows  Generate       Convert        Divide         Grid  Prim  Dual  Control
   syn keyword fortranTypeTflows    Math_Type      Sort_Type      File_Type      String_Type       Work_Type      Tokenizer_Type

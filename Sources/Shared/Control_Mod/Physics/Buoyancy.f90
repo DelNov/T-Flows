@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Buoyancy(val, verbose)
+  subroutine Buoyancy(Control, val, verbose)
 !------------------------------------------------------------------------------!
 !   Reading buoyancy model from the control file.                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical,       optional    :: verbose
 !==============================================================================!

@@ -1,9 +1,10 @@
 !==============================================================================!
-  subroutine Control_Mod_Track_Front(track_front, verbose)
+  subroutine Track_Front(Control, track, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, intent(out) :: track_front
+  class(Control_Type)  :: Control
+  logical, intent(out) :: track
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
@@ -13,10 +14,10 @@
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
-    track_front = .true.
+    track = .true.
 
   else if( val .eq. 'NO' ) then
-    track_front = .false.
+    track = .false.
 
   else
     call Message % Error(60,                                             &

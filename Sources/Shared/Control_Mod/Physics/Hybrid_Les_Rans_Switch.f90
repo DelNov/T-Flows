@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Hybrid_Les_Rans_Switch(val, verbose)
+  subroutine Hybrid_Les_Rans_Switch(Control, val, verbose)
 !------------------------------------------------------------------------------!
 !   Reading switch for hybrid LES/RANS model.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical,       optional    :: verbose
 !==============================================================================!

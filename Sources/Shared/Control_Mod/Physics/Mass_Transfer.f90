@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Mass_Transfer(phase_change, verbose)
+  subroutine Mass_Transfer(Control, phase_change, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: phase_change
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

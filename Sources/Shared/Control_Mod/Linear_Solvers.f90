@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Linear_Solvers(name, verbose)
+  subroutine Linear_Solvers(Control, name, verbose)
 !------------------------------------------------------------------------------!
 !   Reading linear solvers (native or PETSc) from the control file.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: name  ! name of the pressure-momentum coupling algorithm
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(SL)       :: name
+  logical, optional   :: verbose
 !==============================================================================!
 
   call Control % Read_Char_Item('LINEAR_SOLVERS',  &

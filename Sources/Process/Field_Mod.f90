@@ -231,7 +231,7 @@
       procedure :: Calculate_Courant_In_Cells  ! for post-processing
       procedure :: Calculate_Bulk_Fluxes
       procedure :: Compute_Wall_Distance       ! see: Potential_Initialization
-      procedure :: Potential_Initialization    ! see: Compute_Wall_Distance
+      procedure :: Potential_Initialisation    ! see: Compute_Wall_Distance
       procedure :: Prandtl_Numb
       procedure :: Schmidt_Numb
       procedure :: U_Tan

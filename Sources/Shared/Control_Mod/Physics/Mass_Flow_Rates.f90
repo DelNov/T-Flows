@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Mass_Flow_Rates(b_x, b_y, b_z, verbose)
+  subroutine Mass_Flow_Rates(Control, b_x, b_y, b_z, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: b_x, b_y, b_z
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: b_x, b_y, b_z
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
   real :: val(3)

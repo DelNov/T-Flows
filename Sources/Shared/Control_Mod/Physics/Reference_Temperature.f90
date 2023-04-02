@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Reference_Temperature(t_ref, verbose)
+  subroutine Reference_Temperature(Control, t_ref, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: t_ref
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: t_ref
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

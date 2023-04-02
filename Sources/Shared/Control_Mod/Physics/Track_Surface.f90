@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Track_Surface(track_surf, verbose)
+  subroutine Track_Surface(Control, track_surf, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: track_surf
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

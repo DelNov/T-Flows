@@ -90,7 +90,7 @@
         c2 = Grid % faces_c(2,s)
 
         ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coefficient(c1, c2)
+        z_o = Turb % Roughness_Coeff(c1, c2)
 
         ! Kinematic viscosities
         kin_vis = Flow % viscosity(c1) / Flow % density(c1)

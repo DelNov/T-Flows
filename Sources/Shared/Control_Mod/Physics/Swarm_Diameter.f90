@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Swarm_Diameter(s_dia, verbose)
+  subroutine Swarm_Diameter(Control, s_dia, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: s_dia
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: s_dia
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

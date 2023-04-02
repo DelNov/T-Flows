@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Roughness_Coefficient(val, verbose)
+  subroutine Roughness_Coefficient(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val(:)
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: val(:)
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: con
 !==============================================================================!

@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Thermal_Conductivity(val, verbose)
+  subroutine Thermal_Conductivity(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Real_Item('THERMAL_CONDUCTIVITY', 1.0, val, verbose)

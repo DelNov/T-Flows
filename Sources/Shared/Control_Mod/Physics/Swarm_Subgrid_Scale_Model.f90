@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Swarm_Subgrid_Scale_Model(val, verbose)
+  subroutine Swarm_Subgrid_Scale_Model(Control, val, verbose)
 !------------------------------------------------------------------------------!
 !   Reading swarm SGS model from the control file.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical,       optional    :: verbose
 !==============================================================================!

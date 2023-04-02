@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Scalars_Diffusivity(val, verbose)
+  subroutine Scalars_Diffusivity(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Real_Item('SCALARS_DIFFUSIVITY', 1.0e-6, val, verbose)

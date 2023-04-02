@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Potential_Initialization(pot_init, verbose)
+  subroutine Potential_Initialization(Control, pot_init, verbose)
 !------------------------------------------------------------------------------!
 !   Reading potential initialization from the control file.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: pot_init
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

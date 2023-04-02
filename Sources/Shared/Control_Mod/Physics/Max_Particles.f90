@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Particles(val, verbose)
+  subroutine Max_Particles(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   integer, intent(out) :: val
   logical, optional    :: verbose
 !==============================================================================!
