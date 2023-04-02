@@ -147,7 +147,7 @@
       r_p(i)   = r_p(i)   / n_count(i)
     end if
   end do
-  call Comm_Mod_Wait
+  call Global % Wait
 
   !-----------------------------------!
   !   Write from one processor only   !

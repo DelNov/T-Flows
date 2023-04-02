@@ -201,7 +201,7 @@
     counter2 =  counter2 + n_count2(pl)
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     ! Background Flow

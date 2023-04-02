@@ -91,7 +91,7 @@
   call Work % Disconnect_Real_Node(d_probe,z_probe,u_mean_n,uu_res_n,vv_res_n)
   call Work % Disconnect_Int_Node (node_ind)
 
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

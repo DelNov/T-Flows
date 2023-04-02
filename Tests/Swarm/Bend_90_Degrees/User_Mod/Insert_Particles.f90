@@ -80,7 +80,7 @@
     else
       if(First_Proc()) then
         print *, '# @User_Mod_Insert_Particles: too many particles'
-        call Comm_Mod_End
+        call Global % End_Parallel
         stop
       end if
     end if

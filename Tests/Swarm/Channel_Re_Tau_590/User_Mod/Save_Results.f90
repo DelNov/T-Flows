@@ -39,8 +39,8 @@
   call Flow % Alias_Energy  (t)
 
   ! Take constant physical properties
-  call Control_Mod_Mass_Density     (dens_const)
-  call Control_Mod_Dynamic_Viscosity(visc_const)
+  call Control % Mass_Density     (dens_const)
+  call Control % Dynamic_Viscosity(visc_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
@@ -170,7 +170,7 @@
     call Global % Sum_Real(vv_p(pl))
     call Global % Sum_Real(ww_p(pl))
     call Global % Sum_Real(uw_p(pl))
- 
+
     call Global % Sum_Real(uw_mod_p(pl))
     call Global % Sum_Real(kin_p   (pl))
     call Global % Sum_Real(eps_p   (pl))
@@ -181,7 +181,7 @@
     call Global % Sum_Real(ww_mod_p(pl))
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then

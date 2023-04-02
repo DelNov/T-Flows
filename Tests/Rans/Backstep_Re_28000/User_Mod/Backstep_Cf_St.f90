@@ -36,10 +36,10 @@
   t    => Flow % t
 
   ! Get constant physical properties
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !

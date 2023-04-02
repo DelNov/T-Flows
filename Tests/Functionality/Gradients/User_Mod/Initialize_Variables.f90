@@ -339,7 +339,7 @@
   call Work % Disconnect_Real_Cell(phi_x, phi_y, phi_z, phi_c)
   call Work % Disconnect_Int_Cell (c_computed, c_visited)
 
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

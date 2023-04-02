@@ -51,10 +51,10 @@
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
 
   ! Read constant physical properties from control file
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')

@@ -54,7 +54,7 @@
 
   call Work % Disconnect_Real_Cell(var)
 
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

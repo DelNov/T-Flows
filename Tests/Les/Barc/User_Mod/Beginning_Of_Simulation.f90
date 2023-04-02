@@ -35,7 +35,7 @@
                              tensor_comp = 6,               &
                              tensor_name = 'Cell Inertia')
 
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

@@ -97,7 +97,7 @@
     call Global % Sum_Real(u_p(i))
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n-1
     if(n_count(i) .ne. 0) then
