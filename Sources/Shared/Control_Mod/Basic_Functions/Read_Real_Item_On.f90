@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Real_Item_On(keyword, def, val, verbose)
+  subroutine Read_Real_Item_On(Control, keyword, def, val, verbose)
 !------------------------------------------------------------------------------!
 !   Working horse function to read real values (argument "val") behind a       !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
@@ -7,12 +7,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  real, intent(in)  :: def      ! default value
-  real, intent(out) :: val      ! spefified value, if found
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(len=*)    :: keyword
+  real,   intent(in)  :: def      ! default value
+  real,   intent(out) :: val      ! spefified value, if found
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   ! Set default value
@@ -28,10 +31,6 @@
   if(Line % tokens(1) .eq. trim(keyword)) then
     read(Line % tokens(2), *) val
     return
-
-  ! Keyword not found, try to see if there is similar, maybe it was a typo
-  else
-    call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
   end if
 
   !--------------------------------------------!
@@ -39,8 +38,8 @@
   !--------------------------------------------!
 1 if(present(verbose)) then
      if(verbose .and. First_Proc()) then
-      print '(3a,1pe9.3)', ' # NOTE! Could not find the keyword: ',  &
-                            trim(keyword), '. Using the default: ', def
+      print '(3a,1pe10.3)', ' # NOTE! Could not find the keyword: ',  &
+                             trim(keyword), '. Using the default: ', def
     end if
   end if
 

@@ -9,7 +9,7 @@
   logical,       optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('BUOYANCY', 'none', val, verbose)
+  call Control % Read_Char_Item('BUOYANCY', 'none', val, verbose)
 
   call String % To_Upper_Case(val)
 

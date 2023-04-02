@@ -11,6 +11,6 @@
 
   def = 0.0
 
-  call Control_Mod_Read_Real_Item('REFERENCE_DENSITY', def, d_ref, verbose)
+  call Control % Read_Real_Item('REFERENCE_DENSITY', def, d_ref, verbose)
 
   end subroutine

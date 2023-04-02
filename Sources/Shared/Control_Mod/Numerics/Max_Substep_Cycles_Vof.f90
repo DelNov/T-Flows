@@ -7,7 +7,7 @@
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MAX_SUBSTEP_CYCLES_VOF',  &
-                                   100, val, verbose)
+  call Control % Read_Int_Item('MAX_SUBSTEP_CYCLES_VOF',  &
+                                100, val, verbose)
 
   end subroutine

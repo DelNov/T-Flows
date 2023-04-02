@@ -12,8 +12,7 @@
 
   def = 0.0
 
-  call Control_Mod_Read_Real_Array('MASS_FLOW_RATES', 3, def,  &
-                                    val, verbose)
+  call Control % Read_Real_Vector('MASS_FLOW_RATES', 3, def, val, verbose)
 
   b_x = val(1)
   b_y = val(2)

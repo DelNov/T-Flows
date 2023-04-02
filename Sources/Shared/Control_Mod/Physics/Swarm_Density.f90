@@ -11,6 +11,6 @@
 
   def = 1000.0
 
-  call Control_Mod_Read_Real_Item('SWARM_DENSITY', def, s_den, verbose)
+  call Control % Read_Real_Item('SWARM_DENSITY', def, s_den, verbose)
 
   end subroutine

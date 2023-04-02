@@ -7,7 +7,7 @@
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_COMPUTATION',  &
-                                 1200, val, verbose)
+  call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_COMPUTATION',  &
+                                1200, val, verbose)
 
   end subroutine

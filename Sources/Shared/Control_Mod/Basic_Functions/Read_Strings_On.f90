@@ -1,17 +1,20 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Strings_On(keyword, values, n, verbose)
+  subroutine Read_Strings_On(Control, keyword, values, n, verbose)
 !------------------------------------------------------------------------------!
 !   Used to read variable names in bnd. and initial condition specificaton     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  character(SL)     :: values(MSI)   ! spefified value, if found
-  integer           :: n             ! number of items
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(len=*)    :: keyword
+  character(SL)       :: values(MSI)   ! spefified value, if found
+  integer             :: n             ! number of items
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
   logical :: reached_end
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   ! Set default values
@@ -30,12 +33,7 @@
       read(Line % tokens(i), *) values(i-1)
     end do
     n = Line % n_tokens - 1
-    return 
-
-  ! Keyword not found, try to see if there is similar, maybe it was a typo
-  ! (Tokens 2 and on hold variable names, they are too short to be checked)
-  else
-    call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
+    return
   end if
 
   !--------------------------------------------!

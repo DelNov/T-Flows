@@ -72,18 +72,18 @@
         !-----------------------------------------------------------------!
         !   Try to find specified interface condition between d1 and d2   !
         !-----------------------------------------------------------------!
-        call Control_Mod_Position_At_Three_Keys('INTERFACE_CONDITION',    &
-                                                trim(problem_name(d1)),   &
-                                                trim(problem_name(d2)),   &
-                                                found,                    &
-                                                verbose=.false.)
+        call Control % Position_At_Three_Keys('INTERFACE_CONDITION',    &
+                                              trim(problem_name(d1)),   &
+                                              trim(problem_name(d2)),   &
+                                              found,                    &
+                                              verbose=.false.)
 
         !---------------------------------------------------!
         !   Found specification between domains d1 and d2   !
         !---------------------------------------------------!
         if(found) then
-          call Control_Mod_Read_Strings_On('BOUNDARY_CONDITIONS',  &
-                                           keys, nks, .false.)
+          call Control % Read_Strings_On('BOUNDARY_CONDITIONS',  &
+                                         keys, nks, .false.)
           do k = 1, nks
             call String % To_Upper_Case(keys(k))
           end do

@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_SIMPLE_ALGORITHM',  &
-                                   1.0e-4, val, verbose)
+  call Control % Read_Real_Item('TOLERANCE_FOR_SIMPLE_ALGORITHM',  &
+                                 1.0e-4, val, verbose)
 
   end subroutine

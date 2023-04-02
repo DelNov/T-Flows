@@ -12,8 +12,8 @@
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('EXTRAPOLATE_TEMPERATURE_EXP',  &
-                                  'no', val, verbose)
+  call Control % Read_Char_Item('EXTRAPOLATE_TEMPERATURE_EXP',  &
+                                'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

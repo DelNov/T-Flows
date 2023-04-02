@@ -7,7 +7,6 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('PROBLEM_NAME', 'unknown',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('PROBLEM_NAME', 'unknown', val, verbose)
 
   end subroutine

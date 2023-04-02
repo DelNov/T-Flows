@@ -9,7 +9,7 @@
   logical,       optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SWARM_SUBGRID_SCALE_MODEL', & 
-                                  'none', val, verbose)
+  call Control % Read_Char_Item('SWARM_SUBGRID_SCALE_MODEL', &
+                                'none', val, verbose)
 
   end subroutine

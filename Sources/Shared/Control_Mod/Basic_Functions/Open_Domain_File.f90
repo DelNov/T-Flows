@@ -1,12 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Open_Domain_File(dom, file_name)
+  subroutine Open_Domain_File(Control, dom, file_name)
 !------------------------------------------------------------------------------!
 !   Opens control file for a domain.                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer          :: dom
-  character(len=*) :: file_name
+  class(Control_Type) :: Control
+  integer             :: dom
+  character(len=*)    :: file_name
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   call File % Open_For_Reading_Ascii(file_name,                   &

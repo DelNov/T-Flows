@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Real_Array(keyword, n, def, val, verbose)
+  subroutine Read_Real_Vector(Control, keyword, n, def, val, verbose)
 !------------------------------------------------------------------------------!
 !   Working horse function to read integer value (argument "val") behind a     !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
@@ -7,14 +7,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  integer           :: n        ! size of array (typically small)
-  real              :: def(n)   ! default value
-  real              :: val(n)   ! spefified value, if found
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(len=*)    :: keyword
+  integer             :: n        ! size of array (typically small)
+  real                :: def(n)   ! default value
+  real                :: val(n)   ! spefified value, if found
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
   integer :: i
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   rewind(control_file_unit)
@@ -35,10 +38,6 @@
         read(Line % tokens(i+1), *) val(i)
       end do
       return
-
-    ! Keyword not found, try to see if there is similar, maybe it was a typo
-    else
-      call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
     end if
 
   end do
@@ -48,8 +47,8 @@
   !--------------------------------------------!
 1 if(present(verbose)) then
     if(verbose .and. First_Proc()) then
-      print '(3a,1pe9.3)', ' # NOTE! Could not find the keyword: ',  &
-                            trim(keyword), '. Using the default: ', def(1)
+      print '(3a,1pe10.3)', ' # NOTE! Could not find the keyword: ',  &
+                             trim(keyword), '. Using the default: ', def(1)
     end if
   end if
 

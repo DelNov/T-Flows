@@ -1,11 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Open_Root_File(file_name)
+  subroutine Open_Root_File(Control, file_name)
 !------------------------------------------------------------------------------!
 !   It rarely gets simpler than this - just opens a file for reading.          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*) :: file_name
+  class(Control_Type) :: Control
+  character(len=*)    :: file_name
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   call File % Open_For_Reading_Ascii(file_name, root_control_file_unit,  &

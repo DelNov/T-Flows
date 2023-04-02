@@ -13,8 +13,8 @@
 
   data def / 0.0, 0.0, 0.0 /
 
-  call Control_Mod_Read_Real_Array('POINT_FOR_MONITORING_PLANES', 3, def,  &
-                                    val, verbose)
+  call Control % Read_Real_Vector('POINT_FOR_MONITORING_PLANES', 3, def,  &
+                                   val, verbose)
   b_xp = val(1)
   b_yp = val(2)
   b_zp = val(3)

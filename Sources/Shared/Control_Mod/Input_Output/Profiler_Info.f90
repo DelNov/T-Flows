@@ -7,8 +7,7 @@
   logical, optional, intent(in)  :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('PROFILER_INFO', 'percents',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('PROFILER_INFO', 'percents', val, verbose)
   call String % To_Upper_Case(val)
 
   end subroutine

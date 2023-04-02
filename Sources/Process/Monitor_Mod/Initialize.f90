@@ -24,8 +24,8 @@
   Monitor % pnt_grid => Grid
 
   ! Read number of Monitoring points from control file
-  call Control_Mod_Read_Int_Item('NUMBER_OF_MONITORING_POINTS', 0, &
-                                  Monitor % n_points, .true.)
+  call Control % Read_Int_Item('NUMBER_OF_MONITORING_POINTS', 0, &
+                                Monitor % n_points, .true.)
 
   if(Monitor % n_points .eq. 0) return
 
@@ -46,7 +46,7 @@
     write(point_name, '(a,i3.3)') 'MONITORING_POINT_', n
 
     def = 0.  ! don't have a better idea what to set
-    call Control_Mod_Read_Real_Array(point_name, 3, def, xyz, .true.)
+    call Control % Read_Real_Vector(point_name, 3, def, xyz, .true.)
 
     Monitor % x(n) = xyz(1)
     Monitor % y(n) = xyz(2)

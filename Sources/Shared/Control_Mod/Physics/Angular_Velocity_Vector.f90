@@ -12,8 +12,8 @@
 
   data def / 0.0, 0.0, 0.0 /
 
-  call Control_Mod_Read_Real_Array('ANGULAR_VELOCITY_VECTOR', 3, def,  &
-                                    val, verbose)
+  call Control % Read_Real_Vector('ANGULAR_VELOCITY_VECTOR', 3, def,  &
+                                  val, verbose)
 
   v_x = val(1)
   v_y = val(2)

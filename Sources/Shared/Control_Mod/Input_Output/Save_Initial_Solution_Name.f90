@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SAVE_INITIAL_SOLUTION_NAME', 'skip',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('SAVE_INITIAL_SOLUTION_NAME', 'skip',  &
+                                 val, verbose)
 
   end subroutine

@@ -7,8 +7,7 @@
   logical, optional          :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_TURBULENCE', 'cg',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('SOLVER_FOR_TURBULENCE', 'cg', val, verbose)
   call String % To_Lower_Case(val)
 
   if( val .ne. 'bicg' .and. val .ne. 'cg') then

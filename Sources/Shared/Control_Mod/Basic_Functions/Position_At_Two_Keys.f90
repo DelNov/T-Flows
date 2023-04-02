@@ -1,18 +1,23 @@
 !==============================================================================!
-  subroutine Control_Mod_Position_At_Two_Keys(keyword_1, keyword_2,  &
-                                              found, verbose)
+  subroutine Position_At_Two_Keys(Control,    &
+                                  keyword_1,  &
+                                  keyword_2,  &
+                                  found, verbose)
 !------------------------------------------------------------------------------!
 !   Position yourself within the file at the line specified with two keys.     !
 !   It is intended to be used to find the boundary condition specifications.   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword_1
-  character(len=*)  :: keyword_2
-  logical           :: found
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(len=*)    :: keyword_1
+  character(len=*)    :: keyword_2
+  logical             :: found
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   rewind(control_file_unit)
@@ -33,15 +38,8 @@
        Line % tokens(2) .eq. trim(keyword_2)) then
       found = .true.
       return
-
-    ! Keywords not found, try to see if there is similar, maybe there was a typo
-    else
-      call Control_Mod_Similar_Warning(trim(keyword_1),         &
-                                       trim(Line % tokens(1)))
-      call Control_Mod_Similar_Warning(trim(keyword_2),         &
-                                       trim(Line % tokens(2)),  &
-                                       key_type='boundary condition')
     end if
+
   end do
 
   !--------------------------------------------!

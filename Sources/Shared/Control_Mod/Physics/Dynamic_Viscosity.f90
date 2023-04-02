@@ -7,6 +7,6 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('DYNAMIC_VISCOSITY', 0.01, val, verbose)
+  call Control % Read_Real_Item('DYNAMIC_VISCOSITY', 0.01, val, verbose)
 
   end subroutine

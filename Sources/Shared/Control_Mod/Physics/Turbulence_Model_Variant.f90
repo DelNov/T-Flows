@@ -9,8 +9,8 @@
   logical,       optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('TURBULENCE_MODEL_VARIANT', 'stabilized',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('TURBULENCE_MODEL_VARIANT', 'stabilized',  &
+                                 val, verbose)
   call String % To_Upper_Case(val)
 
   end subroutine

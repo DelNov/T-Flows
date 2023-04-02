@@ -32,7 +32,7 @@
      Backup % Time_To_Save_Backup(curr_dt) .or.  &
      Info % Time_To_Exit()) then
     do d = 1, n_dom
-      call Control_Mod_Switch_To_Domain(d)
+      call Control % Switch_To_Domain(d)
       call Backup % Save(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                          time, curr_dt, dom=d)
     end do
@@ -46,7 +46,7 @@
      Info % Time_To_Exit()) then
 
     do d = 1, n_dom
-      call Control_Mod_Switch_To_Domain(d)
+      call Control % Switch_To_Domain(d)
       call Results % Save_Vtu_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                                       curr_dt, plot_inside=.true., domain=d)
       call Results % Save_Vtu_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
@@ -80,7 +80,7 @@
      Info % Time_To_Exit()) then
 
     do d = 1, n_dom
-      call Control_Mod_Switch_To_Domain(d)
+      call Control % Switch_To_Domain(d)
       if(Flow(d) % with_particles) then
         call Results % Save_Vtu_Swarm(Swarm(d), curr_dt, domain=d)
 

@@ -12,8 +12,8 @@
 
   data def / 0.0, 0.0, 0.0 /
 
-  call Control_Mod_Read_Real_Array('PRESSURE_DROPS', 3, def,  &
-                                    val, verbose)
+  call Control % Read_Real_Vector('PRESSURE_DROPS', 3, def, val, verbose)
+
   p_drop_x = val(1)
   p_drop_y = val(2)
   p_drop_z = val(3)

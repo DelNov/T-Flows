@@ -7,7 +7,7 @@
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MIN_SIMPLE_ITERATIONS', 3,  &
-                                  val, verbose)
+  call Control % Read_Int_Item('MIN_SIMPLE_ITERATIONS', 3,  &
+                                val, verbose)
 
   end subroutine

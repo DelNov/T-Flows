@@ -78,9 +78,9 @@
   if (First_Proc()) print '(a,a)', ' # Grid name: ', trim(Grid % name)
 
   ! Found the line where boundary condition definition is defined
-  call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
-                                       found,               &
-                                       .true.)
+  call Control % Position_At_One_Key('INITIAL_CONDITION', &
+                                     found,               &
+                                     .true.)
 
   !-----------------------------------------------!
   !                                               !
@@ -89,7 +89,7 @@
   !-----------------------------------------------!
   if (found) then
 
-    call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
+    call Control % Read_Strings_On('VARIABLES', keys, nks, .true.)
 
     ! Input is valid, turn keys to upper case
     do i = 1, nks
@@ -97,7 +97,7 @@
     end do
 
     ! Check if there is file specified
-    call Control_Mod_Read_Strings_On('FILE', keys_file, nvs, .true.)
+    call Control % Read_Strings_On('FILE', keys_file, nvs, .true.)
 
     !------------------------------------------------!
     !                                                !
@@ -257,18 +257,18 @@
     else
 
       ! Go back to key and read again
-      call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
-                                           found,               &
-                                           .true.)
+      call Control % Position_At_One_Key('INITIAL_CONDITION', &
+                                         found,               &
+                                         .true.)
 
-      call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
+      call Control % Read_Strings_On('VARIABLES', keys, nks, .true.)
 
       ! Input is valid, turn keys to upper case
       do i = 1, nks
         call String % To_Upper_Case(keys(i))
       end do
 
-      call Control_Mod_Read_Strings_On('VALUES', vals(1), nvs, .true.)
+      call Control % Read_Strings_On('VALUES', vals(1), nvs, .true.)
 
       ! Check validity of the input
       if(nks .eq. 0 .or. nvs .eq. 0 .and. First_Proc()) then

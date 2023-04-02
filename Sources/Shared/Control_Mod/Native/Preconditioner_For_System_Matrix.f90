@@ -18,10 +18,10 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('PRECONDITIONER_FOR_SYSTEM_MATRIX',  &
-                                  'incomplete_cholesky',               &
-                                   val,                                &
-                                   verbose)
+  call Control % Read_Char_Item('PRECONDITIONER_FOR_SYSTEM_MATRIX',  &
+                                'incomplete_cholesky',               &
+                                 val,                                &
+                                 verbose)
   call String % To_Lower_Case(val)
 
   ! Check validity of the input

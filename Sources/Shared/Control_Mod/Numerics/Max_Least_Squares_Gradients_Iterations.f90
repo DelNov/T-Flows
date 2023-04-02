@@ -7,7 +7,7 @@
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS', 4,  &
-                                  val, verbose)
+  call Control % Read_Int_Item('MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS', 4,  &
+                                val, verbose)
 
   end subroutine

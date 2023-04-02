@@ -61,12 +61,12 @@
   !-----------------------!
   !   Open control file   !
   !-----------------------!
-  call Control_Mod_Open_Root_File(root_control)
+  call Control % Open_Root_File(root_control)
 
   call Control_Mod_Number_Of_Domains(n_dom)
   if(n_dom > 1) then
     do d = 1, n_dom
-      call Control_Mod_Open_Domain_File(d, dom_control(d))
+      call Control % Open_Domain_File(d, dom_control(d))
     end do
   end if
 
@@ -79,7 +79,7 @@
   !   Read all grids   !
   !--------------------!
   do d = 1, n_dom
-    call Control_Mod_Switch_To_Domain(d)  ! take domain's d control file
+    call Control % Switch_To_Domain(d)  ! take domain's d control file
     call Control_Mod_Problem_Name(problem_name(d))
 
     ! Load the finite volume Grid
@@ -98,7 +98,7 @@
   end do
 
   ! Out of domain loop - go back to root
-  call Control_Mod_Switch_To_Root()
+  call Control % Switch_To_Root()
 
   ! Allocate memory for working arrays (RSM models are memory hungry)
   call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=8,  n_r_node=8,  &
@@ -117,7 +117,7 @@
 
   ! Read physical models for each domain from control file
   do d = 1, n_dom
-    call Control_Mod_Switch_To_Domain(d)  ! take proper control file
+    call Control % Switch_To_Domain(d)  ! take proper control file
     call Read_Control % Physical_Models(Flow(d), Turb(d), Vof(d), Swarm(d))
   end do
 
@@ -125,16 +125,16 @@
   !   Allocate memory for all variables (over all domains)   !
   !----------------------------------------------------------!
   do d = 1, n_dom
-    call Control_Mod_Switch_To_Domain(d)  ! take proper control file
+    call Control % Switch_To_Domain(d)  ! take proper control file
     call Flow(d)  % Allocate_Field(Grid(d))
     call Turb(d)  % Allocate_Turb(Flow(d))
     call Vof(d)   % Allocate_Vof(Flow(d))
     call Swarm(d) % Allocate_Swarm(Flow(d), Turb(d), Vof(d))
 
     ! Read time step from root
-    call Control_Mod_Switch_To_Root()
+    call Control % Switch_To_Root()
     call Control_Mod_Time_Step(Flow(d) % dt, verbose=.true.)
-    call Control_Mod_Switch_To_Domain(d)  ! go back to local domain's control
+    call Control % Switch_To_Domain(d)  ! go back to local domain's control
 
     ! Read numerical models from control file (after the memory is allocated)
     call Read_Control % Numerical_Schemes(Flow(d), Turb(d), Vof(d))
@@ -155,12 +155,12 @@
   end do
 
   ! Create interfaces
-  call Control_Mod_Switch_To_Root()
+  call Control % Switch_To_Root()
   call Interface_Mod_Create(inter, Grid, n_dom)
 
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
   do d = 1, n_dom
-    call Control_Mod_Switch_To_Domain(d)  ! take proper control file
+    call Control % Switch_To_Domain(d)  ! take proper control file
     call Backup % Load(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                        time, first_dt, read_backup(d))
 
@@ -204,7 +204,7 @@
   !               !
   !---------------!
 
-  call Control_Mod_Switch_To_Root()
+  call Control % Switch_To_Root()
   call Control_Mod_Backup_Save_Interval  (backup % interval, verbose=.true.)
   call Control_Mod_Results_Save_Interval (Results % interval, verbose=.true.)
   call Control_Mod_Save_Initial_Condition(Results % initial,  verbose=.true.)
@@ -224,7 +224,7 @@
   !-------------------------------------------------------------!
   if(first_dt .eq. 0) then
     do d = 1, n_dom
-      call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
+      call Control % Switch_To_Domain(d)  ! not sure if this call is needed
       call Control_Mod_Potential_Initialization(pot_init, .true.)
       if(pot_init) call Flow(d) % Potential_Initialization(Sol(d))
     end do
@@ -253,7 +253,7 @@
     !------------------------------------!
     do d = 1, n_dom
 
-      call Control_Mod_Switch_To_Domain(d)  ! not sure if this call is needed
+      call Control % Switch_To_Domain(d)  ! not sure if this call is needed
 
       ! Update turbulent planes
       do tp = 1, turb_planes(d) % n_planes
@@ -299,7 +299,7 @@
     !--------------------------!
     !   Inner-iteration loop   !
     !--------------------------!
-    call Control_Mod_Switch_To_Root()
+    call Control % Switch_To_Root()
     call Control_Mod_Max_Simple_Iterations(max_ini)
     call Control_Mod_Min_Simple_Iterations(min_ini)
     call Control_Mod_Tolerance_For_Simple_Algorithm(simple_tol)
@@ -311,7 +311,7 @@
 
       do d = 1, n_dom
 
-        call Control_Mod_Switch_To_Domain(d)
+        call Control % Switch_To_Domain(d)
 
         ! Beginning of iteration
         call User_Mod_Beginning_Of_Iteration(Flow(d), Turb(d), Vof(d),  &
@@ -389,7 +389,7 @@
 
     do d = 1, n_dom
 
-      call Control_Mod_Switch_To_Domain(d)
+      call Control % Switch_To_Domain(d)
 
       ! Write the values in monitoring points
       call Monitor(d) % Write_Vars(Flow(d), curr_dt)
@@ -428,7 +428,7 @@
     ! Last time step reached; call user function for end of simulation
     if(curr_dt .eq. last_dt) then
       do d = 1, n_dom
-        call Control_Mod_Switch_To_Domain(d)
+        call Control % Switch_To_Domain(d)
         call User_Mod_End_Of_Simulation(Flow(d), Turb(d), Vof(d), Swarm(d),  &
                                         curr_dt, time)
       end do

@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_ENERGY', 0.5,  &
-                                   val, verbose)
+  call Control % Read_Real_Item('SIMPLE_UNDERRELAXATION_FOR_ENERGY', 0.5,  &
+                                 val, verbose)
 
   end subroutine

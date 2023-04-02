@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_SCALARS_SOLVER',  &
-                                   1.0e-6, val, verbose)
+  call Control % Read_Real_Item('TOLERANCE_FOR_SCALARS_SOLVER',  &
+                                 1.0e-6, val, verbose)
 
   end subroutine

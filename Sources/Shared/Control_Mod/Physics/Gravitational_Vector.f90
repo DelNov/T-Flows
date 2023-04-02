@@ -12,8 +12,7 @@
 
   data def / 0.0, 0.0, 0.0 /
 
-  call Control_Mod_Read_Real_Array('GRAVITATIONAL_VECTOR', 3, def,  &
-                                    val, verbose)
+  call Control % Read_Real_Vector('GRAVITATIONAL_VECTOR', 3, def, val, verbose)
 
   grav_x = val(1)
   grav_y = val(2)

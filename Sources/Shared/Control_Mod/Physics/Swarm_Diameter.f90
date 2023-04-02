@@ -11,6 +11,6 @@
 
   def = 2.5e-5
 
-  call Control_Mod_Read_Real_Item('SWARM_DIAMETER', def, s_dia, verbose)
+  call Control % Read_Real_Item('SWARM_DIAMETER', def, s_dia, verbose)
 
   end subroutine

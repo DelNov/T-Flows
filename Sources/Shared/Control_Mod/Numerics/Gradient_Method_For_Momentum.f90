@@ -9,9 +9,9 @@
   logical, optional          :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('GRADIENT_METHOD_FOR_MOMENTUM',  &
-                                  'least_squares',                 &
-                                   scheme_name, verbose)
+  call Control % Read_Char_Item('GRADIENT_METHOD_FOR_MOMENTUM',  &
+                                'least_squares',                 &
+                                 scheme_name, verbose)
   call String % To_Upper_Case(scheme_name)
 
   end subroutine

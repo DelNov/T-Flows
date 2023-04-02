@@ -100,7 +100,7 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(DEBUG), yes)
     OPT_F_COMP += -O0 -g -traceback
   else
-    OPT_F_COMP += -O2
+    OPT_F_COMP += -O3
   endif
   ifeq ($(PROF), yes)
     OPT_F_COMP += -g -O2 -shared-intel -debug inline-debug-info  \

@@ -13,6 +13,6 @@
 
   def = 1.0
 
-  call Control_Mod_Read_Real_Array('PHASE_CAPACITIES', 2, def, val, verbose)
+  call Control % Read_Real_Vector('PHASE_CAPACITIES', 2, def, val, verbose)
 
   end subroutine

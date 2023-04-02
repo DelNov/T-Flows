@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Position_At_Three_Keys(keyword_1,  &
-                                                keyword_2,  &
-                                                keyword_3,  &
-                                                found, verbose)
+  subroutine Position_At_Three_Keys(Control,    &
+                                    keyword_1,  &
+                                    keyword_2,  &
+                                    keyword_3,  &
+                                    found, verbose)
 !------------------------------------------------------------------------------!
 !   Position yourself within the file at the line specified with three keys.   !
 !   It is intended to be used to find the interface condition specifications.  !
@@ -11,13 +12,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword_1
-  character(len=*)  :: keyword_2
-  character(len=*)  :: keyword_3
-  logical           :: found
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(len=*)    :: keyword_1
+  character(len=*)    :: keyword_2
+  character(len=*)    :: keyword_3
+  logical             :: found
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   rewind(control_file_unit)
@@ -37,8 +41,8 @@
        Line % tokens(3) .eq. trim(keyword_3)) then
       found = .true.
       return
-
     end if
+
   end do
 
   !--------------------------------------------!

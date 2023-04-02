@@ -7,7 +7,7 @@
   logical, optional :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('MAX_COURANT_VOF',  &
-                                   0.25, val, verbose)
+  call Control % Read_Real_Item('MAX_COURANT_VOF',  &
+                                 0.25, val, verbose)
 
   end subroutine

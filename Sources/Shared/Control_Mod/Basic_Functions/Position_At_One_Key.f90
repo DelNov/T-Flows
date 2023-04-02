@@ -1,16 +1,19 @@
 !==============================================================================!
-  subroutine Control_Mod_Position_At_One_Key(keyword, found, verbose)
+  subroutine Position_At_One_Key(Control, keyword, found, verbose)
 !------------------------------------------------------------------------------!
 !   Position yourself within the file at the line specified with one key.      !
 !   It is intended to be used to find the initial condition specifications.    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  logical           :: found
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  character(len=*)    :: keyword
+  logical             :: found
+  logical, optional   :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   rewind(control_file_unit)
@@ -27,11 +30,6 @@
     if(Line % tokens(1) .eq. trim(keyword)) then
       found = .true.
       return
-
-    ! Keyword not found, try to see if there is similar, maybe it was a typo
-    else
-      call Control_Mod_Similar_Warning(trim(keyword),           &
-                                       trim(Line % tokens(1)))
     end if
 
   end do

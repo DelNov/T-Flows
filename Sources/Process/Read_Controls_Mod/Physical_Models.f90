@@ -30,7 +30,7 @@
   !   Number of time steps   !
   !                          !
   !--------------------------!
-  call Control_Mod_Read_Int_Item('NUMBER_OF_TIME_STEPS', 0, n_times, .false.)
+  call Control % Read_Int_Item('NUMBER_OF_TIME_STEPS', 0, n_times, .false.)
 
   !-------------------------------------------!
   !                                           !
@@ -127,8 +127,8 @@
   call Control_Mod_Rough_Walls(Turb % rough_walls, .true.)
 
   ! Does the user want to gather statistics?
-  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
-                                 HUGE_INT, n_stat, .false.)
+  call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
+                               HUGE_INT, n_stat, .false.)
 
   !-------------------------------------------------------------------!
   !   For scale-resolving simulations, engage turbulence statistics   !
@@ -272,8 +272,8 @@
     call Control_Mod_Number_Of_Swarm_Sub_Steps       (Swarm % n_sub_steps, &
                                                       verbose = .true.)
 
-    call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
-                                   HUGE_INT, n_stat_p, .false.)
+    call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
+                                 HUGE_INT, n_stat_p, .false.)
 
     ! SGS models for particle
     call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)

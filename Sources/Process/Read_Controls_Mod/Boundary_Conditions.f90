@@ -67,22 +67,22 @@
   c_types            = 0
 
   do bc = Boundary_Regions()
-    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',      &
-                                          Grid % region % name(bc),  &
-                                          found,                     &
-                                          .false.)
+    call Control % Position_At_Two_Keys('BOUNDARY_CONDITION',      &
+                                        Grid % region % name(bc),  &
+                                        found,                     &
+                                        .false.)
     if(found) then
 1     continue
 
       ! Try to read next 'TYPE' in the control file
-      call Control_Mod_Read_Char_Item_On('TYPE', 'VOID', bc_type_name, .false.)
+      call Control % Read_Char_Item_On('TYPE', 'VOID', bc_type_name, .false.)
 
       ! Get out of the loop if you fail
       if(bc_type_name .eq. 'VOID') goto 2
 
       ! Skip following two lines
-      call Control_Mod_Read_Char_Item_On('VARIABLES', 'VOID', try_str, .false.)
-      call Control_Mod_Read_Char_Item_On('VALUES',    'VOID', try_str, .false.)
+      call Control % Read_Char_Item_On('VARIABLES', 'VOID', try_str, .false.)
+      call Control % Read_Char_Item_On('VALUES',    'VOID', try_str, .false.)
 
       types_per_reg(bc) = types_per_reg(bc) + 1
       c_types = c_types + 1
@@ -118,10 +118,10 @@
   do bc = Boundary_Regions()
 
     ! Position yourself well
-    call Control_Mod_Position_At_Two_Keys('BOUNDARY_CONDITION',      &
-                                          Grid % region % name(bc),  &
-                                          found,                     &
-                                          .false.)
+    call Control % Position_At_Two_Keys('BOUNDARY_CONDITION',      &
+                                        Grid % region % name(bc),  &
+                                        found,                     &
+                                        .false.)
     do l = 1, types_per_reg(bc)
 
       ! Update the counter
@@ -132,7 +132,7 @@
       !   Read first line which is common for all   !
       !                                             !
       !---------------------------------------------!
-      call Control_Mod_Read_Char_Item_On('TYPE', 'WALL', bc_type_name, .false.)
+      call Control % Read_Char_Item_On('TYPE', 'WALL', bc_type_name, .false.)
       call String % To_Upper_Case(bc_type_name)
 
       ! Copy boundary conditions which were given for the Grid
@@ -169,7 +169,7 @@
       !   Read second line which is common for all   !
       !                                              !
       !----------------------------------------------!
-      call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .false.)
+      call Control % Read_Strings_On('VARIABLES', keys, nks, .false.)
       do i = 1, nks
         call String % To_Upper_Case(keys(i))
       end do
@@ -180,7 +180,7 @@
       !                                                                 !
       !-----------------------------------------------------------------!
       if( .not. types_file(c_types) ) then
-        call Control_Mod_Read_Real_Array_On('VALUES', vals(1), nvs, .false.)
+        call Control % Read_Real_Vector_On('VALUES', vals(1), nvs, .false.)
 
         !--------------------------------------------------!
         !   Distribute boundary values to boundary cells   !
@@ -311,7 +311,7 @@
       !---------------------------------------------!
       else  !  types_file(c_types) == .true.
 
-        call Control_Mod_Read_Strings_On('FILE', name_prof, nvs, .false.)
+        call Control % Read_Strings_On('FILE', name_prof, nvs, .false.)
 
         call File % Open_For_Reading_Ascii(name_prof(1), fu)
         call File % Read_Line(fu)
@@ -758,15 +758,15 @@
   !-----------------------------------!
   turb_planes % n_planes = 0
   do bc = Boundary_Regions()  ! imagine there are as many eddies as bcs
-    call Control_Mod_Position_At_Two_Keys('SYNTHETIC_EDDIES',          &
-                                          Grid % region % name(bc),  &
-                                          found,                       &
-                                          .false.)
+    call Control % Position_At_Two_Keys('SYNTHETIC_EDDIES',        &
+                                        Grid % region % name(bc),  &
+                                        found,                     &
+                                        .false.)
     if(found) then
       turb_planes % n_planes = turb_planes % n_planes + 1
-      call Control_Mod_Read_Int_Item_On ('NUMBER_OF_EDDIES', 24, edd_n, .false.)
-      call Control_Mod_Read_Real_Item_On('MAX_EDDY_RADIUS',  .2, edd_r, .false.)
-      call Control_Mod_Read_Real_Item_On('EDDY_INTENSITY',   .1, edd_i, .false.)
+      call Control % Read_Int_Item_On ('NUMBER_OF_EDDIES', 24, edd_n, .false.)
+      call Control % Read_Real_Item_On('MAX_EDDY_RADIUS',  .2, edd_r, .false.)
+      call Control % Read_Real_Item_On('EDDY_INTENSITY',   .1, edd_i, .false.)
       call Eddies_Mod_Allocate(turb_planes % plane(turb_planes % n_planes),  &
                                edd_n,                                        &
                                edd_r,                                        &

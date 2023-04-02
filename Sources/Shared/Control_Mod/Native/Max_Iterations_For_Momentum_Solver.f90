@@ -7,7 +7,7 @@
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MAX_ITERATIONS_FOR_MOMENTUM_SOLVER',  &
-                                  5, val, verbose)
+  call Control % Read_Int_Item('MAX_ITERATIONS_FOR_MOMENTUM_SOLVER',  &
+                                5, val, verbose)
 
   end subroutine

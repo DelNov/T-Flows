@@ -11,7 +11,7 @@
 
   def = 1.0
 
-  call Control_Mod_Read_Real_Item('SWARM_COEFFICIENT_OF_RESTITUTION',  &
-                                   def, cor, verbose)
+  call Control % Read_Real_Item('SWARM_COEFFICIENT_OF_RESTITUTION',  &
+                                 def, cor, verbose)
 
   end subroutine

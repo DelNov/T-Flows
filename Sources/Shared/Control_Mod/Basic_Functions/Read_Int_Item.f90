@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Int_Item(keyword, def, val, verbose)
+  subroutine Read_Int_Item(Control, keyword, def, val, verbose)
 !------------------------------------------------------------------------------!
 !   Working horse function to read integer value (argument "val") behind a     !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
@@ -7,12 +7,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   character(len=*)     :: keyword
   integer, intent(in)  :: def      ! default value
   integer, intent(out) :: val      ! spefified value, if found
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Control)
 !==============================================================================!
 
   rewind(control_file_unit)
@@ -31,11 +34,8 @@
     if(Line % tokens(1) .eq. trim(keyword)) then
       read(Line % tokens(2), *) val
       return
-
-    ! Keyword not found, try to see if there is similar, maybe it was a typo
-    else
-      call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
     end if
+
   end do
 
   !--------------------------------------------!
