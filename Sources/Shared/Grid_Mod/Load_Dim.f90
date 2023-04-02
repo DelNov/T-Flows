@@ -9,8 +9,8 @@
   integer, intent(in) :: this_proc
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu, real_prec
-  character(SL) :: name_in
+  integer       :: c, n, s, fu, real_prec, version
+  character(SL) :: name_in, str1, str2
 !==============================================================================!
 
   call Profiler % Start('Load_Dim')
@@ -46,6 +46,22 @@
                        'convert or generate the meshes again and re-run.',     &
                        one_proc = .true.)
     end if
+  end if
+
+  !------------------------------!
+  !   Read version of the file   !
+  !------------------------------!
+  read(fu) version
+
+  if(version .ne. VERSION_DIM) then
+    write(str1, '(i0.0)')  version
+    write(str2, '(i0.0)')  VERSION_DIM
+    call Message % Error(72,                                                   &
+                 'You seem to be reading wrong version of the .dim file.  '//  &
+                 'The version you are reading is '//trim(str1)//' but the '//  &
+                 'code expects version '//trim(str2)//'. Re-generate or   '//  &
+                 'convert again the grids (and divide them if you run in  '//  &
+                 'parallel).', one_proc = .true.)
   end if
 
   !-------------------------!

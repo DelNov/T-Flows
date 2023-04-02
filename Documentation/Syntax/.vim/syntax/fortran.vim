@@ -418,6 +418,7 @@ if b:fortran_dialect == "f08"
 " Start with constants from Const_Mod:
   syn keyword fortranConstant      PROGRAM_NAME
   syn keyword fortranConstant      VL  SL  DL   MSI  DP  SP  IP  LP  RP
+  syn keyword fortranConstant      VERSION_CFN  VERSION_DIM  VERSION_BACKUP
   syn keyword fortranConstant      YOCTO  ZEPTO  ATTO  FEMTO  PICO  NANO  MICRO  MILI
   syn keyword fortranConstant      YOTTA  ZETTA  EXA   PETA   TERA  GIGA  MEGA   KILO
   syn keyword fortranConstant      HUGE  TINY  HUGE_INT  EULER  PI

@@ -44,6 +44,12 @@
   integer, parameter :: LP = IP          ! logical precision
   integer, parameter :: RP = sizeof(1.0) ! real number precision
 
+  ! Version of the .cfn and .dim files
+  ! (This number was set in April of 2023)
+  integer, parameter :: VERSION_CFN    = 202304
+  integer, parameter :: VERSION_DIM    = 202304
+  integer, parameter :: VERSION_BACKUP = 202304
+
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!
