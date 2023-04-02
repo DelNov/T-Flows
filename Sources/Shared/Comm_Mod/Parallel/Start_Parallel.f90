@@ -1,9 +1,11 @@
 !==============================================================================!
-  subroutine Comm_Mod_Start
+  subroutine Start_Parallel(Global)
 !------------------------------------------------------------------------------!
 !   Initializes parallel execution.                                            !
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Comm_Type) :: Global
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: error
   integer              :: n
@@ -40,7 +42,7 @@
     if(Global % this_processor < 2) then
       print *, '# Error - 64 bit integers are not supported!'
       print *, '# This error is critical, exiting!'
-      call Comm_Mod_End
+      call Global % End_Parallel
       stop
     end if
   end if

@@ -153,14 +153,12 @@
           call Global % Sum_Int(n2_tot)
 
           if(n1_tot .ne. n2_tot) then
-            if(First_Proc()) then
-              print *, '# Number of cells at the interface between ',  &
-                        trim(problem_name(d1)), ' and ',               &
-                        trim(problem_name(d2)), ' is not the same!'
-              print *, '# Only conformal mappings are supported.  Exiting!'
-            end if
-            call Comm_Mod_End
-            stop
+            call Message % Error(72,                                        &
+                       'Number of cells at the interface between '//        &
+                       trim(problem_name(d1))//' and '//                    &
+                       trim(problem_name(d2))//' is not the same! '//       &
+                       'Only conformal mappings are supported.  Exiting!',  &
+                       file=__FILE__, line=__LINE__, one_proc=.true.)
           else
             n_tot = n1_tot
             inter(d1, d2) % n_tot = n_tot

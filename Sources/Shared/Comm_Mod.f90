@@ -103,16 +103,19 @@
       procedure :: Sendrecv_Real_Arrays
 
       ! Global
+      procedure :: End_Parallel
       procedure :: Lor_Log
       procedure :: Lor_Log_Array
       procedure :: Max_Int
       procedure :: Max_Real
       procedure :: Min_Int
       procedure :: Min_Real
+      procedure :: Start_Parallel
       procedure :: Sum_Int
       procedure :: Sum_Int_Array
       procedure :: Sum_Real
       procedure :: Sum_Real_Array
+      procedure :: Wait
   end type
 
   !------------------------------------------------------------------------!
@@ -142,10 +145,9 @@
 #   include "Comm_Mod/Shared/This_Proc.f90"
 
 # if T_FLOWS_MPI == 1
-    ! Three basic ones are non-member
-#   include "Comm_Mod/Parallel/Start.f90"
+#   include "Comm_Mod/Parallel/Start_Parallel.f90"
 #   include "Comm_Mod/Parallel/Wait.f90"
-#   include "Comm_Mod/Parallel/End.f90"
+#   include "Comm_Mod/Parallel/End_Parallel.f90"
 
     ! File management
 #   include "Comm_Mod/Parallel/Close_File.f90"
@@ -191,10 +193,9 @@
 #   include "Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90"
 #   include "Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90"
 # else
-    ! Three basic ones are non-member
-#   include "Comm_Mod/Sequential/Start.f90"
+#   include "Comm_Mod/Sequential/Start_Parallel.f90"
 #   include "Comm_Mod/Sequential/Wait.f90"
-#   include "Comm_Mod/Sequential/End.f90"
+#   include "Comm_Mod/Sequential/End_Parallel.f90"
 
     ! File management
 #   include "Comm_Mod/Sequential/Close_File.f90"

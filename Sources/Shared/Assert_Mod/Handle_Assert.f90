@@ -19,7 +19,7 @@
                     ') failed in file ', file,                 &
                     ' at line ',         trim(adjustl(numb)),  &
                     '.'
-      call Comm_Mod_End
+      call Global % End_Parallel
       stop
     end if
 
@@ -33,7 +33,7 @@
                     ' at line ',         trim(adjustl(numb)),  &
                     ' in processor ',    trim(adjustl(proc)),  &
                     '.'
-      call Comm_Mod_End
+      call Global % End_Parallel
       stop
     end if
 

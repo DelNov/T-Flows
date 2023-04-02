@@ -45,7 +45,7 @@
   !----------------------------------------!
   !   Errors are critical by definitiion   !
   !----------------------------------------!
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

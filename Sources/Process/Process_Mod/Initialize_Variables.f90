@@ -240,7 +240,7 @@
 
         end do ! c = 1, Grid % n_cells
 
-        call Comm_Mod_Wait
+        call Global % Wait
         deallocate(prof)
         deallocate(x)
         deallocate(y)
@@ -271,17 +271,17 @@
       call Control % Read_Strings_On('VALUES', vals(1), nvs, .true.)
 
       ! Check validity of the input
-      if(nks .eq. 0 .or. nvs .eq. 0 .and. First_Proc()) then
-        print '(2a)', '# Critical, for initial condition: ',        &
-                      ' no values or variables have been provided'
-        call Comm_Mod_End
-        stop
+      if(nks .eq. 0 .or. nvs .eq. 0) then
+        call Message % Error(72,                                     &
+                      'Critical, for initial condition: '//          &
+                      'no values or variables have been provided ',  &
+                      file=__FILE__, line=__LINE__, one_proc=.true.)
       end if
-      if(nks .ne. nvs .and. First_Proc()) then
-        print '(2a)', '# Critical for initial conditions, number of values ',  &
-                      ' is not the same as number of provided variable names'
-        call Comm_Mod_End
-        stop
+      if(nks .ne. nvs) then
+        call Message % Error(72,                                               &
+                      'Critical, for initial condition: number of values '//   &
+                      'is not the same as number of provided variable names.', &
+                      file=__FILE__, line=__LINE__, one_proc=.true.)
       end if
 
       ! Input is valid, turn keys to upper case

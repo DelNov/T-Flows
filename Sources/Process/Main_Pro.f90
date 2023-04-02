@@ -51,7 +51,7 @@
   !------------------------------!
   !   Start parallel execution   !
   !------------------------------!
-  call Comm_Mod_Start
+  call Global % Start_Parallel
 
   !--------------------------------!
   !   Splash out the logo screen   !
@@ -462,6 +462,6 @@
   !----------------------------!
   !   End parallel execution   !
   !----------------------------!
-  call Comm_Mod_End
+  call Global % End_Parallel
 
   end program
