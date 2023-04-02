@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Interface_Tracking(track_int, verbose)
+  subroutine Interface_Tracking(Control, track_int, verbose)
 !------------------------------------------------------------------------------!
 !   Reading if vof will be used to model multiphase situation                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: track_int
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

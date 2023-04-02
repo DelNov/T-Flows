@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Phase_Conductivities(val, verbose)
+  subroutine Phase_Conductivities(Control, val, verbose)
 !------------------------------------------------------------------------------!
 !   Reads as many densities as there are phases.                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val(0:1)
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real                :: val(0:1)
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(2)
 !==============================================================================!

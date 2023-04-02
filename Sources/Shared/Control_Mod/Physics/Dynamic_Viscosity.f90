@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Dynamic_Viscosity(val, verbose)
+  subroutine Dynamic_Viscosity(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Real_Item('DYNAMIC_VISCOSITY', 0.01, val, verbose)

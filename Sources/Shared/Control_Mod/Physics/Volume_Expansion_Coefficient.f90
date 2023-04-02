@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Volume_Expansion_Coefficient(cor, verbose)
+  subroutine Volume_Expansion_Coefficient(Control, cor, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: cor
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: cor
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

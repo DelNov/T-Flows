@@ -52,6 +52,8 @@
       procedure :: Swarm_Save_Interval
       procedure :: Profiler_Info
 
+      procedure :: Max_Threads
+
       ! Native solvers
       procedure :: Max_Iterations_For_Energy_Solver
       procedure :: Max_Iterations_For_Momentum_Solver
@@ -128,6 +130,59 @@
       procedure :: Max_Courant_Vof
       procedure :: Max_Substep_Cycles_Vof
       procedure :: Skewness_Correction_Vof
+
+      ! Physics
+      procedure :: Number_Of_Domains
+      procedure :: Dynamic_Viscosity
+      procedure :: Heat_Capacity
+      procedure :: Latent_Heat
+      procedure :: Mass_Density
+      procedure :: Thermal_Conductivity
+      procedure :: Scalars_Diffusivity
+      procedure :: Interface_Tracking
+      procedure :: Particle_Tracking
+      procedure :: Mass_Transfer
+      procedure :: Heat_Transfer
+      procedure :: Buoyancy
+      procedure :: Reference_Temperature
+      procedure :: Saturation_Temperature
+      procedure :: Volume_Expansion_Coefficient
+      procedure :: Hybrid_Les_Rans_Switch
+      procedure :: Roughness_Coefficient
+      procedure :: Rough_Walls
+      procedure :: Smagorinsky_Constant
+      procedure :: Turbulence_Model
+      procedure :: Turbulence_Model_Variant
+      procedure :: Turbulent_Prandtl_Number
+      procedure :: Turbulent_Schmidt_Number
+      procedure :: Turbulent_Heat_Flux_Model
+      procedure :: Turbulent_Scalar_Flux_Model
+      procedure :: Angular_Velocity_Vector
+      procedure :: Gravitational_Vector
+      procedure :: Mass_Flow_Rates
+      procedure :: Pressure_Drops
+      procedure :: Point_For_Monitoring_Planes
+      procedure :: Potential_Initialization
+      procedure :: Max_Particles
+      procedure :: Number_Of_Phases
+      procedure :: Number_Of_Swarm_Sub_Steps
+      procedure :: Swarm_Coefficient_Of_Restitution
+      procedure :: Swarm_Density
+      procedure :: Swarm_Diameter
+      procedure :: Swarm_Subgrid_Scale_Model
+      procedure :: Phase_Capacities
+      procedure :: Phase_Conductivities
+      procedure :: Phase_Densities
+      procedure :: Phase_Viscosities
+      procedure :: Reference_Density
+      procedure :: Surface_Tension
+      procedure :: Track_Front
+      procedure :: Track_Surface
+      procedure :: Number_Of_Scalars
+      procedure :: Starting_Time_Step_For_Turb_Statistics
+      procedure :: Starting_Time_Step_For_Swarm_Computation
+      procedure :: Starting_Time_Step_For_Swarm_Statistics
+      procedure :: Extrapolate_Temperature_Exp
 
   end type
 

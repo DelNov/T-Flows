@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Phase_Viscosities(val, verbose)
+  subroutine Phase_Viscosities(Control, val, verbose)
 !------------------------------------------------------------------------------!
 !   Reads as many viscosities as there are phases.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val(0:1)
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real                :: val(0:1)
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(2)
 !==============================================================================!

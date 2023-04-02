@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Particle_Tracking(track_part, verbose)
+  subroutine Particle_Tracking(Control, track_part, verbose)
 !------------------------------------------------------------------------------!
 !   Reading if Lagrangian particle tracking  will be used in simulations       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: track_part
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

@@ -37,11 +37,11 @@
   !   Related to heat transfer and bouyancy   !
   !                                           !
   !-------------------------------------------!
-  call Control_Mod_Heat_Transfer(Flow % heat_transfer, verbose = .true.)
-  call Control_Mod_Gravitational_Vector(Flow % grav_x,  &
-                                        Flow % grav_y,  &
-                                        Flow % grav_z, .true.)
-  call Control_Mod_Buoyancy(name, .true.)
+  call Control % Heat_Transfer(Flow % heat_transfer, verbose = .true.)
+  call Control % Gravitational_Vector(Flow % grav_x,  &
+                                      Flow % grav_y,  &
+                                      Flow % grav_z, .true.)
+  call Control % Buoyancy(name, .true.)
   select case(name)
     case('NONE')
       Flow % buoyancy = NO_BUOYANCY
@@ -55,18 +55,19 @@
                            '.  \n Exiting!')
   end select
 
-  call Control_Mod_Reference_Density           (Flow % dens_ref, .true.)
-  call Control_Mod_Reference_Temperature       (Flow % t_ref,    .true.)
-  call Control_Mod_Volume_Expansion_Coefficient(Flow % beta,     .true.)
-  call Control_Mod_Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
-  call Control_Mod_Extrapolate_Temperature_Exp (Flow % exp_temp_wall, .true.)
+  call Control % Reference_Density           (Flow % dens_ref, .true.)
+  call Control % Reference_Temperature       (Flow % t_ref,    .true.)
+  call Control % Volume_Expansion_Coefficient(Flow % beta,     .true.)
+  call Control % Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
+  call Control % Turbulent_Schmidt_Number    (sc_t)  ! default is (0.9)
+  call Control % Extrapolate_Temperature_Exp (Flow % exp_temp_wall, .true.)
 
   !---------------------------!
   !                           !
   !   Related to turbulence   !
   !                           !
   !---------------------------!
-  call Control_Mod_Turbulence_Model(name, .true.)
+  call Control % Turbulence_Model(name, .true.)
   select case(name)
 
     case('NONE')
@@ -109,7 +110,7 @@
   !---------------------------------------------------------!
   if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
      Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Control_Mod_Turbulence_Model_Variant(name, .true.)
+    call Control % Turbulence_Model_Variant(name, .true.)
     if     (name .eq. 'NONE') then
       Turb % model_variant = NO_TURBULENCE_MODEL
     else if(name .eq. 'STABILIZED') then
@@ -124,7 +125,7 @@
   !----------------------------!
   !   Rough or smooth walls?   !
   !----------------------------!
-  call Control_Mod_Rough_Walls(Turb % rough_walls, .true.)
+  call Control % Rough_Walls(Turb % rough_walls, .true.)
 
   ! Does the user want to gather statistics?
   call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
@@ -156,7 +157,7 @@
   !-------------------------------!
   !   Turbulent heat flux model   !
   !-------------------------------!
-  call Control_Mod_Turbulent_Heat_Flux_Model(name, .true.)
+  call Control % Turbulent_Heat_Flux_Model(name, .true.)
   select case(name)
     case('SGDH')
       Turb % heat_flux_model = SGDH
@@ -174,7 +175,7 @@
   !   Type of switching for hybrid LES/RANS   !
   !-------------------------------------------!
   if(Turb % model .eq. HYBRID_LES_RANS) then
-    call Control_Mod_Hybrid_Les_Rans_Switch(name, .true.)
+    call Control % Hybrid_Les_Rans_Switch(name, .true.)
     select case(name)
       case('SWITCH_DISTANCE')
         Turb % hybrid_les_rans_switch = SWITCH_DISTANCE
@@ -192,7 +193,7 @@
   !-------------------------------------------------------------------------!
   if(Turb % model .eq. LES_SMAGORINSKY .or.  &
      Turb % model .eq. HYBRID_LES_PRANDTL) then
-    call Control_Mod_Smagorinsky_Constant(c_smag, .true.)
+    call Control % Smagorinsky_Constant(c_smag, .true.)
   end if
 
   if(Turb % model .eq. K_EPS) then
@@ -227,31 +228,31 @@
   !   Pressure drops and mass fluxes   !
   !                                    !
   !------------------------------------!
-  call Control_Mod_Pressure_Drops(bulk % p_drop_x,  &
-                                  bulk % p_drop_y,  &
-                                  bulk % p_drop_z)
-  call Control_Mod_Mass_Flow_Rates(bulk % flux_x_o,  &
-                                   bulk % flux_y_o,  &
-                                   bulk % flux_z_o)
+  call Control % Pressure_Drops(bulk % p_drop_x,  &
+                                bulk % p_drop_y,  &
+                                bulk % p_drop_z)
+  call Control % Mass_Flow_Rates(bulk % flux_x_o,  &
+                                 bulk % flux_y_o,  &
+                                 bulk % flux_z_o)
 
   !-----------------------!
   !                       !
   !   Number of scalars   !
   !                       !
   !-----------------------!
-  call Control_Mod_Number_Of_Scalars(Flow % n_scalars, verbose = .true.)
+  call Control % Number_Of_Scalars(Flow % n_scalars, verbose = .true.)
 
   !-----------------------------------!
   !                                   !
   !   Related to interface tracking   !
   !                                   !
   !-----------------------------------!
-  call Control_Mod_Interface_Tracking(Flow % with_interface, .true.)
+  call Control % Interface_Tracking(Flow % with_interface, .true.)
 
   if(Flow % with_interface) then
-    call Control_Mod_Track_Front  (Vof % track_front,   .true.)
-    call Control_Mod_Track_Surface(Vof % track_surface, .true.)
-    call Control_Mod_Mass_Transfer(Flow % mass_transfer)
+    call Control % Track_Front  (Vof % track_front,   .true.)
+    call Control % Track_Surface(Vof % track_surface, .true.)
+    call Control % Mass_Transfer(Flow % mass_transfer)
   end if
 
   !-----------------------!
@@ -259,24 +260,24 @@
   !   Particle tracking   !
   !                       !
   !-----------------------!
-  call Control_Mod_Particle_Tracking(Flow % with_particles, .true.)
+  call Control % Particle_Tracking(Flow % with_particles, .true.)
 
   if(Flow % with_particles) then
 
-    call Control_Mod_Max_Particles (Swarm % max_particles, verbose = .true.)
-    call Control_Mod_Swarm_Density (Swarm % density,       verbose = .true.)
-    call Control_Mod_Swarm_Diameter(Swarm % diameter,      verbose = .true.)
+    call Control % Max_Particles (Swarm % max_particles, verbose = .true.)
+    call Control % Swarm_Density (Swarm % density,       verbose = .true.)
+    call Control % Swarm_Diameter(Swarm % diameter,      verbose = .true.)
 
-    call Control_Mod_Swarm_Coefficient_Of_Restitution(Swarm % rst,         &
-                                                      verbose = .true.)
-    call Control_Mod_Number_Of_Swarm_Sub_Steps       (Swarm % n_sub_steps, &
-                                                      verbose = .true.)
+    call Control % Swarm_Coefficient_Of_Restitution(Swarm % rst,         &
+                                                    verbose = .true.)
+    call Control % Number_Of_Swarm_Sub_Steps       (Swarm % n_sub_steps, &
+                                                    verbose = .true.)
 
     call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_SWARM_STATISTICS',  &
                                  HUGE_INT, n_stat_p, .false.)
 
     ! SGS models for particle
-    call Control_Mod_Swarm_Subgrid_Scale_Model(name, verbose = .true.)
+    call Control % Swarm_Subgrid_Scale_Model(name, verbose = .true.)
     select case(name)
       case('BROWNIAN_FUKAGATA')
            Swarm % subgrid_scale_model = BROWNIAN_FUKAGATA

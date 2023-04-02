@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Pressure_Drops(p_drop_x, p_drop_y, p_drop_z, verbose)
+  subroutine Pressure_Drops(Control, p_drop_x, p_drop_y, p_drop_z, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: p_drop_x, p_drop_y, p_drop_z
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: p_drop_x, p_drop_y, p_drop_z
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
   real :: val(3)

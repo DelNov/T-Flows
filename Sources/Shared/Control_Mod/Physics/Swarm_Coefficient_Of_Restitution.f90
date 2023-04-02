@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Swarm_Coefficient_Of_Restitution(cor, verbose)
+  subroutine Swarm_Coefficient_Of_Restitution(Control, cor, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: cor
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: cor
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

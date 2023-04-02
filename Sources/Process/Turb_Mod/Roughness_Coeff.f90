@@ -1,5 +1,5 @@
 !==============================================================================!
-  real function Roughness_Coefficient(Turb, c1, c2)
+  real function Roughness_Coeff(Turb, c1, c2)
 !------------------------------------------------------------------------------!
 !   Set up roughness coefficient                                               !
 !------------------------------------------------------------------------------!
@@ -21,6 +21,6 @@
   end if
 
   ! Specify the return value
-  Roughness_Coefficient = z_o
+  Roughness_Coeff = z_o
 
   end function

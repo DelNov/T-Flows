@@ -91,7 +91,7 @@
         kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coefficient(c1, c2)
+        z_o = Turb % Roughness_Coeff(c1, c2)
 
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)

@@ -63,7 +63,7 @@
   !-----------------------!
   call Control % Open_Root_File(root_control)
 
-  call Control_Mod_Number_Of_Domains(n_dom)
+  call Control % Number_Of_Domains(n_dom)
   if(n_dom > 1) then
     do d = 1, n_dom
       call Control % Open_Domain_File(d, dom_control(d))
@@ -87,7 +87,7 @@
     call Grid(d) % Load_Dim(This_Proc(), domain=d)
 
     ! Determine threads for OpenMP runs
-    call Control_Mod_Max_Threads(Grid(d) % Vect % d_threads, .true.)
+    call Control % Max_Threads(Grid(d) % Vect % d_threads, .true.)
     call Grid(d) % Determine_Threads()
 
     call Grid(d) % Calculate_Face_Geometry()
@@ -108,12 +108,12 @@
   curr_dt  = 0
   first_dt = 0
   call Control % Number_Of_Time_Steps(last_dt, verbose=.true.)
-  call Control_Mod_Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
+  call Control % Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
+                                                        verbose = .true.)
+  call Control % Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
+                                                         verbose = .true.)
+  call Control % Starting_Time_Step_For_Swarm_Computation(first_dt_p,  &
                                                           verbose = .true.)
-  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
-                                                           verbose = .true.)
-  call Control_Mod_Starting_Time_Step_For_Swarm_Computation(first_dt_p,  &
-                                                            verbose = .true.)
 
   ! Read physical models for each domain from control file
   do d = 1, n_dom
@@ -183,9 +183,9 @@
     call Por(d) % Create_Porosity(Grid(d))
 
     ! Plane for calcution of overall mass fluxes
-    call Control_Mod_Point_For_Monitoring_Planes(Flow(d) % bulk % xp,  &
-                                                 Flow(d) % bulk % yp,  &
-                                                 Flow(d) % bulk % zp)
+    call Control % Point_For_Monitoring_Planes(Flow(d) % bulk % xp,  &
+                                               Flow(d) % bulk % yp,  &
+                                               Flow(d) % bulk % zp)
 
     ! Prepare ...
     call Bulk_Mod_Monitoring_Planes_Areas(Flow(d) % bulk, Grid(d))
@@ -224,8 +224,8 @@
   if(first_dt .eq. 0) then
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)  ! not sure if this call is needed
-      call Control_Mod_Potential_Initialization(pot_init, .true.)
-      if(pot_init) call Flow(d) % Potential_Initialization(Sol(d))
+      call Control % Potential_Initialization(pot_init, .true.)
+      if(pot_init) call Flow(d) % Potential_Initialisation(Sol(d))
     end do
   end if
 

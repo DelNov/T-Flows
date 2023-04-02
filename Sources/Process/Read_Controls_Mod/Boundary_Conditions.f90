@@ -56,7 +56,7 @@
   !   Read wall roughness, if specified as a constant for all walls   !
   !   (If it is not specified in the control file, it will be zero)   !
   !-------------------------------------------------------------------!
-  call Control_Mod_Roughness_Coefficient(Turb % z_o)
+  call Control % Roughness_Coefficient(Turb % z_o)
 
   !----------------------------------------------------------------!
   !   Count number of types per boundary condition, total number   !

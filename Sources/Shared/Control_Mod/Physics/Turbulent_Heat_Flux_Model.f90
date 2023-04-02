@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Turbulent_Heat_Flux_Model(val, verbose)
+  subroutine Turbulent_Heat_Flux_Model(Control, val, verbose)
 !------------------------------------------------------------------------------!
 !   Reading turbulent heat flux model from the control file.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical,       optional    :: verbose
 !==============================================================================!

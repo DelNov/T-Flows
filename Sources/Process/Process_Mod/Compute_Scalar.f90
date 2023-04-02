@@ -97,7 +97,9 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  call Control_Mod_Turbulent_Schmidt_Number(sc_t)  ! get default sc_t (0.9)
+
+  ! It used to read sc_t from here which is an overkill, so check
+  Assert(sc_t > 0.0)
 
   do s = 1, Grid % n_faces
 

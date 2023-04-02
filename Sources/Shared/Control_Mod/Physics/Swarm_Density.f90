@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Swarm_Density(s_den, verbose)
+  subroutine Swarm_Density(Control, s_den, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: s_den
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: s_den
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

@@ -1,8 +1,9 @@
 !==============================================================================!
-  subroutine Control_Mod_Starting_Time_Step_For_Swarm_Computation(val, verbose)
+  subroutine Starting_Time_Step_For_Swarm_Computation(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   integer, intent(out) :: val
   logical, optional    :: verbose
 !==============================================================================!

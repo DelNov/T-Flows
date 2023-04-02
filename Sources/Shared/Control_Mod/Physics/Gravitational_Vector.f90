@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Gravitational_Vector(grav_x, grav_y, grav_z, verbose)
+  subroutine Gravitational_Vector(Control, grav_x, grav_y, grav_z, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: grav_x, grav_y, grav_z
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: grav_x, grav_y, grav_z
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
   real :: val(3)

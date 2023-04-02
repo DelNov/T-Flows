@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Reference_Density(d_ref, verbose)
+  subroutine Reference_Density(Control, d_ref, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: d_ref
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: d_ref
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

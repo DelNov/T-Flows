@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Angular_Velocity_Vector(v_x, v_y, v_z, verbose)
+  subroutine Angular_Velocity_Vector(Control, v_x, v_y, v_z, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: v_x, v_y, v_z
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: v_x, v_y, v_z
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
   real :: val(3)

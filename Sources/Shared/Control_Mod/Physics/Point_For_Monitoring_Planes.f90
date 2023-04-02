@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Point_For_Monitoring_Planes(b_xp, b_yp, b_zp,  &
-                                                     verbose)
+  subroutine Point_For_Monitoring_Planes(Control, b_xp, b_yp, b_zp, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: b_xp, b_yp, b_zp
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: b_xp, b_yp, b_zp
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
   real :: val(3)

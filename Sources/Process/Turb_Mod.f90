@@ -206,7 +206,7 @@
       procedure :: Tau_Wall_Log_Law
       procedure :: U_Plus_Log_Law
       procedure :: Time_And_Length_Scale
-      procedure :: Roughness_Coefficient
+      procedure :: Roughness_Coeff
 
       procedure :: Les
 
@@ -348,7 +348,7 @@
 #   include "Turb_Mod/Tau_Wall_Log_Law.f90"
 #   include "Turb_Mod/U_Plus_Log_Law.f90"
 #   include "Turb_Mod/Time_And_Length_Scale.f90"
-#   include "Turb_Mod/Roughness_Coefficient.f90"
+#   include "Turb_Mod/Roughness_Coeff.f90"
 
 #   include "Turb_Mod/Les.f90"
 

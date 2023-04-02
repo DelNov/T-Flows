@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Control_Mod_Turbulent_Schmidt_Number(val, verbose)
+  subroutine Turbulent_Schmidt_Number(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real,   intent(out) :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   call Control % Read_Real_Item('TURBULENT_SCHMIDT_NUMBER', 0.9, val, verbose)
