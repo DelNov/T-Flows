@@ -9,25 +9,23 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(len=*)    :: keyword_1
-  character(len=*)    :: keyword_2
-  logical             :: found
-  logical,   optional :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword_1
+  character(len=*),    intent(in)  :: keyword_2
+  logical,             intent(out) :: found
+  logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Control)
 !==============================================================================!
 
-  rewind(control_file_unit)
+  rewind(Control % file_unit)
 
   !------------------------------------------------------------------!
   !   Browse through command file to find two keywords in one file   !
   !------------------------------------------------------------------!
   found = .false.
   do
-    call File % Read_Line(control_file_unit, reached_end)
+    call File % Read_Line(Control % file_unit, reached_end)
     if(reached_end) goto 1
 
     call String % To_Upper_Case(Line % tokens(2))

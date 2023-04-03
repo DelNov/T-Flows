@@ -5,16 +5,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(len=*)    :: keyword
-  character(SL)       :: values(MSI)   ! spefified value, if found
-  integer             :: n             ! number of items
-  logical,   optional :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword
+  character(SL),       intent(out) :: values(MSI)   ! spefified value, if found
+  integer,             intent(out) :: n             ! number of items
+  logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
   logical :: reached_end
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Control)
 !==============================================================================!
 
   ! Set default values
@@ -23,7 +21,7 @@
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !
   !---------------------------------------------------------!
-  call File % Read_Line(control_file_unit, reached_end)
+  call File % Read_Line(Control % file_unit, reached_end)
   if(reached_end) goto 1
 
   ! Found the correct keyword

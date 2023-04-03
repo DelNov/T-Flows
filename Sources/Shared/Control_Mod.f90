@@ -10,15 +10,15 @@
   implicit none
 !==============================================================================!
 
-  ! Control file unit
-  integer, private :: control_file_unit          ! current control file unit
-  integer, private :: root_control_file_unit     ! root control file unit
-  integer, private :: dom_control_file_unit(MD)  ! domain control file units
-
   !------------------!
   !   Control type   !
   !------------------!
   type Control_Type
+
+    ! Control file unit
+    integer, private :: file_unit          ! current control file unit
+    integer, private :: root_file_unit     ! root control file unit
+    integer, private :: dom_file_unit(MD)  ! domain control file units
 
     contains
 

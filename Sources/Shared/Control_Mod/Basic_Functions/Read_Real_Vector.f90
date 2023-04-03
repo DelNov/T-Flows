@@ -7,20 +7,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(len=*)    :: keyword
-  integer             :: n        ! size of array (typically small)
-  real                :: def(n)   ! default value
-  real                :: val(n)   ! spefified value, if found
-  logical,   optional :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword
+  integer,             intent(in)  :: n        ! size of array (typically small)
+  real,                intent(in)  :: def(n)   ! default value
+  real,                intent(out) :: val(n)   ! spefified value, if found
+  logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
   integer :: i
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Control)
 !==============================================================================!
 
-  rewind(control_file_unit)
+  rewind(Control % file_unit)
 
   ! Set default values
   val = def
@@ -29,7 +27,7 @@
   !   Browse through command file to find the keyword   !
   !-----------------------------------------------------!
   do
-    call File % Read_Line(control_file_unit, reached_end)
+    call File % Read_Line(Control % file_unit, reached_end)
     if(reached_end) goto 1
 
     ! Found the correct keyword

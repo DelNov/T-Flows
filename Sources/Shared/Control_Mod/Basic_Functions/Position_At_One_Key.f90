@@ -6,24 +6,22 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(len=*)    :: keyword
-  logical             :: found
-  logical, optional   :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword
+  logical,             intent(out) :: found
+  logical, optional,   intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Control)
 !==============================================================================!
 
-  rewind(control_file_unit)
+  rewind(Control % file_unit)
 
   !-----------------------------------------------------!
   !   Browse through command file to find one keyword   !
   !-----------------------------------------------------!
   found = .false.
   do
-    call File % Read_Line(control_file_unit, reached_end)
+    call File % Read_Line(Control % file_unit, reached_end)
     if(reached_end) goto 1
 
     ! Found the correct keyword

@@ -7,15 +7,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)           :: Control
-  character(len=*)              :: keyword
-  character(len=*), intent(in)  :: def      ! default value
-  character(SL),    intent(out) :: val      ! spefified value, if found
-  logical,          optional    :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword
+  character(len=*),    intent(in)  :: def      ! default value
+  character(SL),       intent(out) :: val      ! spefified value, if found
+  logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Control)
 !==============================================================================!
 
   ! Set default value
@@ -24,7 +22,7 @@
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !
   !---------------------------------------------------------!
-  call File % Read_Line(control_file_unit, reached_end)
+  call File % Read_Line(Control % file_unit, reached_end)
   if(reached_end) goto 1
 
   ! Found the correct keyword
