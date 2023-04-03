@@ -54,12 +54,12 @@
       if(char(byte(1)) .eq. 'E' .and.  &
          char(byte(2)) .eq. 'n' .and.  &
          char(byte(3)) .eq. 'd') then
-        do i = 1, MAX_TOKENS*2
+        do i = 1, len(Line % whole)
           read(fu, end=2) byte(0);  pos = pos + 1
           if(byte(0) .eq. 10) exit
         end do
         Line % whole = ''
-        do i = 1, MAX_TOKENS*2
+        do i = 1, len(Line % whole)
           read(fu, end=2) byte(0);  pos = pos + 1
           if(byte(0) .eq. 10) exit
           if(byte(0) .ne. 13) Line % whole(i:i) = char(byte(0))

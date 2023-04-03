@@ -12,14 +12,7 @@ $(DIR_OBJECT)/Divide_Mod.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
 $(DIR_SHARED)/Grid_Mod/*.f90 \
-Divide_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Divide_Mod/Logo_Div.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Logo_Div.o:\
-$(DIR_OBJECT)/Const_Mod.o 
+Divide_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Message_Mod.f90
@@ -285,5 +278,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Tokenizer_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 

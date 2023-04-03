@@ -1,5 +1,5 @@
 !==============================================================================!
-  pure subroutine Parse(Tok)
+  subroutine Parse(Tok)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,10 +19,11 @@
     Tok % n_tokens = 1
     Tok % s(1)=1
   end if
-  do i = 1, MAX_TOKENS*2 - 2
+  do i = 1, len(Tok % whole) - 1
     if( Tok % whole(i:  i  ) <  '!' .and.  &
         Tok % whole(i+1:i+1) >= '!') then
       Tok % n_tokens = Tok % n_tokens + 1
+      Assert(Tok % n_tokens <= MAX_TOKENS)
       Tok % s(Tok % n_tokens) = i+1
     end if
     if( Tok % whole(i  :i  ) >= '!' .and.  &
