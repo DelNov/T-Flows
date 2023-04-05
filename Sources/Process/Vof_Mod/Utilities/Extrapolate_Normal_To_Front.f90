@@ -43,19 +43,20 @@
   !   Unit for dtau is [m]                     !
   !--------------------------------------------!
   dtau = HUGE
-!  dtau = - HUGE
+! dtau = -HUGE
   do s = 1, Grid % n_faces
     dx = abs(Grid % dx(s))
     dy = abs(Grid % dy(s))
     dz = abs(Grid % dz(s))
     dtau = min(dtau, sqrt((dx**2 + dy**2 + dz**2)))
-!    dtau = max(dtau, dx, dy, dz)
+!   dtau = max(dtau, dx, dy, dz)
   end do
+  call Global % Min_Real(dtau)
 
   !-------------------!
   !   Initial guess   !
   !-------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     phi_n(c) = phi(c)
     phi_o(c) = phi(c)
   end do
@@ -65,7 +66,6 @@
   !   Pseudo time-step iteration   !
   !                                !
   !--------------------------------!
-
   do t_iter = 1, MAX_ITER
 
     !-------------------!
@@ -125,13 +125,15 @@
           ! Value in c2 is updated when flux is positive, goes from c1 to c2 (0 --> 1)
           if(Vof % fun % n(c2) > 0.5 .and. Vof % fun % n(c1) < 0.5) then
             ! Units: [m^2] * [P] = [m^2] * [P] + [m^2] * [P]   --> good!
-            adv_t(c2) = adv_t(c2) + max(flux_s, 0.0) * (phi_n(c1) - phi_n(c2)) / Grid % d(s)
+            adv_t(c2) = adv_t(c2)  &
+                      + max(flux_s, 0.0) * (phi_n(c1) - phi_n(c2)) / Grid % d(s)
           end if
 
           ! Value in c1 is updated when flux is negative, goes from c2 to c1 (0 --> 1)
           if(Vof % fun % n(c1) > 0.5 .and. Vof % fun % n(c2) < 0.5) then
             ! Units: [m^2] * [P] = [m^2] * [P] + [m^2] * [P]   --> good!
-            adv_t(c1) = adv_t(c1) - min(flux_s, 0.0) * (phi_n(c2) - phi_n(c1)) / Grid % d(s)
+            adv_t(c1) = adv_t(c1)  &
+                      - min(flux_s, 0.0) * (phi_n(c2) - phi_n(c1)) / Grid % d(s)
           end if
         end if
 
@@ -142,12 +144,14 @@
           ! Value in c2 is updated when flux is positive, goes from c1 to c2 (1 --> 0)
           if(Vof % fun % n(c2) < 0.5 .and. Vof % fun % n(c1) > 0.5) then
             ! Units: [m^2] * [P] = [m^2] * [P] + [m^2] * [P]   --> good!
-            adv_t(c2) = adv_t(c2) + max(flux_s, 0.0) * (phi_n(c1) - phi_n(c2)) / Grid % d(s)
+            adv_t(c2) = adv_t(c2)  &
+                      + max(flux_s, 0.0) * (phi_n(c1) - phi_n(c2)) / Grid % d(s)
           end if
           ! Value in c1 is updated when flux is negative, goes from c2 to c1 (1 --> 0)
           if(Vof % fun % n(c1) < 0.5 .and. Vof % fun % n(c2) > 0.5) then
             ! Units: [m^2] * [P] = [m^2] * [P] + [m^2] * [P]   --> good!
-            adv_t(c1) = adv_t(c1) - min(flux_s, 0.0) * (phi_n(c2) - phi_n(c1)) / Grid % d(s)
+            adv_t(c1) = adv_t(c1)  &
+                      - min(flux_s, 0.0) * (phi_n(c2) - phi_n(c1)) / Grid % d(s)
           end if
         end if
       end if  ! e1 > 0 .or. e2 > 0
@@ -157,23 +161,27 @@
       ! Units: [P] = [P] + [m^2] * [P] * [m] / [m^3]  --> good!
       phi_n(c) = phi_n(c) + adv_t(c) * dtau
     end do
+    call Grid % Exchange_Cells_Real(phi_n)
 
     ! Check the error
     max_error = -HUGE
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       max_error = max(max_error, abs(phi_o(c) - phi_n(c)))
     end do
+    call Global % Max_Real(max_error)
     if(max_error < MICRO) goto 1
 
     ! The new becomes old
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi_o(c) = phi_n(c)
     end do
 
   end do  ! iter
 
 1 continue
-   PRINT *, 'final max_error = ', max_error, t_iter
+  if(First_Proc()) then
+    PRINT *, 'final max_error and iterations = ', max_error, t_iter
+  end if
 
   !----------------------------------------------------------!
   !                                                          !
