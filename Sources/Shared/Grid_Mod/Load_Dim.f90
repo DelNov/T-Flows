@@ -23,6 +23,12 @@
                        domain=domain)
   call File % Open_For_Reading_Binary(name_in, fu, this_proc)
 
+  !----------------------------------------------!
+  !   Store rank (domain number) for this grid   !
+  !----------------------------------------------!
+  Grid % rank = 0
+  if(present(domain)) Grid % rank = domain
+
   !-------------------------!
   !   Read real precision   !
   !-------------------------!

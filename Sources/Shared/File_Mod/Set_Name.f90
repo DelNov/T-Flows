@@ -46,6 +46,8 @@
   !   Handle problems with multiple domains   !
   !-------------------------------------------!
   if(present(domain)) then
+    Assert(domain >=  1)
+    Assert(domain <= MD)
     lnam = len_trim(problem_name(domain))
     if(last_pos > 0) then
       name_out(last_pos+1:last_pos+lnam) = problem_name(domain)(1:lnam)

@@ -47,6 +47,9 @@
     integer :: per_y_reg     = 0  ! periodic y region
     integer :: per_z_reg     = 0  ! periodic z region
 
+    ! Rank (in case of simulations with multiple domains)
+    integer :: rank = 0
+
     ! Periodic span
     real :: per_x, per_y, per_z
 

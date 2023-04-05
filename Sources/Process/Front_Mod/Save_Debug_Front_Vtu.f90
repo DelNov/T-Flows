@@ -38,7 +38,8 @@
       call File % Set_Name(name_out,             &
                            time_step=time_step,  &
                            appendix='-front',    &
-                           extension='.pvtu')
+                           extension='.pvtu',    &
+                           domain=Grid % rank)
       call File % Open_For_Writing_Ascii(name_out, fu)
 
       ! Header
@@ -84,7 +85,8 @@
                        processor = This_Proc(),  &
                        time_step = time_step,    &
                        appendix  = '-front',     &
-                       extension = '.vtu')
+                       extension = '.vtu',       &
+                       domain=Grid % rank)
   call File % Open_For_Writing_Ascii(name_out, fu)
 
   !------------!
@@ -298,7 +300,8 @@
   call File % Set_Name(name_out,                    &
                        time_step=time_step,         &
                        appendix ='-intersections',  &
-                       extension='.vtu')
+                       extension='.vtu',            &
+                       domain=Grid % rank)
   call File % Open_For_Writing_Ascii(name_out, fu)
 
   !------------!
