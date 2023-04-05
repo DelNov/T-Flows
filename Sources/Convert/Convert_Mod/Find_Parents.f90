@@ -195,15 +195,18 @@
   end do  ! bc
 
   if(n_match_tot .ne. Grid % n_bnd_cells) then
-    call Message % Error(70, 'Number of boundary cells found is not the  '//  &
-                             'same as the one prescribed boundary cells. '//  &
-                             'The probable cause for it is that some '    //  &
-                             'internal faces in Gmsh are denoted as '     //  &
-                             'boundary conditions (physical groups). '    //  &
-                             '\n \n '                                     //  &
-                             'Check the Gmsh mesh for physical groups '   //  &
-                             'and try to repair this.',                       &
-                             file=__FILE__, line=__LINE__)
+    call Message % Warning(80,                                                 &
+              'Number of boundary cells found here is not the same as   '  //  &
+              'the number of boundary cells prescribed in Gmsh. Possible ' //  &
+              'cause for it is that some internal faces in Gmsh are '      //  &
+              'marked as boundary conditions (physical groups). \n \n '    //  &
+              'It might also be that you deleted some volumes in Gmsh '    //  &
+              'intentionally to ensure conformal mappings for simulations '//  &
+              'in multiple domains.  If that is the case, it is probably ' //  &
+              'safe to ignore this warning.  \n \n '                       //  &
+              'It is, nonetheless, advised to check the Gmsh mesh for '    //  &
+              'physical groups.',                                              &
+              file=__FILE__, line=__LINE__)
   end if
 
   call Profiler % Stop('Find_Parents')
