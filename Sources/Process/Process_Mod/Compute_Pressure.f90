@@ -21,10 +21,9 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
-  character(SL)              :: solver
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !
-!   The form of equations which I am solving:
+!   The form of equations which are being solved:
 !
 !      /           /
 !     |           |
@@ -62,7 +61,7 @@
   call Flow % Alias_Momentum(u, v, w)
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance_Start(curr_dt, ini)
+  call Flow % Report_Vol_Balance_Start(curr_dt, ini)
 
   ! User function
   call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
@@ -72,7 +71,7 @@
   !--------------------------------------------------!
 
   ! From control file
-  call Control_Mod_Normalization_For_Pressure_Solver(p_nor_c)
+  call Control % Normalization_For_Pressure_Solver(p_nor_c)
 
   ! Calculate pressure magnitude for normalization of pressure solution
   p_max = -HUGE
@@ -138,7 +137,7 @@
   end do
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance(Sol, curr_dt, ini)
+  call Flow % Report_Vol_Balance(Sol, curr_dt, ini)
 
   !------------------------------------------!
   !   Cross diffusion fluxes for pressure    !
@@ -182,9 +181,6 @@
   !-------------------------------------------------------------------------!
   call Vof % Mass_Transfer_Pressure_Source(b)
 
-  ! Get solver
-  call Control_Mod_Solver_For_Pressure(solver)
-
   call Profiler % Start(String % First_Upper(pp % solver)  //  &
                         ' (solver for pressure)')
 
@@ -215,10 +211,10 @@
                        ' (solver for pressure)')
 
   if (Flow % p_m_coupling == SIMPLE) then
-    call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
+    call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
   else
     if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
+      call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
     end if
   end if
 
@@ -248,7 +244,7 @@
   call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance_Stop()
+  call Flow % Report_Vol_Balance_Stop()
 
   call Profiler % Stop('Compute_Pressure (without solvers)')
 

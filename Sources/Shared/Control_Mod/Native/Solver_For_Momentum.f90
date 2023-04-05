@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Momentum(val, verbose)
+  subroutine Solver_For_Momentum(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)        :: Control
   character(SL), intent(out) :: val
   logical, optional          :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_MOMENTUM', 'bicg',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('SOLVER_FOR_MOMENTUM', 'bicg', val, verbose)
   call String % To_Lower_Case(val)
 
   if( val .ne. 'bicg' .and. val .ne. 'cg') then

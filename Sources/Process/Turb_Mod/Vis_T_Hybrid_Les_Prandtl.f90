@@ -41,7 +41,7 @@
   !----------------------------!
   !   Model's eddy viscosity   !
   !----------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     hmax = Turb % h_max(c)
     hwn  = Turb % h_w(c)

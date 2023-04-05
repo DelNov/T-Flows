@@ -418,13 +418,18 @@ if b:fortran_dialect == "f08"
 " Start with constants from Const_Mod:
   syn keyword fortranConstant      PROGRAM_NAME
   syn keyword fortranConstant      VL  SL  DL   MSI  DP  SP  IP  LP  RP
+  syn keyword fortranConstant      VERSION_CFN  VERSION_DIM  VERSION_BACKUP
   syn keyword fortranConstant      YOCTO  ZEPTO  ATTO  FEMTO  PICO  NANO  MICRO  MILI
   syn keyword fortranConstant      YOTTA  ZETTA  EXA   PETA   TERA  GIGA  MEGA   KILO
   syn keyword fortranConstant      HUGE  TINY  HUGE_INT  EULER  PI
   syn keyword fortranConstant      ONE_THIRD  TWO_THIRDS  ONE_SIXTH
   syn keyword fortranConstant      MD  MAX_VARS_INTERFACE
+" Constants from Tokenizer_Mod
+  syn keyword fortranConstant      MAX_TOKENS
 " Constants related to indentation (O think they are defined in a few places - bad!
   syn keyword fortranConstant      IN_0  IN_1  IN_2  IN_3  IN_4  IN_5
+" Constants from Info_Mod
+  syn keyword fortranConstant      L_LINE  L_BOX  MAX_USER_LINES
 " Constants from Numerics_Mod
   syn keyword fortranConstant      UPWIND  CENTRAL  LUDS  QUICK  SMART  GAMMA
   syn keyword fortranConstant      MINMOD  BLENDED  SUPERBEE  AVL_SMART  CICSAM  STACS
@@ -441,22 +446,22 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
 " After the constants, I have alternating definitions of types and objects derived from them
-  syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type       Range_Type
-  syn keyword fortranObjectTflows  Dom            points         blocks         lines           ranges
-  syn keyword fortranTypeTflows    Generate_Type  Convert_Type   Divide_Type    Grid_Type
-  syn keyword fortranObjectTflows  Generate       Convert        Divide         Grid  Prim  Dual
-  syn keyword fortranTypeTflows    Math_Type      Sort_Type      File_Type      String_Type     Work_Type      Tokenizer_Type
-  syn keyword fortranObjectTflows  Math           Sort           File           String          Work           Line  Tok
-  syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type       Vof_Type       Swarm_Type
-  syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur       Vof            Swarm Swr
+  syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
+  syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges         Read_Control  Rc
+  syn keyword fortranTypeTflows    Generate_Type  Convert_Type   Divide_Type    Grid_Type         Control_Type
+  syn keyword fortranObjectTflows  Generate       Convert        Divide         Grid  Prim  Dual  Control
+  syn keyword fortranTypeTflows    Math_Type      Sort_Type      File_Type      String_Type       Work_Type      Tokenizer_Type
+  syn keyword fortranObjectTflows  Math           Sort           File           String            Work           Line  Tok
+  syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type         Vof_Type       Swarm_Type
+  syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur         Vof            Swarm Swr
   syn keyword fortranTypeTflows    Bulk_Type      Face_Type
-  syn keyword fortranObjectTflows  bulk           v_flux
-  syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type       Vert_Type      Particle_Type
-  syn keyword fortranObjectTflows  Front          Surf           Elem           side            Vert           Part
-  syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type   Message_Type
-  syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof  Message
-  syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type     Petsc_Type     Process_Type
-  syn keyword fortranObjectTflows  A  M           vector         Sol            Nat             Pet            Process
+  syn keyword fortranObjectTflows                 v_flux
+  syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type         Vert_Type      Particle_Type
+  syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part
+  syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type
+  syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof    Message        Info
+  syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Process_Type
+  syn keyword fortranObjectTflows  A  M           vector         Sol            Nat               Pet            Process
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis
 " Items which follow are not really objects, but I don't know where else to put them
@@ -465,6 +470,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
+  syn keyword fortranMacroTflows   Assert  Unused
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
 "---------------------------------------------------------------------[T-Flows]-
@@ -472,12 +478,13 @@ if b:fortran_dialect == "f08"
 "==============================================================[MPI in T-Flows]=
 " Here are MPI calls from T-Flows
 " Note that they are not set in this file at all, only in the .vimrc
-  syn keyword fortranMpiTflows     Mpi_Barrier  Mpi_Finalize  Mpi_Sendrecv_Replace
-  syn keyword fortranMpiTflows     Mpi_Allreduce  Mpi_File_Close  Mpi_File  Mpi_File_Set_View
+  syn keyword fortranMpiTflows     Mpi_Init  Mpi_Comm_Size  Mpi_Comm_Rank  Mpi_Barrier  Mpi_Finalize
+  syn keyword fortranMpiTflows     Mpi_Allreduce  Mpi_File_Close  Mpi_File  Mpi_File_Set_View Mpi_Sendrecv_Replace
   syn keyword fortranMpiTflows     Mpi_Send  Mpi_Sendrecv  Mpi_Status  Mpi_Recv  Mpi_Write
   syn keyword fortranMpiTflows     Mpi_Type_Create_Indexed_Block  Mpi_Type_Commit
   syn keyword fortranMpiTflows     Mpi_File_Open  Mpi_File_Read
   syn keyword fortranMpiTflows     MPI_COMM_WORLD  MPI_CHARACTER  MPI_INFO_NULL  MPI_STATUS_IGNORE  MPI_IN_PLACE
+  syn keyword fortranMpiTflows     MPI_INTEGER  MPI_LOGICAL  MPI_DOUBLE_PRECISION  MPI_REAL
   syn keyword fortranMpiTflows     MPI_LOR  MPI_SUM  MPI_MAX  MPI_MIN  MPI_MODE_WRONLY  MPI_MODE_CREATE
 "--------------------------------------------------------------[MPI in T-Flows]-
 

@@ -26,14 +26,11 @@
   if(Swarm % max_particles > 0) then
     allocate(Swarm % Particle(Swarm % max_particles))
   else
-    if(First_Proc()) then
-      print *, '# ERROR!  You are attempting a simulation with'
-      print *, '# particles but max number of particles is zero.'
-      print *, '# Did you set the parameter MAX_PARTICLES in control file?'
-      print *, '# This error is critical.  Exiting!'
-      call Comm_Mod_End
-      stop
-    end if
+    call Message % Error(72,                                               &
+             'You are attempting a simulation with particles, but max '//  &
+             'number of particles is zero.  Did you set the parameter '//  &
+             'MAX_PARTICLES in control file?  This error is critical. '//  &
+             ' Exiting!', file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   ! Allocate logical array if cell holds particles

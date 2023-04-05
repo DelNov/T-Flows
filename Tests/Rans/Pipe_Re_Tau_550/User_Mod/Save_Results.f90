@@ -51,10 +51,10 @@
   call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Take constant physical properties
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1r')
@@ -204,7 +204,7 @@
   end do
 
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
@@ -261,7 +261,7 @@
       end if
     end do
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     if(Flow % heat_flux > 0.0) then
       call Global % Min_Real(t_inf)
@@ -287,7 +287,7 @@
     call Global % Sum_Real(nu_mean)
     call Global % Sum_Int(n_points)
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points

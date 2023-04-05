@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Control_Mod_Save_Results_At_Boundaries(save_results_bnd, verbose)
+  subroutine Save_Results_At_Boundaries(Control, save_results_bnd, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical           :: save_results_bnd
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  logical             :: save_results_bnd
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SAVE_RESULTS_AT_BOUNDARIES', 'yes',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('SAVE_RESULTS_AT_BOUNDARIES', 'yes',  &
+                                 val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

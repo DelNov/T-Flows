@@ -125,7 +125,7 @@
 
   call Profiler % Statistics(indent=34)
 
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

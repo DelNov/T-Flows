@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Control_Mod_Report_Volume_Balance(vol_bal, verbose)
+  subroutine Report_Volume_Balance(Control, vol_bal, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: vol_bal
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('REPORT_VOLUME_BALANCE',   &
-                                  'no', val, verbose)
+  call Control % Read_Char_Item('REPORT_VOLUME_BALANCE',   &
+                                'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

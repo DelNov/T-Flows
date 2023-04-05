@@ -1,19 +1,19 @@
 !==============================================================================!
-  subroutine Control_Mod_Extrapolate_Temperature_Exp(temp_exp,  &
-                                                     verbose)
+  subroutine Extrapolate_Temperature_Exp(Control, temp_exp, verbose)
 !------------------------------------------------------------------------------!
 !   Reading if temprature will be extrapolated to walls exponentially          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: temp_exp
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('EXTRAPOLATE_TEMPERATURE_EXP',  &
-                                  'no', val, verbose)
+  call Control % Read_Char_Item('EXTRAPOLATE_TEMPERATURE_EXP',  &
+                                'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

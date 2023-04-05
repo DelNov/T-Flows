@@ -362,5 +362,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Tokenizer_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 

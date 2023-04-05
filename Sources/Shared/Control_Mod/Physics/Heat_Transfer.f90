@@ -1,22 +1,23 @@
 !==============================================================================!
-  subroutine Control_Mod_Heat_Transfer(heat_transfer, verbose)
+  subroutine Heat_Transfer(Control, heat, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, intent(out) :: heat_transfer
+  class(Control_Type)  :: Control
+  logical, intent(out) :: heat
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('HEAT_TRANSFER', 'no', val, verbose)
+  call Control % Read_Char_Item('HEAT_TRANSFER', 'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
-    heat_transfer = .true.
+    heat = .true.
 
   else if( val .eq. 'NO' ) then
-    heat_transfer = .false.
+    heat = .false.
 
   else
     call Message % Error(60,                                               &

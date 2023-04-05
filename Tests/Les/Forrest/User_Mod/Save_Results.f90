@@ -36,7 +36,7 @@
   if(ts .eq. 0) return
   if(.not. Turb % statistics) return
 
-  call Control_Mod_Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
+  call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
                                HUGE_INT, n_stat, .false.)
 
   if(ts < n_stat) return
@@ -50,7 +50,7 @@
   call Flow % Alias_Energy  (t)
 
   ! Take constant physical properties
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
+  call Control % Dynamic_Viscosity(visc_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
@@ -210,7 +210,7 @@
     end if
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then

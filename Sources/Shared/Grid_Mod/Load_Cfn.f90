@@ -9,9 +9,11 @@
   integer, intent(in) :: this_proc  ! needed if called from Processor
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, c1, c2, s, n, ss, sr, fu, real_prec
+  integer       :: c, c1, c2, s, n, ss, sr, fu, real_prec, version
   character(SL) :: name_in, str, str1, str2
 !==============================================================================!
+
+  call Profiler % Start('Load_Cfn')
 
   !-------------------------------!
   !     Read the file with the    !
@@ -46,6 +48,22 @@
                        'convert or generate the meshes again and re-run.',     &
                        one_proc = .true.)
     end if
+  end if
+
+  !------------------------------!
+  !   Read version of the file   !
+  !------------------------------!
+  read(fu) version
+
+  if(version .ne. VERSION_CFN) then
+    write(str1, '(i0.0)')  version
+    write(str2, '(i0.0)')  VERSION_CFN
+    call Message % Error(72,                                                   &
+                 'You seem to be reading wrong version of the .cfn file.  '//  &
+                 'The version you are reading is '//trim(str1)//' but the '//  &
+                 'code expects version '//trim(str2)//'. Re-generate or   '//  &
+                 'convert again the grids (and divide them if you run in  '//  &
+                 'parallel).', one_proc = .true.)
   end if
 
   !-----------------------------------------------!
@@ -282,5 +300,7 @@
   call Grid % Determine_Regions_Ranges()
 
   close(fu)
+
+  call Profiler % Stop('Load_Cfn')
 
   end subroutine

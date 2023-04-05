@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Save_Initial_Condition(save_init_cond, verbose)
+  subroutine Save_Initial_Condition(Control, save_init_cond, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical           :: save_init_cond
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  logical             :: save_init_cond
+  logical,   optional :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SAVE_INITIAL_CONDITION', 'yes',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('SAVE_INITIAL_CONDITION', 'yes', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

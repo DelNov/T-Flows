@@ -64,7 +64,7 @@
                                    ' couldn''t be located!'
             print *, '# Check initial placement of particles.'
             print *, '# This error is critical, exiting!'
-            call Comm_Mod_End
+            call Global % End_Parallel
             stop
           end if
 

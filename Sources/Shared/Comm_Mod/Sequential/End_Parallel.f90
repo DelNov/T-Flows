@@ -1,15 +1,13 @@
 !==============================================================================!
-  subroutine Report_Volume_Balance_Stop(Flow)
+  subroutine End_Parallel(Global)
 !------------------------------------------------------------------------------!
-!   Closes file for volume balance reporting.
+!   Dummy function for sequential runs.                                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type) :: Flow
+  class(Comm_Type) :: Global
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Global)
 !==============================================================================!
-
-  if(First_Proc()) then
-    if(Flow % report_vol_balance) close(Flow % fuvbr)
-  end if
 
   end subroutine

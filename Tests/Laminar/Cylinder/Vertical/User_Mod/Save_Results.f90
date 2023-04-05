@@ -41,11 +41,11 @@
   call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Take constant physical properties
-  call Control_Mod_Mass_Density        (rho_const)
-  call Control_Mod_Dynamic_Viscosity   (mu_const)
+  call Control % Mass_Density        (rho_const)
+  call Control % Dynamic_Viscosity   (mu_const)
   nu_const = mu_const / rho_const
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(k_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(k_const)
 
   d      =  1.0  ! characteristic dim.
   t_wall = 50.0  ! temp. at the wal
@@ -85,7 +85,7 @@
     call Global % Sum_Real(nuss_mean)
     call Global % Sum_Int(n_points)
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     nuss_mean = nuss_mean / n_points
   end if

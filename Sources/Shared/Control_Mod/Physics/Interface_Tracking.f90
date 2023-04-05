@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Control_Mod_Interface_Tracking(track_int, verbose)
+  subroutine Interface_Tracking(Control, track_int, verbose)
 !------------------------------------------------------------------------------!
 !   Reading if vof will be used to model multiphase situation                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: track_int
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('INTERFACE_TRACKING', 'no', val, verbose)
+  call Control % Read_Char_Item('INTERFACE_TRACKING', 'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

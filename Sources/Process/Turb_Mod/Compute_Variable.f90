@@ -27,7 +27,7 @@
   real                       :: dt
   real                       :: visc_f, pr_t1, pr_t2, pr_1, pr_2
   real, contiguous,  pointer :: cross(:)
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !                                                                              !
 !  The form of equations which are solved:                                     !
 !                                                                              !
@@ -37,7 +37,7 @@
 !    |      dt       |                |  sigma              |                  !
 !   /               /                /                     /                   !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   call Profiler % Start('Compute_Variable (without solvers)')
 
@@ -59,7 +59,7 @@
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -191,7 +191,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) + cross(c)
   end do
 
@@ -259,20 +259,20 @@
                        ' (solver for turbulence)')
 
   ! Avoid negative values for all computed turbulent quantities
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
   ! Set the lower limit of zeta to 1.8
   if(phi % name .eq. 'ZETA') then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = min(phi % n(c), 1.8)
     end do
   end if
 
   ! Set the lower limit of epsilon 
   if(phi % name .eq. 'EPS') then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = max(phi % n(c), 1.0e-10)
     end do
   end if
@@ -282,14 +282,14 @@
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % eniter)
     if(phi % name .eq. 'EPS')  &
-      call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 2, phi % name, phi % res, phi % eniter)
     if(phi % name .eq. 'ZETA')  &
-      call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 3, phi % name, phi % res, phi % eniter)
     if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  &
-      call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 5, phi % name, phi % res, phi % eniter)
     end if
   end if
 

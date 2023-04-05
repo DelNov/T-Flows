@@ -192,7 +192,7 @@
     call Global % Sum_Real(uw_pp(pl))
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
 

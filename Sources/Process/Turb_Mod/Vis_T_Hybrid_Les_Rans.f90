@@ -29,7 +29,7 @@
     call Flow % Grad_Variable(t)
   end if
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     lf = Grid % vol(c) ** ONE_THIRD
     Turb % vis_t_sgs(c) = Flow % density(c)  &
                         * (lf*lf)            &          ! delta^2
@@ -38,7 +38,7 @@
   end do
 
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       nc2 = -Flow % beta * (  Flow % grav_x * t % x(c)   &
                             + Flow % grav_y * t % y(c)   &
                             + Flow % grav_z * t % z(c))

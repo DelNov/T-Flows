@@ -26,7 +26,7 @@
 
   if(Turb % model .eq. SPALART_ALLMARAS) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       !---------------------------------!
       !   Compute the production term   !
@@ -60,7 +60,7 @@
     end do
 
   else if(Turb % model .eq. DES_SPALART) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       ! What is 0.65 here?  A ghost number
       dist = min(Grid % wall_dist(c), 0.65 * Turb % h_max(c))

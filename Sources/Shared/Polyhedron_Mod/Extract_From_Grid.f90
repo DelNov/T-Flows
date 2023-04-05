@@ -97,11 +97,12 @@
     dy = Grid % yf(s) - Grid % yc(cell)
     dz = Grid % zf(s) - Grid % zc(cell)
 
-    ! They might be in the wrong order, correct if needed
-    ! (If the face is oriented outwards to current cell,
-    ! the nodes have to sorted in reverse order because
-    ! ISOAP library requies faces to point inwards)
-    if(sx*dx + sy*dy + sz*dz > 0) then
+    ! Faces' nodes might be in the wrong order, correct here if needed.
+    ! (If the face is oriented outwards to current cell,the nodes have to
+    ! sorted in reverse order because ISOAP requies faces to point inwards.
+    ! But then again, this seems to make the extracted iso-surface to point
+    ! from VOF = 1 towards VOF = 0, which is not in line with T-Flows.)
+    if(sx*dx + sy*dy + sz*dz < 0) then
       call Sort % Reverse_Order_Int(local_face_nodes(1:faces_n_nodes))
     end if
 

@@ -29,7 +29,7 @@
   Comm => Grid % Comm
 
   ! Full name is specified in control file
-  call Control_Mod_Load_Backup_Name(name_in)
+  call Control % Load_Backup_Name(name_in)
 
   answer = name_in
   call String % To_Upper_Case(answer)

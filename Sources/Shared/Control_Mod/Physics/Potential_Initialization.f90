@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Control_Mod_Potential_Initialization(pot_init, verbose)
+  subroutine Potential_Initialization(Control, pot_init, verbose)
 !------------------------------------------------------------------------------!
 !   Reading potential initialization from the control file.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: pot_init
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('POTENTIAL_INITIALIZATION', 'no',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('POTENTIAL_INITIALIZATION', 'no', val, verbose)
   call String % To_Upper_Case(val)
 
   select case(val)

@@ -100,7 +100,7 @@ ifeq ($(FORTRAN), intel)
   ifeq ($(DEBUG), yes)
     OPT_F_COMP += -O0 -g -traceback
   else
-    OPT_F_COMP += -O2
+    OPT_F_COMP += -O3
   endif
   ifeq ($(PROF), yes)
     OPT_F_COMP += -g -O2 -shared-intel -debug inline-debug-info  \
@@ -200,9 +200,9 @@ endif
 SRC_F_MOD = Const_Mod.f90      \
             Region_Mod.f90     \
             String_Mod.f90     \
-            Tokenizer_Mod.f90  \
             Comm_Mod.f90       \
             Assert_Mod.f90     \
+            Tokenizer_Mod.f90  \
             Message_Mod.f90    \
             Vect_Mod.f90       \
             Control_Mod.f90    \

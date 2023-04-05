@@ -5,7 +5,7 @@
 !   In addition, it breaks the line in tokens (individual strings).            !
 !                                                                              !
 !   A comment is each line which begins with "!", "#" or "%".                  !
-!   Input line must not exceed MAX_TOKENS*2 characters in length               !
+!   Input line must not exceed len(Line % whole) characters in length          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -36,11 +36,11 @@
   inquire(unit=un, formatted=fmtd)
 1 continue
   if(fmtd .eq. 'YES') then
-    write(format(3:6), '(i4.4)') MAX_TOKENS*2
+    write(format(3:6), '(i4.4)') len(Line % whole)
     read(un, format, end=2) Line % whole
   else
     Line % whole = ''
-    do i = 1, MAX_TOKENS*2
+    do i = 1, len(Line % whole)
       read(un, end=2) byte
       if(byte .eq. 10) exit
       if(byte .ne. 13) Line % whole(i:i) = char(byte)

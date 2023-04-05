@@ -5,6 +5,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type) :: Control
   character(len=*)           :: keyword
   character(len=*)           :: item
   character(len=*), optional :: key_type

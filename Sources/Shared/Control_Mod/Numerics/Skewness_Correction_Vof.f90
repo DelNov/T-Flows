@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Control_Mod_Skewness_Correction_Vof(skew_corr, verbose)
+  subroutine Skewness_Correction_Vof(Control, skew_corr, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   logical, intent(out) :: skew_corr
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SKEWNESS_CORRECTION_VOF',   &
-                                  'no', val, verbose)
+  call Control % Read_Char_Item('SKEWNESS_CORRECTION_VOF',   &
+                                'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

@@ -50,14 +50,14 @@
   !----------------------------!
   !   For momentum equations   !
   !----------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_MOMENTUM',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_MOMENTUM',  &
                                         found,                        &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     u % solver = sstring
     v % solver = sstring
@@ -90,14 +90,14 @@
   !---------------------------!
   !   For pressure equation   !
   !---------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_PRESSURE',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_PRESSURE',  &
                                         found,                        &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm', pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm', pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
     Flow % pp % solver = sstring
     Flow % pp % prec = pstring
@@ -116,14 +116,14 @@
   !-----------------------------------!
   !   For wall distance computation   !
   !-----------------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_WALL_DISTANCE',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_WALL_DISTANCE',  &
                                         found,                             &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
     Flow % wall_dist % solver = sstring
     Flow % wall_dist % prec = pstring
@@ -142,14 +142,14 @@
   !----------------------------!
   !   For potential equation   !
   !----------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_POTENTIAL',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_POTENTIAL',  &
                                         found,                         &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
     Flow % pot % solver = sstring
     Flow % pot % prec = pstring
@@ -168,14 +168,14 @@
   !----------------------!
   !   For VOF function   !
   !----------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_VOF',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_VOF',  &
                                         found,                   &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
     Vof % fun % solver = sstring
     Vof % fun % prec = pstring
@@ -194,14 +194,14 @@
   !-------------------------!
   !   For energy equation   !
   !-------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_ENERGY',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_ENERGY',  &
                                         found,                      &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     t % solver = sstring
     t % prec = pstring
@@ -220,15 +220,15 @@
   !--------------------------------!
   !   Related to passive scalars   !
   !--------------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_SCALARS',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_SCALARS',  &
                                         found,                       &
                                         .false.)
 
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
@@ -253,14 +253,14 @@
   !------------------------------!
   !   All turbuelnt quantities   !
   !------------------------------!
-  call Control_Mod_Position_At_One_Key('PETSC_OPTIONS_FOR_TURBULENCE',  &
+  call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_TURBULENCE',  &
                                         found,                          &
                                         .false.)
   if(found) then
-    call Control_Mod_Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control_Mod_Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
-    call Control_Mod_Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
-    call Control_Mod_Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
 
     do i = 1, 12
       if(i .eq.  1) tq => Turb % kin

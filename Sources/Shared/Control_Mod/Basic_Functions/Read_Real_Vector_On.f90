@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Real_Array_On(keyword, values, n, verbose)
+  subroutine Read_Real_Vector_On(Control, keyword, values, n, verbose)
 !------------------------------------------------------------------------------!
 !   Working horse function to read integer value (argument "val") behind a     !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
@@ -7,10 +7,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  real              :: values(128)   ! spefified value, if found
-  integer           :: n             ! number of items
-  logical, optional :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword
+  real,                intent(out) :: values(128)   ! spefified value, if found
+  integer,             intent(out) :: n             ! number of items
+  logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
   logical :: reached_end
@@ -22,7 +23,7 @@
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !
   !---------------------------------------------------------!
-  call File % Read_Line(control_file_unit, reached_end)
+  call File % Read_Line(Control % file_unit, reached_end)
   if(reached_end) goto 1
 
   ! Found the correct keyword
@@ -34,9 +35,6 @@
     n = Line % n_tokens - 1
     return
 
-  ! Keyword not found, try to see if there is similar, maybe it was a typo
-  else
-    call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
   end if
 
   !--------------------------------------------!

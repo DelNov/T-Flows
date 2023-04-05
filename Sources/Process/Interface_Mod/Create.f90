@@ -72,18 +72,18 @@
         !-----------------------------------------------------------------!
         !   Try to find specified interface condition between d1 and d2   !
         !-----------------------------------------------------------------!
-        call Control_Mod_Position_At_Three_Keys('INTERFACE_CONDITION',    &
-                                                trim(problem_name(d1)),   &
-                                                trim(problem_name(d2)),   &
-                                                found,                    &
-                                                verbose=.false.)
+        call Control % Position_At_Three_Keys('INTERFACE_CONDITION',    &
+                                              trim(problem_name(d1)),   &
+                                              trim(problem_name(d2)),   &
+                                              found,                    &
+                                              verbose=.false.)
 
         !---------------------------------------------------!
         !   Found specification between domains d1 and d2   !
         !---------------------------------------------------!
         if(found) then
-          call Control_Mod_Read_Strings_On('BOUNDARY_CONDITIONS',  &
-                                           keys, nks, .false.)
+          call Control % Read_Strings_On('BOUNDARY_CONDITIONS',  &
+                                         keys, nks, .false.)
           do k = 1, nks
             call String % To_Upper_Case(keys(k))
           end do
@@ -153,14 +153,12 @@
           call Global % Sum_Int(n2_tot)
 
           if(n1_tot .ne. n2_tot) then
-            if(First_Proc()) then
-              print *, '# Number of cells at the interface between ',  &
-                        trim(problem_name(d1)), ' and ',               &
-                        trim(problem_name(d2)), ' is not the same!'
-              print *, '# Only conformal mappings are supported.  Exiting!'
-            end if
-            call Comm_Mod_End
-            stop
+            call Message % Error(72,                                        &
+                       'Number of cells at the interface between '//        &
+                       trim(problem_name(d1))//' and '//                    &
+                       trim(problem_name(d2))//' is not the same! '//       &
+                       'Only conformal mappings are supported.  Exiting!',  &
+                       file=__FILE__, line=__LINE__, one_proc=.true.)
           else
             n_tot = n1_tot
             inter(d1, d2) % n_tot = n_tot

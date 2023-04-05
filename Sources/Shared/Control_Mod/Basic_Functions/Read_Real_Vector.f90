@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Real_Array(keyword, n, def, val, verbose)
+  subroutine Read_Real_Vector(Control, keyword, n, def, val, verbose)
 !------------------------------------------------------------------------------!
 !   Working horse function to read integer value (argument "val") behind a     !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
@@ -7,17 +7,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  integer           :: n        ! size of array (typically small)
-  real              :: def(n)   ! default value
-  real              :: val(n)   ! spefified value, if found
-  logical, optional :: verbose
+  class(Control_Type)              :: Control
+  character(len=*),    intent(in)  :: keyword
+  integer,             intent(in)  :: n        ! size of array (typically small)
+  real,                intent(in)  :: def(n)   ! default value
+  real,                intent(out) :: val(n)   ! spefified value, if found
+  logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
   integer :: i
 !==============================================================================!
 
-  rewind(control_file_unit)
+  rewind(Control % file_unit)
 
   ! Set default values
   val = def
@@ -26,7 +27,7 @@
   !   Browse through command file to find the keyword   !
   !-----------------------------------------------------!
   do
-    call File % Read_Line(control_file_unit, reached_end)
+    call File % Read_Line(Control % file_unit, reached_end)
     if(reached_end) goto 1
 
     ! Found the correct keyword
@@ -35,10 +36,6 @@
         read(Line % tokens(i+1), *) val(i)
       end do
       return
-
-    ! Keyword not found, try to see if there is similar, maybe it was a typo
-    else
-      call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
     end if
 
   end do
@@ -48,8 +45,8 @@
   !--------------------------------------------!
 1 if(present(verbose)) then
     if(verbose .and. First_Proc()) then
-      print '(3a,1pe9.3)', ' # NOTE! Could not find the keyword: ',  &
-                            trim(keyword), '. Using the default: ', def(1)
+      print '(3a,1pe10.3)', ' # NOTE! Could not find the keyword: ',  &
+                             trim(keyword), '. Using the default: ', def(1)
     end if
   end if
 

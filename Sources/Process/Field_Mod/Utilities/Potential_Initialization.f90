@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Potential_Initialization(Flow, Sol)
+  subroutine Potential_Initialisation(Flow, Sol)
 !------------------------------------------------------------------------------!
 !   Initializes velocity from potential (pressure-like) equation               !
 !------------------------------------------------------------------------------!

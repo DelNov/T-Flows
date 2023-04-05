@@ -58,14 +58,14 @@
 
   ! Old values (o) and older than old (oo)
   if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c)   = phi % o(c)
       phi % o (c)   = phi % n(c)
     end do
   end if
 
   ! New values
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     cross(c) = 0.0
   end do
 
@@ -142,7 +142,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) + cross(c)
   end do
 
@@ -186,9 +186,9 @@
 
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
   else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(4, 2, phi % name, phi % res, phi % eniter)
   end if
 
   call Flow % Grad_Variable(phi)

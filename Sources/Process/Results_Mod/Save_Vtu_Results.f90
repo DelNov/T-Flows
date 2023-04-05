@@ -100,7 +100,7 @@
     end do
   end if
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   !--------------------------------------!
   !                                      !

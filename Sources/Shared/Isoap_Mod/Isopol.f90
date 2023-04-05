@@ -56,7 +56,7 @@
        ISE(NS,NV),ISNEW,ITYPE,IV,IV1,IVISE(NS,NV),IVNEW,IVNEWT,      &
        NEDGE(NS),NINT,NIPNEW,NISCUT,NIV,NIVNEW
 !* Avoid unused warning
-    ASSOCIATE(ISOAP => ISOAP); END ASSOCIATE
+  ASSOCIATE(ISOAP => ISOAP); END ASSOCIATE
 !* Determination of the faces intersected by the isosurface      
   NISCUT=0
 !* NEDGE(IS) = Number of intersected edges of the face IS
