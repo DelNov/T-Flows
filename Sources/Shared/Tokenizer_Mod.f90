@@ -29,6 +29,11 @@
 
   end type
 
+  !---------------------------!
+  !   Singleton object Line   !
+  !---------------------------!
+  type(Tokenizer_Type) :: Line
+
   contains
 
 #   include "Tokenizer_Mod/Parse.f90"

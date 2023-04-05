@@ -1,3 +1,4 @@
+#include "../Shared/Assert.h90"
 #include "../Shared/Unused.h90"
 
 !==============================================================================!
@@ -40,11 +41,10 @@
 
   end type
 
-  !-------------------------------------!
-  !   Singleton objects Line and File   !
-  !-------------------------------------!
-  type(Tokenizer_Type) :: Line
-  type(File_Type)      :: File
+  !---------------------------!
+  !   Singleton object File   !
+  !---------------------------!
+  type(File_Type) :: File
 
   integer(SP) :: int4_array(MAX_ITEMS)
   integer(DP) :: int8_array(MAX_ITEMS)
