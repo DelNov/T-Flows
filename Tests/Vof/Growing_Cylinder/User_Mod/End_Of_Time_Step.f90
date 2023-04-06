@@ -53,12 +53,12 @@
   if (First_Proc()) then
     call File % Append_For_Writing_Ascii('bench-data.dat', fu)
     !with circularity 2D:
-    write(fu,'(5(2X,E16.10E2))') time, b_volume,                    &
+    write(fu,'(5(2x,e16.10e2))') time, b_volume,                    &
                                 2.0*PI/surface*sqrt(b_volume/PI),  &
                                 c_position/b_volume,               &
                                 rise_velocity/b_volume
     !with sphericity 3D:
-!    write(fu,'(5(2X,E16.10E2))') time, b_volume,                          &
+!    write(fu,'(5(2x,e16.10e2))') time, b_volume,                          &
 !                                PI**(1.0/3.0)*(6.0*b_volume)**(2.0/3.0)  &
 !                                /surface,                                &
 !                                c_position/b_volume,                     &
