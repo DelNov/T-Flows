@@ -6,11 +6,11 @@
  INTERFACE_TRACKING      yes
  TRACK_FRONT             yes
  REPORT_VOLUME_BALANCE   yes
- 
- NUMBER_OF_TIME_STEPS    1 3600
 
- RESULTS_SAVE_INTERVAL   1 20 
-# BACKUP_SAVE_INTERVAL    20000
+ NUMBER_OF_TIME_STEPS     1500 4500
+
+ RESULTS_SAVE_INTERVAL      50
+ BACKUP_SAVE_INTERVAL    20000
 
  TIME_STEP               1.0e-4
  
@@ -44,7 +44,7 @@
 
  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7   1.0
  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3   0.99
- SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.7   0.99
+ SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.999 0.99
 
  TIME_INTEGRATION_SCHEME  linear
 
@@ -84,25 +84,17 @@
 #---------------------
 # Boundary conditions
 #---------------------
-#  BOUNDARY_CONDITION    wall
-#    TYPE                outflow
-#    VARIABLES           u     v     w     vof     vof_c_ang     q
-#    VALUES              0.0   0.0   0.0   1.0     90.0          0.0
-#  BOUNDARY_CONDITION    symmetry
-#    TYPE                symmetry
-#    VARIABLES           u     v     w     vof
-#    VALUES              0.0   0.0   0.0   1.0
   BOUNDARY_CONDITION    lower_wall
-    TYPE                convective   (or: inflow/ outflow / pressure / convective / symmetry )
-    VARIABLES           u     v     w     v     q
+    TYPE                outflow
+    VARIABLES           u     v     w     vof     q
     VALUES              0.0   0.0   0.0   1.0   0.0 
  BOUNDARY_CONDITION     upper_wall
-    TYPE                convective
-    VAVARIABLES         u      v     w     vof     q
+    TYPE                outflow
+    VAVARIABLES         u      v    w     vof     q
     VALUES              0.00  0.0   0.0   1.0     0.0
   BOUNDARY_CONDITION    side_walls
-    TYPE                convective
-    VARIABLES           u      v     w     vof     q
+    TYPE                outflow
+    VARIABLES           u      v    w     vof     q
     VALUES              0.00  0.0   0.0   1.0     0.0
 
 
