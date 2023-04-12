@@ -13,7 +13,9 @@
   type(Var_Type),   pointer :: smooth
   integer                   :: c, c1, c2, s, nb, nc
   real                      :: v1(3), v2(3), v3(3), v4(3)
-  real                      :: norm_grad, dotprod
+  real                      :: norm_grad, dotprod, mag_ntan, theta
+  real                      :: nwallx, nwally, nwallz
+  real                      :: nintx, ninty, nintz, ntanx, ntany, ntanz
   real, contiguous, pointer :: div_x(:), div_y(:), div_z(:)
 !==============================================================================!
 
@@ -112,27 +114,41 @@
 
         if(norm_grad > FEMTO) then
 
-          dotprod = Grid % dx(s) * Grid % sx(s)  &
-                  + Grid % dy(s) * Grid % sy(s)  &
-                  + Grid % dz(s) * Grid % sz(s)
+          ! unit normal vector of interface
+          nintx = Vof % nx(c1)
+          ninty = Vof % ny(c1)
+          nintz = Vof % nz(c1)
 
-          Vof % nx(c1) = Grid % dx(s) / dotprod * Grid % s(s)          &
-                       * cos(fun % q(c2) * PI /180.0)                  &
-                       + Vof % nx(c2) * sin(fun % q(c2) * PI /180.0)
+          ! unit wall normal vector directed into wall
+          nwallx = Grid % sx(s)/Grid %s(s)
+          nwally = Grid % sy(s)/Grid %s(s)
+          nwallz = Grid % sz(s)/Grid %s(s)
 
-          Vof % ny(c1) = Grid % dy(s) / dotprod * Grid % s(s)          &
-                       * cos(fun % q(c2) * PI /180.0)                  &
-                       + Vof % ny(c2) * sin(fun % q(c2) * PI /180.0)
+          ! ntan vector lies in wall and is normal to contact line, see Brackbill's paper
+          ! ntan = (nint - (nint.nwall) nwall) / abs(nint - (nint.nwall) nwall)
+          dotprod = nintx * nwallx + ninty * nwally + nintz * nwallz
+          ntanx = nintx - dotprod * nwallx
+          ntany = ninty - dotprod * nwally
+          ntanz = nintz - dotprod * nwallz
+          ! normalize
+          mag_ntan = sqrt( ntanx**2.0 + ntany**2.0 + ntanz**2.0 + FEMTO)
+          ntanx = ntanx/mag_ntan
+          ntany = ntany/mag_ntan
+          ntanz = ntanz/mag_ntan
 
-          Vof % nz(c1) = Grid % dz(s) / dotprod * Grid % s(s)          &
-                       * cos(fun % q(c2) * PI /180.0)                  &
-                       + Vof % nz(c2) * sin(fun % q(c2) * PI /180.0)
+          theta = fun % q(c2) * PI /180.0
+          Vof % nx(c2) = nwallx * cos(theta) + ntanx * sin(theta)
+          Vof % ny(c2) = nwally * cos(theta) + ntany * sin(theta)
+          Vof % nz(c2) = nwallz * cos(theta) + ntanz * sin(theta)
 
-          Vof % nx(c2) = Vof % nx(c1)
-          Vof % ny(c2) = Vof % ny(c1)
-          Vof % nz(c2) = Vof % nz(c1)
+          ! debug
+          !IF (abs(Grid % zf(s)-0.0e-3).LT.1e-6) THEN
+          !  WRITE(*,*)'Curv:x',Grid % xf(s), Grid % yf(s), Grid % zf(s)
+          !  WRITE(*,*)'Curv:d',Grid % dx(s), Grid % dy(s), Grid % dz(s)
+          !  WRITE(*,*)'Curv:s',Grid % sx(s), Grid % sy(s), Grid % sz(s), Grid % s(s) 
+          !ENDIF
+
         end if
-
       end if  ! if WALL
     end if  ! c2 < 0
 
