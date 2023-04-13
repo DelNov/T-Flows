@@ -85,8 +85,7 @@
 
   call Flow % Grad_Variable(t)
   ! Calculate smooth variable from vof function ...
-  call Vof % Smooth_Scalar(Grid, fun % n,   &
-                           smooth % n(-nb:nc), Vof % n_conv_curv)
+  call Vof % Curvature_Csf()
 
   ! ... and find its gradients as well
   call Flow % Grad_Variable(smooth)

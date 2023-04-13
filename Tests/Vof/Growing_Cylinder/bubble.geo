@@ -1,7 +1,7 @@
-A  = 1.0;  // length and height of the cavity
-B  = 0.2;  // width of the cavity
-NA = 40;    // resolution in length and height
-NB = 20;    // resolution in width (periodic direction)
+A  = 1.0;   // length and height of the cavity
+B  = 0.03;  // width of the cavity
+NA = 60;    // resolution in length and height
+NB =  3;    // resolution in width (periodic direction)
 
 // Define points
 Point(1) = {-0.5*A, 0, -0.5*A};  Point(2) = {A*0.5, 0, -0.5*A};

@@ -64,11 +64,10 @@
     ! For phase change
     real :: t_sat, latent_heat  ! [K, J/kg]
 
-    ! Heat from phase change and index of saturated cells
-    real, allocatable :: q_int(:,:)
-    real, allocatable :: q_0(:)
-    real, allocatable :: q_1(:)
-    real, allocatable :: m_dot(:)         ! [kg/s]
+    ! Neighbouring coefficients due to presence of saturated front
+    real, allocatable :: a12(:)
+    real, allocatable :: a21(:)
+    real, allocatable :: m_dot(:) ! [kg/s]
 
     type(Var_Type) :: t_0, t_1
 
@@ -105,7 +104,7 @@
       !   (convoluted) variant of vof function   !
       !   for eventual estimation of curvature   !
       !------------------------------------------!
-      procedure, private :: Curvature_Csf
+      procedure          :: Curvature_Csf
       procedure, private :: Smooth_Curvature
       procedure          :: Smooth_For_Curvature_Csf
       procedure          :: Smooth_Scalar

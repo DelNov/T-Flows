@@ -21,7 +21,10 @@
   integer, contiguous, pointer :: elem_used(:)
   character(SL)                :: fname
   integer                      :: e, s, c, c1, c2
-  real                         :: cond_1, cond_2, phi_c1, phi_c2, sx, sy, sz
+  real                         :: phi_c1, phi_c2, sx, sy, sz
+  real                         :: dx1, dy1, dz1, dx2, dy2, dz2, d1, d2, st
+  real                         :: dx1_n, dy1_n, dz1_n, dx2_n, dy2_n, dz2_n
+  real                         :: q_0, q_1
 !==============================================================================!
 
   ! Take aliases
@@ -29,18 +32,20 @@
   Flow => Vof % pnt_flow
   t    => Flow % t
 
-  call Work % Connect_Real_Cell(elem_sx, elem_sy, elem_sz)
-  call Work % Connect_Int_Cell(elem_used)
-
   ! If not a problem with mass transfer, get out of here
   if(.not. Flow % mass_transfer) return
+
+  call Work % Connect_Real_Cell(elem_sx, elem_sy, elem_sz)
+  call Work % Connect_Int_Cell(elem_used)
 
   ! Initialize mass transfer term
   Vof % m_dot(:) = 0.0
 
   !------------------------------------------------!
+  !                                                !
   !   Compute gradients of temperature, imposing   !
   !    saturation temperature at the interface     !
+  !                                                !
   !------------------------------------------------!
   call Vof % Grad_Variable_With_Front(t, Vof % t_sat)
   if(DEBUG) then
@@ -50,6 +55,35 @@
                                vector_cell = (/t % x, t % y, t % z/),  &
                                vector_name = "grad-t")
   end if
+
+  !----------------------------------------------!
+  !                                              !
+  !    Extrapolate gradients from each of the    !
+  !   phases toward the cells at the interface   !
+  !                                              !
+  !----------------------------------------------!
+
+  ! Intialize t_0 and t_1 ...
+  Vof % t_0 % x(1:) = t % x(1:)
+  Vof % t_0 % y(1:) = t % y(1:)
+  Vof % t_0 % z(1:) = t % z(1:)
+  Vof % t_1 % x(1:) = t % x(1:)
+  Vof % t_1 % y(1:) = t % y(1:)
+  Vof % t_1 % z(1:) = t % z(1:)
+
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % x, towards=1)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % y, towards=1)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % z, towards=1)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % x, towards=0)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % y, towards=0)
+  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % z, towards=0)
+
+  !-------------------------------------------!
+  !                                           !
+  !   Computation of heat fluxes to or from   !
+  !   interface towards the cells around it   !
+  !                                           !
+  !-------------------------------------------!
 
   !---------------------------------------------------!
   !   Distribute element areas to cell-based arrays   !
@@ -66,6 +100,7 @@
   call Grid % Exchange_Cells_Real(elem_sx)
   call Grid % Exchange_Cells_Real(elem_sy)
   call Grid % Exchange_Cells_Real(elem_sz)
+
   if(DEBUG) then
     fname = "elem-s-"
     write(fname(8:12), '(i5.5)') curr_dt
@@ -101,14 +136,19 @@
   !     they are used to avoid excessive integration     !
   !------------------------------------------------------!
   do c = Cells_In_Domain_And_Buffers()
-    elem_sx(c) = elem_sx(c) / elem_used(c)
-    elem_sy(c) = elem_sy(c) / elem_used(c)
-    elem_sz(c) = elem_sz(c) / elem_used(c)
+    if(elem_used(c) > 0) then
+      elem_sx(c) = elem_sx(c) / elem_used(c)
+      elem_sy(c) = elem_sy(c) / elem_used(c)
+      elem_sz(c) = elem_sz(c) / elem_used(c)
+    end if
   end do
 
   !----------------------------------------!
   !   Compute heat flux at the interface   !
   !----------------------------------------!
+  Vof % a12(:) = 0.0
+  Vof % a21(:) = 0.0
+
   do s = 1, Grid % n_faces
 
     c1 = Grid % faces_c(1,s)
@@ -117,22 +157,12 @@
     phi_c1 = Vof % fun % n(c1)
     phi_c2 = Vof % fun % n(c2)
 
+    Assert(phi_c1 .ne. 0.5)
+    Assert(phi_c2 .ne. 0.5)
+
     if( (phi_c1 - 0.5) * (phi_c2 - 0.5) < 0 ) then
 
-      Vof % q_int(1,s) = 0.0
-      Vof % q_int(2,s) = 0.0
-
-      ! Take conductivities from each side of the interface
-      cond_1 = Vof % phase_cond(1)
-      cond_2 = Vof % phase_cond(0)
-      if(Vof % fun % n(c1) < 0.5) cond_1 = Vof % phase_cond(0)
-      if(Vof % fun % n(c2) > 0.5) cond_2 = Vof % phase_cond(1)
-
-      ! Compute heat fluxes from each side of the interface
-      ! Keep in mind that in the Stefan's case, dot product of
-      ! element's surface and face's surface is positive.  If
-      ! VOF's definition changes, I assume this would have to
-      ! be adjusted accordingly.
+      ! Compute internal boundary coefficients on each side of the interface
       ! Units: W/(mK) * K/m * m^2 = W
 
       ! Simply sum the areas up.  Keep in mind that these
@@ -140,79 +170,65 @@
       sx = elem_sx(c1) + elem_sx(c2)
       sy = elem_sy(c1) + elem_sy(c2)
       sz = elem_sz(c1) + elem_sz(c2)
+      st = sqrt(sx**2 + sy**2 + sz**2)
 
-      Vof % q_int(1,s) = Vof % q_int(1,s)  &
-          + cond_1 * (t % x(c1) * sx + t % y(c1) * sy + t % z(c1) * sz)
+      dx1 = Grid % xc(c1) - Grid % xs(s)
+      dy1 = Grid % yc(c1) - Grid % ys(s)
+      dz1 = Grid % zc(c1) - Grid % zs(s)
 
-      Vof % q_int(2,s) = Vof % q_int(2,s)  &
-          + cond_2 * (t % x(c2) * sx + t % y(c2) * sy + t % z(c2) * sz)
+      dx2 = Grid % xc(c1) + Grid % dx(s) - Grid % xs(s)
+      dy2 = Grid % yc(c1) + Grid % dy(s) - Grid % ys(s)
+      dz2 = Grid % zc(c1) + Grid % dz(s) - Grid % zs(s)
+
+      dx1_n = dx1 * 0.5*(Vof % nx(c1) + Vof % nx(c2))
+      dy1_n = dy1 * 0.5*(Vof % ny(c1) + Vof % ny(c2))
+      dz1_n = dz1 * 0.5*(Vof % nz(c1) + Vof % nz(c2))
+      d1 = norm2((/dx1_n, dy1_n, dz1_n/))
+
+      dx2_n = dx2 * 0.5*(Vof % nx(c1) + Vof % nx(c2))
+      dy2_n = dy2 * 0.5*(Vof % ny(c1) + Vof % ny(c2))
+      dz2_n = dz2 * 0.5*(Vof % nz(c1) + Vof % nz(c2))
+      d2 = norm2((/dx2_n, dy2_n, dz2_n/))
+
+      ! This asserion was failing due to imperfections in periodic solutions
+      ! Assert(dot_product((/dx1_n, dy1_n, dz1_n/),(/dx2_n, dy2_n, dz2_n/))<0.0)
+
+      ! Cell c1 is in vapor and c2 is in liquid
+      if(Vof % fun % n(c1) < 0.5) then
+        Vof % a12(s) = Vof % a12(s) + Vof % phase_cond(0) * st / d1
+        Vof % a21(s) = Vof % a21(s) + Vof % phase_cond(1) * st / d2
+      ! Cell c1 is in liquid and c2 is in vapor
+      else
+        Vof % a12(s) = Vof % a12(s) + Vof % phase_cond(1) * st / d1
+        Vof % a21(s) = Vof % a21(s) + Vof % phase_cond(0) * st / d2
+      end if
 
     end if      ! face is at the front
 
   end do
 
   !-----------------------------------------------!
-  !   Mass transfer with gradient extrapolation   !
+  !                                               !
+  !   Mass transfer with extrapolated gradients   !
+  !                                               !
   !-----------------------------------------------!
-
-  ! Intialize t_0 and t_1 ...
-  Vof % t_0 % x(1:) = t % x(1:)
-  Vof % t_0 % y(1:) = t % y(1:)
-  Vof % t_0 % z(1:) = t % z(1:)
-  Vof % t_1 % x(1:) = t % x(1:)
-  Vof % t_1 % y(1:) = t % y(1:)
-  Vof % t_1 % z(1:) = t % z(1:)
-
-  ! ... then extrapolate in the direction of the normal
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % x, towards=1)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % y, towards=1)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % z, towards=1)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % x, towards=0)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % y, towards=0)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % z, towards=0)
-
-  if(DEBUG) then
-    fname = "grad-t-0-"
-    write(fname(10:14), '(i5.5)') curr_dt
-    call Grid % Save_Debug_Vtu(fname,                            &
-                               scalar_cell = Vof % fun % n,      &
-                               scalar_name = "vof_fun",          &
-                               vector_cell = (/Vof % t_0 % x,    &
-                                               Vof % t_0 % y,    &
-                                               Vof % t_0 % z/),  &
-                               vector_name = "grad-t-0")
-    fname = "grad-t-1-"
-    write(fname(10:14), '(i5.5)') curr_dt
-    call Grid % Save_Debug_Vtu(fname,                            &
-                               scalar_cell = Vof % fun % n,      &
-                               scalar_name = "vof_fun",          &
-                               vector_cell = (/Vof % t_1 % x,    &
-                                               Vof % t_1 % y,    &
-                                               Vof % t_1 % z/),  &
-                               vector_name = "grad-t-1")
-  end if
-
-  Vof % q_0(:) = 0
-  Vof % q_1(:) = 0
   do c = Cells_In_Domain_And_Buffers()
 
     if(elem_used(c) > 0) then
       ! Heat flux to the interface in cell c from phase 0
       ! Units: W/(mK) * K/m * m^2 = W
-      Vof % q_0(c) = (  Vof % t_0 % x(c) * elem_sx(c)    &
-                      + Vof % t_0 % y(c) * elem_sy(c)    &
-                      + Vof % t_0 % z(c) * elem_sz(c) )  &
-                   * Vof % phase_cond(0)
+      q_0 = (  Vof % t_0 % x(c) * elem_sx(c)    &
+             + Vof % t_0 % y(c) * elem_sy(c)    &
+             + Vof % t_0 % z(c) * elem_sz(c) ) * Vof % phase_cond(0)
 
       ! Heat flux to the interface in cell c from phase 1
       ! Units: W/(mK) * K/m * m^2 = W
-      Vof % q_1(c) = (  Vof % t_1 % x(c) * elem_sx(c)    &
-                      + Vof % t_1 % y(c) * elem_sy(c)    &
-                      + Vof % t_1 % z(c) * elem_sz(c) )  &
-                   * Vof % phase_cond(1)
+      q_1 = (  Vof % t_1 % x(c) * elem_sx(c)    &
+             + Vof % t_1 % y(c) * elem_sy(c)    &
+             + Vof % t_1 % z(c) * elem_sz(c) ) * Vof % phase_cond(1)
 
       ! Units: W / (J/kg) = kg/s
-      Vof % m_dot(c) = (Vof % q_1(c) - Vof % q_0(c)) / L
+      Vof % m_dot(c) = (q_1 - q_0) / L
     end if
 
   end do
