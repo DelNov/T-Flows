@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine Save_Results(Results,  &
-                          Flow, Turb, Vof, Swarm, ts, plot_inside, domain)
+  subroutine Save_Results(Results, Flow, Turb, Vof, Swarm, &
+                          time, ts, plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
@@ -12,6 +12,7 @@
   type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
+  real                      :: time         ! physical time of the simulation
   integer                   :: ts           ! time step
   logical                   :: plot_inside  ! plot results inside?
   integer,         optional :: domain
@@ -24,7 +25,7 @@
   integer                      :: s1, s2, c1, c2, c_f, c_l
   real                         :: dist1, dist2
   character(SL)                :: name_out_8, name_out_9, name_mean, a_name
-  character(SL)                :: str1, str2
+  character(SL)                :: str1, str2, str_time
   integer, pointer, contiguous :: int_save(:), type_save(:), offs_save(:)
   real,    pointer, contiguous :: save_01(:), save_02(:), save_03(:)
   real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
@@ -136,21 +137,36 @@
   end if
   call File % Open_For_Writing_Binary(name_out_9, f9)
 
+  write(str_time,'(E16.9)')time
+
   !------------!
   !            !
   !   Header   !
   !            !
   !------------!
+  ! Note: f8 = pvtu,  f9 = vtu
   if(n_proc > 1 .and. this_proc .eq. 1)  then
     write(f8) IN_0 // '<?xml version="1.0"?>'              // LF
     write(f8) IN_0 // '<VTKFile type="PUnstructuredGrid">' // LF
     write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="1">' // LF
+    write(f8) IN_2 // '<PFieldData>' // LF
+    ! TIME must be capitalized for visit
+    write(f8) IN_3 // '<PDataArray type="Float64" Name="TIME" ' // &
+                  'NumberOfTuples="1" format="ascii"> ' // trim(str_time) // LF
+    write(f8) IN_3 // '</PDataArray>' // LF
+    write(f8) IN_2 // '</PFieldData>' // LF
   end if
 
   write(f9) IN_0 // '<?xml version="1.0"?>'                           // LF
   write(f9) IN_0 // '<VTKFile type="UnstructuredGrid" version="0.1" ' //  &
                     'byte_order="LittleEndian">'                      // LF
   write(f9) IN_1 // '<UnstructuredGrid>'                              // LF
+  write(f9) IN_2 // '<FieldData>' // LF
+  ! TIME must be capitalized for visit
+  write(f9) IN_3 // '<DataArray type="Float64" Name="TIME" ' // & 
+                    'NumberOfTuples="1" format="ascii">' // trim(str_time) // LF
+  write(f9) IN_3 // '</DataArray>' // LF
+  write(f9) IN_2 // '</FieldData>' // LF
 
   write(str1,'(i0.0)') Grid % n_nodes
   if(plot_inside) then

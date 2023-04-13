@@ -48,9 +48,9 @@
     do d = 1, n_dom
       call Control_Mod_Switch_To_Domain(d)
       call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                  curr_dt, plot_inside=.true., domain=d)
+                                  time, curr_dt, plot_inside=.true., domain=d)
       call Results % Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                  curr_dt, plot_inside=.false., domain=d)
+                                  time, curr_dt, plot_inside=.false., domain=d)
 
       if(Flow(d) % with_interface) then
         if(Vof(d) % track_front) then
