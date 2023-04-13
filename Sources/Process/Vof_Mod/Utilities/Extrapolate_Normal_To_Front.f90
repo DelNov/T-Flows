@@ -25,7 +25,7 @@
   type(Grid_Type),  pointer   :: Grid
   type(Front_Type), pointer   :: Front
   real, pointer, contiguous   :: phi_n(:), phi_o(:), adv_t(:)
-  real                        :: dx, dy, dz, nx, ny, nz, sx, sy, sz
+  real                        :: dx, dy, dz, nx, ny, nz
   real                        :: dtau, flux_s, max_error
   integer                     :: t_iter, c, s, c1, c2, e1, e2
 !------------------------------[Local parameters]------------------------------!
@@ -169,7 +169,7 @@
       max_error = max(max_error, abs(phi_o(c) - phi_n(c)))
     end do
     call Global % Max_Real(max_error)
-    if(max_error < MICRO) goto 1
+    if(max_error < MILI) goto 1
 
     ! The new becomes old
     do c = Cells_In_Domain_And_Buffers()
