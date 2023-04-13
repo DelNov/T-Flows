@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Vof_Type), target :: Vof
-  real                    :: added_vol
+  class(Vof_Type), target, intent(in)  :: Vof
+  real,                    intent(out) :: added_vol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
