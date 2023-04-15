@@ -215,6 +215,7 @@
   call Control_Mod_Results_Save_Interval (Results % interval, verbose=.true.)
   call Control_Mod_Save_Initial_Condition(Results % initial,  verbose=.true.)
   call Control_Mod_Save_Results_At_Boundaries(Results % boundary)
+  call Control_Mod_Save_Results_Units(Results % units)
   call Control_Mod_Swarm_Save_Interval(Results % interval_swarm, verbose=.true.)
 
   !-------------------------------------------------------!
