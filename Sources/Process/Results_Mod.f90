@@ -18,6 +18,7 @@
   type Results_Type
 
     logical :: boundary        ! save results at boundaries or not
+    logical :: units           ! save results with units
     logical :: initial         ! save intial condition or not
     integer :: interval        ! result save interval
     integer :: interval_swarm  ! result save interval for particles
