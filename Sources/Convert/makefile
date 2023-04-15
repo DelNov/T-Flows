@@ -33,10 +33,10 @@ $(info #                                                                       )
 $(info # Note: The first item, for each of the options above, is the default.  )
 $(info #                                                                       )
 $(info # Examples:                                                             )
-$(info #   make              - compile with gnu compiler                       )
-$(info #   make FORTAN=intel - compile with intel compiler                     )
-$(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
-$(info #   make OPENMP=yes   - compile with gnu compiler for parallel Convert  )
+$(info #   make               - compile with gnu compiler                      )
+$(info #   make FORTRAN=intel - compile with intel compiler                    )
+$(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
+$(info #   make OPENMP=yes    - compile with gnu compiler for parallel Convert )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------
@@ -157,9 +157,7 @@ SRC_F_MOD = Const_Mod.f90          \
 #---------------
 
 # Sources for all shared functions
-SRC_F_FUN = Probe_1d_Nodes.f90  \
-            To_Lower_Case.f90   \
-            To_Upper_Case.f90
+SRC_F_FUN = Probe_1d_Nodes.f90
 
 # Local functions are added one by one ...
 SRC_F_FUN += Allocate_Memory.f90       \
@@ -237,4 +235,5 @@ include makefile_explicit_dependencies
 #   Explicit target
 #---------------------
 clean:
-	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod \
+	      $(DIR_MODULE)/*.f90 $(PROGRAM_FILE)

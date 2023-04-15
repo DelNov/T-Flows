@@ -9,12 +9,16 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Prim, Dual
-!----------------------------------[Calling]-----------------------------------!
-  integer :: N_Sharp_Corners
-  integer :: N_Edges_On_Bnd_Color
-  integer :: N_Bnd_Cells_In_Color
-  integer :: N_Sharp_Edges
-  integer :: N_Nodes_In_Bnd_Color
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Allocate_Memory.h90'
+    include 'N_Sharp_Corners.h90'
+    include 'N_Edges_In_Bnd_Color.h90'
+    include 'N_Bnd_Cells_In_Color.h90'
+    include 'N_Sharp_Edges.h90'
+    include 'N_Nodes_In_Bnd_Color.h90'
+    include 'Sort_Face_Nodes.h90'
+  end interface
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: bc, e, c, c1, c2, s, n, n1, n2
   integer              :: i, i_nod, j_nod, i_edg
@@ -203,7 +207,7 @@
   allocate(Dual % bnd_cond % name(Dual % n_bnd_cond))
   do bc = 1, Prim % n_bnd_cond
     Dual % bnd_cond % name(bc) = Prim % bnd_cond % name(bc)
-    call To_Upper_Case(Dual % bnd_cond % name(bc))
+    call String % To_Upper_Case(Dual % bnd_cond % name(bc))
   end do
 
   !----------------------------------!

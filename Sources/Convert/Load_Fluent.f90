@@ -5,13 +5,17 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
-  use IFPORT
-  use IFPOSIX
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include 'Allocate_Memory.h90'
+  end interface
 !---------------------------------[Arguments]----------------------------------!
   type(Grid_Type) :: Grid
   character(SL)   :: file_name
+!----------------------------------[Calling]-----------------------------------!
+  integer(DP) :: ftell
 !-----------------------------------[Locals]-----------------------------------!
   character(SL)          :: one_token
   character(1)           :: one_char
@@ -28,7 +32,6 @@
   integer                :: face_sect_pos(2048)   ! where did Fluent store it
   integer                :: face_sect_bnd(2048)   ! where does T-Flows store it
   integer                :: n_bnd_cond            ! number of boundary conditions
-  integer                 :: istat
   logical                :: this_sect_bnd         ! .true. if bnd cond section
   logical                :: the_end               ! end of file reached?
   logical                :: ascii                 ! is file in ascii format?
@@ -341,8 +344,13 @@
 
   ! Initialize all cell counters
   n_cells = 0
-  n_tri   = 0;  n_quad  = 0;  n_tet = 0
-  n_hexa  = 0;  n_pyra  = 0;  n_wed = 0
+  n_tri   = 0
+  n_quad  = 0
+  n_tet   = 0
+  n_hexa  = 0
+  n_pyra  = 0
+  n_wed   = 0
+  n_poly  = 0
   the_end = .false.
 
   rewind(fu)
@@ -430,7 +438,7 @@
             ! Find out the line length
             offset = ftell(fu)                ! mark offset
             length = File % Line_Length(fu)   ! read the line
-            istat = fseek(fu, offset, 0)         ! go back
+            call fseek(fu, offset, 0)         ! go back
 
             ! Allocate helping arrays
             allocate(very_long_line(length))    ! allocate very long line
@@ -1076,7 +1084,7 @@
         do n = 1, 2048
           if(face_sect_bnd(n) .ne. 0) then
             if(face_sect_pos(n) .eq. pos) then
-              call To_Upper_Case(one_token)
+              call String % To_Upper_Case(one_token)
               Grid % bnd_cond % name(face_sect_bnd(n)) = one_token
             end if
           end if
