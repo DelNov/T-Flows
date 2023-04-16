@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Nu(Turb, ts)
+  subroutine User_Mod_Impinging_Jet_Nu(Turb)
 !------------------------------------------------------------------------------!
 !   The subroutine creates ASCII file with Nusselt number averaged             !
 !   in azimuthal direction.                                                    !
@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
-  integer,     intent(in) :: ts     ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
@@ -155,8 +154,10 @@
   if(First_Proc()) then
 
     ! Set the file name
-    call File % Set_Name(res_name, time_step=ts, &
-                         appendix='-nu-utau', extension='.dat')
+    call File % Set_Name(res_name,                      &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-nu-utau',        &
+                         extension = '.dat')
     call File % Open_For_Writing_Ascii(res_name, fu)
 
     ! Write the file out

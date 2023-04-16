@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Vof(Vof, Sol, dt, curr_dt)
+  subroutine Compute_Vof(Vof, Sol, dt)
 !------------------------------------------------------------------------------!
 !   Solves Volume Fraction equation using UPWIND ADVECTION and CICSAM          !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,6 @@
   class(Vof_Type),   target :: Vof
   type(Solver_Type), target :: Sol
   real                      :: dt
-  integer, intent(in)       :: curr_dt  ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -26,7 +25,7 @@
 
   call Profiler % Start('Compute_Vof (without solvers)')
 
-  call User_Mod_Beginning_Of_Compute_Vof(Vof, Sol, curr_dt)
+  call User_Mod_Beginning_Of_Compute_Vof(Vof, Sol)
 
   ! Take aliases
   Flow   => Vof % pnt_flow
@@ -53,7 +52,7 @@
       if(n_sub > 1) then
         if(First_Proc()) then
           call File % Append_For_Writing_Ascii('alert-dt-vof.dat', fu)
-          write(fu,*) 'Courant Number was exceded at iteration: ', curr_dt
+          write(fu,*) 'Courant Number exceded at iteration: ', Time % Curr_Dt()
           write(fu,*) 'Co_max = ', courant_max
           write(fu,*) 'Try reducing time step'
           close(fu)
@@ -248,7 +247,7 @@
 
   call Flow % Grad_Variable(fun)
 
-  call User_Mod_End_Of_Compute_Vof(Vof, Sol, curr_dt)
+  call User_Mod_End_Of_Compute_Vof(Vof, Sol)
 
   call Profiler % Stop('Compute_Vof (without solvers)')
 

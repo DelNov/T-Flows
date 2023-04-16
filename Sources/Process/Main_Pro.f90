@@ -9,7 +9,7 @@
 !----------------------------------[Locals]------------------------------------!
   character(len=7)      :: root_control    = 'control'
   character(len=9)      :: dom_control(MD) = 'control.d'
-  integer               :: curr_dt, sc, tp
+  integer               :: sc, tp, ldt
   logical               :: read_backup(MD), exit_now, pot_init
   type(Grid_Type)       :: Grid(MD)        ! grid used in computations
   type(Field_Type)      :: Flow(MD)        ! flow field we will be solving for
@@ -21,9 +21,6 @@
   type(Monitor_Type)    :: monitor(MD)     ! monitors
   type(Porosity_Type)   :: Por(MD)         ! porosity
   type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
-  real                  :: time            ! physical time of the simulation
-  integer               :: first_dt        ! first time step in this run
-  integer               :: last_dt         ! number of time steps
   integer               :: max_ini         ! max number of inner iterations
   integer               :: min_ini         ! min number of inner iterations
   integer               :: n_stat_t        ! first time step for turb. statistic
@@ -45,8 +42,8 @@
   end do
 
   ! Initialize variables
-  time           =  0.      ! initialize time to zero
-  read_backup(:) = .false.  ! can turn .true. in Load_Backup
+  call Time % Set_Time(0.0)  ! initialize time to zero
+  read_backup(:) = .false.   ! can turn .true. in Load_Backup
 
   !------------------------------!
   !   Start parallel execution   !
@@ -105,9 +102,10 @@
                                   n_i_cell= 8,  n_i_face=8,  n_i_node=8)
 
   ! Initialize first and current and read the last time step
-  curr_dt  = 0
-  first_dt = 0
-  call Control % Number_Of_Time_Steps(last_dt, verbose=.true.)
+  call Time % Set_Curr_Dt(0)
+  call Time % Set_First_Dt(0)
+  call Control % Number_Of_Time_Steps(ldt, verbose=.true.)
+  call Time % Set_Last_Dt(ldt)
   call Control % Starting_Time_Step_For_Turb_Statistics(n_stat_t,  &
                                                         verbose = .true.)
   call Control % Starting_Time_Step_For_Swarm_Statistics(n_stat_p,  &
@@ -161,8 +159,7 @@
   ! Read backup file if directed so, and set the "backup" to .true. or .false.
   do d = 1, n_dom
     call Control % Switch_To_Domain(d)  ! take proper control file
-    call Backup % Load(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                       time, first_dt, read_backup(d))
+    call Backup % Load(Flow(d), Turb(d), Vof(d), Swarm(d), read_backup(d))
 
     ! Initialize variables
     if(.not. read_backup(d)) then
@@ -221,7 +218,7 @@
   !-------------------------------------------------------------!
   !   Perform potential initialization in the first time step   !
   !-------------------------------------------------------------!
-  if(first_dt .eq. 0) then
+  if(Time % First_Dt() .eq. 0) then
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)  ! not sure if this call is needed
       call Control % Potential_Initialization(pot_init, .true.)
@@ -231,21 +228,16 @@
 
   ! Good time to call user function for beginning of simulation
   do d = 1, n_dom
-    call User_Mod_Beginning_Of_Simulation(Flow(d), Turb(d),  &
-                                          Vof(d), Swarm(d),  &
-                                          first_dt, time)
+    call User_Mod_Beginning_Of_Simulation(Flow(d), Turb(d), Vof(d), Swarm(d))
   end do
 
   ! Save initial condition
-  if(first_dt .eq. 0 .and. Results % initial) then
-    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                                Flow, Turb, Vof, Swarm, exit_now)
-  end if
+  call Results % Main_Results(n_dom, Flow, Turb, Vof, Swarm, exit_now)
 
   !-------------------------------------!
   !   The time loop really begins now   !
   !-------------------------------------!
-  do curr_dt = first_dt + 1, last_dt
+  do while (Time % Needs_More_Steps())
 
     !------------------------------------!
     !   Preparations for new time step   !
@@ -260,11 +252,10 @@
         call Eddies_Mod_Advance    (turb_planes(d) % plane(tp))
       end do
 
-      if(d .eq. 1) time = time + Flow(d) % dt
+      if(d .eq. 1) call Time % Increase_Time(Flow(d) % dt)
 
       ! Beginning of time step
-      call User_Mod_Beginning_Of_Time_Step(Flow(d), Turb(d), Vof(d),  &
-                                           Swarm(d), curr_dt, time)
+      call User_Mod_Beginning_Of_Time_Step(Flow(d), Turb(d), Vof(d), Swarm(d))
 
       ! Start info boxes.
       call Info % Time_Start()
@@ -273,7 +264,7 @@
 
       ! Initialize and print time info box
       if(d .eq. 1) then
-        call Info % Time_Fill(curr_dt, time)
+        call Info % Time_Fill(Time % Curr_Dt(), Time % Get_Time())
         call Info % Time_Print()
       end if
 
@@ -283,14 +274,13 @@
       ! Interface tracking
       if(Flow(d) % with_interface) then
         call Process % Update_Boundary_Values(Flow(d), Turb(d), Vof(d), 'VOF')
-        call Vof(d) % Main_Vof(Flow(d), Turb(d), Sol(d), curr_dt)
+        call Vof(d) % Main_Vof(Flow(d), Turb(d), Sol(d))
         call Vof(d) % Update_Physical_Properties()
       end if
 
       ! Lagrangian particle tracking
       if(Flow(d) % with_particles) then
-        call User_Mod_Insert_Particles(Flow(d), Turb(d), Vof(d),  &
-                                       Swarm(d), curr_dt, time)
+        call User_Mod_Insert_Particles(Flow(d), Turb(d), Vof(d), Swarm(d))
       end if
 
     end do  ! through domains
@@ -313,13 +303,12 @@
         call Control % Switch_To_Domain(d)
 
         ! Beginning of iteration
-        call User_Mod_Beginning_Of_Iteration(Flow(d), Turb(d), Vof(d),  &
-                                             Swarm(d), curr_dt, time)
+        call User_Mod_Beginning_Of_Iteration(Flow(d), Turb(d), Vof(d), Swarm(d))
 
         call Info % Iter_Fill(ini)
 
         ! Future? call Process % Simple_Step(Flow(d), Turb(d), Vof(d),  &
-        ! Future?                            Sol(d), curr_dt, ini)
+        ! Future?                            Sol(d), ini)
 
         ! Compute velocity gradients
         call Flow(d) % Grad_Variable(Flow(d) % u)
@@ -328,28 +317,27 @@
 
         ! All three velocity components one after another
         call Process % Compute_Momentum(Flow(d), Turb(d), Vof(d), Por(d),  &
-                                        Sol(d), curr_dt, ini)
-        call Process % Compute_Pressure(Flow(d), Vof(d), Sol(d), curr_dt, ini)
-        call Process % Correct_Velocity(Flow(d), Vof(d), Sol(d), curr_dt, ini)
+                                        Sol(d), ini)
+        call Process % Compute_Pressure(Flow(d), Vof(d), Sol(d), ini)
+        call Process % Correct_Velocity(Flow(d), Vof(d), Sol(d), ini)
 
         call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d), Por(d),  &
-                                      Sol(d), curr_dt, ini)
+                                      Sol(d), ini)
 
         call Flow(d) % Calculate_Bulk_Fluxes(Flow(d) % v_flux % n)
 
         ! Deal with turbulence (if you dare ;-))
-        call Turb(d) % Main_Turb(Sol(d), curr_dt, ini)
+        call Turb(d) % Main_Turb(Sol(d), ini)
 
         ! Energy (practically temperature)
         if(Flow(d) % heat_transfer) then
-          call Process % Compute_Energy(Flow(d), Turb(d), Vof(d),  &
-                                        Sol(d), curr_dt, ini)
+          call Process % Compute_Energy(Flow(d), Turb(d), Vof(d), Sol(d), ini)
         end if
 
         ! Passive scalars
         do sc = 1, Flow(d) % n_scalars
-          call Process % Compute_Scalar(Flow(d), Turb(d), Vof(d),  &
-                                        Sol(d), curr_dt, ini, sc)
+          call Process % Compute_Scalar(Flow(d), Turb(d), Vof(d), Sol(d),  &
+                                        ini, sc)
         end do
 
         ! Update the values at boundaries
@@ -359,8 +347,8 @@
         call Info % Iter_Print(d)
 
         ! End of iteration
-        call User_Mod_End_Of_Iteration(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                       curr_dt, time)
+        call User_Mod_End_Of_Iteration(Flow(d), Turb(d), Vof(d), Swarm(d))
+
       end do  ! through domains
 
       if(ini >= min_ini) then
@@ -379,7 +367,7 @@
 1   continue
 
     do d = 1, n_dom
-      call Process % Convective_Outflow(Flow(d), Turb(d), Vof(d), curr_dt)
+      call Process % Convective_Outflow(Flow(d), Turb(d), Vof(d))
     end do
 
     do d = 1, n_dom
@@ -391,33 +379,31 @@
       call Control % Switch_To_Domain(d)
 
       ! Write the values in monitoring points
-      call Monitor(d) % Write_Vars(Flow(d), curr_dt)
+      call Monitor(d) % Write_Vars(Flow(d), Time % Curr_Dt())
 
       ! Calculate mean values
-      call Turb(d) % Calculate_Mean(n_stat_t, curr_dt)
-      call User_Mod_Calculate_Mean(Turb(d), n_stat_t, curr_dt)
+      call Turb(d) % Calculate_Mean(n_stat_t)
+      call User_Mod_Calculate_Mean(Turb(d), n_stat_t)
 
       ! Adjust pressure drops to keep the mass fluxes constant
       call Bulk_Mod_Adjust_P_Drops(Flow(d) % bulk, Flow(d) % dt)
 
       ! Lagrangian particle tracking
       if(Flow(d) % with_particles) then
-        if(curr_dt >= first_dt_p) then
-          call Swarm_Mod_Advance_Particles(Swarm(d), curr_dt,  &
-                                           n_stat_p, first_dt_p)
+        if(Time % Curr_Dt() >= first_dt_p) then
+          call Swarm_Mod_Advance_Particles(Swarm(d), n_stat_p, first_dt_p)
         end if
       end if
 
       ! Just before the end of time step
       call User_Mod_End_Of_Time_Step(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                     curr_dt, n_stat_t, n_stat_p, time)
+                                     n_stat_t, n_stat_p)
     end do
 
     !----------------------!
     !   Save the results   !
     !----------------------!
-    call Results % Main_Results(curr_dt, last_dt, time, n_dom,  &
-                                Flow, Turb, Vof, Swarm, exit_now)
+    call Results % Main_Results(n_dom, Flow, Turb, Vof, Swarm, exit_now)
 
     ! Ran more than a set wall clock time limit
     if(Info % Time_To_Exit() .or. exit_now) then
@@ -425,11 +411,10 @@
     end if
 
     ! Last time step reached; call user function for end of simulation
-    if(curr_dt .eq. last_dt) then
+    if(Time % Curr_Dt() .eq. Time % Last_Dt()) then
       do d = 1, n_dom
         call Control % Switch_To_Domain(d)
-        call User_Mod_End_Of_Simulation(Flow(d), Turb(d), Vof(d), Swarm(d),  &
-                                        curr_dt, time)
+        call User_Mod_End_Of_Simulation(Flow(d), Turb(d), Vof(d), Swarm(d))
       end do
     end if
 

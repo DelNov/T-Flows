@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   Append viscous forces to pressure drops.                                   !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n     ! time step
   integer, intent(in)      :: n_stat_t  ! 1st step for turbulence statist.
   integer, intent(in)      :: n_stat_p  ! 1st step for particle statistics
-  real,    intent(in)      :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk

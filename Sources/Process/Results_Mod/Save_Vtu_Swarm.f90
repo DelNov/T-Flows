@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Save_Vtu_Swarm(Results, Swarm, time_step, domain)
+  subroutine Save_Vtu_Swarm(Results, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   Writes particles in VTU file format (for VisIt and Paraview)               !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type)      :: Results
-  type(Swarm_Type), target :: Swarm
-  integer                  :: time_step
-  integer,        optional :: domain
+  class(Results_Type),      intent(in) :: Results
+  type(Swarm_Type), target             :: Swarm
+  integer, optional,        intent(in) :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow
@@ -61,11 +60,11 @@
 
   if(First_Proc()) then
 
-    call File % Set_Name(name_out,             &
-                         time_step=time_step,  &
-                         appendix ='-swarm',   &
-                         extension='.vtu',     &
-                         domain=domain)
+    call File % Set_Name(name_out,                      &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-swarm',          &
+                         extension = '.vtu',            &
+                         domain    = domain)
     call File % Open_For_Writing_Ascii(name_out, fu)
 
     !------------!

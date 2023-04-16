@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Energy function.             !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,6 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt  ! current time step
   integer, intent(in)         :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -29,7 +28,7 @@
       if(ini .eq. 1                            .and.  &
          Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
          Math % Approx_Real(Grid % zs(s), 0.0)) then
-        write(fu,  '(99(es12.4))') curr_dt * Flow % dt, Grid % xs(s)
+        write(fu,  '(99(es12.4))') Time % Curr_Dt() * Flow % dt, Grid % xs(s)
       end if
 
     end if

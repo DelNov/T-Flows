@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Convective_Outflow(Process, Flow, Turb, Vof, curr_dt)
+  subroutine Convective_Outflow(Process, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
 !   Extrapoloate variables on the boundaries where needed.                     !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,6 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
-  integer, intent(in)         :: curr_dt
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: BEGIN = 12
 !-----------------------------------[Locals]-----------------------------------!
@@ -55,7 +54,7 @@
   !                        !
   !------------------------!
 
-  if(curr_dt > BEGIN) then
+  if(Time % Curr_Dt() > BEGIN) then
 
     call Flow % Grad_Variable(Flow % u)
     call Flow % Grad_Variable(Flow % v)
@@ -80,7 +79,7 @@
       end if      ! boundary condition
     end do        ! region
 
-  else      ! curr_dt <= BEGIN
+  else      ! Time % Curr_Dt() <= BEGIN
 
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. CONVECT) then
@@ -95,7 +94,7 @@
       end if      ! boundary condition
     end do        ! region
 
-  end if    ! curr_dt > BEGIN
+  end if    ! Time % Curr_Dt() > BEGIN
 
   !--------------------------!
   !                          !
@@ -108,7 +107,7 @@
   !-----------------!
   if(Turb % model .eq. K_EPS) then
 
-    if(curr_dt > BEGIN) then
+    if(Time % Curr_Dt() > BEGIN) then
 
       call Flow % Grad_Variable(kin)
       call Flow % Grad_Variable(eps)
@@ -137,7 +136,7 @@
         end if      ! boundary condition
       end do        ! region
 
-    else      ! curr_dt <= BEGIN
+    else      ! Time % Curr_Dt() <= BEGIN
 
       do reg = Boundary_Regions()
         if(Grid % region % type(reg) .eq. CONVECT) then
@@ -154,7 +153,7 @@
         end if      ! boundary condition
       end do        ! region
 
-    end if    ! curr_dt > BEGIN
+    end if    ! Time % Curr_Dt() > BEGIN
 
   end if
 
@@ -164,7 +163,7 @@
   if(Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
 
-    if(curr_dt > BEGIN) then
+    if(Time % Curr_Dt() > BEGIN) then
 
       call Flow % Grad_Variable(kin)
       call Flow % Grad_Variable(eps)
@@ -202,7 +201,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    else      ! curr_dt <= BEGIN
+    else      ! Time % Curr_Dt() <= BEGIN
 
       ! On the boundary perform the extrapolation
       do reg = Boundary_Regions()
@@ -222,7 +221,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    end if    ! curr_dt > BEGIN
+    end if    ! Time % Curr_Dt() > BEGIN
 
   end if
 
@@ -232,7 +231,7 @@
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
 
-    if(curr_dt > BEGIN) then
+    if(Time % Curr_Dt() > BEGIN) then
 
       call Flow % Grad_Variable(vis)
 
@@ -249,7 +248,7 @@
         end if      ! boundary condition
       end do        ! region
 
-    else      ! curr_dt <= BEGIN
+    else      ! Time % Curr_Dt() <= BEGIN
 
       do reg = Boundary_Regions()
         if(Grid % region % type(reg) .eq. CONVECT) then
@@ -262,7 +261,7 @@
         end if      ! boundary condition
       end do        ! region
 
-    end if    ! curr_dt > BEGIN
+    end if    ! Time % Curr_Dt() > BEGIN
 
   end if
 
@@ -273,7 +272,7 @@
   if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
      Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-    if(curr_dt > BEGIN) then
+    if(Time % Curr_Dt() > BEGIN) then
 
       call Flow % Grad_Variable(uu)
       call Flow % Grad_Variable(vv)
@@ -322,7 +321,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    else      ! curr_dt <= BEGIN
+    else      ! Time % Curr_Dt() <= BEGIN
 
       do reg = Boundary_Regions()
         if(Grid % region % type(reg) .eq. CONVECT) then
@@ -344,7 +343,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    end if    ! curr_dt > BEGIN
+    end if    ! Time % Curr_Dt() > BEGIN
 
   end if
 
@@ -357,7 +356,7 @@
   do sc = 1, Flow % n_scalars
     phi => Flow % scalar(sc)
 
-    if(curr_dt > BEGIN) then
+    if(Time % Curr_Dt() > BEGIN) then
 
       call Flow % Grad_Variable(phi)
 
@@ -374,7 +373,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    else      ! curr_dt <= BEGIN
+    else      ! Time % Curr_Dt() <= BEGIN
 
       do reg = Boundary_Regions()
         if(Grid % region % type(reg) .eq. CONVECT) then
@@ -387,7 +386,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    end if    ! curr_dt > BEGIN
+    end if    ! Time % Curr_Dt() > BEGIN
 
   end do      ! sc
 
@@ -399,7 +398,7 @@
 
   if(Flow % heat_transfer) then
 
-    if(curr_dt > BEGIN) then
+    if(Time % Curr_Dt() > BEGIN) then
 
       ! Temperature gradients might have been computed and
       ! stored already in t % x, t % y and t % z, check it
@@ -418,7 +417,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    else      ! curr_dt <= BEGIN
+    else      ! Time % Curr_Dt() <= BEGIN
 
       do reg = Boundary_Regions()
         if(Grid % region % type(reg) .eq. CONVECT) then
@@ -431,7 +430,7 @@
         end if    ! boundary condition
       end do      ! region
 
-    end if    ! curr_dt < BEGIN
+    end if        ! Time % Curr_Dt() < BEGIN
 
   end if
 

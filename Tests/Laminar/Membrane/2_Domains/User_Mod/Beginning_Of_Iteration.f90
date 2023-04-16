@@ -1,7 +1,7 @@
 #include "T_Sat.f90"
 
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Iteration(Flow, Turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Beginning_Of_Iteration(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -11,8 +11,6 @@
   type(Turb_Type),       target :: Turb
   type(Vof_Type),        target :: Vof
   type(Swarm_Type),      target :: Swarm
-  integer                       :: n     ! time step
-  real                          :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t, scalar

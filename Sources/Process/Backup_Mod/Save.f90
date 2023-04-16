@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save(Backup, Flow, Turb, Vof, Swarm, time, time_step, dom)
+  subroutine Save(Backup, Flow, Turb, Vof, Swarm, dom)
 !------------------------------------------------------------------------------!
 !   Saves backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -10,8 +10,6 @@
   type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
-  real                      :: time            ! time of simulation
-  integer                   :: time_step       ! current time step
   integer,         optional :: dom
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
@@ -31,7 +29,7 @@
   Comm => Grid % Comm
 
   ! Name backup file
-  call File % Set_Name(name_out, time_step=time_step,  &
+  call File % Set_Name(name_out, time_step = Time % Curr_Dt(),  &
                        extension='.backup', domain=dom)
 
   ! Open backup file
@@ -46,29 +44,28 @@
   ! Intialize number of stored variables
   vc = 0
 
-  !-----------------------------------------------------------------------!
-  !   Save cell-centre coordinates.  Could be useful for interpolations   !
-  !-----------------------------------------------------------------------!
-  call Backup % Save_Cell_Real(Grid, d, vc, 'x_coords', Grid % xc)
-  call Backup % Save_Cell_Real(Grid, d, vc, 'y_coords', Grid % yc)
-  call Backup % Save_Cell_Real(Grid, d, vc, 'z_coords', Grid % zc)
-
   !---------------!
   !               !
   !   Save data   !
   !               !
   !---------------!
 
+  !---------------------------------!
+  !   Related to time integration   !
+  !---------------------------------!
+
   ! Time step
-  call Backup % Save_Int(Comm, d, vc, 'time_step', time_step)
+  call Backup % Save_Int(Comm, d, vc, 'time_step', Time % Curr_Dt())
 
   ! Simulation time
-  call Backup % Save_Real(Comm, d, vc, 'time', time)
+  call Backup % Save_Real(Comm, d, vc, 'time', Time % Get_Time())
 
   ! Number of processors
   call Backup % Save_Int(Comm, d, vc, 'n_proc', N_Procs())
 
-  ! Bulk flows and pressure drops in each direction
+  !-----------------------------------------------------!
+  !   Bulk flows and pressure drops in each direction   !
+  !-----------------------------------------------------!
   call Backup % Save_Real(Comm, d, vc, 'bulk_flux_x',   bulk % flux_x)
   call Backup % Save_Real(Comm, d, vc, 'bulk_flux_y',   bulk % flux_y)
   call Backup % Save_Real(Comm, d, vc, 'bulk_flux_z',   bulk % flux_z)

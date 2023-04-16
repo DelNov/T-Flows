@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Plain_Profiles(Flow, Turb, ts)
+  subroutine User_Mod_Plain_Profiles(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Grid_Type), pointer :: Grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
-                              k, c1, c2, s, n_hor, fu, ts
+                              k, c1, c2, s, n_hor, fu
   character(SL)            :: coord_name, result_name
   real, parameter          :: u_b = 11.3, h = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
@@ -175,27 +175,38 @@
     end do
 
     if(k == 1) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-1', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-1', extension='.dat')
     else if(k == 2) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-2', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-2', extension='.dat')
     else if(k == 3) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-3', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-3', extension='.dat')
     else if(k == 4) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-4', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-4', extension='.dat')
     else if(k == 5) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-5', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-5', extension='.dat')
     else if(k == 6) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-6', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-6', extension='.dat')
     else if(k == 7) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-7', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-7', extension='.dat')
     else if(k == 8) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-8', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-8', extension='.dat')
     else if(k == 9) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-9', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-9', extension='.dat')
     else if(k == 10) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-10', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-10', extension='.dat')
     else if(k == 11) then
-      call File % Set_Name(result_name, time_step=ts, appendix='-11', extension='.dat')
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
+                           appendix='-11', extension='.dat')
     end if  
 
     call File % Open_For_Writing_Ascii(result_name, fu)

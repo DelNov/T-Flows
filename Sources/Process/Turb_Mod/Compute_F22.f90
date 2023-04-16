@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_F22(Turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_F22(Turb, Sol, ini, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Turb_Type)          :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
   integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
@@ -20,8 +19,6 @@
   real                       :: a0, a12, a21
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real, contiguous,  pointer :: cross(:)
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(curr_dt)
 !------------------------------------------------------------------------------!
 !                                                                              !
 !   The form of equations which are solved:                                    !

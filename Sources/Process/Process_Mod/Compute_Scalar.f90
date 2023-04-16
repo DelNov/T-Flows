@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(Process, Flow, Turb, Vof, Sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(Process, Flow, Turb, Vof, Sol, ini, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for user defined scalar.                 !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,6 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
   integer, intent(in)         :: sc
 !-----------------------------------[Locals]-----------------------------------!
@@ -54,8 +53,7 @@
   call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(Flow, Turb, Vof, Sol,  &
-                                            curr_dt, ini, sc)
+  call User_Mod_Beginning_Of_Compute_Scalar(Flow, Turb, Vof, Sol, ini, sc)
 
   ! Initialize cross diffusion sources, matrix and right hand side
   cross(:) = 0.0
@@ -236,7 +234,7 @@
   call Flow % Grad_Variable(phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, ini, sc)
 
   call Work % Disconnect_Real_Cell(q_turb, cross)
 

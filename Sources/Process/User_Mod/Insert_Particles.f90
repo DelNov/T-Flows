@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, curr_dt, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   Insert particles for Lagrangian particle tracking                          !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Swarm_Type),    target :: Swarm
-  integer, intent(in)         :: curr_dt  ! time step
-  real,    intent(in)         :: time     ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi

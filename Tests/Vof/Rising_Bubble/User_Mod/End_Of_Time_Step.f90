@@ -1,8 +1,8 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
-!          This function is computing benchmark for rising bubble.             !
+!   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer                  :: n         ! current time step
   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
   integer                  :: n_stat_p  ! 1st t.s. statistics particles
-  real                     :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
@@ -55,17 +53,13 @@
   ! Write to file
   if (First_Proc()) then
     call File % Append_For_Writing_Ascii('bench-data.dat', fu)
-    !with circularity 2D:
-!    write(fu,'(5(2X,E16.10E2))') time, b_volume,                    &
-!                                2.0*PI/surface*sqrt(b_volume/PI),  &
-!                                c_position/b_volume,               &
-!                                rise_velocity/b_volume
-    !with sphericity 3D:
-    write(fu,'(5(2X,E16.10E2))') time, b_volume,                         &
-                                PI**(1.0/3.0)*(6.0*b_volume)**(2.0/3.0)  &
-                                /surface,                                &
-                                c_position/b_volume,                     &
-                                rise_velocity/b_volume
+
+    ! With sphericity 3D
+    write(fu,'(5(2X,E16.10E2))') Time % Get_Time(), b_volume,             &
+                                 PI**(1.0/3.0)*(6.0*b_volume)**(2.0/3.0)  &
+                                 /surface,                                &
+                                 c_position/b_volume,                     &
+                                 rise_velocity/b_volume
     close(fu)
   end if
 

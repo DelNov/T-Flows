@@ -43,8 +43,6 @@ $(DIR_OBJECT)/Turb_Mod.o \
 Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Results_Mod.o \
 Results_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
@@ -193,6 +191,14 @@ Field_Mod/*/*.f90 \
 Eddies_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Time_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Time_Mod.o:\
+Time_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./User_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/User_Mod.o:\
@@ -216,6 +222,8 @@ Native_Mod/*.f90
 # Dependencies for: ./Field_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Field_Mod.o:\
+$(DIR_OBJECT)/Time_Mod.o \
+Time_Mod/*.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
 Solver_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
@@ -352,14 +360,6 @@ $(DIR_OBJECT)/Comm_Mod.o \
 $(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \
 Bulk_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Process_Mod/Logo_Pro.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Logo_Pro.o:\
-$(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Surf_Mod.f90
@@ -653,5 +653,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Tokenizer_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 

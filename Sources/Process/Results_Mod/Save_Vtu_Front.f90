@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Save_Vtu_Front(Results, Front, time_step, domain)
+  subroutine Save_Vtu_Front(Results, Front, domain)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type)      :: Results
-  type(Front_Type), target :: Front
-  integer                  :: time_step
-  integer,        optional :: domain
+  class(Results_Type), intent(in) :: Results
+  type(Front_Type), target        :: Front
+  integer, optional               :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
   integer                  :: v, e     ! vertex and element counters
@@ -27,16 +26,16 @@
   !                            !
   !----------------------------!
 
-  call File % Set_Name(name_out_8,             &
-                       time_step = time_step,  &
-                       appendix  = '-front',   &
-                       extension = '.pvtu',    &
+  call File % Set_Name(name_out_8,                    &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-front',          &
+                       extension = '.pvtu',           &
                        domain    = domain)
-  call File % Set_Name(name_out_9,             &
-                       processor = This_Proc(),  &
-                       time_step = time_step,  &
-                       appendix  = '-front',   &
-                       extension = '.vtu',     &
+  call File % Set_Name(name_out_9,                    &
+                       processor = This_Proc(),       &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-front',          &
+                       extension = '.vtu',            &
                        domain    = domain)
 
   if(This_Proc() .eq. 1) then
@@ -307,11 +306,11 @@
   !------------!
   if(This_Proc() .eq. 1) then
     do n = 1, N_Procs()
-      call File % Set_Name(name_out_9,             &
-                           processor = n,          &
-                           time_step = time_step,  &
-                           appendix  = '-front',   &
-                           extension = '.vtu',     &
+      call File % Set_Name(name_out_9,                    &
+                           processor = n,                 &
+                           time_step = Time % Curr_Dt(),  &
+                           appendix  = '-front',          &
+                           extension = '.vtu',            &
                            domain    = domain)
       write(f8) IN_2 // '<Piece Source="', trim(name_out_9), '"/>' // LF
     end do

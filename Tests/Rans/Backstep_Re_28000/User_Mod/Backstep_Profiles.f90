@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(Flow, Turb, ts)
+  subroutine User_Mod_Backstep_Profiles(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Grid_Type), pointer :: Grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
-                              k, c1, c2, s, n_hor, fu, ts
+                              k, c1, c2, s, n_hor, fu
   character(SL)            :: coord_name, result_name
   real, parameter          :: u_b = 11.3, h = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
@@ -187,37 +187,37 @@
     end do
 
     if(k == 1) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-0.35h', extension='.h.dat')
     else if(k == 2) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-1.68h', extension='.h.dat')
     else if(k == 3) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-2.30h', extension='.h.dat')
     else if(k == 4) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-3.15h', extension='.h.dat')
     else if(k == 5) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-3.92h', extension='.h.dat')
     else if(k == 6) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-4.70h', extension='.h.dat')
     else if(k == 7) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-5.20h', extension='.h.dat')
     else if(k == 8) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-6.50h', extension='.h.dat')
     else if(k == 9) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-8.90h', extension='.h.dat')
     else if(k == 10) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-26.0h', extension='.h.dat')
     else if(k == 11) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-52.0h', extension='.h.dat')
     end if  
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Plain_Nu(Flow, Turb, ts)
+  subroutine User_Mod_Plain_Nu(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -12,7 +12,7 @@
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
-  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu, ts
+  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu
   character(SL)            :: result_name
   real, allocatable        :: r1_p(:), r2_p(:), z_p(:),  &
                               um_p(:), vm_p(:), wm_p(:), & 
@@ -158,7 +158,10 @@
     end if
   end do
 
-  call File % Set_Name(result_name, time_step=ts, appendix='-Nu', extension='.dat')
+  call File % Set_Name(result_name,                   &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-Nu',             &
+                       extension = '.dat')
   call File % Open_For_Writing_Ascii(result_name, fu)
 
   write(fu,*) '# x, Cf, Cf_corr, Nu, Nu_corr, q'

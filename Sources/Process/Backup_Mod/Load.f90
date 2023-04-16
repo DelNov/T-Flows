@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Load(Backup, Flow, Turb, Vof, Swarm, time, time_step, bckp)
+  subroutine Load(Backup, Flow, Turb, Vof, Swarm, bckp)
 !------------------------------------------------------------------------------!
 !   Loads backup files name.backup                                             !
 !------------------------------------------------------------------------------!
@@ -10,8 +10,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  real                     :: time            ! time of simulation
-  integer                  :: time_step       ! current time step
   logical                  :: bckp, present
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
@@ -19,8 +17,9 @@
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: phi
   character(SL)            :: name_in, answer, name_mean
-  integer                  :: vc, sc
+  integer                  :: vc, sc, ts
   integer(DP)              :: d
+  real                     :: st  ! saved time, simulation time
 !==============================================================================!
 
   ! Take aliases
@@ -76,20 +75,21 @@
   !               !
   !---------------!
 
-  !-----------------------------------------------!
-  !   Skip three coordinates for the time being   !
-  !-----------------------------------------------!
-  ! call Backup % Load_Cell_Real(Grid, d, vc, 'x_coords', Grid % xc)
-  ! call Backup % Load_Cell_Real(Grid, d, vc, 'y_coords', Grid % yc)
-  ! call Backup % Load_Cell_Real(Grid, d, vc, 'z_coords', Grid % zc)
+  !---------------------------------!
+  !   Related to time integration   !
+  !---------------------------------!
 
   ! Time step
-  call Backup % Load_Int(Comm, d, vc, 'time_step', time_step)
+  call Backup % Load_Int(Comm, d, vc, 'time_step', ts)
+  call Time % Set_First_Dt(ts)
 
   ! Simulation time
-  call Backup % Load_Real(Comm, d, vc, 'time', time)
+  call Backup % Load_Real(Comm, d, vc, 'time', st)
+  call Time % Set_Time(st)
 
-  ! Bulk flows and pressure drops in each direction
+  !-----------------------------------------------------!
+  !   Bulk flows and pressure drops in each direction   !
+  !-----------------------------------------------------!
   call Backup % Load_Real(Comm, d, vc, 'bulk_flux_x',   bulk % flux_x)
   call Backup % Load_Real(Comm, d, vc, 'bulk_flux_y',   bulk % flux_y)
   call Backup % Load_Real(Comm, d, vc, 'bulk_flux_z',   bulk % flux_z)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Src_Zeta_K_Eps_Zeta_F(Turb, Sol, curr_dt)
+  subroutine Src_Zeta_K_Eps_Zeta_F(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -9,7 +9,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -44,7 +43,7 @@
   ! instabilities for some cases such as Flow around cylinder. That is why we
   ! choose this particular way to the add source term.
   do c = Cells_In_Domain()
-    if(curr_dt > 500) then
+    if(Time % Curr_Dt() > 500) then
       b(c) = b(c) + f22 % n(c) * Grid % vol(c) * Flow % density(c)
     else
       b(c) = b(c) + max(0.0, f22 % n(c)*Grid % vol(c)) * Flow % density(c)

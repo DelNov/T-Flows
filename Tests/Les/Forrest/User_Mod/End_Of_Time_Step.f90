@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
-  integer, intent(in)       :: n         ! time step
   integer, intent(in)       :: n_stat_t  ! 1st t.s. statistics turbulence
   integer, intent(in)       :: n_stat_p  ! 1st t.s. statistics particles
-  real, intent(in)          :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
@@ -24,10 +22,10 @@
 !==============================================================================!
 
   ! If not time for disturbing the velocity field, return
-  if(mod(n, 120) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 120) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(n > 1200) return
+  if(Time % Curr_Dt() > 1200) return
 
   ! Take aliases
   Grid => Flow % pnt_grid

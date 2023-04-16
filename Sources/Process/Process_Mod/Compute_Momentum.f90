@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Process, Flow, Turb, Vof, Por, Sol, curr_dt, ini)
+  subroutine Compute_Momentum(Process, Flow, Turb, Vof, Por, Sol, ini)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,6 @@
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   type(Porosity_Type), target :: Por
-  integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -99,8 +98,7 @@
   b      => Sol % Nat % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(Flow, Turb, Vof, Sol,  &
-                                              curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Momentum(Flow, Turb, Vof, Sol, ini)
 
   !-------------------------------------------------------!
   !   Store the old volume fluxes for Choi's correction   !
@@ -396,7 +394,7 @@
   call Grid % Exchange_Cells_Real(M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol, ini)
 
   call Work % Disconnect_Real_Cell(cross)
 

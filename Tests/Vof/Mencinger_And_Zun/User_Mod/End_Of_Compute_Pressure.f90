@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Pressure function.           !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,6 @@
   type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt  ! current time step
   integer, intent(in)       :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -26,7 +25,7 @@
   A    => Sol % Nat % A
   b    => Sol % Nat % b % val
 
-  write(file_name(10:14), '(i5.5)') curr_dt
+  write(file_name(10:14), '(i5.5)') Time % Curr_Dt()
   write(file_name(16:18), '(i3.3)') ini
 
   open(99, file=file_name)

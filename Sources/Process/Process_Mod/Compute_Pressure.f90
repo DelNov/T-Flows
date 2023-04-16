@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Process, Flow, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Pressure(Process, Flow, Vof, Sol, ini)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,6 @@
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -61,10 +60,10 @@
   call Flow % Alias_Momentum(u, v, w)
 
   ! Volume balance reporting
-  call Flow % Report_Vol_Balance_Start(curr_dt, ini)
+  call Flow % Report_Vol_Balance_Start(ini)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, ini)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
@@ -137,7 +136,7 @@
   end do
 
   ! Volume balance reporting
-  call Flow % Report_Vol_Balance(Sol, curr_dt, ini)
+  call Flow % Report_Vol_Balance(Sol, ini)
 
   !------------------------------------------!
   !   Cross diffusion fluxes for pressure    !
@@ -241,7 +240,7 @@
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, ini)
 
   ! Volume balance reporting
   call Flow % Report_Vol_Balance_Stop()

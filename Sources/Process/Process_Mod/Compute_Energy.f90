@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(Process, Flow, Turb, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Energy(Process, Flow, Turb, Vof, Sol, ini)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,6 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt
   integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: Grid
@@ -73,7 +72,7 @@
   call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol, ini)
 
   ! Initialize cross diffusion sources, matrix and right hand side
   cross  (:) = 0.0
@@ -302,7 +301,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, ini)
 
   call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb, cross)
 

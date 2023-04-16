@@ -1,6 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, Sol,  &
-                                                    curr_dt, ini)
+  subroutine User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, Sol, ini)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
@@ -9,7 +8,6 @@
   type(Field_Type),   target :: Flow
   type(Vof_Type),     target :: Vof
   type(Solver_Type),  target :: Sol
-  integer, intent(in)        :: curr_dt
   integer, intent(in)        :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -28,7 +26,7 @@
   !-----------------------------------------------------------!
   !   Write down face-centered velocities before correction   !
   !-----------------------------------------------------------!
-  write(file_name(28:32), '(i5.5)') curr_dt
+  write(file_name(28:32), '(i5.5)') Time % Curr_Dt()
   write(file_name(34:36), '(i3.3)') ini
 
   open(99, file=file_name)

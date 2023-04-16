@@ -1,20 +1,19 @@
 !==============================================================================!
   subroutine Save_Vtu_Results(Results, Flow, Turb, Vof, Swarm,  &
-                              ts, plot_inside, domain)
+                              plot_inside, domain)
 !------------------------------------------------------------------------------!
 !   Writes results in VTU file format (for VisIt and Paraview)                 !
 !------------------------------------------------------------------------------!
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type)       :: Results
-  type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: Turb
-  type(Vof_Type),    target :: Vof
-  type(Swarm_Type),  target :: Swarm
-  integer                   :: ts           ! time step
-  logical                   :: plot_inside  ! plot results inside?
-  integer,         optional :: domain
+  class(Results_Type)         :: Results
+  type(Field_Type),    target :: Flow
+  type(Turb_Type),     target :: Turb
+  type(Vof_Type),      target :: Vof
+  type(Swarm_Type),    target :: Swarm
+  logical                     :: plot_inside  ! plot results inside?
+  integer,           optional :: domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer     :: Grid
   type(Var_Type),  pointer     :: phi
@@ -108,27 +107,27 @@
   !                                      !
   !--------------------------------------!
   if(plot_inside) then
-    call File % Set_Name(name_out_8,             &
-                         time_step=ts,           &
-                         extension='.pvtu',      &
-                         domain=domain)
-    call File % Set_Name(name_out_9,             &
-                         processor=This_Proc(),  &
-                         time_step=ts,           &
-                         extension='.vtu',       &
-                         domain=domain)
+    call File % Set_Name(name_out_8,                    &
+                         time_step = Time % Curr_Dt(),  &
+                         extension = '.pvtu',           &
+                         domain    = domain)
+    call File % Set_Name(name_out_9,                    &
+                         processor = This_Proc(),       &
+                         time_step = Time % Curr_Dt(),  &
+                         extension = '.vtu',            &
+                         domain    = domain)
   else
-    call File % Set_Name(name_out_8,             &
-                         time_step=ts,           &
-                         appendix ='-bnd',       &
-                         extension='.pvtu',      &
+    call File % Set_Name(name_out_8,                    &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-bnd',            &
+                         extension = '.pvtu',           &
                          domain=domain)
-    call File % Set_Name(name_out_9,             &
-                         processor=This_Proc(),  &
-                         time_step=ts,           &
-                         appendix ='-bnd',       &
-                         extension='.vtu',       &
-                         domain=domain)
+    call File % Set_Name(name_out_9,                    &
+                         processor = This_Proc(),       &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-bnd',            &
+                         extension = '.vtu',            &
+                         domain    = domain)
   end if
 
   if(Parallel_Run() .and. First_Proc()) then
@@ -1039,18 +1038,18 @@
   if(Parallel_Run() .and. First_Proc()) then
     do n = 1, N_Procs()
       if(plot_inside) then
-        call File % Set_Name(name_out_9,        &
-                             processor=n,       &
-                             time_step=ts,      &
-                             extension='.vtu',  &
-                             domain=domain)
+        call File % Set_Name(name_out_9,                    &
+                             processor = n,                 &
+                             time_step = Time % Curr_Dt(),  &
+                             extension = '.vtu',            &
+                             domain    = domain)
       else
-        call File % Set_Name(name_out_9,        &
-                             processor=n,       &
-                             time_step=ts,      &
-                             appendix ='-bnd',  &
-                             extension='.vtu',  &
-                             domain=domain)
+        call File % Set_Name(name_out_9,                    &
+                             processor = n,                 &
+                             time_step = Time % Curr_Dt(),  &
+                             appendix  = '-bnd',            &
+                             extension = '.vtu',            &
+                             domain    =  domain)
       end if
       write(f8) IN_2 // '<Piece Source="', trim(name_out_9), '"/>' // LF
     end do

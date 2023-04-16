@@ -12,6 +12,7 @@
   use Face_Mod
   use Bulk_Mod
   use Solver_Mod
+  use Time_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none

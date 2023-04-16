@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Report_Vol_Balance(Flow, Sol, curr_dt, ini)
+  subroutine Report_Vol_Balance(Flow, Sol, ini)
 !------------------------------------------------------------------------------!
 !   Opens file for volume balance reporting.
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt, ini
+  integer,       intent(in) :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   real, contiguous, pointer :: b(:)
@@ -28,12 +28,12 @@
     if(First_Proc()) then
       if(Flow % p_m_coupling == PISO) then
         write(Flow % fuvbr, '(a,i6.6,a,i3.3,a,i2.2,es13.5)')  &
-                            '# ts-', curr_dt,  &
-                            ' oi-', ini,      &
+                            '# ts-', Time % Curr_Dt(),        &
+                            ' oi-', ini,                      &
                             ' ii-', Flow % i_corr, src
       else
-        write(Flow % fuvbr, '(a,i6.6,a,i3.3,es13.5)')  &
-                            '# ts-', curr_dt,  &
+        write(Flow % fuvbr, '(a,i6.6,a,i3.3,es13.5)')   &
+                            '# ts-', Time % Curr_Dt(),  &
                             ' oi-',  ini, src
       end if
     end if

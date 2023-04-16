@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm, n,    &
-                                       n_stat_t, n_stat_p, time)
+  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,    &
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function computes position of contact line and high of droplet        !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! time step
   integer, intent(in)      :: n_stat_t
   integer, intent(in)      :: n_stat_p
-  real,    intent(in)      :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Var_Type),      pointer :: fun
@@ -103,11 +101,11 @@
 
   ! Write Results
   if (First_Proc()) then
-    if(n .eq. 1) then
+    if(Time % Curr_Dt() .eq. 1) then
       call File % Delete('spurious.dat')
     end if
     call File % Append_For_Writing_Ascii('spurious.dat', fu)
-    write(fu,'(6(2X,E16.10E2))')  time, a_vof, u_rms, u_max, &
+    write(fu,'(6(2X,E16.10E2))')  Time % Get_Time(), a_vof, u_rms, u_max, &
                                   p_max-p_min, p_in-p_out
     close(fu)
   end if

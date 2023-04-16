@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer                  :: n         ! current time step
   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
   integer                  :: n_stat_p  ! 1st t.s. statistics particles
-  real                     :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
@@ -44,7 +42,7 @@
   if (First_Proc()) then
     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
 
-    write(fu,'(4(2x,e16.10e2))') time,                   &
+    write(fu,'(4(2x,e16.10e2))') Time % Get_Time(),      &
                                  b_volume,               &
                                  c_position/b_volume,    &
                                  rise_velocity/b_volume

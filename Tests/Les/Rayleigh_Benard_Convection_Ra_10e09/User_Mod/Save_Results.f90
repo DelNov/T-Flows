@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -12,7 +12,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: ts
   integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -36,7 +35,7 @@
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
-  if(ts .eq. 0) return
+  if(Time % Curr_Dt() .eq. 0) return
 
   call Work % Connect_Real_Cell(tz_mean)
 
@@ -64,14 +63,14 @@
   call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File % Set_Name(res_name,           &
-                        time_step=ts,      &
-                        appendix='-res',   &
-                        extension='.dat')
-  call File % Set_Name(res_name_plus,          &
-                        time_step=ts,          &
-                        appendix='-res-plus',  &
-                        extension='.dat')
+  call File % Set_Name(res_name,                      &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-res',            &
+                       extension = '.dat')
+  call File % Set_Name(res_name_plus,                 &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-res-plus',       &
+                       extension = '.dat')
 
   !------------------!
   !   Read 1d file   !

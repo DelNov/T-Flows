@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Vof(Vof, Sol, curr_dt)
+  subroutine User_Mod_Beginning_Of_Compute_Vof(Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of Compute_Vof function.          !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt  ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
@@ -21,7 +20,7 @@
   fun  => Vof % fun
   A    => Sol % Nat % A
 
-  if(curr_dt > 120) then
+  if(Time % Curr_Dt() > 120) then
     ! Do something
 
   end if

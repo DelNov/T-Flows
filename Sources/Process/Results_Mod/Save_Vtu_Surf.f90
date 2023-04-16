@@ -1,13 +1,12 @@
 !==============================================================================!
-  subroutine Save_Vtu_Surf(Results, Surf, time_step)
+  subroutine Save_Vtu_Surf(Results, Surf)
 !------------------------------------------------------------------------------!
 !   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type)     :: Results
-  type(Surf_Type), target :: Surf
-  integer                 :: time_step
+  class(Results_Type),     intent(in) :: Results
+  type(Surf_Type), target, intent(in) :: Surf
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
   integer                  :: v, e     ! vertex and element counters
@@ -30,9 +29,9 @@
 
   if(First_Proc()) then
 
-    call File % Set_Name(name_out,               &
-                         time_step = time_step,  &
-                         appendix  = '-surf',    &
+    call File % Set_Name(name_out,                      &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-surf',           &
                          extension = '.vtu')
     call File % Open_For_Writing_Ascii(name_out, fu)
 

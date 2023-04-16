@@ -1,5 +1,5 @@
 !==============================================================================!
-   subroutine User_Mod_Save_Swarm(Flow, Turb, Vof, Swarm, curr_dt, domain)
+   subroutine User_Mod_Save_Swarm(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -13,7 +13,6 @@
   type(Turb_Type),       target :: Turb
   type(Vof_Type),        target :: Vof
   type(Swarm_Type),      target :: Swarm
-  integer,           intent(in) :: curr_dt   ! current time step
   integer, optional, intent(in) :: domain    ! current domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -222,10 +221,10 @@
 
   ! Creating files for swarm statistics
   call File % Set_Name(swarm_result_name, appendix='-swarm-res',            &
-                       time_step=curr_dt, extension='.dat')
+                       time_step=Time % Curr_Dt(), extension='.dat')
   call File % Open_For_Writing_Ascii(swarm_result_name, fu1)
   call File % Set_Name(swarm_result_name_plus, appendix='-swarm-res-plus',  &
-                       time_step=curr_dt, extension='.dat')
+                       time_step=Time % Curr_Dt(), extension='.dat')
   call File % Open_For_Writing_Ascii(swarm_result_name_plus, fu2)
 
   ! Calculating friction velocity and friction temperature (for the flow!)

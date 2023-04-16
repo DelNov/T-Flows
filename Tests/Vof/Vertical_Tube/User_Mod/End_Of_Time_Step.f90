@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer                  :: n         ! time step
   integer                  :: n_stat_t  ! 1st step for turbulence statist.
   integer                  :: n_stat_p  ! 1st step for particle statistics
-  real                     :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun

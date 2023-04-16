@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! current time step
   integer, intent(in)      :: n_stat_t  ! 1st t.s. statistics turbulence
   integer, intent(in)      :: n_stat_p  ! 1st t.s. statistics particles
-  real,    intent(in)      :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
@@ -57,7 +55,7 @@
   rise_vel_cen = (y_pos_cen - y_pos_cen_old) / Flow % dt
 
   ! Just open the file benchmark.dat
-  if(n .eq. 1) then
+  if(Time % Curr_Dt() .eq. 1) then
     call File % Open_For_Writing_Ascii('benchmark.dat', fu)
     close(fu)
   end if
@@ -65,7 +63,7 @@
   !-------------------!
   !   Write results   !
   !-------------------!
-  if(n > 1) then
+  if(Time % Curr_Dt() > 1) then
 
     if(First_Proc()) then
       print *, 'y_pos_cen        = ', y_pos_cen
@@ -76,15 +74,8 @@
       ! Write to file
       call File % Append_For_Writing_Ascii('benchmark.dat', fu)
 
-      ! With circularity 2D:
-      ! write(fu,'(6(2x,es16.10e2))') time, b_volume,                    &
-      !                               2.0*PI/surface*sqrt(b_volume/PI),  &
-      !                               y_pos_cen,                         &
-      !                               rise_vel_int,                      &
-      !                               rise_vel_cen
-
       ! With sphericity 3D:
-      write(fu,'(6(2x,es16.10e2))') time, b_volume,                          &
+      write(fu,'(6(2x,es16.10e2))') Time % Get_Time(), b_volume,             &
                                     PI**(1.0/3.0)*(6.0*b_volume)**(2.0/3.0)  &
                                     /surface,                                &
                                     y_pos_cen,                               &

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Piso_Algorithm(Process, Flow, Turb, Vof, Por, Sol, curr_dt, ini)
+  subroutine Piso_Algorithm(Process, Flow, Turb, Vof, Por, Sol, ini)
 !------------------------------------------------------------------------------!
 !   PISO algorithm                                                             !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,6 @@
   type(Vof_Type),      target :: Vof
   type(Porosity_Type), target :: Por
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt   ! current time step
   integer, intent(in)         :: ini       ! current inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -29,9 +28,9 @@
     do corr_steps = 1, Flow % n_piso_corrections
       Flow % i_corr = corr_steps
 
-      call Process % Compute_Momentum(Flow, Turb, Vof, Por, Sol, curr_dt, ini)
-      call Process % Compute_Pressure(Flow,       Vof,      Sol, curr_dt, ini)
-      call Process % Correct_Velocity(Flow,       Vof,      Sol, curr_dt, ini)
+      call Process % Compute_Momentum(Flow, Turb, Vof, Por, Sol, ini)
+      call Process % Compute_Pressure(Flow,       Vof,      Sol, ini)
+      call Process % Correct_Velocity(Flow,       Vof,      Sol, ini)
     end do
 
     Flow % inside_piso_loop = .false.
