@@ -10,10 +10,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type)  :: Rc
-  type(Field_Type),   target :: Flow
-  type(Turb_Type),    target :: Turb
-  type(Vof_Type),     target :: Vof
+  class(Read_Controls_Type), intent(in) :: Rc
+  type(Field_Type), target              :: Flow
+  type(Turb_Type),  target              :: Turb
+  type(Vof_Type),   target              :: Vof
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi

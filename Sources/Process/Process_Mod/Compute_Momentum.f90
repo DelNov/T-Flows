@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Process, Flow, Turb, Vof, Por, Sol, ini)
+  subroutine Compute_Momentum(Process, Flow, Turb, Vof, Por, Sol)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves momentum conservation equations                     !
 !------------------------------------------------------------------------------!
@@ -11,7 +11,6 @@
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
   type(Porosity_Type), target :: Por
-  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
@@ -98,13 +97,13 @@
   b      => Sol % Nat % b % val
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Momentum(Flow, Turb, Vof, Sol, ini)
+  call User_Mod_Beginning_Of_Compute_Momentum(Flow, Turb, Vof, Sol)
 
   !-------------------------------------------------------!
   !   Store the old volume fluxes for Choi's correction   !
   !-------------------------------------------------------!
   if(.not. Flow % inside_piso_loop) then  ! check about this
-    if(ini .eq. 1) then
+    if(Iter % Current() .eq. 1) then
       do s = 1, Grid % n_faces
         v_flux % oo(s) = v_flux % o(s)
         v_flux % o (s) = v_flux % n(s)
@@ -174,7 +173,7 @@
 
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then
-      if(ini .eq. 1) then
+      if(Iter % Current() .eq. 1) then
         do c = Cells_In_Domain_And_Buffers()
           ui % oo(c) = ui % o(c)
           ui % o (c) = ui % n(c)
@@ -394,7 +393,7 @@
   call Grid % Exchange_Cells_Real(M % sav)
 
   ! User function
-  call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol, ini)
+  call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol)
 
   call Work % Disconnect_Real_Cell(cross)
 

@@ -313,6 +313,7 @@ SRC_F_MOD += Point_Mod.f90          \
              Time_Mod.f90           \
              Numerics_Mod.f90       \
              Field_Mod.f90          \
+             Iter_Mod.f90           \
              Front_Mod.f90          \
              Surf_Mod.f90           \
              Info_Mod.f90           \

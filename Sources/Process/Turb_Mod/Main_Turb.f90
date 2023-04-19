@@ -1,13 +1,12 @@
 !==============================================================================!
-  subroutine Main_Turb(Turb, Sol, ini)
+  subroutine Main_Turb(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Turbulence model main function (called inside inner iterations)            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type)    :: Turb
-  type(Solver_Type)   :: Sol
-  integer, intent(in) :: ini     ! inner iteration
+  class(Turb_Type)  :: Turb
+  type(Solver_Type) :: Sol
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -37,13 +36,13 @@
     call Calculate_Shear_And_Vorticity(Flow)
     call Turb % Time_And_Length_Scale(Grid)
 
-    call Turb % Compute_Variable(Sol, ini, Turb % kin)
-    call Turb % Compute_Variable(Sol, ini, Turb % eps)
+    call Turb % Compute_Variable(Sol, Turb % kin)
+    call Turb % Compute_Variable(Sol, Turb % eps)
 
     if(Flow % heat_transfer) then
       call Turb % Calculate_Stress   ()
       call Turb % Calculate_Heat_Flux()
-      call Turb % Compute_Variable(Sol, ini, Turb % t2)
+      call Turb % Compute_Variable(Sol, Turb % t2)
     end if
 
     call Turb % Vis_T_K_Eps()
@@ -64,17 +63,17 @@
 
     call Calculate_Shear_And_Vorticity(Flow)
 
-    call Turb % Compute_Variable(Sol, ini, Turb % kin)
-    call Turb % Compute_Variable(Sol, ini, Turb % eps)
+    call Turb % Compute_Variable(Sol, Turb % kin)
+    call Turb % Compute_Variable(Sol, Turb % eps)
 
     if(Flow % heat_transfer) then
       call Turb % Calculate_Stress   ()
       call Turb % Calculate_Heat_Flux()
-      call Turb % Compute_Variable(Sol, ini, Turb % t2)
+      call Turb % Compute_Variable(Sol, Turb % t2)
     end if
 
-    call Turb % Compute_F22(Sol, ini, Turb % f22)
-    call Turb % Compute_Variable(Sol, ini, Turb % zeta)
+    call Turb % Compute_F22(Sol, Turb % f22)
+    call Turb % Compute_Variable(Sol, Turb % zeta)
 
     ! For some cases, it is beneficial to start simulations with
     ! turbulent viscosity computed with k-eps.  Particularly for
@@ -96,19 +95,19 @@
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
 
-    call Turb % Compute_Stress(Sol, ini, Turb % uu)
-    call Turb % Compute_Stress(Sol, ini, Turb % vv)
-    call Turb % Compute_Stress(Sol, ini, Turb % ww)
+    call Turb % Compute_Stress(Sol, Turb % uu)
+    call Turb % Compute_Stress(Sol, Turb % vv)
+    call Turb % Compute_Stress(Sol, Turb % ww)
 
-    call Turb % Compute_Stress(Sol, ini, Turb % uv)
-    call Turb % Compute_Stress(Sol, ini, Turb % uw)
-    call Turb % Compute_Stress(Sol, ini, Turb % vw)
+    call Turb % Compute_Stress(Sol, Turb % uv)
+    call Turb % Compute_Stress(Sol, Turb % uw)
+    call Turb % Compute_Stress(Sol, Turb % vw)
 
     if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Turb % Compute_F22(Sol, ini, Turb % f22)
+      call Turb % Compute_F22(Sol, Turb % f22)
     end if
 
-    call Turb % Compute_Stress(Sol, ini, Turb % eps)
+    call Turb % Compute_Stress(Sol, Turb % eps)
 
     call Turb % Vis_T_Rsm()
 
@@ -121,7 +120,7 @@
      Turb % model .eq. DES_SPALART) then
     call Calculate_Shear_And_Vorticity(Flow)
 
-    call Turb % Compute_Variable(Sol, ini, Turb % vis)
+    call Turb % Compute_Variable(Sol, Turb % vis)
     call Turb % Vis_T_Spalart_Allmaras()
   end if
 

@@ -21,15 +21,10 @@
   type(Monitor_Type)    :: monitor(MD)     ! monitors
   type(Porosity_Type)   :: Por(MD)         ! porosity
   type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
-  integer               :: max_ini         ! max number of inner iterations
-  integer               :: min_ini         ! min number of inner iterations
   integer               :: n_stat_t        ! first time step for turb. statistic
   integer               :: n_stat_p        ! first time step for swarm statistic
   integer               :: first_dt_p      ! first t.s. for swarm computation
-  integer               :: ini             ! inner iteration counter
-  real                  :: simple_tol      ! tolerance for SIMPLE algorithm
-  integer               :: n_dom           ! number of domains
-  integer               :: d               ! domain counter
+  integer               :: n_dom, d        ! number of domains, domain counter
 !==============================================================================!
 
   ! Initialize program profler
@@ -72,30 +67,14 @@
   !-------------------------!
   call Info % Start_Info()
 
-  !--------------------!
-  !   Read all grids   !
-  !--------------------!
+  !-----------------------------------------------!
+  !   Load and prepare all grids for processing   !
+  !-----------------------------------------------!
   do d = 1, n_dom
     call Control % Switch_To_Domain(d)  ! take domain's d control file
-    call Control % Read_Problem_Name(problem_name(d))
-
-    ! Load the finite volume Grid
-    call Grid(d) % Load_Cfn(This_Proc(), domain=d)
-    call Grid(d) % Load_Dim(This_Proc(), domain=d)
-
-    ! Determine threads for OpenMP runs
-    call Control % Max_Threads(Grid(d) % Vect % d_threads, .true.)
-    call Grid(d) % Determine_Threads()
-
-    call Grid(d) % Calculate_Face_Geometry()
-
-    ! Find communication patterns
-    call Grid(d) % Form_Cells_Comm()
-    call Grid(d) % Form_Maps_For_Backup()
+    call Grid(d) % Load_And_Prepare_For_Processing(d)
   end do
-
-  ! Out of domain loop - go back to root
-  call Control % Switch_To_Root()
+  call Control % Switch_To_Root()  ! out of domain loop - go back to root
 
   ! Allocate memory for working arrays (RSM models are memory hungry)
   call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=8,  n_r_node=8,  &
@@ -183,7 +162,6 @@
     call Control % Point_For_Monitoring_Planes(Flow(d) % bulk % xp,  &
                                                Flow(d) % bulk % yp,  &
                                                Flow(d) % bulk % zp)
-
     ! Prepare ...
     call Bulk_Mod_Monitoring_Planes_Areas(Flow(d) % bulk, Grid(d))
 
@@ -257,7 +235,7 @@
       ! Beginning of time step
       call User_Mod_Beginning_Of_Time_Step(Flow(d), Turb(d), Vof(d), Swarm(d))
 
-      ! Start info boxes.
+      ! Start info boxes
       call Info % Time_Start()
       call Info % Iter_Start()
       call Info % Bulk_Start()
@@ -289,11 +267,9 @@
     !   Inner-iteration loop   !
     !--------------------------!
     call Control % Switch_To_Root()
-    call Control % Max_Simple_Iterations(max_ini)
-    call Control % Min_Simple_Iterations(min_ini)
-    call Control % Tolerance_For_Simple_Algorithm(simple_tol)
+    call Read_Control % Iterations()
 
-    do ini = 1, max_ini
+    do while (Iter % Needs_More_Iterations(Flow, n_dom))
 
       ! Exchange data between domains
       call User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
@@ -305,10 +281,10 @@
         ! Beginning of iteration
         call User_Mod_Beginning_Of_Iteration(Flow(d), Turb(d), Vof(d), Swarm(d))
 
-        call Info % Iter_Fill(ini)
+        call Info % Iter_Fill(Iter % Current())
 
         ! Future? call Process % Simple_Step(Flow(d), Turb(d), Vof(d),  &
-        ! Future?                            Sol(d), ini)
+        ! Future?                            Sol(d))
 
         ! Compute velocity gradients
         call Flow(d) % Grad_Variable(Flow(d) % u)
@@ -317,27 +293,23 @@
 
         ! All three velocity components one after another
         call Process % Compute_Momentum(Flow(d), Turb(d), Vof(d), Por(d),  &
-                                        Sol(d), ini)
-        call Process % Compute_Pressure(Flow(d), Vof(d), Sol(d), ini)
-        call Process % Correct_Velocity(Flow(d), Vof(d), Sol(d), ini)
+                                        Sol(d))
+        call Process % Compute_Pressure(Flow(d), Vof(d), Sol(d))
+        call Process % Correct_Velocity(Flow(d), Vof(d), Sol(d))
 
-        call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d), Por(d),  &
-                                      Sol(d), ini)
+        call Process % Piso_Algorithm(Flow(d), Turb(d), Vof(d), Por(d), Sol(d))
 
         call Flow(d) % Calculate_Bulk_Fluxes(Flow(d) % v_flux % n)
 
-        ! Deal with turbulence (if you dare ;-))
-        call Turb(d) % Main_Turb(Sol(d), ini)
+        ! Deal with turbulence
+        call Turb(d) % Main_Turb(Sol(d))
 
         ! Energy (practically temperature)
-        if(Flow(d) % heat_transfer) then
-          call Process % Compute_Energy(Flow(d), Turb(d), Vof(d), Sol(d), ini)
-        end if
+        call Process % Compute_Energy(Flow(d), Turb(d), Vof(d), Sol(d))
 
         ! Passive scalars
         do sc = 1, Flow(d) % n_scalars
-          call Process % Compute_Scalar(Flow(d), Turb(d), Vof(d), Sol(d),  &
-                                        ini, sc)
+          call Process % Compute_Scalar(Flow(d), Turb(d), Vof(d), Sol(d), sc)
         end do
 
         ! Update the values at boundaries
@@ -351,21 +323,11 @@
 
       end do  ! through domains
 
-      if(ini >= min_ini) then
-        if( maxval(Flow(1:n_dom) % u % res) <= simple_tol .and.  &
-            maxval(Flow(1:n_dom) % v % res) <= simple_tol .and.  &
-            maxval(Flow(1:n_dom) % w % res) <= simple_tol .and.  &
-            maxval(Flow(1:n_dom) % t % res) <= simple_tol .and.  &
-            maxval(Flow(1:n_dom) % vol_res) <= simple_tol ) goto 1
-      end if
-
-    end do    ! through inner iterations
+    end do    ! through outer iterations
 
     !----------------------------------!
     !   End of the current time step   !
     !----------------------------------!
-1   continue
-
     do d = 1, n_dom
       call Process % Convective_Outflow(Flow(d), Turb(d), Vof(d))
     end do
@@ -375,7 +337,6 @@
     end do
 
     do d = 1, n_dom
-
       call Control % Switch_To_Domain(d)
 
       ! Write the values in monitoring points

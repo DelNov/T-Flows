@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, ini)
+  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,6 @@
   type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u
@@ -29,7 +28,7 @@
   !   Write down corrected cell-centered velocities   !
   !---------------------------------------------------!
   write(fil1_name(27:31), '(i5.5)') Time % Curr_Dt()
-  write(fil1_name(33:35), '(i3.3)') ini
+  write(fil1_name(33:35), '(i3.3)') Iter % Current()
 
   open(99, file=fil1_name)
   write(99, '(a)') '# User_Mod_End_Of_Correct_Velocity: 1:x  2:u  3:rho'
@@ -48,7 +47,7 @@
   !   Write down corrected face-centered velocities   !
   !---------------------------------------------------!
   write(fil2_name(27:31), '(i5.5)') Time % Curr_Dt()
-  write(fil2_name(33:35), '(i3.3)') ini
+  write(fil2_name(33:35), '(i3.3)') Iter % Current()
 
   open(99, file=fil2_name)
   write(99, '(a)') '# User_Mod_End_Of_Correct_Velocity: '  //  &  

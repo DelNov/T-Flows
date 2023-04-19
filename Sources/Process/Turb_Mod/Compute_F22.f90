@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_F22(Turb, Sol, ini, phi)
+  subroutine Compute_F22(Turb, Sol, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Turb_Type)          :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
@@ -54,7 +53,7 @@
   b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
-  if(ini .eq. 1) then
+  if(Iter % Current() .eq. 1) then
     do c = Cells_In_Domain_And_Buffers()
       phi % oo(c)   = phi % o(c)
       phi % o (c)   = phi % n(c)

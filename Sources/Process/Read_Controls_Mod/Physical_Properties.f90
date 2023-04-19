@@ -5,16 +5,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type) :: Rc
-  type(Field_Type)          :: Flow
-  type(Vof_Type)            :: Vof
-  type(Swarm_Type)          :: Swarm
+  class(Read_Controls_Type), intent(in) :: Rc
+  type(Field_Type)                      :: Flow
+  type(Vof_Type)                        :: Vof
+  type(Swarm_Type)                      :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Rc)
+  Unused(Swarm)
 !==============================================================================!
 
   ! Take alias

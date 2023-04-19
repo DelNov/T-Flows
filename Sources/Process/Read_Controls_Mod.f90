@@ -24,6 +24,7 @@
 
     contains
       procedure          :: Boundary_Conditions
+      procedure          :: Iterations
       procedure, private :: Native_Solvers
       procedure          :: Numerical_Schemes
       procedure, private :: Petsc_Solvers
@@ -39,6 +40,7 @@
 
     ! Member function
 #   include "Read_Controls_Mod/Boundary_Conditions.f90"
+#   include "Read_Controls_Mod/Iterations.f90"
 #   include "Read_Controls_Mod/Native_Solvers.f90"
 #   include "Read_Controls_Mod/Numerical_Schemes.f90"
 #   include "Read_Controls_Mod/Petsc_Solvers.f90"

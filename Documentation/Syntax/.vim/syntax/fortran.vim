@@ -441,7 +441,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  DES_SPALART
   syn keyword fortranConstant      SPALART_ALLMARAS  RSM_HANJALIC_JAKIRLIC  RSM_MANCEAU_HANJALIC
   syn keyword fortranConstant      HYBRID_LES_RANS HYBRID_LES_PRANDTL  STABILIZED  SGDH  GGDH  AFM  A_POW  B_POW
-  syn keyword fortranConstant      SWITCH_DISTANCE  SWITCH_VELOCITY  THERMALLY_DRIVEN  DENSITY_DRIVEN
+  syn keyword fortranConstant      SWITCH_DISTANCE  SWITCH_VELOCITY  THERMALLY_DRIVEN  DENSITY_DRIVEN  NO_BUOYANCY
 " Constants from Region_Mod
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
@@ -456,8 +456,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Math           Sort           File           String            Work           Line  Tok
   syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type         Vof_Type       Swarm_Type
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur         Vof            Swarm Swr
-  syn keyword fortranTypeTflows    Bulk_Type      Face_Type
-  syn keyword fortranObjectTflows                 v_flux
+  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type
+  syn keyword fortranObjectTflows                 v_flux         Iter
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type         Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type

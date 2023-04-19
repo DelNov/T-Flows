@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, ini, sc)
+  subroutine User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, sc)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Scalar function.             !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,7 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: ini      ! inner iteration
-  integer, intent(in)         :: sc       ! scalar index
+  integer,         intent(in) :: sc       ! scalar index
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: phi, p

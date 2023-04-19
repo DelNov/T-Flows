@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Energy(Process, Flow, Turb, Vof, Sol, ini)
+  subroutine Compute_Energy(Process, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for scalar (such as temperature)         !
 !------------------------------------------------------------------------------!
@@ -10,7 +10,6 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
@@ -59,6 +58,8 @@
 !   heat flux                   Flow % heat_flux  [W/m^2]
 !==============================================================================!
 
+  if(.not. Flow % heat_transfer) return
+
   call Profiler % Start('Compute_Energy (without solvers)')
 
   call Work % Connect_Real_Cell(cap_dens, q_int, q_turb, cross)
@@ -72,7 +73,7 @@
   call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol, ini)
+  call User_Mod_Beginning_Of_Compute_Energy(Flow, Turb, Vof, Sol)
 
   ! Initialize cross diffusion sources, matrix and right hand side
   cross  (:) = 0.0
@@ -85,7 +86,7 @@
   q_int (:) = 0.0
 
   ! Old values (o and oo)
-  if(ini .eq. 1) then
+  if(Iter % Current() .eq. 1) then
     do c = 1, Grid % n_cells
       t % oo(c) = t % o(c)
       t % o (c) = t % n(c)
@@ -301,7 +302,7 @@
   end if
 
   ! User function
-  call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol, ini)
+  call User_Mod_End_Of_Compute_Energy(Flow, Turb, Vof, Sol)
 
   call Work % Disconnect_Real_Cell(cap_dens, q_int, q_turb, cross)
 

@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, ini)
+  subroutine User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Pressure function.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: Flow
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: ini      ! inner iteration
+  type(Field_Type),  target :: Flow
+  type(Vof_Type),    target :: Vof
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: p, pp

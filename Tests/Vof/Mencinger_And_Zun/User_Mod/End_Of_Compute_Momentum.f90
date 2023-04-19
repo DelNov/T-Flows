@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol, ini)
+  subroutine User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Momentum function.           !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,6 @@
   type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: ini      ! inner iteration
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, p
@@ -26,7 +25,7 @@
   M    => Sol % Nat % M
 
   write(file_name(28:32), '(i5.5)') Time % Curr_Dt()
-  write(file_name(34:36), '(i3.3)') ini
+  write(file_name(34:36), '(i3.3)') Iter % Current()
 
   open(99, file=file_name)
   write(99, '(a)') '#  User_Mod_End_Of_Compute_Momentum '         //  &

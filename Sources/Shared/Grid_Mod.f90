@@ -219,6 +219,7 @@
       procedure :: Initialize_New_Numbers
       procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
+      procedure :: Load_And_Prepare_For_Processing
       procedure :: Load_Cfn
       procedure :: Load_Dim
       procedure :: Merge_Duplicate_Nodes
@@ -278,6 +279,7 @@
 #   include "Grid_Mod/Initialize_New_Numbers.f90"
 #   include "Grid_Mod/Is_Face_In_Cell.f90"
 #   include "Grid_Mod/Is_Point_In_Cell.f90"
+#   include "Grid_Mod/Load_And_Prepare_For_Processing.f90"
 #   include "Grid_Mod/Load_Cfn.f90"
 #   include "Grid_Mod/Load_Dim.f90"
 #   include "Grid_Mod/Merge_Duplicate_Nodes.f90"
