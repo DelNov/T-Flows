@@ -30,6 +30,8 @@
 
   !-----------------------------------------------------------!
   !   Fill up PETSc matrix with values from original matrix   !
+  !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -!
+  !   (This can be very slow, comparable to call to solver)   !
   !-----------------------------------------------------------!
   do i = 1, Pet % m_lower
     do j = A % row(i), A % row(i+1)-1
@@ -58,6 +60,9 @@
 
   !-----------------------------------!
   !   Set solver and preconditioner   !
+  !- - - - - - - - - - - - - - - - - -!
+  !   (This can be very slow, much    !
+  !    slower than call to solver.)   !
   !-----------------------------------!
   solvers = solver;   l = len_trim(solvers);  solvers(l+1:l+1) = c_null_char
   precs   = prec;     l = len_trim(precs);    precs  (l+1:l+1) = c_null_char
@@ -101,7 +106,10 @@
                                   Pet % miter)
   !-----------!
   !   Solve   !
-  !-----------!
+  !- - - - - -+------------------------------------------------------!
+  !   (This step takes roughly half of the time of filling up the    !
+  !    PETSc matrix and setiting the preconditioner, put together)   !
+  !------------------------------------------------------------------!
   call C_Petsc_Ksp_Solve(Pet % ksp, Pet % b, Pet % x)
 
   ! Check if converged
