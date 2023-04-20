@@ -30,13 +30,24 @@
     return
   end if
 
-  !---------------------------------------------------!
-  !   Residuals reached the tolerance level -> stop   !
-  !---------------------------------------------------!
+  !--------------------------------------------!
+  !   You are in between minimum and maximum   !
+  !   number of iterations, check residuals    !
+  !--------------------------------------------!
+
+  ! Residuals reached the tolerance level -> stop
   if(Iter % Max_Fields_Residual(Flow, n_dom) <= Iter % Get_Tol()) then
     Iter % current_iteration = 0
     Needs_More_Iterations = .false.
     return
+
+  ! Residuals did not reached the tolerance level -> continue
+  else
+    Needs_More_Iterations = .true.
+    return
   end if
+
+  ! You shouldn't be here
+  Assert(.false.)
 
   end function
