@@ -21,8 +21,8 @@
   /*---------------------------------------------------------------------------+
   |  PetscInitialize (and PetcIntialized)                                      |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialize.html          |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialized.html         |
+  |  https://petsc.org/release/manualpages/Sys/PetscInitialize/                |
+  |  https://petsc.org/release/manualpages/Sys/PetscInitialized/               |
   +---------------------------------------------------------------------------*/
   void c_petsc_initialize_() {
 
@@ -37,8 +37,8 @@
   /*---------------------------------------------------------------------------+
   |  PetscFinalize (and PetscInitialized)                                      |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscFinalize.html            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialized.html         |
+  |  https://petsc.org/release/manualpages/Sys/PetscFinalize/                  |
+  |  https://petsc.org/release/manualpages/Sys/PetscFinalized/                 |
   +---------------------------------------------------------------------------*/
   void c_petsc_finalize_() {
 
@@ -53,7 +53,7 @@
   /*---------------------------------------------------------------------------+
   |  PetscOptionsSetValue                                                      |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscOptionsSetValue.html     |
+  |  https://petsc.org/release/manualpages/Sys/PetscOptionsSetValue/           |
   +---------------------------------------------------------------------------*/
   void c_petsc_options_value_(const char name[], const char value[]) {
 
@@ -69,7 +69,7 @@
   /*---------------------------------------------------------------------------+
   |  MatCreate                                                                 |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatCreate.html             |
+  |  https://petsc.org/release/manualpages/Mat/MatCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_create_(Mat * A) {
 
@@ -79,7 +79,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetSizes                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetSizes.html           |
+  |  https://petsc.org/release/manualpages/Mat/MatSetSizes/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_sizes_(Mat * A, PetscInt * m, PetscInt * M) {
 
@@ -89,7 +89,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetType (to MATAIJ)                                                    |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html            |
+  |  https://petsc.org/release/manualpages/Mat/MatSetType/                     |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_type_to_mat_aij_(Mat * A) {
 
@@ -101,10 +101,10 @@
   |  MatSeqAIJSetPreallocation                                                 |
   |                                                                            |
   |  Combines two calls which seems to be important or necessary               |
-  |  https://petsc.org/release/docs/manualpages/Mat/MATAIJ.html#MATAIJ         |
+  |  https://petsc.org/release/manualpages/Mat/MATAIJ/                         |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatMPIAIJSetPreallocation.html
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetPreallocation.html
+  |  https://petsc.org/release/manualpages/Mat/MatMPIAIJSetPreallocation/      |
+  |  https://petsc.org/release/manualpages/Mat/MatSeqAIJSetPreallocation/      |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_aij_set_preallocation_(Mat      * A,
                                           PetscInt * d_nnz,
@@ -117,7 +117,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetValue                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetValue.html           |
+  |  https://petsc.org/release/manualpages/Mat/MatSetValue/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_value_(Mat         * A,
                               PetscInt    * row,
@@ -130,9 +130,9 @@
   /*---------------------------------------------------------------------------+
   |  MatAssemblyBegin and MatAssemblyEnd                                       |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatAssemblyBegin.html      |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatAssemblyEnd.html        |
-  |  https://petsc.org/main/docs/manualpages/Mat/MatSetOption.html             |
+  |  https://petsc.org/release/manualpages/Mat/MatAssemblyBegin/               |
+  |  https://petsc.org/release/manualpages/Mat/MatAssemblyEnd/                 |
+  |  https://petsc.org/release/manualpages/Mat/MatSetOption/                   |
   +---------------------------------------------------------------------------*/
   void c_petsc_assemble_mat_(Mat * A) {
 
@@ -144,6 +144,8 @@
     |  Uncomment the block below to check if matrix is symmetric      |
     |  It must be called after MatAssemblyBegin and MatAssemblyEnd    |
     |  Ideally, this should become a separate function in the future  |
+    |                                                                 |
+    |  https://petsc.org/release/manualpages/Mat/MatIsSymmetric/      |
     +----------------------------------------------------------------*/
     /* PetscBool symmetric;
        MatIsSymmetric(*A, 0.0, &symmetric);
@@ -160,8 +162,8 @@
   /*---------------------------------------------------------------------------+
   |  MatSetNullSpace                                                           |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatNullSpaceCreate.html    |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetNullSpace.html       |
+  |  https://petsc.org/release/manualpages/Mat/MatNullSpaceCreate/             |
+  |  https://petsc.org/release/manualpages/Mat/MatSetNullSpace/                |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_null_space_(Mat * A) {
 
@@ -175,7 +177,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetNullSpace                                                           |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetNullSpace.html       |
+  |  https://petsc.org/release/manualpages/Mat/MatSetNullSpace/                |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_remove_null_space_(Mat * A) {
 
@@ -191,7 +193,7 @@
   /*---------------------------------------------------------------------------+
   |  VecCreate                                                                 |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecCreate.html             |
+  |  https://petsc.org/release/manualpages/Vec/VecCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_create_(Vec * v) {
 
@@ -201,7 +203,7 @@
   /*---------------------------------------------------------------------------+
   |  VecCreateMPI                                                              |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecCreateMPI.html          |
+  |  https://petsc.org/release/manualpages/Vec/VecCreateMPI/                   |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m, PetscInt * M) {
 
@@ -211,7 +213,7 @@
   /*---------------------------------------------------------------------------+
   |  VecSetSizes                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecSetSizes.html           |
+  |  https://petsc.org/release/manualpages/Vec/VecSetSizes/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_set_sizes_(Vec * v, PetscInt * m, PetscInt * M) {
 
@@ -221,7 +223,7 @@
   /*---------------------------------------------------------------------------+
   |  VecSetType (to VECSTANDARD)                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecSetType.html            |
+  |  https://petsc.org/release/manualpages/Vec/VecSetType/                     |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_set_type_to_standard_(Vec * v) {
 
@@ -231,7 +233,7 @@
   /*---------------------------------------------------------------------------+
   |  VecSetValue                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecSetValue.html           |
+  |  https://petsc.org/release/manualpages/Vec/VecSetValue/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_set_value_(Vec * v, PetscInt * row, PetscScalar * value) {
 
@@ -241,8 +243,8 @@
   /*---------------------------------------------------------------------------+
   |  VecAssemblyBegin and VecAssemblyEnd                                       |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyBegin.html      |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyEnd.html        |
+  |  https://petsc.org/release/manualpages/Vec/VecAssemblyBegin/               |
+  |  https://petsc.org/release/manualpages/Vec/VecAssemblyEnd/                 |
   +---------------------------------------------------------------------------*/
   void c_petsc_assemble_vec_(Vec * v) {
 
@@ -253,7 +255,7 @@
   /*---------------------------------------------------------------------------+
   |  VecGetValues                                                              |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecGetValues.html          |
+  |  https://petsc.org/release/manualpages/Vec/VecGetValues/                   |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_get_values_(Vec         * v,
                                PetscInt    * ni,
@@ -272,7 +274,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPCreate                                                                 |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPCreate.html             |
+  |  https://petsc.org/release/manualpages/KSP/KSPCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_create_(KSP * ksp) {
 
@@ -282,13 +284,13 @@
   /*---------------------------------------------------------------------------+
   |  KSP routines to set solver and preconditioner                             |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetOperators.html       |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetType.html            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPGetPC.html              |
-  |  https://petsc.org/release/docs/manualpages/PC/PCSetType.html              |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetFromOptions.html     |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetUp.html              |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetInitialGuessNonzero.html
+  |  https://petsc.org/release/manualpages/KSP/KSPSetOperators/                |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetType/                     |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetPC/                       |
+  |  https://petsc.org/release/manualpages/PC/PCSetType/                       |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetFromOptions/              |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetUp/                       |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetInitialGuessNonzero/      |v
   +---------------------------------------------------------------------------*/
   void c_petsc_set_solver_and_preconditioner_(KSP  * ksp,
                                               PC   * pc,
@@ -326,7 +328,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPSetTolerances                                                          |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetTolerances.html      |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetTolerances/               |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_set_tolerances_(KSP         * ksp,
                                    PetscScalar * rtol,
@@ -339,7 +341,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPSetTolerances                                                          |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSolve.html              |
+  |  https://petsc.org/release/manualpages/KSP/KSPSolve/                       |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_solve_(KSP * ksp, Vec * b, Vec * x) {
 
@@ -349,7 +351,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPGetConvergedReason                                                     |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/KSP/KSPGetConvergedReason.html    |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetConvergedReason/          |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_converged_reason_(KSP * ksp, KSPConvergedReason * reason) {
 
@@ -359,7 +361,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPGetIterationNumber                                                     |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPGetIterationNumber.html |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetIterationNumber/          |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_get_iteration_number_(KSP * ksp, PetscInt * its) {
 
@@ -369,7 +371,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPGetResidualNorm                                                        |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPGetResidualNorm.html    |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetResidualNorm/             |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_get_residual_norm_(KSP * ksp, PetscScalar * rnorm) {
 
