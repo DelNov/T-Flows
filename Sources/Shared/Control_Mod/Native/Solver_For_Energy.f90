@@ -1,6 +1,9 @@
 !==============================================================================!
   subroutine Solver_For_Energy(Control, val, verbose)
 !------------------------------------------------------------------------------!
+!   Default values in this, and her sister functions, is simply as follows:    !
+!   If matrix is expected to be symmetric, take 'cg', otherwise take 'bicg'.   !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Control_Type)        :: Control
@@ -8,10 +11,10 @@
   logical, optional          :: verbose
 !==============================================================================!
 
-  call Control % Read_Char_Item('SOLVER_FOR_ENERGY', 'cg', val, verbose)
+  call Control % Read_Char_Item('SOLVER_FOR_ENERGY', 'bicg', val, verbose)
   call String % To_Lower_Case(val)
 
-  if( val .ne. 'bicg' .and. val .ne. 'cg') then
+  if(val .ne. 'bicg' .and. val .ne. 'cg') then
     call Message % Error(60,                                    &
              'Unknown linear solver for energy: '//trim(val)//  &
              '. \n This error is critical.  Exiting.',          &

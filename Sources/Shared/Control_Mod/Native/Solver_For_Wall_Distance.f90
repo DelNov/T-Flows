@@ -1,6 +1,9 @@
 !==============================================================================!
   subroutine Solver_For_Wall_Distance(Control, val, verbose)
 !------------------------------------------------------------------------------!
+!   Default values in this, and her sister functions, is simply as follows:    !
+!   If matrix is expected to be symmetric, take 'cg', otherwise take 'bicg'.   !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Control_Type)        :: Control
@@ -11,7 +14,7 @@
   call Control % Read_Char_Item('SOLVER_FOR_WALL_DISTANCE', 'cg', val, verbose)
   call String % To_Lower_Case(val)
 
-  if( val .ne. 'bicg' .and. val .ne. 'cg') then
+  if(val .ne. 'bicg' .and. val .ne. 'cg') then
     call Message % Error(60,                                           &
              'Unknown linear solver for wall distance: '//trim(val)//  &
              '. \n This error is critical.  Exiting.',                 &

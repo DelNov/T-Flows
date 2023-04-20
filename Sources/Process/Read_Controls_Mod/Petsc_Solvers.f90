@@ -75,16 +75,20 @@
     v % tol = tol
     w % tol = tol
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for momentum are not specified.'  //  &
-                ' Using the default values'
-    end if
-    u % prec = 'asm'
-    v % prec = 'asm'
-    w % prec = 'asm'
+    u % solver = 'bicg'
+    v % solver = 'bicg'
+    w % solver = 'bicg'
+    u % prec   = 'asm'
+    v % prec   = 'asm'
+    w % prec   = 'asm'
     u % prec_opts(1:MSI) = ''
     v % prec_opts(1:MSI) = ''
     w % prec_opts(1:MSI) = ''
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for momentum are not'  //  &
+                   ' specified.  Using the default: '             //  &
+                   trim(u % solver) // '/' // trim(u % prec)
+    end if
   end if
 
   !---------------------------!
@@ -94,8 +98,8 @@
                                         found,                        &
                                         .false.)
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER', 'cg',  sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',   'asm', pstring, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'cg',   sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'gamg', pstring, .true.)
     call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
@@ -105,12 +109,14 @@
     Flow % pp % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % pp % tol = tol
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for pressure are not specified.'  //  &
-               ' Using the default values'
-    end if
-    Flow % pp % prec = 'asm'
+    Flow % pp % solver = 'cg'
+    Flow % pp % prec   = 'gamg'
     Flow % pp % prec_opts(1:MSI) = ''
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for pressure are not'  //  &
+                   ' specified.  Using the default: '             //  &
+                   trim(Flow % pp % solver) // '/' // trim(Flow % pp % prec)
+    end if
   end if
 
   !-----------------------------------!
@@ -120,8 +126,8 @@
                                         found,                             &
                                         .false.)
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'cg',   sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'gamg', pstring, .true.)
     call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
@@ -131,12 +137,15 @@
     Flow % wall_dist % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % wall_dist % tol = tol
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for potential are not specified.'  //  &
-               ' Using the default values'
-    end if
-    Flow % wall_dist % prec = 'asm'
+    Flow % wall_dist % solver = 'cg'
+    Flow % wall_dist % prec   = 'gamg'
     Flow % wall_dist % prec_opts(1:MSI) = ''
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for wall distance are not'  //  &
+                   ' specified.  Using the default: '                  //  &
+                   trim(Flow % wall_dist % solver) // '/'              //  &
+                   trim(Flow % wall_dist % prec)
+    end if
   end if
 
   !----------------------------!
@@ -146,8 +155,8 @@
                                         found,                         &
                                         .false.)
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
+    call Control % Read_Char_Item_On('SOLVER', 'cg',   sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',   'gamg', pstring, .true.)
     call Control % Read_Strings_On  ('PREC_OPTS', opts, n_opts, .false.)
     call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
 
@@ -157,12 +166,14 @@
     Flow % pot % prec_opts(1:n_opts) = opts(1:n_opts)
     Flow % pot % tol = tol
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for potential are not specified.'  //  &
-               ' Using the default values'
-    end if
-    Flow % pot % prec = 'asm'
+    Flow % pot % solver = 'cg'
+    Flow % pot % prec   = 'gamg'
     Flow % pot % prec_opts(1:MSI) = ''
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for potential are not'  //  &
+                   ' specified.  Using the default: '              //  &
+                   trim(Flow % pot % solver) // '/' // trim(Flow % pot % prec)
+    end if
   end if
 
   !----------------------!
@@ -183,12 +194,14 @@
     Vof % fun % prec_opts(1:n_opts) = opts(1:n_opts)
     Vof % fun % tol = tol
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for VOF are not specified.'  //  &
-               ' Using the default values'
-    end if
-    Vof % fun % prec = 'asm'
+    Vof % fun % solver = 'bicg'
+    Vof % fun % prec   = 'asm'
     Vof % fun % prec_opts(1:MSI) = ''
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for VOF are not'  //  &
+                   ' specified.  Using the default: '        //  &
+                   trim(Vof % fun % solver) // '/' // trim(Vof % fun % prec)
+    end if
   end if
 
   !-------------------------!
@@ -209,12 +222,14 @@
     t % prec_opts(1:n_opts) = opts(1:n_opts)
     t % tol = tol
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for energy are not specified.'  //  &
-               ' Using the default values'
-    end if
-    t % prec = 'asm'
+    t % solver = 'bicg'
+    t % prec   = 'asm'
     t % prec_opts(1:MSI) = ''
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for energy are not'  //  &
+                   ' specified.  Using the default: '           //  &
+                   trim(t % solver) // '/' // trim(t % prec)
+    end if
   end if
 
   !--------------------------------!
@@ -239,23 +254,25 @@
       phi % tol = tol
     end do
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for scalars are not specified.'  //  &
-               ' Using the default values'
-    end if
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
-      phi % prec = 'asm'
+      phi % solver = 'bicg'
+      phi % prec   = 'asm'
       phi % prec_opts(1:MSI) = ''
     end do
+    if(First_Proc() .and. associated(phi)) then
+      print '(a)', ' # NOTE! PETSc options for scalars are not'  //  &
+                   ' specified.  Using the default: '            //  &
+                   trim(phi % solver) // '/' // trim(phi % prec)
+    end if
   end if
 
   !------------------------------!
   !   All turbuelnt quantities   !
   !------------------------------!
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_TURBULENCE',  &
-                                        found,                          &
-                                        .false.)
+                                      found,                          &
+                                      .false.)
   if(found) then
     call Control % Read_Char_Item_On('SOLVER', 'bicg', sstring, .true.)
     call Control % Read_Char_Item_On('PREC',   'asm',  pstring, .true.)
@@ -282,10 +299,6 @@
       tq % tol                 = tol
     end do
   else
-    if(First_Proc()) then
-      print *, '# NOTE! PETSc options for turbulence are not specified.'  //  &
-               ' Using the default values'
-    end if
     do i = 1, 12
       if(i .eq.  1) tq => Turb % kin
       if(i .eq.  2) tq => Turb % eps
@@ -299,9 +312,15 @@
       if(i .eq. 10) tq => Turb % uv
       if(i .eq. 11) tq => Turb % uw
       if(i .eq. 12) tq => Turb % vw
-      tq % prec = 'asm'
+      tq % solver = 'bicg'
+      tq % prec   = 'asm'
       tq % prec_opts(1:MSI) = ''
     end do
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! PETSc options for turbulence are not'  //  &
+                   ' specified.  Using the default: '               //  &
+                   trim(tq % solver) // '/' // trim(tq % prec)
+    end if
   end if
 
   end subroutine
