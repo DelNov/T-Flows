@@ -140,6 +140,16 @@
     err = MatAssemblyBegin(*A, MAT_FINAL_ASSEMBLY);
     err = MatAssemblyEnd  (*A, MAT_FINAL_ASSEMBLY);
 
+    /*----------------------------------------------------------------+
+    |  Uncomment the block below to check if matrix is symmetric      |
+    |  It must be called after MatAssemblyBegin and MatAssemblyEnd    |
+    |  Ideally, this should become a separate function in the future  |
+    +----------------------------------------------------------------*/
+    /* PetscBool symmetric;
+       MatIsSymmetric(*A, 0.0, &symmetric);
+       if(!symmetric) {printf("Matrix is not symmetric\n");}
+       else           {printf("Matrix is symmetric\n");} */
+
     /* If one wishes to repeatedly assemble matrices that retain the
        same nonzero pattern (such as within a time-dependent problem),
        the option should be specified after the first matrix has been
