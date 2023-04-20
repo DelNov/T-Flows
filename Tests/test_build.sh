@@ -105,7 +105,7 @@ LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
 HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
-# MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
+# Not used (yet ... if ever):
 # MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
 
 #--------------------------------------------------------------
@@ -127,7 +127,6 @@ ALL_GENERATE_TESTS=( \
                     "$RANS_CHANNEL_LR_STRETCHED_DIR" \
                     "$RANS_CHANNEL_LR_UNIFORM_DIR" \
                     "$MULTDOM_BACKSTEP_DIR" \
-                    "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                     "$VOF_DAM_BREAK_2D_DIR" \
                     "$VOF_RISING_BUBBLE_DIR" \
                     "$SWARM_VOF_THREE_PHASE_DIR" \
@@ -149,6 +148,7 @@ ALL_CONVERT_TESTS=( \
                    "$LAMINAR_CONVECTIVE_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
+                   "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
