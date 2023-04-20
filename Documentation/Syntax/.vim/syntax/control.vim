@@ -236,6 +236,9 @@ syn keyword controlNumericalParameters   simple  piso  linear  parabolic  gauss_
 syn keyword controlNumericalParameters   central  smart  luds  quick  smart  gamma  minmod  blended  superbee  avl_smart
 syn keyword controlNumericalParameters   cicsam  upwind  stacs
 syn keyword controlNumericalParameters   yes  no
+syn keyword controlTurbulenceModels      k_eps_zeta_f  k_eps  les_tvm  les_wal  les_dynamic  les_smagorinsky  hybrid_les_prandtl
+syn keyword controlTurbulenceModels      des_spalart  spalart_allmaras  dns  rsm_hanjalic_jakirlic  rsm_manceau_hanjalic  dns  none
+syn keyword controlTurbulenceModels      high_re  low_re  ggdh  sgdh  afm
 
 " ==============================================================================
 " The default methods for highlighting. Can be overridden later.
@@ -247,6 +250,7 @@ hi def link controlIntrinsic             Identifier
 hi def link controlBoundaryConditon      Keyword
 hi def link controlLinearSolvers         Keyword
 hi def link controlNumericalParameters   Keyword
+hi def link controlTurbulenceModels      Keyword
 
 let b:current_syntax = "control"
 

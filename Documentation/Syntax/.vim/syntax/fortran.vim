@@ -465,7 +465,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Process_Type
   syn keyword fortranObjectTflows  A  M           vector         Sol            Nat               Pet            Process
   syn keyword fortranTypeTflows    Var_Type
-  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis
+  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
 " Items which follow are not really objects, but I don't know where else to put them
   syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
 " Macros might need a special group of their own.
