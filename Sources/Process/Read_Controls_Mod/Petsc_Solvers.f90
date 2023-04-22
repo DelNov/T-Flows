@@ -260,10 +260,13 @@
       phi % prec   = 'asm'
       phi % prec_opts(1:MSI) = ''
     end do
-    if(First_Proc() .and. associated(phi)) then
-      print '(a)', ' # NOTE! PETSc options for scalars are not'  //  &
-                   ' specified.  Using the default: '            //  &
-                   trim(phi % solver) // '/' // trim(phi % prec)
+    if(Flow % n_scalars > 0) then
+      phi => Flow % scalar(1)  ! probably not needed, but doesn't harm
+      if(First_Proc() .and. associated(phi)) then
+        print '(a)', ' # NOTE! PETSc options for scalars are not'  //  &
+                     ' specified.  Using the default: '            //  &
+                     trim(phi % solver) // '/' // trim(phi % prec)
+      end if
     end if
   end if
 
