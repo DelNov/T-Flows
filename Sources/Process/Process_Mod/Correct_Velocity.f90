@@ -72,7 +72,7 @@
 
 
   ! User function
-  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
 
   !------------------------------------!
   !   Calculate the max volume error   !
