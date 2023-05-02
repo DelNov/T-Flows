@@ -47,15 +47,18 @@
 
   integer                   :: n_points, k
   real, allocatable         :: prof(:,:), x(:), y(:), z(:), dist(:)
-  logical                   :: found
+  logical                   :: found, file_exists
 
   ! Default values for initial conditions
   character(3) :: u_def   = '0.0',  v_def    = '0.0',  w_def   = '0.0'
   character(3) :: t_def   = '0.0',  t2_def   = '0.0',  phi_def = '0.0'
+  character(3) :: vf_def   = '0.0'
   character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
   character(3) :: vis_def = '0.0',  zeta_def = '0.0'
   character(3) :: uu_def  = '0.0',  vv_def   = '0.0',  ww_def  = '0.0'
   character(3) :: uv_def  = '0.0',  uw_def   = '0.0',  vw_def  = '0.0'
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   ! Take aliases
@@ -73,12 +76,12 @@
   call Turb % Alias_T2          (t2)
 
   area  = 0.0
-  if (this_proc < 2) print '(a,a)', ' # Grid name: ', trim(Grid % name)
+  if (First_Proc()) print '(a,a)', ' # Grid name: ', trim(Grid % name)
 
   ! Found the line where boundary condition definition is defined
-  call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
-                                       found,               &
-                                       .true.)
+  call Control % Position_At_One_Key('INITIAL_CONDITION', &
+                                     found,               &
+                                     .true.)
 
   !-----------------------------------------------!
   !                                               !
@@ -87,7 +90,7 @@
   !-----------------------------------------------!
   if (found) then
 
-    call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
+    call Control % Read_Strings_On('VARIABLES', keys, nks, .true.)
 
     ! Input is valid, turn keys to upper case
     do i = 1, nks
@@ -95,7 +98,7 @@
     end do
 
     ! Check if there is file specified
-    call Control_Mod_Read_Strings_On('FILE', keys_file, nvs, .true.)
+    call Control % Read_Strings_On('FILE', keys_file, nvs, .true.)
 
     !------------------------------------------------!
     !                                                !
@@ -104,17 +107,17 @@
     !------------------------------------------------!
     if (nvs .eq. 1) then ! word 'file' was specified
 
-      if (this_proc < 2) &
+      if (First_Proc()) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
 
-      call File % Open_For_Reading_Ascii(keys_file(1), fu, this_proc)
+      call File % Open_For_Reading_Ascii(keys_file(1), fu, This_Proc())
 
       ! Number of points
       call File % Read_Line(fu)
 
       read(Line % tokens(1), *) n_points
 
-      if (this_proc < 2) print '(a,i0,2a)', " # Reading ", nks, &
+      if (First_Proc()) print '(a,i0,2a)', " # Reading ", nks, &
         " columns in file " , trim(keys_file(1))
 
       allocate(prof(n_points, 0:nks)); prof = 0.
@@ -238,7 +241,7 @@
 
         end do ! c = 1, Grid % n_cells
 
-        call Comm_Mod_Wait
+        call Global % Wait
         deallocate(prof)
         deallocate(x)
         deallocate(y)
@@ -255,31 +258,31 @@
     else
 
       ! Go back to key and read again
-      call Control_Mod_Position_At_One_Key('INITIAL_CONDITION', &
-                                           found,               &
-                                           .true.)
+      call Control % Position_At_One_Key('INITIAL_CONDITION', &
+                                         found,               &
+                                         .true.)
 
-      call Control_Mod_Read_Strings_On('VARIABLES', keys, nks, .true.)
+      call Control % Read_Strings_On('VARIABLES', keys, nks, .true.)
 
       ! Input is valid, turn keys to upper case
       do i = 1, nks
         call String % To_Upper_Case(keys(i))
       end do
 
-      call Control_Mod_Read_Strings_On('VALUES', vals(1), nvs, .true.)
+      call Control % Read_Strings_On('VALUES', vals(1), nvs, .true.)
 
       ! Check validity of the input
-      if(nks .eq. 0 .or. nvs .eq. 0 .and. this_proc < 2) then
-        print '(2a)', '# Critical, for initial condition: ',        &
-                      ' no values or variables have been provided'
-        call Comm_Mod_End
-        stop
+      if(nks .eq. 0 .or. nvs .eq. 0) then
+        call Message % Error(72,                                     &
+                      'Critical, for initial condition: '//          &
+                      'no values or variables have been provided ',  &
+                      file=__FILE__, line=__LINE__, one_proc=.true.)
       end if
-      if(nks .ne. nvs .and. this_proc < 2) then
-        print '(2a)', '# Critical for initial conditions, number of values ',  &
-                      ' is not the same as number of provided variable names'
-        call Comm_Mod_End
-        stop
+      if(nks .ne. nvs) then
+        call Message % Error(72,                                               &
+                      'Critical, for initial condition: number of values '//   &
+                      'is not the same as number of provided variable names.', &
+                      file=__FILE__, line=__LINE__, one_proc=.true.)
       end if
 
       ! Input is valid, turn keys to upper case
@@ -316,6 +319,15 @@
           vals(0) = t_def;  read(vals(Key_Ind('T', keys, nks)), *)  t % n(c)
           t % o(c)  = t % n(c)
           t % oo(c) = t % n(c)
+        end if
+
+        !---------!
+        !   Vof   !
+        !---------!
+        if(Flow % with_interface) then
+          vals(0) = vf_def
+          read(vals(Key_Ind('VOF', keys, nks)), *, err=999)  Vof % fun % n(c)
+ 999      continue  ! file name may be defined
         end if
 
         !-------------!
@@ -419,7 +431,12 @@
     !---------------------------------!
     if(Flow % with_interface) then
       read(vals(Key_Ind('VOF', keys, nks)), *)  Vof % name_stl
-      call Vof % Initialize_From_Stl()
+      inquire(file = trim(Vof % name_stl), exist = file_exists)
+
+      ! File exists
+      if(file_exists) then
+        call Vof % Initialize_From_Stl()
+      endif
     end if
 
   end if
@@ -471,15 +488,15 @@
     end if
   end do
 
-  call Comm_Mod_Global_Sum_Int(n_wall)
-  call Comm_Mod_Global_Sum_Int(n_inflow)
-  call Comm_Mod_Global_Sum_Int(n_outflow)
-  call Comm_Mod_Global_Sum_Int(n_symmetry)
-  call Comm_Mod_Global_Sum_Int(n_heated_wall)
-  call Comm_Mod_Global_Sum_Int(n_convect)
-  call Comm_Mod_Global_Sum_Int(n_pressure)
-  call Comm_Mod_Global_Sum_Real(bulk % vol_in)
-  call Comm_Mod_Global_Sum_Real(area)
+  call Global % Sum_Int(n_wall)
+  call Global % Sum_Int(n_inflow)
+  call Global % Sum_Int(n_outflow)
+  call Global % Sum_Int(n_symmetry)
+  call Global % Sum_Int(n_heated_wall)
+  call Global % Sum_Int(n_convect)
+  call Global % Sum_Int(n_pressure)
+  call Global % Sum_Real(bulk % vol_in)
+  call Global % Sum_Real(area)
 
   !----------------------------------------------------------------------!
   !   This parameter, has_pressure_outlet, is used in Compute_Pressure   !
@@ -502,7 +519,7 @@
   !----------------------!
   !   Initializes time   !
   !----------------------!
-  if(this_proc  < 2) then
+  if(First_Proc()) then
     if(n_inflow .gt. 0) then
       print '(a29,es12.5)', ' # Volume inflow           : ', bulk % vol_in
       if(Flow % with_interface) then

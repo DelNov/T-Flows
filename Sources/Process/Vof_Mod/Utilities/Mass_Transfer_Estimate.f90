@@ -72,14 +72,14 @@
           ! be adjusted accordingly.
           ! Units: W/(mK) * K/m * m^2 = W
           Vof % q_int(1,s) = Vof % q_int(1,s)                               &
-              + cond_1 * (  t % x(c1) * Vof % Front % elem(e) % sx   &
-                          + t % y(c1) * Vof % Front % elem(e) % sy   &
-                          + t % z(c1) * Vof % Front % elem(e) % sz)
+              + cond_1 * (  t % x(c1) * Vof % Front % Elem(e) % sx   &
+                          + t % y(c1) * Vof % Front % Elem(e) % sy   &
+                          + t % z(c1) * Vof % Front % Elem(e) % sz)
 
           Vof % q_int(2,s) = Vof % q_int(2,s)                               &
-              + cond_2 * (  t % x(c2) * Vof % Front % elem(e) % sx   &
-                          + t % y(c2) * Vof % Front % elem(e) % sy   &
-                          + t % z(c2) * Vof % Front % elem(e) % sz)
+              + cond_2 * (  t % x(c2) * Vof % Front % Elem(e) % sx   &
+                          + t % y(c2) * Vof % Front % Elem(e) % sy   &
+                          + t % z(c2) * Vof % Front % Elem(e) % sz)
 
         end if  ! e .ne. 0
       end do    ! i_ele

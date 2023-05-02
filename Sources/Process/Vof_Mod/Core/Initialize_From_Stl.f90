@@ -20,16 +20,16 @@
   real,    pointer, contiguous :: surf_dist(:), node_dist(:)
   integer, pointer, contiguous :: dis_nod_int(:), cut_cel(:), glo(:)
   integer, pointer, contiguous :: set_cel(:), set_old(:)
-  integer                      :: b, c, s, i_nod, j_nod, i, j, k1, k2, m
-  integer                      :: i_iso, i_ver, i_fac, fac, p
+  integer                      :: b, c, c1, c2, s, i_nod, j_nod, i, j, k1, k2, m
+  integer                      :: i_iso, i_ver, i_fac, fac, p, reg
   integer                      :: n_cut_facets, cut_facets(1024)
   real                         :: vol_1, vol_2, vol_3, vol_4, vol_5
-  real                         :: cell_vol, cel0_vol, cel1_vol, d, d1, d2
+  real                         :: cell_vol, cel0_vol, cel1_vol, d
   real                         :: p1(3), p2(3), p3(3), qc(3), qn(3)
   real                         :: f(3), n(3)
   integer                      :: ij_cut(MAX_ISOAP_VERTS, MAX_ISOAP_VERTS)
   integer                      :: new_faces_n_nodes, cnt_p, cnt_m
-  integer                      :: new_faces_n(MAX_ISOAP_VERTS), processed_cells
+  integer                      :: new_faces_n(MAX_ISOAP_VERTS)
   logical                      :: flooding
 !==============================================================================!
 
@@ -60,21 +60,21 @@
     call Work % Connect_Real_Cell(surf_dist, surf_dist_pos, surf_dist_neg)
     call Work % Connect_Real_Cell(node_dist)
 
-    if(Stl % n_boddies > 1 .and. this_proc < 2) then
+    if(Stl % n_boddies > 1 .and. First_Proc()) then
       print '(a,i3)', ' # Processing body ', b
     end if
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a)', ' # Calculating distance from the STL interface'
     end if
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       surf_dist_pos(c) = 0.0
       surf_dist_neg(c) = 0.0
       node_dist(c) = -HUGE
     end do
 
-    do c = 1, Grid % n_cells
-      if(this_proc < 2) then
+    do c = Cells_In_Domain()
+      if(First_Proc()) then
         write(*,'(a2,f5.0,a14,a1)', advance='no') ' #',  &
              (100.*real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
         flush(6)
@@ -124,8 +124,12 @@
           Grid % xn(i), Grid % yn(i), Grid % zn(i)))
       end do
     end do
+    call Grid % Exchange_Cells_Real(node_dist)
+    call Grid % Exchange_Cells_Real(surf_dist)
+    call Grid % Exchange_Cells_Real(surf_dist_pos)
+    call Grid % Exchange_Cells_Real(surf_dist_neg)
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       node_dist(c) = sqrt(node_dist(c))
     end do
     if(DEBUG) then
@@ -154,8 +158,8 @@
     !   the node distance for all nodes in the grid      !
     !                                                    !
     !----------------------------------------------------!
-    if(this_proc < 2) print '(a)', ' # Searching for cells cut by the STL facets'
-    do c = 1, Grid % n_cells
+    if(First_Proc()) print '(a)', ' # Searching for cells cut by the STL facets'
+    do c = Cells_In_Domain_And_Buffers()
 
       ! Fetch cell coordinates
       qc(1) = Grid % xc(c);  qc(2) = Grid % yc(c);  qc(3) = Grid % zc(c)
@@ -166,7 +170,7 @@
         cut_facets(:) = 0
         cut_cel(c)    = NO
 
-        if(this_proc < 2) then
+        if(First_Proc()) then
           write(*,'(a2,f5.0,a14,a1)', advance='no') ' #',  &
                (100. * real(c)/real(Grid % n_cells)), ' % complete...', achar(13)
           flush(6)
@@ -312,13 +316,13 @@
     !---------------------------------------!
     !   The actual flood fill starts here   !
     !---------------------------------------!
-    if(this_proc < 2) write(*, '(a)', advance='no') ' # Flooding ...'
+    if(First_Proc()) write(*, '(a)', advance='no') ' # Flooding ...'
     m = 0
   1 continue
     m = m + 1
     flooding = .false.
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if( set_cel(c) .eq. NO ) then
 
         flooding = .true.     ! flooding is still going on
@@ -351,10 +355,10 @@
             dis_nod_int(i) = -1
           end do
 
-        ! Throw an error if you come to this
+        ! Throw a warning if you come to this
         else   ! cnt_p == cnt_m
           if(cnt_p .gt. 0 .and. cnt_m .gt. 0) then
-          PRINT *, __FILE__, __LINE__, 'HOW ON EARTH?  CELL: ', C, CNT_P, CNT_M
+          ! PRINT *, __FILE__, __LINE__, DENTED CELL: ', C, CNT_P, CNT_M
           end if
         end if
 
@@ -369,7 +373,7 @@
     call Grid % Exchange_Cells_Real(vof_body(:,b))
 
     ! Check if the cell has been set in another processor
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if( set_cel(c) .eq. YES .and. set_old(c) .eq. NO ) then
         if(vof_body(c, b) < MICRO) then  ! the cell was filled with zero
           do i_nod = 1, abs(Grid % cells_n_nodes(c))
@@ -387,9 +391,9 @@
     end do
 
     ! Flood fill still going, go back
-    call Comm_Mod_Global_Lor_Log(flooding)
+    call Global % Lor_Log(flooding)
     if(flooding) goto 1
-    if(this_proc < 2) print '(a)', ' done!'
+    if(First_Proc()) print '(a)', ' done!'
 
     if(DEBUG) then
       call Grid % Save_Debug_Vtu(append="set_cel",                &
@@ -435,9 +439,9 @@
         !    of VOF, some cells happen to have multiple iso-surfaces    !
         !---------------------------------------------------------------!
         if(Iso_Polygons % n_polys > 1) then
-          print '(4(a,i8))',  __FILE__,        __LINE__,   &
-                             ' # check cell ', c,          &
-                             ' in processor ', this_proc,  &
+          print '(4(a,i8))',  __FILE__,        __LINE__,     &
+                             ' # check cell ', c,            &
+                             ' in processor ', This_Proc(),  &
                              ' global cell ',  glo(c)
           call Polyhedron % Plot_Polyhedron_Vtk("check-cell", glo(c))
           call Iso_Polygons % Plot_Iso_polygons_Vtk("check-iso", glo(c))
@@ -607,13 +611,30 @@
     call Work % Disconnect_Real_Cell(node_dist)
 
   end do  ! through boddies
+  call Grid % Exchange_Cells_Real(Vof % fun % n)
+
+  !-----------------------------!
+  !   Set boundary values too   !
+  !-----------------------------!
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .ne. INFLOW) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+
+        Vof % fun % n(c2) = Vof % fun % n(c1)
+      end do  ! faces
+    end if    ! inflow
+  end do      ! region
 
   !------------------------------------!
   !   Set the old time steps as well   !
   !------------------------------------!
-  do c = 1, Grid % n_cells
-    Vof % fun % o (c) = Vof % fun % n(c)
-    Vof % fun % oo(c) = Vof % fun % n(c)
+  do reg = Boundary_Inside_And_Buffer_Regions()
+    do c = Cells_In_Region(reg)
+      Vof % fun % o (c) = Vof % fun % n(c)
+      Vof % fun % oo(c) = Vof % fun % n(c)
+    end do
   end do
 
   if(DEBUG) then

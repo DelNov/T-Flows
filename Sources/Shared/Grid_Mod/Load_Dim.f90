@@ -9,9 +9,11 @@
   integer, intent(in) :: this_proc
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu, real_prec
-  character(SL) :: name_in
+  integer       :: c, n, s, fu, real_prec, version
+  character(SL) :: name_in, str1, str2
 !==============================================================================!
+
+  call Profiler % Start('Load_Dim')
 
   !----------------------------!
   !     Read the file with     !
@@ -20,6 +22,12 @@
   call File % Set_Name(name_in, processor=this_proc, extension='.dim',  &
                        domain=domain)
   call File % Open_For_Reading_Binary(name_in, fu, this_proc)
+
+  !----------------------------------------------!
+  !   Store rank (domain number) for this grid   !
+  !----------------------------------------------!
+  Grid % rank = 0
+  if(present(domain)) Grid % rank = domain
 
   !-------------------------!
   !   Read real precision   !
@@ -44,6 +52,22 @@
                        'convert or generate the meshes again and re-run.',     &
                        one_proc = .true.)
     end if
+  end if
+
+  !------------------------------!
+  !   Read version of the file   !
+  !------------------------------!
+  read(fu) version
+
+  if(version .ne. VERSION_DIM) then
+    write(str1, '(i0.0)')  version
+    write(str2, '(i0.0)')  VERSION_DIM
+    call Message % Error(72,                                                   &
+                 'You seem to be reading wrong version of the .dim file.  '//  &
+                 'The version you are reading is '//trim(str1)//' but the '//  &
+                 'code expects version '//trim(str2)//'. Re-generate or   '//  &
+                 'convert again the grids (and divide them if you run in  '//  &
+                 'parallel).', one_proc = .true.)
   end if
 
   !-------------------------!
@@ -90,5 +114,7 @@
   read(fu) Grid % per_z
 
   close(fu)
+
+  call Profiler % Stop('Load_Dim')
 
   end subroutine

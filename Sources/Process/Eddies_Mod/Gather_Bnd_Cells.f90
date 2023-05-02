@@ -26,19 +26,19 @@
   ! Count boundary cells in this processor
   eddies % n_bnd_cells = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
       eddies % n_bnd_cells = eddies % n_bnd_cells + 1
     end if
   end do
 
   ! Estimate first boundary cell for each processor
-  if(n_proc > 1) then
-    allocate(n_bnd_cells_proc(n_proc));  n_bnd_cells_proc(:) = 0;
-    n_bnd_cells_proc(this_proc) = eddies % n_bnd_cells
-    call Comm_Mod_Global_Sum_Int_Array(n_proc, n_bnd_cells_proc)
+  if(Parallel_Run()) then
+    allocate(n_bnd_cells_proc(N_Procs()));  n_bnd_cells_proc(:) = 0;
+    n_bnd_cells_proc(This_Proc()) = eddies % n_bnd_cells
+    call Global % Sum_Int_Array(N_Procs(), n_bnd_cells_proc)
 
-    allocate(s_bnd_cell_proc(n_proc)); s_bnd_cell_proc(:) = 0
-    do n = 2, n_proc
+    allocate(s_bnd_cell_proc(N_Procs())); s_bnd_cell_proc(:) = 0
+    do n = 2, N_Procs()
       s_bnd_cell_proc(n) = s_bnd_cell_proc(n-1) + n_bnd_cells_proc(n-1)
     end do
   else
@@ -47,8 +47,8 @@
 
   ! Gather coordinates from all processors
   eddies % n_bnd_cells_glo = eddies % n_bnd_cells
-  call Comm_Mod_Global_Sum_Int(eddies % n_bnd_cells_glo)
-  if(this_proc < 2) then
+  call Global % Sum_Int(eddies % n_bnd_cells_glo)
+  if(First_Proc()) then
     print '(a,a,i6)', ' # Number of boundary cells at ',  &
                       trim(eddies % bc_name),             &
                       eddies % n_bnd_cells_glo
@@ -63,24 +63,24 @@
 
   cnt = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Bnd_Cond_Name( c) .eq. eddies % bc_name) then
+    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
       cnt = cnt + 1
-      eddies % bnd_xc(cnt + s_bnd_cell_proc(this_proc)) = Grid % xc(c)
-      eddies % bnd_yc(cnt + s_bnd_cell_proc(this_proc)) = Grid % yc(c)
-      eddies % bnd_zc(cnt + s_bnd_cell_proc(this_proc)) = Grid % zc(c)
-      eddies % bnd_wd(cnt + s_bnd_cell_proc(this_proc)) = Grid % wall_dist(c)
-      eddies % bnd_u (cnt + s_bnd_cell_proc(this_proc)) = Flow % u % b(c)
-      eddies % bnd_v (cnt + s_bnd_cell_proc(this_proc)) = Flow % v % b(c)
-      eddies % bnd_w (cnt + s_bnd_cell_proc(this_proc)) = Flow % w % b(c)
+      eddies % bnd_xc(cnt + s_bnd_cell_proc(This_Proc())) = Grid % xc(c)
+      eddies % bnd_yc(cnt + s_bnd_cell_proc(This_Proc())) = Grid % yc(c)
+      eddies % bnd_zc(cnt + s_bnd_cell_proc(This_Proc())) = Grid % zc(c)
+      eddies % bnd_wd(cnt + s_bnd_cell_proc(This_Proc())) = Grid % wall_dist(c)
+      eddies % bnd_u (cnt + s_bnd_cell_proc(This_Proc())) = Flow % u % b(c)
+      eddies % bnd_v (cnt + s_bnd_cell_proc(This_Proc())) = Flow % v % b(c)
+      eddies % bnd_w (cnt + s_bnd_cell_proc(This_Proc())) = Flow % w % b(c)
     end if
   end do
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_xc)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_yc)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_zc)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_wd)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_u)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_v)
-  call Comm_Mod_Global_Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_w)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_xc)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_yc)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_zc)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_wd)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_u)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_v)
+  call Global % Sum_Real_Array(eddies % n_bnd_cells_glo, eddies % bnd_w)
 
   !-------------------------------------------------------!
   !           Find position of the inlet plane            !

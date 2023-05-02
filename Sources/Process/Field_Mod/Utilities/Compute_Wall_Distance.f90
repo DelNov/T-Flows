@@ -15,7 +15,6 @@
   integer                    :: s, c, c1, c2, n
   real                       :: f_ex, f_im
   real                       :: phi_x_f, phi_y_f, phi_z_f
-  real                       :: vol_in_real, vol_in_fake, dist_min
   real, contiguous,  pointer :: cross(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: NDT = 24       ! number of false time steps
@@ -38,7 +37,7 @@
 
   call Work % Connect_Real_Cell(cross)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',      ' # Computing wall distance ...'
     print '(a,i3,a)', ' # ... with ', NDT, ' fake time steps.'
     print '(a)',      ' # This might take a while, please wait'
@@ -201,7 +200,7 @@
                    phi % tol,        &
                    phi % res)
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a,i4,a,e12.4)', ' # Computed wall distance in ',  phi % eniter,  &
                               ' iterations with residual: ',    phi % res
     end if

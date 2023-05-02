@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Field_Mod
@@ -11,6 +12,7 @@
   use Face_Mod
   use Bulk_Mod
   use Solver_Mod
+  use Time_Mod
   use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -141,7 +143,7 @@
     logical :: inside_piso_loop
     logical :: choi_correction
     logical :: gu_correction
-    logical :: report_vol_balance
+    logical :: rep_vol_balance
 
     ! Maximum CFL and Pe numbers
     real :: cfl_max, pe_max
@@ -200,6 +202,7 @@
       procedure          :: Grad
       procedure          :: Grad_Component
       procedure, private :: Grad_Component_No_Refresh
+      procedure, private :: Grad_Three_Components_No_Refresh
       ! procedure          :: Grad_Component_Faces_To_Cells         ! not used
       ! procedure          :: Grad_Component_Nodes_To_Cells         ! not used
       ! procedure          :: Grad_Component_Cells_To_Nodes         ! not used
@@ -227,15 +230,16 @@
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Courant_In_Cells  ! for post-processing
-      procedure :: Calculate_Fluxes
+      procedure :: Calculate_Bulk_Fluxes
       procedure :: Compute_Wall_Distance       ! see: Potential_Initialization
-      procedure :: Potential_Initialization    ! see: Compute_Wall_Distance
+      procedure :: Potential_Initialisation    ! see: Compute_Wall_Distance
       procedure :: Prandtl_Numb
       procedure :: Schmidt_Numb
       procedure :: U_Tan
-      procedure :: Report_Volume_Balance
-      procedure :: Report_Volume_Balance_Start
-      procedure :: Report_Volume_Balance_Stop
+      procedure :: Report_Vol_Balance
+      procedure :: Report_Vol_Balance_Start
+      procedure :: Report_Vol_Balance_Stop
+      procedure :: Volume_Average
 
   end type
 
@@ -263,6 +267,7 @@
 #   include "Field_Mod/Gradients/Grad.f90"
 #   include "Field_Mod/Gradients/Grad_Component.f90"
 #   include "Field_Mod/Gradients/Grad_Component_No_Refresh.f90"
+#   include "Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90"
 !   include "Field_Mod/Gradients/Grad_Component_Faces_To_Cells.f90"
 !   include "Field_Mod/Gradients/Grad_Component_Nodes_To_Cells.f90"
 !   include "Field_Mod/Gradients/Grad_Component_Cells_To_Nodes.f90"
@@ -290,15 +295,16 @@
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
 #   include "Field_Mod/Utilities/Buoyancy_Forces.f90"
 #   include "Field_Mod/Utilities/Calculate_Courant_In_Cells.f90"
-#   include "Field_Mod/Utilities/Calculate_Fluxes.f90"
+#   include "Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90"
 #   include "Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90"
 #   include "Field_Mod/Utilities/Potential_Initialization.f90"
 #   include "Field_Mod/Utilities/Prandtl_Numb.f90"
 #   include "Field_Mod/Utilities/Schmidt_Numb.f90"
 #   include "Field_Mod/Utilities/U_Tan.f90"
 #   include "Field_Mod/Utilities/Compute_Wall_Distance.f90"
-#   include "Field_Mod/Utilities/Report_Volume_Balance.f90"
-#   include "Field_Mod/Utilities/Report_Volume_Balance_Start.f90"
-#   include "Field_Mod/Utilities/Report_Volume_Balance_Stop.f90"
+#   include "Field_Mod/Utilities/Report_Vol_Balance.f90"
+#   include "Field_Mod/Utilities/Report_Vol_Balance_Start.f90"
+#   include "Field_Mod/Utilities/Report_Vol_Balance_Stop.f90"
+#   include "Field_Mod/Utilities/Volume_Average.f90"
 
   end module

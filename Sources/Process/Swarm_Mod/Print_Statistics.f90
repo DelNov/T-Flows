@@ -31,7 +31,7 @@
   max_st  = -HUGE
   do k = 1, Swarm % n_particles
     Part => Swarm % Particle(k)
-    if(Part % proc .eq. this_proc) then
+    if(Part % proc .eq. This_Proc()) then
       avg_cfl = avg_cfl + Part % cfl
       avg_re  = avg_re  + Part % re
       avg_st  = avg_st  + Part % st
@@ -40,12 +40,12 @@
       max_st  = max(max_st,  Part % st)
     end if
   end do
-  call Comm_Mod_Global_Sum_Real(avg_cfl)
-  call Comm_Mod_Global_Sum_Real(avg_st)
-  call Comm_Mod_Global_Sum_Real(avg_re)
-  call Comm_Mod_Global_Max_Real(max_cfl)
-  call Comm_Mod_Global_Max_Real(max_re)
-  call Comm_Mod_Global_Max_Real(max_st)
+  call Global % Sum_Real(avg_cfl)
+  call Global % Sum_Real(avg_st)
+  call Global % Sum_Real(avg_re)
+  call Global % Max_Real(max_cfl)
+  call Global % Max_Real(max_re)
+  call Global % Max_Real(max_st)
   avg_cfl = avg_cfl / real(Swarm % n_particles)
   avg_re  = avg_re  / real(Swarm % n_particles)
   avg_st  = avg_st  / real(Swarm % n_particles)
@@ -54,20 +54,20 @@
   n_esc = 0
   n_ref = 0
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. this_proc) then  ! avoid buffer cells
+    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then  ! avoid buffer cells
       n_dep = n_dep + nint(Swarm % n_deposited(c))
       n_esc = n_esc + nint(Swarm % n_escaped(c))
       n_ref = n_ref + nint(Swarm % n_reflected(c))
     end if
   end do
-  call Comm_Mod_Global_Sum_Int(n_dep)
-  call Comm_Mod_Global_Sum_Int(n_esc)
-  call Comm_Mod_Global_Sum_Int(n_ref)
+  call Global % Sum_Int(n_dep)
+  call Global % Sum_Int(n_esc)
+  call Global % Sum_Int(n_ref)
 
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  if(this_proc < 2) then
+  if(First_Proc()) then
     line( 1:160) = ' '
     line( 1+T:52+T) = ' #================================================#'
     print '(a)', trim(line)

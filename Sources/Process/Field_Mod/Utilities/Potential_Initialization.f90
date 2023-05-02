@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Potential_Initialization(Flow, Sol)
+  subroutine Potential_Initialisation(Flow, Sol)
 !------------------------------------------------------------------------------!
 !   Initializes velocity from potential (pressure-like) equation               !
 !------------------------------------------------------------------------------!
@@ -23,9 +23,11 @@
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
 
+  call Profiler % Start('Potential_Initialization')
+
   call Work % Connect_Real_Cell(log_dist, cross)
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)',      ' # Computing potential to initialize velocity field ...'
     print '(a,i3,a)', ' # ... with ', NDT, ' fake time steps.'
     print '(a)',      ' # This might take a while, please wait'
@@ -209,6 +211,9 @@
     !                                 !
     !---------------------------------!
 
+    call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                          ' (solver for potential initialization)')
+
     ! Call linear solver to solve the equations
     call Sol % Run(phi % solver,     &
                    phi % prec,       &
@@ -221,7 +226,10 @@
                    phi % tol,        &
                    phi % res)
 
-    if(this_proc < 2) then
+    call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                         ' (solver for potential initialization)')
+
+    if(First_Proc()) then
       print '(a,i4,a,e12.4)', ' # Computed potential in ',   phi % eniter,  &
                               ' iterations with residual: ', phi % res
     end if
@@ -260,7 +268,7 @@
     log_dist(c) = Grid % wall_dist(c)
   end do
   dist_min = minval(log_dist(1:Grid % n_cells))
-  call Comm_Mod_Global_Min_Real(dist_min)
+  call Global % Min_Real(dist_min)
 
   !------------------------------------------------------!
   !   Set distances from the wall to friendlier values   !
@@ -298,17 +306,17 @@
     c2 = Grid % faces_c(2,s)
     if(c2  < 0) then
       if(Grid % Bnd_Cond_Type( c2) .eq. INFLOW) then
-        vol_in_real = vol_in_real + ( u % n(c2)*Grid % sx(s)    &
-                                    + v % n(c2)*Grid % sy(s)    &
-                                    + w % n(c2)*Grid % sz(s) )
-        vol_in_fake = vol_in_fake + ( u % n(c1)*Grid % sx(s)    &
-                                    + v % n(c1)*Grid % sy(s)    &
-                                    + w % n(c1)*Grid % sz(s) )
+        vol_in_real = vol_in_real + ( u % n(c2) * Grid % sx(s)    &
+                                    + v % n(c2) * Grid % sy(s)    &
+                                    + w % n(c2) * Grid % sz(s) )
+        vol_in_fake = vol_in_fake + ( u % n(c1) * Grid % sx(s)    &
+                                    + v % n(c1) * Grid % sy(s)    &
+                                    + w % n(c1) * Grid % sz(s) )
       end if
     end if
   end do
-  call Comm_Mod_Global_Sum_Real(vol_in_real)
-  call Comm_Mod_Global_Sum_Real(vol_in_fake)
+  call Global % Sum_Real(vol_in_real)
+  call Global % Sum_Real(vol_in_fake)
 
   !-------------------------------------------------!
   !   Correct velocities to more realistic values   !
@@ -326,5 +334,7 @@
   end do
 
   call Work % Disconnect_Real_Cell(log_dist, cross)
+
+  call Profiler % Stop('Potential_Initialization')
 
   end subroutine

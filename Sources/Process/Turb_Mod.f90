@@ -1,3 +1,7 @@
+#include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
+#include "../Shared/Unused.h90"
+
 !==============================================================================!
   module Turb_Mod
 !------------------------------------------------------------------------------!
@@ -5,6 +9,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Info_Mod
+  use Iter_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -141,6 +146,7 @@
       procedure :: Alias_Heat_Fluxes
       procedure :: Alias_Stresses
       procedure :: Alias_T2
+      procedure :: Alias_Vis
 
       procedure :: Calculate_Deltas
       procedure :: Calculate_Heat_Flux
@@ -192,6 +198,7 @@
       procedure, private :: Vis_T_Wale
       procedure, private :: Vis_T_Tensorial
 
+      procedure, private :: Beta_Scalar
       procedure, private :: Ebf_Momentum
       procedure, private :: Ebf_Scalar
       procedure          :: Prandtl_Turb
@@ -200,7 +207,7 @@
       procedure :: Tau_Wall_Log_Law
       procedure :: U_Plus_Log_Law
       procedure :: Time_And_Length_Scale
-      procedure :: Roughness_Coefficient
+      procedure :: Roughness_Coeff
 
       procedure :: Les
 
@@ -281,6 +288,7 @@
 #   include "Turb_Mod/Alias_Heat_Fluxes.f90"
 #   include "Turb_Mod/Alias_Stresses.f90"
 #   include "Turb_Mod/Alias_T2.f90"
+#   include "Turb_Mod/Alias_Vis.f90"
 
 #   include "Turb_Mod/Calculate_Deltas.f90"
 #   include "Turb_Mod/Calculate_Heat_Flux.f90"
@@ -332,6 +340,7 @@
 #   include "Turb_Mod/Vis_T_Tensorial.f90"
 
     ! Other subroutines ellipitic blending, turbulent Prandtl number
+#   include "Turb_Mod/Beta_Scalar.f90"
 #   include "Turb_Mod/Ebf_Momentum.f90"
 #   include "Turb_Mod/Ebf_Scalar.f90"
 #   include "Turb_Mod/Prandtl_Turb.f90"
@@ -340,7 +349,7 @@
 #   include "Turb_Mod/Tau_Wall_Log_Law.f90"
 #   include "Turb_Mod/U_Plus_Log_Law.f90"
 #   include "Turb_Mod/Time_And_Length_Scale.f90"
-#   include "Turb_Mod/Roughness_Coefficient.f90"
+#   include "Turb_Mod/Roughness_Coeff.f90"
 
 #   include "Turb_Mod/Les.f90"
 

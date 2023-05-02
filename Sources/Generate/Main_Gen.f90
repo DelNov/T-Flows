@@ -15,11 +15,11 @@
     include '../Shared/Probe_2d.h90'
   end interface
 !-----------------------------------[Locals]-----------------------------------!
-  type(Domain_Type)  :: dom       ! domain to be used
+  type(Domain_Type)  :: Dom       ! domain to be used
   type(Grid_Type)    :: Grid      ! Grid which will be generated
   type(Smooths_Type) :: smooths   ! smoothing regions
   type(Refines_Type) :: refines   ! refinement regions and levels
-  integer            :: c         ! cell counter
+  integer            :: c, s      ! cell counter
 !==============================================================================!
 
   ! Initialize program profler
@@ -31,15 +31,15 @@
   !-------------------------!
   !   Read the input file   !
   !-------------------------!
-  call Generate % Load_Dom(dom, smooths, refines, Grid)
+  call Generate % Load_Dom(Dom, smooths, refines, Grid)
 
   !-----------------------!
   !   Handle the domain   !
   !-----------------------!
-  call Domain_Mod_Calculate_Node_Coordinates(dom, Grid)
-  call Domain_Mod_Distribute_Regions        (dom, Grid)
-  call Domain_Mod_Connect_Blocks            (dom, Grid)
-  call Domain_Mod_Connect_Periodicity       (dom, Grid)
+  call Dom % Calculate_Node_Coordinates(Grid)
+  call Dom % Distribute_Ranges         (Grid)
+  call Dom % Connect_Blocks            (Grid)
+  call Dom % Connect_Periodicity       (Grid)
 
   !--------------------------------!
   !   From this point on, domain   !
@@ -52,10 +52,10 @@
   call Refines_Mod_Connectivity     (refines, Grid, .true.)   ! real run
   call Generate % Calculate_Geometry(Grid,          .true.)
 
-  call Grid % Sort_Cells_Smart       ()
-  call Grid % Sort_Faces_Smart       ()
-  call Grid % Calculate_Wall_Distance()
-  call Grid % Find_Cells_Faces       ()
+  call Grid % Sort_Cells_By_Coordinates()
+  call Grid % Sort_Faces_By_Region     ()
+  call Grid % Calculate_Wall_Distance  ()
+  call Grid % Find_Cells_Faces         ()
 
   ! Prepare for saving
   call Grid % Initialize_New_Numbers()
@@ -71,9 +71,11 @@
   ! and they are pointing to each other.  Besides, both real face and its
   ! shadow have the same c1 and c2, both inside cells with positive indices
   ! Real faces which do not have shadows have "0" for shadow.
-  ! Checked like this: do s = 1, Grid % n_faces + Grid % n_shadows
-  ! Checked like this:   write(20, '(99i9)') s, Grid % faces_s(s)
-  ! Checked like this: end do
+  do s = 1, Grid % n_faces + Grid % n_shadows
+    if(Grid % faces_s(s) .ne. 0) then
+      Assert(Grid % faces_s(Grid % faces_s(s)) .eq. s)
+    end if
+  end do
   ! Similar note is in Convert, also called Note #1
 
   !------------------------------!

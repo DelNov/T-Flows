@@ -20,18 +20,13 @@
 
   ! Remove the following 12 lines in real Lagrangian tracking simulations
   if(Flow % with_interface .and. .not. Vof % init_stl) then
-    if(this_proc < 2) then
-      print '(a)','#======================================================' // &
-                  '======================================================='
-      print '(a)','# ERROR: You are running a Volume of Fluid simulation'   // &
-                  'with the default version of Initialize_Variables.'
-      print '(a)','# You have probably forgotten to compile Process with '  // &
-                  'DIR_CASE=<full_or_relative_path_to_case> directive.'
-      print '(a)','#------------------------------------------------------' // &
-                  '-------------------------------------------------------'
-    end if
-    call Comm_Mod_End
-    stop
+    call Message % Error(96,                                                 &
+                'You are running a Volume of Fluid simulation with the '  // &
+                'default version of Initialize_Variables, and you did '   // &
+                'not provide an STL file for initialization.  You might'  // &
+                'have forgotten to compile Process with '                 // &
+                'DIR_CASE=<full_or_relative_path_to_case> directive.',       &
+                file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

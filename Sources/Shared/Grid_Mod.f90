@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Grid_Mod
@@ -7,10 +8,10 @@
 !   (that means in "Generate", "Divide", "Convert", "Process".                 !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Assert_Mod
+  use Vect_Mod
   use Profiler_Mod
   use File_Mod
-  use Boundary_Mod
+  use Region_Mod
   use Vtk_Mod
   use Metis_Mod
   use Sort_Mod
@@ -34,13 +35,20 @@
     logical       :: polyhedral = .false.
 
     ! Number of ...
-    integer :: n_nodes     = 0  ! ... nodes
-    integer :: n_cells     = 0  ! ... cells
-    integer :: n_faces     = 0  ! ... faces
-    integer :: n_bnd_cells = 0  ! ... boundary cells
-    integer :: n_bnd_cond  = 0  ! ... boundary conditions
-    integer :: n_shadows   = 0  ! ... shadow faces
-    integer :: n_edges     = 0  ! ... edges (needed to create dual grid)
+    integer :: n_nodes       = 0  ! nodes
+    integer :: n_cells       = 0  ! cells
+    integer :: n_faces       = 0  ! faces
+    integer :: n_bnd_cells   = 0  ! boundary cells
+    integer :: n_bnd_regions = 0  ! boundary conditions
+    integer :: n_regions     = 0  ! all conditions (bnd, inside, per ...)
+    integer :: n_shadows     = 0  ! shadow faces
+    integer :: n_edges       = 0  ! edges (needed to create dual grid)
+    integer :: per_x_reg     = 0  ! periodic x region
+    integer :: per_y_reg     = 0  ! periodic y region
+    integer :: per_z_reg     = 0  ! periodic z region
+
+    ! Rank (in case of simulations with multiple domains)
+    integer :: rank = 0
 
     ! Periodic span
     real :: per_x, per_y, per_z
@@ -92,7 +100,7 @@
     integer, allocatable :: cells_bnd_face(:)
 
     ! For each cell; type of the boundary condition in a given direction
-    integer, allocatable :: cells_bnd_color(:,:)
+    integer, allocatable :: cells_bnd_region(:,:)
 
     !-------------------------!
     !  Face-based variables   !
@@ -132,7 +140,7 @@
     ! Node coordinates
     real, allocatable :: xn(:), yn(:), zn(:)
 
-    type(Boundary_Type) :: bnd_cond
+    type(Region_Type) :: region
 
     !  Maximum number of cells, boundary cells and faces
     ! (Used for tentative memory allocation in Generator)
@@ -164,23 +172,24 @@
     integer, allocatable :: edges_bc(:,:)  ! edges' boundary conditions
     integer, allocatable :: edges_fb(:,:)  ! edges' faces on boundaries
 
-    !------------------------------------------!
-    !   Communication class for parallel run   !
-    !------------------------------------------!
+    !-------------------------------------------!
+    !   Communication class for parallel runs   !
+    !-------------------------------------------!
     type(Comm_Type) :: Comm
 
-    ! User arrays.  I am neither sure if this is the ...
-    ! ... best place for them nor do I need them at all?
-    integer           :: n_user_arrays
-    real, allocatable :: user_array(:,:)
+    !-------------------------------------------!
+    !   Vectorization class for manycore runs   !
+    !-------------------------------------------!
+    type(Vect_Type) :: Vect
 
     contains
       procedure :: Allocate_Cells
       procedure :: Allocate_Faces
       procedure :: Allocate_Nodes
-      procedure :: Bnd_Cond_Name
+      procedure :: Allocate_Regions
+      procedure :: Bnd_Cond_Name_At_Cell
+      procedure :: Bnd_Cond_Name_At_Face
       procedure :: Bnd_Cond_Type
-      procedure :: Bnd_Cond_Ranges
       procedure :: Bounding_Box
       procedure :: Calculate_Cell_Centers
       procedure :: Calculate_Cell_Inertia
@@ -196,6 +205,8 @@
       procedure :: Check_Cells_Closure
       procedure :: Correct_Face_Surfaces
       procedure :: Decompose
+      procedure :: Determine_Regions_Ranges
+      procedure :: Determine_Threads
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
@@ -204,25 +215,28 @@
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
       procedure :: Form_Cells_Comm
-      procedure :: Form_Maps
+      procedure :: Form_Maps_For_Backup
       procedure :: Initialize_New_Numbers
       procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
+      procedure :: Load_And_Prepare_For_Processing
       procedure :: Load_Cfn
       procedure :: Load_Dim
       procedure :: Merge_Duplicate_Nodes
-      procedure :: Print_Bnd_Cond_List
+      procedure :: Print_Regions_List
       procedure :: Print_Grid_Statistics
       procedure :: Save_Cfn
       procedure :: Save_Dim
       procedure :: Save_Debug_Vtu
+      procedure :: Save_Vtk_Cell
+      procedure :: Save_Vtk_Face
       procedure :: Save_Vtu_Cells
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
-      procedure :: Sort_Cells_By_Index
-      procedure :: Sort_Cells_Smart
+      procedure :: Sort_Cells_By_Thread
+      procedure :: Sort_Cells_By_Coordinates
       procedure :: Sort_Faces_By_Index
-      procedure :: Sort_Faces_Smart
+      procedure :: Sort_Faces_By_Region
       procedure :: Write_Template_Control_File
 
   end type
@@ -232,9 +246,10 @@
 #   include "Grid_Mod/Allocate_Cells.f90"
 #   include "Grid_Mod/Allocate_Faces.f90"
 #   include "Grid_Mod/Allocate_Nodes.f90"
-#   include "Grid_Mod/Bnd_Cond_Name.f90"
+#   include "Grid_Mod/Allocate_Regions.f90"
+#   include "Grid_Mod/Bnd_Cond_Name_At_Cell.f90"
+#   include "Grid_Mod/Bnd_Cond_Name_At_Face.f90"
 #   include "Grid_Mod/Bnd_Cond_Type.f90"
-#   include "Grid_Mod/Bnd_Cond_Ranges.f90"
 #   include "Grid_Mod/Bounding_Box.f90"
 #   include "Grid_Mod/Calculate_Cell_Centers.f90"
 #   include "Grid_Mod/Calculate_Cell_Inertia.f90"
@@ -251,6 +266,8 @@
 #   include "Grid_Mod/Correct_Face_Surfaces.f90"
 #   include "Grid_Mod/Check_Cells_Closure.f90"
 #   include "Grid_Mod/Decompose.f90"
+#   include "Grid_Mod/Determine_Regions_Ranges.f90"
+#   include "Grid_Mod/Determine_Threads.f90"
 #   include "Grid_Mod/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Exchange_Cells_Real.f90"
@@ -258,25 +275,28 @@
 #   include "Grid_Mod/Find_Cells_Faces.f90"
 #   include "Grid_Mod/Find_Nodes_Cells.f90"
 #   include "Grid_Mod/Form_Cells_Comm.f90"
-#   include "Grid_Mod/Form_Maps.f90"
+#   include "Grid_Mod/Form_Maps_For_Backup.f90"
 #   include "Grid_Mod/Initialize_New_Numbers.f90"
 #   include "Grid_Mod/Is_Face_In_Cell.f90"
 #   include "Grid_Mod/Is_Point_In_Cell.f90"
+#   include "Grid_Mod/Load_And_Prepare_For_Processing.f90"
 #   include "Grid_Mod/Load_Cfn.f90"
 #   include "Grid_Mod/Load_Dim.f90"
 #   include "Grid_Mod/Merge_Duplicate_Nodes.f90"
-#   include "Grid_Mod/Print_Bnd_Cond_List.f90"
+#   include "Grid_Mod/Print_Regions_List.f90"
 #   include "Grid_Mod/Print_Grid_Statistics.f90"
 #   include "Grid_Mod/Save_Cfn.f90"
 #   include "Grid_Mod/Save_Dim.f90"
 #   include "Grid_Mod/Save_Debug_Vtu.f90"
+#   include "Grid_Mod/Save_Vtk_Cell.f90"
+#   include "Grid_Mod/Save_Vtk_Face.f90"
 #   include "Grid_Mod/Save_Vtu_Cells.f90"
 #   include "Grid_Mod/Save_Vtu_Edges.f90"
 #   include "Grid_Mod/Save_Vtu_Faces.f90"
-#   include "Grid_Mod/Sort_Cells_By_Index.f90"
-#   include "Grid_Mod/Sort_Cells_Smart.f90"
+#   include "Grid_Mod/Sort_Cells_By_Coordinates.f90"
+#   include "Grid_Mod/Sort_Cells_By_Thread.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"
-#   include "Grid_Mod/Sort_Faces_Smart.f90"
+#   include "Grid_Mod/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Write_Template_Control_File.f90"
 
   end module

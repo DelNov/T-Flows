@@ -1,8 +1,15 @@
+#include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
+#include "../Shared/Unused.h90"
+
 !==============================================================================!
   module Convert_Mod
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Stl_Mod
+# ifdef __INTEL_COMPILER
+  use Ifport              ! Intel's module for fseek and ftell
+# endif
 !------------------------------------------------------------------------------!
 !   Collection of functions used in the Convert program.  In honesty, it was   !
 !   introduced to get rid of the Fortran header files with interfaces which,   !
@@ -15,6 +22,7 @@
   !   Convert type   !
   !------------------!
   type Convert_Type
+
     contains
       procedure :: Allocate_Memory
       procedure :: Calculate_Geometry
@@ -30,9 +38,9 @@
       procedure :: Load_Gmsh
       procedure :: Load_Obj
       procedure :: Logo_Con
-      procedure :: N_Bnd_Cells_In_Color
-      procedure :: N_Edges_In_Bnd_Color
-      procedure :: N_Nodes_In_Bnd_Color
+      procedure :: N_Bnd_Cells_In_Region
+      procedure :: N_Edges_In_Region
+      procedure :: N_Nodes_In_Region
       procedure :: N_Sharp_Corners
       procedure :: N_Sharp_Edges
       procedure :: Sort_Face_Nodes
@@ -162,9 +170,9 @@
 #   include "Convert_Mod/Load_Gmsh.f90"
 #   include "Convert_Mod/Load_Obj.f90"
 #   include "Convert_Mod/Logo_Con.f90"
-#   include "Convert_Mod/N_Bnd_Cells_In_Color.f90"
-#   include "Convert_Mod/N_Edges_In_Bnd_Color.f90"
-#   include "Convert_Mod/N_Nodes_In_Bnd_Color.f90"
+#   include "Convert_Mod/N_Bnd_Cells_In_Region.f90"
+#   include "Convert_Mod/N_Edges_In_Region.f90"
+#   include "Convert_Mod/N_Nodes_In_Region.f90"
 #   include "Convert_Mod/N_Sharp_Corners.f90"
 #   include "Convert_Mod/N_Sharp_Edges.f90"
 #   include "Convert_Mod/Sort_Face_Nodes.f90"

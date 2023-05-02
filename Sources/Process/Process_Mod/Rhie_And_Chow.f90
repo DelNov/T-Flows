@@ -32,6 +32,8 @@
   real, contiguous,  pointer :: u_c(:), v_c(:), w_c(:), v_m(:), t_m(:)
   real, contiguous,  pointer :: pst_x(:), pst_y(:), pst_z(:), pst_d(:)
   real, contiguous,  pointer :: u_f(:), v_f(:), w_f(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Rhie_And_Chow')
@@ -157,10 +159,12 @@
   !-------------------------------------------------!
   !   Calculate the mass fluxes on the cell faces   !
   !-------------------------------------------------!
-  do s = 1, Grid % n_faces
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
     fs = Grid % f(s)
+
+    Assert(c2 > 0)
 
     ! Face is inside the domain
     if(c2 > 0) then

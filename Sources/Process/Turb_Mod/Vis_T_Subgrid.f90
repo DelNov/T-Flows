@@ -11,8 +11,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: A_POW = 8.3
-  integer, parameter :: B_POW = 1.0/7.0
+  real, parameter :: A_POW = 8.3
+  real, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -39,7 +39,7 @@
   end if
 
   if(Turb % model .eq. LES_SMAGORINSKY) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c)**ONE_THIRD
 
       nu   = Flow % viscosity(c) / Flow % density(c)
@@ -62,7 +62,7 @@
     end do
 
   else if(Turb % model .eq. LES_DYNAMIC) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c) ** ONE_THIRD
       Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
@@ -71,7 +71,7 @@
     end do
 
   else if(Turb % model .eq. LES_WALE) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c)**ONE_THIRD
       Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
@@ -85,7 +85,7 @@
   !   buoyancy according to Eidson, T., JFM, 1985   !
   !-------------------------------------------------!
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       nc2 = max(- Flow % beta * (  Flow % grav_x * t % x(c)   &
                                  + Flow % grav_y * t % y(c)   &
                                  + Flow % grav_z * t % z(c)), 0.0)
@@ -127,7 +127,7 @@
         kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coefficient(c1, c2)
+        z_o = Turb % Roughness_Coeff(c1, c2)
 
         u_tan = Flow % U_Tan(s)
 
@@ -164,9 +164,7 @@
 
           pr_t = Turb % Prandtl_Turb(c1)
           pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
-          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &
-               * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-
+          beta = Turb % Beta_Scalar(pr, pr_t)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
@@ -186,9 +184,7 @@
           u_plus = u_tan / u_tau
 
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
-          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                   &
-               * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
-
+          beta = Turb % Beta_Scalar(sc, sc_t)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
@@ -196,12 +192,11 @@
             beta = 0.0
           end if
 
-          ebf = 0.01 * (sc * Turb % y_plus(c1)**4                 &
-              / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          ebf = Turb % Ebf_Scalar(c1, sc)
           Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
               / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
-              + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
         end if
 
       end if  ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL

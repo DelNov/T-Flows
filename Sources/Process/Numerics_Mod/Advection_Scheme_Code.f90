@@ -36,13 +36,12 @@
       Numerics_Mod_Advection_Scheme_Code = STACS
 
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown advection scheme: ', trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-      stop
-
+      call Message % Error(64, 'Unknown advection scheme: '//trim(name)    //  &
+                               '. This error is critical, exiting! '       //  &
+                               'Check the file: Documents/all_control'     //  &
+                               '_keywords to see which advection schemes ' //  &
+                               'are currently available in the code.',         &
+                               file=__FILE__, line=__LINE__, one_proc=.true.)
   end select
 
   end function

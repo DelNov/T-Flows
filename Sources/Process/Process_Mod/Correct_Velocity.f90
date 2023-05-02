@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(Process, Flow, Vof, Sol, curr_dt, ini)
+  subroutine Correct_Velocity(Process, Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt
-  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
@@ -21,6 +19,8 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: c, c1, c2, s
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Correct_Velocity')
@@ -38,7 +38,7 @@
   call Flow % Alias_Momentum(u, v, w)
 
   ! User function
-  call User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Correct_Velocity(Flow, Vof, Sol)
 
   !-----------------------------------------!
   !   Correct velocities and fluxes with    !
@@ -70,6 +70,10 @@
     end if
   end do
 
+
+  ! User function
+  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
+
   !------------------------------------!
   !   Calculate the max volume error   !
   !   with the new corrected fluxes    !
@@ -98,7 +102,7 @@
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     Flow % vol_res = max(Flow % vol_res, abs(b(c)))
   end do
-  call Comm_Mod_Global_Max_Real(Flow % vol_res)
+  call Global % Max_Real(Flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
@@ -124,19 +128,16 @@
       Flow % pe_max  = max( Flow % pe_max,  pe_t  )
     end if
   end do
-  call Comm_Mod_Global_Max_Real(Flow % cfl_max)
-  call Comm_Mod_Global_Max_Real(Flow % pe_max)
+  call Global % Max_Real(Flow % cfl_max)
+  call Global % Max_Real(Flow % pe_max)
 
-  if (Flow % p_m_coupling == SIMPLE) then
-    call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, Flow % vol_res)
+  if(Flow % p_m_coupling == SIMPLE) then
+    call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
   else
-    if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info_Mod_Iter_Fill_At(1, 5, 'dum', -1, Flow % vol_res)
+    if(Flow % i_corr == Flow % n_piso_corrections) then
+      call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
     end if
   end if
-
-  ! User function
-  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
 
   call Profiler % Stop('Correct_Velocity')
 

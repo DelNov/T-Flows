@@ -1,17 +1,8 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       curr_dt, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Var_Mod,   only: Var_Type
-  use Const_Mod, only: PI
-  use Comm_Mod,  only: Comm_Mod_Global_Max_Real,  &
-                       Comm_Mod_Global_Min_Real,  &
-                       this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,10 +10,8 @@
   type(Turb_Type),   target :: Turb
   type(Vof_Type),    target :: Vof
   type(Swarm_Type),  target :: Swarm
-  integer, intent(in)       :: curr_dt   ! time step
   integer, intent(in)       :: n_stat_t  ! 1st t.s. statistics turbulence
   integer, intent(in)       :: n_stat_p  ! 1st t.s. statistics particles
-  real, intent(in)          :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
@@ -34,10 +23,10 @@
 !==============================================================================!
 
   ! If not time for disturbing the velocity field, return
-  if(mod(curr_dt, 120) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 120) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(curr_dt > 1440) return
+  if(Time % Curr_Dt() > 1440) return
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -50,7 +39,7 @@
   if(Grid % name .ne. 'PRECURSOR') return
 
   ! Print a message
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Superimposing random eddies on top of velocity field!'
   end if
 
@@ -73,12 +62,12 @@
       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
     end do
   end do
-  call Comm_Mod_Global_Min_Real(xmin)
-  call Comm_Mod_Global_Min_Real(ymin)
-  call Comm_Mod_Global_Min_Real(zmin)
-  call Comm_Mod_Global_Max_Real(xmax)
-  call Comm_Mod_Global_Max_Real(ymax)
-  call Comm_Mod_Global_Max_Real(zmax)
+  call Global % Min_Real(xmin)
+  call Global % Min_Real(ymin)
+  call Global % Min_Real(zmin)
+  call Global % Max_Real(xmax)
+  call Global % Max_Real(ymax)
+  call Global % Max_Real(zmax)
   lx = xmax - xmin
   ly = ymax - ymin
   lz = zmax - zmin
@@ -170,7 +159,7 @@
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
-  call Comm_Mod_Global_Max_Real(vmax)
+  call Global % Max_Real(vmax)
   do c = 1, Grid % n_cells
     v % n(c) = v % n(c) / vmax
     v % o(c) = v % o(c) / vmax

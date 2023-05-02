@@ -12,12 +12,14 @@
   type(Grid_Type)     :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: fn(6,4), i_fac, j_fac, i_nod, i_cel, c1, c2
-  integer              :: nodes(4), n_match, dir, bc, cnt_c, cnt_f
+  integer              :: nodes(4), n_match, n_match_tot, dir, bc, cnt_c, cnt_f
   integer              :: n_face_nodes ! number of nodes in a face
   integer              :: n_cell_faces ! number of faces in a cell
   logical, allocatable :: is_node_bnd(:)
   integer, allocatable :: cell_near_bnd(:)
   integer, allocatable :: cr1(:), cr2(:), cr3(:), w1(:), w2(:)  ! for sorting
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   call Profiler % Start('Find_Parents')
@@ -37,7 +39,7 @@
       file=__FILE__, line=__LINE__)
   end if
 
-  allocate(is_node_bnd(Grid % n_nodes));    is_node_bnd(:)   = .false.
+  allocate(is_node_bnd  (Grid % n_nodes));  is_node_bnd(:)   = .false.
   allocate(cell_near_bnd(Grid % n_cells));  cell_near_bnd(:) = 0
 
   !--------------------------------------------------------------!
@@ -47,7 +49,7 @@
   ! Mark all nodes on the boundary
   is_node_bnd(:) = .false.
   do c2 = -Grid % n_bnd_cells, -1
-    if( Grid % bnd_cond % color(c2) .gt. 0 ) then
+    if( Grid % region % at_cell(c2) .gt. 0 ) then
       do i_nod = 1, Grid % cells_n_nodes(c2)  ! 3 or 4
         is_node_bnd( Grid % cells_n(i_nod, c2) ) = .true.
       end do
@@ -83,8 +85,9 @@
   !----------------------!
   !   Real work begins   !
   !----------------------!
+  n_match_tot = 0
 
-  do bc = 1, Grid % n_bnd_cond
+  do bc = Boundary_Regions()
 
     cr1(:) = HUGE_INT
     cr2(:) = HUGE_INT
@@ -94,7 +97,7 @@
 
     cnt_f = 0
     do c2 = -Grid % n_bnd_cells, -1
-      if( Grid % bnd_cond % color(c2) .eq. bc ) then
+      if( Grid % region % at_cell(c2) .eq. bc ) then
 
         ! Increase total face count
         cnt_f = cnt_f + 1
@@ -180,14 +183,31 @@
             c1  = w1(j_fac)
             dir = w2(j_fac)
           end if
-          Grid % cells_bnd_color(dir, c1) = bc
+          Grid % cells_bnd_region(dir, c1) = bc
 
         end if
       end if
     end do
+
     print *, '# Number of matches: ', n_match
+    n_match_tot = n_match_tot + n_match
 
   end do  ! bc
+
+  if(n_match_tot .ne. Grid % n_bnd_cells) then
+    call Message % Warning(80,                                                 &
+              'Number of boundary cells found here is not the same as   '  //  &
+              'the number of boundary cells prescribed in Gmsh. Possible ' //  &
+              'cause for it is that some internal faces in Gmsh are '      //  &
+              'marked as boundary conditions (physical groups). \n \n '    //  &
+              'It might also be that you deleted some volumes in Gmsh '    //  &
+              'intentionally to ensure conformal mappings for simulations '//  &
+              'in multiple domains.  If that is the case, it is probably ' //  &
+              'safe to ignore this warning.  \n \n '                       //  &
+              'It is, nonetheless, advised to check the Gmsh mesh for '    //  &
+              'physical groups.',                                              &
+              file=__FILE__, line=__LINE__)
+  end if
 
   call Profiler % Stop('Find_Parents')
 

@@ -16,13 +16,13 @@
       Numerics_Mod_Gradient_Method_Code = GAUSS_THEOREM
 
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown gradient computation method: ', trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-      stop
-
+      call Message % Error(80, 'Unknown gradient calculation method: '   //  &
+                                trim(name)//'. This error is critical, ' //  &
+                               ' exiting! Check the file: '              //  &
+                               'Documents/all_control_keywords to see '  //  &
+                               'which gradient computation methods are ' //  &
+                               'currently available in the code.',           &
+                               file=__FILE__, line=__LINE__, one_proc=.true.)
   end select
 
   end function

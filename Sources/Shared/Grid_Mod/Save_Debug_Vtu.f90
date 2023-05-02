@@ -161,8 +161,10 @@
   !   Create .vtu file   !
   !                      !
   !----------------------!
-  call File % Set_Name(name_out, appendix='-'//trim(append),  &
-                       processor=this_proc, extension='.vtu')
+  call File % Set_Name(name_out,                       &
+                       appendix  = '-'//trim(append),  &
+                       processor = This_Proc(),        &
+                       extension = '.vtu')
   call File % Open_For_Writing_Binary(name_out, fu)
 
   !------------!
@@ -644,7 +646,7 @@
   if(.not. allocated(Grid % Comm % cell_proc)) return
 
   ! Create it only from subdomain 1, when decomposed
-  if(maxval(Grid % Comm % cell_proc(:)) > 1 .and. this_proc .eq. 1) then
+  if(maxval(Grid % Comm % cell_proc(:)) > 1 .and. This_Proc() .eq. 1) then
 
     call File% Set_Name(name_out, appendix='-'//trim(append),  &
                         extension='.pvtu')
@@ -702,7 +704,7 @@
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
-    do n = 1, n_proc
+    do n = 1, N_Procs()
       call File % Set_Name(name_out, appendix='-'//trim(append),  &
                            processor=n, extension='.vtu')
       write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'

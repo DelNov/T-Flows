@@ -16,7 +16,7 @@
   Vert => Surf % Vert
   nv   => Surf % n_verts
 
-  if(n_proc < 2) then
+  if(Sequential_Run()) then
     do v = 1, nv
       c = Surf % Vert(v) % cell  ! get nearest cell
       Surf % Vert(v) % cell_x = Grid % xc(c)
@@ -33,7 +33,7 @@
 
       c = Surf % Vert(v) % cell  ! get nearest cell
       if(c > 0) then             ! if cell is in this processor
-        if(Grid % Comm % cell_proc(c) .eq. this_proc) then
+        if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
           Surf % buff_x(v) = Grid % xc(c)
           Surf % buff_y(v) = Grid % yc(c)
           Surf % buff_z(v) = Grid % zc(c)
@@ -43,10 +43,10 @@
 
     end do
 
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_x)
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_y)
-    call Comm_Mod_Global_Sum_Real_Array(nv, Surf % buff_z)
-    call Comm_Mod_Global_Sum_Int_Array (nv, Surf % buff_n)
+    call Global % Sum_Real_Array(nv, Surf % buff_x)
+    call Global % Sum_Real_Array(nv, Surf % buff_y)
+    call Global % Sum_Real_Array(nv, Surf % buff_z)
+    call Global % Sum_Int_Array (nv, Surf % buff_n)
 
     do v = 1, nv
       Surf % Vert(v) % cell_x = Surf % buff_x(v) / Surf % buff_n(v)

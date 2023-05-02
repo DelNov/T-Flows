@@ -10,12 +10,14 @@
   character        :: file_name*(*)  ! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   ! Open file with MPI
   call Mpi_File_Open(MPI_COMM_WORLD,                    &
                      file_name,                         &
-                     MPI_MODE_WRONLY + MPI_MODE_CREATE, & 
+                     MPI_MODE_WRONLY + MPI_MODE_CREATE, &
                      MPI_INFO_NULL,                     &
                      fh,                                &
                      error) 

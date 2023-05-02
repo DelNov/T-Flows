@@ -13,6 +13,7 @@
   integer                  :: e, j, v1, v2, i_ver
   real                     :: surf_v(3)
   real                     :: a(3), b(3), tri_v(3), area_x2
+  character(SL)            :: str
 !==============================================================================!
 
   ! Take aliases
@@ -30,6 +31,8 @@
     Elem(e) % sx   = 0.0
     Elem(e) % sy   = 0.0
     Elem(e) % sz   = 0.0
+
+    Assert(Elem(e) % nv > 2)
 
     do i_ver = 1, Elem(e) % nv
 
@@ -74,8 +77,10 @@
       surf_v(3) = Vert(Elem(e) % v(j)) % smooth_z
 
       if(dot_product(surf_v, tri_v) < 0.0) then
-        print *, '# Error, element ', e, 'is not properly oriented!'
-        stop
+        write(str, '(i0.0)')  e
+        call Message % Error(60,                                          &
+                  ' Element '//trim(str)//' is not properly oriented! ',  &
+                  file=__FILE__, line=__LINE__)
       end if
     end do   ! for i, j, k
 

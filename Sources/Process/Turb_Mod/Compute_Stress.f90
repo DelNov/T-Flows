@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Stress(Turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_Stress(Turb, Sol, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equation for Re stresses for RSM.         !
 !------------------------------------------------------------------------------!
@@ -7,8 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
-  integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
@@ -30,7 +28,7 @@
   real, contiguous,  pointer :: phi_x(:), phi_y(:), phi_z(:), cross(:)
   real, contiguous,  pointer :: u1uj_phij(:),   u2uj_phij(:),   u3uj_phij(:)
   real, contiguous,  pointer :: u1uj_phij_x(:), u2uj_phij_y(:), u3uj_phij_z(:)
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !                                                                              !
 !   The form of equations which are being solved:                              !
 !                                                                              !
@@ -40,9 +38,9 @@
 !    |      dt       |                |  sigma              |                  !
 !   /               /                /                     /                   !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
-  call Profiler % Start('Compute_Turbulence (without solvers)')
+  call Profiler % Start('Compute_Stress (without solvers)')
 
   call Work % Connect_Real_Cell(phi_x, phi_y, phi_z, cross,       &
                                 u1uj_phij, u2uj_phij, u3uj_phij,  &
@@ -67,8 +65,8 @@
   b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
-  if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+  if(Iter % Current() .eq. 1) then
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -181,7 +179,7 @@
 
   if(Turb % model_variant .ne. STABILIZED) then
     if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
@@ -207,7 +205,7 @@
                      - Flow % viscosity(c) * phi_z(c)
       end do
     else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
                      * Turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
@@ -232,7 +230,7 @@
     call Flow % Grad_Component(u2uj_phij(-nb:nc), 2, u2uj_phij_y(-nb:nc))
     call Flow % Grad_Component(u3uj_phij(-nb:nc), 3, u3uj_phij_z(-nb:nc))
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       b(c) = b(c) + (  u1uj_phij_x(c)  &
                      + u2uj_phij_y(c)  &
                      + u3uj_phij_z(c) ) * Grid % vol(c)
@@ -277,7 +275,7 @@
   !   Source term contains difference between      !
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) + cross(c)
   end do
 
@@ -310,7 +308,8 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
-  call Profiler % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
   call Sol % Run(phi % solver,     &
@@ -324,23 +323,24 @@
                  phi % tol,        &
                  phi % res)
 
-  call Profiler % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for turbulence)')
 
   ! Print info on the screen
   if( phi % name .eq. 'UU' )   &
-    call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'VV' )   &
-    call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 2, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'WW' )   &
-    call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 3, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'UV' )   &
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'UW' )   &
-    call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 5, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'VW' )   &
-    call Info_Mod_Iter_Fill_At(3, 6, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 6, phi % name, phi % res, phi % eniter)
   if( phi % name .eq. 'EPS' )  &
-    call Info_Mod_Iter_Fill_At(4, 1, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(4, 1, phi % name, phi % res, phi % eniter)
 
   if(phi % name .eq. 'EPS') then
     do c= 1, Grid % n_cells
@@ -354,7 +354,7 @@
   if(phi % name .eq. 'UU' .or.  &
      phi % name .eq. 'VV' .or.  &
      phi % name .eq. 'WW') then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = phi % n(c)
       if(phi % n(c) < 0.) then
         phi % n(c) = phi % o(c)
@@ -368,6 +368,6 @@
                                    u1uj_phij, u2uj_phij, u3uj_phij,  &
                                    u1uj_phij_x, u2uj_phij_y, u3uj_phij_z)
 
-  call Profiler % Stop('Compute_Turbulence (without solvers)')
+  call Profiler % Stop('Compute_Stress (without solvers)')
 
   end subroutine

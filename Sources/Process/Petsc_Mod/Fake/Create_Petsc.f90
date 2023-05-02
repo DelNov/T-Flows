@@ -6,11 +6,13 @@
   class(Petsc_Type)        :: Pet
   type(Native_Type)        :: Nat
   type(Grid_Type),  target :: Grid
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
 
   Pet % pnt_grid => Grid
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a)', ' # NOTE! This version was compiled without PETSc,'  //  &
                  ' so the PETSc class was not created ...'
     print '(a)', ' # ... which is OK as long as you don''t specify'   //  &

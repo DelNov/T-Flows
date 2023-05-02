@@ -8,8 +8,8 @@
   class(File_Type) :: File
   character(len=*) :: file_name
 !-----------------------------------[Locals]-----------------------------------!
-  integer    :: file_size, file_unit, i
-  integer(1) :: byte, next, cnt_13_10
+  integer    :: file_size, file_unit, cnt_13_10, i
+  integer(1) :: byte, next
 !==============================================================================!
 
   inquire(file=file_name, size=file_size)

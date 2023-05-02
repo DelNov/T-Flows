@@ -5,6 +5,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Solver_Type) :: Sol
   type(Matrix_Type)  :: A
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(A)
 !==============================================================================!
 
   ! Remove singularity information for PETSc

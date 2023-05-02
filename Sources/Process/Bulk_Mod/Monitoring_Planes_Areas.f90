@@ -69,8 +69,8 @@
 
   end do
 
-  call Comm_Mod_Global_Sum_Real(bulk % area_x)
-  call Comm_Mod_Global_Sum_Real(bulk % area_y)
-  call Comm_Mod_Global_Sum_Real(bulk % area_z)
+  call Global % Sum_Real(bulk % area_x)
+  call Global % Sum_Real(bulk % area_y)
+  call Global % Sum_Real(bulk % area_z)
 
   end subroutine

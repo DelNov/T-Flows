@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Swarm_Type),    target :: Swarm
-  integer, intent(in)         :: n         ! time step
   integer, intent(in)         :: n_stat_t  ! start time step for Turb. stat.
   integer, intent(in)         :: n_stat_p  ! start time step for Swarm. stat.
-  real,    intent(in)         :: time      ! physical time
 !==============================================================================!
 
   end subroutine

@@ -140,7 +140,7 @@
   !   should be unique since buffer cells are avoided in the loop above   !
   !                                                                       !
   !-----------------------------------------------------------------------!
-  if(n_proc > 1) then
+  if(Parallel_Run()) then
     call Surf % Distribute_Mesh(verbose)
   end if
 

@@ -159,7 +159,7 @@
       flag3  = .true.
     end if
   else
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "# Sigma is not continuous!"
     end if
     stop

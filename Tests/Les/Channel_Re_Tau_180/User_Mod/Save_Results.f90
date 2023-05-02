@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -7,22 +7,12 @@
 !   The results are then writen in files swarm_name_res.dat and                !
 !   swarm_name_res_plus.dat                                                    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod 
-  use Swarm_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target  :: Flow
   type(Turb_Type),     target  :: Turb
   type(Vof_Type),      target  :: Vof
   type(Swarm_Type),    target  :: Swarm
-  integer, intent(in)          :: ts     ! time step
   integer, optional            :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -74,7 +64,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -201,16 +191,16 @@
   ! Average over all processors
   do pl=1, n_prob-1
 
-    call Comm_Mod_Global_Sum_Int(n_count2(pl))
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Int(n_count2(pl))
+    call Global % Sum_Real(wall_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
     counter2 =  counter2 + n_count2(pl)
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     ! Background Flow
@@ -337,6 +327,6 @@
   deallocate(store)
 
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Swarm.f90.'
 
   end subroutine

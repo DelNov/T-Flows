@@ -5,10 +5,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: length
-  integer          :: phi(length)
-  integer          :: dest         ! destination processor
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(in)    :: length
+  integer,          intent(inout) :: phi(length)
+  integer,          intent(in)    :: dest         ! destination processor
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
+  Unused(length)
+  Unused(phi)
+  Unused(dest)
 !==============================================================================!
 
   end subroutine

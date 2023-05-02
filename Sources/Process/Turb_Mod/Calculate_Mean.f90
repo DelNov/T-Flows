@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Calculate_Mean(Turb, n0, n1)
+  subroutine Calculate_Mean(Turb, n0)
 !------------------------------------------------------------------------------!
 !   Calculates time averaged velocity and velocity fluctuations.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
-  integer                  :: n0, n1
+  integer,      intent(in) :: n0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -84,7 +84,7 @@
   ut_res => Turb % ut_res;  vt_res => Turb % vt_res;  wt_res => Turb % wt_res
   t2_res => Turb % t2_res
 
-  n = n1 - n0
+  n = Time % Curr_Dt() - n0
 
   if(n > -1) then
 

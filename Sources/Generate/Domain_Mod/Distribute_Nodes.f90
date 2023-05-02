@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Domain_Mod_Distribute_Nodes(dom, Grid, b, w,   &
-                                         is, js, ks, ie, je, ke)
+  subroutine Distribute_Nodes(Dom, Grid, b, w,   &
+                              is, js, ks, ie, je, ke)
 !------------------------------------------------------------------------------!
 !   Places the nodes on the line defined with local block position             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type)   :: dom
+  class(Domain_Type)  :: Dom
   type(Grid_Type)     :: Grid
   integer, intent(in) :: b, is, js, ks, ie, je, ke
   real,    intent(in) :: w
@@ -17,9 +17,9 @@
   real    :: x0, y0, z0, delx, dely, delz, t, dt, ddt, pr, xi
 !==============================================================================!
 
-  ni = dom % blocks(b) % resolutions(1)
-  nj = dom % blocks(b) % resolutions(2)
-  nk = dom % blocks(b) % resolutions(3)
+  ni = Dom % blocks(b) % resolutions(1)
+  nj = Dom % blocks(b) % resolutions(2)
+  nk = Dom % blocks(b) % resolutions(3)
 
   x0   = Grid % xn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
   y0   = Grid % yn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)

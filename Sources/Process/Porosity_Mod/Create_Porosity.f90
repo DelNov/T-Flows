@@ -11,8 +11,8 @@
 !==============================================================================!
 
   ! Read number of Porous regions from control file
-  call Control_Mod_Read_Int_Item('NUMBER_OF_POROUS_REGIONS', 0, &
-                                  Por % n_regions, .true.)
+  call Control % Read_Int_Item('NUMBER_OF_POROUS_REGIONS', 0, &
+                               Por % n_regions, .true.)
 
   if(Por % n_regions .eq. 0) return
 
@@ -38,7 +38,7 @@
     write(porous_region_rank, '(a,i3.3)') 'POROUS_REGION_', reg
 
     ! Look for it
-    call Control_Mod_Position_At_One_Key(porous_region_rank, found, .true.)
+    call Control % Position_At_One_Key(porous_region_rank, found, .true.)
 
     !------------------------------------------!
     !   Found the section with porous region   !
@@ -46,19 +46,19 @@
     if (found) then
 
       ! Read "on", otherwise you will always find the first mention of STL_FILE
-      call Control_Mod_Read_Char_Item_On('STL_FILE',  'default.stl',    &
-                                         Por % region(reg) % stl_name,  &
-                                         .true.)
+      call Control % Read_Char_Item_On('STL_FILE',  'default.stl',    &
+                                       Por % region(reg) % stl_name,  &
+                                       .true.)
 
       print '(a)', trim(Por % region(reg) % stl_name)
 
-      call Control_Mod_Read_Real_Array('C1X_C2X', 2, def, c1c2, .true.)
+      call Control % Read_Real_Vector('C1X_C2X', 2, def, c1c2, .true.)
       Por % region(reg) % c1_x = c1c2(1)
       Por % region(reg) % c2_x = c1c2(2)
-      call Control_Mod_Read_Real_Array('C1Y_C2Y', 2, def, c1c2, .true.)
+      call Control % Read_Real_Vector('C1Y_C2Y', 2, def, c1c2, .true.)
       Por % region(reg) % c1_y = c1c2(1)
       Por % region(reg) % c2_y = c1c2(2)
-      call Control_Mod_Read_Real_Array('C1Z_C2Z', 2, def, c1c2, .true.)
+      call Control % Read_Real_Vector('C1Z_C2Z', 2, def, c1c2, .true.)
       Por % region(reg) % c1_z = c1c2(1)
       Por % region(reg) % c2_z = c1c2(2)
     else

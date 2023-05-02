@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Calculate_Mean(Swarm, k, n, n_stat_p, ss)
+  subroutine Swarm_Mod_Calculate_Mean(Swarm, k, n_stat_p)
 !------------------------------------------------------------------------------!
 !   Calculates particle time averaged velocity                                 !
 !------------------------------------------------------------------------------!
@@ -7,9 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Swarm_Type), target :: Swarm
   integer, intent(in)      :: k         ! particle index
-  integer, intent(in)      :: n         ! current time step (flow time step)
   integer, intent(in)      :: n_stat_p  ! starting time step for swarm statist.
-  integer, intent(in)      :: ss        ! sub steo
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow
@@ -26,7 +24,7 @@
   Flow => Swarm % pnt_flow
   Turb => Swarm % pnt_turb
 
-  l = n - n_stat_p
+  l = Time % Curr_Dt() - n_stat_p
   if(l > -1) then
 
     !---------------------------------!

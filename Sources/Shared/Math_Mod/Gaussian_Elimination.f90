@@ -23,6 +23,8 @@
   integer, allocatable :: p(:)
   real                 :: r, rmax, smax, sum, z
   integer              :: i, k, j, pk
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Math)
 !==============================================================================!
 
   allocate(s(n))

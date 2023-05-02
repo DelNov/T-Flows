@@ -26,8 +26,6 @@
 !---------------------------------------------------------------------!
   IMPLICIT NONE
 !---------------------------------------------------------------------!
-  INCLUDE "Isoap_Mod/Dim_Polyhedron.h"  ! holds NS and NV
-!---------------------------------------------------------------------!
   CLASS(ISOAP_TYPE)               :: ISOAP
   TYPE(POLYHEDRON_TYPE),   TARGET :: POLYHEDRON
   TYPE(ISO_POLYGONS_TYPE), TARGET :: ISO_POLYGONS

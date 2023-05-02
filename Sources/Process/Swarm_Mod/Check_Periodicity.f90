@@ -26,7 +26,7 @@
   Swarm % cell_has_particles(:) = .false.  ! assume no cells has particles
 
   Part => Swarm % Particle(k)
-  if(Part % proc .eq. this_proc) then
+  if(Part % proc .eq. This_Proc()) then
     Swarm % cell_has_particles(Part % cell) = .true.
   end if
 
@@ -49,7 +49,7 @@
 
         Part => Swarm % Particle(k)
 
-        if(Part % proc .eq. this_proc) then
+        if(Part % proc .eq. This_Proc()) then
 
           xc1 = Grid % xc(c1)
           yc1 = Grid % yc(c1)
@@ -105,7 +105,7 @@
 
         Part => Swarm % Particle(k)
 
-        if(Part % proc .eq. this_proc) then
+        if(Part % proc .eq. This_Proc()) then
 
           ! Take position of c1 at its shadow position
           xc1 = Grid % xc(c2) - Grid % dx(s)

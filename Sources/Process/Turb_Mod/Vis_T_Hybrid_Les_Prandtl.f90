@@ -13,8 +13,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: A_POW = 8.3
-  integer, parameter :: B_POW = 1.0/7.0
+  real, parameter :: A_POW = 8.3
+  real, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -41,7 +41,7 @@
   !----------------------------!
   !   Model's eddy viscosity   !
   !----------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     hmax = Turb % h_max(c)
     hwn  = Turb % h_w(c)

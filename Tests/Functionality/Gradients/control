@@ -7,26 +7,26 @@
 
 # This is just to give it temperature
 # as dependendent variable to work on
-HEAT_TRANSFER         yes
+  HEAT_TRANSFER         yes
 
 # Do not compute anything except what
 # is in User_Mod_Initialize_Variables
-NUMBER_OF_TIME_STEPS  0
+  NUMBER_OF_TIME_STEPS  0
 
 # Boundary conditions are mandatory
-BOUNDARY_CONDITION    top
-  TYPE                wall
-  VARIABLES           u     v     w     t
-  VALUES              0.0   0.0   0.0   20.0
+  BOUNDARY_CONDITION    top
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   20.0
 
-BOUNDARY_CONDITION    bottom
-  TYPE                wall
-  VARIABLES           u     v     w     t
-  VALUES              0.0   0.0   0.0   10.0
+  BOUNDARY_CONDITION    bottom
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   10.0
 
-BOUNDARY_CONDITION    side
-  TYPE                wall
-  VARIABLES           u     v     w     q
-  VALUES              0.0   0.0   0.0   15.0
+  BOUNDARY_CONDITION    side
+    TYPE                wall
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   15.0
 
 

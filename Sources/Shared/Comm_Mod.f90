@@ -1,3 +1,5 @@
+#include "../Shared/Unused.h90"
+
 !==============================================================================!
   module Comm_Mod
 !------------------------------------------------------------------------------!
@@ -36,8 +38,8 @@
     integer, allocatable :: cell_proc(:)
 
     ! Global cell and node numbers
-    integer, contiguous, pointer :: cell_glo(:)
-    integer, contiguous, pointer :: node_glo(:)
+    integer, allocatable :: cell_glo(:)
+    integer, allocatable :: node_glo(:)
 
     ! Variables which follow are for backup saving to single file
     integer :: nc_sub   ! number of cells in subdomain
@@ -62,6 +64,9 @@
     ! Number of processors per node and processor i.d.s for each node
     type(Buffer_Type), allocatable :: cells_send(:)
     type(Buffer_Type), allocatable :: cells_recv(:)
+
+    integer, private :: n_processors    ! number of processors
+    integer, private :: this_processor  ! current processor
 
     contains
 
@@ -97,10 +102,27 @@
       procedure :: Sendrecv_Log_Arrays
       procedure :: Sendrecv_Real_Arrays
 
+      ! Global
+      procedure :: End_Parallel
+      procedure :: Lor_Log
+      procedure :: Lor_Log_Array
+      procedure :: Max_Int
+      procedure :: Max_Real
+      procedure :: Min_Int
+      procedure :: Min_Real
+      procedure :: Start_Parallel
+      procedure :: Sum_Int
+      procedure :: Sum_Int_Array
+      procedure :: Sum_Real
+      procedure :: Sum_Real_Array
+      procedure :: Wait
   end type
 
-  integer :: this_proc  ! processor i.d.
-  integer :: n_proc     ! number of processors
+  !------------------------------------------------------------------------!
+  !   A big global communicator, introduced essentiall to give access to   !
+  !   private variables n_processors and this_processor to other objects   !
+  !------------------------------------------------------------------------!
+  type(Comm_Type) :: Global
 
   ! These communication types will depend on precision
 #if T_FLOWS_MPI == 1
@@ -115,11 +137,17 @@
 
   contains
 
+    ! Shared pure function
+#   include "Comm_Mod/Shared/First_Proc.f90"
+#   include "Comm_Mod/Shared/N_Procs.f90"
+#   include "Comm_Mod/Shared/Parallel_Run.f90"
+#   include "Comm_Mod/Shared/Sequential_Run.f90"
+#   include "Comm_Mod/Shared/This_Proc.f90"
+
 # if T_FLOWS_MPI == 1
-    ! Three basic ones are non-member
-#   include "Comm_Mod/Parallel/Start.f90"
+#   include "Comm_Mod/Parallel/Start_Parallel.f90"
 #   include "Comm_Mod/Parallel/Wait.f90"
-#   include "Comm_Mod/Parallel/End.f90"
+#   include "Comm_Mod/Parallel/End_Parallel.f90"
 
     ! File management
 #   include "Comm_Mod/Parallel/Close_File.f90"
@@ -165,10 +193,9 @@
 #   include "Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90"
 #   include "Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90"
 # else
-    ! Three basic ones are non-member
-#   include "Comm_Mod/Sequential/Start.f90"
+#   include "Comm_Mod/Sequential/Start_Parallel.f90"
 #   include "Comm_Mod/Sequential/Wait.f90"
-#   include "Comm_Mod/Sequential/End.f90"
+#   include "Comm_Mod/Sequential/End_Parallel.f90"
 
     ! File management
 #   include "Comm_Mod/Sequential/Close_File.f90"

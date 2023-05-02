@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_Swarm_Sub_Steps(val, verbose)
+  subroutine Number_Of_Swarm_Sub_Steps(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type)  :: Control
   integer, intent(out) :: val
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_SWARM_SUB_STEPS', 60, &
-                                  val, verbose)
+  call Control % Read_Int_Item('NUMBER_OF_SWARM_SUB_STEPS', 60, val, verbose)
 
   end subroutine

@@ -8,16 +8,6 @@
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
-!-----------------------------------[Locals]-----------------------------------!
-  integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
-  integer                    :: n_memb, n_tags, n_crvs, n_nods
-  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu
-  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
-  integer, allocatable       :: n(:), new(:)
-  integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
-  character(SL), allocatable :: phys_names(:)
-  logical                    :: ascii                 ! is file in ascii format?
-  logical                    :: the_end               ! did it reach the end
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MSH_TRI   = 2
   integer, parameter :: MSH_QUAD  = 3
@@ -25,12 +15,73 @@
   integer, parameter :: MSH_HEXA  = 5
   integer, parameter :: MSH_WEDGE = 6
   integer, parameter :: MSH_PYRA  = 7
+!-----------------------------------[Locals]-----------------------------------!
+  integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
+  integer                    :: n_memb, n_tags, n_crvs, n_nods, error
+  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu
+  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
+  integer, allocatable       :: n(:), new(:)
+  integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
+  character(SL), allocatable :: phys_names(:)
+  logical                    :: ascii                 ! is file in ascii format?
+  integer                    :: pos
+  integer                    :: pos_physicalnames  = -1
+  integer                    :: pos_entities       = -1
+  integer                    :: pos_nodes          = -1
+  integer                    :: pos_elements       = -1
+  integer(1)                 :: byte(0:3)
 !==============================================================================!
 
   call Profiler % Start('Load_Gmsh')
 
-  ! Open the file in binary mode, because it just might be
+  !-------------------------------------------------------!
+  !                                                       !
+  !   Open the file in binary mode for initial analyzis   !
+  !                                                       !
+  !-------------------------------------------------------!
   call File % Open_For_Reading_Binary(file_name, fu)
+
+  !-----------------------------------------------------------!
+  !   A very rudimentary way to find beginnings of sections   !
+  !-----------------------------------------------------------!
+  pos = 0
+  do
+    read(fu, end=2) byte(0);  pos = pos + 1
+    if(char(byte(0)) .eq. '$') then
+      read(fu, end=2) byte(1);  pos = pos + 1
+      read(fu, end=2) byte(2);  pos = pos + 1
+      read(fu, end=2) byte(3);  pos = pos + 1
+      if(char(byte(1)) .eq. 'E' .and.  &
+         char(byte(2)) .eq. 'n' .and.  &
+         char(byte(3)) .eq. 'd') then
+        do i = 1, len(Line % whole)
+          read(fu, end=2) byte(0);  pos = pos + 1
+          if(byte(0) .eq. 10) exit
+        end do
+        Line % whole = ''
+        do i = 1, len(Line % whole)
+          read(fu, end=2) byte(0);  pos = pos + 1
+          if(byte(0) .eq. 10) exit
+          if(byte(0) .ne. 13) Line % whole(i:i) = char(byte(0))
+        end do
+        if(Line % whole .eq. '$PhysicalNames') pos_physicalnames = pos
+        if(Line % whole .eq. '$Entities')      pos_entities      = pos
+        if(Line % whole .eq. '$Nodes')         pos_nodes         = pos
+        if(Line % whole .eq. '$Elements')      pos_elements      = pos
+      end if
+    end if
+  end do
+2 continue
+
+  ! Error trap
+  if(pos_physicalnames .eq. -1) then
+    call Message % Error(60,                                              &
+      "This is bad.  PhysicalNames don't seem to be defined in the "  //  &
+      ".msh file.  Maybe you forgot to define boundary conditions  "  //  &
+      "(called physical groups) in Gmsh?",                                &
+      file=__FILE__, line=__LINE__)
+  end if
+  print *, '# Broswed the file in binary format and read ', pos, ' bytes'
 
   !----------------------------------------!
   !   Gmsh can't handle polyhedral grids   !
@@ -41,10 +92,8 @@
   !   Check format fo the file   !
   !------------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$MeshFormat') exit
-  end do
+  call File % Read_Line(fu)
+  Assert(Line % tokens(1) == '$MeshFormat')
   call File % Read_Line(fu)
   if(Line % tokens(1) .ne. '4.1') then
     call Message % Error(60,                                            &
@@ -56,7 +105,17 @@
   ! My guess is that second tokens says it is binary (1) or not (0)
   ascii = .true.
   if(Line % tokens(2) .eq. '1') ascii = .false.
-  ! Line which follows contains some crap, but who cares?
+
+  !------------------------------------------!
+  !                                          !
+  !   Once you know the format of the file   !
+  !     close it and open again if ASCII     !
+  !                                          !
+  !------------------------------------------!
+  if(ascii) then
+    close(fu)
+    call File % Open_For_Reading_Ascii(file_name, fu)
+  end if
 
   !----------------------------------------------!
   !                                              !
@@ -73,19 +132,13 @@
   !-------------------------------------------------!
   n_blocks   = 0
   n_bnd_sect = 0
-  the_end    = .false.
   rewind(fu)
-  do
-    call File % Read_Line(fu, reached_end=the_end)
-    if(Line % tokens(1) .eq. '$PhysicalNames') exit
-    if(the_end) then
-      call Message % Error(60,                                              &
-        "This is bad.  PhysicalNames don't seem to be defined in the "  //  &
-        ".msh file.  Maybe you forgot to define boundary conditions  "  //  &
-        "(called physical groups) in Gmsh?",                                &
-        file=__FILE__, line=__LINE__)
-    end if
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_physicalnames, 0)
+# else
+  error = 0
+  call fseek(fu, pos_physicalnames, 0)
+# endif
   call File % Read_Line(fu)
   read(Line % tokens(1), *) n_sect
   allocate(phys_names(n_sect))
@@ -109,16 +162,17 @@
   !                          !
   !--------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Nodes') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_nodes, 0)
+# else
+  call fseek(fu, pos_nodes, 0)
+# endif
   if(ascii) then
-    call File % Read_Line(fu)
+    read(fu, *) (Line % tokens(k), k = 1, 4)
     read(Line % tokens(4), *) Grid % n_nodes  ! 2 and 4 store number of nodes
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    Grid % n_nodes = int8_array(4)
+    Grid % n_nodes = int(int8_array(4))
   end if
   print *,'# Number of nodes: ', Grid % n_nodes
 
@@ -128,16 +182,17 @@
   !                                      !
   !--------------------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Elements') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_elements, 0)
+# else
+  call fseek(fu, pos_elements, 0)
+# endif
   if(ascii) then
-    call File % Read_Line(fu)
+    read(fu, *) (Line % tokens(k), k = 1, 4)
     read(Line % tokens(4), *) n_elem  ! both 2 and 4 store number of elements
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_elem = int8_array(4)
+    n_elem = int(int8_array(4))
   end if
   allocate(new(n_elem))
   new(:) = 0
@@ -151,22 +206,23 @@
     if(run .eq. 1) s_tag_max = 0
 
     rewind(fu)
-    do
-      call File % Read_Line(fu)
-      if(Line % tokens(1) .eq. '$Entities') exit
-    end do
+#   ifdef __INTEL_COMPILER
+    error = fseek(fu, pos_entities, 0)
+#   else
+    call fseek(fu, pos_entities, 0)
+#   endif
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
       read(Line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
       read(Line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
       read(Line % tokens(4), *) n_e_3d  ! number of 3D entities (volumes)
     else
       call File % Read_Binary_Int8_Array(fu, 4)
-      n_e_0d = int8_array(1)  ! number of 0D entities (points)
-      n_e_1d = int8_array(2)  ! number of 1D entities (lines)
-      n_e_2d = int8_array(3)  ! number of 2D entities (faces)
-      n_e_3d = int8_array(4)  ! number of 3D entities (volumes)
+      n_e_0d = int(int8_array(1))  ! number of 0D entities (points)
+      n_e_1d = int(int8_array(2))  ! number of 1D entities (lines)
+      n_e_2d = int(int8_array(3))  ! number of 2D entities (faces)
+      n_e_3d = int(int8_array(4))  ! number of 3D entities (volumes)
     end if
 
     !--------------------------!
@@ -174,7 +230,7 @@
     !--------------------------!
     if(ascii) then
       do i = 1, n_e_0d
-        call File % Read_Line(fu)
+        read(fu, *) Line % whole
       end do
     else
       do i = 1, n_e_0d
@@ -192,7 +248,7 @@
     !--------------------------!
     if(ascii) then
       do i = 1, n_e_1d
-        call File % Read_Line(fu)
+        read(fu, *) Line % whole
       end do
     else
       do i = 1, n_e_1d
@@ -230,14 +286,14 @@
         call File % Read_Binary_Real8_Array(fu, 6)
         ! Number of physical tags
         call File % Read_Binary_Int8_Array (fu, 1)
-        n_tags = int8_array(1)
+        n_tags = int(int8_array(1))
         do j = 1, n_tags  ! read the physical tags you have
           call File % Read_Binary_Int4_Array (fu, 1)
           p_tag = int4_array(1)
         end do
         ! Number of bounding curves
         call File % Read_Binary_Int8_Array (fu, 1)
-        n_crvs = int8_array(1)
+        n_crvs = int(int8_array(1))
         ! Read the bounding curves
         call File % Read_Binary_Int4_Array (fu, n_crvs)
       end if
@@ -268,20 +324,20 @@
   Grid % n_bnd_cells = 0
   Grid % n_cells     = 0
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Elements') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_elements, 0)
+# else
+  call fseek(fu, pos_elements, 0)
+# endif
 
   !-------------------------------!
   !   Read the number of groups   !
   !-------------------------------!
   if(ascii) then
-    call File % Read_Line(fu)
-    read(Line % tokens(1),*) n_grps
+    read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_grps = int8_array(1)
+    n_grps = int(int8_array(1))
   end if
 
   !-------------------------------------------------------------!
@@ -291,29 +347,28 @@
 
     ! Read dim, s_tag, type and n_memb <--= this is what you actually need!
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(1), *) dim     ! dimension of the element
       read(Line % tokens(2), *) s_tag   ! element tag
       read(Line % tokens(3), *) type    ! element type
       read(Line % tokens(4), *) n_memb  ! number of members in the group
     else
       call File % Read_Binary_Int4_Array(fu, 3)
-      dim   = int4_array(1)  ! dimension of the element
-      s_tag = int4_array(2)  ! element tag
-      type  = int4_array(3)  ! element type
+      dim   = int4_array(1)        ! dimension of the element
+      s_tag = int4_array(2)        ! element tag
+      type  = int4_array(3)        ! element type
       call File % Read_Binary_Int8_Array(fu, 1)
-      n_memb = int8_array(1)  ! number of members in the group
+      n_memb = int(int8_array(1))  ! number of members in the group
     end if
 
     ! Read cell number and cell's nodes <--= this is just to carry on
     do j = 1, n_memb
       if(ascii) then
-        call File % Read_Line(fu)
-        read(Line % tokens(1), *) c     ! Gmsh cell number
+        read(fu, *) c
       else
         ! Element tag
         call File % Read_Binary_Int8_Array(fu, 1)
-        c = int8_array(1)
+        c = int(int8_array(1))
         ! Node tags
         if(type .eq. MSH_TRI)   call File % Read_Binary_Int8_Array(fu, 3)
         if(type .eq. MSH_QUAD)  call File % Read_Binary_Int8_Array(fu, 4)
@@ -340,6 +395,15 @@
   print '(a38,i9)', '# Total number of boundary sections: ', n_bnd_sect
   print '(a38,i9)', '# Total number of boundary cells:    ', Grid % n_bnd_cells
 
+  if(n_bnd_sect .eq. 0) then
+    call Message % Error(60, 'No boundary sections (physical groups in  ' //  &
+                             'Gmsh) have been defined.  Convert can''t '  //  &
+                             'work with grids like that. '                //  &
+                             '\n \n '                                     //  &
+                             'Define physical groups in Gmsh and retry.',     &
+                             file=__FILE__, line=__LINE__)
+  end if
+
   !--------------------------------------------!
   !                                            !
   !   Allocate memory for Grid_Mod variables   !
@@ -356,20 +420,20 @@
   n_bnd_cells(:) = 0
 
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Elements') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_elements, 0)
+# else
+  call fseek(fu, pos_elements, 0)
+# endif
 
   !-------------------------------!
   !   Read the number of groups   !
   !-------------------------------!
   if(ascii) then
-    call File % Read_Line(fu)
-    read(Line % tokens(1),*) n_grps
+    read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_grps = int8_array(1)
+    n_grps = int(int8_array(1))
   end if
 
   !----------------------------------------------------------------!
@@ -379,7 +443,7 @@
 
     ! Read dim, s_tag, type and n_memb
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(1), *) dim     ! dimension of the element
       read(Line % tokens(2), *) s_tag   ! element tag
       read(Line % tokens(3), *) type    ! element type
@@ -390,7 +454,7 @@
       s_tag = int4_array(2)  ! element tag
       type  = int4_array(3)  ! element type
       call File % Read_Binary_Int8_Array(fu, 1)
-      n_memb = int8_array(1)  ! number of members in the group
+      n_memb = int(int8_array(1))  ! number of members in the group
     end if
 
     ! Treat different cell types now
@@ -404,7 +468,7 @@
     ! Read cell number and cell's nodes
     do j = 1, n_memb
       if(ascii) then
-        call File % Read_Line(fu)
+        read(fu, *) (Line % tokens(k), k = 1, 1 + n_nods)
         read(Line % tokens(1), *) c  ! fetch Gmsh cell number
         c = new(c)                   ! use T-Flows numbering
 
@@ -418,19 +482,19 @@
 
         ! Element tag
         call File % Read_Binary_Int8_Array(fu, n_nods+1)
-        c = int8_array(1)  ! fetch Gmsh cell number
-        c = new(c)         ! use T-Flows numbering
+        c = int(int8_array(1))  ! fetch Gmsh cell number
+        c = new(c)              ! use T-Flows numbering
 
         Grid % cells_n_nodes(c) = n_nods
         call Adjust_First_Dim(n_nods, Grid % cells_n)
         do k = 1, n_nods
-          Grid % cells_n(k, c) = int8_array(k+1)
+          Grid % cells_n(k, c) = int(int8_array(k+1))
         end do
 
       end if
 
       if(dim .eq. 2) then
-        Grid % bnd_cond % color(c) = phys_tags(s_tag)
+        Grid % region % at_cell(c) = phys_tags(s_tag)
         n_bnd_cells(phys_tags(s_tag)) = n_bnd_cells(phys_tags(s_tag)) + 1
       end if
     end do
@@ -447,20 +511,20 @@
   !                                !
   !--------------------------------!
   rewind(fu)
-  do
-    call File % Read_Line(fu)
-    if(Line % tokens(1) .eq. '$Nodes') exit
-  end do
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_nodes, 0)
+# else
+  call fseek(fu, pos_nodes, 0)
+# endif
 
   !-------------------------------!
   !   Read the number of groups   !
   !-------------------------------!
   if(ascii) then
-    call File % Read_Line(fu)
-    read(Line % tokens(1),*) n_grps
+    read(fu, *) n_grps
   else
     call File % Read_Binary_Int8_Array(fu, 4)
-    n_grps = int8_array(1)
+    n_grps = int(int8_array(1))
   end if
 
   !-------------------------------------------------------!
@@ -468,35 +532,31 @@
   !-------------------------------------------------------!
   do i = 1, n_grps
     if(ascii) then
-      call File % Read_Line(fu)
+      read(fu, *) (Line % tokens(k), k = 1, 4)
       read(Line % tokens(4),*) n_memb  ! fetch number of members
     else
       call File % Read_Binary_Int4_Array(fu, 3)
       call File % Read_Binary_Int8_Array(fu, 1)
-      n_memb = int8_array(1)
+      n_memb = int(int8_array(1))
     end if
     allocate(n(n_memb))
 
     ! Fetch all node numbers in the group
     if(ascii) then
       do j = 1, n_memb
-        call File % Read_Line(fu)
-        read(Line % tokens(1),*) n(j)
+        read(fu, *) n(j)
       end do
     else
       do j = 1, n_memb                 ! fetch all node numbers
         call File % Read_Binary_Int8_Array(fu, 1)
-        n(j) = int8_array(1)
+        n(j) = int(int8_array(1))
       end do
     end if
 
     ! Fetch all node coordinates in the group
     if(ascii) then
       do j = 1, n_memb
-        call File % Read_Line(fu)    ! read node coordinates
-        read(Line % tokens(1),*) Grid % xn(n(j))
-        read(Line % tokens(2),*) Grid % yn(n(j))
-        read(Line % tokens(3),*) Grid % zn(n(j))
+        read(fu, *) Grid % xn(n(j)), Grid % yn(n(j)), Grid % zn(n(j))
       end do
     else
       do j = 1, n_memb
@@ -514,12 +574,11 @@
   !   Copy boundary condition info   !
   !                                  !
   !----------------------------------!
-  Grid % n_bnd_cond = n_bnd_sect
-  allocate(Grid % bnd_cond % name(n_bnd_sect))
+  call Grid % Allocate_Regions(n_bnd_sect)
 
   do i = 1, n_bnd_sect
-    Grid % bnd_cond % name(i) = phys_names(i)
-    call String % To_Upper_Case(Grid % bnd_cond % name(i))
+    Grid % region % name(i) = phys_names(i)
+    call String % To_Upper_Case(Grid % region % name(i))
   end do
 
   !------------------------------------!
@@ -527,7 +586,7 @@
   !   Print boundary conditions info   !
   !                                    !
   !------------------------------------!
-  call Grid % Print_Bnd_Cond_List()
+  call Grid % Print_Regions_List()
 
   close(fu)
 

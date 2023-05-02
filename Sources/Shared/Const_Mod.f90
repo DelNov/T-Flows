@@ -2,9 +2,23 @@
   module Const_Mod
 !------------------------------------------------------------------------------!
 !   Constants definitions for all other modules.                               !
+!                                                                              !
+!   Program name (T_FLOWS_PROGRAM) is passed from makefile of each program     !
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+# if T_FLOWS_PROGRAM == 1
+  character(8), parameter :: PROGRAM_NAME = "Generate"
+# elif T_FLOWS_PROGRAM == 2
+  character(6), parameter :: PROGRAM_NAME = "Divide"
+# elif T_FLOWS_PROGRAM == 3
+  character(7), parameter :: PROGRAM_NAME = "Convert"
+# elif T_FLOWS_PROGRAM == 4
+  character(7), parameter :: PROGRAM_NAME = "Process"
+# else
+  character(9), parameter :: PROGRAM_NAME = "Undefined"
+# endif
 
   ! Standard string length
   integer, parameter :: VL =   4  ! variable name length
@@ -30,6 +44,12 @@
   integer, parameter :: LP = IP          ! logical precision
   integer, parameter :: RP = sizeof(1.0) ! real number precision
 
+  ! Version of the .cfn and .dim files
+  ! (This number was set in April of 2023)
+  integer, parameter :: VERSION_CFN    = 202304
+  integer, parameter :: VERSION_DIM    = 202304
+  integer, parameter :: VERSION_BACKUP = 202304
+
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!
@@ -54,7 +74,10 @@
 
   real,    parameter :: HUGE     = PETA
   real,    parameter :: TINY     = FEMTO
-  integer, parameter :: HUGE_INT = 2147483647
+  integer, parameter :: HUGE_INT = 1073741824  ! this is 2 ** 30
+
+  ! Euler's prime number (also the largest integer in 32 bit precision)
+  integer, parameter :: EULER    = 2147483647  ! 2 ** 31 - 1
 
   ! Archimedes’ constant
   real, parameter :: PI = 3.14159265359

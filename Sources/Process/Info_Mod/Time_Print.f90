@@ -1,25 +1,27 @@
 !==============================================================================!
-  subroutine Info_Mod_Time_Print()
+  subroutine Time_Print(Info)
 !------------------------------------------------------------------------------!
 !   Prints information about inner iteration on the screen.                    !
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Info_Type) :: Info
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     print '(a)',   ''
     print '(a)',   ''
-    print '(a90)', trim(time_info % line_lead)
+    print '(a90)', trim(Info % time % line_lead)
 
     ! Print only lines which have colon in the first column :-)
-    do i=1,6
-      print '(a90)', trim(time_info % lines(i))
+    do i = 1, 6
+      print '(a90)', trim(Info % time % line(i))
     end do
 
-    print '(a90)', trim(time_info % line_trail)
+    print '(a90)', trim(Info % time % line_trail)
     print '(a)',   ''
 
   end if

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Scalar(Process, Flow, Turb, Vof, Sol, curr_dt, ini, sc)
+  subroutine Compute_Scalar(Process, Flow, Turb, Vof, Sol, sc)
 !------------------------------------------------------------------------------!
 !   Purpose: Solve transport equation for user defined scalar.                 !
 !------------------------------------------------------------------------------!
@@ -10,8 +10,6 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt
-  integer, intent(in)         :: ini
   integer, intent(in)         :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
@@ -27,6 +25,8 @@
   real                       :: phi_stress, q_exp
   real                       :: phix_f, phiy_f, phiz_f
   real, contiguous,  pointer :: q_turb(:), cross(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !------------------------------------------------------------------------------!
 !
 !  The form of equations which are solved:
@@ -39,7 +39,7 @@
 !
 !==============================================================================!
 
-  call Profiler % Start('Compute_Scalars (without solvers)')
+  call Profiler % Start('Compute_Scalar (without solvers)')
 
   call Work % Connect_Real_Cell(q_turb, cross)
 
@@ -52,8 +52,7 @@
   call Sol % Alias_Native   (A, b)
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Scalar(Flow, Turb, Vof, Sol,  &
-                                            curr_dt, ini, sc)
+  call User_Mod_Beginning_Of_Compute_Scalar(Flow, Turb, Vof, Sol, sc)
 
   ! Initialize cross diffusion sources, matrix and right hand side
   cross(:) = 0.0
@@ -69,7 +68,7 @@
   !--------------------------!
 
   ! Old values (o and oo)
-  if(ini.lt.2) then
+  if(Iter % Current() .lt. 2) then
     do c = 1, Grid % n_cells
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
@@ -95,7 +94,9 @@
   !----------------------------!
   !   Spatial discretization   !
   !----------------------------!
-  call Control_Mod_Turbulent_Schmidt_Number(sc_t)  ! get default sc_t (0.9)
+
+  ! It used to read sc_t from here which is an overkill, so check
+  Assert(sc_t > 0.0)
 
   do s = 1, Grid % n_faces
 
@@ -205,7 +206,8 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, A, b)
 
-  call Profiler % Start('Linear_Solver_For_Scalars')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for scalars)')
 
   ! Call linear solver to solve them
   call Sol % Run(phi % solver,     &
@@ -219,21 +221,22 @@
                  phi % tol,        &
                  phi % res)
 
-  call Profiler % Stop('Linear_Solver_For_Scalars')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for scalars)')
 
   read(phi % name(3:4), *) ns  ! reterive the number of scalar
   row = ceiling(ns/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
   col = nint(ns) - (row-1)*6   ! will be in range 1 - 6
 
-  call Info_Mod_Iter_Fill_User_At(row, col, phi % name, phi % eniter, phi % res)
+  call Info % Iter_Fill_Scalar_At(row, col, phi % name, phi % res, phi % eniter)
 
   call Flow % Grad_Variable(phi)
 
   ! User function
-  call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, curr_dt, ini, sc)
+  call User_Mod_End_Of_Compute_Scalar(Flow, Turb, Vof, Sol, sc)
 
   call Work % Disconnect_Real_Cell(q_turb, cross)
 
-  call Profiler % Stop('Compute_Scalars (without solvers)')
+  call Profiler % Stop('Compute_Scalar (without solvers)')
 
   end subroutine

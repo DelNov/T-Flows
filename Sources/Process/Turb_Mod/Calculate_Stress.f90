@@ -13,11 +13,7 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, nc, nb
-  real                      :: wd_m, u2, v2, w2
-  real, contiguous, pointer :: wd_x(:), wd_y(:), wd_z(:)
 !==============================================================================!
-
-  call Work % Connect_Real_Cell(wd_x, wd_y, wd_z)
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -35,7 +31,7 @@
   if( Turb % model .eq. K_EPS        .or.  &
       Turb % model .eq. K_EPS_ZETA_F) then 
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       uu % n(c) = - 2. * Turb % vis_t(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
@@ -52,7 +48,7 @@
 
   else if(Turb % model .eq. HYBRID_LES_RANS) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       uu % n(c) = - 2. * Turb % vis_t_eff(c) / Flow % density(c)  &
                        * u % x(c) + TWO_THIRDS * kin % n(c)
@@ -69,7 +65,7 @@
 
   if( Turb % model .eq. K_EPS_ZETA_F .or.  &
       Turb % model .eq. HYBRID_LES_RANS) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       uu % n(c) = zeta % n(c) * kin % n(c) 
       vv % n(c) = zeta % n(c) * kin % n(c)
@@ -77,7 +73,5 @@
 
     end do
   end if
-
-  call Work % Disconnect_Real_Cell(wd_x, wd_y, wd_z)
 
   end subroutine

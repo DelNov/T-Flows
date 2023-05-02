@@ -107,9 +107,9 @@
   nv     = n_vert
   nv_tot = n_vert
   if(Surf % mesh_divided) then
-    call Comm_Mod_Global_Sum_Int(nv_tot)
+    call Global % Sum_Int(nv_tot)
   end if
-  if(verbose .and. this_proc < 2) then
+  if(verbose .and. First_Proc()) then
     print '(a40,i8)', ' # Compressed number of vertices:       ', nv_tot
   end if
 

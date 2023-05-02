@@ -6,12 +6,19 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: len_s         ! send length
-  integer          :: phi_s(len_s)  ! send buffer
-  integer          :: len_r         ! receive length
-  integer          :: phi_r(len_r)  ! receive buffer
-  integer          :: dest          ! destination processor
+  class(Comm_Type), intent(in) :: Comm
+  integer,          intent(in) :: len_s         ! send length
+  integer,          intent(in) :: phi_s(len_s)  ! send buffer
+  integer,          intent(in) :: len_r         ! receive length
+  integer,          intent(in) :: phi_r(len_r)  ! receive buffer
+  integer,          intent(in) :: dest          ! destination processor
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
+  Unused(len_s)
+  Unused(phi_s)
+  Unused(len_r)
+  Unused(phi_r)
+  Unused(dest)
 !==============================================================================!
 
   end subroutine

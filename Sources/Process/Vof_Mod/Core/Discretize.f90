@@ -16,7 +16,7 @@
   type(Var_Type),   pointer :: fun
   type(Front_Type), pointer :: Front
   real, contiguous, pointer :: beta_f(:)
-  integer                   :: c, c1, c2, s
+  integer                   :: c, c1, c2, s, reg
   real                      :: upwd1, upwd2, upwd3, a0
 !==============================================================================!
 
@@ -32,87 +32,94 @@
   b       = 0.0
   A % val = 0.0
 
-  !-------------------------!
-  !   Matrix Coefficients   !
-  !-------------------------!
+  !------------------------------------!
+  !   Matrix coefficients for UPWIND   !
+  !------------------------------------!
   if(fun % adv_scheme .eq. UPWIND) then
 
     ! At boundaries
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    do reg = Boundary_Regions()
+      if(     Grid % region % type(reg) .eq. OUTFLOW  &
+         .or. Grid % region % type(reg) .eq. CONVECT  &
+         .or. Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
 
-      if(c2 < 0) then
-        if(Grid % Bnd_Cond_Type(c2) .eq. INFLOW) then
-          b(c1) = b(c1) - v_flux % n(s) * fun % n(c2)
-        else if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
           A % val(A % dia(c1)) = A % val(A % dia(c1)) + v_flux % n(s)
-        end if
-      end if
+        end do
+      else if(Grid % region % type(reg) .eq. INFLOW) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-    end do
+          b(c1) = b(c1) - v_flux % n(s) * fun % n(c2)
+        end do
+      end if    ! outflow or inflow
+    end do      ! regions
 
     ! Interior faces
-    do s = 1, Grid % n_faces
+    do s = Faces_In_Domain()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
-      if(c2 > 0) then
 
-        upwd1 = 0.5 * max( v_flux % n(s), 0.0)
-        upwd2 = 0.5 * max(-v_flux % n(s), 0.0)
+      upwd1 = 0.5 * max( v_flux % n(s), 0.0)
+      upwd2 = 0.5 * max(-v_flux % n(s), 0.0)
 
-        A % val(A % dia(c1)) = A % val(A % dia(c1)) + upwd1
-        A % val(A % dia(c2)) = A % val(A % dia(c2)) + upwd2
+      A % val(A % dia(c1)) = A % val(A % dia(c1)) + upwd1
+      A % val(A % dia(c2)) = A % val(A % dia(c2)) + upwd2
 
-        A % val(A % pos(1,s)) =  - upwd2
-        A % val(A % pos(2,s)) =  - upwd1
+      A % val(A % pos(1,s)) =  - upwd2
+      A % val(A % pos(2,s)) =  - upwd1
 
-        b(c1) = b(c1) - ( upwd1 * fun % o(c1) - upwd2 * fun % o(c2) )
-        b(c2) = b(c2) - ( upwd2 * fun % o(c2) - upwd1 * fun % o(c1) )
-
-      end if
+      b(c1) = b(c1) - ( upwd1 * fun % o(c1) - upwd2 * fun % o(c2) )
+      b(c2) = b(c2) - ( upwd2 * fun % o(c2) - upwd1 * fun % o(c1) )
     end do
 
+  !----------------------------------------------!
+  !   Matrix coefficients for CICSAM and STACS   !
+  !----------------------------------------------!
   else if(fun % adv_scheme .eq. CICSAM .or. &
           fun % adv_scheme .eq. STACS) then
 
     ! At boundaries
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
+    do reg = Boundary_Regions()
+      if(     Grid % region % type(reg) .eq. OUTFLOW  &
+         .or. Grid % region % type(reg) .eq. CONVECT  &
+         .or. Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
 
-        if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) then
           A % val(A % dia(c1)) = A % val(A % dia(c1)) + v_flux % n(s)
-        else
-          b(c1) = b(c1) - v_flux % n(s) * fun % n(c2)
-        end if
+        end do
+      else
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-      end if
-    end do
+          b(c1) = b(c1) - v_flux % n(s) * fun % n(c2)
+        end do
+      end if    ! outflow or inflow
+    end do      ! regions
 
     ! Interior faces
-    do s = 1, Grid % n_faces
+    do s = Faces_In_Domain()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
-      if(c2 > 0) then
 
-        upwd1 = (0.5 - beta_f(s)) * max(-v_flux % n(s), 0.0)  &
-               - 0.5 * beta_f(s)  * v_flux % n(s)
-        upwd2 = (0.5 - beta_f(s)) * max(+v_flux % n(s), 0.0)  &
-               + 0.5 * beta_f(s)  * v_flux % n(s)
-        upwd3 = 0.5 * v_flux % n(s)
+      upwd1 = (0.5 - beta_f(s)) * max(-v_flux % n(s), 0.0)  &
+             - 0.5 * beta_f(s)  * v_flux % n(s)
+      upwd2 = (0.5 - beta_f(s)) * max(+v_flux % n(s), 0.0)  &
+             + 0.5 * beta_f(s)  * v_flux % n(s)
+      upwd3 = 0.5 * v_flux % n(s)
 
-        A % val(A % dia(c1)) = A % val(A % dia(c1)) + upwd1 + upwd3
-        A % val(A % dia(c2)) = A % val(A % dia(c2)) + upwd2 - upwd3
+      A % val(A % dia(c1)) = A % val(A % dia(c1)) + upwd1 + upwd3
+      A % val(A % dia(c2)) = A % val(A % dia(c2)) + upwd2 - upwd3
 
-        A % val(A % pos(1,s)) = - upwd1
-        A % val(A % pos(2,s)) = - upwd2
+      A % val(A % pos(1,s)) = - upwd1
+      A % val(A % pos(2,s)) = - upwd2
 
-        b(c1) = b(c1) - (upwd1 + upwd3) * fun % o(c1) + upwd1 * fun % o(c2)
-        b(c2) = b(c2) - (upwd2 - upwd3) * fun % o(c2) + upwd2 * fun % o(c1)
-
-      end if
+      b(c1) = b(c1) - (upwd1 + upwd3) * fun % o(c1) + upwd1 * fun % o(c2)
+      b(c2) = b(c2) - (upwd2 - upwd3) * fun % o(c2) + upwd2 * fun % o(c1)
     end do
 
   end if
@@ -124,7 +131,7 @@
 
   ! Two time levels; linear interpolation
   if(fun % td_scheme .eq. LINEAR) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       a0 = Grid % vol(c) / dt
       A % val(A % dia(c)) = A % val(A % dia(c)) + a0
       b(c) = b(c) + a0 * fun % o(c)
@@ -133,7 +140,7 @@
 
   ! Three time levels; parabolic interpolation
   if(fun % td_scheme .eq. PARABOLIC) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       a0 = Grid % vol(c) / dt
       A % val(A % dia(c)) = A % val(A % dia(c)) + 1.5 * a0
       b(c) = b(c) + 2.0 * a0 * fun % o(c) - 0.5 * a0 * fun % oo(c)

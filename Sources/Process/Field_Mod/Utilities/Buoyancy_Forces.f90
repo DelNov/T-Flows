@@ -131,7 +131,7 @@
   !---------------------------------------!
   !   Correct the units for body forces   !
   !---------------------------------------!
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     cell_fi(c) = cell_fi(c) / Grid % vol(c)
   end do
 

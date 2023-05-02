@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_F22(Turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_F22(Turb, Sol, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves eliptic relaxation equations for f22.               !
 !------------------------------------------------------------------------------!
@@ -7,8 +7,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Turb_Type)          :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
-  integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
@@ -20,7 +18,7 @@
   real                       :: a0, a12, a21
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real, contiguous,  pointer :: cross(:)
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !                                                                              !
 !   The form of equations which are solved:                                    !
 !                                                                              !
@@ -38,7 +36,9 @@
 !                                                                              !
 !     f22            [1/s]                                                     !
 !     Lsc            [m]                                                       !
-!------------------------------------------------------------------------------!
+!==============================================================================!
+
+  call Profiler % Start('Compute_F22 (without solvers)')
 
   call Work % Connect_Real_Cell(cross)
 
@@ -53,15 +53,15 @@
   b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
-  if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+  if(Iter % Current() .eq. 1) then
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c)   = phi % o(c)
       phi % o (c)   = phi % n(c)
     end do
   end if
 
   ! New values
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     cross(c) = 0.0
   end do
 
@@ -138,7 +138,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) + cross(c)
   end do
 
@@ -162,7 +162,8 @@
   ! Underrelax the equations
   call Numerics_Mod_Under_Relax(phi, a, b)
 
-  call Profiler % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
   call Sol % Run(phi % solver,     &
@@ -176,17 +177,20 @@
                  phi % tol,        &
                  phi % res)
 
-  call Profiler % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for turbulence)')
 
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then
-    call Info_Mod_Iter_Fill_At(3, 4, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
   else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info_Mod_Iter_Fill_At(4, 2, phi % name, phi % eniter, phi % res)
+    call Info % Iter_Fill_At(4, 2, phi % name, phi % res, phi % eniter)
   end if
 
   call Flow % Grad_Variable(phi)
 
   call Work % Disconnect_Real_Cell(cross)
+
+  call Profiler % Stop('Compute_F22 (without solvers)')
 
   end subroutine

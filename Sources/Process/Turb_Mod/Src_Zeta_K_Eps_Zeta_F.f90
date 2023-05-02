@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Src_Zeta_K_Eps_Zeta_F(Turb, Sol, curr_dt)
+  subroutine Src_Zeta_K_Eps_Zeta_F(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Calculate source terms in equation for zeta.                               !
 !   Term which is negative is put on left hand side in diagonal of             !
@@ -9,7 +9,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -17,7 +16,7 @@
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   In transport equation for zeta two source terms exist which have form:     !
 !                                                                              !
 !    /                                                                         !
@@ -30,7 +29,7 @@
 !   sign of term , it is placed on left or right hand side.  Second, negative  !
 !   source term is added to main diagonal left hand side coefficient matrix    !
 !   in order to increase stability of solver                                   !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -43,8 +42,8 @@
   ! sensitive to initial condition while the second one can lead to 
   ! instabilities for some cases such as Flow around cylinder. That is why we
   ! choose this particular way to the add source term.
-  do c = 1, Grid % n_cells
-    if(curr_dt > 500) then
+  do c = Cells_In_Domain()
+    if(Time % Curr_Dt() > 500) then
       b(c) = b(c) + f22 % n(c) * Grid % vol(c) * Flow % density(c)
     else
       b(c) = b(c) + max(0.0, f22 % n(c)*Grid % vol(c)) * Flow % density(c)

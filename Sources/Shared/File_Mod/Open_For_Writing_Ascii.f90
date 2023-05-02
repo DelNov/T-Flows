@@ -9,6 +9,8 @@
   character(len=*)  :: name_o
   integer           :: file_unit
   integer, optional :: processor
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   open(newunit = file_unit, file = trim(name_o), status = 'replace')

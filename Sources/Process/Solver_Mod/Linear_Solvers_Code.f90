@@ -15,14 +15,12 @@
       Solver_Mod_Linear_Solvers_Code = PETSC
 
     case default
-      if(this_proc < 2) then
-        print *, '# ERROR!  Unknown linear solvers option: ',  &
-                 trim(name)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-      stop
-
+      call Message % Error(80, 'Unknown linear solver option: '//trim(name)//  &
+                               '. This error is critical, exiting! '       //  &
+                               'Check the file: Documents/all_control'     //  &
+                               '_keywords to see which linear solvers are '//  &
+                               'available.  Probably just native and petsc.',  &
+                               file=__FILE__, line=__LINE__, one_proc=.true.)
   end select
 
   end function

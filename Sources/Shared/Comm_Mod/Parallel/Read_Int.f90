@@ -5,12 +5,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  type(Mpi_File)   :: fh    ! file handle
-  integer          :: num   ! number to read
-  integer(DP)      :: disp  ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  type(Mpi_File),   intent(in)    :: fh    ! file handle
+  integer,          intent(out)   :: num   ! number to read
+  integer(DP),      intent(inout) :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error = 0
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   ! Set it at position disp (same as in Write counterpart)

@@ -12,6 +12,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   logical       :: file_exists          ! file exists?
   logical, save :: first_call = .true.  ! first call?
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   inquire(file = trim(name_o), exist = file_exists)

@@ -72,7 +72,7 @@
   call Grid % Exchange_Cells_Real(w % n)
   call Grid % Exchange_Cells_Real(Flow % shear)
 
-  do c =1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     u_a   = 0.0
     v_a   = 0.0
     w_a   = 0.0
@@ -180,7 +180,7 @@
                                 w % y,  &  ! dW/dy
                                 w % z)     ! dW/dz
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     l_g  = Grid % vol(c)**ONE_THIRD
     l_f  = 2.0 * l_g
 
@@ -191,16 +191,16 @@
                          0.5*(u % z(c) + w % x(c))*(u % z(c) + w % x(c)) +   &
                          0.5*(v % x(c) + u % y(c))*(v % x(c) + u % y(c))))
 
-    l_11 = uu_f(c) - u_f(c) * u_f(c) 
-    l_22 = vv_f(c) - v_f(c) * v_f(c) 
-    l_33 = ww_f(c) - w_f(c) * w_f(c) 
-    l_12 = uv_f(c) - u_f(c) * v_f(c) 
-    l_13 = uw_f(c) - u_f(c) * w_f(c) 
-    l_23 = vw_f(c) - v_f(c) * w_f(c) 
+    l_11 = uu_f(c) - u_f(c) * u_f(c)
+    l_22 = vv_f(c) - v_f(c) * v_f(c)
+    l_33 = ww_f(c) - w_f(c) * w_f(c)
+    l_12 = uv_f(c) - u_f(c) * v_f(c)
+    l_13 = uw_f(c) - u_f(c) * w_f(c)
+    l_23 = vw_f(c) - v_f(c) * w_f(c)
 
-    m_11 = l_f**2 * shear_test(c) * u % x(c) - l_g**2 * m_11_f(c) 
-    m_22 = l_f**2 * shear_test(c) * v % y(c) - l_g**2 * m_22_f(c) 
-    m_33 = l_f**2 * shear_test(c) * w % z(c) - l_g**2 * m_33_f(c) 
+    m_11 = l_f**2 * shear_test(c) * u % x(c) - l_g**2 * m_11_f(c)
+    m_22 = l_f**2 * shear_test(c) * v % y(c) - l_g**2 * m_22_f(c)
+    m_33 = l_f**2 * shear_test(c) * w % z(c) - l_g**2 * m_33_f(c)
 
     m_12 = l_f**2 * shear_test(c) * .5*(u % y(c)+v % x(c)) - l_g**2 * m_12_f(c)
     m_13 = l_f**2 * shear_test(c) * .5*(u % z(c)+w % x(c)) - l_g**2 * m_13_f(c)
@@ -211,11 +211,11 @@
     l_dot_m =        l_11 * m_11 + l_22 * m_22 + l_33 * m_33   &
             + 2.0 * (l_12 * m_12 + l_13 * m_13 + l_23 * m_23)
 
-    Turb % c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY) 
+    Turb % c_dyn(c)  =  -0.5 * l_dot_m / (m_dot_m + TINY)
 
     ! Set lower and upper limiter on c_dyn
     if(Turb % c_dyn(c) < 0.0) then
-      Turb % c_dyn(c) = 0.0 
+      Turb % c_dyn(c) = 0.0
     else if(Turb % c_dyn(c) > 0.04) then
       Turb % c_dyn(c) = 0.04
     end if

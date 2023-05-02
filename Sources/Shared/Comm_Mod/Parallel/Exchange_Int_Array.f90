@@ -7,18 +7,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: length
-  integer          :: phi(length)
-  integer          :: dest         ! destination processor
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(in)    :: length
+  integer,          intent(inout) :: phi(length)
+  integer,          intent(in)    :: dest         ! destination processor
 !-----------------------------------[Locals]-----------------------------------!
-  integer          :: rtag, stag, error
+  integer          :: rtag, stag, error  ! receive and send tags, error
   type(Mpi_Status) :: status
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   ! Form send and receive tags
-  stag = (n_proc) * this_proc + dest  ! tag for sending
-  rtag = (n_proc) * dest + this_proc  ! tag for receiving
+  stag = Global % n_processors * Global % this_processor + dest
+  rtag = Global % n_processors * dest + Global % this_processor
 
   call Mpi_Sendrecv_Replace(phi(1),          & ! buffer
                             length,          & ! length

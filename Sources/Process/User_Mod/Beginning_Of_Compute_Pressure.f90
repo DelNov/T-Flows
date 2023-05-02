@@ -1,16 +1,13 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol,  &
-                                                    curr_dt, ini)
+  subroutine User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of Compute_Pressure function.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: Flow
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt  ! current time step
-  integer, intent(in)         :: ini      ! inner iteration
+  type(Field_Type),  target :: Flow
+  type(Vof_Type),    target :: Vof
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, p
