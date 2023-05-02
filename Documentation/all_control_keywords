@@ -14,6 +14,7 @@
   SAVE_BACKUP_NAME                         |         skip                  |   name of backup file you want to create
   SAVE_INITIAL_CONDITION                   |         yes                   |   no
   SAVE_RESULTS_AT_BOUNDARIES               |         yes                   |   no
+  SAVE_RESULTS_UNITS                       |         yes                   |   no
   SWARM_SAVE_INTERVAL                      |        60                     |   any integer > 0
   WALL_TIME_MAX_HOURS                      |       168.0                   |   any number
   PROFILER_INFO                            |         percents              |   seconds

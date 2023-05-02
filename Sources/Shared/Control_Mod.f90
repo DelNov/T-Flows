@@ -46,6 +46,7 @@
       procedure :: Save_Backup_Name
       procedure :: Save_Initial_Condition
       procedure :: Save_Results_At_Boundaries
+      procedure :: Save_Results_Units
       procedure :: Wall_Time_Max_Hours
       procedure :: Backup_Save_Interval
       procedure :: Results_Save_Interval
@@ -223,6 +224,7 @@
 #   include "Control_Mod/Input_Output/Save_Backup_Name.f90"
 #   include "Control_Mod/Input_Output/Save_Initial_Condition.f90"
 #   include "Control_Mod/Input_Output/Save_Results_At_Boundaries.f90"
+#   include 'Control_Mod/Input_Output/Save_Results_Units.f90'
 #   include "Control_Mod/Input_Output/Wall_Time_Max_Hours.f90"
 
     ! Save
