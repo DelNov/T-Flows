@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Grad_Modeled_Flow(Swarm)
+  subroutine Grad_Modeled_Flow(Swarm)
 !------------------------------------------------------------------------------!
 !   Stores gradients of modeled Flow parameters for swarm SGS models           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid

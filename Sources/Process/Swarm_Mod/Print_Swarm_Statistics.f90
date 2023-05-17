@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Print_Statistics(Swarm)
+  subroutine Print_Swarm_Statistics(Swarm)
 !------------------------------------------------------------------------------!
 !   Prints particle statistics (still in early evolutionary stage)             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part

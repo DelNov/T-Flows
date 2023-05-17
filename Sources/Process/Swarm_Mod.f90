@@ -91,12 +91,20 @@
     integer :: N_R_VARS = 15
 
     contains
+      procedure          :: Advance_Particles
       procedure          :: Allocate_Swarm
       procedure, private :: Bounce_Particle
+      procedure, private :: Calculate_Particles_Mean
       procedure, private :: Check_Periodicity
+      procedure          :: Exchange_Particles
+      procedure, private :: Grad_Modeled_Flow
       procedure, private :: Move_Particle
       procedure, private :: Move_Trapped
       procedure, private :: Particle_Forces
+      procedure, private :: Particle_Time_Scale
+      procedure, private :: Print_Swarm_Statistics
+      procedure, private :: Sgs_Discrete_Random_Walk
+      procedure, private :: Sgs_Fukagata
       procedure, private :: Trap_Particle
 
   end type
@@ -115,7 +123,7 @@
 #   include "Swarm_Mod/Advance_Particles.f90"
 #   include "Swarm_Mod/Allocate_Swarm.f90"
 #   include "Swarm_Mod/Bounce_Particle.f90"
-#   include "Swarm_Mod/Calculate_Mean.f90"
+#   include "Swarm_Mod/Calculate_Particles_Mean.f90"
 #   include "Swarm_Mod/Check_Periodicity.f90"
 #   include "Swarm_Mod/Exchange_Particles.f90"
 #   include "Swarm_Mod/Grad_Modeled_Flow.f90"
@@ -123,7 +131,7 @@
 #   include "Swarm_Mod/Move_Trapped.f90"
 #   include "Swarm_Mod/Particle_Forces.f90"
 #   include "Swarm_Mod/Particle_Time_Scale.f90"
-#   include "Swarm_Mod/Print_Statistics.f90"
+#   include "Swarm_Mod/Print_Swarm_Statistics.f90"
 #   include "Swarm_Mod/Sgs_Discrete_Random_Walk.f90"
 #   include "Swarm_Mod/Sgs_Fukagata.f90"
 #   include "Swarm_Mod/Trap_Particle.f90"

@@ -133,7 +133,7 @@
       Part % f = 1.0 + 0.15 *(Part % re ** 0.687)
 
       ! Add stochasticity by SEIM model (for modeled tubulent quantities)
-      call Swarm_Mod_Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
+      call Swarm % Sgs_Discrete_Random_Walk(k, rx, ry, rz)
 
       ! Adding the stochastic part from the Random Walk model (SEIM)
       up = up + Part % u_drw

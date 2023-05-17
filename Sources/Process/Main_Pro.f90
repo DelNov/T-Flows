@@ -351,7 +351,7 @@
       ! Lagrangian particle tracking
       if(Flow(d) % with_particles) then
         if(Time % Curr_Dt() >= first_dt_p) then
-          call Swarm_Mod_Advance_Particles(Swarm(d), n_stat_p, first_dt_p)
+          call Swarm(d) % Advance_Particles(n_stat_p, first_dt_p)
         end if
       end if
 

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Calculate_Mean(Swarm, k, n_stat_p)
+  subroutine Calculate_Particles_Mean(Swarm, k, n_stat_p)
 !------------------------------------------------------------------------------!
 !   Calculates particle time averaged velocity                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: k         ! particle index
-  integer, intent(in)      :: n_stat_p  ! starting time step for swarm statist.
+  class(Swarm_Type), target :: Swarm
+  integer,       intent(in) :: k         ! particle index
+  integer,       intent(in) :: n_stat_p  ! starting time step for swarm statist.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow

@@ -1,16 +1,15 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Exchange_Particles(Swarm)
+  subroutine Exchange_Particles(Swarm)
 !------------------------------------------------------------------------------!
-!   Advances all particles in the Swarm.                                       !
+!   Exchange particles between processors                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target     :: Swarm
-  integer                      :: k      ! particle number
+  class(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part
-  integer                      :: i, c, n
+  integer                      :: i, k, c, n
 !==============================================================================!
 
   ! Take aliases for the Swarm

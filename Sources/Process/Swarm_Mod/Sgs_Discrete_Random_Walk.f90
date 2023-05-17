@@ -1,16 +1,16 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
+  subroutine Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
 !------------------------------------------------------------------------------!
 !  SGS model introducing stochasticity to LES/K-Eps-Zeta-F modeled quantities..
 !  .. seen by particles. (taken from Z. Cheng et. al., (2018) 435-451)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
-  integer                  :: k
-  real                     :: rx
-  real                     :: ry
-  real                     :: rz
+  class(Swarm_Type), target :: Swarm
+  integer,       intent(in) :: k
+  real,          intent(in) :: rx
+  real,          intent(in) :: ry
+  real,          intent(in) :: rz
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: Grid

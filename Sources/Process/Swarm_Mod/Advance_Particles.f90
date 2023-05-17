@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(Swarm, n_stat_p, first_dt_p)
+  subroutine Advance_Particles(Swarm, n_stat_p, first_dt_p)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the Swarm.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n_stat_p    ! starting time for swarm statistics
-  integer, intent(in)      :: first_dt_p  ! starting time for swarm simulation
+  class(Swarm_Type), target :: Swarm
+  integer, intent(in)       :: n_stat_p    ! starting time for swarm statistics
+  integer, intent(in)       :: first_dt_p  ! starting time for swarm simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow
@@ -34,17 +34,17 @@
   !------------------------!
   if(Turb % model .eq. HYBRID_LES_PRANDTL) then
     if(Swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
-      call Swarm_Mod_Sgs_Fukagata(Swarm)
+      call Swarm % Sgs_Fukagata()
     end if
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
 
     ! Correcting for particle time step size (if ER-HRL model is used)
-    call Swarm_Mod_Particle_Time_Scale(Swarm)
+    call Swarm % Particle_Time_Scale()
 
     ! Store gradients for modeled Flow quantities for Swarm
-    call Swarm_Mod_Grad_Modeled_Flow(Swarm)
+    call Swarm % Grad_Modeled_Flow()
 
   end if
 
@@ -119,7 +119,7 @@
           call Swarm % Check_Periodicity(k, n_parts_in_buffers)
 
           ! Gathering Swarm statistics
-          call Swarm_Mod_Calculate_Mean(Swarm, k, n_stat_p)
+          call Swarm % Calculate_Particles_Mean(k, n_stat_p)
 
         end if  ! in this processor
       end if    ! deposited or escaped
@@ -128,7 +128,7 @@
     ! Exchange particles for parallel version; if needed
     call Global % Sum_Int(n_parts_in_buffers)
     if(n_parts_in_buffers > 0) then
-      call Swarm_Mod_Exchange_Particles(Swarm)
+      call Swarm % Exchange_Particles()
     end if
 
   end do        ! through sub-steps
@@ -163,12 +163,12 @@
   ! Exchange particles for parallel version; if needed
   call Global % Sum_Int(n_parts_in_buffers)
   if(n_parts_in_buffers > 0) then
-    call Swarm_Mod_Exchange_Particles(Swarm)
+    call Swarm % Exchange_Particles()
   end if
 
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  call Swarm_Mod_Print_Statistics(Swarm)
+  call Swarm % Print_Swarm_Statistics()
 
   end subroutine

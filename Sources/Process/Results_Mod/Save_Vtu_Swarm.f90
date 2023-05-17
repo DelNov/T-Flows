@@ -32,7 +32,7 @@
   !   Only one processor saves the Swarm,   !
   !    therefore it has to be refreshed     !
   !-----------------------------------------!
-  call Swarm_Mod_Exchange_Particles(Swarm)
+  call Swarm % Exchange_Particles()
 
   !-------------------------------!
   !   Count remaining particles   !
