@@ -442,6 +442,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      SPALART_ALLMARAS  RSM_HANJALIC_JAKIRLIC  RSM_MANCEAU_HANJALIC
   syn keyword fortranConstant      HYBRID_LES_RANS HYBRID_LES_PRANDTL  STABILIZED  SGDH  GGDH  AFM  A_POW  B_POW
   syn keyword fortranConstant      SWITCH_DISTANCE  SWITCH_VELOCITY  THERMALLY_DRIVEN  DENSITY_DRIVEN  NO_BUOYANCY
+" Constants from Swarm_Mod
+  syn keyword fortranConstant      BROWNIAN_FUKAGATA  DISCRETE_RANDOM_WALK  N_I_VARS  N_L_VARS  N_R_VARS
 " Constants from Region_Mod
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
