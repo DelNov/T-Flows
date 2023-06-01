@@ -28,7 +28,7 @@
   print *, '#-------------------------------------------'
   print *, '# Insert non-homogeneous direction '
   print *, '# (x, y, z, rx, ry, rz or skip)'
-  print *, '# -------------------------------------------'
+  print *, '#-------------------------------------------'
   read(*,*) answer
   call To_Upper_Case(answer)
   if(answer .eq. 'SKIP') then
