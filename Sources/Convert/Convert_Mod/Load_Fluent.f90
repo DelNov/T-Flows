@@ -31,7 +31,7 @@
   integer                :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
   integer                :: n_cells, n_bnd_cells, n_faces, n_nodes
   integer                :: n_face_nodes, n_cells_zone
-  integer                :: c, c1, c2, s, n, fu, i, l, pos, length, error
+  integer                :: c, c1, c2, s, n, fu, l, pos, length, error
   integer                :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
   integer                :: cell_type, zone_type
   integer                :: cell_f, cell_l, side_f, side_l, node_f, node_l
@@ -44,7 +44,6 @@
   logical                :: the_end               ! end of file reached?
   logical                :: ascii                 ! is file in ascii format?
   integer,   allocatable :: cell_visited_from(:), cell_types(:)
-  character, allocatable :: very_long_line(:)
 !==============================================================================!
 
   call Profiler % Start('Load_Fluent')
@@ -432,9 +431,19 @@
           n_cells_zone = cell_l - cell_f + 1  ! this was read above
 
           if(ascii) then
-            ! Find out the Line length
-            offset = ftell(fu)                ! mark offset
-            length = File % Line_Length(fu)   ! read the Line
+            ! Find out the cell record length
+            ! This is approximate, just until you encounter next
+            ! ')' character, but will nonetheless do the job
+            offset = ftell(fu)  ! mark the offset
+            length = 0
+            do
+              read(fu) one_char
+              if(one_char .eq. ')') exit
+              length = length + 1
+            end do
+
+            ! Once you've found lenght, go back to the beginning
+            ! of the record using the offset you stored before
 #           ifdef __INTEL_COMPILER
             error = fseek(fu, offset, 0)
 #           else
@@ -443,23 +452,21 @@
 #           endif
 
             ! Allocate helping arrays
-            allocate(very_long_line(length))    ! allocate very long Line
             allocate(cell_types(n_cells_zone))  ! allocate cell types
 
-            ! Read the very long Line
-            read(fu) very_long_line
-
             ! Browse the very long Line and read cell types from it
-            c = 0                                  ! cell counter
-            do i = 1, length                       ! thrugh entire long Line
-              if(ichar(very_long_line(i)) .ge. ichar('0') .and.  &
-                 ichar(very_long_line(i)) .le. ichar('9')) then
-                c = c + 1                          ! increase cell count
-                read(very_long_line(i), '(i1)') &
-                     cell_types(c)                 ! read cell types
+            c = 0  ! cell counter
+            do
+              read(fu) one_char
+              if(one_char .eq. ')') exit
+              if(one_char .ge. '0' .and. one_char .le. '9') then
+                c = c + 1                             ! increase cell count
+                read(one_char, '(i1)') cell_types(c)  ! read cell types
               end if
             end do
-            ! At this point: c .eq. n_cells_zone; maybe check it?
+
+            ! At this point: c .eq. n_cells_zone: check it!
+            Assert(c .eq. n_cells_zone)
           end if
 
           do c = 1, n_cells_zone
