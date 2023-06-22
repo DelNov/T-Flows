@@ -120,25 +120,29 @@
   !--------------------------------------------------------------------------!
   if(Flow % choi_correction) then
 
-    ! Weights of o and oo time step depending on the scheme used
-    if(u % td_scheme == LINEAR) then
-      w_o  = 1.0
-      w_oo = 0.0
-    else if(u % td_scheme == PARABOLIC) then
-      w_o  =  2.0
-      w_oo = -0.5
+    ! To make sure that you have both o and oo values
+    if(Time % Curr_Dt() - Time % First_Dt() > 3) then
+
+      ! Weights of o and oo time step depending on the scheme used
+      if(u % td_scheme == LINEAR) then
+        w_o  = 1.0
+        w_oo = 0.0
+      else if(u % td_scheme == PARABOLIC) then
+        w_o  =  2.0
+        w_oo = -0.5
+      end if
+
+      do c = 1, Grid % n_cells
+        ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
+        t_m(c) = (Grid % vol(c) * Flow % density(c) / Flow % dt) / M % sav(c)
+
+        u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
+        v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)
+        w_c(c) = w_c(c) - (w_o * w % o(c) + w_oo * w % oo(c)) * t_m(c)
+      end do
+
     end if
 
-    do c = 1, Grid % n_cells
-
-      ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
-      t_m(c) = (Grid % vol(c) * Flow % density(c) / Flow % dt) / M % sav(c)
-
-      u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
-      v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)
-      w_c(c) = w_c(c) - (w_o * w % o(c) + w_oo * w % oo(c)) * t_m(c)
-
-    end do
   end if
 
   !---------------------------------------------------------------------!
@@ -211,10 +215,14 @@
       !   Choi's correction, part 2: add flux from old time step   !
       !------------------------------------------------------------!
       if(Flow % choi_correction) then
-        v_flux % n(s) = v_flux % n(s)                        &
-                      + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &
-                        * (  w_o *  v_flux % o(s)            &
-                           + w_oo * v_flux % oo(s))
+
+        ! To make sure that you have both o and oo values
+        if(Time % Curr_Dt() - Time % First_Dt() > 3) then
+
+          v_flux % n(s) = v_flux % n(s)                        &
+                        + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &
+                          * (w_o * v_flux % o(s) + w_oo * v_flux % oo(s))
+        end if
       end if  ! choi_correction
 
       !-------------------------------------------------------!
