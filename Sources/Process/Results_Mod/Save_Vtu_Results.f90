@@ -19,10 +19,10 @@
   type(Var_Type),  pointer     :: phi
   integer(SP)                  :: data_size
   integer                      :: data_offset, cell_offset, i_fac, reg
-  integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, run
+  integer                      :: s, n, n_conns, n_polyg, sc, f7, f8, f9, run
   integer                      :: s1, s2, c1, c2, c_f, c_l
   real                         :: dist1, dist2
-  character(SL)                :: name_out_8, name_out_9, name_mean
+  character(SL)                :: name_out_7, name_out_8, name_out_9, name_mean
   character(SL)                :: str1, str2
   integer, pointer, contiguous :: int_save(:), type_save(:), offs_save(:)
   real,    pointer, contiguous :: save_01(:), save_02(:), save_03(:)
@@ -394,12 +394,7 @@
     !--------------------!
     !   Cell processor   !
     !--------------------!
-    do c1 = c_f, c_l
-      int_save(c1) = Grid % Comm % cell_proc(c1)
-    end do
-    do c2 = c_f, c_l
-      int_save(c2) = Grid % Comm % cell_proc(c2)
-    end do
+    int_save(c_f:c_l) = Grid % Comm % cell_proc(c_f:c_l)
     call Results % Save_Vtu_Scalar_Int("Grid Processor [1]", plot_inside,  &
                                        int_save(c_f:c_l),                  &
                                        f8, f9, data_offset, run)
@@ -419,6 +414,16 @@
       int_save(c_f:c_l) = domain
       call Results % Save_Vtu_Scalar_Int("Grid Domain [1]", plot_inside, &
                                          int_save(c_f:c_l),              &
+                                         f8, f9, data_offset, run)
+    end if
+
+    !----------------------!
+    !   Boundary regions   !
+    !----------------------!
+    if(.not. plot_inside) then
+      int_save(c_f:c_l) = Grid % region % at_cell(c_f:c_l)
+      call Results % Save_Vtu_Scalar_Int("Boundary Condition [1]",        &
+                                         plot_inside, int_save(c_f:c_l),  &
                                          f8, f9, data_offset, run)
     end if
 
@@ -1056,6 +1061,34 @@
     write(f8) IN_1 // '</PUnstructuredGrid>' // LF
     write(f8) IN_0 // '</VTKFile>'           // LF
     close(f8)
+  end if
+
+  !----------------------------------------------------------!
+  !                                                          !
+  !   Create Python scripts to extract boundary conditions   !
+  !                                                          !
+  !----------------------------------------------------------!
+  if(First_Proc() .and. .not. plot_inside) then
+    call File % Set_Name(name_out_7,                    &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-extract-bnd',    &
+                         extension = '.py',             &
+                         domain=domain)
+    call File % Open_For_Writing_Ascii(name_out_7, f7)
+    write(f7, '(a)') "from paraview.simple import *"
+    write(f7, '(a)') "paraview.simple._DisableFirstRenderCameraReset()"
+    write(f7, '(a)') ""
+    write(f7, '(a)') "CurrentFile = FindSource('"//trim(name_out_8)//"')"
+    do reg = Boundary_Regions()
+      write(f7, '(a)') ""
+      write(f7, '(a)')    "threshold = Threshold(Input=CurrentFile)"
+      write(f7, '(a,f4.2,a,f4.2,a)') "threshold.ThresholdRange = [",  &
+                                     reg-0.01,  ", ", reg+0.01, "]"
+      str1 = trim(Grid % region % name(reg))
+      call String % To_Lower_Case(str1)
+      write(f7, '(a)') "RenameSource('"//trim(str1)//"', threshold)"
+    end do
+    close(f7)
   end if
 
   call Work % Disconnect_Int_Cell(int_save, type_save, offs_save)
