@@ -66,11 +66,11 @@
       c2  = Grid % faces_c(2, s)
 
       ! Find temperature and density with linear interpolation.
-      ! (One could consider a more accurate interpolation with
-      !  gradients, or even just running it through Grad_Gauss
-      !  to get iterativelly improved face temperature values)
-      temp_f =        Grid % f(s)  * t % n(c1)  &
-             + (1.0 - Grid % f(s)) * t % n(c2)
+      ! (At one point Hamo noticed that using straight "f" for
+      !  interpolation gives too high buoyancy forces, and they
+      !  have consequently been replaced by "fw" int. factors)
+      temp_f =        Grid % fw(s)  * t % n(c1)  &
+             + (1.0 - Grid % fw(s)) * t % n(c2)
 
       ! Density is constant for Boussinesq hypothesis
       ! this linear interpolation should do just fine
