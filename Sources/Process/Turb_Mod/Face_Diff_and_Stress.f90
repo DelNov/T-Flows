@@ -7,10 +7,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
-  real                     :: dif_eff
-  real                     :: phi_stress
-  integer                  :: s
-  integer, intent(in)      :: sc
+  real,        intent(out) :: dif_eff
+  real,        intent(out) :: phi_stress
+  integer,     intent(in)  :: s
+  integer,     intent(in)  :: sc
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow

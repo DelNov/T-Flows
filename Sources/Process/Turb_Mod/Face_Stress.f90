@@ -7,8 +7,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
-  real                     :: f_stress
-  integer                  :: s
+  real,        intent(out) :: f_stress
+  integer,     intent(in)  :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: ui

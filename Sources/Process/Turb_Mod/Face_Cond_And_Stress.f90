@@ -7,9 +7,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
-  real                     :: con_eff
-  real                     :: t_stress
-  integer                  :: s
+  real,        intent(out) :: con_eff
+  real,        intent(out) :: t_stress
+  integer,     intent(in)  :: s
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
