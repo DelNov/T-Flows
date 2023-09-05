@@ -289,9 +289,9 @@
   ! Count number of intersections in a very simple way
   n_int = 0
   do s = 1, Grid % n_faces
-    if(.not. Math % Approx_Real(Grid % xs(s), 0.0) .and.  &
-       .not. Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
-       .not. Math % Approx_Real(Grid % zs(s), 0.0)) then
+    if(.not. Math % Approx_Real(Front % xs(s), 0.0) .and.  &
+       .not. Math % Approx_Real(Front % ys(s), 0.0) .and.  &
+       .not. Math % Approx_Real(Front % zs(s), 0.0)) then
       n_int = n_int + 1
     end if
   end do
@@ -328,11 +328,11 @@
                           ' NumberOfComponents="3"'   //  &
                           ' format="ascii">'
   do s = 1, Grid % n_faces
-    if(.not. Math % Approx_Real(Grid % xs(s), 0.0) .and.   &
-       .not. Math % Approx_Real(Grid % ys(s), 0.0) .and.   &
-       .not. Math % Approx_Real(Grid % zs(s), 0.0)) then
+    if(.not. Math % Approx_Real(Front % xs(s), 0.0) .and.   &
+       .not. Math % Approx_Real(Front % ys(s), 0.0) .and.   &
+       .not. Math % Approx_Real(Front % zs(s), 0.0)) then
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')       &
-                  IN_5, Grid % xs(s), Grid % ys(s), Grid % zs(s)
+                  IN_5, Front % xs(s), Front % ys(s), Front % zs(s)
     end if
   end do
   write(fu,'(a,a)') IN_4, '</DataArray>'

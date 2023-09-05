@@ -43,6 +43,9 @@
     integer, allocatable :: elem_in_cell(:)
     integer, allocatable :: elems_at_face(:,:)
 
+    ! Face-based interserction with surface
+    real, allocatable :: xs(:), ys(:), zs(:)
+
     contains
 
       procedure :: Allocate_Front

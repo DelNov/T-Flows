@@ -50,12 +50,12 @@
     if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
       dphi1 = phif - phi(c1)
       dphi2 = phi(c2) - phif
-      dx_c1 = Grid % xs(s) - Grid % xc(c1)
-      dy_c1 = Grid % ys(s) - Grid % yc(c1)
-      dz_c1 = Grid % zs(s) - Grid % zc(c1)
-      dx_c2 = Grid % xc(c2) - Grid % xs(s)
-      dy_c2 = Grid % yc(c2) - Grid % ys(s)
-      dz_c2 = Grid % zc(c2) - Grid % zs(s)
+      dx_c1 = Vof % Front % xs(s) - Grid % xc(c1)
+      dy_c1 = Vof % Front % ys(s) - Grid % yc(c1)
+      dz_c1 = Vof % Front % zs(s) - Grid % zc(c1)
+      dx_c2 = Grid % xc(c2) - Vof % Front % xs(s)
+      dy_c2 = Grid % yc(c2) - Vof % Front % ys(s)
+      dz_c2 = Grid % zc(c2) - Vof % Front % zs(s)
     end if
 
     ! On the boundaries

@@ -36,9 +36,9 @@
   !-----------!
   n_fac = 0
   Front % elems_at_face(:,:) = 0  ! not at surface
-  Grid % xs(:) = 0.0
-  Grid % ys(:) = 0.0
-  Grid % zs(:) = 0.0
+  Front % xs(:) = 0.0
+  Front % ys(:) = 0.0
+  Front % zs(:) = 0.0
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
@@ -61,9 +61,9 @@
       w2 = abs(phi_c1 - 0.5) / abs(phi_c1 - phi_c2)
 
       ! Intersection point (dx, dy and dz are to take care of periodicity)
-      Grid % xs(s) = w1 * Grid % xc(c1) + w2 * (Grid % xc(c1) + Grid % dx(s))
-      Grid % ys(s) = w1 * Grid % yc(c1) + w2 * (Grid % yc(c1) + Grid % dy(s))
-      Grid % zs(s) = w1 * Grid % zc(c1) + w2 * (Grid % zc(c1) + Grid % dz(s))
+      Front % xs(s) = w1 * Grid % xc(c1) + w2 * (Grid % xc(c1) + Grid % dx(s))
+      Front % ys(s) = w1 * Grid % yc(c1) + w2 * (Grid % yc(c1) + Grid % dy(s))
+      Front % zs(s) = w1 * Grid % zc(c1) + w2 * (Grid % zc(c1) + Grid % dz(s))
 
       ! Store the elements at this face: essentially just
       ! copy the elements at cells surrounding this face

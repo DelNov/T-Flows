@@ -41,6 +41,11 @@
   allocate(Front % elem_in_cell (-nb:nc));  Front % elem_in_cell (:)   = 0
   allocate(Front % elems_at_face  (2,nf));  Front % elems_at_face(:,:) = 0
 
+  ! Face-based intersection with surface (needed for phase change)
+  allocate(Front % xs(nf));  Front % xs(:) = 0.0
+  allocate(Front % ys(nf));  Front % ys(:) = 0.0
+  allocate(Front % zs(nf));  Front % zs(:) = 0.0
+
   ! Initialize front's local variables
   call Front % Initialize_Front()
 

@@ -29,7 +29,7 @@
     type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
     type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
     type(Front_Type)          :: Front     ! pointer to Front (simple surface)
-    type(Surf_Type)           :: surf      ! pointer to surface
+    type(Surf_Type)           :: Surf      ! pointer to surface
 
     ! Volume fraction (colour function) and its smooth variant
     type(Var_Type) :: fun

@@ -10,12 +10,14 @@
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: s, fu
+  type(Grid_Type),  pointer :: Grid
+  type(Front_Type), pointer :: Front
+  integer                   :: s, fu
 !==============================================================================!
 
   ! Take aliases
-  Grid => Flow % pnt_grid
+  Grid  => Flow % pnt_grid
+  Front => Vof % Front
 
   call File % Append_For_Writing_Ascii('stefans_solution.dat', fu)
 
@@ -25,9 +27,9 @@
 
       ! Write down Stefan's solution
       if(Iter % Current() .eq. 1               .and.  &
-         Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
-         Math % Approx_Real(Grid % zs(s), 0.0)) then
-        write(fu,  '(99(es12.4))') Time % Curr_Dt() * Flow % dt, Grid % xs(s)
+         Math % Approx_Real(Front % ys(s), 0.0) .and.  &
+         Math % Approx_Real(Front % zs(s), 0.0)) then
+        write(fu,  '(99(es12.4))') Time % Curr_Dt() * Flow % dt, Front % xs(s)
       end if
 
     end if

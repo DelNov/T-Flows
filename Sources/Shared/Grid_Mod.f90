@@ -122,9 +122,6 @@
     ! Face coordinates
     real, allocatable :: xf(:), yf(:), zf(:)
 
-    ! Face-based interserction with surface
-    real, allocatable :: xs(:), ys(:), zs(:)
-
     ! Vectors connecting face center with face cell centers connection
     real, allocatable :: rx(:), ry(:), rz(:)
 
