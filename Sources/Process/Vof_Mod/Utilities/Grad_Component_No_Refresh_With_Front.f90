@@ -16,6 +16,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
+  type(Front_Type), pointer :: Front
   integer                   :: s, c1, c2
   real                      :: dphi1, dphi2
   real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
@@ -26,8 +27,9 @@
 !==============================================================================!
 
   ! Take alias
-  Grid => Vof % pnt_grid
-  Flow => Vof % pnt_flow
+  Grid  => Vof % pnt_grid
+  Flow  => Vof % pnt_flow
+  Front => Vof % Front
 
   ! Initialize gradients
   phii(1:Grid % n_cells) = 0.
@@ -47,7 +49,7 @@
     dz_c2 = Grid % dz(s)
 
     ! If face is at the front, reduce the extents of the stencil
-    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
+    if(Front % intersects_face(s)) then
       dphi1 = phif - phi(c1)
       dphi2 = phi(c2) - phif
       dx_c1 = Vof % Front % xs(s) - Grid % xc(c1)

@@ -176,13 +176,15 @@
     !      and add heat transferred to the interface      !
     !-----------------------------------------------------!
     if(Flow % mass_transfer) then
-      if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
+      if(Vof % Front % intersects_face(s)) then
         a12  = 0.0
         a21  = 0.0
-        f_ex = 0.0  ! included in q_int
-        f_im = 0.0  ! phases are detached
-        q_int(c1) = q_int(c1) + Vof % q_int(1,s)
-        q_int(c2) = q_int(c2) - Vof % q_int(2,s)
+        f_ex = 0.0
+        f_im = 0.0
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + Vof % a12(s)
+        b(c1) = b(c1) + Vof % a12(s) * Vof % t_sat
+        A % val(A % dia(c2)) = A % val(A % dia(c2)) + Vof % a21(s)
+        b(c2) = b(c2) + Vof % a21(s) * Vof % t_sat
       end if
     end if
 

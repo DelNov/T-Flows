@@ -35,7 +35,7 @@
   !           !
   !-----------!
   n_fac = 0
-  Front % elems_at_face(:,:) = 0  ! not at surface
+  Front % intersects_face(:) = .false.  ! not at surface
   Front % xs(:) = 0.0
   Front % ys(:) = 0.0
   Front % zs(:) = 0.0
@@ -68,8 +68,7 @@
       ! Store the elements at this face: essentially just
       ! copy the elements at cells surrounding this face
       n_fac = n_fac + 1
-      Front % elems_at_face(1, s) = Front % elem_in_cell(c1)
-      Front % elems_at_face(2, s) = Front % elem_in_cell(c2)
+      Front % intersects_face(s) = .true.
 
     end if  ! face crosses 0.5
   end do    ! through faces

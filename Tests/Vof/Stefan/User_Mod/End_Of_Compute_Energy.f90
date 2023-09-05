@@ -23,10 +23,10 @@
 
   do s = 1, Grid % n_faces
 
-    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
+    if(Front % intersects_face(s)) then
 
       ! Write down Stefan's solution
-      if(Iter % Current() .eq. 1               .and.  &
+      if(Iter % Current() .eq. 1                .and.  &
          Math % Approx_Real(Front % ys(s), 0.0) .and.  &
          Math % Approx_Real(Front % zs(s), 0.0)) then
         write(fu,  '(99(es12.4))') Time % Curr_Dt() * Flow % dt, Front % xs(s)

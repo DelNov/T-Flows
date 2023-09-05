@@ -507,14 +507,15 @@
         save_03(c1) = Flow % t % z(c1)
       end do
 
-      if(.not. Flow % mass_transfer) then
-        call Flow % Grad_Variable(Flow % t)
-      else
+      if(Flow % mass_transfer) then
         call Vof % Calculate_Grad_Matrix_With_Front()
         call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
         call Flow % Calculate_Grad_Matrix()
+      else
+        call Flow % Grad_Variable(Flow % t)
       end if
 
+      ! Single-phase or mixture (in case of multiphase) gradients
       call Results % Save_Vtu_Vector_Real("Temperature Gradients [K/m]",  &
                                           plot_inside,                    &
                                           save_01(c_f:c_l),               &
@@ -522,6 +523,23 @@
                                           save_03(c_f:c_l),               &
                                           f8, f9, data_offset, run)
 
+      ! Phase gradients (for cases with mass transfer)
+      if(Flow % mass_transfer) then
+        call Results % Save_Vtu_Vector_Real(                                &
+                                 "Temperature Gradients from Phase 0 [K/m]",&
+                                            plot_inside,                    &
+                                            Vof % t_0 % x(c_f:c_l),         &
+                                            Vof % t_0 % y(c_f:c_l),         &
+                                            Vof % t_0 % z(c_f:c_l),         &
+                                            f8, f9, data_offset, run)
+        call Results % Save_Vtu_Vector_Real(                                &
+                                 "Temperature Gradients from Phase 1 [K/m]",&
+                                            plot_inside,                    &
+                                            Vof % t_1 % x(c_f:c_l),         &
+                                            Vof % t_1 % y(c_f:c_l),         &
+                                            Vof % t_1 % z(c_f:c_l),         &
+                                            f8, f9, data_offset, run)
+      end if
     end if
 
     !-------------------------!

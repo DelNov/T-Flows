@@ -328,9 +328,7 @@
                           ' NumberOfComponents="3"'   //  &
                           ' format="ascii">'
   do s = 1, Grid % n_faces
-    if(.not. Math % Approx_Real(Front % xs(s), 0.0) .and.   &
-       .not. Math % Approx_Real(Front % ys(s), 0.0) .and.   &
-       .not. Math % Approx_Real(Front % zs(s), 0.0)) then
+    if(Front % intersects_face(s)) then
       write(fu, '(a,1pe16.6e4,1pe16.6e4,1pe16.6e4)')       &
                   IN_5, Front % xs(s), Front % ys(s), Front % zs(s)
     end if

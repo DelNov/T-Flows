@@ -41,10 +41,10 @@
 
     ! Front to static Grid connectivity
     integer, allocatable :: elem_in_cell(:)
-    integer, allocatable :: elems_at_face(:,:)
 
     ! Face-based interserction with surface
-    real, allocatable :: xs(:), ys(:), zs(:)
+    logical, allocatable :: intersects_face(:)
+    real,    allocatable :: xs(:), ys(:), zs(:)
 
     contains
 

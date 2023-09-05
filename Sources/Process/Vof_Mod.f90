@@ -64,9 +64,12 @@
     ! For phase change
     real :: t_sat, latent_heat  ! [K, J/kg]
 
-    ! Heat from phase change and index of saturated cells
-    real, allocatable :: q_int(:,:)
-    real, allocatable :: m_dot(:)         ! [kg/s]
+    ! Neighbouring coefficients due to presence of saturated front
+    real, allocatable :: a12(:)
+    real, allocatable :: a21(:)
+    real, allocatable :: m_dot(:)  ! [kg/s]
+
+    type(Var_Type) :: t_0, t_1
 
     ! User define parameters for vof function (fun)
     real    :: courant_max_param
@@ -101,7 +104,7 @@
       !   (convoluted) variant of vof function   !
       !   for eventual estimation of curvature   !
       !------------------------------------------!
-      procedure, private :: Curvature_Csf
+      procedure          :: Curvature_Csf
       procedure, private :: Smooth_Curvature
       procedure          :: Smooth_For_Curvature_Csf
       procedure          :: Smooth_Scalar
@@ -110,6 +113,7 @@
       !   Procedures to be called by other modules   !
       !----------------------------------------------!
       procedure :: Calculate_Grad_Matrix_With_Front
+      procedure :: Extrapolate_Normal_To_Front
       procedure :: Get_Vapour_And_Liquid_Phase
       procedure :: Grad_Component_No_Refresh_With_Front
       procedure :: Grad_Variable_With_Front
@@ -151,6 +155,7 @@
     !   Procedures to be called by other modules   !
     !----------------------------------------------!
 #   include "Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90"
+#   include "Vof_Mod/Utilities/Extrapolate_Normal_To_Front.f90"
 #   include "Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90"
 #   include "Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90"
 #   include "Vof_Mod/Utilities/Grad_Variable_With_Front.f90"

@@ -7,12 +7,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Vof_Type) :: Vof
+  class(Vof_Type), target :: Vof
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
+  type(Front_Type), pointer :: Front
   integer                   :: c, c1, c2, s
   real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
   real                      :: jac, g_inv(6)
@@ -24,8 +25,9 @@
   end if
 
   ! Take alias
-  Grid => Vof % pnt_grid
-  Flow => Vof % pnt_flow
+  Grid  => Vof % pnt_grid
+  Flow  => Vof % pnt_flow
+  Front => Vof % Front
 
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
@@ -54,13 +56,13 @@
     dz_c2 = Grid % dz(s)
 
     ! If face is at the front, reduce the extents of the stencil
-    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
-      dx_c1 = Vof % Front % xs(s) - Grid % xc(c1)
-      dy_c1 = Vof % Front % ys(s) - Grid % yc(c1)
-      dz_c1 = Vof % Front % zs(s) - Grid % zc(c1)
-      dx_c2 = Grid % xc(c2) - Vof % Front % xs(s)
-      dy_c2 = Grid % yc(c2) - Vof % Front % ys(s)
-      dz_c2 = Grid % zc(c2) - Vof % Front % zs(s)
+    if(Front % intersects_face(s)) then
+      dx_c1 = Front % xs(s) - Grid % xc(c1)
+      dy_c1 = Front % ys(s) - Grid % yc(c1)
+      dz_c1 = Front % zs(s) - Grid % zc(c1)
+      dx_c2 = Grid % xc(c2) - Front % xs(s)
+      dy_c2 = Grid % yc(c2) - Front % ys(s)
+      dz_c2 = Grid % zc(c2) - Front % zs(s)
     end if
 
     Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1    ! 1,1

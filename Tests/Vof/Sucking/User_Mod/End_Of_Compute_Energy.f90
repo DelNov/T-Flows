@@ -10,14 +10,16 @@
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: c1, c2, s, fui, fut
-  character(33)            :: profile_name
-  logical, save            :: first_entry = .true.
+  type(Grid_Type),  pointer :: Grid
+  type(Front_Type), pointer :: Front
+  integer                   :: c1, c2, s, fui, fut
+  character(33)             :: profile_name
+  logical, save             :: first_entry = .true.
 !==============================================================================!
 
   ! Take aliases
-  Grid => Flow % pnt_grid
+  Grid  => Flow % pnt_grid
+  Front => Vof % Front
 
   !----------------------------------------!
   !   Write out temperature distribution   !
@@ -34,10 +36,10 @@
          Math % Approx_Real(Grid % zf(s), 0.0)) then
         write(fut, '(99(es12.4))') Grid % xc(c1), Flow % t % n(c1)
       end if
-      if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
-        if(Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
-           Math % Approx_Real(Grid % zs(s), 0.0)) then
-          write(fut, '(99(es12.4))') Grid % xs(s), Vof % t_sat
+      if(Front % intersects_face(s)) then
+        if(Math % Approx_Real(Front % ys(s), 0.0) .and.  &
+           Math % Approx_Real(Front % zs(s), 0.0)) then
+          write(fut, '(99(es12.4))') Front % xs(s), Vof % t_sat
         end if
       end if
     end if
@@ -75,13 +77,13 @@
   end if
 
   do s = 1, Grid % n_faces
-    if(any(Vof % Front % elems_at_face(1:2,s) .ne. 0)) then
+    if(Front % intersects_face(s)) then
 
       ! Write down Stefan's solution
       if(Iter % Current() .eq. 1               .and.  &
-         Math % Approx_Real(Grid % ys(s), 0.0) .and.  &
-         Math % Approx_Real(Grid % zs(s), 0.0)) then
-        write(fui,  '(99(es12.4))')  Time % Curr_Dt() * Flow % dt, Grid % xs(s)
+         Math % Approx_Real(Front % ys(s), 0.0) .and.  &
+         Math % Approx_Real(Front % zs(s), 0.0)) then
+        write(fui,  '(99(es12.4))')  Time % Curr_Dt() * Flow % dt, Front % xs(s)
       end if
 
     end if

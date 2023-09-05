@@ -39,7 +39,7 @@
   nc =  Grid % n_cells
   nf =  Grid % n_faces
   allocate(Front % elem_in_cell (-nb:nc));  Front % elem_in_cell (:)   = 0
-  allocate(Front % elems_at_face  (2,nf));  Front % elems_at_face(:,:) = 0
+  allocate(Front % intersects_face(nf));    Front % intersects_face(:) = .false.
 
   ! Face-based intersection with surface (needed for phase change)
   allocate(Front % xs(nf));  Front % xs(:) = 0.0
