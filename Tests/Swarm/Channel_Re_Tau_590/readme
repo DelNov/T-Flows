@@ -11,3 +11,10 @@ Phase 2:
 
 Use the control file control_b_with_particles to compute flow with particles,
 gather particle statistics and another flow statistics.
+
+# --------------------------------- #
+# Running the case use bash scripts
+# --------------------------------- #
+1- submit the first bash script for advecting the fluid flow by typing: sh runCaseFluid.sh
+2- Once the flow is fully developed and the first simulation is over, start advancing particles
+   by running: sh runCaseParticles.sh
