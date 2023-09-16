@@ -3,7 +3,7 @@
 # Specify the number of processors here (for parallel mode): 
 NUMBEROFCPUS=4
 
-# Cleaning any old files 
+# Cleaning old files 
 rm -f out* *.faces *-monit* readme
 rm -f *.cfn *.dim *.pvtu *.vtu
 rm -rf Sub*
