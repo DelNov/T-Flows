@@ -40,11 +40,10 @@
   else
 
     print *, '# Input problem name: (without extension)'
-    call File % Read_Line(5)
-    read(Line % tokens(1), *)  problem_name(1)
+    problem_name(1) = File % Single_Word_From_Keyboard()
 
     print *, '# Number of subdomains:'
-    read(*,*)  n_sub
+    n_sub = File % Single_Int_From_Keyboard()
 
   end if
 

@@ -32,7 +32,7 @@
   print '(a)', ' #========================================================'
   print '(a)', ' # Enter the grid file name you are importing (with ext.):'
   print '(a)', ' #--------------------------------------------------------'
-  read(*,*) file_name
+  file_name = File % Single_Word_From_Keyboard()
 
   !-----------------------------------------------!
   !                                               !
@@ -121,8 +121,7 @@
   print '(a)', ' #================================================='
   print '(a)', ' # Would you like to create a dual grid? (yes/no)'
   print '(a)', ' #-------------------------------------------------'
-  call File % Read_Line(5)
-  answer = Line % tokens(1)
+  answer = File % Single_Word_From_Keyboard()
   call String % To_Upper_Case(answer)
 
   n_grids = 1

@@ -95,14 +95,14 @@
   integer, intent(in) :: ask
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b, i, j
-  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
+  integer              :: c11, c12, c21, c22, s1, s2, cnt_bnd, cnt_per
   integer              :: reg_per, n_per, number_faces
   real                 :: xs2, ys2, zs2
   real                 :: t, tot_surf, dis, min_dis, max_dis
   real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
   real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
   integer, allocatable :: b_face(:)
-  character(SL)        :: answer
+  character(SL)        :: answer, bou_cen
   real                 :: factor, prod
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Convert)
@@ -191,9 +191,9 @@
     print *, '# Type 1 for barycentric placement'
     print *, '# Type 2 for orthogonal placement'
     print *, '#------------------------------------'
-    read(*,*) bou_cen
+    bou_cen = File % Single_Word_From_Keyboard()
   else
-    bou_cen = 1
+    bou_cen = '1'
   end if
 
   do s = 1, Grid % n_faces
@@ -211,7 +211,7 @@
       Grid % xc(c2) = Grid % xc(c1) + Grid % sx(s)*t / tot_surf
       Grid % yc(c2) = Grid % yc(c1) + Grid % sy(s)*t / tot_surf
       Grid % zc(c2) = Grid % zc(c1) + Grid % sz(s)*t / tot_surf
-      if(bou_cen .eq. 1) then
+      if(bou_cen .eq. '1') then
         Grid % xc(c2) = Grid % xf(s)
         Grid % yc(c2) = Grid % yf(s)
         Grid % zc(c2) = Grid % zf(s)

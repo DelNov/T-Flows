@@ -38,6 +38,8 @@
       procedure :: Read_Binary_Real8_Array
       procedure :: Read_Line
       procedure :: Set_Name
+      procedure :: Single_Int_From_Keyboard
+      procedure :: Single_Word_From_Keyboard
 
   end type
 
@@ -58,7 +60,6 @@
 #   include "File_Mod/Is_In_Binary_Format.f90"
 #   include "File_Mod/Is_In_Unix_Format.f90"
 #   include "File_Mod/Line_Length.f90"
-#   include "File_Mod/Set_Name.f90"
 #   include "File_Mod/Open_For_Reading_Ascii.f90"
 #   include "File_Mod/Open_For_Reading_Binary.f90"
 #   include "File_Mod/Open_For_Writing_Ascii.f90"
@@ -68,5 +69,8 @@
 #   include "File_Mod/Read_Binary_Real4_Array.f90"
 #   include "File_Mod/Read_Binary_Real8_Array.f90"
 #   include "File_Mod/Read_Line.f90"
+#   include "File_Mod/Set_Name.f90"
+#   include "File_Mod/Single_Int_From_Keyboard.f90"
+#   include "File_Mod/Single_Word_From_Keyboard.f90"
 
   end module
