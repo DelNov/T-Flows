@@ -447,6 +447,8 @@ if b:fortran_dialect == "f08"
 " Constants from Region_Mod
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
+" Constants from Solver_Mod
+  syn keyword fortranConstant      NATIVE  PETSC
 " Constants from various procedures
   syn keyword fortranConstant      YES  NO  DEBUG  BEGIN
 " After the constants, I have alternating definitions of types and objects derived from them
@@ -458,8 +460,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Math           Sort           File           String            Work           Line  Tok
   syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type         Vof_Type       Swarm_Type
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur         Vof            Swarm Swr
-  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type
-  syn keyword fortranObjectTflows                 v_flux         Iter
+  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type
+  syn keyword fortranObjectTflows                 v_flux         Iter           Metis
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type         Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type
