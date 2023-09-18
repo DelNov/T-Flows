@@ -210,16 +210,7 @@
                         ' (solver for scalars)')
 
   ! Call linear solver to solve them
-  call Sol % Run(phi % solver,     &
-                 phi % prec,       &
-                 phi % prec_opts,  &
-                 A,                &
-                 phi % n,          &
-                 b,                &
-                 phi % mniter,     &
-                 phi % eniter,     &
-                 phi % tol,        &
-                 phi % res)
+  call Sol % Run(A, phi, b)
 
   call Profiler % Stop(String % First_Upper(phi % solver)  //  &
                        ' (solver for scalars)')
@@ -228,7 +219,7 @@
   row = ceiling(ns/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
   col = nint(ns) - (row-1)*6   ! will be in range 1 - 6
 
-  call Info % Iter_Fill_Scalar_At(row, col, phi % name, phi % res, phi % eniter)
+  call Info % Iter_Fill_Scalar_At(row, col, phi % name, phi % res, phi % niter)
 
   call Flow % Grad_Variable(phi)
 

@@ -166,25 +166,16 @@
                         ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(phi % solver,     &
-                 phi % prec,       &
-                 phi % prec_opts,  &
-                 A,                &
-                 phi % n,          &
-                 b,                &
-                 phi % mniter,     &
-                 phi % eniter,     &
-                 phi % tol,        &
-                 phi % res)
+  call Sol % Run(A, phi, b)
 
   call Profiler % Stop(String % First_Upper(phi % solver)  //  &
                        ' (solver for turbulence)')
 
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then
-    call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % eniter)
+    call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % niter)
   else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info % Iter_Fill_At(4, 2, phi % name, phi % res, phi % eniter)
+    call Info % Iter_Fill_At(4, 2, phi % name, phi % res, phi % niter)
   end if
 
   call Flow % Grad_Variable(phi)

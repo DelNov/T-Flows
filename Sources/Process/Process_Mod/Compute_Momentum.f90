@@ -361,24 +361,14 @@
                             ' (solver for momentum)')
 
       ! Call linear solver
-      call Sol % Run(ui % solver,     &
-                     ui % prec,       &
-                     ui % prec_opts,  &
-                     M,               &
-                     ui % n,          &
-                     b,               &
-                     ui % mniter,     &
-                     ui % eniter,     &
-                     ui % tol,        &
-                     ui % res,        &
-                     norm = vel_max)
+      call Sol % Run(M, ui, b, norm = vel_max)
 
       call Profiler % Stop(String % First_Upper(ui % solver)  //  &
                            ' (solver for momentum)')
 
       ! Fill the info screen up
       if (Flow % p_m_coupling == SIMPLE) then
-        call Info % Iter_Fill_At(1, i, ui % name, ui % res, ui % eniter)
+        call Info % Iter_Fill_At(1, i, ui % name, ui % res, ui % niter)
       end if
 
     end if

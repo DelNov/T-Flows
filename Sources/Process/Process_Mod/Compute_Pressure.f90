@@ -188,17 +188,7 @@
   end if
 
   ! Call linear solver
-  call Sol % Run(pp % solver,     &
-                 pp % prec,       &
-                 pp % prec_opts,  &
-                 A,               &
-                 pp % n,          &
-                 b,               &
-                 pp % mniter,     &  ! max number of iterations
-                 pp % eniter,     &  ! executed number of iterations
-                 pp % tol,        &  ! tolerance
-                 pp % res,        &  ! final residual
-                 norm = p_nor)       ! number for normalisation
+  call Sol % Run(A, pp, b, norm = p_nor)
 
   ! Remove singularity from the matrix
   if(.not. Flow % has_pressure) then
@@ -209,10 +199,10 @@
                        ' (solver for pressure)')
 
   if (Flow % p_m_coupling == SIMPLE) then
-    call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
+    call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
   else
     if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % eniter)
+      call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
     end if
   end if
 

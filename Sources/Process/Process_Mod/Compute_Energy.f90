@@ -277,22 +277,13 @@
                         ' (solver for energy)')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(t % solver,     &
-                 t % prec,       &
-                 t % prec_opts,  &
-                 A,              &
-                 t % n,          &
-                 b,              &
-                 t % mniter,     &
-                 t % eniter,     &
-                 t % tol,        &
-                 t % res)
+  call Sol % Run(A, t, b)
 
   call Profiler % Stop(String % First_Upper(t % solver)  //  &
                        ' (solver for energy)')
 
   ! Print some info on the screen
-  call Info % Iter_Fill_At(1, 6, t % name, t % res, t % eniter)
+  call Info % Iter_Fill_At(1, 6, t % name, t % res, t % niter)
 
   ! Gradients
   if(.not. Flow % mass_transfer) then

@@ -35,7 +35,7 @@
     call Control % Solver_For_Momentum               (ui % solver)
     call Control % Preconditioner_For_System_Matrix  (ui % prec)
     call Control % Tolerance_For_Momentum_Solver     (ui % tol)
-    call Control % Max_Iterations_For_Momentum_Solver(ui % mniter)
+    call Control % Max_Iterations_For_Momentum_Solver(ui % miter)
   end do
 
   !-------------------------!
@@ -44,7 +44,7 @@
   call Control % Solver_For_Pressure               (Flow % pp % solver)
   call Control % Preconditioner_For_System_Matrix  (Flow % pp % prec)
   call Control % Tolerance_For_Pressure_Solver     (Flow % pp % tol)
-  call Control % Max_Iterations_For_Pressure_Solver(Flow % pp % mniter)
+  call Control % Max_Iterations_For_Pressure_Solver(Flow % pp % miter)
 
   !------------------------------!
   !   Related to wall distance   !
@@ -53,7 +53,7 @@
   call Control % Preconditioner_For_System_Matrix    (Flow % wall_dist % prec)
   call Control % Tolerance_For_Wall_Distance_Solver  (Flow % wall_dist % tol)
   call Control % Max_Iterations_For_Wall_Distance_Solver  &
-                                                     (Flow % wall_dist % mniter)
+                                                     (Flow % wall_dist % miter)
 
   !--------------------------!
   !   Related to potential   !  (for flow field initialization)
@@ -61,7 +61,7 @@
   call Control % Solver_For_Potential               (Flow % pot % solver)
   call Control % Preconditioner_For_System_Matrix   (Flow % pot % prec)
   call Control % Tolerance_For_Potential_Solver     (Flow % pot % tol)
-  call Control % Max_Iterations_For_Potential_Solver(Flow % pot % mniter)
+  call Control % Max_Iterations_For_Potential_Solver(Flow % pot % miter)
 
   !------------------------------!
   !   Related to heat transfer   !
@@ -70,7 +70,7 @@
     call Control % Solver_For_Energy                (Flow % t % solver)
     call Control % Preconditioner_For_System_Matrix (Flow % t % prec)
     call Control % Tolerance_For_Energy_Solver      (Flow % t % tol)
-    call Control % Max_Iterations_For_Energy_Solver (Flow % t % mniter)
+    call Control % Max_Iterations_For_Energy_Solver (Flow % t % miter)
   end if
 
   !--------------------------------!
@@ -80,7 +80,7 @@
     call Control % Solver_For_Vof                  (Vof % fun % solver)
     call Control % Preconditioner_For_System_Matrix(Vof % fun % prec)
     call Control % Tolerance_For_Vof_Solver        (Vof % fun % tol)
-    call Control % Max_Iterations_For_Vof_Solver   (Vof % fun % mniter)
+    call Control % Max_Iterations_For_Vof_Solver   (Vof % fun % miter)
   end if
 
   !--------------------------------!
@@ -91,7 +91,7 @@
     call Control % Solver_For_Scalars               (phi % solver)
     call Control % Preconditioner_For_System_Matrix (phi % prec)
     call Control % Tolerance_For_Scalars_Solver     (phi % tol)
-    call Control % Max_Iterations_For_Scalars_Solver(phi % mniter)
+    call Control % Max_Iterations_For_Scalars_Solver(phi % miter)
   end do
 
   !------------------------------!
@@ -113,7 +113,7 @@
     call Control % Solver_For_Turbulence               (tq % solver)
     call Control % Preconditioner_For_System_Matrix    (tq % prec)
     call Control % Tolerance_For_Turbulence_Solver     (tq % tol)
-    call Control % Max_Iterations_For_Turbulence_Solver(tq % mniter)
+    call Control % Max_Iterations_For_Turbulence_Solver(tq % miter)
   end do
 
   end subroutine

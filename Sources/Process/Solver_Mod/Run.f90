@@ -1,53 +1,40 @@
 !==============================================================================!
-  subroutine Run(Sol,                      &
-                 solver, prec, prec_opts,  &
-                 A, x, b,                  &
-                 miter, niter,             &
-                 tol, fin_res,             &
-                 norm)
+  subroutine Run(Sol, A, phi, b, norm)
 !------------------------------------------------------------------------------!
 !   From this procedure, the code branches either to Native or Petsc solver    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Solver_Type) :: Sol
-  character(*)       :: solver          ! solver and preconditioner as ...
-  character(*)       :: prec            ! ... specifed in the control file
-  character(SL)      :: prec_opts(MSI)  ! ... specifed in the control file
   type(Matrix_Type)  :: A
-  real               :: x(-Sol % Nat % pnt_grid % n_bnd_cells :  &
-                           Sol % Nat % pnt_grid % n_cells)
-  real               :: b( Sol % Nat % pnt_grid % n_cells)
-  integer            :: miter           ! maximum and actual ...
-  integer            :: niter           ! ... number of iterations
-  real               :: tol             ! desired tolerance
-  real               :: fin_res         ! final (achieved) residual
-  real, optional     :: norm            ! normalization
+  type(Var_Type)     :: phi
+  real               :: b(Sol % Nat % pnt_grid % n_cells)
+  real, optional     :: norm                              ! normalization
 !==============================================================================!
 
   ! Call linear solver to solve the equations
   if(Sol % solvers == NATIVE) then
-    call Sol % Nat % Solve_Native(solver,   &
-                                  prec,     &
-                                  A,        &
-                                  x,        &
-                                  b,        &
-                                  miter,    &
-                                  niter,    &
-                                  tol,      &
-                                  fin_res,  &
+    call Sol % Nat % Solve_Native(phi % solver,   &  ! solver
+                                  phi % prec,     &  ! preconditioner
+                                  A,              &
+                                  phi % n,        &
+                                  b,              &
+                                  phi % miter,    &  ! maximum and performed...
+                                  phi % niter,    &  ! ... number of iterations
+                                  phi % tol,      &  ! desired tolerance
+                                  phi % res,      &  ! final (achieved) resid.
                                   norm)
   else
-    call Sol % Pet % Solve_Petsc(solver,     &
-                                 prec,       &
-                                 prec_opts,  &
-                                 A,          &
-                                 x,          &
-                                 b,          &
-                                 miter,      &
-                                 niter,      &
-                                 tol,        &
-                                 fin_res)
+    call Sol % Pet % Solve_Petsc(phi % solver,     &  ! solver
+                                 phi % prec,       &  ! preconditioner
+                                 phi % prec_opts,  &
+                                 A,                &
+                                 phi % n,          &
+                                 b,                &
+                                 phi % miter,      &  ! maximum and performed...
+                                 phi % niter,      &  ! ... number of iterations
+                                 phi % tol,        &  ! desired tolerance
+                                 phi % res)           ! final (achieved) resid.
   end if
 
   end subroutine

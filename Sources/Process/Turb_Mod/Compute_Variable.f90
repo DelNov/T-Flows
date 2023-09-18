@@ -242,16 +242,7 @@
                         ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(phi % solver,     &
-                 phi % prec,       &
-                 phi % prec_opts,  &
-                 A,                &
-                 phi % n,          &
-                 b,                &
-                 phi % mniter,     &
-                 phi % eniter,     &
-                 phi % tol,        &
-                 phi % res)
+  call Sol % Run(A, phi, b)
 
   call Profiler % Stop(String % First_Upper(phi % solver)  //  &
                        ' (solver for turbulence)')
@@ -280,14 +271,14 @@
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % eniter)
+      call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % niter)
     if(phi % name .eq. 'EPS')  &
-      call Info % Iter_Fill_At(3, 2, phi % name, phi % res, phi % eniter)
+      call Info % Iter_Fill_At(3, 2, phi % name, phi % res, phi % niter)
     if(phi % name .eq. 'ZETA')  &
-      call Info % Iter_Fill_At(3, 3, phi % name, phi % res, phi % eniter)
+      call Info % Iter_Fill_At(3, 3, phi % name, phi % res, phi % niter)
     if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  &
-      call Info % Iter_Fill_At(3, 5, phi % name, phi % res, phi % eniter)
+      call Info % Iter_Fill_At(3, 5, phi % name, phi % res, phi % niter)
     end if
   end if
 

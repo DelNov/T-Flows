@@ -306,7 +306,6 @@ SRC_F_MOD = Const_Mod.f90         \
 # Sources for modules in the local directory
 SRC_F_MOD += Point_Mod.f90          \
              Bulk_Mod.f90           \
-             Var_Mod.f90            \
              Face_Mod.f90           \
              Vert_Mod.f90           \
              Elem_Mod.f90           \
@@ -315,6 +314,7 @@ SRC_F_MOD += Point_Mod.f90          \
              Vector_Mod.f90         \
              Native_Mod.f90         \
              Petsc_Mod.f90          \
+             Var_Mod.f90            \
              Solver_Mod.f90         \
              Time_Mod.f90           \
              Numerics_Mod.f90       \

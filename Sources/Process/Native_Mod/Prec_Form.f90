@@ -20,6 +20,8 @@
   Unused(Nat)
 !==============================================================================!
 
+  call Profiler % Start('Native_Prec_Form (all solvers)')
+
   ! Take some aliases
   a_col => A % col
   a_row => A % row
@@ -60,5 +62,7 @@
     end do
     !$omp end parallel do
   end if
+
+  call Profiler % Stop('Native_Prec_Form (all solvers)')
 
   end subroutine

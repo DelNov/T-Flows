@@ -189,23 +189,14 @@
     !---------------------------------!
 
     ! Call linear solver to solve the equations
-    call Sol % Run(phi % solver,     &
-                   phi % prec,       &
-                   phi % prec_opts,  &
-                   A,                &
-                   phi % n,          &
-                   b,                &
-                   phi % mniter,     &
-                   phi % eniter,     &
-                   phi % tol,        &
-                   phi % res)
+    call Sol % Run(A, phi, b)
 
     if(First_Proc()) then
-      print '(a,i4,a,e12.4)', ' # Computed wall distance in ',  phi % eniter,  &
+      print '(a,i4,a,e12.4)', ' # Computed wall distance in ',  phi % niter,  &
                               ' iterations with residual: ',    phi % res
     end if
 
-    if(phi % eniter .eq. 0) goto 1
+    if(phi % niter .eq. 0) goto 1
 
     call Grid % Exchange_Cells_Real(phi % n)
 

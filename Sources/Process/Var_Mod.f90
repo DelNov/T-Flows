@@ -1,7 +1,7 @@
 !==============================================================================!
   module Var_Mod
 !------------------------------------------------------------------------------!
-  use Grid_Mod
+  use Petsc_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -39,8 +39,8 @@
     integer       :: td_scheme       ! time-disretization
     real          :: tol             ! linear solver tolerance
     real          :: urf             ! under-relaxation factor
-    integer       :: mniter          ! max number of iterations for variable
-    integer       :: eniter          ! executed number of iterations for var
+    integer       :: miter           ! max number of iterations for variable
+    integer       :: niter           ! executed number of iterations for var
   end type
 
   contains
