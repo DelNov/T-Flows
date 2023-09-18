@@ -447,8 +447,8 @@ if b:fortran_dialect == "f08"
 " Constants from Region_Mod
   syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
-" Constants from Solver_Mod
-  syn keyword fortranConstant      NATIVE  PETSC
+" Constants from Solver_Mod and other related modules
+  syn keyword fortranConstant      NATIVE  PETSC  PETSC_ACTIVE  OUT_OF_ITS
 " Constants from various procedures
   syn keyword fortranConstant      YES  NO  DEBUG  BEGIN
 " After the constants, I have alternating definitions of types and objects derived from them
@@ -469,7 +469,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Process_Type
   syn keyword fortranObjectTflows  A  M           vector         Sol            Nat               Pet            Process
   syn keyword fortranTypeTflows    Var_Type
-  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
+  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
 " Items which follow are not really objects, but I don't know where else to put them
   syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
 " Macros might need a special group of their own.
