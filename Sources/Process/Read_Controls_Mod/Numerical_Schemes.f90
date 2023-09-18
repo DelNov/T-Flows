@@ -38,6 +38,8 @@
     Flow % inside_piso_loop = .false.
   end if
 
+  call Control % Blend_System_Matrices(Flow % blend_matrices, .false.)
+
   ! Improvements to Rhie and Chow method (Choi, Gu)
   call Control % Choi_Correction(Flow % choi_correction, .false.)
   call Control % Gu_Correction  (Flow % gu_correction,   .false.)

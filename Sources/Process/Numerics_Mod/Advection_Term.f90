@@ -1,15 +1,16 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, b)
+  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, b, blend_matrix)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize advection term in conservation equations.               !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Var_Type) :: phi
-  real           :: coef(-phi % pnt_grid % n_bnd_cells:  &
-                          phi % pnt_grid % n_cells)
-  real           :: v_flux(phi % pnt_grid % n_faces)
-  real           :: b(:)
+  type(Var_Type), intent(in)     :: phi
+  real,           intent(in)     :: coef(-phi % pnt_grid % n_bnd_cells:  &
+                                          phi % pnt_grid % n_cells)
+  real,           intent(in)     :: v_flux(phi % pnt_grid % n_faces)
+  real,           intent(inout)  :: b(:)
+  logical,        intent(in)     :: blend_matrix
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer  :: Grid
   real                      :: phif          ! phi and coef at the cell face
@@ -37,9 +38,9 @@
   advect(:) = 0.0
   upwind(:) = 0.0
 
-  !-----------------------------------!
-  !   Browse through boundary faces   !
-  !-----------------------------------!
+  !----------------------------------------------!
+  !   Compute advection term on the boundaries   !
+  !----------------------------------------------!
   do reg = Boundary_Regions()
     do s = Faces_In_Region(reg)
       c1 = Grid % faces_c(1,s)
@@ -58,19 +59,32 @@
       ! Compute advection term (volume-conservative form)
       advect(c1) = advect(c1) - v_flux(s) * phif * coef(c1)
 
-      ! Store upwinded part of the advection term
-      if(v_flux(s) .lt. 0) then   ! from c2 to c1
-        upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c2) * coef(c1)
-      else
-        upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c1) * coef(c1)
-      end if
-
     end do  ! faces
   end do    ! regions
 
-  !---------------------------------!
-  !   Browse through inside faces   !
-  !---------------------------------!
+  !-------------------------------------------!
+  !   Compute upwind term on the boundaries   !
+  !-------------------------------------------!
+  if(blend_matrix) then
+    do reg = Boundary_Regions()
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+
+        ! Store upwinded part of the advection term
+        if(v_flux(s) .lt. 0) then   ! from c2 to c1
+          upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c2) * coef(c1)
+        else
+          upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c1) * coef(c1)
+        end if
+
+      end do  ! faces
+    end do    ! regions
+  end if
+
+  !----------------------------------------------!
+  !   Compute advection term inside the domain   !
+  !----------------------------------------------!
   do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
@@ -88,16 +102,27 @@
     advect(c1) = advect(c1) - v_flux(s) * phif * coef(c1)
     advect(c2) = advect(c2) + v_flux(s) * phif * coef(c2)
 
-    ! Store upwinded part of the advection term
-    if(v_flux(s) .lt. 0) then   ! from c2 to c1
-      upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c2) * coef(c1)
-      upwind(c2) = upwind(c2) + v_flux(s) * phi % n(c2) * coef(c2)
-    else
-      upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c1) * coef(c1)
-      upwind(c2) = upwind(c2) + v_flux(s) * phi % n(c1) * coef(c2)
-    end if
-
   end do  ! through faces in domain
+
+  !-------------------------------------------!
+  !   Compute upwind term inside the domain   !
+  !-------------------------------------------!
+  if(blend_matrix) then
+    do s = Faces_In_Domain()
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+
+      ! Store upwinded part of the advection term
+      if(v_flux(s) .lt. 0) then   ! from c2 to c1
+        upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c2) * coef(c1)
+        upwind(c2) = upwind(c2) + v_flux(s) * phi % n(c2) * coef(c2)
+      else
+        upwind(c1) = upwind(c1) - v_flux(s) * phi % n(c1) * coef(c1)
+        upwind(c2) = upwind(c2) + v_flux(s) * phi % n(c1) * coef(c2)
+      end if
+
+    end do  ! through faces in domain
+  end if
 
   !------------------------------------------------!
   !   Source term contains difference between      !

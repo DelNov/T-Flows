@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #---------
-  PROBLEM_NAME     backstep_orthogonal
+  PROBLEM_NAME     backstep_orthogonal_36
   HEAT_TRANSFER    no
 
   TIME_STEP                       0.00375  # 0.02  0.01  0.005  0.00375  0.0025
@@ -11,6 +11,8 @@
   SAVE_RESULTS_AT_BOUNDARIES     no
 
   SAVE_INITIAL_CONDITION  no
+
+  PROFILER_INFO                  seconds
 
 #-------------------
 # Monitoring points

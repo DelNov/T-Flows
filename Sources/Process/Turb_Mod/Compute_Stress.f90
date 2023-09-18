@@ -82,7 +82,8 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(phi, Flow % density, flux, b)
+  call Numerics_Mod_Advection_Term(phi, Flow % density, flux, b,  &
+                                        Flow % blend_matrices)
 
   !------------------!
   !                  !
@@ -143,8 +144,11 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), 0.0) * Flow % density(c1)
-    a21 = a21  + max(flux(s), 0.0) * Flow % density(c2)
+    ! Blend system matrix if desired to do so
+    if(Flow % blend_matrices) then
+      a12 = a12  - min(flux(s), 0.0) * Flow % density(c1)
+      a21 = a21  + max(flux(s), 0.0) * Flow % density(c2)
+    end if
 
     ! Fill the system matrix
     if(c2  > 0) then

@@ -191,7 +191,8 @@
     !   Advection   !
     !               !
     !---------------!
-    call Numerics_Mod_Advection_Term(ui, Flow % density, v_flux % n, fi)
+    call Numerics_Mod_Advection_Term(ui, Flow % density, v_flux % n, fi,  &
+                                         Flow % blend_matrices)
 
     !---------------!
     !               !
@@ -236,9 +237,11 @@
         cross(c2) = cross(c2) - f_ex + f_im - f_stress * Flow % density(c2)
       end if
 
-      ! Compute the coefficients for the sysytem matrix
-      m12 = m0 - min(v_flux % n(s), 0.0) * Flow % density(c1)
-      m21 = m0 + max(v_flux % n(s), 0.0) * Flow % density(c2)
+      ! Blend system matrix if desired to do so
+      if(Flow % blend_matrices) then
+        m12 = m0 - min(v_flux % n(s), 0.0) * Flow % density(c1)
+        m21 = m0 + max(v_flux % n(s), 0.0) * Flow % density(c2)
+      end if
 
       ! Fill the system matrix
       if(c2 > 0) then

@@ -32,6 +32,7 @@
   BLENDING_COEFFICIENT_FOR_SCALARS         |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_TURBULENCE      |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_VOF             |         1.0                   |   from 0.0 to 1.0
+  BLEND_SYSTEM_MATRICES                    |         yes                   |   no
   CHOI_CORRECTION                          |         no                    |   yes
   GRADIENT_METHOD_FOR_ENERGY               |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_MOMENTUM             |         least_squares         |   gauss_theorem

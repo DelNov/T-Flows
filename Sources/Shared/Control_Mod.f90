@@ -101,6 +101,7 @@
       procedure :: Blending_Coefficient_For_Scalars
       procedure :: Blending_Coefficient_For_Turbulence
       procedure :: Blending_Coefficient_For_Vof
+      procedure :: Blend_System_Matrices
       procedure :: Choi_Correction
       procedure :: Gradient_Method_For_Energy
       procedure :: Gradient_Method_For_Momentum
@@ -300,6 +301,7 @@
 #   include "Control_Mod/Numerics/Blending_Coefficient_For_Scalars.f90"
 #   include "Control_Mod/Numerics/Blending_Coefficient_For_Turbulence.f90"
 #   include "Control_Mod/Numerics/Blending_Coefficient_For_Vof.f90"
+#   include "Control_Mod/Numerics/Blend_System_Matrices.f90"
 #   include "Control_Mod/Numerics/Choi_Correction.f90"
 #   include "Control_Mod/Numerics/Gradient_Method_For_Energy.f90"
 #   include "Control_Mod/Numerics/Gradient_Method_For_Momentum.f90"
