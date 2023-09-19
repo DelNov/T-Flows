@@ -472,6 +472,14 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
 " Items which follow are not really objects, but I don't know where else to put them
   syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
+  syn keyword fortranPetscTflows  C_Petsc_Finalize  C_Petsc_Initialize  C_Petsc_Ksp_Converged_Reason  C_Petsc_Ksp_Create  C_Petsc_Ksp_Destroy
+  syn keyword fortranPetscTflows  C_Petsc_Ksp_Get_Iteration_Number  C_Petsc_Ksp_Get_Residual_Norm C_Petsc_Ksp_Set_Initial_Guess_Nonzero
+  syn keyword fortranPetscTflows  C_Petsc_Ksp_Set_Operators  C_Petsc_Ksp_Set_Preconditioner  C_Petsc_Ksp_Set_Tolerances  C_Petsc_Ksp_Set_Type
+  syn keyword fortranPetscTflows  C_Petsc_Ksp_Solve  C_Petsc_Log_Default_Begin  C_Petsc_Log_View  C_Petsc_Mat_Aij_Set_Preallocation
+  syn keyword fortranPetscTflows  C_Petsc_Mat_Assemble  C_Petsc_Mat_Create  C_Petsc_Mat_Destroy  C_Petsc_Mat_Remove_Null_Space
+  syn keyword fortranPetscTflows  C_Petsc_Mat_Set_Null_Space  C_Petsc_Mat_Set_Sizes  C_Petsc_Mat_Set_Type_To_Mat_Aij  C_Petsc_Mat_Set_Value
+  syn keyword fortranPetscTflows  C_Petsc_Options_Set_Value  C_Petsc_Vec_Assemble  C_Petsc_Vec_Create_Mpi  C_Petsc_Vec_Destroy  C_Petsc_Vec_Get_Values
+  syn keyword fortranPetscTflows  C_Petsc_Vec_Set_Value
 " Macros might need a special group of their own.
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain
@@ -707,6 +715,7 @@ hi def link fortranConstantTflows  fortranConstant
 hi def link fortranTypeTflows      fortranType
 hi def link fortranObjectTflows    fortranIntrinsic
 hi def link fortranMpiTflows       fortranIntrinsic
+hi def link fortranPetscTflows     fortranIntrinsic
 hi def link fortranMacroTflows     fortranIntrinsic
 hi def link fortranGlobalTflows    Todo
 "---------------------------------------------------------------------[T-Flows]-
