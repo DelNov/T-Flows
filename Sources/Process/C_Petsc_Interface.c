@@ -59,7 +59,7 @@
   |                                                                            |
   |  https://petsc.org/release/manualpages/Profiling/PetscLogView/             |
   +---------------------------------------------------------------------------*/
-  void c_petsc_log_view_(const char name[], const char value[]) {
+  void c_petsc_log_view_() {
 
     err = PetscLogView(PETSC_VIEWER_STDOUT_WORLD);
   }
