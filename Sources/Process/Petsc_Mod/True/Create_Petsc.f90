@@ -52,14 +52,15 @@
       if( options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '-' .or. &
           options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '') then
         !Debug: print *, 'A:', trim(options(i))
-        call C_Petsc_Options_Set_Value(trim(options(i)), C_NULL_CHAR)
+        call C_Petsc_Options_Set_Value(trim(options(i)) // C_NULL_CHAR,  &
+                                       C_NULL_CHAR)
         i = i + 1
 
       ! Option is followed by a switch
       else
         !Debug: print *, 'B:', trim(options(i)), ' ', trim(options(i+1))
-        call C_Petsc_Options_Set_Value(trim(options(i)),    &
-                                       trim(options(i+1)))
+        call C_Petsc_Options_Set_Value(trim(options(i))   // C_NULL_CHAR,  &
+                                       trim(options(i+1)) // C_NULL_CHAR)
         i = i + 2
 
       end if

@@ -107,14 +107,15 @@
       if( prec_opts(i)(1:1) .eq. '-' .and. prec_opts(i+1)(1:1) .eq. '-' .or. &
           prec_opts(i)(1:1) .eq. '-' .and. prec_opts(i+1)(1:1) .eq. '') then
         !debug: print *, 'A:', trim(prec_opts(i))
-        call C_Petsc_Options_Set_Value(trim(prec_opts(i)), C_NULL_CHAR)
+        call C_Petsc_Options_Set_Value(trim(prec_opts(i)) // C_NULL_CHAR,  &
+                                       C_NULL_CHAR)
         i = i + 1
 
       ! Option is followed by a switch
       else
         !debug: print *, 'B:', trim(prec_opts(i)), ' ', trim(prec_opts(i+1))
-        call C_Petsc_Options_Set_Value(trim(prec_opts(i)),    &
-                                       trim(prec_opts(i+1)))
+        call C_Petsc_Options_Set_Value(trim(prec_opts(i))   // C_NULL_CHAR,  &
+                                       trim(prec_opts(i+1)) // C_NULL_CHAR)
         i = i + 2
 
       end if
