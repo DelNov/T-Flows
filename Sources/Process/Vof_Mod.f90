@@ -24,12 +24,13 @@
 
     ! Stores the name of the STL file for initialization
     character(SL) :: name_stl = ''
-    logical       :: init_stl = .false.    ! is it intialized from STL?
+    logical       :: init_stl = .false.     ! is it intialized from STL?
 
-    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
-    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
-    type(Front_Type)          :: Front     ! pointer to Front (simple surface)
-    type(Surf_Type)           :: Surf      ! pointer to surface
+    type(Grid_Type),   pointer :: pnt_grid    ! its grid
+    type(Field_Type),  pointer :: pnt_flow    ! its flow
+    type(Matrix_Type), pointer :: pnt_matrix  ! its matrix
+    type(Front_Type)           :: Front       ! pointer to front
+    type(Surf_Type)            :: Surf        ! pointer to surface
 
     ! Volume fraction (colour function) and its smooth variant
     type(Var_Type) :: fun
@@ -88,7 +89,7 @@
       !----------------------------------------!
       !   Procedures to advance vof function   !
       !----------------------------------------!
-      procedure          :: Allocate_Vof
+      procedure          :: Create_Vof
       procedure          :: Main_Vof
       procedure, private :: Compute_Vof
       procedure, private :: Discretize
@@ -131,7 +132,7 @@
     !----------------------------------------!
     !   Procedures to advance vof function   !
     !----------------------------------------!
-#   include "Vof_Mod/Core/Allocate_Vof.f90"
+#   include "Vof_Mod/Core/Create_Vof.f90"
 #   include "Vof_Mod/Core/Main_Vof.f90"
 #   include "Vof_Mod/Core/Compute_Vof.f90"
 #   include "Vof_Mod/Core/Discretize.f90"

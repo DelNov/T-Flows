@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Allocate_Swarm(Swarm, Flow, Turb, Vof)
+  subroutine Create_Swarm(Swarm, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
 !   Allocates memory to store the charge of each particle                      !
 !   It assumes that the number of particles was read from the control file     !

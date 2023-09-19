@@ -8,6 +8,7 @@
 !==============================================================================!
 
   Nat % pnt_grid => Grid
+  Assert(associated(Nat % pnt_grid))
 
   if(First_Proc()) print *, '# Determining matrix topology.'
 

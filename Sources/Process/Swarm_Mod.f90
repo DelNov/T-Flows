@@ -92,10 +92,10 @@
 
     contains
       procedure          :: Advance_Particles
-      procedure          :: Allocate_Swarm
       procedure, private :: Bounce_Particle
       procedure, private :: Calculate_Particles_Mean
       procedure, private :: Check_Periodicity
+      procedure          :: Create_Swarm
       procedure          :: Exchange_Particles
       procedure, private :: Grad_Modeled_Flow
       procedure, private :: Move_Particle
@@ -121,7 +121,7 @@
 
     ! Member procedures sorted alphabetically
 #   include "Swarm_Mod/Advance_Particles.f90"
-#   include "Swarm_Mod/Allocate_Swarm.f90"
+#   include "Swarm_Mod/Create_Swarm.f90"
 #   include "Swarm_Mod/Bounce_Particle.f90"
 #   include "Swarm_Mod/Calculate_Particles_Mean.f90"
 #   include "Swarm_Mod/Check_Periodicity.f90"

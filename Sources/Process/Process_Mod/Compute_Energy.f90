@@ -113,8 +113,7 @@
   !   Advection   !
   !               !
   !---------------!
-  call Numerics_Mod_Advection_Term(t, cap_dens, v_flux % n, b,  &
-                                      Flow % blend_matrices)
+  call Numerics_Mod_Advection_Term(t, cap_dens, v_flux % n, b)
 
   !--------------!
   !              !
@@ -168,7 +167,7 @@
     a21 = con_eff * A % fc(s)
 
     ! Blend system matrix if desired to do so
-    if(Flow % blend_matrices) then
+    if(t % blend_matrix) then
       a12 = a12 - min(v_flux % n(s), 0.0)  &
                    * Flow % capacity(c1) * Flow % density(c1)  ! Flow: 1 -> 2
       a21 = a21 + max(v_flux % n(s), 0.0)  &

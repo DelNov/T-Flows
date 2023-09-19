@@ -1,7 +1,7 @@
 #----------
 # Prologue
 #---------
-  PROBLEM_NAME     backstep_orthogonal_36
+  PROBLEM_NAME     backstep_orthogonal
   HEAT_TRANSFER    no
 
   TIME_STEP                       0.00375  # 0.02  0.01  0.005  0.00375  0.0025
@@ -46,6 +46,8 @@
   GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
   MAX_GAUSS_GRADIENTS_ITERATIONS   3
 
+  BLEND_SYSTEM_MATRICES            no
+
 #------------------------
 # Linear solver settings
 #------------------------
@@ -62,18 +64,21 @@
     SOLVER        cg
     PREC          hypre      # asm or hypre
     PREC_OPTS     
+    PETSC_OPTS    -log_view
     TOLERANCE     1.0e-6     # 1.0e-3 was also working
 
   PETSC_OPTIONS_FOR_WALL_DISTANCE
     SOLVER        cg
     PREC          hypre      # asm or hypre
     PREC_OPTS     
+    PETSC_OPTS    
     TOLERANCE     1.0e-6     # 1.0e-3 was also working
 
   PETSC_OPTIONS_FOR_MOMENTUM
     SOLVER        bicg
     PREC          asm
     PREC_OPTS     
+    PETSC_OPTS    
     TOLERANCE     1.0e-6     # 1.0e-5 was also working
 
 #--------------------

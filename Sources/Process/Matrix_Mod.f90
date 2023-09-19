@@ -1,3 +1,5 @@
+#include "../Shared/Assert.h90"
+
 !==============================================================================!
   module Matrix_Mod
 !------------------------------------------------------------------------------!
@@ -41,11 +43,15 @@
     real,    allocatable :: val(:)    ! value
     real,    allocatable :: fc (:)    ! bare matrix entry for face
     real,    allocatable :: sav(:)    ! saved momentum diag. value
-    integer, allocatable :: col(:)    ! beginning of each row   
+    integer, allocatable :: col(:)    ! beginning of each row
     integer, allocatable :: row(:)    ! column positions
-    integer, allocatable :: dia(:)    ! diagonal positions 
+    integer, allocatable :: dia(:)    ! diagonal positions
     integer, allocatable :: pos(:,:)  ! position in the matrix
-    integer, allocatable :: mir(:)    ! mirror positions   
+    integer, allocatable :: mir(:)    ! mirror positions
+    integer, allocatable :: glo(:)
+
+      ! Global cell numbering for PETSc, which is
+      ! different from T-Flows' and stars from zero   <---= IMPORTANT
 
     contains
       procedure :: Create_Matrix
@@ -56,4 +62,4 @@
 
 #   include "Matrix_Mod/Create_Matrix.f90"
 
-  end module 
+  end module

@@ -103,10 +103,12 @@
   !----------------------------------------------------------!
   do d = 1, n_dom
     call Control % Switch_To_Domain(d)  ! take proper control file
-    call Flow(d)  % Allocate_Field(Grid(d))
-    call Turb(d)  % Allocate_Turb(Flow(d))
-    call Vof(d)   % Allocate_Vof(Flow(d))
-    call Swarm(d) % Allocate_Swarm(Flow(d), Turb(d), Vof(d))
+    call Read_Control % Solvers(Flow(d), Turb(d), Vof(d), Sol(d))
+    call Sol(d)   % Create_Solver(Grid(d))
+    call Flow(d)  % Create_Field(Sol(d) % Nat % A)  ! will store pnt_matrix
+    call Turb(d)  % Create_Turb(Flow(d))
+    call Vof(d)   % Create_Vof(Flow(d))
+    call Swarm(d) % Create_Swarm(Flow(d), Turb(d), Vof(d))
 
     ! Read time step from root
     call Control % Switch_To_Root()
@@ -115,16 +117,11 @@
 
     ! Read numerical models from control file (after the memory is allocated)
     call Read_Control % Numerical_Schemes(Flow(d), Turb(d), Vof(d))
-    call Read_Control % Solvers(Flow(d), Turb(d), Vof(d), Sol(d))
 
     call Grid(d) % Find_Nodes_Cells()
     call Grid(d) % Calculate_Weights_Cells_To_Nodes()  ! needed for front
     call Grid(d) % Calculate_Global_Volumes()
     call Flow(d) % Calculate_Grad_Matrix()
-
-    ! Allocate memory for linear systems of equations
-    ! (You need face geomtry for this step)
-    call Sol(d) % Create_Solver(Grid(d))
 
     call Read_Control % Physical_Properties(Flow(d), Vof(d), Swarm(d))
     call Read_Control % Boundary_Conditions(Flow(d), Turb(d), Vof(d),   &

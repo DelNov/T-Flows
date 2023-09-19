@@ -326,6 +326,9 @@
 
   call Work % Disconnect_Real_Cell(log_dist, cross)
 
+  ! Don't destroy it (yet), it is plotted with results
+  ! call Var_Mod_Destroy_Solution(phi)
+
   call Profiler % Stop('Potential_Initialization')
 
   end subroutine

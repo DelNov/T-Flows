@@ -1,3 +1,5 @@
+#include "../Shared/Assert.h90"
+
 !==============================================================================!
   module Var_Mod
 !------------------------------------------------------------------------------!
@@ -11,7 +13,8 @@
   !--------------!
   type Var_Type
 
-    type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
+    type(Grid_Type),   pointer :: pnt_grid    ! its grid
+    type(Matrix_Type), pointer :: pnt_matrix  ! its matrix
 
     character(VL) :: name       ! variable name, always upper case and
                                 ! very short (4, defined in Const_Mod)
@@ -32,7 +35,8 @@
     ! Parameters for numerical solution of the variable
     character(SL) :: solver          ! solver
     character(SL) :: prec            ! preconditioner
-    character(SL) :: prec_opts(MSI)  ! preconditioner options
+    character(SL) :: o_prec(MSI)     ! options for preconditioner
+    character(SL) :: o_pets(MSI)     ! options for PETSc
     integer       :: adv_scheme      ! advection scheme
     integer       :: grad_method     ! gradient computation method
     real          :: blend           ! blending (1.0 central; 0.0 upwind)
@@ -41,12 +45,18 @@
     real          :: urf             ! under-relaxation factor
     integer       :: miter           ! max number of iterations for variable
     integer       :: niter           ! executed number of iterations for var
+    logical       :: blend_matrix    ! are you blending matrix with upwind?
+
+    ! Each variable has its own copy of PETSc, how cute is that?
+    type(Petsc_Type) :: Pet
   end type
 
   contains
 
-#   include "Var_Mod/Allocate_New_Only.f90"
-#   include "Var_Mod/Allocate_Solution.f90"
+#   include "Var_Mod/Create_New_Only.f90"
+#   include "Var_Mod/Create_Solution.f90"
+#   include "Var_Mod/Destroy_New_Only.f90"
+#   include "Var_Mod/Destroy_Solution.f90"
 #   include "Var_Mod/Bnd_Cond_Name.f90"
 #   include "Var_Mod/Bnd_Cond_Type.f90"
 

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Allocate_Vof(Vof, Flow)
+  subroutine Create_Vof(Vof, Flow)
 !------------------------------------------------------------------------------!
 !   Allocates memory for variables in Multphase_Mod.                           !
 !------------------------------------------------------------------------------!
@@ -8,22 +8,25 @@
   class(Vof_Type),  target :: Vof
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: nb, nc, nf
+  type(Grid_Type),   pointer :: Grid
+  type(Matrix_Type), pointer :: A
+  integer                    :: nb, nc, nf
 !==============================================================================!
 
   ! Store pointers
-  Vof % pnt_flow => Flow
-  Vof % pnt_grid => Flow % pnt_grid
+  Vof % pnt_flow   => Flow
+  Vof % pnt_grid   => Flow % pnt_grid
+  Vof % pnt_matrix => Flow % pnt_matrix
 
   ! Take aliases
   Grid => Flow % pnt_grid
+  A    => Flow % pnt_matrix
   nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
   nf   =  Grid % n_faces
 
-  call Var_Mod_Allocate_Solution(Vof % fun,    Grid, 'VOF', '')
-  call Var_Mod_Allocate_New_Only(Vof % smooth, Grid, 'SMO')
+  call Var_Mod_Create_Solution(Vof % fun,    A, 'VOF', '')
+  call Var_Mod_Create_New_Only(Vof % smooth, Grid, 'SMO')
 
   ! Surface curvature
   allocate(Vof % curv(-nb:nc));  Vof % curv(-nb:nc) = 0.0
@@ -47,8 +50,8 @@
     allocate(Vof % a12(nf));        Vof % a12(1:nf)     = 0.0
     allocate(Vof % a21(nf));        Vof % a21(1:nf)     = 0.0
     allocate(Vof % m_dot(-nb:nc));  Vof % m_dot(-nb:nc) = 0.0
-    call Var_Mod_Allocate_New_Only(Vof % t_0, Grid, 'T_0')
-    call Var_Mod_Allocate_New_Only(Vof % t_1, Grid, 'T_1')
+    call Var_Mod_Create_New_Only(Vof % t_0, Grid, 'T_0')
+    call Var_Mod_Create_New_Only(Vof % t_1, Grid, 'T_1')
   end if
 
   if(Vof % track_front) then

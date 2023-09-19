@@ -1,22 +1,26 @@
 !==============================================================================!
-  subroutine Create_Petsc(Pet, Nat, Grid)
+  subroutine Create_Petsc(Pet, A, var_name, options_pets)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)        :: Pet
-  type(Native_Type)        :: Nat
-  type(Grid_Type),  target :: Grid
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Nat)
+  class(Petsc_Type) :: Pet
+  type(Matrix_Type) :: A
+  character(VL)     :: var_name
+  character(SL)     :: options_pets(MSI)
+!-----------------------------------[Locals]-----------------------------------!
+  logical, save :: called = .false.
 !==============================================================================!
 
-  Pet % pnt_grid => Grid
+  Pet % pnt_grid => A % pnt_grid
 
-  if(First_Proc()) then
-    print '(a)', ' # NOTE! This version was compiled without PETSc,'  //  &
-                 ' so the PETSc class was not created ...'
-    print '(a)', ' # ... which is OK as long as you don''t specify'   //  &
-                 ' to use PETSc solvers in control file.'
+  if(.not. called) then
+    if(First_Proc()) then
+      print '(a)', ' # NOTE! This version was compiled without PETSc,'  //  &
+                   ' so the PETSc class was not created ...'
+      print '(a)', ' # ... which is OK as long as you don''t specify'   //  &
+                   ' to use PETSc solvers in control file.'
+    end if
+    called = .true.
   end if
 
   end subroutine

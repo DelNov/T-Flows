@@ -23,8 +23,9 @@
   !---------------------------!
   type Turb_Type
 
-    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
-    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
+    type(Grid_Type),   pointer :: pnt_grid    ! grid for which it is defined
+    type(Field_Type),  pointer :: pnt_flow
+    type(Matrix_Type), pointer :: pnt_matrix
 
     !---------------!
     !   Variables   !
@@ -139,7 +140,7 @@
     contains
       procedure :: Init_Turb
       procedure :: Main_Turb
-      procedure :: Allocate_Turb
+      procedure :: Create_Turb
 
       procedure :: Alias_K_Eps
       procedure :: Alias_K_Eps_Zeta_F
@@ -281,7 +282,7 @@
 #   include "Turb_Mod/Main_Turb.f90"
 
     ! The constructor-like
-#   include "Turb_Mod/Allocate_Turb.f90"
+#   include "Turb_Mod/Create_Turb.f90"
 
 #   include "Turb_Mod/Alias_K_Eps.f90"
 #   include "Turb_Mod/Alias_K_Eps_Zeta_F.f90"

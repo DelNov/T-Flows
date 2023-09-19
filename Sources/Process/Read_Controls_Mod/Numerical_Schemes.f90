@@ -38,8 +38,6 @@
     Flow % inside_piso_loop = .false.
   end if
 
-  call Control % Blend_System_Matrices(Flow % blend_matrices, .false.)
-
   ! Improvements to Rhie and Chow method (Choi, Gu)
   call Control % Choi_Correction(Flow % choi_correction, .false.)
   call Control % Gu_Correction  (Flow % gu_correction,   .false.)
@@ -71,6 +69,7 @@
     call Control % Simple_Underrelaxation_For_Momentum  (ui % urf)
     call Control % Gradient_Method_For_Momentum         (name)
     ui % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+    call Control % Blend_System_Matrices(ui % blend_matrix, .false.)
   end do
 
   !-------------------------!
@@ -80,12 +79,14 @@
   call Control % Gradient_Method_For_Pressure                (name)
   Flow % p  % grad_method = Numerics_Mod_Gradient_Method_Code(name)
   Flow % pp % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+  call Control % Blend_System_Matrices(Flow % pp % blend_matrix, .false.)
 
   !------------------------------!
   !   Related to wall distance   !
   !------------------------------!
   call Control % Gradient_Method_For_Wall_Distance                  (name)
   Flow % wall_dist % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+  call Control % Blend_System_Matrices(Flow % wall_dist % blend_matrix, .false.)
 
   !--------------------------!
   !   Related to potential   !  (for flow field initialization, nothing here)
@@ -104,6 +105,7 @@
     call Control % Simple_Underrelaxation_For_Energy(Flow % t % urf)
     call Control % Gradient_Method_For_Energy                 (name)
     Flow % t % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+    call Control % Blend_System_Matrices(Flow % t % blend_matrix, .false.)
   end if
 
   !--------------------------------!
@@ -125,6 +127,7 @@
     call Control % Skewness_Correction_Vof           (Vof % skew_corr)
     call Control % Gradient_Method_For_Vof                     (name)
     Vof % fun % grad_method = Numerics_Mod_Gradient_Method_Code(name)
+    call Control % Blend_System_Matrices(Vof % fun % blend_matrix, .false.)
   end if
 
   !--------------------------------!
@@ -140,6 +143,7 @@
     call Control % Simple_Underrelaxation_For_Scalars          (phi % urf)
     call Control % Gradient_Method_For_Scalars                 (name)
     phi % grad_method = Numerics_Mod_Gradient_Method_Code      (name)
+    call Control % Blend_System_Matrices(phi % blend_matrix, .false.)
   end do
 
   !------------------------------!
@@ -166,6 +170,7 @@
     call Control % Simple_Underrelaxation_For_Turbulence      (tq % urf)
     call Control % Gradient_Method_For_Turbulence             (name)
     tq % grad_method = Numerics_Mod_Gradient_Method_Code      (name)
+    call Control % Blend_System_Matrices(tq % blend_matrix, .false.)
   end do
 
   end subroutine

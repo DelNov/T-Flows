@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Create_Solver(Sol, Grid)
+  subroutine Destroy_Petsc(Pet, var_name)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type)       :: Sol
-  type(Grid_Type),  target :: Grid
+  class(Petsc_Type) :: Pet
+  character(VL)     :: var_name
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Pet)
+  Unused(var_name)
 !==============================================================================!
-
-  call Sol % Nat % Create_Native(Grid)
 
   end subroutine
 

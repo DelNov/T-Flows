@@ -184,7 +184,7 @@
 
   ! Set singularity to the matrix
   if(.not. Flow % has_pressure) then
-    call Sol % Set_Singular(A)
+    call Sol % Set_Singular(pp)
   end if
 
   ! Call linear solver
@@ -192,7 +192,7 @@
 
   ! Remove singularity from the matrix
   if(.not. Flow % has_pressure) then
-    call Sol % Remove_Singular(A)
+    call Sol % Remove_Singular(pp)
   end if
 
   call Profiler % Stop(String % First_Upper(pp % solver)  //  &

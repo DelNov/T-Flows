@@ -37,32 +37,27 @@
 
 #   if T_FLOWS_PETSC == 1
       ! Petsc-related variables
-      type(tMat)                  :: A         ! sparse matrix
-      type(tVec)                  :: x         ! solution vector
-      type(tVec)                  :: b         ! right hand side
-      type(tKSP)                  :: ksp       ! linear solver context
-      type(tPc)                   :: pc        ! preconditioner
-      type(PetscInt)              :: m_lower   ! unknowns in this proc.
-      type(PetscInt)              :: m_upper   ! total number of unknowns
-      type(PetscInt)              :: miter     ! maximum number of iterations
-      type(PetscInt)              :: niter     ! performed number of iterations
-      type(PetscInt), allocatable :: d_nnz(:)  ! diagonal stencil width per cell
-      type(PetscInt), allocatable :: o_nnz(:)  ! off-diag. stencil width per cell
-      type(PetscErrorCode)        :: err
-      type(PetscEnum)             :: reason
+      type(tMat)           :: A         ! sparse matrix
+      type(tVec)           :: x         ! solution vector
+      type(tVec)           :: b         ! right hand side
+      type(tKSP)           :: ksp       ! linear solver context
+      type(tPc)            :: pc        ! preconditioner
+      type(PetscInt)       :: m_lower   ! unknowns in this proc.
+      type(PetscInt)       :: m_upper   ! total number of unknowns
+      type(PetscInt)       :: miter     ! maximum number of iterations
+      type(PetscInt)       :: niter     ! performed number of iterations
+      type(PetscErrorCode) :: err
+      type(PetscEnum)      :: reason
+      logical              :: matrix_coppied = .false.
+      logical              :: precond_formed = .false.
 #   else
       ! Fake Petsc-related variables
       type(Matrix_Type) :: A         ! sparse matrix
 #   endif
 
-#   if T_FLOWS_PETSC == 1
-      ! Global cell numbering for PETSc, which is
-      ! different from T-Flows' and stars from zero   <---= IMPORTANT
-      integer, allocatable :: glo(:)
-#   endif
-
     contains
       procedure :: Create_Petsc
+      procedure :: Destroy_Petsc
       procedure :: Solve_Petsc
 
   end type
@@ -78,9 +73,11 @@
 
 # if T_FLOWS_PETSC == 1
 #   include "Petsc_Mod/True/Create_Petsc.f90"
+#   include "Petsc_Mod/True/Destroy_Petsc.f90"
 #   include "Petsc_Mod/True/Solve_Petsc.f90"
 # else
 #   include "Petsc_Mod/Fake/Create_Petsc.f90"
+#   include "Petsc_Mod/Fake/Destroy_Petsc.f90"
 #   include "Petsc_Mod/Fake/Solve_Petsc.f90"
 # endif
 

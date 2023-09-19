@@ -150,6 +150,7 @@ syn keyword controlKeyword   PETSC_OPTIONS_FOR_TURBULENCE
 syn keyword controlKeyword   SOLVER
 syn keyword controlKeyword   PREC
 syn keyword controlKeyword   PREC_OPTS
+syn keyword controlKeyword   PETSC_OPTS
 syn keyword controlKeyword   TOLERANCE
 " Physics
 syn keyword controlKeyword   ANGULAR_VELOCITY_VECTOR
@@ -233,6 +234,7 @@ syn keyword controlIntrinsic             c_01  c_02  c_03  c_04  c_05  c_06  q_0
 syn keyword controlIntrinsic             x  y  z  rx  ry  rz
 syn keyword controlBoundaryConditon      wall  inflow  outflow  pressure  convective  symmetry
 syn keyword controlLinearSolvers         native  petsc  cg  bicg  incomplete_cholesky  diagonal  none  asm  hypre
+syn keyword controlLinearSolvers         log  log_view
 syn keyword controlNumericalParameters   simple  piso  linear  parabolic  gauss_theorem  least_squares
 syn keyword controlNumericalParameters   central  smart  luds  quick  smart  gamma  minmod  blended  superbee  avl_smart
 syn keyword controlNumericalParameters   cicsam  upwind  stacs

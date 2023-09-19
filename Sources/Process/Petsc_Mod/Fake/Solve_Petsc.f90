@@ -4,25 +4,26 @@
                          A, x, b,                  &
                          miter, niter,             &
                          tol, fin_res,             &
-                         norm)
+                         blend_matrix)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)    :: Pet
-  character(*)         :: solver          ! solver
-  character(*)         :: prec            ! preconditioner
-  character(SL)        :: prec_opts(MSI)  ! preconditioner options
-  type(Matrix_Type)    :: A
-  real                 :: x(-Pet % pnt_grid % n_bnd_cells :  &
-                             Pet % pnt_grid % n_cells)
-  real                 :: b( Pet % pnt_grid % n_cells)
-  integer, intent(in)  :: miter
-  integer, intent(out) :: niter
-  real,    intent(in)  :: tol      ! tolerance
-  real,    intent(out) :: fin_res  ! final residual
-  real,    optional    :: norm     ! normalization
+  class(Petsc_Type)          :: Pet
+  character(*),  intent(in)  :: solver          ! solver
+  character(*),  intent(in)  :: prec            ! preconditioner
+  character(SL), intent(in)  :: prec_opts(MSI)  ! preconditioner options
+  type(Matrix_Type)          :: A
+  real                       :: x(-Pet % pnt_grid % n_bnd_cells :  &
+                                   Pet % pnt_grid % n_cells)
+  real                       :: b( Pet % pnt_grid % n_cells)
+  integer,       intent(in)  :: miter
+  integer,       intent(out) :: niter
+  real,          intent(in)  :: tol      ! tolerance
+  real,          intent(out) :: fin_res  ! final residual
+  logical,       intent(in)  :: blend_matrix
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Pet)
+  Unused(Pet_Shared)
   Unused(solver)
   Unused(prec)
   Unused(prec_opts)
@@ -33,7 +34,6 @@
   Unused(niter)
   Unused(tol)
   Unused(fin_res)
-  Unused(norm)
 !==============================================================================!
 
   ! Just to avoid compiler's warning

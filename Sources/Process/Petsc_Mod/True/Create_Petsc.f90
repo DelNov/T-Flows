@@ -1,61 +1,66 @@
 !==============================================================================!
-  subroutine Create_Petsc(Pet, Nat, Grid)
+  subroutine Create_Petsc(Pet, A, var_name, options)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)        :: Pet
-  type(Native_Type)        :: Nat
-  type(Grid_Type),  target :: Grid
+  class(Petsc_Type) :: Pet
+  type(Matrix_Type) :: A
+  character(VL)     :: var_name
+  character(SL)     :: options(MSI)
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: i, j, k, start
-  integer, allocatable :: all_lower_ms(:)
+  type(Grid_Type),    pointer :: Grid
+  integer                     :: i, j, k
+  type(PetscInt), allocatable :: d_nnz(:)  ! diagonal stencil width per cell
+  type(PetscInt), allocatable :: o_nnz(:)  ! off-diag stencil width per cell
 !==============================================================================!
 
-  Pet % pnt_grid => Grid
+  Pet % pnt_grid => A % pnt_grid
+  Grid           => A % pnt_grid
 
-  if(First_Proc()) print *, '# Initializing PETSc.'
+  if(First_Proc()) then
+    write(*,'(a,a4,a1)', advance='no')  &
+      ' # Initializing PETSc for ', trim(var_name), ' '
+  end if
 
   ! Total number of unknowns and unknowns in this processor only
   Pet % m_upper = Grid % Comm % nc_tot
   Pet % m_lower = Grid % n_cells - Grid % Comm % n_buff_cells
 
-  !----------------------------------------+
-  !    Create global numbering for PETSc   !
-  !----------------------------------------+------------------!
-  !    This one has little to do with global numbering from   !
-  !    T-Flows and is unique for each number of processors    !
-  !-----------------------------------------------------------!
-
-  ! Dimensions must spread from all boundary cells through all ...
-  ! ... buffers cells to successfully use Grid % Exchange_Cells_Int
-  allocate(Pet % glo(-Grid % n_bnd_cells:Grid % n_cells))
-  Pet % glo(:) = 0
-
-  if(Sequential_Run()) then
-    Pet % glo(1:Grid % n_cells) = Grid % Comm % cell_glo(1:Grid % n_cells) - 1
-  else
-    start = 1  ! first row
-    allocate(all_lower_ms(N_Procs()));  ! allocate array for all m_lowers
-    all_lower_ms(:) = 0                 ! important to initialize to zero
-
-    ! Distribute m_lowers among all processors
-    all_lower_ms(This_Proc()) = Pet % m_lower
-    call Global % Sum_Int_Array(N_Procs(), all_lower_ms)
-
-    start = sum(all_lower_ms(1:This_Proc())) - Pet % m_lower
-
-    ! Distribute global numbers over other processors
-    do i = 1, Pet % m_lower
-      Pet % glo(i) = i + start - 1
-    end do
-    call Grid % Exchange_Cells_Int(Pet % glo)
-
-  end if
-
   !----------------------!
   !   Initialize PETSc   !
   !----------------------!
   call C_Petsc_Initialize()
+
+  !--------------------!
+  !   Enable logging   !
+  !--------------------!
+  call C_Petsc_Log_Default_Begin()
+
+  !---------------------------!
+  !   Process PETSc options   !
+  !---------------------------!
+  if(options(1) .ne. '') then
+
+    i = 1
+    do while(i < MSI .and. options(i)(1:1) .ne. '')
+
+      ! Option is just a single word (followed by another option or end)
+      if( options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '-' .or. &
+          options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '') then
+        !Debug: print *, 'A:', trim(options(i))
+        call C_Petsc_Options_Set_Value(trim(options(i)), C_NULL_CHAR)
+        i = i + 1
+
+      ! Option is followed by a switch
+      else
+        !Debug: print *, 'B:', trim(options(i)), ' ', trim(options(i+1))
+        call C_Petsc_Options_Set_Value(trim(options(i)),    &
+                                       trim(options(i+1)))
+        i = i + 2
+
+      end if
+    end do
+  end if
 
   !--------------------------!
   !    Create PETSc matrix   !
@@ -78,27 +83,27 @@
 
   ! Allocate memory for array with number of non-zero entries per row
   ! for entries in this processor (d_nnz), and other processors (o_nnz)
-  allocate(Pet % d_nnz(Pet % m_lower))
-  allocate(Pet % o_nnz(Pet % m_lower))
-  Pet % d_nnz(:) = 0
-  Pet % o_nnz(:) = 0
+  allocate(d_nnz(Pet % m_lower))
+  allocate(o_nnz(Pet % m_lower))
+  d_nnz(:) = 0
+  o_nnz(:) = 0
 
   ! Find number of nonzeros (nnz) in this processor and in other processors
   do i = 1, Pet % m_lower
-    do j = Nat % A % row(i), Nat % A % row(i+1)-1
-      k = Nat % A % col(j)
+    do j = A % row(i), A % row(i+1)-1
+      k = A % col(j)
       if(Grid % Comm % cell_proc(k) .eq. This_Proc()) then
-        Pet % d_nnz(i) = Pet % d_nnz(i) + 1
+        d_nnz(i) = d_nnz(i) + 1
       else
-        Pet % o_nnz(i) = Pet % o_nnz(i) + 1
+        o_nnz(i) = o_nnz(i) + 1
       end if
     end do
   end do
 
   ! This will call both MPI and Seq versions of preallocation
-  call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,        &
-                                         Pet % d_nnz,    &
-                                         Pet % o_nnz)
+  call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,  &
+                                         d_nnz,    &
+                                         o_nnz)
 
   !--------------------------!
   !   Create PETSc vectors   !
@@ -111,7 +116,7 @@
   !-------------------------!
   call C_Petsc_Ksp_Create(Pet % ksp)
 
-  if(First_Proc()) print *, '# Finished !'
+  if(First_Proc()) print *, 'done!'
 
   end subroutine
 

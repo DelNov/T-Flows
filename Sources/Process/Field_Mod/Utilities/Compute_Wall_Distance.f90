@@ -255,6 +255,8 @@
 
   call Work % Disconnect_Real_Cell(cross)
 
+  call Var_Mod_Destroy_Solution(phi)
+
   call Profiler % Stop('Compute_Wall_Distance')
 
   end subroutine

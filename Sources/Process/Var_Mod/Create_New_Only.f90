@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Var_Mod_Allocate_New_Only(phi, Grid, name_phi)
+  subroutine Var_Mod_Create_New_Only(phi, Grid, name_phi)
 !------------------------------------------------------------------------------!
 !   This is to allocate a simplified uknown, holding only current value,       !
 !   such as pressure for example.                                              !

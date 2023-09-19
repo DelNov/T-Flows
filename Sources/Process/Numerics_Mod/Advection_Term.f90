@@ -1,16 +1,15 @@
 !==============================================================================!
-  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, b, blend_matrix)
+  subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, b)
 !------------------------------------------------------------------------------!
 !   Purpose: Dicretize advection term in conservation equations.               !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Var_Type), intent(in)     :: phi
-  real,           intent(in)     :: coef(-phi % pnt_grid % n_bnd_cells:  &
-                                          phi % pnt_grid % n_cells)
-  real,           intent(in)     :: v_flux(phi % pnt_grid % n_faces)
-  real,           intent(inout)  :: b(:)
-  logical,        intent(in)     :: blend_matrix
+  type(Var_Type), intent(in)    :: phi
+  real,           intent(in)    :: coef(-phi % pnt_grid % n_bnd_cells:  &
+                                         phi % pnt_grid % n_cells)
+  real,           intent(in)    :: v_flux(phi % pnt_grid % n_faces)
+  real,           intent(inout) :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer  :: Grid
   real                      :: phif          ! phi and coef at the cell face
@@ -65,7 +64,7 @@
   !-------------------------------------------!
   !   Compute upwind term on the boundaries   !
   !-------------------------------------------!
-  if(blend_matrix) then
+  if(phi % blend_matrix) then
     do reg = Boundary_Regions()
       do s = Faces_In_Region(reg)
         c1 = Grid % faces_c(1,s)
@@ -107,7 +106,7 @@
   !-------------------------------------------!
   !   Compute upwind term inside the domain   !
   !-------------------------------------------!
-  if(blend_matrix) then
+  if(phi % blend_matrix) then
     do s = Faces_In_Domain()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)

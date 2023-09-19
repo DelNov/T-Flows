@@ -19,7 +19,7 @@
   static char help[] = "This is to initialize PETSc from T-Flows!\n";
 
   /*---------------------------------------------------------------------------+
-  |  PetscInitialize (and PetcIntialized)                                      |
+  |  PetscInitialize (and PetscIntialized)                                     |
   |                                                                            |
   |  https://petsc.org/release/manualpages/Sys/PetscInitialize/                |
   |  https://petsc.org/release/manualpages/Sys/PetscInitialized/               |
@@ -32,6 +32,36 @@
     if(!initialized) {
       err = PetscInitialize(0, NULL, (char*)0, help);
     }
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  PetscLogDefaultBegin                                                      |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Profiling/PetscLogDefaultBegin/     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_log_default_begin_() {
+
+    err = PetscLogDefaultBegin();
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  PetscOptionsSetValue                                                      |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Sys/PetscOptionsSetValue/           |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_options_set_value_(const char name[], const char value[]) {
+
+    err = PetscOptionsSetValue(NULL, name, value);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  PetscLogView                                                              |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Profiling/PetscLogView/             |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_log_view_(const char name[], const char value[]) {
+
+    err = PetscLogView(PETSC_VIEWER_STDOUT_WORLD);
   }
 
   /*---------------------------------------------------------------------------+
@@ -48,16 +78,6 @@
     if(initialized) {
       err = PetscFinalize();
     }
-  }
-
-  /*---------------------------------------------------------------------------+
-  |  PetscOptionsSetValue                                                      |
-  |                                                                            |
-  |  https://petsc.org/release/manualpages/Sys/PetscOptionsSetValue/           |
-  +---------------------------------------------------------------------------*/
-  void c_petsc_options_value_(const char name[], const char value[]) {
-
-    err = PetscOptionsSetValue(NULL, name, value);
   }
 
   /*---------------------------------------------------------------------------+
@@ -134,7 +154,7 @@
   |  https://petsc.org/release/manualpages/Mat/MatAssemblyEnd/                 |
   |  https://petsc.org/release/manualpages/Mat/MatSetOption/                   |
   +---------------------------------------------------------------------------*/
-  void c_petsc_assemble_mat_(Mat * A) {
+  void c_petsc_mat_assemble_(Mat * A) {
 
     /* These two always go in pairs */
     err = MatAssemblyBegin(*A, MAT_FINAL_ASSEMBLY);
@@ -182,6 +202,16 @@
   void c_petsc_mat_remove_null_space_(Mat * A) {
 
     MatSetNullSpace(*A, NULL);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  MatDestroy                                                                |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Mat/MatDestroy/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_destroy_(Mat * A) {
+
+    err = MatDestroy(A);
   }
 
   /*---------------------------------------------------------------------------+
@@ -246,7 +276,7 @@
   |  https://petsc.org/release/manualpages/Vec/VecAssemblyBegin/               |
   |  https://petsc.org/release/manualpages/Vec/VecAssemblyEnd/                 |
   +---------------------------------------------------------------------------*/
-  void c_petsc_assemble_vec_(Vec * v) {
+  void c_petsc_vec_assemble_(Vec * v) {
 
     err = VecAssemblyBegin(*v);
     err = VecAssemblyEnd(*v);
@@ -259,10 +289,20 @@
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_get_values_(Vec         * v,
                                PetscInt    * ni,
-                               PetscInt    * row,
-                               PetscScalar * value) {
+                             PetscInt    * row,
+                             PetscScalar * value) {
 
     err = VecGetValues(*v, *ni, row, value);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  VecDestroy                                                                |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Vec/VecDestroy/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_vec_destroy_(Vec * v) {
+
+    err = VecDestroy(v);
   }
 
   /*---------------------------------------------------------------------------+
@@ -274,6 +314,9 @@
   /*---------------------------------------------------------------------------+
   |  KSPCreate                                                                 |
   |                                                                            |
+  |  "To solve a linear system with KSP, one must first create a solver con-   |
+  |  text with the command KSPCreate" (https://petsc.org/release/manual/ksp/)  |
+  |                                                                            |
   |  https://petsc.org/release/manualpages/KSP/KSPCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_create_(KSP * ksp) {
@@ -282,35 +325,61 @@
   }
 
   /*---------------------------------------------------------------------------+
-  |  KSP routines to set solver and preconditioner                             |
+  |  KSPSetOperators                                                           |
+  |                                                                            |
+  |  "Before actually solving a linear system with KSP, the user must call     |
+  |  the following routine to set the matrices associated with the linear      |
+  |  system: KSPSetOperators" (https://petsc.org/release/manual/ksp/)          |
   |                                                                            |
   |  https://petsc.org/release/manualpages/KSP/KSPSetOperators/                |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_set_operators_(KSP * ksp,
+                                  Mat * A) {
+
+    /*--------------------------------------------------------------------+
+    |  Here the matrix that defines the linear system also serves as the  |
+    |  preconditioning matrix. Since all the matrices will have the same  |
+    |  nonzero pattern here, we indicate this so the linear solvers can   |
+    |  take advantage of this (How on Earth?*)                            |
+    +--------------------------------------------------------------------*/
+
+    /* Set precondioning matrix to be A */
+    err = KSPSetOperators(*ksp, *A, *A);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  KSPSetType                                                                |
+  |                                                                            |
+  |  "The Krylov subspace methods accept a number of options, many of which    |
+  |  are discussed below. First, to set the Krylov subspace method that is to  |
+  |  be used, one calls the command KSPSetType.  The type can be one of:       |
+  |  KSPRICHARDSON, KSPCHEBYSHEV, KSPCG, KSPGMRES, KSPTCQMR, KSPBCGS, KSPCGS,  |
+  |  KSPTFQMR, KSPCR, KSPLSQR, KSPBICG, KSPPREONLY (or equivalent KSPNONE), or |
+  |  others; see KSP Objects or the KSPType man page for more. The KSP method  |
+  |  can also be set with the options database command -ksp_type, followed by  |
+  |  one of the options: richardson, chebyshev, cg, gmres, tcqmr, bcgs, cgs,   |
+  |  tfqmr, cr, lsqr, bicg ..." (https://petsc.org/release/manual/ksp/)        |
+  |                                                                            |
   |  https://petsc.org/release/manualpages/KSP/KSPSetType/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_set_type_(KSP  * ksp,
+                             char * sol) {
+
+    /* Set solver */
+    err = KSPSetType(*ksp, sol);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  KSP routines to set preconditioner                                        |
+  |                                                                            |
   |  https://petsc.org/release/manualpages/KSP/KSPGetPC/                       |
   |  https://petsc.org/release/manualpages/PC/PCSetType/                       |
   |  https://petsc.org/release/manualpages/KSP/KSPSetFromOptions/              |
   |  https://petsc.org/release/manualpages/KSP/KSPSetUp/                       |
-  |  https://petsc.org/release/manualpages/KSP/KSPSetInitialGuessNonzero/      |v
   +---------------------------------------------------------------------------*/
-  void c_petsc_set_solver_and_preconditioner_(KSP  * ksp,
-                                              PC   * pc,
-                                              Mat  * A,
-                                              char * sol,
-                                              char * prec) {
-
-    /*---------------------------------------------------------------------+
-    |  Set operators. Here the matrix that defines the linear system       |
-    |  also serves as the preconditioning matrix. Since all the matrices   |
-    |  will have the same nonzero pattern here, we indicate this so the    |
-    |  linear solvers can take advantage of this.                          |
-    +---------------------------------------------------------------------*/
-
-    /* Set precondioning matrix to be A */
-    err = KSPSetOperators(*ksp, *A, *A);
-
-    /* Set solver */
-    err = KSPSetType(*ksp, sol);
-
+  void c_petsc_ksp_set_preconditioner_(KSP  * ksp,
+                                       PC   * pc,
+                                       char * prec) {
     /* Set preconditioner */
     err = KSPGetPC(*ksp, pc);
     err = PCSetType(*pc, prec);
@@ -318,10 +387,15 @@
     /* These two lines are needed to finish the setup */
     err = KSPSetFromOptions(*ksp);
     err = KSPSetUp         (*ksp);
+  }
 
-    /*----------------------------------------------------------+
-    |  And please don't start from zero - for the sake of God   |
-    +----------------------------------------------------------*/
+  /*---------------------------------------------------------------------------+
+  |  And please don't start from zero - for the sake of God                    |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetInitialGuessNonzero/      |v
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_set_initial_guess_nonzero_(KSP * ksp) {
+
     err = KSPSetInitialGuessNonzero(*ksp, PETSC_TRUE);
   }
 
@@ -376,6 +450,19 @@
   void c_petsc_ksp_get_residual_norm_(KSP * ksp, PetscScalar * rnorm) {
 
     err = KSPGetResidualNorm(*ksp, rnorm);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  KSPDestroy                                                                |
+  |                                                                            |
+  |  "Once the KSP context is no longer needed, it should be destroyed with    |
+  |  the command KSPDestroy" (https://petsc.org/release/manual/ksp/)           |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPDestroy/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_destroy_(KSP * ksp) {
+
+    err = KSPDestroy(ksp);
   }
 
 /*-----------------------------------------------------------------------------+

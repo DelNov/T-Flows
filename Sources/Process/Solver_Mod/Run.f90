@@ -25,16 +25,17 @@
                                   phi % res,      &  ! final (achieved) resid.
                                   norm)
   else
-    call Sol % Pet % Solve_Petsc(phi % solver,     &  ! solver
+    call phi % Pet % Solve_Petsc(phi % solver,     &  ! solver
                                  phi % prec,       &  ! preconditioner
-                                 phi % prec_opts,  &
+                                 phi % o_prec,     &  ! options for precondit
                                  A,                &
                                  phi % n,          &
                                  b,                &
                                  phi % miter,      &  ! maximum and performed...
                                  phi % niter,      &  ! ... number of iterations
                                  phi % tol,        &  ! desired tolerance
-                                 phi % res)           ! final (achieved) resid.
+                                 phi % res,        &  ! final (achieved) resid.
+                                 phi % blend_matrix)
   end if
 
   end subroutine

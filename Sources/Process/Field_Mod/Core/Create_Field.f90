@@ -1,19 +1,22 @@
 !==============================================================================!
-  subroutine Allocate_Field(Flow, Grid)
+  subroutine Create_Field(Flow, A)
 !------------------------------------------------------------------------------!
 !   Allocates memory for the entire field.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type)        :: Flow
-  type(Grid_Type),  target :: Grid
+  class(Field_Type)         :: Flow
+  type(Matrix_Type), target :: A
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: sc, nb, nc, nn, nf
-  character(VL) :: c_name, q_name
+  type(Grid_Type), pointer :: Grid
+  integer                  :: sc, nb, nc, nn, nf
+  character(VL)            :: c_name, q_name
 !==============================================================================!
 
   ! Store the pointer to a Grid
-  Flow % pnt_grid => Grid
+  Flow % pnt_matrix => A
+  Flow % pnt_grid   => A % pnt_grid
+  Grid              => A % pnt_grid
 
   ! Take some aliases
   nb = Grid % n_bnd_cells
@@ -42,19 +45,19 @@
   !----------------------------!
 
   ! Allocate memory for velocity components
-  call Var_Mod_Allocate_Solution(Flow % u,   Grid, 'U', '')
-  call Var_Mod_Allocate_Solution(Flow % v,   Grid, 'V', '')
-  call Var_Mod_Allocate_Solution(Flow % w,   Grid, 'W', '')
+  call Var_Mod_Create_Solution(Flow % u, A, 'U', '')
+  call Var_Mod_Create_Solution(Flow % v, A, 'V', '')
+  call Var_Mod_Create_Solution(Flow % w, A, 'W', '')
 
   ! Potential for initial velocity computation
-  call Var_Mod_Allocate_Solution(Flow % pot, Grid, 'POT', '')
+  call Var_Mod_Create_Solution(Flow % pot, A, 'POT', '')
 
   ! For computation of wall distance
-  call Var_Mod_Allocate_Solution(Flow % wall_dist, Grid, 'WD', '')
+  call Var_Mod_Create_Solution(Flow % wall_dist, A, 'WD', '')
 
   ! Allocate memory for pressure correction and pressure
-  call Var_Mod_Allocate_New_Only(Flow % pp, Grid, 'PP')
-  call Var_Mod_Allocate_New_Only(Flow % p,  Grid, 'P')
+  call Var_Mod_Create_Solution(Flow % pp, A, 'PP', '')
+  call Var_Mod_Create_New_Only(Flow % p,  Grid, 'P')
 
   ! Allocate memory for volumetric fluxes
   call Face_Mod_Allocate(Flow % v_flux, Grid, 'V_FL')
@@ -63,7 +66,7 @@
   !   Enthalpy conservation (temperature)   !
   !-----------------------------------------!
   if(Flow % heat_transfer) then
-    call Var_Mod_Allocate_Solution(Flow % t, Grid, 'T', 'Q')
+    call Var_Mod_Create_Solution(Flow % t, A, 'T', 'Q')
   end if ! heat_transfer
 
   allocate(Flow % vort (-nb:nc)); Flow % vort  = 0.
@@ -101,7 +104,7 @@
     write(q_name(3:4),'(i2.2)') sc
 
     ! Allocate memory for passive scalar
-    call Var_Mod_Allocate_Solution(Flow % scalar(sc), Grid, c_name, q_name)
+    call Var_Mod_Create_Solution(Flow % scalar(sc), A, c_name, q_name)
 
   end do
 

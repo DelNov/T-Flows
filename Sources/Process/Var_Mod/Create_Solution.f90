@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Var_Mod_Allocate_Solution(phi, Grid, name_phi, name_flux)
+  subroutine Var_Mod_Create_Solution(phi, A, name_phi, name_flux)
 !------------------------------------------------------------------------------!
 !   This is to allocate a variable for a solution with usual algorithm.        !
 !   Variables such as velocities and pressures should be allocated with it.    !
@@ -8,14 +8,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)          :: phi
-  type(Grid_Type), target :: Grid
-  character(len=*)        :: name_phi
-  character(len=*)        :: name_flux
+  type(Var_Type)            :: phi
+  type(Matrix_Type), target :: A
+  character(len=*)          :: name_phi
+  character(len=*)          :: name_flux
+!-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type), pointer :: Grid
 !==============================================================================!
 
   ! Store Grid for which the variable is defined
-  phi % pnt_grid => Grid
+  Grid             => A % pnt_grid
+  phi % pnt_grid   => Grid
+  phi % pnt_matrix => A
 
   ! Store variable name
   phi % name      = name_phi
@@ -44,5 +48,10 @@
   allocate (phi % x(-Grid % n_bnd_cells:Grid % n_cells));  phi % x = 0.0
   allocate (phi % y(-Grid % n_bnd_cells:Grid % n_cells));  phi % y = 0.0
   allocate (phi % z(-Grid % n_bnd_cells:Grid % n_cells));  phi % z = 0.0
+
+  ! Variable creates its own PETSc types
+  call phi % Pet % Create_Petsc(phi % pnt_matrix,  &
+                                phi % name,        &
+                                phi % o_pets)         ! general PETSc options
 
   end subroutine

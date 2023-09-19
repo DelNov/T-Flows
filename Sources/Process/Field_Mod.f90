@@ -23,7 +23,8 @@
   !----------------!
   type Field_Type
 
-    type(Grid_Type), pointer :: pnt_grid  ! grid for which it is defined
+    type(Matrix_Type), pointer :: pnt_matrix  ! pointer to the matrix
+    type(Grid_Type),   pointer :: pnt_grid    ! grid for which it is defined
 
     !-------------------------!
     !   Physical properties   !
@@ -141,7 +142,6 @@
     ! Pressure velocity coupling algorithm
     integer :: p_m_coupling, i_corr, n_piso_corrections
     logical :: inside_piso_loop
-    logical :: blend_matrices
     logical :: choi_correction
     logical :: gu_correction
     logical :: rep_vol_balance
@@ -179,7 +179,7 @@
     real :: grav_x, grav_y, grav_z
 
     ! Angular velocity
-    real :: omega_x, omega_y, omega_z!, omega
+    real :: omega_x, omega_y, omega_z
 
     ! For volume balance reporting
     integer :: fuvbr
@@ -189,7 +189,7 @@
       !------------------------!
       !   Core functionality   !
       !------------------------!
-      procedure :: Allocate_Field
+      procedure :: Create_Field
 
       !-----------------------------------------!
       !   Procedures for gradient computation   !
@@ -254,7 +254,7 @@
     !------------------------!
     !   Core functionality   !
     !------------------------!
-#   include "Field_Mod/Core/Allocate_Field.f90"
+#   include "Field_Mod/Core/Create_Field.f90"
 
     !-----------------------------------------!
     !   Procedures for gradient computation   !
