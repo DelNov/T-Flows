@@ -39,6 +39,7 @@
     do while(i < MSI .and. petsc_options(i)(1:1) .ne. '')
 
       ! Check if user wants to profile PETSc
+      ! (-info and -log don't create files; -log_trace only sometimes)
       if(petsc_options(i) .eq. "-info"      .or.  &
          petsc_options(i) .eq. "-log"       .or.  &
          petsc_options(i) .eq. "-log_view"  .or.  &
