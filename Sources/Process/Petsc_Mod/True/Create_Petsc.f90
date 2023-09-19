@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Create_Petsc(Pet, A, var_name, options)
+  subroutine Create_Petsc(Pet, A, var_name)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type) :: Pet
   type(Matrix_Type) :: A
   character(VL)     :: var_name
-  character(SL)     :: options(MSI)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),    pointer :: Grid
   integer                     :: i, j, k
@@ -34,33 +33,31 @@
   !---------------------------!
   !   Process PETSc options   !
   !---------------------------!
-  if(options(1) .ne. '') then
+  if(petsc_options(1) .ne. '') then
 
     i = 1
-    do while(i < MSI .and. options(i)(1:1) .ne. '')
+    do while(i < MSI .and. petsc_options(i)(1:1) .ne. '')
 
       ! Check if user wants to profile PETSc
-      if(options(i) .eq. "-info"      .or.  &
-         options(i) .eq. "-log"       .or.  &
-         options(i) .eq. "-log_view"  .or.  &
-         options(i) .eq. "-log_trace") then
+      if(petsc_options(i) .eq. "-info"      .or.  &
+         petsc_options(i) .eq. "-log"       .or.  &
+         petsc_options(i) .eq. "-log_view"  .or.  &
+         petsc_options(i) .eq. "-log_trace") then
         call C_Petsc_Log_Default_Begin()
         petsc_is_reporting = .true.
       end if
 
       ! Option is just a single word (followed by another option or end)
-      if( options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '-' .or. &
-          options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '') then
-        !Debug: print *, 'A:', trim(options(i))
-        call C_Petsc_Options_Set_Value(trim(options(i)) // C_NULL_CHAR,  &
+      if(petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'-' .or. &
+         petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'') then
+        call C_Petsc_Options_Set_Value(trim(petsc_options(i))//C_NULL_CHAR,  &
                                        C_NULL_CHAR)
         i = i + 1
 
       ! Option is followed by a switch
       else
-        !Debug: print *, 'B:', trim(options(i)), ' ', trim(options(i+1))
-        call C_Petsc_Options_Set_Value(trim(options(i))   // C_NULL_CHAR,  &
-                                       trim(options(i+1)) // C_NULL_CHAR)
+        call C_Petsc_Options_Set_Value(trim(petsc_options(i))  //C_NULL_CHAR,  &
+                                       trim(petsc_options(i+1))//C_NULL_CHAR)
         i = i + 2
 
       end if

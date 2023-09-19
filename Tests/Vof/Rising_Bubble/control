@@ -67,7 +67,6 @@
     SOLVER        cg
     PREC          hypre       # asm or hypre
     PREC_OPTS     
-    PETSC_OPTS    
     TOLERANCE     1.0e-3
 
 #--------------------

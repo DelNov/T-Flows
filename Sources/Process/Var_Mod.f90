@@ -36,7 +36,6 @@
     character(SL) :: solver          ! solver
     character(SL) :: prec            ! preconditioner
     character(SL) :: o_prec(MSI)     ! options for preconditioner
-    character(SL) :: o_pets(MSI)     ! options for PETSc
     integer       :: adv_scheme      ! advection scheme
     integer       :: grad_method     ! gradient computation method
     real          :: blend           ! blending (1.0 central; 0.0 upwind)

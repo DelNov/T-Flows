@@ -139,6 +139,7 @@ syn keyword controlKeyword   TOLERANCE_FOR_TURBULENCE_SOLVER
 syn keyword controlKeyword   TOLERANCE_FOR_VOF_SOLVER
 syn keyword controlKeyword   TOLERANCE_FOR_WALL_DISTANCE_SOLVER
 " PETSc options
+syn keyword controlKeyword   PETSC_OPTIONS
 syn keyword controlKeyword   PETSC_OPTIONS_FOR_MOMENTUM
 syn keyword controlKeyword   PETSC_OPTIONS_FOR_PRESSURE
 syn keyword controlKeyword   PETSC_OPTIONS_FOR_WALL_DISTANCE
@@ -150,7 +151,6 @@ syn keyword controlKeyword   PETSC_OPTIONS_FOR_TURBULENCE
 syn keyword controlKeyword   SOLVER
 syn keyword controlKeyword   PREC
 syn keyword controlKeyword   PREC_OPTS
-syn keyword controlKeyword   PETSC_OPTS
 syn keyword controlKeyword   TOLERANCE
 " Physics
 syn keyword controlKeyword   ANGULAR_VELOCITY_VECTOR

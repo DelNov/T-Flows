@@ -60,25 +60,25 @@
   MAX_ITERATIONS_FOR_PRESSURE_SOLVER   99
   MAX_ITERATIONS_FOR_POTENTIAL_SOLVER  99
 
+  PETSC_OPTIONS
+    VALUES    -log_view :backstep_orthogonal.petsc
+
   PETSC_OPTIONS_FOR_PRESSURE
     SOLVER        cg
     PREC          hypre      # asm or hypre
     PREC_OPTS     
-    PETSC_OPTS    -log_view
     TOLERANCE     1.0e-6     # 1.0e-3 was also working
 
   PETSC_OPTIONS_FOR_WALL_DISTANCE
     SOLVER        cg
     PREC          hypre      # asm or hypre
     PREC_OPTS     
-    PETSC_OPTS    
     TOLERANCE     1.0e-6     # 1.0e-3 was also working
 
   PETSC_OPTIONS_FOR_MOMENTUM
     SOLVER        bicg
     PREC          asm
     PREC_OPTS     
-    PETSC_OPTS    
     TOLERANCE     1.0e-6     # 1.0e-5 was also working
 
 #--------------------

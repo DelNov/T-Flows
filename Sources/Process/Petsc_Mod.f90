@@ -69,8 +69,11 @@
     logical, parameter :: PETSC_ACTIVE = .false.
 # endif
 
-    ! I couldn't find a better way to do this
-    logical :: petsc_is_reporting = .false.
+    !---------------------------------------------!
+    !   I couldn't find a better way to do this   !
+    !---------------------------------------------!
+    logical       :: petsc_is_reporting = .false.  ! is PETSc reporting
+    character(SL) :: petsc_options(MSI)            ! options for PETSc
 
   contains
 

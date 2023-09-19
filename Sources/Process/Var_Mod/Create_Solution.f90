@@ -50,8 +50,6 @@
   allocate (phi % z(-Grid % n_bnd_cells:Grid % n_cells));  phi % z = 0.0
 
   ! Variable creates its own PETSc types
-  call phi % Pet % Create_Petsc(phi % pnt_matrix,  &
-                                phi % name,        &
-                                phi % o_pets)         ! general PETSc options
+  call phi % Pet % Create_Petsc(phi % pnt_matrix, phi % name)
 
   end subroutine
