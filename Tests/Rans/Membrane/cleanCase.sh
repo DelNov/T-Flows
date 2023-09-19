@@ -1,7 +1,7 @@
 # Cleaning old files 
 mv readme README
-rm -f out* *.faces *-monit* readme
-rm -f *.cfn *.dim *.pvtu *.vtu
+rm -f out* *.faces *-monit* *.backup readme
+rm -f *.cfn *.dim *.pvtu *bnd* *.vtu control
 rm -rf Sub*
 rm -f Process
 rm -f Generate
