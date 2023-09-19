@@ -12,7 +12,7 @@
 
   ! Call linear solver to solve the equations
   if(PETSC_ACTIVE) then
-    call C_Petsc_Log_View()
+    if(petsc_is_reporting) call C_Petsc_Log_View()
     call C_Petsc_Finalize()
   end if
 

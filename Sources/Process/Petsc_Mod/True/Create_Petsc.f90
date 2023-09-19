@@ -31,11 +31,6 @@
   !----------------------!
   call C_Petsc_Initialize()
 
-  !--------------------!
-  !   Enable logging   !
-  !--------------------!
-  call C_Petsc_Log_Default_Begin()
-
   !---------------------------!
   !   Process PETSc options   !
   !---------------------------!
@@ -43,6 +38,15 @@
 
     i = 1
     do while(i < MSI .and. options(i)(1:1) .ne. '')
+
+      ! Check if user wants to profile PETSc
+      if(options(i) .eq. "-info"      .or.  &
+         options(i) .eq. "-log"       .or.  &
+         options(i) .eq. "-log_view"  .or.  &
+         options(i) .eq. "-log_trace") then
+        call C_Petsc_Log_Default_Begin()
+        petsc_is_reporting = .true.
+      end if
 
       ! Option is just a single word (followed by another option or end)
       if( options(i)(1:1) .eq. '-' .and. options(i+1)(1:1) .eq. '-' .or. &

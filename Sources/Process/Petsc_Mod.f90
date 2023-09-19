@@ -69,6 +69,9 @@
     logical, parameter :: PETSC_ACTIVE = .false.
 # endif
 
+    ! I couldn't find a better way to do this
+    logical :: petsc_is_reporting = .false.
+
   contains
 
 # if T_FLOWS_PETSC == 1

@@ -44,12 +44,15 @@
                                    A % val(j))     ! matrix entry
       end do
     end do
+
+    ! The following two calls are needed after calls to MatSetValue
+    ! But be carefull when you call: it triggers the re-formation of
+    ! the preconditioning matrices which is a rather slow process
+    call C_Petsc_Mat_Assemble(Pet % A)
+
     Pet % matrix_coppied = .true.
     call Profiler % Stop('Solve_Petsc (matrix copy)')
   end if
-
-  ! The following two calls are needed after the calls to MatSetValue
-  call C_Petsc_Mat_Assemble(Pet % A)
 
   !---------------------!
   !   Fill up vectors   ! (A % glo starts from zero)
