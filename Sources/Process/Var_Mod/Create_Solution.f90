@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Var_Mod_Create_Solution(phi, A, name_phi, name_flux)
+  subroutine Var_Mod_Create_Solution(phi, A, name_phi, name_flux,  &
+                                     reuse_pet)
 !------------------------------------------------------------------------------!
 !   This is to allocate a variable for a solution with usual algorithm.        !
 !   Variables such as velocities and pressures should be allocated with it.    !
@@ -8,10 +9,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)            :: phi
-  type(Matrix_Type), target :: A
-  character(len=*)          :: name_phi
-  character(len=*)          :: name_flux
+  type(Var_Type)             :: phi
+  type(Matrix_Type),  target :: A
+  character(len=*)           :: name_phi
+  character(len=*)           :: name_flux
+  integer,          optional :: reuse_pet
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
 !==============================================================================!
@@ -49,7 +51,25 @@
   allocate (phi % y(-Grid % n_bnd_cells:Grid % n_cells));  phi % y = 0.0
   allocate (phi % z(-Grid % n_bnd_cells:Grid % n_cells));  phi % z = 0.0
 
-  ! Variable creates its own PETSc types
-  call phi % Pet % Create_Petsc(phi % pnt_matrix, phi % name)
+# if T_FLOWS_PETSC == 1
+  ! Variable creates its own new PETSc type
+  if(.not. present(reuse_pet)) then
+    Work_Pet % n_members = Work_Pet % n_members + 1
+    call Work_Pet % Member(Work_Pet % n_members) % Create_Petsc(  &
+      phi % pnt_matrix,                                           &
+      phi % name,                                                 &
+      phi % pet_rank                                              &
+    )
+    Assert(phi % pet_rank .eq. Work_Pet % n_members)
+    phi % Pet => Work_Pet % Member(Work_Pet % n_members)
+
+  ! Variable re-uses the existing
+  else
+    Assert(reuse_pet > 0)
+    Assert(reuse_pet <= Work_Pet % n_members)
+    phi % pet_rank = reuse_pet
+    phi % Pet => Work_Pet % Member(reuse_pet)
+  end if
+# endif
 
   end subroutine

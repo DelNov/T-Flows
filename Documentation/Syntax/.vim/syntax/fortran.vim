@@ -417,7 +417,7 @@ if b:fortran_dialect == "f08"
 " T-Flows specific
 " Start with constants from Const_Mod:
   syn keyword fortranConstant      PROGRAM_NAME
-  syn keyword fortranConstant      VL  SL  DL   MSI  DP  SP  IP  LP  RP
+  syn keyword fortranConstant      VL  SL  DL   DP  SP  IP  LP  RP  MAX_STRING_ITEMS  MAX_PETSC_MEMBERS
   syn keyword fortranConstant      VERSION_CFN  VERSION_DIM  VERSION_BACKUP
   syn keyword fortranConstant      YOCTO  ZEPTO  ATTO  FEMTO  PICO  NANO  MICRO  MILI
   syn keyword fortranConstant      YOTTA  ZETTA  EXA   PETA   TERA  GIGA  MEGA   KILO
@@ -466,8 +466,10 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type
   syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof    Message        Info
-  syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Process_Type
-  syn keyword fortranObjectTflows  A  M           vector         Sol            Nat               Pet            Process
+  syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Work_Petsc_Type
+  syn keyword fortranObjectTflows  A  M           vector         Sol            Nat               Pet            Work_Pet  Member
+  syn keyword fortranTypeTflows    Process_Type
+  syn keyword fortranObjectTflows  Process
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
 " Items which follow are not really objects, but I don't know where else to put them

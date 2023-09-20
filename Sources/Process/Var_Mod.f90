@@ -35,7 +35,7 @@
     ! Parameters for numerical solution of the variable
     character(SL) :: solver          ! solver
     character(SL) :: prec            ! preconditioner
-    character(SL) :: o_prec(MSI)     ! options for preconditioner
+    character(SL) :: o_prec(MAX_STRING_ITEMS)  ! options for preconditioner
     integer       :: adv_scheme      ! advection scheme
     integer       :: grad_method     ! gradient computation method
     real          :: blend           ! blending (1.0 central; 0.0 upwind)
@@ -47,7 +47,8 @@
     logical       :: blend_matrix    ! are you blending matrix with upwind?
 
     ! Each variable has its own copy of PETSc, how cute is that?
-    type(Petsc_Type) :: Pet
+    integer                   :: pet_rank
+    type(Petsc_Type), pointer :: Pet
   end type
 
   contains

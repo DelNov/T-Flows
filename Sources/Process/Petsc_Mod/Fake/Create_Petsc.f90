@@ -6,7 +6,7 @@
   class(Petsc_Type) :: Pet
   type(Matrix_Type) :: A
   character(VL)     :: var_name
-  character(SL)     :: options_pets(MSI)
+  character(SL)     :: options_pets(MAX_STRING_ITEMS)
 !-----------------------------------[Locals]-----------------------------------!
   logical, save :: called = .false.
 !==============================================================================!

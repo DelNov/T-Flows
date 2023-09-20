@@ -1,18 +1,78 @@
 !==============================================================================!
-  subroutine Create_Petsc(Pet, A, var_name)
+  subroutine Create_Petsc(Pet, A, var_name, petsc_rank)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type) :: Pet
-  type(Matrix_Type) :: A
-  character(VL)     :: var_name
+  class(Petsc_Type)    :: Pet
+  type(Matrix_Type)    :: A
+  character(VL)        :: var_name
+  integer, intent(out) :: petsc_rank
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),    pointer :: Grid
   integer                     :: i, j, k
+  integer,               save :: call_count = 0
   type(PetscInt), allocatable :: d_nnz(:)  ! diagonal stencil width per cell
   type(PetscInt), allocatable :: o_nnz(:)  ! off-diag stencil width per cell
 !==============================================================================!
 
+  ! Increaset the call count
+  call_count = call_count + 1
+
+  ! Number of times this function is called, gives the PETSC rank
+  petsc_rank = call_count
+
+  !----------------------------------!
+  !                                  !
+  !   General PETSc initialization   !
+  !                                  !
+  !----------------------------------!
+  if(call_count .eq. 1) then
+
+    !----------------------!
+    !   Initialize PETSc   !
+    !----------------------!
+    call C_Petsc_Initialize()
+
+    !---------------------------!
+    !   Process PETSc options   !
+    !---------------------------!
+    if(petsc_options(1) .ne. '') then
+
+      i = 1
+      do while(i < MAX_STRING_ITEMS .and. petsc_options(i)(1:1) .ne. '')
+
+        ! Check if user wants to profile PETSc
+        ! (-info and -log don't create files; -log_trace only sometimes)
+        if(petsc_options(i) .eq. "-info"      .or.  &
+           petsc_options(i) .eq. "-log"       .or.  &
+           petsc_options(i) .eq. "-log_view"  .or.  &
+           petsc_options(i) .eq. "-log_trace") then
+          call C_Petsc_Log_Default_Begin()
+          petsc_is_reporting = .true.
+        end if
+
+        ! Option is just a single word (followed by another option or end)
+        if(petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'-' .or. &
+           petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'') then
+          call C_Petsc_Options_Set_Value(trim(petsc_options(i))//C_NULL_CHAR,  &
+                                         C_NULL_CHAR)
+          i = i + 1
+
+        ! Option is followed by a switch
+        else
+          call C_Petsc_Options_Set_Value(trim(petsc_options(i))  //C_NULL_CHAR,  &
+                                         trim(petsc_options(i+1))//C_NULL_CHAR)
+          i = i + 2
+
+        end if
+      end do
+    end if
+  end if
+
+  !---------------------------------------------------!
+  !   General PETSc initialization done for the 1st   !
+  !   time, continue with variable-specific things    !
+  !---------------------------------------------------!
   Pet % pnt_grid => A % pnt_grid
   Grid           => A % pnt_grid
 
@@ -24,46 +84,6 @@
   ! Total number of unknowns and unknowns in this processor only
   Pet % m_upper = Grid % Comm % nc_tot
   Pet % m_lower = Grid % n_cells - Grid % Comm % n_buff_cells
-
-  !----------------------!
-  !   Initialize PETSc   !
-  !----------------------!
-  call C_Petsc_Initialize()
-
-  !---------------------------!
-  !   Process PETSc options   !
-  !---------------------------!
-  if(petsc_options(1) .ne. '') then
-
-    i = 1
-    do while(i < MSI .and. petsc_options(i)(1:1) .ne. '')
-
-      ! Check if user wants to profile PETSc
-      ! (-info and -log don't create files; -log_trace only sometimes)
-      if(petsc_options(i) .eq. "-info"      .or.  &
-         petsc_options(i) .eq. "-log"       .or.  &
-         petsc_options(i) .eq. "-log_view"  .or.  &
-         petsc_options(i) .eq. "-log_trace") then
-        call C_Petsc_Log_Default_Begin()
-        petsc_is_reporting = .true.
-      end if
-
-      ! Option is just a single word (followed by another option or end)
-      if(petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'-' .or. &
-         petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'') then
-        call C_Petsc_Options_Set_Value(trim(petsc_options(i))//C_NULL_CHAR,  &
-                                       C_NULL_CHAR)
-        i = i + 1
-
-      ! Option is followed by a switch
-      else
-        call C_Petsc_Options_Set_Value(trim(petsc_options(i))  //C_NULL_CHAR,  &
-                                       trim(petsc_options(i+1))//C_NULL_CHAR)
-        i = i + 2
-
-      end if
-    end do
-  end if
 
   !--------------------------!
   !    Create PETSc matrix   !

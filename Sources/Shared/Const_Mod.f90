@@ -26,8 +26,8 @@
   integer, parameter :: DL = 160  ! double string length
 
   ! Maximum number of string items in a line
-  ! (when reading boundary conditions, options for PETSc)
-  integer, parameter :: MSI = 32
+  ! (for example when reading boundary conditions, options for PETSc)
+  integer, parameter :: MAX_STRING_ITEMS = 32
 
   ! Double and single precision constants definitions
   integer, parameter :: DP =  8  ! double precisions for real and integer

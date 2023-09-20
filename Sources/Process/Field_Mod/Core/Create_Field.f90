@@ -5,10 +5,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type)         :: Flow
+  class(Field_Type), target :: Flow
   type(Matrix_Type), target :: A
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
+  type(Var_Type),  pointer :: u, v, w
   integer                  :: sc, nb, nc, nn, nf
   character(VL)            :: c_name, q_name
 !==============================================================================!
@@ -43,11 +44,14 @@
   !----------------------------!
   !   Navier-Stokes equation   !
   !----------------------------!
+  u => Flow % u
+  v => Flow % v
+  w => Flow % w
 
   ! Allocate memory for velocity components
-  call Var_Mod_Create_Solution(Flow % u, A, 'U', '')
-  call Var_Mod_Create_Solution(Flow % v, A, 'V', '')
-  call Var_Mod_Create_Solution(Flow % w, A, 'W', '')
+  call Var_Mod_Create_Solution(u, A, 'U', '')
+  call Var_Mod_Create_Solution(v, A, 'V', '', reuse_pet = u % pet_rank)
+  call Var_Mod_Create_Solution(w, A, 'W', '', reuse_pet = u % pet_rank)
 
   ! Potential for initial velocity computation
   call Var_Mod_Create_Solution(Flow % pot, A, 'POT', '')

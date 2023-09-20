@@ -75,12 +75,14 @@ $(info #   make                        - sequential version with gnu compiler  )
 $(info #   make MPI=yes                - MPI version with gnu compiler         )
 $(info #   make MPI=yes FCOMP=compiler - MPI version with custom compiler      )
 $(info #   make FORTRAN=intel MPI=yes  - MPI version with intel compiler       )
+ifneq ($(PETSC_DIR),)
 $(info #                                                                       )
-$(info # Note:                                                                 )
+$(info # Warning:                                                              )
 $(info #   At the very end of the makefile, environment variables for PETSc    )
 $(info #   libraries are included.  If you have a compiler mismatch there,     )
 $(info #   that is if you PETSc was compiled with different compiler from      )
 $(info #   the one you are using to compile Process, errors will occur.        )
+endif
 $(info #-----------------------------------------------------------------------)
 
 #-------------------

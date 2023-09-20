@@ -9,9 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)          :: Pet
-  character(*),  intent(in)  :: solver          ! solver
-  character(*),  intent(in)  :: prec            ! preconditioner
-  character(SL), intent(in)  :: prec_opts(MSI)  ! preconditioner options
+  character(*),  intent(in)  :: solver                       ! solver
+  character(*),  intent(in)  :: prec                         ! preconditioner
+  character(SL), intent(in)  :: prec_opts(MAX_STRING_ITEMS)  ! prec. options
   type(Matrix_Type)          :: A
   real                       :: x(-Pet % pnt_grid % n_bnd_cells :  &
                                    Pet % pnt_grid % n_cells)
@@ -101,7 +101,7 @@
   !------------------------------------!
   if(prec_opts(1) .ne. '') then
     i = 1
-    do while(i < MSI .and. prec_opts(i)(1:1) .ne. '')
+    do while(i < MAX_STRING_ITEMS .and. prec_opts(i)(1:1) .ne. '')
 
       ! Option is just a single word (followed by another option or end)
       if( prec_opts(i)(1:1) .eq. '-' .and. prec_opts(i+1)(1:1) .eq. '-' .or. &

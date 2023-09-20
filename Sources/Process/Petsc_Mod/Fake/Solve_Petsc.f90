@@ -9,9 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Petsc_Type)          :: Pet
-  character(*),  intent(in)  :: solver          ! solver
-  character(*),  intent(in)  :: prec            ! preconditioner
-  character(SL), intent(in)  :: prec_opts(MSI)  ! preconditioner options
+  character(*),  intent(in)  :: solver                       ! solver
+  character(*),  intent(in)  :: prec                         ! preconditioner
+  character(SL), intent(in)  :: prec_opts(MAX_STRING_ITEMS)  ! prec. options
   type(Matrix_Type)          :: A
   real                       :: x(-Pet % pnt_grid % n_bnd_cells :  &
                                    Pet % pnt_grid % n_cells)

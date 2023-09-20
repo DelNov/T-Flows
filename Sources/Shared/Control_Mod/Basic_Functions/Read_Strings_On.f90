@@ -7,8 +7,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Control_Type)              :: Control
   character(len=*),    intent(in)  :: keyword
-  character(SL),       intent(out) :: values(MSI)   ! spefified value, if found
-  integer,             intent(out) :: n             ! number of items
+  character(SL),       intent(out) :: values(MAX_STRING_ITEMS)
+  integer,             intent(out) :: n        ! number of items
   logical,   optional, intent(in)  :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
@@ -16,7 +16,7 @@
 !==============================================================================!
 
   ! Set default values
-  values(1:MSI) = ''
+  values(1:MAX_STRING_ITEMS) = ''
 
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !

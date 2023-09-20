@@ -28,6 +28,9 @@
   implicit none
 !==============================================================================!
 
+  ! Maximum number of PETSc objects to create
+  integer, parameter :: MAX_PETSC_MEMBERS = 32
+
   !----------------!
   !   Petsc type   !
   !----------------!
@@ -72,8 +75,18 @@
     !---------------------------------------------!
     !   I couldn't find a better way to do this   !
     !---------------------------------------------!
-    logical       :: petsc_is_reporting = .false.  ! is PETSc reporting
-    character(SL) :: petsc_options(MSI)            ! options for PETSc
+    logical       :: petsc_is_reporting = .false.     ! is PETSc reporting
+    character(SL) :: petsc_options(MAX_STRING_ITEMS)  ! options for PETSc
+
+    !---------------------!
+    !   Work PETSC type   !
+    !---------------------!
+    type Work_Petsc_Type
+      integer          :: n_members = 0
+      type(Petsc_Type) :: Member(MAX_PETSC_MEMBERS)
+    end type
+
+    type(Work_Petsc_Type), target :: Work_Pet
 
   contains
 

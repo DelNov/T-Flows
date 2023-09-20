@@ -8,6 +8,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Matrix_Type), pointer :: A
+  type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   integer                    :: nb, nc
 !==============================================================================!
 
@@ -218,12 +219,18 @@
     allocate(Turb % p_kin  (-nb:nc));  Turb % p_kin   = 0.
 
     ! Reynolds stresses
-    call Var_Mod_Create_Solution(Turb % uu, A, 'UU', '')
-    call Var_Mod_Create_Solution(Turb % vv, A, 'VV', '')
-    call Var_Mod_Create_Solution(Turb % ww, A, 'WW', '')
-    call Var_Mod_Create_Solution(Turb % uv, A, 'UV', '')
-    call Var_Mod_Create_Solution(Turb % uw, A, 'UW', '')
-    call Var_Mod_Create_Solution(Turb % vw, A, 'VW', '')
+    uu => Turb % uu
+    vv => Turb % vv
+    ww => Turb % ww
+    uv => Turb % uv
+    uw => Turb % uw
+    vw => Turb % vw
+    call Var_Mod_Create_Solution(uu, A, 'UU', '')
+    call Var_Mod_Create_Solution(vv, A, 'VV', '', reuse_pet = uu % pet_rank)
+    call Var_Mod_Create_Solution(ww, A, 'WW', '', reuse_pet = uu % pet_rank)
+    call Var_Mod_Create_Solution(uv, A, 'UV', '', reuse_pet = uu % pet_rank)
+    call Var_Mod_Create_Solution(uw, A, 'UW', '', reuse_pet = uu % pet_rank)
+    call Var_Mod_Create_Solution(vw, A, 'VW', '', reuse_pet = uu % pet_rank)
 
     call Var_Mod_Create_New_Only(Turb % kin, Grid,    'KIN')
     call Var_Mod_Create_Solution(Turb % eps, A, 'EPS', '')

@@ -21,7 +21,7 @@
   type(Var_Type),  pointer :: tq, phi
   logical                  :: found
   character(SL)            :: sstring, pstring
-  character(SL)            :: pets(MSI), prec(MSI)
+  character(SL)            :: pets(MAX_STRING_ITEMS), prec(MAX_STRING_ITEMS)
   integer                  :: i, n_pets, n_prec, sc
   real                     :: tol
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -49,7 +49,7 @@
   !---------------------------!
   !   General PETSc options   !
   !---------------------------!
-  petsc_options(1:MSI)  = ''
+  petsc_options(1:MAX_STRING_ITEMS)  = ''
   call Control % Position_At_One_Key('PETSC_OPTIONS', found, .false.)
   if(found) then
     call Control % Read_Strings_On('VALUES', pets, n_pets, .false.)
@@ -62,11 +62,14 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_MOMENTUM',  &
                                       found,                        &
                                       .false.)
+  u % o_prec(1:MAX_STRING_ITEMS) = ''
+  v % o_prec(1:MAX_STRING_ITEMS) = ''
+  w % o_prec(1:MAX_STRING_ITEMS) = ''
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'asm',  pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'bicg',  sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'asm',   pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol,     .true.)
 
     u % solver = sstring
     v % solver = sstring
@@ -74,9 +77,6 @@
     u % prec = pstring
     v % prec = pstring
     w % prec = pstring
-    u % o_prec(1:MSI) = ''
-    v % o_prec(1:MSI) = ''
-    w % o_prec(1:MSI) = ''
     u % o_prec(1:n_prec) = prec(1:n_prec)
     v % o_prec(1:n_prec) = prec(1:n_prec)
     w % o_prec(1:n_prec) = prec(1:n_prec)
@@ -90,9 +90,6 @@
     u % prec   = 'asm'
     v % prec   = 'asm'
     w % prec   = 'asm'
-    u % o_prec(1:MSI) = ''
-    v % o_prec(1:MSI) = ''
-    w % o_prec(1:MSI) = ''
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for momentum are not'  //  &
                    ' specified.  Using the default: '             //  &
@@ -106,21 +103,20 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_PRESSURE',  &
                                       found,                        &
                                       .false.)
+  Flow % pp % o_prec(1:MAX_STRING_ITEMS)    = ''
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'cg',   sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'gamg', pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'cg',    sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'gamg',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol,     .true.)
 
     Flow % pp % solver = sstring
     Flow % pp % prec = pstring
-    Flow % pp % o_prec(1:MSI)    = ''
     Flow % pp % o_prec(1:n_prec) = prec(1:n_prec)
     Flow % pp % tol = tol
   else
     Flow % pp % solver = 'cg'
     Flow % pp % prec   = 'gamg'
-    Flow % pp % o_prec(1:MSI) = ''
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for pressure are not'  //  &
                    ' specified.  Using the default: '             //  &
@@ -134,21 +130,20 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_WALL_DISTANCE',  &
                                         found,                             &
                                         .false.)
+  Flow % wall_dist % o_prec(1:MAX_STRING_ITEMS)    = ''
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'cg',   sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'gamg', pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'cg',    sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'gamg',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol,     .true.)
 
     Flow % wall_dist % solver = sstring
     Flow % wall_dist % prec = pstring
-    Flow % wall_dist % o_prec(1:MSI)    = ''
     Flow % wall_dist % o_prec(1:n_prec) = prec(1:n_prec)
     Flow % wall_dist % tol = tol
   else
     Flow % wall_dist % solver = 'cg'
     Flow % wall_dist % prec   = 'gamg'
-    Flow % wall_dist % o_prec(1:MSI) = ''
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for wall distance are not'  //  &
                    ' specified.  Using the default: '                  //  &
@@ -163,21 +158,20 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_POTENTIAL',  &
                                       found,                         &
                                       .false.)
+  Flow % pot % o_prec(1:MAX_STRING_ITEMS) = ''
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'cg',   sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'gamg', pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE',  1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'cg',    sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'gamg',  pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol,     .true.)
 
     Flow % pot % solver = sstring
     Flow % pot % prec = pstring
-    Flow % pot % o_prec(1:MSI)    = ''
     Flow % pot % o_prec(1:n_prec) = prec(1:n_prec)
     Flow % pot % tol = tol
   else
     Flow % pot % solver = 'cg'
     Flow % pot % prec   = 'gamg'
-    Flow % pot % o_prec(1:MSI) = ''
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for potential are not'  //  &
                    ' specified.  Using the default: '              //  &
@@ -191,21 +185,20 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_VOF',  &
                                       found,                   &
                                       .false.)
+  Vof % fun % o_prec(1:MAX_STRING_ITEMS) = ''
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'asm',  pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'bicg',  sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'asm',   pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol,     .true.)
 
     Vof % fun % solver = sstring
     Vof % fun % prec = pstring
-    Vof % fun % o_prec(1:MSI)    = ''
     Vof % fun % o_prec(1:n_prec) = prec(1:n_prec)
     Vof % fun % tol = tol
   else
     Vof % fun % solver = 'bicg'
     Vof % fun % prec   = 'asm'
-    Vof % fun % o_prec(1:MSI) = ''
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for VOF are not'  //  &
                    ' specified.  Using the default: '        //  &
@@ -219,21 +212,20 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_ENERGY',  &
                                       found,                      &
                                       .false.)
+  t % o_prec(1:MAX_STRING_ITEMS) = ''
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'asm',  pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'bicg',  sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'asm',   pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-5, tol,     .true.)
 
     t % solver = sstring
     t % prec = pstring
-    t % o_prec(1:MSI)    = ''
     t % o_prec(1:n_prec) = prec(1:n_prec)
     t % tol = tol
   else
     t % solver = 'bicg'
     t % prec   = 'asm'
-    t % o_prec(1:MSI) = ''
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for energy are not'  //  &
                    ' specified.  Using the default: '           //  &
@@ -247,19 +239,18 @@
   call Control % Position_At_One_Key('PETSC_OPTIONS_FOR_SCALARS',  &
                                       found,                       &
                                       .false.)
-
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'asm',  pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'bicg',  sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'asm',   pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol,     .true.)
 
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
       phi % solver = sstring
       phi % prec = pstring
-      phi % o_prec(1:MSI)    = ''
       phi % o_prec(1:n_prec) = prec(1:n_prec)
+      phi % o_prec(1:MAX_STRING_ITEMS) = ''
       phi % tol = tol
     end do
   else
@@ -267,7 +258,7 @@
       phi => Flow % scalar(sc)
       phi % solver = 'bicg'
       phi % prec   = 'asm'
-      phi % o_prec(1:MSI) = ''
+      phi % o_prec(1:MAX_STRING_ITEMS) = ''
     end do
     if(Flow % n_scalars > 0) then
       phi => Flow % scalar(1)  ! probably not needed, but doesn't harm
@@ -286,10 +277,10 @@
                                       found,                          &
                                       .false.)
   if(found) then
-    call Control % Read_Char_Item_On('SOLVER',   'bicg', sstring, .true.)
-    call Control % Read_Char_Item_On('PREC',     'asm',  pstring, .true.)
-    call Control % Read_Strings_On  ('PREC_OPTS',  prec, n_prec, .false.)
-    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol, .true.)
+    call Control % Read_Char_Item_On('SOLVER',   'bicg',  sstring, .true.)
+    call Control % Read_Char_Item_On('PREC',     'asm',   pstring, .true.)
+    call Control % Read_Strings_On  ('PREC_OPTS', prec,   n_prec, .false.)
+    call Control % Read_Real_Item_On('TOLERANCE', 1.0e-3, tol,     .true.)
 
     do i = 1, 12
       if(i .eq.  1) tq => Turb % kin
@@ -304,11 +295,11 @@
       if(i .eq. 10) tq => Turb % uv
       if(i .eq. 11) tq => Turb % uw
       if(i .eq. 12) tq => Turb % vw
-      tq % solver              = sstring
-      tq % prec                = pstring
-      tq % o_prec(1:MSI)    = ''
+      tq % solver           = sstring
+      tq % prec             = pstring
+      tq % o_prec(:)        = ''
       tq % o_prec(1:n_prec) = prec(1:n_prec)
-      tq % tol                 = tol
+      tq % tol              = tol
     end do
   else
     do i = 1, 12
@@ -324,9 +315,9 @@
       if(i .eq. 10) tq => Turb % uv
       if(i .eq. 11) tq => Turb % uw
       if(i .eq. 12) tq => Turb % vw
-      tq % solver = 'bicg'
-      tq % prec   = 'asm'
-      tq % o_prec(1:MSI) = ''
+      tq % solver    = 'bicg'
+      tq % prec      = 'asm'
+      tq % o_prec(:) = ''
     end do
     if(First_Proc()) then
       print '(a)', ' # NOTE! PETSc options for turbulence are not'  //  &
