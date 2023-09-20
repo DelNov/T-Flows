@@ -76,6 +76,8 @@
   allocate(Flow % vort (-nb:nc)); Flow % vort  = 0.
   allocate(Flow % shear(-nb:nc)); Flow % shear = 0.
 
+  allocate(Flow % potential(-nb:nc)); Flow % potential = 0.
+
   !--------------------------------------------------------------!
   !   Nine variables which follow are needed for Rhie and Chow   !
   !--------------------------------------------------------------!

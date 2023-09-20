@@ -449,7 +449,7 @@
     !   Potential   !
     !---------------!
     call Results % Save_Vtu_Scalar_Real("Potential [m^2/s]", plot_inside,  &
-                                        Flow % pot % n(c_f:c_l),           &
+                                        Flow % potential(c_f:c_l),         &
                                         f8, f9, data_offset, run)
 
     !--------------------------------------!

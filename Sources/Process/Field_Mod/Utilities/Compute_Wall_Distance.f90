@@ -251,10 +251,16 @@
 !                            scalar_cell = abs(phi % n - Grid % wall_dist)     &
 !                                        / (Grid % wall_dist + TINY) * 100.0,  &
 !                            scalar_name = "Wall Distance Error [%]")
+
+  !---------------------------------!
+  !   Save what you have computed   !
+  !---------------------------------!
   Grid % wall_dist(:) = phi % n(:)
 
+  !----------------------------------!
+  !   Releasing and freeing memory   !
+  !----------------------------------!
   call Work % Disconnect_Real_Cell(cross)
-
   call Var_Mod_Destroy_Solution(phi)
 
   call Profiler % Stop('Compute_Wall_Distance')

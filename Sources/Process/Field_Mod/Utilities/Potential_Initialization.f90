@@ -324,10 +324,16 @@
     w % oo(c) = w % n(c)
   end do
 
-  call Work % Disconnect_Real_Cell(log_dist, cross)
+  !---------------------------------!
+  !   Save what you have computed   !
+  !---------------------------------!
+  Flow % potential(:) = phi % n(:)
 
-  ! Don't destroy it (yet), it is plotted with results
-  ! call Var_Mod_Destroy_Solution(phi)
+  !----------------------------------!
+  !   Releasing and freeing memory   !
+  !----------------------------------!
+  call Work % Disconnect_Real_Cell(log_dist, cross)
+  call Var_Mod_Destroy_Solution(phi)
 
   call Profiler % Stop('Potential_Initialization')
 

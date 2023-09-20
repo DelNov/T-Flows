@@ -50,6 +50,9 @@
     real, allocatable :: shear(:)  ! [1/s]
     real, allocatable :: vort(:)   ! [1/s]
 
+    ! Pressure-like potential for initial velocity field
+    real, allocatable :: potential(:)
+
     ! Volumetric flux through cell faces
     type(Face_Type) :: v_flux  ! [m^3/s]
 
