@@ -14,7 +14,7 @@
   RESULTS_SAVE_INTERVAL                      200
   BACKUP_SAVE_INTERVAL                      3000
 
-  LOAD_BACKUP_NAME          matrix-ts060000.backup
+# LOAD_BACKUP_NAME          matrix-ts060000.backup
 
 #-------------------
 # Monitoring points
