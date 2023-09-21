@@ -31,6 +31,9 @@
   ! If it wasn't compiled with PETSc, don't confuse a user with this
   if(.not. PETSC_ACTIVE) return
 
+  ! Initialize PETSc options to be all empty strings
+  petsc_options(1:MAX_STRING_ITEMS) = ''
+
   ! Also, don't bother to read if user wants to use native solvers
   if(Sol % solvers .ne. PETSC) return
 
@@ -49,7 +52,6 @@
   !---------------------------!
   !   General PETSc options   !
   !---------------------------!
-  petsc_options(1:MAX_STRING_ITEMS)  = ''
   call Control % Position_At_One_Key('PETSC_OPTIONS', found, .false.)
   if(found) then
     call Control % Read_Strings_On('VALUES', pets, n_pets, .false.)
