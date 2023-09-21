@@ -26,7 +26,7 @@
   print *, '# Insert homogeneous direction  '
   print *, '# (xy, yz, zx or skip)'
   print *, '#-------------------------------'
-  read(*,*) answer
+  answer = File % Single_Word_From_Keyboard()
   call String % To_Upper_Case(answer)
   if(answer .eq. 'SKIP') then
     call Profiler % Stop('Probe_2d')
