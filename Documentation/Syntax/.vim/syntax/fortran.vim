@@ -570,6 +570,8 @@ syn match fortranOpenMP		excludenl 		"^\s*!\$\(OMP\)\=&\=\s.*$"
 syn match  cPreProc    "^\s*#\s*\(define\|ifdef\)\>.*"
 syn match  cPreProc    "^\s*#\s*\(elif\|if\)\>.*"
 syn match  cPreProc    "^\s*#\s*\(ifndef\|undef\)\>.*"
+syn match  cPreProc    "__FILE__"
+syn match  cPreProc    "__LINE__"
 syn match  cPreCondit  "^\s*#\s*\(else\|endif\)\>.*"
 syn region cIncluded   contained start=+"[^("]+ skip=+\\\\\|\\"+ end=+"+ contains=fortranLeftMargin,fortranContinueMark,fortranSerialNumber
 "syn region	cIncluded	        contained start=+"[^("]+ skip=+\\\\\|\\"+ end=+"+
