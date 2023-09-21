@@ -309,14 +309,14 @@
   mem_j_heat_avg = mem_j_heat_acc / area_acc
   t_int_avg      = t_int_acc      / area_acc
   ! Control
-  if(First_Proc()) then
-    print *, 'mem_j_diff = ' , mem_j_diff_avg * 3600, ' kg/m²h'
-    print *, 'mem_j_heat = ' , mem_j_heat_avg * 3600, ' kg/m²h'
-    print *, 'jump condition coefficients: ', lhs_lin, lhs_fun, rhs
-    print *, 'partial vapor pressure on water and air side: ', p_v_h2o, p_v_air
-    print *, 'scalars salt and vapor: ', sc1, sc2
-    print *, 'M in air gap: ', M
-    print *, 't_int_mem = ' , t_int_avg, ' C'
-  end if
+  !if(First_Proc()) then
+  !  print *, 'mem_j_diff = ' , mem_j_diff_avg * 3600, ' kg/m²h'
+  !  print *, 'mem_j_heat = ' , mem_j_heat_avg * 3600, ' kg/m²h'
+  !  print *, 'jump condition coefficients: ', lhs_lin, lhs_fun, rhs
+  !  print *, 'partial vapor pressure on water and air side: ', p_v_h2o, p_v_air
+  !  print *, 'scalars salt and vapor: ', sc1, sc2
+  !  print *, 'M in air gap: ', M
+  !  print *, 't_int_mem = ' , t_int_avg, ' C'
+  !end if
 
   end subroutine

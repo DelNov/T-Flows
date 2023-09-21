@@ -157,10 +157,10 @@
     call Global % Sum_Real(area_acc)
     m_evap_avg = m_evap_acc / area_acc
     t_int_avg  = t_int_acc  / area_acc
-    if(First_Proc()) then
-      print * , 'm_evap =', m_evap_avg * 3600, ' kg/m²h '
-      print * , 't_int = ', t_int_avg, 'Celsius'
-    end if
+    !if(First_Proc()) then
+    !  print * , 'm_evap =', m_evap_avg * 3600, ' kg/m²h '
+    !  print * , 't_int = ', t_int_avg, 'Celsius'
+    !end if
 
   end if
 
