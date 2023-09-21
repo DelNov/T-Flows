@@ -20,7 +20,7 @@
   integer(SP)                  :: data_size
   integer                      :: data_offset, cell_offset, i_fac, reg
   integer                      :: s, n, n_conns, n_polyg, sc, f7, f8, f9, run
-  integer                      :: s1, s2, c1, c2, c_f, c_l
+  integer                      :: i, j, n1, n2, s1, s2, c, c1, c2, c_f, c_l
   real                         :: dist1, dist2
   character(SL)                :: name_out_7, name_out_8, name_out_9, name_mean
   character(SL)                :: str1, str2
@@ -29,6 +29,8 @@
   real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
   real,    pointer, contiguous :: var_ins(:)
   real,    pointer, contiguous :: v2_calc(:), kin_vis_t(:), phi_save(:)
+  real,    allocatable         :: r_buffer(:)
+  integer, allocatable         :: i_buffer(:)
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
@@ -71,6 +73,33 @@
       end do
     end if
   end if
+
+  !------------------------------------------------------------------!
+  !   Count the required buffer sizes and allocate memory for them   !
+  !------------------------------------------------------------------!
+
+  ! Count the size of integer buffer for non-polyhedral cells
+  n1 = 0
+  do c = c_f, c_l
+    n1 = n1 + max(abs(Grid % cells_n_nodes(c)), Grid % cells_n_faces(c))
+  end do
+
+  ! Still counting, but now for polyhedral cells
+  n2 = 0
+  do c = c_f, c_l
+    if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+      n2 = n2 + 1
+      do i_fac = 1, Grid % cells_n_faces(c)  ! and all polyfaces
+        s = Grid % cells_f(i_fac, c)
+        n = Grid % faces_n_nodes(s)
+        n2 = n2 + 1                          ! to store number of nodes
+        n2 = n2 + n                          ! to store each node
+      end do
+    end if
+  end do
+
+  allocate(i_buffer(max(Grid % n_nodes, max(n1,n2))))
+  allocate(r_buffer(Grid % n_nodes * 3))
 
   !-------------------------------------------------------------------------!
   !   Count connections and polygons in this Grid, you will need it later   !
@@ -290,6 +319,8 @@
   !----------------!
   do run = 1, 2
 
+    call Profiler % Start('Save_Vtu_Results (grid remnants)')
+
     !------------------------------------------!
     !   Save remnants of the Grid definition   !
     !------------------------------------------!
@@ -298,26 +329,39 @@
       ! Save the nodes' coordinates
       data_size = int(Grid % n_nodes * RP * 3, SP)
       write(f9) data_size
+      i = 0
       do n = 1, Grid % n_nodes
-        write(f9) Grid % xn(n), Grid % yn(n), Grid % zn(n)
+        i = i + 1;  r_buffer(i) = Grid % xn(n)
+        i = i + 1;  r_buffer(i) = Grid % yn(n)
+        i = i + 1;  r_buffer(i) = Grid % zn(n)
       end do
+      write(f9) r_buffer(1:i)
 
       ! Save connections
       data_size = int(n_conns * IP, SP)
       write(f9) data_size
       if(plot_inside) then
+        i = 0
         do c1 = c_f, c_l
 
           ! Tetrahedral, pyramid, wedge and hexahedral cells
           if( any( Grid % cells_n_nodes(c1) .eq. (/4,5,6,8/)  ) ) then
-            write(f9) (Grid % cells_n(1:Grid % cells_n_nodes(c1), c1))-1
+            do j = 1, Grid % cells_n_nodes(c1)
+              i = i + 1
+              i_buffer(i) = Grid % cells_n(j, c1) - 1  ! VTU counts from 0
+            end do
 
           ! Polyhedral cells
           else if(Grid % cells_n_nodes(c1) .lt. 0) then
-            write(f9) (Grid % cells_n(1:-Grid % cells_n_nodes(c1), c1))-1
+            do j = 1, -Grid % cells_n_nodes(c1)
+              i = i + 1
+              i_buffer(i) = Grid % cells_n(j, c1) - 1  ! VTU counts from 0
+            end do
 
           end if
         end do
+        write(f9) i_buffer(1:i)
+
       else  ! plot only boundary
         do c2 = c_f, c_l
 
@@ -342,9 +386,11 @@
         data_size = int(n_polyg * IP, SP)
         write(f9) data_size
 
+        i = 0
         do c1 = c_f, c_l
           if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
-            write(f9) Grid % cells_n_faces(c1)      ! write number of polygons
+            i = i + 1
+            i_buffer(i) = Grid % cells_n_faces(c1)  ! write number of polygons
             do i_fac = 1, Grid % cells_n_faces(c1)  ! write nodes of each polygn
               s = Grid % cells_f(i_fac, c1)
               if(Grid % faces_s(s) .ne. 0) then  ! face has a shadow, if it ...
@@ -360,16 +406,23 @@
                 if(dist2 < dist1) s = s2
               end if
               n = Grid % faces_n_nodes(s)
-              write(f9) n, (Grid % faces_n(1:n, s))-1
+              i = i + 1
+              i_buffer(i) = n
+              do j = 1, n
+                i = i + 1
+                i_buffer(i) = Grid % faces_n(j, s) - 1   ! VTU counts from 0
+              end do
             end do
           end if
         end do
+        write(f9) i_buffer(1:i)
 
         ! Write polyhedral cells' faces offsets
         data_size = int((c_l-c_f+1) * IP, SP)
         write(f9) data_size
 
         cell_offset = 0
+        i = 0
         do c1 = c_f, c_l
           if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
             cell_offset = cell_offset + 1           ! to store number of polygs
@@ -378,18 +431,23 @@
               n = Grid % faces_n_nodes(s)
               cell_offset = cell_offset + 1 + n
             end do
-            write(f9) cell_offset
+            i = i + 1
+            i_buffer(i) = cell_offset
 
           ! Not a polyhedron, offsets are not needed and set to -1
           else
-            write(f9) -1
+            i = i + 1
+            i_buffer(i) = -1
           end if
 
         end do
+        write(f9) i_buffer(1:i)
 
       end if  ! n_polyg > 0
 
     end if
+
+    call Profiler % Stop('Save_Vtu_Results (grid remnants)')
 
     !--------------------!
     !   Cell processor   !

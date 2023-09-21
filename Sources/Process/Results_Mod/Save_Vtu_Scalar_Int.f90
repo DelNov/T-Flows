@@ -16,12 +16,15 @@
   integer             :: data_offset
   integer             :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
-  integer(SP)   :: data_size
-  integer       :: c1, c2, c_f, c_l
-  character(SL) :: str1
+  integer(SP)                  :: data_size
+  integer                      :: i, c1, c2, c_f, c_l
+  character(SL)                :: str1
+  integer, pointer, contiguous :: buffer(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Results)
 !==============================================================================!
+
+  call Work % Connect_Int_Cell(buffer)
 
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
@@ -50,21 +53,33 @@
 
   ! Data
   if(sweep .eq. 2) then
+
+    call Profiler % Start('Save_Vtu_Results (scalar int)')
+
     if(plot_inside) then
       data_size = int((c_l-c_f+1) * IP, SP)
       write(fp) data_size
+      i = 0
       do c1 = c_f, c_l
-        write(fp) val(c1)
+        i = i + 1
+        buffer(i) = val(c1)
       end do
+      write(fp) buffer(1:i)
     else
       do c2 = c_f, c_l
         data_size = int(data_size + IP, SP)
       end do
       write(fp) data_size
+      i = 0
       do c2 = c_f, c_l
-        write(fp) val(c2)
+        i = i + 1
+        buffer(i) = val(c2)
       end do
+      write(fp) buffer(1:i)
     end if
+
+    call Profiler % Stop('Save_Vtu_Results (scalar int)')
+
   end if
 
   ! Update data_offset
@@ -78,5 +93,7 @@
     end if
     data_offset = data_offset + SP
   end if
+
+  call Work % Disconnect_Int_Cell(buffer)
 
   end subroutine

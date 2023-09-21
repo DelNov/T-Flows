@@ -20,8 +20,9 @@
   integer             :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
-  integer       :: c1, c2, c_f, c_l
+  integer       :: i, c1, c2, c_f, c_l
   character(SL) :: str1
+  real, allocatable :: buffer(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Results)
 !==============================================================================!
@@ -33,6 +34,9 @@
 
   c_f = lbound(val_11, 1)
   c_l = ubound(val_11, 1)
+
+  ! Allocate local array
+  allocate(buffer((c_l-c_f+1)*6))
 
   ! Header
   if(sweep .eq. 1) then
@@ -58,19 +62,31 @@
     if(plot_inside) then
       data_size = int((c_l-c_f+1) * RP * 6, SP)
       write(fp) data_size
+      i = 0
       do c1 = c_f, c_l
-        write(fp) val_11(c1), val_22(c1), val_33(c1),  &
-                  val_12(c1), val_13(c1), val_23(c1)
+        i = i + 1;  buffer(i) = val_11(c1)
+        i = i + 1;  buffer(i) = val_22(c1)
+        i = i + 1;  buffer(i) = val_33(c1)
+        i = i + 1;  buffer(i) = val_12(c1)
+        i = i + 1;  buffer(i) = val_13(c1)
+        i = i + 1;  buffer(i) = val_23(c1)
       end do
+      write(fp) buffer(1:i)
     else
       do c2 = c_f, c_l
         data_size = int(data_size + RP * 6, SP)
       end do
       write(fp) data_size
+      i = 0
       do c2 = c_f, c_l
-        write(fp) val_11(c2), val_22(c2), val_33(c2),  &
-                  val_12(c2), val_13(c2), val_23(c2)
+        i = i + 1;  buffer(i) = val_11(c2)
+        i = i + 1;  buffer(i) = val_22(c2)
+        i = i + 1;  buffer(i) = val_33(c2)
+        i = i + 1;  buffer(i) = val_12(c2)
+        i = i + 1;  buffer(i) = val_13(c2)
+        i = i + 1;  buffer(i) = val_23(c2)
       end do
+      write(fp) buffer(1:i)
     end if
   end if
 

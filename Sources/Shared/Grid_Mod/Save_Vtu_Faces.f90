@@ -10,10 +10,13 @@
   real,    optional :: real_phi_f(1:Grid % n_faces)
   integer, optional :: int_phi_f (1:Grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
-  integer(SP)   :: data_size
-  integer       :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns, fu
-  character(SL) :: name_out, ext, str1, str2
-  real          :: mag
+  integer(SP)          :: data_size
+  integer              :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns
+  integer              :: fu, i, j
+  character(SL)        :: name_out, ext, str1, str2
+  real                 :: mag
+  real,    allocatable :: r_buffer(:)
+  integer, allocatable :: i_buffer(:)
 !==============================================================================!
 
   call Profiler % Start('Save_Vtu_Faces')
@@ -25,6 +28,14 @@
   s_f = 1
   s_l = Grid % n_faces
   ext = '.faces.vtu'
+
+  ! Allocate memory for local buffers
+  allocate(r_buffer(max(Grid % n_nodes, Grid % n_faces) * 3))
+  n = 0
+  do s = s_f, s_l
+    n = n + Grid % faces_n_nodes(s)
+  end do
+  allocate(i_buffer(max(grid % n_nodes * 3, grid % n_faces * 3, n)))
 
   ! Fix counters and file extension if you are plotting shadows
   ! (Keep in mind that minval and maxval return HUGE if no mask is matched)
@@ -220,9 +231,13 @@
   !-----------!
   data_size = int(Grid % n_nodes * RP * 3, SP)
   write(fu) data_size
+  i = 0
   do n = 1, Grid % n_nodes
-    write(fu) Grid % xn(n), Grid % yn(n), Grid % zn(n)
+    i=i+1;  r_buffer(i) = Grid % xn(n)
+    i=i+1;  r_buffer(i) = Grid % yn(n)
+    i=i+1;  r_buffer(i) = Grid % zn(n)
   end do
+  write(fu) r_buffer(1:i)
 
   !-----------!
   !   Faces   !
@@ -231,46 +246,58 @@
   ! Faces' nodes
   data_size = int(n_conns * IP, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
     n = Grid % faces_n_nodes(s)
-    write(fu) Grid % faces_n(1:n,s)-1
+    do j = 1, n
+      i=i+1;  i_buffer(i) = Grid % faces_n(j,s)-1
+    end do
   end do
+  write(fu) i_buffer(1:i)
 
   ! Faces' offsets
   data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
+  i = 0
   cell_offset = 0
   do s = s_f, s_l
     cell_offset = cell_offset + Grid % faces_n_nodes(s)
-    write(fu) cell_offset
+    i=i+1;  i_buffer(i) = cell_offset
   end do
+  write(fu) i_buffer(1:i)
 
   ! Faces' types
   data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
     if(Grid % faces_n_nodes(s) .eq. 4) then
-      write(fu) VTK_QUAD
+      i=i+1;  i_buffer(i) = VTK_QUAD
     else if(Grid % faces_n_nodes(s) .eq. 3) then
-      write(fu) VTK_TRIANGLE
+      i=i+1;  i_buffer(i) = VTK_TRIANGLE
     else
-      write(fu) VTK_POLYGON
+      i=i+1;  i_buffer(i) = VTK_POLYGON
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! Boundary conditions
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
   data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
     c2 = Grid % faces_c(2,s)
 
     if(c2 < 0) then
-      write(fu) Grid % region % at_cell(c2)
+      i=i+1;  i_buffer(i) = Grid % region % at_cell(c2)
     else
-      write(fu) 0
+      i=i+1;  i_buffer(i) = 0
     end if
   end do
+  write(fu) i_buffer(1:i)
+
+  call Profiler % Start('Save_Vtu_Faces (optional real - optimize!)')
 
   ! Optional real face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
@@ -282,6 +309,10 @@
     end do
   end if
 
+  call Profiler % Stop('Save_Vtu_Faces (optional real - optimize!)')
+
+  call Profiler % Start('Save_Vtu_Faces (optional int - optimize!)')
+
   ! Optional integer face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
   if(present(int_phi_f)) then
@@ -292,36 +323,50 @@
     end do
   end if
 
+  call Profiler % Stop('Save_Vtu_Faces (optional int - optimize!)')
+
   ! Number of nodes
   data_size = int((s_l-s_f+1) * IP, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
-    write(fu) Grid % faces_n_nodes(s)
+    i=i+1;  i_buffer(i) = Grid % faces_n_nodes(s)
   end do
+  write(fu) i_buffer(1:i)
 
   ! Surface vectors
   data_size = int((s_l-s_f+1) * RP * 3, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
-    write(fu) Grid % sx(s), Grid % sy(s), Grid % sz(s)
+    i=i+1;  r_buffer(i) = Grid % sx(s)
+    i=i+1;  r_buffer(i) = Grid % sy(s)
+    i=i+1;  r_buffer(i) = Grid % sz(s)
   end do
+  write(fu) r_buffer(1:i)
 
   ! Surface normals
   data_size = int((s_l-s_f+1) * RP * 3, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
     mag = sqrt(Grid % sx(s)**2 + Grid % sy(s)**2 + Grid % sz(s)**2)
-    write(fu) Grid % sx(s) / (mag+TINY),  &
-              Grid % sy(s) / (mag+TINY),  &
-              Grid % sz(s) / (mag+TINY)
+    i=i+1;  r_buffer(i) = Grid % sx(s) / (mag+TINY)
+    i=i+1;  r_buffer(i) = Grid % sy(s) / (mag+TINY)
+    i=i+1;  r_buffer(i) = Grid % sz(s) / (mag+TINY)
   end do
+  write(fu) r_buffer(1:i)
 
   ! Connection vectors
   data_size = int((s_l-s_f+1) * RP * 3, SP)
   write(fu) data_size
+  i = 0
   do s = s_f, s_l
-    write(fu) Grid % dx(s), Grid % dy(s), Grid % dz(s)
+    i=i+1;  r_buffer(i) = Grid % dx(s)
+    i=i+1;  r_buffer(i) = Grid % dy(s)
+    i=i+1;  r_buffer(i) = Grid % dz(s)
   end do
+  write(fu) r_buffer(1:i)
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
   write(fu) IN_0 // '</VTKFile>' // LF

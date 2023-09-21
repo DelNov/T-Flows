@@ -8,12 +8,14 @@
   class(Grid_Type) :: Grid
   integer          :: sub, n_nodes_sub, n_cells_sub
 !-----------------------------------[Locals]-----------------------------------!
-  integer(SP)     :: data_size
-  integer         :: c, n, s, i_fac, data_offset, cell_offset, fu, s1, s2
-  real            :: dist1, dist2
-  integer         :: n_conns, n_polyg
-  character(SL)   :: name_out
-  character(DL*2) :: str1, str2
+  integer(SP)          :: data_size
+  integer              :: c, s, i_fac, data_offset, cell_offset, fu, s1, s2
+  integer              :: n_conns, n_polyg, i, j, n, n1, n2
+  real                 :: dist1, dist2
+  character(SL)        :: name_out
+  character(DL*2)      :: str1, str2
+  real,    allocatable :: r_buffer(:)
+  integer, allocatable :: i_buffer(:)
 !==============================================================================!
 
   call Profiler % Start('Save_Vtu_Cells')
@@ -41,6 +43,31 @@
       end if
     end if
   end do
+
+  ! Allocate memory for local buffers
+  allocate(r_buffer(max(Grid % n_nodes * 3, Grid % n_cells * 6)))
+  n1 = 0
+  do c = 1, Grid % n_cells
+    n1 = n1 + max(abs(Grid % cells_n_nodes(c)), Grid % cells_n_faces(c))
+  end do
+
+  ! Still counting
+  n2 = 0
+  do c = 1, Grid % n_cells
+    if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
+      if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
+        n2 = n2 + 1
+        do i_fac = 1, Grid % cells_n_faces(c)  ! and all polyfaces
+          s = Grid % cells_f(i_fac, c)
+          n = Grid % faces_n_nodes(s)
+          n2 = n2 + 1                          ! to store number of nodes
+          n2 = n2 + n                          ! to store each node
+        end do
+      end if
+    end if
+  end do
+
+  allocate(i_buffer(max(Grid % n_nodes, max(n1,n2))))
 
   !------------------------!
   !   Open the .vtu file   !
@@ -217,13 +244,18 @@
   !-----------!
   !   Nodes   !
   !-----------!
+
   data_size = int(n_nodes_sub * RP * 3, SP)
   write(fu) data_size
+  i = 0
   do n = 1, Grid % n_nodes
     if(Grid % new_n(n) .ne. 0) then
-      write(fu) Grid % xn(n), Grid % yn(n), Grid % zn(n)
+      i=i+1;  r_buffer(i) = Grid % xn(n)
+      i=i+1;  r_buffer(i) = Grid % yn(n)
+      i=i+1;  r_buffer(i) = Grid % zn(n)
     end if
   end do
+  write(fu) r_buffer(1:i)
 
   !-----------!
   !   Cells   !
@@ -232,16 +264,21 @@
   ! Cells' nodes
   data_size = int(n_conns * IP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
 
       ! Tetrahedral, pyramid, wedge and hexahedral cells
       if( any( Grid % cells_n_nodes(c) .eq. (/4,5,6,8/)  ) ) then
-        write(fu) Grid % new_n(Grid % cells_n(1:Grid % cells_n_nodes(c), c))-1
+        do j = 1, Grid % cells_n_nodes(c)
+          i=i+1;  i_buffer(i) = Grid % new_n(Grid % cells_n(j, c)) - 1
+        end do
 
       ! Polyhedral cells
       else if(Grid % cells_n_nodes(c) < 0) then
-        write(fu) Grid % new_n(Grid % cells_n(1:-Grid % cells_n_nodes(c), c))-1
+        do j = 1, -Grid % cells_n_nodes(c)
+          i=i+1;  i_buffer(i) = Grid % new_n(Grid % cells_n(j, c)) - 1
+        end do
 
       else
         print *, '# Unsupported cell type with ',  &
@@ -251,30 +288,36 @@
       end if
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! Cells' offsets
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
+  i = 0
   cell_offset = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
       cell_offset = cell_offset + abs(Grid % cells_n_nodes(c))
-      write(fu) cell_offset
+      i=i+1;  i_buffer(i) = cell_offset
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! Cells' types
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      if(Grid % cells_n_nodes(c) .eq. 4) write(fu) VTK_TETRA
-      if(Grid % cells_n_nodes(c) .eq. 8) write(fu) VTK_HEXAHEDRON
-      if(Grid % cells_n_nodes(c) .eq. 6) write(fu) VTK_WEDGE
-      if(Grid % cells_n_nodes(c) .eq. 5) write(fu) VTK_PYRAMID
-      if(Grid % cells_n_nodes(c) .lt. 0) write(fu) VTK_POLYHEDRON
+      i=i+1
+      if(Grid % cells_n_nodes(c) .eq. 4) i_buffer(i) = VTK_TETRA
+      if(Grid % cells_n_nodes(c) .eq. 8) i_buffer(i) = VTK_HEXAHEDRON
+      if(Grid % cells_n_nodes(c) .eq. 6) i_buffer(i) = VTK_WEDGE
+      if(Grid % cells_n_nodes(c) .eq. 5) i_buffer(i) = VTK_PYRAMID
+      if(Grid % cells_n_nodes(c) .lt. 0) i_buffer(i) = VTK_POLYHEDRON
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! For polyhedral grids, save faces and face offsets
   if(Grid % polyhedral) then
@@ -282,10 +325,12 @@
     ! Write polyhedral cells' faces
     data_size = int(n_polyg * IP, SP)
     write(fu) data_size
+    i = 0
     do c = 1, Grid % n_cells
       if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
         if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-          write(fu) Grid % cells_n_faces(c)      ! write number of its polyfaces
+          i=i+1
+          i_buffer(i) = Grid % cells_n_faces(c)  ! write number of its polyfaces
           do i_fac = 1, Grid % cells_n_faces(c)  ! and all polyfaces
             s = Grid % cells_f(i_fac, c)
             if(Grid % faces_s(s) .ne. 0) then    ! face has a shadow, if it ...
@@ -301,15 +346,20 @@
               if(dist2 < dist1) s = s2
             end if
             n = Grid % faces_n_nodes(s)
-            write(fu) n, Grid % new_n(Grid % faces_n(1:n, s))-1
+            i=i+1;  i_buffer(i) = n
+            do j = 1, n
+              i=i+1;  i_buffer(i) = Grid % new_n(Grid % faces_n(j, s))-1
+            end do
           end do
         end if
       end if
     end do
+    write(fu) i_buffer(1:i)
 
     ! Write polyhedral cells' faces offsets
     data_size = int(Grid % n_cells * IP, SP)
     write(fu) data_size
+    i = 0
     cell_offset = 0
     do c = 1, Grid % n_cells
       if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
@@ -320,12 +370,13 @@
             n = Grid % faces_n_nodes(s)
             cell_offset = cell_offset + 1 + n    ! number of nodes and nodes
           end do
-          write(fu) cell_offset                  ! write the current offset
+          i=i+1;  i_buffer(i) = cell_offset      ! write the current offset
         else
-          write(fu) -1             ! not a polyhedron, offsets are not needed
+          i=i+1;  i_buffer(i) = -1  ! not a polyhedron, offsets are not needed
         end if
       end if
     end do
+    write(fu) i_buffer(1:i)
 
   end if  ! if Grid % polyhedral
 
@@ -336,57 +387,73 @@
   ! Cell processor
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) Grid % Comm % cell_proc(c)
+      i=i+1;  i_buffer(i) = Grid % Comm % cell_proc(c)
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! Cell thread
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) Grid % Vect % cell_thread(c)
+      i=i+1;  i_buffer(i) = Grid % Vect % cell_thread(c)
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! Number of nodes
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) abs(Grid % cells_n_nodes(c))
+      i=i+1;  i_buffer(i) = abs(Grid % cells_n_nodes(c))
     end if
   end do
+  write(fu) i_buffer(1:i)
 
   ! Wall distance
   data_size = int(n_cells_sub * RP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) Grid % wall_dist(c)
+      i=i+1;  r_buffer(i) = Grid % wall_dist(c)
     end if
   end do
+  write(fu) r_buffer(1:i)
 
   ! Cell volume
   data_size = int(n_cells_sub * RP, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) Grid % vol(c)
+      i=i+1;  r_buffer(i) = Grid % vol(c)
     end if
   end do
+  write(fu) r_buffer(1:i)
 
   ! Cell inertia
   data_size = int(n_cells_sub * RP * 6, SP)
   write(fu) data_size
+  i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      write(fu) Grid % ixx(c), Grid % iyy(c), Grid % izz(c),  &
-                Grid % ixy(c), Grid % iyz(c), Grid % ixz(c)
+      i=i+1;  r_buffer(i) = Grid % ixx(c)
+      i=i+1;  r_buffer(i) = Grid % iyy(c)
+      i=i+1;  r_buffer(i) = Grid % izz(c)
+      i=i+1;  r_buffer(i) = Grid % ixy(c)
+      i=i+1;  r_buffer(i) = Grid % iyz(c)
+      i=i+1;  r_buffer(i) = Grid % ixz(c)
     end if
   end do
+  write(fu) r_buffer(1:i)
 
   write(fu) LF // IN_0 // '</AppendedData>' // LF
   write(fu) IN_0 // '</VTKFile>' // LF
