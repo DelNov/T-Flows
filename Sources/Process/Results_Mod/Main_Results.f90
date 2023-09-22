@@ -18,6 +18,12 @@
   logical :: save_now
 !==============================================================================!
 
+  ! Get out of here if you don't want to save initial conditions all right
+  if( .not. Results % initial .and.  &
+      Time % First_Dt() .eq. Time % Curr_Dt() ) then
+    return
+  end if
+
   inquire(file='exit_now', exist=exit_now)
   inquire(file='save_now', exist=save_now)
 
