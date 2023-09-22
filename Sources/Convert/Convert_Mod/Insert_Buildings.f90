@@ -68,6 +68,8 @@
   integer :: fn(6,4), n_f_nod, f_nod(4)
 !==============================================================================!
 
+  call Profiler % Start('Insert_Buildings')
+
   !----------------------------------------------------------!
   !                                                          !
   !   Phase I: Read the ground definition from an STL file   !
@@ -77,7 +79,7 @@
   print *, '#==============================================================='
   print *, '# Enter the name of the ground file (with ext.):'
   print *, '#---------------------------------------------------------------'
-  read(*,*) name_in
+  name_in = File % Single_Word_From_Keyboard()
 
   call File % Open_For_Reading_Ascii(name_in, fu)
 
@@ -695,5 +697,7 @@
     end if
 
   end do  ! chimney
+
+  call Profiler % Stop('Insert_Buildings')
 
   end subroutine
