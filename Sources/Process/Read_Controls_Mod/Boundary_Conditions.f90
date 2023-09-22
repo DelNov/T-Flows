@@ -317,6 +317,15 @@
         call File % Read_Line(fu)
         read(Line % tokens(1),*) n_points  ! number of points
 
+        if(n_points .eq. 0) then
+          call Message % Error(68,                                      &
+                 'It seems that you forgot to specify the number '  //  &
+                 'of points in the inlet profile file, or you set ' //  &
+                 'it to zero, which is unlikely.  \n '              //  &
+                 '\n This error is critical, exiting!',                 &
+                 file=__FILE__, line=__LINE__)
+        end if
+
         !---------------------------------!
         !   Allocate memory for profile   !
         !---------------------------------!
@@ -339,6 +348,8 @@
         if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y' .or.  &
            keys(1) .eq. 'X' .and. keys(2) .eq. 'Z' .or.  &
            keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
+
+STOP
 
           ! Set the closest point
           do c = Cells_In_Region(bc)
