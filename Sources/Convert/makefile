@@ -218,7 +218,8 @@ SRC_F_MOD = Const_Mod.f90      \
             Stl_Mod.f90
 
 # Modules in the local directory
-SRC_F_MOD += Convert_Mod.f90
+SRC_F_MOD += Pattern_Mod.f90  \
+             Convert_Mod.f90
 
 #---------------
 #   Functions

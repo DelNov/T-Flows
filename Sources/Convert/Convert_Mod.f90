@@ -6,6 +6,7 @@
   module Convert_Mod
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Pattern_Mod
   use Stl_Mod
 # ifdef __INTEL_COMPILER
   use Ifport              ! Intel's module for fseek and ftell

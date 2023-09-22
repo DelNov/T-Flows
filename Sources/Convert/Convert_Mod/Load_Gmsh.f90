@@ -15,21 +15,51 @@
   integer, parameter :: MSH_HEXA  = 5
   integer, parameter :: MSH_WEDGE = 6
   integer, parameter :: MSH_PYRA  = 7
+  integer, parameter :: L         = 1048576  ! buffer size
+  integer, parameter :: W         =       8  ! buffer's window size
+  integer, parameter :: P         =       5  ! pattern's length
 !-----------------------------------[Locals]-----------------------------------!
-  integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
-  integer                    :: n_memb, n_tags, n_crvs, n_nods, error
-  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu
-  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
-  integer, allocatable       :: n(:), new(:)
-  integer, allocatable       :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
-  character(SL), allocatable :: phys_names(:)
-  logical                    :: ascii                 ! is file in ascii format?
-  integer                    :: pos
+  type(Pattern_Type)         :: PhysicalNames
+  type(Pattern_Type)         :: Entities
+  type(Pattern_Type)         :: Nodes
+  type(Pattern_Type)         :: Elements
   integer                    :: pos_physicalnames  = -1
   integer                    :: pos_entities       = -1
   integer                    :: pos_nodes          = -1
   integer                    :: pos_elements       = -1
+  integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
+  integer                    :: n_memb, n_tags, n_crvs, n_nods, error, ios
+  integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu, tot
+  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
+  integer                    :: f, e, s  ! buffer indices; first, ending, start
+  integer,       allocatable :: n(:), new(:)
+  integer,       allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
+  character(SL), allocatable :: phys_names(:)
+  logical                    :: ascii                 ! is file in ascii format?
+  integer                    :: pos
   integer(1)                 :: byte(0:3)
+  integer(1)                 :: buffer(L)
+!------------------------------------------------------------------------------!
+!   Buffered reading in search of patterns:                                    !
+!                                                                              !
+!   The way to handle this is to maintain a sliding window that keeps track    !
+!   of the last few bytes of the previous buffer. When you load new buffer,    !
+!   you combine the last few bytes of the old buffer with the new buffer.      !
+!   Thus, even if pattern is split between buffers, you can still detect it.   !
+!                                                                              !
+!   Representation of a buffer and explanation of some local variables:        !
+!                                                                              !
+!   + is the leading window from the previous buffer                           !
+!   o is the current buffer                                                    !
+!                                                                              !
+!   buffer:    ++++++++oooooooooooooooooooooooooooooooooooooooooooooooo        !
+!   global:    f       s                                              e        !
+!   local:     1       W                                              L        !
+!                                                                              !
+!   There is no point in searching for a pattern from s till e, since you      !
+!   know that you won't be able to find it if it split by buffers.  Hence      !
+!   you search from s - P (where P is the pattern lengt) till e - P.  The      !
+!   trailing part of the buffer will be coppied to the next sweep              !
 !==============================================================================!
 
   call Profiler % Start('Load_Gmsh')
@@ -41,37 +71,70 @@
   !-------------------------------------------------------!
   call File % Open_For_Reading_Binary(file_name, fu)
 
-  !-----------------------------------------------------------!
-  !   A very rudimentary way to find beginnings of sections   !
-  !-----------------------------------------------------------!
-  pos = 0
+  call Profiler % Start('Load_Gmsh (find sections)')
+
+  !-------------------!
+  !                   !
+  !   Find sections   !
+  !                   !
+  !-------------------!
+
+  ! A chance that another five character pattern will occur
+  ! in a binary file is 1/*256^5 or 9.094947e-13 or 1.e-12)
+  call PhysicalNames % Create_Pattern("$Phys")
+  call Entities      % Create_Pattern("$Enti")
+  call Nodes         % Create_Pattern("$Node")
+  call Elements      % Create_Pattern("$Elem")
+
+  !---------------------------------------------!
+  !   Read the input file in windowed buffers   !
+  !---------------------------------------------!
+  tot = 0  ! number of items already found
   do
-    read(fu, end=2) byte(0);  pos = pos + 1
-    if(char(byte(0)) .eq. '$') then
-      read(fu, end=2) byte(1);  pos = pos + 1
-      read(fu, end=2) byte(2);  pos = pos + 1
-      read(fu, end=2) byte(3);  pos = pos + 1
-      if(char(byte(1)) .eq. 'E' .and.  &
-         char(byte(2)) .eq. 'n' .and.  &
-         char(byte(3)) .eq. 'd') then
-        do i = 1, len(Line % whole)
-          read(fu, end=2) byte(0);  pos = pos + 1
-          if(byte(0) .eq. 10) exit
-        end do
-        Line % whole = ''
-        do i = 1, len(Line % whole)
-          read(fu, end=2) byte(0);  pos = pos + 1
-          if(byte(0) .eq. 10) exit
-          if(byte(0) .ne. 13) Line % whole(i:i) = char(byte(0))
-        end do
-        if(Line % whole .eq. '$PhysicalNames') pos_physicalnames = pos
-        if(Line % whole .eq. '$Entities')      pos_entities      = pos
-        if(Line % whole .eq. '$Nodes')         pos_nodes         = pos
-        if(Line % whole .eq. '$Elements')      pos_elements      = pos
+    ! Read data into the buffer, from the end of the window (W) till the end
+    read(fu, iostat=ios) buffer(W+1:L)
+
+    inquire(unit=fu, pos=e)  ! get the global position within the file
+    f = e - (L-W)            ! first position in the buffer (e points to last+1)
+    e = e - 1                ! correct the last position in the buffer
+    s = f + W                ! start of the new freshly read data (unused)
+
+    Assert(ios .le. 0)       ! check if an error occurred
+
+    ! At this position, I have at my disposal buffer from local position
+    ! W+1 till L to analyze, which corresponds to global positions s to e
+    ! However, since I want to analyze from s - P till e - P, I should
+    ! browse from W + 1 - P to L - P
+    do i = W+1-P, L-P
+      if( PhysicalNames % Match_Pattern(buffer(i)) ) then
+        pos_physicalnames  = i+f-1-W + len("$PhysicalNames")
+        tot = tot + 1
       end if
-    end if
+      if( Entities % Match_Pattern(buffer(i)) ) then
+        pos_entities       = i+f-1-W + len("$Entities")
+        tot = tot + 1
+      end if
+      if( Nodes % Match_Pattern(buffer(i)) ) then
+        pos_nodes          = i+f-1-W + len("$Nodes")
+        tot = tot + 1
+      end if
+      if( Elements % Match_Pattern(buffer(i)) ) then
+        pos_elements       = i+f-1-W + len("$Elements")
+        tot = tot + 1
+      end if
+      if(tot .eq. 4) goto 1
+    end do
+
+    ! Copy the last window back for the next buffer
+    buffer(1:W) = buffer(L-W+1:L)
+
+    if(ios < 0) exit  ! if end of file reached, exit
   end do
-2 continue
+
+1 continue
+  print *, "Total size of the file: ", e, " bytes."
+
+  call Profiler % Stop('Load_Gmsh (find sections)')
 
   ! Error trap
   if(pos_physicalnames .eq. -1) then
