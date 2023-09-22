@@ -132,7 +132,6 @@
   end do
 
 1 continue
-  print *, "Total size of the file: ", e, " bytes."
 
   call Profiler % Stop('Load_Gmsh (find sections)')
 
@@ -144,7 +143,6 @@
       "(called physical groups) in Gmsh?",                                &
       file=__FILE__, line=__LINE__)
   end if
-  print *, '# Broswed the file in binary format and read ', pos, ' bytes'
 
   !----------------------------------------!
   !   Gmsh can't handle polyhedral grids   !
