@@ -17,7 +17,7 @@ PERIODIC  =  0;  // or 0
 ANGLE_DEG =  0.0;
 
 // Number of layers
-N_LAYERS     = 35;
+N_LAYERS     = 70;
 N_SKY_LAYERS = 20;
 
 // Height of the volume
