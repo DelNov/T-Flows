@@ -23,7 +23,6 @@
   logical,       intent(in)  :: blend_matrix
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Pet)
-  Unused(Pet_Shared)
   Unused(solver)
   Unused(prec)
   Unused(prec_opts)
@@ -34,6 +33,7 @@
   Unused(niter)
   Unused(tol)
   Unused(fin_res)
+  Unused(blend_matrix)
 !==============================================================================!
 
   ! Just to avoid compiler's warning
