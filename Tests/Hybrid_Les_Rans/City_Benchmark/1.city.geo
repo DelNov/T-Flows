@@ -14,6 +14,7 @@
 //------------------------------------------------------------------------------
 
 PERIODIC = 0;  // or 0
+ANGLE_DEG =  0.0;
 
 // Number of layers
 N_LAYERS     = 35;
@@ -27,16 +28,16 @@ DELTA_H_MIN = URBAN_HIGH / N_LAYERS;
 L_TARGET    = SKY_HIGH - URBAN_HIGH;
 
 // Coordinates of the problem domain (the whole piece of simulated land)
-GROUND_X_MIN =   0;
-GROUND_X_MAX =  26;
-GROUND_Y_MIN =   0;
-GROUND_Y_MAX =  13;
+GROUND_X_MIN = -10.0;
+GROUND_X_MAX =  30.0;
+GROUND_Y_MIN = -10.0;
+GROUND_Y_MAX =  10.0;
 
 // Coordinates of the city (where buildings will reside)
-city_x_min =   3;
-city_x_max =  20;
-city_y_min =   3;
-city_y_max =  10;
+CITY_X_MIN = -5.5;
+CITY_X_MAX = 14.5;
+CITY_Y_MIN = -3.5;
+CITY_Y_MAX =  3.5;
 
 // Resolutions in the city (min) and country side (max)
 DELTA_MIN = 0.2;
@@ -60,6 +61,7 @@ MAX_BUILDING_HEIGHT = 300;
 MAXN                =   8;                // max nodes per building
 TINY                =   1.0e-3;
 HUGE                =   1.0e+3;
+ANGLE_RAD           = ANGLE_DEG * Pi / 180.0;
 
 //------------------------------------------------------------------------------
 //
@@ -85,6 +87,15 @@ Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
 //---------------------------------
 Printf("Including file 1_building.geo");
 Include "1_building.geo";
+
+// Rotate them
+For b In { 1 : n_buildings }
+  For n In{ 1 : node_b(b) }
+    i = MAXN*b + n;
+    x(i) = xo(i) * Cos(ANGLE_RAD) - yo(i) * Sin(ANGLE_RAD);
+    y(i) = xo(i) * Sin(ANGLE_RAD) + yo(i) * Cos(ANGLE_RAD);
+  EndFor
+EndFor
 
 //-----------------------------------------------------------------------
 // Browse through all buildings to define points and lines defining them
