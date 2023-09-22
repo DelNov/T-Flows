@@ -1,0 +1,69 @@
+#----------
+# Prologue
+#----------
+  PROBLEM_NAME    chan
+
+  TIME_STEP                                     0.01
+  NUMBER_OF_TIME_STEPS                      20000
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS   100000
+  RESULTS_SAVE_INTERVAL                      2000
+  BACKUP_SAVE_INTERVAL                     200000
+
+#-------------------
+# Monitoring points 
+#-------------------
+  NUMBER_OF_MONITORING_POINTS    1
+  MONITORING_POINT_001           0.5  0.5  1.0
+  POINT_FOR_MONITORING_PLANES    0.01 0.01 0.25
+
+#-----------------
+# Physical models
+#-----------------
+  MASS_DENSITY           1000
+  DYNAMIC_VISCOSITY      0.001
+
+  TURBULENCE_MODEL       k_eps_zeta_f
+
+  PRESSURE_DROPS     0.0036   0.0   0.0
+  MASS_FLOW_RATES    0.005    0.0   0.0
+
+#----------------------
+# Numerical parameters
+#----------------------
+  PRESSURE_MOMENTUM_COUPLING    simple
+
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.8
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
+
+  TIME_INTEGRATION_SCHEME  parabolic
+
+  ADVECTION_SCHEME_FOR_MOMENTUM    central
+  ADVECTION_SCHEME_FOR_ENERGY      smart
+
+  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
+
+  TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-4
+  TOLERANCE_FOR_PRESSURE_SOLVER     1.e-4
+  TOLERANCE_FOR_ENERGY_SOLVER       1.e-4
+  TOLERANCE_FOR_SIMPLE_ALGORITHM    5.e-3
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w     t     kin   eps   zeta   f22
+    VALUES              0.5   0.0   0.0   20.0  0.01  0.001 0.1    0.1
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION    wall
+    TYPE                wall
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
+
+  BOUNDARY_CONDITION    symmetry
+    TYPE                symmetry
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
