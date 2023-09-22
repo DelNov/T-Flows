@@ -80,7 +80,7 @@
   !-------------------!
 
   ! A chance that another five character pattern will occur
-  ! in a binary file is 1/*256^5 or 9.094947e-13 or 1.e-12)
+  ! in a binary file is 1/256^5 or 9.094947e-13 or 1.e-12)
   call PhysicalNames % Create_Pattern("$Phys")
   call Entities      % Create_Pattern("$Enti")
   call Nodes         % Create_Pattern("$Node")
