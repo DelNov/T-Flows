@@ -13,12 +13,12 @@
 //
 //------------------------------------------------------------------------------
 
-PERIODIC = 0;  // or 0
+PERIODIC  =  0;  // or 0
 ANGLE_DEG =  0.0;
 
 // Number of layers
-N_LAYERS     = 35;
-N_SKY_LAYERS = 20;
+N_LAYERS     = 70;
+N_SKY_LAYERS = 35;
 
 // Height of the volume
 SKY_HIGH    = 10.0;      // max height of the domain
@@ -36,8 +36,8 @@ GROUND_Y_MAX =  10.0;
 // Coordinates of the city (where buildings will reside)
 CITY_X_MIN = -5.5;
 CITY_X_MAX = 14.5;
-CITY_Y_MIN = -3.5;
-CITY_Y_MAX =  3.5;
+CITY_Y_MIN = -5.0;
+CITY_Y_MAX =  5.0;
 
 // Resolutions in the city (min) and country side (max)
 DELTA_MIN = 0.2;
@@ -177,10 +177,10 @@ Field[1].F = Sprintf("  (%5.2g)
                                              - tanh((y-(%5.2g))/(%5.2g)))) )",
   DELTA_MIN,
   DELTA_MAX - DELTA_MIN,
-  city_x_min, CITY_LIMIT_WIDTH,
-  city_x_max, CITY_LIMIT_WIDTH,
-  city_y_min, CITY_LIMIT_WIDTH,
-  city_y_max, CITY_LIMIT_WIDTH);
+  CITY_X_MIN, CITY_LIMIT_WIDTH,
+  CITY_X_MAX, CITY_LIMIT_WIDTH,
+  CITY_Y_MIN, CITY_LIMIT_WIDTH,
+  CITY_Y_MAX, CITY_LIMIT_WIDTH);
 Background Field = 1;
 
 

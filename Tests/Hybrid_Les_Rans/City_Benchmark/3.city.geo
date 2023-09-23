@@ -18,7 +18,7 @@ ANGLE_DEG =  0.0;
 
 // Number of layers
 N_LAYERS     = 70;
-N_SKY_LAYERS = 20;
+N_SKY_LAYERS = 35;
 
 // Height of the volume
 SKY_HIGH    = 10.0;      // max height of the domain
@@ -36,8 +36,8 @@ GROUND_Y_MAX =  10.0;
 // Coordinates of the city (where buildings will reside)
 CITY_X_MIN = -5.5;
 CITY_X_MAX = 14.5;
-CITY_Y_MIN = -3.5;
-CITY_Y_MAX =  3.5;
+CITY_Y_MIN = -5.0;
+CITY_Y_MAX =  5.0;
 
 // Resolutions in the city (min) and country side (max)
 DELTA_MIN = 0.2;
