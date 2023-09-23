@@ -40,8 +40,9 @@ CITY_Y_MIN = -5.0;
 CITY_Y_MAX =  5.0;
 
 // Resolutions in the city (min) and country side (max)
-DELTA_MIN = 0.2;
-DELTA_MAX = 0.5;
+DELTA_MIN      = 0.2;
+DELTA_MAX      = 0.5;
+DELTA_BUILDING = 0.2;
 
 // Transition between fine and coarse mesh, ...
 // ... between city and the rest of the domain
