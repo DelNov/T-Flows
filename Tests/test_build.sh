@@ -827,14 +827,14 @@ function process_backup_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
 
   # BEGIN:---------------------------------------#
   elog "np=1, MPI=yes, start from 0, make a backup"
   user_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # comment line with LOAD_BACKUP_NAME
     replace_line_with_first_occurence_in_file \
@@ -863,7 +863,7 @@ function process_backup_test {
   elog "np=1, MPI=yes, load from backup(produced by seq)"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # uncomment line with LOAD_BACKUP_NAME
     replace_line_with_first_occurence_in_file \
@@ -895,7 +895,7 @@ function process_backup_test {
   elog "np=2, MPI=yes, load from backup(produced by par.np=1)"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     replace_line_with_first_occurence_in_file \
       "LOAD_BACKUP_NAME" \
@@ -911,7 +911,7 @@ function process_backup_test {
   elog "np=2, MPI=yes, start from 0, make a backup"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     replace_line_with_first_occurence_in_file \
       "LOAD_BACKUP_NAME" \
@@ -927,7 +927,7 @@ function process_backup_test {
   elog "np=2, MPI=yes, load from backup(produced by par.np=2)"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     replace_line_with_first_occurence_in_file \
       "LOAD_BACKUP_NAME" \
@@ -1088,14 +1088,14 @@ function process_save_exit_now_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
 
   # BEGIN:---------------------------------------#
   elog "np=1, MPI=yes, start from 0, make a backup"
   user_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # change number of timesteps to 3
     replace_line_with_first_occurence_in_file \
@@ -1128,7 +1128,7 @@ function process_save_exit_now_test {
     elog "np=1, MPI=yes, load from backup(produced by seq)"
 
     for (( i=1; i<=$n_dom; i++ )); do
-      name_in_div=$(head -n1 divide."$i".scr)
+      name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
       # comment line with LOAD_BACKUP_NAME
       replace_line_with_first_occurence_in_file \
@@ -1173,7 +1173,7 @@ function process_save_exit_now_test {
       touch exit_now
 
       for (( i=1; i<=$n_dom; i++ )); do
-        name_in_div=$(head -n1 divide."$i".scr)
+        name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
         # uncomment line with LOAD_BACKUP_NAME
         replace_line_with_first_occurence_in_file \
@@ -1315,8 +1315,8 @@ function process_compilation_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
-  name_in_div=$(head -n1 divide.1.scr)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
+  name_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '1p')
 
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
@@ -1382,7 +1382,7 @@ function process_full_length_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
 
   # BEGIN:-------------------------#
   elog "np="$nproc_in_div", MPI=yes"
@@ -1392,7 +1392,7 @@ function process_full_length_test {
   user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # comment line with LOAD_BACKUP_NAME
     replace_line_with_first_occurence_in_file \
@@ -1545,8 +1545,8 @@ function process_accuracy_test {
     fi
     launch_divide   "$1" "quiet"
 
-    name_in_div=$(head  -n1 divide.scr)
-    nproc_in_div=$(head -n2 divide.scr | tail -n1)
+    name_in_div=$(grep -v "^#" divide.scr | awk 'NF' | sed -n '1p')
+    nproc_in_div=$(grep -v "^#" divide.scr | awk 'NF' | sed -n '2p')
 
     elog "np="$nproc_in_div", MPI=yes"
 
