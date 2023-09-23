@@ -451,6 +451,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      NATIVE  PETSC  PETSC_ACTIVE  OUT_OF_ITS
 " Constants from various procedures
   syn keyword fortranConstant      YES  NO  DEBUG  BEGIN
+" Constants from File_Mod
+  syn keyword fortranConstant      BUFFER_SIZE  MAX_ITEMS
 " After the constants, I have alternating definitions of types and objects derived from them
   syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
   syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges         Read_Control  Rc
