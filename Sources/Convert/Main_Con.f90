@@ -21,6 +21,7 @@
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
   integer         :: s, l, p, g, n_grids
   logical         :: city
+  logical         :: coordinate_alignment = .true.
 !==============================================================================!
 
   ! Initialize program profler
@@ -28,6 +29,11 @@
 
   ! Open with a logo
   call Convert % Logo_Con()
+
+  ! heck the coordinate alignment
+  if(command_argument_count() .eq. 1) then
+    coordinate_alignment = .false.
+  end if
 
   print '(a)', ' #========================================================'
   print '(a)', ' # Enter the grid file name you are importing (with ext.):'
@@ -98,7 +104,7 @@
 
   ! Sort cells in height first thing after reading	    
   if(city) then
-    call Convert % Insert_Buildings(Grid(1))
+    call Convert % Insert_Buildings(Grid(1), coordinate_alignment)
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored

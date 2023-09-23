@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Insert_Buildings(Convert, Grid)
+  subroutine Insert_Buildings(Convert, Grid, align_coordinates)
 !------------------------------------------------------------------------------!
 !   This soubroutine was developed to import mesh with buildings, and place    !
 !   them both on a ground.  This subroutine is not a part of the standard      !
@@ -8,8 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
+  class(Convert_Type)  :: Convert
+  type(Grid_Type)      :: Grid
+  logical,  intent(in) :: align_coordinates
 !-----------------------------------[Locals]-----------------------------------!
 
   ! Facet type
@@ -266,38 +267,41 @@
 
   !---------------------------------------------------------------------!
   !   For each cell, find the nearest on the ground and align with it   !
+  !    (It is slow, but I am not sure if it is really that important)   !
   !---------------------------------------------------------------------!
 
-  print *, '#=================================================================='
-  print *, '# Aligning cell coordinates.  This may take a few minutes          '
-  print *, '#------------------------------------------------------------------'
-  do c = 1, Grid % n_cells
-    dis2_min = HUGE
+  if(align_coordinates) then
+    print *, '#================================================================'
+    print *, '# Aligning cell coordinates.  This may take a few minutes        '
+    print *, '#----------------------------------------------------------------'
+    do c = 1, Grid % n_cells
+      dis2_min = HUGE
 
-    ! Print progress on the screen
-    if(mod(c, (Grid % n_cells / 20) ) .eq. 0) then
-      print '(a2, f5.0, a14)',   &
-            ' #', (100. * c / (1.0*(Grid % n_cells))), ' % complete...'
-    end if ! each 5%
+      ! Print progress on the screen
+      if(mod(c, (Grid % n_cells / 20) ) .eq. 0) then
+        print '(a2, f5.0, a14)',   &
+              ' #', (100. * c / (1.0*(Grid % n_cells))), ' % complete...'
+      end if ! each 5%
 
-    do n = 1, n_ground_cells
-      cg = ground_cell(n)     ! real ground cell number
+      do n = 1, n_ground_cells
+        cg = ground_cell(n)     ! real ground cell number
 
-      ! Compute planar distance
-      dis2 = (  (Grid % xc(c) - Grid % xc(cg)) ** 2  &
-              + (Grid % yc(c) - Grid % yc(cg)) ** 2)
+        ! Compute planar distance
+        dis2 = (  (Grid % xc(c) - Grid % xc(cg)) ** 2  &
+                + (Grid % yc(c) - Grid % yc(cg)) ** 2)
 
-      ! Store ground cell if nearest
-      if(dis2 < dis2_min) then
-        dis2_min = dis2
-        near_cg = cg
-      end if
+        ! Store ground cell if nearest
+        if(dis2 < dis2_min) then
+          dis2_min = dis2
+          near_cg = cg
+        end if
+      end do
+
+      ! Simply take planar coordinates from the nearest wall cell
+      Grid % xc(c) = Grid % xc(near_cg)
+      Grid % yc(c) = Grid % yc(near_cg)
     end do
-
-    ! Simply take planar coordinates from the nearest wall cell
-    Grid % xc(c) = Grid % xc(near_cg)
-    Grid % yc(c) = Grid % yc(near_cg)
-  end do
+  end if
 
   !----------------------------------------------------!
   !                                                    !
