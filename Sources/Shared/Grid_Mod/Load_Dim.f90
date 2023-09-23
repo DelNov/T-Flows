@@ -11,6 +11,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: c, n, s, fu, real_prec, version
   character(SL) :: name_in, str1, str2
+  integer       :: nc, nb, nf, nn, ns
 !==============================================================================!
 
   call Profiler % Start('Load_Dim')
@@ -73,41 +74,48 @@
   !-------------------------!
   !   Read everything else  !
   !-------------------------!
-  read(fu) (Grid % xn(n), n = 1, Grid % n_nodes)
-  read(fu) (Grid % yn(n), n = 1, Grid % n_nodes)
-  read(fu) (Grid % zn(n), n = 1, Grid % n_nodes)
+  nb = Grid % n_bnd_cells
+  nc = Grid % n_cells
+  nn = Grid % n_nodes
+  nf = Grid % n_faces
+  ns = Grid % n_shadows
 
-  read(fu) (Grid % xc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
-  read(fu) (Grid % yc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
-  read(fu) (Grid % zc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
+  call File % Buffered_Read_Real_Array(fu, Grid % xn(1:nn))
+  call File % Buffered_Read_Real_Array(fu, Grid % yn(1:nn))
+  call File % Buffered_Read_Real_Array(fu, Grid % zn(1:nn))
 
-  read(fu) (Grid % wall_dist(c), c = -Grid % n_bnd_cells, Grid % n_cells)
-  read(fu) (Grid % vol(c), c = 1, Grid % n_cells)
+  call File % Buffered_Read_Real_Array(fu, Grid % xc(-nb:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % yc(-nb:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % zc(-nb:nc))
 
-  read(fu) (Grid % ixx(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % iyy(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % izz(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % ixy(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % ixz(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % iyz(c), c = 1, Grid % n_cells)
+  ! Why on earth do I save wall distance for boundary cells?
+  call File % Buffered_Read_Real_Array(fu, Grid % wall_dist(-nb:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % vol(1:nc))
 
-  read(fu) (Grid % sx(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % sy(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % sz(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % ixx(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % iyy(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % izz(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % ixy(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % ixz(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % iyz(1:nc))
 
-  read(fu) (Grid % dx(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % dy(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % dz(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % sx(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % sy(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % sz(1:nf+ns))
 
-  read(fu) (Grid % f(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % dx(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % dy(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % dz(1:nf+ns))
 
-  read(fu) (Grid % xf(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % yf(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % zf(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % f(1:nf+ns))
 
-  read(fu) (Grid % rx(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % ry(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % rz(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % xf(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % yf(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % zf(1:nf+ns))
+
+  call File % Buffered_Read_Real_Array(fu, Grid % rx(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % ry(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % rz(1:nf+ns))
 
   read(fu) Grid % per_x
   read(fu) Grid % per_y

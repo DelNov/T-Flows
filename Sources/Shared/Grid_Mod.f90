@@ -19,6 +19,7 @@
   implicit none
 !---------------------------------[Interfaces]---------------------------------!
   interface
+    include '../Shared/Adjust_Dim.h90'
     include '../Shared/Adjust_First_Dim.h90'
   end interface
 !==============================================================================!
