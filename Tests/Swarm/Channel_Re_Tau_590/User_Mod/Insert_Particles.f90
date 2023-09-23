@@ -25,7 +25,8 @@
   !-----------------------!
   !   24001st time step   !
   !-----------------------!
-  if(Time % Curr_Dt() .eq. 24001) then  ! should be after the Flow is developed
+  #if(Time % Curr_Dt() .eq. 24001) then  ! should be after the Flow is developed
+  if(Time % Curr_Dt() .eq. 405) then  ! should be after the Flow is developed
 
     ! Track maximum number of particles
     Swarm % n_particles = Swarm % max_particles

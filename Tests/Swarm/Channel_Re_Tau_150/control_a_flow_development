@@ -4,12 +4,13 @@
   PROBLEM_NAME    chan
 
   TIME_STEP                                        0.5
-  NUMBER_OF_TIME_STEPS                         24000
+  #NUMBER_OF_TIME_STEPS                         24000
+  NUMBER_OF_TIME_STEPS                         400
   STARTING_TIME_STEP_FOR_TURB_STATISTICS       18001 # 6000 for statistics
-  STARTING_TIME_STEP_FOR_SWARM_COMPUTATION     24001 # after the last time step
+  STARTING_TIME_STEP_FOR_SWARM_COMPUTATION     405   # after the last time step
   STARTING_TIME_STEP_FOR_SWARM_STATISTICS      30001 # beyond this computation
 
-  RESULTS_SAVE_INTERVAL        600
+  RESULTS_SAVE_INTERVAL        100
   SWARM_SAVE_INTERVAL          600
   BACKUP_SAVE_INTERVAL       12000
 
@@ -29,10 +30,10 @@
 #----------------
   PARTICLE_TRACKING            yes
 # SWARM_SUBGRID_SCALE_MODEL    brownian_fukagata
-  SWARM_DIAMETER                                 3.66356E-03
+  SWARM_DIAMETER                                 3.5E-03
   SWARM_DENSITY                               1000
   NUMBER_OF_SWARM_SUB_STEPS                      2
-  MAX_PARTICLES                             100000
+  MAX_PARTICLES                               1000
   SWARM_COEFFICIENT_OF_RESTITUTION               1.0
 
 #-------------------
