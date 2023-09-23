@@ -791,11 +791,12 @@
                                           f8, f9, data_offset, run)
     end if
 
-    kin_vis_t(:) = 0.0
     if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        Turb % model .ne. HYBRID_LES_RANS     .and.  &
        Turb % model .ne. DNS) then
-      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      do c = c_f, c_l  ! implied loop was causing errors with Intel compiler
+        kin_vis_t(c) = Turb % vis_t(c) / Flow % viscosity(c)
+      end do
       call Results % Save_Vtu_Scalar_Real(                                   &
                                   "Eddy Over Molecular Viscosity [1]",       &
                                   plot_inside,                               &
@@ -804,15 +805,17 @@
     end if
 
     if(Turb % model .eq. HYBRID_LES_RANS) then
-      kin_vis_t(:) = 0.0
-      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      do c = c_f, c_l  ! implied loop was causing errors with Intel compiler
+        kin_vis_t(c) = Turb % vis_t(c) / Flow % viscosity(c)
+      end do
       call Results % Save_Vtu_Scalar_Real(                                   &
                                   "Rans Eddy Over Molecular Viscosity [1]",  &
                                   plot_inside,                               &
                                   kin_vis_t(c_f:c_l),                        &
                                   f8, f9, data_offset, run)
-      kin_vis_t(:) = 0.0
-      kin_vis_t(c_f:c_l) = Turb % vis_t_sgs(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      do c = c_f, c_l  ! implied loop was causing errors with Intel compiler
+        kin_vis_t(c) = Turb % vis_t_sgs(c) / Flow % viscosity(c)
+      end do
       call Results % Save_Vtu_Scalar_Real(                                   &
                                   "Sgs Eddy Over Molecular Viscosity [1]",   &
                                   plot_inside,                               &
