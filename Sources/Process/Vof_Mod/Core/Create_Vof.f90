@@ -13,6 +13,10 @@
   integer                    :: nb, nc, nf
 !==============================================================================!
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Creating the volume of fluid (VOF) module'
+
   ! Store pointers
   Vof % pnt_flow   => Flow
   Vof % pnt_grid   => Flow % pnt_grid

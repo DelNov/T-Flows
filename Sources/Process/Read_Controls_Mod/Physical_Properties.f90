@@ -18,6 +18,10 @@
   Unused(Swarm)
 !==============================================================================!
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Reading about physical properties'
+
   ! Take alias
   Grid => Flow % pnt_grid
 

@@ -22,6 +22,10 @@
   Unused(Rc)
 !==============================================================================!
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Reading about physical models'
+
   ! Take aliases
   bulk => Flow % bulk
 

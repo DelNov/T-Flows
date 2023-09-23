@@ -38,6 +38,10 @@
   Unused(Rc)
 !==============================================================================!
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Reading boundary conditions'
+
   ! Take aliases
   Grid   => Flow % pnt_grid
   t      => Flow % t

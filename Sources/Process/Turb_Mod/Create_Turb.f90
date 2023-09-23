@@ -12,6 +12,10 @@
   integer                    :: nb, nc
 !==============================================================================!
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Creating the turbulence module'
+
   ! Store pointers
   Turb % pnt_flow => Flow
   Turb % pnt_grid => Flow % pnt_grid

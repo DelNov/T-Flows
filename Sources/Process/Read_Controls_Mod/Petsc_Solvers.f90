@@ -31,6 +31,10 @@
   ! If it wasn't compiled with PETSc, don't confuse a user with this
   if(.not. PETSC_ACTIVE) return
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Reading info about PETSc solvers'
+
   ! Initialize PETSc options to be all empty strings
   petsc_options(1:MAX_STRING_ITEMS) = ''
 

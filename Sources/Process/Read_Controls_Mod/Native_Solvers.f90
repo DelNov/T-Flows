@@ -22,6 +22,10 @@
   Unused(Rc)
 !==============================================================================!
 
+  ! Give some sign
+  if(First_Proc())  &
+    print '(a)', ' # Reading info about native (home-brewed) solvers'
+
   ! Take alias
   Grid => Flow % pnt_grid
 
