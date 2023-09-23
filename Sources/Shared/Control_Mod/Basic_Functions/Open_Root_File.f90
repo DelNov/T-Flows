@@ -7,7 +7,23 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Control_Type) :: Control
   character(len=*)    :: file_name
+!-----------------------------------[Locals]-----------------------------------!
+  logical :: file_exists
 !==============================================================================!
+
+  ! First check if the file exists
+  inquire(file  = trim(file_name),  &
+          exist = file_exists)
+
+  ! File doesn't exist
+  if(.not. file_exists) then
+    call Message % Error(60, "The control file is not "  //   &
+                             " present in the working "  //   &
+                             " directory!  \n \n      "  //   &
+                             " This error is critical."  //   &
+                             " Exiting!",                     &
+                             one_proc = .true.)
+  end if
 
   call File % Open_For_Reading_Ascii(file_name, Control % root_file_unit,  &
                                      processor=This_Proc())
