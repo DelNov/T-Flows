@@ -1149,10 +1149,9 @@
   !----------------------------------------------------------!
   if(First_Proc() .and. .not. plot_inside) then
     call File % Set_Name(name_out_7,                    &
-                         time_step = Time % Curr_Dt(),  &
                          appendix  = '-extract-bnd',    &
                          extension = '.py',             &
-                         domain=domain)
+                         domain    = domain)
     call File % Open_For_Writing_Ascii(name_out_7, f7)
     write(f7, '(a)') "from paraview.simple import *"
     write(f7, '(a)') "paraview.simple._DisableFirstRenderCameraReset()"
