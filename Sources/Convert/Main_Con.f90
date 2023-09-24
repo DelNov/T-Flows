@@ -209,6 +209,10 @@
       ! Create a template control file for this domain
       call Grid(g) % Write_Template_Control_File()
 
+      ! Check homogeneity of the grid (ideally, this shoudld
+      ! be done as a test before calling the Probe_1d_Nodes)
+      call Grid(g) % Search_Coordinate_Clusters()
+
       ! Create 1D file (used for channel or pipe flow)
       call Probe_1d_Nodes(Grid(g))
     end if

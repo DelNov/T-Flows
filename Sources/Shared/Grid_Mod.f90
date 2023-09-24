@@ -231,6 +231,7 @@
       procedure :: Save_Vtu_Cells
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
+      procedure :: Search_Coordinate_Clusters
       procedure :: Sort_Cells_By_Thread
       procedure :: Sort_Cells_By_Coordinates
       procedure :: Sort_Faces_By_Index
@@ -291,6 +292,7 @@
 #   include "Grid_Mod/Save_Vtu_Cells.f90"
 #   include "Grid_Mod/Save_Vtu_Edges.f90"
 #   include "Grid_Mod/Save_Vtu_Faces.f90"
+#   include "Grid_Mod/Search_Coordinate_Clusters.f90"
 #   include "Grid_Mod/Sort_Cells_By_Coordinates.f90"
 #   include "Grid_Mod/Sort_Cells_By_Thread.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"

@@ -12,7 +12,6 @@
 !---------------------------------[Interfaces]---------------------------------!
   interface
     include '../Shared/Probe_1d_Nodes.h90'
-    include '../Shared/Probe_2d.h90'
   end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Domain_Type)  :: Dom       ! domain to be used
@@ -103,11 +102,12 @@
   ! Create a template control file for this domain
   call Grid % Write_Template_Control_File()
 
+  ! Check homogeneity of the grid (ideally, this shoudld
+  ! be done as a test before calling the Probe_1d_Nodes)
+  call Grid % Search_Coordinate_Clusters()
+
   ! Save the 1d probe (good for the channel flow)
   call Probe_1d_Nodes(Grid)
-
-  ! Save the 2d probe
-  call Probe_2d(Grid)
 
   ! Write something on the screen
   call Generate % Print_Generate_Statistics(Grid)

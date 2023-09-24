@@ -426,7 +426,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      MD  MAX_VARS_INTERFACE
 " Constants from Tokenizer_Mod
   syn keyword fortranConstant      MAX_TOKENS
-" Constants related to indentation (O think they are defined in a few places - bad!
+" Constants related to indentation (I think they are defined in a few places - bad!
   syn keyword fortranConstant      IN_0  IN_1  IN_2  IN_3  IN_4  IN_5
 " Constants from Info_Mod
   syn keyword fortranConstant      L_LINE  L_BOX  MAX_USER_LINES
@@ -453,6 +453,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      YES  NO  DEBUG  BEGIN
 " Constants from File_Mod
   syn keyword fortranConstant      BUFFER_SIZE  MAX_ITEMS
+" Constant from Grid_Mod
+  syn keyword fortranConstant      MAX_CLUSTERS
 " After the constants, I have alternating definitions of types and objects derived from them
   syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
   syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges         Read_Control  Rc
