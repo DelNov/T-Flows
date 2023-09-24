@@ -317,15 +317,14 @@
 
         call Control % Read_Strings_On('FILE', name_prof, nvs, .false.)
 
-        call File % Open_For_Reading_Ascii(name_prof(1), fu)
+        call File % Open_For_Reading_Ascii(name_prof(1), fu, This_Proc())
         call File % Read_Line(fu)
         read(Line % tokens(1),*) n_points  ! number of points
 
         if(n_points .eq. 0) then
           call Message % Error(68,                                      &
                  'It seems that you forgot to specify the number '  //  &
-                 'of points in the inlet profile file, or you set ' //  &
-                 'it to zero, which is unlikely.  \n '              //  &
+                 'of points in the inlet profile file. \n '         //  &
                  '\n This error is critical, exiting!',                 &
                  file=__FILE__, line=__LINE__)
         end if
@@ -365,13 +364,13 @@ STOP
               i = Key_Ind('T', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
-                if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)    = WALL
+                if(bc_type_tag .eq. WALLFL) t    % bnd_cond_type(c)  = WALL
                 if(bc_type_tag .eq. WALLFL) Grid % region % type(bc) = WALL
               end if
               i = Key_Ind('Q', keys, nks)
               if(i > 0) then
                 t % bnd_cond_type(c) = bc_type_tag
-                if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)    = WALLFL
+                if(bc_type_tag .eq. WALL) t    % bnd_cond_type(c)  = WALLFL
                 if(bc_type_tag .eq. WALL) Grid % region % type(bc) = WALLFL
               end if
             end if
