@@ -26,7 +26,7 @@
 
   ! If not used, destroy the solution (release memory and solvers)
   if(.not. init) then
-    call Var_Mod_Destroy_Solution(phi)
+    call Var_Mod_Destroy_Solution(Flow % pot)
     return
   end if
 
