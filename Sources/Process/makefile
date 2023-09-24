@@ -85,6 +85,22 @@ $(info #   the one you are using to compile Process, errors will occur.        )
 endif
 $(info #-----------------------------------------------------------------------)
 
+#----------------------------------------------------
+# Error trap for unknow options passed to makefile
+#----------------------------------------------------
+KNOWN_VARIABLES := FORTRAN ASSERT DEBUG PROF REAL MPI OMP
+COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
+  $(if $(findstring command line,$(origin $(v))),$(v),))
+UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))
+ifneq ($(strip $(UNKNOWN_VARIABLES)),)
+$(info # Error:                                                                )
+$(info #   Some options you passed are misspelled or not known to makefile.    )
+$(info #   Check the list of valid options above, in the section "Usage".      )
+$(info #   Unknown options: $(UNKNOWN_VARIABLES)                               )
+$(info #-----------------------------------------------------------------------)
+$(error This error is critical, exiting!)
+endif
+
 #-------------------
 #   METIS library
 #-------------------
@@ -423,3 +439,4 @@ clean:
 ifneq ($(PETSC_DIR),)
   include ${PETSC_DIR}/lib/petsc/conf/variables
 endif
+

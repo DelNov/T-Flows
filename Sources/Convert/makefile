@@ -69,6 +69,22 @@ $(info #   make ASSERT=no     - compile without assert with gnu compiler       )
 $(info #   make OMP=yes       - compile with gnu compiler for parallel Convert )
 $(info #-----------------------------------------------------------------------)
 
+#----------------------------------------------------
+# Error trap for unknow options passed to makefile
+#----------------------------------------------------
+KNOWN_VARIABLES := FORTRAN ASSERT DEBUG PROF REAL MPI OMP
+COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
+  $(if $(findstring command line,$(origin $(v))),$(v),))
+UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))
+ifneq ($(strip $(UNKNOWN_VARIABLES)),)
+$(info # Error:                                                                )
+$(info #   Some options you passed are misspelled or not known to makefile.    )
+$(info #   Check the list of valid options above, in the section "Usage".      )
+$(info #   Unknown options: $(UNKNOWN_VARIABLES)                               )
+$(info #-----------------------------------------------------------------------)
+$(error This error is critical, exiting!)
+endif
+
 #-------------------
 #   METIS library
 #-------------------
