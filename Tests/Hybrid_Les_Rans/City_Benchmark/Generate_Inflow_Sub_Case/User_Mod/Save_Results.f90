@@ -1,10 +1,9 @@
 !==============================================================================!
   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
-!   This subroutine reads name.1d file created by Convert or Generator and     !
-!   averages the results in homogeneous directions.                            !
-!                                                                              !
-!   The results are then writen in files name_res.dat and name_res_plus.dat    !
+!   This subroutine was derived from many simular one spread throughout the    !
+!   Tests' subdirectories, but is tailored to provide inlet profiles as the    !
+!   boundary conditions for the city benchmark cases.                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -19,11 +18,10 @@
   type(Var_Type),  pointer :: u, v, w
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
-  character(SL)            :: coord_name, res_name, res_name_plus
-  real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), t_p(:),       &
+  integer                  :: n_prob, pl, c, i, s, c1, c2, n_points
+  character(SL)            :: coord_name, res_name
+  real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), uw_p(:),      &
                               kin_p(:), eps_p(:), f22_p(:), zeta_p(:),      &
-                              uw_p(:), t2_p(:), ut_p(:), vt_p(:), wt_p(:),  &
                               y_plus_p(:),  vis_t_p(:), ind(:), wall_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
@@ -35,6 +33,8 @@
 
   ! Don't save if this is intial condition, nothing is developed yet
   if(Time % Curr_Dt() .eq. 0) return
+
+  Assert(Turb % model .eq. K_EPS_ZETA_F)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -57,10 +57,6 @@
                        time_step = Time % Curr_Dt(),  &
                        appendix  = '-res',            &
                        extension = '.dat')
-  call File % Set_Name(res_name_plus,                 &
-                       time_step = Time % Curr_Dt(),  &
-                       appendix  = '-res-plus',       &
-                       extension = '.dat')
 
   !------------------!
   !   Read 1d file   !
@@ -76,7 +72,7 @@
       print *, '# 10  ! number of cells + 1'
       print *, '# 1 0.0'
       print *, '# 2 0.1'
-      print *, '# 3 0.2'
+      print *, '# 9 0.2'
       print *, '# ... '
       print *, '#--------------------------------------------------------------'
     end if
@@ -84,7 +80,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
+  ubulk    = bulk % flux_x / (bulk % area_x)
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0
@@ -116,14 +112,6 @@
   allocate(y_plus_p(n_prob));  y_plus_p = 0.0
 
   allocate(n_count(n_prob)); n_count = 0
-  count = 0
-  if(Flow % heat_transfer) then
-    allocate(t_p (n_prob));  t_p = 0.0
-    allocate(t2_p(n_prob));  t2_p = 0.0
-    allocate(ut_p(n_prob));  ut_p = 0.0
-    allocate(vt_p(n_prob));  vt_p = 0.0
-    allocate(wt_p(n_prob));  wt_p = 0.0
-  end if
 
   !-------------------------!
   !   Average the results   !
@@ -175,8 +163,6 @@
     call Global % Sum_Real(f22_p (pl))
     call Global % Sum_Real(zeta_p(pl))
 
-    count =  count + n_count(pl)
-
   end do
 
   call Global % Wait
@@ -198,7 +184,7 @@
     end if
   end do
 
-  ! Calculating friction velocity and friction temperature
+  ! Calculating friction velocity
   if(y_plus_p(1) > 5.0) then
     u_tau_p = sqrt(max(abs(bulk % p_drop_x),  &
                        abs(bulk % p_drop_y),  &
@@ -219,84 +205,47 @@
     return
   end if
 
-  open(3, file = res_name)
-  open(4, file = res_name_plus)
+  open(9, file = res_name)
 
-  do i = 3, 4
-    pr = visc_const * capa_const / cond_const
-    re = dens_const * ubulk * 2.0 / visc_const
-    cf_dean = 0.073*(re)**(-0.25)
-    cf      = u_tau_p**2/(0.5*ubulk**2)
-    error   = abs(cf_dean - cf)/cf_dean * 100.0
-    write(i,'(a1,(a12,e12.6))')  &
-    '#', 'density  = ', dens_const 
-    write(i,'(a1,(a12,e12.6))')  &
-    '#', 'Ubulk    = ', ubulk 
-    write(i,'(a1,(a12,e12.6))')  &
-    '#', 'Re       = ', dens_const * ubulk * 2.0 / visc_const
-    write(i,'(a1,(a12,e12.6))')  &
-    '#', 'Re_tau   = ', dens_const * u_tau_p / visc_const
-    write(i,'(a1,(a12,e12.6))')  &
-    '#', 'Cf       = ', 2.0*(u_tau_p / ubulk)**2
-    write(i,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
-    write(i,'(a1,(a12,f12.6,a2,a22))') & 
-    '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
+  pr = visc_const * capa_const / cond_const
+  re = dens_const * ubulk * 2.0 / visc_const
+  cf = u_tau_p**2/(0.5*ubulk**2)
+  write(9,'(a1,(a12,es15.5e3))')  &
+  '#', 'density  = ', dens_const 
+  write(9,'(a1,(a12,es15.5e3))')  &
+  '#', 'U        = ', ubulk 
+  write(9,'(a1,(a12,es15.5e3))')  &
+  '#', 'Re       = ', dens_const * ubulk * 2.0 / visc_const
+  write(9,'(a1,(a12,es15.5e3))')  &
+  '#', 'Re_tau   = ', dens_const * u_tau_p / visc_const
+  write(9,'(a1,(a12,es15.5e3))')  &
+  '#', 'Cf       = ', 2.0*(u_tau_p / ubulk)**2
+  write(9,'(a1,(a12,es15.5e3))')  &
+  '#', 'U_tau    = ', u_tau_p
 
-    if(Turb % model .eq. K_EPS) then
-      write(i,'(a1,2X,a60)')  '#', ' z,'                    //  &
-                                   ' u,'                    //  &
-                                   ' kin, eps, uw, vis_t/visc_const'
-    else if(Turb % model .eq. K_EPS_ZETA_F) then
-      write(i,'(a1,2x,a54)') '#', ' z,'                     //  &
-                                  ' u,'                     //  &
-                                  ' kin, eps, uw,'          //  &
-                                  ' f22, zeta'              //  &
-                                  ' vis_t/visc_const,'
-    end if
-  end do
+  write(9, '(a19)') '# Number of points:'
+  write(9, '(i6)')   n_prob
+  write(9, '(a86)') '# The following line can be coppied to control file ' // &
+                    ' (without the leading # of course)'
+  write(9, '(a80)') '# z            '   //  &
+                    '  u            '   //  &
+                    '  kin          '   //  &
+                    '  eps          '   //  &
+                    '  zeta         '   //  &
+                    '  f22'
 
   do i = 1, n_prob
     if(n_count(i) .ne. 0) then
-      write(3,'(8es15.5e3)')  wall_p(i),   &  !  1
+      write(9,'(8es15.5e3)')  wall_p(i),   &  !  1
                               u_p(i),      &  !  2
                               kin_p(i),    &  !  3
                               eps_p(i),    &  !  4
-                              uw_p(i),     &  !  5
-                              f22_p(i),    &  !  6
-                              zeta_p(i),   &  !  7
-                              vis_t_p(i)      !  8
+                              zeta_p(i),   &  !  5
+                              f22_p(i)        !  6
     end if
   end do
 
-  close(3)
-
-  do i = 1, n_prob-1
-    wall_p(i) = dens_const * wall_p(i) * u_tau_p / visc_const
-    u_p   (i) = u_p  (i) / u_tau_p
-    kin_p (i) = kin_p(i) / u_tau_p**2                 ! kin%n(c)
-    eps_p (i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)  ! eps%n(c)
-    uw_p  (i) = uw_p (i) / (u_tau_p**2 * dens_const)  ! vis_t(c)*(u%z(c)+w%x(c))
-
-    if(Turb % model .eq. K_EPS_ZETA_F) then
-      f22_p(i) = f22_p(i) * visc_const / u_tau_p**2   ! f22%n(c)
-    end if
-  end do
-
-  do i = 1, n_prob
-    if(n_count(i) .ne. 0) then
-      write(4,'(8es15.5e3)')  wall_p(i),   &  !  1
-                              u_p(i),      &  !  2
-                              kin_p(i),    &  !  3
-                              eps_p(i),    &  !  4
-                              uw_p(i),     &  !  5
-                              f22_p(i),    &  !  6
-                              zeta_p(i),   &  !  7
-                              vis_t_p(i)      !  8
-    end if
-  end do
-
-  close(4)
+  close(9)
 
   if(First_Proc())  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
 
