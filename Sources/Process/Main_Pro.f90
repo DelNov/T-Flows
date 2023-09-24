@@ -197,7 +197,7 @@
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)  ! not sure if this call is needed
       call Control % Potential_Initialization(pot_init, .true.)
-      if(pot_init) call Flow(d) % Potential_Initialisation(Sol(d))
+      call Flow(d) % Potential_Initialisation(Sol(d), pot_init)
     end do
   end if
 

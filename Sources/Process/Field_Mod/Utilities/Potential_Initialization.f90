@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Potential_Initialisation(Flow, Sol)
+  subroutine Potential_Initialisation(Flow, Sol, init)
 !------------------------------------------------------------------------------!
 !   Initializes velocity from potential (pressure-like) equation               !
 !------------------------------------------------------------------------------!
@@ -7,6 +7,7 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Field_Type), target :: Flow
   type(Solver_Type), target :: Sol
+  logical, intent(in)       :: init
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: phi, u, v, w
@@ -22,6 +23,12 @@
   integer, parameter :: NDT = 24       ! number of false time steps
   real,    parameter :: DT  =  1.0e+6  ! false time step
 !==============================================================================!
+
+  ! If not used, destroy the solution (release memory and solvers)
+  if(.not. init) then
+    call Var_Mod_Destroy_Solution(phi)
+    return
+  end if
 
   call Profiler % Start('Potential_Initialization')
 
