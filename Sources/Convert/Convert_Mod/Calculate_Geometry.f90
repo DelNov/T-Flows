@@ -714,8 +714,8 @@
                             + Grid % dy(s)*Grid % dy(s)  &
                             + Grid % dz(s)*Grid % dz(s) ) )
   end do
-  print '(a45,e12.5)', ' # Maximal distance of periodic boundary is: ',  &
-                       sqrt(max_dis)
+  print '(a45,es12.5)', ' # Maximal distance of periodic boundary is: ',  &
+                        sqrt(max_dis)
 
   !----------------------------------!
   !   Calculate the cell volumes     !
