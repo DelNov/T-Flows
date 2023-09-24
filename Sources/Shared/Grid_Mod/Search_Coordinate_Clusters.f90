@@ -16,6 +16,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: MAX_CLUSTERS = 512
 !-----------------------------------[Locals]-----------------------------------!
   integer      :: n, i, cluster
   real         :: cluster_xyz(3, MAX_CLUSTERS) = HUGE
