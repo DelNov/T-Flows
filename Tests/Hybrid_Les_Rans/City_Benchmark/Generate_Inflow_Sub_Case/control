@@ -6,14 +6,12 @@
   TIME_STEP                                     0.01
   NUMBER_OF_TIME_STEPS                      20000
   STARTING_TIME_STEP_FOR_TURB_STATISTICS   100000
-  RESULTS_SAVE_INTERVAL                      2000
+  RESULTS_SAVE_INTERVAL                      4000
   BACKUP_SAVE_INTERVAL                     200000
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
-  NUMBER_OF_MONITORING_POINTS    1
-  MONITORING_POINT_001           0.5  0.5  1.0
   POINT_FOR_MONITORING_PLANES    0.01 0.01 0.25
 
 #-----------------
@@ -52,8 +50,8 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t     kin   eps   zeta   f22
-    VALUES              0.5   0.0   0.0   20.0  0.01  0.001 0.1    0.1
+    VARIABLES           u     v     w     kin   eps   zeta   f22
+    VALUES              0.5   0.0   0.0   0.01  0.001 0.1    0.1
 
 #---------------------
 # Boundary conditions
