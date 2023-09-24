@@ -13,8 +13,8 @@
 //
 //------------------------------------------------------------------------------
 
-PERIODIC  =  0;  // or 0
-ANGLE_DEG =  0.0;
+PERIODIC  =   0;  // or 0
+ANGLE_DEG =   0.0;
 
 // Number of layers
 N_LAYERS     = 70;
