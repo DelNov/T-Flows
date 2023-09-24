@@ -9,7 +9,7 @@
   integer, intent(in) :: this_proc
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu, real_prec, version
+  integer       :: fu, real_prec, version
   character(SL) :: name_in, str1, str2
   integer       :: nc, nb, nf, nn, ns
 !==============================================================================!

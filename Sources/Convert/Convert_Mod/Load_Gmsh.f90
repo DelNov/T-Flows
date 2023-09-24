@@ -36,8 +36,6 @@
   integer,       allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
   character(SL), allocatable :: phys_names(:)
   logical                    :: ascii                 ! is file in ascii format?
-  integer                    :: pos
-  integer(1)                 :: byte(0:3)
   integer(1)                 :: buffer(L)
 !------------------------------------------------------------------------------!
 !   Buffered reading in search of patterns:                                    !
