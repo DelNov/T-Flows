@@ -1,9 +1,22 @@
+# Grid file name
 backstep_polyhedral.msh
+
+# Dual grid?
 yes
+
+# Geometrical scaling?
 1.000
+
+# Boundary cell centres positions (2 is orthogonal)
 2
+
+# Periodicity (take the last one and skip)
 6
 skip
+
+# Distance from the wall
 3 4 5
+
+# 1D probes
 skip
 
