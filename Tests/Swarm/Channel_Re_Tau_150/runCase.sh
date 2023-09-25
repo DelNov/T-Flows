@@ -17,6 +17,7 @@ if [ $1 = "fluid" ]; then
 	
 	# Remove any old output file for fluid phase (can be refined) 
         rm -f out_fluidResults_parallelMode.dat
+        rm -f out_fluidResults_serialMode.dat
 
 	# Creating soft links from Binaries/ 
 	ln -i -s ../../../Binaries/* . 
@@ -59,6 +60,7 @@ elif [ $1 = "particles" ]; then
 
 	# Remove any old output file for particles (can be refined) 
         rm -f out_particleResults_parallelMode.dat
+        rm -f out_particleResults_serialMode.dat
 
 	# Creating a soft link for the particle control file 
 	ln -i -s control_b_particles control 

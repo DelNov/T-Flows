@@ -6,7 +6,8 @@
   TIME_STEP                                        0.5
   #NUMBER_OF_TIME_STEPS                         24000
   NUMBER_OF_TIME_STEPS                         400
-  STARTING_TIME_STEP_FOR_TURB_STATISTICS       18001 # 6000 for statistics
+  #STARTING_TIME_STEP_FOR_TURB_STATISTICS       18001 # 6000 for statistics
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS       300 # 6000 for statistics
   STARTING_TIME_STEP_FOR_SWARM_COMPUTATION     405   # after the last time step
   STARTING_TIME_STEP_FOR_SWARM_STATISTICS      30001 # beyond this computation
 

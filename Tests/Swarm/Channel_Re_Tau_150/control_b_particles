@@ -5,7 +5,8 @@
 
   TIME_STEP                                        0.1
   NUMBER_OF_TIME_STEPS                         600
-  STARTING_TIME_STEP_FOR_TURB_STATISTICS       30001 # wait 6000 for statistics
+  #STARTING_TIME_STEP_FOR_TURB_STATISTICS       30001 # wait 6000 for statistics
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS       300 # wait 6000 for statistics
   STARTING_TIME_STEP_FOR_SWARM_COMPUTATION     405   # start right from restart
   STARTING_TIME_STEP_FOR_SWARM_STATISTICS      30001 # wait 6000 for statistics
 
