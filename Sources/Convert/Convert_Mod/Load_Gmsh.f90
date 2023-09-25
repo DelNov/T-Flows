@@ -31,7 +31,7 @@
   integer                    :: n_memb, n_tags, n_crvs, n_nods, error, ios
   integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu, tot
   integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
-  integer                    :: f, e, s  ! buffer indices; first, ending, start
+  integer                    :: f, e  ! buffer indices: first (f) and end (e)
   integer,       allocatable :: n(:), new(:)
   integer,       allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
   character(SL), allocatable :: phys_names(:)
@@ -89,13 +89,17 @@
   !---------------------------------------------!
   tot = 0  ! number of items already found
   do
+
+    ! Get the first position, or position before reading
+    inquire(unit=fu, pos=f)  ! get the global position within the file
+                             ! when you read the file for the first time,
+                             ! it will be one, pos points to last+!
+
     ! Read data into the buffer, from the end of the window (W) till the end
     read(fu, iostat=ios) buffer(W+1:L)
 
+    ! Get the position after reading
     inquire(unit=fu, pos=e)  ! get the global position within the file
-    f = e - (L-W)            ! first position in the buffer (e points to last+1)
-    e = e - 1                ! correct the last position in the buffer
-    s = f + W                ! start of the new freshly read data (unused)
 
     Assert(ios .le. 0)       ! check if an error occurred
 
