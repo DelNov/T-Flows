@@ -1,22 +1,24 @@
-# Grid file name
+# Grid file name you are importing (with ext.):
 backstep_polyhedral.msh
 
-# Dual grid?
+# Would you like to create a dual grid? (yes/no)
 yes
 
-# Geometrical scaling?
+# Geometrical scaling for the second grid
 1.000
 
-# Boundary cell centres positions (2 is orthogonal)
+# Enforce uniformity on dual grid?
+yes
+
+# Position the boundary cell centres:
 2
 
-# Periodicity (take the last one and skip)
+# Periodicity
 6
 skip
 
-# Distance from the wall
+# Calculating distance from the walls
 3 4 5
 
-# 1D probes
+# Insert non-homogeneous direction for dual grid
 skip
-

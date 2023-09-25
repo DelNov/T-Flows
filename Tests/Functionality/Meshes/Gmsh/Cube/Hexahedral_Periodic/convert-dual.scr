@@ -1,6 +1,14 @@
 cube-hex.msh
 yes
+
+# Geometrical scaling
 1.0000000000000000
+
+# Uniform (X 3)
+yes
+yes
+yes
+
 2
 skip
 skip

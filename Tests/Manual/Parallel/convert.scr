@@ -1,5 +1,9 @@
+# Full mesh name
 rod_tet.msh
+
+# Dual grid?
 yes
+
 1.000000
 2
 1
