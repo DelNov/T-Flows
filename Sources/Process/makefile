@@ -436,7 +436,14 @@ clean:
 #-----------------------------------
 #   Load options to compile PETSc
 #-----------------------------------
+FC_OLD := $(FC)
 ifneq ($(PETSC_DIR),)
   include ${PETSC_DIR}/lib/petsc/conf/variables
 endif
 
+ifneq ($(FC),$(FC_OLD))
+$(info #   That might indeed be happening.  Based on your options, or lack     )
+$(info #   of any, makefile would expect $(FC_OLD), but PETSc enforces $(FC).  )
+$(info #   They might, or might not be compatible, please check.               )
+$(info #-----------------------------------------------------------------------)
+endif
