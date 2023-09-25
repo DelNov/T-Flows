@@ -153,7 +153,9 @@
     !--------------------------------------!
     !   Calculate geometrical quantities   !
     !--------------------------------------!
-    call Convert % Calculate_Geometry(Grid(g), g-n_grids)  ! if zero, ask
+    call Convert % Calculate_Geometry(Grid(g),         &
+                                      (g.eq.n_grids),  &  ! should you scale
+                                      g)
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
     ! ... faster if it is called after Grid_Mod_Sort_Faces_By_Region
@@ -208,10 +210,6 @@
     if( (g-n_grids) .eq. 0) then
       ! Create a template control file for this domain
       call Grid(g) % Write_Template_Control_File()
-
-      ! Check homogeneity of the grid (ideally, this shoudld
-      ! be done as a test before calling the Probe_1d_Nodes)
-      call Grid(g) % Search_Coordinate_Clusters()
 
       ! Create 1D file (used for channel or pipe flow)
       call Probe_1d_Nodes(Grid(g))

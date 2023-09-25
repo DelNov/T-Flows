@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Geometry(Convert, Grid, ask)
+  subroutine Calculate_Geometry(Convert, Grid, ask, g)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
 !                                                                              !
@@ -92,7 +92,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
-  integer, intent(in) :: ask
+  logical, intent(in) :: ask
+  integer, intent(in) :: g    ! grid rank
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b, i, j
   integer              :: c11, c12, c21, c22, s1, s2, cnt_bnd, cnt_per
@@ -128,7 +129,7 @@
   !   => depends on: xn, yn, zn   !
   !   <= gives:      xn, yn, zn   !
   !-------------------------------!
-  if(ask == 0) then
+  if(ask) then
     print *, '#========================================='
     print *, '# Geometric extents:                 '
     print *, '#-----------------------------------------'
@@ -153,6 +154,10 @@
       Grid % zn(:) = Grid % zn(:) * factor
     end if
   end if
+
+  ! Check homogeneity of the grid and ask if you want it uniform
+  if(g.eq.1) call Grid % Search_Coordinate_Clusters(enforce_uniform=.false.)
+  if(g.eq.2) call Grid % Search_Coordinate_Clusters(enforce_uniform=.true.)
 
   !-----------------------------------------!
   !   Calculate the cell centers            !
@@ -184,7 +189,7 @@
   !   => depends on: xc, yc, zc, sx, sy, sz   !
   !   <= gives:      xc, yc, zc  for c<0      !
   !-------------------------------------------!
-  if(ask == 0) then
+  if(ask) then
     print *, '#===================================='
     print *, '# Position the boundary cell centres:'
     print *, '#------------------------------------'
@@ -285,7 +290,7 @@
   !   Phase I  ->  find the faces on periodic boundaries   !
   !                                                        !
   !--------------------------------------------------------!
-  if(ask == 0) then
+  if(ask) then
     answer = ''
     do while(answer .ne. 'SKIP')
 
@@ -528,7 +533,7 @@
       Grid % n_bnd_regions = Grid % n_bnd_regions - 1
 
     end do  ! while answer .ne. 'SKIP'
-  end if    ! ask == 0
+  end if    ! ask
 
   !----------------------------------------------------!
   !                                                    !
