@@ -28,7 +28,7 @@
   integer              :: n_xyz(3) = 0     ! number of clusters in x, y and z
   logical              :: new
   integer, allocatable :: cluster(:)
-  character(SL)        :: answer
+  character(SL)        :: answer, output
   logical, allocatable :: orphan(:)
 !==============================================================================!
 
@@ -93,7 +93,11 @@
   !--------------------------------!
   !   Report what you have found   !
   !--------------------------------!
-  print '(a,3i6)',   ' # Number of clusters in x, y and z: ', n_xyz(:)
+  write(output, '(a,3i6)') ' # Number of clusters in x, y and z: ', n_xyz(:)
+  if(n_xyz(1) > MAX_CLUSTERS) write(output(38:43), '(a6)')  '  high'
+  if(n_xyz(2) > MAX_CLUSTERS) write(output(44:49), '(a6)')  '  high'
+  if(n_xyz(3) > MAX_CLUSTERS) write(output(50:55), '(a6)')  '  high'
+  print '(a)', output
 
   !-----------------------------------------!
   !   Browse three cooordinate directions   !
