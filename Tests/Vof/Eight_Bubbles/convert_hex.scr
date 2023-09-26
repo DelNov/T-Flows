@@ -1,8 +1,21 @@
+# Full grid name
 cube_hex.msh
+
+# Create dual mesh?
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell center positions
 1
+
+# Periodicity
 skip
+
+# Wall distance
 1 2 3 4
+
+# Probe 1d
 skip
 

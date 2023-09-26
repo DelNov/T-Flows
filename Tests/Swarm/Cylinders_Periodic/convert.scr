@@ -1,9 +1,22 @@
+# Full mesh name
 cylinder.msh
+
+# Dual grid
 no
+
+# Physical scaling
 1.000
+
+# Boundary cell centers
 1
+
+# Periodicity
 1
 3
 skip
+
+# Distance from the walls
 1 2 3
+
+# Probe 1d
 skip

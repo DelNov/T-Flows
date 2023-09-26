@@ -1,8 +1,21 @@
+# Full mesh name
 cube_tet.msh
+
+# Create dual?
 yes
+
+# Geometrical scaling
 skip
+
+# Boundary cell centers
 1
+
+# Periodicity
 skip
+
+# Wall distance
 1
+
+# Probe 1d
 skip
 

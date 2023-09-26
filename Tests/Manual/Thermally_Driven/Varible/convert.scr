@@ -1,8 +1,21 @@
 air.msh
+# Grid name with extension
+
+# Create dual mesh
 no
+
+# Geometrical scaling
 0.07803
+
+# Boundary cell center coordinates
 2
+
+# Periodicity
 skip
+
+# Wall distance
 1 2 3 4
+
+# Probe 1d
 skip
 

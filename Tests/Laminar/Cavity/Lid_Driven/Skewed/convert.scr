@@ -1,9 +1,22 @@
+# Full mesh name
 skewed.msh
+
+# Create dual grid?
 no
+
+# Geometric scaling?
 skip
+
+# Position of boundary cell centers
 2
+
+# Periodicity
 1
 skip
+
+# Distance from the walls
 1 2 3 4
+
+# Probe 1d
 skip
 
