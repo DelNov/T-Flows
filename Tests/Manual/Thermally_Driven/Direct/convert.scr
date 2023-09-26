@@ -1,8 +1,21 @@
 therm_driven.msh
+# Grid name with extension
+
+# Create dual mesh
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell center coordinates
 2
+
+# Periodicity
 5
 skip
+
+# Wall distance
 skip
+
+# Probe 1d
 skip
