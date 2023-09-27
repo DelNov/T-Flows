@@ -55,7 +55,9 @@
   allocate(Grid % Vect % face_thread(nf+ns));  Grid % Vect % face_thread(:) = 0
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  allocate(Grid % new_f(nf+ns));  Grid % new_f(:) = 0
-  allocate(Grid % old_f(nf+ns));  Grid % old_f(:) = 0
+  if(PROGRAM_NAME .ne. "Process") then
+    allocate(Grid % new_f(nf+ns));  Grid % new_f(:) = 0
+    allocate(Grid % old_f(nf+ns));  Grid % old_f(:) = 0
+  end if
 
   end subroutine

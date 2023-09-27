@@ -92,7 +92,7 @@
     ! Cells' nodes, faces, and neigboring cells
     integer, allocatable :: cells_n(:,:)
     integer, allocatable :: cells_f(:,:)
-    integer, allocatable :: cells_c(:,:)
+    integer, allocatable :: cells_c(:,:)  ! needed in Generate and Convert
 
     ! Weights for interpolation from nodes
     real, allocatable :: weight_n2c(:,:)

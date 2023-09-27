@@ -23,7 +23,9 @@
   end do
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  allocate(Grid % new_n(n));  Grid % new_n(:) = 0
-  allocate(Grid % old_n(n));  Grid % old_n(:) = 0
+  if(PROGRAM_NAME .ne. "Process") then
+    allocate(Grid % new_n(n));  Grid % new_n(:) = 0
+    allocate(Grid % old_n(n));  Grid % old_n(:) = 0
+  end if
 
   end subroutine
