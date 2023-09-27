@@ -47,7 +47,6 @@
     integer, allocatable :: row(:)    ! column positions
     integer, allocatable :: dia(:)    ! diagonal positions
     integer, allocatable :: pos(:,:)  ! position in the matrix
-    integer, allocatable :: mir(:)    ! mirror positions
     integer, allocatable :: glo(:)
 
       ! Global cell numbering for PETSc, which is

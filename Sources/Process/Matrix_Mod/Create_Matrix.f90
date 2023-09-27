@@ -61,7 +61,6 @@
   A % nonzeros = n + 1
   allocate(A % val(n+1)); A % val = 0. ! it reffers to A % row+1
   allocate(A % col(n+1)); A % col = 0  ! it reffers to A % row+1
-  allocate(A % mir(n+1)); A % mir = 0  ! it reffers to A % row+1
 
   !---------------------------------------------------------!
   !   Form A % row and diagonal only formation of A % col   !
@@ -96,29 +95,6 @@
                           A % row(c) + stencw(c) - 1))
     do pos = A % row(c), A % row(c+1)-1
       if(A % col(pos) .eq. c) A % dia(c) = pos
-    end do
-  end do
-
-  !---------------------------!
-  !   Find mirror positions   !
-  !---------------------------!
-  do c1 = 1, Grid % n_cells
-    do pos1 = A % row(c1), A % row(c1 + 1) - 1
-      n1 = A % col(pos1)  ! at this point you have c1 and n1
-
-      ! Inner loop (it might probably go from 1 to c1-1
-      c2 = n1
-      do pos2 = A % row(c2), A % row(c2 + 1) - 1
-        n2 = A % col(pos2)  ! at this point you have c2 and n2
-
-        if(n2 .eq. c1) then
-          A % mir(pos1) = pos2
-          A % mir(pos2) = pos1
-          goto 2  ! done with the inner loop, get out
-        end if
-      end do
-
-2     continue
     end do
   end do
 
