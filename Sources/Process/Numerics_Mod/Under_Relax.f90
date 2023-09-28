@@ -9,13 +9,17 @@
   type(Matrix_Type) :: A
   real              :: b(:)
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type), pointer :: Grid
   integer :: c
 !==============================================================================!
+
+  ! Take the alias to grid
+  Grid => phi % pnt_grid
 
   !------------------------------------------!
   !   Browse through cells and under-relax   !
   !------------------------------------------!
-  do c = 1, phi % pnt_grid % n_cells
+  do c = Cells_In_Domain()
 
     ! Under-relax central coefficient
     A % val(A % dia(c)) = A % val(A % dia(c)) / phi % urf

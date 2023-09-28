@@ -75,3 +75,6 @@
 # define Cells_In_Buffers()                        \
     Grid % region % f_cell(Grid % n_regions + 1),  \
     Grid % region % l_cell(Grid % n_regions + 1)
+
+# define Cell_In_This_Proc(cell)     \
+    Grid % Comm % cell_proc(cell) .eq. This_Proc()

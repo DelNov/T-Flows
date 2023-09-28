@@ -9,9 +9,8 @@
   class(Matrix_Type)      :: A
   type(Grid_Type), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, s, pos, pos1, pos2, n
+  integer              :: c, s, pos, n
   integer              :: c1, c2  ! cell 1 and 2
-  integer              :: n1, n2  ! neighbour 1 and 2
   integer              :: m_lower, m_upper, start
   integer, allocatable :: stencw(:)
   integer, allocatable :: all_lower_ms(:)
@@ -39,14 +38,14 @@
   !-----------------------------------!
   A % nonzeros = 0
 
-  !----------------------------!
-  !   Compute stencis widths   !
-  !----------------------------!
-  do s = 1, Grid % n_faces
+  !------------------------------!
+  !   Compute stencils' widths   !
+  !------------------------------!
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(c2 > 0) then
-      stencw(c1) = stencw(c1) + 1
+    stencw(c1) = stencw(c1) + 1
+    if(Cell_In_This_Proc(c2)) then
       stencw(c2) = stencw(c2) + 1
     end if
   end do
@@ -55,7 +54,7 @@
   !   Count the nonzero entries and allocate the memory for the array   !
   !---------------------------------------------------------------------!
   n = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()  ! these are without buffers
     n = n + stencw(c)
   end do
   A % nonzeros = n + 1
@@ -66,22 +65,22 @@
   !   Form A % row and diagonal only formation of A % col   !
   !---------------------------------------------------------!
   A % row(1) = 1
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()  ! these are without buffers
     A % row(c + 1) = A % row(c) + stencw(c)
     A % col(A % row(c)) = c   ! it is first to its own self
-    stencw(c) = 1                       ! reset stencw
+    stencw(c) = 1             ! reset stencw
   end do
 
   !----------------------------------------------------!
   !   Extend A % col entries with off-diagonal terms   !
   !----------------------------------------------------!
-  do s = 1, Grid % n_faces
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(c2 > 0) then
-      A % col(A % row(c1) + stencw(c1)) = c2
+    A % col(A % row(c1) + stencw(c1)) = c2
+    stencw(c1) = stencw(c1) + 1
+    if(Cell_In_This_Proc(c2)) then
       A % col(A % row(c2) + stencw(c2)) = c1
-      stencw(c1) = stencw(c1) + 1
       stencw(c2) = stencw(c2) + 1
     end if
   end do
@@ -90,7 +89,7 @@
   !   Sort A % col to make them nice and neat    !
   !   and also locate the position of diagonal   !
   !----------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()  ! these are without buffers
     call Sort % Int_Array(A % col(A % row(c) :  &
                           A % row(c) + stencw(c) - 1))
     do pos = A % row(c), A % row(c+1)-1
@@ -101,18 +100,18 @@
   !---------------------------------------!
   !   Connect faces with matrix entries   !
   !---------------------------------------!
-  do s = 1, Grid % n_faces
+  do s = Faces_In_Domain()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(c2 > 0) then
 
-      ! Where is matrix(c1,c2) and ...
-      do c = A % row(c1), A % row(c1+1)-1 
-        if(A % col(c) .eq. c2) A % pos(1, s) = c
-      end do
+    ! Where is matrix(c1,c2) and ...
+    do c = A % row(c1), A % row(c1+1) - 1
+      if(A % col(c) .eq. c2) A % pos(1, s) = c
+    end do
 
-      ! ... where is matrix(c2,c1)
-      do c=A % row(c2),A % row(c2+1)-1 
+    ! ... where is matrix(c2,c1)
+    if(Cell_In_This_Proc(c2)) then
+      do c = A % row(c2), A % row(c2+1) - 1
         if(A % col(c) .eq. c1) A % pos(2, s) = c
       end do
     end if

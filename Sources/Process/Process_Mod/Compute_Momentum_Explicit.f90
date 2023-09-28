@@ -38,7 +38,9 @@
       c2 = Grid % faces_c(2,s)
 
       sum_neigh(c1) = sum_neigh(c1) - M % val(M % pos(1,s)) * ui % n(c2)
-      sum_neigh(c2) = sum_neigh(c2) - M % val(M % pos(2,s)) * ui % n(c1)
+      if(Cell_In_This_Proc(c2)) then
+        sum_neigh(c2) = sum_neigh(c2) - M % val(M % pos(2,s)) * ui % n(c1)
+      end if
     end do
 
     ! Solve velocity explicitely (no under relaxation!!)

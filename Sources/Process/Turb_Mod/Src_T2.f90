@@ -49,7 +49,7 @@
   call Flow % Grad_Variable(t)
 
   ! Production source:
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain()
 
     !-------------------------------------------------------------------!
     !   ut, vt and wt defined by AFM or GGDH could lead to divergence   !
@@ -72,7 +72,7 @@
 
     b(c) = b(c) + Turb % p_t2(c) * Grid % vol(c)
 
-  ! Negative contribution
+    ! Negative contribution
     A % val(A % dia(c)) = A % val(A % dia(c)) +  &
          2.0 * Flow % density(c) * eps % n(c)  &
              / (kin % n(c) + TINY) * Grid % vol(c)

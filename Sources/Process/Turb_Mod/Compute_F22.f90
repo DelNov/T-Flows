@@ -54,14 +54,14 @@
 
   ! Old values (o) and older than old (oo)
   if(Iter % Current() .eq. 1) then
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       phi % oo(c)   = phi % o(c)
       phi % o (c)   = phi % n(c)
     end do
   end if
 
   ! New values
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain()
     cross(c) = 0.0
   end do
 
@@ -112,8 +112,10 @@
     if(c2  > 0) then
       A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
       A % val(A % dia(c1))  = A % val(A % dia(c1))  + a12
-      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
-      A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+      if(Cell_In_This_Proc(c2)) then
+        A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+        A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+      end if
     else if(c2  < 0) then
 
       ! Inflow
@@ -138,7 +140,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain()
     b(c) = b(c) + cross(c)
   end do
 

@@ -13,7 +13,7 @@
   type(Var_Type),    pointer :: phi, u, v, w
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, n
+  integer                    :: s, c, c1, c2, n, reg
   real                       :: f_ex, f_im
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: vol_in_real, vol_in_fake, dist_min
@@ -73,7 +73,7 @@
   !----------------------------------------!
 
   ! Innertial term
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     A % val(A % dia(c)) = Grid % vol(c) / DT
   end do
 
@@ -86,8 +86,10 @@
     if(c2  > 0) then
       A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - A % fc(s)
       A % val(A % dia(c1))  = A % val(A % dia(c1))  + A % fc(s)
-      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - A % fc(s)
-      A % val(A % dia(c2))  = A % val(A % dia(c2))  + A % fc(s)
+      if(Cell_In_This_Proc(c2)) then
+        A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - A % fc(s)
+        A % val(A % dia(c2))  = A % val(A % dia(c2))  + A % fc(s)
+      end if
     else if(c2  < 0) then
       ! Inflow and outflow
       if( (Grid % Bnd_Cond_Type(c2) .eq. INFLOW)   .or.  &
@@ -105,12 +107,12 @@
   do n = 1, NDT
 
     ! Store the value from previous time step
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       phi % o(c) = phi % n(c)
     end do
 
     ! Innertial term
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       b(c) = Grid % vol(c) / DT * phi % o(c)
     end do
 
@@ -145,7 +147,7 @@
     !----------------------------!
     !   Spatial discretization   !
     !----------------------------!
-    do s = 1, Grid % n_faces
+    do s = Faces_In_Domain()
 
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
@@ -166,40 +168,39 @@
 
       ! Cross diffusion part
       cross(c1) = cross(c1) + f_ex - f_im
-      if(c2  > 0) then
-        cross(c2) = cross(c2) - f_ex + f_im
-      end if
-
-      ! Fill the system matrix
-      if(c2 < 0) then
-
-        ! Inflow
-        if( (Grid % Bnd_Cond_Type(c2) .eq. INFLOW)) then
-          b(c1) = b(c1) +  A % fc(s) * 1.0
-        end if
-
-        ! Outflow
-        if( (Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) .or.  &
-            (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.  &
-            (Grid % Bnd_Cond_Type(c2) .eq. PRESSURE)) then
-          b(c1) = b(c1) + A % fc(s) * 0.0
-        end if
-
-        ! For wall and wall flux, solid walls in any case => do nothing!
-      end if
+      cross(c2) = cross(c2) - f_ex + f_im
 
     end do  ! through faces
+
+    ! Insert boundary conditions
+    ! For solid walls do nothing
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. INFLOW) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          b(c1) = b(c1) +  A % fc(s) * 1.0
+        end do
+      end if  ! region is inflow
+      if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
+         Grid % region % type(reg) .eq. CONVECT .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          b(c1) = b(c1) +  A % fc(s) * 0.0
+        end do
+      end if  ! some kind of outlet
+    end do    ! through regions
 
     ! Add cross diffusion terms explicity for non-polyhedral grids
     ! (Some of them show poor convergence when solving for potential
     ! field, particularly if Grid featured concave cells near edges)
     if(.not. Grid % polyhedral) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
         b(c) = b(c) + cross(c)
       end do
 
       ! Fix negative sources
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
 
         ! Store the central term
         store(c) = A % val(A % dia(c))
@@ -238,13 +239,13 @@
 
     ! Recover the central coefficient in the system matrix
     if(.not. Grid % polyhedral) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
         A % val(A % dia(c)) = store(c)
       end do
     end if
 
     ! Re-initialize cross diffusion terms (for the next time step)
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       cross(c) = 0.0
     end do
 
@@ -262,7 +263,7 @@
   !---------------------------------------------!
   !   Find the minimum distance from the wall   !
   !---------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     log_dist(c) = Grid % wall_dist(c)
   end do
   dist_min = minval(log_dist(1:Grid % n_cells))
@@ -271,7 +272,7 @@
   !------------------------------------------------------!
   !   Set distances from the wall to friendlier values   !
   !------------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     log_dist(c) = log( log_dist(c) / (0.99 * dist_min) )
   end do
 
@@ -288,7 +289,7 @@
   !---------------------------------------!
   !   Set first estimate for velocities   !
   !---------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     u % n(c)  = -phi % x(c) * log_dist(c)
     v % n(c)  = -phi % y(c) * log_dist(c)
     w % n(c)  = -phi % z(c) * log_dist(c)
@@ -299,27 +300,28 @@
   !-------------------------------------------------------------!
   vol_in_real = 0.0
   vol_in_fake = 0.0
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2  < 0) then
-      if(Grid % Bnd_Cond_Type( c2) .eq. INFLOW) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. INFLOW) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+
         vol_in_real = vol_in_real + ( u % n(c2) * Grid % sx(s)    &
                                     + v % n(c2) * Grid % sy(s)    &
                                     + w % n(c2) * Grid % sz(s) )
         vol_in_fake = vol_in_fake + ( u % n(c1) * Grid % sx(s)    &
                                     + v % n(c1) * Grid % sy(s)    &
                                     + w % n(c1) * Grid % sz(s) )
-      end if
-    end if
-  end do
+      end do  ! faces at inflow
+    end if    ! region is inflow
+  end do      ! through regions
   call Global % Sum_Real(vol_in_real)
   call Global % Sum_Real(vol_in_fake)
 
   !-------------------------------------------------!
   !   Correct velocities to more realistic values   !
   !-------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     u % n(c)  = u % n(c) * vol_in_real / vol_in_fake
     v % n(c)  = v % n(c) * vol_in_real / vol_in_fake
     w % n(c)  = w % n(c) * vol_in_real / vol_in_fake

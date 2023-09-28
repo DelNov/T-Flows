@@ -66,7 +66,7 @@
 
   ! Old values (o) and older than old (oo)
   if(Iter % Current() .eq. 1) then
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -153,8 +153,10 @@
     if(c2  > 0) then
       A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
       A % val(A % dia(c1))  = A % val(A % dia(c1))  + a12
-      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
-      A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+      if(Cell_In_This_Proc(c2)) then
+        A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+        A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+      end if
     else if(c2  < 0) then
 
       ! Outflow is not included because it was causing problems     
@@ -182,7 +184,7 @@
 
   if(Turb % model_variant .ne. STABILIZED) then
     if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      do c = Cells_In_Domain_And_Buffers()
+      do c = Cells_In_Domain()
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
@@ -208,7 +210,7 @@
                      - Flow % viscosity(c) * phi_z(c)
       end do
     else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      do c = Cells_In_Domain_And_Buffers()
+      do c = Cells_In_Domain()
         u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
                      * Turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
@@ -233,7 +235,7 @@
     call Flow % Grad_Component(u2uj_phij(-nb:nc), 2, u2uj_phij_y(-nb:nc))
     call Flow % Grad_Component(u3uj_phij(-nb:nc), 3, u3uj_phij_z(-nb:nc))
 
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       b(c) = b(c) + (  u1uj_phij_x(c)  &
                      + u2uj_phij_y(c)  &
                      + u3uj_phij_z(c) ) * Grid % vol(c)
@@ -278,7 +280,7 @@
   !   Source term contains difference between      !
   !   explicity and implicitly treated advection   !
   !------------------------------------------------!
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain()
     b(c) = b(c) + cross(c)
   end do
 
@@ -348,7 +350,7 @@
   if(phi % name .eq. 'UU' .or.  &
      phi % name .eq. 'VV' .or.  &
      phi % name .eq. 'WW') then
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       phi % n(c) = phi % n(c)
       if(phi % n(c) < 0.) then
         phi % n(c) = phi % o(c)

@@ -57,7 +57,7 @@
 
   ! Old values (o) and older than old (oo)
   if(Iter % Current() .eq. 1) then
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -173,8 +173,10 @@
     if(c2  > 0) then
       A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
       A % val(A % dia(c1))  = A % val(A % dia(c1))  + a12
-      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
-      A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+      if(Cell_In_This_Proc(c2)) then
+        A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+        A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
+      end if
     else if(c2 < 0) then
 
       ! Outflow is not included because it was causing problems
@@ -192,7 +194,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain()
     b(c) = b(c) + cross(c)
   end do
 
@@ -251,20 +253,20 @@
                        ' (solver for turbulence)')
 
   ! Avoid negative values for all computed turbulent quantities
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain()
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
   ! Set the lower limit of zeta to 1.8
   if(phi % name .eq. 'ZETA') then
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       phi % n(c) = min(phi % n(c), 1.8)
     end do
   end if
 
   ! Set the lower limit of epsilon 
   if(phi % name .eq. 'EPS') then
-    do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain()
       phi % n(c) = max(phi % n(c), 1.0e-10)
     end do
   end if

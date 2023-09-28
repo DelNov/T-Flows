@@ -170,74 +170,72 @@
 
     Assert(c2 > 0)
 
-    ! Face is inside the domain
-    if(c2 > 0) then
+    ! Interpolate velocity 
+    u_f(s) = fs * u_c(c1) + (1.0 - fs) * u_c(c2)
+    v_f(s) = fs * v_c(c1) + (1.0 - fs) * v_c(c2)
+    w_f(s) = fs * w_c(c1) + (1.0 - fs) * w_c(c2)
 
-      ! Interpolate velocity 
-      u_f(s) = fs * u_c(c1) + (1.0 - fs) * u_c(c2)
-      v_f(s) = fs * v_c(c1) + (1.0 - fs) * v_c(c2)
-      w_f(s) = fs * w_c(c1) + (1.0 - fs) * w_c(c2)
-
-      ! Calculate coeficients for the pressure matrix
-      ! Units: m * m^3 s / kg = m^4 s / kg
-      a12 = A % fc(s) * (fs * v_m(c1) + (1.0-fs) * v_m(c2))
-      A % val(A % pos(1,s)) = -a12
+    ! Calculate coeficients for the pressure matrix
+    ! Units: m * m^3 s / kg = m^4 s / kg
+    a12 = A % fc(s) * (fs * v_m(c1) + (1.0-fs) * v_m(c2))
+    A % val(A % pos(1,s)) = -a12
+    A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
+    if(Cell_In_This_Proc(c2)) then
       A % val(A % pos(2,s)) = -a12
-      A % val(A % dia(c1))  = A % val(A % dia(c1)) +  a12
-      A % val(A % dia(c2))  = A % val(A % dia(c2)) +  a12
-
-      ! Interpolate pressure gradients
-      ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
-      ! Remember from above: v_m is big in gas, small in liquid, meaning
-      ! that this interpolation is gas-biased, which is a good thing
-      px_f = (       fs  * (pst_x(c1)*v_m(c1))    &
-              + (1.0-fs) * (pst_x(c2)*v_m(c2)) )  &
-            * Grid % dx(s)
-      py_f = (       fs  * (pst_y(c1)*v_m(c1))    &
-              + (1.0-fs) * (pst_y(c2)*v_m(c2)) )  &
-            * Grid % dy(s)
-      pz_f = (       fs  * (pst_z(c1)*v_m(c1))    &
-              + (1.0-fs) * (pst_z(c2)*v_m(c2)) )  &
-            * Grid % dz(s)
-
-      ! Calculate mass or volume flux through cell face
-      ! Units in lines which follow:
-      ! m^3 / s = m/s * m^2
-      !         + m^4 s / kg * kg / (m s^2)
-      !         + m * m^2/s = m^3/s
-      v_flux % n(s) = (  u_f(s) * Grid % sx(s)             &
-                       + v_f(s) * Grid % sy(s)             &
-                       + w_f(s) * Grid % sz(s) )           &
-                       + a12 * pst_d(s)                    &
-                       + A % fc(s) * (px_f + py_f + pz_f)
-
-      !------------------------------------------------------------!
-      !   Choi's correction, part 2: add flux from old time step   !
-      !------------------------------------------------------------!
-      if(Flow % choi_correction) then
-
-        ! To make sure that you have both o and oo values
-        if(Time % Curr_Dt() - Time % First_Dt() > 3) then
-
-          v_flux % n(s) = v_flux % n(s)                        &
-                        + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &
-                          * (w_o * v_flux % o(s) + w_oo * v_flux % oo(s))
-        end if
-      end if  ! choi_correction
-
-      !-------------------------------------------------------!
-      !   Gu's correction, part 2: add face-centered forces   !
-      !-------------------------------------------------------!
-      ! Units: m^3 s/kg * kg/(m^2 s^2) * m^2 = m^3/s
-      if(Flow % gu_correction) then
-        v_flux % n(s) = v_flux % n(s)                          &
-                      + (fs * v_m(c1) + (1.0-fs) * v_m(c2))    &
-                      * (  Flow % face_fx(s) * Grid % sx(s)    &
-                         + Flow % face_fy(s) * Grid % sy(s)    &
-                         + Flow % face_fz(s) * Grid % sz(s) )
-      end if  ! gu_correction
-
+      A % val(A % dia(c2))  = A % val(A % dia(c2)) + a12
     end if
+
+    ! Interpolate pressure gradients
+    ! Units: kg/(m^2 s^2) * m^3 s / kg * m = m^2 / s
+    ! Remember from above: v_m is big in gas, small in liquid, meaning
+    ! that this interpolation is gas-biased, which is a good thing
+    px_f = (       fs  * (pst_x(c1)*v_m(c1))    &
+            + (1.0-fs) * (pst_x(c2)*v_m(c2)) )  &
+          * Grid % dx(s)
+    py_f = (       fs  * (pst_y(c1)*v_m(c1))    &
+            + (1.0-fs) * (pst_y(c2)*v_m(c2)) )  &
+          * Grid % dy(s)
+    pz_f = (       fs  * (pst_z(c1)*v_m(c1))    &
+            + (1.0-fs) * (pst_z(c2)*v_m(c2)) )  &
+          * Grid % dz(s)
+
+    ! Calculate mass or volume flux through cell face
+    ! Units in lines which follow:
+    ! m^3 / s = m/s * m^2
+    !         + m^4 s / kg * kg / (m s^2)
+    !         + m * m^2/s = m^3/s
+    v_flux % n(s) = (  u_f(s) * Grid % sx(s)             &
+                     + v_f(s) * Grid % sy(s)             &
+                     + w_f(s) * Grid % sz(s) )           &
+                     + a12 * pst_d(s)                    &
+                     + A % fc(s) * (px_f + py_f + pz_f)
+
+    !------------------------------------------------------------!
+    !   Choi's correction, part 2: add flux from old time step   !
+    !------------------------------------------------------------!
+    if(Flow % choi_correction) then
+
+      ! To make sure that you have both o and oo values
+      if(Time % Curr_Dt() - Time % First_Dt() > 3) then
+
+        v_flux % n(s) = v_flux % n(s)                        &
+                      + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &
+                        * (w_o * v_flux % o(s) + w_oo * v_flux % oo(s))
+      end if
+    end if  ! choi_correction
+
+    !-------------------------------------------------------!
+    !   Gu's correction, part 2: add face-centered forces   !
+    !-------------------------------------------------------!
+    ! Units: m^3 s/kg * kg/(m^2 s^2) * m^2 = m^3/s
+    if(Flow % gu_correction) then
+      v_flux % n(s) = v_flux % n(s)                          &
+                    + (fs * v_m(c1) + (1.0-fs) * v_m(c2))    &
+                    * (  Flow % face_fx(s) * Grid % sx(s)    &
+                       + Flow % face_fy(s) * Grid % sy(s)    &
+                       + Flow % face_fz(s) * Grid % sz(s) )
+    end if  ! gu_correction
+
   end do
 
   call Work % Disconnect_Real_Cell(u_c, v_c, w_c, v_m, t_m, pst_x, pst_y, pst_z)

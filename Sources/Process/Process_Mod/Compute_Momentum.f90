@@ -174,7 +174,7 @@
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then
       if(Iter % Current() .eq. 1) then
-        do c = Cells_In_Domain_And_Buffers()
+        do c = Cells_In_Domain()
           ui % oo(c) = ui % o(c)
           ui % o (c) = ui % n(c)
         end do
@@ -246,8 +246,10 @@
       if(c2 > 0) then
         M % val(M % pos(1,s)) = M % val(M % pos(1,s)) - m12
         M % val(M % dia(c1))  = M % val(M % dia(c1))  + m12
-        M % val(M % pos(2,s)) = M % val(M % pos(2,s)) - m21
-        M % val(M % dia(c2))  = M % val(M % dia(c2))  + m21
+        if(Cell_In_This_Proc(c2)) then
+          M % val(M % pos(2,s)) = M % val(M % pos(2,s)) - m21
+          M % val(M % dia(c2))  = M % val(M % dia(c2))  + m21
+        end if
       else if(c2  < 0) then
         ! Outflow is not included because it was causing problems
         if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.  &

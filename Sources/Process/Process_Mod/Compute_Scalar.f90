@@ -145,10 +145,12 @@
 
     ! Fill the system matrix
     if(c2 > 0) then
-      A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
-      A % val(A % dia(c2))  = A % val(A % dia(c2)) + a21
       A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
-      A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+      A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
+      if(Cell_In_This_Proc(c2)) then
+        A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
+        A % val(A % dia(c2))  = A % val(A % dia(c2)) + a21
+      end if
     else if(c2 < 0) then
 
       ! Outflow is included because of the flux
@@ -172,7 +174,7 @@
   !   Explicitly treated diffusion scalar fluxes !
   !   and cross diffusion                        !
   !----------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
 
     ! Total explicit heat flux
     q_exp = cross(c) + q_turb(c)
