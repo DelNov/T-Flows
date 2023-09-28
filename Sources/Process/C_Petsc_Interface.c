@@ -148,6 +148,19 @@
   }
 
   /*---------------------------------------------------------------------------+
+  |  MatSetValue's sister; this one adds, rather than inserts values           |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Mat/MatSetValue/                    |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_add_value_(Mat         * A,
+                              PetscInt    * row,
+                              PetscInt    * col,
+                              PetscScalar * value) {
+
+    err = MatSetValue(*A, *row, *col, *value, ADD_VALUES);
+  }
+
+  /*---------------------------------------------------------------------------+
   |  MatAssemblyBegin and MatAssemblyEnd                                       |
   |                                                                            |
   |  https://petsc.org/release/manualpages/Mat/MatAssemblyBegin/               |
@@ -202,6 +215,16 @@
   void c_petsc_mat_remove_null_space_(Mat * A) {
 
     MatSetNullSpace(*A, NULL);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  MatZeroEntries                                                            |
+  |                                                                            |
+  |  https://petsc.org/main/manualpages/Mat/MatZeroEntries/                    |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_zero_entries_(Mat * A) {
+
+    MatZeroEntries(* A);
   }
 
   /*---------------------------------------------------------------------------+

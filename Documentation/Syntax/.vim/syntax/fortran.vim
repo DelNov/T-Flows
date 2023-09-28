@@ -471,7 +471,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type
   syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof    Message        Info
   syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Work_Petsc_Type
-  syn keyword fortranObjectTflows  A  M           vector         Sol            Nat               Pet            Work_Pet  Member
+  syn keyword fortranObjectTflows  A  M  Mat      vector         Sol            Nat               Pet            Work_Pet  Member
   syn keyword fortranTypeTflows    Process_Type   Pattern_Type
   syn keyword fortranObjectTflows  Process        Pat
   syn keyword fortranTypeTflows    Var_Type
@@ -485,7 +485,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranPetscTflows  C_Petsc_Mat_Assemble  C_Petsc_Mat_Create  C_Petsc_Mat_Destroy  C_Petsc_Mat_Remove_Null_Space
   syn keyword fortranPetscTflows  C_Petsc_Mat_Set_Null_Space  C_Petsc_Mat_Set_Sizes  C_Petsc_Mat_Set_Type_To_Mat_Aij  C_Petsc_Mat_Set_Value
   syn keyword fortranPetscTflows  C_Petsc_Options_Set_Value  C_Petsc_Vec_Assemble  C_Petsc_Vec_Create_Mpi  C_Petsc_Vec_Destroy  C_Petsc_Vec_Get_Values
-  syn keyword fortranPetscTflows  C_Petsc_Vec_Set_Value
+  syn keyword fortranPetscTflows  C_Petsc_Vec_Set_Value  C_Petsc_Mat_Zero_Entries
 " Macros might need a special group of their own.
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain
