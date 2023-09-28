@@ -52,7 +52,9 @@
 
   !------------------!
   !   Inside cells   !
-  !------------------!
+  !- - - - - - - - - +--------------------------------------!
+  !   Note that this does not entail cells in the buffers   !
+  !---------------------------------------------------------!
   reg = Grid % n_regions
   Grid % region % f_cell(reg) = Grid % n_cells
   Grid % region % l_cell(reg) = 1
@@ -130,7 +132,9 @@
 
   !------------------!
   !   Inside faces   !
-  !------------------!
+  !- - - - - - - - - +--------------------------------------------------!
+  !   Note: Unlike inside cells, this also holds faces in the buffers   !
+  !---------------------------------------------------------------------!
   reg = Grid % n_regions
   Grid % region % f_face(reg) = Grid % n_faces
   Grid % region % l_face(reg) = 1
