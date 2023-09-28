@@ -1,0 +1,3 @@
+This directory houses the syntax highlighting rules for different filetypes.
+Each file corresponds to a specific filetype and defines how different parts
+of a file (like keywords, comments, strings, etc.) should be highlighted.

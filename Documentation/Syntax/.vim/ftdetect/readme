@@ -1,0 +1,4 @@
+This directory contains scripts responsible for detecting the filetype of a
+buffer based on its name, contents, or other criteria. Typically, each script
+will contain one or more autocmd commands that match specific file patterns
+and set the filetype accordingly.
