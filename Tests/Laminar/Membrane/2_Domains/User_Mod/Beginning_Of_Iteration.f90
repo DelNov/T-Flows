@@ -140,7 +140,7 @@
                  + k_film / d_film * (t_film - t_int)) / h_d
 
           ! If not in a buffer, update accumulated variables
-          if(Grid % Comm % cell_proc(c1) .eq. This_Proc()) then
+          if(Cell_In_This_Proc(c1)) then
             t_int_acc  = t_int_acc  + t_int  * Grid % s(s)
             m_evap_acc = m_evap_acc + m_evap * Grid % s(s)
             area_acc   = area_acc   + Grid % s(s)

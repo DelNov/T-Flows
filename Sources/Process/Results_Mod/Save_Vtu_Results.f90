@@ -66,10 +66,10 @@
     c_l = -1
     if(.not. PLOT_BUFFERS) then
       do c_f = -Grid % n_bnd_cells, -1
-        if( Grid % Comm % cell_proc(c_f) .eq. This_Proc()) exit
+        if( Cell_In_This_Proc(c_f)) exit
       end do
       do c_l = -1, -Grid % n_bnd_cells, -1
-        if( Grid % Comm % cell_proc(c_l) .eq. This_Proc()) exit
+        if( Cell_In_This_Proc(c_l)) exit
       end do
     end if
   end if

@@ -32,7 +32,7 @@
 
   ! Forward
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
+    if(Cell_In_This_Proc(c)) then
       reg = Grid % region % at_cell(c)
       if(c < Grid % region % f_cell(reg)) then
         Grid % region % f_cell(reg) = c
@@ -42,7 +42,7 @@
 
   ! Backward
   do c = -1, -Grid % n_bnd_cells, -1
-    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
+    if(Cell_In_This_Proc(c)) then
       reg = Grid % region % at_cell(c)
       if(c > Grid % region % l_cell(reg)) then
         Grid % region % l_cell(reg) = c
@@ -59,7 +59,7 @@
   Grid % region % f_cell(reg) = Grid % n_cells
   Grid % region % l_cell(reg) = 1
   do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
+    if(Cell_In_This_Proc(c)) then
       if(c < Grid % region % f_cell(reg)) then
         Grid % region % f_cell(reg) = c
       end if
@@ -79,7 +79,7 @@
   Grid % region % f_cell(reg) = Grid % n_cells + 1
   Grid % region % l_cell(reg) = Grid % n_cells
   do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .ne. This_Proc()) then
+    if(.not. Cell_In_This_Proc(c)) then
       if(c < Grid % region % f_cell(reg)) then
         Grid % region % f_cell(reg) = c
       end if
@@ -94,10 +94,10 @@
     do reg = All_Regions()
       siz = Grid % region % l_cell(reg) - Grid % region % f_cell(reg) + 1
       write(1000+This_Proc(),'(a,i3,i15,i15,i15,a,a)') ' # Region: ', reg, &
-                                           Grid % region % f_cell(reg),  &
-                                           Grid % region % l_cell(reg),  &
-                                           max(siz, 0), '  ',            &
-                                           trim(Grid % region % name(reg))
+                                             Grid % region % f_cell(reg),  &
+                                             Grid % region % l_cell(reg),  &
+                                             max(siz, 0), '  ',            &
+                                             trim(Grid % region % name(reg))
     end do
   end if
 
@@ -142,15 +142,14 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
     if(c2 > 0) then  ! limit to inside faces
-      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .or.  &
-         Grid % Comm % cell_proc(c2) .eq. This_Proc()) then
+      if(Cell_In_This_Proc(c1) .or. Cell_In_This_Proc(c2)) then
         if(s <= Grid % region % f_face(reg)) then
           Grid % region % f_face(reg) = s
         end if
         if(s >= Grid % region % l_face(reg)) then
           Grid % region % l_face(reg) = s
         end if
-        Assert(Grid % Comm % cell_proc(c1) .eq. This_Proc())  ! this should hold
+        Assert(Cell_In_This_Proc(c1))  ! this should hold
       end if
     end if  ! c2 > 0
   end do
@@ -172,12 +171,10 @@
   do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and.  &
-       Grid % Comm % cell_proc(c2) .eq. This_Proc()) then
+    if(Cell_In_This_Proc(c1) .and. Cell_In_This_Proc(c2)) then
       last_face_only_inside = max(last_face_only_inside, s)
     end if
-    if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and.  &
-       Grid % Comm % cell_proc(c2) .ne. This_Proc()) then
+    if(Cell_In_This_Proc(c1) .and. .not. Cell_In_This_Proc(c2)) then
       first_face_in_buffers = min(first_face_in_buffers, s)
     end if
   end do

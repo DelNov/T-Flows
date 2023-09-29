@@ -272,7 +272,7 @@
       c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
-      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and. c2 < 0) then
+      if(Cell_In_This_Proc(c1) .and. c2 < 0) then
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
@@ -344,7 +344,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and. c2 < 0) then
+      if(Cell_In_This_Proc(c1) .and. c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
           do i_fac = 1, Grid % cells_n_faces(c1)
@@ -365,7 +365,7 @@
 1     continue
 
       ! On the boundary perform the extrapolation
-      if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and. c2 < 0) then
+      if(Cell_In_This_Proc(c1) .and. c2 < 0) then
 
         ! In the "new way" the extrapolation is
         ! independent from turbulence model

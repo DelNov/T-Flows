@@ -115,7 +115,7 @@
   do i = 1, Pet % m_lower
     do j = A % row(i), A % row(i+1)-1
       k = A % col(j)
-      if(Grid % Comm % cell_proc(k) .eq. This_Proc()) then
+      if(Cell_In_This_Proc(k)) then
         d_nnz(i) = d_nnz(i) + 1
       else
         o_nnz(i) = o_nnz(i) + 1

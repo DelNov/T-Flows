@@ -49,10 +49,10 @@
   !-------------------------------!
   Grid % Comm % n_buff_cells = 0
   do c = Cells_In_Domain()
-    Assert(Grid % Comm % cell_proc(c) .eq. This_Proc())
+    Assert(Cell_In_This_Proc(c))
   end do
   do c = Cells_In_Buffers()
-    Assert(Grid % Comm % cell_proc(c) .ne. This_Proc())
+    Assert(.not. Cell_In_This_Proc(c))
     Grid % Comm % n_buff_cells = Grid % Comm % n_buff_cells + 1
   end do
 
@@ -112,7 +112,7 @@
   !-------------------------------------------!
   i_cel = 0
   do c = Cells_In_Buffers()
-    Assert(Grid % Comm % cell_proc(c) .ne. This_Proc())
+    Assert(.not. Cell_In_This_Proc(c))
     i_cel = i_cel + 1
     need_cell(i_cel, This_Proc()) = Grid % Comm % cell_glo(c)
     from_proc(i_cel, This_Proc()) = Grid % Comm % cell_proc(c)

@@ -33,7 +33,7 @@
 
       c = Surf % Vert(v) % cell  ! get nearest cell
       if(c > 0) then             ! if cell is in this processor
-        if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
+        if(Cell_In_This_Proc(c)) then
           Surf % buff_x(v) = Grid % xc(c)
           Surf % buff_y(v) = Grid % yc(c)
           Surf % buff_z(v) = Grid % zc(c)

@@ -39,7 +39,7 @@
     ! If the flux is across a buffer face, it is summed up twice.
     ! The variable "wgt" is here to take care of that.
     wgt = 1.0
-    if(Grid % Comm % cell_proc(c2) .ne. This_Proc()) wgt = 0.5
+    if(.not. Cell_In_This_Proc(c2)) wgt = 0.5
 
     !-------!
     !   X   !

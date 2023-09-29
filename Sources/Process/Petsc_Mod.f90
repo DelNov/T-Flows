@@ -1,3 +1,5 @@
+#include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
 #include "../Shared/Unused.h90"
 
 #if T_FLOWS_PETSC == 1
