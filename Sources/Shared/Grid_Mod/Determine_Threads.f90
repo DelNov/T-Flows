@@ -114,7 +114,7 @@
     ! A plain copy of cell threads to face threads seems to work just fine
     ! (For the time being, I am only treating inside faces.  I am not even
     !  sure if explcit parallelization of boundary regions makes sense)
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c = Grid % faces_c(1, s)
       Vect % face_thread(s) = Vect % cell_thread(c)
     end do
@@ -134,13 +134,13 @@
                                     Grid % old_f(f_s:l_s))
 
     ! Sort connectivity: faces_c, faces_n_nodes, faces_n and faces_s
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       old_fc  (1:2,s) = Grid % faces_c  (1:2, Grid % old_f(s))
       old_nn  (    s) = Grid % faces_n_nodes( Grid % old_f(s))
       old_nods(1:m,s) = Grid % faces_n  (1:m, Grid % old_f(s))
       old_shad(    s) = Grid % faces_s      ( Grid % old_f(s))
     end do
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       Grid % faces_c(1:2,  s) = old_fc  (1:2, s)
       Grid % faces_n_nodes(s) = old_nn  (     s)
       Grid % faces_n(1:m,  s) = old_nods(1:m, s)
@@ -189,7 +189,7 @@
     do thr = 1, Vect % n_threads
       Vect % thread % f_face(thr) =  HUGE_INT
       Vect % thread % l_face(thr) = -HUGE_INT
-      do s = Faces_In_Domain()
+      do s = Faces_In_Domain_And_At_Buffers()
         if(Vect % face_thread(s) .eq. thr) then
           Vect % thread % f_face(thr) = min(Vect % thread % f_face(thr), s)
           Vect % thread % l_face(thr) = max(Vect % thread % l_face(thr), s)

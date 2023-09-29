@@ -38,7 +38,7 @@
     !   Compute beta_f   !
     !--------------------!
 
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
@@ -121,7 +121,7 @@
 
   else if(fun % adv_scheme .eq. STACS) then
 
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 

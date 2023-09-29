@@ -158,7 +158,7 @@
   !-------------!
   !   Check 1   !
   !-------------!
-  do s = Faces_In_Domain()
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
     Assert(c2 > 0)
@@ -169,7 +169,7 @@
   !-------------!
   last_face_only_inside = 0
   first_face_in_buffers = HUGE_INT  ! first face in buffers
-  do s = Faces_In_Domain()
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
     if(Grid % Comm % cell_proc(c1) .eq. This_Proc() .and.  &

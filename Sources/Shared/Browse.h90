@@ -44,7 +44,7 @@
 !   These are faces in the domain, and in buffers ...     !
 !   ... where at least one cell (c1) is the inside cell   !
 !---------------------------------------------------------!
-# define Faces_In_Domain()                         \
+# define Faces_In_Domain_And_At_Buffers()          \
     Grid % region % f_face(Grid % n_regions),      \
     Grid % region % l_face(Grid % n_regions)
 
@@ -75,3 +75,11 @@
 # define Cells_In_Buffers()                        \
     Grid % region % f_cell(Grid % n_regions + 1),  \
     Grid % region % l_cell(Grid % n_regions + 1)
+
+!------------------------------------------------------------------------!
+!   This one is not strictly for browsing, but I don't know where else   !
+!    to put it.  I tried in Comm_Mod, but didn't work for some reason    !
+!------------------------------------------------------------------------!
+# define Cell_In_This_Proc(cell)     \
+    Grid % Comm % cell_proc(cell) .eq. This_Proc()
+

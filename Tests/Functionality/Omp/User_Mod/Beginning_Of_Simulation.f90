@@ -58,7 +58,7 @@
     !$omp parallel do         &
     !$omp private(s, c1, c2)  &
     !$omp shared (faces_c, sur, f_val, c_val1, c_val2)
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = faces_c(1, s)
       c2 = faces_c(2, s)
       f_val(s) = c_val1(c1) * sur(s)  &
@@ -99,7 +99,7 @@
     !$omp parallel do         &
     !$omp private(s, c1, c2)  &
     !$omp shared (faces_c, f_val1, f_val2, c_val1, c_val2)
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = faces_c(1, s)
       c2 = faces_c(2, s)
       f_val1(s) = c_val1(c1)
@@ -108,7 +108,7 @@
     !$omp end parallel do
 
     !$omp parallel do private(s) shared (sur, f_val, f_val1, f_val2)
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       f_val(s) = f_val1(s) * sur(s)  &
                + f_val2(s) * sur(s)
     end do

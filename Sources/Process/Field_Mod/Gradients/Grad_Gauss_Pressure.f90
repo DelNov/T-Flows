@@ -91,7 +91,7 @@
     !$omp parallel do                                            &
     !$omp private(s, c1, c2)                                     &
     !$omp shared(faces_c, c_computed, c_visited, p_x, p_y, p_z)
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = faces_c(1, s)
       c2 = faces_c(2, s)
 

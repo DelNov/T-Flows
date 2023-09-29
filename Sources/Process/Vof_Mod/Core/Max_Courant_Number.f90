@@ -37,7 +37,7 @@
   if(interf == 1) then
 
     ! Interior faces
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
@@ -90,7 +90,7 @@
   else  ! interf = 0
 
     ! Interior faces
-    do s = Faces_In_Domain()
+    do s = Faces_In_Domain_And_At_Buffers()
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 

@@ -49,7 +49,7 @@
   gradk_y(-nb:nc) = 0.0
   gradk_z(-nb:nc) = 0.0
 
-  do s = Faces_In_Domain()
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -68,7 +68,7 @@
   call Grid % Exchange_Cells_Real(gradk_z(-nb:nc))
 
   ! Interior faces
-  do s = Faces_In_Domain()
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -102,7 +102,7 @@
   gradk_y(-nb:nc) = 0.0
   gradk_z(-nb:nc) = 0.0
 
-  do s = Faces_In_Domain()
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -120,7 +120,7 @@
   call Grid % Exchange_Cells_Real(gradk_z(-nb:nc))
 
   ! Interior faces
-  do s = Faces_In_Domain()
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
