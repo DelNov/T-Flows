@@ -12,7 +12,6 @@ ASSERT  ?= yes
 DEBUG   ?= no
 PROF    ?= no
 REAL    ?= double
-MPI     ?= no
 OMP     ?= yes
 
 # Directories for objects and modules. (No need to change.)
@@ -72,7 +71,7 @@ $(info #-----------------------------------------------------------------------)
 #----------------------------------------------------
 # Error trap for unknow options passed to makefile
 #----------------------------------------------------
-KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL MPI OMP
+KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL OMP
 COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
   $(if $(findstring command line,$(origin $(v))),$(v),))
 UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))
@@ -190,16 +189,10 @@ endif
 #-----------------------------------------------------------
 OPT_LINK = $(OPT_F_COMP)
 
-#-----------------------
-#   MPI related stuff
-#-----------------------
-
-# Variable T_FLOWS_MPI is passed on to compilers
-ifeq ($(MPI), yes)
-  PASS_ON += -DT_FLOWS_MPI=1
-else
-  PASS_ON += -DT_FLOWS_MPI=0
-endif
+#----------------------------------------------------------------
+#   MPI related stuff (Generate is not an MPI program, pass 0)
+#----------------------------------------------------------------
+PASS_ON += -DT_FLOWS_MPI=0
 
 #------------------------------------------------------
 #   List of sources for modules and functions

@@ -88,7 +88,7 @@ $(info #-----------------------------------------------------------------------)
 #----------------------------------------------------
 # Error trap for unknow options passed to makefile
 #----------------------------------------------------
-KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL MPI OMP
+KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL MPI OMP DIR_CASE
 COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
   $(if $(findstring command line,$(origin $(v))),$(v),))
 UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))
