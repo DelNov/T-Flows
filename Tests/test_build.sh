@@ -1742,8 +1742,11 @@ else
     echo "#   T-Flows testing"
     echo "#"
     echo "#--------------------------------------------------------------------"
-    echo "#   Fortran set to: " $FORTRAN
+    if [ $FORTRAN == "gnu" ]; then
+    echo -e "#   Fortran set to: \033[1;31m$FORTRAN\033[0m"
+    fi
     if [ $FORTRAN == "intel" ]; then
+    echo -e "#   Fortran set to: \033[1;36m$FORTRAN\033[0m"
     echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "#   Remark: Intel Fortran comes with its own Python suite which does"
     echo "#           not have the matplotlib and, consequently, this script"
@@ -1754,6 +1757,7 @@ else
     echo "#           to get rid of the Python from Intel compiler."
     fi
     if [ $FORTRAN == "nvidia" ]; then
+    echo -e "#   Fortran set to: \033[1;32m$FORTRAN\033[0m"
     echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "#   Remark: When using Nvidia Fortran, please make sure that you are"
     echo "#           using version 4 of the OpenMPI library."
