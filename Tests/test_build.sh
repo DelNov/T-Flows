@@ -385,9 +385,9 @@ function make_clean {
 }
 
 #------------------------------------------------------------------------------#
-# user_compile
+# parallel_compile
 #------------------------------------------------------------------------------#
-function user_compile {
+function parallel_compile {
   # $1 = dir
   # $2 = MPI = yes/no
   # $3 = DIR_CASE path
@@ -429,25 +429,20 @@ function user_compile {
   cd - > /dev/null
   return $success
   if [ $success -eq 0 ]; then
-    elog "User compile passed."
+    elog "Parallel compile passed."
   else
-    elog "User compile in " $1 " failed!"
+    elog "Parallel compile in " $1 " failed!"
   fi
 }
 
 #------------------------------------------------------------------------------#
-# clean_compile
+# sequential_compile
 #------------------------------------------------------------------------------#
-function clean_compile {
+function sequential_compile {
   # $1 = dir
-  # $2 = MPI = yes/no
-  # $3 = DIR_CASE path
 
   if [ -z "${1+xxx}" ]; then
     elog "Directory with sources is not set at all"
-    exit 1
-  elif [ -z "${2+xxx}" ]; then
-    elog "MPI flag is not set at all"
     exit 1
   fi
 
@@ -455,33 +450,21 @@ function clean_compile {
   elog "Clean compile in:" "$1"
   make clean >> $FULL_LOG 2>&1
 
-  if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2"
-    make \
-      FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      MPI=$2 >> $FULL_LOG 2>&1
-    success=$?
-  else
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2 DIR_CASE=$3"
-    make \
-      FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      MPI=$2 \
-      DIR_CASE=$3 >> $FULL_LOG 2>&1
-    success=$?
-  fi
+  elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2"
+  make \
+    FORTRAN=$FORTRAN \
+    FCOMP=$FCOMP \
+    DEBUG=$DEBUG >> $FULL_LOG 2>&1
+  success=$?
 
   time_in_seconds
 
   cd - > /dev/null
   return $success
   if [ $success -eq 0 ]; then
-    elog "Clean compile passed."
+    elog "Sequentail compile passed."
   else
-    elog "Clean compile in " $1 " failed!"
+    elog "Sequential compile in " $1 " failed!"
   fi
 }
 
@@ -648,7 +631,7 @@ function generate_tests {
   elog "#----------------------------------------------------------------------"
   echo "#   Running Generate tests"
 
-  clean_compile $GENE_DIR no # dir MPI
+  sequential_compile $GENE_DIR # dir
 
   for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
     launch_generate $CASE_DIR
@@ -710,7 +693,7 @@ function convert_tests {
   elog "#----------------------------------------------------------------------"
   echo "#   Running Convert tests"
 
-  clean_compile $CONV_DIR no # dir MPI
+  sequential_compile $CONV_DIR # dir
 
   for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
     launch_convert $CASE_DIR
@@ -732,7 +715,7 @@ function divide_tests {
   elog "#----------------------------------------------------------------------"
   echo "#   Running Divide tests"
 
-  clean_compile $DIVI_DIR no # dir MPI
+  sequential_compile $DIVI_DIR # dir
 
   for CASE_DIR in ${ALL_DIVIDE_TESTS[@]}; do
     launch_divide $CASE_DIR
@@ -831,7 +814,7 @@ function process_backup_test {
 
   # BEGIN:---------------------------------------#
   elog "np=1, MPI=yes, start from 0, make a backup"
-  user_compile $PROC_DIR yes # dir MPI
+  parallel_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
@@ -878,7 +861,7 @@ function process_backup_test {
 
   # BEGIN:----------------------------------------------#
   elog "np=1, MPI=yes, load from backup(produced by seq)"
-  user_compile $PROC_DIR yes # dir MPI
+  parallel_compile $PROC_DIR yes # dir MPI
 
   launch_process par 1
   #------------------------------------------------:END #
@@ -941,7 +924,7 @@ function process_backup_test {
 
   # BEGIN:------------------------------------------#
   elog "np=1, MPI=yes, backup=(produced by par.np=2)"
-  user_compile $PROC_DIR yes # dir MPI
+  parallel_compile $PROC_DIR yes # dir MPI
   launch_process par 1
   #--------------------------------------------:END #
 
@@ -1092,7 +1075,7 @@ function process_save_exit_now_test {
 
   # BEGIN:---------------------------------------#
   elog "np=1, MPI=yes, start from 0, make a backup"
-  user_compile $PROC_DIR yes # dir MPI
+  parallel_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
@@ -1141,11 +1124,11 @@ function process_save_exit_now_test {
     #-----------------------------------------------:END #
 
     if [ "$i" = 1 ]; then
-      user_compile $PROC_DIR yes
+      parallel_compile $PROC_DIR yes
     elif [ "$i" = 2 ]; then
-      user_compile $PROC_DIR yes
+      parallel_compile $PROC_DIR yes
     elif [ "$i" = 3 ]; then
-      user_compile $PROC_DIR yes
+      parallel_compile $PROC_DIR yes
     fi
 
     elog "#   Forcing to save: save_now"
@@ -1321,7 +1304,7 @@ function process_compilation_test {
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
 
-  user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+  parallel_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   # Restore control
   if [ $n_dom -eq 1 ]; then
@@ -1389,7 +1372,7 @@ function process_full_length_test {
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
-  user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+  parallel_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   for (( i=1; i<=$n_dom; i++ )); do
     name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
@@ -1536,12 +1519,12 @@ function process_accuracy_test {
       chan.dom
 
     if [ ! -f $GENE_EXE ]; then
-      clean_compile $GENE_DIR no # dir MPI
+      sequential_compile $GENE_DIR # dir
     fi
     launch_generate "$1" "quiet"
 
     if [ ! -f $DIVI_EXE ]; then
-      clean_compile $DIVI_DIR no # dir MPI
+      sequential_compile $DIVI_DIR # dir
     fi
     launch_divide   "$1" "quiet"
 
@@ -1553,7 +1536,7 @@ function process_accuracy_test {
     # rel_dir to User_Mod/ from Process/
     rel_dir=$(realpath --relative-to="$PROC_DIR" "$path")
 
-    user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+    parallel_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
     launch_process par $nproc_in_div
 
