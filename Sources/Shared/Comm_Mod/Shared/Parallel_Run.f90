@@ -4,6 +4,6 @@
   implicit none
 !==============================================================================!
 
-  Parallel_Run = Global % n_processors > 2
+  Parallel_Run = Global % n_processors > 1
 
   end function
