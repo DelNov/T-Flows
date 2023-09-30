@@ -442,8 +442,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranPetscTflows  C_Petsc_Vec_Set_Value  C_Petsc_Mat_Zero_Entries
 " Macros might need a special group of their own.
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
-  syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain
-  syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
+  syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain_And_At_Buffers
+  syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers  Cell_In_This_Proc
   syn keyword fortranMacroTflows   Assert  Unused
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
