@@ -1,5 +1,10 @@
-#include "Save_Impinging_Jet_Nu.f90"
-#include "Save_Impinging_Jet_Profiles.f90"
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Save_Impinging_Jet_Nu.f90"
+#   include "User_Mod/Save_Impinging_Jet_Profiles.f90"
+# else
+#   include "Save_Impinging_Jet_Nu.f90"
+#   include "Save_Impinging_Jet_Profiles.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)

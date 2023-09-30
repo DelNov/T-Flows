@@ -1,6 +1,12 @@
-#include "Vof_Quick_Sort.f90"
-#include "Intersection_Line_Face.f90"
-#include "Interpolate_From_Nodes.f90"
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Vof_Quick_Sort.f90"
+#   include "User_Mod/Intersection_Line_Face.f90"
+#   include "User_Mod/Interpolate_From_Nodes.f90"
+# else
+#   include "Vof_Quick_Sort.f90"
+#   include "Intersection_Line_Face.f90"
+#   include "Interpolate_From_Nodes.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
