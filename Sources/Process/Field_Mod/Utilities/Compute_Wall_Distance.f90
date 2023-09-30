@@ -12,7 +12,7 @@
   type(Var_Type),    pointer :: phi, u, v, w
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2, n
+  integer                    :: s, c, c1, c2, n, reg
   real                       :: f_ex, f_im
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real, contiguous,  pointer :: cross(:)
@@ -57,7 +57,7 @@
   b      (:) = 0.0
 
   ! Initial values (for some cases, zero was necessary)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     phi % n(c) = 0.0
   end do
 
@@ -66,29 +66,34 @@
   !----------------------------------------!
 
   ! Innertial term
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     A % val(A % dia(c)) = Grid % vol(c) / DT
   end do
 
   ! Diffusive term
-  do s = 1, Grid % n_faces
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
     ! Fill the system matrix
-    if(c2  > 0) then
-      A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - A % fc(s)
-      A % val(A % dia(c1))  = A % val(A % dia(c1))  + A % fc(s)
+    A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - A % fc(s)
+    A % val(A % dia(c1))  = A % val(A % dia(c1))  + A % fc(s)
+    if(Cell_In_This_Proc(c2)) then
       A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - A % fc(s)
       A % val(A % dia(c2))  = A % val(A % dia(c2))  + A % fc(s)
-    else if(c2  < 0) then
-      ! Walls
-      if( (Grid % Bnd_Cond_Type(c2) .eq. WALL)   .or.  &
-          (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
-        A % val(A % dia(c1)) = A % val(A % dia(c1)) + A % fc(s)
-      end if
     end if
   end do  ! through faces
+
+  ! Boundary conditions for walls
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1, s)
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + A % fc(s)
+      end do
+    end if  ! some kind of a wall
+  end do    ! through boundary regions
 
   !----------------------------------------!
   !   Begin the false time stepping loop   !
@@ -96,38 +101,36 @@
   do n = 1, NDT
 
     ! Store the value from previous time step
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       phi % o(c) = phi % n(c)
     end do
 
     ! Innertial term
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       b(c) = Grid % vol(c) / DT * phi % o(c)
     end do
 
     ! Source term
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       b(c) = b(c) + Grid % vol(c)
     end do
 
-    ! Update boundary values
-    ! (Set 1 at inflows and 0 at outflows)
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1, s)
-      c2 = Grid % faces_c(2, s)
-
-      if(c2 < 0) then
-        ! On all walls set to zero
-        if( (Grid % Bnd_Cond_Type(c2) .eq. WALL)   .or.  &
-            (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
+    ! Insert boundary conditions
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL .or.  &
+         Grid % region % type(reg) .eq. WALLFL) then
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2, s)
           phi % n(c2) = 0.0
-
-        ! Copy from inside everywhere else
-        else
+        end do
+      else
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
           phi % n(c2) = phi % n(c1)
-        end if
-      end if
-    end do
+        end do
+      end if  ! is it some kind of wall?
+    end do    ! through regions
 
     !------------------!
     !                  !
@@ -141,7 +144,7 @@
     !----------------------------!
     !   Spatial discretization   !
     !----------------------------!
-    do s = 1, Grid % n_faces
+    do s = Faces_In_Domain_And_At_Buffers()
 
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
@@ -162,22 +165,15 @@
 
       ! Cross diffusion part
       cross(c1) = cross(c1) + f_ex - f_im
-      if(c2  > 0) then
-        cross(c2) = cross(c2) - f_ex + f_im
-      end if
+      cross(c2) = cross(c2) - f_ex + f_im
 
-      ! Fill the system matrix
-      if(c2 < 0) then
-        ! For wall and wall flux, solid walls in any case => do nothing!
-      end if
-
-    end do  ! through faces
+    end do  ! through faces in domain
 
     ! Add cross diffusion terms explicity for non-polyhedral grids
     ! (Some of them show poor convergence when solving for potential
     ! field, particularly if Grid featured concave cells near edges)
     if(.not. Grid % polyhedral) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
         b(c) = b(c) + cross(c)
       end do
     end if
@@ -201,7 +197,7 @@
     call Grid % Exchange_Cells_Real(phi % n)
 
     ! Re-initialize cross diffusion terms (for the next time step)
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       cross(c) = 0.0
     end do
 
@@ -217,26 +213,25 @@
 1 continue
 
   ! Set it to zero on boundaries (probably not needed)
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1, s)
-    c2 = Grid % faces_c(2, s)
-
-    if(c2 < 0) then
-      ! On all walls set to zero
-      if( (Grid % Bnd_Cond_Type(c2) .eq. WALL)   .or.  &
-          (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c2 = Grid % faces_c(2, s)
         phi % n(c2) = 0.0
-
-      ! Copy from inside everywhere else
-      else
+      end do
+    else
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
         phi % n(c2) = phi % n(c1)
-      end if
-    end if
-  end do
+      end do
+    end if  ! is it some kind of wall?
+  end do    ! through regions
 
   ! Compute wall distance
   call Flow % Grad_Gauss_Variable(phi)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     phi % n(c) = sqrt(  phi % x(c) * phi % x(c)  &
                       + phi % y(c) * phi % y(c)  &
                       + phi % z(c) * phi % z(c)  &
