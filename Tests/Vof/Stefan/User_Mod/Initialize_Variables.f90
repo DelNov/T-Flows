@@ -1,6 +1,12 @@
-#include "Vof_Initialization_Box.f90"
-#include "Vof_Interface_Box.f90"
-#include "Check_Inside_Box.f90"
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Check_Inside_Box.f90"
+#   include "User_Mod/Vof_Initialization_Box.f90"
+#   include "User_Mod/Vof_Interface_Box.f90"
+# else
+#   include "Vof_Initialization_Box.f90"
+#   include "Vof_Interface_Box.f90"
+#   include "Check_Inside_Box.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)

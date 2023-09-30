@@ -1,4 +1,8 @@
-#include "T_Sat.f90"
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/T_Sat.f90"
+# else
+#   include "T_Sat.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Beginning_Of_Iteration(Flow, Turb, Vof, Swarm)

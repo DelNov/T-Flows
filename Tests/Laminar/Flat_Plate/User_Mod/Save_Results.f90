@@ -1,5 +1,10 @@
-#include "Plain_Profiles.f90"
-#include "Plain_Nu.f90"
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Plain_Profiles.f90"
+#   include "User_Mod/Plain_Nu.f90"
+# else
+#   include "Plain_Profiles.f90"
+#   include "Plain_Nu.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)

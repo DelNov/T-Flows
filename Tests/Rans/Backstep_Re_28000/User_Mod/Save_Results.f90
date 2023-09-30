@@ -1,5 +1,10 @@
-#include "Backstep_Profiles.f90"
-#include "Backstep_Cf_St.f90"
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Backstep_Profiles.f90"
+#   include "User_Mod/Backstep_Cf_St.f90"
+# else
+#   include "Backstep_Profiles.f90"
+#   include "Backstep_Cf_St.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
