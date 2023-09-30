@@ -40,13 +40,5 @@
   niter   = 0
   fin_res = 0.0
 
-  call Message % Error(60,                                                   &
-                  'This version was compiled without PETSc, and yet '    //  &
-                  'they are specified in the control file.  This error ' //  &
-                  'is critical, exiting. Eithrt fix the control file '   //  &
-                  'by setting LINEAR_SOLVERS to native, or install   '   //  &
-                  'PETSc on your system',                                    &
-                  file=__FILE__, line=__LINE__, one_proc=.true.)
-
   end subroutine
 
