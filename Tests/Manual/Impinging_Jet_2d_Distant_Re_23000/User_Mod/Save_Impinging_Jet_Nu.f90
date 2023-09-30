@@ -12,7 +12,7 @@
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: n_prob, i, s, c1, c2, fu
+  integer                   :: n_prob, i, s, c1, c2, fu, reg
   character(SL)             :: res_name
   real,    allocatable      :: u_s(:), v_s(:), w_s(:), t_s(:), tau_s(:), q_s(:)
   real,    allocatable      :: z_s(:), r_s(:), rad(:)
@@ -80,11 +80,12 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob - 1
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2 < 0) then
-        if(Grid % Bnd_Cond_Name_At_Cell(c2) .eq. 'LOWER_WALL') then
+    do reg = Boundary_Regions()
+      if(Grid % region % name(reg) .eq. 'LOWER_WALL') then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+
           r = sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
                    Grid % yc(c1)*Grid % yc(c1)) + TINY
           if(r < rad(i+1) .and. r > rad(i)) then
@@ -101,10 +102,10 @@
             q_s(i)     = q_s(i)     + t % q(c2)
             n_count(i) = n_count(i) + 1
           end if
-        end if
-      end if
-    end do
-  end do
+        end do  ! faces in this region
+      end if    ! region is called 'LOWER_WALL'
+    end do      ! through regions
+  end do        ! through probes
 
   !---------------------------------!
   !   Average over all processors   !
@@ -149,10 +150,15 @@
     call File % Open_For_Writing_Ascii(res_name, fu)
 
     ! Write the file out
-    write(fu, *) '# 1:Xrad, 2:Nu, 3:Utau, 4:Yplus, 5:Temp, 6:Numb of points '
+    write(fu, '(a66)')  '# 1:Xrad,  ' //  &
+                        '  2:Nu,    ' //  &
+                        '  3:Utau,  ' //  &
+                        '  4:Yplus, ' //  &
+                        '  5:Temp,  ' //  &
+                        '  6:Points '
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu, '(5e11.3,i6)')                                  &
+        write(fu, '(5e11.3,i11)')                                 &
           r_s(i) / 2.0,                                           &  !  1
           2.0 * q_s(i) / (Flow % conductivity(1)*(t_s(i)-20.0)),  &  !  2
           tau_s(i),                                               &  !  3

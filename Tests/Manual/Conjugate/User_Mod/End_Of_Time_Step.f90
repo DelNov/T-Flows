@@ -15,7 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: t
-  integer                  :: c1, c2, s
+  integer                  :: c1, c2, s, reg
   real                     :: nu, area
 !==============================================================================!
 
@@ -33,20 +33,19 @@
     nu   = 0.0
     area = 0.0
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-      if(c2 < 0 .and. Cell_In_This_Proc(c1)) then
-
-        if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL ) then
           area = area + Grid % s(s)
           nu   = nu + Grid % s(s)                 &
                     * abs(t % n(c2) - t % n(c1))  &
                     / Grid % d(s)
-        end if  ! if wall
-      end if    ! c2 < 0
-    end do      ! through s
+        end do  ! faces in this region
+      end if    ! region is at the wall; it is a wall region
+    end do      ! through regions
 
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
@@ -61,7 +60,7 @@
 
     if(First_Proc()) then
       print '(a)',        ' #==========================================='
-      print '(a)',        ' # Output from user function, Nusslet number!'
+      print '(a)',        ' # Output from user function, Nusselt number!'
       print '(a)',        ' #-------------------------------------------'
       print '(a,es12.4)', ' # Toral  area    : ', area
       print '(a,es12.4)', ' # Nusselt number : ', nu

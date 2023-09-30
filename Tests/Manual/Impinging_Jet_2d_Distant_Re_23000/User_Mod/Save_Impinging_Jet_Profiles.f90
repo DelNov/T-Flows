@@ -7,19 +7,17 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
-!------------------------------[Local parameters]------------------------------!
-  real, parameter :: U_AVER = 1.14
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: u, v, w, t
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: n_prob, i, c, k, fu, ind
+  integer                   :: n_prob, i, c, s, c2, k, fu, ind, reg
   character(SL)             :: coord_name, res_name, ext
   real,    allocatable      :: z_p(:), zm_p(:), u_p(:),  v_p(:), w_p(:), t_p(:)
   real,    allocatable      :: kin_p(:), eps_p(:), vis_p(:), zet_p(:), f22_p(:)
   integer, allocatable      :: n_count(:)
-  real                      :: r, r1, r2, u_rad, u_tan, lnum
+  real                      :: r, r1, r2, u_rad, u_tan, lnum, area_in, velo_in
 !==============================================================================!
 
   ! Take aliases
@@ -33,6 +31,23 @@
   eps  => Turb % eps
   zeta => Turb % zeta
   f22  => Turb % f22
+
+  ! Calculate the average inlet velocity
+  area_in = 0.0
+  velo_in = 0.0
+  do reg = Boundary_Regions()
+    if(Grid % region % name(reg) .eq. 'PIPE_INLET') then
+      do s = Faces_In_Region(reg)
+        c2 = Grid % faces_c(2,s)  ! fetch the boundary cell
+        velo_in = velo_in - w % n(c2) * Grid % sz(s)
+        area_in = area_in + Grid % s(s)
+      end do  ! through faces in the region
+    end if    ! region is called 'PIPE_INLET'
+  end do      ! through all boundary regions
+  call Global % Sum_Real(area_in)
+  call Global % Sum_Real(velo_in)
+  Assert(area_in > 0.0)
+  velo_in = velo_in / area_in
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
@@ -113,7 +128,7 @@
     end if
 
     do i = 1, n_prob-1
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain()
         r = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) + TINY
         if(r > r1 .and. r < r2) then
           if(Grid % zc(c) > z_p(i) .and.  &
@@ -184,29 +199,29 @@
 
       call File % Open_For_Writing_Ascii(res_name, fu)
 
-      write(fu,'(a,a)') '#', ' 1:Xrad, '          //  &
-                             ' 2:Umag, '          //  &
-                             ' 3:Urad, '          //  &
-                             ' 4:Uaxi, '          //  &
-                             ' 5:Kin,  '          //  &
-                             ' 6:Eps,  '          //  &
-                             ' 7:Temp, '          //  &
-                             ' 8:Vis_t/Vis_l, '   //  &
-                             ' 9:Zeta, '          //  &
-                             '10:F22 '
+      write(fu,'(a,a120)') '#', '  1:Xrad,   '   //  &
+                                '  2:Umag,   '   //  &
+                                '  3:Urad,   '   //  &
+                                '  4:Uaxi,   '   //  &
+                                '  5:Kin,    '   //  &
+                                '  6:Eps,    '   //  &
+                                '  7:Temp,   '   //  &
+                                '  8:Vis_t/l,'   //  &
+                                '  9:Zeta,   '   //  &
+                                ' 10:F22     '
 
       do i = 1, n_prob
         if(n_count(i) .ne. 0) then
-          write(fu,'(10e11.3)') zm_p(i)  / 2.0,        &  !  1
-                                u_p(i)   / U_AVER,     &  !  2
-                                v_p(i)   / U_AVER,     &  !  3
-                                w_p(i)   / U_AVER,     &  !  4
-                                kin_p(i) / U_AVER**2,  &  !  5
-                                eps_p(i),              &  !  6
-                                t_p(i),                &  !  7
-                                vis_p(i),              &  !  8
-                                zet_p(i),              &  !  9
-                                f22_p(i)                  ! 10
+          write(fu,'(10e12.3)') zm_p(i)  / 2.0,         &  !  1
+                                u_p(i)   / VELO_IN,     &  !  2
+                                v_p(i)   / VELO_IN,     &  !  3
+                                w_p(i)   / VELO_IN,     &  !  4
+                                kin_p(i) / VELO_IN**2,  &  !  5
+                                eps_p(i),               &  !  6
+                                t_p(i),                 &  !  7
+                                vis_p(i),               &  !  8
+                                zet_p(i),               &  !  9
+                                f22_p(i)                   ! 10
         end if
       end do
       close(fu)

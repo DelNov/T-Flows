@@ -1925,7 +1925,7 @@ beginning of simulation, and we wrote it in a way to read physical properties:
  44
  45   close(fu)
  46
- 47   if(this_proc < 2) then
+ 47   if(First_Proc()) then
  48     print '(a)',        ' #============================================'
  49     print '(a)',        ' # Output from user function, read properties!'
  50     print '(a)',        ' #--------------------------------------------'
@@ -1974,8 +1974,8 @@ input, it also skips all the lines beginning with ```#```, ```!``` and ```%```,
 considering such lines as comments.
 
 Finally, in the lines 47 to 51 we print a message that physical properties
-have been read.  Here we use global variable ```this_proc``` to make sure we
-print the message only from first processor in parallel runs.
+have been read.  Here we use the global function ```First_Proc()``` to make sure
+we print the message only from first processor in parallel runs.
 
 Once the look-up table is properly read into memory, we can use it at the
 beginning of each time step with procedure ```Beginning_Of_Time_Step``` which reads:
@@ -2231,34 +2231,35 @@ only new files, looks like this:
 ├── ...
 ├── rod_tet_dual.pvtu
 ├── ...
-├── Sub-00001
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00002
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00003
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00004
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00005
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-└── Sub-00006
-    ├── rod_tet_dual.cfn
-    ├── rod_tet_dual.dim
-    └── rod_tet_dual.vtu
+└── Sub
+    ├── 00001
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00002
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00003
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00004
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00005
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    └── 00006
+        ├── rod_tet_dual.cfn
+        ├── rod_tet_dual.dim
+        └── rod_tet_dual.vtu
 ```
-_Divide_ has created a number of sub-directory in the working directory called:
-```Sub-00001``` to ```Sub-0000N```, where N is the number of processors (here
-6 because that's what we requested.  Each of this sub-directory contains its
+_Divide_ has created the sub-directory ```Sub``` with a number of sub-sub-directories
+called: ```00001``` to ```0000N```, where N is the number of processors (here
+6 because that's what we requested.  Each of this sub-sub-directory contains its
 portion of the grid in T-Flows' format (the ```.cfn``` and ```.dim``` files)
 and its portion of the ```.vtu``` file for visualization with ParaView.
 
@@ -2380,10 +2381,10 @@ Parallel runs, almost invariantly, create a huge amount of data on the file
 system.  If you want to clear a certain directory in which a parallel simulation
 was running in order to free some disk space, deleting ```.pvtu``` files
 alone will be of much benefit.  The sub-directories holding sub-domains
-(```Sub-00001``` - ```Sub-0000N```) are the biggest in volume.  So, in order
+(```Sub/00001``` - ```Sub/0000N```) are the biggest in volume.  So, in order
 to get rid of ```.vtu``` files, you should delete like this:
 ```
-rm -f Sub-0*/*.vtu
+rm -f Sub/*/*.vtu
 ```
 
 #### Thing to try next
@@ -3548,7 +3549,7 @@ What you can also see in the ```out``` log file is the output from the user
 function which reads:
 ```
  #===========================================
- # Output from user function, Nusslet number!
+ # Output from user function, Nusselt number!
  #-------------------------------------------
  # Toral  area    :    5.000E-01
  # Nusselt number :    2.221E+00
@@ -3556,67 +3557,77 @@ function which reads:
 
 An exceprt from the user function ```End_Of_Time_Step``` is given here:
 ```
+ 27   !------------------------------------!
+ 28   !   Compute average Nusselt number   !
  29   !------------------------------------!
- 30   !   Compute average Nusselt number   !
- 31   !------------------------------------!
- 32   if(Grid % name(1:6) .eq. 'FLUID') then
- 33
- 34     ! Initialize variables for computing average Nusselt number
- 35     nu   = 0.0
- 36     area = 0.0
- 37
- 38     do s = 1, Grid % n_faces
- 39       c1 = Grid % faces_c(1,s)
- 40       c2 = Grid % faces_c(2,s)
+ 30   if(Grid % name(1:6) .eq. 'FLUID') then
+ 31
+ 32     ! Initialize variables for computing average Nusselt number
+ 33     nu   = 0.0
+ 34     area = 0.0
+ 35
+ 36     do reg = Boundary_Regions()
+ 37       if(Grid % region % type(reg) .eq. WALL) then
+ 38         do s = Faces_In_Region(reg)
+ 39           c1 = Grid % faces_c(1,s)
+ 40           c2 = Grid % faces_c(2,s)
  41
- 42       if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
- 43
- 44         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL ) then
- 45           area = area + Grid % s(s)
- 46           nu   = nu + Grid % s(s)                 &
- 47                     * abs(t % n(c2) - t % n(c1))  &
- 48                     / Grid % d(s)
- 49         end if  ! if wall
- 50       end if    ! c2 < 0
- 51     end do      ! through s
- 52
- 53     !-----------------------------------------------!
- 54     !   Integrate (summ) heated area, and heat up   !
- 55     !-----------------------------------------------!
- 56     call Comm_Mod_Global_Sum_Real(area)
- 57     call Comm_Mod_Global_Sum_Real(nu)
- 58
- 59     !-------------------------------------------------!
- 60     !   Compute averaged Nussel number and print it   !
- 61     !-------------------------------------------------!
- 62     nu = nu / area
- 63
- 64     if(this_proc < 2) then
- 65       print '(a)',        ' #==========================================='
- 66       print '(a)',        ' # Output from user function, Nusslet number!'
- 67       print '(a)',        ' #-------------------------------------------'
- 68       print '(a,es12.3)', ' # Toral  area    : ', area
- 69       print '(a,es12.3)', ' # Nusselt number : ', nu
- 70     end if
- 71
- 72   end if  ! domain is middle
+ 42           area = area + Grid % s(s)
+ 43           nu   = nu + Grid % s(s)                 &
+ 44                     * abs(t % n(c2) - t % n(c1))  &
+ 45                     / Grid % d(s)
+ 46         end do
+ 47       end if  ! region is at the wall; it is a wall region
+ 48     end do    ! through regions
+ 49
+ 50     !-----------------------------------------------!
+ 51     !   Integrate (summ) heated area, and heat up   !
+ 52     !-----------------------------------------------!
+ 53     call Global % Sum_Real(area)
+ 54     call Global % Sum_Real(nu)
+ 55
+ 56     !-------------------------------------------------!
+ 57     !   Compute averaged Nussel number and print it   !
+ 58     !-------------------------------------------------!
+ 59     nu = nu / area
+ 60
+ 61     if(First_Proc()) then
+ 62       print '(a)',        ' #==========================================='
+ 63       print '(a)',        ' # Output from user function, Nusselt number!'
+ 64       print '(a)',        ' #-------------------------------------------'
+ 65       print '(a,es12.4)', ' # Toral  area    : ', area
+ 66       print '(a,es12.4)', ' # Nusselt number : ', nu
+ 67     end if
+ 68
+ 69   end if  ! domain is middle
 ```
-Line 32 ensures that the code which follows is only executed in the fluid domain.
-At line 38 you can see an example of the face-based data structure which is one
-of the main features of finite volume based unstructured solvers.  We browse
-through all faces (```Grid % n_faces```) and for each one of them fetch the
-cells surrounding it from structure ```Grid % faces_c(:,s)```.  Once both cells
-surrounding the face are known and stored in variables ```c1``` and ```c2```,
-we check if ```c2``` is a boundary face in line 42.
+Line 30 ensures that the code which follows is only executed in the fluid domain.
+Line 36 is a loop which starts to browse through all boundary regions defined in
+the computational domain, and line 37 makes sure that you stop only at the
+regions of the type ```WALL```.  Once at the wall, start browsing (with a do
+loop) through all the faces in the selected region, as it is done in line 38.
+At thie lines 39 and 40 you can see an example of the face-based data structure
+which is one of the main features of finite volume based unstructured solvers.
+We browse through all the faces in the region and for each one of them fetch the
+cells surrounding it from structure ```Grid % faces_c(:,s)```.
 
-> **_Note:_** In T-Flows, boundary faces have negative indices.
+> **_Note 1:_** ```Boundary_Regions()``` and ```Faces_In_Region(reg)``` are not
+regular Fortran expressions.  Rather, they are macros defined in the file
+```[root]/Sources/Shared/Browse.h90```, which make the syntax in T-Flows shorter
+and easier to understad.  For example, instead of typing:
+```do s = Grid % region % f_face(reg), Grid % region % l_face(reg)```, we type:
+```do s = Faces_In_Region(reg)```
 
-What we also check in the same line is that ```c1``` is in the current processor,
-_i.e._ it is not in the buffer cells, because otherwise global summs of area
-and accumulated Nusselt number in lines 56 and 57, wouldn't be correct for
-parallel runs.  In line 62 all processors have the same values of ```nu```
-and ```area``` and we can compute the average Nusselt number.  Lines 64 - 70
-print the value of Nuseelt number only from one processor.
+> **_Note 2:_** In T-Flows, boundary cells have negative indices.  In the loops
+shown above, ```c2``` would only hold negative numbers.
+
+The macros ```Boundary_Regions``` and ```Faces_In_Region(reg)``` also ensure
+that ```c1``` is in the current processor, _i.e._ it is not in the buffer cells,
+because otherwise global summs of area and accumulated Nusselt number in lines
+53 and 54, wouldn't be correct for parallel runs.  In line 59 all processors have
+the same values of ```nu``` and ```area``` and we can compute the average
+Nusselt number.  Lines 61 - 67 print the value of Nuseelt number only from one
+processor, using the logical function ```First_Proc()```.
 
 ### Comparison with benchmark solution <a name="bench_conjugate_compare"> </a>
 
@@ -3908,8 +3919,9 @@ hence the extension ```.neu```.
 
 > **_Note:_** Grids in neutral file format were created by Fluent's legacy
 mesh generator called Gambit.  Since Fluent got acquired by ANSYS, Gambit was
-dropped from the package and neutral file format became obsolete.  Since, we
-keep this file here for reproducibility of results.
+dropped from the package and neutral file format became obsolete.  However,
+since the impinging jet is one our standard test case, we keep this file here
+for reproducibility of results.
 
 In addition to these, you can find the file ```rad_coordinate.dat``` which will
 be used by user functions, residing in sub-directory ```User_Mod``` during the
@@ -3971,91 +3983,96 @@ We call the first one _standard_ becuase it is a part of T-Flows and always
 called when T-Flows saves results.  In this case, it is a mere interface to
 two other functions:
 ```
-  1 include '../User_Mod/Save_Impinging_Jet_Nu.f90'
-  2 include '../User_Mod/Save_Impinging_Jet_Profiles.f90'
-  3
-  4 !==============================================================================!
-  5   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
-  6 !------------------------------------------------------------------------------!
-  7 !   Calls Save_Impinging_Jet_Nu and Save_Impinging_Jet_Profile functions.      !
-  8 !------------------------------------------------------------------------------!
-  9   implicit none
- 10 !---------------------------------[Arguments]----------------------------------!
- 11   type(Field_Type)    :: Flow
- 12   type(Turb_Type)     :: Turb
- 13   type(Vof_Type)      :: Vof
- 14   type(Swarm_Type)    :: Swarm
- 15   integer, intent(in) :: ts     ! time step
- 16   integer, optional   :: domain
- 17 !==============================================================================!
- 18
- 19   ! Don't save if this is intial condition, nothing is developed yet
- 20   if(ts .eq. 0) return
- 21
- 22   call Save_Impinging_Jet_Nu      (Turb, ts)
- 23   call Save_Impinging_Jet_Profiles(Turb, ts)
- 24
- 25   end subroutine
+  1 # ifdef __INTEL_COMPILER
+  2 #   include "User_Mod/Save_Impinging_Jet_Nu.f90"
+  3 #   include "User_Mod/Save_Impinging_Jet_Profiles.f90"
+  4 # else
+  5 #   include "Save_Impinging_Jet_Nu.f90"
+  6 #   include "Save_Impinging_Jet_Profiles.f90"
+  7 # endif
+  8
+  9 !==============================================================================!
+ 10   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
+ 11 !------------------------------------------------------------------------------!
+ 12 !   Calls Save_Impinging_Jet_Nu and Save_Impinging_Jet_Profile functions.      !
+ 13 !------------------------------------------------------------------------------!
+ 14   implicit none
+ 15 !---------------------------------[Arguments]----------------------------------!
+ 16   type(Field_Type)  :: Flow
+ 17   type(Turb_Type)   :: Turb
+ 18   type(Vof_Type)    :: Vof
+ 19   type(Swarm_Type)  :: Swarm
+ 20   integer, optional :: domain
+ 21 !==============================================================================!
+ 22
+ 23   ! Don't save if this is intial condition, nothing is developed yet
+ 24   if(Time % Curr_Dt() .eq. 0) return
+ 25
+ 26   call Save_Impinging_Jet_Nu      (Turb)
+ 27   call Save_Impinging_Jet_Profiles(Turb)
+ 28
+ 29   end subroutine
 ```
-The first of the called functions, reads the radial segments from the file
-```rad_coordinates.dat```, averages results over those segments and writes
-them in a special file called ```jet-nu-tsXXXXXX.dat```, where `XXXXXX` is
-the time step.  Withough going through each and every line of the code, let's
-just briefly explain a few sections.  
+The first of the called functions, ```Save_Impinging_Jet_Nu```, reads the radial
+segments from the file ```rad_coordinates.dat```, averages results over those
+segments and writes them in a special file called ```jet-nu-tsXXXXXX.dat```,
+where `XXXXXX` is the time step.  Without going through each and every line of
+the code, let's just briefly explain a few sections.
 
 Declaration of local variables which will be used for averaging results in the
 radial segments, is in lines 18-20:
 ```
- 18   real,    allocatable      :: u_s(:), v_s(:), w_s(:), t_s(:), tau_s(:), q_s(:)
- 19   real,    allocatable      :: z_s(:), r_s(:), rad(:)
- 20   integer, allocatable      :: n_count(:)
+ 17   real,    allocatable      :: u_s(:), v_s(:), w_s(:), t_s(:), tau_s(:), q_s(:)
+ 18   real,    allocatable      :: z_s(:), r_s(:), rad(:)
+ 19   integer, allocatable      :: n_count(:)
 ```
 Here beginning of names ```u```, ```v```, ... stand for velocity components,
 temperature, wall friction, heat flux, wall distance, radii and extension
 ```_s``` stands for segment.
 
-The function reads the ```rad_coordinate.dat``` in lines 40-68, checking if
-file exists (line 40) and issuing a warning message if it doesn't (lines 42-55).
+The function reads the ```rad_coordinate.dat``` in lines 39-67, checking if
+file exists (line 39) and issuing a warning message if it doesn't (lines 41-54).
 ```
- 40   inquire(file='rad_coordinate.dat', exist=there)
- 41   if(.not.there) then
- 42     if(this_proc < 2) then
- 43       print *, "#=========================================================="
- 44       print *, "# In order to extract Nusselt number profile               "
+ 39   inquire(file='rad_coordinate.dat', exist=there)
+ 40   if(.not.there) then
+ 41     if(First_Proc()) then
+ 42       print *, "#=========================================================="
+ 43       print *, "# In order to extract Nusselt number profile               "
  ...
  ...
- 54     end if
- 55     return
- 56   end if
- 57
- 58   call File % Open_For_Reading_Ascii('rad_coordinate.dat', fu)
- 59
- 60   ! Read the number of searching intervals·
- 61   read(fu,*) n_prob
- 62   allocate(rad(n_prob))
- 63
- 64   ! Read the intervals positions
- 65   do i = 1, n_prob
- 66     read(fu, *) rad(i)
- 67   end do
- 68   close(fu)
+ 53     end if
+ 54     return
+ 55   end if
+ 56
+ 57   call File % Open_For_Reading_Ascii('rad_coordinate.dat', fu)
+ 58
+ 59   ! Read the number of searching intervals
+ 60   read(fu,*) n_prob
+ 61   allocate(rad(n_prob))
+ 62
+ 63   ! Read the intervals positions
+ 64   do i = 1, n_prob
+ 65     read(fu, *) rad(i)
+ 66   end do
+ 67   close(fu)
 ```
-Line 58 is the standard way to open files in T-Flows.  One could use plain
+Line 57 is the standard way to open files in T-Flows.  One could use plain
 standard Fortran for that, but T-Flows' functions are encouraged because they
 come with additional checks and customizations.
 
-Lines 60-68 reveal the format and contents of file ```rad_coordinate.dat```,
+Lines 59-67 reveal the format and contents of file ```rad_coordinate.dat```,
 it reads number of readial cooridantes over which to perform averaging, and
 actual radial coordinate.
 
 With this data read, we perform averaging in lines 83-107:
 ```
- 83   do i = 1, n_prob - 1
- 84     do s = 1, Grid % n_faces
- 85       c1 = Grid % faces_c(1,s)
- 86       c2 = Grid % faces_c(2,s)
- 87       if(c2 < 0) then
- 88         if(Grid % Bnd_Cond_Name(c2) .eq. 'LOWER_WALL') then
+ 82   do i = 1, n_prob - 1
+ 83     do reg = Boundary_Regions()
+ 84       if(Grid % region % name(reg) .eq. 'LOWER_WALL') then
+ 85         do s = Faces_In_Region(reg)
+ 86           c1 = Grid % faces_c(1,s)
+ 87           c2 = Grid % faces_c(2,s)
+ 88
  89           r = sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
  90                    Grid % yc(c1)*Grid % yc(c1)) + TINY
  91           if(r < rad(i+1) .and. r > rad(i)) then
@@ -4067,61 +4084,126 @@ With this data read, we perform averaging in lines 83-107:
 ...
 103             n_count(i) = n_count(i) + 1
 104           end if
-105         end if
-106       end if
-107     end do
+105         end do  ! faces in this region
+106       end if    ! region is called 'LOWER_WALL'
+107     end do      ! through regions
+108   end do        ! through probes
 ```
-We browse through segments (line 83), then faces (line 85), take the cells
-which surround each face (lines 85 and 86), check if the face is on a boundary
-called `LOWER_WALL` (lines 87 and 88), and then eventually if that face is
-also within the segment we want to average (line 91).  If this is all satisfied,
-the accumulation of values is performed in lines 92-102, and line 103 counting
-the number of faces in the segment.
+We browse through segments (line 82), then boundary regions (line 83), take the
+region which is called 'LOWER_WALL' (line 84), then browse through the faces
+at that region (line 85).  Once in that region, we fetch the cells ```c1``` and
+```c2``` which surround the face ```s``` and in line 91 check if the faces fall
+in the current segment.  If this is all satisfied, the accumulation of values
+is performed in lines 92-102, and line 103 counting the number of faces in the
+segment.
+
+> **_Note:_** It was written above, but it's probably worth repeating that, in
+T-Flows, boundary cells have negative indices.  In the loops over faces at the
+boundaries, such as the one above, ```c1``` will be the inside cell with a
+positive index, whereas ```c2``` will be a boundary cell with negative index.
 
 Since we intend to run this code in parallel, we should also make sure that
 the accumulation of sums is extended to all processors involved, ensured by
 lines 113-126:
 ```
 113   do i = 1, n_prob
-114     call Comm_Mod_Global_Sum_Int(n_count(i))
+114     call Global % Sum_Int(n_count(i))
 115
-116     call Comm_Mod_Global_Sum_Real(u_s(i))
-...
-...
-125     call Comm_Mod_Global_Sum_Real(t_s(i))
+116     call Global % Sum_Real(u_s(i))
+117     call Global % Sum_Real(v_s(i))
+118     call Global % Sum_Real(w_s(i))
+119
+120     call Global % Sum_Real(z_s(i))
+121     call Global % Sum_Real(tau_s(i))
+122     call Global % Sum_Real(q_s(i))
+123
+124     call Global % Sum_Real(r_s(i))
+125     call Global % Sum_Real(t_s(i))
 126   end do
-
 ```
 Once the sums are extend over all processors, averaged values are computed in
 lines 128-139 (not shown here) and results are eventually save to a file with
-desired file name in lines 145-167:
+desired file name in lines 145-172:
 ```
-145   if(this_proc < 2) then
+145   if(First_Proc()) then
 146
 147     ! Set the file name
-148     call File % Set_Name(res_name, time_step=ts, &
+148     call File % Set_Name(res_name, time_step=Time % Curr_Dt(), &
 149                          appendix='-nu-utau', extension='.dat')
 150     call File % Open_For_Writing_Ascii(res_name, fu)
 151
 152     ! Write the file out
-153     write(fu, *) '# 1:Xrad, 2:Nu, 3:Utau, 4:Yplus, 5:Temp, 6:Numb of points '
-...
-...
-166     close(fu)
-167   end if
+153     write(fu, '(a66)')  '# 1:Xrad,  ' //  &
+154                         '  2:Nu,    ' //  &
+155                         '  3:Utau,  ' //  &
+156                         '  4:Yplus, ' //  &
+157                         '  5:Temp,  ' //  &
+158                         '  6:Points '
+159     do i = 1, n_prob
+160       if(n_count(i) .ne. 0) then
+161         write(fu, '(5e11.3,i11)')                                 &
+162           r_s(i) / 2.0,                                           &  !  1
+163           2.0 * q_s(i) / (Flow % conductivity(1)*(t_s(i)-20.0)),  &  !  2
+164           tau_s(i),                                               &  !  3
+165           tau_s(i) * z_s(i) / Flow % viscosity(1),                &  !  4
+166           t_s(i),                                                 &  !  5
+167           n_count(i)                                                 !  6
+168       end if
+169     end do
+170
+171     close(fu)
+172   end if_
 ```
 Line 145 ensures that the file is written only from one processor, lines
 148 and 149 set the file name in standard T-Flows' format.  Line 150 shows
-how to use T-Flows' standar way to open files and the rest is just plain
+how to use T-Flows' standard way to open files and the rest is just plain
 Fortran which doesn't need furhter explanation.
 
 The remaining user function ```Save_Impinging_Jet_Profiles``` has a very
-similar structure as the ```Save_Impinging_Jet_Nu```, but a few differences.
+similar structure to the ```Save_Impinging_Jet_Nu```, but a few differences.
 Instead of reading a file with radial coordinates, ```Save_Impinging_Jet_Profiles```
 reads a file with coordinates in $z$ direction, created during the grid
-conversion process (file ```jet.1d```).  Just like its sister it declares local
+conversion process (file ```jet.1d```).  Just like its sister, it declares local
 variables for averaging the results, performs global summs over all processor
 for parallel runs, and eventually saves data for post-processing.
+
+There is one section in the ```Save_Impinging_Jet_Profiles``` which might
+deserve a bit of attention.  It is a section which calculates average inlet
+velocity, and is given here in full:
+```
+ 36   area_in = 0.0
+ 37   velo_in = 0.0
+ 38   do reg = Boundary_Regions()
+ 39     if(Grid % region % name(reg) .eq. 'PIPE_INLET') then
+ 40       do s = Faces_In_Region(reg)
+ 41         c2 = Grid % faces_c(2,s)  ! fetch the boundary cell
+ 42         velo_in = velo_in - w % n(c2) * Grid % sz(s)
+ 43         area_in = area_in + Grid % s(s)
+ 44       end do  ! through faces in the region
+ 45     end if    ! region is called 'PIPE_INLET'
+ 46   end do      ! through all boundary regions
+ 47   call Global % Sum_Real(area_in)
+ 48   call Global % Sum_Real(velo_in)
+ 49   Assert(area_in > 0.0)
+ 50   velo_in = velo_in / area_in
+```
+Variables ```area_in``` and ```velo_in``` are surface area at the inlet and
+velocity at the inlet, and are initialized in lines 36 and 37.  A loop
+through bundary regions begins in line 38, and line 39 picks only the region
+which is called ```PIPE_INLET```, since that is how inlet was called in the
+original grid file definition (```jet.neu```).  Once that region is found,
+we browse through its faces (line 40), take the faces' boundary cell ```c2```
+in line 41, and update velocity (line 42) and area (line 43) inside that
+loop.  The negative sign in line 42 is because the faces' surface vectors,
+such as ```Grid % sz(s)``` always point outwards of computational domain so
+for a velocity which pointed towards the inlet, their product would have a
+negative value.  In case of a parallel run, we can't be sure that the
+entire inllet are is covered by one sub-domain, and we therefore have to
+perform a global sum, as it is done in lines 47 and 48 above.  Line 49 is
+an _assertion_, not part of the standard Fortran, but it is introduced in
+T-Flows for its usefulness.  (In this case, the assertion might fail if
+there is no region called ```PIPE_INLET``` in the grid.)  Finally, line 50
+computes the bulk velocity at the inlet.
 
 As far as the ```control``` file is concerned, there is nothing very special
 about this case.  By trying different values of time steps and times of time
@@ -4945,7 +5027,7 @@ function ```End_Of_Time_Step```, given here in full:
  41   call Comm_Mod_Global_Sum_Real(rise_velocity)
  42
  43   ! Write to file
- 44   if (this_proc < 2) then
+ 44   if(First_Proc()) then
  45     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
  46
  47     write(fu,'(4(2x,e16.10e2))') time,                   &

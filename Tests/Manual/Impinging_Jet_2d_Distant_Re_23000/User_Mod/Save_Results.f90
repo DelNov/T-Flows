@@ -13,11 +13,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type)    :: Flow
-  type(Turb_Type)     :: Turb
-  type(Vof_Type)      :: Vof
-  type(Swarm_Type)    :: Swarm
-  integer, optional   :: domain
+  type(Field_Type)  :: Flow
+  type(Turb_Type)   :: Turb
+  type(Vof_Type)    :: Vof
+  type(Swarm_Type)  :: Swarm
+  integer, optional :: domain
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
