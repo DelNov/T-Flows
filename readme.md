@@ -123,6 +123,8 @@ practical use of T-Flows, it is highly desirable that you also have the followin
   or any tool which can read ```.vtu``` file format
 - [OpenMPI](https://www.open-mpi.org/) installation (mpif90 for compilation and
   mpirun for parallel processing)
+- [Blender](https://www.blender.org/) could prove to be useful when prescribing
+  STL files as initial conditions for multiphase simulations with VOF.
 
 T-Flows is, in essence, a fluid flow solver without any graphical user interface (GUI).
 Although it comes with its own grid generator, it is very rudimentary, and an
@@ -3945,7 +3947,7 @@ to compile the _Process_ for this case.
 
 To run this case, in a Linux terminal go to directory ```[root]/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000```
 A very practical thing to do is to create links to executables in the working
-directory as it was explained [here](#seek_binaries). 
+directory as it was explained [here](#seek_binaries).
 
 Since the grid for this case comes in the gzipped format, you should first
 decompress it with:
@@ -4660,10 +4662,10 @@ there and check the contents.  They include the following:
 ├── bubble.geo
 ├── control
 ├── convert.scr
-├── ellipsoid_parameters.ini
+├── sphere.py
+├── sphere.stl
 └── User_Mod/
-    ├── End_Of_Time_Step.f90
-    └── Initialize_Variables.f90
+    └── End_Of_Time_Step.f90
 ```
 
 The usage of ```control```, ```convert.scr``` and ```bubble.geo``` files should
@@ -4673,200 +4675,38 @@ be clear to you by now.  If not, revisit the section on
 ### Initialization of VOF function <a name="bench_cases_buble_init"> </a>
 
 An _important characteristic_ of simulating multiphase flows with VOF, is that
-initial conditions can _only_ be defined through user functions.  At the time
-of writing this manual, we believe that the initial conditions for VOF are very
-case dependent, and expanding the ```control``` file, as well as all the
-procedures to read them, would be overwhelming.
+prescribing initial condition practically means prescribing morphology of the
+multiphase situation.  One possibility to achieve this might be through user
+functions which would prescribe the value of VOF function in three-dimensional
+domain of interest.  In T-Flows, however, we have an additional option which is
+to read an STL file describing the interface between the phases.  Surface normals
+of the STL file define which phase will be zero and which one.
+are used to prescribe the values (0 and 1) of the VOF function: surface always
+points from 0 to 1.  As an example, if a morphology of the multiphase situation
+is a single bubble described by a sphere in STL format, and if sphere's normals
+point outwards, T-Flows will set the cells inside the bubble to 0 and outside
+of the bubble to 1.
 
-Because of this, with each case using VOF, you will have a ```User_Mod``` directory
-with function to initialize VOF.  In this particular case, the subroutine
-```Initialize_Variables.f90``` reads:
+Different CAD software packages can be used to prescribe STL surfaces, but when
+it comes to prescribing spherical bubbles, the quality of STL files generated
+by Blender, using its ico-sphere algorithm, is unsurpassed.  Check, for example
+how the included ```sphere.stl``` looks:
+
+<img src="Documentation/Manual/Figures/bubble_sphere.png" width="300"/>
+
+The python script to create this ico-sphere in Blender is in the file
+```sphere.py```. which is also included in this case's directroy for reader's
+convenience.  The STL file is used in the ```control``` file, in a manner
+very similar to the presciption of initial conditions in the section on
+(thermally driven cavity)[#demo_thermally_driven] flows.  Here, the section
+for prescribing initial conditions looks like this:
 ```
-  1 !==============================================================================!
-  2   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
-  3 !------------------------------------------------------------------------------!
-  4 !   Case-dependent initialization of VOF variable.                             !
-  5 !------------------------------------------------------------------------------!
-  6 !----------------------------------[Modules]-----------------------------------!
-  7   use Work_Mod, only: prelim_vof => r_cell_01,  &
-  8                       min_dist   => r_cell_02,  &
-  9                       max_dist   => r_cell_03,  &
- 10                       dist_node  => r_node_01
- 11 !------------------------------------------------------------------------------!
- 12   implicit none
- 13 !---------------------------------[Arguments]----------------------------------!
- 14   type(Field_Type),  target :: Flow
- 15   type(Turb_Type),   target :: Turb
- 16   type(Vof_Type),    target :: Vof
- 17   type(Swarm_Type),  target :: Swarm
- 18   type(Solver_Type), target :: Sol
- 19 !-----------------------------------[Locals]-----------------------------------!
- 20   type(Grid_Type), pointer :: Grid
- 21   type(Var_Type),  pointer :: fun
- 22   real,            pointer :: dt
- 23   integer                  :: c, n, i_nod, e, n_ellipses, fu
- 24   real                     :: radius_x, radius_y, radius_z
- 25   real                     :: cent_x, cent_y, cent_z, dist_norm
- 26 !==============================================================================!
- 27
- 28   ! Take aliases
- 29   Grid => Flow % pnt_grid
- 30   fun  => Vof % fun
- 31   dt   => Flow % dt
- 32
- 33   !---------------------------------!
- 34   !   Initialize the VOF function   !
- 35   !---------------------------------!
- 36
- 37   ! Initialize the whole domain as 0.0
- 38   fun % n(:) = 0.0
- 39
- 40   ! Open file to read Ellipsoid parameters:
- 41   call File % Open_For_Reading_Ascii('ellipsoid_parameters.ini', fu)
- 42
- 43   call File % Read_Line(fu)
- 44   read(line % tokens(1), *) n_ellipses
- 45
- 46   do e = 1, n_ellipses
- 47
- 48     ! Initialize working arrays
- 49     prelim_vof(:) = 0.0
- 50
- 51     ! Read line with radii
- 52     call File % Read_Line(fu)
- 53     read(line % tokens(1), *) radius_x
- 54     read(line % tokens(2), *) radius_y
- 55     read(line % tokens(3), *) radius_z
- 56
- 57     ! Read line with coordinates of the elliposoid's center
- 58     call File % Read_Line(fu)
- 59     read(line % tokens(1), *) cent_x
- 60     read(line % tokens(2), *) cent_y
- 61     read(line % tokens(3), *) cent_z
- 62
- 63     ! Normalized distance from ellipsoid center in nodes
- 64     dist_node (:) = 0.0
- 65     do n = 1, Grid % n_nodes
- 66       dist_node(n) = sqrt(  ((Grid % xn(n) - cent_x) / radius_x)**2   &
- 67                           + ((Grid % yn(n) - cent_y) / radius_y)**2   &
- 68                           + ((Grid % zn(n) - cent_z) / radius_z)**2)
- 69     end do
- 70
- 71     ! Minimum and maximum normalized distance in cells
- 72     min_dist(:) = +HUGE
- 73     max_dist(:) = -HUGE
- 74     do c = 1, Grid % n_cells
- 75       do i_nod = 1, Grid % cells_n_nodes(c)
- 76         n = Grid % cells_n(i_nod, c)
- 77
- 78         min_dist(c)= min(dist_node(n), min_dist(c))
- 79         max_dist(c)= max(dist_node(n), max_dist(c))
- 80       end do
- 81     end do
- 82
- 83     ! Simply interpolate linearly
- 84     do c = 1, Grid % n_cells
- 85
- 86       ! Since surface is at 1.0 this checks if cell crosses the surface
- 87       if (min_dist(c) < 1.0 .and. max_dist(c) > 1.0) then
- 88         prelim_vof(c) = (1.0 - min_dist(c))  &
- 89                       / (max_dist(c)-min_dist(c))
- 90
- 91       else if (max_dist(c) <= 1.0) then
- 92         prelim_vof(c) = 1.0
- 93       end if
- 94
- 95     end do
- 96
- 97     ! This is useful if more elliposoids are
- 98     ! defined and they intersect each other
- 99     do c = 1, Grid % n_cells
-100       Vof % fun % n(c) = max(prelim_vof(c), Vof % fun % n(c))
-101     end do
-102
-103   end do
-104
-105   close(fu)
-106
-107   ! Update buffer values
-108   call Grid % Exchange_Cells_Real(fun % n)
-109
-110   ! Set old values to be the same as new ones
-111   fun % o(:) = fun % n(:)
-112
-113   end subroutine
-
+  INITIAL_CONDITION
+    VARIABLES           u    v    w    vof
+    VALUES              0.0  0.0  0.0  sphere.stl
 ```
-In the argument list, you can see a number of _Process'_ classes which were
-described [above](#demo_thermally_driven_variable).  The only class you didn't
-see before is ```Sol_Type``` which is an _abstraction_ of two other classes
-```Nat_Type``` for T-Flows' native linear solvers and ```Pet_Type``` for
-PETSc solver.  None of them will be used in this function, and we will not
-describe them further.
-
-An interesting novelty here is in between lines 7 and 10, the usage of ```Work_Mod```.
-This module has no functionality, but holds a number of pre-allocated fields of
-different types (```r_cell_..```, ```r_node_```, ```i_cell_```, ...) with sizes
-which span over cells, faces or nodes.  These pre-allocated memory locations
-are used inside _Process'_ functions to avoid frequent allocations and
-de-allocations of memory.  In this case, we will use three real fields (```r_```
-in the name) spanning over cells (```cell_``` in the name) and one real field
-spanning over nodes (```r_node_01```).
-
-Lines 28 to 31 take different _aliases_ to shorten the syntax in the rest of
-this subroutine.  It is probably worth noting that VOF's phase indicator function
-is stored in ```Vof % fun```, and the value of VOF function in the new time
-step is in the field ```Vof % fun % n```.
-
-Line 41 opens the file ```ellipsoid_parameters.ini``` which holds the definition
-of ellipsoids we want to define.  It reads:
-```
-# Number of ellipsoids
- 1
-
-# Ellipsoids' characteristic radii in x, y and z direction
- 0.25 0.25 0.25
-
-# Ellipsoid's center
- 0.0  0.0  0.0
-```
-which, we believe, is self-explanatory.  This file will be read by user function
-in lines 51 - 61.
-
-> **_Note:_** Remember that procedure ```Read_Line``` not only tokenizes a line
-from input, but also skips all the lines beginning with ```#```, ```!``` and
-```%```, which it considers comments.  That is why we can have comments inside
-```ellipsoid_parameters.dat```
-
-Lines 63 - 69 calculate normalized distance from the ellipsoid in the nodes.  It
-is worth reminding you at this point that T-Flows is cell-centered, _nodes are
-not_ computational points, _cell centers are_.  Once we have all normalized
-distances in nodes, we can define them for cells in lines 71 - 81.  These lines show
-how can you access cells' nodes.
-```
-  74     do c = 1, Grid % n_cells
-```
-will start browsing through all the cells,
-```
- 75       do i_nod = 1, Grid % cells_n_nodes(c)
-```
-will browse through local nodes of each cell and
-```
- 76         n = Grid % cells_n(i_nod, c)
-```
-gives you a global number of the cell's node.  Lines 78 and 79 compute minimum
-and maximuim normalized distance for each cell, which is used in lines 83 to 95
-to calculate preliminary VOF in cell centers.  We don't put these values straight
-into VOF function (```Vof % n```) to prevent that, in case we have more than
-one ellipsoid defined, they over-write each other, which is achieved in lines
-97 - 101.
-
-Line 108 is important for parallel runs since it echanges the values
-of VOF functions in buffer cells.
-
-Finally, once VOF is set in the entire domain, we also make sure that the
-values in the old time step (```fun % o```) are the same as new ones in
-line 110.
+Under the variable ```vof```, we don't just put a value, but rather an STL file
+which prescribes the initial surface shape and position.
 
 ### Compilation <a name="bench_cases_buble_compiling"> </a>
 
@@ -4878,8 +4718,10 @@ directory, hence from ```[root]/Sources/Process``` run:
 make clean
 make DIR_CASE=../../Tests/Manual/Rising_Bubble/
 ```
+Only one user function is used in this case, ```End_Of_The_Time_Step```, which
+will calculate some data for comparing results with benchmark solutions.
 
-> **_Note 1:_** Every time you run ```make clean``` for the _Processs_ it will
+> **_Note:_** Every time you run ```make clean``` for the _Processs_ it will
 replace the existing links in its ```User_Mod``` with _empty hooks_ as explained
 [above](#demo_thermally_driven_variable).  Running make with ```DIR_CASE```
 option will establish new links to user's case.

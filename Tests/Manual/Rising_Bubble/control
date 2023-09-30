@@ -64,6 +64,13 @@
   MAX_SMOOTHING_CYCLES_NORMAL_VOF       0
   MIN_SIMPLE_ITERATIONS                 3
 
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w     vof
+    VALUES              0.0   0.0   0.0   sphere.stl
+
 #---------------------
 # Boundary conditions
 #---------------------
