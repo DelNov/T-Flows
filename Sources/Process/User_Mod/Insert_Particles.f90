@@ -18,11 +18,11 @@
   Grid => Flow % pnt_grid
 
   ! Remove the following six lines in real Lagrangian tracking simulations
-  call Message % Warning(72,                                             &
+  call Message % Error(72,                                               &
              'You are running a Lagrangian tracking simulation  '    //  &
              'with the default version of Insert_Particles. You '    //  &
              'have probably forgotten to compile Process with '      //  &
              'DIR_CASE=<full_or_relative_path_to_case> directive.',      &
-             file=__FILE__, line=__LINE__)
+             file=__FILE__, line=__LINE__, one_proc=.true.)
 
   end subroutine
