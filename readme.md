@@ -346,28 +346,29 @@ of them.  When compiling _Convert_, for example, command ```make``` in its
 directory prints the following lines on the terminal:
 ```
 #=======================================================================
-# Compiling Convert with compiler gnu
+# Compiling Convert with gnu compiler
 #-----------------------------------------------------------------------
 # Usage:
-#   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> OPENMP=<no/yes>
-#        <REAL=double/single>
+#   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>
+#        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>
+#        <PROF=no/yes> <REAL=double/single> <OMP=yes/no>
 #
 # Note: The first item, for each of the options above, is the default.
 #
 # Examples:
-#   make              - compile with gnu compiler
-#   make FORTAN=intel - compile with intel compiler
-#   make DEBUG=yes    - compile with gnu compiler in debug mode
-#   make OPENMP=yes   - compile with gnu compiler for parallel Convert
+#   make               - compile with gnu compiler
+#   make FORTRAN=intel - compile with intel compiler
+#   make DEBUG=yes     - compile with gnu compiler in debug mode
+#   make ASSERT=no     - compile without assert with gnu compiler
+#   make OMP=yes       - compile with gnu compiler for parallel Convert
 #-----------------------------------------------------------------------
 gfortran ../Shared/Const_Mod.f90
-gfortran ../Shared/Comm_Mod_Seq.f90
-gfortran ../Shared/Math_Mod.f90
-gfortran ../Shared/File_Mod.f90
-...
-...
-gfortran Load_Fluent.f90
-gfortran Load_Gmsh.f90
+gfortran ../Shared/Region_Mod.f90
+gfortran ../Shared/String_Mod.f90
+gfortran ../Shared/Comm_Mod.f90
+gfortran ../Shared/Assert_Mod.f90
+gfortran ../Shared/Tokenizer_Mod.f90
+gfortran ../Shared/Message_Mod.f90
 ...
 ...
 gfortran Main_Con.f90
@@ -2951,102 +2952,102 @@ which is achiveve with this line:
 In order to place the eddies inside the domain, we must find its extents over
 nodes.  This is done in these lines:
 ```
- 57   !--------------------------------------!
- 58   !   Size of the computational domain   !
- 59   !                                      !
- 60   !   This algorithm is not silly. We    !
- 61   !   could have browsed through nodes   !
- 62   !   only, but then we might have en-   !
- 63   !   countered some hanging from GMSH   !
- 64   !--------------------------------------!
- 65   xmin = HUGE;  xmax = -HUGE
- 66   ymin = HUGE;  ymax = -HUGE
- 67   zmin = HUGE;  zmax = -HUGE
- 68   do c = 1, Grid % n_cells
- 69     do i_nod = 1, Grid % cells_n_nodes(c)
- 70       n = Grid % cells_n(i_nod, c)
- 71       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
- 72       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
- 73       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
- 74     end do
- 75   end do
- 76   call Comm_Mod_Global_Min_Real(xmin)
- 77   call Comm_Mod_Global_Min_Real(ymin)
- 78   call Comm_Mod_Global_Min_Real(zmin)
- 79   call Comm_Mod_Global_Max_Real(xmax)
- 80   call Comm_Mod_Global_Max_Real(ymax)
- 81   call Comm_Mod_Global_Max_Real(zmax)
- 82   lx = xmax - xmin
- 83   ly = ymax - ymin
- 84   lz = zmax - zmin
+ 46   !--------------------------------------!
+ 47   !   Size of the computational domain   !
+ 48   !                                      !
+ 49   !   This algorithm is not silly. We    !
+ 50   !   could have browsed through nodes   !
+ 51   !   only, but then we might have en-   !
+ 52   !   countered some hanging from GMSH   !
+ 53   !--------------------------------------!
+ 54   xmin = HUGE;  xmax = -HUGE
+ 55   ymin = HUGE;  ymax = -HUGE
+ 56   zmin = HUGE;  zmax = -HUGE
+ 57   do c = 1, Grid % n_cells
+ 58     do i_nod = 1, Grid % cells_n_nodes(c)
+ 59       n = Grid % cells_n(i_nod, c)
+ 60       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
+ 61       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
+ 62       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
+ 63     end do
+ 64   end do
+ 65   call Global % Min_Real(xmin)
+ 66   call Global % Min_Real(ymin)
+ 67   call Global % Min_Real(zmin)
+ 68   call Global % Max_Real(xmax)
+ 69   call Global % Max_Real(ymax)
+ 70   call Global % Max_Real(zmax)
+ 71   lx = xmax - xmin
+ 72   ly = ymax - ymin
+ 73   lz = zmax - zmin
 ```
-In lines 68 - 75, we browse through all the cells, and through individual nodes
-of each cell in line 69.  Field ```Grid % cells_n_nodes(c)``` holds the number
-of nodes for each cell.  In line 70, we take the grid node index (```i_nod```
-is just to browse locally through cell) and in lines 71 - 73, we are seeking
-for minimum and maximum coordinates in each direction.  Lines 76 - 81 ensure
+In lines 57 - 64, we browse through all the cells, and through individual nodes
+of each cell in line 58.  Field ```Grid % cells_n_nodes(c)``` holds the number
+of nodes for each cell.  In line 59, we take the grid node index (```i_nod```
+is just to browse locally through cell) and in lines 60 - 62, we are seeking
+for minimum and maximum coordinates in each direction.  Lines 65 - 70 ensure
 we work with extrema over all processors.  Variables ```lx```, ```ly``` and
 ```lz``` hold global domain dimensions.
 
 Once the domain dimensions are know, we can also set minimum and maximum size
 of the eddies:
 ```
- 86   ! Minimum and maximum size of eddies
- 87   rmin = min(ly, lz) / 10.0
- 88   rmax = min(ly, lz) /  5.0
+ 75   ! Minimum and maximum size of eddies
+ 76   rmin = min(ly, lz) / 10.0
+ 77   rmax = min(ly, lz) /  5.0
 ```
 We only compare eddy radius in plane orthogonal to the streamwise direction
 (assumed to be _x_ here) and that is why we only use dimension in _y_ and
 _z_ to correlate eddy sizes.
 
-This function introduces 48 eddies (hard-coded) in line 90:
+This function introduces 48 eddies (hard-coded) in line 93:
 ```
- 90   !-------------------------------!
- 91   !   Browse through all eddies   !
- 92   !-------------------------------!
- 93   do eddy = 1, 48
- 94
- 95     ! Random direction of the vortex
- 96     call random_number(sg);
- 97     if(sg < 0.5) then
- 98       sg = -1.0
- 99     else
-100       sg = +1.0
-101     end if
-102
-103     ! Determine random position of a vortex
-104     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
-105     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
-106     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
-107     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
-108
-109     ! Handle periodicity; that is: copy eddie in periodic directions
-110     xo(2:4) = xo(1)
-111     zo(2:4) = zo(1)
-112     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
-113     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
-114     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
-115     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
-116     xo(4) = xo(3)
-117     zo(4) = zo(2)
+ 79   !-------------------------------!
+ 80   !   Browse through all eddies   !
+ 81   !-------------------------------!
+ 82   do eddy = 1, 48
+ 83
+ 84     ! Random direction of the vortex
+ 85     call random_number(sg);
+ 86     if(sg < 0.5) then
+ 87       sg = -1.0
+ 88     else
+ 89       sg = +1.0
+ 90     end if
+ 91
+ 92     ! Determine random position of a vortex
+ 93     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
+ 94     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
+ 95     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
+ 96     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
+ 97
+ 98     ! Handle periodicity; that is: copy eddie in periodic directions
+ 99     xo(2:4) = xo(1)
+100     zo(2:4) = zo(1)
+101     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
+102     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
+103     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
+104     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
+105     xo(4) = xo(3)
+106     zo(4) = zo(2)
 ...
 ```
-Their sense of rotation is assigned randomly in lines 96 - 101, and their random
-positions (inside the domain) in lines 104 - 107.  Lines 110 - 117 take care of
+Their sense of rotation is assigned randomly in lines 85 - 90, and their random
+positions (inside the domain) in lines 93 - 96.  Lines 99 - 106 take care of
 periodicity, that is, make coppies of eddies in periodic directions (here _x_
 and _z_) depending on their relative position inside the domain.
 
 We set the lenght of each eddy to be six times its radius:
 ```
-119     ! Length of the eddy is six times the diameter
-120     lo = ro * 6.0
+108     ! Length of the eddy is six times the diameter
+109     lo = ro * 6.0
 ```
 We limit eddy extents with Gaussian distribution.  The sigma coefficients
 for Gaussian distribution in direction orthogonal to the flow (_y_ and _z_) and
-parallel to the flow (_x_) is set in lines 119 and 120:
+parallel to the flow (_x_) is set in lines 111 and 112:
 ```
-122     sig_yz = ro / 2.0
-123     sig_x  = lo / 2.0
+111     sig_yz = ro / 2.0
+112     sig_x  = lo / 2.0
 ```
 
 > **_Note:_** The ```sigma_yz``` would be the red functions in the figure
@@ -3061,48 +3062,47 @@ and ```wc```)
 figure introduced above.
 
 ```
-125     ! Superimpose eddies on the velocity field
-126     do dir = 1, 4
-127       do c = 1, Grid % n_cells
-128         xc = Grid % xc(c)
-129         yc = Grid % yc(c)
-130         zc = Grid % zc(c)
-131         vc = sg * ( (zc-zo(dir))/ro )
-132         wc = sg * ( (yo-yc     )/ro )
-133
-134         !--------------------------------------------+
-135         !   Gaussian distribution:                   !
-136         !                                - (x-a)^2   !
-137         !                  1           ^ ---------   !
-138         !   f(x) = ------------------ e  2 sigma^2   !
-139         !          sqrt(2 PI sigma^2)                !
-140         !                                            !
-141         !                                            !
-142         !          exp[-(x-a)^2 / (2 sigma^2)]       !
-143         !   f(x) = ---------------------------       !
-144         !              sqrt(2 PI sigma^2)            !
-145         !                                            !
-146         !          exp[-0.5 ((x-a) / sigma)^2]       !
-147         !   f(x) = ---------------------------       !
-148         !               sigma sqrt(2 PI)             !
-149         !--------------------------------------------!
-150         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-151         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-152
-153         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-154         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-155
-156         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-157         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-158
-159         ! Superimposed those fluctuations on spanwise and normal velocity comp.
-160         v % n(c) = v % n(c) + vc
-161         v % o(c) = v % o(c) + vc
-162         w % n(c) = w % n(c) + wc
-163         w % o(c) = w % o(c) + wc
-164       end do
-165     end do
-166   end do
+114     ! Superimpose eddies on the velocity field
+115     do dir = 1, 4
+116       do c = 1, Grid % n_cells
+117         xc = Grid % xc(c)
+118         yc = Grid % yc(c)
+119         zc = Grid % zc(c)
+120         vc = sg * ( (zc-zo(dir))/ro )
+121         wc = sg * ( (yo-yc     )/ro )
+122
+123         !--------------------------------------------+
+124         !   Gaussian distribution:                   !
+125         !                                - (x-a)^2   !
+126         !                  1           ^ ---------   !
+127         !   f(x) = ------------------ e  2 sigma^2   !
+128         !          sqrt(2 PI sigma^2)                !
+129         !                                            !
+130         !                                            !
+131         !          exp[-(x-a)^2 / (2 sigma^2)]       !
+132         !   f(x) = ---------------------------       !
+133         !              sqrt(2 PI sigma^2)            !
+134         !                                            !
+135         !          exp[-0.5 ((x-a) / sigma)^2]       !
+136         !   f(x) = ---------------------------       !
+137         !               sigma sqrt(2 PI)             !
+138         !--------------------------------------------!
+139         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+140         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+141
+142         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+143         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+144
+145         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+146         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+147
+148         ! Superimposed those fluctuations on spanwise and normal velocity comp.
+149         v % n(c) = v % n(c) + vc
+150         v % o(c) = v % o(c) + vc
+151         w % n(c) = w % n(c) + wc
+152         w % o(c) = w % o(c) + wc
+153       end do
+154     end do
 ```
 
 If all this seems a bit complicated to you, don't worry, this same function
@@ -4152,7 +4152,7 @@ desired file name in lines 145-172:
 169     end do
 170
 171     close(fu)
-172   end if_
+172   end if
 ```
 Line 145 ensures that the file is written only from one processor, lines
 148 and 149 set the file name in standard T-Flows' format.  Line 150 shows
@@ -4162,7 +4162,7 @@ Fortran which doesn't need furhter explanation.
 The remaining user function ```Save_Impinging_Jet_Profiles``` has a very
 similar structure to the ```Save_Impinging_Jet_Nu```, but a few differences.
 Instead of reading a file with radial coordinates, ```Save_Impinging_Jet_Profiles```
-reads a file with coordinates in $z$ direction, created during the grid
+reads a file with coordinates in _z_ direction, created during the grid
 conversion process (file ```jet.1d```).  Just like its sister, it declares local
 variables for averaging the results, performs global summs over all processor
 for parallel runs, and eventually saves data for post-processing.
@@ -4246,7 +4246,7 @@ The line beginning with the keyword ```VARIABLES``` tells T-Flows which
 variables are specified in the file.  The name of the file is specified in the
 line which follows beginning with the keyword ```FILE```.  We believe that
 all variable names are self-explanatory, except maybe ```rz``` which stands
-for radial coordinate (```r```) orthogonal to the $z$ plane (```z```).  More
+for radial coordinate (```r```) orthogonal to the _z_ plane (```z```).  More
 details on prescribing inlet profiles from files can be found in section
 [Prescribed velocity profile](#demo_inflows_parabolic).
 
@@ -4986,7 +4986,7 @@ function ```End_Of_Time_Step```, given here in full:
 ```
   1 !==============================================================================!
   2   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-  3                                        n, n_stat_t, n_stat_p, time)
+  3                                        n_stat_t, n_stat_p)
   4 !------------------------------------------------------------------------------!
   5 !   This function is computing benchmark for rising bubble.                    !
   6 !------------------------------------------------------------------------------!
@@ -4996,65 +4996,76 @@ function ```End_Of_Time_Step```, given here in full:
  10   type(Turb_Type),  target :: Turb
  11   type(Vof_Type),   target :: Vof
  12   type(Swarm_Type), target :: Swarm
- 13   integer                  :: n         ! current time step
- 14   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
- 15   integer                  :: n_stat_p  ! 1st t.s. statistics particles
- 16   real                     :: time      ! physical time
- 17 !-----------------------------------[Locals]-----------------------------------!
- 18   type(Grid_Type), pointer :: Grid
- 19   type(Var_Type),  pointer :: fun
- 20   integer                  :: c, fu
- 21   real                     :: b_volume, rise_velocity, c_position
- 22 !==============================================================================!
- 23
- 24   ! Take aliases
- 25   Grid => Flow % pnt_Grid
- 26   fun  => Vof % fun
- 27
- 28   ! Integrate bubble volume, current position and rise velocity over cells
- 29   b_volume      = 0.0
- 30   c_position    = 0.0
- 31   rise_velocity = 0.0
- 32
- 33   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
- 34     b_volume      = b_volume + Grid % vol(c) * fun % n(c)
- 35     c_position    = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
- 36     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
- 37   end do
- 38
- 39   call Comm_Mod_Global_Sum_Real(b_volume)
- 40   call Comm_Mod_Global_Sum_Real(c_position)
- 41   call Comm_Mod_Global_Sum_Real(rise_velocity)
- 42
- 43   ! Write to file
- 44   if(First_Proc()) then
- 45     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
- 46
- 47     write(fu,'(4(2x,e16.10e2))') time,                   &
- 48                                  b_volume,               &
- 49                                  c_position/b_volume,    &
- 50                                  rise_velocity/b_volume
- 51     close(fu)
- 52   end if
- 53
- 54   end subroutine
+ 13   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
+ 14   integer                  :: n_stat_p  ! 1st t.s. statistics particles
+ 15 !-----------------------------------[Locals]-----------------------------------!
+ 16   type(Grid_Type), pointer :: Grid
+ 17   type(Var_Type),  pointer :: fun
+ 18   integer                  :: c, fu
+ 19   real                     :: b_volume, rise_velocity, c_position
+ 20 !==============================================================================!
+ 21
+ 22   ! Take aliases
+ 23   Grid => Flow % pnt_Grid
+ 24   fun  => Vof % fun
+ 25
+ 26   ! Integrate bubble volume, current position and rise velocity over cells
+ 27   b_volume      = 0.0
+ 28   c_position    = 0.0
+ 29   rise_velocity = 0.0
+ 30
+ 31   do c = Cells_In_Domain()
+ 32     b_volume      = b_volume + Grid % vol(c) * fun % n(c)
+ 33     c_position    = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
+ 34     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
+ 35   end do
+ 36
+ 37   call Global % Sum_Real(b_volume)
+ 38   call Global % Sum_Real(c_position)
+ 39   call Global % Sum_Real(rise_velocity)
+ 40
+ 41   ! Write to file
+ 42   if (First_Proc()) then
+ 43     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
+ 44
+ 45     write(fu,'(4(2x,e16.10e2))') Time % Get_Time(),      &
+ 46                                  b_volume,               &
+ 47                                  c_position/b_volume,    &
+ 48                                  rise_velocity/b_volume
+ 49     close(fu)
+ 50   end if
+ 51
+ 52   end subroutine
 ```
 Arguments in lines 9 - 11 have been described above, as well as local aliases
-in lines 18 and 19. Arguments which haven't beel explained before are the
+in lines 16 and 17. Arguments which haven't beel explained before are the
 staring time step for turbulent and particle statistics, ```n_stat_t``` and
-```n_stat_p``` in lines 14 and 15.  These are irrelevant for this case and not
+```n_stat_p``` in lines 13 and 14.  These are irrelevant for this case and not
 used.  Their importance and use is explained in sections describing LES and
 simulations of particle-laden flows.
 
-The function integrates bubble position, velocity and volume in lines 33 - 37.
+The function integrates bubble position, velocity and volume in lines 31 - 35.
 One thing worth emphasising here is that we are not browsing over _all_ cells,
-but rather restrict the loop in line 33 to cells inside the domain, which
-_do not_ include _buffer cells_:
+but rather restrict the loop in line 31 to cells inside the domain, which
+_do not_ include _buffer cells_.  We achieved that by using the macro
 ```
- 33   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
+      ...
+      ...
+    end do
 ```
-Buffer cells are passive cells added to each sub-domain for communication with
-other processsors and are illustrated here:
+which is a handy replacement for a lengthier and arguably less readable version:
+```
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+      ...
+      ...
+    end do
+```
+These two ways of browsing through cells are analogous and equally valid, though
+the code will probably be more robust and easier to mantain if the former (the
+version with the macro) is used.  In any case, the buffer cells are passive
+cells added to each sub-domain for communication with other processsors and are
+illustrated here:
 
 ![!](Documentation/Manual/Figures/bubble_buffers.png "")
 
@@ -5063,11 +5074,34 @@ to processor 1 and are active for that processor, meaning processor 1 is doing
 computations for them. Light blue, pink and red cells are activelly
 computed in processors 2 - 4 and processor 1 uses them only to properly
 compute gradients, fluxes through cell faces and matrix-vector products in
-its active cells.  If we integrated over these buffer cells, that is looping
-from ```1``` to ```Grid % n_cells```, buffer cells would be counted twice
-in lines 39 - 41, which perform global sums.
+its active cells.  If we integrated over these buffer cells, that is looping:
+```
+    do c = 1, Grid % n_cells
+      ...
+      ...
+    end do
+```
+or:
+```
+    do c = Cells_In_Domain_And_Buffers()
+      ...
+      ...
+    end do
+```
+with the macro, buffer cells would be counted twice in lines 37 - 39, which
+perform global sums.
 
-Anyway, lines 43 - 52 update file ```benchmark.dat``` with bubble position and
+Anyway, lines 43 - 49 update file ```benchmark.dat``` with bubble position and
+rise velocity at the end of each time step.  We use tool Grace to plot the
+results and compare them with benchmark solutions.
+
+## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
+
+
+, buffer cells would be counted twice
+in lines 37 - 39, which perform global sums.
+
+Anyway, lines 43 - 49 update file ```benchmark.dat``` with bubble position and
 rise velocity at the end of each time step.  We use tool Grace to plot the
 results and compare them with benchmark solutions.
 
