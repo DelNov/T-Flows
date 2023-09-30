@@ -113,7 +113,7 @@ ifeq ($(FORTRAN), intel)
   endif
   OPT_F_COMP = -module $(DIR_MODULE) -cpp
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP += -O0 -g -traceback
+    OPT_F_COMP += -O0 -g -traceback -check bounds
   else
     OPT_F_COMP += -O3
   endif
