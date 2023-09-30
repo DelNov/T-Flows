@@ -32,7 +32,7 @@
   last_pos = 0
   if(present(processor)) then
     if(processor > 0) then
-      rel_path = 'Sub-00000/'
+      rel_path = 'Sub/00000/'
       ldir = len_trim(rel_path)
       write(rel_path(ldir-5:ldir-1), '(i5.5)') processor
       sys_comm = 'mkdir -p ' // trim(rel_path)
