@@ -4692,7 +4692,7 @@ it comes to prescribing spherical bubbles, the quality of STL files generated
 by Blender, using its ico-sphere algorithm, is unsurpassed.  Check, for example
 how the included ```sphere.stl``` looks:
 
-<img src="Documentation/Manual/Figures/bubble_sphere.png" width="300"/>
+<img src="Documentation/Manual/Figures/bubble_sphere.png" width="256"/>
 
 The python script to create this ico-sphere in Blender is in the file
 ```sphere.py```. which is also included in this case's directroy for reader's
