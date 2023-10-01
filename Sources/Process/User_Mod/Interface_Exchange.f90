@@ -5,12 +5,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Interface_Type)        :: inter(MD, MD)
-  type(Field_Type),    target :: Flow(MD)
-  type(Turb_Type),     target :: Turb(MD)
-  type(Vof_Type),      target :: Vof(MD)
-  type(Swarm_Type),    target :: Swarm(MD)
-  integer, intent(in)         :: n_dom
+  type(Interface_Type)     :: inter(MD, MD)
+  type(Field_Type), target :: Flow(MD)
+  type(Turb_Type),  target :: Turb(MD)
+  type(Vof_Type),   target :: Vof(MD)
+  type(Swarm_Type), target :: Swarm(MD)
+  integer,      intent(in) :: n_dom
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...

@@ -5,8 +5,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  type(Vof_Type),    target :: Vof
+  type(Solver_Type), target :: Sol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow

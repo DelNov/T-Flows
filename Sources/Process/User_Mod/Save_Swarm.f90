@@ -10,7 +10,7 @@
   type(Turb_Type),  target  :: Turb
   type(Vof_Type),   target  :: Vof
   type(Swarm_Type), target  :: Swarm
-  integer,          optional :: domain
+  integer,         optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk

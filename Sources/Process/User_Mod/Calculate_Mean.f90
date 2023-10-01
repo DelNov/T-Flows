@@ -6,8 +6,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target  :: Turb
-  integer, intent(in)      :: n0
+  type(Turb_Type), target :: Turb
+  integer, intent(in)     :: n0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
