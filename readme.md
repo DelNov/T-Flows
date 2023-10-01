@@ -29,8 +29,9 @@
     1. [Inflows](#demo_inflows)
         1. [Flat velocity profile](#demo_inflows_flat)
         2. [Prescribed velocity profile](#demo_inflows_parabolic)
-        3. [Synthetic eddies](#demo_inflows_eddies)
-        4. [Turbulent precursor domain](#demo_inflows_turbulent)
+        3. [Through user functions](#demo_inflows_user_functions)
+        4. [Synthetic eddies](#demo_inflows_eddies)
+        5. [Turbulent precursor domain](#demo_inflows_turbulent)
     2. [Outflows](#demo_outflows)
 8. [PETSc solvers](#link_petsc)
     1. [Compiling PETSc](#link_petsc_compiling)
@@ -1883,7 +1884,7 @@ The source ```Beginning_Of_Simulation``` is, clearly enough, called at the
 beginning of simulation, and we wrote it in a way to read physical properties:
 ```
   1 !==============================================================================!
-  2   subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm, n, time)
+  2   subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm)
   3 !------------------------------------------------------------------------------!
   4 !   This function is called at the beginning of simulation.                    !
   5 !------------------------------------------------------------------------------!
@@ -1893,90 +1894,84 @@ beginning of simulation, and we wrote it in a way to read physical properties:
   9   type(Turb_Type),     target :: Turb
  10   type(Vof_Type),      target :: Vof
  11   type(Swarm_Type),    target :: Swarm
- 12   integer, intent(in)         :: n     ! time step
- 13   real,    intent(in)         :: time  ! physical time
- 14 !-----------------------------------[Locals]-----------------------------------!
- 15   type(Grid_Type), pointer :: Grid
- 16   integer                  :: i, fu
- 17 !==============================================================================!
- 18
- 19   ! Take aliases
- 20   Grid => Flow % pnt_grid
- 21
+ 12 !-----------------------------------[Locals]-----------------------------------!
+ 13   type(Grid_Type), pointer :: Grid
+ 14   integer                  :: i, fu
+ 15 !==============================================================================!
+ 16
+ 17   ! Take aliases
+ 18   Grid => Flow % pnt_grid
+ 19
+ 20   !----------------------------------------!
+ 21   !   Open file with physical properties   !
  22   !----------------------------------------!
- 23   !   Open file with physical properties   !
- 24   !----------------------------------------!
- 25   call File % Open_For_Reading_Ascii("air_properties_at_1_bar.dat", fu)
- 26
+ 23   call File % Open_For_Reading_Ascii("air_properties_at_1_bar.dat", fu)
+ 24
+ 25   !-----------------------------!
+ 26   !   Read all the properties   !
  27   !-----------------------------!
- 28   !   Read all the properties   !
- 29   !-----------------------------!
- 30   do i = 1, N_ITEMS
- 31     call File % Read_Line(fu)
- 32
- 33     ! Read desired properties
- 34     read(line % tokens(1), *) air_t(i)
- 35     read(line % tokens(2), *) air_rho(i)
- 36     read(line % tokens(3), *) air_mu(i)
- 37     read(line % tokens(5), *) air_cp(i)
- 38     read(line % tokens(6), *) air_lambda(i)
- 39
- 40     ! Fix units where needed (check the values in the table)
- 41     air_cp(i) = air_cp(i) * 1.0e3
- 42     air_mu(i) = air_mu(i) / 1.0e5
- 43   end do
+ 28   do i = 1, N_ITEMS
+ 29     call File % Read_Line(fu)
+ 30
+ 31     ! Read desired properties
+ 32     read(line % tokens(1), *) air_t(i)
+ 33     read(line % tokens(2), *) air_rho(i)
+ 34     read(line % tokens(3), *) air_mu(i)
+ 35     read(line % tokens(5), *) air_cp(i)
+ 36     read(line % tokens(6), *) air_lambda(i)
+ 37
+ 38     ! Fix units where needed (check the values in the table)
+ 39     air_cp(i) = air_cp(i) * 1.0e3
+ 40     air_mu(i) = air_mu(i) / 1.0e5
+ 41   end do
+ 42
+ 43   close(fu)
  44
- 45   close(fu)
- 46
- 47   if(First_Proc()) then
- 48     print '(a)',        ' #============================================'
- 49     print '(a)',        ' # Output from user function, read properties!'
- 50     print '(a)',        ' #--------------------------------------------'
- 51   end if
+ 45   if(First_Proc()) then
+ 46     print '(a)',        ' #============================================'
+ 47     print '(a)',        ' # Output from user function, read properties!'
+ 48     print '(a)',        ' #--------------------------------------------'
+ 49   end if
+ 50
+ 51   end subroutine
 ```
 
-This probalby needs some explanation.  As arguments to this function, _Process_
+This probably needs some explanations.  As arguments to this function, _Process_
 sends a number of its classes which are used to model different aspects of numerical
 simulation.  Class ```Field_Type``` holds velocities, temperatures and other variables
 describing a flow _field_.  Class ```Turb_Type``` holds variables describing the state
 of turbulence; turbulent kinetic energy (k), its dissipation (ε), individial
 Reynolds stresses for second moment closures or turbulent statistics.  Multiphase
 flows with interface tracking are described by class ```Vof_Type``` and Lagrangian
-particle tracking with ```Swarm_Type```.  In addition to these classes, _Process_
-also sends current time step (```n```) and physical time of simulation (```time```)
-
-> **_Note:_** It may sound counter-intuitive to send the last two variables to a
-procedure called at the beginning of simulation, but think of a restart.  This
-procedure is also called after a restart, but time step and time of simulation
-are not zero in such a case.
+particle tracking with ```Swarm_Type```.
 
 All the classes outlined above hold a pointer to a grid (```pnt_grid```) for which
 are they defined. The grid and its entities could be accessed as ```Flow % pnt_grid```,
 but we make sytnax shorter by introducing local pointer:
 ```
- 15   type(Grid_Type), pointer :: Grid
+ 13   type(Grid_Type), pointer :: Grid
 ```
 and assingning it a value:
 ```
- 20   Grid => Flow % pnt_grid
+ 18   Grid => Flow % pnt_grid
 ```
 
-Line 20 calls T-Flows's class ```File_Type``` member function
+Line 23 calls T-Flows's class ```File_Type``` member function
 ```Open_For_Reading_Ascii``` whose purpose is clear from the name.
 The function returns a handle to file it openned called ```fu```.
 
-From lines 30 to 43 we read the look-up table from the file, and store it into
-memory defined in ```Types.f90```.  Note that in lines 41 and 42 we convert
+From lines 28 to 41 we read the look-up table from the file, and store it into
+memory defined in ```Types.f90```.  Note that in lines 39 and 40 we convert
 units from the table to plain SI units for compatibility with T-Flows.
 While reading the files we use another procedure from ```File_Type``` called
 ```Read_Line``` which reads a line from ASCII file and splits it into individual
-tokens.  Tokens are stored in the fields ```line % token(:)```.
+tokens.  Tokens are stored in the fields ```Line % token(:)```.
 
 > **_Note:_** The procedure ```Read_Line``` not only tokenizes a line from
 input, it also skips all the lines beginning with ```#```, ```!``` and ```%```,
 considering such lines as comments.
 
-Finally, in the lines 47 to 51 we print a message that physical properties
+Finally, in the lines 45 to 49 we print a message that physical properties
 have been read.  Here we use the global function ```First_Proc()``` to make sure
 we print the message only from first processor in parallel runs.
 
@@ -1984,7 +1979,7 @@ Once the look-up table is properly read into memory, we can use it at the
 beginning of each time step with procedure ```Beginning_Of_Time_Step``` which reads:
 ```
   1 !==============================================================================!
-  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm, n, time)
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
   3 !------------------------------------------------------------------------------!
   4 !   This function is called at the beginning of time step.                     !
   5 !------------------------------------------------------------------------------!
@@ -1994,45 +1989,43 @@ beginning of each time step with procedure ```Beginning_Of_Time_Step``` which re
   9   type(Turb_Type),     target :: Turb
  10   type(Vof_Type),      target :: Vof
  11   type(Swarm_Type),    target :: Swarm
- 12   integer, intent(in)         :: n     ! time step
- 13   real,    intent(in)         :: time  ! physical time
- 14 !-----------------------------------[Locals]-----------------------------------!
- 15   type(Grid_Type), pointer :: Grid
- 16   type(Var_Type),  pointer :: u, v, w, t, phi
- 17   integer                  :: c, i
- 18   real                     :: wi, wip
- 19 !==============================================================================!
- 20
- 21   ! Take aliases
- 22   Grid => Flow % pnt_grid
- 23
+ 12 !-----------------------------------[Locals]-----------------------------------!
+ 13   type(Grid_Type), pointer :: Grid
+ 14   type(Var_Type),  pointer :: u, v, w, t, phi
+ 15   integer                  :: c, i
+ 16   real                     :: wi, wip
+ 17 !==============================================================================!
+ 18
+ 19   ! Take aliases
+ 20   Grid => Flow % pnt_grid
+ 21
+ 22   !------------------------------!
+ 23   !   Browse through all cells   !
  24   !------------------------------!
- 25   !   Browse through all cells   !
- 26   !------------------------------!
- 27   do c = -Grid % n_bnd_cells, Grid % n_cells
- 28
- 29     ! Browse through all table entries
- 30     do i = 1, N_ITEMS - 1
- 31
- 32       ! Did you find the right interval
- 33       if(Flow % t % n(c) >= air_t(i) .and.  &
- 34          Flow % t % n(c) <  air_t(i+1)) then
- 35
- 36         ! If so, calculate interpolation factors ...
- 37         wi  = (air_t(i+1) - Flow % t % n(c)) / (air_t(i+1) - air_t(i))
- 38         wip = 1.0 - wi
- 39
- 40         ! ... and interpolate physical properties
- 41         Flow % density(c)      = wi * air_rho   (i)  + wip * air_rho   (i+1)
- 42         Flow % viscosity(c)    = wi * air_mu    (i)  + wip * air_mu    (i+1)
- 43         Flow % conductivity(c) = wi * air_lambda(i)  + wip * air_lambda(i+1)
- 44         Flow % capacity(c)     = wi * air_cp    (i)  + wip * air_cp    (i+1)
- 45       end if
- 46
- 47     end do
- 48   end do
- 49
- 50   end subroutine
+ 25   do c = -Grid % n_bnd_cells, Grid % n_cells
+ 26
+ 27     ! Browse through all table entries
+ 28     do i = 1, N_ITEMS - 1
+ 29
+ 30       ! Did you find the right interval
+ 31       if(Flow % t % n(c) >= air_t(i) .and.  &
+ 32          Flow % t % n(c) <  air_t(i+1)) then
+ 33
+ 34         ! If so, calculate interpolation factors ...
+ 35         wi  = (air_t(i+1) - Flow % t % n(c)) / (air_t(i+1) - air_t(i))
+ 36         wip = 1.0 - wi
+ 37
+ 38         ! ... and interpolate physical properties
+ 39         Flow % density(c)      = wi * air_rho   (i)  + wip * air_rho   (i+1)
+ 40         Flow % viscosity(c)    = wi * air_mu    (i)  + wip * air_mu    (i+1)
+ 41         Flow % conductivity(c) = wi * air_lambda(i)  + wip * air_lambda(i+1)
+ 42         Flow % capacity(c)     = wi * air_cp    (i)  + wip * air_cp    (i+1)
+ 43       end if
+ 44
+ 45     end do
+ 46   end do
+ 47
+ 48   end subroutine
 ```
 Arguments are the same as in the call to previous procedure and don't need explanation.
 What is new here are the fields ```n_bnd_cells``` and ```n_cells``` from class
@@ -2041,10 +2034,10 @@ respectivelly.  As you can see from the beginning of the loop in line 27,
 boundary cells are stored with negative indices.
 
 Anyhow, for each of the cells in the grid, the entire look-up table is browsed
-through in lines 30 - 47, and for temperature in that cell (```Flow % t % n(c)```)
-the interval for interpolation is searched in lines 33 and 34.  Once found,
-the interpolation factors are calculated in lines 37 and 38, and physical
-properties interpolated in lines 41 - 44.
+through in lines 28 - 45, and for temperature in that cell (```Flow % t % n(c)```)
+the interval for interpolation is searched in lines 31 and 32.  Once found,
+the interpolation factors are calculated in lines 35 and 36, and physical
+properties interpolated in lines 39 - 42.
 
 The only novelty in the present ```control``` file is that we set the time step
 and the total number of time steps as:
@@ -2410,7 +2403,7 @@ dealt with.
 
 The information on prescribing inflows and outflows in T-Flows might end up
 somewhat scattereed over this manual, and we believe that a dedicated section
-is needed to outline all the option you have to prescribe them.  Like the section
+is needed to outline all the options you have to prescribe them.  Like the section
 [Demonstration cases](#demo_cases), what we present here is neither a benchmark,
 nor is it rigorously following best practices in fluid flow modeling, it is a
 mere demonstration of options you have to prescribe inflow and, to a lesser
@@ -2439,8 +2432,12 @@ go there and check the contensts.  It should read:
 ├── Option_2
 │   └── control
 ├── Option_3
+│   ├── control
+│   └── User_Mod
+│       └── End_Of_Time_Step.f90
+├── Option_4
 │   └── control
-└── Option_4
+└── Option_5
     ├── control
     ├── control.1
     ├── control.2
@@ -2478,8 +2475,8 @@ would recommend, you should also decompose the grid with:
 
 > **_Note:_**  Don't go overboard with number of processors as you will end up
 communicating between processors more than computing.  A useful rule of thumb
-is to have around a hundred thousand cells per processor.  This grid has approximatelly
-300'000 cells, so four is a reasonable choice.
+is to have around a hundred thousand cells per processor.  This grid has
+approximatelly 300'000 cells, so four is a reasonable choice.
 
 ### Flat velocity profile <a name="demo_inflows_flat"> </a>
 
@@ -2616,27 +2613,16 @@ desired bulk velocity is one, we can invoke _Parabolic_ with:
 ```
 ./Parabolic  0  4.1  1  31
 ```
-to get:
+to get (some lines are ommitted):
 ```
- #==================
- # Number of points
- #==================
-          31
- #=================================
- #   Coordinate      Velocity
- #=================================
+#    Number of points:
+    31
+#    Coordinate:     Velocity:
      0.00000E+00     0.00000E+00
      1.36667E-01     1.93333E-01
      2.73333E-01     3.73333E-01
-     4.10000E-01     5.40000E-01
-     5.46667E-01     6.93333E-01
-     6.83333E-01     8.33333E-01
-     8.20000E-01     9.60000E-01
-     9.56667E-01     1.07333E+00
-     1.09333E+00     1.17333E+00
-     1.23000E+00     1.26000E+00
-     1.36667E+00     1.33333E+00
-     1.50333E+00     1.39333E+00
+     ...
+     ...
      1.64000E+00     1.44000E+00
      1.77667E+00     1.47333E+00
      1.91333E+00     1.49333E+00
@@ -2644,15 +2630,8 @@ to get:
      2.18667E+00     1.49333E+00
      2.32333E+00     1.47333E+00
      2.46000E+00     1.44000E+00
-     2.59667E+00     1.39333E+00
-     2.73333E+00     1.33333E+00
-     2.87000E+00     1.26000E+00
-     3.00667E+00     1.17333E+00
-     3.14333E+00     1.07333E+00
-     3.28000E+00     9.60000E-01
-     3.41667E+00     8.33333E-01
-     3.55333E+00     6.93333E-01
-     3.69000E+00     5.40000E-01
+     ...
+     ...
      3.82667E+00     3.73333E-01
      3.96333E+00     1.93333E-01
      4.10000E+00     0.00000E+00
@@ -2696,6 +2675,157 @@ For both cases we computed roughly three flow through times and ```convective```
 outflow seems to be handling the eddies which are leaving the domain pretty
 well.
 
+### Through user functions <a name="demo_inflows_user_functions"> </a>
+
+Another possibility to prescribe an inlet profile would be through a proper
+user function.  For this particular case, we chose the ```Beginning_Of_Time_Step```,
+which was already introduced in section showing how to implement
+[variable physical properties](#demo_thermally_driven_variable), given here
+in full:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
+  3 !------------------------------------------------------------------------------!
+  4 !   This function is called at the beginning of time step.                     !
+  5 !------------------------------------------------------------------------------!
+  6   implicit none
+  7 !---------------------------------[Arguments]----------------------------------!
+  8   type(Field_Type), target :: Flow
+  9   type(Turb_Type),  target :: Turb
+ 10   type(Vof_Type),   target :: Vof
+ 11   type(Swarm_Type), target :: Swarm
+ 12 !------------------------------[Local parameters]------------------------------!
+ 13   real, parameter :: U_BULK = 1.0           ! bulk velocity
+ 14   real, parameter :: U_MAX  = 1.5 * U_BULK  ! max velocity
+ 15   real, parameter :: HALF_W = 2.05          ! half channel width
+ 16 !-----------------------------------[Locals]-----------------------------------!
+ 17   type(Grid_Type), pointer :: Grid
+ 18   type(Var_Type),  pointer :: u, v, w, t, phi
+ 19   integer                  :: reg, c2
+ 20   real                     :: y
+ 21 !==============================================================================!
+ 22
+ 23   ! Take aliases
+ 24   Grid => Flow % pnt_grid
+ 25   u    => Flow % u
+ 26
+ 27   do reg = Boundary_Regions()
+ 28     if(Grid % region % type(reg) .eq. INFLOW) then
+ 29       do c2 = Cells_In_Region(reg)
+ 30         y = Grid % yc(c2)
+ 31         u % n(c2) = U_MAX * (1.0 - ( (y-HALF_W)/HALF_W )**2)
+ 32       end do  ! through boundary cells of the region
+ 33     end if    ! if at inflow region
+ 34   end do      ! through all boundary regions
+ 35
+ 36   end subroutine
+```
+
+First 11 lines have already been described in the section describing the
+[variable physical properties](#demo_thermally_driven_variable), and don't
+need to be repeated here.  Lines 13 - 15 introduce parameters which define a
+parabolic inlet velocity profile, spanning over a channel with half-width of
+2.05, with bulk velocity equal to 1 [m/s].  Lines 24 and 25 take aliases to
+grid on which the simulation is performed and the variable ```u``` for velocity
+component in _x_ direction.  In line 27, we use macro ```Boundary_Regions()```
+which will, as its name implies, give the range of all boundary regions.  In
+line 28, we pick the region with type ```INFLOW```.
+
+> **_Note 1:_** The ```Boundary_Regions()``` macro is defined in
+```[root]/Sources/Shared/Browse.h90```, you are most than welcome to have a
+look at it.
+
+> **_Note 2:_** ```INFLOW``` is a constant in T-Flows, denoting boundary
+condition type.  It is defined in file ```[root]/Sources/Shared/Regions.f90```,
+together with other constants for describing boundary conditions.
+
+In line 29, we start browsing through boundary cells in region ```reg```,
+taking the _y_ coordinate in line 30 and prescribing the velocity in _x_
+direction at line 31.
+
+The control file for this case is in sub-directory ```Option_3```.  Like
+before, you should make a soft link to it with the command:
+```
+ln -i -s Option_3/control .
+```
+
+The control file for this case is exactly the same as for ```Option_1```, so
+nothing new is introduced with it.   The only thing worth saying might be that
+the values prescribed a the boundary conditions called ```IN``` will be
+over-written by the user function.
+
+With the control file is in the working directory (```[root]/Tests/Manual/Inflows/```)
+you can launch the simulation with:
+```
+mpirun -np 4 ./Process > out_03  &
+```
+
+Since the inlet profile is effectivelly the same as for ```Option_2```, results
+are the same and don't have to be shown again.
+
+#### Thing to try next
+
+You might be thinking why did we use the ```Beginning_Of_Time_Step``` to define
+boundary condition when we also have ```Beginning_Of_Simulation```, with
+exactly the same arguments.  Well, using the ```Beginning_Of_Time_Step```
+allows us to prescribe time-dependent inflow.  For example, if you wanted an
+inlet velocity which grows exponentially, you could have written the function
+like this:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
+  3 !------------------------------------------------------------------------------!
+  4 !   This function is called at the beginning of time step.                     !
+  5 !------------------------------------------------------------------------------!
+  6   implicit none
+  7 !---------------------------------[Arguments]----------------------------------!
+  8   type(Field_Type), target :: Flow
+  9   type(Turb_Type),  target :: Turb
+ 10   type(Vof_Type),   target :: Vof
+ 11   type(Swarm_Type), target :: Swarm
+ 12 !------------------------------[Local parameters]------------------------------!
+ 13   real, parameter :: U_BULK = 1.0           ! bulk velocity
+ 14   real, parameter :: U_MAX  = 1.5 * U_BULK  ! max velocity
+ 15   real, parameter :: HALF_W = 2.05          ! half channel width
+ 16   real, parameter :: TAU    = 1.0           ! characteristic time period
+ 17 !-----------------------------------[Locals]-----------------------------------!
+ 18   type(Grid_Type), pointer :: Grid
+ 19   type(Var_Type),  pointer :: u, v, w, t, phi
+ 20   integer                  :: reg, c2
+ 21   real                     :: y
+ 22 !==============================================================================!
+ 23
+ 24   ! Take aliases
+ 25   Grid => Flow % pnt_grid
+ 26   u    => Flow % u
+ 27
+ 28   do reg = Boundary_Regions()
+ 29     if(Grid % region % type(reg) .eq. INFLOW) then
+ 30       do c2 = Cells_In_Region(reg)
+ 31         y = Grid % yc(c2)
+ 32         u % n(c2) = U_MAX * (1.0 - ( (y-HALF_W)/HALF_W )**2)  &
+ 33                   * (1.0 - exp(-Time % Get_Time() / TAU))
+ 34       end do  ! through boundary cells of the region
+ 35     end if    ! if at inflow region
+ 36   end do      ! through all boundary regions
+ 37
+ 38   end subroutine
+```
+
+There are only two new lines in the _unsteady_ subroutine above. Line 16, in
+which a characteristic time scale is introduced, and line 33, which adds an
+exponential increase in velocity at the inlet.  The time in T-Flows is defined
+in the module ```Time_Mod```, defined in ```[root]/Sources/Process/Time_Mod.f90```,
+which creats a global, _singleton_ type of object called ```Time```, used
+above.  We believe that time is a global parameter and it is the same to all
+the fields which are considered, as well as their models.
+
+> **_Note:_** ```Time``` is not the only singleton type of object in T-Flows.
+There are other examples of objects which should be accessible everywhere, some
+examples are ```File``` (for manipulation with I/O and files), ```Global``` (for
+global MPI communication, ```Math``` (for global mathematical functions),
+```Sort``` (for sorting routines), to mention just a few.
+
 ### Synthetic eddies <a name="demo_inflows_eddies"> </a>
 
 As we said in [](#), we departed from the benchmark in increasing the Re
@@ -2706,11 +2836,11 @@ _Process_'s class ```Eddies_Mod``` which has the functionality to impose unstead
 eddies at the inflow.  The method is heavily based on the work from
 [Jarin et al.](https://www.sciencedirect.com/science/article/pii/S0142727X06000282)
 
-The control file for the case of synthetic eddies is in sub-directory ```Option_3```.
+The control file for the case of synthetic eddies is in sub-directory ```Option_4```.
 To use it, do the same as for previous cases, link the ```control``` file from
 that sub-directory to the current:
 ```
-ln -i -s Option_3/control .
+ln -i -s Option_4/control .
 ```
 
 The only difference in that control file, compared to the one given in
@@ -2740,7 +2870,7 @@ be superimposed over the flat velocity profile.
 Once the new control file is in the working directory (```[root]/Tests/Manual/Inflows/```)
 you can launch it with:
 ```
-mpirun -np 4 ./Process > out_03  &
+mpirun -np 4 ./Process > out_04  &
 ```
 
 After a minute of simulation time, results look like this:
@@ -2831,12 +2961,12 @@ As explained in [Conjugate heat transfer](#bench_conjugate), the way _Process_
 goes about simulating in multiple domains, is to have a control file for each
 of the domains called ```control.1```, ```control.2``` and so forth, and one
 central ```control``` file with information about coupling.  For this particular
-case, all control files are in sub-directory ```Option_4```.  To use them,
+case, all control files are in sub-directory ```Option_5```.  To use them,
 feel free to remove any existing control files currently residing in the
 working directory and make the links:
 ```
 rm -f control
-ln -i -s Option_4/control* .
+ln -i -s Option_5/control* .
 ```
 
 At this point it might be worth nothing that ```control.2``` is the same as
@@ -2897,7 +3027,7 @@ simulation are infinite, they are dealt with through a user function.  In
 [Conjugate heat transfer](#bench_conjugate) we used the one provided with
 _Process_ by default, which couples temperatures, as presumably the most basic
 case for coupled simulations.  For velocity coupling we need a special version
-which is in sub-directory ```Option_4/User_Mod/Interface_Exchange.f90```.
+which is in sub-directory ```Option_5/User_Mod/Interface_Exchange.f90```.
 It would take us too far to explain this function in detail, but let's just say
 that it works in two steps; in the first one it gathers information from all
 domains involved and stores them in a special buffer, and in the second step
@@ -3110,18 +3240,18 @@ figure introduced above.
 If all this seems a bit complicated to you, don't worry, this same function
 works for any turbulent channel flow, so you won't be modifying it a lot.
 
-Both of these function reside in sub-directory ```Option_4/User_Mod/```.  To
+Both of these function reside in sub-directory ```Option_5/User_Mod/```.  To
 use them, you will have to re-compile _Process_ by specifying the path to that
 directory.  More specifically, from ```[root]/Sources/Process/``` run the
 command:
 ```
 make clean
-make DIR_CASE=../../Tests/Manual/Inflows/Option_4/ MPI=yes
+make DIR_CASE=../../Tests/Manual/Inflows/Option_5/ MPI=yes
 ```
 and then go back to the case directory (```[root]/Tests/Manual/Inflows/```)
 and run:
 ```
-mpirun -np 4 ./Process > out_04 &
+mpirun -np 4 ./Process > out_05 &
 ```
 
 After a minute of simulation time, the results in the precursor and in the
