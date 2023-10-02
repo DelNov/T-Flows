@@ -10,8 +10,6 @@
   logical,          intent(inout) :: phi(n)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: error
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Global)
 !==============================================================================!
 
   call Mpi_Allreduce(MPI_IN_PLACE,    & ! indicate that send and recv are same
@@ -21,5 +19,12 @@
                      MPI_LOR,         & ! operation
                      MPI_COMM_WORLD,  &
                      error)
+
+  ! Although the barrier shouldn't be needed here, in some rare
+  ! cases (only some small grids with some number of processors,
+  ! with certain combinations of compiler/libraries and OS'), it
+  ! was a gurantess that all the processors have the correct data
+  ! It was introduced only in conjunction with MPI_IN_PLACE.
+  call Global % Wait()
 
   end subroutine

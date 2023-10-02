@@ -26,7 +26,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: sub, ms, mr, cnt, n_fail
+  integer              :: sub, ms, mr, cnt, n_fail, i, j
   integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, i_cel
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
@@ -79,9 +79,9 @@
     recv_cells(c) = sub
   end do
 
-  if(DEBUG) then
+  if(DEBUG) then  ! a)
     do sub=1, N_Procs()
-      if(sub .ne. This_Proc()) then
+      if(sub.ne.This_Proc() .and. recv_buff_cnt(This_Proc(), sub).gt.0) then
         write(100*This_Proc()+sub, *)                                          &
                                     '#====================================' // &
                                     '====================================='
@@ -92,7 +92,7 @@
                                     '#------------------------------------' // &
                                     '-------------------------------------'
         write(100*This_Proc()+sub, '(a,i7,a,i7)')                       &
-              ' #   It needs       ', recv_buff_cnt(This_Proc(), sub),  &
+              ' a)  It needs       ', recv_buff_cnt(This_Proc(), sub),  &
               ' cells from processors     ', sub
       end if
     end do
@@ -140,11 +140,32 @@
           send_buff_cnt(This_Proc(), sub) = send_buff_cnt(This_Proc(), sub) + 1
         end if
       end do
-      if(DEBUG) write(100*This_Proc() + sub, '(2(a,i7))')                &
-                      ' #   It should send ', send_buff_cnt(This_Proc(), sub),  &
-                      ' cells to processor        ', sub
+      if(DEBUG) then  ! b)
+        if(send_buff_cnt(This_Proc(), sub).gt.0) then
+          write(100*This_Proc() + sub, '(2(a,i7))')                           &
+                    ' b)  It should send ', send_buff_cnt(This_Proc(), sub),  &
+                    ' cells to processor        ', sub
+        end if
+      end if
     end if
   end do
+
+  Assert(send_buff_cnt(This_Proc(), This_Proc()) .eq. 0)
+
+  if(DEBUG) then
+    send_buff_cnt = reshape(send_buff_cnt, (/N_Procs()*N_Procs(), 1/))
+    recv_buff_cnt = reshape(recv_buff_cnt, (/N_Procs()*N_Procs(), 1/))
+    call Global % Sum_Int_Array(N_Procs()*N_Procs(), send_buff_cnt)
+    call Global % Sum_Int_Array(N_Procs()*N_Procs(), recv_buff_cnt)
+    send_buff_cnt = reshape(send_buff_cnt, (/N_Procs(),N_Procs()/))
+    recv_buff_cnt = reshape(recv_buff_cnt, (/N_Procs(),N_Procs()/))
+
+    do i = 1, N_Procs()
+      do j = 1, N_Procs()
+        Assert(send_buff_cnt(i,j) .eq. recv_buff_cnt(j,i))
+      end do
+    end do
+  end if
 
   !--------------------------------------------------!
   !   Allocate memory for send and receive buffers   !
@@ -206,9 +227,13 @@
 
         end if
       end do
-      if(DEBUG) write(100*This_Proc() + sub, '(2(a,i7))')    &
-                      ' #   It did find    ', cnt,    &
-                      ' cells to send to processor', sub
+      if(DEBUG) then  ! c)
+        if(send_buff_cnt(This_Proc(), sub).gt.0) then
+          write(100*This_Proc() + sub, '(2(a,i7))')    &
+                       ' c)  It did find    ', cnt,    &
+                       ' cells to send to processor', sub
+        end if
+      end if
 
       ! Browse through cells in domain to find what you have to send
       ms = 0
@@ -246,9 +271,12 @@
       !                             Grid % Comm % cells_recv(sub) % map)
       ! end if
 
-      if(DEBUG) then
-        write(100*This_Proc()+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
-              ' #   send/recv (', This_Proc(), '/', sub, ') =  ', ms, ' / ', mr
+      if(DEBUG) then  !  d)
+        if(recv_buff_cnt(This_Proc(), sub).gt.0 .and.  &
+           send_buff_cnt(This_Proc(), sub).gt.0) then
+          write(100*This_Proc()+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
+              ' d)  send/recv (', This_Proc(), '/', sub, ') =  ', ms, ' / ', mr
+        end if
       end if
 
       ! Store final buffer lengths
