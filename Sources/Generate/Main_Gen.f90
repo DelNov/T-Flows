@@ -80,24 +80,24 @@
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
-  call Grid % Save_Cfn(0,                   &
+  call Grid % Save_Cfn((/0, 0/),            &
                        Grid % n_nodes,      &
                        Grid % n_cells,      &
                        Grid % n_faces,      &
                        Grid % n_shadows,    &
                        Grid % n_bnd_cells)
-  call Grid % Save_Dim(0)
+  call Grid % Save_Dim((/0, 0/))
 
   !-----------------------------------------------------!
   !   Save Grid for visualisation and post-processing   !
   !-----------------------------------------------------!
 
   ! Create output in vtu format
-  call Grid % Save_Vtu_Cells(0,               &
+  call Grid % Save_Vtu_Cells((/0, 0/),        &
                              Grid % n_nodes,  &
                              Grid % n_cells)
-  call Grid % Save_Vtu_Faces()
-  call Grid % Save_Vtu_Faces(plot_shadows=.true.)
+  call Grid % Save_Vtu_Faces((/0, 0/))
+  call Grid % Save_Vtu_Faces((/0, 0/), plot_shadows=.true.)
 
   ! Create a template control file for this domain
   call Grid % Write_Template_Control_File()

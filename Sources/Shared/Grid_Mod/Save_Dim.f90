@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid
-  integer, intent(in) :: sub
+  integer, intent(in) :: sub(1:2)  ! sub (out of) n_subs
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: c, s, n, c1, c2, var, fu, i
   character(SL)     :: name_out

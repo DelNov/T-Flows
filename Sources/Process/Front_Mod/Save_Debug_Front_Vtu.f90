@@ -56,10 +56,10 @@
       ! Write out the names of all the pieces
       do n = 1, N_Procs()
         if(n_elems(n) > 0) then
-          call File % Set_Name(name_out,             &
-                               time_step=time_step,  &
-                               appendix='-front',    &
-                               processor=n,          &
+          call File % Set_Name(name_out,                    &
+                               time_step=time_step,         &
+                               appendix='-front',           &
+                               processor=(/n, N_Procs()/),  &
                                extension='.vtu')
           write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
         end if

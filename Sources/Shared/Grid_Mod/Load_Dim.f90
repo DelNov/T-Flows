@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Load_Dim(Grid, this_proc, domain)
+  subroutine Load_Dim(Grid, procs, domain)
 !------------------------------------------------------------------------------!
 !   Reads file with grid dimensions (.dim, used to be .geo)                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid
-  integer, intent(in) :: this_proc
+  integer, intent(in) :: procs(1:2)  ! this (proc) and n_procs
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: fu, real_prec, version
@@ -20,9 +20,11 @@
   !     Read the file with     !
   !   geometrical dimensions   !
   !----------------------------!
-  call File % Set_Name(name_in, processor=this_proc, extension='.dim',  &
-                       domain=domain)
-  call File % Open_For_Reading_Binary(name_in, fu, this_proc)
+  call File % Set_Name(name_in,             &
+                       processor = procs,   &
+                       extension = '.dim',  &
+                       domain    = domain)
+  call File % Open_For_Reading_Binary(name_in, fu)
 
   !----------------------------------------------!
   !   Store rank (domain number) for this grid   !

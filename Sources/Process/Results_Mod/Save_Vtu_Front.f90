@@ -307,7 +307,7 @@
   if(This_Proc() .eq. 1) then
     do n = 1, N_Procs()
       call File % Set_Name(name_out_9,                    &
-                           processor = n,                 &
+                           processor = (/n, N_Procs()/),  &
                            time_step = Time % Curr_Dt(),  &
                            appendix  = '-front',          &
                            extension = '.vtu',            &

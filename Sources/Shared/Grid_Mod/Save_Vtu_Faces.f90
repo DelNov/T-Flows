@@ -1,14 +1,15 @@
 !==============================================================================!
-  subroutine Save_Vtu_Faces(Grid, plot_shadows, real_phi_f, int_phi_f)
+  subroutine Save_Vtu_Faces(Grid, sub, plot_shadows, real_phi_f, int_phi_f)
 !------------------------------------------------------------------------------!
 !   Writes boundary condition .faces.vtu or shadow .shadow.vtu file.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)  :: Grid
-  logical, optional :: plot_shadows  ! plot shadow faces
-  real,    optional :: real_phi_f(1:Grid % n_faces)
-  integer, optional :: int_phi_f (1:Grid % n_faces)
+  class(Grid_Type)    :: Grid
+  integer, intent(in) :: sub(1:2)      ! sub (out of) n_subs
+  logical,   optional :: plot_shadows  ! plot shadow faces
+  real,      optional :: real_phi_f(1:Grid % n_faces)
+  integer,   optional :: int_phi_f (1:Grid % n_faces)
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)          :: data_size
   integer              :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns
@@ -63,8 +64,8 @@
   !------------------------!
   !   Open the .vtu file   !
   !------------------------!
-  call File % Set_Name(name_out,                 &
-                       processor = This_Proc(),  &
+  call File % Set_Name(name_out,         &
+                       processor = sub,  &
                        extension = trim(ext))
   call File % Open_For_Writing_Binary(name_out, fu)
 

@@ -11,7 +11,6 @@
 !==============================================================================!
 
   call File % Open_For_Reading_Ascii(file_name,                     &
-                                     Control % dom_file_unit(dom),  &
-                                     processor = This_Proc())
+                                     Control % dom_file_unit(dom))
 
   end subroutine

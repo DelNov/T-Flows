@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Subdomains(Divide, Grid, n_buff_layers)
+  subroutine Save_Subdomains(Divide, Grid, n_sub)
 !------------------------------------------------------------------------------!
 !   Number the cells in each subdomain for subsequent separate saving.         !
 !                                                                              !
@@ -19,7 +19,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Divide_Type)  :: Divide
   type(Grid_Type)     :: Grid
-  integer, intent(in) :: n_buff_layers  ! number of buffer layers, keep it here
+  integer, intent(in) :: n_sub  ! number of subdomains
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MARK = -1
 !-----------------------------------[Locals]-----------------------------------!
@@ -32,8 +32,16 @@
   integer :: nbc_sub     ! number of boundary cells in subdomain
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Divide)
-  Unused(n_buff_layers)
 !==============================================================================!
+
+  !---------------------------------!
+  !                                 !
+  !                                 !
+  !   Purge the Sub sub-directory   !
+  !                                 !
+  !                                 !
+  !---------------------------------!
+  call File % Purge_Sub()
 
   !-------------------------------!
   !                               !
@@ -106,29 +114,6 @@
             end if
           end if
         end do
-
-!exp:        ! Browse through deeper levels of buffers
-!exp:        do lev = 2, n_buff_layers
-!exp:
-!exp:          ! Mark nodes on this level ...
-!exp:          do c = 1, Grid % n_cells
-!exp:            if(Grid % new_c(c) .eq. MARK) then
-!exp:              do i_nod = 1, abs(Grid % cells_n_nodes(c))
-!exp:                Grid % new_n(Grid % cells_n(i_nod,c)) = MARK
-!exp:              end do
-!exp:            end if
-!exp:          end do
-!exp:
-!exp:          ! ... and then also the cells
-!exp:          do c = 1, Grid % n_cells
-!exp:            if(Grid % Comm % cell_proc(c) .eq. subo) then
-!exp:              n = abs(Grid % cells_n_nodes(c))
-!exp:              if( any(Grid % new_n(Grid % cells_n(1:n, c)) .eq. MARK) ) then
-!exp:                Grid % new_c(c) = MARK
-!exp:              end if
-!exp:            end if
-!exp:          end do
-!exp:        end do
 
         ! Renumber cells in buffer "subo"
         do c = 1, Grid % n_cells
@@ -364,18 +349,18 @@
     print '(a,i9,a)', ' # ', nbc_sub,           ' boundary cells'
     print '(a,i5,a)', ' #---------------------------------------------'
 
-    call Grid % Save_Cfn(sub,          &
-                         nn_sub,       &
-                         nc_sub,       &
-                         nf_sub,       &
-                         ns_sub,       &   ! number of shadow faces
-                         nbc_sub)
+    call Grid % Save_Cfn((/sub, n_sub/),  &
+                           nn_sub,        &
+                           nc_sub,        &
+                           nf_sub,        &
+                           ns_sub,        &   ! number of shadow faces
+                           nbc_sub)
 
-    call Grid % Save_Dim(sub)
+    call Grid % Save_Dim((/sub, n_sub/))
 
-    call Grid % Save_Vtu_Cells(sub,     &
-                               nn_sub,  &
-                               nc_sub)
+    call Grid % Save_Vtu_Cells((/sub, n_sub/),  &
+                                 nn_sub,        &
+                                 nc_sub)
 
   end do   ! through subdomains
 

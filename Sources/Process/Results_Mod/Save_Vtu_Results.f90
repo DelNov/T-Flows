@@ -1123,13 +1123,13 @@
     do n = 1, N_Procs()
       if(plot_inside) then
         call File % Set_Name(name_out_9,                    &
-                             processor = n,                 &
+                             processor = (/n, N_Procs()/),  &
                              time_step = Time % Curr_Dt(),  &
                              extension = '.vtu',            &
                              domain    = domain)
       else
         call File % Set_Name(name_out_9,                    &
-                             processor = n,                 &
+                             processor = (/n, N_Procs()/),  &
                              time_step = Time % Curr_Dt(),  &
                              appendix  = '-bnd',            &
                              extension = '.vtu',            &
