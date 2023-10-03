@@ -81,11 +81,11 @@
   !                            !
   !----------------------------!
 
-  call File % Set_Name(name_out,                 &
-                       processor = This_Proc(),  &
-                       time_step = time_step,    &
-                       appendix  = '-front',     &
-                       extension = '.vtu',       &
+  call File % Set_Name(name_out,                                &
+                       processor = (/This_Proc(), N_Procs()/),  &
+                       time_step = time_step,                   &
+                       appendix  = '-front',                    &
+                       extension = '.vtu',                      &
                        domain=Grid % rank)
   call File % Open_For_Writing_Ascii(name_out, fu)
 

@@ -31,11 +31,11 @@
                        appendix  = '-front',          &
                        extension = '.pvtu',           &
                        domain    = domain)
-  call File % Set_Name(name_out_9,                    &
-                       processor = This_Proc(),       &
-                       time_step = Time % Curr_Dt(),  &
-                       appendix  = '-front',          &
-                       extension = '.vtu',            &
+  call File % Set_Name(name_out_9,                              &
+                       processor = (/This_Proc(), N_Procs()/),  &
+                       time_step = Time % Curr_Dt(),            &
+                       appendix  = '-front',                    &
+                       extension = '.vtu',                      &
                        domain    = domain)
 
   if(This_Proc() .eq. 1) then
