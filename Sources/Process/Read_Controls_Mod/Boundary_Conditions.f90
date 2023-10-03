@@ -317,7 +317,7 @@
 
         call Control % Read_Strings_On('FILE', name_prof, nvs, .false.)
 
-        call File % Open_For_Reading_Ascii(name_prof(1), fu, This_Proc())
+        call File % Open_For_Reading_Ascii(name_prof(1), fu)
         call File % Read_Line(fu)
         read(Line % tokens(1),*) n_points  ! number of points
 

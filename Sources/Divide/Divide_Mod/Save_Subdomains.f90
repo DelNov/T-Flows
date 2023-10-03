@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Subdomains(Divide, Grid, n_buff_layers)
+  subroutine Save_Subdomains(Divide, Grid, n_sub)
 !------------------------------------------------------------------------------!
 !   Number the cells in each subdomain for subsequent separate saving.         !
 !                                                                              !
@@ -19,7 +19,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Divide_Type)  :: Divide
   type(Grid_Type)     :: Grid
-  integer, intent(in) :: n_buff_layers  ! number of buffer layers, keep it here
+  integer, intent(in) :: n_sub  ! number of subdomains
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MARK = -1
 !-----------------------------------[Locals]-----------------------------------!
@@ -32,7 +32,6 @@
   integer :: nbc_sub     ! number of boundary cells in subdomain
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Divide)
-  Unused(n_buff_layers)
 !==============================================================================!
 
   !-------------------------------!
@@ -364,18 +363,18 @@
     print '(a,i9,a)', ' # ', nbc_sub,           ' boundary cells'
     print '(a,i5,a)', ' #---------------------------------------------'
 
-    call Grid % Save_Cfn(sub,          &
-                         nn_sub,       &
-                         nc_sub,       &
-                         nf_sub,       &
-                         ns_sub,       &   ! number of shadow faces
-                         nbc_sub)
+    call Grid % Save_Cfn((/sub, n_sub/),  &
+                           nn_sub,        &
+                           nc_sub,        &
+                           nf_sub,        &
+                           ns_sub,        &   ! number of shadow faces
+                           nbc_sub)
 
-    call Grid % Save_Dim(sub)
+    call Grid % Save_Dim((/sub, n_sub/))
 
-    call Grid % Save_Vtu_Cells(sub,     &
-                               nn_sub,  &
-                               nc_sub)
+    call Grid % Save_Vtu_Cells((/sub, n_sub/),  &
+                                 nn_sub,        &
+                                 nc_sub)
 
   end do   ! through subdomains
 

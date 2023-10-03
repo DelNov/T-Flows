@@ -14,8 +14,8 @@
   class(File_Type)           :: File
   character(len=*)           :: name_out
   integer,          optional :: time_step
-  integer,          optional :: processor
-  character(len=*), optional :: appendix   ! used to add '-bnd' to name
+  integer,          optional :: processor(1:2)  ! proc (out of) n_procs
+  character(len=*), optional :: appendix        ! used to add '-bnd' to name
   character(len=*)           :: extension
   integer,          optional :: domain
 !-----------------------------------[Locals]-----------------------------------!
@@ -30,11 +30,30 @@
   !   Create directories for each processor   !
   !-------------------------------------------!
   last_pos = 0
-  if(present(processor)) then
-    if(processor > 0) then
-      rel_path = 'Sub/00000/'
-      ldir = len_trim(rel_path)
-      write(rel_path(ldir-5:ldir-1), '(i5.5)') processor
+  if (present(processor)) then
+    if (processor(1) > 0) then
+      if (processor(2) < 10) then
+        rel_path = 'Sub/0/'
+        ldir = len_trim(rel_path)
+        write(rel_path(ldir-1:ldir-1), '(i1)') processor(1)
+      else if (processor(2) < 100) then
+        rel_path = 'Sub/00/'
+        ldir = len_trim(rel_path)
+        write(rel_path(ldir-2:ldir-1), '(i2.2)') processor(1)
+      else if (processor(2) < 1000) then
+        rel_path = 'Sub/000/'
+        ldir = len_trim(rel_path)
+        write(rel_path(ldir-3:ldir-1), '(i3.3)') processor(1)
+      else if (processor(2) < 10000) then
+        rel_path = 'Sub/0000/'
+        ldir = len_trim(rel_path)
+        write(rel_path(ldir-4:ldir-1), '(i4.4)') processor(1)
+      else
+        rel_path = 'Sub/00000/'
+        ldir = len_trim(rel_path)
+        write(rel_path(ldir-5:ldir-1), '(i5.5)') processor(1)
+      end if
+
       sys_comm = 'mkdir -p ' // trim(rel_path)
       call system(trim(sys_comm))
       name_out = rel_path

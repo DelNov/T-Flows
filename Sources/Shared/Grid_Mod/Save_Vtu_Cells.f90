@@ -5,8 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid
-  integer          :: sub, n_nodes_sub, n_cells_sub
+  class(Grid_Type)    :: Grid
+  integer, intent(in) :: sub(1:2)  ! sub (out of) n_subs
+  integer, intent(in) :: n_nodes_sub, n_cells_sub
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)          :: data_size
   integer              :: c, s, i_fac, data_offset, cell_offset, fu, s1, s2
@@ -467,7 +468,8 @@
   !-----------------------!
 
   ! Create it only from subdomain 1, when decomposed
-  if(maxval(Grid % Comm % cell_proc(:)) > 1 .and. sub .eq. 1) then
+  Assert(maxval(Grid % Comm % cell_proc(:)) .eq. sub(2))
+  if(sub(2) > 1 .and. sub(1) .eq. 1) then
 
     call File % Set_Name(name_out, extension='.pvtu')
     call File % Open_For_Writing_Ascii(name_out, fu)
@@ -496,8 +498,8 @@
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
-    do n = 1, maxval(Grid % Comm % cell_proc(:))
-      call File % Set_Name(name_out, processor=n, extension='.vtu')
+    do n = 1, sub(2)
+      call File % Set_Name(name_out, processor=(/n, sub(2)/), extension='.vtu')
       write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do
 

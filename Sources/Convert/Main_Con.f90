@@ -85,7 +85,7 @@
 
     ! Read the single tree
     call Convert % Load_Obj(Grid(1), file_name)
-    call Grid(1) % Save_Vtu_Faces()
+    call Grid(1) % Save_Vtu_Faces((/0, 0/))
 
     print '(a)', ' #========================================================'
     print '(a)', ' # Enter STL forrest file name to plant trees (with ext.):'
@@ -94,7 +94,7 @@
 
     ! Read the forrest STL file and plant the trees
     call Convert % Load_Forrest(Grid, file_name)
-    call Grid(2) % Save_Vtu_Faces()
+    call Grid(2) % Save_Vtu_Faces((/0, 0/))
 
     ! Finalize program profler
     call Profiler % Stop('Main')
@@ -187,25 +187,25 @@
     !-------------------------------!
     !   Save files for processing   !
     !-------------------------------!
-    call Grid(g) % Save_Cfn(0,                      &
+    call Grid(g) % Save_Cfn((/0, 0/),               &
                             Grid(g) % n_nodes,      &
                             Grid(g) % n_cells,      &
                             Grid(g) % n_faces,      &
                             Grid(g) % n_shadows,    &
                             Grid(g) % n_bnd_cells)
 
-    call Grid(g) % Save_Dim(0)
+    call Grid(g) % Save_Dim((/0, 0/))
 
     !-----------------------------------------------------!
     !   Save grid for visualisation and post-processing   !
     !-----------------------------------------------------!
 
     ! Create output in vtu format
-    call Grid(g) % Save_Vtu_Cells(0,                  &
+    call Grid(g) % Save_Vtu_Cells((/0, 0/),           &
                                   Grid(g) % n_nodes,  &
                                   Grid(g) % n_cells)
-    call Grid(g) % Save_Vtu_Faces()
-    call Grid(g) % Save_Vtu_Faces(plot_shadows=.true.)
+    call Grid(g) % Save_Vtu_Faces((/0, 0/))
+    call Grid(g) % Save_Vtu_Faces((/0, 0/), plot_shadows=.true.)
 
     if( (g-n_grids) .eq. 0) then
       ! Create a template control file for this domain

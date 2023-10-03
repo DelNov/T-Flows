@@ -161,9 +161,9 @@
   !   Create .vtu file   !
   !                      !
   !----------------------!
-  call File % Set_Name(name_out,                       &
-                       appendix  = '-'//trim(append),  &
-                       processor = This_Proc(),        &
+  call File % Set_Name(name_out,                                &
+                       appendix  = '-'//trim(append),           &
+                       processor = (/This_Proc(), N_Procs()/),  &
                        extension = '.vtu')
   call File % Open_For_Writing_Binary(name_out, fu)
 
@@ -706,7 +706,7 @@
     ! Write out the names of all the pieces
     do n = 1, N_Procs()
       call File % Set_Name(name_out, appendix='-'//trim(append),  &
-                           processor=n, extension='.vtu')
+                           processor=(/n, N_Procs()/), extension='.vtu')
       write(fu, '(a,a,a,a)') IN_2, '<Piece Source="', trim(name_out), '"/>'
     end do
 

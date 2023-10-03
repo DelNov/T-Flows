@@ -1,21 +1,19 @@
 !==============================================================================!
-  subroutine Open_For_Writing_Ascii(File, name_o, file_unit)
+  subroutine Purge_Sub(File)
 !------------------------------------------------------------------------------!
-!   Opens file for writing in the first available unit.                        !
+!   Called from Divide only to purge the "Sub" directory structure             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
-  character(len=*) :: name_o
-  integer          :: file_unit
+  class(File_Type)           :: File
+!-----------------------------------[Locals]-----------------------------------!
+  character(SL) :: rel_path, sys_comm
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(File)
 !==============================================================================!
 
-  open(newunit = file_unit, file = trim(name_o), status = 'replace')
-
-  if(First_Proc()) then
-    print '(a)', ' # Creating the ASCII file: ' // trim(name_o)
-  end if
+  rel_path = 'Sub/'
+  sys_comm = 'rm -fR ' // trim(rel_path)
+  call system(trim(sys_comm))
 
   end subroutine

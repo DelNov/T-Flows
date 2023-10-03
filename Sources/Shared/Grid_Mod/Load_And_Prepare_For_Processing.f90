@@ -10,8 +10,8 @@
   call Control % Read_Problem_Name(problem_name(d))
 
   ! Load the finite volume Grid
-  call Grid % Load_Cfn(This_Proc(), domain=d)
-  call Grid % Load_Dim(This_Proc(), domain=d)
+  call Grid % Load_Cfn((/This_Proc(), N_Procs()/), domain=d)
+  call Grid % Load_Dim((/This_Proc(), N_Procs()/), domain=d)
 
   ! Determine threads for OpenMP runs
   call Control % Max_Threads(Grid % Vect % d_threads, .true.)

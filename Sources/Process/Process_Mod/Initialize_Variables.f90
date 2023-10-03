@@ -109,7 +109,7 @@
       if (First_Proc()) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
 
-      call File % Open_For_Reading_Ascii(keys_file(1), fu, This_Proc())
+      call File % Open_For_Reading_Ascii(keys_file(1), fu)
 
       ! Number of points
       call File % Read_Line(fu)

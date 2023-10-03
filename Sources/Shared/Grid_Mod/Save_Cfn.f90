@@ -12,7 +12,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid
-  integer, intent(in) :: sub, nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
+  integer, intent(in) :: sub(1:2)  ! sub (out of) n_subs
+  integer, intent(in) :: nn_sub, nc_sub, nf_sub, ns_sub, nbc_sub
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, n, i_nod, s, fu, c1, c2, ss, sr, max_n, i, j
   integer, allocatable :: faces_n(:), buffer(:)
@@ -142,8 +143,8 @@
 
       ! Check only if least one cell is in this processor
       ! (Meaning it is not a face entirelly in the buffer)
-      if(Grid % Comm % cell_proc(c1) .eq. sub .or.  &
-         Grid % Comm % cell_proc(c2) .eq. sub) then
+      if(Grid % Comm % cell_proc(c1) .eq. sub(1) .or.  &
+         Grid % Comm % cell_proc(c2) .eq. sub(1)) then
         if(Grid % new_c(c1) .eq. 0) then
           write(str,  '(i0.0)') Grid % old_f(s)
           write(str1, '(i0.0)') c1;  write(str2, '(i0.0)') c2;
@@ -344,8 +345,8 @@
 
       ! At least one cell is in this processor
       ! (Meaning it is not a face entirelly in the buffer)
-      if(Grid % Comm % cell_proc(c1) .eq. sub .or.  &
-         Grid % Comm % cell_proc(c2) .eq. sub) then
+      if(Grid % Comm % cell_proc(c1) .eq. sub(1) .or.  &
+         Grid % Comm % cell_proc(c2) .eq. sub(1)) then
         if(Grid % new_c(c2) < 0 .or. Grid % new_c(c1) < Grid % new_c(c2)) then
           i=i+1;  buffer(i) = Grid % new_c(c1)
           i=i+1;  buffer(i) = Grid % new_c(c2)

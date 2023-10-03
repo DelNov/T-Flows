@@ -25,8 +25,7 @@
                              one_proc = .true.)
   end if
 
-  call File % Open_For_Reading_Ascii(file_name, Control % root_file_unit,  &
-                                     processor=This_Proc())
+  call File % Open_For_Reading_Ascii(file_name, Control % root_file_unit)
 
   ! Make root default to begin with
   Control % file_unit = Control % root_file_unit

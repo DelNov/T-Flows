@@ -118,7 +118,8 @@
       c = Grid % faces_c(1, s)
       Vect % face_thread(s) = Vect % cell_thread(c)
     end do
-    call Grid % Save_Vtu_Faces(int_phi_f=Vect % face_thread)
+    call Grid % Save_Vtu_Faces((/This_Proc(), N_Procs()/),  &
+                               int_phi_f=Vect % face_thread)
 
     ! The problem with simple assignments above is that face threads
     ! are not continous, they break at buffer faces which are sorted

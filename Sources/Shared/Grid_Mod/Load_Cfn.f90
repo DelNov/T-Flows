@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Load_Cfn(Grid, this_proc, domain)
+  subroutine Load_Cfn(Grid, procs, domain)
 !------------------------------------------------------------------------------!
 !   Reads: .cfn file.                                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid
-  integer, intent(in) :: this_proc  ! needed if called from Processor
+  integer, intent(in) :: procs(1:2)  ! this and number of processors
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, s, n, ss, sr, fu, real_prec, version
@@ -21,11 +21,11 @@
   !     Read the file with the    !
   !   connections between cells   !
   !-------------------------------!
-  call File % Set_Name(name_in,              &
-                       processor=this_proc,  &
-                       extension='.cfn',     &
+  call File % Set_Name(name_in,           &
+                       processor=procs,   &
+                       extension='.cfn',  &
                        domain=domain)
-  call File % Open_For_Reading_Binary(name_in, fu, this_proc)
+  call File % Open_For_Reading_Binary(name_in, fu)
 
   !-------------------------!
   !   Read real precision   !
@@ -280,8 +280,8 @@
 
     ! Check only if least one cell is in this processor
     ! (Meaning it is not a face entirelly in the buffer)
-    if(Grid % Comm % cell_proc(c1) .eq. this_proc .or.  &
-       Grid % Comm % cell_proc(c2) .eq. this_proc) then
+    if(Grid % Comm % cell_proc(c1) .eq. procs(1) .or.  &
+       Grid % Comm % cell_proc(c2) .eq. procs(1)) then
       if( .not. (c1.eq.0 .and. c2.eq.0) ) then
         if(Grid % faces_c(1, s) .eq. 0) then
           write(str,  '(i0.0)') s
