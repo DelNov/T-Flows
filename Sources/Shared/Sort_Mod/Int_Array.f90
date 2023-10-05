@@ -1,7 +1,7 @@
 !==============================================================================!
   pure recursive subroutine Int_Array(Sort, a)
 !------------------------------------------------------------------------------!
-!   Quick sort one integer array and carry an integer arral along              !
+!   Quick sort one integer array.                                              !
 !                                                                              !
 !   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
 !------------------------------------------------------------------------------!
