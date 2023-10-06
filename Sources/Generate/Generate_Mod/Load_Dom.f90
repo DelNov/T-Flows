@@ -33,9 +33,9 @@
   !---------------------------------------------!
   Grid % polyhedral = .false.
 
-  print *, '#========================================'
-  print *, '# Input problem name: (without extension)'
-  print *, '#----------------------------------------'
+  print '(a)', ' #========================================'
+  print '(a)', ' # Input problem name: (without extension)'
+  print '(a)', ' #----------------------------------------'
   call File % Read_Line(5)
   read(Line % tokens(1), *) problem_name(1)
 
@@ -56,10 +56,10 @@
   !---------------------!
   !   Allocate memory   !
   !---------------------!
-  print '(a)', ' # Allocating memory for: '
-  print '(a)', ' #', Grid % max_n_nodes,     ' nodes and cells'
-  print '(a)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
-  print '(a)', ' #', Grid % max_n_faces,     ' cell faces'
+  print '(a)',    ' # Allocating memory for: '
+  print '(a,i7)', ' #', Grid % max_n_nodes,     ' nodes and cells'
+  print '(a,i7)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
+  print '(a,i7)', ' #', Grid % max_n_faces,     ' cell faces'
 
   allocate (Grid % region % at_cell(-Grid % max_n_bnd_cells-1:-1))
   Grid % region % at_cell = 0
