@@ -27,6 +27,11 @@
   else
   print *,'#                        Single precision mode'
   end if
+# if T_FLOWS_QUICKSORT == 1
+  print *,'#                  Compiled with recursive quicksort'
+# else
+  print *,'#                 Compiled with nonrecursive heapsort'
+# endif
   print *,'#-----------------------------------' // &
           '------------------------------------'
 
