@@ -13,7 +13,7 @@
   logical       :: file_exists
   logical       :: verb = .true.
   integer       :: f, l
-  character(SL) :: name_b, name_l   ! b for the base, l for the last name
+  character(SL) :: name_l   ! l for the last name
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(File)
 !==============================================================================!
