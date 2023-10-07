@@ -13,8 +13,16 @@ DEBUG   ?= no
 PROF    ?= no
 REAL    ?= double
 OMP     ?= yes
+SORT    ?= quick
 
-# Directories for objects and modules. (No need to change.)
+#-------------------------------------
+#   Check values passed to makefile
+#-------------------------------------
+include makefile_check_arguments
+
+#---------------------------------------------------------------
+#   Directories for objects and modules. (No need to change.)
+#---------------------------------------------------------------
 DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
@@ -50,6 +58,12 @@ else
   PASS_ON += -DT_FLOWS_DEBUG=0
 endif
 
+ifeq ($(SORT), quick)
+  PASS_ON += -DT_FLOWS_QUICKSORT=1
+else
+  PASS_ON += -DT_FLOWS_QUICKSORT=0
+endif
+
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
@@ -57,6 +71,7 @@ $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <PROF=no/yes> <REAL=double/single> <OMP=yes/no>                )
+$(info #        <SORT=quick/heap>                                              )
 $(info #                                                                       )
 $(info # Note: The first item, for each of the options above, is the default.  )
 $(info #                                                                       )
@@ -66,12 +81,13 @@ $(info #   make FORTRAN=intel - compile with intel compiler                    )
 $(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
 $(info #   make ASSERT=no     - compile without assert with gnu compiler       )
 $(info #   make OMP=yes       - compile with gnu compiler for parallel Convert )
+$(info #   make SORT=heap     - use heap-sort variant of sorting functions     )
 $(info #-----------------------------------------------------------------------)
 
 #----------------------------------------------------
 # Error trap for unknow options passed to makefile
 #----------------------------------------------------
-KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL OMP
+KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL OMP SORT
 COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
   $(if $(findstring command line,$(origin $(v))),$(v),))
 UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))

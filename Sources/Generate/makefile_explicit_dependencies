@@ -73,6 +73,7 @@ $(DIR_OBJECT)/Const_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Gen.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
@@ -148,6 +149,7 @@ $(DIR_SHARED)/Gen_Mod/*.f90
 $(DIR_OBJECT)/Sort_Mod.o:\
 $(DIR_OBJECT)/Swap_Mod.o \
 $(DIR_SHARED)/Swap_Mod/*.f90 \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 
@@ -218,6 +220,7 @@ $(DIR_SHARED)/Grid_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Probe_1d_Nodes.o:\
 $(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 \
@@ -283,6 +286,7 @@ $(DIR_SHARED)/Vtk_Mod/*.f90 \
 $(DIR_OBJECT)/Vect_Mod.o \
 $(DIR_SHARED)/Vect_Mod/*.f90 \
 $(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Region_Mod.o \
 $(DIR_OBJECT)/Profiler_Mod.o \
@@ -330,18 +334,6 @@ $(DIR_OBJECT)/Metis_Mod.o:\
 $(DIR_SHARED)/Metis_Mod/*.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Probe_2d.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Probe_2d.o:\
-$(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/Metis_Partgraphrecursive.h90 \
-$(DIR_SHARED)/Grid_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Tokenizer_Mod.f90

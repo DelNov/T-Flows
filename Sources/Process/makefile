@@ -14,8 +14,23 @@ PROF    ?= no
 REAL    ?= double
 MPI     ?= no
 OMP     ?= no
+SORT    ?= quick
 
-# Directories for objects and modules. (No need to change.)
+#-------------------------------------
+#   Check values passed to makefile
+#-------------------------------------
+include makefile_check_arguments
+
+# MPI
+ifneq ($(MPI), yes)
+  ifneq ($(MPI), no)
+    $(error Unknown value for MPI: $(MPI))
+  endif
+endif
+
+#---------------------------------------------------------------
+#   Directories for objects and modules. (No need to change.)
+#---------------------------------------------------------------
 DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
@@ -54,6 +69,12 @@ else
   PASS_ON += -DT_FLOWS_DEBUG=0
 endif
 
+ifeq ($(SORT), quick)
+  PASS_ON += -DT_FLOWS_QUICKSORT=1
+else
+  PASS_ON += -DT_FLOWS_QUICKSORT=0
+endif
+
 $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
@@ -61,7 +82,7 @@ $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <PROF=no/yes> <REAL=double/single> <MPI=no/yes> <OMP=no/yes>   )
-$(info #        <DIR_CASE=full_or_relative_path_to_case>                       )
+$(info #        <SORT=quick> <DIR_CASE=full_or_relative_path_to_case>          )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
@@ -75,6 +96,8 @@ $(info #   make                        - sequential version with gnu compiler  )
 $(info #   make MPI=yes                - MPI version with gnu compiler         )
 $(info #   make MPI=yes FCOMP=compiler - MPI version with custom compiler      )
 $(info #   make FORTRAN=intel MPI=yes  - MPI version with intel compiler       )
+$(info #   make MPI=yes SORT=heap      - MPI version with gnu compiler and     )
+$(info #                               - heap-sort version of sorting          )
 ifneq ($(PETSC_DIR),)
 $(info #                                                                       )
 $(info # Warning:                                                              )
@@ -88,7 +111,7 @@ $(info #-----------------------------------------------------------------------)
 #----------------------------------------------------
 # Error trap for unknow options passed to makefile
 #----------------------------------------------------
-KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL MPI OMP DIR_CASE
+KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL MPI OMP DIR_CASE SORT
 COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
   $(if $(findstring command line,$(origin $(v))),$(v),))
 UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))
