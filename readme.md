@@ -5063,18 +5063,10 @@ or:
 with the macro, buffer cells would be counted twice in lines 37 - 39, which
 perform global sums.
 
-Anyway, lines 43 - 49 update file ```benchmark.dat``` with bubble position and
-rise velocity at the end of each time step.  We use tool Grace to plot the
-results and compare them with benchmark solutions.
+To leave the buffer cells aside and come back to the user function;
+lines 43 - 49 update file ```benchmark.dat``` with bubble position and rise
+velocity at the end of each time step.  We use tool Grace to plot the results
+and compare them with benchmark solutions.
 
 ## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
 
-
-, buffer cells would be counted twice
-in lines 37 - 39, which perform global sums.
-
-Anyway, lines 43 - 49 update file ```benchmark.dat``` with bubble position and
-rise velocity at the end of each time step.  We use tool Grace to plot the
-results and compare them with benchmark solutions.
-
-## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
