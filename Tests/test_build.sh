@@ -10,7 +10,7 @@
 #-----------------------
 # Exit when any command
 #-----------------------
-set -e
+# set -e
 
 #-------------------------------
 # Trap where the error occurred
@@ -31,6 +31,7 @@ set -e
 FORTRAN="gnu"
 FCOMP=""
 DEBUG="no"
+SORT="heap"
 
 # Intel compiler (python is messed up with Intel, don't plot for now)
 # FORTRAN="intel"
@@ -406,20 +407,24 @@ function parallel_compile {
   git checkout User_Mod/*.f90 >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2"
-    make \
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG  \
+               SORT=$SORT MPI=$2"
+    make               \
       FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
+      FCOMP=$FCOMP     \
+      DEBUG=$DEBUG     \
+      SORT=$SORT       \
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2 DIR_CASE=$3"
-    make \
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG  \
+               SORT=$SORT MPI=$2 DIR_CASE=$3"
+    make               \
       FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      MPI=$2 \
+      FCOMP=$FCOMP     \
+      DEBUG=$DEBUG     \
+      SORT=$SORT       \
+      MPI=$2           \
       DIR_CASE=$3 >> $FULL_LOG 2>&1
     success=$?
   fi
@@ -450,10 +455,11 @@ function sequential_compile {
   elog "Clean compile in:" "$1"
   make clean >> $FULL_LOG 2>&1
 
-  elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG MPI=$2"
-  make \
+  elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG SORT=$SORT"
+  make               \
     FORTRAN=$FORTRAN \
-    FCOMP=$FCOMP \
+    FCOMP=$FCOMP     \
+    SORT=$SORT       \
     DEBUG=$DEBUG >> $FULL_LOG 2>&1
   success=$?
 
