@@ -403,8 +403,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
 " Constants from Solver_Mod and other related modules
   syn keyword fortranConstant      NATIVE  PETSC  PETSC_ACTIVE  OUT_OF_ITS
-" Constants from various procedures
-  syn keyword fortranConstant      YES  NO  DEBUG  BEGIN
+" Constants from various procedures and modules
+  syn keyword fortranConstant      YES  NO  DEBUG  BEGIN  DEFAULT_TOLERANCE
 " Constants from File_Mod
   syn keyword fortranConstant      BUFFER_SIZE  MAX_ITEMS
 " Constant from Grid_Mod
