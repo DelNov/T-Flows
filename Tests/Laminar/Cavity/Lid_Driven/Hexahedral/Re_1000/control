@@ -29,6 +29,7 @@
   DYNAMIC_VISCOSITY      0.001
   HEAT_CAPACITY          1.0
 
+  TURBULENCE_MODEL            none
   PRESSURE_MOMENTUM_COUPLING  simple
 
 #----------------------
@@ -48,8 +49,8 @@
 #------------------------
   PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
   TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
-  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-3
-  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-4
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
 #--------------------
 # Initial conditions
@@ -70,4 +71,3 @@
     TYPE                inflow
     VARIABLES           u     v     w
     VALUES              1.0   0.0   0.0
-:q1:q!
