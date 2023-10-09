@@ -24,7 +24,12 @@ include makefile_check_arguments
 # MPI
 ifneq ($(MPI), yes)
   ifneq ($(MPI), no)
-    $(error Unknown value for MPI: $(MPI))
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for MPI are "yes" or "no" and they are        )
+    $(info #   case sensitive.  You used the "$(MPI)", which is unknown.     )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
   endif
 endif
 
