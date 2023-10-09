@@ -16,13 +16,13 @@
 
   n = size(a1, 1)
 
-  if (n < 2) return
+  if(n < 2) return
 
   l = n / 2 + 1
   ir = n
 
   do
-    if (l > 1) then
+    if(l > 1) then
       l = l - 1
       a_1 = a1(l)
       a_2 = a2(l)
@@ -46,7 +46,7 @@
     i = l
     j = 2 * l
 
-    do while (j <= ir)
+    do while(j <= ir)
       if(j < ir) then
         if(                                              a1(j) < a1(j+1) .or.  &
            a1(j) == a1(j+1) .and.                        a2(j) < a2(j+1) .or.  &

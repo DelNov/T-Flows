@@ -50,13 +50,15 @@
 
     do while(j <= ir)
       if(j < ir) then
-        if(                             a1(j) < a1(j+1) .or.  &
-           Approx(a1(j), a1(j+1)) .and. a2(j) < a2(j+1)) then
+        if( Math % Smaller_Real(a1(j), a1(j+1)) .or.   &
+            Math % Approx_Real (a1(j), a1(j+1)) .and.  &
+            Math % Smaller_Real(a2(j), a2(j+1)) ) then
           j = j + 1
         end if
       end if
-      if(                         a_1 < a1(j) .or.  &
-         Approx(a_1, a1(j)) .and. a_2 < a2(j)) then
+      if( Math % Smaller_Real(a_1, a1(j)) .or.   &
+          Math % Approx_Real (a_1, a1(j)) .and.  &
+          Math % Smaller_Real(a_2, a2(j)) ) then
         a1(i) = a1(j)
         a2(i) = a2(j)
         b (i) = b (j)

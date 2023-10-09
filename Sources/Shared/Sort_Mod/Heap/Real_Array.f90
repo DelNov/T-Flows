@@ -40,11 +40,11 @@
 
     do while(j <= ir)
       if(j < ir) then
-        if(a1(j) < a1(j+1)) then
+        if( Math % Smaller_Real(a1(j), a1(j+1)) ) then
           j = j + 1
         end if
       end if
-      if(a_1 < a1(j)) then
+      if( Math % Smaller_Real(a_1, a1(j)) ) then
         a1(i) = a1(j)
         i = j
         j = 2 * j
