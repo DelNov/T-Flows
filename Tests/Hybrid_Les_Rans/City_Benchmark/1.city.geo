@@ -20,33 +20,37 @@ ANGLE_DEG =   0.0;
 N_LAYERS     = 70;
 N_SKY_LAYERS = 35;
 
+// Building characteristic dimension and the pitch between them
+A = 50.0;
+P = 30.0;
+
 // Height of the volume
-SKY_HIGH    = 10.0;      // max height of the domain
-URBAN_HIGH  =  3.5;      // height 0.5 above the buildings
+SKY_HIGH    = 500.0;      // max height of the domain
+URBAN_HIGH  = 175.0;      // height 25.0 above the buildings
 
 DELTA_H_MIN = URBAN_HIGH / N_LAYERS;
 L_TARGET    = SKY_HIGH - URBAN_HIGH;
 
 // Coordinates of the problem domain (the whole piece of simulated land)
-GROUND_X_MIN = -10.0;
-GROUND_X_MAX =  30.0;
-GROUND_Y_MIN = -10.0;
-GROUND_Y_MAX =  10.0;
+GROUND_X_MIN =  -500.0;
+GROUND_X_MAX =  1500.0;
+GROUND_Y_MIN =  -500.0;
+GROUND_Y_MAX =   500.0;
 
 // Coordinates of the city (where buildings will reside)
-CITY_X_MIN = -5.5;
-CITY_X_MAX = 14.5;
-CITY_Y_MIN = -5.0;
-CITY_Y_MAX =  5.0;
+CITY_X_MIN = -275.0;
+CITY_X_MAX =  725.0;
+CITY_Y_MIN = -250.0;
+CITY_Y_MAX =  250.0;
 
 // Resolutions in the city (min) and country side (max)
-DELTA_MIN      = 0.2;
-DELTA_MAX      = 0.5;
-DELTA_BUILDING = 0.2;
+DELTA_MIN      = 10.0;
+DELTA_MAX      = 25.0;
+DELTA_BUILDING = 10.0;
 
 // Transition between fine and coarse mesh, ...
 // ... between city and the rest of the domain
-CITY_LIMIT_WIDTH = 0.8;
+CITY_LIMIT_WIDTH = 40.0;
 
 //------------------------------------------------------------------------------
 //

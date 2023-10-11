@@ -8,7 +8,7 @@ ground.stl
 no
 
 # Geometric scaling (this will give meters)
-0.05
+0.001
 
 # Position the boundary cell centres:
 # Type 1 for barycentric placement
@@ -19,7 +19,8 @@ no
 skip
 
 # Calculating distance from the walls
-1 2
+# 1 2
+skip
 
 # Insert non-homogeneous direction 
 skip
