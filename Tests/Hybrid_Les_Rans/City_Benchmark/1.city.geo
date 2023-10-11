@@ -60,8 +60,8 @@ BASE_LOOP_START     = GROUND_LOOP + 500;  // buildings' base definitions
 GROUND_SURF         = 100;                // ground surface number
 MAX_BUILDING_HEIGHT = 300;
 MAXN                =   8;                // max nodes per building
-TINY                =   1.0e-3;
-HUGE                =   1.0e+3;
+TINY                =   1.0e-9;
+HUGE                =   1.0e+9;
 ANGLE_RAD           = ANGLE_DEG * Pi / 180.0;
 
 //------------------------------------------------------------------------------
@@ -275,9 +275,9 @@ For h In { 0 : MAX_BUILDING_HEIGHT }  // browse through all heights
     If(height_b(b) == h)  // found a building with matching height
       If(exists == 0)     // is it the first building at this height
         exists = 1;       // not any more
-        Physical Surface(Sprintf("building_%03g", h)) = {GROUND_SURF + b};
+        Physical Surface(Sprintf("building_%03g_%03g",h,b)) = {GROUND_SURF+b};
       Else                // not the first building at this height, append
-        Physical Surface(Sprintf("building_%03g", h)) += {GROUND_SURF + b};
+        Physical Surface(Sprintf("building_%03g_%03g",h,b)) += {GROUND_SURF+b};
       EndIf
     EndIf
 
