@@ -119,6 +119,9 @@
     logical           :: rough_walls
     real, allocatable :: z_o(:)
 
+    ! Monin-Obukov Similarity Theory for ABL 
+    logical           :: monin_obukov
+
     ! Various cell sizes for Spalart-Allmaras and DES models
     real, allocatable :: h_max(:)
     real, allocatable :: h_min(:)
@@ -209,6 +212,8 @@
       procedure :: U_Plus_Log_Law
       procedure :: Time_And_Length_Scale
       procedure :: Roughness_Coeff
+      procedure :: Monin_Obukov_Mom
+      procedure :: Monin_Obukov_Th
 
       procedure :: Les
 
@@ -351,6 +356,8 @@
 #   include "Turb_Mod/U_Plus_Log_Law.f90"
 #   include "Turb_Mod/Time_And_Length_Scale.f90"
 #   include "Turb_Mod/Roughness_Coeff.f90"
+#   include "Turb_Mod/Monin_Obukov_Mom.f90"
+#   include "Turb_Mod/Monin_Obukov_Th.f90"
 
 #   include "Turb_Mod/Les.f90"
 
