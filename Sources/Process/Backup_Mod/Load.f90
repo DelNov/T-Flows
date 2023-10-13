@@ -255,9 +255,7 @@
   !--------------!
   !   Roughness  !
   !--------------!
-  if(Turb % rough_walls) then
-    call Backup % Load_Cell_Real(Grid, d, vc, 'z_o', Turb % z_o)
-  end if
+  call Backup % Load_Cell_Real(Grid, d, vc, 'z_o', Turb % z_o)
 
   !------------------!
   !   Load scalars   !
