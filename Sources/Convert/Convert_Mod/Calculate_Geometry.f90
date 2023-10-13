@@ -156,8 +156,12 @@
   end if
 
   ! Check homogeneity of the grid and ask if you want it uniform
-  if(g.eq.1) call Grid % Search_Coordinate_Clusters(enforce_uniform=.false.)
-  if(g.eq.2) call Grid % Search_Coordinate_Clusters(enforce_uniform=.true.)
+  if(g.eq.1)                                                          &
+    call Grid % Search_Coordinate_Clusters(nodal           = .true.,  &
+                                           enforce_uniform = .false.)
+  if(g.eq.2)                                                          &
+    call Grid % Search_Coordinate_Clusters(nodal           = .true.,  &
+                                           enforce_uniform = .true.)
 
   !-----------------------------------------!
   !   Calculate the cell centers            !

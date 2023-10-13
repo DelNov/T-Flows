@@ -104,7 +104,8 @@
 
   ! Check homogeneity of the grid in three coordinate directions
   ! Here, in generator, there is no sense to enforce uniformity
-  call Grid % Search_Coordinate_Clusters(enforce_uniform=.false.)
+  call Grid % Search_Coordinate_Clusters(nodal           = .true.,   &
+                                         enforce_uniform = .false.)
 
   ! Save the 1d probe (good for the channel flow)
   call Probe_1d_Nodes(Grid)

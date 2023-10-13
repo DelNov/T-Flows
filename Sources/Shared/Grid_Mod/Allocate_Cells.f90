@@ -56,6 +56,9 @@
   !  non-polyhedral meshes creted in Gambit/Gmsh)
   allocate(Grid % cells_bnd_region(6, -nb:nc))
 
+  ! Allocate cell-based porous regions
+  allocate(Grid % por(-nb:nc));  Grid % por(:) = 0
+
   ! Allocate processor i.d.
   allocate(Grid % Comm % cell_proc(-nb:nc));  Grid % Comm % cell_proc(:) = 0
   allocate(Grid % Comm % cell_glo (-nb:nc))

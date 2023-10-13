@@ -45,7 +45,6 @@
       procedure :: N_Sharp_Corners
       procedure :: N_Sharp_Edges
       procedure :: Sort_Face_Nodes
-      procedure :: Triangle_Area_Z
   end type
 
   ! Singleton Convert object
@@ -177,6 +176,5 @@
 #   include "Convert_Mod/N_Sharp_Corners.f90"
 #   include "Convert_Mod/N_Sharp_Edges.f90"
 #   include "Convert_Mod/Sort_Face_Nodes.f90"
-#   include "Convert_Mod/Triangle_Area_Z.f90"
 
   end module

@@ -1,14 +1,15 @@
 !==============================================================================!
   subroutine Sort_Cells_By_Coordinates(Grid)
 !------------------------------------------------------------------------------!
-!   Sorts cells by their geometrical positions.                                !
+!   Sorts cells by their geometrical positions.  Called from main functions    !
+!   in Generate and Convert, just after calculating geometrical quantities     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type), intent(inout) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: s, c, c1, c2, n
-  integer              :: mcc, mcn, mcf
+  integer              :: s, c, c1, c2, n, nc
+  integer              :: mcc, mcn, mcf, mcb
   integer              :: max_diff_1, max_diff_2, c1_s1, c2_s1, c1_s2, c2_s2
   integer, allocatable :: old_nn   (:)       ! old number of nodes (per cell)
   integer, allocatable :: old_nodes(:,:)     ! old nodes list per cell
@@ -16,12 +17,29 @@
   integer, allocatable :: old_nf   (:)       ! old number of faces (per cell)
   integer, allocatable :: old_faces(:,:)     ! old faces list per cell
   integer, allocatable :: old_cells(:,:)     ! old cells list per cell
-  real,    allocatable :: xc(:), yc(:), zc(:)
+  integer, allocatable :: old_b_reg(:,:)     ! old cells boundary regions
 !==============================================================================!
 
-  mcc = size(Grid % cells_c, 1)
-  mcn = size(Grid % cells_n, 1)
-  mcf = size(Grid % cells_f, 1)
+  Assert(PROGRAM_NAME .eq. 'Generate' .or. PROGRAM_NAME .eq. 'Convert')
+
+  if(Math % Approx_Real(maxval(Grid % xc(:)), 0.0) .and.  &
+     Math % Approx_Real(maxval(Grid % yc(:)), 0.0) .and.  &
+     Math % Approx_Real(maxval(Grid % zc(:)), 0.0) .and.  &
+     Math % Approx_Real(minval(Grid % xc(:)), 0.0) .and.  &
+     Math % Approx_Real(minval(Grid % yc(:)), 0.0) .and.  &
+     Math % Approx_Real(minval(Grid % zc(:)), 0.0)) then
+    call Message % Error(80,                                                  &
+            'You called the function Grid % Sort_Cells_By_Coordinates   ' //  &
+            'before the cell coordinates have been calculated.  The     ' //  &
+            'code can''t continue like this. \n Something is wrong with ' //  &
+            'the logic of the algorithm, you better re-assess it.',           &
+            file=__FILE__, line=__LINE__)
+  end if
+
+  mcc = size(Grid % cells_c,          1)
+  mcn = size(Grid % cells_n,          1)
+  mcf = size(Grid % cells_f,          1)
+  mcb = size(Grid % cells_bnd_region, 1)
 
   allocate(old_nn        (Grid % n_cells));  old_nn   (:)   = 0
   allocate(old_nodes(mcn, Grid % n_cells));  old_nodes(:,:) = 0
@@ -29,38 +47,34 @@
   allocate(old_cells(mcc ,Grid % n_cells));  old_cells(:,:) = 0
   allocate(old_nf        (Grid % n_cells));  old_nf   (:)   = 0
   allocate(old_faces(mcf, Grid % n_cells));  old_faces(:,:) = 0
-  allocate(xc            (Grid % n_cells));  xc       (:)   = 0.0
-  allocate(yc            (Grid % n_cells));  yc       (:)   = 0.0
-  allocate(zc            (Grid % n_cells));  zc       (:)   = 0.0
+  allocate(old_b_reg(mcb, Grid % n_cells));  old_b_reg(:,:) = 0
 
   !------------------------!
   !   Store cells' nodes   !
   !------------------------!
   do c = 1, Grid % n_cells
-    old_nn   (c)        = Grid % cells_n_nodes(c)
-    old_nodes(1:mcn, c) = Grid % cells_n(1:mcn, c)
-    old_nf   (c)        = Grid % cells_n_faces(c)
-    old_faces(1:mcf, c) = Grid % cells_f(1:mcf, c)
-    old_nc   (c)        = Grid % cells_n_cells(c)
-    old_cells(1:mcc, c) = Grid % cells_c(1:mcc, c)
+    old_nn   (c)        = Grid % cells_n_nodes          (c)
+    old_nodes(1:mcn, c) = Grid % cells_n         (1:mcn, c)
+    old_nf   (c)        = Grid % cells_n_faces          (c)
+    old_faces(1:mcf, c) = Grid % cells_f         (1:mcf, c)
+    old_nc   (c)        = Grid % cells_n_cells          (c)
+    old_cells(1:mcc, c) = Grid % cells_c         (1:mcc, c)
+    old_b_reg(1:mcb, c) = Grid % cells_bnd_region(1:mcb, c)
   end do
 
-  !--------------------------!
-  !   Set sorting criteria   !
-  !--------------------------!
+  !----------------------------!
+  !   Store old cell numbers   !
+  !----------------------------!
   do c = 1, Grid % n_cells
-    xc(c) = Grid % xc(c)
-    yc(c) = Grid % yc(c)
-    zc(c) = Grid % zc(c)
     Grid % old_c(c) = c
   end do
 
   !--------------------------------------------------!
   !   Sort new numbers according to three criteria   !
   !--------------------------------------------------!
-  call Sort % Three_Real_Carry_Int(xc(1:Grid % n_cells),  &
-                                   yc(1:Grid % n_cells),  &
-                                   zc(1:Grid % n_cells),  &
+  call Sort % Three_Real_Carry_Int(Grid % xc(1:Grid % n_cells),  &
+                                   Grid % yc(1:Grid % n_cells),  &
+                                   Grid % zc(1:Grid % n_cells),  &
                                    Grid % old_c(1:Grid % n_cells))
   ! This is a bit of a bluff
   do c = 1, Grid % n_cells
@@ -103,23 +117,24 @@
   !   Do the sorting of data pertinent to cells   !
   !-----------------------------------------------!
   do c = 1, Grid % n_cells
-    Grid % cells_n_nodes(Grid % new_c(c)) = old_nn          (c)
-    Grid % cells_n(1:mcn,Grid % new_c(c)) = old_nodes(1:mcn, c)
-    Grid % cells_n_faces(Grid % new_c(c)) = old_nf          (c)
-    Grid % cells_f(1:mcf,Grid % new_c(c)) = old_faces(1:mcf, c)
-    Grid % cells_n_cells(Grid % new_c(c)) = old_nc          (c)
-    Grid % cells_c(1:mcc,Grid % new_c(c)) = old_cells(1:mcc, c)
+    Grid % cells_n_nodes         (Grid % new_c(c)) = old_nn          (c)
+    Grid % cells_n         (1:mcn,Grid % new_c(c)) = old_nodes(1:mcn, c)
+    Grid % cells_n_faces         (Grid % new_c(c)) = old_nf          (c)
+    Grid % cells_f         (1:mcf,Grid % new_c(c)) = old_faces(1:mcf, c)
+    Grid % cells_n_cells         (Grid % new_c(c)) = old_nc          (c)
+    Grid % cells_c         (1:mcc,Grid % new_c(c)) = old_cells(1:mcc, c)
+    Grid % cells_bnd_region(1:mcb,Grid % new_c(c)) = old_b_reg(1:mcb, c)
   end do
-  call Sort % Real_By_Index(Grid % n_cells, Grid % xc (1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % yc (1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % zc (1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % vol(1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % ixx(1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % iyy(1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % izz(1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % ixy(1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % ixz(1), Grid % new_c(1))
-  call Sort % Real_By_Index(Grid % n_cells, Grid % iyz(1), Grid % new_c(1))
+  nc = Grid % n_cells  ! abbreviate the syntax
+  call Sort % Real_By_Index(nc, Grid % vol      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % ixx      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % iyy      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % izz      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % ixy      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % ixz      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % iyz      (1), Grid % new_c(1))
+  call Sort % Real_By_Index(nc, Grid % wall_dist(1), Grid % new_c(1))
+  call Sort % Int_By_Index (nc, Grid % por      (1), Grid % new_c(1))
 
   !--------------------------------------------!
   !   Find out distance between cell indices   !
@@ -141,7 +156,9 @@
       end if
     end if
   end do
-  print '(a)',    ' # In Sort_Cells_Smart'
+  print '(a)',    ' #=========================================================='
+  print '(a)',    ' # In Sort_Cells_By_Coordinates'
+  print '(a)',    ' #----------------------------------------------------------'
   print '(a,i9)', ' # Maximum cell difference at single face:   ', max_diff_1
   print '(a,i9)', ' # Maximum cell difference betwen two faces: ', max_diff_2
 

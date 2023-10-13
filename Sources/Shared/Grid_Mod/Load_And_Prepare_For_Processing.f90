@@ -7,6 +7,8 @@
   integer,          intent(in)    :: d
 !==============================================================================!
 
+  Assert(PROGRAM_NAME .eq. 'Process')
+
   call Control % Read_Problem_Name(problem_name(d))
 
   ! Load the finite volume Grid
