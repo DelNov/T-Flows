@@ -19,7 +19,7 @@
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: nx, ny, nz
-  real                      :: cs, lf, u_tau, nc2, u_tan, nu, dely
+  real                      :: cs, lf, u_tau, nc2, u_tan, nu, z_wall
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !==============================================================================!
 
@@ -43,7 +43,6 @@
       lf = Grid % vol(c)**ONE_THIRD
 
       nu   = Flow % viscosity(c) / Flow % density(c)
-      dely = Grid % wall_dist(c)
 
       ! Tangential velocity.  Here it assumed that, as you approach the
       ! wall, the tangential velocity component is dominant and that the
@@ -51,7 +50,8 @@
       u_tan = sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2)
 
       ! Calculate u_tau, y+ and perform Van Driest damping
-      u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+      u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c))**B_POW)   &
+              ** (1.0/(1.0+B_POW))
       Turb % y_plus(c) = Grid % wall_dist(c) * u_tau / Flow % viscosity(c)
       cs = c_smag * (1.0 - exp(-Turb % y_plus(c) / 25.0))
 
@@ -132,12 +132,24 @@
         u_tan = Flow % U_Tan(s)
 
         nu = Flow % viscosity(c1) / Flow % density(c1)
-        dely = Grid % wall_dist(c1)
 
-        ! Calculate u_tau
-        u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+        ! Calculate u_tau for smooth wall
+        u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c1))**B_POW) &
+                ** (1.0/(1.0+B_POW))
 
-        ! Calculate y+
+        ! Calculate u_tau for rough wall
+        if(z_o .gt. tiny) then
+          u_tau = u_tan * kappa/(log((Grid % wall_dist(c1) + z_o)/z_o))
+        end if
+
+        ! Calculate u_tau according to Monin-Obukov Similarity Theory
+        if(Flow % heat_transfer.and.Turb % monin_obukov) then
+          u_tau = sqrt(Turb % Monin_Obukov_Mom(c1, c2, abs(u_tan),   &
+                  Grid % wall_dist(c1), z_o, t % n(c1),              &
+                  t % n(c2), abs(Flow % grav_z)))
+        end if
+
+! Calculate y+
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
                                    u_tau,                 &
                                    Grid % wall_dist(c1),  &
@@ -149,10 +161,11 @@
                                Turb % y_plus(c1),     &
                                z_o)
 
+
         ! Effective viscosity above and below 11.18 threshold
         if(Turb % y_plus(c1)  >=  11.81) then
-          Turb % vis_w(c1) = Flow % density(c1) * u_tau * u_tau * dely  &
-                           / abs(u_tan)
+          Turb % vis_w(c1) = Flow % density(c1) * u_tau * u_tau  &
+                             * Grid % wall_dist(c1) / abs(u_tan)
         else
           Turb % vis_w(c1) = Flow % viscosity(c1)                &
                         +      Grid % fw(s)  * Turb % vis_t(c1)  &
@@ -168,7 +181,7 @@
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
-          if(Turb % rough_walls) then
+          if(z_o .gt. tiny) then
             beta = 0.0
           end if
 
@@ -178,6 +191,14 @@
                               * Flow % capacity(c1)                       &
                       / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+
+          if(Turb % monin_obukov) then
+            Turb % con_w(c1) = Turb % Monin_Obukov_Th(c1, c2, abs(u_tan) ,    &
+              Grid % wall_dist(c), z_o, t % n(c1), t % n(c2),                 & 
+              abs(Flow % grav_z))                                             &
+              * Flow % capacity(c1) * Flow % density(c1)  &
+              * Grid % wall_dist(c1) / (t % n(c1) - t % n(c2))
+          end if
         end if
 
         if(Flow % n_scalars > 0) then
@@ -188,7 +209,7 @@
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
-          if(Turb % rough_walls) then
+          if(z_o .gt. tiny) then
             beta = 0.0
           end if
 
