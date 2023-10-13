@@ -18,52 +18,68 @@
 
   call Work % Connect_Real_Cell(por_real)
 
-  !------------------------------------!
-  !   Create an STL object from file   !
-  !------------------------------------!
-  call Por % region(reg) % Stl % Create_From_File(Por % region(reg) % stl_name)
+  !---------------------------------------------------!
+  !                                                   !
+  !   An STL file was defined for the porous region   !
+  !                                                   !
+  !---------------------------------------------------!
+  if(Por % region(reg) % stl_name .ne. '') then
 
-  !-------------------------------------------!
-  !   Use the STL object to define porosity   !
-  !-------------------------------------------!
-  do c = 1, Grid % n_cells
+    !------------------------------------!
+    !   Create an STL object from file   !
+    !------------------------------------!
+    call Por % region(reg) % Stl % Create_From_File(Por % region(reg) % stl_name)
 
-    ! Assume cell is in the STL
-    Por % region(reg) % cell_porous(c) = .true.
+    !-------------------------------------------!
+    !   Use the STL object to define porosity   !
+    !-------------------------------------------!
+    do c = 1, Grid % n_cells
 
-    do f = 1, Por % region(reg) % Stl % N_Facets()
+      ! Assume cell is in the STL
+      !Por % region(reg) % cell_porous(c) = .true.
+      Grid % por(c) = reg
 
-      ! Compute facet's center of gravity
-      xyz(1:3) = Por % region(reg) % Stl % Facet_Coords(f)
-      xc = xyz(1);  yc = xyz(2);  zc = xyz(3)
+      do f = 1, Por % region(reg) % Stl % N_Facets()
 
-      n(1:3) = Por % region(reg) % Stl % Facet_Normal(f)
-      nx = n(1);  ny = n(2);  nz = n(3)
+        ! Compute facet's center of gravity
+        xyz(1:3) = Por % region(reg) % Stl % Facet_Coords(f)
+        xc = xyz(1);  yc = xyz(2);  zc = xyz(3)
 
-      ! Vector connecting facet centroid with cell centroid
-      cx = xc - Grid % xc(c)
-      cy = yc - Grid % yc(c)
-      cz = zc - Grid % zc(c)
+        n(1:3) = Por % region(reg) % Stl % Facet_Normal(f)
+        nx = n(1);  ny = n(2);  nz = n(3)
 
-      dot_prod = cx * nx + cy * ny + cz * nz
+        ! Vector connecting facet centroid with cell centroid
+        cx = xc - Grid % xc(c)
+        cy = yc - Grid % yc(c)
+        cz = zc - Grid % zc(c)
 
-      ! First time this is negative, cell is not in the stl
-      if(dot_prod < 0) then
-        Por % region(reg) % cell_porous(c) = .false.
-        goto 1
-      end if
-    end do
-1   continue
+        dot_prod = cx * nx + cy * ny + cz * nz
 
-  end do
+        ! First time this is negative, cell is not in the stl
+        if(dot_prod < 0) then
+          !Por % region(reg) % cell_porous(c) = .false.
+          Grid % por(c) = 0
+          goto 1
+        end if
+      end do  ! through regions
+1     continue
+    end do    ! through cells
+
+  !-----------------------------------------------------------------------!
+  !                                                                       !
+  !   Porous regions defined with grid, nothing to be done here, really   !
+  !                                                                       !
+  !-----------------------------------------------------------------------!
+  else
+  end if      ! porous region defined in an STL file
 
   ! Save for checking
   por_real(1:Grid % n_cells) = 0.0
   do c = 1, Grid % n_cells
-    if(Por % region(reg) % cell_porous(c)) por_real(c) = 1.0;
+    por_real(c) = Grid % por(c)
   end do
   l = len_trim(Por % region(reg) % Stl % name)
-  name_out = Por % region(reg) % Stl % name(1:l-4)
+  name_out = 'porosity-field'
   call Grid % Save_Debug_Vtu(name_out,               &
                              scalar_cell=por_real,   &
                              scalar_name='porosity')

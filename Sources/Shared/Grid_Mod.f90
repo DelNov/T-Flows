@@ -103,6 +103,10 @@
     ! For each cell; type of the boundary condition in a given direction
     integer, allocatable :: cells_bnd_region(:,:)
 
+    ! For each cell: to each porous region it belongs
+    ! (Introduced with Insert_Buildings in Convert)
+    integer, allocatable :: por(:)
+
     !-------------------------!
     !  Face-based variables   !
     !-------------------------!
@@ -232,10 +236,11 @@
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
       procedure :: Search_Coordinate_Clusters
-      procedure :: Sort_Cells_By_Thread
       procedure :: Sort_Cells_By_Coordinates
+      procedure :: Sort_Cells_By_Thread
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
+      procedure :: Sort_Nodes_By_Coordinates
       procedure :: Write_Template_Control_File
 
   end type
@@ -297,6 +302,7 @@
 #   include "Grid_Mod/Sort_Cells_By_Thread.f90"
 #   include "Grid_Mod/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sort_Faces_By_Region.f90"
+#   include "Grid_Mod/Sort_Nodes_By_Coordinates.f90"
 #   include "Grid_Mod/Write_Template_Control_File.f90"
 
   end module

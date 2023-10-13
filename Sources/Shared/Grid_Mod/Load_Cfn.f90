@@ -57,9 +57,20 @@
   !------------------------------!
   read(fu) version
 
-  if(version .ne. VERSION_CFN) then
-    write(str1, '(i0.0)')  version
-    write(str2, '(i0.0)')  VERSION_CFN
+  write(str1, '(i0.0)')  version
+  write(str2, '(i0.0)')  VERSION_CFN
+
+  ! Old version, but still backward compatible
+  if(version .eq. 202304) then
+    call Message % Warning(72,                                                 &
+                 'You seem to be reading version '//trim(str1)//' of the  '//  &
+                 '.cfn file, but the latest version is '//trim(str2)//'.  '//  &
+                 'Porosity regions are not written in '//trim(str1)//'    '//  &
+                 'and the code will set them all to zero.',                    &
+                 one_proc = .true.)
+
+  ! Old version, but incompatible
+  else if(version .ne. VERSION_CFN) then
     call Message % Error(72,                                                   &
                  'You seem to be reading wrong version of the .cfn file.  '//  &
                  'The version you are reading is '//trim(str1)//' but the '//  &
@@ -215,6 +226,13 @@
 
   ! Cells' global indices
   call File % Buffered_Read_Int_Array(fu, Grid % Comm % cell_glo(-nb:nc))
+
+  ! Cells' porosity regions
+  if(version .eq. VERSION_CFN) then
+    call File % Buffered_Read_Int_Array(fu, Grid % por(-nb:nc))
+  else if(version .eq. 202304) then
+    Grid % por(-nb:nc) = 0
+  end if
 
   !-----------!
   !   Faces   !

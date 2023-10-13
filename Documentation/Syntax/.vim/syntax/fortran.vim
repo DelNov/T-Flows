@@ -409,6 +409,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      BUFFER_SIZE  MAX_ITEMS
 " Constant from Grid_Mod
   syn keyword fortranConstant      MAX_CLUSTERS
+" Constant from Convert_Mod
+  syn keyword fortranConstant      MAX_N  ITERS  FOR_BUILDINGS  FOR_POROSITIES  FOR_CHIMNEYS
 " After the constants, I have alternating definitions of types and objects derived from them
   syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
   syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges         Read_Control  Rc
@@ -418,8 +420,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Math           Sort           File           String            Work           Line  Tok
   syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type         Vof_Type       Swarm_Type
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur         Vof            Swarm Swr
-  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type
-  syn keyword fortranObjectTflows                 v_flux         Iter           Metis
+  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type        Vect_Type
+  syn keyword fortranObjectTflows                 v_flux         Iter           Metis             Vect
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type         Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type

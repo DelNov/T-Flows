@@ -22,6 +22,8 @@
   integer, allocatable :: thread(:), cell(:), old_proc(:)
 !==============================================================================!
 
+  Assert(PROGRAM_NAME .eq. 'Process')
+
   mcc = size(Grid % cells_c, 1)
   mcn = size(Grid % cells_n, 1)
   mcf = size(Grid % cells_f, 1)
@@ -136,6 +138,8 @@
   call Sort % Real_By_Index(nc, Grid % ixz               (1), Grid % new_c(1))
   call Sort % Real_By_Index(nc, Grid % iyz               (1), Grid % new_c(1))
   call Sort % Real_By_Index(nc, Grid % wall_dist         (1), Grid % new_c(1))
+  call Sort % Int_By_Index (nc, Grid % por               (1), Grid % new_c(1))
+  ! Sorting of the following three fields does not exist in the sister function
   call Sort % Int_By_Index (nc, Grid % Vect % cell_thread(1), Grid % new_c(1))
   call Sort % Int_By_Index (nc, Grid % Comm % cell_glo   (1), Grid % new_c(1))
   call Sort % Int_By_Index (nc, Grid % Comm % cell_proc  (1), Grid % new_c(1))

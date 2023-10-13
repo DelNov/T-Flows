@@ -37,6 +37,7 @@
       procedure          :: Smaller_Real
       procedure          :: Tet_Inertia
       procedure          :: Tet_Volume
+      procedure          :: Triangle_Area
 
   end type
 
@@ -65,5 +66,6 @@
 #   include "Math_Mod/Smaller_Real.f90"
 #   include "Math_Mod/Tet_Inertia.f90"
 #   include "Math_Mod/Tet_Volume.f90"
+#   include "Math_Mod/Triangle_Area.f90"
 
   end module

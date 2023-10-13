@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Search_Coordinate_Clusters(Grid, enforce_uniform)
+  subroutine Search_Coordinate_Clusters(Grid, nodal, enforce_uniform,  &
+                                        nx, ny, nz)
 !------------------------------------------------------------------------------!
 !   This subroutine searches for homogeneous directions in a grid.  It is a    !
 !   result of discussion with ChatGPT, which did come with a good idea to      !
@@ -15,12 +16,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)    :: Grid
-  logical, intent(in) :: enforce_uniform
+  class(Grid_Type)               :: Grid
+  logical, intent(in)            :: nodal
+  logical, intent(in)            :: enforce_uniform
+  integer, optional, intent(out) :: nx, ny, nz
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_CLUSTERS = 512
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: n, i, clust, C, I_NOD
+  integer              :: n, nf, nl, i, clust, c, i_nod
   real                 :: cluster_xyz(MAX_CLUSTERS, 3)
   integer              :: cluster_vis(MAX_CLUSTERS, 3)
   integer              :: cluster_ord(MAX_CLUSTERS)
@@ -33,7 +36,11 @@
 !==============================================================================!
 
   print '(a)', ' #======================================================'
-  print '(a)', ' # Searching for nodal coordinate clusters'
+  if(nodal) then
+    print '(a)', ' # Searching for nodal coordinate clusters'
+  else
+    print '(a)', ' # Searching for celular coordinate clusters'
+  end if
   print '(a)', ' #------------------------------------------------------'
 
   ! For some reason, these have to be initialized each time
@@ -41,34 +48,53 @@
   cluster_vis(:,:) = 0
   n_xyz(:) = 0
 
-  allocate(cluster(Grid % n_nodes))
-  allocate(orphan (Grid % n_nodes))
-  orphan(:) = .true.
+  if(nodal) then
+    nf = 1
+    nl = Grid % n_nodes
+  else
+    nf = 1               ! do not use yet -Grid % n_bnd_cells, if ever
+    nl = Grid % n_cells
+  end if
+
+  allocate(cluster(nf:nl))
+  allocate(orphan (nf:nl))
 
   ! GMSH might leave some orphan nodes, that ...
   ! ... is nodes which do not belong to any cell
   ! (Is it a problem of Convert itself?)
-  do c = 1, Grid % n_cells
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      orphan(n) = .false.
+  if(nodal) then
+    orphan(:) = .true.
+    do c = 1, Grid % n_cells
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        n = Grid % cells_n(i_nod, c)
+        orphan(n) = .false.
+      end do
     end do
-  end do
+  ! There should be no orphan cells
+  else
+    orphan(nf:nl) = .false.
+  end if
 
   !-----------------------------------------!
   !   Browse three cooordinate directions   !
   !-----------------------------------------!
   do i = 1, 3
 
-    ! Browse through all the nodes
-    do n = 1, Grid % n_nodes
+    ! Browse through all the nodes or cells (including boundary cells)
+    do n = nf, nl
 
       if(.not. orphan(n)) then
 
         ! Initialize general coordinate xyz
-        if(i .eq. 1) xyz = Grid % xn(n)
-        if(i .eq. 2) xyz = Grid % yn(n)
-        if(i .eq. 3) xyz = Grid % zn(n)
+        if(nodal) then
+          if(i .eq. 1) xyz = Grid % xn(n)
+          if(i .eq. 2) xyz = Grid % yn(n)
+          if(i .eq. 3) xyz = Grid % zn(n)
+        else
+          if(i .eq. 1) xyz = Grid % xc(n)
+          if(i .eq. 2) xyz = Grid % yc(n)
+          if(i .eq. 3) xyz = Grid % zc(n)
+        end if
 
         ! Find new cluster in each "i" dir
         new = .true.
@@ -99,6 +125,24 @@
   if(n_xyz(3) > MAX_CLUSTERS) write(output(50:55), '(a6)')  '  high'
   print '(a)', output
 
+  !-------------------------------------------------------------!
+  !   Return the values you have found if parameters are sent   !
+  !-------------------------------------------------------------!
+  if(present(nx)) then
+    nx = n_xyz(1)
+    if(nx > MAX_CLUSTERS) nx = -1
+  end if
+
+  if(present(ny)) then
+    ny = n_xyz(2)
+    if(ny > MAX_CLUSTERS) ny = -1
+  end if
+
+  if(present(nz)) then
+    nz = n_xyz(3)
+    if(nz > MAX_CLUSTERS) nz = -1
+  end if
+
   !-----------------------------------------!
   !   Browse three cooordinate directions   !
   !-----------------------------------------!
@@ -114,7 +158,7 @@
         if(i .eq. 2) print '(a,a1)', ' # Grid is homogeneous in y direction'
         if(i .eq. 3) print '(a,a1)', ' # Grid is homogeneous in z direction'
 
-        if(enforce_uniform) then
+        if(nodal .and. enforce_uniform) then
           print '(a)', ' # ... would you like to enforce uniform grid in it?'
 
           answer = File % Single_Word_From_Keyboard()
@@ -122,8 +166,10 @@
           if(answer .eq. 'YES') then
 
             ! Browse through all the nodes to assign them their cluster
-            do n = 1, Grid % n_nodes
-
+            Assert(nf .eq. 1)
+            Assert(nl .eq. Grid % n_nodes)
+            do n = 1, Grid % n_nodes  ! you get here only in case of nodal
+                                      ! meaning nf and nl are superfluous
               if(i .eq. 1) xyz = Grid % xn(n)
               if(i .eq. 2) xyz = Grid % yn(n)
               if(i .eq. 3) xyz = Grid % zn(n)

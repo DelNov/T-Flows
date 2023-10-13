@@ -204,7 +204,7 @@
   end do
 
   print '(a)',    ' #=========================================================='
-  print '(a)',    ' # In Sort_Faces_Smart'
+  print '(a)',    ' # In Sort_Faces_By_Region'
   print '(a)',    ' #----------------------------------------------------------'
   print '(a,i9)', ' # Maximum cell difference at single face:   ', max_diff_1
   print '(a,i9)', ' # Maximum cell difference betwen two faces: ', max_diff_2

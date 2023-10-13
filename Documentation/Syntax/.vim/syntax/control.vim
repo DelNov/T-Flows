@@ -221,7 +221,7 @@ syn keyword controlKeyword   POROUS_REGION_013
 syn keyword controlKeyword   POROUS_REGION_014
 syn keyword controlKeyword   POROUS_REGION_015
 syn keyword controlKeyword   POROUS_REGION_016
-syn keyword controlKeyword   STL_FILE
+syn keyword controlKeyword   STL_FILE  FROM_GRID
 
 " ==============================================================================
 " Numbers (integer must be before the float, otherwise things get messed up)

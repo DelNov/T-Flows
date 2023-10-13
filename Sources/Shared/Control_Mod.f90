@@ -30,13 +30,14 @@
       procedure :: Position_At_Three_Keys
       procedure :: Read_Char_Item
       procedure :: Read_Char_Item_On
-      procedure :: Read_Strings_On
       procedure :: Read_Int_Item
       procedure :: Read_Int_Item_On
+      procedure :: Read_Keyless_Strings_On
       procedure :: Read_Real_Item
       procedure :: Read_Real_Item_On
       procedure :: Read_Real_Vector
       procedure :: Read_Real_Vector_On
+      procedure :: Read_Strings_On
       procedure :: Switch_To_Domain
       procedure :: Switch_To_Root
 
@@ -204,13 +205,14 @@
 #   include "Control_Mod/Basic_Functions/Position_At_Three_Keys.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item_On.f90"
-#   include "Control_Mod/Basic_Functions/Read_Strings_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item_On.f90"
+#   include "Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Item_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Vector.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Vector_On.f90"
+#   include "Control_Mod/Basic_Functions/Read_Strings_On.f90"
 #   include "Control_Mod/Basic_Functions/Switch_To_Domain.f90"
 #   include "Control_Mod/Basic_Functions/Switch_To_Root.f90"
 

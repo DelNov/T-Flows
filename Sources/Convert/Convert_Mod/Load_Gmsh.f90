@@ -502,7 +502,8 @@
   !----------------------------------------------------------------!
   !   Browse through groups, read and extract more detailed info   !
   !----------------------------------------------------------------!
-  do i = 1, n_grps
+  print '(a)', ' # Browse through groups, for more detailed info'
+  do i = 1, n_grps  ! there are hundreds of these groups :-(
 
     ! Read dim, s_tag, type and n_memb
     if(ascii) then

@@ -294,6 +294,15 @@
   end do
   write(fu) buffer(1:i)
 
+  ! Cells' porosity regions
+  i = 0
+  do c = -Grid % n_bnd_cells, Grid % n_cells
+    if(Grid % old_c(c) .ne. 0 .or. c .eq. 0) then
+      i=i+1;  buffer(i) = Grid % por(Grid % old_c(c))
+    end if
+  end do
+  write(fu) buffer(1:i)
+
   !-----------!
   !   Faces   !
   !-----------!

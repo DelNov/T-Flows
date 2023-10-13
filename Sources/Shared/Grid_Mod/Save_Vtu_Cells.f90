@@ -218,12 +218,21 @@
   ! Cell inertia
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//floatp          //  &
-                    ' Name="Grid Cell inertia [m^2]"'   //  &
+                    ' Name="Grid Cell Inertia [m^2]"'   //  &
                     ' NumberOfComponents="6"'           //  &
                     ' format="appended"'                //  &
                     ' offset="' // trim(str1) //'">'    // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * RP * 6  ! prepare for next
+
+  ! Cell porosity region
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type='//intp                 //  &
+                    ' Name="Grid Cell Porosity Region [1]"'  //  &
+                    ' format="appended"'                     //  &
+                    ' offset="' // trim(str1) //'">'         // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
 
   !------------!
   !            !
@@ -456,6 +465,17 @@
   end do
   write(fu) r_buffer(1:i)
 
+  ! Cell porosity
+  data_size = int(n_cells_sub * IP, SP)
+  write(fu) data_size
+  i = 0
+  do c = 1, Grid % n_cells
+    if(Grid % new_c(c) .ne. 0) then
+      i=i+1;  i_buffer(i) = Grid % por(c)
+    end if
+  end do
+  write(fu) i_buffer(1:i)
+
   write(fu) LF // IN_0 // '</AppendedData>' // LF
   write(fu) IN_0 // '</VTKFile>' // LF
 
@@ -495,6 +515,10 @@
                             ' Name="Grid Wall Distance [m]"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
                             ' Name="Grid Cell Volume [m^3]"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
+                            ' Name="Grid Cell Inertia [m^2]"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
+                            ' Name="Grid Cell Porosity Region [1]"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
     ! Write out the names of all the pieces
