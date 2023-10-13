@@ -131,6 +131,11 @@
   !----------------------------!
   call Control % Rough_Walls(Turb % rough_walls, .true.)
 
+  !----------------------------!
+  !   Monin-Obukov for ABL?    !
+  !----------------------------!
+  call Control % Monin_Obukov(Turb % monin_obukov, .true.)
+
   ! Does the user want to gather statistics?
   call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
                                HUGE_INT, n_stat, .false.)
