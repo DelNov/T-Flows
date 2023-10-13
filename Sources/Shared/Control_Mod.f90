@@ -153,6 +153,7 @@
       procedure :: Hybrid_Les_Rans_Switch
       procedure :: Roughness_Coefficient
       procedure :: Rough_Walls
+      procedure :: Monin_Obukov
       procedure :: Smagorinsky_Constant
       procedure :: Turbulence_Model
       procedure :: Turbulence_Model_Variant
@@ -374,6 +375,7 @@
 #   include "Control_Mod/Physics/Turbulent_Schmidt_Number.f90"
 #   include "Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90"
 #   include "Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90"
+#   include "Control_Mod/Physics/Monin_Obukov.f90"
 
     ! Other environmental conditions
 #   include "Control_Mod/Physics/Angular_Velocity_Vector.f90"
