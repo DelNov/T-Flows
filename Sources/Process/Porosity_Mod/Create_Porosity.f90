@@ -51,7 +51,9 @@
       else if(next_strings(1) .eq. 'FROM_GRID') then
         Por % region(reg) % stl_name = ''           ! empty, undefined
         ! Do some checks here
-        if(.not. any(Grid % por(:) .eq. reg)) then  ! not good for parallel
+        found = any(Grid % por(:) .eq. reg)
+        call Global % Lor_Log(found)  ! any processor found it?
+        if(.not. found) then          ! not good for parallel
           call Message % Error(72,                                      &
                  'You specified keyword "FROM_GRID" in the porous ' //  &
                  'regions of the control file, but the grid does  ' //  &
