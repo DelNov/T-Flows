@@ -35,7 +35,6 @@
   end if
 
   ! Specify the return value
-  Monin_Obukov_Th = (kappa**2/(LOG(wall_dist/z_o))**2 * (t_p - t_wall) &
-                   * u_tan * Fth/Pr_turb)
+  Monin_Obukov_Th = Fth / Pr_turb
 
   end function
