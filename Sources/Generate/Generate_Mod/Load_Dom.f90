@@ -56,10 +56,10 @@
   !---------------------!
   !   Allocate memory   !
   !---------------------!
-  print '(a)',    ' # Allocating memory for: '
-  print '(a,i7)', ' #', Grid % max_n_nodes,     ' nodes and cells'
-  print '(a,i7)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
-  print '(a,i7)', ' #', Grid % max_n_faces,     ' cell faces'
+  print '(a)',      ' # Allocating memory for: '
+  print '(a,i9,a)', ' #', Grid % max_n_nodes,     ' nodes and cells'
+  print '(a,i9,a)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
+  print '(a,i9,a)', ' #', Grid % max_n_faces,     ' cell faces'
 
   allocate (Grid % region % at_cell(-Grid % max_n_bnd_cells-1:-1))
   Grid % region % at_cell = 0
