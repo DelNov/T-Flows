@@ -139,17 +139,17 @@
 
         ! Calculate u_tau for rough wall
         if(z_o .gt. tiny) then
-          u_tau = u_tan * kappa/(log((Grid % wall_dist(c1) + z_o)/z_o))
+          u_tau = u_tan * kappa/log(Grid % wall_dist(c1)/z_o)
         end if
 
         ! Calculate u_tau according to Monin-Obukov Similarity Theory
         if(Flow % heat_transfer.and.Turb % monin_obukov) then
-          u_tau = sqrt(Turb % Monin_Obukov_Mom(c1, c2, abs(u_tan),   &
+          u_tau = u_tau * Turb % Monin_Obukov_Mom(c1, c2, abs(u_tan),   &
                   Grid % wall_dist(c1), z_o, t % n(c1),              &
-                  t % n(c2), abs(Flow % grav_z)))
+                  t % n(c2), abs(Flow % grav_z))
         end if
 
-! Calculate y+
+        ! Calculate y+
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
                                    u_tau,                 &
                                    Grid % wall_dist(c1),  &
@@ -173,8 +173,6 @@
         end if
 
         if(Flow % heat_transfer) then
-          u_plus = u_tan / u_tau
-
           pr_t = Turb % Prandtl_Turb(c1)
           pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
           beta = Turb % Beta_Scalar(pr, pr_t)
@@ -193,17 +191,14 @@
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
 
           if(Turb % monin_obukov) then
-            Turb % con_w(c1) = Turb % Monin_Obukov_Th(c1, c2, abs(u_tan) ,    &
-              Grid % wall_dist(c), z_o, t % n(c1), t % n(c2),                 & 
-              abs(Flow % grav_z))                                             &
-              * Flow % capacity(c1) * Flow % density(c1)  &
-              * Grid % wall_dist(c1) / (t % n(c1) - t % n(c2))
+            Turb % con_w(c1) = pr_t * Turb % con_w(c1)                         &
+                             * Turb % Monin_Obukov_Th(c1, c2, abs(u_tan) ,     &
+                               Grid % wall_dist(c), z_o, t % n(c1), t % n(c2), &
+                               abs(Flow % grav_z))
           end if
         end if
 
         if(Flow % n_scalars > 0) then
-          u_plus = u_tan / u_tau
-
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
           beta = Turb % Beta_Scalar(sc, sc_t)
           ! According to Toparlar et al. 2019 paper
@@ -218,6 +213,13 @@
               * (Flow % viscosity(c1)/Flow % density(c1))         &
               / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
                + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+
+          if(Turb % monin_obukov) then
+            Turb % diff_w(c1) = sc_t * Turb % diff_w(c1)                       &
+                             * Turb % Monin_Obukov_Th(c1, c2, abs(u_tan) ,     &
+                               Grid % wall_dist(c), z_o, t % n(c1), t % n(c2), &
+                               abs(Flow % grav_z))
+          end if
         end if
 
       end if  ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
