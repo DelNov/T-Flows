@@ -93,14 +93,9 @@
   allocate(Flow % face_fy(nf));      Flow % face_fy = 0.0
   allocate(Flow % face_fz(nf));      Flow % face_fz = 0.0
 
-  !--------------------------------------!
-  !   Allocate memory for user scalars   !
-  !--------------------------------------!
-  allocate(Flow % scalar(Flow % n_scalars))
-
-  !-------------------------------------!
-  !   Browse through all user scalars   !
-  !-------------------------------------!
+  !---------------------------------!
+  !   Allocate memory for scalars   !
+  !---------------------------------!
   do sc = 1, Flow % n_scalars
 
     ! Set variable name
