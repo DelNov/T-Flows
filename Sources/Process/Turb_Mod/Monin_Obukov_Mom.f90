@@ -32,6 +32,6 @@
   end if
 
   ! Specify the return value
-  Monin_Obukov_Mom = (kappa/log(wall_dist/z_o) * u_tan * sqrt(Fm))**2
+  Monin_Obukov_Mom = sqrt(Fm)
 
   end function
