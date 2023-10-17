@@ -45,8 +45,8 @@
   integer, parameter :: RP = sizeof(1.0) ! real number precision
 
   ! Version of the .cfn and .dim files
-  ! (This number was set in April of 2023)
-  integer, parameter :: VERSION_CFN    = 202304
+  ! (First four digits are the year, last two the month)
+  integer, parameter :: VERSION_CFN    = 202310
   integer, parameter :: VERSION_DIM    = 202304
   integer, parameter :: VERSION_BACKUP = 202304
 
