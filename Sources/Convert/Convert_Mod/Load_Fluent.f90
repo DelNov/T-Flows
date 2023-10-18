@@ -539,6 +539,9 @@
     stop
   end if
 
+  ! This looks like a convenient time to adjust the dimenson for cells' nodes
+  call Adjust_First_Dim(maxval(Grid % cells_n_nodes(1:n_cells)), Grid % cells_n)
+
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Summary of interior cell shapes:                         '
   print '(a60)', ' #----------------------------------------------------------'
@@ -640,6 +643,7 @@
           else
             if(zone_type .eq. FACE_TRI)  n_face_nodes = 3
             if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
+            call Adjust_First_Dim(n_face_nodes, Grid % faces_n)
             if(ascii) then
               call File % Read_Line(fu)
               do i_nod = 1, n_face_nodes

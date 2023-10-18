@@ -118,7 +118,7 @@ practical use of T-Flows, it is highly desirable that you also have the followin
 
 - [GMSH](https://gmsh.info)
 - any other free or commercial mesh generator exporting ANSYS' ```.msh``` or
-  ```.cas``` format (**double-check** for .cas)
+  ```.cas``` format.
 - visualization software which can read ```.vtu``` file format such as
   [ParaView](https://www.paraview.org/) or [VisIt](https://wci.llnl.gov/simulation/computer-codes/visit),
   or any tool which can read ```.vtu``` file format
@@ -132,8 +132,8 @@ Although it comes with its own grid generator, it is very rudimentary, and an
 external grid generation software would be highly desirable for meshing complex
 computational domains.  We regularly use GMSH and would highly recommend it for
 its inherent scripting ability, but if you have access to any commercial grid
-generator which can export meshes in ANSYS' ```.msh``` (and ```.cas```, **this should
-be checked**) format, that would just fine.
+generator which can export meshes in ANSYS' ```.msh``` (and ```.cas```) format,
+that would just fine.
 
 Having no GUI, T-Flows relies on
 external tools for visualization of results.  The results are saved in ```.vtu```,
