@@ -60,6 +60,14 @@
     allocate(Turb % p_kin  (-nb:nc));  Turb % p_kin   = 0.
     allocate(Turb % t_scale(-nb:nc));  Turb % t_scale = 0.
 
+    ! Reynolds stresses
+    call Var_Mod_Create_New_Only(Turb % uu, Grid, 'UU')
+    call Var_Mod_Create_New_Only(Turb % vv, Grid, 'VV')
+    call Var_Mod_Create_New_Only(Turb % ww, Grid, 'WW')
+    call Var_Mod_Create_New_Only(Turb % uv, Grid, 'UV')
+    call Var_Mod_Create_New_Only(Turb % uw, Grid, 'UW')
+    call Var_Mod_Create_New_Only(Turb % vw, Grid, 'VW')
+
     if(Flow % heat_transfer) then
       call Var_Mod_Create_Solution(Turb % t2, A, 'T2', '')
       call Var_Mod_Create_New_Only(Turb % ut, Grid, 'UT')
@@ -67,14 +75,6 @@
       call Var_Mod_Create_New_Only(Turb % wt, Grid, 'WT')
       allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.  ! wall cond
       allocate(Turb % p_t2 (-nb:nc));  Turb % p_t2  = 0.
-
-      ! Reynolds stresses
-      call Var_Mod_Create_New_Only(Turb % uu, Grid, 'UU')
-      call Var_Mod_Create_New_Only(Turb % vv, Grid, 'VV')
-      call Var_Mod_Create_New_Only(Turb % ww, Grid, 'WW')
-      call Var_Mod_Create_New_Only(Turb % uv, Grid, 'UV')
-      call Var_Mod_Create_New_Only(Turb % uw, Grid, 'UW')
-      call Var_Mod_Create_New_Only(Turb % vw, Grid, 'VW')
     end if ! Flow % heat_transfer
 
     ! Turbulent statistics; if needed
@@ -142,7 +142,6 @@
     allocate(Turb % vis_w   (-nb:nc));  Turb % vis_w   = 0.  ! wall visc
     allocate(Turb % p_kin   (-nb:nc));  Turb % p_kin   = 0.
 
-
     ! Reynolds stresses
     call Var_Mod_Create_New_Only(Turb % uu, Grid, 'UU')
     call Var_Mod_Create_New_Only(Turb % vv, Grid, 'VV')
@@ -158,7 +157,6 @@
       call Var_Mod_Create_New_Only(Turb % wt, Grid, 'WT')
       allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.  ! wall cond
       allocate(Turb % p_t2 (-nb:nc));  Turb % p_t2  = 0.
-
     end if ! Flow % heat_transfer
 
     if(Turb % statistics) then
