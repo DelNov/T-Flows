@@ -682,8 +682,10 @@
     !   Save scalars   !
     !------------------!
     do sc = 1, Flow % n_scalars
+      write(str1,     '(a23)')  "Scalar XX [independent]"
+      write(str1(8:9),'(i2.2)') sc
       phi => Flow % scalar(sc)
-      call Results % Save_Vtu_Scalar_Real(phi % name, plot_inside,   &
+      call Results % Save_Vtu_Scalar_Real(str1, plot_inside,         &
                                           phi % n(c_f:c_l),          &
                                           f8, f9, data_offset, run)
     end do
