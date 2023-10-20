@@ -12,14 +12,14 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi
-  integer                  :: c1, c2, s
+  integer                  :: c1, c2, s,  c
 !==============================================================================!
 
   ! Take aliases
   Grid => Flow % pnt_grid
   u    => Flow % u
-  v    => Flow % u
-  w    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
 
   ! Impose slip condition
   do s = 1, Grid % n_faces
