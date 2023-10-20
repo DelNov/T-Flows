@@ -34,21 +34,24 @@
 
         if(Grid % wall_dist(c) < 20.0) then
 
-          a_coef =                                                          &
-                   + 3.5642635513332240e-006 * Grid % wall_dist(c)**5       &
-                   - 1.3555088944116367e-004 * Grid % wall_dist(c)**4       &
-                   + 1.7125968146226682e-004 * Grid % wall_dist(c)**3       &
-                   + 2.0848654211247653e-002 * Grid % wall_dist(c)**2       &
-                   + 4.2234984220098151e-003 * Grid % wall_dist(c)          &
-                   + 5.0417568827710268e-001 
+          a_coef = 1.0/8.172                                                 &
+                   * (3.5642635513332240e-006 * Grid % wall_dist(c)**5       &
+                    - 1.3555088944116367e-004 * Grid % wall_dist(c)**4       &
+                    + 1.7125968146226682e-004 * Grid % wall_dist(c)**3       &
+                    + 2.0848654211247653e-002 * Grid % wall_dist(c)**2       &
+                    + 4.2234984220098151e-003 * Grid % wall_dist(c)          &
+                    + 5.0417568827710268e-001)
         end if
 
         if( ui % name .eq. 'U' ) then
-          b_vector(c) = b_vector(c) -  0.15 * a_coef * u_mag * u % n(c)
+          b_vector(c) = b_vector(c)                                         &
+                        - 0.15 * a_coef * u_mag * u % n(c) * Grid % vol(c)
         else if( ui % name .eq. 'V' ) then
-          b_vector(c) = b_vector(c) -  0.15 * a_coef * u_mag * v % n(c)
+          b_vector(c) = b_vector(c)                                         &
+                        -  0.15 * a_coef * u_mag * v % n(c) * Grid % vol(c)
         else if( ui % name .eq. 'W' ) then
-          b_vector(c) = b_vector(c) -  0.15 * a_coef * u_mag * w % n(c)
+          b_vector(c) = b_vector(c)                                         &
+                        -  0.15 * a_coef * u_mag * w % n(c) * Grid % vol(c)
         end if
       end if
     end do
