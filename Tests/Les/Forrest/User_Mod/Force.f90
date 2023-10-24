@@ -34,7 +34,14 @@
 
         if(Grid % wall_dist(c) < 20.0) then
 
-          a_coef = 1.0/8.172                                                 &
+  !----------------------------------------------------!
+  ! a_coef is approximated to follow the coefficient   !
+  ! used by Tom Grylls and Maarten van Reeuwijk in     !
+  ! publication "Tree model with drag, transpiration,  !
+  ! shading and deposition: Identification of cooling  !
+  ! regimes and large-eddy simulation"                 !
+  !----------------------------------------------------!
+          a_coef = 1.65/8.172                                                &
                    * (3.5642635513332240e-006 * Grid % wall_dist(c)**5       &
                     - 1.3555088944116367e-004 * Grid % wall_dist(c)**4       &
                     + 1.7125968146226682e-004 * Grid % wall_dist(c)**3       &
@@ -45,13 +52,13 @@
 
         if( ui % name .eq. 'U' ) then
           b_vector(c) = b_vector(c)                                         &
-                        - 0.15 * a_coef * u_mag * u % n(c) * Grid % vol(c)
+                        - 0.5 * 0.15 * a_coef * u_mag * u % n(c) * Grid % vol(c)
         else if( ui % name .eq. 'V' ) then
           b_vector(c) = b_vector(c)                                         &
-                        -  0.15 * a_coef * u_mag * v % n(c) * Grid % vol(c)
+                        - 0.5 * 0.15 * a_coef * u_mag * v % n(c) * Grid % vol(c)
         else if( ui % name .eq. 'W' ) then
           b_vector(c) = b_vector(c)                                         &
-                        -  0.15 * a_coef * u_mag * w % n(c) * Grid % vol(c)
+                        - 0.5 * 0.15 * a_coef * u_mag * w % n(c) * Grid % vol(c)
         end if
       end if
     end do
