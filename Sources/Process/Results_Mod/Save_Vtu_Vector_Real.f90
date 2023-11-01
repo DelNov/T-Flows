@@ -18,10 +18,9 @@
   integer             :: data_offset
   integer             :: sweep           ! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
-  integer(SP)       :: data_size
-  integer           :: i, c1, c2, c_f, c_l
-  character(SL)     :: str1
-  real, allocatable :: buffer(:)
+  integer(SP)   :: data_size
+  integer       :: c1, c2, c_f, c_l
+  character(SL) :: str1
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Results)
 !==============================================================================!
@@ -34,14 +33,11 @@
   c_f = lbound(val_1, 1)
   c_l = ubound(val_1, 1)
 
-  ! Allocate local array
-  allocate(buffer((c_l-c_f+1)*3))
-
   ! Header
   if(sweep .eq. 1) then
     if(Parallel_Run() .and. First_Proc()) then
       write(fs) IN_4                                //  &
-                '<DataArray type='//floatp          //  &
+                '<PDataArray type='//floatp         //  &
                 ' Name="' // trim(var_name) // '"'  //  &
                 ' NumberOfComponents="3"/>'         // LF
     end if
@@ -58,35 +54,21 @@
 
   ! Data
   if(sweep .eq. 2) then
-
-    call Profiler % Start('Save_Vtu_Results (vector real)')
-
     if(plot_inside) then
       data_size = int((c_l-c_f+1) * RP * 3, SP)
       write(fp) data_size
-      i = 0
       do c1 = c_f, c_l
-        i = i + 1;  buffer(i) = val_1(c1)
-        i = i + 1;  buffer(i) = val_2(c1)
-        i = i + 1;  buffer(i) = val_3(c1)
+        write(fp) val_1(c1), val_2(c1), val_3(c1)
       end do
-      write(fp) buffer(1:i)
     else
       do c2 = c_f, c_l
         data_size = int(data_size + RP * 3, SP)
       end do
       write(fp) data_size
-      i = 0
       do c2 = c_f, c_l
-        i = i + 1;  buffer(i) = val_1(c2)
-        i = i + 1;  buffer(i) = val_2(c2)
-        i = i + 1;  buffer(i) = val_3(c2)
+        write(fp) val_1(c2), val_2(c2), val_3(c2)
       end do
-      write(fp) buffer(1:i)
     end if
-
-    call Profiler % Stop('Save_Vtu_Results (vector real)')
-
   end if
 
   ! Update data_offset
