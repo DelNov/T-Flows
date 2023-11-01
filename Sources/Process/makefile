@@ -414,20 +414,23 @@ OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN) $(OBJ_C_FUN)
 
 # Fortran sources
 $(DIR_OBJECT)/%.o: %.f90
-	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
+#	@echo $(FC) $<
+#	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
+	$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
 
 # C functions
 $(DIR_OBJECT)/%.o: %.c
-	@echo $(CC) $<
-	@$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
+#	@echo $(CC) $<
+#	@$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
+	$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
 
 # Special rule to build User_Mod.f90.
 # Note: If you don't write it as User%Mod.o, makefile will think that it
 # is the final target and would not proceed further to build the Program
 $(DIR_OBJECT)/User%Mod.o: User%Mod.f90
-	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP_USER) $(PASS_ON) -c -o $@ $<
+#	@echo $(FC) $<
+#	@$(FC) $(OPT_F_COMP_USER) $(PASS_ON) -c -o $@ $<
+	$(FC) $(OPT_F_COMP_USER) $(PASS_ON) -c -o $@ $<
 
 #-----------------------------------
 #   Rule to build main program
