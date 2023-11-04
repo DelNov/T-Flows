@@ -8,7 +8,8 @@
   logical       :: found
   character(SL) :: porous_region_rank
   character(SL) :: next_strings(MAX_STRING_ITEMS)
-  real          :: c1c2(2), def(2) = (/0.0, 0.0/)
+! Muhamed doesn't need those and Bojan forgot what they were
+! real          :: c1c2(2), def(2) = (/0.0, 0.0/)
 !==============================================================================!
 
   ! Read number of Porous regions from control file

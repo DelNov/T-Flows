@@ -9,9 +9,8 @@
   class(Matrix_Type)      :: A
   type(Grid_Type), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, s, pos, pos1, pos2, n
+  integer              :: c, s, pos, n
   integer              :: c1, c2  ! cell 1 and 2
-  integer              :: n1, n2  ! neighbour 1 and 2
   integer              :: m_lower, m_upper, start
   integer, allocatable :: stencw(:)
   integer, allocatable :: all_lower_ms(:)

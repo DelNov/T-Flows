@@ -70,6 +70,8 @@
     phi % pet_rank = reuse_pet
     phi % Pet => Work_Pet % Member(reuse_pet)
   end if
+# else
+  Unused(reuse_pet)
 # endif
 
   end subroutine

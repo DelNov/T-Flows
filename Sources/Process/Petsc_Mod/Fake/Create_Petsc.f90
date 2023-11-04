@@ -1,14 +1,17 @@
 !==============================================================================!
-  subroutine Create_Petsc(Pet, A, var_name, options_pets)
+  subroutine Create_Petsc(Pet, A, var_name, petsc_rank)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type) :: Pet
-  type(Matrix_Type) :: A
-  character(VL)     :: var_name
-  character(SL)     :: options_pets(MAX_STRING_ITEMS)
+  class(Petsc_Type)    :: Pet
+  type(Matrix_Type)    :: A
+  character(VL)        :: var_name
+  integer, intent(out) :: petsc_rank
 !-----------------------------------[Locals]-----------------------------------!
   logical, save :: called = .false.
+!------------------------------[Unused arguments]------------------------------!
+  Unused(var_name)
+  Unused(petsc_rank)
 !==============================================================================!
 
   Pet % pnt_grid => A % pnt_grid
