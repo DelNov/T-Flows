@@ -69,7 +69,7 @@
 
   ! Initialize front
   if(Vof % track_front) then
-    call Vof % Smooth_For_Curvature_Csf()
+    call Vof % Smooth_Vof_And_Compute_Surface_Normals()
     call Vof % Front % Place_Front_At_Value(Vof % fun,     &
                                             .true.)  ! don't print messages
     call Vof % Front % Print_Front_Statistics()

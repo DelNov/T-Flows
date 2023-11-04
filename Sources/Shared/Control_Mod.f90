@@ -129,8 +129,7 @@
       procedure :: Tolerance_For_Gauss_Gradients
       procedure :: Tolerance_For_Simple_Algorithm
       procedure :: Max_Correction_Cycles_Beta_Vof
-      procedure :: Max_Smoothing_Cycles_Curvature_Vof
-      procedure :: Max_Smoothing_Cycles_Normal_Vof
+      procedure :: Max_Smooth_Cycles_Curvature_Vof
       procedure :: Max_Courant_Vof
       procedure :: Max_Substep_Cycles_Vof
       procedure :: Skewness_Correction_Vof
@@ -332,8 +331,7 @@
 
     ! Numerical Parameters VOF (CICSAM)
 #   include "Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90"
-#   include "Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90"
-#   include "Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90"
+#   include "Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90"
 #   include "Control_Mod/Numerics/Max_Courant_Vof.f90"
 #   include "Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90"
 #   include "Control_Mod/Numerics/Skewness_Correction_Vof.f90"

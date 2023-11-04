@@ -4936,10 +4936,9 @@ we also set Gu's and Choi's correction in the control file:
 One of the most serious source of inaccuracies of surface phenomena in VOF is
 the calculation of curvature and, associated with that, surface normals.  In
 _Process_, we use a smoothing procedure which is controlled with following
-parameters:
+parameter:
 ```
- MAX_SMOOTHING_CYCLES_CURVATURE_VOF  12
- MAX_SMOOTHING_CYCLES_NORMAL_VOF      0
+ MAX_SMOOTH_CYCLES_CURVATURE_VOF  12
 ```
 
 ### Final solution and benchmarking <a name="bench_cases_buble_final"> </a>

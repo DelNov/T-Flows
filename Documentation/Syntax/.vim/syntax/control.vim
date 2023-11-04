@@ -94,8 +94,7 @@ syn keyword controlKeyword   MAX_ITERATIONS_FOR_VOF_SOLVER
 syn keyword controlKeyword   MAX_ITERATIONS_FOR_WALL_DISTANCE_SOLVER
 syn keyword controlKeyword   MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS
 syn keyword controlKeyword   MAX_SIMPLE_ITERATIONS
-syn keyword controlKeyword   MAX_SMOOTHING_CYCLES_CURVATURE_VOF
-syn keyword controlKeyword   MAX_SMOOTHING_CYCLES_NORMAL_VOF
+syn keyword controlKeyword   MAX_SMOOTH_CYCLES_CURVATURE_VOF
 syn keyword controlKeyword   MAX_SUBSTEP_CYCLES_VOF
 syn keyword controlKeyword   MAX_THREADS
 syn keyword controlKeyword   MIN_SIMPLE_ITERATIONS

@@ -20,6 +20,7 @@
   Flow => Vof  % pnt_flow
   Grid => Flow % pnt_grid
   fun  => Vof % fun
+  A    => Sol % Nat % A
 
   do c = 1, Grid % n_cells
 

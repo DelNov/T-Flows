@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Max_Smoothing_Cycles_Normal_Vof(Control, val, verbose)
+  subroutine Max_Smooth_Cycles_Curvature_Vof(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -8,7 +8,7 @@
   logical, optional    :: verbose
 !==============================================================================!
 
-  call Control % Read_Int_Item('MAX_SMOOTHING_CYCLES_NORMAL_VOF',  &
-                                0, val, verbose)
+  call Control % Read_Int_Item('MAX_SMOOTHING_CYCLES_CURVATURE_VOF',  &
+                                2, val, verbose)
 
   end subroutine

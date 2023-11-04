@@ -29,27 +29,6 @@
 
   Vof % curv = 0.0
 
-  !-------------------------------!
-  !   Normalize vector at cells   !
-  !-------------------------------!
-  do c = Cells_In_Domain()
-    norm_grad = sqrt(  smooth % x(c) ** 2  &
-                     + smooth % y(c) ** 2  &
-                     + smooth % z(c) ** 2)
-    if(norm_grad >= FEMTO) then
-      Vof % nx(c) = smooth % x(c) / norm_grad
-      Vof % ny(c) = smooth % y(c) / norm_grad
-      Vof % nz(c) = smooth % z(c) / norm_grad
-    else
-      Vof % nx(c) = 0.0
-      Vof % ny(c) = 0.0
-      Vof % nz(c) = 0.0
-    end if
-  end do
-  call Grid % Exchange_Cells_Real(Vof % nx(-nb:nc))
-  call Grid % Exchange_Cells_Real(Vof % ny(-nb:nc))
-  call Grid % Exchange_Cells_Real(Vof % nz(-nb:nc))
-
   !---------------------------------------!
   !   Tangent vector to walls/symmetries  !
   !---------------------------------------!

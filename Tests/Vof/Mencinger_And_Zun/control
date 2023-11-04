@@ -74,8 +74,7 @@
   TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-04
   TOLERANCE_FOR_VOF_SOLVER              1.e-06
   MAX_ITERATIONS_FOR_PRESSURE_SOLVER  900
-  MAX_SMOOTHING_CYCLES_CURVATURE_VOF    8
-  MAX_SMOOTHING_CYCLES_NORMAL_VOF       0
+  MAX_SMOOTH_CYCLES_CURVATURE_VOF       8
 
 #--------------------
 # Initial conditions  velocity was 0.05 for nice transport of vof

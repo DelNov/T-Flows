@@ -31,7 +31,7 @@
     !   Prepare smooth variant of the vof function   !
     !    for computation of normals and curvature    !
     !------------------------------------------------!
-    call Vof % Smooth_For_Curvature_Csf()
+    call Vof % Smooth_Vof_And_Compute_Surface_Normals()
     call Vof % Curvature_Csf()
 
     !---------------------------------------------------------------!
