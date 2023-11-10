@@ -24,6 +24,10 @@ RESET='\U001B[0m'
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
 
+# Find the "root" of all sources
+cur=$(pwd)
+src=$(echo "$cur" | awk -F'/Sources/' '{print $1 "/Sources"}')
+
 # The following four affect the width of the output
 tabs 60
 glo_indent="    "      # four characters wide
@@ -156,9 +160,9 @@ extract_hierarchy() {
     #   Get the full path of the module you seek
     #----------------------------------------------
     if [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $glo_exclude_dir)
+      local full_path_you_seek=$(find $src -name $module_file_you_seek | grep -v $glo_exclude_dir)
     else
-      local full_path_you_seek=$(find . -name $module_file_you_seek)
+      local full_path_you_seek=$(find $src -name $module_file_you_seek)
     fi
 
     #--------------------------------
@@ -182,7 +186,7 @@ extract_hierarchy() {
       #-----------------------------------------------------
       #   Storing results of the grep command in an array
       #-----------------------------------------------------
-      local used_modules=($(grep '\ \ use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
+      local used_modules=($(grep '  use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
 
       #------------------------------------------------------------------
       #   Print out the name of the module you are currently analysing

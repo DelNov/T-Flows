@@ -24,6 +24,10 @@ RESET='\U001B[0m'
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
 
+# Find the "root" of all sources
+cur=$(pwd)
+src=$(echo "$cur" | awk -F'/Sources/' '{print $1 "/Sources"}')
+
 # The following four affect the width of the output
 tabs 60
 glo_indent="    "    # four characters wide
@@ -252,26 +256,26 @@ extract_call_graph() {
     #   the sane mind will be interested in analyzing them.
     #-----------------------------------------------------------------------------
     if [[ $module_in_which_you_seek ]] && [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
                                        | grep $module_in_which_you_seek  \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake                    \
                                        | grep -v $glo_exclude_dir)
     elif [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake                    \
                                        | grep -v $glo_exclude_dir)
     elif [[ $module_in_which_you_seek ]]; then
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
                                        | grep $module_in_which_you_seek  \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake)
     else
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
+      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
                                        | grep -v No_Checking             \
                                        | grep -v Sequential              \
                                        | grep -v Fake)
@@ -297,7 +301,7 @@ extract_call_graph() {
       #-----------------------------------------------------
       #   Storing results of the grep command in an array
       #-----------------------------------------------------
-      local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek  \
+      local called_procedures=($(grep '  call ' $full_path_you_seek  \
                                  | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
       local called_modules=$called_procedures   # just to declare
 
@@ -432,7 +436,7 @@ extract_call_graph() {
           # Yet, at this point you can't tell one from another, and that's why
           # another call to find is done here
           if [[ ! ${called_modules[proc]} ]]; then
-            internal=$(find . -type f -name ${called_procedures[proc]}".f90")
+            internal=$(find $src -type f -name ${called_procedures[proc]}".f90")
             if [[ ! $internal ]]; then
               print_line "$indent"                   \
                          $glo_color_ex               \
