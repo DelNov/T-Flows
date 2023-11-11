@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Profiler_Type), target :: Prof
-  character(len=*)              :: f_name
+  character(len=*)             :: f_name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_fun  ! function counter
 !==============================================================================!
