@@ -70,7 +70,7 @@ glo_out_width=72       # should be multiple of indent and separator widhts
 glo_color_mu=$LIGHT_CYAN       # module users other
 glo_color_mn=$GREEN            # module not using others
 
-glo_exclude_dir=""   # directory to be excluded from the search
+glo_exclude_dir=""   # global list of directories to be excluded from the search
 glo_expand_all="no"  # are you expanding them all?
 glo_ignore_mod=""    # global list of modules to ignore
 
@@ -136,7 +136,7 @@ print_usage() {
   echo "#"
   echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
-  echo "# -e <directory to exclude>"
+  echo "# -e <list of directories to exclude>"
   echo "#"
   echo "#    In cases where the same module name is used in more than one"
   echo "#    directory, use this option to exclude one from the search."
@@ -192,11 +192,22 @@ extract_hierarchy() {
     #----------------------------------------------
     #   Get the full path of the module you seek
     #----------------------------------------------
+
+    # Start building the find command as a string
+    find_command="find $src -name $module_file_you_seek"
+
+    # Convert glo_exclude_dir to an array and add a grep -v for each directory
     if [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find $src -name $module_file_you_seek | grep -v $glo_exclude_dir)
-    else
-      local full_path_you_seek=$(find $src -name $module_file_you_seek)
+      read -r -a exclude_dirs <<< "$glo_exclude_dir"
+      for exclude_dir in "${exclude_dirs[@]}"; do
+        if [[ $exclude_dir ]]; then
+          find_command+=" | grep -v $exclude_dir"
+        fi
+      done
     fi
+
+    # Execute the find command
+    local full_path_you_seek=$(eval $find_command)
 
     #--------------------------------
     #   If there is anything to do
@@ -316,10 +327,10 @@ while [[ $# > 0 ]]; do
       shift  # past argument
       ;;     # part of the case construct
 
-    # Exclude - takes only one argument
+    # Exclude - accumulate arguments
     -e)
       current_opt=$1
-      glo_exclude_dir=$2
+      glo_exclude_dir=$glo_exclude_dir" $2"
       shift  # past argument
       shift  # past value
       ;;     # part of the case construct
@@ -346,7 +357,9 @@ while [[ $# > 0 ]]; do
 
     # Accumulates additonal strings to glo_ignore
     *)
-      if [[ $current_opt == -i ]]; then
+      if [[ $current_opt == -e ]]; then
+        glo_exclude_dir=$glo_exclude_dir" $1"
+      elif [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
@@ -358,5 +371,3 @@ while [[ $# > 0 ]]; do
 done
 
 extract_hierarchy $name
-# echo $analyzed_units
-# echo "default = ${default}"

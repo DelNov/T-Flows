@@ -150,6 +150,11 @@ print_usage() {
   echo "#"
   echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
+  echo "# -e <list of directories to exclude>"
+  echo "#"
+  echo "#    In cases where the same module name is used in more than one"
+  echo "#    directory, use this option to exclude one from the search."
+  echo "#"
   echo "# -i <list of modules to ignore>"
   echo "#"
   echo "#    You may want to exclude some of the smaller modules, such as"
@@ -294,31 +299,33 @@ extract_call_graph() {
     #   in "Seqential" part of the Comm_Mod are just empty hooks, no one in
     #   the sane mind will be interested in analyzing them.
     #-----------------------------------------------------------------------------
-    if [[ $module_in_which_you_seek ]] && [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
-                                       | grep $module_in_which_you_seek  \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake                    \
-                                       | grep -v $glo_exclude_dir)
-    elif [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake                    \
-                                       | grep -v $glo_exclude_dir)
-    elif [[ $module_in_which_you_seek ]]; then
-      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
-                                       | grep $module_in_which_you_seek  \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake)
-    else
-      local full_path_you_seek=$(find $src -name $procedure_file_you_seek   \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake)
+
+    # Start building the find command as a string
+    find_command="find $src -name $procedure_file_you_seek"
+
+    # Add a condition to grep for the module if it's specified
+    if [[ $module_in_which_you_seek ]]; then
+      find_command+=" | grep $module_in_which_you_seek"
     fi
+
+    # Exclude standard directories
+    find_command+=" | grep -v No_Checking"
+    find_command+=" | grep -v Sequential"
+    find_command+=" | grep -v Unused"
+    find_command+=" | grep -v Fake"
+
+    # Convert glo_exclude_dir to an array and add a grep -v for each directory
+    if [[ $glo_exclude_dir ]]; then
+      read -r -a exclude_dirs <<< "$glo_exclude_dir"
+      for exclude_dir in "${exclude_dirs[@]}"; do
+        if [[ $exclude_dir ]]; then
+          find_command+=" | grep -v $exclude_dir"
+        fi
+      done
+    fi
+
+    # Execute the find command
+    local full_path_you_seek=$(eval $find_command)
 
     # This command counts number of occurrences of modules name in the result of
     # command find. If it is more than one, the same file is in more directories
@@ -329,7 +336,7 @@ extract_call_graph() {
       for path in ${full_path_you_seek[*]}; do
         echo $path
       done
-      echo "Exclude all but one directory with "  \
+      echo "Exclude all but one directory with"\
            "the command line argument -e <directory>"
       exit
     fi
@@ -361,35 +368,50 @@ extract_call_graph() {
 
         # Typical substitues:
         if [[ $glo_module != "" ]]; then
-          if [[ $glo_module == "Comm" ]];     then glo_module=Comm_Mod;      fi
-          if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
-          if [[ $glo_module == "Divide" ]];   then glo_module=Divide_Mod;    fi
-          if [[ $glo_module == "Elem" ]];     then glo_module=Elem_Mod;      fi
-          if [[ $glo_module == "File" ]];     then glo_module=File_Mod;      fi
-          if [[ $glo_module == "Flow" ]];     then glo_module=Field_Mod;     fi
-          if [[ $glo_module == "Front" ]];    then glo_module=Front_Mod;     fi
-          if [[ $glo_module == "Grid" ]];     then glo_module=Grid_Mod;      fi
-          if [[ $glo_module == "Line" ]];     then glo_module=Tokenizer_Mod; fi
-          if [[ $glo_module == "Math" ]];     then glo_module=Math_Mod;      fi
-          if [[ $glo_module == "Message" ]];  then glo_module=Message_Mod;   fi
-          if [[ $glo_module == "Metis" ]];    then glo_module=Metis_Mod;     fi
-          if [[ $glo_module == "Monitor" ]];  then glo_module=Monitor_Mod;   fi
-          if [[ $glo_module == "Msg" ]];      then glo_module=Message_Mod;   fi
-          if [[ $glo_module == "Nat" ]];      then glo_module=Native_Mod;    fi
-          if [[ $glo_module == "Particle" ]]; then glo_module=Particle_Mod;  fi
-          if [[ $glo_module == "Pet" ]];      then glo_module=Petsc_Mod;     fi
-          if [[ $glo_module == "Process" ]];  then glo_module=Process_Mod;   fi
-          if [[ $glo_module == "Profiler" ]]; then glo_module=Profiler_Mod;  fi
-          if [[ $glo_module == "Results" ]];  then glo_module=Results_Mod;   fi
-          if [[ $glo_module == "Sol" ]];      then glo_module=Solver_Mod;    fi
-          if [[ $glo_module == "Sort" ]];     then glo_module=Sort_Mod;      fi
-          if [[ $glo_module == "String" ]];   then glo_module=String_Mod;    fi
-          if [[ $glo_module == "Surf" ]];     then glo_module=Surf_Mod;      fi
-          if [[ $glo_module == "Swarm" ]];    then glo_module=Swarm_Mod;     fi
-          if [[ $glo_module == "Tok" ]];      then glo_module=Tokenizer_Mod; fi
-          if [[ $glo_module == "Turb" ]];     then glo_module=Turb_Mod;      fi
-          if [[ $glo_module == "Vof" ]];      then glo_module=Vof_Mod;       fi
-          if [[ $glo_module == "Work" ]];     then glo_module=Work_Mod;      fi
+          if [[ $glo_module == "Backup" ]];       then glo_module=Backup_Mod;       fi
+          if [[ $glo_module == "Comm" ]];         then glo_module=Comm_Mod;         fi
+          if [[ $glo_module == "Control" ]];      then glo_module=Control_Mod;      fi
+          if [[ $glo_module == "Convert" ]];      then glo_module=Convert_Mod;      fi
+          if [[ $glo_module == "Divide" ]];       then glo_module=Divide_Mod;       fi
+          if [[ $glo_module == "Dom" ]];          then glo_module=Domain_Mod;       fi
+          if [[ $glo_module == "Elem" ]];         then glo_module=Elem_Mod;         fi
+          if [[ $glo_module == "File" ]];         then glo_module=File_Mod;         fi
+          if [[ $glo_module == "Flow" ]];         then glo_module=Field_Mod;        fi
+          if [[ $glo_module == "Front" ]];        then glo_module=Front_Mod;        fi
+          if [[ $glo_module == "Generate" ]];     then glo_module=Generate_Mod;     fi
+          if [[ $glo_module == "Grid" ]];         then glo_module=Grid_Mod;         fi
+          if [[ $glo_module == "Isoap" ]];        then glo_module=Isoap_Mod;        fi
+          if [[ $glo_module == "Iso_Polygons" ]]; then glo_module=Iso_Polygons_Mod; fi
+          if [[ $glo_module == "Info" ]];         then glo_module=Info_Mod;         fi
+          if [[ $glo_module == "Iter" ]];         then glo_module=Iter_Mod;         fi
+          if [[ $glo_module == "Line" ]];         then glo_module=Tokenizer_Mod;    fi
+          if [[ $glo_module == "Math" ]];         then glo_module=Math_Mod;         fi
+          if [[ $glo_module == "Message" ]];      then glo_module=Message_Mod;      fi
+          if [[ $glo_module == "Metis" ]];        then glo_module=Metis_Mod;        fi
+          if [[ $glo_module == "Monitor" ]];      then glo_module=Monitor_Mod;      fi
+          if [[ $glo_module == "Msg" ]];          then glo_module=Message_Mod;      fi
+          if [[ $glo_module == "Nat" ]];          then glo_module=Native_Mod;       fi
+          if [[ $glo_module == "Particle" ]];     then glo_module=Particle_Mod;     fi
+          if [[ $glo_module == "Pet" ]];          then glo_module=Petsc_Mod;        fi
+          if [[ $glo_module == "Pol" ]];          then glo_module=Polyhedron_Mod;   fi
+          if [[ $glo_module == "Polyhedron" ]];   then glo_module=Polyhedron_Mod;   fi
+          if [[ $glo_module == "Por" ]];          then glo_module=Porosity_Mod;     fi
+          if [[ $glo_module == "Process" ]];      then glo_module=Process_Mod;      fi
+          if [[ $glo_module == "Prof" ]];         then glo_module=Profiler_Mod;     fi
+          if [[ $glo_module == "Profiler" ]];     then glo_module=Profiler_Mod;     fi
+          if [[ $glo_module == "Read_Control" ]]; then glo_module=Read_Control_Mod; fi
+          if [[ $glo_module == "Results" ]];      then glo_module=Results_Mod;      fi
+          if [[ $glo_module == "Sol" ]];          then glo_module=Solver_Mod;       fi
+          if [[ $glo_module == "Sort" ]];         then glo_module=Sort_Mod;         fi
+          if [[ $glo_module == "Stl" ]];          then glo_module=Stl_Mod;          fi
+          if [[ $glo_module == "String" ]];       then glo_module=String_Mod;       fi
+          if [[ $glo_module == "Surf" ]];         then glo_module=Surf_Mod;         fi
+          if [[ $glo_module == "Swarm" ]];        then glo_module=Swarm_Mod;        fi
+          if [[ $glo_module == "Tok" ]];          then glo_module=Tokenizer_Mod;    fi
+          if [[ $glo_module == "Time" ]];         then glo_module=Time_Mod;         fi
+          if [[ $glo_module == "Turb" ]];         then glo_module=Turb_Mod;         fi
+          if [[ $glo_module == "Vof" ]];          then glo_module=Vof_Mod;          fi
+          if [[ $glo_module == "Work" ]];         then glo_module=Work_Mod;         fi
         fi
         called_modules[$proc]=$glo_module
         called_procedures[$proc]=$glo_procedure
@@ -532,10 +554,10 @@ while [[ $# > 0 ]]; do
       shift  # past argument
       ;;     # part of the case construct
 
-    # Exclude - takes only one argument
+    # Exclude - accumulate arguments
     -e)
       current_opt=$1
-      glo_exclude_dir=$2
+      glo_exclude_dir=$glo_exclude_dir" $2"
       shift  # past argument
       shift  # past value
       ;;     # part of the case construct
@@ -562,7 +584,9 @@ while [[ $# > 0 ]]; do
 
     # Accumulates additonal strings to glo_ignore
     *)
-      if [[ $current_opt == -i ]]; then
+      if [[ $current_opt == -e ]]; then
+        glo_exclude_dir=$glo_exclude_dir" $1"
+      elif [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
@@ -573,6 +597,4 @@ while [[ $# > 0 ]]; do
   esac
 done
 
-echo $glo_ignore_mod
 extract_call_graph $name
-# echo "default = ${default}"
