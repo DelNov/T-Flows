@@ -1,3 +1,42 @@
+#==============================================================================#
+#   Script for extracting call graphs from T-Flows sources
+#------------------------------------------------------------------------------#
+#   A brief description of the scripts main components and functionalities:
+#
+#   * Color Definitions: The script starts by defining color variables for
+#     output formatting
+#
+#   * Global Settings: It sets global variables for the root source directory,
+#     output formatting, and color schemes for different types of procedures
+#     (e.g., member callers, global callers).
+#
+#   * Utility Functions: Functions like print_separator, print_line, and
+#     print_usage are defined for formatting and providing usage information,
+#     which is consistent with your module hierarchy script.
+#
+#   * Main Functionality - extract_call_graph:
+#     - This function recursively explores procedure calls within your code.
+#     - It takes a procedure name as input and analyses its calls by reading
+#       .f90 files.
+#     - The script distinguishes between member callers, global callers, and
+#       external procedures.
+#     - It handles various cases like procedures calling others, procedures not
+#       calling any others, and excluded or ignored modules.
+#     - The script uses grep and awk for text processing within Fortran source
+#       files.
+#
+#   * Command-Line Argument Parsing: The script processes command-line arguments
+#     for options like expanding all calls (-a), excluding certain directories
+#     (-e), and ignoring specific modules (-i).
+#
+#   * Procedure and Module Extraction: An additional function
+#     extract_procedure_and_module is used to parse and determine the procedure
+#     and module names from the call lines.
+#
+#   * Execution Logic: The script executes the extract_call_graph function based
+#    on the input parameters and command-line arguments.
+#------------------------------------------------------------------------------#
+
 #!/bin/bash
 
 BLACK='\U001B[30m'
@@ -103,7 +142,7 @@ print_usage() {
   echo "#"
   echo "# where Source is the procedure name for which you want to perform"
   echo "# the analysis, such as: Main_Con, Compute_Energy, Main_Div, hence"
-  echo -e "# case sensitive, ${RED}without${RESET} the .f90 extension."
+  echo -e "# case sensitive, with or without the .f90 extension."
   echo "#"
   echo "# Valid options are:"
   echo "#"
@@ -473,8 +512,13 @@ fi
 #   Parse command line options like a pro :-)
 #-----------------------------------------------
 
-# Fetch the name and shift on
+# Fetch the name
 name=$1
+
+# Remove the .f90 extension if it exists
+name="${name%.f90}"
+
+# Shift on
 shift
 
 current_opt=""

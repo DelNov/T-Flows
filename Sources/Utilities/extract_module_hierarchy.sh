@@ -1,3 +1,35 @@
+#==============================================================================#
+#   Script for extracting module hierarchy from T-Flows sources
+#------------------------------------------------------------------------------#
+#   Overview of its functionality and structure:
+#
+#   * Color Definitions: The script begins by defining a series of color
+#     variables for output formatting.
+#
+#   * Global Settings: These include the root source directory, output
+#     formatting settings (like tab width and indentation), and color schemes
+#     for different types of modules.
+#
+#   * Utility Functions: Functions like print_separator, print_line, and
+#     print_usage are defined for handling output formatting and providing usage
+#     information.
+#
+#   * Main Functionality - extract_hierarchy:
+#
+#     This function recursively explores module dependencies.
+#     It takes a module name as input and analyses its dependencies by reading
+#     .f90 files.  It handles various cases, like modules using other modules,
+#     modules not using any others, and excluded or ignored modules.
+#     The script uses grep and awk for text processing within Fortran source
+#     files.
+#     Command-Line Argument Parsing: The script processes command-line arguments
+#     for various options like expanding all modules (-a), excluding certain
+#     directories (-e), and ignoring specific modules (-i).
+#
+#     Execution Logic: The script executes the extract_hierarchy function based
+#     on the input parameters and command-line arguments.
+#------------------------------------------------------------------------------#
+
 #!/bin/bash
 
 BLACK='\U001B[30m'
@@ -95,7 +127,8 @@ print_usage() {
   echo "# where Target_Mod is the module name for which you want to perform"
   echo "# the analysis, such as: Grid_Mod, Convert_Mod, Generate_Mod, hence"
   echo -e "# case sensitive, ${RED}with${RESET} the _Mod suffix,"\
-          "${RED}without${RESET} the .f90 extension."
+          "with or without the .f90"
+  echo "# extension."
   echo "#"
   echo "# Valid options are:"
   echo "#"
@@ -263,8 +296,13 @@ fi
 #   Parse command line options like a pro :-)
 #-----------------------------------------------
 
-# Fetch the name and shift on
+# Fetch the name
 name=$1
+
+# Remove the .f90 extension if it exists
+name="${name%.f90}"
+
+# Shift on
 shift
 
 current_opt=""
