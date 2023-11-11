@@ -65,7 +65,7 @@ RESET='\U001B[0m'
 
 # Find the "root" of all sources
 cur=$(pwd)
-src=$(echo "$cur" | awk -F'/Sources/' '{print $1 "/Sources"}')
+src=$(echo "$cur" | awk -F'/Sources/' '{print ($2 == "" ? $0 : $1 "/Sources")}')
 
 # The following four affect the width of the output
 tabs 60
@@ -138,7 +138,7 @@ print_usage() {
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/extract_call_graph.sh <Source> [options]"
+  echo "# "$0" <Source> [options]"
   echo "#"
   echo "# where Source is the procedure name for which you want to perform"
   echo "# the analysis, such as: Main_Con, Compute_Energy, Main_Div, hence"
@@ -147,22 +147,24 @@ print_usage() {
   echo "# Valid options are:"
   echo "#"
   echo "# -a"
-  echo "#"
   echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
   echo "# -e <list of directories to exclude>"
-  echo "#"
   echo "#    In cases where the same module name is used in more than one"
   echo "#    directory, use this option to exclude one from the search."
   echo "#"
   echo "# -i <list of modules to ignore>"
-  echo "#"
   echo "#    You may want to exclude some of the smaller modules, such as"
   echo "#    Comm_Mod, Message_Mod, Work_Mod, Profiler_Mod, String_Mod,"
   echo "#    Tokenizer_Mod to reduce the amoun of information printed."
   echo "#"
-  echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
-          "T-Flows/Sources!" ${RESET}
+  echo "# Note that:"
+  echo -e "#   ${LIGHT_RED} The script is supposed to be executed from:" \
+          "T-Flows/Sources,"${RESET}
+  echo -e "#   ${LIGHT_RED} or any of its sub-directories. The <Target_Mod>" \
+          "doesnot have"${RESET}
+  echo -e "#   ${LIGHT_RED} to reside in the directory from which you launch" \
+          "the script!"${RESET}
   echo "#----------------------------------------------------------------------"
   exit
 
