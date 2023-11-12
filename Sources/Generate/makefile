@@ -44,7 +44,7 @@ PASS_ON = -DT_FLOWS_COMPILATION=1
 #   Add T_FLOWS_PROGRAM, T_FLOWS_ASSERT and T_FLOWS_DEBUG
 #   and later on it add also T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
-PASS_ON += -DT_FLOWS_PROGRAM=1
+PASS_ON += -DT_FLOWS_PROGRAM=2
 
 ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1

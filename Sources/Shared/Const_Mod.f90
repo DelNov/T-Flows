@@ -9,11 +9,11 @@
 !==============================================================================!
 
 # if T_FLOWS_PROGRAM == 1
-  character(8), parameter :: PROGRAM_NAME = "Generate"
-# elif T_FLOWS_PROGRAM == 2
-  character(6), parameter :: PROGRAM_NAME = "Divide"
-# elif T_FLOWS_PROGRAM == 3
   character(7), parameter :: PROGRAM_NAME = "Convert"
+# elif T_FLOWS_PROGRAM == 2
+  character(8), parameter :: PROGRAM_NAME = "Generate"
+# elif T_FLOWS_PROGRAM == 3
+  character(6), parameter :: PROGRAM_NAME = "Divide"
 # elif T_FLOWS_PROGRAM == 4
   character(7), parameter :: PROGRAM_NAME = "Process"
 # else
