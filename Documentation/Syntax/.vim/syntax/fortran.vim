@@ -448,7 +448,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers  Cell_In_This_Proc
   syn keyword fortranMacroTflows   Assert  Unused
 " Finally, a few global functions which I don't really like in the code
-  syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
+  syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real  Key_Ind
 "---------------------------------------------------------------------[T-Flows]-
 
 "==============================================================[MPI in T-Flows]=
