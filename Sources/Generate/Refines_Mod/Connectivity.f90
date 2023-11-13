@@ -13,7 +13,7 @@
   integer, dimension(6,4) :: fn  ! link faces' nodes for a hexahedral cell
                                  ! not quite the same as Gambit's neu numbering
 !------------------------------------------------------------------------------!
-  include 'Block_Numbering.f90'
+  include 'Block_Numbering.h90'
 !==============================================================================!
 
   ! Copy face-node numbering for faces

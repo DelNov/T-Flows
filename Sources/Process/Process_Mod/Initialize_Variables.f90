@@ -8,18 +8,7 @@
 !   be kept after restart, it should be stored in backup file.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use File_Mod
-  use Field_Mod,   only: Field_Type
-  use Comm_Mod
-  use Turb_Mod
-  use Swarm_Mod
-  use Grid_Mod
-  use Bulk_Mod
   use User_Mod
-  use Control_Mod
-  use Vof_Mod
-  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -15,6 +15,10 @@
   use Eddies_Mod
 !------------------------------------------------------------------------------!
   implicit none
+!---------------------------------[Interfaces]---------------------------------!
+  interface
+    include '../Shared/Key_Ind.h90'
+  end interface
 !==============================================================================!
 
   !-----------------------!
@@ -47,6 +51,5 @@
 #   include "Read_Controls_Mod/Physical_Models.f90"
 #   include "Read_Controls_Mod/Physical_Properties.f90"
 #   include "Read_Controls_Mod/Solvers.f90"
-#   include "Key_Ind.f90"
 
   end module
