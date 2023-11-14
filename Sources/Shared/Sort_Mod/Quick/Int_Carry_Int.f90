@@ -1,15 +1,14 @@
 !==============================================================================!
   pure recursive subroutine Int_Carry_Int(Sort, a, b)
 !------------------------------------------------------------------------------!
-!   Quick sort one integer array and carry another integer arral along         !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort one integer array and carry another integer array along.
+!>  Adapted from: https://gist.github.com/1AdAstra1.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(inout) :: a(:)
-  integer,          intent(inout) :: b(:)
+  class(Sort_Type), intent(in)    :: Sort  !! parent class
+  integer,          intent(inout) :: a(:)  !! array for sorting
+  integer,          intent(inout) :: b(:)  !! array to carry on
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x, at
   integer :: bt

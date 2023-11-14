@@ -1,14 +1,39 @@
 !==============================================================================!
   subroutine Error(Message, width, message_text, file, line, one_proc)
 !------------------------------------------------------------------------------!
+!>  Displays an error message in a structured format, optionally including the
+!>  file name and line number where the error occurred. It's tailored to work
+!>  in parallel computing environments, allowing for the option to print from
+!>  only one processor. The subroutine also signifies a critical stop in the
+!>  execution of the program upon encountering an error.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Header formation:                                                        !
+!     - Depending on the presence of file and line arguments, the subroutine   !
+!       forms a header string. It concatenates "ERROR" with the file name and  !
+!       line number if provided, helping to pinpoint the location of error.    !
+!   * Width adjustment:                                                        !
+!     - The width (wd) is adjusted to accommodate the length of the header     !
+!       text plus a margin.                                                    !
+!   * Error message printing:                                                  !
+!     - The subroutine prints the error message using the Framed method of     !
+!       the Message object. If one_proc is provided and set to true, it        !
+!       checks if the current processor is the first processor (First_Proc()). !
+!       If so, or if one_proc is not provided or set to false, it proceeds     !
+!       to call Message % Framed.                                              !
+!   * Critical program stop:                                                   !
+!     - After displaying the error message, the subroutine calls               !
+!       Global % End_Parallel and then a stop statement.                       !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Message_Type)                :: Message
-  integer,                intent(in) :: width
-  character(*),           intent(in) :: message_text
-  character(*), optional, intent(in) :: file
-  integer,      optional, intent(in) :: line
-  logical,      optional, intent(in) :: one_proc  ! print from one processor
+  class(Message_Type)                :: Message       !! parent class
+  integer,                intent(in) :: width         !! width of the message
+  character(*),           intent(in) :: message_text  !! actuall message text
+  character(*), optional, intent(in) :: file          !! file with error
+  integer,      optional, intent(in) :: line          !! line with error
+  logical,      optional, intent(in) :: one_proc      !! print by 1 processor?
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: wd
   character(DL) :: header_text

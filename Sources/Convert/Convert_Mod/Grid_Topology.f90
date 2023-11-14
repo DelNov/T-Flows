@@ -1,22 +1,39 @@
 !==============================================================================!
   subroutine Grid_Topology(Convert, Grid)
 !------------------------------------------------------------------------------!
-!   Determines the topology of the Grid.                                       !
-!
-!   To be more specific, it determines:
+!>  The subroutine plays a crucial role in determining the topology of a grid.
+!>  It specifically focuses on the boundary elements of the grid and computes
+!>  several important properties.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
 !                                                                              !
-!   Grid % n_bnd_cells   - number of boundary cells                            !
-!   Grid % cells_n_nodes - number of nodes for each cell                       !
-!   Grid % cells_n       - list of each cell's nodes                           !
-!   Grid % n_faces       - number of faces on the boundary                     !
-!   Grid % faces_n_nodes - number of nodes for each face on the boundary       !
-!   Grid % faces_n       - list of each boundary face's nodes                  !
-!   Grid % faces_c       - a pair of cells surrounding each boundary face      !
+!   * The subroutine iterates over all cells in the grid.                      !
+!   * For each cell, it checks if any of its faces are part of a boundary      !
+!     region.                                                                  !
+!   * When a boundary face is found, it updates the count of boundary cells    !
+!     and faces.                                                               !
+!   * It then determines the nodes that constitute each boundary face based    !
+!     on the cell shape (hexahedron, prism, tetrahedron, or pyramid) and       !
+!     stores this information.                                                 !
+!   * The process involves mapping the local face identifiers to the global    !
+!     node identifiers of the grid.                                            !
+!   * Finally, the subroutine updates the Grid data structure with the         !
+!     computed topology information, including boundary cells, faces, and      !
+!     their corresponding nodes.                                               !
+!------------------------------------------------------------------------------!
+!   Note: To be more specific, this subroutine determines:                     !
+!   * Grid % n_bnd_cells   - number of boundary cells                          !
+!   * Grid % cells_n_nodes - number of nodes for each cell                     !
+!   * Grid % cells_n       - list of each cell's nodes                         !
+!   * Grid % n_faces       - number of faces on the boundary                   !
+!   * Grid % faces_n_nodes - number of nodes for each face on the boundary     !
+!   * Grid % faces_n       - list of each boundary face's nodes                !
+!   * Grid % faces_c       - a pair of cells surrounding each boundary face    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j
 !------------------------[Avoid unused parent warning]-------------------------!

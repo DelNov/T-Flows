@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Reference_Density(Control, d_ref, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads the value of reference density from the control file.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  real,   intent(out) :: d_ref
-  logical,   optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: d_ref    !! value of reference density
+  logical,   optional :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

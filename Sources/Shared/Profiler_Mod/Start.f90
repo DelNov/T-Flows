@@ -1,12 +1,14 @@
 !==============================================================================!
   subroutine Start(Prof, f_name)
 !------------------------------------------------------------------------------!
-!   This subroutine is called whenever new function is invoked                 !
+!>  Initializes profiling for a function. It records the function's name and
+!>  updates internal counters and time stamps.  It is called whenever new
+!>  function (or code segment) starts.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target :: Prof
-  character(len=*)             :: f_name
+  class(Profiler_Type), target :: Prof    !! parent class
+  character(len=*)             :: f_name  !! function (or code segment) name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_fun  ! function counter
 !==============================================================================!

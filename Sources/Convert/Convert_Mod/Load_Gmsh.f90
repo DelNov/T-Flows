@@ -1,13 +1,44 @@
 !==============================================================================!
   subroutine Load_Gmsh(Convert, Grid, file_name)
 !------------------------------------------------------------------------------!
-!   Reads the Gmsh file format.                                                !
+!>  This subroutine is designed to read grid files in the Gmsh file format
+!>  and populate the provided Grid object with the necessary data.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initial setup: The subroutine starts by opening the specified Gmsh file  !
+!     in binary mode for initial analysis.                                     !
+!   * Section identification: It identifies important sections in the Gmsh     !
+!     file, such as PhysicalNames, Entities, Nodes, and Elements, using a      !
+!     buffered reading approach. (This is crucial for locating and parsing     !
+!     different parts of the file efficiently.)                                !
+!   * File format check: The subroutine checks the version of the Gmsh file    !
+!     and whether it's in ASCII or binary format. This affects how the file    !
+!     will be read and processed.                                              !
+!   * Reading grid information:                                                !
+!     - It reads the number of blocks and boundary sections in the grid.       !
+!     - The subroutine counts the number of internal and boundary cells, a key !
+!       step for allocating memory for the grid data.                          !
+!     - It processes boundary conditions and entities, extracting data such    !
+!       as surface dimensions, element types, and the number of members in     !
+!       each group.                                                            !
+!   * Memory allocation for grid: Allocates memory for the Grid object based   !
+!     on the extracted information, preparing it for storing grid data.        !
+!   * Reading cell and node data:                                              !
+!     - It reads and stores cell information, including cell types (triangles, !
+!       quadrilaterals, tetrahedra, etc.) and node indices.                    !
+!     - The subroutine also reads and stores nodal coordinates.                !
+!   * Boundary condition processing: Reads and processes boundary condition    !
+!     information, translating Gmsh's physical group tags to T-Flows' format.  !
+!   * Finalization: The subroutine closes the file, stops profiling, and       !
+!     prepares the Grid object with all the necessary grid data for further    !
+!     processing.                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  character(SL)       :: file_name
+  class(Convert_Type) :: Convert    !! parent class
+  type(Grid_Type)     :: Grid       !! grid being converted
+  character(SL)       :: file_name  !! file name
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MSH_TRI   = 2
   integer, parameter :: MSH_QUAD  = 3

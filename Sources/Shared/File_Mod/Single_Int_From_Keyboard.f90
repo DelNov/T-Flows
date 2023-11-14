@@ -1,13 +1,12 @@
 !==============================================================================!
   integer function Single_Int_From_Keyboard(File)
 !------------------------------------------------------------------------------!
-!   Reads a single word form keybaord, discarding comments                     !
-!                                                                              !
-!   A comment is each line which begins with "!", "#" or "%".                  !
+!>  Reads a single integer form keybaord, discarding comments.
+!>  A comment is each line which begins with "!", "#" or "%".
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
+  class(File_Type) :: File  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   integer :: val
 !==============================================================================!

@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Heat_Transfer(Control, heat, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads, from the control file, if simulation involves heat transfer.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: heat
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: heat     !! true if problem involves heat transfer
+  logical, optional    :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

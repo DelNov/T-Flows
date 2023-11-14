@@ -1,25 +1,41 @@
 !==============================================================================!
   subroutine Find_Faces(Convert, Grid)
 !------------------------------------------------------------------------------!
-!   Find faces inside the domain.  To be more specific, it determines:         !
+!>  This subroutine is dedicated to finding faces within a grid, specifically
+!>  for conformal meshes composed of tetrahedra, wedges, prisms, and hexahedra.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   Grid % n_faces       - final number of faces (boundary + inside)           !
-!   Grid % faces_n_nodes - number of nodes for each face                       !
-!   Grid % faces_n       - nodes of each face                                  !
-!   Grid % faces_c       - pair of cells surrounding each face                 !
-!                                                                              !
-!   Note 1: Boundary faces have been determined in "Grid_Topology".            !
-!   Note 2: This algorithm only works with conformal meshes made up of tetra-  !
-!           hedra, wedges, prisms and hexahedra.  Meshes with hanging nodes    !
-!           and/or polyhedral meshes are not supported.  That should not be    !
-!           a big deal though, since such meshes comes in formats which is     !
-!           already face-based, thus one will not need to find faces in them.  !
+!   * Initialization: Allocates memory for arrays to store face and cell       !
+!     information. It then calculates the maximum number of faces (max_fac)    !
+!     and nodes (max_nod) per cell.                                            !
+!   * Face identification in cells: The subroutine iterates over each cell,    !
+!     identifying potential faces based on the nodes that define each cell.    !
+!     It stores the smallest three nodes of each potential face, along with    !
+!     the corresponding cell.                                                  !
+!   * Sorting and annotating faces: The potential faces are sorted based on    !
+!     their node indices. Faces with the same nodes are annotated for further  !
+!     processing.                                                              !
+!   * Main loop for face organization: Iterates through the annotated faces,   !
+!     pairing cells to form internal faces of the mesh. It checks for matching !
+!     nodes between cells to identify shared faces.                            !
+!   * Finalizing face data: stores the identified faces' data in the Grid      !
+!     structure, including the number of nodes per face and the cells each     !
+!     face connects.                                                           !
+!   * Memory Deallocation: deallocate local arrays to clean up the memory.     !
+!------------------------------------------------------------------------------!
+!   Note 1: To be more specific, this subrotine determines:                    !
+!   * Grid % n_faces       - final number of faces (boundary + inside)         !
+!   * Grid % faces_n_nodes - number of nodes for each face                     !
+!   * Grid % faces_n       - nodes of each face                                !
+!   * Grid % faces_c       - pair of cells surrounding each face               !
+!   Note 2: Boundary faces have been determined in "Grid_Topology".            !
 !   Note 3: This is called before geometrical quantities are calculated.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n1, n2, n3, f_nod(4)
   integer              :: n_match, i_fac, max_fac, match_nodes(-1:8)

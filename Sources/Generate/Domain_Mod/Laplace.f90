@@ -3,14 +3,40 @@
                                          wy16, wy24, wy35,  &
                                          wz16, wz24, wz35)
 !------------------------------------------------------------------------------!
-!   Places the nodes inside the block using Laplace-like function              !
+!>  Places nodes inside the block using Laplace-like function.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization:                                                          !
+!     - Retrieves the resolution of the block and the coordinates of the       !
+!       corners of the block.                                                  !
+!   * Node position calculation:                                               !
+!     - Iterates through the node indices to calculate the positions of the    !
+!       nodes inside the block.                                                !
+!     - Uses a Laplace-like function to interpolate node positions based on    !
+!       the coordinates of the block's corners and the provided weigh factors. !
+!     - The interpolation takes into account the relative position of the node !
+!       within the block and adjusts the node's coordinates (xn, yn, zn) in    !
+!       the grid accordingly.                                                  !
+!   * Face position calculations:                                              !
+!     - Determines the positions of the faces of the block (xf1, yf1, zf1,     !
+!       etc.) based on the corner coordinates                                  !
+!     -  If a node on a face has not been previously positioned (indicated     !
+!        by a coordinate greater than TERA), calculates its position;          !
+!        otherwise, uses the existing position.                                !
+!   * Node Position Assignment:                                                !
+!     - If the node's position has not been previously set, it calculates      !
+!       the node's position using the weighted averages of the face positions. !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type)  :: Dom
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: b, i, j, k
-  real,    intent(in) :: wx16, wx24, wx35, wy16, wy24, wy35, wz16, wz24, wz35
+  class(Domain_Type)  :: Dom      !! domain in which the grid is generated
+  type(Grid_Type)     :: Grid     !! grid being generated
+  integer, intent(in) :: b        !! current block
+  integer, intent(in) :: i, j, k  !! point position inside the block
+  real,    intent(in) :: wx16, wx24, wx35  !! weights in x direction
+  real,    intent(in) :: wy16, wy24, wy35  !! weights in y direction
+  real,    intent(in) :: wz16, wz24, wz35  !! weights in z direction
 !-----------------------------------[Locals]-----------------------------------!
   real    :: xt(8), yt(8), zt(8)
   integer :: ni, nj, nk, n, n1, n2, n3, n4, n5, n6

@@ -1,13 +1,13 @@
 !==============================================================================!
   pure subroutine Int_Carry_Real(Sort, a1, b)
 !------------------------------------------------------------------------------!
-!   Heap sort one integer array and carry a real arral along                   !
+!>  Heap sort one integer array and carry a real arral along.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  integer,          intent(inout) :: a1(:)
-  real,             intent(inout) :: b(:)
+  class(Sort_Type), intent(inout) :: Sort   !! parent class
+  integer,          intent(inout) :: a1(:)  !! array for sorting
+  real,             intent(inout) :: b(:)   !! array to carry on
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   integer :: a_1

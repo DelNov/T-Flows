@@ -1,15 +1,15 @@
 !==============================================================================!
   subroutine Position_At_One_Key(Control, keyword, found, verbose)
 !------------------------------------------------------------------------------!
-!   Position yourself within the file at the line specified with one key.      !
-!   It is intended to be used to find the initial condition specifications.    !
+!>  Position yourself within the contrl file at the line specified with one key.
+!>  It is intended to be used to find the initial condition specifications.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword
-  logical,             intent(out) :: found
-  logical, optional,   intent(in)  :: verbose
+  class(Control_Type)              :: Control  !! parent class
+  character(len=*),    intent(in)  :: keyword  !! keyword it searches
+  logical,             intent(out) :: found    !! true if keyword is found
+  logical, optional,   intent(in)  :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
 !==============================================================================!

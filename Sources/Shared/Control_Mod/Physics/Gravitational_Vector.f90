@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Gravitational_Vector(Control, grav_x, grav_y, grav_z, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads components of gravitational vector.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  real,   intent(out) :: grav_x, grav_y, grav_z
-  logical,   optional :: verbose
+  class(Control_Type) :: Control                 !! parent class
+  real,   intent(out) :: grav_x, grav_y, grav_z  !! gravity vector component
+  logical,   optional :: verbose                 !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   real :: def(3)
   real :: val(3)

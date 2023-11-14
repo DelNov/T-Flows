@@ -1,15 +1,29 @@
 !==============================================================================!
   subroutine Calculate_Geometry(Generate, Grid, real_run)
 !------------------------------------------------------------------------------!
-!   Calculates geometrical quantities of the grid.                             !
-!                                                                              !
+!>  Calculates geometrical quantities (such as cell centers, face surface
+!>  areas, ...) and handles periodicity of the grid.
+!------------------------------------------------------------------------------!
 !   This subroutine has a sibling in Convert_Mod, with the same name.  They    !
 !   can never be quite the same, unfortunatelly, because the data they start   !
-!   with is different.                                                         !
+!   with is different.  One of the most distinct differences is the treatment  !
+!   of periodicity.  Here, periodic faces are added to the existing (internal) !
+!   ones, while in Convert_Mod existing faces are turned into periodic ones.   !
 !                                                                              !
-!   One of the most distinct differences is the treatment of periodicity.      !
-!   Here, periodic faces are added to the existing (internal) ones, whereas    !
-!   in Convert_Mod, existing faces are turned into periodic ones.              !
+!   Functionality overview:                                                    !
+!   * Geometry calculations: It computes geometric quantities such as cell     !
+!     centers, face surface areas, face centers, and volumes of cells in grid. !
+!   * Periodicity handling: The subroutine uniquely addresses the aspect of    !
+!     periodicity in the grid. It adds periodic faces to the existing internal !
+!     ones or adjusts existing faces to account for periodic boundaries.       !
+!   * Boundary cell centers: It calculates the centers of boundary cells based !
+!     on the geometry of the internal cells and their faces.                   !
+!   * Cell volume calculation: It computes the volume of each cell             !
+!   * Cell inertia tensor calculation: Calculates the inertia tensor for each  !
+!     cell, providing information about the cell's resistance to rotation.     !
+!   * Face interpolation factors: Determines interpolation factors for the     !
+!     cell faces, facilitating the estimation of properties at face centers    !
+!     from cell center values.                                                 !
 !------------------------------------------------------------------------------!
 !                                                                              !
 !                                n3                                            !
@@ -91,9 +105,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Generate_Type) :: Generate
-  type(Grid_Type)      :: Grid
-  logical, intent(in)  :: real_run
+  class(Generate_Type) :: Generate  !! parent class
+  type(Grid_Type)      :: Grid      !! grid being generated
+  logical, intent(in)  :: real_run  !! logical variable, false for trial run,
+                                    !! true for real run
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, c1, c2, m, s, n_per, nn, nf
   real    :: xs2, ys2, zs2, t, tot_surf

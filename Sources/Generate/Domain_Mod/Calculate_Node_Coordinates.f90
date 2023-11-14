@@ -1,12 +1,33 @@
 !==============================================================================!
   subroutine Calculate_Node_Coordinates(Dom, Grid)
 !------------------------------------------------------------------------------!
-!   Calculate node coordinates inside the domain, block by block.              !
+!>  This subroutine, used only from Generate program, is responsible for
+!>  calculating the coordinates of nodes within each block of the computational
+!>  domain and transferring this data to a grid object.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization: It first initializes the node coordinates to a specific  !
+!     value (PETA) to serve as an indicator of whether a node's coordinates    !
+!     have been calculated.                                                    !
+!   * Block-by-block processing: For each block in the domain, it calculates   !
+!     the coordinates of the nodes based on the block's resolution and corner  !
+!     points.                                                                  !
+!   * Processing lines within blocks: The subroutine then iterates over each   !
+!     line within the domain, checking if the line is part of the current      !
+!     block and then calculating node coordinates along the line based on      !
+!     either direct specifications (point by point) or a weighting factor.     !
+!   * Distributing nodes on faces and volumes: It distributes nodes along the  !
+!     faces and within the volumes of each block, considering different        !
+!     weighting factors for node clustering.                                   !
+!   * Control volume nodes and neighbors: Finally, the subroutine calculates   !
+!     and assigns nodes and their neighbors to the control volumes within      !
+!     each block, updating the overall number of nodes and cells in the grid.  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type) :: Dom
-  type(Grid_Type)    :: Grid
+  class(Domain_Type) :: Dom   !! domain in which the grid is being generated
+  type(Grid_Type)    :: Grid  !! grid being generated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: fc, b, bl, i, j, k, n, c, ig
   integer :: l, l1, l2
@@ -230,7 +251,7 @@
           ie=trans(1,1)+trans(1,2)*Dom % lines(l) % resolution
           je=trans(2,1)+trans(2,2)*Dom % lines(l) % resolution
           ke=trans(3,1)+trans(3,2)*Dom % lines(l) % resolution
-          call Dom % Distribute_Nodes(Grid,                                 &
+          call Dom % Distribute_Nodes(Grid,                  &
                                 b, Dom % lines(l) % weight,  &
                                 is, js, ks, ie, je, ke)
         end if
@@ -336,7 +357,7 @@
       end do
     else ! Dom % lines in the j direction
       do k=1,nk
-        call Dom % Distribute_Nodes(Grid,                                              &
+        call Dom % Distribute_Nodes(Grid,                               &
                               b, Dom % blocks(b) % face_weights(fc,2),  &
                               i,1,k,i,nj,k)
       end do
@@ -348,13 +369,13 @@
     if( .not. Math % Approx_Real(  &
               Dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do i=1,ni
-        call Dom % Distribute_Nodes(Grid,                                              &
+        call Dom % Distribute_Nodes(Grid,                               &
                               b, Dom % blocks(b) % face_weights(fc,3),  &
                               i,j,1,i,j,nk)
       end do
     else ! Dom % lines in the i direction
       do k=1,nk
-        call Dom % Distribute_Nodes(Grid,                                              &
+        call Dom % Distribute_Nodes(Grid,                               &
                               b, Dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do
@@ -366,13 +387,13 @@
     if( .not. Math % Approx_Real(  &
               Dom % blocks(b) % face_weights(fc,3),1.0 ) ) then
       do i=1,ni
-        call Dom % Distribute_Nodes(Grid,                                              &
+        call Dom % Distribute_Nodes(Grid,                               &
                               b, Dom % blocks(b) % face_weights(fc,3),  &
                               i,j,1,i,j,nk)
       end do
     else ! Dom % lines in the i direction
       do k=1,nk
-        call Dom % Distribute_Nodes(Grid,                                              &
+        call Dom % Distribute_Nodes(Grid,                               &
                               b, Dom % blocks(b) % face_weights(fc,1),  &
                               1,j,k,ni,j,k)
       end do

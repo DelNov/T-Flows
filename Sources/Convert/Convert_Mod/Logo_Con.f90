@@ -1,6 +1,10 @@
 !==============================================================================!
   subroutine Logo_Con(Convert)
 !------------------------------------------------------------------------------!
+!>  Prints Convert's logo on the terminal.  Along with it, also in which
+!>  precision (single or double) were the floating point numbers compiled
+!>  and the flavour of sorting routines used (quick or heap sort).
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert

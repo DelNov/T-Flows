@@ -1,13 +1,15 @@
 !==============================================================================!
   subroutine Find_Surface(Dom, n1, n2, n3, n4, block, face)
 !------------------------------------------------------------------------------!
-!   Searches for a block where the surface defined by n1, n2, n3, n4 is.       !
+!>  Identifies the block and face in domain (Dom) where a surface defined
+!>  by nodes n1, n2, n3, and n4 exists.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type)   :: Dom
-  integer, intent(in)  :: n1, n2, n3, n4
-  integer, intent(out) :: block, face
+  class(Domain_Type)   :: Dom             !! computational domain
+  integer, intent(in)  :: n1, n2, n3, n4  !! node of a face
+  integer, intent(out) :: block           !! identified block
+  integer, intent(out) :: face            !! identified face
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, fc, p1, p2, p3, p4
 !==============================================================================!

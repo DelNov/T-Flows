@@ -1,13 +1,14 @@
 !==============================================================================!
   pure function First_Upper(String, char_array) result(char_manip)
 !------------------------------------------------------------------------------!
-!   Returns a string with first letter from the upper case.                    !
+!>  Function that converts the first letter of a string to uppercase while the
+!>  rest of the string is in lowercase.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(String_Type), intent(in) :: String
-  character(len=*),   intent(in) :: char_array
-  character(:),      allocatable :: char_manip
+  class(String_Type), intent(in) :: String      !! parent class
+  character(len=*),   intent(in) :: char_array  !! input string
+  character(:),      allocatable :: char_manip  !! final (manipulated) string
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
 !------------------------[Avoid unused parent warning]-------------------------!

@@ -1,12 +1,12 @@
 !==============================================================================!
   pure subroutine Int_Array(Sort, a1)
 !------------------------------------------------------------------------------!
-!   Heap sort one integer array.                                               !
+!>  Heap sort one integer array.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  integer,          intent(inout) :: a1(:)
+  class(Sort_Type), intent(inout) :: Sort   !! parent class
+  integer,          intent(inout) :: a1(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   integer :: a_1

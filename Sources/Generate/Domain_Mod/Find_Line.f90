@@ -1,13 +1,14 @@
 !==============================================================================!
   subroutine Find_Line(Dom, n1, n2, res)
 !------------------------------------------------------------------------------!
-!   Searches for a smallest block where the line defined by n1-n2 is.          !
+!>  Searches for the smallest block in domain (Dom) where the line defined by
+!>  nodes n1 and n2 exists, and outputs its resolution (res).
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type)   :: Dom
-  integer, intent(in)  :: n1, n2
-  integer, intent(out) :: res
+  class(Domain_Type)   :: Dom     !! computational domain
+  integer, intent(in)  :: n1, n2  !! node
+  integer, intent(out) :: res     !! output resolution
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, l1, l2
 !==============================================================================!

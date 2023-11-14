@@ -1,7 +1,9 @@
 !==============================================================================!
   module Domain_Mod
 !------------------------------------------------------------------------------!
-!   Domain as the one used in "Generator"                                      !
+!>  The Domain_Mod module, as part of the Generate program is an essential part
+!>  of the code. It integrates several specialized modules (Point_Mod, Line_Mod,
+!>  Block_Mod and Range_Mod) to define a computational grid.
 !------------------------------------------------------------------------------!
   use Gen_Mod                      ! a relict from the past
   use Point_Mod, only: Point_Type
@@ -16,18 +18,20 @@
   !-----------------!
   !   Domain type   !
   !-----------------!
+  !> Central to the Domain_Mod module, defining the computational domain.
   type Domain_Type
 
-    integer :: n_points
-    integer :: n_blocks
-    integer :: n_lines
-    integer :: n_ranges
-    integer :: n_smooths
+    integer :: n_points   !! number of points specified in the .dom file,
+                          !! hence number of points defining the domain
+    integer :: n_blocks   !! number of hexahedral blocks defining the domain
+    integer :: n_lines    !! number of lines defined in the .dom file
+    integer :: n_ranges   !! number of refinement regions
+    integer :: n_smooths  !! number of smoothing regions
 
-    type(Point_Type), allocatable :: points(:)
-    type(Block_Type), allocatable :: blocks(:)
-    type(Line_Type),  allocatable :: lines(:)
-    type(Range_Type), allocatable :: ranges(:)
+    type(Point_Type), allocatable :: points(:)  !! array to store points
+    type(Block_Type), allocatable :: blocks(:)  !! array to store blocks
+    type(Line_Type),  allocatable :: lines(:)   !! array to store lines
+    type(Range_Type), allocatable :: ranges(:)  !! array to store ranges
 
     contains
       procedure :: Allocate_Points

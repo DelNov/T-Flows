@@ -1,18 +1,44 @@
 !==============================================================================!
   subroutine Read_Line(File, un, reached_end, remove)
 !------------------------------------------------------------------------------!
-!   Reads a Line from a file unit un and discards if it is comment.            !
-!   In addition, it breaks the line in tokens (individual strings).            !
+!>  Reads a Line from a file unit un and discards if it is comment and, if
+!>  specified so, unwanted characters.  In addition, it breaks the line in
+!>  tokens (individual strings).
+!>
+!>  A comment is each line which begins with "!", "#" or "%".
+!>  Input line must not exceed len(Line % whole) characters in length.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
 !                                                                              !
-!   A comment is each line which begins with "!", "#" or "%".                  !
-!   Input line must not exceed len(Line % whole) characters in length          !
+!   * Initial setup:                                                           !
+!     - Sets reached_end to .false. if it is provided.                         !
+!     - Determines the number of characters to be removed based on remove.     !
+!   * Reading the line:                                                        !
+!     - Checks if the file is formatted or unformatted using inquire.          !
+!     - Reads the line either as a formatted string or character by character, !
+!       depending on the file format.                                          !
+!     - Ignores carriage return characters (byte .eq. 13) and stops reading    !
+!       at newline characters (byte .eq. 10).                                  !
+!   * Removing unwanted characters:                                            !
+!     - If remove is provided, removes specified characters from the line by   !
+!       replacing them with spaces.                                            !
+!   * Adjusting the line:                                                      !
+!     - Trims leading spaces from the line using adjustl.                      !
+!   * Skipping empty or comment lines:                                         !
+!     - Skips over empty lines and lines starting with comment characters      !
+!   * Tokenization:                                                            !
+!     - Calls Line % Parse() to tokenize the line                              !
+!   * End of file handling:                                                    !
+!     - If the end of the file is reached (indicated by the end=2 label),      !
+!       sets reached_end to .true. if it is present.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type)       :: File
-  integer                :: un  ! unit
-  logical,      optional :: reached_end
-  character(*), optional :: remove
+  class(File_Type)       :: File         !! parent class
+  integer                :: un           !! file unit
+  logical,      optional :: reached_end  !! flag to set if the end of the file
+                                         !! was reached during the reading
+  character(*), optional :: remove       !! list of characters to remove
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i, j, n
   integer(1)    :: byte

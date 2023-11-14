@@ -1,13 +1,46 @@
 !==============================================================================!
   subroutine Load_Fluent(Convert, Grid, file_name)
 !------------------------------------------------------------------------------!
-!   Reads the Fluent's file format.                                            !
+!>  This subroutine is designed to read grid files in the Fluent's file format
+!>  and populate the provided Grid object with the necessary data.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * File opening and initial setup: The subroutine opens the Fluent file in  !
+!     binary mode, assuming that the grid does not contain polyhedral cells    !
+!     initially.                                                               !
+!   * Reading header information: It extracts essential data from the file     !
+!     header, including the number of nodes, cells, and faces in the mesh.     !
+!   * Processing face data: The subroutine counts boundary cells and detrmines !
+!     the number of boundary cell sections by reading through the face data.   !
+!     This includes identifying the type of each face (mixed, quadrilateral,   !
+!     or triangular) and the cells (c1 and c2) adjacent to each face.          !
+!   * Memory allocation: Based on the information gathered, it allocates       !
+!     memory  for various Grid structure variables to store the mesh data.     !
+!   * Reading node coordinates: The subroutine reads and stores the            !
+!     coordinates of each node in the grid.                                    !
+!   * Reading and classifying cells: It reads through cell data to classify    !
+!     cells into different types (e.g., triangles, quadrilaterals, tetrahedra, !
+!     hexahedra, pyramids, wedges, polyhedra) and counts the number of each    !
+!     type.                                                                    !
+!   * Processing faces again for detailed data: The subroutine revisits the    !
+!     face data to store detailed information about each face, including nodes !
+!     and adjacent cells.
+!   * Reconstructing cell nodes: For non-polyhedral cells, it reconstructs the !
+!     nodes of each cell based on face data. For polyhedral cells, nodes are   !
+!     accumulated from all surrounding faces.                                  !
+!   * Data verification and integrity checks: It performs various checks to    !
+!     ensure the integrity of the data, such as verifying that no duplicate    !
+!     nodes or cells exist in the face and cell data.                          !
+!   * Final Processing of Boundary Conditions: The subroutine goes through all !
+!     sections in the file to store the number of boundary conditions and      !
+!     their names in the Grid structure.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  character(SL)       :: file_name
+  class(Convert_Type) :: Convert    !! parent class
+  type(Grid_Type)     :: Grid       !! grid being converted
+  character(SL)       :: file_name  !! file name
 !----------------------------------[Calling]-----------------------------------!
 # ifdef __NVCOMPILER_LLVM__
   integer :: ftell  ! needed for Nvidia compiler

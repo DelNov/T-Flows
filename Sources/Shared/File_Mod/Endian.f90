@@ -3,8 +3,16 @@
 !==============================================================================!
   logical function Is_Machine_Little_Endian()
 !------------------------------------------------------------------------------!
-!   Checks if this is a little endian machine.
-!   Returns litend=.true. if it is, litend=.false. if not
+!>  Checks if the machine on which it is running uses little-endian byte order.
+!>  If it is little-endian, it returns true, otherwise it returns false.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * The function sets i to 1. In a little-endian system, the least           !
+!     significant byte (which is 1) will be stored in the first byte of i.     !
+!     The equivalence statement allows j(1) to access this first byte.         !
+!   * If j(1) equals 1, it concludes that the machine is little-endian;        !
+!     otherwise, it's not.                                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Locals]-----------------------------------!
@@ -25,7 +33,9 @@
 !==============================================================================!
   subroutine Byte_Swap_Int_2(k)
 !------------------------------------------------------------------------------!
-!   Does a byteswap on integer(2) number                                       !
+!>  The subroutine swaps the bytes of a 2-byte integer.
+!>  (I don't think this function is ever used which indicates that we are
+!>  working in environments where endianness consistency isn't a concern.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -50,8 +60,11 @@
 !==============================================================================!
   subroutine Byte_Swap_Real_4(k)
 !------------------------------------------------------------------------------!
-!   Does a byteswap on real(4) number
+!>  The subroutine swaps the bytes of a 4-byte real number.
+!>  (I don't think this function is ever used which indicates that we are
+!>  working in environments where endianness consistency isn't a concern.)
 !------------------------------------------------------------------------------!
+  implicit none
 !---------------------------------[Arguments]----------------------------------!
   real(4) :: r
 !-----------------------------------[Locals]-----------------------------------!

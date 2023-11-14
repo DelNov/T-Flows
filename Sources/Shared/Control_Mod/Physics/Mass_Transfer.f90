@@ -1,11 +1,14 @@
 !==============================================================================!
   subroutine Mass_Transfer(Control, phase_change, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads if the simulation involves mass transfer (phase change) from the
+!>  control file.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: phase_change
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control       !! parent class
+  logical, intent(out) :: phase_change  !! true if phase change is modelled
+  logical, optional    :: verbose       !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

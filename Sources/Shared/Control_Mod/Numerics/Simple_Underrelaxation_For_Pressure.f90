@@ -1,9 +1,11 @@
 !==============================================================================!
   subroutine Simple_Underrelaxation_For_Pressure(Control, val, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads the SIMPLE under-relaxation coefficient for pressure.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
+  class(Control_Type) :: Control  !! parent class
   real,   intent(out) :: val
   logical,   optional :: verbose
 !==============================================================================!

@@ -1,17 +1,17 @@
 !==============================================================================!
   subroutine Read_Int_Item_On(Control, keyword, def, val, verbose)
 !------------------------------------------------------------------------------!
-!   Working horse function to read integer value (argument "val") behind a     !
-!   keyword (argument "keyword") in control file.  If not found, a default     !
-!   vaue specified in argument "def" is used.
+!>  Working horse function to read integer value (argument "val") behind a     !
+!>  keyword (argument "keyword") in control file, starting from the current
+!>  position. If not found, a default vaue specified in argument "def" is used.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword
-  integer,             intent(in)  :: def      ! default value
-  integer,             intent(out) :: val      ! spefified value, if found
-  logical,   optional, intent(in)  :: verbose
+  class(Control_Type)              :: Control  !! parent class
+  character(len=*),    intent(in)  :: keyword  !! keyword it searches
+  integer,             intent(in)  :: def      !! default value
+  integer,             intent(out) :: val      !! spefified value, if found
+  logical,   optional, intent(in)  :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
 !==============================================================================!

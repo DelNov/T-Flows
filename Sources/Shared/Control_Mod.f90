@@ -3,6 +3,10 @@
 
 !==============================================================================!
   module Control_Mod
+!------------------------------------------------------------------------------!
+!>  The Control_Mod module is a central component of controling a simulation
+!>  in the T-Flows code.  It reads and processes the control file, which
+!>  contains parameters and settings for a CFD simulations.
 !----------------------------------[Modules]-----------------------------------!
   use Math_Mod
   use File_Mod
@@ -13,6 +17,13 @@
   !------------------!
   !   Control type   !
   !------------------!
+  !> Encapsulates various aspects of the control file, including file units
+  !> (root control file and control files for different domains) and procedures
+  !> for reading and manipulating control file data.  Procedures are classified
+  !> in five big groups: basic functionality, input-output, native solvers,
+  !> numerical models and physical models.  In most cases, each procedure in
+  !> the Control_Type is reading one keyword in the control file (exceptions
+  !> are the boundary and initial conditions).
   type Control_Type
 
     ! Control file unit
@@ -189,8 +200,9 @@
 
   end type
 
-  type(Control_Type) :: Control
-
+  type(Control_Type) :: Control  !! Singleton object of the class Control_Type
+                                 !! to make the access to Control_Type
+                                 !! procedures easier.
   contains
 
     !-------------------------!

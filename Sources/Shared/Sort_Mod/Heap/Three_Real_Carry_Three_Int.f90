@@ -1,13 +1,13 @@
 !==============================================================================!
   pure subroutine Three_Real_Carry_Three_Int(Sort, a1, a2, a3, b, c, d)
 !------------------------------------------------------------------------------!
-!   Heap sort three integer aa_ys.and.carry an integer aa_l along            !
+!>  Heap sort three integer arays and carry an integer array along.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  real,             intent(inout) :: a1(:), a2(:), a3(:)
-  integer,          intent(inout) :: b (:), c (:), d (:)
+  class(Sort_Type), intent(inout) :: Sort                 !! parent class
+  real,             intent(inout) :: a1(:), a2(:), a3(:)  !! array for sorting
+  integer,          intent(inout) :: b (:), c (:), d (:)  !! array to carry on
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   real    :: a_1, a_2, a_3

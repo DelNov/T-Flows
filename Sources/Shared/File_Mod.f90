@@ -4,7 +4,9 @@
 !==============================================================================!
   module File_Mod
 !------------------------------------------------------------------------------!
-!   Variables and subroutines for handling file access.                        !
+!>  This module contains variables, subroutines and function for managing file
+!>  operations, including reading, writing, deleting, and modifying files in
+!>  both ASCII and binary formats.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use String_Mod
@@ -12,20 +14,23 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: MAX_ITEMS   =    2048
-  integer, parameter :: BUFFER_SIZE = 1048576
+  integer, parameter :: MAX_ITEMS   =    2048  !! maximum items in work arrays
+  integer, parameter :: BUFFER_SIZE = 1048576  !! buffer size
 !==============================================================================!
 
-  character(SL) :: problem_name(MD)
+  character(SL) :: problem_name(MD)  !! stores problem names for all domains
 
   !---------------!
   !   File type   !
   !---------------!
+  !> File_Type encapsulates a set of procedures for various file
+  !> operations and also buffers (i_buffer for integers, r_buffer
+  !> for reals) used in buffered I/O.
   type File_Type
 
     ! Buffers for reading
-    integer, private :: i_buffer(BUFFER_SIZE)
-    real,    private :: r_buffer(BUFFER_SIZE)
+    integer, private :: i_buffer(BUFFER_SIZE)  !! integer buffer
+    real,    private :: r_buffer(BUFFER_SIZE)  !! real buffer
 
     contains
       procedure :: Append_For_Writing_Ascii
@@ -54,12 +59,13 @@
   !---------------------------!
   !   Singleton object File   !
   !---------------------------!
-  type(File_Type) :: File
+  type(File_Type) :: File  !! singleton File object allowing easy access to
+                           !! module's functionalities across the application
 
-  integer(SP) :: int4_array(MAX_ITEMS)
-  integer(DP) :: int8_array(MAX_ITEMS)
-  real(SP)    :: real4_array(MAX_ITEMS)
-  real(DP)    :: real8_array(MAX_ITEMS)
+  integer(SP) :: int4_array(MAX_ITEMS)   !! working integer(4) array
+  integer(DP) :: int8_array(MAX_ITEMS)   !! working integer(8) array
+  real(SP)    :: real4_array(MAX_ITEMS)  !! working real(4) array
+  real(DP)    :: real8_array(MAX_ITEMS)  !! working real(8) array
 
   contains
 

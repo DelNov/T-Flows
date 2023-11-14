@@ -7,22 +7,25 @@
                               i_x, i_y, i_z, i_xy, i_xz, i_yz,  &
                               around_node)
 !------------------------------------------------------------------------------!
-!   Computes the moment of inertia for a tetrahedron defined with nodes 1 - 4. !
-!   around the centrod of tetrahedron.  If optional parameter around_node is   !
-!   present, it will shif the center of inertia to the specified node.
+!>  Computes the moment of inertia for a tetrahedron defined with nodes 1 - 4.
+!>  around the centrod of tetrahedron.  If optional parameter around_node is
+!>  present, it will shif the center of inertia to the specified node.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type),  intent(in)  :: Math
-  real,              intent(in)  :: x_1, y_1, z_1, x_2, y_2, z_2
-  real,              intent(in)  :: x_3, y_3, z_3, x_4, y_4, z_4
+  class(Math_Type),  intent(in)  :: Math           !! parent class
+  real,              intent(in)  :: x_1, y_1, z_1  !! point 1
+  real,              intent(in)  :: x_2, y_2, z_2  !! point 2
+  real,              intent(in)  :: x_3, y_3, z_3  !! point 3
+  real,              intent(in)  :: x_4, y_4, z_4  !! point 4
   real,              intent(out) :: i_x, i_y, i_z, i_xy, i_xz, i_yz
+                                          !! tensor of innertia component
   integer, optional, intent(in)  :: around_node
 !-----------------------------------[Locals]-----------------------------------!
   real :: x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4
   real :: xc, yc, zc  ! shift of the coordinates
   real :: vol         ! tetrahedron's volume
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   This is, in essence, Fortran implementation of the Tonon's (2004) paper    !
 !                                                                              !
 !            Tonon:                Here:                                       !
@@ -31,7 +34,7 @@
 !       | -b'  b  -a' |  =  | -i_xy  i_y  -i_yz |                              !
 !       | -c' -a'  c  |     | -i_xz -i_yz  i_z  |                              !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   !------------------------------------------------!
   !   Fetch the local coppies of input arguments   !

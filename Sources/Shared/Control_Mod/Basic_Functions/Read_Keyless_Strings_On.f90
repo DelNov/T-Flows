@@ -1,14 +1,16 @@
 !==============================================================================!
   subroutine Read_Keyless_Strings_On(Control, values, n, verbose)
 !------------------------------------------------------------------------------!
-!                                                                              !
+!> Reads a number od strings (till the end of line) without a key, that means
+!> from the current position in the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(SL),       intent(out) :: values(MAX_STRING_ITEMS)
-  integer,             intent(out) :: n        ! number of items
-  logical,   optional, intent(in)  :: verbose
+  class(Control_Type)              :: Control                   !! parent class
+  character(SL),       intent(out) :: values(MAX_STRING_ITEMS)  !! strings list
+  integer,             intent(out) :: n                         !! number of
+                                                                !! strings found
+  logical,   optional, intent(in)  :: verbose                   !! verbosity
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
   logical :: reached_end

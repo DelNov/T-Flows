@@ -5,7 +5,9 @@
 !==============================================================================!
   module Sort_Mod
 !------------------------------------------------------------------------------!
-!   A collection of sorting (and maybe compression in the future) subroutines  !
+!>  A holder of the Sort_Type, which holds a collection of sorting routines.
+!>  If you need sort an array, have a look here first, a routine you need might
+!>  already be defined here.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Math_Mod
@@ -17,6 +19,11 @@
   !---------------!
   !   Sort type   !
   !---------------!
+  !> Sort_Type holds a collection of routines to sort arrays of different types
+  !> It comes in two flavors: heap-sort routines and quick-sort routines, which
+  !> can be set through compiler option SORT=heap/quick.  Quick is a bit faster,
+  !> but sometimes runs out of heap memory because of its recursive nature.  If
+  !> that happens, recompile the programs with option SORT=heap.
   type Sort_Type
 
     contains

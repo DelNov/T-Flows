@@ -4,7 +4,8 @@
                               xb, yb,   &
                               xc, yc)
 !------------------------------------------------------------------------------!
-!   Area of a tringle in a plane defined with nodes "a", "b", "c"              !
+!>  Area of a tringle in a plane defined with points a, b, c.
+!------------------------------------------------------------------------------!
 !                                                                              !
 !                c                                                             !
 !               / \                                                            !
@@ -21,8 +22,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type) :: Math
-  real, intent(in) :: xa, ya, xb, yb, xc, yc
+  class(Math_Type) :: Math    !! parent class
+  real, intent(in) :: xa, ya  !! point a
+  real, intent(in) :: xb, yb  !! point b
+  real, intent(in) :: xc, yc  !! point c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Math)
 !==============================================================================!

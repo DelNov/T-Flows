@@ -1,13 +1,13 @@
 !==============================================================================!
   pure real function Signed_Lower_Limit(Math, a, limit)
 !------------------------------------------------------------------------------!
-!   Calculates a lower limit, preserving a sign                                !
+!>  Calculates a lower limit (of a small number), preserving a sign.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type), intent(in) :: Math
-  real,             intent(in) :: a
-  real,             intent(in) :: limit  ! lower limit, usually a small number
+  class(Math_Type), intent(in) :: Math   !! parent class
+  real,             intent(in) :: a      !! input value, usually a small number
+  real,             intent(in) :: limit  !! lower limit
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Math)
 !==============================================================================!

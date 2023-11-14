@@ -1,14 +1,13 @@
 !==============================================================================!
   pure recursive subroutine Int_Array(Sort, a)
 !------------------------------------------------------------------------------!
-!   Quick sort one integer array.                                              !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort one integer array.
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(inout) :: a(:)
+  class(Sort_Type), intent(in)    :: Sort  !! parent class
+  integer,          intent(inout) :: a(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x
   integer :: i, j, n

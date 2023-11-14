@@ -5,19 +5,18 @@
                                     keyword_3,  &
                                     found, verbose)
 !------------------------------------------------------------------------------!
-!   Position yourself within the file at the line specified with three keys.   !
-!   It is intended to be used to find the interface condition specifications.  !
-!                                                                              !
-!   This function is case sensitive!                                           !
+!>  Position yourself within the control file at the line specified with three
+!>  keys. It is intended to be used to find the interface condition
+!>  specifications. (This function is case sensitive!)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword_1
-  character(len=*),    intent(in)  :: keyword_2
-  character(len=*),    intent(in)  :: keyword_3
-  logical,             intent(out) :: found
-  logical, optional,   intent(in)  :: verbose
+  class(Control_Type)              :: Control    !! parent class
+  character(len=*),    intent(in)  :: keyword_1  !! keyword 1
+  character(len=*),    intent(in)  :: keyword_2  !! keyword 2
+  character(len=*),    intent(in)  :: keyword_3  !! keyword 3
+  logical,             intent(out) :: found      !! true if three keys are found
+  logical, optional,   intent(in)  :: verbose    !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
 !==============================================================================!

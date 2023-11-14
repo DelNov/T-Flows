@@ -1,13 +1,15 @@
 !==============================================================================!
   subroutine Open_For_Writing_Ascii(File, name_o, file_unit)
 !------------------------------------------------------------------------------!
-!   Opens file for writing in the first available unit.                        !
+!>  To open an ASCII file for writing. It also prints a message which file is
+!>  being created from one (first) processor.
+!>  File unit is assigned dynamically when opening the file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
-  character(len=*) :: name_o
-  integer          :: file_unit
+  class(File_Type) :: File       !! parent class
+  character(len=*) :: name_o     !! name of the output file
+  integer          :: file_unit  !! file unit assigned when opening the file
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(File)
 !==============================================================================!

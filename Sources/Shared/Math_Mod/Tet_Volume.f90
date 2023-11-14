@@ -5,8 +5,8 @@
                                 x3, y3, z3,  &
                                 x4, y4, z4)
 !------------------------------------------------------------------------------!
-!   Returns the volume of tethraedra spanned with nodes 1 to 4                 !
-!                                                                              !
+!>  Returns the volume of tethraedra spanned with nodes 1 to 4.
+!------------------------------------------------------------------------------!
 !   The order of nodes matters here, so you should either be very careful to   !
 !   send the nodes in the right order (which is a bit of a nuissance) or       !
 !   use the absolute value of the volume computed here (that is mostly done).  !
@@ -22,8 +22,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type), intent(in) :: Math
-  real,             intent(in) :: x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4
+  class(Math_Type), intent(in) :: Math        !! parent class
+  real,             intent(in) :: x1, y1, z1  !! point 1
+  real,             intent(in) :: x2, y2, z2  !! point 2
+  real,             intent(in) :: x3, y3, z3  !! point 3
+  real,             intent(in) :: x4, y4, z4  !! point 4
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Math)
 !==============================================================================!

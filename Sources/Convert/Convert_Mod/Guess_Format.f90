@@ -1,17 +1,18 @@
 !==============================================================================!
   subroutine Guess_Format(Convert, file_name, file_format)
 !------------------------------------------------------------------------------!
-!   Based on the file contents, returns one of the following:                  !
-!   'UNKNOWN', 'GAMBIT_NEU' or 'GMSH_MSH' as the grid file format.
+!>  Designed to determine the format of a grid file based on its contents.
+!>  As a result, returns one of the following: 'UNKNOWN', 'FLUENT', 'GMSH' or
+!>  'GAMBIT' or 'OBJ' as the grid file format.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use File_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type)        :: Convert
-  character(SL), intent(in)  :: file_name
-  character(SL), intent(out) :: file_format
+  class(Convert_Type)        :: Convert      !! parent class
+  character(SL), intent(in)  :: file_name    !! input file name
+  character(SL), intent(out) :: file_format  !! output format of the file
 !-----------------------------------[Locals]-----------------------------------!
   integer :: l, fu
 !------------------------[Avoid unused parent warning]-------------------------!

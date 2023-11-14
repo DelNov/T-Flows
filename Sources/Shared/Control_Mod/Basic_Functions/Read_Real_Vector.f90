@@ -1,18 +1,18 @@
 !==============================================================================!
   subroutine Read_Real_Vector(Control, keyword, n, def, val, verbose)
 !------------------------------------------------------------------------------!
-!   Working horse function to read integer value (argument "val") behind a     !
-!   keyword (argument "keyword") in control file.  If not found, a default     !
-!   vaue specified in argument "def" is used.
+!>  Working horse function to read integer value (argument "val") behind a
+!>  keyword (argument "keyword") in control file, starting from the beginning.
+!>  If not found, a default value specified in argument "def" is used.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword
-  integer,             intent(in)  :: n        ! size of array (typically small)
-  real,                intent(in)  :: def(n)   ! default value
-  real,                intent(out) :: val(n)   ! spefified value, if found
-  logical,   optional, intent(in)  :: verbose
+  class(Control_Type)              :: Control  !! parent class
+  character(len=*),    intent(in)  :: keyword  !! keyword it searches
+  integer,             intent(in)  :: n        !! size of array (typically small)
+  real,                intent(in)  :: def(n)   !! default value
+  real,                intent(out) :: val(n)   !! spefified value, if found
+  logical,   optional, intent(in)  :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
   integer :: i

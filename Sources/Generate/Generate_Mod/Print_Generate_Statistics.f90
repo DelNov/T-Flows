@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Print_Generate_Statistics(Generate, Grid)
 !------------------------------------------------------------------------------!
-!   Prints some statistical data about the Grid on the standard output.        !
+!>  Prints some statistical data about the Grid on the terminal.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Gen_Mod,  only: twin_n
@@ -9,8 +9,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Generate_Type) :: Generate
-  type(Grid_Type)      :: Grid
+  class(Generate_Type) :: Generate  !! parent class
+  type(Grid_Type)      :: Grid      !! grid being analyzed
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k, numb, nonz, stencw
 !------------------------[Avoid unused parent warning]-------------------------!

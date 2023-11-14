@@ -3,8 +3,10 @@
 !==============================================================================!
   module String_Mod
 !------------------------------------------------------------------------------!
-!   Procedures for handling string.  For now To_Upper_Case and To_Lower_Case   !
-!   and a function which returns a string with only first letter in upper.     !
+!>  The String_Mod module is a simple and straightforward module designed for
+!>  handling string transformations. It includes procedures for converting
+!>  strings to upper case, lower case, and a function to capitalize only the
+!>  first letter of a string.
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -12,6 +14,7 @@
   !-----------------!
   !   String type   !
   !-----------------!
+  !> String_Type encapsulates procedures related to string manipulation.
   type String_Type
 
     contains
@@ -22,8 +25,8 @@
   end type
 
   ! One handle for all modules to use string routines
-  type(String_Type) :: String
-
+  type(String_Type) :: String  !! A global object of String_Type that can be
+                               !! used across different parts of the program.
   contains
 
 #   include "String_Mod/First_Upper.f90"

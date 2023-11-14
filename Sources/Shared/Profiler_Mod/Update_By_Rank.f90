@@ -1,12 +1,14 @@
 !==============================================================================!
   subroutine Update_By_Rank(Prof, i_fun)
 !------------------------------------------------------------------------------!
-!   Updates function's timer by her rank (number)                              !
+!>  Updates the accumulated time for a specified function. It calculates the
+!>  elapsed time since the last update and adds this to the total time spent
+!>  in the function.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target :: Prof
-  integer, intent(in)          :: i_fun
+  class(Profiler_Type), target :: Prof   !! parent class
+  integer, intent(in)          :: i_fun  !! function rank
 !-----------------------------------[Locals]-----------------------------------!
   real(DP) :: wall_time
 !==============================================================================!

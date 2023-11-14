@@ -1,6 +1,11 @@
 !==============================================================================!
   integer function Key_Ind(key, key_to_values, n_keys)
 !------------------------------------------------------------------------------!
+!>  Simple lookup function that searches for a specified key within an array
+!>  of keys and returns the index of the first occurrence of this key. If the
+!>  key is not found, the function returns zero.  It is primarily used when
+!>  reading control file, searching for boundary and initial conditions.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer      :: n_keys

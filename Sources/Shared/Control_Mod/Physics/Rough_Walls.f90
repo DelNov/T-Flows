@@ -1,13 +1,14 @@
 !==============================================================================!
   subroutine Rough_Walls(Control, rough, verbose)
 !------------------------------------------------------------------------------!
-!   Reading wall roughness from the control file.                              !
+!>  Reads wall roughness from the control file.  (This could be obsolete,
+!>  see also Roughness_Coefficient.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: rough
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: rough    !! true if walls are rough
+  logical, optional    :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

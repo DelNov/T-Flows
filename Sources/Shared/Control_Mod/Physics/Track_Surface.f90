@@ -1,11 +1,15 @@
 !==============================================================================!
   subroutine Track_Surface(Control, track_surf, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads if surface will be re-contstructed with VOF simulations of a
+!>  multiphase flow. Surface is represented with triangular grids independent
+!>  from computational cells.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: track_surf
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control     !! parent class
+  logical, intent(out) :: track_surf  !! true if surface is tracked
+  logical, optional    :: verbose     !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

@@ -1,12 +1,12 @@
 !==============================================================================!
   pure subroutine Two_Int(Sort, a1, a2)
 !------------------------------------------------------------------------------!
-!   Heap sort two integer arrays                                               !
+!>  Heap sort two integer arrays.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  integer,          intent(inout) :: a1(:), a2(:)
+  class(Sort_Type), intent(inout) :: Sort          !! parent class
+  integer,          intent(inout) :: a1(:), a2(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   integer :: a_1, a_2

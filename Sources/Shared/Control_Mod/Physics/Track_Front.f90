@@ -1,11 +1,14 @@
 !==============================================================================!
   subroutine Track_Front(Control, track, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads if front will be re-contstructed with VOF simulations of a multiphase
+!>  flow. Front is represented with polygons spanned inside computational cells.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: track
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: track    !! true if front is tracked
+  logical, optional    :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

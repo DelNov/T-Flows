@@ -1,15 +1,15 @@
 !==============================================================================!
   subroutine Call_Metis(Metis, n_parts, part)
 !------------------------------------------------------------------------------!
-!   Executes a call to METIS for decomposition                                 !
+!>  Facilitates the partitioning of grid into a specified number of parts using
+!>  the METIS library. This subroutine abstracts the complexity of calling
+!>  METIS functions by providing a simplified interface
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Metis_Type),     intent(inout) :: Metis
-  integer,               intent(in)    :: n_parts
-  integer, dimension(:), intent(out)   :: part
-!-----------------------------------[Locals]-----------------------------------!
-! integer :: s, i, v, v1, v2
+  class(Metis_Type),     intent(inout) :: Metis    !! parent class
+  integer,               intent(in)    :: n_parts  !! number of partitions
+  integer, dimension(:), intent(out)   :: part     !! result of partitioning
 !==============================================================================!
 
   Metis % options = -1                       ! Initialize all to default

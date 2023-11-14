@@ -1,14 +1,13 @@
 !==============================================================================!
   subroutine Solver_For_Vof(Control, val, verbose)
 !------------------------------------------------------------------------------!
-!   Default values in this, and her sister functions, is simply as follows:    !
-!   If matrix is expected to be symmetric, take 'cg', otherwise take 'bicg'.   !
+!>  Reads linear solver for VOF function from control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)        :: Control
-  character(SL), intent(out) :: val
-  logical, optional          :: verbose
+  class(Control_Type)        :: Control  !! parent class
+  character(SL), intent(out) :: val      !! linear solver (cg or bicg)
+  logical, optional          :: verbose  !! controls output verbosity
 !==============================================================================!
 
   call Control % Read_Char_Item('SOLVER_FOR_VOF', 'bicg', val, verbose)

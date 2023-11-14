@@ -1,14 +1,13 @@
 !==============================================================================!
   pure recursive subroutine Two_Real(Sort, a1, a2)
 !------------------------------------------------------------------------------!
-!   Quick sort two real arrays (think of three coordinates)                    !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort two real arrays (think of three coordinates).
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  real,             intent(inout) :: a1(:), a2(:)
+  class(Sort_Type), intent(in)    :: Sort          !! parent class
+  real,             intent(inout) :: a1(:), a2(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2
   integer :: i, j, n

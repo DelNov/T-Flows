@@ -1,12 +1,12 @@
 !==============================================================================!
   pure subroutine Two_Real(Sort, a1, a2)
 !------------------------------------------------------------------------------!
-!   Heap sort two real arrays (think of three coordinates)                     !
+!>  Heap sort two real arrays (think of three coordinates).
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  real,             intent(inout) :: a1(:), a2(:)
+  class(Sort_Type), intent(inout) :: Sort          !! parent class
+  real,             intent(inout) :: a1(:), a2(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   real    :: a_1, a_2

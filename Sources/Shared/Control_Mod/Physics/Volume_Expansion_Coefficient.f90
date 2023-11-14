@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Volume_Expansion_Coefficient(Control, cor, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads the value of volume expansion coefficient from the control file.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  real,   intent(out) :: cor
-  logical,   optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: cor      !! volume expansion coefficient
+  logical,   optional :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

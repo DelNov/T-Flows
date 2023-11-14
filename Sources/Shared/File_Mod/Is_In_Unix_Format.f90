@@ -1,12 +1,19 @@
 !==============================================================================!
   logical function Is_In_Unix_Format(File, file_name)
 !------------------------------------------------------------------------------!
-!   Find out if file is written in Unix (or Windows) format.                   !
+!>  Finds out whether a given file uses Unix-style or Windows-style line
+!>  endings.  To identify the line-ending format used in a file. Unix-based
+!>  systems typically use a single newline character (\n, ASCII code 10) for
+!>  line breaks, whereas Windows systems use a carriage return followed by a
+!>  newline character (\r\n, ASCII codes 13 and 10, respectively).  This
+!>  functions reads 1024 bytes of a file and counts how many times is char(13)
+!>  followed by char(10) and if it is less than five times in 1024 bytes, it
+!>  concludes that file is in Unix form.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
-  character(len=*) :: file_name
+  class(File_Type) :: File       !! parent class
+  character(len=*) :: file_name  !! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer    :: file_size, file_unit, cnt_13_10, i
   integer(1) :: byte, next

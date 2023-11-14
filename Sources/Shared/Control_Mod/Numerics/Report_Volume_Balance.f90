@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Report_Volume_Balance(Control, vol_bal, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads the control file to find out if volume balance should be reported.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: vol_bal
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: vol_bal  !! report balance (true or false)
+  logical, optional    :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

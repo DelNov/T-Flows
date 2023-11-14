@@ -1,13 +1,13 @@
 !==============================================================================!
   subroutine Potential_Initialization(Control, pot_init, verbose)
 !------------------------------------------------------------------------------!
-!   Reading potential initialization from the control file.                    !
+!>  Reads, from the control file, if potential initialization will be used.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: pot_init
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control   !! parent class
+  logical, intent(out) :: pot_init  !! true if potential initialization is used
+  logical, optional    :: verbose   !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

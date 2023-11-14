@@ -1,13 +1,13 @@
 !==============================================================================!
   pure subroutine Two_Real_Carry_Int(Sort, a1, a2, b)
 !------------------------------------------------------------------------------!
-!   Heap sort two real arrays and carry one integer array along                !
+!>  Heap sort two real arrays and carry one integer array along.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  real,             intent(inout) :: a1(:), a2(:)
-  integer,          intent(inout) :: b(:)
+  class(Sort_Type), intent(inout) :: Sort          !! parent class
+  real,             intent(inout) :: a1(:), a2(:)  !! array for sorting
+  integer,          intent(inout) :: b(:)          !! array to carry on
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   real    :: a_1, a_2

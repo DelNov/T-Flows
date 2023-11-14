@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Max_Threads(Control, val, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads number of threads to use (for OMP) from the control file.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! number of threads to use
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
 # ifdef _OPENMP

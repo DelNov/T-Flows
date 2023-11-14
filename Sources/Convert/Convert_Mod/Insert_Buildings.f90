@@ -1,15 +1,17 @@
 !==============================================================================!
   subroutine Insert_Buildings(Convert, Grid)
 !------------------------------------------------------------------------------!
-!   This soubroutine was developed to import mesh with buildings, and place    !
-!   them both on a ground.  This subroutine is not a part of the standard      !
-!   T-Flows distribution, it was developed specifically for the project on     !
-!   Smart Cities.  It is rather long and it will probably stay like that.      !
+!>  This soubroutine was developed to import mesh with buildings, and place
+!>  them both on a ground defined with an STL file.  This subroutine was
+!>  traditionally not a part of the standard T-Flows distribution, but after
+!>  publishing a couple of papers with it, we decided to include it.  It is
+!>  rather long and often chaning, and it will probably stay like that in the
+!>  foreseeable future.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_N          = 64
   integer, parameter :: ITERS          = 24

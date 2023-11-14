@@ -1,13 +1,31 @@
 !==============================================================================!
   subroutine Refines_Mod_Connectivity(ref, Grid, real_run)
 !------------------------------------------------------------------------------!
-!   Determines the topology of the cells, faces and boundary cells.            !
+!>  Determines the topology of the cells, faces and boundary cells.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * The subroutine initializes the face-node numbering for hexahedral cells, !
+!     counts the boundary cells, and adjusts the dimensions of the cells_c     !
+!     array in the Grid.                                                       !
+!   * It then loops through the grid cells to identify neighboring cells and   !
+!     boundary cells, assigning their relationship in terms of connectivity    !
+!     and face information.                                                    !
+!   * A two-pass run (run = 1, 2) ensures that all necessary relationships are !
+!     established, including determining which volumes are connected by each   !
+!     face and identifying the nodes that constitute each face.                !
+!   * During a 'real run' (real_run = .true.), boundary cells are marked and   !
+!     allocated, whereas, in a non-real run, the boundary cell information is  !
+!     restored to its initial state.                                           !
+!   * The subroutine also checks for sufficient allocated memory for the faces !
+!     and outputs an error if the allocated memory is exceeded, indicating     !
+!     the need for adjustments in the domain file and recompilation.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Refines_Type) :: ref
-  type(Grid_Type)    :: Grid
-  logical            :: real_run
+  type(Refines_Type) :: ref       !! type holding information on refinement
+  type(Grid_Type)    :: Grid      !! grid being generated (refined here)
+  logical            :: real_run  !! false for trial run, true for real run
 !-----------------------------------[Locals]-----------------------------------!
   integer                 :: c, c1, c2, m, run
   integer, dimension(6,4) :: fn  ! link faces' nodes for a hexahedral cell

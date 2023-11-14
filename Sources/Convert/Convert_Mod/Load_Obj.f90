@@ -1,13 +1,43 @@
 !==============================================================================!
   subroutine Load_Obj(Convert, Grid, file_name)
 !------------------------------------------------------------------------------!
-!   Reads the Wavefront's obj file format.                                     !
+!>  This subroutine is designed to read and process a 3D object in the
+!>  Wavefront OBJ file format, populating the Grid structure with its
+!>  geometric information.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Opening the OBJ file: The subroutine starts by opening the specified     !
+!     OBJ file in ASCII mode for reading.                                      !
+!   * Counting nodes and faces:                                                !
+!     - It counts the number of vertices (v) and faces (f) present in the      !
+!       OBJ file.                                                              !
+!     - These counts are used to allocate memory for storing node and face     !
+!       information in the Grid structure.                                     !
+!   * Reading coordinates and face nodes:                                      !
+!     - The subroutine reads through the file again, this time extracting the  !
+!       vertex coordinates and the indices of vertices that make up each face. !
+!     - It swaps the y and z coordinates during this process.                  !
+!   * Normalizing the Object:                                                  !
+!     - It calculates the minimum and maximum values for the x, y, and z       !
+!       coordinates of the vertices.                                           !
+!     - The object is scaled based on its height (z dimension), and its origin !
+!       is shifted to the center of its bounding box in the x and y directions ! 
+!       This normalization ensures that the object fits within a standard      !
+!       coordinate system and size range.                                      !
+!   * Storing Geometry in Grid:                                                !
+!     - The Grid structure is populated with the normalized node coordinates   !
+!       and the faces' vertices.                                               !
+!     - This information is used to represent the 3D geometry of the object    !
+!       within T-Flows.                                                        !
+!   * Handling of File End: The subroutine includes checks for the end of the  !
+!     file to ensure that all necessary data is read without errors.           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  character(SL)       :: file_name
+  class(Convert_Type) :: Convert    !! parent class
+  type(Grid_Type)     :: Grid       !! grid being converted
+  character(SL)       :: file_name  !! file name
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: tok
   integer       :: fu, s, n, i, i_nod

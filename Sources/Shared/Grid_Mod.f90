@@ -4,8 +4,8 @@
 !==============================================================================!
   module Grid_Mod
 !------------------------------------------------------------------------------!
-!   Grids module is used throughout all programs                               !
-!   (that means in "Generate", "Divide", "Convert", "Process".                 !
+!>  Modile Grid_Mod is practically a holder for Grid_Type, which holds the
+!>  data which defines a grid as well as procedures to manipulate the grids.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Vect_Mod
@@ -29,43 +29,48 @@
   !   Grid type   !
   !               !
   !---------------!
+  !> Grid_Type is used throughout all sub-programs ("Generate", "Divide",
+  !> "Convert", "Process") and holds the data which defines a grid as well
+  !> as the procedures needed to manipulate the grids.
   type Grid_Type
 
     ! Stores the name of this domain
-    character(SL) :: name
-    logical       :: polyhedral = .false.
+    character(SL) :: name                  !! name of the grid
+    logical       :: polyhedral = .false.  !! true if grid is polyhedral
 
     ! Number of ...
-    integer :: n_nodes       = 0  ! nodes
-    integer :: n_cells       = 0  ! cells
-    integer :: n_faces       = 0  ! faces
-    integer :: n_bnd_cells   = 0  ! boundary cells
-    integer :: n_bnd_regions = 0  ! boundary conditions
-    integer :: n_regions     = 0  ! all conditions (bnd, inside, per ...)
-    integer :: n_shadows     = 0  ! shadow faces
-    integer :: n_edges       = 0  ! edges (needed to create dual grid)
-    integer :: per_x_reg     = 0  ! periodic x region
-    integer :: per_y_reg     = 0  ! periodic y region
-    integer :: per_z_reg     = 0  ! periodic z region
+    integer :: n_nodes       = 0  !! number of nodes in a grid
+    integer :: n_cells       = 0  !! number of cells in a grid
+    integer :: n_faces       = 0  !! number of faces in a grid
+    integer :: n_bnd_cells   = 0  !! number of boundary cells
+    integer :: n_bnd_regions = 0  !! number of boundary conditions
+    integer :: n_regions     = 0  !! number of all conditions (bnd, inside, per)
+    integer :: n_shadows     = 0  !! number of shadow (periodic) faces
+    integer :: n_edges       = 0  !! number of edges (when creating dual grid)
+    integer :: per_x_reg     = 0  !! periodic x region
+    integer :: per_y_reg     = 0  !! periodic y region
+    integer :: per_z_reg     = 0  !! periodic z region
 
     ! Rank (in case of simulations with multiple domains)
-    integer :: rank = 0
+    integer :: rank = 0  !! grid rank (it's number)
 
     ! Periodic span
-    real :: per_x, per_y, per_z
+    real :: per_x, per_y, per_z  !! periodic distance in coordinate direction
 
     ! Minimum, Maximum and total volumes
-    real :: min_vol, max_vol, tot_vol
+    real :: min_vol  !! volume of the smallest cell in the grid
+    real :: max_vol  !! volume of the biggest cell in the grid
+    real :: tot_vol  !! total volume of the grid
 
     !-------------------------!
     !  Cell-based variables   !
     !-------------------------!
 
     ! Cell center coordinates
-    real, allocatable :: xc(:), yc(:), zc(:)
+    real, allocatable :: xc(:), yc(:), zc(:)  !! cell center coordinates
 
     ! Cell volumes
-    real, allocatable :: vol(:)
+    real, allocatable :: vol(:)  !! cell volumes
 
     ! Cells' tensor of inertia
     real, allocatable :: ixx(:), iyy(:), izz(:), ixy(:), ixz(:), iyz(:)
@@ -75,24 +80,25 @@
     real, allocatable :: dv2(:)
 
     ! Wall distance - distance from the nearest wall
-    real, allocatable :: wall_dist(:)
+    real, allocatable :: wall_dist(:)  !! distance from the nearest wall
 
     ! True if cell is near wall.  Used in Process for some turblence models.
-    logical, allocatable :: cell_near_wall(:)
+    logical, allocatable :: cell_near_wall(:)  !! true if cell is near wall
 
     ! Number of nodes at each cell (determines cell's shape really)
-    integer, allocatable :: cells_n_nodes(:)
+    integer, allocatable :: cells_n_nodes(:)  !! number of nodes in each cell
 
     ! Number of faces surrounding each cell
-    integer, allocatable :: cells_n_faces(:)
+    integer, allocatable :: cells_n_faces(:)  !! number of faces in each cell
 
     ! Number of cells surrounding each cell
-    integer, allocatable :: cells_n_cells(:)
+    integer, allocatable :: cells_n_cells(:)  !! number of cells around cell
 
     ! Cells' nodes, faces, and neigboring cells
-    integer, allocatable :: cells_n(:,:)
-    integer, allocatable :: cells_f(:,:)
-    integer, allocatable :: cells_c(:,:)  ! needed in Generate and Convert
+    integer, allocatable :: cells_n(:,:)  !! list of cells' nodes
+    integer, allocatable :: cells_f(:,:)  !! list of cells' faces
+    integer, allocatable :: cells_c(:,:)  !! list of cells' neighbouring cells
+                                          !! (needed in Generate and Convert)
 
     ! Weights for interpolation from nodes
     real, allocatable :: weight_n2c(:,:)
@@ -105,19 +111,19 @@
 
     ! For each cell: to each porous region it belongs
     ! (Introduced with Insert_Buildings in Convert)
-    integer, allocatable :: por(:)
+    integer, allocatable :: por(:)  !! porous region to which each cell belongs
 
     !-------------------------!
     !  Face-based variables   !
     !-------------------------!
 
     ! Number of nodes at each face (determines face's shape really)
-    integer, allocatable :: faces_n_nodes(:)
+    integer, allocatable :: faces_n_nodes(:)  !! number of nodes for each face
 
     ! Faces' nodes, neigboring cells and shadows
-    integer, allocatable :: faces_n(:,:)
-    integer, allocatable :: faces_c(:,:)
-    integer, allocatable :: faces_s(:)
+    integer, allocatable :: faces_n(:,:)  !! faces' nodes
+    integer, allocatable :: faces_c(:,:)  !! faces' cells (the two around it)
+    integer, allocatable :: faces_s(:)    !! faces' shadows (periodic pairs)
 
     ! Face surface areas (si), total surface (s) 
     ! and distances between cells (di)
@@ -125,7 +131,7 @@
     real, allocatable :: dx(:), dy(:), dz(:), d(:)
 
     ! Face coordinates
-    real, allocatable :: xf(:), yf(:), zf(:)
+    real, allocatable :: xf(:), yf(:), zf(:)  !! face center coordinate
 
     ! Vectors connecting face center with face cell centers connection
     real, allocatable :: rx(:), ry(:), rz(:)
@@ -140,49 +146,50 @@
     !-------------------------!
 
     ! Node coordinates
-    real, allocatable :: xn(:), yn(:), zn(:)
+    real, allocatable :: xn(:), yn(:), zn(:)  !! node coordinate
 
-    type(Region_Type) :: region
+    type(Region_Type) :: region  !! boundary condition regions
 
     !  Maximum number of cells, boundary cells and faces
     ! (Used for tentative memory allocation in Generator)
-    integer :: max_n_nodes
-    integer :: max_n_bnd_cells
-    integer :: max_n_faces
+    integer :: max_n_nodes      !! max. number of nodes (used only in Generate)
+    integer :: max_n_bnd_cells  !! max. number of bnd. cells (only in Generate)
+    integer :: max_n_faces      !! max. number of faces (used only in Generate)
 
     ! New numbers for nodes, cells, faces and edges
-    integer, allocatable :: new_n(:)
-    integer, allocatable :: new_c(:)
-    integer, allocatable :: new_f(:)
-    integer, allocatable :: new_e(:)  ! used for dual grid creation
-
+    integer, allocatable :: new_n(:)  !! new node numbers (when renumbering)
+    integer, allocatable :: new_c(:)  !! new cell numbers (when renumbering)
+    integer, allocatable :: new_f(:)  !! new face numbers (when renumbering)
+    integer, allocatable :: new_e(:)  !! new edge numbers
+                                      !! (used for dual grid creation)
     ! Old numbers for cells and faces
-    integer, allocatable :: old_n(:)
-    integer, allocatable :: old_c(:)
-    integer, allocatable :: old_f(:)
+    integer, allocatable :: old_n(:)  !! old node numbers (when renumbering)
+    integer, allocatable :: old_c(:)  !! old cell numbers (when renumbering)
+    integer, allocatable :: old_f(:)  !! old face numbers (when renumbering)
 
     ! Number of cells surrounding each node
-    integer, allocatable :: nodes_n_cells(:)
-
+    integer, allocatable :: nodes_n_cells(:)  !! number of cells surrounding
+                                              !! each node
     ! List of cells surrounding each node ...
     ! ... and weights for cell to node interpolation
-    integer, allocatable :: nodes_c(:,:)
-    real,    allocatable :: weight_c2n(:,:)
+    integer, allocatable :: nodes_c(:,:)     !! cells surrounding each node
+    real,    allocatable :: weight_c2n(:,:)  !! weights for cell to node
+                                             !! interpolation
 
     ! Edge-base variables
-    integer, allocatable :: edges_n (:,:)  ! edges' nodes
-    integer, allocatable :: edges_bc(:,:)  ! edges' boundary conditions
-    integer, allocatable :: edges_fb(:,:)  ! edges' faces on boundaries
+    integer, allocatable :: edges_n (:,:)  !! edges' nodes
+    integer, allocatable :: edges_bc(:,:)  !! edges' boundary conditions
+    integer, allocatable :: edges_fb(:,:)  !! edges' faces on boundaries
 
     !-------------------------------------------!
     !   Communication class for parallel runs   !
     !-------------------------------------------!
-    type(Comm_Type) :: Comm
+    type(Comm_Type) :: Comm  !! module for MPI communication, local to grid
 
     !-------------------------------------------!
     !   Vectorization class for manycore runs   !
     !-------------------------------------------!
-    type(Vect_Type) :: Vect
+    type(Vect_Type) :: Vect  !! used in vectorization for manycore runs
 
     contains
       procedure :: Allocate_Cells
@@ -247,62 +254,62 @@
 
   contains
 
-#   include "Grid_Mod/Allocate_Cells.f90"
-#   include "Grid_Mod/Allocate_Faces.f90"
-#   include "Grid_Mod/Allocate_Nodes.f90"
-#   include "Grid_Mod/Allocate_Regions.f90"
-#   include "Grid_Mod/Bnd_Cond_Name_At_Cell.f90"
-#   include "Grid_Mod/Bnd_Cond_Name_At_Face.f90"
-#   include "Grid_Mod/Bnd_Cond_Type.f90"
-#   include "Grid_Mod/Bounding_Box.f90"
-#   include "Grid_Mod/Calculate_Cell_Centers.f90"
-#   include "Grid_Mod/Calculate_Cell_Inertia.f90"
-#   include "Grid_Mod/Calculate_Cell_Volumes.f90"
-#   include "Grid_Mod/Calculate_Face_Centers.f90"
-#   include "Grid_Mod/Calculate_Face_Geometry.f90"
-#   include "Grid_Mod/Calculate_Face_Interpolation.f90"
-#   include "Grid_Mod/Calculate_Face_Surfaces.f90"
-#   include "Grid_Mod/Calculate_Faces_Surface.f90"
-#   include "Grid_Mod/Calculate_Global_Volumes.f90"
-#   include "Grid_Mod/Calculate_Wall_Distance.f90"
-#   include "Grid_Mod/Calculate_Weights_Cells_To_Nodes.f90"
-#   include "Grid_Mod/Calculate_Weights_Nodes_To_Cells.f90"
-#   include "Grid_Mod/Correct_Face_Surfaces.f90"
-#   include "Grid_Mod/Check_Cells_Closure.f90"
-#   include "Grid_Mod/Decompose.f90"
-#   include "Grid_Mod/Determine_Regions_Ranges.f90"
-#   include "Grid_Mod/Determine_Threads.f90"
-#   include "Grid_Mod/Exchange_Cells_Int.f90"
-#   include "Grid_Mod/Exchange_Cells_Log.f90"
-#   include "Grid_Mod/Exchange_Cells_Real.f90"
-#   include "Grid_Mod/Face_Normal.f90"
-#   include "Grid_Mod/Find_Cells_Faces.f90"
-#   include "Grid_Mod/Find_Nodes_Cells.f90"
-#   include "Grid_Mod/Form_Cells_Comm.f90"
-#   include "Grid_Mod/Form_Maps_For_Backup.f90"
-#   include "Grid_Mod/Initialize_New_Numbers.f90"
-#   include "Grid_Mod/Is_Face_In_Cell.f90"
-#   include "Grid_Mod/Is_Point_In_Cell.f90"
-#   include "Grid_Mod/Load_And_Prepare_For_Processing.f90"
-#   include "Grid_Mod/Load_Cfn.f90"
-#   include "Grid_Mod/Load_Dim.f90"
-#   include "Grid_Mod/Merge_Duplicate_Nodes.f90"
-#   include "Grid_Mod/Print_Regions_List.f90"
-#   include "Grid_Mod/Print_Grid_Statistics.f90"
-#   include "Grid_Mod/Save_Cfn.f90"
-#   include "Grid_Mod/Save_Dim.f90"
-#   include "Grid_Mod/Save_Debug_Vtu.f90"
-#   include "Grid_Mod/Save_Vtk_Cell.f90"
-#   include "Grid_Mod/Save_Vtk_Face.f90"
-#   include "Grid_Mod/Save_Vtu_Cells.f90"
-#   include "Grid_Mod/Save_Vtu_Edges.f90"
-#   include "Grid_Mod/Save_Vtu_Faces.f90"
-#   include "Grid_Mod/Search_Coordinate_Clusters.f90"
-#   include "Grid_Mod/Sort_Cells_By_Coordinates.f90"
-#   include "Grid_Mod/Sort_Cells_By_Thread.f90"
-#   include "Grid_Mod/Sort_Faces_By_Index.f90"
-#   include "Grid_Mod/Sort_Faces_By_Region.f90"
-#   include "Grid_Mod/Sort_Nodes_By_Coordinates.f90"
-#   include "Grid_Mod/Write_Template_Control_File.f90"
+#   include "Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90"
+#   include "Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90"
+#   include "Grid_Mod/Boundary/Bnd_Cond_Type.f90"
+#   include "Grid_Mod/Calculate/Bounding_Box.f90"
+#   include "Grid_Mod/Calculate/Calculate_Cell_Centers.f90"
+#   include "Grid_Mod/Calculate/Calculate_Cell_Inertia.f90"
+#   include "Grid_Mod/Calculate/Calculate_Cell_Volumes.f90"
+#   include "Grid_Mod/Calculate/Calculate_Face_Centers.f90"
+#   include "Grid_Mod/Calculate/Calculate_Face_Geometry.f90"
+#   include "Grid_Mod/Calculate/Calculate_Face_Interpolation.f90"
+#   include "Grid_Mod/Calculate/Calculate_Faces_Surface.f90"
+#   include "Grid_Mod/Calculate/Calculate_Face_Surfaces.f90"
+#   include "Grid_Mod/Calculate/Calculate_Global_Volumes.f90"
+#   include "Grid_Mod/Calculate/Calculate_Wall_Distance.f90"
+#   include "Grid_Mod/Calculate/Calculate_Weights_Cells_To_Nodes.f90"
+#   include "Grid_Mod/Calculate/Calculate_Weights_Nodes_To_Cells.f90"
+#   include "Grid_Mod/Connectivity/Check_Cells_Closure.f90"
+#   include "Grid_Mod/Connectivity/Correct_Face_Surfaces.f90"
+#   include "Grid_Mod/Connectivity/Determine_Regions_Ranges.f90"
+#   include "Grid_Mod/Connectivity/Face_Normal.f90"
+#   include "Grid_Mod/Connectivity/Find_Cells_Faces.f90"
+#   include "Grid_Mod/Connectivity/Find_Nodes_Cells.f90"
+#   include "Grid_Mod/Connectivity/Initialize_New_Numbers.f90"
+#   include "Grid_Mod/Connectivity/Is_Face_In_Cell.f90"
+#   include "Grid_Mod/Connectivity/Is_Point_In_Cell.f90"
+#   include "Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90"
+#   include "Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90"
+#   include "Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90"
+#   include "Grid_Mod/Input_Output/Load_Cfn.f90"
+#   include "Grid_Mod/Input_Output/Load_Dim.f90"
+#   include "Grid_Mod/Input_Output/Print_Grid_Statistics.f90"
+#   include "Grid_Mod/Input_Output/Print_Regions_List.f90"
+#   include "Grid_Mod/Input_Output/Save_Cfn.f90"
+#   include "Grid_Mod/Input_Output/Save_Debug_Vtu.f90"
+#   include "Grid_Mod/Input_Output/Save_Dim.f90"
+#   include "Grid_Mod/Input_Output/Save_Vtk_Cell.f90"
+#   include "Grid_Mod/Input_Output/Save_Vtk_Face.f90"
+#   include "Grid_Mod/Input_Output/Save_Vtu_Cells.f90"
+#   include "Grid_Mod/Input_Output/Save_Vtu_Edges.f90"
+#   include "Grid_Mod/Input_Output/Save_Vtu_Faces.f90"
+#   include "Grid_Mod/Input_Output/Write_Template_Control_File.f90"
+#   include "Grid_Mod/Memory/Allocate_Cells.f90"
+#   include "Grid_Mod/Memory/Allocate_Faces.f90"
+#   include "Grid_Mod/Memory/Allocate_Nodes.f90"
+#   include "Grid_Mod/Memory/Allocate_Regions.f90"
+#   include "Grid_Mod/Parallel/Decompose.f90"
+#   include "Grid_Mod/Parallel/Determine_Threads.f90"
+#   include "Grid_Mod/Parallel/Exchange_Cells_Int.f90"
+#   include "Grid_Mod/Parallel/Exchange_Cells_Log.f90"
+#   include "Grid_Mod/Parallel/Exchange_Cells_Real.f90"
+#   include "Grid_Mod/Parallel/Form_Cells_Comm.f90"
+#   include "Grid_Mod/Parallel/Form_Maps_For_Backup.f90"
+#   include "Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90"
+#   include "Grid_Mod/Sorting/Sort_Cells_By_Thread.f90"
+#   include "Grid_Mod/Sorting/Sort_Faces_By_Index.f90"
+#   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
+#   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"
 
   end module

@@ -1,14 +1,43 @@
 !==============================================================================!
   subroutine Sort_Face_Nodes(Convert, Grid, s, concave_link)
 !------------------------------------------------------------------------------!
-!   Sort nodes of a given face in rotational fashion                           !
+!>  Designed to reorganize the nodes of a given face in a mesh structure
+!>  so that they follow a rotational (circular) order.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * The function begins by setting up various local variables and arrays     !
+!   * Dealing with concave faces:                                              !
+!      - The code includes a specific treatment for faces with concave nodes.  !
+!        It temporarily adjusts the position of any concave nodes to make the  !
+!        face convex for the purpose of sorting.                               !
+!   * Calculating face center and normals:                                     !
+!     - The subroutine calculates the geometric center of the face and the     !
+!       normal vector for each face node relative to this center. This is      !
+!       used to establish a local coordinate system on the face.               !
+!   * Establishing 2D plane for projection:                                    !
+!     - It establishes a 2D coordinate system on the plane of the face by      !
+!       defining x and y axes in the plane. This is achieved using cross       !
+!       products to ensure orthogonality with the face's normal vector.        !
+!   * Projecting nodes and sorting:                                            !
+!     - The face's nodes are projected onto this 2D coordinate system.         !
+!     - The nodes are then sorted based on their angular position (using       !
+!       atan2) in this 2D plane, which arranges them in a rotational order.    !
+!   * Restoring concave nodes:                                                 !
+!     - If any nodes were adjusted for concavity earlier, they are moved back  !
+!       to their original positions after sorting.                             !
+!   * Final adjustments for visualization:                                     !
+!     - The sorted nodes might be further adjusted for better visualization    !
+!       in tools like Paraview, ensuring that certain nodes (like the sharpest !
+!       edge) remain first in the order for visual clarity.  I am not sure it  !
+!       had a hell of an impact on visualization.                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  integer             :: s
-  integer             :: concave_link(2, Grid % n_nodes)
+  class(Convert_Type) :: Convert                        !! parent class
+  type(Grid_Type)     :: Grid                           !! grid being converted
+  integer             :: s                              !! face number
+  integer             :: concave_link(2,Grid % n_nodes) !! concave link storage
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, j, m, n, nn, cnt
   real                 :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)

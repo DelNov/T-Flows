@@ -7,17 +7,20 @@
                       extension,  &
                       domain)
 !------------------------------------------------------------------------------!
-!   Creates the file name depending on time step, subdomain, type and domain   !
+!>  Construct a file name based on provided inputs such as time step,
+!>  processor number, an optional appendix, file extension, and domain.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type)           :: File
-  character(len=*)           :: name_out
-  integer,          optional :: time_step
-  integer,          optional :: processor(1:2)  ! proc (out of) n_procs
-  character(len=*), optional :: appendix        ! used to add '-bnd' to name
-  character(len=*)           :: extension
-  integer,          optional :: domain
+  class(File_Type)           :: File            !! parent class
+  character(len=*)           :: name_out        !! output string with the name
+  integer,          optional :: time_step       !! time step
+  integer,          optional :: processor(1:2)  !! processor number and
+                                                !! total number of processors
+  character(len=*), optional :: appendix        !! optional string added to the
+                                                !! (such as '-bnd')
+  character(len=*)           :: extension       !! file extension
+  integer,          optional :: domain          !! domain number
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: last_pos
   integer       :: ldir, lnam, lext, lapp

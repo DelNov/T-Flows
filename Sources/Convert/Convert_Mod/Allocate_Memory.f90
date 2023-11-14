@@ -1,12 +1,14 @@
 !==============================================================================!
   subroutine Allocate_Memory(Convert, Grid)
 !------------------------------------------------------------------------------!
-!   Allocates memory for the convertor.                                        !
+!>  The subroutine is responsible for dynamically allocating memory for
+!>  different elements of the grid such as nodes, cells, and faces, for the
+!>  Convert sub-program.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
 !-----------------------------------[Locals]-----------------------------------!
   integer, parameter :: F = 3   ! workaround to allocate more memory for bnds
 !------------------------[Avoid unused parent warning]-------------------------!

@@ -1,14 +1,16 @@
 !==============================================================================!
   subroutine Control_Mod_Similar_Warning(keyword, item, key_type)
 !------------------------------------------------------------------------------!
-!   Checks if item in the argument list is similar to a keyword.               !
+!>  Checks if item in the argument list is similar to a keyword.  This was
+!>  introduced to warn users that they might have misspelled a keyword in
+!>  the control file. (It did not prove to be very useful though.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(len=*)           :: keyword
-  character(len=*)           :: item
-  character(len=*), optional :: key_type
+  class(Control_Type)        :: Control   !! parent class
+  character(len=*)           :: keyword   !! keyword being compared
+  character(len=*)           :: item      !! item being compared
+  character(len=*), optional :: key_type  !! type of the keyword
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n
   logical :: found

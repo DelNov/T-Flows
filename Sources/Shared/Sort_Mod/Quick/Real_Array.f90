@@ -1,14 +1,13 @@
 !==============================================================================!
   pure recursive subroutine Real_Array(Sort, a)
 !------------------------------------------------------------------------------!
-!   Quick sort one real array.                                                 !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort one real array.
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  real,             intent(inout) :: a(:)
+  class(Sort_Type), intent(in)    :: Sort  !! parent class
+  real,             intent(inout) :: a(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x
   integer :: i, j, n

@@ -1,15 +1,14 @@
 !==============================================================================!
   pure recursive subroutine Three_Int_Carry_Two_Int(Sort, a1, a2, a3, b, c)
 !------------------------------------------------------------------------------!
-!   Quick sort three integer arrays and carry two integer arrays along         !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort three integer arrays and carry two integer arrays along.
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(inout) :: a1(:), a2(:), a3(:)
-  integer,          intent(inout) :: b(:), c(:)
+  class(Sort_Type), intent(in)    :: Sort                 !! parent class
+  integer,          intent(inout) :: a1(:), a2(:), a3(:)  !! array for sorting
+  integer,          intent(inout) :: b(:), c(:)           !! array carried on
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x1, x2, x3
   integer :: i, j, n

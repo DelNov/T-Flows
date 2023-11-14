@@ -1,6 +1,8 @@
 !==============================================================================!
   subroutine Preconditioner_For_System_Matrix(Control, val, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads which preconditioner to use from the file.
+!------------------------------------------------------------------------------!
 !   These are preconditioners for the T-Flows suite of solvers.  PETSc has     !
 !   many more, of course.  For compatibillity with PETSc, these keywords have  !
 !   the same values as in PETSc, and all are in lower case.                    !
@@ -14,9 +16,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(SL)       :: val
-  logical, optional   :: verbose
+  class(Control_Type) :: Control  !! parent class
+  character(SL)       :: val      !! preconditioner (diagonal, jacobi, icc, ...)
+  logical, optional   :: verbose  !! controls output verbosity
 !==============================================================================!
 
   call Control % Read_Char_Item('PRECONDITIONER_FOR_SYSTEM_MATRIX',  &

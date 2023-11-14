@@ -1,7 +1,33 @@
 !==============================================================================!
   subroutine Refines_Mod_Refine_Marked_Cells(ref, Grid, lev)
 !------------------------------------------------------------------------------!
-!   Refine the marked cells.                                                   !
+!>  This function is responsible for refining the grid cells that have been
+!>  marked for refinement. It adjusts the grid structure to account for the
+!>  increased resolution in specific areas, adding new nodes and cells as
+!>  required.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Cell and node handling: It processes each cell in the grid. For the      !
+!     cells marked for refinement, it subdivides each cell into eight smaller  !
+!     cells. This involves calculating the positions of new nodes (such as     !
+!     edge midpoints, face centers, and cell center) and updating the          !
+!     cell-to-node connectivity.                                               !
+!   * Neighbor update: For each refined cell, it updates the neighboring cell  !
+!     information, ensuring the grid's integrity and connectivity.             !
+!   * Refinement levels: The refinement level for each new cell is set,        !
+!     keeping track of the depth of refinement.                                !
+!   * Handling new nodes: The subroutine calculates the positions of new nodes !
+!     by averaging the positions of existing nodes. These new nodes include    !
+!     those placed on the edges, faces, and center of the original cell.       !
+!   * Connectivity update: It updates the connectivity information for cells   !
+!     and nodes, including handling the special cases where neighboring cells  !
+!     are also refined.                                                        !
+!   * Cleanup and rearrangement: After refinement, it cleans up and rearranges !
+!     the data structures to reflect the new grid configuration. This includes !
+!     renumbering cells and removing redundant data.                           !
+!   * Memory management: Allocation and deallocation of temporary arrays used  !
+!     for storing node and cell information during the refinement process.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -1,15 +1,48 @@
 !==============================================================================!
   subroutine Calculate_Geometry(Convert, Grid, ask, g)
 !------------------------------------------------------------------------------!
-!   Calculates geometrical quantities of the grid.                             !
-!                                                                              !
+!>  Calculates geometrical quantities (such as cell centers, face surface
+!>  areas, ...) and handles periodicity of the grid.
+!------------------------------------------------------------------------------!
 !   This subroutine has a sibling in Generate_Mod, with the same name.  They   !
 !   can never be quite the same, unfortunatelly, because the data they start   !
-!   with is different.                                                         !
+!   with is different. One of the most distinct differences is the treatment   !
+!   of periodicity. Here, periodic faces are created from existing (internal)  !
+!   ones, whereas in Generate_Mod, they are added to existing cells.           !
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   One of the most distinct differences is the treatment of periodicity.      !
-!   Here, periodic faces are created from existing (internal) ones, whereas    !
-!   in Generate_Mod, they are added to existing cells.                         !
+!   * Initial checks and scaling: The subroutine begins with error checking    !
+!     for cell face orientation and offers the option to scale the grid        !
+!     geometry based on user input.                                            !
+!   * Grid homogeneity: It assesses the homogeneity of the grid, potentially   !
+!     enforcing uniformity for certain cases (important for polyhedral grids). !
+!   * Cell center calculation: Calculates the centers of cells in the grid,    !
+!     essential for subsequent geometrical computations.                       !
+!   * Face surface area calculation: Computes the surface area of each face in !
+!     the grid, a key step in volume and flux calculations.                    !
+!   * Face center calculation: Determines the geometric center of each face in !
+!     the grid.                                                                !
+!   * Boundary cell center calculation: The subroutine calculates the centers  !
+!     of boundary cells.                                                       !
+!   * Periodicity handling: This is a significant part of the subroutine,      !
+!     where it identifies and processes faces on periodic boundaries.          !
+!     It includes:                                                             !
+!     - Finding periodic direction vectors and rotating vectors to align with  !
+!       the periodic faces.                                                    !
+!     - Matching periodic faces and creating 'shadow' faces to handle periodic !
+!       conditions.                                                            !
+!     - Adjusting boundary cell indices and coordinates to accommodate         !
+!       periodicity.                                                           !
+!   * Face orientation correction: The subroutine checks and corrects the      !
+!     orientation of faces in the grid to ensure consistency in calculation.   !
+!   * Volume calculations: Computes the volume of each cell.                   !
+!   * Cell inertia tensor calculation: Calculates the inertia tensor for each  !
+!     cell, providing information about the cell's resistance to rotation.     !
+!   * Face interpolation factors: Determines interpolation factors for the     !
+!     cell faces, facilitating the estimation of properties at face centers    !
+!     from cell center values.                                                 !
+!------------------------------------------------------------------------------!
 !                                                                              !
 !                                n3                                            !
 !                 +---------------!---------------+                            !
@@ -90,10 +123,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  logical, intent(in) :: ask
-  integer, intent(in) :: g    ! grid rank
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
+  logical, intent(in) :: ask      !! controls interactive or optional parts
+  integer, intent(in) :: g        !! grid rank
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, c1, c2, n, n1, n2, s, b, i, j
   integer              :: c11, c12, c21, c22, s1, s2, cnt_bnd, cnt_per

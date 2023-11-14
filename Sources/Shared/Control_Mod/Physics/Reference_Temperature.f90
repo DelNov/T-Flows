@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Reference_Temperature(Control, t_ref, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads the value of reference temperature from the control file.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  real,   intent(out) :: t_ref
-  logical,   optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: t_ref    !! value of reference temperature
+  logical,   optional :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!

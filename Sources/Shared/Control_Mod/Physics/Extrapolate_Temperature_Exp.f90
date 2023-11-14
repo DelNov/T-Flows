@@ -1,13 +1,15 @@
 !==============================================================================!
   subroutine Extrapolate_Temperature_Exp(Control, temp_exp, verbose)
 !------------------------------------------------------------------------------!
-!   Reading if temprature will be extrapolated to walls exponentially          !
+!>  Reads, from the control file, if temprature will be extrapolated to the
+!>  walls with exponential interpolation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: temp_exp
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control   !! parent class
+  logical, intent(out) :: temp_exp  !! true if temperatures are extrapolated
+                                    !! exponentially, false otherwise
+  logical, optional    :: verbose   !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

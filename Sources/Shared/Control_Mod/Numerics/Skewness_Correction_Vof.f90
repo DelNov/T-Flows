@@ -1,9 +1,11 @@
 !==============================================================================!
   subroutine Skewness_Correction_Vof(Control, skew_corr, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads skewness correction for VOF.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
+  class(Control_Type)  :: Control    !! parent class
   logical, intent(out) :: skew_corr
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!

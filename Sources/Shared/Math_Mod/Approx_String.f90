@@ -1,6 +1,10 @@
 !==============================================================================!
   pure logical function Approx_String(Math, s, t, tol)
 !------------------------------------------------------------------------------!
+!>  Estimates if two strings are approximatelly the same.  It does it with
+!>  by using Levenshtein distance which, in a nutshell, estimates how many
+!>  characters are two strings appart.
+!------------------------------------------------------------------------------!
 !   For all i and j, d[i,j] will hold the Levenshtein distance between the     !
 !   first "i" characters of "s" and the first "j" characters of "t".           !
 !                                                                              !
@@ -8,9 +12,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type),  intent(in) :: Math
-  character(*),      intent(in) :: s, t  ! source and target strings
-  integer, optional, intent(in) :: tol   ! number of tolerated misstyped chars
+  class(Math_Type),  intent(in) :: Math  !! parent class
+  character(*),      intent(in) :: s, t  !! source and target strings
+  integer, optional, intent(in) :: tol   !! number of tolerated misstyped chars
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, j, m, n, cost, tolerance
   integer, allocatable :: d(:,:)

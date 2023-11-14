@@ -1,13 +1,17 @@
 !==============================================================================!
   subroutine Open_For_Writing_Binary(File, name_o, file_unit)
 !------------------------------------------------------------------------------!
-!   Opens file for writing in the first available unit.                        !
+!>  Opens a binary file for writing. It also prints a message which file is
+!>  being created from one (first) processor.  For parallel runs, it writes
+!>  not only the name of one file being read, but a range of files for all
+!>  processor.
+!>  File unit is assigned dynamically when opening the file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
-  character(len=*) :: name_o
-  integer          :: file_unit
+  class(File_Type) :: File       !! parent class
+  character(len=*) :: name_o     !! name of the output file
+  integer          :: file_unit  !! file unit assigned when opening
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: f, l
   character(SL) :: name_l   ! l for the last name

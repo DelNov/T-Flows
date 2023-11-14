@@ -1,14 +1,13 @@
 !==============================================================================!
   pure recursive subroutine Three_Real(Sort, a1, a2, a3)
 !------------------------------------------------------------------------------!
-!   Quick sort three real arrays (think of three coordinates)                  !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort three real arrays (think of three coordinates).
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  real,             intent(inout) :: a1(:), a2(:), a3(:)
+  class(Sort_Type), intent(in)    :: Sort                 !! parent class
+  real,             intent(inout) :: a1(:), a2(:), a3(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2, x3
   integer :: i, j, n
