@@ -44,7 +44,7 @@ PASS_ON = -DT_FLOWS_COMPILATION=1
 #   Add T_FLOWS_PROGRAM, T_FLOWS_ASSERT and T_FLOWS_DEBUG
 #   and later on it add also T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
-PASS_ON += -DT_FLOWS_PROGRAM=2
+PASS_ON += -DT_FLOWS_PROGRAM=1
 
 ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1
@@ -76,12 +76,12 @@ $(info #                                                                       )
 $(info # Note: The first item, for each of the options above, is the default.  )
 $(info #                                                                       )
 $(info # Examples:                                                             )
-$(info #   make              - compile with gnu compiler                       )
-$(info #   make FORTAN=intel - compile with intel compiler                     )
-$(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
-$(info #   make ASSERT=no    - compile without assert with gnu compiler        )
-$(info #   make OMP=yes      - compile with gnu compiler for parallel Generate )
-$(info #   make SORT=heap    - use heap-sort variant of sorting functions      )
+$(info #   make               - compile with gnu compiler                      )
+$(info #   make FORTRAN=intel - compile with intel compiler                    )
+$(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
+$(info #   make ASSERT=no     - compile without assert with gnu compiler       )
+$(info #   make OMP=yes       - compile with gnu compiler for parallel Generate)
+$(info #   make SORT=heap     - use heap-sort variant of sorting functions     )
 $(info #-----------------------------------------------------------------------)
 
 #----------------------------------------------------
