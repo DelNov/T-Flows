@@ -111,10 +111,10 @@
                          time_step = Time % Curr_Dt(),  &
                          extension = '.pvtu',           &
                          domain    = domain)
-    call File % Set_Name(name_out_9,                    &
-                         processor = This_Proc(),       &
-                         time_step = Time % Curr_Dt(),  &
-                         extension = '.vtu',            &
+    call File % Set_Name(name_out_9,                              &
+                         processor = (/This_Proc(), N_Procs()/),  &
+                         time_step = Time % Curr_Dt(),            &
+                         extension = '.vtu',                      &
                          domain    = domain)
   else
     call File % Set_Name(name_out_8,                    &
@@ -122,11 +122,11 @@
                          appendix  = '-bnd',            &
                          extension = '.pvtu',           &
                          domain=domain)
-    call File % Set_Name(name_out_9,                    &
-                         processor = This_Proc(),       &
-                         time_step = Time % Curr_Dt(),  &
-                         appendix  = '-bnd',            &
-                         extension = '.vtu',            &
+    call File % Set_Name(name_out_9,                              &
+                         processor = (/This_Proc(), N_Procs()/),  &
+                         time_step = Time % Curr_Dt(),            &
+                         appendix  = '-bnd',                      &
+                         extension = '.vtu',                      &
                          domain    = domain)
   end if
 
