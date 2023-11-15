@@ -70,6 +70,10 @@
     end if
   end do
 
+
+  ! User function
+  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
+
   !------------------------------------!
   !   Calculate the max volume error   !
   !   with the new corrected fluxes    !
@@ -134,9 +138,6 @@
       call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
     end if
   end if
-
-  ! User function
-  call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
 
   call Profiler % Stop('Correct_Velocity')
 
