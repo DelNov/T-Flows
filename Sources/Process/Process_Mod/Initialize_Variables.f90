@@ -8,7 +8,18 @@
 !   be kept after restart, it should be stored in backup file.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
+  use File_Mod
+  use Field_Mod,   only: Field_Type
+  use Comm_Mod
+  use Turb_Mod
+  use Swarm_Mod
+  use Grid_Mod
+  use Bulk_Mod
   use User_Mod
+  use Control_Mod
+  use Vof_Mod
+  use Numerics_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -36,11 +47,12 @@
 
   integer                   :: n_points, k
   real, allocatable         :: prof(:,:), x(:), y(:), z(:), dist(:)
-  logical                   :: found
+  logical                   :: found, file_exists
 
   ! Default values for initial conditions
   character(3) :: u_def   = '0.0',  v_def    = '0.0',  w_def   = '0.0'
   character(3) :: t_def   = '0.0',  t2_def   = '0.0',  phi_def = '0.0'
+  character(3) :: vf_def   = '0.0'
   character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
   character(3) :: vis_def = '0.0',  zeta_def = '0.0'
   character(3) :: uu_def  = '0.0',  vv_def   = '0.0',  ww_def  = '0.0'
@@ -98,6 +110,7 @@
       if (First_Proc()) &
         print *, '# Values specified in the file: ', trim(keys_file(nvs))
 
+      !call File % Open_For_Reading_Ascii(keys_file(1), fu, This_Proc())
       call File % Open_For_Reading_Ascii(keys_file(1), fu)
 
       ! Number of points
@@ -309,6 +322,15 @@
           t % oo(c) = t % n(c)
         end if
 
+        !---------!
+        !   Vof   !
+        !---------!
+        if(Flow % with_interface) then
+          vals(0) = vf_def
+          read(vals(Key_Ind('VOF', keys, nks)), *, err=999)  Vof % fun % n(c)
+ 999      continue  ! file name may be defined
+        end if
+
         !-------------!
         !   Scalars   !
         !-------------!
@@ -410,7 +432,12 @@
     !---------------------------------!
     if(Flow % with_interface) then
       read(vals(Key_Ind('VOF', keys, nks)), *)  Vof % name_stl
-      call Vof % Initialize_From_Stl()
+      inquire(file = trim(Vof % name_stl), exist = file_exists)
+
+      ! File exists
+      if(file_exists) then
+        call Vof % Initialize_From_Stl()
+      endif
     end if
 
   end if
