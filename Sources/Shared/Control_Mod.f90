@@ -130,8 +130,7 @@
       procedure :: Tolerance_For_Gauss_Gradients
       procedure :: Tolerance_For_Simple_Algorithm
       procedure :: Max_Correction_Cycles_Beta_Vof
-      procedure :: Max_Smoothing_Cycles_Curvature_Vof
-      procedure :: Max_Smoothing_Cycles_Normal_Vof
+      procedure :: Max_Smooth_Cycles_Curvature_Vof
       procedure :: Max_Courant_Vof
       procedure :: Max_Substep_Cycles_Vof
       procedure :: Skewness_Correction_Vof
@@ -227,7 +226,7 @@
 #   include "Control_Mod/Input_Output/Save_Backup_Name.f90"
 #   include "Control_Mod/Input_Output/Save_Initial_Condition.f90"
 #   include "Control_Mod/Input_Output/Save_Results_At_Boundaries.f90"
-#   include 'Control_Mod/Input_Output/Save_Results_Units.f90'
+#   include "Control_Mod/Input_Output/Save_Results_Units.f90"
 #   include "Control_Mod/Input_Output/Wall_Time_Max_Hours.f90"
 
     ! Save
@@ -334,8 +333,7 @@
 
     ! Numerical Parameters VOF (CICSAM)
 #   include "Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90"
-#   include "Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90"
-#   include "Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90"
+#   include "Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90"
 #   include "Control_Mod/Numerics/Max_Courant_Vof.f90"
 #   include "Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90"
 #   include "Control_Mod/Numerics/Skewness_Correction_Vof.f90"
