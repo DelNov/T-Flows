@@ -439,6 +439,17 @@
                                          f8, f9, data_offset, run)
     end if
 
+    !----------------------!
+    !   Boundary regions   !
+    !----------------------!
+    if(.not. plot_inside) then
+      int_save(c_f:c_l) = Grid % region % at_cell(c_f:c_l)
+      str_var =  Var_Name("Boundary COndition","[1]",Results % units)
+      call Results % Save_Vtu_Scalar_Int(trim(str_var),plot_inside,    &
+                                         int_save(c_f:c_l),            &
+                                         f8, f9, data_offset, run)
+    end if
+
     !--------------!
     !   Velocity   !
     !--------------!
