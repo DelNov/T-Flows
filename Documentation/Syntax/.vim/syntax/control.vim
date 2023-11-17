@@ -56,6 +56,7 @@ syn keyword controlKeyword   RESULTS_SAVE_INTERVAL
 syn keyword controlKeyword   SAVE_BACKUP_NAME
 syn keyword controlKeyword   SAVE_INITIAL_CONDITION
 syn keyword controlKeyword   SAVE_RESULTS_AT_BOUNDARIES
+syn keyword controlKeyword   SAVE_RESULTS_UNITS  
 syn keyword controlKeyword   SWARM_SAVE_INTERVAL
 syn keyword controlKeyword   WALL_TIME_MAX_HOURS
 syn keyword controlKeyword   PROFILER_INFO
