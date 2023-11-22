@@ -1,8 +1,21 @@
+# Full grid name
 plate.neu
+
+# Create dual grid
 no
+
+# Geometric scaling
 skip
+
+# Boundary cell centers' positions
 2
+
+# Periodicity
 6
 skip
+
+# Wall distance
 1
+
+# Probe 1d
 z

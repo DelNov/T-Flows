@@ -39,7 +39,7 @@
 
   call Calculate_Shear_And_Vorticity(Flow)
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     kin % n(c) = 0.5*max(uu % n(c) + vv % n(c) + ww % n(c), TINY)
 
     cmu_mod = max(-(  uu % n(c) * u % x(c)               &

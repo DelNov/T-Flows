@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n     ! time step
-  real,    intent(in)      :: time  ! physical time
 !----------------------------------[Locals]------------------------------------!
   integer :: i, j, k, n_parts_in_buffers
   real    :: x, y, z, xo, yo, zo, dy, dz, my, mz
@@ -22,7 +20,7 @@
   !----------------------------------------------------!
   !   Initialize particles only in the 1st time step   !
   !----------------------------------------------------!
-  if(n .eq. 1) then
+  if(Time % Curr_Dt() .eq. 1) then
 
     ! Leave 10% margin
     xo = -1.0

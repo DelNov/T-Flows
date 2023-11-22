@@ -1,13 +1,13 @@
 !==============================================================================!
-  real function Ebf_Scalar(Turb, c, coef)
+  pure real function Ebf_Scalar(Turb, c, coef)
 !------------------------------------------------------------------------------!
 !   Calculates elliptic blending function for scalars.                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type) :: Turb
-  integer          :: c
-  real             :: coef    ! Prandtl number (maybe even Shmidt number)
+  class(Turb_Type), intent(in) :: Turb
+  integer,          intent(in) :: c
+  real,             intent(in) :: coef    ! Prandtl number (Shmidt number)
 !==============================================================================!
 
   Ebf_Scalar = 0.01 * ((coef * Turb % y_plus(c)) ** 4  &

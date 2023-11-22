@@ -9,28 +9,9 @@
   type(Grid_Type)     :: Grid
   character(SL)       :: file_name
 !----------------------------------[Calling]-----------------------------------!
-  integer(DP) :: ftell
-!-----------------------------------[Locals]-----------------------------------!
-  character(SL)          :: one_token
-  character(1)           :: one_char
-  integer(DP)            :: offset
-  integer                :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
-  integer                :: n_cells, n_bnd_cells, n_faces, n_nodes
-  integer                :: n_face_nodes, n_cells_zone
-  integer                :: c, c1, c2, s, n, fu, i, l, pos, length
-  integer                :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
-  integer                :: cell_type, zone_type
-  integer                :: cell_f, cell_l, side_f, side_l, node_f, node_l
-  integer                :: all_nodes(1024)       ! all cell's nodes
-  integer                :: n_face_sect           ! number of face sections
-  integer                :: face_sect_pos(2048)   ! where did Fluent store it
-  integer                :: face_sect_bnd(2048)   ! where does T-Flows store it
-  integer                :: n_bnd_cond            ! number of boundary conditions
-  logical                :: this_sect_bnd         ! .true. if bnd cond section
-  logical                :: the_end               ! end of file reached?
-  logical                :: ascii                 ! is file in ascii format?
-  integer,   allocatable :: cell_visited_from(:), cell_types(:)
-  character, allocatable :: very_long_line(:)
+# ifdef __NVCOMPILER_LLVM__
+  integer :: ftell  ! needed for Nvidia compiler
+# endif
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MIXED_ZONE = 0
   integer, parameter :: CELL_TRI   = 1
@@ -42,7 +23,27 @@
   integer, parameter :: CELL_POLY  = 7
   integer, parameter :: FACE_TRI   = 3
   integer, parameter :: FACE_QUAD  = 4
-  integer, parameter :: FACE_POLY  = 5  ! just a guess
+  integer, parameter :: FACE_POLY  = 5  ! an educated guess, but seems good
+!-----------------------------------[Locals]-----------------------------------!
+  character(SL)          :: one_token
+  character(1)           :: one_char
+  integer(DP)            :: offset
+  integer                :: n_tri, n_quad, n_tet, n_hexa, n_pyra, n_wed, n_poly
+  integer                :: n_cells, n_bnd_cells, n_faces, n_nodes
+  integer                :: n_face_nodes, n_cells_zone
+  integer                :: c, c1, c2, s, n, fu, l, pos, length, error
+  integer                :: i_cel, i_nod, j_nod, k_nod, l_nod, i_fac
+  integer                :: cell_type, zone_type
+  integer                :: cell_f, cell_l, side_f, side_l, node_f, node_l
+  integer                :: all_nodes(1024)       ! all cell's nodes
+  integer                :: n_face_sect           ! number of face sections
+  integer                :: face_sect_pos(2048)   ! where did Fluent store it
+  integer                :: face_sect_bnd(2048)   ! where does T-Flows store it
+  integer                :: n_bnd_reg            ! number of boundary conditions
+  logical                :: this_sect_bnd         ! .true. if bnd cond section
+  logical                :: the_end               ! end of file reached?
+  logical                :: ascii                 ! is file in ascii format?
+  integer,   allocatable :: cell_visited_from(:), cell_types(:)
 !==============================================================================!
 
   call Profiler % Start('Load_Fluent')
@@ -131,7 +132,7 @@
   face_sect_pos(:) = 0
   face_sect_bnd(:) = 0
   n_face_sect      = 0
-  n_bnd_cond       = 0
+  n_bnd_reg        = 0
   n_bnd_cells      = 0
   n_faces          = 0
   the_end          = .false.
@@ -233,10 +234,10 @@
         if( this_sect_bnd ) then
 
           ! Increase the number of boundary condition sections and ...
-          n_bnd_cond = n_bnd_cond + 1
+          n_bnd_reg = n_bnd_reg + 1
 
           ! ... store mapping of this face section to T-Flows boundary condition
-          face_sect_bnd(n_face_sect) = n_bnd_cond
+          face_sect_bnd(n_face_sect) = n_bnd_reg
         end if
 
       end if
@@ -250,11 +251,10 @@
   end if
 
   print '(a34,i9)', ' # Boundary cells from face data: ', n_bnd_cells
-  print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_cond
+  print '(a34,i9)', ' # Boundary condition sections:   ', n_bnd_reg
 
   Grid % n_bnd_cells = n_bnd_cells
-  Grid % n_bnd_cond  = n_bnd_cond
-  allocate(Grid % bnd_cond % name(n_bnd_cond))
+  call Grid % Allocate_Regions(n_bnd_reg)
 
   !--------------------------------------------!
   !                                            !
@@ -431,29 +431,42 @@
           n_cells_zone = cell_l - cell_f + 1  ! this was read above
 
           if(ascii) then
-            ! Find out the Line length
-            offset = ftell(fu)                ! mark offset
-            length = File % Line_Length(fu)   ! read the Line
-            call fseek(fu, offset, 0)         ! go back
+            ! Find out the cell record length
+            ! This is approximate, just until you encounter next
+            ! ')' character, but will nonetheless do the job
+            offset = ftell(fu)  ! mark the offset
+            length = 0
+            do
+              read(fu) one_char
+              if(one_char .eq. ')') exit
+              length = length + 1
+            end do
+
+            ! Once you've found lenght, go back to the beginning
+            ! of the record using the offset you stored before
+#           ifdef __INTEL_COMPILER
+            error = fseek(fu, offset, 0)
+#           else
+            error = 0
+            call fseek(fu, offset, 0)
+#           endif
 
             ! Allocate helping arrays
-            allocate(very_long_line(length))    ! allocate very long Line
             allocate(cell_types(n_cells_zone))  ! allocate cell types
 
-            ! Read the very long Line
-            read(fu) very_long_line
-
             ! Browse the very long Line and read cell types from it
-            c = 0                                  ! cell counter
-            do i = 1, length                       ! thrugh entire long Line
-              if(ichar(very_long_line(i)) .ge. ichar('0') .and.  &
-                 ichar(very_long_line(i)) .le. ichar('9')) then
-                c = c + 1                          ! increase cell count
-                read(very_long_line(i), '(i1)') &
-                     cell_types(c)                 ! read cell types
+            c = 0  ! cell counter
+            do
+              read(fu) one_char
+              if(one_char .eq. ')') exit
+              if(one_char .ge. '0' .and. one_char .le. '9') then
+                c = c + 1                             ! increase cell count
+                read(one_char, '(i1)') cell_types(c)  ! read cell types
               end if
             end do
-            ! At this point: c .eq. n_cells_zone; maybe check it?
+
+            ! At this point: c .eq. n_cells_zone: check it!
+            Assert(c .eq. n_cells_zone)
           end if
 
           do c = 1, n_cells_zone
@@ -652,14 +665,14 @@
             n_bnd_cells = n_bnd_cells + 1
             Grid % faces_c(1, s) = c2
             Grid % faces_c(2, s) = -n_bnd_cells
-            Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
+            Grid % region % at_cell(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Case when c2 is a boundary cell
           else if(c2 .eq. 0) then
             n_bnd_cells = n_bnd_cells + 1
             Grid % faces_c(1, s) = c1
             Grid % faces_c(2, s) = -n_bnd_cells
-            Grid % bnd_cond % color(-n_bnd_cells) = face_sect_bnd(n_face_sect)
+            Grid % region % at_cell(-n_bnd_cells) = face_sect_bnd(n_face_sect)
 
           ! Neither c1 nor c2 are boundary cells
           else
@@ -1085,7 +1098,7 @@
           if(face_sect_bnd(n) .ne. 0) then
             if(face_sect_pos(n) .eq. pos) then
               call String % To_Upper_Case(one_token)
-              Grid % bnd_cond % name(face_sect_bnd(n)) = one_token
+              Grid % region % name(face_sect_bnd(n)) = one_token
             end if
           end if
         end do

@@ -14,9 +14,10 @@
   type(Field_Type),    pointer :: Flow
   type(Particle_Type), pointer :: Part
   type(Var_Type),      pointer :: u, v, w, smooth
-  integer                      :: ver, c, n_verts_in_buffers
-  real                         :: max_dis, rx, ry, rz, r, u_p, v_p, w_p
+  integer                      :: c
+  real                         :: max_dis, rx, ry, rz
   real                         :: nx, ny, nz, dm, smooth_m, smooth_p
+! real                         :: r, u_p, v_p, w_p
 !==============================================================================!
 
   ! Take aliases

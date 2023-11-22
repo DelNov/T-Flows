@@ -10,7 +10,7 @@
 #-----------------------
 # Exit when any command
 #-----------------------
-set -e
+# set -e
 
 #-------------------------------
 # Trap where the error occurred
@@ -31,13 +31,12 @@ set -e
 FORTRAN="gnu"
 FCOMP=""
 DEBUG="no"
-OPENMP="yes"
+SORT="heap"
 
 # Intel compiler (python is messed up with Intel, don't plot for now)
 # FORTRAN="intel"
 # FCOMP="mpiifort"
 # DEBUG="no"
-# OPENMP="yes"
 
 # Variable MODE can be set to "interactive" or "noninteractive", depending if
 # the script is ran in interactive mode (without command line options) or in
@@ -87,6 +86,7 @@ RANS_FUEL_BUNDLE_DIR=Rans/Fuel_Bundle
 RANS_IMPINGING_JET_DIR=Rans/Impinging_Jet_2d_Distant_Re_23000
 
 MULTDOM_BACKSTEP_DIR=Laminar/Copy_Inlet
+MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
 MULTDOM_MEMBRANE_DIR=Rans/Membrane
 
 ELBOW_ASCII_DIR=Functionality/Meshes/Ansys/Elbow_Ascii
@@ -106,44 +106,8 @@ LES_RB_109_DIR=Les/Rayleigh_Benard_Convection_Ra_10e09
 HYB_CHANNEL_HR_STRETCHED_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Stretched_Mesh
 HYB_CHANNEL_HR_UNIFORM_DIR=Hybrid_Les_Rans/Channel_Re_Tau_2000/Uniform_Mesh
 
-# Add compressed meshes for these:
-# MULTDOM_SINGLE_ROD_DIR=Rans/Single_Rod
-# MULTDOM_COPY_INLET_DIR=Laminar/Copy_Inlet
-# MULTDOM_HEAT_EXCHANGER_2_DIR=Laminar/Heat_Exchanger/2_Domains
+# Not used (yet ... if ever):
 # MULTDOM_HEAT_EXCHANGER_3_DIR=Laminar/Heat_Exchanger/3_Domains
-
-#----------------------------------------------------------------------------
-# All compilation tests including those with User_Mod/
-# (These are essentially most tests, but maybe not all of them
-# have the User_Mod directory, so there is some redundancy here)
-#----------------------------------------------------------------------------
-ALL_COMPILE_TESTS=( \
-                   "$LAMINAR_CAVITY_THERM_DRIVEN_106_DIR" \
-                   "$LAMINAR_CAVITY_THERM_DRIVEN_108_DIR" \
-                   "$LAMINAR_T_JUNCTION_DIR" \
-                   "$LAMINAR_CHANNEL_DIR" \
-                   "$RANS_BACKSTEP_05100_DIR" \
-                   "$RANS_BACKSTEP_28000_DIR" \
-                   "$RANS_CHANNEL_LR_LONG_DIR" \
-                   "$RANS_CHANNEL_LR_RSM_DIR" \
-                   "$RANS_CHANNEL_LR_STRETCHED_DIR" \
-                   "$RANS_CHANNEL_LR_UNIFORM_DIR" \
-                   "$RANS_FUEL_BUNDLE_DIR" \
-                   "$RANS_IMPINGING_JET_DIR" \
-                   "$MULTDOM_BACKSTEP_DIR" \
-                   "$MULTDOM_MEMBRANE_DIR" \
-                   "$SWARM_PERIODIC_CYL_DIR" \
-                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
-                   "$VOF_RISING_BUBBLE_DIR" \
-                   "$SWARM_VOF_THREE_PHASE_DIR" \
-                   "$LES_CHANNEL_180_LONG_DIR" \
-                   "$LES_CHANNEL_180_PERIODIC_DIR" \
-                   "$LES_PIPE_DIR" \
-                   "$LES_RB_109_DIR" \
-                   "$HYB_CHANNEL_HR_UNIFORM_DIR" \
-                   "$HYB_CHANNEL_HR_STRETCHED_DIR" \
-                   )
-DONE_COMPILE_TESTS=0
 
 #--------------------------------------------------------------
 # All directories to test Generate
@@ -185,6 +149,7 @@ ALL_CONVERT_TESTS=( \
                    "$LAMINAR_CONVECTIVE_DIR" \
                    "$RANS_FUEL_BUNDLE_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
+                   "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                    "$MULTDOM_MEMBRANE_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
@@ -218,6 +183,7 @@ ALL_DIVIDE_TESTS=( \
                   "$RANS_FUEL_BUNDLE_DIR" \
                   "$RANS_IMPINGING_JET_DIR" \
                   "$MULTDOM_BACKSTEP_DIR" \
+                  "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                   "$MULTDOM_MEMBRANE_DIR" \
                   "$SWARM_PERIODIC_CYL_DIR" \
                   "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
@@ -256,6 +222,7 @@ ALL_PROCESS_TESTS=( \
                    "$RANS_CHANNEL_LR_RSM_DIR" \
                    "$RANS_IMPINGING_JET_DIR" \
                    "$MULTDOM_BACKSTEP_DIR" \
+                   "$MULTDOM_HEAT_EXCHANGER_2_DIR" \
                    "$SWARM_PERIODIC_CYL_DIR" \
                    "$SWARM_ROD_BUNDLE_POLYHEDRAL_DIR" \
                    "$VOF_DAM_BREAK_2D_DIR" \
@@ -287,6 +254,7 @@ ALL_TURBULENCE_MODELS=( \
                        "none" \
                        "none" \
                        "none" \
+                       "none" \
                        "les_dynamic" \
                        "hybrid_les_rans" \
                        "hybrid_les_rans" \
@@ -294,6 +262,7 @@ ALL_TURBULENCE_MODELS=( \
 # For single test: ALL_TURBULENCE_MODELS=("none")
 
 ALL_INTERFACE_TRACKING=( \
+                       "no" \
                        "no" \
                        "no" \
                        "no" \
@@ -320,6 +289,7 @@ ALL_INTERFACE_TRACKING=( \
 # For single test: ALL_INTERFACE_TRACKING=("yes")
 
 ALL_PARTICLE_TRACKING=( \
+                       "no" \
                        "no" \
                        "no" \
                        "no" \
@@ -416,9 +386,9 @@ function make_clean {
 }
 
 #------------------------------------------------------------------------------#
-# user_compile
+# parallel_compile
 #------------------------------------------------------------------------------#
-function user_compile {
+function parallel_compile {
   # $1 = dir
   # $2 = MPI = yes/no
   # $3 = DIR_CASE path
@@ -437,22 +407,24 @@ function user_compile {
   git checkout User_Mod/*.f90 >> $FULL_LOG 2>&1
 
   if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
-    make \
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG  \
+               SORT=$SORT MPI=$2"
+    make               \
       FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
+      FCOMP=$FCOMP     \
+      DEBUG=$DEBUG     \
+      SORT=$SORT       \
       MPI=$2 >> $FULL_LOG 2>&1
     success=$?
   else
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
-    make \
+    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG  \
+               SORT=$SORT MPI=$2 DIR_CASE=$3"
+    make               \
       FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
-      MPI=$2 \
+      FCOMP=$FCOMP     \
+      DEBUG=$DEBUG     \
+      SORT=$SORT       \
+      MPI=$2           \
       DIR_CASE=$3 >> $FULL_LOG 2>&1
     success=$?
   fi
@@ -462,25 +434,20 @@ function user_compile {
   cd - > /dev/null
   return $success
   if [ $success -eq 0 ]; then
-    elog "User compile passed."
+    elog "Parallel compile passed."
   else
-    elog "User compile in " $1 " failed!"
+    elog "Parallel compile in " $1 " failed!"
   fi
 }
 
 #------------------------------------------------------------------------------#
-# clean_compile
+# sequential_compile
 #------------------------------------------------------------------------------#
-function clean_compile {
+function sequential_compile {
   # $1 = dir
-  # $2 = MPI = yes/no
-  # $3 = DIR_CASE path
 
   if [ -z "${1+xxx}" ]; then
     elog "Directory with sources is not set at all"
-    exit 1
-  elif [ -z "${2+xxx}" ]; then
-    elog "MPI flag is not set at all"
     exit 1
   fi
 
@@ -488,35 +455,22 @@ function clean_compile {
   elog "Clean compile in:" "$1"
   make clean >> $FULL_LOG 2>&1
 
-  if [ -z "${3+xxx}" ]; then
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2"
-    make \
-      FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
-      MPI=$2 >> $FULL_LOG 2>&1
-    success=$?
-  else
-    elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG OPENMP=$OPENMP MPI=$2 DIR_CASE=$3"
-    make \
-      FORTRAN=$FORTRAN \
-      FCOMP=$FCOMP \
-      DEBUG=$DEBUG \
-      OPENMP=$OPENMP \
-      MPI=$2 \
-      DIR_CASE=$3 >> $FULL_LOG 2>&1
-    success=$?
-  fi
+  elog "make FORTRAN=$FORTRAN FCOMP=$FCOMP DEBUG=$DEBUG SORT=$SORT"
+  make               \
+    FORTRAN=$FORTRAN \
+    FCOMP=$FCOMP     \
+    SORT=$SORT       \
+    DEBUG=$DEBUG >> $FULL_LOG 2>&1
+  success=$?
 
   time_in_seconds
 
   cd - > /dev/null
   return $success
   if [ $success -eq 0 ]; then
-    elog "Clean compile passed."
+    elog "Sequentail compile passed."
   else
-    elog "Clean compile in " $1 " failed!"
+    elog "Sequential compile in " $1 " failed!"
   fi
 }
 
@@ -683,7 +637,7 @@ function generate_tests {
   elog "#----------------------------------------------------------------------"
   echo "#   Running Generate tests"
 
-  clean_compile $GENE_DIR no # dir MPI
+  sequential_compile $GENE_DIR # dir
 
   for CASE_DIR in ${ALL_GENERATE_TESTS[@]}; do
     launch_generate $CASE_DIR
@@ -745,7 +699,7 @@ function convert_tests {
   elog "#----------------------------------------------------------------------"
   echo "#   Running Convert tests"
 
-  clean_compile $CONV_DIR no # dir MPI
+  sequential_compile $CONV_DIR # dir
 
   for CASE_DIR in ${ALL_CONVERT_TESTS[@]}; do
     launch_convert $CASE_DIR
@@ -767,7 +721,7 @@ function divide_tests {
   elog "#----------------------------------------------------------------------"
   echo "#   Running Divide tests"
 
-  clean_compile $DIVI_DIR no # dir MPI
+  sequential_compile $DIVI_DIR # dir
 
   for CASE_DIR in ${ALL_DIVIDE_TESTS[@]}; do
     launch_divide $CASE_DIR
@@ -862,14 +816,14 @@ function process_backup_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
 
   # BEGIN:---------------------------------------#
-  elog "np=1, MPI=no, start from 0, make a backup"
-  user_compile $PROC_DIR no # dir MPI
+  elog "np=1, MPI=yes, start from 0, make a backup"
+  parallel_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # comment line with LOAD_BACKUP_NAME
     replace_line_with_first_occurence_in_file \
@@ -895,10 +849,10 @@ function process_backup_test {
 
 
   # BEGIN:---------------------------------------------#
-  elog "np=1, MPI=no, load from backup(produced by seq)"
+  elog "np=1, MPI=yes, load from backup(produced by seq)"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # uncomment line with LOAD_BACKUP_NAME
     replace_line_with_first_occurence_in_file \
@@ -913,7 +867,7 @@ function process_backup_test {
 
   # BEGIN:----------------------------------------------#
   elog "np=1, MPI=yes, load from backup(produced by seq)"
-  user_compile $PROC_DIR yes # dir MPI
+  parallel_compile $PROC_DIR yes # dir MPI
 
   launch_process par 1
   #------------------------------------------------:END #
@@ -930,7 +884,7 @@ function process_backup_test {
   elog "np=2, MPI=yes, load from backup(produced by par.np=1)"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     replace_line_with_first_occurence_in_file \
       "LOAD_BACKUP_NAME" \
@@ -946,7 +900,7 @@ function process_backup_test {
   elog "np=2, MPI=yes, start from 0, make a backup"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     replace_line_with_first_occurence_in_file \
       "LOAD_BACKUP_NAME" \
@@ -962,7 +916,7 @@ function process_backup_test {
   elog "np=2, MPI=yes, load from backup(produced by par.np=2)"
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     replace_line_with_first_occurence_in_file \
       "LOAD_BACKUP_NAME" \
@@ -976,7 +930,7 @@ function process_backup_test {
 
   # BEGIN:------------------------------------------#
   elog "np=1, MPI=yes, backup=(produced by par.np=2)"
-  user_compile $PROC_DIR no # dir MPI
+  parallel_compile $PROC_DIR yes # dir MPI
   launch_process par 1
   #--------------------------------------------:END #
 
@@ -1123,14 +1077,14 @@ function process_save_exit_now_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
 
   # BEGIN:---------------------------------------#
-  elog "np=1, MPI=no, start from 0, make a backup"
-  user_compile $PROC_DIR no # dir MPI
+  elog "np=1, MPI=yes, start from 0, make a backup"
+  parallel_compile $PROC_DIR yes # dir MPI
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # change number of timesteps to 3
     replace_line_with_first_occurence_in_file \
@@ -1149,7 +1103,7 @@ function process_save_exit_now_test {
     elog ""
     elog "#===================================================================="
     if [ "$i" = 1 ]; then
-      elog "#   Test np=1, MPI=no"
+      elog "#   Test np=1, MPI=yes"
     fi
     if [ "$i" = 2 ]; then
       elog "#   Test np=1, MPI=yes"
@@ -1160,10 +1114,10 @@ function process_save_exit_now_test {
     elog "#--------------------------------------------------------------------"
 
     # BEGIN:---------------------------------------------#
-    elog "np=1, MPI=no, load from backup(produced by seq)"
+    elog "np=1, MPI=yes, load from backup(produced by seq)"
 
     for (( i=1; i<=$n_dom; i++ )); do
-      name_in_div=$(head -n1 divide."$i".scr)
+      name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
       # comment line with LOAD_BACKUP_NAME
       replace_line_with_first_occurence_in_file \
@@ -1176,11 +1130,11 @@ function process_save_exit_now_test {
     #-----------------------------------------------:END #
 
     if [ "$i" = 1 ]; then
-      user_compile $PROC_DIR no
+      parallel_compile $PROC_DIR yes
     elif [ "$i" = 2 ]; then
-      user_compile $PROC_DIR yes
+      parallel_compile $PROC_DIR yes
     elif [ "$i" = 3 ]; then
-      user_compile $PROC_DIR yes
+      parallel_compile $PROC_DIR yes
     fi
 
     elog "#   Forcing to save: save_now"
@@ -1208,7 +1162,7 @@ function process_save_exit_now_test {
       touch exit_now
 
       for (( i=1; i<=$n_dom; i++ )); do
-        name_in_div=$(head -n1 divide."$i".scr)
+        name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
         # uncomment line with LOAD_BACKUP_NAME
         replace_line_with_first_occurence_in_file \
@@ -1313,6 +1267,7 @@ function launch_matplotlib {
   fi
   time_in_seconds
 }
+
 #------------------------------------------------------------------------------#
 # Individual process tests for compilation
 #------------------------------------------------------------------------------#
@@ -1349,13 +1304,13 @@ function process_compilation_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
-  name_in_div=$(head -n1 divide.1.scr)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
+  name_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '1p')
 
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$TEST_DIR/$1")
 
-  user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+  parallel_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   # Restore control
   if [ $n_dom -eq 1 ]; then
@@ -1367,25 +1322,6 @@ function process_compilation_test {
     unlink control
     git checkout -q control.?
   fi
-}
-
-#------------------------------------------------------------------------------#
-# All process compilation tests
-#------------------------------------------------------------------------------#
-function process_compilation_tests {
-  # $1 = dir with test
-
-  elog ""
-  elog "#======================================================================"
-  elog "#"
-  elog "#   Running Processor compilation tests"
-  elog "#"
-  elog "#----------------------------------------------------------------------"
-  echo "#   Running Processor compilation tests"
-
-  for CASE_DIR in ${ALL_COMPILE_TESTS[@]}; do
-    process_compilation_test $CASE_DIR
-  done
 }
 
 #------------------------------------------------------------------------------#
@@ -1435,17 +1371,17 @@ function process_full_length_test {
     ln -s control.0 control
   fi
 
-  nproc_in_div=$(head -n2 divide.1.scr | tail -n1)
+  nproc_in_div=$(grep -v "^#" divide.1.scr | awk 'NF' | sed -n '2p')
 
   # BEGIN:-------------------------#
   elog "np="$nproc_in_div", MPI=yes"
   # rel_dir to User_Mod/ from Process/
   rel_dir=$(realpath --relative-to="$PROC_DIR" "$1")
 
-  user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+  parallel_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
   for (( i=1; i<=$n_dom; i++ )); do
-    name_in_div=$(head -n1 divide."$i".scr)
+    name_in_div=$(grep -v "^#" divide."$i".scr | awk 'NF' | sed -n '1p')
 
     # comment line with LOAD_BACKUP_NAME
     replace_line_with_first_occurence_in_file \
@@ -1589,24 +1525,24 @@ function process_accuracy_test {
       chan.dom
 
     if [ ! -f $GENE_EXE ]; then
-      clean_compile $GENE_DIR no # dir MPI
+      sequential_compile $GENE_DIR # dir
     fi
     launch_generate "$1" "quiet"
 
     if [ ! -f $DIVI_EXE ]; then
-      clean_compile $DIVI_DIR no # dir MPI
+      sequential_compile $DIVI_DIR # dir
     fi
     launch_divide   "$1" "quiet"
 
-    name_in_div=$(head  -n1 divide.scr)
-    nproc_in_div=$(head -n2 divide.scr | tail -n1)
+    name_in_div=$(grep -v "^#" divide.scr | awk 'NF' | sed -n '1p')
+    nproc_in_div=$(grep -v "^#" divide.scr | awk 'NF' | sed -n '2p')
 
     elog "np="$nproc_in_div", MPI=yes"
 
     # rel_dir to User_Mod/ from Process/
     rel_dir=$(realpath --relative-to="$PROC_DIR" "$path")
 
-    user_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
+    parallel_compile $PROC_DIR yes $rel_dir # dir MPI DIR_CASE
 
     launch_process par $nproc_in_div
 
@@ -1675,67 +1611,87 @@ function chose_test {
   option=$1
 
   if [ $option -eq 0 ]; then exit 1; fi
+
+  #  1. Generate tests"
   if [ $option -eq 1 ]; then
     generate_tests
   fi
+
+  #  2. Convert tests"
   if [ $option -eq 2 ]; then
     convert_tests
   fi
+
+  #  3. Divide tests"
   if [ $option -eq 3 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     divide_tests
   fi
-  if [ $option -eq 4 ]; then process_compilation_tests;    fi
+
+  #  4. Processor backup tests"
+  if [ $option -eq 4 ]; then
+    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
+    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
+    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
+    process_backup_tests
+  fi
+
+  #  5. Processor save_now/exit_now tests"
   if [ $option -eq 5 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
-    process_backup_tests
+    process_save_exit_now_tests
   fi
+
+  #  6. Processor full lenght tests"
   if [ $option -eq 6 ]; then
     if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
     if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
     if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
-    process_save_exit_now_tests
-  fi
-  if [ $option -eq 7 ]; then
-    if [ $DONE_GENERATE_TESTS -eq 0 ]; then generate_tests; fi
-    if [ $DONE_CONVERT_TESTS  -eq 0 ]; then convert_tests;  fi
-    if [ $DONE_DIVIDE_TESTS   -eq 0 ]; then divide_tests;   fi
     process_full_length_tests
   fi
-  if [ $option -eq 8 ]; then
+
+  #  7. Process accuracy test"
+  if [ $option -eq 7 ]; then
     process_accuracy_tests
   fi
-  if [ $option -eq 9 ]; then
+
+  #  8. Perform all tests"
+  if [ $option -eq 8 ]; then
     generate_tests
     convert_tests
     divide_tests
-    process_compilation_tests
     process_backup_tests
     process_save_exit_now_tests
     process_full_length_tests
     process_accuracy_tests
   fi
-  if [ $option -eq 10 ]; then
+
+  #  9. Clean all test directories"
+  if [ $option -eq 9 ]; then
     git clean -dfx $TEST_DIR/..
     make_clean $GENE_DIR
     make_clean $CONV_DIR
     make_clean $DIVI_DIR
     make_clean $PROC_DIR
   fi
-  if [ $option -eq 11 ]; then
+
+  # 10. Change the compiler"
+  if [ $option -eq 10 ]; then
     if [ $FORTRAN == "gnu" ]; then
       FORTRAN="intel"
       FCOMP="mpiifort"
       DEBUG="no"
-      OPENMP="yes"
     elif [ $FORTRAN == "intel" ]; then
+      FORTRAN="nvidia"
+      FCOMP=""
+      DEBUG="no"
+    elif [ $FORTRAN == "nvidia" ]; then
       FORTRAN="gnu"
       FCOMP=""
       DEBUG="no"
-      OPENMP="yes"
     fi
   fi
 
@@ -1775,8 +1731,11 @@ else
     echo "#   T-Flows testing"
     echo "#"
     echo "#--------------------------------------------------------------------"
-    echo "#   Fortran set to: " $FORTRAN
+    if [ $FORTRAN == "gnu" ]; then
+    echo -e "#   Fortran set to: \033[1;31m$FORTRAN\033[0m"
+    fi
     if [ $FORTRAN == "intel" ]; then
+    echo -e "#   Fortran set to: \033[1;36m$FORTRAN\033[0m"
     echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "#   Remark: Intel Fortran comes with its own Python suite which does"
     echo "#           not have the matplotlib and, consequently, this script"
@@ -1786,6 +1745,15 @@ else
     echo "#           compiler.  In that case, purge the Intel environment."
     echo "#           to get rid of the Python from Intel compiler."
     fi
+    if [ $FORTRAN == "nvidia" ]; then
+    echo -e "#   Fortran set to: \033[1;32m$FORTRAN\033[0m"
+    echo "# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+    echo "#   Remark: When using Nvidia Fortran, please make sure that you are"
+    echo "#           using version 4 of the OpenMPI library."
+    echo "#"
+    echo "#           For most installations, you should adjust the link mpi in"
+    echo "#           directory /opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs"
+    fi
     echo "#--------------------------------------------------------------------"
     echo ""
     echo "  Chose the type of test you want to perform:"
@@ -1794,14 +1762,13 @@ else
     echo "  1. Generate tests"
     echo "  2. Convert tests"
     echo "  3. Divide tests"
-    echo "  4. Processor compilation tests with User_Mod"
-    echo "  5. Processor backup tests"
-    echo "  6. Processor save_now/exit_now tests"
-    echo "  7. Processor full lenght tests"
-    echo "  8. Process accuracy test"
-    echo "  9. Perform all tests"
-    echo " 10. Clean all test directories"
-    echo " 11. Change the compiler"
+    echo "  4. Processor backup tests"
+    echo "  5. Processor save_now/exit_now tests"
+    echo "  6. Processor full lenght tests"
+    echo "  7. Process accuracy test"
+    echo "  8. Perform all tests"
+    echo "  9. Clean all test directories"
+    echo " 10. Change the compiler"
     echo ""
     read -p "  Enter the desired type of test: " option
     chose_test $option

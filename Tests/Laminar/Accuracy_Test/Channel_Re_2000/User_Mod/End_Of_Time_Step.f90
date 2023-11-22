@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   Append viscous forces to pressure drops.                                   !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n     ! time step
   integer, intent(in)      :: n_stat_t  ! 1st step for turbulence statist.
   integer, intent(in)      :: n_stat_p  ! 1st step for particle statistics
-  real,    intent(in)      :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
@@ -82,17 +80,17 @@
   end do
 
   if( abs(bulk % flux_x_o) >= TINY ) then
-    call Comm_Mod_Global_Sum_Real(tau_wall_x)
+    call Global % Sum_Real(tau_wall_x)
     bulk % p_drop_x = bulk % p_drop_x  &
                     + tau_wall_x / Grid % tot_vol  ! [kg/m^2/s^2]
   end if
   if( abs(bulk % flux_y_o) >= TINY ) then
-    call Comm_Mod_Global_Sum_Real(tau_wall_y)
+    call Global % Sum_Real(tau_wall_y)
     bulk % p_drop_y = bulk % p_drop_y  &
                     + tau_wall_y / Grid % tot_vol  ! [kg/m^2/s^2]
   end if
   if( abs(bulk % flux_z_o) >= TINY ) then
-    call Comm_Mod_Global_Sum_Real(tau_wall_z)
+    call Global % Sum_Real(tau_wall_z)
     bulk % p_drop_z = bulk % p_drop_z  &
                     + tau_wall_z / Grid % tot_vol  ! [kg/m^2/s^2]
   end if

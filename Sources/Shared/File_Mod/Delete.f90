@@ -10,6 +10,8 @@
   class(File_Type) :: File
   integer          :: file_unit
   logical          :: file_exists
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   ! First check if the file exists

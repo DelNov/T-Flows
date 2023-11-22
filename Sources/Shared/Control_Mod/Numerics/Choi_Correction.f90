@@ -1,32 +1,29 @@
 !==============================================================================!
-  subroutine Control_Mod_Choi_Correction(choi_correction, verbose)
+  subroutine Choi_Correction(Control, corr, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, intent(out) :: choi_correction
+  class(Control_Type)  :: Control
+  logical, intent(out) :: corr
   logical, optional    :: verbose
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('CHOI_CORRECTION', 'no', val, verbose)
+  call Control % Read_Char_Item('CHOI_CORRECTION', 'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
-    choi_correction = .true.
+    corr = .true.
 
   else if( val .eq. 'NO' ) then
-    choi_correction = .false.
+    corr = .false.
 
   else
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown state for Choi''s correction: ',   &
-                trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
-    stop
-
+    call Message % Error(60,                                     &
+             'Unknown state for Choi correction: '//trim(val)//  &
+             '. \n This error is critical.  Exiting.',           &
+             file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

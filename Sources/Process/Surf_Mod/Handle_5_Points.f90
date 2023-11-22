@@ -90,10 +90,10 @@
 
   end do
 
-  print *, '# ERROR: Failed to find a good permutation in Handle_5_Points!'
-  print *, '# This error is critical.  Exiting!'
-  call Comm_Mod_End
-  stop
+  call Message % Error(72,                                                    &
+                  'Failed to find a good permutation in Handle_5_Points! '//  &
+                  'This error is critical.  Exiting!',                        &
+                  file=__FILE__, line=__LINE__)
 
   !--------------------------------------------------------------------!
   !   You've found a permutation which works, store new elements now   !

@@ -8,7 +8,6 @@
 !==============================================================================!
 
   call Sol % Nat % Create_Native(Grid)
-  call Sol % Pet % Create_Petsc(Sol % Nat, Grid)
 
   end subroutine
 

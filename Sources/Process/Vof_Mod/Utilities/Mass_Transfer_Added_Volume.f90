@@ -41,6 +41,6 @@
   end do
 
   ! Take global summ
-  call Comm_Mod_Global_Sum_Real(added_vol)
+  call Global % Sum_Real(added_vol)
 
   end subroutine

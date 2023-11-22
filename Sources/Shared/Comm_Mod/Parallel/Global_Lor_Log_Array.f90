@@ -1,27 +1,30 @@
 !==============================================================================!
-  subroutine Comm_Mod_Global_Lor_Log_Array(n, phi)
+  subroutine Lor_Log_Array(Global, n, phi)
 !------------------------------------------------------------------------------!
 !   Estimates logical or over all processors.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: n
-  logical :: phi(n)
+  class(Comm_Type), intent(in)    :: Global
+  integer,          intent(in)    :: n
+  logical,          intent(inout) :: phi(n)
 !-----------------------------------[Locals]-----------------------------------!
-  logical, allocatable :: phi_res(:)
-  integer              :: error
+  integer :: error
 !==============================================================================!
 
-  allocate(phi_res(n))
-
-  call Mpi_Allreduce(phi,             & ! send buffer
-                     phi_res,         & ! recv buffer
+  call Mpi_Allreduce(MPI_IN_PLACE,    & ! indicate that send and recv are same
+                     phi,             & ! send and recv buffer
                      n,               & ! length
                      comm_type_log,   & ! datatype
                      MPI_LOR,         & ! operation
                      MPI_COMM_WORLD,  &
                      error)
 
-  phi(1:n) = phi_res(1:n)
+  ! Although the barrier shouldn't be needed here, in some rare
+  ! cases (only some small grids with some number of processors,
+  ! with certain combinations of compiler/libraries and OS'), it
+  ! was a gurantess that all the processors have the correct data
+  ! It was introduced only in conjunction with MPI_IN_PLACE.
+  call Global % Wait()
 
   end subroutine

@@ -37,26 +37,26 @@
 #-----------------------------------------------------------
 # Numerical parameters
 #-----------------------------------------------------------
- PRESSURE_MOMENTUM_COUPLING             piso
+  PRESSURE_MOMENTUM_COUPLING               piso
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    1.0
- SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.999
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    1.0
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.999
 
- GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
- MAX_GAUSS_GRADIENTS_ITERATIONS      200
- TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-5
+  GRADIENT_METHOD_FOR_PRESSURE          gauss_theorem
+  MAX_GAUSS_GRADIENTS_ITERATIONS      200
+  TOLERANCE_FOR_GAUSS_GRADIENTS         1.0e-5
 
 #-----------------------------------------------------------
 # Linear solver settings
 #-----------------------------------------------------------
- PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+  TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER   240
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER   240
 
 #-----------------------------------------------------------
 # Boundary conditions

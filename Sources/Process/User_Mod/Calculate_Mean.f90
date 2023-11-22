@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine User_Mod_Calculate_Mean(Turb, n0, n1)
+  subroutine User_Mod_Calculate_Mean(Turb, n0)
 !------------------------------------------------------------------------------!
 !   User-defined calculation of time-averaged values.                          !
 !   Follow Turb_Mod/Calculate_Mean.f90 as guideline for this function.         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Turb_Type), target  :: Turb
-  integer, intent(in)      :: n0
-  integer, intent(in)      :: n1
+  type(Turb_Type), target :: Turb
+  integer, intent(in)     :: n0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
@@ -17,7 +16,7 @@
 
   if(.not. Turb % statistics) return
 
-  n = n1 - n0
+  n = Time % Curr_Dt() - n0
 
   ! Take aliases
   Flow => Turb % pnt_flow

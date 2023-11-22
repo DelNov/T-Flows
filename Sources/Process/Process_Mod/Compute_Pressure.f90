@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Process, Flow, Vof, Sol, curr_dt, ini)
+  subroutine Compute_Pressure(Process, Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   Forms and solves pressure equation for the SIMPLE method.                  !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Field_Type),    target :: Flow
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt
-  integer, intent(in)         :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk
@@ -21,10 +19,9 @@
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
   real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
-  character(SL)              :: solver
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !
-!   The form of equations which I am solving:
+!   The form of equations which are being solved:
 !
 !      /           /
 !     |           |
@@ -62,17 +59,17 @@
   call Flow % Alias_Momentum(u, v, w)
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance_Start(curr_dt, ini)
+  call Flow % Report_Vol_Balance_Start(Iter % Current())
 
   ! User function
-  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_Beginning_Of_Compute_Pressure(Flow, Vof, Sol)
 
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
   !--------------------------------------------------!
 
   ! From control file
-  call Control_Mod_Normalization_For_Pressure_Solver(p_nor_c)
+  call Control % Normalization_For_Pressure_Solver(p_nor_c)
 
   ! Calculate pressure magnitude for normalization of pressure solution
   p_max = -HUGE
@@ -81,8 +78,8 @@
     p_max = max(p_max, p % n(c))
     p_min = min(p_min, p % n(c))
   end do
-  call Comm_Mod_Global_Max_Real(p_max)
-  call Comm_Mod_Global_Min_Real(p_min)
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
 
   ! Normalize pressure with the maximum of pressure difference, 
   ! value defined in control file and pressure drops.
@@ -138,7 +135,7 @@
   end do
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance(Sol, curr_dt, ini)
+  call Flow % Report_Vol_Balance(Sol, Iter % Current())
 
   !------------------------------------------!
   !   Cross diffusion fluxes for pressure    !
@@ -182,41 +179,30 @@
   !-------------------------------------------------------------------------!
   call Vof % Mass_Transfer_Pressure_Source(b)
 
-  ! Get solver
-  call Control_Mod_Solver_For_Pressure(solver)
-
-  call Profiler % Start('Linear_Solver_For_Pressure')
+  call Profiler % Start(String % First_Upper(pp % solver)  //  &
+                        ' (solver for pressure)')
 
   ! Set singularity to the matrix
   if(.not. Flow % has_pressure) then
-    call Sol % Set_Singular(A)
+    call Sol % Set_Singular(pp)
   end if
 
   ! Call linear solver
-  call Sol % Run(pp % solver,     &
-                 pp % prec,       &
-                 pp % prec_opts,  &
-                 A,               &
-                 pp % n,          &
-                 b,               &
-                 pp % mniter,     &  ! max number of iterations
-                 pp % eniter,     &  ! executed number of iterations
-                 pp % tol,        &  ! tolerance
-                 pp % res,        &  ! final residual
-                 norm = p_nor)       ! number for normalisation
+  call Sol % Run(A, pp, b, norm = p_nor)
 
   ! Remove singularity from the matrix
   if(.not. Flow % has_pressure) then
-    call Sol % Remove_Singular(A)
+    call Sol % Remove_Singular(pp)
   end if
 
-  call Profiler % Stop('Linear_Solver_For_Pressure')
+  call Profiler % Stop(String % First_Upper(pp % solver)  //  &
+                       ' (solver for pressure)')
 
   if (Flow % p_m_coupling == SIMPLE) then
-    call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
+    call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
   else
     if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info_Mod_Iter_Fill_At(1, 4, pp % name, pp % eniter, pp % res)
+      call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
     end if
   end if
 
@@ -237,16 +223,16 @@
   p_max  = maxval(p % n(1:Grid % n_cells))
   p_min  = minval(p % n(1:Grid % n_cells))
 
-  call Comm_Mod_Global_Max_Real(p_max)
-  call Comm_Mod_Global_Min_Real(p_min)
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
 
   p % n(:) = p % n(:) - 0.5*(p_max+p_min)
 
   ! User function
-  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol, curr_dt, ini)
+  call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol)
 
   ! Volume balance reporting
-  call Flow % Report_Volume_Balance_Stop()
+  call Flow % Report_Vol_Balance_Stop()
 
   call Profiler % Stop('Compute_Pressure (without solvers)')
 

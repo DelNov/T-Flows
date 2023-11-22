@@ -5,12 +5,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: fh            ! file handle
-  character        :: text_out*(*)  ! text to write out
-  integer(DP)      :: disp          ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(in)    :: fh            ! file handle
+  character,        intent(in)    :: text_out*(*)  ! text to write out
+  integer(DP),      intent(inout) :: disp          ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: leng
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   leng = len(text_out)

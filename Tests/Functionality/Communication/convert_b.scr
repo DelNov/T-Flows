@@ -1,12 +1,28 @@
+# Full grid name
 case_b.msh
+
+# Create dual mesh
 yes
+
+# Geometrical scaling
 1.000000
+
+# Enforce uniform grid
+yes
+
+# Boundary cell placement
 2
+
+# Periodicity
 1
 2
 2
 2
 skip
+
+# Distance from the walls
 1
+
+# Create 1d probe
 skip
 

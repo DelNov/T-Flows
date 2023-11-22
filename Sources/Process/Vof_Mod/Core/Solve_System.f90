@@ -12,7 +12,6 @@
   type(Var_Type),    pointer :: fun
   type(Field_Type),  pointer :: Flow
   type(Matrix_Type), pointer :: A
-  character(SL)              :: solver
 !==============================================================================!
 
   ! Take aliases
@@ -20,29 +19,17 @@
   Flow => Vof % pnt_flow
   A    => Sol % Nat % A
 
-  ! Get solver
-  call Control_Mod_Solver_For_Vof(solver)
-
-  call Profiler % Start('Linear_Solver_For_Vof')
+  call Profiler % Start(String % First_Upper(fun % solver)//' (solver for VOF)')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(fun % solver,     &
-                 fun % prec,       &
-                 fun % prec_opts,  &
-                 A,                &
-                 fun % n,          &
-                 b,                &
-                 fun % mniter,     &
-                 fun % eniter,     &
-                 fun % tol,        &
-                 fun % res)
+  call Sol % Run(A, fun, b)
 
-  call Profiler % Stop('Linear_Solver_For_Vof')
+  call Profiler % Stop(String % First_Upper(fun % solver)//' (solver for VOF)')
 
   if(.not. Flow % heat_transfer) then
-    call Info_Mod_Iter_Fill_At(1, 6, fun % name, fun % eniter, fun % res)
+    call Info % Iter_Fill_At(1, 6, fun % name, fun % res, fun % niter)
   else
-    call Info_Mod_Iter_Fill_At(2, 1, fun % name, fun % eniter, fun % res)
+    call Info % Iter_Fill_At(2, 1, fun % name, fun % res, fun % niter)
   end if
 
   end subroutine

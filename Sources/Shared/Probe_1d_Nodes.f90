@@ -29,8 +29,8 @@
   print *, '#-------------------------------------------'
   print *, '# Insert non-homogeneous direction '
   print *, '# (x, y, z, rx, ry, rz or skip)'
-  print *, '# -------------------------------------------'
-  read(*,*) answer
+  print *, '#-------------------------------------------'
+  answer = File % Single_Word_From_Keyboard()
   call String % To_Upper_Case(answer)
   if(answer .eq. 'SKIP') then
     call Profiler % Stop('Probe_1d_Nodes')
@@ -38,12 +38,12 @@
   end if
 
   n_prob = 0
-  zp    = 0.0
+  zp     = 0.0
 
   !-----------------------------!
   !   Browse through all nodes  !
   !-----------------------------!
-  do n = 1, Grid % n_nodes 
+  do n = 1, Grid % n_nodes
 
     ! Try to find the cell among the probes
     do p=1,n_prob

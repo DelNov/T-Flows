@@ -1,9 +1,22 @@
+# Full mesh name
 pipe.msh
+
+# Dual grid
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell positions
 1
+
+# Periodicity
 1
 skip
+
+# Wall distance
 1
+
+# Probe 1d
 skip
 

@@ -1,9 +1,23 @@
+# Full mesh name
 cube-hex.msh
+
+
+# Create dual?
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell positions
 1
+
+# Periodicity
 1
 skip
+
+# Wall distance
 skip
+
+# Probe 1d
 skip
 

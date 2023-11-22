@@ -30,7 +30,7 @@
                                      h_w_z(-nb:nc))
 
   ! Normalize gradients
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     d = sqrt(  h_w_x(c)**2 + h_w_y(c)**2 + h_w_z(c)**2)
     h_w_x(c) = h_w_x(c) / d
     h_w_y(c) = h_w_y(c) / d
@@ -78,7 +78,7 @@
   end do
 
   ! Correct h_max and h_min
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     Turb % h_max(c) = Turb % h_max(c) * 2.0
     Turb % h_min(c) = Turb % h_min(c) * 2.0
   end do

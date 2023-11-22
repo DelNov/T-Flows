@@ -1,0 +1,74 @@
+ifneq ($(FORTRAN), intel)
+  ifneq ($(FORTRAN), gnu)
+    ifneq ($(FORTRAN), nvidia)
+      $(info #=================================================================)
+      $(info # Error:                                                          )
+      $(info #   Possible values for FORTRAN are "gnu", "intel" and "nvidia",  )
+      $(info #   and are case sensitive.  You used the unknown "$(FORTRAN)"    )
+      $(info #-----------------------------------------------------------------)
+      $(error This error is critical, exiting!)
+    endif
+  endif
+endif
+
+ifneq ($(ASSERT), yes)
+  ifneq ($(ASSERT), no)
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for ASSERT are "yes" or "no" and they are     )
+    $(info #   case sensitive.  You used the "$(ASSERT)", which is unknown.  )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
+  endif
+endif
+
+ifneq ($(DEBUG), yes)
+  ifneq ($(DEBUG), no)
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for DEBUG are "yes" or "no" and they are      )
+    $(info #   case sensitive.  You used the "$(DEBUG)", which is unknown.   )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
+  endif
+endif
+
+ifneq ($(PROF), yes)
+  ifneq ($(PROF), no)
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for PROF are "yes" or "no" and they are       )
+    $(info #   case sensitive.  You used the "$(PROF)", which is unknown.    )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
+  endif
+endif
+
+ifneq ($(REAL), double)
+  ifneq ($(REAL), single)
+    $(error Unknown option for REAL: $(REAL)!)
+  endif
+endif
+
+ifneq ($(OMP), yes)
+  ifneq ($(OMP), no)
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for OMP are "yes" or "no" and they are        )
+    $(info #   case sensitive.  You used the "$(OMP)", which is unknown.     )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
+  endif
+endif
+
+ifneq ($(SORT), quick)
+  ifneq ($(SORT), heap)
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for SORT are "quick" or "heap" and they are   )
+    $(info #   case sensitive.  You used the "$(SORT)", which is unknown.    )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
+  endif
+endif
+

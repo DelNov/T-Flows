@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Front_Mod
@@ -27,7 +28,7 @@
     integer                      :: n_verts
     integer                      :: n_sides
     type(Vert_Type), allocatable :: Vert(:)
-    type(Elem_Type), allocatable :: elem(:)
+    type(Elem_Type), allocatable :: Elem(:)
     type(Side_Type), allocatable :: side(:)
 
     ! Bounding nodes for each vertex (derives from Isoap usage)
@@ -40,7 +41,10 @@
 
     ! Front to static Grid connectivity
     integer, allocatable :: elem_in_cell(:)
-    integer, allocatable :: elems_at_face(:,:)
+
+    ! Face-based interserction with surface
+    logical, allocatable :: intersects_face(:)
+    real,    allocatable :: xs(:), ys(:), zs(:)
 
     contains
 

@@ -1,12 +1,12 @@
 !==============================================================================!
-  real function Ebf_Momentum(Turb, c)
+  pure real function Ebf_Momentum(Turb, c)
 !------------------------------------------------------------------------------!
 !   Calculates elliptic blending function for momentum.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type) :: Turb
-  integer          :: c
+  class(Turb_Type), intent(in) :: Turb
+  integer,          intent(in) :: c
 !==============================================================================!
 
   Ebf_Momentum = max(   0.01 * Turb % y_plus(c)**4            &

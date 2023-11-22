@@ -23,45 +23,74 @@
   end type
 
   !--------------------!
-  !   Time_Info type   !
+  !   Time Info type   !
   !--------------------!
   type Time_Info_Type
     character(len=L_LINE) :: line_lead  = ''
     character(len=L_LINE) :: line_trail = ''
-    character(len=L_LINE) :: lines(6)   = ''
+    character(len=L_LINE) :: line(6)    = ''
   end type
 
   !--------------------!
-  !   Iter_Info type   !
+  !   Iter Info type   !
   !--------------------!
   type Iter_Info_Type
-    integer               :: n_user_lines              = 0
-    character(len=L_LINE) :: line_lead                 = ''
-    character(len=L_LINE) :: line_sep                  = ''
-    character(len=L_LINE) :: line_iter                 = ''
-    character(len=L_LINE) :: lines(4)                  = ''
+    integer               :: n_user_lines               = 0
+    character(len=L_LINE) :: line_lead                  = ''
+    character(len=L_LINE) :: line_sep                   = ''
+    character(len=L_LINE) :: line_iter                  = ''
+    character(len=L_LINE) :: line(4)                    = ''
     character(len=L_LINE) :: lines_user(MAX_USER_LINES) = ''
   end type
 
   !--------------------!
-  !   Bulk_Info type   !
+  !   Bulk Info type   !
   !--------------------!
   type Bulk_Info_Type
     character(len=L_LINE) :: line_lead  = ''
     character(len=L_LINE) :: line_foll  = ''
     character(len=L_LINE) :: line_sep   = ''
     character(len=L_LINE) :: line_trail = ''
-    character(len=L_LINE) :: lines(3)   = ''
+    character(len=L_LINE) :: line(3)    = ''
   end type
 
-  type(System_Clock_Type), save :: sys_clock
-  type(Time_Info_Type),    save :: time_info
-  type(Iter_Info_Type),    save :: iter_info
-  type(Bulk_Info_Type),    save :: bulk_info
+  !---------------!
+  !   Info type   !
+  !---------------!
+  type Info_Type
+    type(System_Clock_Type), private :: clock
+    type(Time_Info_Type),    private :: time
+    type(Iter_Info_Type),    private :: iter
+    type(Bulk_Info_Type),    private :: bulk
+
+    contains
+      procedure :: Start_Info
+      procedure :: Time_To_Exit
+
+      procedure :: Time_Start
+      procedure :: Time_Fill
+      procedure :: Time_Print
+
+      procedure :: Iter_Start
+      procedure :: Iter_Fill
+      procedure :: Iter_Fill_At
+      procedure :: Iter_Fill_Scalar_At
+      procedure :: Iter_Print
+
+      procedure :: Bulk_Start
+      procedure :: Bulk_Fill
+      procedure :: Bulk_Print
+
+  end type
+
+  !---------------------------------!
+  !   Singletone type Info object   !
+  !---------------------------------!
+  type(Info_Type) :: Info
 
   contains
 
-#   include "Info_Mod/Start.f90"
+#   include "Info_Mod/Start_Info.f90"
 #   include "Info_Mod/Time_To_Exit.f90"
 
 #   include "Info_Mod/Time_Start.f90"
@@ -71,7 +100,7 @@
 #   include "Info_Mod/Iter_Start.f90"
 #   include "Info_Mod/Iter_Fill.f90"
 #   include "Info_Mod/Iter_Fill_At.f90"
-#   include "Info_Mod/Iter_Fill_User_At.f90"
+#   include "Info_Mod/Iter_Fill_Scalar_At.f90"
 #   include "Info_Mod/Iter_Print.f90"
 
 #   include "Info_Mod/Bulk_Start.f90"

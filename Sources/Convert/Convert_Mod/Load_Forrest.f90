@@ -10,12 +10,14 @@
   character(SL)       :: file_name
 !-----------------------------------[Locals]-----------------------------------!
   type(Stl_Type)    :: Forrest
-  integer           :: fu, s, i_nod, v, fac, attempts
+  integer           :: s, i_nod, v, fac, attempts
   integer           :: n_trees, t1, t2, t, n0, n1, n2
   real              :: f_min_x, f_max_x, f_min_y, f_max_y, f_min_z, f_max_z
   real              :: n(3)
   real              :: delta_x, delta_y, min_dist, tmp
   real, allocatable :: t_x(:), t_y(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   call Profiler % Start('Load_Forrest')
@@ -41,8 +43,6 @@
   print '(a,2f9.3)', ' # Forrest span in x directon: ', f_min_x, f_max_x
   print '(a,2f9.3)', ' # Forrest span in y directon: ', f_min_y, f_max_y
   print '(a,2f9.3)', ' # Forrest span in z directon: ', f_min_z, f_max_z
-
-  close(fu)
 
   ! Scale the single tree by forrest height
   Grid(1) % zn(:) = Grid(1) % zn - f_min_z

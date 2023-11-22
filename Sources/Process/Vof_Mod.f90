@@ -1,4 +1,6 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Vof_Mod
@@ -22,12 +24,13 @@
 
     ! Stores the name of the STL file for initialization
     character(SL) :: name_stl = ''
-    logical       :: init_stl = .false.    ! is it intialized from STL?
+    logical       :: init_stl = .false.     ! is it intialized from STL?
 
-    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
-    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
-    type(Front_Type)          :: Front     ! pointer to Front (simple surface)
-    type(Surf_Type)           :: surf      ! pointer to surface
+    type(Grid_Type),   pointer :: pnt_grid    ! its grid
+    type(Field_Type),  pointer :: pnt_flow    ! its flow
+    type(Matrix_Type), pointer :: pnt_matrix  ! its matrix
+    type(Front_Type)           :: Front       ! pointer to front
+    type(Surf_Type)            :: Surf        ! pointer to surface
 
     ! Volume fraction (colour function) and its smooth variant
     type(Var_Type) :: fun
@@ -62,9 +65,12 @@
     ! For phase change
     real :: t_sat, latent_heat  ! [K, J/kg]
 
-    ! Heat from phase change and index of saturated cells
-    real, allocatable :: q_int(:,:)
-    real, allocatable :: m_dot(:)         ! [kg/s]
+    ! Neighbouring coefficients due to presence of saturated front
+    real, allocatable :: a12(:)
+    real, allocatable :: a21(:)
+    real, allocatable :: m_dot(:)  ! [kg/s]
+
+    type(Var_Type) :: t_0, t_1
 
     ! User define parameters for vof function (fun)
     real    :: courant_max_param
@@ -83,7 +89,7 @@
       !----------------------------------------!
       !   Procedures to advance vof function   !
       !----------------------------------------!
-      procedure          :: Allocate_Vof
+      procedure          :: Create_Vof
       procedure          :: Main_Vof
       procedure, private :: Compute_Vof
       procedure, private :: Discretize
@@ -99,7 +105,7 @@
       !   (convoluted) variant of vof function   !
       !   for eventual estimation of curvature   !
       !------------------------------------------!
-      procedure, private :: Curvature_Csf
+      procedure          :: Curvature_Csf
       procedure, private :: Smooth_Curvature
       procedure          :: Smooth_For_Curvature_Csf
       procedure          :: Smooth_Scalar
@@ -108,6 +114,7 @@
       !   Procedures to be called by other modules   !
       !----------------------------------------------!
       procedure :: Calculate_Grad_Matrix_With_Front
+      procedure :: Extrapolate_Normal_To_Front
       procedure :: Get_Vapour_And_Liquid_Phase
       procedure :: Grad_Component_No_Refresh_With_Front
       procedure :: Grad_Variable_With_Front
@@ -125,7 +132,7 @@
     !----------------------------------------!
     !   Procedures to advance vof function   !
     !----------------------------------------!
-#   include "Vof_Mod/Core/Allocate_Vof.f90"
+#   include "Vof_Mod/Core/Create_Vof.f90"
 #   include "Vof_Mod/Core/Main_Vof.f90"
 #   include "Vof_Mod/Core/Compute_Vof.f90"
 #   include "Vof_Mod/Core/Discretize.f90"
@@ -149,6 +156,7 @@
     !   Procedures to be called by other modules   !
     !----------------------------------------------!
 #   include "Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90"
+#   include "Vof_Mod/Utilities/Extrapolate_Normal_To_Front.f90"
 #   include "Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90"
 #   include "Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90"
 #   include "Vof_Mod/Utilities/Grad_Variable_With_Front.f90"

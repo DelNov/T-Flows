@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Turb_Type),  target     :: Turb
   type(Vof_Type),   target     :: Vof
   type(Swarm_Type), target     :: Swarm
-  integer,          intent(in) :: n      ! current time step
-  real,             intent(in) :: time   ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: k, n_parts_in_buffers
@@ -27,7 +25,7 @@
   !-----------------------!
   !   24001st time step   !
   !-----------------------!
-  if(n .eq. 24001) then     ! should be after the Flow is developed
+  if(Time % Curr_Dt() .eq. 24001) then  ! should be after the Flow is developed
 
     ! Track maximum number of particles
     Swarm % n_particles = Swarm % max_particles

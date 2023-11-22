@@ -19,10 +19,10 @@
   static char help[] = "This is to initialize PETSc from T-Flows!\n";
 
   /*---------------------------------------------------------------------------+
-  |  PetscInitialize (and PetcIntialized)                                      |
+  |  PetscInitialize (and PetscIntialized)                                     |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialize.html          |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialized.html         |
+  |  https://petsc.org/release/manualpages/Sys/PetscInitialize/                |
+  |  https://petsc.org/release/manualpages/Sys/PetscInitialized/               |
   +---------------------------------------------------------------------------*/
   void c_petsc_initialize_() {
 
@@ -35,10 +35,40 @@
   }
 
   /*---------------------------------------------------------------------------+
+  |  PetscLogDefaultBegin                                                      |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Profiling/PetscLogDefaultBegin/     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_log_default_begin_() {
+
+    err = PetscLogDefaultBegin();
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  PetscOptionsSetValue                                                      |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Sys/PetscOptionsSetValue/           |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_options_set_value_(const char name[], const char value[]) {
+
+    err = PetscOptionsSetValue(NULL, name, value);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  PetscLogView                                                              |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Profiling/PetscLogView/             |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_log_view_() {
+
+    err = PetscLogView(PETSC_VIEWER_STDOUT_WORLD);
+  }
+
+  /*---------------------------------------------------------------------------+
   |  PetscFinalize (and PetscInitialized)                                      |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscFinalize.html            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscInitialized.html         |
+  |  https://petsc.org/release/manualpages/Sys/PetscFinalize/                  |
+  |  https://petsc.org/release/manualpages/Sys/PetscFinalized/                 |
   +---------------------------------------------------------------------------*/
   void c_petsc_finalize_() {
 
@@ -51,16 +81,6 @@
   }
 
   /*---------------------------------------------------------------------------+
-  |  PetscOptionsSetValue                                                      |
-  |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/Sys/PetscOptionsSetValue.html     |
-  +---------------------------------------------------------------------------*/
-  void c_petsc_options_value_(const char name[], const char value[]) {
-
-    err = PetscOptionsSetValue(NULL, name, value);
-  }
-
-  /*---------------------------------------------------------------------------+
   |                                                                            |
   |  Matrix routines                                                           |
   |                                                                            |
@@ -69,7 +89,7 @@
   /*---------------------------------------------------------------------------+
   |  MatCreate                                                                 |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatCreate.html             |
+  |  https://petsc.org/release/manualpages/Mat/MatCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_create_(Mat * A) {
 
@@ -79,7 +99,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetSizes                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetSizes.html           |
+  |  https://petsc.org/release/manualpages/Mat/MatSetSizes/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_sizes_(Mat * A, PetscInt * m, PetscInt * M) {
 
@@ -89,7 +109,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetType (to MATAIJ)                                                    |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetType.html            |
+  |  https://petsc.org/release/manualpages/Mat/MatSetType/                     |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_type_to_mat_aij_(Mat * A) {
 
@@ -101,10 +121,10 @@
   |  MatSeqAIJSetPreallocation                                                 |
   |                                                                            |
   |  Combines two calls which seems to be important or necessary               |
-  |  https://petsc.org/release/docs/manualpages/Mat/MATAIJ.html#MATAIJ         |
+  |  https://petsc.org/release/manualpages/Mat/MATAIJ/                         |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatMPIAIJSetPreallocation.html
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSeqAIJSetPreallocation.html
+  |  https://petsc.org/release/manualpages/Mat/MatMPIAIJSetPreallocation/      |
+  |  https://petsc.org/release/manualpages/Mat/MatSeqAIJSetPreallocation/      |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_aij_set_preallocation_(Mat      * A,
                                           PetscInt * d_nnz,
@@ -117,7 +137,7 @@
   /*---------------------------------------------------------------------------+
   |  MatSetValue                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetValue.html           |
+  |  https://petsc.org/release/manualpages/Mat/MatSetValue/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_value_(Mat         * A,
                               PetscInt    * row,
@@ -128,17 +148,42 @@
   }
 
   /*---------------------------------------------------------------------------+
+  |  MatSetValue's sister; this one adds, rather than inserts values           |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Mat/MatSetValue/                    |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_add_value_(Mat         * A,
+                              PetscInt    * row,
+                              PetscInt    * col,
+                              PetscScalar * value) {
+
+    err = MatSetValue(*A, *row, *col, *value, ADD_VALUES);
+  }
+
+  /*---------------------------------------------------------------------------+
   |  MatAssemblyBegin and MatAssemblyEnd                                       |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatAssemblyBegin.html      |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatAssemblyEnd.html        |
-  |  https://petsc.org/main/docs/manualpages/Mat/MatSetOption.html             |
+  |  https://petsc.org/release/manualpages/Mat/MatAssemblyBegin/               |
+  |  https://petsc.org/release/manualpages/Mat/MatAssemblyEnd/                 |
+  |  https://petsc.org/release/manualpages/Mat/MatSetOption/                   |
   +---------------------------------------------------------------------------*/
-  void c_petsc_assemble_mat_(Mat * A) {
+  void c_petsc_mat_assemble_(Mat * A) {
 
     /* These two always go in pairs */
     err = MatAssemblyBegin(*A, MAT_FINAL_ASSEMBLY);
     err = MatAssemblyEnd  (*A, MAT_FINAL_ASSEMBLY);
+
+    /*----------------------------------------------------------------+
+    |  Uncomment the block below to check if matrix is symmetric      |
+    |  It must be called after MatAssemblyBegin and MatAssemblyEnd    |
+    |  Ideally, this should become a separate function in the future  |
+    |                                                                 |
+    |  https://petsc.org/release/manualpages/Mat/MatIsSymmetric/      |
+    +----------------------------------------------------------------*/
+    /* PetscBool symmetric;
+       MatIsSymmetric(*A, 0.0, &symmetric);
+       if(!symmetric) {printf("Matrix is not symmetric\n");}
+       else           {printf("Matrix is symmetric\n");} */
 
     /* If one wishes to repeatedly assemble matrices that retain the
        same nonzero pattern (such as within a time-dependent problem),
@@ -150,8 +195,8 @@
   /*---------------------------------------------------------------------------+
   |  MatSetNullSpace                                                           |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatNullSpaceCreate.html    |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetNullSpace.html       |
+  |  https://petsc.org/release/manualpages/Mat/MatNullSpaceCreate/             |
+  |  https://petsc.org/release/manualpages/Mat/MatSetNullSpace/                |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_set_null_space_(Mat * A) {
 
@@ -165,11 +210,31 @@
   /*---------------------------------------------------------------------------+
   |  MatSetNullSpace                                                           |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Mat/MatSetNullSpace.html       |
+  |  https://petsc.org/release/manualpages/Mat/MatSetNullSpace/                |
   +---------------------------------------------------------------------------*/
   void c_petsc_mat_remove_null_space_(Mat * A) {
 
     MatSetNullSpace(*A, NULL);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  MatZeroEntries                                                            |
+  |                                                                            |
+  |  https://petsc.org/main/manualpages/Mat/MatZeroEntries/                    |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_zero_entries_(Mat * A) {
+
+    MatZeroEntries(* A);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  MatDestroy                                                                |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Mat/MatDestroy/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_destroy_(Mat * A) {
+
+    err = MatDestroy(A);
   }
 
   /*---------------------------------------------------------------------------+
@@ -181,7 +246,7 @@
   /*---------------------------------------------------------------------------+
   |  VecCreate                                                                 |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecCreate.html             |
+  |  https://petsc.org/release/manualpages/Vec/VecCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_create_(Vec * v) {
 
@@ -191,7 +256,7 @@
   /*---------------------------------------------------------------------------+
   |  VecCreateMPI                                                              |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecCreateMPI.html          |
+  |  https://petsc.org/release/manualpages/Vec/VecCreateMPI/                   |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_create_mpi_(Vec * v, PetscInt * m, PetscInt * M) {
 
@@ -201,7 +266,7 @@
   /*---------------------------------------------------------------------------+
   |  VecSetSizes                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecSetSizes.html           |
+  |  https://petsc.org/release/manualpages/Vec/VecSetSizes/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_set_sizes_(Vec * v, PetscInt * m, PetscInt * M) {
 
@@ -211,7 +276,7 @@
   /*---------------------------------------------------------------------------+
   |  VecSetType (to VECSTANDARD)                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecSetType.html            |
+  |  https://petsc.org/release/manualpages/Vec/VecSetType/                     |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_set_type_to_standard_(Vec * v) {
 
@@ -221,7 +286,7 @@
   /*---------------------------------------------------------------------------+
   |  VecSetValue                                                               |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecSetValue.html           |
+  |  https://petsc.org/release/manualpages/Vec/VecSetValue/                    |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_set_value_(Vec * v, PetscInt * row, PetscScalar * value) {
 
@@ -231,10 +296,10 @@
   /*---------------------------------------------------------------------------+
   |  VecAssemblyBegin and VecAssemblyEnd                                       |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyBegin.html      |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecAssemblyEnd.html        |
+  |  https://petsc.org/release/manualpages/Vec/VecAssemblyBegin/               |
+  |  https://petsc.org/release/manualpages/Vec/VecAssemblyEnd/                 |
   +---------------------------------------------------------------------------*/
-  void c_petsc_assemble_vec_(Vec * v) {
+  void c_petsc_vec_assemble_(Vec * v) {
 
     err = VecAssemblyBegin(*v);
     err = VecAssemblyEnd(*v);
@@ -243,14 +308,24 @@
   /*---------------------------------------------------------------------------+
   |  VecGetValues                                                              |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/Vec/VecGetValues.html          |
+  |  https://petsc.org/release/manualpages/Vec/VecGetValues/                   |
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_get_values_(Vec         * v,
                                PetscInt    * ni,
-                               PetscInt    * row,
-                               PetscScalar * value) {
+                             PetscInt    * row,
+                             PetscScalar * value) {
 
     err = VecGetValues(*v, *ni, row, value);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  VecDestroy                                                                |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Vec/VecDestroy/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_vec_destroy_(Vec * v) {
+
+    err = VecDestroy(v);
   }
 
   /*---------------------------------------------------------------------------+
@@ -262,7 +337,10 @@
   /*---------------------------------------------------------------------------+
   |  KSPCreate                                                                 |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPCreate.html             |
+  |  "To solve a linear system with KSP, one must first create a solver con-   |
+  |  text with the command KSPCreate" (https://petsc.org/release/manual/ksp/)  |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPCreate/                      |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_create_(KSP * ksp) {
 
@@ -270,35 +348,61 @@
   }
 
   /*---------------------------------------------------------------------------+
-  |  KSP routines to set solver and preconditioner                             |
+  |  KSPSetOperators                                                           |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetOperators.html       |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetType.html            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPGetPC.html              |
-  |  https://petsc.org/release/docs/manualpages/PC/PCSetType.html              |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetFromOptions.html     |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetUp.html              |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetInitialGuessNonzero.html
+  |  "Before actually solving a linear system with KSP, the user must call     |
+  |  the following routine to set the matrices associated with the linear      |
+  |  system: KSPSetOperators" (https://petsc.org/release/manual/ksp/)          |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetOperators/                |
   +---------------------------------------------------------------------------*/
-  void c_petsc_set_solver_and_preconditioner_(KSP  * ksp,
-                                              PC   * pc,
-                                              Mat  * A,
-                                              char * sol,
-                                              char * prec) {
+  void c_petsc_ksp_set_operators_(KSP * ksp,
+                                  Mat * A) {
 
-    /*---------------------------------------------------------------------+
-    |  Set operators. Here the matrix that defines the linear system       |
-    |  also serves as the preconditioning matrix. Since all the matrices   |
-    |  will have the same nonzero pattern here, we indicate this so the    |
-    |  linear solvers can take advantage of this.                          |
-    +---------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------+
+    |  Here the matrix that defines the linear system also serves as the  |
+    |  preconditioning matrix. Since all the matrices will have the same  |
+    |  nonzero pattern here, we indicate this so the linear solvers can   |
+    |  take advantage of this (How on Earth?*)                            |
+    +--------------------------------------------------------------------*/
 
     /* Set precondioning matrix to be A */
     err = KSPSetOperators(*ksp, *A, *A);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  KSPSetType                                                                |
+  |                                                                            |
+  |  "The Krylov subspace methods accept a number of options, many of which    |
+  |  are discussed below. First, to set the Krylov subspace method that is to  |
+  |  be used, one calls the command KSPSetType.  The type can be one of:       |
+  |  KSPRICHARDSON, KSPCHEBYSHEV, KSPCG, KSPGMRES, KSPTCQMR, KSPBCGS, KSPCGS,  |
+  |  KSPTFQMR, KSPCR, KSPLSQR, KSPBICG, KSPPREONLY (or equivalent KSPNONE), or |
+  |  others; see KSP Objects or the KSPType man page for more. The KSP method  |
+  |  can also be set with the options database command -ksp_type, followed by  |
+  |  one of the options: richardson, chebyshev, cg, gmres, tcqmr, bcgs, cgs,   |
+  |  tfqmr, cr, lsqr, bicg ..." (https://petsc.org/release/manual/ksp/)        |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetType/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_set_type_(KSP  * ksp,
+                             char * sol) {
 
     /* Set solver */
     err = KSPSetType(*ksp, sol);
+  }
 
+  /*---------------------------------------------------------------------------+
+  |  KSP routines to set preconditioner                                        |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetPC/                       |
+  |  https://petsc.org/release/manualpages/PC/PCSetType/                       |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetFromOptions/              |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetUp/                       |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_set_preconditioner_(KSP  * ksp,
+                                       PC   * pc,
+                                       char * prec) {
     /* Set preconditioner */
     err = KSPGetPC(*ksp, pc);
     err = PCSetType(*pc, prec);
@@ -306,17 +410,22 @@
     /* These two lines are needed to finish the setup */
     err = KSPSetFromOptions(*ksp);
     err = KSPSetUp         (*ksp);
+  }
 
-    /*----------------------------------------------------------+
-    |  And please don't start from zero - for the sake of God   |
-    +----------------------------------------------------------*/
+  /*---------------------------------------------------------------------------+
+  |  And please don't start from zero - for the sake of God                    |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetInitialGuessNonzero/      |v
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_set_initial_guess_nonzero_(KSP * ksp) {
+
     err = KSPSetInitialGuessNonzero(*ksp, PETSC_TRUE);
   }
 
   /*---------------------------------------------------------------------------+
   |  KSPSetTolerances                                                          |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSetTolerances.html      |
+  |  https://petsc.org/release/manualpages/KSP/KSPSetTolerances/               |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_set_tolerances_(KSP         * ksp,
                                    PetscScalar * rtol,
@@ -329,7 +438,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPSetTolerances                                                          |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPSolve.html              |
+  |  https://petsc.org/release/manualpages/KSP/KSPSolve/                       |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_solve_(KSP * ksp, Vec * b, Vec * x) {
 
@@ -339,7 +448,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPGetConvergedReason                                                     |
   |                                                                            |
-  |  https://petsc.org/main/docs/manualpages/KSP/KSPGetConvergedReason.html    |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetConvergedReason/          |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_converged_reason_(KSP * ksp, KSPConvergedReason * reason) {
 
@@ -349,7 +458,7 @@
   /*---------------------------------------------------------------------------+
   |  KSPGetIterationNumber                                                     |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPGetIterationNumber.html |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetIterationNumber/          |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_get_iteration_number_(KSP * ksp, PetscInt * its) {
 
@@ -359,11 +468,24 @@
   /*---------------------------------------------------------------------------+
   |  KSPGetResidualNorm                                                        |
   |                                                                            |
-  |  https://petsc.org/release/docs/manualpages/KSP/KSPGetResidualNorm.html    |
+  |  https://petsc.org/release/manualpages/KSP/KSPGetResidualNorm/             |
   +---------------------------------------------------------------------------*/
   void c_petsc_ksp_get_residual_norm_(KSP * ksp, PetscScalar * rnorm) {
 
     err = KSPGetResidualNorm(*ksp, rnorm);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  KSPDestroy                                                                |
+  |                                                                            |
+  |  "Once the KSP context is no longer needed, it should be destroyed with    |
+  |  the command KSPDestroy" (https://petsc.org/release/manual/ksp/)           |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/KSP/KSPDestroy/                     |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_ksp_destroy_(KSP * ksp) {
+
+    err = KSPDestroy(ksp);
   }
 
 /*-----------------------------------------------------------------------------+

@@ -1,7 +1,21 @@
+# Full file name
 x_junction.msh
+
+# Dual?
 no
+
+# Scale geometry?
 skip
+
+# Boundary cell placement
 1
+
+# Periodcity?
 skip
+
+# Distance to the wall
 1
+
+# Probe 1d
 skip
+

@@ -5,13 +5,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  type(Mpi_File)   :: fh           ! file handle
-  character        :: text_in*(*)  ! text to write out
-  integer(DP)      :: disp         ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  type(Mpi_File),   intent(in)    :: fh           ! file handle
+  character,        intent(out)   :: text_in*(*)  ! text to read in
+  integer(DP),      intent(inout) :: disp         ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: leng
   integer :: error = 0
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   leng = len(text_in)

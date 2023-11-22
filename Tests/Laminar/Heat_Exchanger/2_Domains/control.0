@@ -1,13 +1,13 @@
- NUMBER_OF_DOMAINS         2
+  NUMBER_OF_DOMAINS         2
 
- NUMBER_OF_TIME_STEPS      90
- RESULTS_SAVE_INTERVAL     30
- BACKUP_SAVE_INTERVAL     120
+  NUMBER_OF_TIME_STEPS      90
+  RESULTS_SAVE_INTERVAL     30
+  BACKUP_SAVE_INTERVAL     120
 
- TIME_STEP               0.1
+  TIME_STEP               0.1
 
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- INTERFACE_CONDITION      upper_dom    lower_dom
-   BOUNDARY_CONDITIONS    bottom_wall  top_wall
+  INTERFACE_CONDITION      upper_dom    lower_dom
+    BOUNDARY_CONDITIONS    bottom_wall  top_wall
 

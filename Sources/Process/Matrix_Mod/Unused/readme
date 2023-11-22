@@ -1,0 +1,4 @@
+This routine sorts out matrix connectivity excluding the buffers.
+Although this is the way it should be formed, it has a huge impact
+on the rest of the code, I am afraid that something important with
+mass transfer or interface tracking or reconstruction stops working.

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Geometry(Convert, Grid, ask)
+  subroutine Calculate_Geometry(Convert, Grid, ask, g)
 !------------------------------------------------------------------------------!
 !   Calculates geometrical quantities of the grid.                             !
 !                                                                              !
@@ -10,24 +10,6 @@
 !   One of the most distinct differences is the treatment of periodicity.      !
 !   Here, periodic faces are created from existing (internal) ones, whereas    !
 !   in Generate_Mod, they are added to existing cells.                         !
-!------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: ask
-!-----------------------------------[Locals]-----------------------------------!
-  integer              :: c, c1, c2, n, n1, n2, s, b, i, j
-  integer              :: c11, c12, c21, c22, s1, s2, bou_cen, cnt_bnd, cnt_per
-  integer              :: color_per, n_per, number_faces
-  real                 :: xs2, ys2, zs2
-  real                 :: t, tot_surf, dis, min_dis, max_dis
-  real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
-  real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
-  integer, allocatable :: b_face(:)
-  character(SL)        :: answer
-  real                 :: factor, prod
-!==============================================================================!
 !                                                                              !
 !                                n3                                            !
 !                 +---------------!---------------+                            !
@@ -105,6 +87,26 @@
 !     t = -----------------------------------------------------------          !
 !                           rx*sx + ry*sy + rz*sz                              !
 !                                                                              !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Convert_Type) :: Convert
+  type(Grid_Type)     :: Grid
+  logical, intent(in) :: ask
+  integer, intent(in) :: g    ! grid rank
+!-----------------------------------[Locals]-----------------------------------!
+  integer              :: c, c1, c2, n, n1, n2, s, b, i, j
+  integer              :: c11, c12, c21, c22, s1, s2, cnt_bnd, cnt_per
+  integer              :: reg_per, n_per, number_faces
+  real                 :: xs2, ys2, zs2
+  real                 :: t, tot_surf, dis, min_dis, max_dis
+  real                 :: v(3), k(3), v_o(3), v_r(3), theta  ! for rotation
+  real,    allocatable :: b_coor_1(:), b_coor_2(:), b_coor_3(:)
+  integer, allocatable :: b_face(:)
+  character(SL)        :: answer, bou_cen
+  real                 :: factor, prod
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Convert)
 !==============================================================================!
 
   call Profiler % Start('Calculate_Geometry')
@@ -127,7 +129,7 @@
   !   => depends on: xn, yn, zn   !
   !   <= gives:      xn, yn, zn   !
   !-------------------------------!
-  if(ask == 0) then
+  if(ask) then
     print *, '#========================================='
     print *, '# Geometric extents:                 '
     print *, '#-----------------------------------------'
@@ -152,6 +154,10 @@
       Grid % zn(:) = Grid % zn(:) * factor
     end if
   end if
+
+  ! Check homogeneity of the grid and ask if you want it uniform
+  if(g.eq.1) call Grid % Search_Coordinate_Clusters(enforce_uniform=.false.)
+  if(g.eq.2) call Grid % Search_Coordinate_Clusters(enforce_uniform=.true.)
 
   !-----------------------------------------!
   !   Calculate the cell centers            !
@@ -183,16 +189,16 @@
   !   => depends on: xc, yc, zc, sx, sy, sz   !
   !   <= gives:      xc, yc, zc  for c<0      !
   !-------------------------------------------!
-  if(ask == 0) then
+  if(ask) then
     print *, '#===================================='
     print *, '# Position the boundary cell centres:'
     print *, '#------------------------------------'
     print *, '# Type 1 for barycentric placement'
     print *, '# Type 2 for orthogonal placement'
     print *, '#------------------------------------'
-    read(*,*) bou_cen
+    bou_cen = File % Single_Word_From_Keyboard()
   else
-    bou_cen = 1
+    bou_cen = '1'
   end if
 
   do s = 1, Grid % n_faces
@@ -210,7 +216,7 @@
       Grid % xc(c2) = Grid % xc(c1) + Grid % sx(s)*t / tot_surf
       Grid % yc(c2) = Grid % yc(c1) + Grid % sy(s)*t / tot_surf
       Grid % zc(c2) = Grid % zc(c1) + Grid % sz(s)*t / tot_surf
-      if(bou_cen .eq. 1) then
+      if(bou_cen .eq. '1') then
         Grid % xc(c2) = Grid % xf(s)
         Grid % yc(c2) = Grid % yf(s)
         Grid % zc(c2) = Grid % zf(s)
@@ -284,11 +290,11 @@
   !   Phase I  ->  find the faces on periodic boundaries   !
   !                                                        !
   !--------------------------------------------------------!
-  if(ask == 0) then
+  if(ask) then
     answer = ''
     do while(answer .ne. 'SKIP')
 
-      call Grid % Print_Bnd_Cond_List()
+      call Grid % Print_Regions_List()
       n_per = 0
       print *, '#=============================================================='
       print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
@@ -300,13 +306,13 @@
       call String % To_Upper_Case(answer)
 
       if( answer .eq. 'SKIP' ) then
-        color_per = 0
+        reg_per = 0
         exit
       end if
 
-      read(Line % tokens(1), *) color_per
-      if( color_per > Grid % n_bnd_cond ) then
-        print *, '# Critical error: boundary condition ', color_per,  &
+      read(Line % tokens(1), *) reg_per
+      if( reg_per > Grid % n_bnd_regions ) then
+        print *, '# Critical error: boundary condition ', reg_per,  &
                    ' doesn''t exist!'
         print *, '# Exiting! '
         stop
@@ -322,7 +328,7 @@
       do s = 1, Grid % n_faces
         c2 = Grid % faces_c(2,s)
         if(c2 < 0) then
-          if(Grid % bnd_cond % color(c2) .eq. color_per) then
+          if(Grid % region % at_cell(c2) .eq. reg_per) then
             cnt_per = cnt_per + 1
 
             ! This is a dot product of surface vector and vector 1.0, 1.0, 1,0
@@ -354,7 +360,7 @@
       do s = 1, Grid % n_faces
         c2 = Grid % faces_c(2,s)
         if(c2 < 0) then
-          if(Grid % bnd_cond % color(c2) .eq. color_per) then
+          if(Grid % region % at_cell(c2) .eq. reg_per) then
             v_o(1) = Grid % xf(s)
             v_o(2) = Grid % yf(s)
             v_o(3) = Grid % zf(s)
@@ -465,7 +471,7 @@
       cnt_bnd = 0
       Grid % new_c = 0
       do c = -1, -Grid % n_bnd_cells, -1
-        if(Grid % bnd_cond % color(c) .ne. color_per) then
+        if(Grid % region % at_cell(c) .ne. reg_per) then
           cnt_bnd = cnt_bnd + 1
           Grid % new_c(c) = -cnt_bnd
         end if
@@ -477,7 +483,7 @@
           Grid % xc(Grid % new_c(c)) = Grid % xc(c)
           Grid % yc(Grid % new_c(c)) = Grid % yc(c)
           Grid % zc(Grid % new_c(c)) = Grid % zc(c)
-         Grid % bnd_cond % color(Grid % new_c(c)) = Grid % bnd_cond % color(c)
+         Grid % region % at_cell(Grid % new_c(c)) = Grid % region % at_cell(c)
         end if
       end do
 
@@ -493,41 +499,41 @@
       Grid % n_bnd_cells = cnt_bnd
       print *, '# Kept boundary cells: ', Grid % n_bnd_cells
 
-      !--------------------------------------------------------------------!
-      !   Remove boundary condition with color_per and compress the rest   !
-      !--------------------------------------------------------------------!
-      if(color_per < Grid % n_bnd_cond) then
+      !------------------------------------------------------------------!
+      !   Remove boundary condition with reg_per and compress the rest   !
+      !------------------------------------------------------------------!
+      if(reg_per < Grid % n_bnd_regions) then
 
-        ! Set the color of boundary selected to be periodic to zero
+        ! Set the regions of boundary selected to be periodic to zero
         do c = -1, -Grid % n_bnd_cells, -1
-          if(Grid % bnd_cond % color(c) .eq. color_per) then
-            Grid % bnd_cond % color(c) = 0
+          if(Grid % region % at_cell(c) .eq. reg_per) then
+            Grid % region % at_cell(c) = 0
           end if
         end do
 
         ! Shift the rest of the boundary cells
-        do b = 1, Grid % n_bnd_cond - 1
-          if(b .ge. color_per) then
+        do b = 1, Grid % n_bnd_regions - 1
+          if(b .ge. reg_per) then
 
             ! Correct the names
-            Grid % bnd_cond % name(b) = Grid % bnd_cond % name (b+1)
+            Grid % region % name(b) = Grid % region % name (b+1)
 
-            ! Correct all boundary colors too
+            ! Correct all boundary regions too
             do c = -1, -Grid % n_bnd_cells, -1
-              if(Grid % bnd_cond % color(c) .eq. (b+1)) then
-                Grid % bnd_cond % color(c) = b
+              if(Grid % region % at_cell(c) .eq. (b+1)) then
+                Grid % region % at_cell(c) = b
               end if
             end do
 
           end if
         end do
       else
-        Grid % bnd_cond % name(Grid % n_bnd_cond) = ''
+        Grid % region % name(Grid % n_bnd_regions) = ''
       end if
-      Grid % n_bnd_cond = Grid % n_bnd_cond - 1
+      Grid % n_bnd_regions = Grid % n_bnd_regions - 1
 
     end do  ! while answer .ne. 'SKIP'
-  end if    ! ask == 0
+  end if    ! ask
 
   !----------------------------------------------------!
   !                                                    !
@@ -713,8 +719,8 @@
                             + Grid % dy(s)*Grid % dy(s)  &
                             + Grid % dz(s)*Grid % dz(s) ) )
   end do
-  print '(a45,e12.5)', ' # Maximal distance of periodic boundary is: ',  &
-                       sqrt(max_dis)
+  print '(a45,es12.5)', ' # Maximal distance of periodic boundary is: ',  &
+                        sqrt(max_dis)
 
   !----------------------------------!
   !   Calculate the cell volumes     !

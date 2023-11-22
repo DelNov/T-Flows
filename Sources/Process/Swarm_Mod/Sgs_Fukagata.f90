@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Sgs_Fukagata(Swarm)
+  subroutine Sgs_Fukagata(Swarm)
 !------------------------------------------------------------------------------!
 !   SGS model accounting for Brownian diffusion force by Fukagata et al., 2004 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid

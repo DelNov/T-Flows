@@ -17,13 +17,13 @@
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, i_fac, c1, c2, s, sh, m, n, pnt_to, pnt_from, fail_count
+  integer :: c1, c2, s, sh, n, pnt_to, pnt_from, fail_count
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
-  real    :: d_s, min_d, max_d, dx, dy, dz, sx, sy, sz
-  real    :: vec1(3), vec2(3), prod(3), dist(3), surf(3)
+  real    :: d_s, min_d, max_d, sx, sy, sz
+  real    :: dist(3), surf(3)
 !==============================================================================!
 
-  if(this_proc < 2) print '(a)', ' # Checking the integrity of cell faces ...'
+  if(First_Proc()) print '(a)', ' # Checking the integrity of cell faces ...'
 
   !-----------------------------------!
   !   Perform some integrity checks   !
@@ -153,7 +153,7 @@
                             "this and will terminate now.",                 &
                              file=__FILE__, line=__LINE__)
 
-  if(this_proc < 2) print '(a)', ' # All integrity tests passed'
+  if(First_Proc()) print '(a)', ' # All integrity tests passed'
 
   !---------------------------------------!
   !                                       !
@@ -169,9 +169,9 @@
     min_d = min(min_d, d_s)
     max_d = max(max_d, d_s)
   end do
-  call Comm_Mod_Global_Min_Real(min_d)
-  call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2 .and. Grid % n_shadows > 0) then
+  call Global % Min_Real(min_d)
+  call Global % Max_Real(max_d)
+  if(First_Proc() .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', ' # Minimum distance stored in shadow faces: ', min_d
     print '(a,f9.3)', ' # Maximum distance stored in shadow faces: ', max_d
   end if
@@ -192,28 +192,22 @@
 
       if(abs(Grid % dx(s)) > PICO) then
         if(abs(Grid % xc(c2) - Grid % xc(c1) ) > 1.5 * abs(Grid % dx(s))) then
-          if(Grid % xc(c2) > Grid % xc(c1)) then
-            Assert(Grid % faces_s(s) > 0)
-            Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 1
-          end if
+          Assert(Grid % faces_s(s) > 0)
+          Grid % region % at_face(s) = Grid % per_x_reg
         end if
       end if
 
       if(abs(Grid % dy(s)) > PICO) then
         if(abs(Grid % yc(c2) - Grid % yc(c1) ) > 1.5 * abs(Grid % dy(s))) then
-          if(Grid % yc(c2) > Grid % yc(c1)) then
-            Assert(Grid % faces_s(s) > 0)
-            Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 2
-          end if
+          Assert(Grid % faces_s(s) > 0)
+          Grid % region % at_face(s) = Grid % per_y_reg
         end if
       end if
 
       if(abs(Grid % dz(s)) > PICO) then
         if(abs(Grid % zc(c2) - Grid % zc(c1) ) > 1.5 * abs(Grid % dz(s))) then
-          if(Grid % zc(c2) > Grid % zc(c1)) then
-            Assert(Grid % faces_s(s) > 0)
-            Grid % bnd_cond % color(s) = Grid % n_bnd_cond + 3
-          end if
+          Assert(Grid % faces_s(s) > 0)
+          Grid % region % at_face(s) = Grid % per_z_reg
         end if
       end if
 
@@ -236,9 +230,9 @@
       max_d = max(max_d, d_s)
     end if
   end do
-  call Comm_Mod_Global_Min_Real(min_d)
-  call Comm_Mod_Global_Max_Real(max_d)
-  if(this_proc < 2 .and. Grid % n_shadows > 0) then
+  call Global % Min_Real(min_d)
+  call Global % Max_Real(max_d)
+  if(First_Proc() .and. Grid % n_shadows > 0) then
     print '(a,f9.3)', ' # Minimum corrected distance at shadows:   ', min_d
     print '(a,f9.3)', ' # Maximum corrected distance at shadows:   ', max_d
   end if
@@ -257,7 +251,7 @@
     if(Grid % faces_s(s) .ne. 0) pnt_from = pnt_from + 1
   end do
   if(pnt_to .ne. pnt_from) then
-    print *, '# Pointers to and from shadows wrong in processor: ', this_proc
+    print *, '# Pointers to and from shadows wrong in processor: ', This_Proc()
     stop
   end if
 

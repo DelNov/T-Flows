@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n     ! time step
-  real,    intent(in)      :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: G
   type(Var_Type),   pointer :: u, v, w, t, phi
@@ -54,7 +52,7 @@
 
   call Work % Disconnect_Real_Cell(var)
 
-  call Comm_Mod_End
+  call Global % End_Parallel
   stop
 
   end subroutine

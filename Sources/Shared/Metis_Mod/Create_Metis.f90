@@ -1,29 +1,31 @@
 !==============================================================================!
-  subroutine Create_Metis(Metis, face_to_cell, n_parts)
+  subroutine Create_Metis(Metis, e_f, e_l, edge_conn, n_parts)
 !------------------------------------------------------------------------------!
 !   Prepares all the arrays for a call to METIS function(s)                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Metis_Type)                                :: Metis
-  integer, allocatable, intent(in), dimension(:,:) :: face_to_cell
-  integer, optional,    intent(in)                 :: n_parts
+  class(Metis_Type),       intent(out) :: Metis
+  integer,                 intent(in)  :: e_f, e_l
+  integer, dimension(:,:), intent(in)  :: edge_conn
+  integer,                 intent(in)  :: n_parts
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s, i, v, v1, v2
 !==============================================================================!
 
   Assert(n_parts > 0)
+  Assert(e_l > e_f)
+  Assert(e_f >= lbound(edge_conn, 2))
+  Assert(e_l <= ubound(edge_conn, 2))
 
   !------------------------------------------------------------!
   !   Number of vertices and number of edges for first level   !
   !------------------------------------------------------------!
   Metis % n_verts = 0
   Metis % n_edges = 0
-  do s = 1, size(face_to_cell, 2)
-    if(face_to_cell(2, s) > 0) then
-      Metis % n_edges = Metis % n_edges + 1
-      Metis % n_verts = max(Metis % n_verts, face_to_cell(2, s))
-    end if
+  do s = e_f, e_l
+    Metis % n_edges = Metis % n_edges + 1
+    Metis % n_verts = max(Metis % n_verts, edge_conn(2, s))
   end do
   Assert(Metis % n_verts > 0)
   Assert(Metis % n_edges > 0)
@@ -40,13 +42,11 @@
   !   Form edge connectivity   !
   !----------------------------!
   i = 0
-  do s = 1, size(face_to_cell, 2)
-    if(face_to_cell(2, s) > 0) then
-      i = i + 1
-      Metis % edges_v(1:2, i) = face_to_cell(1:2, s)
-      Assert(Metis % edges_v(1,i) > 0)
-      Assert(Metis % edges_v(2,i) > 0)
-    end if
+  do s = e_f, e_l
+    i = i + 1
+    Metis % edges_v(1:2, i) = edge_conn(1:2, s)
+    Assert(Metis % edges_v(1,i) > 0)
+    Assert(Metis % edges_v(2,i) > 0)
   end do
 
   !------------------------------!

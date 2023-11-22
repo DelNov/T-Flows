@@ -32,9 +32,13 @@
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: c0, c1, c2, i_fac, s, s1, sc
+  integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
   real                     :: kin_vis, u_tau, dt_dn
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
 !==============================================================================!
+
+  call Profiler % Start('Update_Boundary_Values')
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -54,11 +58,9 @@
      update .ne. 'ENERGY'     .and.  &
      update .ne. 'SCALARS'    .and.  &
      update .ne. 'ALL') then
-    if(this_proc < 2) then
-      print *, '# Invalid parameter in call to Update_Boundary_Values'
-    end if
-    call Comm_Mod_End
-    stop
+    call Message % Error(72,                                              &
+                         'Invalid parameter in function call. Exiting!',  &
+                         file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   !--------------!
@@ -68,23 +70,21 @@
   !--------------!
   if( (update .eq. 'MOMENTUM' .or. update .eq. 'ALL') ) then
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    ! On the boundary perform the extrapolation
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+         Grid % region % type(reg) .eq. PRESSURE .or.  &
+         Grid % region % type(reg) .eq. SYMMETRY) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-      ! On the boundary perform the extrapolation
-      if(c2 < 0) then
-
-        ! Extrapolate velocities on the outflow boundary
-        if( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.     &
-            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.    &
-            Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY ) then
           u % n(c2) = u % n(c1)
           v % n(c2) = v % n(c1)
           w % n(c2) = w % n(c1)
-        end if
-      end if ! c2 < 0
-    end do
+        end do  ! faces
+      end if    ! boundary condition
+    end do      ! region
 
   end if  ! update momentum
 
@@ -121,31 +121,96 @@
   !----------------!
   if(update .eq. 'TURBULENCE' .or. update .eq. 'ALL') then
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
+    !----------------------!
+    !   K-epsilon-zeta-f   !
+    !----------------------!
+    if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+       Turb % model .eq. HYBRID_LES_RANS) then
 
-      ! On the boundary perform the extrapolation
-      if(c2 < 0) then
+      do reg = Boundary_Regions()
 
+        ! Regions outflow, pressure or symmetry
+        if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+           Grid % region % type(reg) .eq. PRESSURE .or.  &
+           Grid % region % type(reg) .eq. SYMMETRY) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        ! Spalart Allmaras
-        if(Turb % model .eq. SPALART_ALLMARAS .or.  &
-           Turb % model .eq. DES_SPALART) then
-          if ( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-               Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-               Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
-               Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
+            kin  % n(c2) = kin  % n(c1)
+            eps  % n(c2) = eps  % n(c1)
+            zeta % n(c2) = zeta % n(c1)
+            f22  % n(c2) = f22  % n(c1)
+            if(Flow % heat_transfer) then
+              t2  % n(c2) = t2  % n(c1)
+            end if
+          end do  ! faces
+        end if    ! boundary condition
+      end do      ! regions
+    end if        ! turbulence model
+
+    !---------------!
+    !   K-epsilon   !
+    !---------------!
+    if(Turb % model .eq. K_EPS) then
+
+      do reg = Boundary_Regions()
+
+        ! Regions outflow, pressure or symmetry
+        if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+           Grid % region % type(reg) .eq. PRESSURE .or.  &
+           Grid % region % type(reg) .eq. SYMMETRY) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
+            kin % n(c2) = kin % n(c1)
+            eps % n(c2) = eps % n(c1)
+            if(Flow % heat_transfer) then
+              t2  % n(c2) = t2  % n(c1)
+            end if
+          end do  ! faces
+        end if    ! boundary condition
+      end do      ! regions
+    end if        ! turbulence model
+
+    !----------------------!
+    !   Spalart-Allmaras   !
+    !----------------------!
+    if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+       Turb % model .eq. DES_SPALART) then
+
+      do reg = Boundary_Regions()
+
+        ! Regions outflow, pressure or symmetry
+        if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+           Grid % region % type(reg) .eq. PRESSURE .or.  &
+           Grid % region % type(reg) .eq. SYMMETRY) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
             vis % n(c2) = vis % n(c1)
-          end if
-        end if
+          end do  ! faces
+        end if    ! boundary condition
+      end do      ! regions
+    end if        ! turbulence model
 
-        ! Reynolds stress models
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
+    !----------------------------!
+    !   Reynolds stress models   !
+    !----------------------------!
+    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
+       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
-          if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+      do reg = Boundary_Regions()
+
+        ! Regions at solid walls
+        if(Grid % region % type(reg) .eq. WALL .or.  &
+           Grid % region % type(reg) .eq. WALLFL) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
             uu  % n(c2) = 0.0
             vv  % n(c2) = 0.0
             ww  % n(c2) = 0.0
@@ -161,46 +226,16 @@
                                                      kin_vis,               &
                                                      0.0)
             if(Turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
-          end if
-        end if
+          end do  ! faces
 
-        ! k-epsilon-zeta-f
-        if(Turb % model .eq. K_EPS_ZETA_F .or.  &
-           Turb % model .eq. HYBRID_LES_RANS) then
-          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.   &
-             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.   &
-             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.   &
-             Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
-            kin  % n(c2) = kin  % n(c1)
-            eps  % n(c2) = eps  % n(c1)
-            zeta % n(c2) = zeta % n(c1)
-            f22  % n(c2) = f22  % n(c1)
-            if(Flow % heat_transfer) then
-              t2  % n(c2) = t2  % n(c1)
-            end if
-          end if
+        ! Regions outflow, pressure or symmetry
+        else if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+                Grid % region % type(reg) .eq. PRESSURE .or.  &
+                Grid % region % type(reg) .eq. SYMMETRY) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
 
-        end if
-
-        ! k-epsilon
-        if(Turb % model .eq. K_EPS) then
-          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
-            kin % n(c2) = kin % n(c1)
-            eps % n(c2) = eps % n(c1)
-            if(Flow % heat_transfer) then
-              t2  % n(c2) = t2  % n(c1)
-            end if 
-          end if
-        end if
-
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-          if(Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. CONVECT .or.  &
-             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
             uu  % n(c2) = uu  % n(c1)
             vv  % n(c2) = vv  % n(c1)
             ww  % n(c2) = ww  % n(c1)
@@ -211,10 +246,10 @@
             eps % n(c2) = eps % n(c1)
             if(Turb % model .eq. RSM_MANCEAU_HANJALIC)  &
               f22 % n(c2) = f22 % n(c1)
-          end if
-        end if
-      end if ! c2 < 0
-    end do
+          end do  ! faces
+        end if    ! boundary condition
+      end do      ! regions
+    end if        ! turbulence model
 
   end if  ! update turbulence
 
@@ -237,7 +272,7 @@
       c2 = Grid % faces_c(2,s)
 
       ! On the boundary perform the extrapolation
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+      if(Cell_In_This_Proc(c1) .and. c2 < 0) then
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models. 
@@ -284,8 +319,8 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(Flow % heat)
-    call Comm_Mod_Global_Sum_Real(Flow % heated_area)
+    call Global % Sum_Real(Flow % heat)
+    call Global % Sum_Real(Flow % heated_area)
     Flow % heat_flux = Flow % heat / max(Flow % heated_area, TINY)
 
   end if  ! update energy and heat transfer
@@ -309,7 +344,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+      if(Cell_In_This_Proc(c1) .and. c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
           do i_fac = 1, Grid % cells_n_faces(c1)
@@ -330,7 +365,7 @@
 1     continue
 
       ! On the boundary perform the extrapolation
-      if(Grid % Comm % cell_proc(c1) .eq. this_proc .and. c2 < 0) then
+      if(Cell_In_This_Proc(c1) .and. c2 < 0) then
 
         ! In the "new way" the extrapolation is
         ! independent from turbulence model
@@ -376,8 +411,8 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(Flow % heat)
-    call Comm_Mod_Global_Sum_Real(Flow % heated_area)
+    call Global % Sum_Real(Flow % heat)
+    call Global % Sum_Real(Flow % heated_area)
     Flow % heat_flux = Flow % heat / max(Flow % heated_area, TINY)
 
   end if  ! update energy and heat transfer
@@ -435,5 +470,7 @@
     end do ! sc = 1, Flow % n_scalars
 
   end if  ! update_scalars
+
+  call Profiler % Stop('Update_Boundary_Values')
 
   end subroutine

@@ -1,7 +1,20 @@
+# Full mesh name
 membrane.msh
+
+# Create dual mesh
 no
+
+# Physical scaling
 skip
+
+# Boundary cell positions
 2
+
+# Periodicity
 skip
+
+# Distance from the walls
 1 2 3
+
+# Probe 1d
 skip

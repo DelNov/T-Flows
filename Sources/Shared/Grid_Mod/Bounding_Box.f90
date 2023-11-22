@@ -20,12 +20,12 @@
   ymax = maxval(Grid % yn(1:nn))
   zmax = maxval(Grid % zn(1:nn))
 
-  call Comm_Mod_Global_Min_Real(xmin)
-  call Comm_Mod_Global_Min_Real(ymin)
-  call Comm_Mod_Global_Min_Real(zmin)
+  call Global % Min_Real(xmin)
+  call Global % Min_Real(ymin)
+  call Global % Min_Real(zmin)
 
-  call Comm_Mod_Global_Max_Real(xmax)
-  call Comm_Mod_Global_Max_Real(ymax)
-  call Comm_Mod_Global_Max_Real(zmax)
+  call Global % Max_Real(xmax)
+  call Global % Max_Real(ymax)
+  call Global % Max_Real(zmax)
 
   end subroutine

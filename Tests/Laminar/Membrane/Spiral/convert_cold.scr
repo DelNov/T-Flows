@@ -1,8 +1,21 @@
+# Full mesh name
 spiral_cold.msh
+
+# Create dual?
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell centers
 2
+
+# Periodicity
 skip
+
+# Wall distance
 1 2
+
+# Probe 1d
 skip
 

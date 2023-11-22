@@ -47,7 +47,7 @@
     ! Allocate memory for cells surrounding each node
     if(run .eq. 1) then
       max_n_cells = maxval(Grid % nodes_n_cells)
-      call Comm_Mod_Global_Max_Int(max_n_cells)
+      call Global % Max_Int(max_n_cells)
       allocate(Grid % nodes_c(1:max_n_cells, 1:Grid % n_nodes))
       allocate(cell_list(max_n_cells*2));  cell_list(:) = 0
     end if

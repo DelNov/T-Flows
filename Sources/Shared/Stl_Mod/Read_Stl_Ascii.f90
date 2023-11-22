@@ -7,7 +7,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Stl_Type) :: Stl
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: fu, v, f, i_ver, n
+  integer :: fu, v, f, i_ver
 !==============================================================================!
 
   call File % Open_For_Reading_Ascii(Stl % name, fu)
@@ -22,7 +22,7 @@
     if(Line % tokens(1) .eq. 'endsolid') exit
     if(Line % tokens(1) .eq. 'facet') f = f + 1
   end do
-  if(this_proc < 2) print '(a,i9)', ' # Number of facets on the STL: ', f
+  if(First_Proc()) print '(a,i9)', ' # Number of facets on the STL: ', f
   call Stl % Allocate_Stl(f)
 
   !------------------------------------------------!
@@ -51,7 +51,7 @@
       call File % Read_Line(fu)                ! 'endloop'
     end if
   end do
-  if(this_proc < 2) print '(a)', ' # Read all STL facets!'
+  if(First_Proc()) print '(a)', ' # Read all STL facets!'
 
   close(fu)
 

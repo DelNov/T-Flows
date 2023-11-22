@@ -1,30 +1,40 @@
 !==============================================================================!
-  subroutine Residual_Vector(Native, ni, r, b, A, x)
+  subroutine Residual_Vector(Nat, ni, r, b, A, x)
 !------------------------------------------------------------------------------!
 !   Calculates residual vector {r} = {b} - [A]{x}                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type) :: Native
-  integer            :: ni
-  real               :: r(:)  ! this might be only for inner cells
-  real               :: b(:)  ! this might be only for inner cells
-  type(Matrix_Type)  :: A
-  real               :: x(:)  ! this may incude buffer cells
+  class(Native_Type),         intent(in)  :: Nat
+  integer,                    intent(in)  :: ni
+  real,                       intent(out) :: r(:)  ! only for inner cells
+  real,                       intent(in)  :: b(:)  ! only for inner cells
+  type(Matrix_Type),  target, intent(in)  :: A
+  real,                       intent(in)  :: x(:)  ! may incude buffer cells
 !-----------------------------------[Locals]-----------------------------------!
-  integer  :: i, j, k
+  integer                      :: i, j, k
+  real,    contiguous, pointer :: a_val(:)
+  integer, contiguous, pointer :: a_col(:), a_row(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Nat)
 !==============================================================================!
+
+  ! Take some aliases
+  a_col => A % col
+  a_row => A % row
+  a_val => A % val
 
   !----------------!
   !   r = b - Ax   !
   !----------------!
-  ! Why not callig this: call exchange(x) ???
+  !$omp parallel do private(i, j) shared (r, b, x)
   do i = 1, ni
     r(i) = b(i)
-    do j = A % row(i), A % row(i+1) - 1
-      k = A % col(j)
-      r(i) = r(i) - A % val(j) * x(k)
+    do j = a_row(i), a_row(i+1) - 1
+      k = a_col(j)
+      r(i) = r(i) - a_val(j) * x(k)
     end do
   end do
+  !$omp end parallel do
 
   end subroutine

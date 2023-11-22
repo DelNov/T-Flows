@@ -13,11 +13,12 @@
 //
 //------------------------------------------------------------------------------
 
-PERIODIC = 0;  // or 0
+PERIODIC  =   0;  // or 0
+ANGLE_DEG =   0.0;
 
 // Number of layers
-N_LAYERS     = 35;
-N_SKY_LAYERS = 20;
+N_LAYERS     = 70;
+N_SKY_LAYERS = 35;
 
 // Height of the volume
 SKY_HIGH    = 10.0;      // max height of the domain
@@ -27,20 +28,21 @@ DELTA_H_MIN = URBAN_HIGH / N_LAYERS;
 L_TARGET    = SKY_HIGH - URBAN_HIGH;
 
 // Coordinates of the problem domain (the whole piece of simulated land)
-GROUND_X_MIN =   0;
-GROUND_X_MAX =  26;
-GROUND_Y_MIN =   0;
-GROUND_Y_MAX =  13;
+GROUND_X_MIN = -10.0;
+GROUND_X_MAX =  30.0;
+GROUND_Y_MIN = -10.0;
+GROUND_Y_MAX =  10.0;
 
 // Coordinates of the city (where buildings will reside)
-city_x_min =   3;
-city_x_max =  20;
-city_y_min =   3;
-city_y_max =  10;
+CITY_X_MIN = -5.5;
+CITY_X_MAX = 14.5;
+CITY_Y_MIN = -5.0;
+CITY_Y_MAX =  5.0;
 
 // Resolutions in the city (min) and country side (max)
-DELTA_MIN = 0.2;
-DELTA_MAX = 0.5;
+DELTA_MIN      = 0.2;
+DELTA_MAX      = 0.5;
+DELTA_BUILDING = 0.2;
 
 // Transition between fine and coarse mesh, ...
 // ... between city and the rest of the domain
@@ -60,6 +62,7 @@ MAX_BUILDING_HEIGHT = 300;
 MAXN                =   8;                // max nodes per building
 TINY                =   1.0e-3;
 HUGE                =   1.0e+3;
+ANGLE_RAD           = ANGLE_DEG * Pi / 180.0;
 
 //------------------------------------------------------------------------------
 //
@@ -85,6 +88,15 @@ Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
 //---------------------------------
 Printf("Including file 1_building.geo");
 Include "1_building.geo";
+
+// Rotate them
+For b In { 1 : n_buildings }
+  For n In{ 1 : node_b(b) }
+    i = MAXN*b + n;
+    x(i) = xo(i) * Cos(ANGLE_RAD) - yo(i) * Sin(ANGLE_RAD);
+    y(i) = xo(i) * Sin(ANGLE_RAD) + yo(i) * Cos(ANGLE_RAD);
+  EndFor
+EndFor
 
 //-----------------------------------------------------------------------
 // Browse through all buildings to define points and lines defining them
@@ -166,10 +178,10 @@ Field[1].F = Sprintf("  (%5.2g)
                                              - tanh((y-(%5.2g))/(%5.2g)))) )",
   DELTA_MIN,
   DELTA_MAX - DELTA_MIN,
-  city_x_min, CITY_LIMIT_WIDTH,
-  city_x_max, CITY_LIMIT_WIDTH,
-  city_y_min, CITY_LIMIT_WIDTH,
-  city_y_max, CITY_LIMIT_WIDTH);
+  CITY_X_MIN, CITY_LIMIT_WIDTH,
+  CITY_X_MAX, CITY_LIMIT_WIDTH,
+  CITY_Y_MIN, CITY_LIMIT_WIDTH,
+  CITY_Y_MAX, CITY_LIMIT_WIDTH);
 Background Field = 1;
 
 

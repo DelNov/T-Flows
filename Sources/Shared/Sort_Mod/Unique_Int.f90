@@ -13,6 +13,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, min_val, max_val
   integer, allocatable :: unique(:)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Sort)
 !==============================================================================!
 
   ! Set initial size of unique list ...

@@ -11,15 +11,15 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: A_POW = 8.3
-  integer, parameter :: B_POW = 1.0/7.0
+  real, parameter :: A_POW = 8.3
+  real, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: nx, ny, nz
-  real                      :: cs, lf, u_tau, nc2, u_tan, nu, dely
+  real                      :: cs, lf, u_tau, nc2, u_tan, nu, z_wall
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !==============================================================================!
 
@@ -39,11 +39,10 @@
   end if
 
   if(Turb % model .eq. LES_SMAGORINSKY) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c)**ONE_THIRD
 
       nu   = Flow % viscosity(c) / Flow % density(c)
-      dely = Grid % wall_dist(c)
 
       ! Tangential velocity.  Here it assumed that, as you approach the
       ! wall, the tangential velocity component is dominant and that the
@@ -51,7 +50,8 @@
       u_tan = sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2)
 
       ! Calculate u_tau, y+ and perform Van Driest damping
-      u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+      u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c))**B_POW)   &
+              ** (1.0/(1.0+B_POW))
       Turb % y_plus(c) = Grid % wall_dist(c) * u_tau / Flow % viscosity(c)
       cs = c_smag * (1.0 - exp(-Turb % y_plus(c) / 25.0))
 
@@ -62,7 +62,7 @@
     end do
 
   else if(Turb % model .eq. LES_DYNAMIC) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c) ** ONE_THIRD
       Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
@@ -71,7 +71,7 @@
     end do
 
   else if(Turb % model .eq. LES_WALE) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c)**ONE_THIRD
       Turb % vis_t(c) = Flow % density(c)  &
                       * (lf*lf)            &  ! delta^2
@@ -85,7 +85,7 @@
   !   buoyancy according to Eidson, T., JFM, 1985   !
   !-------------------------------------------------!
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       nc2 = max(- Flow % beta * (  Flow % grav_x * t % x(c)   &
                                  + Flow % grav_y * t % y(c)   &
                                  + Flow % grav_z * t % z(c)), 0.0)
@@ -127,15 +127,27 @@
         kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coefficient(c1, c2)
+        z_o = Turb % Roughness_Coeff(c1, c2)
 
         u_tan = Flow % U_Tan(s)
 
         nu = Flow % viscosity(c1) / Flow % density(c1)
-        dely = Grid % wall_dist(c1)
 
-        ! Calculate u_tau
-        u_tau = (u_tan/A_POW * (nu/dely)**B_POW) ** (1.0/(1.0+B_POW))
+        ! Calculate u_tau for smooth wall
+        u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c1))**B_POW) &
+                ** (1.0/(1.0+B_POW))
+
+        ! Calculate u_tau for rough wall
+        if(z_o .gt. tiny) then
+          u_tau = u_tan * kappa/log(Grid % wall_dist(c1)/z_o)
+        end if
+
+        ! Calculate u_tau according to Monin-Obukov Similarity Theory
+        if(Flow % heat_transfer.and.Turb % monin_obukov) then
+          u_tau = u_tau * Turb % Monin_Obukov_Mom(c1, c2, abs(u_tan),   &
+                  Grid % wall_dist(c1), z_o, t % n(c1),              &
+                  t % n(c2), abs(Flow % grav_z))
+        end if
 
         ! Calculate y+
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
@@ -149,10 +161,11 @@
                                Turb % y_plus(c1),     &
                                z_o)
 
+
         ! Effective viscosity above and below 11.18 threshold
         if(Turb % y_plus(c1)  >=  11.81) then
-          Turb % vis_w(c1) = Flow % density(c1) * u_tau * u_tau * dely  &
-                           / abs(u_tan)
+          Turb % vis_w(c1) = Flow % density(c1) * u_tau * u_tau  &
+                             * Grid % wall_dist(c1) / abs(u_tan)
         else
           Turb % vis_w(c1) = Flow % viscosity(c1)                &
                         +      Grid % fw(s)  * Turb % vis_t(c1)  &
@@ -160,17 +173,13 @@
         end if
 
         if(Flow % heat_transfer) then
-          u_plus = u_tan / u_tau
-
           pr_t = Turb % Prandtl_Turb(c1)
           pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
-          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)     &
-               * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
-
+          beta = Turb % Beta_Scalar(pr, pr_t)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
-          if(Turb % rough_walls) then
+          if(z_o .gt. tiny) then
             beta = 0.0
           end if
 
@@ -180,28 +189,37 @@
                               * Flow % capacity(c1)                       &
                       / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+
+          if(Turb % monin_obukov) then
+            Turb % con_w(c1) = pr_t * Turb % con_w(c1)                         &
+                             * Turb % Monin_Obukov_Th(c1, c2, abs(u_tan) ,     &
+                               Grid % wall_dist(c), z_o, t % n(c1), t % n(c2), &
+                               abs(Flow % grav_z))
+          end if
         end if
 
         if(Flow % n_scalars > 0) then
-          u_plus = u_tan / u_tau
-
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
-          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)                   &
-               * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
-
+          beta = Turb % Beta_Scalar(sc, sc_t)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
-          if(Turb % rough_walls) then
+          if(z_o .gt. tiny) then
             beta = 0.0
           end if
 
-          ebf = 0.01 * (sc * Turb % y_plus(c1)**4                 &
-              / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
+          ebf = Turb % Ebf_Scalar(c1, sc)
           Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
               / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
-              + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+
+          if(Turb % monin_obukov) then
+            Turb % diff_w(c1) = sc_t * Turb % diff_w(c1)                       &
+                             * Turb % Monin_Obukov_Th(c1, c2, abs(u_tan) ,     &
+                               Grid % wall_dist(c), z_o, t % n(c1), t % n(c2), &
+                               abs(Flow % grav_z))
+          end if
         end if
 
       end if  ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL

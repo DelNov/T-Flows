@@ -1,9 +1,12 @@
-include '../User_Mod/Vof_Initialization_Box.f90'
-include '../User_Mod/Vof_Interface_Box.f90'
-include '../User_Mod/Check_Inside_Box.f90'
-include '../User_Mod/Vof_Quick_Sort.f90'
-include '../User_Mod/Intersection_Line_Face.f90'
-include '../User_Mod/Interpolate_From_Nodes.f90'
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Vof_Quick_Sort.f90"
+#   include "User_Mod/Intersection_Line_Face.f90"
+#   include "User_Mod/Interpolate_From_Nodes.f90"
+# else
+#   include "Vof_Quick_Sort.f90"
+#   include "Intersection_Line_Face.f90"
+#   include "Interpolate_From_Nodes.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
@@ -68,7 +71,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid % Bnd_Cond_Name(c2) .eq. 'STEP') then
+        if(Grid % Bnd_Cond_Name_At_Cell(c2) .eq. 'STEP') then
           do n = 1, Grid % cells_n_nodes(c1)
             dist = sqrt(                                                    &
                   (Grid % xn(Grid % cells_n(n,c1))-x_probe(i_probe)) ** 2   &
@@ -87,7 +90,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
 
   do i_probe = 1, N_PROBE
     glo_dist = p_dist(i_probe)
-    call Comm_Mod_Global_Min_Real(glo_dist)
+    call Global % Min_Real(glo_dist)
 
     if(.not. Math % Approx_Real( glo_dist,    &
                                  p_dist(i_probe), TINY)) then
@@ -150,7 +153,7 @@ include '../User_Mod/Interpolate_From_Nodes.f90'
   ! Sort probs by height
   do i_probe = 1, N_PROBE_F
     if (allocated(probes(i_probe) % s_probe)) then
-      write(*,*) this_proc,i_probe, N_PROBE_F,c_inters
+      write(*,*) This_Proc(), i_probe, N_PROBE_F, c_inters
       call Vof_Quick_Sort(probes(i_probe) % s_probe(1:c_inters),   &
                           probes(i_probe) % s_coor(:,:), 3, 1,     &
                           size(probes(i_probe) % s_probe))

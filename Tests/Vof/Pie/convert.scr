@@ -1,7 +1,20 @@
+# Full mesh name
 pie.msh
+
+# Create dual grid
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell centers
 2
+
+# Periodicity
 skip
+
+# Distance from the walls
 1
+
+# Probe 1d
 skip

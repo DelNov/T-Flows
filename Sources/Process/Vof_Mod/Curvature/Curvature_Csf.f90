@@ -11,7 +11,7 @@
   type(Field_Type), pointer :: Flow
   type(Var_Type),   pointer :: fun
   type(Var_Type),   pointer :: smooth
-  integer                   :: c, c1, c2, s, nb, nc
+  integer                   :: c, c1, c2, s, nb, nc, reg
   real                      :: v1(3), v2(3), v3(3), v4(3)
   real                      :: norm_grad, dotprod
   real, contiguous, pointer :: div_x(:), div_y(:), div_z(:)
@@ -32,7 +32,7 @@
   !-------------------------------!
   !   Normalize vector at cells   !
   !-------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     norm_grad = sqrt(  smooth % x(c) ** 2  &
                      + smooth % y(c) ** 2  &
                      + smooth % z(c) ** 2)
@@ -46,7 +46,6 @@
       Vof % nz(c) = 0.0
     end if
   end do
-
   call Grid % Exchange_Cells_Real(Vof % nx(-nb:nc))
   call Grid % Exchange_Cells_Real(Vof % ny(-nb:nc))
   call Grid % Exchange_Cells_Real(Vof % nz(-nb:nc))
@@ -54,13 +53,13 @@
   !---------------------------------------!
   !   Tangent vector to walls/symmetries  !
   !---------------------------------------!
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL   .or.   &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL .or.   &
-         Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY) then
+  do reg = Boundary_Regions()
+    if(     Grid % region % type(reg) .eq. WALL    &
+       .or. Grid % region % type(reg) .eq. WALLFL  &
+       .or. Grid % region % type(reg) .eq. SYMMETRY) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
         norm_grad = sqrt(  Vof % nx(c1)**2   &
                          + Vof % ny(c1)**2   &
@@ -85,25 +84,29 @@
             Vof % nz(c2) = v4(3) / norm_grad
           end if
         end if
-      else
+      end do      ! faces
+    else  ! other boundaries
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+
         Vof % nx(c2) = Vof % nx(c1)
         Vof % ny(c2) = Vof % ny(c1)
         Vof % nz(c2) = Vof % nz(c1)
-      end if
-
-    end if  ! c2 < 0
-  end do
+      end do  ! faces
+    end if    ! boundary condition
+  end do      ! regions
 
   !----------------------------------------!
   !   Correct for contact angle at walls   !
   !----------------------------------------!
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  do reg = Boundary_Regions()
+    if(     Grid % region % type(reg) .eq. WALL     &
+       .or. Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
 
-    if(c2 < 0) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.    &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
         ! Accumulate values of faces
         norm_grad = sqrt(  Vof % nx(c1)**2   &
@@ -133,10 +136,9 @@
           Vof % nz(c2) = Vof % nz(c1)
         end if
 
-      end if  ! if WALL
-    end if  ! c2 < 0
-
-  end do
+      end do  ! faces
+    end if    ! regions are walls
+  end do      ! regions
 
   call Grid % Exchange_Cells_Real(Vof % nx(-nb:nc))
   call Grid % Exchange_Cells_Real(Vof % ny(-nb:nc))
@@ -151,12 +153,14 @@
   call Flow % Grad_Component(Vof % ny(-nb:nc), 2, div_y(-nb:nc))
   call Flow % Grad_Component(Vof % nz(-nb:nc), 3, div_z(-nb:nc))
 
-  do c = -nb, nc
-    Vof % curv(c) = Vof % curv(c) - div_x(c)
-    Vof % curv(c) = Vof % curv(c) - div_y(c)
-    Vof % curv(c) = Vof % curv(c) - div_z(c)
+  ! It might be an overkill to browse boundary cells here
+  do reg = Boundary_And_Inside_Regions()
+    do c = Cells_In_Region(reg)
+      Vof % curv(c) = Vof % curv(c) - div_x(c)
+      Vof % curv(c) = Vof % curv(c) - div_y(c)
+      Vof % curv(c) = Vof % curv(c) - div_z(c)
+    end do
   end do
-
   call Grid % Exchange_Cells_Real(Vof % curv)
 
   ! call Grid % Save_Debug_Vtu('curv_sharp',scalar_cell=Vof % curv,  &
@@ -167,9 +171,10 @@
   ! call Grid% Save_Debug_Vtu('curv_smooth',scalar_cell=Vof % curv,  &
   !                                         scalar_name='curv_smooth')
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(smooth % n(c) < 0.01 .or. smooth % n(c) > 0.99) Vof % curv(c) = 0.0
   end do
+  call Grid % Exchange_Cells_Real(Vof % curv(-nb:nc))
 
   call Work % Disconnect_Real_Cell(div_x, div_y, div_z)
 

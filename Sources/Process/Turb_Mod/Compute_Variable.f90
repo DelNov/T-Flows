@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Compute_Variable(Turb, Sol, curr_dt, ini, phi)
+  subroutine Compute_Variable(Turb, Sol, phi)
 !------------------------------------------------------------------------------!
 !   Discretizes and solves transport equations for different turbulent         !
 !   variables.                                                                 !
@@ -8,8 +8,6 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
-  integer, intent(in)       :: ini
   type(Var_Type)            :: phi
 !----------------------------------[Locals]------------------------------------!
   type(Field_Type),  pointer :: Flow
@@ -27,7 +25,7 @@
   real                       :: dt
   real                       :: visc_f, pr_t1, pr_t2, pr_1, pr_2
   real, contiguous,  pointer :: cross(:)
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !                                                                              !
 !  The form of equations which are solved:                                     !
 !                                                                              !
@@ -37,9 +35,9 @@
 !    |      dt       |                |  sigma              |                  !
 !   /               /                /                     /                   !
 !                                                                              !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
-  call Profiler % Start('Compute_Turbulence (without solvers)')
+  call Profiler % Start('Compute_Variable (without solvers)')
 
   call Work % Connect_Real_Cell(cross)
 
@@ -58,8 +56,8 @@
   b      (:) = 0.0
 
   ! Old values (o) and older than old (oo)
-  if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+  if(Iter % Current() .eq. 1) then
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -165,8 +163,11 @@
     a12 = a0
     a21 = a0
 
-    a12 = a12  - min(flux(s), 0.0) * Flow % density(c1)
-    a21 = a21  + max(flux(s), 0.0) * Flow % density(c2)
+    ! Blend system matrix if desired to do so
+    if(phi % blend_matrix) then
+      a12 = a12  - min(flux(s), 0.0) * Flow % density(c1)
+      a21 = a21  + max(flux(s), 0.0) * Flow % density(c2)
+    end if
 
     ! Fill the system matrix
     if(c2  > 0) then
@@ -191,7 +192,7 @@
   end do  ! through faces
 
   ! Cross diffusion terms are treated explicity
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) + cross(c)
   end do
 
@@ -220,7 +221,7 @@
     if(phi % name .eq. 'KIN')  call Turb % Src_Kin_K_Eps_Zeta_F(Sol)
     if(phi % name .eq. 'EPS')  call Turb % Src_Eps_K_Eps_Zeta_F(Sol)
     if(phi % name .eq. 'ZETA')  &
-      call Turb % Src_Zeta_K_Eps_Zeta_F(Sol, curr_dt)
+      call Turb % Src_Zeta_K_Eps_Zeta_F(Sol)
     if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb % Src_T2(Sol)
     end if
@@ -240,37 +241,30 @@
   ! Under-relax the equations
   call Numerics_Mod_Under_Relax(phi, A, b)
 
-  call Profiler % Start('Linear_Solver_For_Turbulence')
+  call Profiler % Start(String % First_Upper(phi % solver)  //  &
+                        ' (solver for turbulence)')
 
   ! Call linear solver to solve the equations
-  call Sol % Run(phi % solver,     &
-                 phi % prec,       &
-                 phi % prec_opts,  &
-                 A,                &
-                 phi % n,          &
-                 b,                &
-                 phi % mniter,     &
-                 phi % eniter,     &
-                 phi % tol,        &
-                 phi % res)
+  call Sol % Run(A, phi, b)
 
-  call Profiler % Stop('Linear_Solver_For_Turbulence')
+  call Profiler % Stop(String % First_Upper(phi % solver)  //  &
+                       ' (solver for turbulence)')
 
   ! Avoid negative values for all computed turbulent quantities
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
   ! Set the lower limit of zeta to 1.8
   if(phi % name .eq. 'ZETA') then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = min(phi % n(c), 1.8)
     end do
   end if
 
   ! Set the lower limit of epsilon 
   if(phi % name .eq. 'EPS') then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = max(phi % n(c), 1.0e-10)
     end do
   end if
@@ -280,14 +274,14 @@
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
-      call Info_Mod_Iter_Fill_At(3, 1, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % niter)
     if(phi % name .eq. 'EPS')  &
-      call Info_Mod_Iter_Fill_At(3, 2, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 2, phi % name, phi % res, phi % niter)
     if(phi % name .eq. 'ZETA')  &
-      call Info_Mod_Iter_Fill_At(3, 3, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 3, phi % name, phi % res, phi % niter)
     if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  &
-      call Info_Mod_Iter_Fill_At(3, 5, phi % name, phi % eniter, phi % res)
+      call Info % Iter_Fill_At(3, 5, phi % name, phi % res, phi % niter)
     end if
   end if
 
@@ -295,6 +289,6 @@
 
   call Work % Disconnect_Real_Cell(cross)
 
-  call Profiler % Stop('Compute_Turbulence (without solvers)')
+  call Profiler % Stop('Compute_Variable (without solvers)')
 
   end subroutine

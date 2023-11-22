@@ -1,14 +1,13 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Advance_Particles(Swarm, n, n_stat_p, first_dt_p)
+  subroutine Advance_Particles(Swarm, n_stat_p, first_dt_p)
 !------------------------------------------------------------------------------!
 !   Advances all particles in the Swarm.                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n           ! current time step
-  integer, intent(in)      :: n_stat_p    ! starting time for swarm statistics
-  integer, intent(in)      :: first_dt_p  ! starting time for swarm simulation
+  class(Swarm_Type), target :: Swarm
+  integer, intent(in)       :: n_stat_p    ! starting time for swarm statistics
+  integer, intent(in)       :: first_dt_p  ! starting time for swarm simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow
@@ -35,22 +34,22 @@
   !------------------------!
   if(Turb % model .eq. HYBRID_LES_PRANDTL) then
     if(Swarm % subgrid_scale_model .eq. BROWNIAN_FUKAGATA) then
-      call Swarm_Mod_Sgs_Fukagata(Swarm)
+      call Swarm % Sgs_Fukagata()
     end if
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
 
     ! Correcting for particle time step size (if ER-HRL model is used)
-    call Swarm_Mod_Particle_Time_Scale(Swarm)
+    call Swarm % Particle_Time_Scale()
 
     ! Store gradients for modeled Flow quantities for Swarm
-    call Swarm_Mod_Grad_Modeled_Flow(Swarm, k)
+    call Swarm % Grad_Modeled_Flow()
 
   end if
 
   ! Gaussian random no.s interval (for SEIM model)
-  Swarm % time_eim = n - first_dt_p
+  Swarm % time_eim = Time % Curr_Dt() - first_dt_p
 
   !---------------------------------------------!
   !       Store old particle coordinates        !
@@ -92,7 +91,7 @@
       if(.not. deposited .and. .not. escaped .and. .not. trapped) then
 
         ! If particle is in this processor, carry on with it
-        if(Part % proc .eq. this_proc) then
+        if(Part % proc .eq. This_Proc()) then
 
           ! Compute velocity at the particle, and move it
           ! (also calls Bounce_Particle)
@@ -120,16 +119,16 @@
           call Swarm % Check_Periodicity(k, n_parts_in_buffers)
 
           ! Gathering Swarm statistics
-          call Swarm_Mod_Calculate_Mean(Swarm, k, n, n_stat_p, ss)
+          call Swarm % Calculate_Particles_Mean(k, n_stat_p)
 
         end if  ! in this processor
       end if    ! deposited or escaped
     end do      ! through particles
 
     ! Exchange particles for parallel version; if needed
-    call Comm_Mod_Global_Sum_Int(n_parts_in_buffers)
+    call Global % Sum_Int(n_parts_in_buffers)
     if(n_parts_in_buffers > 0) then
-      call Swarm_Mod_Exchange_Particles(Swarm)
+      call Swarm % Exchange_Particles()
     end if
 
   end do        ! through sub-steps
@@ -148,7 +147,7 @@
     if(trapped) then
 
       ! If particle is in this processor, carry on with it
-      if(Part % proc .eq. this_proc) then
+      if(Part % proc .eq. This_Proc()) then
         call Swarm % Move_Trapped(k)
 
         ! It might have moved to a new cell
@@ -162,14 +161,14 @@
   end do      ! through particles
 
   ! Exchange particles for parallel version; if needed
-  call Comm_Mod_Global_Sum_Int(n_parts_in_buffers)
+  call Global % Sum_Int(n_parts_in_buffers)
   if(n_parts_in_buffers > 0) then
-    call Swarm_Mod_Exchange_Particles(Swarm)
+    call Swarm % Exchange_Particles()
   end if
 
   !-----------------------------------!
   !   Print some data on the screen   !
   !-----------------------------------!
-  call Swarm_Mod_Print_Statistics(Swarm)
+  call Swarm % Print_Swarm_Statistics()
 
   end subroutine

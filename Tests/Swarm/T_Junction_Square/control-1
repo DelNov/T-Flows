@@ -1,55 +1,55 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME       t_junction
- HEAT_TRANSFER      no
+  PROBLEM_NAME       t_junction
+  HEAT_TRANSFER      no
 
- NUMBER_OF_TIME_STEPS      1200
+  NUMBER_OF_TIME_STEPS      1200
 
- RESULTS_SAVE_INTERVAL      120
- BACKUP_SAVE_INTERVAL       600
- SAVE_INITIAL_CONDITION      no
- SAVE_RESULTS_AT_BOUNDARIES  no
+  RESULTS_SAVE_INTERVAL      120
+  BACKUP_SAVE_INTERVAL       600
+  SAVE_INITIAL_CONDITION      no
+  SAVE_RESULTS_AT_BOUNDARIES  no
 
- TIME_STEP                  1.0e-3
+  TIME_STEP                  1.0e-3
 
 #-------------------
 # Monitoring points 
 #-------------------
- NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         0.0  0.0  0.0
+  NUMBER_OF_MONITORING_POINTS    1
+    MONITORING_POINT_001         0.0  0.0  0.0
 
- POINT_FOR_MONITORING_PLANES    0.0  0.0  0.0
+  POINT_FOR_MONITORING_PLANES    0.0  0.0  0.0
 
 #-----------------
 # Physical models
 #-----------------
- MASS_DENSITY                         1.0
- DYNAMIC_VISCOSITY                    1.8e-5
+  MASS_DENSITY                         1.0
+  DYNAMIC_VISCOSITY                    1.8e-5
 
- TURBULENCE_MODEL       none
+  TURBULENCE_MODEL       none
 
 #----------------------
 # Numerical parameters
 #----------------------
- PRESSURE_MOMENTUM_COUPLING             piso
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.5
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.5
+  PRESSURE_MOMENTUM_COUPLING             piso
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.5
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.5
 
- TIME_INTEGRATION_SCHEME          linear
- ADVECTION_SCHEME_FOR_MOMENTUM    upwind
+  TIME_INTEGRATION_SCHEME          linear
+  ADVECTION_SCHEME_FOR_MOMENTUM    upwind
 
 #------------------------
 # Linear solver settings
 #------------------------
- PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- MIN_SIMPLE_ITERATIONS                   3
- MAX_ITERATIONS_FOR_MOMENTUM_SOLVER     33
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER    333
+  MIN_SIMPLE_ITERATIONS                   3
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER     33
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER    333
 
 #--------------------
 # Initial conditions

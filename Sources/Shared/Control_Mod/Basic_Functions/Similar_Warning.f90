@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Control_Mod_Similar_Warning(keyword, item, verbose, key_type)
+  subroutine Control_Mod_Similar_Warning(keyword, item, key_type)
 !------------------------------------------------------------------------------!
 !   Checks if item in the argument list is similar to a keyword.               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
+  class(Control_Type) :: Control
   character(len=*)           :: keyword
   character(len=*)           :: item
-  logical,          optional :: verbose
   character(len=*), optional :: key_type
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n
@@ -37,7 +37,7 @@
   if( Math % Approx_String(keyword, item, 1) ) then
 
     ! Print a warning message
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *,  '#============================================='//           &
                 '============================================='
       if(.not. present(key_type)) then

@@ -2,24 +2,45 @@
   subroutine Form_Cells_Comm(Grid)
 !------------------------------------------------------------------------------!
 !   Find communication patterns for cells from Process                         !
+!                                                                              !
+!   This is not the simplest procedure in T-Flows, so in this header I will    !
+!   try to explain how it works.  In a nutshell, it browses through buffer     !
+!   cells of all sub-domains and stores their global numbers as well as sub-   !
+!   domain numbers they are from (in need_cell and from_proc matrices).        !
+!   This information is distributed among all the processor by performing a    !
+!   global sum over integer arrays, and with that continues to form buffers.   !
+!                                                                              !
+!   For this procedure to work, it is essential that global cell numbers are   !
+!   the same in buffers and in inside cells from which the data is needed.     !
+!   This was the case until the moment we started sorting inside cells to be   !
+!   in different threads for vectorization.  Once that happened, an extra      !
+!   measure was taken, by sorting buffers with criteria in send_sort() and     !
+!   recv_sort().  (Though, the latter one might not be needed.)                !
+!                                                                              !
+!   In other words: because we are  browsing through cells in separate dom-    !
+!   ains independently, we must ensure they are in right order.  This is en-   !
+!   sured by forming send_sort() and recv_sort() and applying them order       !
+!   cells in send and receive buffers.                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: sub, ms, mr, cnt
+  integer              :: sub, ms, mr, cnt, n_fail, i, j
   integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, i_cel
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
+  integer, allocatable :: send_sort(:), recv_sort(:)
+  integer, allocatable :: glo(:)  ! used for checking the communication
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
-  if(n_proc < 2) return
+  if(Sequential_Run()) return
 
   ! Allocate memory for locally used arrays
-  allocate(send_buff_cnt(n_proc, n_proc))
-  allocate(recv_buff_cnt(n_proc, n_proc))
+  allocate(send_buff_cnt(N_Procs(), N_Procs()))
+  allocate(recv_buff_cnt(N_Procs(), N_Procs()))
   allocate(send_cells(-Grid % n_bnd_cells:Grid % n_cells))
   allocate(recv_cells(-Grid % n_bnd_cells:Grid % n_cells))
 
@@ -27,11 +48,12 @@
   !   Count buffer cells inside   !
   !-------------------------------!
   Grid % Comm % n_buff_cells = 0
-  do c = 1, Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .ne. this_proc) then
-      Grid % Comm % n_buff_cells =    &
-      Grid % Comm % n_buff_cells + 1
-    end if
+  do c = Cells_In_Domain()
+    Assert(Cell_In_This_Proc(c))
+  end do
+  do c = Cells_In_Buffers()
+    Assert(.not. Cell_In_This_Proc(c))
+    Grid % Comm % n_buff_cells = Grid % Comm % n_buff_cells + 1
   end do
 
   !------------------------!
@@ -51,25 +73,26 @@
   !--------------------------------------------------------!
   recv_buff_cnt(:,:)   = 0
   recv_cells(:) = 0
-  do c = Grid % n_cells - Grid % Comm % n_buff_cells + 1,  &
-         Grid % n_cells
+  do c = Cells_In_Buffers()
     sub = Grid % Comm % cell_proc(c)
-    recv_buff_cnt(this_proc, sub) = recv_buff_cnt(this_proc, sub) + 1
+    recv_buff_cnt(This_Proc(), sub) = recv_buff_cnt(This_Proc(), sub) + 1
     recv_cells(c) = sub
   end do
 
-  if(DEBUG) then
-    do sub=1, n_proc
-      if(sub .ne. this_proc) then
-        write(100*this_proc+sub, *) '#====================================' // &
+  if(DEBUG) then  ! a)
+    do sub=1, N_Procs()
+      if(sub.ne.This_Proc() .and. recv_buff_cnt(This_Proc(), sub).gt.0) then
+        write(100*This_Proc()+sub, *)                                          &
+                                    '#====================================' // &
                                     '====================================='
-        write(100*this_proc+sub, '(a,i7,a,i7)')                    &
+        write(100*This_Proc()+sub, '(a,i7,a,i7)')                    &
               ' # There are        ', Grid % Comm % n_buff_cells,  &
-              ' buffer cells in processor ', this_proc
-        write(100*this_proc+sub, *) '#------------------------------------' // &
+              ' buffer cells in processor ', This_Proc()
+        write(100*This_Proc()+sub, *)                                          &
+                                    '#------------------------------------' // &
                                     '-------------------------------------'
-        write(100*this_proc+sub, '(a,i7,a,i7)')                       &
-              ' #   It needs       ', recv_buff_cnt(this_proc, sub),  &
+        write(100*This_Proc()+sub, '(a,i7,a,i7)')                       &
+              ' a)  It needs       ', recv_buff_cnt(This_Proc(), sub),  &
               ' cells from processors     ', sub
       end if
     end do
@@ -79,82 +102,102 @@
   !   Allocate memory for matrix with needed cells   !
   !--------------------------------------------------!
   n_max_buff_cells = Grid % Comm % n_buff_cells
-  call Comm_Mod_Global_Max_Int(n_max_buff_cells)
-  allocate(need_cell(n_max_buff_cells, n_proc));  need_cell(:,:) = 0
-  allocate(from_proc(n_max_buff_cells, n_proc));  from_proc(:,:) = 0
+  call Global % Max_Int(n_max_buff_cells)
+  allocate(need_cell(n_max_buff_cells, N_Procs()));  need_cell(:,:) = 0
+  allocate(from_proc(n_max_buff_cells, N_Procs()));  from_proc(:,:) = 0
 
   !-------------------------------------------!
   !   Store global number of cells you need   !
   !    and also from which processor it is    !
   !-------------------------------------------!
   i_cel = 0
-  do c = Grid % n_cells - Grid % Comm % n_buff_cells + 1,  &
-         Grid % n_cells
-    if(Grid % Comm % cell_proc(c) .ne. this_proc) then
-      i_cel = i_cel + 1
-      need_cell(i_cel, this_proc) = Grid % Comm % cell_glo(c)
-      from_proc(i_cel, this_proc) = Grid % Comm % cell_proc(c)
-    end if
+  do c = Cells_In_Buffers()
+    Assert(.not. Cell_In_This_Proc(c))
+    i_cel = i_cel + 1
+    need_cell(i_cel, This_Proc()) = Grid % Comm % cell_glo(c)
+    from_proc(i_cel, This_Proc()) = Grid % Comm % cell_proc(c)
   end do
 
   !----------------------------------------------!
   !   Inform all processors about needed cells   !
   !   and from which processor are they needed   !
   !----------------------------------------------!
-  need_cell = reshape(need_cell, (/n_max_buff_cells*n_proc, 1/))
-  from_proc = reshape(from_proc, (/n_max_buff_cells*n_proc, 1/))
-  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*n_proc, need_cell)
-  call Comm_Mod_Global_Sum_Int_Array(n_max_buff_cells*n_proc, from_proc)
-  need_cell = reshape(need_cell, (/n_max_buff_cells, n_proc/))
-  from_proc = reshape(from_proc, (/n_max_buff_cells, n_proc/))
+  need_cell = reshape(need_cell, (/n_max_buff_cells*N_Procs(), 1/))
+  from_proc = reshape(from_proc, (/n_max_buff_cells*N_Procs(), 1/))
+  call Global % Sum_Int_Array(n_max_buff_cells*N_Procs(), need_cell)
+  call Global % Sum_Int_Array(n_max_buff_cells*N_Procs(), from_proc)
+  need_cell = reshape(need_cell, (/n_max_buff_cells, N_Procs()/))
+  from_proc = reshape(from_proc, (/n_max_buff_cells, N_Procs()/))
 
   !---------------------------------------------------------------------!
   !   Form send_buff_cnt from the information in the matrix from_proc   !
   !---------------------------------------------------------------------!
   send_buff_cnt(:,:) = 0
-  do sub = 1, n_proc
-    if(sub .ne. this_proc) then
+  do sub = 1, N_Procs()
+    if(sub .ne. This_Proc()) then
       do i_cel = 1, n_max_buff_cells
-        if(from_proc(i_cel, sub) .eq. this_proc) then
-          send_buff_cnt(this_proc, sub) = send_buff_cnt(this_proc, sub) + 1
+        if(from_proc(i_cel, sub) .eq. This_Proc()) then
+          send_buff_cnt(This_Proc(), sub) = send_buff_cnt(This_Proc(), sub) + 1
         end if
       end do
-      if(DEBUG) write(100*this_proc + sub, '(2(a,i7))')                &
-                      ' #   It should send ', send_buff_cnt(this_proc, sub),  &
-                      ' cells to processor        ', sub
+      if(DEBUG) then  ! b)
+        if(send_buff_cnt(This_Proc(), sub).gt.0) then
+          write(100*This_Proc() + sub, '(2(a,i7))')                           &
+                    ' b)  It should send ', send_buff_cnt(This_Proc(), sub),  &
+                    ' cells to processor        ', sub
+        end if
+      end if
     end if
   end do
+
+  Assert(send_buff_cnt(This_Proc(), This_Proc()) .eq. 0)
+
+  if(DEBUG) then
+    send_buff_cnt = reshape(send_buff_cnt, (/N_Procs()*N_Procs(), 1/))
+    recv_buff_cnt = reshape(recv_buff_cnt, (/N_Procs()*N_Procs(), 1/))
+    call Global % Sum_Int_Array(N_Procs()*N_Procs(), send_buff_cnt)
+    call Global % Sum_Int_Array(N_Procs()*N_Procs(), recv_buff_cnt)
+    send_buff_cnt = reshape(send_buff_cnt, (/N_Procs(),N_Procs()/))
+    recv_buff_cnt = reshape(recv_buff_cnt, (/N_Procs(),N_Procs()/))
+
+    do i = 1, N_Procs()
+      do j = 1, N_Procs()
+        Assert(send_buff_cnt(i,j) .eq. recv_buff_cnt(j,i))
+      end do
+    end do
+  end if
 
   !--------------------------------------------------!
   !   Allocate memory for send and receive buffers   !
   !--------------------------------------------------!
-  allocate(Grid % Comm % cells_send(n_proc))
-  allocate(Grid % Comm % cells_recv(n_proc))
+  allocate(Grid % Comm % cells_send(N_Procs()))
+  allocate(Grid % Comm % cells_recv(N_Procs()))
 
   !-----------------------------------!
   !                                   !
   !   Form send and receive buffers   !
   !                                   !
   !-----------------------------------!
-  do sub = 1, n_proc
+  do sub = 1, N_Procs()
 
     ! Initialize buffer size to zero
     Grid % Comm % cells_send(sub) % n_items = 0
     Grid % Comm % cells_recv(sub) % n_items = 0
 
-    if(sub .ne. this_proc) then
+    if(sub .ne. This_Proc()) then
 
       !---------------------------------!
       !   Allocate memory for buffers   !
       !---------------------------------!
-      ms = send_buff_cnt(this_proc, sub)
-      mr = recv_buff_cnt(this_proc, sub)
+      ms = send_buff_cnt(This_Proc(), sub)
+      mr = recv_buff_cnt(This_Proc(), sub)
 
       if(ms > 0) then
         allocate(Grid % Comm % cells_send(sub) % map(ms));
         allocate(Grid % Comm % cells_send(sub) % i_buff(ms));
         allocate(Grid % Comm % cells_send(sub) % l_buff(ms));
         allocate(Grid % Comm % cells_send(sub) % r_buff(ms));
+        allocate(send_sort(ms));
       end if
 
       if(mr > 0) then
@@ -163,20 +206,19 @@
         allocate(Grid % Comm % cells_recv(sub) % l_buff(mr));
         allocate(Grid % Comm % cells_recv(sub) % r_buff(mr));
         allocate(Grid % Comm % cells_recv(sub) % o_buff(mr));
+        allocate(recv_sort(mr));
       end if
 
       !------------------------------------------!
       !   Form send_cells from the information   !
       !   in matrices from_proc and need_cell    !
       !------------------------------------------!
-      ms = 0
-      mr = 0
 
       cnt = 0
       send_cells(:) = 0
       do i_cel = 1, n_max_buff_cells
-        if(from_proc(i_cel, sub) .eq. this_proc) then
-          do c = 1, Grid % n_cells
+        if(from_proc(i_cel, sub) .eq. This_Proc()) then
+          do c = Cells_In_Domain()
             if(Grid % Comm % cell_glo(c) .eq. need_cell(i_cel, sub)) then
               send_cells(c) = sub                                  ! identify
               cnt = cnt + 1
@@ -185,36 +227,67 @@
 
         end if
       end do
-      if(DEBUG) write(100*this_proc + sub, '(2(a,i7))')    &
-                      ' #   It did find    ', cnt,    &
-                      ' cells to send to processor', sub
+      if(DEBUG) then  ! c)
+        if(send_buff_cnt(This_Proc(), sub).gt.0) then
+          write(100*This_Proc() + sub, '(2(a,i7))')    &
+                       ' c)  It did find    ', cnt,    &
+                       ' cells to send to processor', sub
+        end if
+      end if
 
-      ! This worries me.  Why should this be from -Grid % n_bnd_cells or not
-      do c = 1, Grid % n_cells
+      ! Browse through cells in domain to find what you have to send
+      ms = 0
+      do c = Cells_In_Domain()
         if(send_cells(c) .eq. sub) then
           ms = ms + 1
           Grid % Comm % cells_send(sub) % map(ms) = c
+          send_sort(ms) = Grid % Comm % cell_glo(c)    ! store sorting criterion
         end if
       end do
 
-      ! This worries me.  Why should this be from -Grid % n_bnd_cells or not
-      do c = 1, Grid % n_cells
+      ! Important link for robustness: insures that the sent cells in this
+      ! domain are ordered in the same way as receive cells in other domain
+      if(ms > 0) then
+        call Sort % Int_Carry_Int(send_sort,  &
+                                  Grid % Comm % cells_send(sub) % map)
+      end if
+
+      ! Browse through cells in buffers to find out what you need to receive
+      mr = 0
+      do c = Cells_In_Buffers()
         if(recv_cells(c) .eq. sub) then
           mr = mr + 1
           Grid % Comm % cells_recv(sub) % map(mr) = c
+          recv_sort(mr) = Grid % Comm % cell_glo(c)    ! store sorting criterion
         end if
       end do
 
-      if(DEBUG) then
-        write(100*this_proc+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
-              ' #   send/recv (', this_proc, '/', sub, ') =  ', ms, ' / ', mr
+      ! Important link for robustness: insures that the receive cells in this
+      ! domain are ordered in the same way as sent cells in other domain.
+      ! (Yet, this is not engaged yet since the cells in buffers has not been
+      !  fiddled with like the cells in domain due to OpenMP threading.)
+      ! if(mr > 0) then
+      !   call Sort % Int_Carry_Int(recv_sort,  &
+      !                             Grid % Comm % cells_recv(sub) % map)
+      ! end if
+
+      if(DEBUG) then  !  d)
+        if(recv_buff_cnt(This_Proc(), sub).gt.0 .and.  &
+           send_buff_cnt(This_Proc(), sub).gt.0) then
+          write(100*This_Proc()+sub, '(a,i0.0,a,i0.0,a,i0.0,a,i0.0)')  &
+              ' d)  send/recv (', This_Proc(), '/', sub, ') =  ', ms, ' / ', mr
+        end if
       end if
 
       ! Store final buffer lengths
       Grid % Comm % cells_send(sub) % n_items = ms
       Grid % Comm % cells_recv(sub) % n_items = mr
 
-    end if  ! sub .ne. this_proc
+      ! Free sorting arrays for the next iteration
+      if(ms > 0) deallocate(send_sort)
+      if(mr > 0) deallocate(recv_sort)
+
+    end if  ! sub .ne. This_Proc()
   end do    ! sub
 
   !-------------------------------------!
@@ -223,10 +296,31 @@
   !-------------------------------------!
   Grid % n_faces = Grid % n_faces - n_buff_faces
 
-  ! De-allocate locally used memory
-  deallocate(send_buff_cnt)
-  deallocate(recv_buff_cnt)
-  deallocate(send_cells)
-  deallocate(recv_cells)
+  !------------------------------------------!
+  !   Check if communication patterns work   !
+  !------------------------------------------!
+  allocate(glo(-Grid % n_bnd_cells : Grid % n_cells));  glo(:) = 0
+
+  do c = Cells_In_Domain()
+    glo(c) = Grid % Comm % cell_glo(c)
+  end do
+
+  call Grid % Exchange_Cells_Int(glo)
+
+  n_fail = 0
+  do c = Cells_In_Buffers()
+    if(.not. glo(c) .eq. Grid % Comm % cell_glo(c)) then
+      n_fail = n_fail + 1
+    end if
+  end do
+  call Global % Sum_Int(n_fail)
+  if(n_fail .gt. 0) then
+    call Message % Error(55,                                                  &
+                         'Ouch, this hurts. Formation of communication '  //  &
+                         'patterns has failed. Hopefully, you just ran '  //  &
+                         'the simulation on fewer processor than there '  //  &
+                         'are subdomains. \n \n This error is critical.',     &
+                         file=__FILE__, line=__LINE__, one_proc=.true.)
+  end if
 
   end subroutine

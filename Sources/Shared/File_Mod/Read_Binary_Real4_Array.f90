@@ -11,6 +11,8 @@
   logical, optional :: reached_end
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   ! If present, assumed the end of file has not been reached

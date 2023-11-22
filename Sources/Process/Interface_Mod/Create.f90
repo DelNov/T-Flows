@@ -42,9 +42,9 @@
   call Work % Connect_Int_Face(ic_1, ib_1, ip_1, ic_2, ib_2, ip_2)
 
   ! Allocate memory for offsets
-  if(n_proc > 1) then
-    allocate(off_1(n_proc)); off_1 = 0
-    allocate(off_2(n_proc)); off_2 = 0
+  if(Parallel_Run()) then
+    allocate(off_1(N_Procs())); off_1 = 0
+    allocate(off_2(N_Procs())); off_2 = 0
   end if
 
   !--------------------------------------------!
@@ -72,18 +72,18 @@
         !-----------------------------------------------------------------!
         !   Try to find specified interface condition between d1 and d2   !
         !-----------------------------------------------------------------!
-        call Control_Mod_Position_At_Three_Keys('INTERFACE_CONDITION',    &
-                                                trim(problem_name(d1)),   &
-                                                trim(problem_name(d2)),   &
-                                                found,                    &
-                                                verbose=.false.)
+        call Control % Position_At_Three_Keys('INTERFACE_CONDITION',    &
+                                              trim(problem_name(d1)),   &
+                                              trim(problem_name(d2)),   &
+                                              found,                    &
+                                              verbose=.false.)
 
         !---------------------------------------------------!
         !   Found specification between domains d1 and d2   !
         !---------------------------------------------------!
         if(found) then
-          call Control_Mod_Read_Strings_On('BOUNDARY_CONDITIONS',  &
-                                           keys, nks, .false.)
+          call Control % Read_Strings_On('BOUNDARY_CONDITIONS',  &
+                                         keys, nks, .false.)
           do k = 1, nks
             call String % To_Upper_Case(keys(k))
           end do
@@ -99,7 +99,7 @@
           do s = 1, Grid(d1) % n_faces
             c2 = Grid(d1) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d1) % Bnd_Cond_Name(c2) .eq. keys(1)) then
+              if(Grid(d1) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(1)) then
                 n1 = n1 + 1
               end if
             end if
@@ -109,8 +109,8 @@
           do s = 1, Grid(d1) % n_faces
             if(Grid(d1) % faces_s(s) > 0) then  ! only if it has a shadow
               c1 = Grid(d1) % faces_c(1,s)
-              if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
-                 Grid(d1) % Comm % cell_proc(c1) .eq. this_proc) then
+              if(Grid(d1) % Bnd_Cond_Name_At_Face(s) .eq. keys(1) .and.  &
+                 Grid(d1) % Comm % cell_proc(c1) .eq. This_Proc()) then
                 n1 = n1 + 1
               end if
             end if
@@ -124,7 +124,7 @@
           do s = 1, Grid(d2) % n_faces
             c2 = Grid(d2) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d2) % Bnd_Cond_Name(c2) .eq. keys(2)) then
+              if(Grid(d2) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(2)) then
                 n2 = n2 + 1
               end if
             end if
@@ -134,8 +134,8 @@
           do s = 1, Grid(d2) % n_faces
             if(Grid(d2) % faces_s(s) > 0) then  ! only if it has a shadow
               c1 = Grid(d2) % faces_c(1,s)
-              if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
-                 Grid(d2) % Comm % cell_proc(c1) .eq. this_proc) then
+              if(Grid(d2) % Bnd_Cond_Name_At_Face(s) .eq. keys(2) .and.  &
+                 Grid(d2) % Comm % cell_proc(c1) .eq. This_Proc()) then
                 n2 = n2 + 1
               end if
             end if
@@ -149,22 +149,20 @@
           !------------------------------------------!
           n1_tot = n1
           n2_tot = n2
-          call Comm_Mod_Global_Sum_Int(n1_tot)
-          call Comm_Mod_Global_Sum_Int(n2_tot)
+          call Global % Sum_Int(n1_tot)
+          call Global % Sum_Int(n2_tot)
 
           if(n1_tot .ne. n2_tot) then
-            if(this_proc < 2) then
-              print *, '# Number of cells at the interface between ',  &
-                        trim(problem_name(d1)), ' and ',               &
-                        trim(problem_name(d2)), ' is not the same!'
-              print *, '# Only conformal mappings are supported.  Exiting!'
-            end if
-            call Comm_Mod_End
-            stop
+            call Message % Error(72,                                        &
+                       'Number of cells at the interface between '//        &
+                       trim(problem_name(d1))//' and '//                    &
+                       trim(problem_name(d2))//' is not the same! '//       &
+                       'Only conformal mappings are supported.  Exiting!',  &
+                       file=__FILE__, line=__LINE__, one_proc=.true.)
           else
             n_tot = n1_tot
             inter(d1, d2) % n_tot = n_tot
-            if(this_proc < 2) then
+            if(First_Proc()) then
               print '(5a,i6,a)', ' # Domains ', trim(problem_name(d1)),  &
                                        ' and ', trim(problem_name(d2)),  &
                         ' are connected with ', n_tot, ' interface cells!'
@@ -184,15 +182,15 @@
           inter(d1, d2) % phi_2(:,:) = 0.0
 
           ! Work out offsets for each interface for each processor
-          if(n_proc > 1) then
-            off_1(1:n_proc)  = 0
-            off_2(1:n_proc)  = 0
-            off_1(this_proc) = n1
-            off_2(this_proc) = n2
-            call Comm_Mod_Global_Sum_Int_Array(n_proc, off_1)
-            call Comm_Mod_Global_Sum_Int_Array(n_proc, off_2)
+          if(Parallel_Run()) then
+            off_1(1:N_Procs())  = 0
+            off_2(1:N_Procs())  = 0
+            off_1(This_Proc()) = n1
+            off_2(This_Proc()) = n2
+            call Global % Sum_Int_Array(N_Procs(), off_1)
+            call Global % Sum_Int_Array(N_Procs(), off_2)
 
-            do p = n_proc, 2, -1
+            do p = N_Procs(), 2, -1
               off_1(p) = sum(off_1(1:p-1))
               off_2(p) = sum(off_2(1:p-1))
             end do
@@ -206,13 +204,13 @@
             c1 = Grid(d1) % faces_c(1,s)
             c2 = Grid(d1) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d1) % Bnd_Cond_Name(c2) .eq. keys(1)) then
+              if(Grid(d1) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(1)) then
                 n1 = n1 + 1
                 pos = n1
-                if(n_proc > 1) pos = pos + off_1(this_proc)
+                if(Parallel_Run()) pos = pos + off_1(This_Proc())
                 ic_1(pos) = c1
                 ib_1(pos) = c2
-                ip_1(pos) = this_proc
+                ip_1(pos) = This_Proc()
                 xf_1(pos) = Grid(d1) % xf(s)
                 yf_1(pos) = Grid(d1) % yf(s)
                 zf_1(pos) = Grid(d1) % zf(s)
@@ -223,14 +221,14 @@
             c1 = Grid(d1) % faces_c(1,s)
             c2 = Grid(d1) % faces_c(2,s)
             if(Grid(d1) % faces_s(s) > 0) then  ! only if it has a shadow
-              if(Grid(d1) % Bnd_Cond_Name(s) .eq. keys(1) .and.  &
-                 Grid(d1) % Comm % cell_proc(c1) .eq. this_proc) then
+              if(Grid(d1) % Bnd_Cond_Name_At_Face(s) .eq. keys(1) .and.  &
+                 Grid(d1) % Comm % cell_proc(c1) .eq. This_Proc()) then
                 n1 = n1 + 1
                 pos = n1
-                if(n_proc > 1) pos = pos + off_1(this_proc)
+                if(Parallel_Run()) pos = pos + off_1(This_Proc())
                 ic_1(pos) = c1
                 ib_1(pos) = c2
-                ip_1(pos) = this_proc
+                ip_1(pos) = This_Proc()
                 xf_1(pos) = Grid(d1) % xf(s)
                 yf_1(pos) = Grid(d1) % yf(s)
                 zf_1(pos) = Grid(d1) % zf(s)
@@ -244,13 +242,13 @@
             c1 = Grid(d2) % faces_c(1,s)
             c2 = Grid(d2) % faces_c(2,s)
             if(c2 < 0) then
-              if(Grid(d2) % Bnd_Cond_Name(c2) .eq. keys(2)) then
+              if(Grid(d2) % Bnd_Cond_Name_At_Cell(c2) .eq. keys(2)) then
                 n2 = n2 + 1
                 pos = n2
-                if(n_proc > 1) pos = pos + off_2(this_proc)
+                if(Parallel_Run()) pos = pos + off_2(This_Proc())
                 ic_2(pos) = c1
                 ib_2(pos) = c2
-                ip_2(pos) = this_proc
+                ip_2(pos) = This_Proc()
                 xf_2 (pos) = Grid(d2) % xf(s)
                 yf_2 (pos) = Grid(d2) % yf(s)
                 zf_2 (pos) = Grid(d2) % zf(s)
@@ -261,14 +259,14 @@
             c1 = Grid(d2) % faces_c(1,s)
             c2 = Grid(d2) % faces_c(2,s)
             if(Grid(d2) % faces_s(s) > 0) then  ! only if it has a shadow
-              if(Grid(d2) % Bnd_Cond_Name(s) .eq. keys(2) .and.  &
-                 Grid(d2) % Comm % cell_proc(c1) .eq. this_proc) then
+              if(Grid(d2) % Bnd_Cond_Name_At_Face(s) .eq. keys(2) .and.  &
+                 Grid(d2) % Comm % cell_proc(c1) .eq. This_Proc()) then
                 n2 = n2 + 1
                 pos = n2
-                if(n_proc > 1) pos = pos + off_2(this_proc)
+                if(Parallel_Run()) pos = pos + off_2(This_Proc())
                 ic_2(pos) = c1
                 ib_2(pos) = c2
-                ip_2(pos) = this_proc
+                ip_2(pos) = This_Proc()
                 xf_2 (pos) = Grid(d2) % xf(s)
                 yf_2 (pos) = Grid(d2) % yf(s)
                 zf_2 (pos) = Grid(d2) % zf(s)
@@ -279,18 +277,18 @@
           !----------------------------------------------------------!
           !   Distribute interface coordinates over all processors   !
           !----------------------------------------------------------!
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, xf_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, yf_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, zf_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, xf_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, yf_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Real_Array(n_tot, zf_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ic_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ib_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ip_1(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ic_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ib_2(1:n_tot))
-          call Comm_Mod_Global_Sum_Int_Array (n_tot, ip_2(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, xf_1(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, yf_1(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, zf_1(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, xf_2(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, yf_2(1:n_tot))
+          call Global % Sum_Real_Array(n_tot, zf_2(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ic_1(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ib_1(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ip_1(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ic_2(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ib_2(1:n_tot))
+          call Global % Sum_Int_Array (n_tot, ip_2(1:n_tot))
 
           ! Sort interfaces from domain 1 carrying
           ! information of cells surrounding it along
@@ -311,7 +309,7 @@
                                                  ip_2(1:n_tot))
 !         ! Write some debugging information
 !         do n = 1, inter(d1, d2) % n_tot
-!           write(100*this_proc+d1*10+d2, '(i4, 6f10.5)')   &
+!           write(100*This_Proc()+d1*10+d2, '(i4, 6f10.5)')   &
 !                     n,                                    &
 !                     xf_1(n), yf_1(n), zf_1(n),            &
 !                     xf_2(n), yf_2(n), zf_2(n)
@@ -338,7 +336,7 @@
           do n = 1, inter(d1, d2) % n_tot  ! browse through interface now
 
             ! Handle domain 1
-            if(ip_1(n) .eq. this_proc) then
+            if(ip_1(n) .eq. This_Proc()) then
               n1 = n1 + 1
               do c = 1, Grid(d1) % n_cells
                 if(c .eq. ic_1(n)) then
@@ -352,7 +350,7 @@
             end if
 
             ! Handle domain 2
-            if(ip_2(n) .eq. this_proc) then
+            if(ip_2(n) .eq. This_Proc()) then
               n2 = n2 + 1
               do c = 1, Grid(d2) % n_cells
                 if(c .eq. ic_2(n)) then
@@ -373,7 +371,7 @@
     end do
   end do
 
-  if(n_proc > 1) then
+  if(Parallel_Run()) then
     deallocate(off_1)
     deallocate(off_2)
   end if

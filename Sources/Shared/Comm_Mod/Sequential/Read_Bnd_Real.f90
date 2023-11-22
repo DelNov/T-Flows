@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type) :: Comm
-  integer          :: fh         ! file handle
-  real             :: array(:)
-  integer(DP)      :: disp       ! displacement in bytes
+  class(Comm_Type), intent(in)    :: Comm
+  integer,          intent(in)    :: fh         ! file handle
+  real,             intent(out)   :: array(:)
+  integer(DP),      intent(inout) :: disp       ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c
 !==============================================================================!

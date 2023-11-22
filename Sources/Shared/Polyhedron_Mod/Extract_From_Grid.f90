@@ -3,17 +3,17 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  type(Grid_Type)        :: Grid
-  integer, intent(in)    :: cell
-  real,    optional      :: phi_n(:)
+  class(Polyhedron_Type),  intent(out) :: Pol
+  type(Grid_Type), target, intent(in)  :: Grid
+  integer,                 intent(in)  :: cell
+  real,          optional, intent(in)  :: phi_n(:)
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
   integer, pointer, contiguous :: glo(:)
   integer, pointer, contiguous :: local_node(:)         ! local to polyhedron
   integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
+  integer                      :: i_nod, i_fac, l_nod
   integer                      :: s, n, faces_n_nodes
   real                         :: dx, dy, dz, sx, sy, sz
 !==============================================================================!
@@ -97,11 +97,12 @@
     dy = Grid % yf(s) - Grid % yc(cell)
     dz = Grid % zf(s) - Grid % zc(cell)
 
-    ! They might be in the wrong order, correct if needed
-    ! (If the face is oriented outwards to current cell,
-    ! the nodes have to sorted in reverse order because
-    ! ISOAP library requies faces to point inwards)
-    if(sx*dx + sy*dy + sz*dz > 0) then
+    ! Faces' nodes might be in the wrong order, correct here if needed.
+    ! (If the face is oriented outwards to current cell,the nodes have to
+    ! sorted in reverse order because ISOAP requies faces to point inwards.
+    ! But then again, this seems to make the extracted iso-surface to point
+    ! from VOF = 1 towards VOF = 0, which is not in line with T-Flows.)
+    if(sx*dx + sy*dy + sz*dz < 0) then
       call Sort % Reverse_Order_Int(local_face_nodes(1:faces_n_nodes))
     end if
 

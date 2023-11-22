@@ -1,25 +1,36 @@
 !==============================================================================!
-  subroutine Load_Dim(Grid, this_proc, domain)
+  subroutine Load_Dim(Grid, procs, domain)
 !------------------------------------------------------------------------------!
 !   Reads file with grid dimensions (.dim, used to be .geo)                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid
-  integer, intent(in) :: this_proc
+  integer, intent(in) :: procs(1:2)  ! this (proc) and n_procs
   integer, optional   :: domain
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: c, n, s, fu, real_prec
-  character(SL) :: name_in
+  integer       :: fu, real_prec, version
+  character(SL) :: name_in, str1, str2
+  integer       :: nc, nb, nf, nn, ns
 !==============================================================================!
+
+  call Profiler % Start('Load_Dim')
 
   !----------------------------!
   !     Read the file with     !
   !   geometrical dimensions   !
   !----------------------------!
-  call File % Set_Name(name_in, processor=this_proc, extension='.dim',  &
-                       domain=domain)
-  call File % Open_For_Reading_Binary(name_in, fu, this_proc)
+  call File % Set_Name(name_in,             &
+                       processor = procs,   &
+                       extension = '.dim',  &
+                       domain    = domain)
+  call File % Open_For_Reading_Binary(name_in, fu)
+
+  !----------------------------------------------!
+  !   Store rank (domain number) for this grid   !
+  !----------------------------------------------!
+  Grid % rank = 0
+  if(present(domain)) Grid % rank = domain
 
   !-------------------------!
   !   Read real precision   !
@@ -46,49 +57,74 @@
     end if
   end if
 
+  !------------------------------!
+  !   Read version of the file   !
+  !------------------------------!
+  read(fu) version
+
+  if(version .ne. VERSION_DIM) then
+    write(str1, '(i0.0)')  version
+    write(str2, '(i0.0)')  VERSION_DIM
+    call Message % Error(72,                                                   &
+                 'You seem to be reading wrong version of the .dim file.  '//  &
+                 'The version you are reading is '//trim(str1)//' but the '//  &
+                 'code expects version '//trim(str2)//'. Re-generate or   '//  &
+                 'convert again the grids (and divide them if you run in  '//  &
+                 'parallel).', one_proc = .true.)
+  end if
+
   !-------------------------!
   !   Read everything else  !
   !-------------------------!
-  read(fu) (Grid % xn(n), n = 1, Grid % n_nodes)
-  read(fu) (Grid % yn(n), n = 1, Grid % n_nodes)
-  read(fu) (Grid % zn(n), n = 1, Grid % n_nodes)
+  nb = Grid % n_bnd_cells
+  nc = Grid % n_cells
+  nn = Grid % n_nodes
+  nf = Grid % n_faces
+  ns = Grid % n_shadows
 
-  read(fu) (Grid % xc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
-  read(fu) (Grid % yc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
-  read(fu) (Grid % zc(c), c = -Grid % n_bnd_cells, Grid % n_cells)
+  call File % Buffered_Read_Real_Array(fu, Grid % xn(1:nn))
+  call File % Buffered_Read_Real_Array(fu, Grid % yn(1:nn))
+  call File % Buffered_Read_Real_Array(fu, Grid % zn(1:nn))
 
-  read(fu) (Grid % wall_dist(c), c = -Grid % n_bnd_cells, Grid % n_cells)
-  read(fu) (Grid % vol(c), c = 1, Grid % n_cells)
+  call File % Buffered_Read_Real_Array(fu, Grid % xc(-nb:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % yc(-nb:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % zc(-nb:nc))
 
-  read(fu) (Grid % ixx(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % iyy(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % izz(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % ixy(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % ixz(c), c = 1, Grid % n_cells)
-  read(fu) (Grid % iyz(c), c = 1, Grid % n_cells)
+  ! Why on earth do I save wall distance for boundary cells?
+  call File % Buffered_Read_Real_Array(fu, Grid % wall_dist(-nb:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % vol(1:nc))
 
-  read(fu) (Grid % sx(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % sy(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % sz(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % ixx(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % iyy(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % izz(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % ixy(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % ixz(1:nc))
+  call File % Buffered_Read_Real_Array(fu, Grid % iyz(1:nc))
 
-  read(fu) (Grid % dx(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % dy(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % dz(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % sx(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % sy(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % sz(1:nf+ns))
 
-  read(fu) (Grid % f(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % dx(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % dy(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % dz(1:nf+ns))
 
-  read(fu) (Grid % xf(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % yf(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % zf(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % f(1:nf+ns))
 
-  read(fu) (Grid % rx(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % ry(s), s = 1, Grid % n_faces + Grid % n_shadows)
-  read(fu) (Grid % rz(s), s = 1, Grid % n_faces + Grid % n_shadows)
+  call File % Buffered_Read_Real_Array(fu, Grid % xf(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % yf(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % zf(1:nf+ns))
+
+  call File % Buffered_Read_Real_Array(fu, Grid % rx(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % ry(1:nf+ns))
+  call File % Buffered_Read_Real_Array(fu, Grid % rz(1:nf+ns))
 
   read(fu) Grid % per_x
   read(fu) Grid % per_y
   read(fu) Grid % per_z
 
   close(fu)
+
+  call Profiler % Stop('Load_Dim')
 
   end subroutine

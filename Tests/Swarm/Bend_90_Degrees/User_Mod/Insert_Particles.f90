@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm, curr_dt, time)
+  subroutine User_Mod_Insert_Particles(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: curr_dt  ! time step
-  real,    intent(in)      :: time     ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: i, j, k, c, n_parts_in_buffers
@@ -40,10 +38,10 @@
   !-------------------------------------------!
   n_old = Swarm % n_particles   ! old number of particles
 
-  if(curr_dt .eq. 1001 .or.  &
-     curr_dt .eq. 1501 .or.  &
-     curr_dt .eq. 2001 .or.  &
-     curr_dt .eq. 2501) then      ! should be after the flow is developed
+  if(Time % Curr_Dt() .eq. 1001 .or.  &
+     Time % Curr_Dt() .eq. 1501 .or.  &
+     Time % Curr_Dt() .eq. 2001 .or.  &
+     Time % Curr_Dt() .eq. 2501) then  ! should be after the flow is developed
 
     ! First Particle in the center
     k = n_old + 1
@@ -73,14 +71,14 @@
     n_new = k  ! new number of particles
 
     if(n_new <= Swarm % max_particles) then
-      if(this_proc < 2) then
+      if(First_Proc()) then
         print *, '# @User_Mod_Insert_Particles: inserted',  &
                  n_new - n_old, ' particles'
       end if
     else
-      if(this_proc < 2) then
+      if(First_Proc()) then
         print *, '# @User_Mod_Insert_Particles: too many particles'
-        call Comm_Mod_End
+        call Global % End_Parallel
         stop
       end if
     end if

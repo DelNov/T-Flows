@@ -84,7 +84,7 @@
   end do
 
   Stl % n_boddies = maxval(Stl % body_c)
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a,i3)', ' # Number of boddies in the STL file: ', Stl % n_boddies
   end if
 

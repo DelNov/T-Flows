@@ -1,61 +1,89 @@
 !==============================================================================!
-  subroutine Create_Petsc(Pet, Nat, Grid)
+  subroutine Create_Petsc(Pet, A, var_name, petsc_rank)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)        :: Pet
-  type(Native_Type)        :: Nat
-  type(Grid_Type),  target :: Grid
+  class(Petsc_Type)    :: Pet
+  type(Matrix_Type)    :: A
+  character(VL)        :: var_name
+  integer, intent(out) :: petsc_rank
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: i, j, k, start
-  integer, allocatable :: all_lower_ms(:)
+  type(Grid_Type),    pointer :: Grid
+  integer                     :: i, j, k
+  integer,               save :: call_count = 0
+  type(PetscInt), allocatable :: d_nnz(:)  ! diagonal stencil width per cell
+  type(PetscInt), allocatable :: o_nnz(:)  ! off-diag stencil width per cell
 !==============================================================================!
 
-  Pet % pnt_grid => Grid
+  ! Increaset the call count
+  call_count = call_count + 1
 
-  if(this_proc < 2) print *, '# Initializing PETSc.'
+  ! Number of times this function is called, gives the PETSC rank
+  petsc_rank = call_count
+
+  !----------------------------------!
+  !                                  !
+  !   General PETSc initialization   !
+  !                                  !
+  !----------------------------------!
+  if(call_count .eq. 1) then
+
+    !----------------------!
+    !   Initialize PETSc   !
+    !----------------------!
+    call C_Petsc_Initialize()
+
+    !---------------------------!
+    !   Process PETSc options   !
+    !---------------------------!
+    if(petsc_options(1) .ne. '') then
+
+      i = 1
+      do while(i < MAX_STRING_ITEMS .and. petsc_options(i)(1:1) .ne. '')
+
+        ! Check if user wants to profile PETSc
+        ! (-info and -log don't create files; -log_trace only sometimes)
+        if(petsc_options(i) .eq. "-info"      .or.  &
+           petsc_options(i) .eq. "-log"       .or.  &
+           petsc_options(i) .eq. "-log_view"  .or.  &
+           petsc_options(i) .eq. "-log_trace") then
+          call C_Petsc_Log_Default_Begin()
+          petsc_is_reporting = .true.
+        end if
+
+        ! Option is just a single word (followed by another option or end)
+        if(petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'-' .or. &
+           petsc_options(i)(1:1).eq.'-'.and.petsc_options(i+1)(1:1).eq.'') then
+          call C_Petsc_Options_Set_Value(trim(petsc_options(i))//C_NULL_CHAR,  &
+                                         C_NULL_CHAR)
+          i = i + 1
+
+        ! Option is followed by a switch
+        else
+          call C_Petsc_Options_Set_Value(trim(petsc_options(i))  //C_NULL_CHAR,  &
+                                         trim(petsc_options(i+1))//C_NULL_CHAR)
+          i = i + 2
+
+        end if
+      end do
+    end if
+  end if
+
+  !---------------------------------------------------!
+  !   General PETSc initialization done for the 1st   !
+  !   time, continue with variable-specific things    !
+  !---------------------------------------------------!
+  Pet % pnt_grid => A % pnt_grid
+  Grid           => A % pnt_grid
+
+  if(First_Proc()) then
+    write(*,'(a,a4,a1)', advance='no')  &
+      ' # Initializing PETSc for ', trim(var_name), ' '
+  end if
 
   ! Total number of unknowns and unknowns in this processor only
   Pet % m_upper = Grid % Comm % nc_tot
   Pet % m_lower = Grid % n_cells - Grid % Comm % n_buff_cells
-
-  !----------------------------------------+
-  !    Create global numbering for PETSc   !
-  !----------------------------------------+------------------!
-  !    This one has little to do with global numbering from   !
-  !    T-Flows and is unique for each number of processors    !
-  !-----------------------------------------------------------!
-
-  ! Dimensions must spread from all boundary cells through all ...
-  ! ... buffers cells to successfully use Grid % Exchange_Cells_Int
-  allocate(Pet % glo(-Grid % n_bnd_cells:Grid % n_cells))
-  Pet % glo(:) = 0
-
-  if(n_proc < 2) then
-    Pet % glo(1:Grid % n_cells) = Grid % Comm % cell_glo(1:Grid % n_cells) - 1
-  else
-    start = 1  ! first row
-    allocate(all_lower_ms(n_proc));  ! allocate array for all m_lowers
-    all_lower_ms(:) = 0              ! important to initialize to zero
-
-    ! Distribute m_lowers among all processors
-    all_lower_ms(this_proc) = Pet % m_lower
-    call Comm_Mod_Global_Sum_Int_Array(n_proc, all_lower_ms)
-
-    start = sum(all_lower_ms(1:this_proc)) - Pet % m_lower
-
-    ! Distribute global numbers over other processors
-    do i = 1, Pet % m_lower
-      Pet % glo(i) = i + start - 1
-    end do
-    call Grid % Exchange_Cells_Int(Pet % glo)
-
-  end if
-
-  !----------------------!
-  !   Initialize PETSc   !
-  !----------------------!
-  call C_Petsc_Initialize()
 
   !--------------------------!
   !    Create PETSc matrix   !
@@ -78,27 +106,27 @@
 
   ! Allocate memory for array with number of non-zero entries per row
   ! for entries in this processor (d_nnz), and other processors (o_nnz)
-  allocate(Pet % d_nnz(Pet % m_lower))
-  allocate(Pet % o_nnz(Pet % m_lower))
-  Pet % d_nnz(:) = 0
-  Pet % o_nnz(:) = 0
+  allocate(d_nnz(Pet % m_lower))
+  allocate(o_nnz(Pet % m_lower))
+  d_nnz(:) = 0
+  o_nnz(:) = 0
 
   ! Find number of nonzeros (nnz) in this processor and in other processors
   do i = 1, Pet % m_lower
-    do j = Nat % A % row(i), Nat % A % row(i+1)-1
-      k = Nat % A % col(j)
-      if(Grid % Comm % cell_proc(k) .eq. this_proc) then
-        Pet % d_nnz(i) = Pet % d_nnz(i) + 1
+    do j = A % row(i), A % row(i+1)-1
+      k = A % col(j)
+      if(Cell_In_This_Proc(k)) then
+        d_nnz(i) = d_nnz(i) + 1
       else
-        Pet % o_nnz(i) = Pet % o_nnz(i) + 1
+        o_nnz(i) = o_nnz(i) + 1
       end if
     end do
   end do
 
   ! This will call both MPI and Seq versions of preallocation
-  call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,        &
-                                         Pet % d_nnz,    &
-                                         Pet % o_nnz)
+  call C_Petsc_Mat_Aij_Set_Preallocation(Pet % A,  &
+                                         d_nnz,    &
+                                         o_nnz)
 
   !--------------------------!
   !   Create PETSc vectors   !
@@ -111,7 +139,7 @@
   !-------------------------!
   call C_Petsc_Ksp_Create(Pet % ksp)
 
-  if(this_proc < 2) print *, '# Finished !'
+  if(First_Proc()) print *, 'done!'
 
   end subroutine
 

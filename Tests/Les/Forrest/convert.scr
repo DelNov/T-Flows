@@ -1,10 +1,23 @@
+# Full mesh name (with extension)
 domain.msh
+
+# Create dual mesh?
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell centers' position
 2
+
+# Periodicity
 3
 3
 skip
-1 
-z   
+
+# Wall distance
+1
+
+# Probe 1d
+z
 

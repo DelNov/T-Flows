@@ -5,12 +5,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type)     :: Comm
-  integer              :: fh    ! file handle
-  real,   dimension(:) :: arr   ! array to write out
-  integer(DP)          :: disp  ! displacement in bytes
+  class(Comm_Type),   intent(in)    :: Comm
+  integer,            intent(in)    :: fh    ! file handle
+  real, dimension(:), intent(in)    :: arr   ! array to write out
+  integer(DP),        intent(inout) :: disp  ! displacement in bytes
 !-----------------------------------[Locals]-----------------------------------!
   integer :: length
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Comm)
 !==============================================================================!
 
   ! Get array's length

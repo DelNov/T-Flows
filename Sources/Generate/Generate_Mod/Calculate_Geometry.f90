@@ -11,18 +11,6 @@
 !   Here, periodic faces are added to the existing (internal) ones, whereas    !
 !   in Convert_Mod, existing faces are turned into periodic ones.              !
 !------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  class(Generate_Type) :: Generate
-  type(Grid_Type)      :: Grid
-  logical, intent(in)  :: real_run
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, m, s, n_per, nn, nf
-  real    :: xs2, ys2, zs2, t, tot_surf
-  integer :: fn(6,4)
-!------------------------------------------------------------------------------!
-  include 'Block_Numbering.f90'
-!==============================================================================!
 !                                                                              !
 !                                n3                                            !
 !                 +---------------!---------------+                            !
@@ -100,6 +88,20 @@
 !     t = -----------------------------------------------------------          !
 !                           rx*sx + ry*sy + rz*sz                              !
 !                                                                              !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Generate_Type) :: Generate
+  type(Grid_Type)      :: Grid
+  logical, intent(in)  :: real_run
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: c, c1, c2, m, s, n_per, nn, nf
+  real    :: xs2, ys2, zs2, t, tot_surf
+  integer :: fn(6,4)
+!------------------------------------------------------------------------------!
+  include 'Block_Numbering.f90'
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Generate)
 !==============================================================================!
 
   call Profiler % Start('Calculate_Geometry')

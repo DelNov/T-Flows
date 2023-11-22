@@ -4,7 +4,14 @@
 !   Computes the source terms in the eps transport equation,                   !
 !   wall shear stress (wall function approuch)                                 !
 !------------------------------------------------------------------------------!
-!   int( density (c_1e eps/kin Gk - c_2e eps^2/kin) )dV                        !
+!
+!  The form of the term being discretized:
+!                                                                              !
+!     /                                                                        !
+!    |                                                                         !
+!    | ( density (c_1e eps/kin Gk - c_2e eps^2/kin) ) dV                       !
+!    |                                                                         !
+!   /                                                                          !
 !                                                                              !
 !   assigns epsilon from the wall function:                                    !
 !                                                                              !
@@ -22,12 +29,12 @@
   type(Var_Type),    pointer :: kin, eps
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
-  integer                    :: s, c, c1, c2, j
+  integer                    :: s, c, c1, c2, j, reg
   real                       :: u_tan, u_tau
-  real                       :: re_t, f_mu, u_tau_new, fa, kin_vis
+  real                       :: re_t, f_mu, fa, kin_vis
   real                       :: eps_wf, eps_int, y_star, dia_coef_tmp
   real                       :: p_kin_int, p_kin_wf, ebf, z_o
-!==============================================================================!
+!------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
 !   production    p_kin    [m^2/s^3]   | rate-of-strain  shear     [1/s]       !
@@ -39,7 +46,7 @@
 !------------------------------------------------------------------------------!
 !   p_kin = 2*vis_t / density S_ij S_ij                                        !
 !   shear = sqrt(2 S_ij S_ij)                                                  !
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   ! Take aliases
   Flow => Turb % pnt_flow
@@ -48,7 +55,7 @@
   call Turb % Alias_K_Eps   (kin, eps)
   call Sol % Alias_Native   (A, b)
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     kin_vis =  Flow % viscosity(c) / Flow % density(c)
 
     ! Positive contribution:
@@ -82,16 +89,19 @@
   end do
 
   ! Imposing a boundary condition on wall for eps
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-    if(c2 < 0) then
-      kin_vis = Flow % viscosity(c1) / Flow % density(c1)
-      if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+
+        Assert(c2 < 0)  ! just to make sure
+
+        kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
         ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coefficient(c1, c2)
+        z_o = Turb % Roughness_Coeff(c1, c2)
 
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
@@ -141,8 +151,8 @@
           eps % n(c2) = 2.0 * kin_vis * kin % n(c1)  &
                       / Grid % wall_dist(c1)**2
         end if  ! y_plus(c1) < 3
-      end if    ! wall or wall_flux
-    end if      ! c2 < 0
-  end do
+      end do    ! faces in regions
+    end if      ! region is WALL or WALLFL
+  end do        ! through regions
 
   end subroutine

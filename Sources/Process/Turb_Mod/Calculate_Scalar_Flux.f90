@@ -13,10 +13,9 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw, kin, zeta, eps, f
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: phi
-  integer                   :: c, k, c1, c2, s
+  integer                   :: c, k, c1, c2, s, reg
   real                      :: uc_log_law, vc_log_law, wc_log_law
   real                      :: nx, ny, nz, ebf
-  real                      :: uc_new, vc_new, wc_new
 !==============================================================================!
 
   ! Take aliases
@@ -31,43 +30,47 @@
   ! ... maybe this call is not needed
   call Flow % Grad_Variable(phi)
 
+  ! It used to read sc_t from here which is an overkill, so check
+  Assert(sc_t > 0.0)
+
   !-----------------------------------------!
+  !                                         !
   !   Compute the sources in the interior   !
+  !                                         !
   !-----------------------------------------!
-  call Control_Mod_Turbulent_Schmidt_Number(sc_t)
 
   !-----------------------------------------!
   ! First guess is the flux defined by SGDH !
   !-----------------------------------------!
   if(Turb % scalar_flux_model .eq. SGDH) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
-      Turb % uc(c) = - Turb % vis_t(c) / Flow % density(c) / sc_t * phi % x(c)
-      Turb % vc(c) = - Turb % vis_t(c) / Flow % density(c) / sc_t * phi % y(c)
-      Turb % wc(c) = - Turb % vis_t(c) / Flow % density(c) / sc_t * phi % z(c)
+      Turb % uc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % x(c)
+      Turb % vc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % y(c)
+      Turb % wc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % z(c)
 
       if(Turb % model .eq. HYBRID_LES_RANS) then
-        Turb % uc(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                             / sc_t * phi % x(c)
-        Turb % vc(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                             / sc_t * phi % y(c)
-        Turb % wc(c) = - Turb % vis_t_eff(c) / Flow % density(c) &
-                                             / sc_t * phi % z(c)
+        Turb % uc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
+                                            / sc_t * phi % x(c)
+        Turb % vc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
+                                            / sc_t * phi % y(c)
+        Turb % wc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
+                                            / sc_t * phi % z(c)
       end if
     end do
 
   else if(Turb % scalar_flux_model .eq. GGDH) then
 
-    do c = 1, Grid % n_cells
-      Turb % uc(c) = -c_theta * Turb % t_scale(c) * (uu % n(c) * phi % x(c)  +  &
-                                                     uv % n(c) * phi % y(c)  +  &
-                                                     uw % n(c) * phi % z(c))
-      Turb % vc(c) = -c_theta * Turb % t_scale(c) * (uv % n(c) * phi % x(c)  +  &
-                                                     vv % n(c) * phi % y(c)  +  &
-                                                     vw % n(c) * phi % z(c))
-      Turb % wc(c) = -c_theta * Turb % t_scale(c) * (uw % n(c) * phi % x(c)  +  &
-                                                     vw % n(c) * phi % y(c)  +  &
-                                                     ww % n(c) * phi % z(c))
+    do c = Cells_In_Domain_And_Buffers()
+      Turb % uc(c) = -c_theta * Turb % t_scale(c) * (  uu % n(c) * phi % x(c)  &
+                                                     + uv % n(c) * phi % y(c)  &
+                                                     + uw % n(c) * phi % z(c))
+      Turb % vc(c) = -c_theta * Turb % t_scale(c) * (  uv % n(c) * phi % x(c)  &
+                                                     + vv % n(c) * phi % y(c)  &
+                                                     + vw % n(c) * phi % z(c))
+      Turb % wc(c) = -c_theta * Turb % t_scale(c) * (  uw % n(c) * phi % x(c)  &
+                                                     + vw % n(c) * phi % y(c)  &
+                                                     + ww % n(c) * phi % z(c))
     end do
 
   else if(Turb % scalar_flux_model .eq. AFM) then
@@ -75,46 +78,48 @@
     call Flow % Grad_Variable(Flow % v)
     call Flow % Grad_Variable(Flow % w)
     do k = 1, 3
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
 
-        Turb % uc(c) = -c_theta*Turb % t_scale(c) * (( uu % n(c) * phi % x(c)    &
-                                                     + uv % n(c) * phi % y(c)    &
-                                                     + uw % n(c) * phi % z(c))   &
-                                     + afm_eta * (  Turb % uc(c) * u % x(c)      &
-                                                  + Turb % vc(c) * u % y(c)      &
+        Turb % uc(c) = -c_theta*Turb % t_scale(c) * (( uu % n(c) * phi % x(c)  &
+                                                     + uv % n(c) * phi % y(c)  &
+                                                     + uw % n(c) * phi % z(c)) &
+                                     + afm_eta * (  Turb % uc(c) * u % x(c)    &
+                                                  + Turb % vc(c) * u % y(c)    &
                                                   + Turb % wc(c) * u % z(c)))
 
-
-        Turb % vc(c) = -c_theta*Turb % t_scale(c) * (( uv % n(c) * phi % x(c)    &
-                                                     + vv % n(c) * phi % y(c)    &
-                                                     + vw % n(c) * phi % z(c))   &
-                                     + afm_eta * (  Turb % uc(c) * v % x(c)      &
-                                                  + Turb % vc(c) * v % y(c)      &
+        Turb % vc(c) = -c_theta*Turb % t_scale(c) * (( uv % n(c) * phi % x(c)  &
+                                                     + vv % n(c) * phi % y(c)  &
+                                                     + vw % n(c) * phi % z(c)) &
+                                     + afm_eta * (  Turb % uc(c) * v % x(c)    &
+                                                  + Turb % vc(c) * v % y(c)    &
                                                   + Turb % wc(c) * v % z(c)))
 
-        Turb % wc(c) = -c_theta*Turb % t_scale(c) * (( uw % n(c) * phi % x(c)    &
-                                                     + vw % n(c) * phi % y(c)    &
-                                                     + ww % n(c) * phi % z(c))   &
-                                     + afm_eta * (  Turb % uc(c) * w % x(c)      &
-                                                  + Turb % vc(c) * w % y(c)      &
+        Turb % wc(c) = -c_theta*Turb % t_scale(c) * (( uw % n(c) * phi % x(c)  &
+                                                     + vw % n(c) * phi % y(c)  &
+                                                     + ww % n(c) * phi % z(c)) &
+                                     + afm_eta * (  Turb % uc(c) * w % x(c)    &
+                                                  + Turb % vc(c) * w % y(c)    &
                                                   + Turb % wc(c) * w % z(c)))
 
       end do
-    end do
-  end if
+    end do    ! browse three times, but why?
+  end if      ! scalar model SGDH, GGDH or AFM
 
+  !--------------------------------------!
+  !                                      !
+  !   Compute the sources at the walls   !
+  !                                      !
+  !--------------------------------------!
   if(Turb % model .eq. K_EPS        .or.  &
      Turb % model .eq. K_EPS_ZETA_F .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-
-      if(c2 < 0) then
-
-        if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or. &
-           Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL .or.  &
+         Grid % region % type(reg) .eq. WALLFL) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
           nx = Grid % sx(s) / Grid % s(s)
           ny = Grid % sy(s) / Grid % s(s)
@@ -138,9 +143,9 @@
                            + vc_log_law * exp(-1.0 / ebf)
           Turb % wc(c1) = Turb % wc(c1) * exp(-1.0 * ebf)  &
                            + wc_log_law * exp(-1.0 / ebf)
-        end if
-      end if
-    end do
+        end do  ! faces in regions
+      end if    ! region is WALL or WALLFL
+    end do      ! through regions
   end if
 
   end subroutine

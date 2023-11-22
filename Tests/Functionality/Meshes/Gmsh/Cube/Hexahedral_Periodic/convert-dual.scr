@@ -1,8 +1,24 @@
+# Full mesh name
 cube-hex.msh
+
+# Create dual?
 yes
+
+# Geometrical scaling
 1.0000000000000000
+
+# Uniform (X 3)
+yes
+yes
+yes
+
+# Periodicity
 2
 skip
+
+# Wall distance
 skip
+
+# Probe 1d
 skip
 

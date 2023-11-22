@@ -28,7 +28,7 @@
   real                         :: f_fx, f_fy, f_fz  ! Brownian force components
   real                         :: fd_p              ! particle damping funct.
   real                         :: v2_mod_xc, v2_mod_yc, v2_mod_zc
-  real                         :: u_mod, v_mod, w_mod
+  real                         :: w_mod ! , u_mod, v_mod
 !==============================================================================!
 
   ! Take aliases for Flow
@@ -133,7 +133,7 @@
       Part % f = 1.0 + 0.15 *(Part % re ** 0.687)
 
       ! Add stochasticity by SEIM model (for modeled tubulent quantities)
-      call Swarm_Mod_Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
+      call Swarm % Sgs_Discrete_Random_Walk(k, rx, ry, rz)
 
       ! Adding the stochastic part from the Random Walk model (SEIM)
       up = up + Part % u_drw

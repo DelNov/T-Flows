@@ -1,12 +1,28 @@
+# Full mesh name
 rod_tet.msh
+
+# Dual grid?
 yes
+
+# Geometric scaling
 1.000000
+
+# Enforce uniform grid in it?
+yes
+
+# Position of the boundary cell centres:
 2
+
+# Periodicity
 1
 2
 2
 2
 skip
+
+# Wall distance
 1
+
+# Probe 1d
 skip
 

@@ -27,7 +27,7 @@
     xn = yv1*zv2-zv1*yv2
     yn = zv1*xv2-xv1*zv2
     zn = xv1*yv2-yv1*xv2
-    dmod = (xn**2.0d0+yn**2.0d0+zn**2.0d0)**0.5d0
+    dmod = (xn**2.0+yn**2.0+zn**2.0)**0.5
     xns(is) = xn/dmod
     yns(is) = yn/dmod
     zns(is) = zn/dmod

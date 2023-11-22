@@ -1,14 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Wall_Time_Max_Hours(val, verbose)
+  subroutine Wall_Time_Max_Hours(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control
+  real                :: val
+  logical,   optional :: verbose
 !==============================================================================!
 
   ! 168 hours is one week
-  call Control_Mod_Read_Real_Item('WALL_TIME_MAX_HOURS', 168.0,  &
-                                   val, verbose)
+  call Control % Read_Real_Item('WALL_TIME_MAX_HOURS', 168.0, val, verbose)
 
   end subroutine

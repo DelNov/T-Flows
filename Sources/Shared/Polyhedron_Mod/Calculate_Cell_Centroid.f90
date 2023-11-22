@@ -1,13 +1,12 @@
 !==============================================================================!
-  subroutine Calculate_Cell_Centroid(Pol, cell, xc, yc, zc)
+  pure subroutine Calculate_Cell_Centroid(Pol, xc, yc, zc)
 !------------------------------------------------------------------------------!
 !   Calculate cell's centroid, this information is not stored in Polyledron    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  integer, intent(in)    :: cell
-  real,    intent(out)   :: xc, yc, zc
+  class(Polyhedron_Type), intent(in)  :: Pol
+  real,                   intent(out) :: xc, yc, zc
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!

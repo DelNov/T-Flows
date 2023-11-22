@@ -40,11 +40,10 @@
   else
 
     print *, '# Input problem name: (without extension)'
-    call File % Read_Line(5)
-    read(Line % tokens(1), *)  problem_name(1)
+    problem_name(1) = File % Single_Word_From_Keyboard()
 
     print *, '# Number of subdomains:'
-    read(*,*)  n_sub
+    n_sub = File % Single_Int_From_Keyboard()
 
   end if
 
@@ -53,15 +52,15 @@
   !-------------------------------!
 
   ! Load the finite volume grid
-  call Grid % Load_Cfn(0)
-  call Grid % Load_Dim(0)
+  call Grid % Load_Cfn((/0, 0/))
+  call Grid % Load_Dim((/0, 0/))
 
   ! Initialize processor numbers (poor idea to put it here)
   Grid % Comm % cell_proc(-Grid % n_bnd_cells:Grid % n_cells) = 1
 
   call Grid % Decompose(n_sub)
 
-  call Divide % Save_Subdomains(Grid, 1)  ! number of buffer levels hard-coded
+  call Divide % Save_Subdomains(Grid, n_sub)
 
   call cpu_time(p_end)  ! remark: cpu_time doesn't work with OPENMP
   print '(a10,f14.3,a9)', ' # Time = ', p_end-p_start, ' seconds.'

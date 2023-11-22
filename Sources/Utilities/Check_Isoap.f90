@@ -9,8 +9,6 @@
 !------------------------------------------------------------------------------!
   type(Polyhedron_Type)   :: Pol
   type(Iso_Polygons_Type) :: Iso
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: NS = 200, NV = 240
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: icellgeom, ifunc, ifile
   character(80) :: arg

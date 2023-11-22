@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Swarm_Mod_Particle_Time_Scale(Swarm)
+  subroutine Particle_Time_Scale(Swarm)
 !------------------------------------------------------------------------------!
 !   Corrects particle time step size if input value is too big                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow

@@ -19,8 +19,9 @@
   character(SL)   :: app_up
   character(SL)   :: file_name
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
-  integer         :: l, p, g, n_grids
+  integer         :: s, l, p, g, n_grids
   logical         :: city
+  logical         :: coordinate_alignment = .true.
 !==============================================================================!
 
   ! Initialize program profler
@@ -29,10 +30,15 @@
   ! Open with a logo
   call Convert % Logo_Con()
 
+  ! heck the coordinate alignment
+  if(command_argument_count() .eq. 1) then
+    coordinate_alignment = .false.
+  end if
+
   print '(a)', ' #========================================================'
   print '(a)', ' # Enter the grid file name you are importing (with ext.):'
   print '(a)', ' #--------------------------------------------------------'
-  read(*,*) file_name
+  file_name = File % Single_Word_From_Keyboard()
 
   !-----------------------------------------------!
   !                                               !
@@ -79,7 +85,7 @@
 
     ! Read the single tree
     call Convert % Load_Obj(Grid(1), file_name)
-    call Grid(1) % Save_Vtu_Faces()
+    call Grid(1) % Save_Vtu_Faces((/0, 0/))
 
     print '(a)', ' #========================================================'
     print '(a)', ' # Enter STL forrest file name to plant trees (with ext.):'
@@ -88,7 +94,7 @@
 
     ! Read the forrest STL file and plant the trees
     call Convert % Load_Forrest(Grid, file_name)
-    call Grid(2) % Save_Vtu_Faces()
+    call Grid(2) % Save_Vtu_Faces((/0, 0/))
 
     ! Finalize program profler
     call Profiler % Stop('Main')
@@ -98,7 +104,7 @@
 
   ! Sort cells in height first thing after reading	    
   if(city) then
-    call Convert % Insert_Buildings(Grid(1))
+    call Convert % Insert_Buildings(Grid(1), coordinate_alignment)
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
@@ -121,8 +127,7 @@
   print '(a)', ' #================================================='
   print '(a)', ' # Would you like to create a dual grid? (yes/no)'
   print '(a)', ' #-------------------------------------------------'
-  call File % Read_Line(5)
-  answer = Line % tokens(1)
+  answer = File % Single_Word_From_Keyboard()
   call String % To_Upper_Case(answer)
 
   n_grids = 1
@@ -148,13 +153,15 @@
     !--------------------------------------!
     !   Calculate geometrical quantities   !
     !--------------------------------------!
-    call Convert % Calculate_Geometry(Grid(g), g-n_grids)  ! if zero, ask
+    call Convert % Calculate_Geometry(Grid(g),         &
+                                      (g.eq.n_grids),  &  ! should you scale
+                                      g)
 
     ! Keep in mind that Grid_Mod_Calculate_Wall_Distance is ...
-    ! ... faster if it is called after Grid_Mod_Sort_Faces_Smart
-    call Grid(g) % Sort_Cells_Smart()
+    ! ... faster if it is called after Grid_Mod_Sort_Faces_By_Region
+    call Grid(g) % Sort_Cells_By_Coordinates()
 
-    call Grid(g) % Sort_Faces_Smart()
+    call Grid(g) % Sort_Faces_By_Region()
     if( (g-n_grids) .eq. 0) then
       call Grid(g) % Calculate_Wall_Distance()
     end if
@@ -164,13 +171,15 @@
     call Grid(g) % Initialize_New_Numbers()
 
     ! Note #1 about shadows:
-    ! At this point you have grid % n_faces faces and grid % n_shadows (on top)
+    ! At this point you have Grid % n_faces faces and Grid % n_shadows (on top)
     ! and they are pointing to each other.  Besides, both real face and its
     ! shadow have the same c1 and c2, both inside cells with positive indices
     ! Real faces which do not have shadows have index "0" for shadow.
-    ! Should check like this: do s = 1, grid % n_faces + grid % n_shadows
-    ! Should check like this:   write(20, '(99i9)') s, grid % faces_s(s)
-    ! Should check like this: end do
+    do s = 1, Grid(g) % n_faces + Grid(g) % n_shadows
+      if(Grid(g) % faces_s(s) .ne. 0) then
+        Assert(Grid(g) % faces_s(Grid(g) % faces_s(s)) .eq. s)
+      end if
+    end do
     ! Similar note is in Generate, also called Note #1
 
     call Grid(g) % Print_Grid_Statistics()
@@ -178,25 +187,25 @@
     !-------------------------------!
     !   Save files for processing   !
     !-------------------------------!
-    call Grid(g) % Save_Cfn(0,                      &
+    call Grid(g) % Save_Cfn((/0, 0/),               &
                             Grid(g) % n_nodes,      &
                             Grid(g) % n_cells,      &
                             Grid(g) % n_faces,      &
                             Grid(g) % n_shadows,    &
                             Grid(g) % n_bnd_cells)
 
-    call Grid(g) % Save_Dim(0)
+    call Grid(g) % Save_Dim((/0, 0/))
 
     !-----------------------------------------------------!
     !   Save grid for visualisation and post-processing   !
     !-----------------------------------------------------!
 
     ! Create output in vtu format
-    call Grid(g) % Save_Vtu_Cells(0,                  &
+    call Grid(g) % Save_Vtu_Cells((/0, 0/),           &
                                   Grid(g) % n_nodes,  &
                                   Grid(g) % n_cells)
-    call Grid(g) % Save_Vtu_Faces()
-    call Grid(g) % Save_Vtu_Faces(plot_shadows=.true.)
+    call Grid(g) % Save_Vtu_Faces((/0, 0/))
+    call Grid(g) % Save_Vtu_Faces((/0, 0/), plot_shadows=.true.)
 
     if( (g-n_grids) .eq. 0) then
       ! Create a template control file for this domain

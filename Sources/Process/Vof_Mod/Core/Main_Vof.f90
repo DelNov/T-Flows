@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Main_Vof(Vof, Flow, Turb, Sol, curr_dt)
+  subroutine Main_Vof(Vof, Flow, Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Initialize inteface tracking simulations                                   !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,8 @@
   type(Field_Type),    target :: Flow
   type(Turb_Type),     target :: Turb
   type(Solver_Type)           :: Sol
-  integer, intent(in)         :: curr_dt     ! time step
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Turb)
 !==============================================================================!
 
   if(Flow % with_interface) then
@@ -24,16 +25,14 @@
     !   Advance vof function (fun) and   !
     !    re-create its smooth variant    !
     !------------------------------------!
-    call Vof % Compute_Vof(Sol, Flow % dt, curr_dt)
-    call Vof % Smooth_For_Curvature_Csf()
+    call Vof % Compute_Vof(Sol, Flow % dt)
 
     !------------------------------------------------!
     !   Prepare smooth variant of the vof function   !
     !    for computation of normals and curvature    !
     !------------------------------------------------!
-    if(Vof % surface_tension > TINY) then
-      call Vof % Curvature_Csf()
-    end if
+    call Vof % Smooth_For_Curvature_Csf()
+    call Vof % Curvature_Csf()
 
     !---------------------------------------------------------------!
     !   Update properties for other conservation equations to use   !

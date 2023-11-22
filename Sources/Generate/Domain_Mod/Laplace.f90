@@ -1,32 +1,32 @@
 !==============================================================================!
-  subroutine Domain_Mod_Laplace(dom, Grid, b,i,j,k, wx16, wx24, wx35,  &
-                                                    wy16, wy24, wy35,  &
-                                                    wz16, wz24, wz35)
+  subroutine Laplace(Dom, Grid, b,i,j,k, wx16, wx24, wx35,  &
+                                         wy16, wy24, wy35,  &
+                                         wz16, wz24, wz35)
 !------------------------------------------------------------------------------!
 !   Places the nodes inside the block using Laplace-like function              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  type(Grid_Type)   :: Grid
-  integer           :: b, i, j, k
-  real              :: wx16, wx24, wx35, wy16, wy24, wy35, wz16, wz24, wz35 
+  class(Domain_Type)  :: Dom
+  type(Grid_Type)     :: Grid
+  integer, intent(in) :: b, i, j, k
+  real,    intent(in) :: wx16, wx24, wx35, wy16, wy24, wy35, wz16, wz24, wz35
 !-----------------------------------[Locals]-----------------------------------!
   real    :: xt(8), yt(8), zt(8)
   integer :: ni, nj, nk, n, n1, n2, n3, n4, n5, n6
-  real    :: xf1, yf1, zf1, xf2, yf2, zf2, xf3, yf3, zf3 
+  real    :: xf1, yf1, zf1, xf2, yf2, zf2, xf3, yf3, zf3
   real    :: xf4, yf4, zf4, xf5, yf5, zf5, xf6, yf6, zf6
 !==============================================================================!
 
-  ni = dom % blocks(b) % resolutions(1)
-  nj = dom % blocks(b) % resolutions(2)
-  nk = dom % blocks(b) % resolutions(3)
+  ni = Dom % blocks(b) % resolutions(1)
+  nj = Dom % blocks(b) % resolutions(2)
+  nk = Dom % blocks(b) % resolutions(3)
 
   do n=1,8
-    xt(n) = dom % points( dom % blocks(b) % corners(n) ) % x
-    yt(n) = dom % points( dom % blocks(b) % corners(n) ) % y
-    zt(n) = dom % points( dom % blocks(b) % corners(n) ) % z
-  end do  
+    xt(n) = Dom % points( Dom % blocks(b) % corners(n) ) % x
+    yt(n) = Dom % points( Dom % blocks(b) % corners(n) ) % y
+    zt(n) = Dom % points( Dom % blocks(b) % corners(n) ) % z
+  end do
 
   n = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i
 

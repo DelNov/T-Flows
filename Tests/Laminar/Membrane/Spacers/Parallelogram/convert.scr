@@ -1,10 +1,23 @@
+# Full mesh name
 parallelogram.msh
+
+# Create dual grid
 no
+
+# Geometrical scale
 0.01
+
+# Boundary cell center positions
 2
+
+# Periodicity
 1
 1
 skip
+
+# Distance from the walls
 1 2 3
+
+# Probe 1d
 skip
 
