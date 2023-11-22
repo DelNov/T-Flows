@@ -724,6 +724,13 @@
                             plot_inside,                                      &
                             Turb % p_kin(c_f:c_l),                            &
                             f8, f9, data_offset, run)
+ 
+      if(Flow % buoyancy .eq. THERMALLY_DRIVEN)                               &
+      call Results % Save_Vtu_Scalar_Real(                                    &
+                            "Buoyancy-driven TKE Production [m^2/s^3]",       &
+                            plot_inside,                                      &
+                            Turb % g_buoy(c_f:c_l),                           &
+                            f8, f9, data_offset, run)
     end if
 
     ! Save zeta and f22
