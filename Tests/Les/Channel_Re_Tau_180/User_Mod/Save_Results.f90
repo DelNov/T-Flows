@@ -81,7 +81,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_x / (density_const*bulk % area_x)
+  ubulk    = bulk % flux_x / bulk % area_x
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0
