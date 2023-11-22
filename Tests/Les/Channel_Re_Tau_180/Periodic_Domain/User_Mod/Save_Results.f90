@@ -82,7 +82,7 @@
   end if
 
   do c = 1, Grid % n_cells
-    ubulk    = bulk % flux_x / (dens_const * bulk % area_x)
+    ubulk    = bulk % flux_x / bulk % area_x
     t_wall   = 0.0
     nu_mean  = 0.0
     n_points = 0
