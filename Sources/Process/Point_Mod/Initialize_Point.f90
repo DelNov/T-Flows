@@ -1,12 +1,25 @@
 !==============================================================================!
   subroutine Initialize_Point(Point, Grid)
 !------------------------------------------------------------------------------!
-!   Initializes point, as the name clearly implies                             !
+!>  This subroutine is responsible for initializing a point within the context
+!>  of a computational grid. It sets the point's basic properties to default
+!>  values, ensuring a clean starting state for further operations.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Grid association: Establishes the relationship between the point and the !
+!     grid within which it is defined.                                         !
+!   * Coordinate initialization: Sets the initial coordinates of the point to  !
+!     default values (typically zeroes).                                       !
+!   * Proximity initialization: Initializes the closest cell, node, and        !
+!     boundary cell indicators to default values.                              !
+!   * Processor and buffer assignment: Initializes the processor and buffer    !
+!     identifiers for the point to default values.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Point_Type)       :: Point
-  type(Grid_Type), target :: Grid
+  class(Point_Type)       :: Point  !! point being initialized
+  type(Grid_Type), target :: Grid   !! grid for which the point is defined
 !==============================================================================!
 
   ! Pointer to the grid for which the point is defined

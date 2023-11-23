@@ -1,13 +1,35 @@
 !==============================================================================!
   subroutine Find_Nearest_Cell(Point, n_parts_in_buffers, locally)
 !------------------------------------------------------------------------------!
-!   Finds a cell closest to the point                                          !
+!>  This subroutine determines the closest cell to a given point within the
+!>  computational grid. It is a critical function for accurately positioning
+!>  points, such as particles, within the grid space, and for managing their
+!>  interactions with grid elements during simulations.  It also estimates if
+!>  the point traverses inter-processor boundaries, entering into buffers.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Prepares necessary variables for distance computation    !
+!     and identifies whether the search is local to a subdomain or global.     !
+!   * Proximity analysis: Determines the closest cell to the point by          !
+!     calculating the distance to cell centers, both for internal and          !
+!     boundary cells.                                                          !
+!   * Closest cell identification: Identifies the nearest cell and boundary    !
+!     cell based on the computed distances.                                    !
+!   * Buffer zone detection: Establishes if the point has entered a buffer     !
+!     zone, crucial for parallel processing scenarios.                         !
+!   * Global minimum distance: In parallel runs, finds the global minimum      !
+!     distance to ensure the point is in the correct processor's subdomain.    !
+!   * Point update: Updates the point's properties with the identified closest !
+!     cell and processor information.                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Point_Type), target :: Point
-  integer                   :: n_parts_in_buffers
-  logical, optional         :: locally             ! only in your subdomain?
+  class(Point_Type), target :: Point               !! point object
+  integer                   :: n_parts_in_buffers  !! counter for the number of
+                                                   !! particles in buffer zones
+  logical, optional         :: locally             !! flag to restrict search
+                                                   !! to the local subdomain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: c, i_cel    ! cell, local cell

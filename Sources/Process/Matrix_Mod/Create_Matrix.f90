@@ -1,13 +1,33 @@
 !==============================================================================!
   subroutine Create_Matrix(A, Grid)
 !------------------------------------------------------------------------------!
-!   Determines the topology of the system matrix.                              !
-!   It relies only on faces_c structure. Try to keep it that way.              !
+!>  This subroutine serves as a constructor of Matrix_Type and it allocates
+!>  memory for storage of system matrices in CRS formant and is establishes
+!>  the connectivity of the matrix based on the computational grid.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Grid linkage: Establishes a connection to the computational grid.        !
+!   * Memory allocation: Allocates memory for matrix components such as        !
+!     row indices, column indices, and non-zero values.                        !
+!   * Stencil width calculation: Determines the width of each stencil based on !
+!     the grid's face-cell connectivity.                                       !
+!   * Assembly of CRS format: Constructs the compressed row storage format for !
+!     the matrix, including off-diagonal terms.                                !
+!   * Sorting: Orders the column indices to maintain the structure of the CRS  !
+!     format and identifies diagonal positions.                                !
+!   * Face-matrix connection: Links faces to corresponding matrix entries.     !
+!   * Bare-bone coefficient calculation: Computes preliminary coefficients     !
+!     for the system matrix.                                                   !
+!   * PETSc global numbering: Assigns global numbering for PETSc, which starts !
+!     from zero and differs from T-Flows' internal numbering.                  !
+!   * Parallel considerations: Handles global numbering in parallel runs,      !
+!     ensuring consistency across different processors.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Matrix_Type)      :: A
-  type(Grid_Type), target :: Grid
+  class(Matrix_Type)      :: A     !! matrix to be created
+  type(Grid_Type), target :: Grid  !! computational grid for matrix assembly
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, s, pos, n
   integer              :: c1, c2  ! cell 1 and 2

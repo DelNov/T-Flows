@@ -1,12 +1,41 @@
 !==============================================================================!
   subroutine Initialize_Vert(Vert, Grid)
 !------------------------------------------------------------------------------!
-!   Initializes point, as the name clearly implies                             !
+!>  This subroutine is responsible for initializing the Vert_Type instance.
+!>  It sets up all the necessary attributes for a vertex in the computational
+!>  grid, providing a base state from which the vertex's properties can evolve
+!>  during the simulation process.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Inheritance initialization: Calls the constructor of the parent          !
+!     Point_Type to initialize basic point properties.                         !
+!   * Coordinate setup: Initializes both current and previous coordinates      !
+!     of the vertex.                                                           !
+!   * Smoothing components: Sets initial values for smoothing-related          !
+!     variables, likely used in surface reconstruction or processing.          !
+!   * Neighborhood counters: Initializes the counters for neighboring          !
+!     elements and vertices, crucial for interactions and computations         !
+!     involving the vertex.                                                    !
+!   * Boundary flag: Establishes the initial boundary state of the vertex.     !
+!   * Element list: Initializes the list of elements surrounding the vertex,   !
+!     important for mesh-based calculations.                                   !
+!   * Closest features: Sets initial values for the nearest cell, node,        !
+!     boundary cell, and face.                                                 !
+!   * Curvature: Initializes the curvature at the vertex, a key geometric      !
+!     property.                                                                !
+!   * State flags: Sets initial states for 'deposited', 'escaped', and         !
+!     'trapped' flags, reflecting the vertex's interaction with the domain.    !
+!   * Smoothed values: Prepares variables for storing smoothed values and      !
+!     their gradients, aiding in calculations involving the vertex.            !
+!   * Cell coordinates: Initializes coordinates for the closest cell,          !
+!     providing a reference for spatial calculations.                          !
+!------------------------------------------------------------------------------!
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Vert_Type)        :: Vert
-  type(Grid_Type), target :: Grid
+  class(Vert_Type)        :: Vert  !! vertex being initialized
+  type(Grid_Type), target :: Grid  !! grid on which the vertex is initialized
 !==============================================================================!
 
   ! Call parent's constructor
