@@ -44,7 +44,6 @@
       procedure :: Open_For_Reading_Binary
       procedure :: Open_For_Writing_Ascii
       procedure :: Open_For_Writing_Binary
-      procedure :: Purge_Sub
       procedure :: Read_Binary_Int4_Array
       procedure :: Read_Binary_Int8_Array
       procedure :: Read_Binary_Real4_Array
@@ -80,7 +79,6 @@
 #   include "File_Mod/Open_For_Reading_Binary.f90"
 #   include "File_Mod/Open_For_Writing_Ascii.f90"
 #   include "File_Mod/Open_For_Writing_Binary.f90"
-#   include "File_Mod/Purge_Sub.f90"
 #   include "File_Mod/Read_Binary_Int4_Array.f90"
 #   include "File_Mod/Read_Binary_Int8_Array.f90"
 #   include "File_Mod/Read_Binary_Real4_Array.f90"
