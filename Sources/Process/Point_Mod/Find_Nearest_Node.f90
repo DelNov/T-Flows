@@ -1,12 +1,23 @@
 !==============================================================================!
   subroutine Find_Nearest_Node(Point)
 !------------------------------------------------------------------------------!
-!   Finds a node closest to the point                                          !
-!   Important: it assumes that the closest cell has been found!                !
+!>  This subroutine identifies the node closest to a given point within the
+!>  computational grid. It assumes that the closest cell to the point has been
+!>  previously determined.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Prepares variables for distance computation.             !
+!   * Node proximity analysis: Calculates the distance to each node within     !
+!     the closest cell to identify the nearest node to the point.              !
+!   * Closest node determination: Establishes the nearest node based on        !
+!     the minimum computed distance.                                           !
+!   * Point update: Updates the point's properties with the identified         !
+!     closest node.                                                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Point_Type), target :: Point
+  class(Point_Type), target :: Point  !! point object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: i_nod, n     ! local node and node
