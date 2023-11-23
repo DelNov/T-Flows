@@ -86,7 +86,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
+  ubulk    = bulk % flux_x / bulk % area_x
   n_points = 0
 
   ! Open ASCII file for writing in the first available unit (fu)

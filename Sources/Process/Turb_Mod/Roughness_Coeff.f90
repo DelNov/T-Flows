@@ -15,7 +15,7 @@
   z_o = Turb % z_o(c2)
 
   ! Set lower limit to roughness coefficient based on wall distance
-  if(Turb % rough_walls) then
+  if(z_o .gt. TINY) then
     z_o = max(Turb % pnt_grid % wall_dist(c1)  &
         / (e_log * max(Turb % y_plus(c1), 1.0)), z_o)
   end if

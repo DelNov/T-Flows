@@ -116,7 +116,7 @@
   INTERFACE_TRACKING                       |         no                    |   yes
   LATENT_HEAT                              |         1.0                   |   physical property
   MASS_DENSITY                             |         1.0                   |   physical property
-  MASS_FLOW_RATES                          |         0.0,  0.0,  0.0       |   any triplet of real numbers
+  VOLUME_FLOW_RATES                        |         0.0,  0.0,  0.0       |   any triplet of real numbers
   MASS_TRANSFER                            |         no                    |   yes
   MAX_PARTICLES                            |         0                     |   any number >= 0
   NUMBER_OF_DOMAINS                        |         1                     |   from 1 to 4

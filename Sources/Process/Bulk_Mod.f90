@@ -1,7 +1,7 @@
 !==============================================================================!
   module Bulk_Mod
 !------------------------------------------------------------------------------!
-!   Mass fluxes, bulk velocities and pressure drops (for each material)        !
+!   Volume fluxes, bulk velocities and pressure drops (for each material)      !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -28,17 +28,17 @@
     real :: vol_out  ! [m^3/s]
     real :: vol_src  ! [m^3/s]
 
-    ! Bulk mass flux in x-, y-, z- direction
-    real :: flux_x  ! [kg/s]
-    real :: flux_y  ! [kg/s]
-    real :: flux_z  ! [kg/s]
+    ! Volume flow rates in x-, y-, z- direction
+    real :: flux_x  ! [m^3/s]
+    real :: flux_y  ! [m^3/s]
+    real :: flux_z  ! [m^3/s]
 
-    ! Desired bulk mass flux in x-, y-, z- direction (set in control file)
-    real :: flux_x_o  ! [kg/s]
-    real :: flux_y_o  ! [kg/s]
-    real :: flux_z_o  ! [kg/s]
+    ! Desired Volume flow rates in x-, y-, z- direction (set in control file)
+    real :: flux_x_o  ! [m^3/s]
+    real :: flux_y_o  ! [m^3/s]
+    real :: flux_z_o  ! [m^3/s]
 
-    ! Pressure drop to achieve desired mass flux
+    ! Pressure drop to achieve desired volume flux
     real :: p_drop_x  ! [N/m^3] = [kg/m^2/s^2]
     real :: p_drop_y  ! [N/m^3] = [kg/m^2/s^2]
     real :: p_drop_z  ! [N/m^3] = [kg/m^2/s^2]

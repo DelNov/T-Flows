@@ -6,7 +6,7 @@
   HEAT_TRANSFER          yes
 
   PRESSURE_DROPS         0.0   0.0   0.0036
-  MASS_FLOW_RATES        0.0   0.0   11.5
+  VOLUME_FLOW_RATES      0.0   0.0   11.5
 
 #---------------
 # Time stepping

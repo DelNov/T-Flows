@@ -18,8 +18,8 @@
   ! Take aliases
   Grid => Flow % pnt_grid
   u    => Flow % u
-  v    => Flow % u
-  w    => Flow % u
+  v    => Flow % v
+  w    => Flow % w
 
   ! Impose slip condition
   do s = 1, Grid % n_faces

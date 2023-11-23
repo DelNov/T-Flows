@@ -33,7 +33,7 @@
   TURBULENCE_MODEL       les_dynamic
 
   PRESSURE_DROPS     0.0  0.0  -0.0072
-  MASS_FLOW_RATES    0.0  0.0  -2.8
+  VOLUME_FLOW_RATES  0.0  0.0  -2.8
 
 #----------------------
 # Numerical parameters

@@ -22,7 +22,7 @@
 
   POINT_FOR_MONITORING_PLANES    0.0125  0.0125  0.075
   PRESSURE_DROPS                30.0    30.0     0.0
-  MASS_FLOW_RATES                0.025   0.025   0.0
+  VOLUME_FLOW_RATES              0.025   0.025   0.0
 
 #------------------
 # Numerical models

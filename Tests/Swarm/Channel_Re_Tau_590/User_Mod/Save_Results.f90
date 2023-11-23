@@ -67,7 +67,7 @@
   end if
 
   do c = 1, Grid % n_cells
-    ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
+    ubulk    = bulk % flux_x / bulk % area_x
   end do 
 
   open(9, file=coord_name)

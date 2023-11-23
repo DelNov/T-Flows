@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Bulk_Mod_Adjust_P_Drops(bulk, dt)
 !------------------------------------------------------------------------------!
-!   Recalculate the pressure drop to keep the constant mass flux               !
+!   Recalculate the pressure drop to keep the constant volume flux             !
 !                                                                              !
 !   First Newtons law:                                                         !
 !                                                                              !

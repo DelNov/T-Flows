@@ -163,7 +163,7 @@ syn keyword controlKeyword   HYBRID_LES_RANS_SWITCH
 syn keyword controlKeyword   INTERFACE_TRACKING
 syn keyword controlKeyword   LATENT_HEAT
 syn keyword controlKeyword   MASS_DENSITY
-syn keyword controlKeyword   MASS_FLOW_RATES
+syn keyword controlKeyword   VOLUME_FLOW_RATES
 syn keyword controlKeyword   MASS_TRANSFER
 syn keyword controlKeyword   MAX_PARTICLES
 syn keyword controlKeyword   NUMBER_OF_DOMAINS

@@ -2101,8 +2101,8 @@ In this chapter, we will teach you:
 - how to conduct a parallel simulation
 
 and, irrespective of parallel run or not:
-- how to set up periodic cases with prescribed mass flux and pressure drops in
-  periodic direction
+- how to set up periodic cases with prescribed volume flow rate and pressure
+  drops in periodic direction
 - how to request from _Process_ to save results unplanned
 - how to instruct _Process_ to exit prematurely.
 
@@ -2278,25 +2278,25 @@ mpirun  -np 6  ./Process > out_6_proc  &
 where ```-np 6``` tells ```mpirun``` how many processors you want to use.  And
 that is it, the code should be running now.
 
-#### Setting the mass fluxes and pressure drops <a name="demo_parallel_proc_setting_mass_fluxes"> </a>
+#### Setting the volume flow rates and pressure drops <a name="demo_parallel_proc_setting_volume_flow_ratees"> </a>
 
 While the process is running, we should spare a few words on a couple of new
 concepts introduced in the ```control``` file.  The flow across these rod
 bundle is driven by a pressure drop in _x_ direction, which is re-computed
-by T-Flows at every time step to give the desired mass flux in _x_ direction.
+by T-Flows at every time step to give the desired volume flow rates in _x_ direction.
 This is achieved with following two lines:
 ```
  PRESSURE_DROPS         3.6  0.0  0.0
- MASS_FLOW_RATES        0.5  0.0  0.0
+ VOLUME_FLOW_RATES      0.5  0.0  0.0
 ```
 If only first (```PRESSURE_DROPS```) was applied, T-Flows would keep it constant.
-With second line (```MASS_FLOW_RATES```) it re-adjusts the pressure drop to
-keep mass flux at the desired rate.
+With second line (```VOLUME_FLOW_RATES```) it re-adjusts the pressure drop to
+keep volume flow rates at the desired rate.
 
 > **_Note:_** The first option only tends to lead to a rather slow flow
 development.
 
-The mass flow rates and the pressure drops are printed by _Process_ at the end
+The volume flow rates and the pressure drops are printed by _Process_ at the end
 of each time step, see the excerpt from the log file ```out_6_proc``` with
 focus on the fields ```Flux x``` and ```Pdrop x```:
 ```
@@ -2315,12 +2315,12 @@ focus on the fields ```Flux x``` and ```Pdrop x```:
                        #    Pdrop x:  3.601E-02    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
                        #---------------------------+---------------------------+---------------------------#
 ```
-The mass fluxes in question are computed in three characteristic planes (orthogonal
+The volume flow rates in question are computed in three characteristic planes (orthogonal
 to _x_, _y_ and _z_ axis at the point defined in the control file as:
 ```
 POINT_FOR_MONITORING_PLANES    0.007  0.00  0.002
 ```
-For flows with prescribed mass fluxes in periodic direction such as this one,
+For flows with prescribed volume flow rates in periodic direction such as this one,
 it is a good practice to define this point.
 
 #### Saving and/or exiting prematurely.
@@ -2939,8 +2939,8 @@ of processors as principal domain was:
 
 > **_Note 1:_** Precursor domain is, in this case, just a channel with two
 periodic directions, _x_ and _z_.  It doesn't have inflows or outflows, it will
-be driven by a pressure drop to achieve the desired mass flux like, for example
-[Large eddy simulation over a matrix of cubes](#bench_cases_matrix).
+be driven by a pressure drop to achieve the desired volume flow rates like, for
+example [Large eddy simulation over a matrix of cubes](#bench_cases_matrix).
 
 > **_Note 2:_**  Since precursor domain is usually smaller and its grid is coarser
 this may seem like an overkill or limitation.  But it is not.  _Process_ solves
@@ -2981,14 +2981,13 @@ precursor domain
 ```
  ADVECTION_SCHEME    central
 ```
-and desired mass flux is prescribed in _x_ direction:
+and desired volume flow rate is prescribed in _x_ direction:
 ```
- MASS_FLOW_RATES              16.4  0.0  0.0
+ VOLUME_FLOW_RATES            16.4  0.0  0.0
 ```
 
 > **_Note:_** Desired bulk velocity is 1.0, cross sectional area is
-4 x 4.1 = 16.4.  Density is not prescribed hence _Process_ will set it to 1.0,
-which makes the desired mass flow rate of 16.4.
+4 x 4.1 = 16.4, which makes the desired volume flow rate of 16.4.
 
 Furthermore, the point for monitoring plane has been shifted to be inside the
 precursor domain:
@@ -3941,13 +3940,13 @@ In the control file, a turbulence model is defined by using a key word
 
 As mentioned above, the case is homogeneous in streamwise and spanwise direction
 and driven by a pressure drop.  A way to prescribe the point for monitoring
-plane, pressure drops and mass fluxes in characteristic planes was already
-described [above](#demo_parallel_proc_setting_mass_fluxes).  For this case, we
+plane, pressure drops and volume flow rates in characteristic planes was already
+described [above](#demo_parallel_proc_setting_volume_flow_ratees).  For this case, we
 define monitoring planes in the geometrical center of the computational domain
-and set the mass flux to 0.2, which gives Re number of roughly 13'000.
+and set the volume flow rate to 0.2, which gives Re number of roughly 13'000.
 ```
  POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
- MASS_FLOW_RATES                0.2  0.0  0.0
+ VOLUME_FLOW_RATES              0.2  0.0  0.0
 ```
 
 Since we seek a steady solution for this case, we do not care about the accuracy
@@ -4585,10 +4584,10 @@ new, old and time step older than old:
 ```
 
 Since the all streamwise and spanwise boundary conditions are periodic, we
-prescribe the desired mass flux through the computational domain with:
+prescribe the desired volume flow rate through the computational domain with:
 ```
 #-------------------------------------------------
-# Prescribed mass flow
+# Prescribed volume flow rate
 #
 # Re = 13000
 # nu = 1.5112e-5
@@ -4597,7 +4596,7 @@ prescribe the desired mass flux through the computational domain with:
 # Ub = Re * nu / h = 3.852  [m/s]
 # m* = Ub * 1.2047 * 0.051 * 0.06 = 0.0142 [kg/s]
 #-------------------------------------------------
-  MASS_FLOW_RATES    0.0142  0.0  0.0
+  VOLUME_FLOW_RATES  0.0142  0.0  0.0
 ```
 
 With this explained, you can launch a simulation with:

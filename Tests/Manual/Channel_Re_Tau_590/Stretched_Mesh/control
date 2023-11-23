@@ -7,15 +7,15 @@
 # Time stepping
 #---------------
   TIME_STEP                   1.0
-  NUMBER_OF_TIME_STEPS     3000
-  RESULTS_SAVE_INTERVAL    3000
-  BACKUP_SAVE_INTERVAL     3000
+  NUMBER_OF_TIME_STEPS     1800
+  RESULTS_SAVE_INTERVAL    600 
+  BACKUP_SAVE_INTERVAL     600
 
 #--------------------------------------
 # Monitoring plane and mass flow rates
 #--------------------------------------
-  POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
-  MASS_FLOW_RATES                0.2  0.0  0.0
+  POINT_FOR_MONITORING_PLANES    0.5   0.5  0.5
+  VOLUME_FLOW_RATES              0.17  0.0  0.0
 
 #----------------------------------------
 # Fluid properties

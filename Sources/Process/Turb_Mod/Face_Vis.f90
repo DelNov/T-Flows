@@ -39,21 +39,14 @@
   end if
 
   if(c2 < 0) then
-    if( Turb % model .eq. LES_SMAGORINSKY    .or.  &
-        Turb % model .eq. LES_DYNAMIC        .or.  &
-        Turb % model .eq. HYBRID_LES_PRANDTL .or.  &
-        Turb % model .eq. LES_WALE) then
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
-        vis_eff = Turb % vis_w(c1)
-      end if
-    end if
-  end if
-
-  if( Turb % model .eq. K_EPS_ZETA_F     .or.  &
-      Turb % model .eq. HYBRID_LES_RANS  .or.  &
-      Turb % model .eq. K_EPS) then
-    if(c2 < 0) then
+    if(Turb % model .eq. LES_SMAGORINSKY    .or.  &
+       Turb % model .eq. LES_DYNAMIC        .or.  &
+       Turb % model .eq. LES_WALE           .or.  &
+       Turb % model .eq. LES_TVM            .or.  &
+       Turb % model .eq. HYBRID_LES_RANS    .or.  &
+       Turb % model .eq. HYBRID_LES_PRANDTL .or.  &
+       Turb % model .eq. K_EPS              .or.  &
+       Turb % model .eq. K_EPS_ZETA_F) then
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
         vis_eff = Turb % vis_w(c1)

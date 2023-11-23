@@ -43,7 +43,7 @@
   TURBULENCE_MODEL       HYBRID_LES_RANS
 
   PRESSURE_DROPS     2.0e-5      0.0   0.0
-  MASS_FLOW_RATES    0.4046      0.0   0.0
+  VOLUME_FLOW_RATES  0.4046      0.0   0.0
 
 #----------------------
 # Numerical parameters

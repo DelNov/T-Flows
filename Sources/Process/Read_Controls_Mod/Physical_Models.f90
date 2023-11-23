@@ -131,6 +131,11 @@
   !----------------------------!
   call Control % Rough_Walls(Turb % rough_walls, .true.)
 
+  !----------------------------!
+  !   Monin-Obukov for ABL?    !
+  !----------------------------!
+  call Control % Monin_Obukov(Turb % monin_obukov, .true.)
+
   ! Does the user want to gather statistics?
   call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
                                HUGE_INT, n_stat, .false.)
@@ -235,9 +240,9 @@
   call Control % Pressure_Drops(bulk % p_drop_x,  &
                                 bulk % p_drop_y,  &
                                 bulk % p_drop_z)
-  call Control % Mass_Flow_Rates(bulk % flux_x_o,  &
-                                 bulk % flux_y_o,  &
-                                 bulk % flux_z_o)
+  call Control % Volume_Flow_Rates(bulk % flux_x_o,  &
+                                   bulk % flux_y_o,  &
+                                   bulk % flux_z_o)
 
   !-----------------------!
   !                       !

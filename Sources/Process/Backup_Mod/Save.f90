@@ -229,9 +229,7 @@
   !--------------!
   !   Roughness  !
   !--------------!
-  if(Turb % rough_walls) then
-    call Backup % Save_Cell_Real(Grid, d, vc, 'z_o', Turb % z_o)
-  end if
+  call Backup % Save_Cell_Real(Grid, d, vc, 'z_o', Turb % z_o)
 
   !------------------!
   !   Save scalars   !

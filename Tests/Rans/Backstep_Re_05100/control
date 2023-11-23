@@ -21,7 +21,7 @@ Monitoring
     MONITORING_POINT_001               0.314  0.1  -0.038
   POINT_FOR_MONITORING_PLANES          0.1  0.1  0.1
   PRESSURE_DROPS                       0.0  0.0  0.0
-  MASS_FLOW_RATES                      0.0  0.0  0.0
+  VOLUME_FLOW_RATES                    0.0  0.0  0.0
 
 Physical part
 

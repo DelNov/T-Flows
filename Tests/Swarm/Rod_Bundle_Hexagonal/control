@@ -27,7 +27,7 @@
 
   TURBULENCE_MODEL       les_smagorinsky
   PRESSURE_DROPS         3.6  0.0  0.0
-  MASS_FLOW_RATES        0.5  0.0  0.0
+  VOLUME_FLOW_RATES      0.5  0.0  0.0
 
 #----------------
 # Swarm related

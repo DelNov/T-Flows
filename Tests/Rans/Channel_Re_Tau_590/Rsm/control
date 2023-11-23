@@ -5,8 +5,8 @@
   HEAT_TRANSFER  yes
   TURBULENT_HEAT_FLUX_MODEL  ggdh
 
-  PRESSURE_DROPS   0.0036  0.0 0.0
-  MASS_FLOW_RATES  2.32    0.0 0.0
+  PRESSURE_DROPS     0.0036  0.0 0.0
+  VOLUME_FLOW_RATES  2.32    0.0 0.0
 
 #---------------
 # Time stepping

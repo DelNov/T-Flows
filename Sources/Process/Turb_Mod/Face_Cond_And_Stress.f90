@@ -76,8 +76,12 @@
   con_eff = con_mol + con_turb
 
   ! Effective conductivity at walls
-  if(Turb % model .eq. K_EPS        .or.  &
-     Turb % model .eq. K_EPS_ZETA_F .or.  &
+  if(Turb % model .eq. K_EPS           .or.  &
+     Turb % model .eq. K_EPS_ZETA_F    .or.  &
+     Turb % model .eq. LES_SMAGORINSKY .or.  &
+     Turb % model .eq. LES_DYNAMIC     .or.  &
+     Turb % model .eq. LES_WALE        .or.  &
+     Turb % model .eq. LES_TVM         .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(c2 < 0) then
       if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .or.  &

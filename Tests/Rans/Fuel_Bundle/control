@@ -28,8 +28,8 @@ Physical models
   TURBULENCE_MODEL            rsm_hanjalic_jakirlic
   TURBULENCE_MODEL_VARIANT    stabilized
 
-  units: [kg/s]
-  MASS_FLOW_RATES      0.0   0.0   0.0020975
+  units: [m^3/s]
+  VOLUME_FLOW_RATES      0.0   0.0   0.0020975
 
 Initial and boundary conditions
 

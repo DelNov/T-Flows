@@ -90,7 +90,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_z / (dens_const*bulk % area_z)
+  ubulk    = bulk % flux_z / bulk % area_z
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0

@@ -5,13 +5,13 @@
   HEAT_TRANSFER           yes
 
   PRESSURE_DROPS         0.0036  0.0  0.0
-  MASS_FLOW_RATES        0.2    0.0  0.0
+  VOLUME_FLOW_RATES      0.17    0.0  0.0
 
 #---------------
 # Time stepping
 #---------------
   TIME_STEP                  1.0
-  NUMBER_OF_TIME_STEPS     7200
+  NUMBER_OF_TIME_STEPS     2800
   RESULTS_SAVE_INTERVAL     600
   BACKUP_SAVE_INTERVAL      600
 

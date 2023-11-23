@@ -6,7 +6,7 @@
   BACKUP_SAVE_INTERVAL         9999999 # no backups during this test
 
   POINT_FOR_MONITORING_PLANES  6.0       0.5  3.0
-  MASS_FLOW_RATES              3.1415926 0.0  0.0
+  VOLUME_FLOW_RATES            3.1415926 0.0  0.0
 
   MASS_DENSITY                 1.0
   DYNAMIC_VISCOSITY            5.e-4

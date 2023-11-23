@@ -23,7 +23,7 @@
   TURBULENCE_MODEL       k_eps_zeta_f
 
   PRESSURE_DROPS     0.0036   0.0   0.0
-  MASS_FLOW_RATES    0.005    0.0   0.0
+  VOLUME_FLOW_RATES  0.005    0.0   0.0
 
 #----------------------
 # Numerical parameters

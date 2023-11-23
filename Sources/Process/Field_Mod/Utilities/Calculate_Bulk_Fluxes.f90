@@ -22,9 +22,9 @@
   bulk % flux_y = 0.0
   bulk % flux_z = 0.0
 
-  !---------------------------------------------------------------------------!
-  !   Summ up volume mass fluxes [m^3/s] over all faces at monitoring plane   !
-  !---------------------------------------------------------------------------!
+  !----------------------------------------------------------------------!
+  !   Summ up volume fluxes [m^3/s] over all faces at monitoring plane   !
+  !----------------------------------------------------------------------!
   do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
@@ -77,7 +77,7 @@
   call Global % Sum_Real(bulk % flux_y)
   call Global % Sum_Real(bulk % flux_z)
 
-  ! Bulk velocities.  Units: [kg/s] / [kg/m^3] / [m^2] = [m/s]
+  ! Bulk velocities.  Units: [m^3/s] / [m^2] = [m/s]
   bulk % u = bulk % flux_x / (bulk % area_x + TINY)
   bulk % v = bulk % flux_y / (bulk % area_y + TINY)
   bulk % w = bulk % flux_z / (bulk % area_z + TINY)

@@ -27,7 +27,7 @@
 
   TURBULENCE_MODEL       les_dynamic
 
-  MASS_FLOW_RATES     13824.0  0.0   0.0
+  VOLUME_FLOW_RATES   13824.0  0.0   0.0
 
 #----------------
 # Porous regions

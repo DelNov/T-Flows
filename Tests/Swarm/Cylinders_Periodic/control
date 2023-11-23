@@ -27,7 +27,7 @@
   GRAVITATIONAL_VECTOR   0.0  0.0  0.0
 
   TURBULENCE_MODEL       none
-  MASS_FLOW_RATES        2.0  0.0  0.0
+  VOLUME_FLOW_RATES      2.0  0.0  0.0
 
 #----------------
 # Swarm related
