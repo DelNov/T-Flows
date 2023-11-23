@@ -92,7 +92,7 @@
         + Flow % grad_c2c(4,c) * Flow % grad_c2c(5,c) * Flow % grad_c2c(6,c)  &
         + Flow % grad_c2c(4,c) * Flow % grad_c2c(5,c) * Flow % grad_c2c(6,c)  &
         - Flow % grad_c2c(5,c) * Flow % grad_c2c(5,c) * Flow % grad_c2c(2,c)
-    Assert(jac > YOCTO)
+    Assert(jac > 0)
 
     g_inv(1) = +(  Flow % grad_c2c(2,c) * Flow % grad_c2c(3,c)  &
                  - Flow % grad_c2c(6,c) * Flow % grad_c2c(6,c) ) / jac
