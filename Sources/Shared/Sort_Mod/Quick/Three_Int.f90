@@ -1,14 +1,13 @@
 !==============================================================================!
   pure recursive subroutine Three_Int(Sort, a1, a2, a3)
 !------------------------------------------------------------------------------!
-!   Quick sort three integer arrays                                            !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort three integer arrays.
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(inout) :: a1(:), a2(:), a3(:)
+  class(Sort_Type), intent(in)    :: Sort                 !! parent class
+  integer,          intent(inout) :: a1(:), a2(:), a3(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer          :: x1, x2, x3
   integer          :: i, j, n

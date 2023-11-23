@@ -3,6 +3,35 @@
 !==============================================================================!
   program Convert_Prog
 !------------------------------------------------------------------------------!
+!>  Convert's main function.  Its primary function is to import grid files in
+!>  various formats, perform necessary transformations and calculations, and
+!>  prepare them for CFD simulations with T-Flows. It handles various file
+!>  formats such as FLUENT, GAMBIT, GMSH, and OBJ.
+!------------------------------------------------------------------------------!
+!   Program Flow                                                               !
+!                                                                              !
+!   * Initialization: Begins with profiling, followed by the display of the    !
+!     program's logo.                                                          !
+!   * File name and format: The user is prompted to enter the grid file name.  !
+!     The program then guesses the file's format for appropriate processing.   !
+!   * Grid processing: Depending on the detected file format (FLUENT, GAMBIT,  !
+!     GMSH, OBJ), the corresponding loading procedure is invoked from          !
+!     Convert_Mod.                                                             !
+!   * Cityscape handling: If the grid represents a cityscape (determined from  !
+!     the file name), specific city-related processing is performed.           !
+!   * Dual grid option: The user is given the choice to create a dual grid.    !
+!     If selected, both primal and dual grids are processed.                   !
+!   * Geometrical calculations and sorting: For each grid, the program         !
+!     calculates geometrical properties, sorts cells and faces, and performs   !
+!     other preparatory operations.                                            !
+!   * Visualization and post-processing data saving: The grids are saved in    !
+!     various formats (.cfn and .dim for further processing with T-Flows       !
+!     and .vtu for visualization).                                             !
+!   * 1D probe creation: For certain grid types, 1D probe files are generated  !
+!     for specific flow analyses.                                              !
+!   * Final Steps: The program prints grid statistics and concludes with       !
+!      profiling data finalization.                                            !
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Convert_Mod
 !------------------------------------------------------------------------------!
@@ -21,7 +50,6 @@
   character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
   integer         :: s, l, p, g, n_grids
   logical         :: city
-  logical         :: coordinate_alignment = .true.
 !==============================================================================!
 
   ! Initialize program profler
@@ -29,11 +57,6 @@
 
   ! Open with a logo
   call Convert % Logo_Con()
-
-  ! heck the coordinate alignment
-  if(command_argument_count() .eq. 1) then
-    coordinate_alignment = .false.
-  end if
 
   print '(a)', ' #========================================================'
   print '(a)', ' # Enter the grid file name you are importing (with ext.):'
@@ -104,7 +127,7 @@
 
   ! Sort cells in height first thing after reading	    
   if(city) then
-    call Convert % Insert_Buildings(Grid(1), coordinate_alignment)
+    call Convert % Insert_Buildings(Grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored

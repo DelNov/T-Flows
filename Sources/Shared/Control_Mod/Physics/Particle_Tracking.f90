@@ -1,13 +1,14 @@
 !==============================================================================!
   subroutine Particle_Tracking(Control, track_part, verbose)
 !------------------------------------------------------------------------------!
-!   Reading if Lagrangian particle tracking  will be used in simulations       !
+!>  Reads from control file if Lagrangian particle tracking  will be used in
+!>  simulations.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: track_part
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control     !! parent class
+  logical, intent(out) :: track_part  !! true to engage particle tracking
+  logical, optional    :: verbose     !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

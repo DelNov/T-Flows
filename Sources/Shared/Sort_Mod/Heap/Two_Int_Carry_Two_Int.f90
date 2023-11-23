@@ -1,13 +1,13 @@
 !==============================================================================!
   pure subroutine Two_Int_Carry_Two_Int(Sort, a1, a2, b, c)
 !------------------------------------------------------------------------------!
-!   Heap sort two integer arrays and carry two integer arrays along            !
+!>  Heap sort two integer arrays and carry two integer arrays along.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  integer,          intent(inout) :: a1(:), a2(:)
-  integer,          intent(inout) :: b(:), c(:)
+  class(Sort_Type), intent(inout) :: Sort          !! parent class
+  integer,          intent(inout) :: a1(:), a2(:)  !! array for sorting
+  integer,          intent(inout) :: b(:), c(:)    !! array to carry on
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   integer :: a_1, a_2

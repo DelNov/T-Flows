@@ -1,7 +1,28 @@
 !==============================================================================!
   integer function N_Sharp_Corners(Convert, Grid, sharp_corner)
 !------------------------------------------------------------------------------!
-!   Counts and marks nodes at sharp corners and stores in "sharp_corner"       !
+!>  This function is designed to identify and count sharp corners in a 3D
+!>  grid structure. It takes the Grid as an input and returns an array
+!>  sharp_corner marking the nodes at sharp corners.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: The function initializes a counter cnt and sets all      !
+!     entries in the sharp_corner array to zero.                               !
+!   * Identifying Sharp Corners:                                               !
+!     - Iterates over each edge in the grid.                                   !
+!     - For edges between two boundary faces, it computes the normals of these !
+!       faces.                                                                 !
+!     - If the angle between these normals is less than 45 degrees (indicating !
+!       a sharp corner), the nodes at either end of the edge are marked in     !
+!       sharp_corner by incrementing their respective counts.                  !
+!   * Counting Sharp Corners:                                                  !
+!     - After marking, it counts the number of nodes that have been marked     !
+!       more than twice, indicating a sharp corner.                            !
+!     - The count is updated in the sharp_corner array, while nodes not part   !
+!       of a sharp corner are reset to zero.                                   !
+!   * Return Value:                                                            !
+!     - The function returns the total count of sharp corner nodes.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

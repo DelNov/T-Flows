@@ -682,8 +682,10 @@
     !   Save scalars   !
     !------------------!
     do sc = 1, Flow % n_scalars
+      write(str1,     '(a23)')  "Scalar XX [independent]"
+      write(str1(8:9),'(i2.2)') sc
       phi => Flow % scalar(sc)
-      call Results % Save_Vtu_Scalar_Real(phi % name, plot_inside,   &
+      call Results % Save_Vtu_Scalar_Real(str1, plot_inside,         &
                                           phi % n(c_f:c_l),          &
                                           f8, f9, data_offset, run)
     end do
@@ -942,34 +944,37 @@
     end if
 
     ! Wall distance and delta, important for all models
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Volume [m^3]",      &
-                                        plot_inside,                   &
-                                        Grid % vol(c_f:c_l),           &
+    call Results % Save_Vtu_Scalar_Real("Grid Cell Volume [m^3]",              &
+                                        plot_inside,                           &
+                                        Grid % vol(c_f:c_l),                   &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Tensor_6_Real("Grid Cell Inertia [m^2]",   &
-                                          plot_inside,                 &
-                                          Grid % ixx(c_f:c_l),         &
-                                          Grid % iyy(c_f:c_l),         &
-                                          Grid % izz(c_f:c_l),         &
-                                          Grid % ixy(c_f:c_l),         &
-                                          Grid % iyz(c_f:c_l),         &
-                                          Grid % ixz(c_f:c_l),         &
+    call Results % Save_Vtu_Tensor_6_Real("Grid Cell Inertia [m^2]",           &
+                                          plot_inside,                         &
+                                          Grid % ixx(c_f:c_l),                 &
+                                          Grid % iyy(c_f:c_l),                 &
+                                          Grid % izz(c_f:c_l),                 &
+                                          Grid % ixy(c_f:c_l),                 &
+                                          Grid % iyz(c_f:c_l),                 &
+                                          Grid % ixz(c_f:c_l),                 &
                                           f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Wall Distance [m]",      &
-                                        plot_inside,                   &
-                                        Grid % wall_dist(c_f:c_l),     &
+    call Results % Save_Vtu_Scalar_Int("Grid Porous Region [1]", plot_inside,  &
+                                       Grid % por(c_f:c_l),                    &
+                                       f8, f9, data_offset, run)
+    call Results % Save_Vtu_Scalar_Real("Grid Wall Distance [m]",              &
+                                        plot_inside,                           &
+                                        Grid % wall_dist(c_f:c_l),             &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Max [m]",     &
-                                        plot_inside,                   &
-                                        Turb % h_max(c_f:c_l),         &
+    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Max [m]",             &
+                                        plot_inside,                           &
+                                        Turb % h_max(c_f:c_l),                 &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Min [m]",     &
-                                        plot_inside,                   &
-                                        Turb % h_min(c_f:c_l),         &
+    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Min [m]",             &
+                                        plot_inside,                           &
+                                        Turb % h_min(c_f:c_l),                 &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Wall [m]",    &
-                                        plot_inside,                   &
-                                        Turb % h_w  (c_f:c_l),         &
+    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Wall [m]",            &
+                                        plot_inside,                           &
+                                        Turb % h_w  (c_f:c_l),                 &
                                         f8, f9, data_offset, run)
 
     !---------------------------------------------------------------------!

@@ -18,8 +18,8 @@
   real,    contiguous, pointer :: elem_sx(:), elem_sy(:), elem_sz(:)
   integer, contiguous, pointer :: elem_used(:)
   character(SL)                :: fname
-  integer                      :: e, s, c, c1, c2, elem, i_ele
-  real                         :: phi_c1, phi_c2, sx, sy, sz, cond_0, cond_1
+  integer                      :: e, s, c, c1, c2, elem
+  real                         :: phi_c1, phi_c2, sx, sy, sz
   real                         :: dx1, dy1, dz1, dx2, dy2, dz2, d1, d2, st
   real                         :: dx1_n, dy1_n, dz1_n, dx2_n, dy2_n, dz2_n
   real                         :: q_0, q_1, sum_m_dot, sum_nab_t

@@ -3,16 +3,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-!   Sorts an array of unique values in ascending order for an input array of   !
-!   unsorted integers.  The original array is overwritten, the number of       !
-!   unique members is returned in argument "nu".                               !
+!>  Sorts an array of unique values in ascending order for an input array of
+!>  unsorted integers.  The original array is overwritten, the number of
+!>  unique members is returned in argument "nu".
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(inout) :: values(:)
-  integer,          intent(out)   :: nu
+  class(Sort_Type), intent(in)    :: Sort       !! parent class
+  integer,          intent(inout) :: values(:)  !! array to be sorted
+  integer,          intent(out)   :: nu         !! new size of array
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: i, min_val, max_val
-  integer, allocatable :: unique(:)
+  integer              :: i, min_val, max_val  !! helping local variables
+  integer, allocatable :: unique(:)            !! uniquely sorted array
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Sort)
 !==============================================================================!

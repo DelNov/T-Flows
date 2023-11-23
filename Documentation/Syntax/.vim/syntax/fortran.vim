@@ -409,6 +409,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      BUFFER_SIZE  MAX_ITEMS
 " Constant from Grid_Mod
   syn keyword fortranConstant      MAX_CLUSTERS
+" Constant from Convert_Mod
+  syn keyword fortranConstant      MAX_N  ITERS  FOR_BUILDINGS  FOR_POROSITIES  FOR_CHIMNEYS
 " After the constants, I have alternating definitions of types and objects derived from them
   syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
   syn keyword fortranObjectTflows  Dom            points         blocks         lines             ranges         Read_Control  Rc
@@ -418,16 +420,16 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Math           Sort           File           String            Work           Line  Tok
   syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type         Vof_Type       Swarm_Type
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur         Vof            Swarm Swr
-  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type
-  syn keyword fortranObjectTflows                 v_flux         Iter           Metis
+  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type        Vect_Type
+  syn keyword fortranObjectTflows                 v_flux         Iter           Metis             Vect
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type         Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type
   syn keyword fortranObjectTflows  Monitor        Results        Por            Profiler  Prof    Message        Info
   syn keyword fortranTypeTflows    Matrix_Type    Vector_Type    Solver_Type    Native_Type       Petsc_Type     Work_Petsc_Type
   syn keyword fortranObjectTflows  A  M  Mat      vector         Sol            Nat               Pet            Work_Pet  Member
-  syn keyword fortranTypeTflows    Process_Type   Pattern_Type
-  syn keyword fortranObjectTflows  Process        Pat
+  syn keyword fortranTypeTflows    Process_Type   Pattern_Type   Isoap_Type     Polyhedron_Type   Stl_Type       Iso_Polygons_Type
+  syn keyword fortranObjectTflows  Process        Pat            Isoap          Polyhedron  Pol   Stl            Iso_Polygons  Iso
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
 " Items which follow are not really objects, but I don't know where else to put them
@@ -446,7 +448,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers  Cell_In_This_Proc
   syn keyword fortranMacroTflows   Assert  Unused
 " Finally, a few global functions which I don't really like in the code
-  syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real
+  syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real  Key_Ind
 "---------------------------------------------------------------------[T-Flows]-
 
 "==============================================================[MPI in T-Flows]=

@@ -1,14 +1,31 @@
 !==============================================================================!
   integer function N_Sharp_Edges(Convert, Grid, edge_data)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with edge_data) edges at sharp boundaries and            !
-!   in between different boundary conditions.                                  !
+!>  Aims to identify and count sharp edges in the grid, which are either
+!>  geometrically sharp or located between different boundary conditions.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Initializes a counter cnt and sets the edge_data array   !
+!   * Identifying Geometrically Sharp Edges:                                   !
+!     - Iterates through each edge, focusing on those between two boundary     !
+!       faces.                                                                 !
+!     - Computes face normals and checks if the edge is geometrically sharp    !
+!       (based on the angle between normals).                                  !
+!     - Marks edges as convex, concave, or not sharp in the edge_data array    !
+!       based on their geometric relation with adjacent faces.                 !
+!   * Edges Between Different Boundary Conditions:                             !
+!     - Additionally, it checks if an edge lies between faces with different   !
+!       boundary conditions.
+!     - Such edges are also marked as sharp if not already done.
+!   * Return Value:
+!     - Returns the total count of sharp edges.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  integer             :: edge_data(Grid % n_edges)
+  class(Convert_Type) :: Convert                    !! parent class
+  type(Grid_Type)     :: Grid                       !! grid being converted
+  integer             :: edge_data(Grid % n_edges)  !! edge data
 !-----------------------------------[Locals]-----------------------------------!
   integer :: e, cnt, s1, s2, n1, n2
   real    :: norm_1(3), norm_2(3)

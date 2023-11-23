@@ -25,27 +25,26 @@
   type Convert_Type
 
     contains
-      procedure :: Allocate_Memory
-      procedure :: Calculate_Geometry
-      procedure :: Create_Dual
-      procedure :: Find_Faces
-      procedure :: Find_Parents
-      procedure :: Grid_Topology
-      procedure :: Guess_Format
-      procedure :: Insert_Buildings
-      procedure :: Load_Fluent
-      procedure :: Load_Forrest
-      procedure :: Load_Gambit
-      procedure :: Load_Gmsh
-      procedure :: Load_Obj
-      procedure :: Logo_Con
-      procedure :: N_Bnd_Cells_In_Region
-      procedure :: N_Edges_In_Region
-      procedure :: N_Nodes_In_Region
-      procedure :: N_Sharp_Corners
-      procedure :: N_Sharp_Edges
-      procedure :: Sort_Face_Nodes
-      procedure :: Triangle_Area_Z
+      procedure, private :: Allocate_Memory
+      procedure          :: Calculate_Geometry
+      procedure          :: Create_Dual
+      procedure          :: Find_Faces
+      procedure          :: Find_Parents
+      procedure          :: Grid_Topology
+      procedure          :: Guess_Format
+      procedure          :: Insert_Buildings
+      procedure          :: Load_Fluent
+      procedure          :: Load_Forrest
+      procedure          :: Load_Gambit
+      procedure          :: Load_Gmsh
+      procedure          :: Load_Obj
+      procedure          :: Logo_Con
+      procedure, private :: N_Bnd_Cells_In_Region
+      procedure, private :: N_Edges_In_Region
+      procedure, private :: N_Nodes_In_Region
+      procedure, private :: N_Sharp_Corners
+      procedure, private :: N_Sharp_Edges
+      procedure, private :: Sort_Face_Nodes
   end type
 
   ! Singleton Convert object
@@ -177,6 +176,5 @@
 #   include "Convert_Mod/N_Sharp_Corners.f90"
 #   include "Convert_Mod/N_Sharp_Edges.f90"
 #   include "Convert_Mod/Sort_Face_Nodes.f90"
-#   include "Convert_Mod/Triangle_Area_Z.f90"
 
   end module

@@ -1,12 +1,38 @@
 !==============================================================================!
   subroutine Connect_Blocks(Dom, Grid)
 !------------------------------------------------------------------------------!
-!   Solve the cell connectivity after block by block grid generation           !
+!>  This subroutine is designed to establish cell connectivity across different
+!>  blocks in a grid after they have been generated.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization: Sets up a mapping array (Grid % new_n) to keep track of  !
+!     new node indices after connecting blocks and initializes the number of   !
+!     deleted nodes (del).                                                     !
+!   * Early exit for single block: If there's only one block in the domain,    !
+!     the subroutine returns early as there's no need for inter-block          !
+!     connectivity.                                                            !
+!   * Iterating through block faces: It iterates over pairs of blocks,         !
+!     checking each face of one block against every face of the other to       !
+!     find matching faces that need to be connected.                           !
+!   * Node and cell connectivity: Once matching faces are identified, the      !
+!     subroutine establishes node-to-node connectivity between these faces.    !
+!     It uses transformation matrices (trans1, trans2) to map the coordinates  !
+!     from one block to another, ensuring that nodes on the shared face of     !
+!     two blocks are correctly aligned and connected.                          !
+!   * Updating node and cell information: After connecting the blocks, it      !
+!     updates the global node and cell information in the Grid, adjusting      !
+!     node numbers to account for merged nodes and ensuring that the cell      !
+!     connectivity reflects the new structure.                                 !
+!   * Final adjustments and cleanup: The subroutine finalizes the process by   !
+!     adjusting the global node count to reflect the new configuration and     !
+!     updating the node references in the cell structure (Grid % cells_n)      !
+!     to match the new node indices.                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type) :: Dom
-  type(Grid_Type)    :: Grid
+  class(Domain_Type) :: Dom   !! domain in which the grid is being generated
+  type(Grid_Type)    :: Grid  !! grid being generated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n                         ! counters
   integer :: b1, b2                          ! block 1 and 2

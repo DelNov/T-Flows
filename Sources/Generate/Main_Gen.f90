@@ -3,7 +3,31 @@
 !==============================================================================!
   program Generate_Prog
 !------------------------------------------------------------------------------!
-!   Block structured mesh generation and unstructured cell refinement.         !
+!>  Generate's main function.  Generate is a part of T-Flows and is designed
+!>  for block structured mesh generation and unstructured cell refinement.
+!------------------------------------------------------------------------------!
+!   Program Flow:                                                              !
+!                                                                              !
+!   * Initialization: The program begins with a profiling start, followed by   !
+!     displaying its logo.                                                     !
+!   * Input reading: It reads the input file using Generate % Load_Dom, which  !
+!     loads domain specifications, refinement criteria, and smoothing          !
+!     parameters.                                                              !
+!   * Domain handling: The domain's node coordinates are calculated, and       !
+!     ranges are distributed. Blocks are connected, and periodicity in the     !
+!     domain is established.                                                   !
+!   * Refinement and smoothing: The grid undergoes a trial connectivity run,   !
+!     followed by geometry calculation, smoothing, cell marking for refinement,!
+!      and a final connectivity pass.                                          !
+!   * Grid processing: The program sorts cells and faces, calculates wall      !
+!     distances, and associates cells with faces.                              !
+!   * Data saving and visualization: The processed grid data is saved in .cfn  !
+!     and .dim formats for further processing with T-Flows and in VTU format   !
+!     for visualization. A template control file is also created.              !
+!   * Additional analysis: The program checks for grid homogeneity and saves   !
+!     1D probes, which are helpful for channel flow analyses.                  !
+!   * Final output: Generate statistics are printed, and profiling data are    !
+!     finalized.                                                               !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Generate_Mod
@@ -104,7 +128,8 @@
 
   ! Check homogeneity of the grid in three coordinate directions
   ! Here, in generator, there is no sense to enforce uniformity
-  call Grid % Search_Coordinate_Clusters(enforce_uniform=.false.)
+  call Grid % Search_Coordinate_Clusters(nodal           = .true.,   &
+                                         enforce_uniform = .false.)
 
   ! Save the 1d probe (good for the channel flow)
   call Probe_1d_Nodes(Grid)

@@ -1,18 +1,20 @@
 !==============================================================================!
   subroutine Read_Strings_On(Control, keyword, values, n, verbose)
 !------------------------------------------------------------------------------!
-!   Used to read variable names in bnd. and initial condition specificaton     !
+!>  Working horse function to read strings (argument "values") behind a
+!>  keyword (argument "keyword") in control file, starting from the current
+!>  position. If not found, it sets them all to '', which is hard-coded.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword
-  character(SL),       intent(out) :: values(MAX_STRING_ITEMS)
-  integer,             intent(out) :: n        ! number of items
-  logical,   optional, intent(in)  :: verbose
+  class(Control_Type)              :: Control  !! parent class
+  character(len=*),    intent(in)  :: keyword  !! keyword it searches
+  character(SL),       intent(out) :: values(MAX_STRING_ITEMS)  !! values
+  integer,             intent(out) :: n        !! number of items
+  logical,   optional, intent(in)  :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i
   logical :: reached_end
+  integer :: i
 !==============================================================================!
 
   ! Set default values

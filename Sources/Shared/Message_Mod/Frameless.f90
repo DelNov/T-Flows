@@ -1,9 +1,39 @@
 !==============================================================================!
   subroutine Frameless(Msg, width, message_text)
+!------------------------------------------------------------------------------!
+!>  This subroutine formats and prints a message text within a specified width.
+!>  It takes a string message and breaks it into lines, ensuring each line does
+!>  not exceed the given width.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization:                                                          !
+!     - The message_text is loaded into a tokenizer and parsed.                !
+!     - The out_line is initialized to contain a space followed by a # symbol  !
+!       at the second position.                                                !
+!   * Processing tokens:                                                       !
+!     - The subroutine enters a loop over tokens extracted from message_text.  !
+!     - Each token is checked to see if it fits in the current line without    !
+!       exceeding the specified width.                                         !
+!     - If it fits, the token is appended to the out_line.                     !
+!     - If it doesn't fit or is a newline character ('\n'), the current line   !
+!       is printed, and out_line is reinitialized for the next line.           !
+!   * Line management:                                                         !
+!     - The line width is dynamically managed by updating cur_p (current       !
+!       position) and nex_p (next position) as tokens are added.               !
+!     - When a line reaches or exceeds the specified width, it is printed,     !
+!       and the process starts for the next line.                              !
+!   * Handling new lines:                                                      !
+!     - If a newline character is encountered, it causes an immediate line     !
+!       break.                                                                 !
+!   * Final line print:                                                        !
+!     - After processing all tokens, the last line in formation is printed.    !
+!------------------------------------------------------------------------------!
+  implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Message_Type)      :: Msg
-  integer,      intent(in) :: width
-  character(*), intent(in) :: message_text
+  class(Message_Type)      :: Msg           !! parent class
+  integer,      intent(in) :: width         !! maximum width of the text line
+  character(*), intent(in) :: message_text  !! the actual text message
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i
   integer       :: cur_p, nex_p

@@ -1,13 +1,13 @@
 !==============================================================================!
   subroutine Turbulent_Heat_Flux_Model(Control, val, verbose)
 !------------------------------------------------------------------------------!
-!   Reading turbulent heat flux model from the control file.                   !
+!>  Reads turbulence heat flux model (SGDH, GGDH) from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)        :: Control
-  character(SL), intent(out) :: val
-  logical,       optional    :: verbose
+  class(Control_Type)        :: Control  !! parent class
+  character(SL), intent(out) :: val      !! turbulent heat flux model
+  logical,       optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
   call Control % Read_Char_Item('TURBULENT_HEAT_FLUX_MODEL', 'SGDH',  &

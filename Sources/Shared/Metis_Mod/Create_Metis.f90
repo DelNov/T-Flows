@@ -1,14 +1,41 @@
 !==============================================================================!
   subroutine Create_Metis(Metis, e_f, e_l, edge_conn, n_parts)
 !------------------------------------------------------------------------------!
-!   Prepares all the arrays for a call to METIS function(s)                    !
+!>  Sets up and allocates memory for data structures required by METIS for
+!>  grid decomposition (graph partitioning in METIS). These structures include
+!>  arrays for edge connectivity (face-to cell connectivity in a grid),
+!>  vertex (cells in a grid) weights, edge (faces in a grid) weights, and
+!>  other parameters necessary for METIS to function correctly.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Assertion checks:                                                        !
+!     - Performs assertions to ensure valid input values.                      !
+!   * Initialization of vertices and edges:
+!     - Initializes the number of vertices (cell centers) and edges (faces)
+!       based on the edge_conn array and the specified range (e_f to e_l).
+!   * Memory allocation:
+!     - Allocates memory for various arrays in Metis, such as edges_v, edges_c,
+!       star_size, star, etc., based on the calculated number of vertices and
+!       edges.
+!   * Forming edge connectivity and stars:
+!     - Populates the edges_v array with vertex connections from edge_conn.
+!     - Forms 'star' structures, which represent connectivity information.
+!   * Preparing for METIS Call:
+!     - Allocates and fills the row and col arrays, which represents the
+!       graph structures in compressed row format used by METIS.
+!   * Handling constraints and weights:
+!     - Sets up constraints, imbalance tolerances, and initializes vertex and
+!       edge weights, along with other parameters like vert_data and
+!       part_weight.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Metis_Type),       intent(out) :: Metis
-  integer,                 intent(in)  :: e_f, e_l
-  integer, dimension(:,:), intent(in)  :: edge_conn
-  integer,                 intent(in)  :: n_parts
+  class(Metis_Type),       intent(out) :: Metis      !! parent class
+  integer,                 intent(in)  :: e_f        !! first face (edge)
+  integer,                 intent(in)  :: e_l        !! last face (edge)
+  integer, dimension(:,:), intent(in)  :: edge_conn  !! face-cell connectivity
+  integer,                 intent(in)  :: n_parts    !! number of partitions
 !-----------------------------------[Locals]-----------------------------------!
   integer :: s, i, v, v1, v2
 !==============================================================================!

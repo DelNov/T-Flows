@@ -1,20 +1,20 @@
 !==============================================================================!
   subroutine Read_Real_Vector_On(Control, keyword, values, n, verbose)
 !------------------------------------------------------------------------------!
-!   Working horse function to read integer value (argument "val") behind a     !
-!   keyword (argument "keyword") in control file.  If not found, a default     !
-!   vaue specified in argument "def" is used.
+!>  Working horse function to read real values (argument "values") behind a
+!>  keyword (argument "keyword") in control file, starting from the current
+!>  position. If not found, it sets them all to zero, which is hard-coded.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword
-  real,                intent(out) :: values(128)   ! spefified value, if found
-  integer,             intent(out) :: n             ! number of items
-  logical,   optional, intent(in)  :: verbose
+  class(Control_Type)              :: Control      !! parent class
+  character(len=*),    intent(in)  :: keyword      !! keyword it searches
+  real,                intent(out) :: values(128)  !! spefified value, if found
+  integer,             intent(out) :: n            !! number of items
+  logical,   optional, intent(in)  :: verbose      !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i
   logical :: reached_end
+  integer :: i
 !==============================================================================!
 
   ! Set default values
@@ -41,7 +41,7 @@
   !   Keyword was not found; issue a warning   !
   !--------------------------------------------!
 1 if(present(verbose)) then
-     if(verbose .and. First_Proc()) then
+    if(verbose .and. First_Proc()) then
       print '(2a)', ' # NOTE! Could not find the keyword: ',  &
                       trim(keyword)
     end if

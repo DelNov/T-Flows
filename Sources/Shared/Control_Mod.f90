@@ -3,6 +3,10 @@
 
 !==============================================================================!
   module Control_Mod
+!------------------------------------------------------------------------------!
+!>  The Control_Mod module is a central component of controling a simulation
+!>  in the T-Flows code.  It reads and processes the control file, which
+!>  contains parameters and settings for a CFD simulations.
 !----------------------------------[Modules]-----------------------------------!
   use Math_Mod
   use File_Mod
@@ -13,6 +17,13 @@
   !------------------!
   !   Control type   !
   !------------------!
+  !> Encapsulates various aspects of the control file, including file units
+  !> (root control file and control files for different domains) and procedures
+  !> for reading and manipulating control file data.  Procedures are classified
+  !> in five big groups: basic functionality, input-output, native solvers,
+  !> numerical models and physical models.  In most cases, each procedure in
+  !> the Control_Type is reading one keyword in the control file (exceptions
+  !> are the boundary and initial conditions).
   type Control_Type
 
     ! Control file unit
@@ -30,13 +41,14 @@
       procedure :: Position_At_Three_Keys
       procedure :: Read_Char_Item
       procedure :: Read_Char_Item_On
-      procedure :: Read_Strings_On
       procedure :: Read_Int_Item
       procedure :: Read_Int_Item_On
+      procedure :: Read_Keyless_Strings_On
       procedure :: Read_Real_Item
       procedure :: Read_Real_Item_On
       procedure :: Read_Real_Vector
       procedure :: Read_Real_Vector_On
+      procedure :: Read_Strings_On
       procedure :: Switch_To_Domain
       procedure :: Switch_To_Root
 
@@ -128,8 +140,7 @@
       procedure :: Tolerance_For_Gauss_Gradients
       procedure :: Tolerance_For_Simple_Algorithm
       procedure :: Max_Correction_Cycles_Beta_Vof
-      procedure :: Max_Smoothing_Cycles_Curvature_Vof
-      procedure :: Max_Smoothing_Cycles_Normal_Vof
+      procedure :: Max_Smooth_Cycles_Curvature_Vof
       procedure :: Max_Courant_Vof
       procedure :: Max_Substep_Cycles_Vof
       procedure :: Skewness_Correction_Vof
@@ -190,8 +201,9 @@
 
   end type
 
-  type(Control_Type) :: Control
-
+  type(Control_Type) :: Control  !! Singleton object of the class Control_Type
+                                 !! to make the access to Control_Type
+                                 !! procedures easier.
   contains
 
     !-------------------------!
@@ -205,13 +217,14 @@
 #   include "Control_Mod/Basic_Functions/Position_At_Three_Keys.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item_On.f90"
-#   include "Control_Mod/Basic_Functions/Read_Strings_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item_On.f90"
+#   include "Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Item_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Vector.f90"
 #   include "Control_Mod/Basic_Functions/Read_Real_Vector_On.f90"
+#   include "Control_Mod/Basic_Functions/Read_Strings_On.f90"
 #   include "Control_Mod/Basic_Functions/Switch_To_Domain.f90"
 #   include "Control_Mod/Basic_Functions/Switch_To_Root.f90"
 
@@ -331,8 +344,7 @@
 
     ! Numerical Parameters VOF (CICSAM)
 #   include "Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90"
-#   include "Control_Mod/Numerics/Max_Smoothing_Cycles_Curvature_Vof.f90"
-#   include "Control_Mod/Numerics/Max_Smoothing_Cycles_Normal_Vof.f90"
+#   include "Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90"
 #   include "Control_Mod/Numerics/Max_Courant_Vof.f90"
 #   include "Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90"
 #   include "Control_Mod/Numerics/Skewness_Correction_Vof.f90"

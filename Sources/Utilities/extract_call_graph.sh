@@ -1,3 +1,42 @@
+#==============================================================================#
+#   Script for extracting call graphs from T-Flows sources
+#------------------------------------------------------------------------------#
+#   A brief description of the scripts main components and functionalities:
+#
+#   * Color Definitions: The script starts by defining color variables for
+#     output formatting
+#
+#   * Global Settings: It sets global variables for the root source directory,
+#     output formatting, and color schemes for different types of procedures
+#     (e.g., member callers, global callers).
+#
+#   * Utility Functions: Functions like print_separator, print_line, and
+#     print_usage are defined for formatting and providing usage information,
+#     which is consistent with your module hierarchy script.
+#
+#   * Main Functionality - extract_call_graph:
+#     - This function recursively explores procedure calls within your code.
+#     - It takes a procedure name as input and analyses its calls by reading
+#       .f90 files.
+#     - The script distinguishes between member callers, global callers, and
+#       external procedures.
+#     - It handles various cases like procedures calling others, procedures not
+#       calling any others, and excluded or ignored modules.
+#     - The script uses grep and awk for text processing within Fortran source
+#       files.
+#
+#   * Command-Line Argument Parsing: The script processes command-line arguments
+#     for options like expanding all calls (-a), excluding certain directories
+#     (-e), and ignoring specific modules (-i).
+#
+#   * Procedure and Module Extraction: An additional function
+#     extract_procedure_and_module is used to parse and determine the procedure
+#     and module names from the call lines.
+#
+#   * Execution Logic: The script executes the extract_call_graph function based
+#    on the input parameters and command-line arguments.
+#------------------------------------------------------------------------------#
+
 #!/bin/bash
 
 BLACK='\U001B[30m'
@@ -23,6 +62,10 @@ RESET='\U001B[0m'
 #------------------------------------------------------------------------------#
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
+
+# Find the "root" of all sources
+cur=$(pwd)
+src=$(echo "$cur" | awk -F'/Sources/' '{print ($2 == "" ? $0 : $1 "/Sources")}')
 
 # The following four affect the width of the output
 tabs 60
@@ -95,26 +138,33 @@ print_usage() {
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/extract_call_graph.sh <Source> [options]"
+  echo "# "$0" <Source> [options]"
   echo "#"
   echo "# where Source is the procedure name for which you want to perform"
   echo "# the analysis, such as: Main_Con, Compute_Energy, Main_Div, hence"
-  echo -e "# case sensitive, ${RED}without${RESET} the .f90 extension."
+  echo -e "# case sensitive, with or without the .f90 extension."
   echo "#"
   echo "# Valid options are:"
   echo "#"
   echo "# -a"
-  echo "#"
   echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
-  echo "# -i <list of modules to ignore>"
+  echo "# -e <list of directories to exclude>"
+  echo "#    In cases where the same module name is used in more than one"
+  echo "#    directory, use this option to exclude one from the search."
   echo "#"
+  echo "# -i <list of modules to ignore>"
   echo "#    You may want to exclude some of the smaller modules, such as"
   echo "#    Comm_Mod, Message_Mod, Work_Mod, Profiler_Mod, String_Mod,"
   echo "#    Tokenizer_Mod to reduce the amoun of information printed."
   echo "#"
-  echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
-          "T-Flows/Sources!" ${RESET}
+  echo "# Note that:"
+  echo -e "#   ${LIGHT_RED} The script is supposed to be executed from:" \
+          "T-Flows/Sources,"${RESET}
+  echo -e "#   ${LIGHT_RED} or any of its sub-directories. The <Target_Mod>" \
+          "doesnot have"${RESET}
+  echo -e "#   ${LIGHT_RED} to reside in the directory from which you launch" \
+          "the script!"${RESET}
   echo "#----------------------------------------------------------------------"
   exit
 
@@ -251,31 +301,33 @@ extract_call_graph() {
     #   in "Seqential" part of the Comm_Mod are just empty hooks, no one in
     #   the sane mind will be interested in analyzing them.
     #-----------------------------------------------------------------------------
-    if [[ $module_in_which_you_seek ]] && [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                       | grep $module_in_which_you_seek  \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake                    \
-                                       | grep -v $glo_exclude_dir)
-    elif [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake                    \
-                                       | grep -v $glo_exclude_dir)
-    elif [[ $module_in_which_you_seek ]]; then
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                       | grep $module_in_which_you_seek  \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake)
-    else
-      local full_path_you_seek=$(find . -name $procedure_file_you_seek   \
-                                       | grep -v No_Checking             \
-                                       | grep -v Sequential              \
-                                       | grep -v Fake)
+
+    # Start building the find command as a string
+    find_command="find $src -name $procedure_file_you_seek"
+
+    # Add a condition to grep for the module if it's specified
+    if [[ $module_in_which_you_seek ]]; then
+      find_command+=" | grep $module_in_which_you_seek"
     fi
+
+    # Exclude standard directories
+    find_command+=" | grep -v No_Checking"
+    find_command+=" | grep -v Sequential"
+    find_command+=" | grep -v Unused"
+    find_command+=" | grep -v Fake"
+
+    # Convert glo_exclude_dir to an array and add a grep -v for each directory
+    if [[ $glo_exclude_dir ]]; then
+      read -r -a exclude_dirs <<< "$glo_exclude_dir"
+      for exclude_dir in "${exclude_dirs[@]}"; do
+        if [[ $exclude_dir ]]; then
+          find_command+=" | grep -v $exclude_dir"
+        fi
+      done
+    fi
+
+    # Execute the find command
+    local full_path_you_seek=$(eval $find_command)
 
     # This command counts number of occurrences of modules name in the result of
     # command find. If it is more than one, the same file is in more directories
@@ -286,7 +338,7 @@ extract_call_graph() {
       for path in ${full_path_you_seek[*]}; do
         echo $path
       done
-      echo "Exclude all but one directory with "  \
+      echo "Exclude all but one directory with"\
            "the command line argument -e <directory>"
       exit
     fi
@@ -297,7 +349,7 @@ extract_call_graph() {
       #-----------------------------------------------------
       #   Storing results of the grep command in an array
       #-----------------------------------------------------
-      local called_procedures=($(grep '\ \ call\ ' $full_path_you_seek  \
+      local called_procedures=($(grep '  call ' $full_path_you_seek  \
                                  | awk '{print $2$3$4$5$6$7$8$9}' | tr -d ,))
       local called_modules=$called_procedures   # just to declare
 
@@ -318,35 +370,50 @@ extract_call_graph() {
 
         # Typical substitues:
         if [[ $glo_module != "" ]]; then
-          if [[ $glo_module == "Comm" ]];     then glo_module=Comm_Mod;      fi
-          if [[ $glo_module == "Convert" ]];  then glo_module=Convert_Mod;   fi
-          if [[ $glo_module == "Divide" ]];   then glo_module=Divide_Mod;    fi
-          if [[ $glo_module == "Elem" ]];     then glo_module=Elem_Mod;      fi
-          if [[ $glo_module == "File" ]];     then glo_module=File_Mod;      fi
-          if [[ $glo_module == "Flow" ]];     then glo_module=Field_Mod;     fi
-          if [[ $glo_module == "Front" ]];    then glo_module=Front_Mod;     fi
-          if [[ $glo_module == "Grid" ]];     then glo_module=Grid_Mod;      fi
-          if [[ $glo_module == "Line" ]];     then glo_module=Tokenizer_Mod; fi
-          if [[ $glo_module == "Math" ]];     then glo_module=Math_Mod;      fi
-          if [[ $glo_module == "Message" ]];  then glo_module=Message_Mod;   fi
-          if [[ $glo_module == "Metis" ]];    then glo_module=Metis_Mod;     fi
-          if [[ $glo_module == "Monitor" ]];  then glo_module=Monitor_Mod;   fi
-          if [[ $glo_module == "Msg" ]];      then glo_module=Message_Mod;   fi
-          if [[ $glo_module == "Nat" ]];      then glo_module=Native_Mod;    fi
-          if [[ $glo_module == "Particle" ]]; then glo_module=Particle_Mod;  fi
-          if [[ $glo_module == "Pet" ]];      then glo_module=Petsc_Mod;     fi
-          if [[ $glo_module == "Process" ]];  then glo_module=Process_Mod;   fi
-          if [[ $glo_module == "Profiler" ]]; then glo_module=Profiler_Mod;  fi
-          if [[ $glo_module == "Results" ]];  then glo_module=Results_Mod;   fi
-          if [[ $glo_module == "Sol" ]];      then glo_module=Solver_Mod;    fi
-          if [[ $glo_module == "Sort" ]];     then glo_module=Sort_Mod;      fi
-          if [[ $glo_module == "String" ]];   then glo_module=String_Mod;    fi
-          if [[ $glo_module == "Surf" ]];     then glo_module=Surf_Mod;      fi
-          if [[ $glo_module == "Swarm" ]];    then glo_module=Swarm_Mod;     fi
-          if [[ $glo_module == "Tok" ]];      then glo_module=Tokenizer_Mod; fi
-          if [[ $glo_module == "Turb" ]];     then glo_module=Turb_Mod;      fi
-          if [[ $glo_module == "Vof" ]];      then glo_module=Vof_Mod;       fi
-          if [[ $glo_module == "Work" ]];     then glo_module=Work_Mod;      fi
+          if [[ $glo_module == "Backup" ]];       then glo_module=Backup_Mod;       fi
+          if [[ $glo_module == "Comm" ]];         then glo_module=Comm_Mod;         fi
+          if [[ $glo_module == "Control" ]];      then glo_module=Control_Mod;      fi
+          if [[ $glo_module == "Convert" ]];      then glo_module=Convert_Mod;      fi
+          if [[ $glo_module == "Divide" ]];       then glo_module=Divide_Mod;       fi
+          if [[ $glo_module == "Dom" ]];          then glo_module=Domain_Mod;       fi
+          if [[ $glo_module == "Elem" ]];         then glo_module=Elem_Mod;         fi
+          if [[ $glo_module == "File" ]];         then glo_module=File_Mod;         fi
+          if [[ $glo_module == "Flow" ]];         then glo_module=Field_Mod;        fi
+          if [[ $glo_module == "Front" ]];        then glo_module=Front_Mod;        fi
+          if [[ $glo_module == "Generate" ]];     then glo_module=Generate_Mod;     fi
+          if [[ $glo_module == "Grid" ]];         then glo_module=Grid_Mod;         fi
+          if [[ $glo_module == "Isoap" ]];        then glo_module=Isoap_Mod;        fi
+          if [[ $glo_module == "Iso_Polygons" ]]; then glo_module=Iso_Polygons_Mod; fi
+          if [[ $glo_module == "Info" ]];         then glo_module=Info_Mod;         fi
+          if [[ $glo_module == "Iter" ]];         then glo_module=Iter_Mod;         fi
+          if [[ $glo_module == "Line" ]];         then glo_module=Tokenizer_Mod;    fi
+          if [[ $glo_module == "Math" ]];         then glo_module=Math_Mod;         fi
+          if [[ $glo_module == "Message" ]];      then glo_module=Message_Mod;      fi
+          if [[ $glo_module == "Metis" ]];        then glo_module=Metis_Mod;        fi
+          if [[ $glo_module == "Monitor" ]];      then glo_module=Monitor_Mod;      fi
+          if [[ $glo_module == "Msg" ]];          then glo_module=Message_Mod;      fi
+          if [[ $glo_module == "Nat" ]];          then glo_module=Native_Mod;       fi
+          if [[ $glo_module == "Particle" ]];     then glo_module=Particle_Mod;     fi
+          if [[ $glo_module == "Pet" ]];          then glo_module=Petsc_Mod;        fi
+          if [[ $glo_module == "Pol" ]];          then glo_module=Polyhedron_Mod;   fi
+          if [[ $glo_module == "Polyhedron" ]];   then glo_module=Polyhedron_Mod;   fi
+          if [[ $glo_module == "Por" ]];          then glo_module=Porosity_Mod;     fi
+          if [[ $glo_module == "Process" ]];      then glo_module=Process_Mod;      fi
+          if [[ $glo_module == "Prof" ]];         then glo_module=Profiler_Mod;     fi
+          if [[ $glo_module == "Profiler" ]];     then glo_module=Profiler_Mod;     fi
+          if [[ $glo_module == "Read_Control" ]]; then glo_module=Read_Control_Mod; fi
+          if [[ $glo_module == "Results" ]];      then glo_module=Results_Mod;      fi
+          if [[ $glo_module == "Sol" ]];          then glo_module=Solver_Mod;       fi
+          if [[ $glo_module == "Sort" ]];         then glo_module=Sort_Mod;         fi
+          if [[ $glo_module == "Stl" ]];          then glo_module=Stl_Mod;          fi
+          if [[ $glo_module == "String" ]];       then glo_module=String_Mod;       fi
+          if [[ $glo_module == "Surf" ]];         then glo_module=Surf_Mod;         fi
+          if [[ $glo_module == "Swarm" ]];        then glo_module=Swarm_Mod;        fi
+          if [[ $glo_module == "Tok" ]];          then glo_module=Tokenizer_Mod;    fi
+          if [[ $glo_module == "Time" ]];         then glo_module=Time_Mod;         fi
+          if [[ $glo_module == "Turb" ]];         then glo_module=Turb_Mod;         fi
+          if [[ $glo_module == "Vof" ]];          then glo_module=Vof_Mod;          fi
+          if [[ $glo_module == "Work" ]];         then glo_module=Work_Mod;         fi
         fi
         called_modules[$proc]=$glo_module
         called_procedures[$proc]=$glo_procedure
@@ -432,7 +499,7 @@ extract_call_graph() {
           # Yet, at this point you can't tell one from another, and that's why
           # another call to find is done here
           if [[ ! ${called_modules[proc]} ]]; then
-            internal=$(find . -type f -name ${called_procedures[proc]}".f90")
+            internal=$(find $src -type f -name ${called_procedures[proc]}".f90")
             if [[ ! $internal ]]; then
               print_line "$indent"                   \
                          $glo_color_ex               \
@@ -469,8 +536,13 @@ fi
 #   Parse command line options like a pro :-)
 #-----------------------------------------------
 
-# Fetch the name and shift on
+# Fetch the name
 name=$1
+
+# Remove the .f90 extension if it exists
+name="${name%.f90}"
+
+# Shift on
 shift
 
 current_opt=""
@@ -484,10 +556,10 @@ while [[ $# > 0 ]]; do
       shift  # past argument
       ;;     # part of the case construct
 
-    # Exclude - takes only one argument
+    # Exclude - accumulate arguments
     -e)
       current_opt=$1
-      glo_exclude_dir=$2
+      glo_exclude_dir=$glo_exclude_dir" $2"
       shift  # past argument
       shift  # past value
       ;;     # part of the case construct
@@ -514,7 +586,9 @@ while [[ $# > 0 ]]; do
 
     # Accumulates additonal strings to glo_ignore
     *)
-      if [[ $current_opt == -i ]]; then
+      if [[ $current_opt == -e ]]; then
+        glo_exclude_dir=$glo_exclude_dir" $1"
+      elif [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
@@ -525,6 +599,4 @@ while [[ $# > 0 ]]; do
   esac
 done
 
-echo $glo_ignore_mod
 extract_call_graph $name
-# echo "default = ${default}"

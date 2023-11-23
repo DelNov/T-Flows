@@ -1,11 +1,11 @@
 !==============================================================================!
   subroutine Switch_To_Root(Control)
 !------------------------------------------------------------------------------!
-!   Switch the control file to root.                                           !
+!>  Switch the control file to root.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type), intent(inout) :: Control
+  class(Control_Type), intent(inout) :: Control  !! parent class
 !==============================================================================!
 
   Control % file_unit = Control % root_file_unit

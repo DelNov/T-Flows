@@ -1,13 +1,50 @@
 !==============================================================================!
   subroutine Load_Forrest(Convert, Grid, file_name)
 !------------------------------------------------------------------------------!
-!   Reads the forrest in STL file format                                       !
+!>  The Load_Forrest subroutine in the Conver is designed to read a forrest
+!>  represented in STL file format and populate the Grid structure with the
+!>  information. This subroutine is particularly focused on creating a forest
+!>  scene by placing individual trees (represented by a single normalized
+!>  tree in Grid(1)) within a defined area.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initial Setup: The subroutine begins with initializing variables and     !
+!     reading the forest data from the STL file using                          !
+!     Forrest % Create_From_File.                                              !
+!   * Determining Forest Span: It calculates the minimum and maximum coords    !
+!     (x,y,z) of the forrest to understand the overall span and dimensions.    !
+!   * Scaling Single Tree: The single tree in Grid(1) is scaled according to   !
+!     the height of the forest.                                                !
+!   * Estimating Number of Trees: The subroutine estimates the number of trees !
+!     that can be planted within the forest area based on the single tree size !
+!     and forest area.                                                         !
+!   * Tree Placement:                                                          !
+!     - Allocates arrays t_x and t_y for storing the x and y coordinates of    !
+!       each tree.                                                             !
+!     - Randomly places trees within the forest area, ensuring they are not    !
+!       too close to each other.                                               !
+!   * Planting Trees:                                                          !
+!     - The subroutine plants the estimated number of trees (n_trees) by       !
+!       copying the data of the single tree (Grid(1)) into the forest grid     !
+!       (Grid(2)).                                                             !
+!      - It allocates node'n'faces for Grid(2) and adjusts them for each tree. !
+!      - For each tree, it modifies the coordinates (xn, yn, zn) to position   !
+!        the tree correctly in the forest scene.                               !
+!      - The height of each tree is slightly randomized to add variety.        !
+!   * Avoiding Clustering: The subroutine includes logic to prevent trees from !
+!     being placed too close to each other, ensuring a more natural and        !
+!     realistic forest layout.                                                 !
+!   * Performance Optimization: It uses random number generation and a limit   !
+!     on the number of placement attempts to efficiently populate the forest   !
+!     without excessive computational effort.                                  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid(2)    ! Grid(1) holds the single normalized tree
-  character(SL)       :: file_name
+  class(Convert_Type) :: Convert    !! parent class
+  type(Grid_Type)     :: Grid(2)    !! Grid(1) is a single tree and Grid(2)
+                                    !! is a forest scene
+  character(SL)       :: file_name  !! file name
 !-----------------------------------[Locals]-----------------------------------!
   type(Stl_Type)    :: Forrest
   integer           :: s, i_nod, v, fac, attempts

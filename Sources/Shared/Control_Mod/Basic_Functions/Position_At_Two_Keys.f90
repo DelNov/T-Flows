@@ -4,16 +4,16 @@
                                   keyword_2,  &
                                   found, verbose)
 !------------------------------------------------------------------------------!
-!   Position yourself within the file at the line specified with two keys.     !
-!   It is intended to be used to find the boundary condition specifications.   !
+!>  Position yourself within the file at the line specified with two keys.
+!>  It is intended to be used to find the boundary condition specifications.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)              :: Control
-  character(len=*),    intent(in)  :: keyword_1
-  character(len=*),    intent(in)  :: keyword_2
-  logical,             intent(out) :: found
-  logical,   optional, intent(in)  :: verbose
+  class(Control_Type)              :: Control    !! parent class
+  character(len=*),    intent(in)  :: keyword_1  !! keyword 1
+  character(len=*),    intent(in)  :: keyword_2  !! keyword 2
+  logical,             intent(out) :: found      !! true if two keys are found
+  logical,   optional, intent(in)  :: verbose    !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
 !==============================================================================!

@@ -1,13 +1,13 @@
 !==============================================================================!
   subroutine Interface_Tracking(Control, track_int, verbose)
 !------------------------------------------------------------------------------!
-!   Reading if vof will be used to model multiphase situation                  !
+!>  Reads if VOF will be used to track interface in multiphase flow regimes.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: track_int
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control    !! parent class
+  logical, intent(out) :: track_int  !! true if interface is tracked with VOF
+  logical, optional    :: verbose    !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

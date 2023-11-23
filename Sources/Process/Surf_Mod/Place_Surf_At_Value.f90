@@ -23,7 +23,7 @@
   real                       :: surf_v(3)
   real, contiguous,  pointer :: phi_n(:)
 !------------------------------------------------------------------------------!
-  include 'Surf_Mod/Edge_Numbering.f90'
+  include 'Surf_Mod/Edge_Numbering.h90'
 !==============================================================================!
 
   call Work % Connect_Real_Node(phi_n)

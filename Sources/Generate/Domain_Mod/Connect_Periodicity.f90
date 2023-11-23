@@ -1,12 +1,36 @@
 !==============================================================================!
   subroutine Connect_Periodicity(Dom, Grid)
 !------------------------------------------------------------------------------!
-!   Solve the cell connectivity for periodic boundary conditions.              !
+!>  This subroutine is designed to establish cell connectivity for periodic
+!>  boundary conditions in a computational grid.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization of twin nodes: Initializes a mapping array (twin_n)       !
+!     that tracks nodes across periodic boundaries.                            !
+!   * Iterating through blocks and faces: Loops through all blocks and their   !
+!     faces to identify potential periodic connections.                        !
+!   * Transformation matrices setup: Initializes transformation matrices       !
+!     (trans1, trans2) to map node coordinates between periodic faces.         !
+!   * Checking for periodic connectivity: Compares nodes on faces of different !
+!     blocks to determine if they are periodic counterparts, based on          !
+!     predefined periodic conditions.                                          !
+!   * Establishing cell connectivity: For faces that are identified as         !
+!     periodic counterparts, it sets up cell connectivity across the periodic  !
+!     boundary, mapping cells from one block to the corresponding cells in the !
+!     periodic partner block.                                                  !
+!   * Node connectivity across periodic boundaries: Establishes node-to-node   !
+!     connections across the periodic boundaries, ensuring that each node on   !
+!     a periodic face is correctly paired with its counterpart.                !
+!   * Twin of my twin logic: Implements a logic to ensure that if a node is a  !
+!     twin of another node, which in turn is a twin of a third node, then the  !
+!     first node is also considered a twin of the third node. This step        !
+!     ensures comprehensive connectivity across all periodic nodes.            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type) :: Dom
-  type(Grid_Type)    :: Grid
+  class(Domain_Type) :: Dom   !! domain in which the grid is being generated
+  type(Grid_Type)    :: Grid  !! grid being generated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, n, p                      ! counters
   integer :: b1, b2                          ! block 1 and 2

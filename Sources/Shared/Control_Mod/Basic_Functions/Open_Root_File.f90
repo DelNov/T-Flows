@@ -1,12 +1,13 @@
 !==============================================================================!
   subroutine Open_Root_File(Control, file_name)
 !------------------------------------------------------------------------------!
-!   It rarely gets simpler than this - just opens a file for reading.          !
+!>  Opens the root control file.  If it doesn't exist, throws an error.
+!>  T-Flows can't work withut the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  character(len=*)    :: file_name
+  class(Control_Type) :: Control    !! parent class
+  character(len=*)    :: file_name  !! control file name (in essence: control)
 !-----------------------------------[Locals]-----------------------------------!
   logical :: file_exists
 !==============================================================================!

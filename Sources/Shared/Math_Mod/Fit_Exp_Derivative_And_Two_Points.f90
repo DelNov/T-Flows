@@ -5,6 +5,12 @@
                                                x1, y1,   &  ! prescribed
                                                x2, y2)      ! prescribed
 !------------------------------------------------------------------------------!
+!>  This subroutine fits exponential curve of the form:
+!>  y = a * exp(b*x) + c
+!>  through three specified points, where first point starts at zero.
+!>  In the first point, a derivative (in x) is given, and the values are
+!>  given at the remining points.
+!------------------------------------------------------------------------------!
 !   This subroutine fits exponential curve of the form:                        !
 !                                                                              !
 !   y = a * exp(b*x) + c                                                   (1) !
@@ -63,10 +69,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Math_Type)  :: Math
-  real, intent(in)  :: dy_dx_0  ! prescribed
-  real, intent(out) :: x0, y0   ! x0 is zero, y0 is unknown
-  real, intent(in)  :: x1, y1   ! prescribed
-  real, intent(in)  :: x2, y2   ! prescribed
+  real, intent(in)  :: dy_dx_0  !! prescribed dy/dx at 0
+  real, intent(out) :: x0, y0   !! x0 is zero, y0 is unknown
+  real, intent(in)  :: x1, y1   !! prescribed point 1
+  real, intent(in)  :: x2, y2   !! prescribed point 2
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_ITER  = 64
   integer, parameter :: N_SAMPLES =  8

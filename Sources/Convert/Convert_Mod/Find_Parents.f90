@@ -1,15 +1,36 @@
 !==============================================================================!
   subroutine Find_Parents(Convert, Grid)
 !------------------------------------------------------------------------------!
-!   Looks boundary cells' parents for meshes in which they are not given       !
+!>  This subroutine is critical for meshes where the connection between
+!>  boundary cells and their corresponding internal (parent) cells is not
+!>  directly given.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Allocates memory for various arrays and initializes      !
+!     variables. it starts with identifying all nodes on the boundary.         !
+!   * Cells near boundaries: Counts the cells near the boundaries and          !
+!     allocates working arrays for further processing.                         !
+!   * Real work begins: This part involves the core logic of the subroutine.   !
+!     It iterates over boundary regions and cells near boundaries to identify  !
+!     potential parent-child relationships between boundary and internal cells !
+!   * Sorting and matching process: The nodes of each potential face are       !
+!     sorted and compared across boundary cells and internal cells to find     !
+!     matches, which indicate a parent-child relationship.                     !
+!   * Assigning parent information: Once a match is found, the subroutine      !
+!     assigns the corresponding internal cell as the parent of the boundary    !
+!     cell, updating the Grid % cells_bnd_region data structure.               !
+!   * Final checks and warnings: The subroutine checks if the total number of  !
+!     matches equals the number of boundary cells. if not, it issues a         !
+!     warning, as this might indicate inconsistencies in the mesh.             !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Profiler_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: fn(6,4), i_fac, j_fac, i_nod, i_cel, c1, c2
   integer              :: nodes(4), n_match, n_match_tot, dir, bc, cnt_c, cnt_f

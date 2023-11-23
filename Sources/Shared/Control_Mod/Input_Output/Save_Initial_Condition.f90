@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Save_Initial_Condition(Control, save_init_cond, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads, from the control file, if you should save initial condition.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  logical             :: save_init_cond
-  logical,   optional :: verbose
+  class(Control_Type) :: Control         !! parent class
+  logical             :: save_init_cond  !! should you save initial condition
+  logical,   optional :: verbose         !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

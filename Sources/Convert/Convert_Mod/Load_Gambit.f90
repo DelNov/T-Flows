@@ -1,13 +1,36 @@
 !==============================================================================!
   subroutine Load_Gambit(Convert, Grid, file_name)
 !------------------------------------------------------------------------------!
-!   Reads the Gambits neutral file format.                                     !
+!>  Subroutine is designed to read grid files in Gambit's neutral file format
+!>  and populate the provided Grid object with the necessary data.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * File reading: Opens the specified Gambit file in ASCII mode for reading. !
+!   * Header processing: Scans through the file's header to extract key        !
+!     information like the number of nodes, cells, blocks, and bnd sections.   !
+!   * Boundary cells counting: Counts the number of boundary cells by reading  !
+!     relevant sections in the file.                                           !
+!   * Memory allocation: Allocates memory for various arrays within the Grid   !
+!     object based on the extracted information.                               !
+!   * Reading nodal coordinates: Reads coordinates for each node from the file !
+!     and stores them in the Grid object.                                      !
+!   * Reading cell nodes: Reads and stores the nodes of each cell. Special     !
+!     handling is done for hexahedral cells and pyramids to ensure             !
+!     compatibility with .vtu format conventions (swapping certain nodes).     !
+!   * Material section processing: Handles the material section in the Gambit  !
+!     file. Each block’s material information is read, but the details of the  !
+!     processing are not explicitly stored.                                    !
+!   * Boundary conditions processing: Reads boundary condition sections,       !
+!     including the name of each boundary condition and the cells associated   !
+!     with each condition. The information is stored in the Grid object.       !
+!   * Finalization: Closes the file and stops profiling the subroutine.        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  character(SL)       :: file_name
+  class(Convert_Type) :: Convert    !! parent class
+  type(Grid_Type)     :: Grid       !! grid being converted
+  character(SL)       :: file_name  !! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer             :: i, j, n_blocks, n_bnd_sect, dum1, dum2, fu
   integer,allocatable :: temp(:)

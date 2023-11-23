@@ -1,15 +1,14 @@
 !==============================================================================!
   pure recursive subroutine Two_Real_Carry_Int(Sort, a1, a2, b)
 !------------------------------------------------------------------------------!
-!   Quick sort two real arrays and carry one integer array along               !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort two real arrays and carry one integer array along.
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  real,             intent(inout) :: a1(:), a2(:)
-  integer,          intent(inout) :: b(:)
+  class(Sort_Type), intent(in)    :: Sort          !! parent class
+  real,             intent(inout) :: a1(:), a2(:)  !! array for sorting
+  integer,          intent(inout) :: b(:)          !! array carried on
 !-----------------------------------[Locals]-----------------------------------!
   real    :: x1, x2
   integer :: i, j, n

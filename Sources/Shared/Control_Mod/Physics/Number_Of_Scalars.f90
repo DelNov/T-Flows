@@ -1,13 +1,13 @@
 !==============================================================================!
   subroutine Number_Of_Scalars(Control, val, verbose)
 !------------------------------------------------------------------------------!
-!   Reading stuff related to passive scalars                                   !
+!>  Reads the number of simulated scalar transport equations.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! number of scalars
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
   call Control % Read_Int_Item('NUMBER_OF_SCALARS', 0, val, verbose)

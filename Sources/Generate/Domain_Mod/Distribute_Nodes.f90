@@ -2,14 +2,40 @@
   subroutine Distribute_Nodes(Dom, Grid, b, w,   &
                               is, js, ks, ie, je, ke)
 !------------------------------------------------------------------------------!
-!   Places the nodes on the line defined with local block position             !
+!>  This subroutine places nodes on a line defined by local block positions.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization: Retrieves the resolution of the block (ni, nj, nk) and   !
+!     the starting coordinates (x0, y0, z0).                                   !
+!   * Calculating delta values: Determines the change in coordinates (delx,    !
+!     dely, delz) across the specified range within the block.                 !
+!   * Early exit condition: If the number of nodes to distribute is less       !
+!     than 2, the subroutine returns immediately, as no distribution is        !
+!     needed.                                                                  !
+!   * Node distribution logic:                                                 !
+!     - Linear distribution (positive weight): If the weight (w) is positive,  !
+!       it distributes the nodes linearly between the start and end points,    !
+!       adjusting the node positions based on a computed delta shift (dt).     !
+!     - Hyperbolic distribution (negative weight): For negative weights, it    !
+!       uses a hyperbolic tangent function (tanh) to distribute the nodes.     !
+!       This involves determining a case based on the weight value and         !
+!       adjusting the node positions accordingly.                              !
+!   * Iterating over block dimensions: The subroutine iterates over the range  !
+!     specified by is, js, ks to ie, je, ke within the block, placing the      !
+!     nodes according to the calculated distribution.                          !
+!   * Updating node coordinates: For each position in the range, it updates    !
+!     the node coordinates (xn, yn, zn) in the Grid based on the selected      !
+!     distribution method (linear or hyperbolic).                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type)  :: Dom
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: b, is, js, ks, ie, je, ke
-  real,    intent(in) :: w
+  class(Domain_Type)  :: Dom         !! domain in which the grid is generated
+  type(Grid_Type)     :: Grid        !! grid being generated
+  integer, intent(in) :: b           !! current block
+  integer, intent(in) :: is, js, ks  !! starting index in a logical direction
+  integer, intent(in) :: ie, je, ke  !! ending index in a logical direction
+  real,    intent(in) :: w           !! weight of the block
 !----------------------------------[Calling]-----------------------------------!
   real :: atanh
 !-----------------------------------[Locals]-----------------------------------!

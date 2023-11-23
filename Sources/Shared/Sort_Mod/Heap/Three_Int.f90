@@ -1,12 +1,12 @@
 !==============================================================================!
   pure subroutine Three_Int(Sort, a1, a2, a3)
 !------------------------------------------------------------------------------!
-!   Heap sort three integer arrays                                             !
+!>  Heap sort three integer arrays.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(inout) :: Sort
-  integer,          intent(inout) :: a1(:), a2(:), a3(:)
+  class(Sort_Type), intent(inout) :: Sort                 !! parent class
+  integer,          intent(inout) :: a1(:), a2(:), a3(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n, i, ir, j, l
   integer :: a_1, a_2, a_3

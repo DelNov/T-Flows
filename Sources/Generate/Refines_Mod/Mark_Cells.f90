@@ -1,12 +1,24 @@
 !==============================================================================!
   subroutine Refines_Mod_Mark_Cells(ref, Grid)
 !------------------------------------------------------------------------------!
-!   Mark the region of the domain for local refinement and refine the grid!    !
+!>  Marks specific regions of a domain for local refinement and then refines
+!>  the grid accordingly.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initializes all cells as unmarked for refinement.                        !
+!   * Iterates through each refinement level and region, checking if each cell !
+!     in the grid falls within the defined refinement region.                  !
+!   * Uses the shape parameters (ellipsoid, rectangle, or plane) to determine  !
+!     whether a cell is within the refinement region.                          !
+!   * Calls Refines_Mod_Refine_Marked_Cells to refine cells that are marked    !
+!     for refinement.                                                          !
+!   * Resets the marked cells after each refinement level is processed.        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Refines_Type) :: ref
-  type(Grid_Type)    :: Grid
+  type(Refines_Type) :: ref   !! type holding information on refinement
+  type(Grid_Type)    :: Grid  !! grid being generated (refined here)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, lev, reg, n1, n2, n3, n4, n5, n6, n7, n8
   real    :: x1, y1, z1, x8, y8, z8, x0, y0, z0

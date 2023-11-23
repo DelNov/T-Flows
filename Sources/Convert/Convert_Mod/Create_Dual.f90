@@ -1,12 +1,38 @@
 !==============================================================================!
   subroutine Create_Dual(Convert, Prim, Dual)
 !------------------------------------------------------------------------------!
-!   Creates a Dual mesh from an existing                                       !
+!>  Creates a dual grid based on the given primal grid.  The dual grid concept
+!>  is used here to create a polyhedral grid out of a tetrahedral.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initial setup: Sets up the problem name for the dual grid and marks it   !
+!     as polyhedral.                                                           !
+!   * Edge processing: Looks for edges in the primal grid and stores their     !
+!     information.                                                             !
+!   * Edge sorting and compression: Sorts all primal edges by their node       !
+!     numbers and compresses them to eliminate duplicates.                     !
+!   * Allocate mappings and arrays: Allocates memory for various arrays and    !
+!     mappings, such as those relating edges to nodes and cells to nodes.      !
+!   * Boundary conditions processing: Processes boundary conditions, including !
+!     updating the number of boundary cells and faces in the dual grid.        !
+!   * Inside mapping: Maps nodes of the primal grid to cells of the dual grid, !
+!     edges of the primal to faces of the dual, and cells of the primal to     !
+!     nodes of the dual.                                                       !
+!   * Memory allocation for dual grid: Allocates memory for the dual grid      !
+!     based on the calculated sizes of various components.                     !
+!   * Handling sharp edges and corners: Processes sharp edges and corners in   !
+!     the primal grid and reflects these in the dual grid structure.           !
+!   * Face and cell assembly in dual grid: Assembles faces and cells in the    !
+!     dual grid based on the primal-to-dual mappings.                          !
+!   * Final Adjustments: Makes final adjustments to the structure of the dual  !
+!     grid, ensuring that it accurately represents the topology of the primal  !
+!     grid.                                                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Prim, Dual
+  class(Convert_Type) :: Convert     !! parent class
+  type(Grid_Type)     :: Prim, Dual  !! primal and dual grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: bc, e, c, c1, c2, s, n, n1, n2
   integer              :: i, i_nod, j_nod, i_edg

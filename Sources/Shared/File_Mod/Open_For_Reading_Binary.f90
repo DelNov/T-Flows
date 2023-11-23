@@ -1,14 +1,19 @@
 !==============================================================================!
   subroutine Open_For_Reading_Binary(File, name_i, file_unit, verbose)
 !------------------------------------------------------------------------------!
-!   Opens file for reading in binary format in first available unit.           !
+!>  Opens a binary file for reading. It checks if the file exists before
+!>  attempting to open it and reports an error if the file does not exist.
+!>  It also prints a message which file is being read from one processor.
+!>  For parallel runs, it writes not only the name of one file being read,
+!>  but a range of files for all processor.
+!>  File unit is assigned dynamically when opening the file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type)  :: File
-  character(len=*)  :: name_i
-  integer           :: file_unit
-  logical, optional :: verbose    ! used for tests if file is ascii or binary
+  class(File_Type)  :: File       !! parent class
+  character(len=*)  :: name_i     !! name of the input file
+  integer           :: file_unit  !! file unit assigned when opening
+  logical, optional :: verbose    !! used for tests if file is ascii or binary
 !-----------------------------------[Locals]-----------------------------------!
   logical       :: file_exists
   logical       :: verb = .true.

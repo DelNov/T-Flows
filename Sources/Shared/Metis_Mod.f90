@@ -3,7 +3,10 @@
 !==============================================================================!
   module Metis_Mod
 !------------------------------------------------------------------------------!
-!   Holds parameters and a procedure for interaction with METIS library.       !
+!>  Managea interactions with the METIS library, facilitating graph and mesh
+!>  partitioning tasks within T-Flows.  The module provides a Fortran-friendly
+!>  interface to the METIS library, abstracting the complexity of direct
+!>  library calls and providing a more accessible way to utilize METIS.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Assert_Mod
@@ -14,6 +17,7 @@
   !----------------!
   !   Metis type   !
   !----------------!
+  !> Metis_Type includes data members and procedures for interacting with METIS.
   type Metis_Type
 
     ! Data members to prepare a call to METIS
@@ -41,7 +45,10 @@
 
   end type
 
-  type(Metis_Type) :: Metis
+  ! Singleton Metis object
+  type(Metis_Type) :: Metis  !! Singleton Metis object; one instance of
+                             !! Metis_Type used across the module for
+                             !! conducting METIS-related operations
 
   !----------------------------------------!
   !   Handles for calls to METIS library   !

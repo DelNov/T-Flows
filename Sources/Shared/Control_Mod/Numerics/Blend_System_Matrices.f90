@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Blend_System_Matrices(Control, blend, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads if system matrices will be blended with advection.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: blend
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: blend    !! output value, true or false
+  logical,    optional :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

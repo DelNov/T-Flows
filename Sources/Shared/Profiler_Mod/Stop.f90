@@ -1,12 +1,14 @@
 !==============================================================================!
   subroutine Stop(Prof, f_name)
 !------------------------------------------------------------------------------!
-!   Stops a function by her name                                               !
+!>  Stops profiling for a specific function (or code segment). It updates the
+!>  profiling data and handles the transition back to the function that was
+!>  running previously.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target :: Prof
-  character(len=*)             :: f_name
+  class(Profiler_Type), target :: Prof    !! parent class
+  character(len=*)             :: f_name  !! function (or code segment) name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_fun
 !==============================================================================!

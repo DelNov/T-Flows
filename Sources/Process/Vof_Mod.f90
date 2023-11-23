@@ -75,7 +75,7 @@
     ! User define parameters for vof function (fun)
     real    :: courant_max_param
     integer :: n_sub_param, corr_num_max
-    integer :: n_conv_curv, n_conv_norm
+    integer :: n_smooth_for_curv_csf
 
     ! Averaging
     integer, allocatable :: avg_cells(:,:)
@@ -95,7 +95,6 @@
       procedure, private :: Discretize
       procedure, private :: Correct_Beta
       procedure          :: Initialize_From_Stl
-!     procedure, private :: Find_Upstream_Phi
       procedure, private :: Max_Courant_Number
       procedure, private :: Predict_Beta
       procedure, private :: Solve_System
@@ -105,10 +104,10 @@
       !   (convoluted) variant of vof function   !
       !   for eventual estimation of curvature   !
       !------------------------------------------!
-      procedure          :: Curvature_Csf
+      procedure, private :: Curvature_Csf
       procedure, private :: Smooth_Curvature
-      procedure          :: Smooth_For_Curvature_Csf
-      procedure          :: Smooth_Scalar
+      procedure, private :: Smooth_Scalar
+      procedure          :: Smooth_Vof_And_Compute_Surface_Normals
 
       !----------------------------------------------!
       !   Procedures to be called by other modules   !
@@ -149,7 +148,7 @@
     !------------------------------------------!
 #   include "Vof_Mod/Curvature/Curvature_Csf.f90"
 #   include "Vof_Mod/Curvature/Smooth_Curvature.f90"
-#   include "Vof_Mod/Curvature/Smooth_For_Curvature_Csf.f90"
+#   include "Vof_Mod/Curvature/Smooth_Vof_And_Compute_Surface_Normals.f90"
 #   include "Vof_Mod/Curvature/Smooth_Scalar.f90"
 
     !----------------------------------------------!

@@ -90,13 +90,23 @@
   !--------------------------------!
   !   Related to passive scalars   !
   !--------------------------------!
-  do sc = 1, Flow % n_scalars
-    phi => Flow % scalar(sc)
-    call Control % Solver_For_Scalars               (phi % solver)
-    call Control % Preconditioner_For_System_Matrix (phi % prec)
-    call Control % Tolerance_For_Scalars_Solver     (phi % tol)
-    call Control % Max_Iterations_For_Scalars_Solver(phi % miter)
-  end do
+  if(Flow % n_scalars .gt. 0) then
+
+    ! Although there is a slight assymetry here (allocations are done in
+    ! Create_Field), this call is needed here to reserve memory to store
+    ! info on linear solvers. Fields are still allocated in Create_Field
+    allocate(Flow % scalar(Flow % n_scalars))
+
+    ! Now, with basic allocation done, it is safe to read solver options
+    do sc = 1, Flow % n_scalars
+      phi => Flow % scalar(sc)
+      call Control % Solver_For_Scalars               (phi % solver)
+      call Control % Preconditioner_For_System_Matrix (phi % prec)
+      call Control % Tolerance_For_Scalars_Solver     (phi % tol)
+      call Control % Max_Iterations_For_Scalars_Solver(phi % miter)
+    end do
+
+  end if
 
   !------------------------------!
   !   All turbuelnt quantities   !

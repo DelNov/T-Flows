@@ -1,10 +1,16 @@
 !==============================================================================!
   subroutine Statistics(Prof, indent)
 !------------------------------------------------------------------------------!
+!>  Calculates and displays profiling statistics. It handles time formatting
+!>  and can display time in seconds or as percentages. It includes
+!>  functionality to sort the functions based on the time spent and supports
+!>  parallel execution environments.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target  :: Prof
-  integer,           intent(in) :: indent     ! 34 for Main_Pro, 1 for Main_con
+  class(Profiler_Type), target  :: Prof    !! parent class
+  integer,           intent(in) :: indent  !! indent for printing (34 was good
+                                           !! for Main_Pro, 1 for Main_con
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i_fun
   real          :: total_time, t_temp, percent_time

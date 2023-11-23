@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Choi_Correction(Control, corr, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads from the control file if Choi correction will be used.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)  :: Control
-  logical, intent(out) :: corr
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: corr     !! output value, true or false
+  logical, optional    :: verbose  !! verbosity of the output
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

@@ -1,12 +1,33 @@
 !==============================================================================!
   subroutine Distribute_Ranges(Dom, Grid)
 !------------------------------------------------------------------------------!
-!   Distribute ranges (defined in .dom file) to boundary conditions            !
+!>  Distribute ranges (defined in .dom file) to specific boundary conditions
+!>  in a computational grid.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Allocate regions in grid: The subroutine starts by allocating memory     !
+!     for regions within the Grid object, based on the number of ranges in Dom !
+!   * Initialization: Initializes the number of boundary conditions to zero.   !
+!   * Iterating over ranges: Loops through each range in Dom, performing the   !
+!     following steps:                                                         !
+!     - Retrieves the associated block and its resolution.                     !
+!     - Determines the default values and boundary faces based on the          !
+!       range's specifications.                                                !
+!     - Differentiates between boundary conditions prescribed with mnemonics   !
+!       (like 'IMIN', 'IMAX') and those prescribed explicitly by coordinates.  !
+!   * Storing Boundary Conditions:                                             !
+!     - Checks if a boundary condition with the same name already exists       !
+!     - If not, adds the new boundary condition to Grid.                       !
+!     - Assigns a negative index to the corresponding cells in the grid,       !
+!       indicating the boundary condition applied to those cells.              !
+!   * Updating Grid Information: Finally, stores the total number of           !
+!     boundary conditions in Grid and prints the regions list.                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Domain_Type) :: Dom
-  type(Grid_Type)    :: Grid
+  class(Domain_Type)  :: Dom   !! domain in which the grid is being generated
+  type(Grid_Type)     :: Grid  !! grid being generated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: b, i, j, k, n, c, r
   integer :: n_bnd                         ! number of boundary conditions

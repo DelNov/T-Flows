@@ -1,8 +1,8 @@
 !==============================================================================!
   pure subroutine Gaussian_Elimination(Math, n, a, b, x, invertible)
 !------------------------------------------------------------------------------!
-!   Example of Gaussian elimination with scaled row pivoting                   !
-!                                                                              !
+!>  Gaussian elimination with scaled row pivoting.
+!------------------------------------------------------------------------------!
 !   From: Numerical Analysis:                                                  !
 !         The Mathematics of Scientific Computing                              !
 !         D.R. Kincaid & E.W. Cheney                                           !
@@ -12,12 +12,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type), intent(in)    :: Math
-  integer,          intent(in)    :: n
-  real,             intent(inout) :: a(n,n)
-  real,             intent(inout) :: b(n)
-  real,             intent(inout) :: x(n)
-  logical,          intent(inout) :: invertible
+  class(Math_Type), intent(in)    :: Math        !! parent class
+  integer,          intent(in)    :: n           !! number of unknows
+  real,             intent(inout) :: a(n,n)      !! system matrix
+  real,             intent(inout) :: b(n)        !! right hand side vector
+  real,             intent(inout) :: x(n)        !! solution vectoru
+  logical,          intent(inout) :: invertible  !! true if matrix invertible
 !-----------------------------------[Locals]-----------------------------------!
   real,    allocatable :: s(:)
   integer, allocatable :: p(:)

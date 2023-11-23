@@ -1,14 +1,17 @@
 !==============================================================================!
   integer function N_Bnd_Cells_In_Region(Convert, Grid, bc, cell_data)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with cell_data) boundary cells in given boundary color   !
+!>  Counts and marks boundary cells in a specified boundary condition (bc)
+!>  category within a grid.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Grid
-  integer             :: bc
-  integer             :: cell_data(-Grid % n_bnd_cells:Grid % n_cells)
+  class(Convert_Type) :: Convert  !! parent class
+  type(Grid_Type)     :: Grid     !! grid being converted
+  integer             :: bc       !! boundary condition rank (number)
+  integer             :: cell_data(-Grid % n_bnd_cells  &
+                                   :Grid % n_cells)  !! stored data on
+                                                     !! boundary cells
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, cnt
 !------------------------[Avoid unused parent warning]-------------------------!

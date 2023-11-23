@@ -1,10 +1,11 @@
 !==============================================================================!
   subroutine Smooths_Mod_Allocate_Smooths(smr, n)
 !------------------------------------------------------------------------------!
+!>  Allocates arrays for Smooth_Type which are used in grid smoothing.
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Smooths_Type) :: smr  ! smoothing regions
-  integer            :: n
+  type(Smooths_Type) :: smr  !! smoothing regions
+  integer            :: n    !! number of smoothing regions
 !==============================================================================!
 
   smr % n_smooths = n     ! number of smoothing regions

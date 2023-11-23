@@ -1,14 +1,13 @@
 !==============================================================================!
   pure recursive subroutine Two_Int(Sort, a1, a2)
 !------------------------------------------------------------------------------!
-!   Quick sort two integer arrays                                              !
-!                                                                              !
-!   Adapted from: https://gist.github.com/1AdAstra1  (good work Olga)          !
+!>  Quick sort two integer arrays.
+!>  Adapted from: https://gist.github.com/1AdAstra1
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(inout) :: a1(:), a2(:)
+  class(Sort_Type), intent(in)    :: Sort          !! parent class
+  integer,          intent(inout) :: a1(:), a2(:)  !! array for sorting
 !-----------------------------------[Locals]-----------------------------------!
   integer :: x1, x2
   integer :: i, j, n

@@ -1,12 +1,16 @@
 !==============================================================================!
   logical function Is_In_Binary_Format(File, file_name)
 !------------------------------------------------------------------------------!
-!   Find out if file is written in binary (or ASCII) format.                   !
+!>  Checks if the specified file is written in binary format. This is done by
+!>  reading a portion of the file and checking for non-ASCII characters.
+!>  (It is extensivelly used in Convert sub-program, for files in GMSH and
+!>  FLUENT file formats, when we can't be a-priroty sure if file is stored
+!>  ASCII or binary format.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
-  character(len=*) :: file_name
+  class(File_Type) :: File       !! parent class
+  character(len=*) :: file_name  !! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer    :: file_size, file_unit, i
   integer(1) :: byte

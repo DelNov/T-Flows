@@ -1,13 +1,13 @@
 !==============================================================================!
   subroutine Buoyancy(Control, val, verbose)
 !------------------------------------------------------------------------------!
-!   Reading buoyancy model from the control file.                              !
+!>  Reads buoyancy model from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type)        :: Control
-  character(SL), intent(out) :: val
-  logical,       optional    :: verbose
+  class(Control_Type)        :: Control  !! parent class
+  character(SL), intent(out) :: val      !! buoyancy (thermal or density)
+  logical,       optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
   call Control % Read_Char_Item('BUOYANCY', 'none', val, verbose)

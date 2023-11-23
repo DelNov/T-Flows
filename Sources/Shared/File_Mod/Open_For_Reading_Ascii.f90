@@ -1,13 +1,16 @@
 !==============================================================================!
   subroutine Open_For_Reading_Ascii(File, name_i, file_unit)
 !------------------------------------------------------------------------------!
-!   Opens file for writing in the first available unit.                        !
+!>  To open an ASCII file for reading. It checks if the file exists before
+!>  attempting to open it and reports an error if the file does not exist.
+!>  It also prints a message which file is being read from one processor.
+!>  File unit is assigned dynamically when opening the file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File
-  character(len=*) :: name_i
-  integer          :: file_unit
+  class(File_Type) :: File       !! parent class
+  character(len=*) :: name_i     !! name of the input file
+  integer          :: file_unit  !! file unit assigned when opening the file
 !-----------------------------------[Locals]-----------------------------------!
   logical :: file_exists
 !------------------------[Avoid unused parent warning]-------------------------!

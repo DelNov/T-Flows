@@ -1,15 +1,37 @@
 !==============================================================================!
   subroutine Load_Dom(Generate, Dom, smr, ref, Grid)
 !------------------------------------------------------------------------------!
-!   Reads: .dom file                                                           !
+!>  Routine for loading and initializing various aspects of a computational
+!>  domain from a domain file (.dom file).
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!   * Initialization and Memory Allocation: It starts by allocating memory for !
+!     different grid components such as nodes, cells, and faces. This includes !
+!     setting up the grid size and other basic parameters.                     !
+!   * Reading Domain File: The core functionality revolves around reading the  !
+!     .dom file, which contains detailed specifications of the grid. This      !
+!     includes the geometry of the domain (corners, blocks, lines), boundary   !
+!     conditions, refinement levels, and smoothing ranges.                     !
+!   * Setting Up Geometrical Elements:                                         !
+!     - Corners and Blocks: It reads and processes the coordinates of domain   !
+!       points (corners) and the specifications of grid blocks.                !
+!     - Lines: The subroutine handles the definition of lines, which can be    !
+!       specified point by point or with weighting factors.                    !
+!     - Surfaces: It processes the surface elements of the blocks, ensuring    !
+!       proper orientation and weighting.                                      !
+!   * Boundary Conditions and Materials: It reads ranges for boundary          !
+!     conditions and materials.                                                !
+!   * Periodic Boundaries: The subroutine handles periodic boundary conditions !
+!   * Refinement and Smoothing Ranges: It sets up refinement levels and        !
+!     smoothing ranges as specified in the domain file.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Generate_Type) :: Generate
-  type(Domain_Type)    :: Dom
-  type(Smooths_Type)   :: smr
-  type(Refines_Type)   :: ref
-  type(Grid_Type)      :: Grid
+  class(Generate_Type) :: Generate  !! parent class
+  type(Domain_Type)    :: Dom       !! computational domain
+  type(Smooths_Type)   :: smr       !! smoothing regions
+  type(Refines_Type)   :: ref       !! refinement regions
+  type(Grid_Type)      :: Grid      !! computational grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: b, i, l, s, i_fac, n, n1, n2, n3, n4, dumi, fu
   integer       :: n_faces_check, n_nodes_check
@@ -20,7 +42,7 @@
   real          :: xt(8), yt(8), zt(8)
   integer       :: fn(6,4)
 !------------------------------------------------------------------------------!
-  include 'Block_Numbering.f90'
+  include 'Block_Numbering.h90'
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Generate)
 !==============================================================================!
@@ -56,10 +78,10 @@
   !---------------------!
   !   Allocate memory   !
   !---------------------!
-  print '(a)',    ' # Allocating memory for: '
-  print '(a,i7)', ' #', Grid % max_n_nodes,     ' nodes and cells'
-  print '(a,i7)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
-  print '(a,i7)', ' #', Grid % max_n_faces,     ' cell faces'
+  print '(a)',      ' # Allocating memory for: '
+  print '(a,i9,a)', ' #', Grid % max_n_nodes,     ' nodes and cells'
+  print '(a,i9,a)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
+  print '(a,i9,a)', ' #', Grid % max_n_faces,     ' cell faces'
 
   allocate (Grid % region % at_cell(-Grid % max_n_bnd_cells-1:-1))
   Grid % region % at_cell = 0

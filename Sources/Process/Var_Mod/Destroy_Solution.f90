@@ -30,7 +30,9 @@
   deallocate(phi % z)
 
   ! Destroy PETSc too
-  call phi % Pet % Destroy_Petsc(phi % name)
+# if T_FLOWS_PETSC == 1
+    call phi % Pet % Destroy_Petsc(phi % name)
+# endif
 
   ! Delete variable name (do this last because name is used in Destroy_Petsc)
   phi % name      = ''

@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Save_Results_At_Boundaries(Control, save_results_bnd, verbose)
 !------------------------------------------------------------------------------!
+!>  Reads, from the control file, if you should save results at boundarie.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Control_Type) :: Control
-  logical             :: save_results_bnd
-  logical,   optional :: verbose
+  class(Control_Type) :: Control           !! parent class
+  logical             :: save_results_bnd  !! should you save at boundaries
+  logical,   optional :: verbose           !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!

@@ -1,13 +1,13 @@
 !==============================================================================!
   subroutine Delete(File, name_d)
 !------------------------------------------------------------------------------!
-!   Delets a file specified by its name.                                       !
+!>  Subroutine to delete a file specified by its name.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*) :: name_d
+  class(File_Type) :: File    !! parent class
+  character(len=*) :: name_d  !! name of the file to be deleted
 !-----------------------------------[Locals]-----------------------------------!
-  class(File_Type) :: File
   integer          :: file_unit
   logical          :: file_exists
 !------------------------[Avoid unused parent warning]-------------------------!

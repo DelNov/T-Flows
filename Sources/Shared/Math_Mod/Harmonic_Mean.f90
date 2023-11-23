@@ -1,12 +1,12 @@
 !==============================================================================!
   pure real function Harmonic_Mean(Math, a, b)
 !------------------------------------------------------------------------------!
-!   Finds harmonic mean of two input arguments, "a" and "b"                    !
+!>  Finds harmonic mean of two input arguments, a and b.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type), intent(in) :: Math
-  real,             intent(in) :: a, b
+  class(Math_Type), intent(in) :: Math  !! parent class
+  real,             intent(in) :: a, b  !! values
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Math)
 !==============================================================================!
