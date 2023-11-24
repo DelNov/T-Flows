@@ -1,11 +1,24 @@
 !==============================================================================!
   subroutine Print_Swarm_Statistics(Swarm)
 !------------------------------------------------------------------------------!
-!   Prints particle statistics (still in early evolutionary stage)             !
+!>  Gathers and prints statistical data on the particles within a swarm. This
+!>  subroutine is an integral part of monitoring and analyzing the behavior of
+!>  particles in computational fluid dynamics simulations, providing insights
+!>  into their collective dynamics and individual properties.
+!------------------------------------------------------------------------------!
+!   Outputs and Calculations                                                   !
+!                                                                              !
+!   * Particle counts: Reports total, active, deposited, and escaped           !
+!     particles, offering a snapshot of particle distribution in the domain.   !
+!   * Reflection data: Quantifies the number of particle reflections,          !
+!     indicating interactions with boundaries.                                 !
+!   * Non-dimensional numbers: Presents average and maximum values for         !
+!     Courant, Reynolds, and Stokes numbers, crucial for assessing particle    !
+!     dynamics relative to the fluid flow.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part

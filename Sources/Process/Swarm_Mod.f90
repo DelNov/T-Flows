@@ -5,7 +5,24 @@
 !==============================================================================!
   module Swarm_Mod
 !------------------------------------------------------------------------------!
-!   Module for Lagrangian particle tracking                                    !
+!> The Swarm_Mod module is dedicated to Lagrangian particle tracking in
+!> T-Flows. It manages swarms of particles, providing mechanisms for their
+!> interaction with flow fields, turbulence modeling, and surface interactions.
+!------------------------------------------------------------------------------!
+! Features and Functionalities                                                 !
+!                                                                              !
+! * Particle integration: Manages the movement and interaction of particles    !
+!   with the fluid and boundaries within a defined computational grid.         !
+! * Turbulence interaction: Incorporates turbulence models like Brownian       !
+!   motion (Fukagata) and Discrete Random Walk (DRW) for particle tracking.    !
+! * Swarm dynamics: Handles the dynamic properties of particle swarms such     !
+!   as density, diameter, relaxation time, and statistics.                     !
+! * Particle-surface interactions: Manages particle behavior upon collision    !
+!   with surfaces, including bouncing, trapping, and deposition.               !
+! * Parallel processing: Supports particle exchange and tracking in parallel   !
+!   computational environments, ensuring accurate swarm dynamics.              !
+! * Statistical analysis: Provides functionality for calculating and           !
+!   printing ensemble-averaged statistics of particle motion and interaction.  !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Particle_Mod
@@ -21,46 +38,49 @@
   !----------------!
   !   Swarm type   !
   !----------------!
+  !> Defines the properties and behaviors of a particle swarm within the
+  !> computational grid. Extends particle dynamics to collective behavior
+  !> and interaction with the flow field, turbulence and interfaces
   type Swarm_Type
 
-    type(Grid_Type),  pointer :: pnt_grid  ! grid for which it is defined
-    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
-    type(Turb_Type),  pointer :: pnt_turb  ! Turb field for which it is defined
-    type(Vof_Type),   pointer :: pnt_vof   ! vof, for three-phase situations
+    type(Grid_Type),  pointer :: pnt_grid  !! grid for which it is defined
+    type(Field_Type), pointer :: pnt_flow  !! flow field for which it is defined
+    type(Turb_Type),  pointer :: pnt_turb  !! turb field for which it is defined
+    type(Vof_Type),   pointer :: pnt_vof   !! vof, for three-phase situations
 
     integer                          :: max_particles = 0  ! read from control
     integer                          :: n_particles   = 0
     type(Particle_Type), allocatable :: Particle(:)
 
     ! Density of this swarm
-    real :: density
+    real :: density  !! density of this swarm
 
     ! (Mean) diameter for this swarm
-    real :: diameter
+    real :: diameter  !! diameter in this swarm
 
     ! Swarm mean relaxation time
-    real :: tau
+    real :: tau  !! mean relaxation time for the swarm
 
     ! Coefficient of restitution (1.0 - elastic, 0.0 - sticky)
-    real :: rst
+    real :: rst  !! coefficient of restitution (1.0 - elastic, 0.0 - sticky)
 
     ! Time step for the swarm
-    real :: dt
+    real :: dt  !! time step for the swarm
 
     ! Eddy time interval for stochastic eddy interaction (SEIM) model
-    integer :: time_eim
-
+    integer :: time_eim  !! eddy time interval for stochastic
+                         !! eddy interaction (SEIM) model
     ! Number of sub-steps; time sub-steps
-    integer :: n_sub_steps
+    integer :: n_sub_steps  !! number of sub-steps in time
 
     ! Reflected and deposited particles on the walls and the escaped particles
     ! (These variables are declared real because it is currently not ...
     ! ... possible to store integer bnd-cell based variables in backup)
-    real, allocatable :: n_reflected(:)
-    real, allocatable :: n_deposited(:)
-    real, allocatable :: n_escaped(:)
-    integer           :: n_trapped
-
+    real, allocatable :: n_reflected(:)  !! number of reflected particles
+    real, allocatable :: n_deposited(:)  !! number of deposited particles
+    real, allocatable :: n_escaped(:)    !! number of escaped particles
+    integer           :: n_trapped       !! number of trapped particles, in
+                                         !! three-phase flow situations
     ! Particle statistics
     logical :: statistics
 
@@ -74,7 +94,10 @@
 
     ! Gradients of flow modeled  quantity "zeta"
     ! (for SGS of Hybrid_Les_Rans model)
-    real, allocatable :: v2_mod(:), v2_mod_x(:), v2_mod_y(:), v2_mod_z(:)
+    real, allocatable :: v2_mod(:)    !! modeled v2 quantity from zeta-f model
+    real, allocatable :: v2_mod_x(:)  !! gradient of modeled v2 in x-direction
+    real, allocatable :: v2_mod_y(:)  !! gradient of modeled v2 in x-direction
+    real, allocatable :: v2_mod_z(:)  !! gradient of modeled v2 in x-direction
 
     ! SGS Brownian diffusion force
     real, allocatable :: f_fuka_x(:), f_fuka_y(:), f_fuka_z(:)
@@ -83,16 +106,16 @@
     ! (Must be part of type definition for multiple materials)
     integer :: subgrid_scale_model
 
-    integer, allocatable :: i_work(:)
-    logical, allocatable :: l_work(:)
-    real,    allocatable :: r_work(:)
+    integer, allocatable :: i_work(:)  !! integer work array
+    logical, allocatable :: l_work(:)  !! logical work array
+    real,    allocatable :: r_work(:)  !! real work array
 
     ! Working arrays, buffers for parallel version
     ! (Keyword "parameter: not allowed inside a type
     ! declaration. One might think of making a function)
-    integer :: N_I_VARS =  6
-    integer :: N_L_VARS =  3
-    integer :: N_R_VARS = 15
+    integer :: N_I_VARS =  6  !! number of integer arrays
+    integer :: N_L_VARS =  3  !! number of logical arrays
+    integer :: N_R_VARS = 15  !! number of real arrays
 
     contains
       procedure          :: Advance_Particles

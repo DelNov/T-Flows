@@ -1,12 +1,26 @@
 !==============================================================================!
   subroutine Particle_Forces(Swarm, k)
 !------------------------------------------------------------------------------!
-!   Computes the forces exerted on the particle                                !
+!>  Computes the forces exerted on a particle within the swarm, including both
+!>  drag and buoyancy forces. This subroutine is crucial for accurately
+!>  simulating particle dynamics in response to the surrounding flow field and
+!>  gravitational effects.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Drag force calculation: Determines the drag force acting on a particle   !
+!     based on its relative velocity in the flow field and drag coefficient.   !
+!   * Buoyancy force: Assesses the buoyancy force based on the particle's      !
+!     density relative to the fluid density, influencing its vertical motion.  !
+!   * Particle properties: Utilizes particle size to compute surface area and  !
+!     volume, which are essential for force calculations.                      !
+!   * Drag coefficient: Calculates the drag coefficient based on the particle  !
+!     Reynolds number, which varies depending on flow conditions.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer, intent(in)       :: k     ! particle number
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
+  integer, intent(in)       :: k      !! particle number (rank)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Particle_Type), pointer :: Part

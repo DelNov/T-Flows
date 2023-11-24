@@ -1,12 +1,32 @@
 !==============================================================================!
   subroutine Move_Particle(Swarm, k)
 !------------------------------------------------------------------------------!
-!   Updates particle velocity and position                                     !
+!>  Updates the position and velocity of a particle within a swarm. This
+!>  subroutine is integral to the Lagrangian particle tracking mechanism in
+!>  T-Flows. It computes new velocities and positions for each particle based
+!>  on the current flow field, particle properties, and turbulence models.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Turbulence modeling: Integrates effects of turbulence on particle motion !
+!     using subgrid scale (SGS) models like Brownian motion (Fukagata) and     !
+!     Discrete Random Walk (DRW).                                              !
+!   * Particle-flow interaction: Calculates particle velocities based on       !
+!     local flow velocities, accounting for turbulence and fluid properties.   !
+!   * Numerical integration: Employs a fourth-order Runge-Kutta method for     !
+!     updating particle velocities and a first-order explicit scheme for       !
+!     position updates.                                                        !
+!   * Boundary interaction: Manages particle interaction with computational    !
+!     domain boundaries, including reflection and wall effects.                !
+!   * Physical forces: Considers forces like drag, buoyancy, and Brownian      !
+!     motion in particle dynamics.                                             !
+!   * Particle position Update: Determines new particle positions based on     !
+!     updated velocities and time step size.                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer, intent(in)       :: k      ! particle number
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
+  integer, intent(in)       :: k      !! particle number (rank)
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),    pointer :: Flow
   type(Grid_Type),     pointer :: Grid

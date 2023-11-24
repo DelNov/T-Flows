@@ -1,8 +1,29 @@
 !==============================================================================!
   subroutine Sgs_Discrete_Random_Walk(Swarm, k, rx, ry, rz)
 !------------------------------------------------------------------------------!
-!  SGS model introducing stochasticity to LES/K-Eps-Zeta-F modeled quantities..
-!  .. seen by particles. (taken from Z. Cheng et. al., (2018) 435-451)
+!>  Implements the Subgrid Scale (SGS) Discrete Random Walk (DRW) model for
+!>  Lagrangian particle tracking in Large Eddy Simulations (LES). This method
+!>  introduces stochasticity to the particle motion, reflecting the unresolved
+!>  turbulent eddies' effects on particle trajectories.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Eddy lifetime and length: Computes eddy lifetimes and lengths based on   !
+!     turbulence parameters, essential for modeling the particle's interaction !
+!     with the turbulent flow.                                                 !
+!   * Particle time scale: Determines the particle's response time to flow     !
+!     changes, crucial for accurately capturing particle dynamics.             !
+!   * Random number generation: Utilizes Gaussian random numbers to simulate   !
+!     the stochastic nature of turbulence, introducing randomness in particle  !
+!     motion.                                                                  !
+!   * Turbulent velocity contribution: Calculates turbulent velocity           !
+!     fluctuations impacting the particle, combining model constants and       !
+!     fluid properties.                                                        !
+!                                                                              !
+!   Note                                                                       !
+!                                                                              !
+!   * SGS model introducing stochasticity to LES/k-eps-zeta-f modeled          !
+!     quantities seen by particles (from Z. Cheng et. al., (2018) 435-451).    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

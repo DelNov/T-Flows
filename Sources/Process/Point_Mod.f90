@@ -18,6 +18,9 @@
   !----------------!
   !   Point type   !
   !----------------!
+  !> Point_Type includes basic properties of points such as coordinates,
+  !> the closest cell, node, boundary cell, and information about the
+  !> point's position within a subdomain / buffer.
   type Point_Type
 
     ! Grid in which the point is defined

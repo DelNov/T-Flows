@@ -1,12 +1,26 @@
 !==============================================================================!
   subroutine Trap_Particle(Swarm, k)
 !------------------------------------------------------------------------------!
-!   Traps a particle to interface                                              !
+!> This subroutine is responsible for trapping particles at interfaces between
+!> two phases within the computational domain. It is a key component in
+!> simulations involving three-phase flows, two fluid phases resolved with VOF
+!> and a solid phase, represented by particles.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Interface detection: Determines if a particle has crossed an interface   !
+!     a critical aspect in three-phase flow simulations.                       !
+!   * Particle trapping: Implements the logic to trap particles at interfaces, !
+!     altering their state and behavior in response to the encountered surface.!
+!   * Smoothed field evaluation: Utilizes the smoothed (VOF) field to          !
+!     accurately assess the particle's position relative to the interface.     !
+!   * Trapping flag management: Updates particle status flags to reflect       !
+!     trapping, important for tracking particle dynamics and interactions.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer, intent(in)       :: k      ! particle number
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
+  integer, intent(in)       :: k      !! particle number (rank)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Vof_Type),      pointer :: Vof

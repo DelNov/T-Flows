@@ -1,13 +1,32 @@
 !==============================================================================!
   subroutine Advance_Particles(Swarm, n_stat_p, first_dt_p)
 !------------------------------------------------------------------------------!
-!   Advances all particles in the Swarm.                                       !
+!> This subroutine advances all particles in a swarm through a computational
+!> domain. It handles particle motion, interactions with the flow field,
+!> turbulence effects, and interactions with boundaries and surfaces. The
+!> routine is a central part of the Lagrangian particle tracking approach in
+!> T-Flows.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Particle motion: Manages the movement of particles within the grid based   !
+!   on the current flow field and particle properties.                         !
+! * Subgrid scale modeling: Applies turbulence models for particle tracking,   !
+!   including Brownian motion (Fukagata) and Discrete Random Walk (DRW).       !
+! * Boundary interaction: Processes particle collision and interaction with    !
+!   computational domain boundaries, including bouncing and trapping.          !
+! * Surface interaction: Manages the behavior of particles upon contact with   !
+!   surfaces, such as trapping or deposition.                                  !
+! * Parallel processing: Supports particle exchange in parallel computation    !
+!   environments, ensuring accurate tracking across processors.                !
+! * Statistical analysis: Calculates and updates particle statistics during    !
+!   the simulation.                                                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer, intent(in)       :: n_stat_p    ! starting time for swarm statistics
-  integer, intent(in)       :: first_dt_p  ! starting time for swarm simulation
+  class(Swarm_Type), target :: Swarm       !! the swarm of particles
+  integer, intent(in)       :: n_stat_p    !! starting time for swarm statistics
+  integer, intent(in)       :: first_dt_p  !! starting time for swarm simulation
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow

@@ -1,11 +1,25 @@
 !==============================================================================!
   subroutine Particle_Time_Scale(Swarm)
 !------------------------------------------------------------------------------!
-!   Corrects particle time step size if input value is too big                 !
+!>  Adjusts the particle time step size within a swarm to ensure proper time
+!>  scale resolution. This subroutine is pivotal for maintaining numerical
+!>  stability and accuracy in simulations involving particle tracking, by
+!>  adapting the time step size based on fluid and turbulence time scales.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Particle relaxation time: Computes the particle's characteristic time    !
+!     scale based on its diameter and the fluid's viscosity.                   !
+!   * Time scale ratios: Assesses the ratio of fluid and turbulence time       !
+!     scales to the particle's time scale for guiding the adjustment of the    !
+!     time step.                                                               !
+!   * Time step adjustment: Modifies the number of sub-steps and particle      !
+!     time step size to align with the Nyquist criterion and ensure adequate   !
+!     resolution of particle dynamics relative to the flow field.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow

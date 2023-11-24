@@ -1,11 +1,27 @@
 !==============================================================================!
   subroutine Sgs_Fukagata(Swarm)
 !------------------------------------------------------------------------------!
-!   SGS model accounting for Brownian diffusion force by Fukagata et al., 2004 !
+!> Implements the Subgrid Scale (SGS) Brownian diffusion force model by
+!> Fukagata et al., 2004, for Lagrangian particle tracking in turbulence
+!> simulations. This model is particularly effective for representing the
+!> impacts of unresolved turbulent eddies on particle behavior in LES.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Turbulence modeling: Applies the SGS model to calculate turbulence       !
+!     parameters like kinetic energy and dissipation rate, essential for       !
+!     accurate turbulence representation.                                      !
+!   * Particle relaxation time: Computes the particle's response time scale    !
+!     to flow changes, crucial for capturing particle dynamics within the      !
+!     turbulent flow.                                                          !
+!   * Brownian diffusion force: Calculates Brownian diffusion force components !
+!     impacting particle motion, accounting for turbulence-induced randomness. !
+!   * Random number generation: Utilizes Gaussian random numbers to model the  !
+!     stochastic nature of turbulence, impacting particle trajectories.        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid

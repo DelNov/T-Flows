@@ -1,14 +1,35 @@
 !==============================================================================!
   subroutine Move_Trapped(Swarm, k)
 !------------------------------------------------------------------------------!
-!   This was coppied from Surf % Advance and Surf % Smooth, which may sound    !
-!   (code duplication) bad, but I had a very strong feeling that inheriting    !
-!   the procedure would make things more cumbersome, harder to follow.         !
+!>  Manages the movement of trapped (at an interface) particles within the
+!>  swarm. This subroutine is specifically designed for particles that have
+!>  interacted with a surface within the computational domain, particularly
+!>  for particles adhering to surfaces or those at the interface of different
+!>  fluid phases.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Particle-surface interaction: Adjusts the position of trapped particles  !
+!     to align with surface norms, ensuring realistic behavior at interfaces.  !
+!   * Normal direction movement: Calculates the normal direction to the        !
+!     surface at the particle's position and moves the particle accordingly.   !
+!   * Position update: Updates the position of trapped particles based on      !
+!     the computed movement direction to keep them on the surface.             !
+!   * Surface normals: Utilizes the smoothed volume of fluid (VOF) function to !
+!     compute surface normals, contributing to the accuracy of the position    !
+!     adjustment.                                                              !
+!                                                                              !
+!   Note                                                                       !
+!                                                                              !
+!     * This was coppied from Surf % Advance and Surf % Smooth, which may      !
+!       sound bad (code duplication), but I had a very strong feeling that     !
+!       inheriting the procedure would make things more cumbersome, more       !
+!       complex and harder to follow.                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer, intent(in)       :: k
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
+  integer, intent(in)       :: k      !! particle number (rank)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow

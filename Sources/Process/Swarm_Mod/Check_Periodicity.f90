@@ -1,13 +1,31 @@
 !==============================================================================!
   subroutine Check_Periodicity(Swarm, k, n_parts_in_buffers)
 !------------------------------------------------------------------------------!
-!   Check if particle left the the domain in a periodic direction              !
+!> This subroutine checks if a particle in a swarm has crossed a periodic
+!> boundary in the computational domain. It is crucial for maintaining
+!> accurate tracking of particles in simulations with periodic boundary
+!> conditions, ensuring particles are correctly relocated to their new
+!> positions within the domain.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Periodic boundary handling: Identifies if particles have crossed periodic  !
+!   boundaries and adjusts their positions accordingly.                        !
+! * Particle relocation: Ensures particles that cross a periodic boundary are  !
+!   accurately relocated to their corresponding shadow positions.              !
+! * Buffer zone management: Marks particles that move into buffer zones,       !
+!   aiding in parallel processing scenarios.                                   !
+! * Distance calculation: Computes distances to ascertain the closest shadow   !
+!   position of a particle after crossing a boundary.                          !
+! * Cell update: Updates the cell and node information of a particle after     !
+!   crossing a periodic boundary.                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer                   :: k
-  integer                   :: n_parts_in_buffers
+  class(Swarm_Type), target :: Swarm               !! the swarm of particles
+  integer                   :: k                   !! particle number (rank)
+  integer                   :: n_parts_in_buffers  !! counter for the number of
+                                                   !! particles in buffer zones
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part

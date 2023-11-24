@@ -1,15 +1,31 @@
 !==============================================================================!
   subroutine Create_Swarm(Swarm, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
-!   Allocates memory to store the charge of each particle                      !
-!   It assumes that the number of particles was read from the control file     !
+!> This subroutine initializes and allocates memory for a swarm of particles,
+!> setting up the necessary components for Lagrangian particle tracking. It
+!> configures the swarm based on predefined parameters and links it to the
+!> corresponding flow, turbulence, and VOF fields.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Initialization: Sets up a swarm with a specified number of particles and   !
+!   links it to the relevant flow, turbulence, and VOF fields.                 !
+! * Memory allocation: Allocates memory for storing particle properties and    !
+!   various arrays for tracking particle interactions with the flow domain     !
+!   and for parallel processing.                                               !
+! * Particle initialization: Initializes each particle in the swarm with       !
+!   predefined properties like diameter and density.                           !
+! * Ensemble-Averaging Preparation: Allocates memory for variables needed for  !
+!   ensemble-averaging in statistical studies.                                 !
+! * Brownian Motion and Modeled Flow: Prepares variables for Brownian motion   !
+!   forces and modeled flow quantity calculations.                             !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  type(Field_Type),  target :: Flow
-  type(Turb_Type),   target :: Turb
-  type(Vof_Type),    target :: Vof
+  class(Swarm_Type), target :: Swarm  !! the swarm od particles
+  type(Field_Type),  target :: Flow   !! flow field
+  type(Turb_Type),   target :: Turb   !! turbulence field
+  type(Vof_Type),    target :: Vof    !! volume of fluid
 !----------------------------------[Locals]------------------------------------!
   integer :: k, nb, nc
 !==============================================================================!

@@ -33,10 +33,10 @@
   !---------------!
   !   Vert type   !
   !---------------!
-  type, extends(Point_Type) :: Vert_Type
   !> Vert_Type is an extension of the Point_Type used in Front_Mod and
   !> Surf_Mod. Vert_Type includes additional attributes and functionalities
   !> such as handling vertices on computational surfaces.
+  type, extends(Point_Type) :: Vert_Type
 
     ! Old vertex's coordinates; new is in the parent
     real :: x_o  !! old x coordinate

@@ -1,12 +1,34 @@
 !==============================================================================!
   subroutine Initialize_Particle(Particle, Flow, diameter, density)
 !------------------------------------------------------------------------------!
+!> The Initialize_Particle subroutine is tasked with setting up the initial
+!> state of a particle in the computational domain. It initializes the
+!> particle's properties and links it to the flow field, ensuring that the
+!> particle is ready for simulation and interaction within the fluid
+!> environment.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Linking to flow field: Associates the particle with a specific flow        !
+!   field, enabling interaction and tracking within that environment.          !
+! * Particle properties: Sets the particle's diameter and density based on     !
+!   provided values, crucial for physical simulations and force calculations.  !
+! * Velocity initialization: Initializes particle's velocity components to     !
+!   zero, preparing it for dynamic updates during the simulation process.      !
+! * Relative velocity setup: Sets up initial relative velocities for DRW       !
+!   model interactions, important for stochastic eddy interaction modeling.    !
+! * Position and state initialization: Establishes the initial position        !
+!   (coordinates) of the particle and resets its state flags (deposited,       !
+!   escaped, trapped), ensuring accurate tracking and interaction handling.    !
+! * Processor assignment: Assigns a processor number to the particle,          !
+!   critical in parallel processing contexts for managing particle location.   !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Particle_Type)     :: Particle
-  type(Field_Type), target :: Flow
-  real                     :: diameter
-  real                     :: density
+  class(Particle_Type)     :: Particle  !! particle object to be initialized
+  type(Field_Type), target :: Flow      !! flow in which particle is immersed
+  real,         intent(in) :: diameter  !! particle's diameter
+  real,         intent(in) :: density   !! particle's density
 !==============================================================================!
 
   ! Store the grid pointer

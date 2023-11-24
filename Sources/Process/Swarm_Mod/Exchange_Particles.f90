@@ -1,11 +1,28 @@
 !==============================================================================!
   subroutine Exchange_Particles(Swarm)
 !------------------------------------------------------------------------------!
-!   Exchange particles between processors                                      !
+!> This subroutine handles the exchange of particle data between processors
+!> in a parallel computing environment. It is essential for ensuring the
+!> consistency and accuracy of particle tracking across processor boundaries.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Data preparation: Organizes particle data for exchange, including          !
+!   processor and buffer information, position, velocity, and other particle   !
+!   properties.                                                                !
+! * Data exchange: Facilitates the sharing of particle data among different    !
+!   processors, ensuring that each processor has the correct information about !
+!   particles that move across boundaries.                                     !
+! * Particle redistribution: Updates particles’ position and state based on    !
+!   the received data, handling cases where particles enter or leave a         !
+!   processor's sub-domain.                                                    !
+! * Grid-based variable update: Refreshes grid-based variables like particle   !
+!   statistics and flow quantities, which are necessary for accurate particle  !
+!   tracking and post-processing.                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part

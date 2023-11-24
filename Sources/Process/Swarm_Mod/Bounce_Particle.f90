@@ -1,12 +1,30 @@
 !==============================================================================!
   subroutine Bounce_Particle(Swarm, k)
 !------------------------------------------------------------------------------!
-!   Interpolates velocity at the particle's position                           !
+!> This subroutine manages the interaction of particles with the boundaries of
+!> the computational domain in T-Flows. It handles the reflection, deposition,
+!> and escape of particles upon encountering walls, outflows, and other
+!> boundary types.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Particle-boundary Interaction: Detects and processes collisions between    !
+!   particles and boundary surfaces.                                           !
+! * Reflection and deposition: Determines whether a particle is reflected or   !
+!   deposited based on its velocity and the nature of the boundary surface.    !
+! * Escape handling: Identifies particles that exit the computational domain   !
+!   through outflow boundaries and marks them as escaped.                      !
+! * Position adjustment: Updates particle positions post-interaction to        !
+!   reflect their new state (e.g., reflected position or deposited location).  !
+! * Velocity update: Modifies particle velocities after reflection, taking     !
+!   into account factors like the coefficient of restitution.                  !
+! * Boundary crossing Validation: Ensures accurate detection of particles      !
+!   crossing boundary faces, employing a backstepping method if necessary.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer, intent(in)       :: k      ! particle number
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
+  integer, intent(in)       :: k      !! particle number (rank)
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Particle_Type), pointer :: Part

@@ -1,13 +1,26 @@
 !==============================================================================!
   subroutine Calculate_Particles_Mean(Swarm, k, n_stat_p)
 !------------------------------------------------------------------------------!
-!   Calculates particle time averaged velocity                                 !
+!> This subroutine calculates time-averaged velocities and resolved Reynolds
+!> stresses for particles within a swarm in T-Flows. It is integral for
+!> analyzing particle dynamics in scale-resolving simulations such as LES.
+!------------------------------------------------------------------------------!
+! Functionality                                                                !
+!                                                                              !
+! * Time-averaged velocities: Computes mean velocities (u, v, w) for the       !
+!   particles in each computational cell, crucial for ensemble averaging.      !
+! * Resolved reynolds stresses: Calculates resolved Reynolds stresses (uu,     !
+!   vv, ww, uv, uw, vw) for the particles, providing insights into turbulent   !
+! * Tracking particle states: Maintains a count of the number of states        !
+!   (time steps) for averaging, ensuring accurate statistical representation.  !
+! * Compatibility with various models: Supports LES, DES, and other            !
+!   scale-resolving turbulence models, adapting to the simulation context.     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
-  integer,       intent(in) :: k         ! particle index
-  integer,       intent(in) :: n_stat_p  ! starting time step for swarm statist.
+  class(Swarm_Type), target :: Swarm     !! the swarm of particles
+  integer,       intent(in) :: k         !! particle number (rank)
+  integer,       intent(in) :: n_stat_p  !! starting step for swarm statistics
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow

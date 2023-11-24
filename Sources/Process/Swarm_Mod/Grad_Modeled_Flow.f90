@@ -1,11 +1,26 @@
 !==============================================================================!
   subroutine Grad_Modeled_Flow(Swarm)
 !------------------------------------------------------------------------------!
-!   Stores gradients of modeled Flow parameters for swarm SGS models           !
+!>  Calculates and stores the gradients of modeled flow parameters, namely
+!>  the v2 component from the k-eps-zeta-f model. It computes gradients of
+!>  turbulent kinetic energy and dissipation rate, althogh I am not sure it
+!>  uses them. It computes v2_mod from zeta and turbulent kinetic energy and
+!>  then computes its gradients in x, y and z direction.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Turbulence data access: Gathers turbulence data from the flow field,     !
+!     grid, and turbulence model for gradient calculations.                    !
+!   * Gradient calculation: Computes spatial gradients of turbulent kinetic    !
+!     energy and dissipation rate, although I am not sure it is needed.        !!
+!   * Modeled turbulence parameter: Forms an array of a modeled turbulence     !
+!     parameter (v^2) based on turbulence data.                                !
+!   * Gradient storage: Stores spatial gradients of the modeled turbulence     !
+!     variable v2 in three dimensions, important for particle dynamics.        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Swarm_Type), target :: Swarm
+  class(Swarm_Type), target :: Swarm  !! the swarm of particles
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
