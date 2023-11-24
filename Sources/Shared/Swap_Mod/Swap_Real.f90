@@ -1,18 +1,19 @@
 !==============================================================================!
   pure subroutine Swap_Real(a, b)
 !------------------------------------------------------------------------------!
-!   Swaps two real numbers.                                                    !
+!>  Swap_Real is a subroutine in Swap_Mod for swapping two ral values. It
+!>  takes two real numbers as input and exchanges their values.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   real, intent(inout) :: a, b
 !-----------------------------------[Locals]-----------------------------------!
-  real :: t
+  real :: c
 !==============================================================================!
 
-  t = a
+  c = a
   a = b
-  b = t
+  b = c
 
   end subroutine
 

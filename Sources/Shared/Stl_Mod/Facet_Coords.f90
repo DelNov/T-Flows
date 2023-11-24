@@ -1,13 +1,15 @@
 !==============================================================================!
   function Facet_Coords(Stl, fac)
 !------------------------------------------------------------------------------!
-!   Returns facet cooridnates, facet's center of gravity, in other words.      !
+!>  This function, belonging to the Stl_Mod module, calculates and returns the
+!>  coordinates of the center of gravity (centroid) of a specified facet in an
+!>  Stl object.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type)     :: Stl
-  real, dimension(3)  :: Facet_Coords
-  integer, intent(in) :: fac
+  class(Stl_Type)     :: Stl           !! parent Stl_Type object
+  real, dimension(3)  :: Facet_Coords  !! output, centroid of the facet
+  integer, intent(in) :: fac           !! facet number
 !==============================================================================!
 
   Facet_Coords(1) = (  Stl % xn(Stl % cells_n(1,-fac))  &

@@ -1,7 +1,9 @@
 !==============================================================================!
   module Swap_Mod
 !------------------------------------------------------------------------------!
-!   This module is introduced just to check arguments to Swap routines         !
+!>  Swap_Mod is a utility module in T-Flows designed to hold subroutine for
+!>  swapping values of two variables. It includes subroutines for swapping
+!>  integers and real numbers.
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!

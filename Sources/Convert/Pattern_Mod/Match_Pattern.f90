@@ -1,10 +1,14 @@
 !==============================================================================!
   logical function Match_Pattern(Pat, b)
 !------------------------------------------------------------------------------!
+!>  This subroutine is responsible for comparing a given byte sequence with
+!>  the stored pattern in the Pattern_Type instance. It returns a logical value
+!>  indicating whether the provided byte sequence matches the pattern.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Pattern_Type)    :: Pat
-  integer(1), intent(in) :: b(1:Pat % length)
+  class(Pattern_Type)    :: Pat                !! parent Pattern_Type object
+  integer(1), intent(in) :: b(1:Pat % length)  !! byte sequence to compare
 !-----------------------------------[Locals]-----------------------------------!
   logical :: r
   integer :: i

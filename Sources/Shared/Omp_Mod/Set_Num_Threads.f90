@@ -1,12 +1,15 @@
 !==============================================================================!
-  subroutine Set_Num_Threads(Vect, n)
+  subroutine Set_Num_Threads(Omp, n)
+!------------------------------------------------------------------------------!
+!>  The Set_Num_Threads subroutine in the Omp_Mod module serves to specify the
+!> number of threads to be used for OpenMP parallel processing.
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Vect_Type) :: Vect
-  integer, intent(in) :: n
+  class(Omp_Type)     :: Omp  !! parent class
+  integer, intent(in) :: n    !! number of threads
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Vect)
+  Unused(Omp)
 !==============================================================================!
 
 # ifdef _OPENMP

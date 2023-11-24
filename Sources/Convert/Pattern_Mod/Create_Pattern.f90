@@ -1,10 +1,13 @@
 !==============================================================================!
   subroutine Create_Pattern(Pat, string)
 !------------------------------------------------------------------------------!
+!>  The subroutine Create_Pattern is a member of the Pattern_Type and is
+!>  responsible for creating a pattern based on a given input string.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Pattern_Type)          :: Pat
-  character(len=*), intent(in) :: string
+  class(Pattern_Type)          :: Pat     !! parent Pattern_Type object
+  character(len=*), intent(in) :: string  !! input string
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!

@@ -79,7 +79,7 @@
   !   Set sorting criteria   !
   !--------------------------!
   do c = 1, Grid % n_cells
-    thread(c) = Grid % Vect % cell_thread(c)  ! in buffers, must be > n_threads
+    thread(c) = Grid % Omp % cell_thread(c)  ! in buffers, must be > n_threads
     cell  (c) = c
     Grid % old_c(c) = c
   end do
@@ -158,7 +158,7 @@
   call Sort % Real_By_Index(nc, Grid % wall_dist         (1), Grid % new_c(1))
   call Sort % Int_By_Index (nc, Grid % por               (1), Grid % new_c(1))
   ! Sorting of the following three fields does not exist in the sister function
-  call Sort % Int_By_Index (nc, Grid % Vect % cell_thread(1), Grid % new_c(1))
+  call Sort % Int_By_Index (nc, Grid % Omp  % cell_thread(1), Grid % new_c(1))
   call Sort % Int_By_Index (nc, Grid % Comm % cell_glo   (1), Grid % new_c(1))
   call Sort % Int_By_Index (nc, Grid % Comm % cell_proc  (1), Grid % new_c(1))
 

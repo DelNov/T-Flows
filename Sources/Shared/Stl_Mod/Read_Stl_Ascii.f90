@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Read_Stl_Ascii(Stl)
 !------------------------------------------------------------------------------!
-!   Reads an STL file in ASCII format                                          !
+!>  This subroutine reads an STL (Stereolithography) file in ASCII format and
+!>  populates an Stl_Type object with its contents. It parses facet normals and
+!>  vertex coordinates to reconstruct the geometry defined in the STL file.
 !------------------------------------------------------------------------------!
-! implicit none
+  implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type) :: Stl
+  class(Stl_Type) :: Stl  !! parent Stl_Type object
 !-----------------------------------[Locals]-----------------------------------!
   integer :: fu, v, f, i_ver
 !==============================================================================!

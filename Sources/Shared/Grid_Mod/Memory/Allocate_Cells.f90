@@ -70,7 +70,7 @@
   end do
 
   ! Allocate thread i.d.
-  allocate(Grid % Vect % cell_thread(-nb:nc));  Grid % Vect % cell_thread(:) = 0
+  allocate(Grid % Omp % cell_thread(-nb:nc));  Grid % Omp % cell_thread(:) = 0
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
   if(PROGRAM_NAME .ne. "Process") then

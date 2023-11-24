@@ -1,14 +1,15 @@
 !==============================================================================!
   function Facets_Vert_Coords(Stl, fac, v)
 !------------------------------------------------------------------------------!
-!   Returns cooridnates of facets's vertex                                     !
+!>  This function, belonging to the Stl_Mod module, returns the coordinates
+!>  of a specified vertex (numbered locally) in a specified facet.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type)     :: Stl
-  real, dimension(3)  :: Facets_Vert_Coords
-  integer, intent(in) :: fac
-  integer, intent(in) :: v
+  class(Stl_Type)     :: Stl                 !! parent Stl_Type object
+  real, dimension(3)  :: Facets_Vert_Coords  !! output, vertex coordinates
+  integer, intent(in) :: fac                 !! facet number
+  integer, intent(in) :: v                   !! facet's local vertex
 !==============================================================================!
 
   Assert(v <= 3)

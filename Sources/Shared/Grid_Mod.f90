@@ -8,7 +8,7 @@
 !>  data which defines a grid as well as procedures to manipulate the grids.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Vect_Mod
+  use Omp_Mod
   use Profiler_Mod
   use File_Mod
   use Region_Mod
@@ -186,10 +186,10 @@
     !-------------------------------------------!
     type(Comm_Type) :: Comm  !! module for MPI communication, local to grid
 
-    !-------------------------------------------!
-    !   Vectorization class for manycore runs   !
-    !-------------------------------------------!
-    type(Vect_Type) :: Vect  !! used in vectorization for manycore runs
+    !---------------------------------!
+    !   OMP class for manycore runs   !
+    !---------------------------------!
+    type(Omp_Type) :: Omp  !! used in OMP vectorization
 
     contains
       procedure :: Allocate_Cells

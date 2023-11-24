@@ -1,12 +1,15 @@
 !==============================================================================!
   subroutine Create_From_File(Stl, file_name)
 !------------------------------------------------------------------------------!
-!   Creates an Stl object from a file                                          !
+!>  This subroutine constructs an STL object from a given file. It reads the
+!>  contents of the STL file specified by 'file_name' and populates the Stl
+!>  object with its data. The routine handles both binary and ASCII STL formats.
+!>  It also merges duplicate vertices to streamline the object's structure.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type) :: Stl
-  character(*)    :: file_name
+  class(Stl_Type)          :: Stl        !! parent Stl_Type object
+  character(*), intent(in) :: file_name  !! file name
 !-----------------------------------[Locals]-----------------------------------!
   integer :: v, f, i_ver, n
   integer :: body = 0

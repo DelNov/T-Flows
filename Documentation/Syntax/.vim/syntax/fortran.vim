@@ -420,8 +420,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  Math           Sort           File           String            Work           Line  Tok
   syn keyword fortranTypeTflows    Comm_Type      Backup_Type    Field_Type     Turb_Type         Vof_Type       Swarm_Type
   syn keyword fortranObjectTflows  Comm  Global   Backup  Bac    Flow  Fld      Turb  Tur         Vof            Swarm Swr
-  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type        Vect_Type
-  syn keyword fortranObjectTflows                 v_flux         Iter           Metis             Vect
+  syn keyword fortranTypeTflows    Bulk_Type      Face_Type      Iter_Type      Metis_Type        Omp_Type
+  syn keyword fortranObjectTflows                 v_flux         Iter           Metis             Omp
   syn keyword fortranTypeTflows    Front_Type     Surf_Type      Elem_Type      Side_Type         Vert_Type      Particle_Type
   syn keyword fortranObjectTflows  Front          Surf           Elem           side              Vert           Part  Particle
   syn keyword fortranTypeTflows    Monitor_Type   Results_Type   Porosity_Type  Profiler_Type     Message_Type   Info_Type

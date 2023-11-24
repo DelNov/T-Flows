@@ -229,7 +229,7 @@ SRC_F_MOD = Const_Mod.f90      \
             Assert_Mod.f90     \
             Tokenizer_Mod.f90  \
             Message_Mod.f90    \
-            Vect_Mod.f90       \
+            Omp_Mod.f90        \
             Control_Mod.f90    \
             Profiler_Mod.f90   \
             Math_Mod.f90       \

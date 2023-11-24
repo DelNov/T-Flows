@@ -1,10 +1,14 @@
 #include "../Shared/Unused.h90"
 
 !==============================================================================!
-  module Vect_Mod
+  module Omp_Mod
 !------------------------------------------------------------------------------!
-!   Module for OpenMP functionality.                                           !
-!                                                                              !
+!>  This module, Omp_Mod, is dedicated to OpenMP functionalities within the
+!>  T-Flows project. It encapsulates common OpenMP operations, providing a
+!>  structured and efficient approach to parallel processing on manycores.
+!>  The module interfaces with Omp_Lib to access OpenMP functions and manages
+!>  parallel regions through the Region_Mod.
+!------------------------------------------------------------------------------!
 !   Some OpenMP functions you get with Omp_Lib:                                !
 !                                                                              !
 !   - int omp_get_max_threads()                                                !
@@ -29,22 +33,24 @@
   implicit none
 !==============================================================================!
 
-  !---------------!
-  !   Vect type   !
-  !---------------!
-  type Vect_Type    ! used inside the Grid_Type
+  !--------------!
+  !   OMP type   !
+  !--------------!
+  !> The Omp_Type defined within the Omp_Mod module is created to manage
+  !> and facilitate OpenMP functionalities within the T-Flows program.
+  type Omp_Type    ! used inside the Grid_Type
 
     ! Number of threads
-    integer :: n_threads
+    integer :: n_threads  !! actual number of OMP threads
 
     ! Desired number of threads read from control file
-    integer :: d_threads
+    integer :: d_threads  !! desired number of OMP threads
 
-    type(Region_Type) :: thread
+    type(Region_Type) :: thread  !! stores parallel regions in the code
 
     ! Thread for each cell and face
-    integer, allocatable :: cell_thread(:)
-    integer, allocatable :: face_thread(:)
+    integer, allocatable :: cell_thread(:)  !! map cells to threads
+    integer, allocatable :: face_thread(:)  !! map faces to threads
 
     contains
       procedure :: Get_Max_Threads
@@ -54,7 +60,7 @@
 
   contains
 
-#   include "Vect_Mod/Get_Max_Threads.f90"
-#   include "Vect_Mod/Set_Num_Threads.f90"
+#   include "Omp_Mod/Get_Max_Threads.f90"
+#   include "Omp_Mod/Set_Num_Threads.f90"
 
   end module

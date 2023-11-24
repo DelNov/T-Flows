@@ -5,6 +5,12 @@
 !==============================================================================!
   module Convert_Mod
 !------------------------------------------------------------------------------!
+!>  Convert_Mod is a module designed for the Convert program in the T-Flows
+!>  project. It provides a collection of procedures for various conversion and
+!>  geometry processing tasks. The module integrates functions for handling
+!>  different mesh formats and geometrical operations, enhancing the
+!>  versatility and capability of the Convert program.
+!------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Pattern_Mod
   use Stl_Mod
@@ -12,16 +18,15 @@
   use Ifport              ! Intel's module for fseek and ftell
 # endif
 !------------------------------------------------------------------------------!
-!   Collection of functions used in the Convert program.  In honesty, it was   !
-!   introduced to get rid of the Fortran header files with interfaces which,   !
-!   in effect, was needed for Intel compiler to work in the debug mode.        !
-!------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
   !------------------!
   !   Convert type   !
   !------------------!
+  !> Convert_Type encapsulates a number of procedures for various
+  !> tasks such as geometry calculation, grid topology analysis,
+  !> and handling different mesh formats.
   type Convert_Type
 
     contains
@@ -48,7 +53,8 @@
   end type
 
   ! Singleton Convert object
-  type(Convert_Type) :: Convert
+  type(Convert_Type) :: Convert  !! singleton Convert object for easy
+                                 !! access to Conver_Type's functions
 
   !----------------------------------!
   !   Declarations for cell shapes   !

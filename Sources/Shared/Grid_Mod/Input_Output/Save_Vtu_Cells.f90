@@ -433,7 +433,7 @@
   i = 0
   do c = 1, Grid % n_cells
     if(Grid % new_c(c) .ne. 0) then
-      i=i+1;  i_buffer(i) = Grid % Vect % cell_thread(c)
+      i=i+1;  i_buffer(i) = Grid % Omp % cell_thread(c)
     end if
   end do
   write(fu) i_buffer(1:i)

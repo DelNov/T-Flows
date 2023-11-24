@@ -1,7 +1,11 @@
 !==============================================================================!
   module Region_Mod
 !------------------------------------------------------------------------------!
-!   This is used to store regions (boundary conditions) within a Grid_Type     !
+!>  The Region_Mod module in T-Flows is designed to manage boundary condition
+!>  regions within the Grid_Type. It categorizes various types of boundary
+!>  conditions, providing a structured approach to handle different boundary
+!>  interactions in computational domains. The module is also used to store
+!>  threads for OMP runs, although OMP is in an early stage of development.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -29,24 +33,27 @@
   !-----------------!
   !   Region type   !
   !-----------------!
+  !> Region_Type hold ariables for storing boundary condition information
+  !> such as names and types of regions, regions at cells and faces and
+  !> first and last cell or face for each region for more efficient browsing.
   type Region_Type
 
     ! Name of the boundary conditions specified in grid generation
     ! It ranges through number of boundary conditions (aka regions)
-    character(SL), allocatable :: name(:)
+    character(SL), allocatable :: name(:)  !! name of the boundary condition
 
     ! Boundary types, ranging through all regions
-    integer, allocatable :: type(:)
+    integer, allocatable :: type(:)  !! type of the boundary condition
 
     ! Boundary condition ranging through boundary cells.
     ! Values start from one, zero is internal cell
     ! (Follows nomenclature from "../Shared/Comm_Mod_Par.f90")
-    integer, allocatable :: at_cell(:)  ! region at cell
-    integer, allocatable :: at_face(:)  ! region at face (for periodicity)
-    integer, allocatable :: f_cell(:)   ! first (bnd) cell for region
-    integer, allocatable :: l_cell(:)   ! last (bnd) cell for region
-    integer, allocatable :: f_face(:)   ! first (bnd) cell for region
-    integer, allocatable :: l_face(:)   ! last (bnd) cell for region
+    integer, allocatable :: at_cell(:)  !! region at cell
+    integer, allocatable :: at_face(:)  !! region at face (for periodicity)
+    integer, allocatable :: f_cell(:)   !! first (bnd) cell for region
+    integer, allocatable :: l_cell(:)   !! last (bnd) cell for region
+    integer, allocatable :: f_face(:)   !! first (bnd) cell for region
+    integer, allocatable :: l_face(:)   !! last (bnd) cell for region
 
   end type
 

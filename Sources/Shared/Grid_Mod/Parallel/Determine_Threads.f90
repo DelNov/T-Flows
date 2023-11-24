@@ -33,16 +33,16 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type), target, intent(inout) :: Grid  !! The computational grid
 !-----------------------------------[Locals]-----------------------------------!
-  type(Vect_Type), pointer :: Vect
-  integer                  :: c, s, m, i_fac
-  integer                  :: n_cells_in, in_thread, n_remains, thr
-  integer, allocatable     :: cells_in_thread(:)
-  character(SL)            :: st1, st2
-  integer                  :: f_s, l_s
-  integer, allocatable     :: old_fc  (:,:)
-  integer, allocatable     :: old_nn  (:)
-  integer, allocatable     :: old_shad(:)
-  integer, allocatable     :: old_nods(:,:)
+  type(Omp_Type), pointer :: Omp
+  integer                 :: c, s, m, i_fac
+  integer                 :: n_cells_in, in_thread, n_remains, thr
+  integer, allocatable    :: cells_in_thread(:)
+  character(SL)           :: st1, st2
+  integer                 :: f_s, l_s
+  integer, allocatable    :: old_fc  (:,:)
+  integer, allocatable    :: old_nn  (:)
+  integer, allocatable    :: old_shad(:)
+  integer, allocatable    :: old_nods(:,:)
 !==============================================================================!
 
   m = size(Grid % faces_n, 1)
@@ -52,7 +52,7 @@
   allocate(old_nods(m, Grid % n_faces))
 
   ! Take aliases
-  Vect => Grid % Vect
+  Omp => Grid % Omp
 
   !----------------------------!
   !                            !
@@ -60,16 +60,16 @@
   !                            !
   !- - - - - - - - - - - - - - +-----------------------!
   !   This is all a bit silly at this stage, it will   !
-  !    make more sense when Vect_Mod matures a bit.    !
+  !    make more sense when Omp_Mod matures a bit.    !
   !----------------------------------------------------!
 
   ! You read desired number of threads from control file, try to use that
-  if(Vect % d_threads .lt. Vect % Get_Max_Threads()) then
-    call Vect % Set_Num_Threads(Vect % d_threads)
+  if(Omp % d_threads .lt. Omp % Get_Max_Threads()) then
+    call Omp % Set_Num_Threads(Omp % d_threads)
 
-  else if(Vect % d_threads .gt. Vect % Get_Max_Threads()) then
-    write(st1, '(i0.0)') Vect % d_threads
-    write(st2, '(i0.0)') Vect % Get_Max_Threads()
+  else if(Omp % d_threads .gt. Omp % Get_Max_Threads()) then
+    write(st1, '(i0.0)') Omp % d_threads
+    write(st2, '(i0.0)') Omp % Get_Max_Threads()
     call Message % Error(80, &
              'You are trying to run with '//trim(st1)//' OpenMP threads '  //  &
              'but there are only '//trim(st2)//' available. '              //  &
@@ -80,10 +80,10 @@
   end if
 
   ! Set n_threads to whatever you adjusted above
-  Vect % n_threads = Vect % Get_Max_Threads()
+  Omp % n_threads = Omp % Get_Max_Threads()
 
-  if(Vect % n_threads > 1) then
-    write(st1, '(i0.0)') Vect % n_threads
+  if(Omp % n_threads > 1) then
+    write(st1, '(i0.0)') Omp % n_threads
     call Message % Framed(48, 'NOTE from OpenMP!',                  &
                               'You are running a simulation on ' // &
                                trim(st1) // ' threads.', one_proc=.true.)
@@ -95,20 +95,20 @@
   !                                                       !
   !-------------------------------------------------------!
   if(PROGRAM_NAME == "Process" .and.  &
-     Vect % n_threads > 1) then
+     Omp % n_threads > 1) then
 
     !--------------------------!
     !   Arrange cell threads   !
     !--------------------------!
-    allocate(Vect % thread % f_cell(Vect % n_threads))
-    allocate(Vect % thread % l_cell(Vect % n_threads))
+    allocate(Omp % thread % f_cell(Omp % n_threads))
+    allocate(Omp % thread % l_cell(Omp % n_threads))
 
     n_cells_in = Grid % region % l_cell(Grid % n_regions) -    &
                  Grid % region % f_cell(Grid % n_regions) + 1
-    in_thread = n_cells_in / Vect % n_threads
-    n_remains = mod(n_cells_in, Vect % n_threads)
+    in_thread = n_cells_in / Omp % n_threads
+    n_remains = mod(n_cells_in, Omp % n_threads)
 
-    allocate(cells_in_thread(Vect % n_threads))
+    allocate(cells_in_thread(Omp % n_threads))
     cells_in_thread(:) = in_thread
 
     ! Add the remaining cells to the threads
@@ -117,19 +117,19 @@
     end do
 
     ! Work out starts and ends of the threads
-    Vect % thread % f_cell(1) = Grid % region % f_cell(Grid % n_regions)
-    Vect % thread % l_cell(1) = Vect % thread % f_cell(1)  &
-                              + cells_in_thread(1) - 1
-    do thr = 2, Vect % n_threads
-      Vect % thread % f_cell(thr) = Vect % thread % l_cell(thr-1) + 1
-      Vect % thread % l_cell(thr) = Vect % thread % f_cell(thr)  &
-                                  + cells_in_thread(thr) - 1
+    Omp % thread % f_cell(1) = Grid % region % f_cell(Grid % n_regions)
+    Omp % thread % l_cell(1) = Omp % thread % f_cell(1)  &
+                             + cells_in_thread(1) - 1
+    do thr = 2, Omp % n_threads
+      Omp % thread % f_cell(thr) = Omp % thread % l_cell(thr-1) + 1
+      Omp % thread % l_cell(thr) = Omp % thread % f_cell(thr)  &
+                                 + cells_in_thread(thr) - 1
     end do
 
     ! Assign cell threads (not sure if really needed)
-    do thr = 1, Vect % n_threads
-      do c = Vect % thread % f_cell(thr), Vect % thread % l_cell(thr)
-        Vect % cell_thread(c) = thr
+    do thr = 1, Omp % n_threads
+      do c = Omp % thread % f_cell(thr), Omp % thread % l_cell(thr)
+        Omp % cell_thread(c) = thr
       end do
     end do
 
@@ -142,10 +142,10 @@
     !  sure if explcit parallelization of boundary regions makes sense)
     do s = Faces_In_Domain_And_At_Buffers()
       c = Grid % faces_c(1, s)
-      Vect % face_thread(s) = Vect % cell_thread(c)
+      Omp % face_thread(s) = Omp % cell_thread(c)
     end do
     call Grid % Save_Vtu_Faces((/This_Proc(), N_Procs()/),  &
-                               int_phi_f=Vect % face_thread)
+                               int_phi_f=Omp % face_thread)
 
     ! The problem with simple assignments above is that face threads
     ! are not continous, they break at buffer faces which are sorted
@@ -157,7 +157,7 @@
     ! ... hence, faces are sorted by threads
     f_s = Grid % region % f_face(Grid % n_regions)
     l_s = Grid % region % l_face(Grid % n_regions)
-    call Sort % Int_Carry_Int(Vect % face_thread(f_s:l_s),  &
+    call Sort % Int_Carry_Int(Omp % face_thread(f_s:l_s),  &
                                     Grid % old_f(f_s:l_s))
 
     ! Sort connectivity: faces_c, faces_n_nodes, faces_n and faces_s
@@ -210,28 +210,28 @@
     end do
 
     ! Work out starts and ends of the threads
-    allocate(Vect % thread % f_face(Vect % n_threads))
-    allocate(Vect % thread % l_face(Vect % n_threads))
+    allocate(Omp % thread % f_face(Omp % n_threads))
+    allocate(Omp % thread % l_face(Omp % n_threads))
 
-    do thr = 1, Vect % n_threads
-      Vect % thread % f_face(thr) =  HUGE_INT
-      Vect % thread % l_face(thr) = -HUGE_INT
+    do thr = 1, Omp % n_threads
+      Omp % thread % f_face(thr) =  HUGE_INT
+      Omp % thread % l_face(thr) = -HUGE_INT
       do s = Faces_In_Domain_And_At_Buffers()
-        if(Vect % face_thread(s) .eq. thr) then
-          Vect % thread % f_face(thr) = min(Vect % thread % f_face(thr), s)
-          Vect % thread % l_face(thr) = max(Vect % thread % l_face(thr), s)
+        if(Omp % face_thread(s) .eq. thr) then
+          Omp % thread % f_face(thr) = min(Omp % thread % f_face(thr), s)
+          Omp % thread % l_face(thr) = max(Omp % thread % l_face(thr), s)
         end if
       end do
     end do
 
     ! Perform some check
-    do thr = 1, Vect % n_threads
-      Assert(Vect % thread % f_face(thr) .le. Vect % thread % l_face(thr))
+    do thr = 1, Omp % n_threads
+      Assert(Omp % thread % f_face(thr) .le. Omp % thread % l_face(thr))
     end do
-    do thr = 2, Vect % n_threads
-      Assert(Vect % thread % f_face(thr) .ge. Vect % thread % f_face(thr-1))
-      Assert(Vect % thread % l_face(thr) .ge. Vect % thread % l_face(thr-1))
-      Assert(Vect % thread % f_face(thr) .ge. Vect % thread % l_face(thr-1))
+    do thr = 2, Omp % n_threads
+      Assert(Omp % thread % f_face(thr) .ge. Omp % thread % f_face(thr-1))
+      Assert(Omp % thread % l_face(thr) .ge. Omp % thread % l_face(thr-1))
+      Assert(Omp % thread % f_face(thr) .ge. Omp % thread % l_face(thr-1))
     end do
 
   end if
