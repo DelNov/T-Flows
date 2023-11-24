@@ -54,11 +54,11 @@
 
 #!/bin/bash
 
-# Path to the makefile
+# Paths to the makefile and source directories
 makefile_path="$1"/makefile
 
-# Root directory for all sources
-src_root="../../../Sources"
+# Array of root directories for sources
+src_roots=("$1" "$1"../Shared)
 
 # Temporary directory for FORD
 src_temp="./Temporary"
@@ -94,10 +94,12 @@ done < "$makefile_path"
 # Search for, copy the paths of the source files and directories
 #----------------------------------------------------------------
 for file in "${src_files[@]}"; do
-  found_files=( $(find "$src_root" -name "$file.f90" -o -name "$file" -type d) )
-  for found_file in "${found_files[@]}"; do
-    echo "Copying $found_file to $src_temp"
-    cp -R "$found_file" "$src_temp"
+  for src_root in "${src_roots[@]}"; do
+    found_files=( $(find "$src_root" -name "$file.f90" -o -name "$file" -type d) )
+    for found_file in "${found_files[@]}"; do
+      echo "Copying $found_file to $src_temp"
+      cp -R "$found_file" "$src_temp"
+    done
   done
 done
 
