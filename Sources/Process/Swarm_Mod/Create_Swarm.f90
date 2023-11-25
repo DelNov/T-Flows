@@ -1,24 +1,24 @@
 !==============================================================================!
   subroutine Create_Swarm(Swarm, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
-!> This subroutine initializes and allocates memory for a swarm of particles,
-!> setting up the necessary components for Lagrangian particle tracking. It
-!> configures the swarm based on predefined parameters and links it to the
-!> corresponding flow, turbulence, and VOF fields.
+!>  This subroutine initializes and allocates memory for a swarm of particles,
+!>  setting up the necessary components for Lagrangian particle tracking. It
+!>  configures the swarm based on predefined parameters and links it to the
+!>  corresponding flow, turbulence, and VOF fields.
 !------------------------------------------------------------------------------!
-! Functionality                                                                !
+!   Functionality                                                              !
 !                                                                              !
-! * Initialization: Sets up a swarm with a specified number of particles and   !
-!   links it to the relevant flow, turbulence, and VOF fields.                 !
-! * Memory allocation: Allocates memory for storing particle properties and    !
-!   various arrays for tracking particle interactions with the flow domain     !
-!   and for parallel processing.                                               !
-! * Particle initialization: Initializes each particle in the swarm with       !
-!   predefined properties like diameter and density.                           !
-! * Ensemble-Averaging Preparation: Allocates memory for variables needed for  !
-!   ensemble-averaging in statistical studies.                                 !
-! * Brownian Motion and Modeled Flow: Prepares variables for Brownian motion   !
-!   forces and modeled flow quantity calculations.                             !
+!   * Initialization: Sets up a swarm with a specified number of particles     !
+!     and links it to the relevant flow, turbulence, and VOF fields.           !
+!   * Memory allocation: Allocates memory for storing particle properties and  !
+!     various arrays for tracking particle interactions with the flow domain   !
+!     and for parallel processing.                                             !
+!   * Particle initialization: Initializes each particle in the swarm with     !
+!     predefined properties like diameter and density.                         !
+!   * Ensemble-Averaging Preparation: Allocates memory for variables needed    !
+!     for ensemble-averaging in statistical studies.                           !
+!   * Brownian Motion and Modeled Flow: Prepares variables for Brownian motion !
+!     forces and modeled flow quantity calculations.                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

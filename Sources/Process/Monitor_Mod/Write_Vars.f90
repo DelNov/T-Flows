@@ -1,13 +1,18 @@
 !==============================================================================!
   subroutine Write_Vars(Monitor, Flow, curr_dt)
 !------------------------------------------------------------------------------!
-!   This is to write down variavles in monitoring points.                      !
+!> This subroutine is responsible for writing the values of various flow
+!> variables at the defined monitoring points during a T-Flows simulation. It
+!> iterates over each monitoring point and, if the point falls within the
+!> current processor's domain, writes the current values of velocity components
+!> (u, v, w), pressure (p), temperature (t), and any scalar quantities to the
+!> corresponding monitor files.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Monitor_Type) :: Monitor
-  type(Field_Type)    :: Flow
-  integer, intent(in) :: curr_dt
+  class(Monitor_Type) :: Monitor  !! parent class of Monitory_Type
+  type(Field_Type)    :: Flow     !! flow field being monitored
+  integer, intent(in) :: curr_dt  !! current time step
 !-----------------------------------[Locals]-----------------------------------!
   integer :: m, c, sc, fu
 !==============================================================================!

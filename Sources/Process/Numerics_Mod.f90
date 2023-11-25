@@ -3,14 +3,17 @@
 !==============================================================================!
   module Numerics_Mod
 !------------------------------------------------------------------------------!
-!   Module which embodies subroutines and function typical for numerical       !
-!   treatment of dicretized equations.  It should lead to reduction of code    !
-!   duplication for routinely used procedures.                                 !
-!   terms and diffusion terms.                                                 !
-!                                                                              !
-!   (It is also the first module which has all "use" statements here, in       !
-!    the definition of the module itself.  That's a better practice than to
-!    have them spread over included functions.)                                !
+!>  The Numerics_Mod module in T-Flows is essential for implementing numerical
+!>  strategies used in the discretization of conservation equations via the
+!>  finite volume method. It centralizes parameters and procedures common to
+!>  various discretization schemes, reducing code duplication and improving
+!>  maintainability. This module does not handle linear solvers, which are
+!>  managed separately in modules like Native_Mod and Petsc_Mod. Numerics_Mod
+!>  includes advection schemes, time integration parameters, algorithms for
+!>  pressure-velocity coupling, and methods for gradient computation.  It does
+!>  not define a new type.  Rather, it is a collection of procedures (whose
+!>  names start with Numerics_Mod) and parameters used when dicretizing
+!>  the equations.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Matrix_Mod

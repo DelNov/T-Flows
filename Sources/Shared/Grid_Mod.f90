@@ -4,8 +4,17 @@
 !==============================================================================!
   module Grid_Mod
 !------------------------------------------------------------------------------!
-!>  Modile Grid_Mod is practically a holder for Grid_Type, which holds the
-!>  data which defines a grid as well as procedures to manipulate the grids.
+!>  The Grid_Mod module is a cornerstone in the T-Flows program, serving as the
+!>  central repository for data structures and operations related to the
+!>  computational grid. It is utilized across all sub-programs of T-Flows
+!>  including Convert, Generate, Divide, and Process. This module's primary
+!>  construct, Grid_Type, houses the necessary data for representing a
+!>  computational grid and provides a comprehensive suite of methods for
+!>  grid manipulation. These methods encompass a wide range of functionalities
+!>  such as geometrical calculations, connectivity analysis, mesh division,
+!>  and grid data export in various formats. The module's design emphasizes
+!>  versatility and robustness, enabling efficient handling of diverse grid
+!>  configurations and facilitating complex fluid dynamics simulations.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Omp_Mod

@@ -1,14 +1,21 @@
 !==============================================================================!
   subroutine Initialize(Monitor, Flow, restart, domain)
 !------------------------------------------------------------------------------!
-!   This is to read the control file and set up Monitoring points.             !
+!> This subroutine initializes the monitoring points for the Process sub-
+!> program in T-Flows. It reads the number of monitoring points and their
+!> coordinates from the control file, allocates memory for these points, and
+!> establishes file connections for each point. For each moonitoring point it
+!> finds the nearest computational cell and reports directly from that value,
+!> without any extrapolation. The monitoring files have extension 'monit-NNN'
+!> where NNN is point rank. The subroutine also handles the restart logic,
+!> ensuring that existing monitoring files are not over-written after restart.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Monitor_Type)      :: Monitor
-  type(Field_Type), target :: Flow
-  logical                  :: restart
-  integer,        optional :: domain
+  class(Monitor_Type)      :: Monitor  !! parent class of Monitory_Type
+  type(Field_Type), target :: Flow     !! flow field being monitored
+  logical                  :: restart  !! true if current run is a restart
+  integer,        optional :: domain   !! domain number
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: c, m, n, l, sc
@@ -85,8 +92,8 @@
       min_dist_all = min_dist(m)
       call Global % Min_Real(min_dist_all)
 
-      ! If there is, erase Monitoring point at this_proc 
-      if(abs(min_dist_all - min_dist(m)) >= TINY) then 
+      ! If there is, erase Monitoring point at this_proc
+      if(abs(min_dist_all - min_dist(m)) >= TINY) then
         Monitor % cell(m) = 0
       end if
     end if

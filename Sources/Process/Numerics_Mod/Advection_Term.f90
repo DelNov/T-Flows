@@ -1,15 +1,38 @@
 !==============================================================================!
   subroutine Numerics_Mod_Advection_Term(phi, coef, v_flux, b)
 !------------------------------------------------------------------------------!
-!   Purpose: Dicretize advection term in conservation equations.               !
+!>  The subroutine Numerics_Mod_Advection_Term within the Numerics_Mod module
+!>  discretizes the advection term in conservation equations. It is from the
+!>  Process sub-program, to help discretization of variables transported
+!>  with advection and diffusion.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Integration with different Schemes: Allows integration with various      !
+!     advection schemes defined in the Numerics_Mod_Advection_Scheme           !
+!   * Convective flux calculations: Computes the advection term for each cell  !
+!     face, simultaneously accumulating advection terms in surrounding cells.  !
+!   * Volume-conservative formulation: Ensures volume-conservative computation !
+!     of advection terms, crucial for maintaining physical accuracy in fluid   !
+!     simulations.                                                             !
+!   * Boundary handling: Considers advection terms at domain boundaries,       !
+!     addressing unique boundary conditions and flow characteristics.          !
+!   * Blended scheme support: Supports blending of upwind and central schemes, !
+!     providing a balance between accuracy and computational stability.        !
+!   * Source term update: Adjusts the source term in discretized equations to  !
+!     reflect the difference between explicitly and implicitly treated         !
+!     advection, essential for solver convergence and accuracy.                !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Var_Type), intent(in)    :: phi
+  type(Var_Type), intent(in)    :: phi  !! transported variable
   real,           intent(in)    :: coef(-phi % pnt_grid % n_bnd_cells:  &
                                          phi % pnt_grid % n_cells)
+                           !! transport coefficient, like density for momentum,
+                           !! or density times thermal capacity for enthalpy
   real,           intent(in)    :: v_flux(phi % pnt_grid % n_faces)
-  real,           intent(inout) :: b(:)
+                           !! volume flux at faces
+  real,           intent(inout) :: b(:) !! source term, right-hand side
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer  :: Grid
   real                      :: phif          ! phi and coef at the cell face

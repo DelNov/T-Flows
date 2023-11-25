@@ -1,16 +1,20 @@
 !==============================================================================!
   subroutine Residual_Vector(Nat, ni, r, b, A, x)
 !------------------------------------------------------------------------------!
-!   Calculates residual vector {r} = {b} - [A]{x}                              !
+!>  Residual_Vector is a subroutine for calculating the residual vector for
+!>  iterative linear solvers. The residual vector is {r} = {b} - [A]{x},
+!>  where {b} is the known vector, [A] is the system matrix, and {x} is the
+!>  vector of unknowns. This computation is essential to evaluate the accuracy
+!>  of the current iteration.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),         intent(in)  :: Nat
-  integer,                    intent(in)  :: ni
-  real,                       intent(out) :: r(:)  ! only for inner cells
-  real,                       intent(in)  :: b(:)  ! only for inner cells
-  type(Matrix_Type),  target, intent(in)  :: A
-  real,                       intent(in)  :: x(:)  ! may incude buffer cells
+  class(Native_Type),         intent(in)  :: Nat   !! parent class
+  integer,                    intent(in)  :: ni    !! number of uknowns
+  real,                       intent(out) :: r(:)  !! input vector
+  real,                       intent(in)  :: b(:)  !! right hand side vector
+  type(Matrix_Type),  target, intent(in)  :: A     !! system matrix
+  real,                       intent(in)  :: x(:)  !! solution vector
 !-----------------------------------[Locals]-----------------------------------!
   integer                      :: i, j, k
   real,    contiguous, pointer :: a_val(:)

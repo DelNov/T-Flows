@@ -7,20 +7,20 @@
 !> routine is a central part of the Lagrangian particle tracking approach in
 !> T-Flows.
 !------------------------------------------------------------------------------!
-! Functionality                                                                !
+!   Functionality                                                              !
 !                                                                              !
-! * Particle motion: Manages the movement of particles within the grid based   !
-!   on the current flow field and particle properties.                         !
-! * Subgrid scale modeling: Applies turbulence models for particle tracking,   !
-!   including Brownian motion (Fukagata) and Discrete Random Walk (DRW).       !
-! * Boundary interaction: Processes particle collision and interaction with    !
-!   computational domain boundaries, including bouncing and trapping.          !
-! * Surface interaction: Manages the behavior of particles upon contact with   !
-!   surfaces, such as trapping or deposition.                                  !
-! * Parallel processing: Supports particle exchange in parallel computation    !
-!   environments, ensuring accurate tracking across processors.                !
-! * Statistical analysis: Calculates and updates particle statistics during    !
-!   the simulation.                                                            !
+!   * Particle motion: Manages the movement of particles within the grid based !
+!     on the current flow field and particle properties.                       !
+!   * Subgrid scale modeling: Applies turbulence models for particle tracking, !
+!     including Brownian motion (Fukagata) and Discrete Random Walk (DRW).     !
+!   * Boundary interaction: Processes particle collision and interaction with  !
+!     computational domain boundaries, including bouncing and trapping.        !
+!   * Surface interaction: Manages the behavior of particles upon contact with !
+!     surfaces, such as trapping or deposition.                                !
+!   * Parallel processing: Supports particle exchange in parallel computation  !
+!     environments, ensuring accurate tracking across processors.              !
+!   * Statistical analysis: Calculates and updates particle statistics during  !
+!     the simulation.                                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

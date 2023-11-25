@@ -1,21 +1,34 @@
 !==============================================================================!
   subroutine Bicg(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
-!   Solves the linear systems of equations by a preconditioned BiCG method     !
+!>  The Bicg subroutine implements the Bi-Conjugate Gradient (CG) method for
+!>  solving linear systems in sequential and parallel computing environments.
+!>  It solves the system Ax = b, where 'A' is a matrix, 'x' is the unknown
+!>  vector, and 'b' is the right-hand side vector.  The BiCG method is iterative
+!>  and continues until the solution converges within a specified tolerance or
+!>  the maximum number of iterations (miter) is reached.  This subroutine also
+!>  supports optional normalization of the system (via 'norm'), which can
+!>  enhance the numerical stability and convergence behavior. Preconditioning
+!>  is applied to improve convergence, with the type specified by 'prec'.
+!>  The subroutine updates 'niter' with the actual number of iterations
+!>  performed and 'fin_res' with the final residual value.  To avoid memory
+!>  allocation and de-allocation, it relies on memory allocated in Work_Mod.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type), target, intent(in)    :: Nat
-  type(Matrix_Type),  target, intent(in)    :: A
+  class(Native_Type), target, intent(in)    :: Nat      !! parent class
+  type(Matrix_Type),  target, intent(in)    :: A        !! system matrix
   real,                       intent(out)   :: x(-Nat % pnt_grid % n_bnd_cells:&
                                                   Nat % pnt_grid % n_cells)
+    !! unknown vector, the solution of the linear system
   real,                       intent(inout) :: b( Nat % pnt_grid % n_cells)
-  character(SL),              intent(in)    :: prec     ! preconditioner
-  integer,                    intent(in)    :: miter    ! maximum and actual ...
-  integer,                    intent(out)   :: niter    ! ... num. of iterations
-  real,                       intent(in)    :: tol      ! tolerance
-  real,                       intent(out)   :: fin_res  ! final residual
-  real,             optional, intent(in)    :: norm     ! normalization
+    !! right-hand side vector
+  character(SL),              intent(in)    :: prec     !! preconditioner
+  integer,                    intent(in)    :: miter    !! maximum iterations
+  integer,                    intent(out)   :: niter    !! performed iterations
+  real,                       intent(in)    :: tol      !! solver tolerance
+  real,                       intent(out)   :: fin_res  !! achieved residual
+  real,             optional, intent(in)    :: norm     !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   integer                      :: nt, ni, nb

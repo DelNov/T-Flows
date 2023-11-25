@@ -1,11 +1,15 @@
 !==============================================================================!
   integer function Numerics_Mod_Gradient_Method_Code(name)
 !------------------------------------------------------------------------------!
-!   Decode the string value on advection scheme from control file              !
+!>  This function in Numerics_Mod module converts a textual representation of
+!>  the method for gradient calculation into its corresponding numerical code.
+!>  The function ensures that the user input from the control file is accurately
+!>  translated to a predefined numerical value that Process can act upon.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL) :: name
+  character(SL), intent(in) :: name  !! textual representation of the
+                                     !! method for gradient calculation
 !==============================================================================!
 
   select case(name)

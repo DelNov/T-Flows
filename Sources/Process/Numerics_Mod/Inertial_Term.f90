@@ -1,16 +1,34 @@
 !==============================================================================!
   subroutine Numerics_Mod_Inertial_Term(phi, coef, A, b, dt)
 !------------------------------------------------------------------------------!
-!   Purpose: Dicretize inertial term in conservation equations.                !
+!>  The subroutine Numerics_Mod_Inertial_Term within the Numerics_Mod module
+!>  discretizes the inertial term in conservation equations. It computes the
+!>  contributions of the inertial term to the coefficients of the linear system
+!>  being solved and adjusts the source term accordingly.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Grid aliasing: Establishes a connection to the grid associated with the  !
+!     variable 'phi' for spatial discretization and volume calculations.       !
+!   * Time discretization: Incorporates time discretization schemes such as    !
+!     LINEAR and PARABOLIC, adapting the discretization to the chosen          !
+!     temporal integration method.                                             !
+!   * Coefficient adjustment: Modifies the diagonal coefficients of the        !
+!     system matrix 'A' to account for the inertial contributions, enhancing   !
+!     the accuracy of time-dependent simulations.                              !
+!   * Source term modification: Updates the source term 'b' based on the       !
+!     inertial effects, ensuring the consistency of the discretized equations. !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  type(Var_Type)    :: phi
+  type(Var_Type)    :: phi  !! transported variable
   real              :: coef(-phi % pnt_grid % n_bnd_cells:  &
                              phi % pnt_grid % n_cells)
-  type(Matrix_Type) :: A
-  real              :: b(:)
-  real              :: dt
+                            !! transport coefficient, like density for momentum,
+                            !! or density times thermal capacity for enthalpy
+  type(Matrix_Type) :: A    !! system matrix
+  real              :: b(:) !! right-hand side, source term
+  real, intent(in)  :: dt   !! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   real                     :: a0

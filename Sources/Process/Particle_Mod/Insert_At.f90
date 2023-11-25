@@ -1,25 +1,24 @@
 !==============================================================================!
   subroutine Insert_At(Particle, x, y, z, n_parts_in_buffers, Flow, Vof)
 !------------------------------------------------------------------------------!
-!> The Insert_At subroutine repositions a particle to a specified location
-!> within the computational grid and updates its associated properties. It is
-!> crucial for accurately placing particles and initializing their state in
-!> simulations involving Lagrangian particle tracking within the Swarm_Mod.
+!>  The Insert_At subroutine repositions a particle to a specified location
+!>  within the computational grid and updates its associated properties. It is
+!>  crucial for accurately placing particles and initializing their state in
+!>  simulations involving Lagrangian particle tracking within the Swarm_Mod.
 !------------------------------------------------------------------------------!
-! Functionality                                                                !
+!   Functionality                                                              !
 !                                                                              !
-! * Particle repositioning: Updates the particle's position to the specified   !
-!   coordinates, essential for dynamic particle simulations.                   !
-! * Closest cell and node determination: Finds the nearest cell and node to    !
-!   the new position of the particle, ensuring accurate spatial referencing.   !
-! * Velocity computation: Calculates particle's velocity based on the flow     !
-!   field at its new position, essential for fluid-particle interaction.       !
-! * Smoothed VOF value calculation: Determines the smoothed Volume of Fluid    !
-!   (VOF) value at the particle's position, aiding in fluid interaction        !
-!   modeling for three-phase flow simulations.                                 !
-! * Previous position update: Updates the particle's old position to match     !
-!   the new one, maintaining consistency in tracking particle's trajectory.    !
-!------------------------------------------------------------------------------!
+!   * Particle repositioning: Updates the particle's position to the specified !
+!     coordinates, essential for dynamic particle simulations.                 !
+!   * Closest cell and node determination: Finds the nearest cell and node to  !
+!     the new position of the particle, ensuring accurate spatial referencing. !
+!   * Velocity computation: Calculates particle's velocity based on the flow   !
+!     field at its new position, essential for fluid-particle interaction.     !
+!   * Smoothed VOF value calculation: Determines the smoothed Volume of Fluid  !
+!     (VOF) value at the particle's position, aiding in fluid interaction      !
+!     modeling for three-phase flow simulations.                               !
+!   * Previous position update: Updates the particle's old position to match   !
+!     the new one, maintaining consistency in tracking particle's trajectory.  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

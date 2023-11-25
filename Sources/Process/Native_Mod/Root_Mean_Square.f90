@@ -1,14 +1,17 @@
 !==============================================================================!
   real function Root_Mean_Square(Nat, ni, r)
 !------------------------------------------------------------------------------!
-!   Calculates root means square of vector r without normalization.            !
-!   This non-normalized variant seems to be better option for ACM.             !
+!>  The Root_Mean_Square function calculates the root mean square (RMS) of a
+!>  given vector 'r'.  This implementation computes RMS without normalization.
+!>  It takes the sum of squares of the vector elements, computes their global
+!>  sum in a parallel computing environment, and then takes the square root of
+!>  the resulting sum.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type), intent(in) :: Nat
-  integer,            intent(in) :: ni
-  real,               intent(in) :: r(:)  ! this may be only in inner cells
+  class(Native_Type), intent(in) :: Nat   !! parent class
+  integer,            intent(in) :: ni    !! number of uknowns (vector length)
+  real,               intent(in) :: r(:)  !! input vector for RMS computation
 !-----------------------------------[Locals]-----------------------------------!
   real    :: rms
   integer :: i

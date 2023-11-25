@@ -1,24 +1,24 @@
 !==============================================================================!
   subroutine Check_Periodicity(Swarm, k, n_parts_in_buffers)
 !------------------------------------------------------------------------------!
-!> This subroutine checks if a particle in a swarm has crossed a periodic
-!> boundary in the computational domain. It is crucial for maintaining
-!> accurate tracking of particles in simulations with periodic boundary
-!> conditions, ensuring particles are correctly relocated to their new
-!> positions within the domain.
+!>  This subroutine checks if a particle in a swarm has crossed a periodic
+!>  boundary in the computational domain. It is crucial for maintaining
+!>  accurate tracking of particles in simulations with periodic boundary
+!>  conditions, ensuring particles are correctly relocated to their new
+!>  positions within the domain.
 !------------------------------------------------------------------------------!
-! Functionality                                                                !
+!   Functionality                                                              !
 !                                                                              !
-! * Periodic boundary handling: Identifies if particles have crossed periodic  !
-!   boundaries and adjusts their positions accordingly.                        !
-! * Particle relocation: Ensures particles that cross a periodic boundary are  !
-!   accurately relocated to their corresponding shadow positions.              !
-! * Buffer zone management: Marks particles that move into buffer zones,       !
-!   aiding in parallel processing scenarios.                                   !
-! * Distance calculation: Computes distances to ascertain the closest shadow   !
-!   position of a particle after crossing a boundary.                          !
-! * Cell update: Updates the cell and node information of a particle after     !
-!   crossing a periodic boundary.                                              !
+!   * Periodic boundary handling: Identifies if particles have crossed         !
+!     periodic boundaries and adjusts their positions accordingly.             !
+!   * Particle relocation: Ensures particles that cross a periodic boundary    !
+!     are accurately relocated to their corresponding shadow positions.        !
+!   * Buffer zone management: Marks particles that move into buffer zones,     !
+!     aiding in parallel processing scenarios.                                 !
+!   * Distance calculation: Computes distances to ascertain the closest shadow !
+!     position of a particle after crossing a boundary.                        !
+!   * Cell update: Updates the cell and node information of a particle after   !
+!     crossing a periodic boundary.                                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

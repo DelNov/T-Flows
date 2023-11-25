@@ -1,13 +1,15 @@
 !==============================================================================!
   subroutine Numerics_Mod_Under_Relax(phi, A, b)
 !------------------------------------------------------------------------------!
-!   Purpose: Under-relax system of equations before calling linear solver.     !
+!>  This subroutine is a part of the Numerics_Mod module in T-Flows, designed
+!>  to implement under-relaxation on a system of equations prior to solving
+!>  with a linear solver.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)    :: phi
-  type(Matrix_Type) :: A
-  real              :: b(:)
+  type(Var_Type)    :: phi   !! variable to be solved
+  type(Matrix_Type) :: A     !! linear system matrix
+  real              :: b(:)  !! right-hand side vector
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c
 !==============================================================================!
