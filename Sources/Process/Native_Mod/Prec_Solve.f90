@@ -1,26 +1,26 @@
 !==============================================================================!
   subroutine Prec_Solve(Nat, ni, A, d, d_inv, x, b, prec)
 !------------------------------------------------------------------------------!
-!   Solves the preconditioning system [D]{x}={b}                               !
-!------------------------------------------------------------------------------!
-!   Allows preconditioning of the system by:                                   !
-!     1. Diagonal preconditioning                                              !
-!     2. Incomplete Cholesky preconditioning                                   !
-!                                                                              !
-!   The type of precondtioning is chosen by setting the variable prec to 0     !
-!   (for no preconditioning), 1 (for diagonal preconditioning) or 2 (for       !
-!   incomplete Cholesky preconditioning)                                       !
+!>  The Prec_Solve subroutine is integral for solving preconditioned systems
+!>  in iterative solvers. It applies the preconditioning matrix 'd' to the
+!>  system [d]{x}={b}, aiding in improving solver efficiency and convergence.
+!>  The subroutine caters to different preconditioning strategies: Diagonal
+!>  (Jacobi) preconditioning, Incomplete Cholesky preconditioning, or no
+!>  preconditioning. The choice of the preconditioning method is determined by
+!>  the 'prec' parameter. For Diagonal preconditioning, it solves the system
+!>  element-wise. Incomplete Cholesky involves a more complex calculation with
+!>  forward and backward substitution.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),         intent(in)  :: Nat
-  integer,                    intent(in)  :: ni
-  type(Matrix_Type),  target, intent(in)  :: A
-  real,                       intent(in)  :: d(:)
-  real,                       intent(in)  :: d_inv(:)
-  real,                       intent(out) :: x(:)
-  real,                       intent(in)  :: b(:)
-  character(SL),              intent(in)  :: prec  ! preconditioner
+  class(Native_Type),         intent(in)  :: Nat       !! parent class
+  integer,                    intent(in)  :: ni        !! number of unknowns
+  type(Matrix_Type),  target, intent(in)  :: A         !! system matrix
+  real,                       intent(in)  :: d(:)      !! preconditioned matrix
+  real,                       intent(in)  :: d_inv(:)  !! preconditioned inverse
+  real,                       intent(out) :: x(:)      !! unknown vector
+  real,                       intent(in)  :: b(:)      !! right-hand side vector
+  character(SL),              intent(in)  :: prec      !! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   integer                       :: i, j, k
   real                          :: sum

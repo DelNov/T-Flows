@@ -1,16 +1,29 @@
 !==============================================================================!
   subroutine Prec_Form(Nat, ni, A, d, d_inv, prec)
 !------------------------------------------------------------------------------!
-!   Forms preconditioning matrix "D" from provided matrix "A".                 !
+!>  The Prec_Form subroutine is designed to form the preconditioning matrix 'd'
+!>  from the provided matrix 'A'. This subroutine is a key component in
+!>  preconditioned iterative solvers, enhancing convergence rates. It supports
+!>  various preconditioning techniques, including Diagonal (Jacobi) and
+!>  Incomplete Cholesky preconditioning. The choice of preconditioner is
+!>  determined by the 'prec' parameter. For Diagonal preconditioning, only
+!>  diagonal elements of 'A' are used. Incomplete Cholesky preconditioning
+!>  involves a more complex calculation using both diagonal and lower
+!>  triangular parts of 'A'. This subroutine also offers an option for no
+!>  preconditioning, setting all elements of 'd' to 1.0. The 'Nat' object
+!>  contains the grid and other related data, 'ni' specifies the size of the
+!>  problem, and 'd' and 'd_inv' are output arrays representing the
+!>  preconditioning matrix and its inverse, respectively.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),        intent(in)  :: Nat
-  integer,                   intent(in)  :: ni
-  type(Matrix_Type), target, intent(in)  :: A
-  real,                      intent(out) :: d(:)
-  real,                      intent(out) :: d_inv(:)
-  character(SL),             intent(in)  :: prec  ! preconditioner
+  class(Native_Type),        intent(in)  :: Nat       !! parent class
+  integer,                   intent(in)  :: ni        !! number of unknowns
+  type(Matrix_Type), target, intent(in)  :: A         !! system matrix
+  real,                      intent(out) :: d(:)      !! preconditioned matrix
+  real,                      intent(out) :: d_inv(:)  !! preconditioned inverse
+                                                      !! matrix
+  character(SL),             intent(in)  :: prec      !! preconditioner
 !-----------------------------------[Locals]-----------------------------------!
   real                          :: sum
   integer                       :: i, j, k
