@@ -1,11 +1,14 @@
 !==============================================================================!
   subroutine Allocate_Real_Cell(Work, Grid, n)
 !------------------------------------------------------------------------------!
+!>  Allocates memory for real-typed working arrays associated with cells
+!>  in the Work object.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Work_Type) :: Work
-  type(Grid_Type)  :: Grid(:)
-  integer          :: n     ! number of real cell arrays
+  class(Work_Type) :: Work     !! parent; the singleton Work object
+  type(Grid_Type)  :: Grid(:)  !! grids on which the Work will be used
+  integer          :: n        !! number of real cell arrays
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nc, nb, i
 !==============================================================================!

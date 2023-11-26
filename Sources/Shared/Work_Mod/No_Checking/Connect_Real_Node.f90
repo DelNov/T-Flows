@@ -5,13 +5,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Work_Type)                    :: Work
-  real, contiguous, pointer           :: a01(:)
+  class(Work_Type)                    :: Work    !! the singleton Work object
+  integer, contiguous, pointer        :: a01(:)  !! real pointer
   real, contiguous, pointer, optional :: a02(:), a03(:), a04(:),  &
                                          a05(:), a06(:), a07(:),  &
                                          a08(:), a09(:), a10(:),  &
                                          a11(:), a12(:), a13(:),  &
                                          a14(:), a15(:), a16(:)
+    !! additional real pointer
 !==============================================================================!
 
   Work % last_r_node = Work % last_r_node + 1

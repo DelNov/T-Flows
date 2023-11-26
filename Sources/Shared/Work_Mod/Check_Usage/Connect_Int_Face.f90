@@ -3,15 +3,21 @@
                               a01, a02, a03, a04, a05, a06, a07, a08,  &
                               a09, a10, a11, a12, a13, a14, a15, a16)
 !------------------------------------------------------------------------------!
+!>  Connects the provided integer pointers to the allocated integer face
+!>  arrays, effectively "borrowing" the space for temporary use.  Once the
+!>  connected pointer is not needed any more, it must be released with
+!>  Disconnect_Int_Face.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Work_Type)                       :: Work
-  integer, contiguous, pointer           :: a01(:)
+  class(Work_Type)                       :: Work    !! the singleton Work object
+  integer, contiguous, pointer           :: a01(:)  !! integer pointer
   integer, contiguous, pointer, optional :: a02(:), a03(:), a04(:),  &
                                             a05(:), a06(:), a07(:),  &
                                             a08(:), a09(:), a10(:),  &
                                             a11(:), a12(:), a13(:),  &
                                             a14(:), a15(:), a16(:)
+    !! additional integer pointer
 !==============================================================================!
 
   Assert(Work % allocated)

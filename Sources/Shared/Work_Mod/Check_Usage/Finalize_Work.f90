@@ -1,6 +1,11 @@
 !==============================================================================!
   subroutine Finalize_Work(Work)
 !------------------------------------------------------------------------------!
+!>  Provides a summary of the usage of working arrays allocated in the Work
+!>  object. This subroutine is used for diagnostic and monitoring purposes,
+!>  at the end of a program's execution.  It can be used to optimize memory
+!>  usage in Work_Mod.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Work_Type) :: Work

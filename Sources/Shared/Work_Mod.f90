@@ -5,9 +5,11 @@
 !==============================================================================!
   module Work_Mod
 !------------------------------------------------------------------------------!
-!   This is used only to store working variables to used instead of temporary  !
-!   arrays throughout the code.  By doing so, memory is saved (reused),        !
-!   as well as time for allocation and de-allocation.                          !
+!>  The Work_Mod module in T-Flows software serves as a centralized resource
+!>  manager for working variables, replacing the frequent use of temporary
+!>  arrays throughout the code. This module aims to optimize memory usage by
+!>  reusing memory spaces, thus saving both memory and time that would
+!>  otherwise be spent in repeated allocation/deallocation of temporary arrays.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -32,6 +34,9 @@
   !--------------!
   !  Work type   !
   !--------------!
+  !> The Work_Type within this module encapsulates various arrays for both
+  !> integer and real data types, specifically tailored for different grid
+  !> elements like cells, faces, and nodes.
   type Work_Type
 
     ! Real working arrays

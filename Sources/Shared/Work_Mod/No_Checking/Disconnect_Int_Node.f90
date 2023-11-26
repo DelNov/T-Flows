@@ -3,15 +3,21 @@
                                  a01, a02, a03, a04, a05, a06, a07, a08,  &
                                  a09, a10, a11, a12, a13, a14, a15, a16)
 !------------------------------------------------------------------------------!
+!>  Disconnect_Int_Node reverses the process of Connect_Int_Node, releasing
+!>  the arrays back to the Work_Type after their temporary usage, ensuring they
+!>  are available for reuse elsewhere in the program.  The subroutine assumes
+!>  the pointers have previously been connected with Connect_Int_Node.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Work_Type)                       :: Work
-  integer, contiguous, pointer           :: a01(:)
+  class(Work_Type)                       :: Work    !! the singleton Work object
+  integer, contiguous, pointer           :: a01(:)  !! integer pointer
   integer, contiguous, pointer, optional :: a02(:), a03(:), a04(:),  &
                                             a05(:), a06(:), a07(:),  &
                                             a08(:), a09(:), a10(:),  &
                                             a11(:), a12(:), a13(:),  &
                                             a14(:), a15(:), a16(:)
+    !! additional integer pointer
 !==============================================================================!
 
   Work % last_i_node = Work % last_i_node - 1
