@@ -54,6 +54,15 @@
 
 #!/bin/bash
 
+# Check if an argument is provided
+if [ $# -eq 0 ]; then
+  echo "Proper ssage: $0 <relative_path_to_source_directory>"
+  echo "This source directory is one of the directories"
+  echo "where Convert, Generate, Divide and Process are."
+  exit 1
+fi
+
+
 # Paths to the makefile and source directories
 makefile_path="$1"/makefile
 
@@ -111,6 +120,24 @@ find "$src_temp" -type f -name "*.f90" -exec sed -i -e 's/#\s\+include/ include/
 find "$src_temp" -type f -name "*.f90" -exec sed -i -e '/include.*\.h90/d' {} \;
 
 echo "Include statements have been standardized in the temporary source directory."
+
+#----------------------------------------
+# Get rid of multiple include statements
+#----------------------------------------
+if [[ "$1" == *"Process"* ]]; then
+  find ./Temporary -type f -name "*.?90" | while read -r file; do
+    # Use sed with a different delimiter to delete lines containing the sequence
+    sed -i "\|Comm_Mod/Sequential|d" "$file"
+    sed -i "\|Work_Mod/No_Checking|d" "$file"
+    sed -i "\|Petsc_Mod/Fake|d" "$file"
+  done
+else
+  find ./Temporary -type f -name "*.?90" | while read -r file; do
+    # Use sed with a different delimiter to delete lines containing the sequence
+    sed -i "\|Comm_Mod/Parallel|d" "$file"
+    sed -i "\|Work_Mod/No_Checking|d" "$file"
+  done
+fi
 
 #----------
 # Run FORD
