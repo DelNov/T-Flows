@@ -3,7 +3,16 @@
 !==============================================================================!
   module Comm_Mod
 !------------------------------------------------------------------------------!
-!   Module for MPI functionality.                                              !
+!>  The Comm_Mod module in T-Flows is a framework for managing Message Passing
+!>  Interface (MPI) functionality in parallel computing environments.
+!>  It provides an array of subroutines and types to facilitate effective
+!>  communication, data exchange and syncronizations between processors.
+!>  One of the important components are data members and procedure for handling
+!>  parallel I/O, used extensivelly (and exclusivelly) to manage backup files.
+!>  The module seamlessly integrates both parallel and sequential executions,
+!>  ensuring adaptability across various computing environments.
+!>  Additionally, it includes buffer and communicator types for efficient
+!>  handling of distributed data and control over parallel processes.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
 # if T_FLOWS_MPI == 1
@@ -17,42 +26,50 @@
   !-----------------!
   !   Buffer type   !
   !-----------------!
+  !> Encapsulates data which facilitates management
+  !> of communication between different processors.
   type Buffer_Type
-    integer              :: n_items
-    integer, allocatable :: map(:)     ! map to local items
-    integer, allocatable :: i_buff(:)  ! integer values stored in buffers
-    logical, allocatable :: l_buff(:)  ! logical values stored in buffers
-    real,    allocatable :: r_buff(:)  ! real values stored in buffers
-    real,    allocatable :: o_buff(:)  ! old real values stored in buffers
+    integer              :: n_items    !! number if items
+    integer, allocatable :: map(:)     !! map to local items
+    integer, allocatable :: i_buff(:)  !! integer values stored in buffers
+    logical, allocatable :: l_buff(:)  !! logical values stored in buffers
+    real,    allocatable :: r_buff(:)  !! real values stored in buffers
+    real,    allocatable :: o_buff(:)  !! old real values stored in buffers
   end type
 
   !---------------!
   !   Comm type   !
   !---------------!
-  type Comm_Type    ! also used inside the Grid_Type
+  !> Encapsulates all data and procedures related to MPI functionality.
+  !> It manages various aspects of parallel computing, including processor
+  !> identification, buffer management, and communication between processors.
+  !> One instance of Comm_Type is defined globally (called Global) for global
+  !> collective functions, but one copy is also defined inside the Grid object
+  !> for exchanging data between processors and saving backup files.
+  type Comm_Type
 
     ! Number of buffer cells
-    integer :: n_buff_cells
+    integer :: n_buff_cells  !! number of buffer cells in the sub-domain
 
     ! Processor i.d. defined for each cell
-    integer, allocatable :: cell_proc(:)
+    integer, allocatable :: cell_proc(:)  !! processor rank at each cell
 
     ! Global cell and node numbers
-    integer, allocatable :: cell_glo(:)
-    integer, allocatable :: node_glo(:)
+    integer, allocatable :: cell_glo(:)  !! global cell numbers
+    integer, allocatable :: node_glo(:)  !! global node numbers
 
-    ! Variables which follow are for backup saving to single file
-    integer :: nc_sub   ! number of cells in subdomain
-    integer :: nb_sub   ! number of bundary cells in subdomain
-    integer :: nb_f     ! first boundary cell to save
-    integer :: nb_l     ! last boundary cell to save
-    integer :: nc_tot   ! total number of cells
-    integer :: nb_tot   ! total number of bundary cells
+    ! Aiding the backup saving to single file
+    integer :: nc_sub   !! number of cells in subdomain
+    integer :: nb_sub   !! number of bundary cells in subdomain
+    integer :: nb_f     !! first boundary cell to save
+    integer :: nb_l     !! last boundary cell to save
+    integer :: nc_tot   !! total number of cells
+    integer :: nb_tot   !! total number of bundary cells
 
     ! Single precision coud not be avoided here :-(
-    integer(SP), allocatable :: cell_map(:)
-    integer(SP), allocatable :: bnd_cell_map(:)
-
+    integer(SP), allocatable :: cell_map(:)      !! cell map for parallel I/O
+    integer(SP), allocatable :: bnd_cell_map(:)  !! boundary cell map for
+                                                 !! parallel I/O
 #   if T_FLOWS_MPI == 1
       type(Mpi_Datatype), private :: cell_map_type
       type(Mpi_Datatype), private :: bnd_cell_map_type
@@ -62,16 +79,17 @@
 #   endif
 
     ! Number of processors per node and processor i.d.s for each node
-    type(Buffer_Type), allocatable :: cells_send(:)
-    type(Buffer_Type), allocatable :: cells_recv(:)
+    type(Buffer_Type), allocatable :: cells_send(:)  !! send buffers
+    type(Buffer_Type), allocatable :: cells_recv(:)  !! receive buffers
 
-    integer, private :: n_processors    ! number of processors
-    integer, private :: this_processor  ! current processor
+    integer, private :: n_processors    !! number of processors
+    integer, private :: this_processor  !! current processor
 
     contains
 
       ! File management
       procedure :: Close_File
+      procedure :: Create_New_Types
       procedure :: Open_File_Read
       procedure :: Open_File_Write
       procedure :: Read_Int
@@ -94,7 +112,6 @@
       procedure :: Write_Text
 
       ! Messaging
-      procedure :: Create_New_Types
       procedure :: Exchange_Int_Array
       procedure :: Exchange_Log_Array
       procedure :: Exchange_Real_Array
@@ -145,12 +162,13 @@
 #   include "Comm_Mod/Shared/This_Proc.f90"
 
 # if T_FLOWS_MPI == 1
-#   include "Comm_Mod/Parallel/Start_Parallel.f90"
-#   include "Comm_Mod/Parallel/Wait.f90"
-#   include "Comm_Mod/Parallel/End_Parallel.f90"
+#   include "Comm_Mod/Parallel/Global/Start_Parallel.f90"
+#   include "Comm_Mod/Parallel/Global/Wait.f90"
+#   include "Comm_Mod/Parallel/Global/End_Parallel.f90"
 
     ! Parallel I/O (used for backup file management)
 #   include "Comm_Mod/Parallel/Input_Output/Close_File.f90"
+#   include "Comm_Mod/Parallel/Input_Output/Create_New_Types.f90"
 #   include "Comm_Mod/Parallel/Input_Output/Open_File_Read.f90"
 #   include "Comm_Mod/Parallel/Input_Output/Open_File_Write.f90"
 #   include "Comm_Mod/Parallel/Input_Output/Read_Int.f90"
@@ -173,32 +191,32 @@
 #   include "Comm_Mod/Parallel/Input_Output/Write_Text.f90"
 
     ! Global communicatins are better of as non-members
-#   include "Comm_Mod/Parallel/Global_Lor_Log.f90"
-#   include "Comm_Mod/Parallel/Global_Lor_Log_Array.f90"
-#   include "Comm_Mod/Parallel/Global_Max_Real.f90"
-#   include "Comm_Mod/Parallel/Global_Min_Real.f90"
-#   include "Comm_Mod/Parallel/Global_Max_Int.f90"
-#   include "Comm_Mod/Parallel/Global_Min_Int.f90"
-#   include "Comm_Mod/Parallel/Global_Sum_Int.f90"
-#   include "Comm_Mod/Parallel/Global_Sum_Int_Array.f90"
-#   include "Comm_Mod/Parallel/Global_Sum_Real.f90"
-#   include "Comm_Mod/Parallel/Global_Sum_Real_Array.f90"
+#   include "Comm_Mod/Parallel/Global/Lor_Log.f90"
+#   include "Comm_Mod/Parallel/Global/Lor_Log_Array.f90"
+#   include "Comm_Mod/Parallel/Global/Max_Real.f90"
+#   include "Comm_Mod/Parallel/Global/Min_Real.f90"
+#   include "Comm_Mod/Parallel/Global/Max_Int.f90"
+#   include "Comm_Mod/Parallel/Global/Min_Int.f90"
+#   include "Comm_Mod/Parallel/Global/Sum_Int.f90"
+#   include "Comm_Mod/Parallel/Global/Sum_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Global/Sum_Real.f90"
+#   include "Comm_Mod/Parallel/Global/Sum_Real_Array.f90"
 
     ! Messaging
-#   include "Comm_Mod/Parallel/Create_New_Types.f90"
-#   include "Comm_Mod/Parallel/Exchange_Int_Array.f90"
-#   include "Comm_Mod/Parallel/Exchange_Log_Array.f90"
-#   include "Comm_Mod/Parallel/Exchange_Real_Array.f90"
-#   include "Comm_Mod/Parallel/Sendrecv_Int_Arrays.f90"
-#   include "Comm_Mod/Parallel/Sendrecv_Log_Arrays.f90"
-#   include "Comm_Mod/Parallel/Sendrecv_Real_Arrays.f90"
+#   include "Comm_Mod/Parallel/Messaging/Exchange_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Messaging/Exchange_Log_Array.f90"
+#   include "Comm_Mod/Parallel/Messaging/Exchange_Real_Array.f90"
+#   include "Comm_Mod/Parallel/Messaging/Sendrecv_Int_Arrays.f90"
+#   include "Comm_Mod/Parallel/Messaging/Sendrecv_Log_Arrays.f90"
+#   include "Comm_Mod/Parallel/Messaging/Sendrecv_Real_Arrays.f90"
 # else
-#   include "Comm_Mod/Sequential/Start_Parallel.f90"
-#   include "Comm_Mod/Sequential/Wait.f90"
-#   include "Comm_Mod/Sequential/End_Parallel.f90"
+#   include "Comm_Mod/Sequential/Global/Start_Parallel.f90"
+#   include "Comm_Mod/Sequential/Global/Wait.f90"
+#   include "Comm_Mod/Sequential/Global/End_Parallel.f90"
 
     ! Sequential I/O (used for backup file management)
 #   include "Comm_Mod/Sequential/Input_Output/Close_File.f90"
+#   include "Comm_Mod/Sequential/Input_Output/Create_New_Types.f90"
 #   include "Comm_Mod/Sequential/Input_Output/Open_File_Read.f90"
 #   include "Comm_Mod/Sequential/Input_Output/Open_File_Write.f90"
 #   include "Comm_Mod/Sequential/Input_Output/Read_Int.f90"
@@ -221,25 +239,24 @@
 #   include "Comm_Mod/Sequential/Input_Output/Write_Text.f90"
 
     ! Global communicatins are better of as non-members
-#   include "Comm_Mod/Sequential/Global_Lor_Log.f90"
-#   include "Comm_Mod/Sequential/Global_Lor_Log_Array.f90"
-#   include "Comm_Mod/Sequential/Global_Max_Real.f90"
-#   include "Comm_Mod/Sequential/Global_Min_Real.f90"
-#   include "Comm_Mod/Sequential/Global_Max_Int.f90"
-#   include "Comm_Mod/Sequential/Global_Min_Int.f90"
-#   include "Comm_Mod/Sequential/Global_Sum_Int.f90"
-#   include "Comm_Mod/Sequential/Global_Sum_Int_Array.f90"
-#   include "Comm_Mod/Sequential/Global_Sum_Real.f90"
-#   include "Comm_Mod/Sequential/Global_Sum_Real_Array.f90"
+#   include "Comm_Mod/Sequential/Global/Lor_Log.f90"
+#   include "Comm_Mod/Sequential/Global/Lor_Log_Array.f90"
+#   include "Comm_Mod/Sequential/Global/Max_Real.f90"
+#   include "Comm_Mod/Sequential/Global/Min_Real.f90"
+#   include "Comm_Mod/Sequential/Global/Max_Int.f90"
+#   include "Comm_Mod/Sequential/Global/Min_Int.f90"
+#   include "Comm_Mod/Sequential/Global/Sum_Int.f90"
+#   include "Comm_Mod/Sequential/Global/Sum_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Global/Sum_Real.f90"
+#   include "Comm_Mod/Sequential/Global/Sum_Real_Array.f90"
 
     ! Messaging
-#   include "Comm_Mod/Sequential/Create_New_Types.f90"
-#   include "Comm_Mod/Sequential/Exchange_Int_Array.f90"
-#   include "Comm_Mod/Sequential/Exchange_Log_Array.f90"
-#   include "Comm_Mod/Sequential/Exchange_Real_Array.f90"
-#   include "Comm_Mod/Sequential/Sendrecv_Int_Arrays.f90"
-#   include "Comm_Mod/Sequential/Sendrecv_Log_Arrays.f90"
-#   include "Comm_Mod/Sequential/Sendrecv_Real_Arrays.f90"
+#   include "Comm_Mod/Sequential/Messaging/Exchange_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Messaging/Exchange_Log_Array.f90"
+#   include "Comm_Mod/Sequential/Messaging/Exchange_Real_Array.f90"
+#   include "Comm_Mod/Sequential/Messaging/Sendrecv_Int_Arrays.f90"
+#   include "Comm_Mod/Sequential/Messaging/Sendrecv_Log_Arrays.f90"
+#   include "Comm_Mod/Sequential/Messaging/Sendrecv_Real_Arrays.f90"
 # endif
 
   end module
