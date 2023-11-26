@@ -7,9 +7,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File       !! parent class
-  character(len=*) :: name_o     !! name of the output file
-  integer          :: file_unit  !! file unit assigned when opening the file
+  class(File_Type), intent(in)  :: File       !! parent class
+  character(len=*), intent(in)  :: name_o     !! name of the output file
+  integer,          intent(out) :: file_unit  !! file unit assigned at opening
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(File)
 !==============================================================================!

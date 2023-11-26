@@ -8,9 +8,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type) :: File       !! parent class
-  character(len=*) :: name_i     !! name of the input file
-  integer          :: file_unit  !! file unit assigned when opening the file
+  class(File_Type), intent(in)  :: File       !! parent class
+  character(len=*), intent(in)  :: name_i     !! name of the input file
+  integer,          intent(out) :: file_unit  !! file unit assigned at opening
 !-----------------------------------[Locals]-----------------------------------!
   logical :: file_exists
 !------------------------[Avoid unused parent warning]-------------------------!

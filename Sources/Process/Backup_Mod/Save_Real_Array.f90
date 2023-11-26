@@ -26,7 +26,7 @@
   vc = vc + 1
 
   ! Just store one named real number
-  vn = arr_name;           call Comm % Write_Text(fh, vn, disp)
+  vn = arr_name;    call Comm % Write_Text(fh, vn, disp)
   vs = length * RP; call Comm % Write_Int (fh, vs, disp)
 
   call Comm % Write_Real_Array(fh, arr_value(1:length), disp)

@@ -1,12 +1,29 @@
 !==============================================================================!
   subroutine Bulk_Mod_Monitoring_Planes_Areas(bulk, Grid)
 !------------------------------------------------------------------------------!
-!   Calculate total surface of the monitoring plane                            !
+!>  Calculates the total surface area of monitoring planes in the Bulk_Mod
+!>  module. This subroutine is crucial for accurately computing volume fluxes
+!>  and bulk velocities by providing the cross-sectional areas where flow
+!>  monitoring takes place.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Area computation: Determines the surface areas of monitoring planes      !
+!     in x, y, and z directions, which are needed for flow rate calculations   !
+!   * Monitoring plane identification: Identifies planes within the grid where !
+!     flow monitoring is required based on their coordinates.                  !
+!   * Cross-sectional area calculation: Computes the area of each face that    !
+!     intersects with monitoring planes, contributing to the total monitoring  !
+!     area.                                                                    !
+!   * Dual flux consideration: Accounts for flux across buffer faces, ensuring !
+!     accurate area summation without double counting in parallel runs.        !
+!   * Global aggregation: Sums up areas across all processors in parallel      !
+!     simulations, ensuring a coherent overall calculation.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Bulk_Type) :: bulk
-  type(Grid_Type) :: Grid
+  type(Bulk_Type) :: bulk  !! bulk flow properties
+  type(Grid_Type) :: Grid  !! computational grid
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s
   real    :: xc1, yc1, zc1, xc2, yc2, zc2, ax_t, ay_t, az_t, wgt

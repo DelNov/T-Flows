@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Bulk_Mod_Print_Areas(bulk)
 !------------------------------------------------------------------------------!
-!   Compute mass fluxes through whole domain.                                  !
+!>  Prints the computed cross-sectional areas of monitoring planes in the
+!>  Bulk_Mod module. This subroutine facilitates the verification of the
+!>  placement of the point defining monitoring planes.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Bulk_Type) :: bulk
+  type(Bulk_Type) :: bulk  !! bulk flow properties
 !==============================================================================!
 
   if(First_Proc()) then

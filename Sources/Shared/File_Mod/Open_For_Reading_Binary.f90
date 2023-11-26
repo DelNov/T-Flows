@@ -10,10 +10,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type)  :: File       !! parent class
-  character(len=*)  :: name_i     !! name of the input file
-  integer           :: file_unit  !! file unit assigned when opening
-  logical, optional :: verbose    !! used for tests if file is ascii or binary
+  class(File_Type),  intent(in)  :: File       !! parent class
+  character(len=*),  intent(in)  :: name_i     !! name of the input file
+  integer,           intent(out) :: file_unit  !! file unit assigned at opening
+  logical, optional, intent(in)  :: verbose    !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical       :: file_exists
   logical       :: verb = .true.
