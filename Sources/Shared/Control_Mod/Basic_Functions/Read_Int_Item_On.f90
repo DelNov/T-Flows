@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Read_Int_Item_On(Control, keyword, def, val, verbose)
 !------------------------------------------------------------------------------!
-!>  Working horse function to read integer value (argument "val") behind a     !
+!>  Working horse function to read integer value (argument "val") behind a
 !>  keyword (argument "keyword") in control file, starting from the current
 !>  position. If not found, a default vaue specified in argument "def" is used.
 !------------------------------------------------------------------------------!
