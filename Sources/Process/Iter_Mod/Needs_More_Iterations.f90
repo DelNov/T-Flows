@@ -1,11 +1,14 @@
 !==============================================================================!
   logical function Needs_More_Iterations(Iter, Flow, n_dom)
 !------------------------------------------------------------------------------!
+!>  Determines if additional iterations are required and returns .true. if
+!>  that is the case, or .false. if no further iterations are needed.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Iter_Type), intent(inout) :: Iter
-  type(Field_Type), intent(in)    :: Flow(MD)
-  integer,          intent(in)    :: n_dom
+  class(Iter_Type), intent(inout) :: Iter      !! parent, singleton object Iter
+  type(Field_Type), intent(in)    :: Flow(MD)  !! all flow domains in simulation
+  integer,          intent(in)    :: n_dom     !! actual number of domains
 !==============================================================================!
 
   !--------------------------------!

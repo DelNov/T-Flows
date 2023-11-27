@@ -1,11 +1,15 @@
 !==============================================================================!
   pure real function Max_Fields_Residual(Iter, Flow, n_dom)
 !------------------------------------------------------------------------------!
+!>  Calculates and returns the maximum residual across all fields involved
+!>  in a simulation.  It is crucial in deciding when to stop the outer
+!>  iterations in the SIMPLE or PISO algorithm.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Iter_Type), intent(in) :: Iter
-  type(Field_Type), intent(in) :: Flow(MD)
-  integer,          intent(in) :: n_dom
+  class(Iter_Type), intent(in) :: Iter      !! parent, singleton object Iter
+  type(Field_Type), intent(in) :: Flow(MD)  !! all flow domains in simulation
+  integer,          intent(in) :: n_dom     !! actual number of domains
 !-----------------------------------[Locals]-----------------------------------!
   integer :: d, sc
   real    :: mr

@@ -1,9 +1,13 @@
 !==============================================================================!
   logical function Needs_More_Steps(Time)
 !------------------------------------------------------------------------------!
+!>  Determines if additional time steps are required and returns .true. if
+!>  that is the case, or .false. if the desired number of time steps have
+!>  been reached.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Time_Type), intent(inout) :: Time
+  class(Time_Type), intent(inout) :: Time  !! parent, singleton object Time
 !-----------------------------------[Locals]-----------------------------------!
   logical, save :: first_entry = .true.
 !==============================================================================!

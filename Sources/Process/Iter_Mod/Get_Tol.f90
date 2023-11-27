@@ -1,9 +1,11 @@
 !==============================================================================!
   pure real function Get_Tol(Iter)
 !------------------------------------------------------------------------------!
+!>  Function to retreive the SIMPLE/PISO tolerance from Iter.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Iter_Type), intent(in) :: Iter
+  class(Iter_Type), intent(in) :: Iter  !! parent, singleton object Iter
 !==============================================================================!
 
   Get_Tol = Iter % tolerance

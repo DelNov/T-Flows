@@ -4,7 +4,15 @@
 !==============================================================================!
   module Iter_Mod
 !------------------------------------------------------------------------------!
-!   Module containing data and procedures pertinent to SIMPLE/PISO iterations  !
+!>  This module encapsulates the data and procedures relevant to the iteration
+!>  process in SIMPLE (Semi-Implicit Method for Pressure-Linked Equations) and
+!>  PISO (Pressure-Implicit with Splitting of Operators) algorithms used in
+!>  T-Flows.  Module entials the definition of the Iter_Type, global singleton
+!>  object Iter and a lot of iteration-specific data and methods.
+!>  The Iter object is primarily used in the main function of the Process
+!>  program to manage outer iterations within the SIMPLE or PISO algorithms.
+!>  Due to its global accessibility, it can be utilized in other functions
+!>  where decisions depend on the current iteration state.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
@@ -15,12 +23,14 @@
   !---------------!
   !   Iter type   !
   !---------------!
+  !> A type that holds iteration-specific data and methods and is
+  !> the basis for definition of the global singleton object Iter
   type Iter_Type
 
-    integer, private :: current_iteration = 0
-    integer, private :: max_iterations         ! maximum number of iterations
-    integer, private :: min_iterations         ! minimum number of iterations
-    real,    private :: tolerance              ! tolerance for iterations
+    integer, private :: current_iteration = 0  !! current iteration
+    integer, private :: max_iterations         !! maximum number of iterations
+    integer, private :: min_iterations         !! minimum number of iterations
+    real,    private :: tolerance              !! tolerance for iterations
 
     contains
       procedure :: Current
@@ -38,8 +48,9 @@
   !----------------------!
   !   Singleton object   !
   !----------------------!
-  type(Iter_Type) :: Iter
-
+  type(Time_Type) :: Iter  !! singleton type object of type Iter_Type defined
+                           !! globally for synchronization of its data members
+                           !! and easier access to its member functions
   contains
 
 #   include "Iter_Mod/Current.f90"
