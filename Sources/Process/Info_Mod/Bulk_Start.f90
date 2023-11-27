@@ -1,11 +1,15 @@
 !==============================================================================!
   subroutine Bulk_Start(Info)
 !------------------------------------------------------------------------------!
-!   Essentially creates a box in which iteration residuls will be written.     !
+!>  This subroutine initializes a structured information box to display various
+!>  simulation parameters related to bulk flow. It primarily sets up the visual
+!>  layout, including lines, separators, and frames, within which the actual
+!>  data will be displayed. The layout includes provision for displaying volume
+!>  flow rates and pressure drops along different directions.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type) :: Info
+  class(Info_Type) :: Info  !! parent, singleton object Info
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!

@@ -1,12 +1,18 @@
 !==============================================================================!
   subroutine Iter_Print(Info, d)
 !------------------------------------------------------------------------------!
-!   Prints information about inner iteration on the screen.                    !
+!>  This subroutine is responsible for displaying iteration-related information
+!>  on the screen during the simulation process. This function outputs the data
+!>  that has been organized and formatted by Iter_Fill, Iter_Fill_At and
+!>  Iter_Fill_Scalar_At, and other related subroutines. It presents the
+!>  information in a clear and structured manner, ensuring that data such as
+!>  residuals for different fields and iteration counts are easily readable
+!>  and understandable for each computational domain involved in the simulation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)    :: Info
-  integer, intent(in) :: d  ! domain
+  class(Info_Type)    :: Info  !! parent, singleton object Info
+  integer, intent(in) :: d     !! domain rank
 !-----------------------------------[Locals]-----------------------------------!
   integer               :: i
   character(len=L_LINE) :: tmp

@@ -1,13 +1,19 @@
 !==============================================================================!
   subroutine Bulk_Print(Info, Flow, dom, n_dom)
 !------------------------------------------------------------------------------!
-!   Prints information about inner iteration on the screen.                    !
+!>  Prints the filled information box on the screen. It ensures that the
+!>  formatted data, including the bulk flow parameters and numerical values,
+!>  are displayed correctly. This subroutine may be called many times during
+!>  the simulation to update and display the latest bulk flow information.
+!>  The printing is conditional on the domain of the simulation (indicated by
+!>  dom and n_dom), allowing selective information display for each domain
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)             :: Info
-  type(Field_Type), intent(in) :: Flow
-  integer,          intent(in) :: dom, n_dom
+  class(Info_Type)             :: Info   !! parent, singleton object Info
+  type(Field_Type), intent(in) :: Flow   !! flow field for info is printed
+  integer,          intent(in) :: dom    !! domain for which info is printed
+  integer,          intent(in) :: n_dom  !! number of domains in the simulation
 !==============================================================================!
 
   call Info % Bulk_Fill(Flow)

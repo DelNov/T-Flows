@@ -1,11 +1,14 @@
 !==============================================================================!
   subroutine Time_Start(Info)
 !------------------------------------------------------------------------------!
-!   Essentially creates a box in which iteration residuls will be written.     !
+!>  Sets up the structure and visual layout of the time information box. It
+!>  creates the frame and separators within which time-related data will be
+!>  displayed. This structure is crucial for organizing and presenting time
+!>  data in a consistent format during a simulation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type) :: Info
+  class(Info_Type) :: Info  !! parent, singleton object Info
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!

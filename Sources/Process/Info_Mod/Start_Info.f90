@@ -1,11 +1,15 @@
 !==============================================================================!
   subroutine Start_Info(Info)
 !------------------------------------------------------------------------------!
-!  Start Info_Mod by taking system count rate and initial count rate           !
+!>  Initializes the Info_Mod module at the start of the simulation. It retrieves
+!>  the system clock's count rate and the initial count to accurately track the
+!>  elapsed time during the simulation. Additionally, it reads and sets the
+!>  maximum allowable wall-clock time for the simulation from the control file,
+!>  converting this time into seconds for consistent time tracking.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type) :: Info
+  class(Info_Type) :: Info  !! parent, singleton object Info
 !==============================================================================!
 
   ! Get system clock clock rate and initial clock count

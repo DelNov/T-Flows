@@ -1,12 +1,17 @@
 !==============================================================================!
   subroutine Iter_Fill(Info, n)
 !------------------------------------------------------------------------------!
-!   Fills the info box with information to be written on the screen.           !
+!>  The Iter_Fill subroutine is responsible for populating the iteration
+!>  information box with basic data, such as the current iteration number and a
+!>  placeholder for the mass residual. This function sets up the primary
+!>  structure of the iteration info box, which is later populated with more
+!>  detailed information about iterative outcomes and targets of various fields
+!>  in the simulation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)    :: Info
-  integer, intent(in) :: n     ! inner iteration
+  class(Info_Type)    :: Info  !! parent, singleton object Info
+  integer, intent(in) :: n     !! number of iterations performed in linear solver
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c
 !==============================================================================!

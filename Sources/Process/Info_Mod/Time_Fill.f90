@@ -1,13 +1,17 @@
 !==============================================================================!
   subroutine Time_Fill(Info, n, sim_time)
 !------------------------------------------------------------------------------!
-!   Fills the info box with information to be written on the screen.           !
+!>  This subroutine updates and formats simulation time-related data, including
+!>  the current time step number and the simulation's physical time. It also
+!>  calculates and formats the wall-clock time elapsed since the start of the
+!>  simulation. The data is structured to fit within the pre-defined layout of
+!>  the time information box.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)    :: Info
-  integer, intent(in) :: n         ! time step
-  real,    intent(in) :: sim_time  ! simulation time
+  class(Info_Type)    :: Info      !! parent, singleton object Info
+  integer, intent(in) :: n         !! time step to be filled
+  real,    intent(in) :: sim_time  !! simulation time
 !-----------------------------------[Locals]-----------------------------------!
   integer  :: hours, minutes, seconds
   real(DP) :: wall_time                ! number of seconds of wall-clock time

@@ -1,12 +1,17 @@
 !==============================================================================!
   subroutine Bulk_Fill(Info, Flow)
 !------------------------------------------------------------------------------!
-!   Fills the info box with information to be written on the screen.           !
+!>  Fills the previously created information box with actual bulk flow data
+!>  from the simulation. It writes specific data like maximum Courant and
+!>  Peclet numbers, volume flow rates in x, y, and z directions, and pressure
+!>  drops in these directions as well. The data is formatted to fit into the
+!>  structure created by Bulk_Start
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)             :: Info
-  type(Field_Type), intent(in) :: Flow
+  class(Info_Type)             :: Info  !! parent, singleton object Info
+  type(Field_Type), intent(in) :: Flow  !! flow field for which
+                                        !! the info is fille
 !==============================================================================!
 
   if(First_Proc()) then

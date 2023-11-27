@@ -1,11 +1,15 @@
 !==============================================================================!
   subroutine Iter_Start(Info)
 !------------------------------------------------------------------------------!
-!   Essentially creates a box in which iteration residuls will be written.     !
+!>  Initializes the structure for displaying iteration-related information.
+!>  It sets up a formatted box where details about each iteration, such as
+!>  iteration numbers and residuals for different variables, will be displayed.
+!>  This subroutine is responsible for creating the frame and layout for the
+!>  iterative data that will be filled in and printed during the simulation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type) :: Info
+  class(Info_Type) :: Info  !! parent, singleton object Info
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, l
 !==============================================================================!

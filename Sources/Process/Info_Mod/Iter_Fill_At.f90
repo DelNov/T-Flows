@@ -1,16 +1,22 @@
 !==============================================================================!
   subroutine Iter_Fill_At(Info, r, c, name_var, res, n_iter)
 !------------------------------------------------------------------------------!
-!   Inserts infromation at specified position in the information box.          !
+!>  The Iter_Fill_At subroutine populates a specific row and column of the
+!>  iteration information box with details such as the name of the variable,
+!>  its residual, and the number of iterations (if provided). This function is
+!>  vital for displaying specific simulation data within the formatted
+!>  iteration box. It ensures that iteration-related metrics are organized and
+!>  presented in a clear, concise manner.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)              :: Info
-  integer,           intent(in) :: r         ! row
-  integer,           intent(in) :: c         ! column
-  character(len=*),  intent(in) :: name_var
-  real,              intent(in) :: res
-  integer, optional, intent(in) :: n_iter    ! number of iterations
+  class(Info_Type)              :: Info      !! parent, singleton object Info
+  integer,           intent(in) :: r         !! row in the info box
+  integer,           intent(in) :: c         !! column in the info box
+  character(len=*),  intent(in) :: name_var  !! name of the variable to print
+  real,              intent(in) :: res       !! residual after linear solver
+  integer, optional, intent(in) :: n_iter    !! iterations performed
+                                             !! in the linear solver
 !==============================================================================!
 
   if(First_Proc()) then

@@ -1,11 +1,13 @@
 !==============================================================================!
   subroutine Time_Print(Info)
 !------------------------------------------------------------------------------!
-!   Prints information about inner iteration on the screen.                    !
+!>  Responsible for printing the time information box, previously filled with
+!>  current simulation time data, on the screen. It ensures that the
+!>  time-related data is visually accessible and readable during a simulation.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type) :: Info
+  class(Info_Type) :: Info  !! parent, singleton object Info
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!

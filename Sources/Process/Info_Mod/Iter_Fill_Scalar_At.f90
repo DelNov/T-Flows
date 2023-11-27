@@ -1,16 +1,21 @@
 !==============================================================================!
   subroutine Iter_Fill_Scalar_At(Info, r, c, name_var, res, n_iter)
 !------------------------------------------------------------------------------!
-!   Inserts infromation at specified position in the information box.          !
+!>  Iter_Fill_Scalar_At is designed to insert detailed information about
+!>  user-defined scalar variables at a specified position within the iteration
+!>  information box. It updates the contents of the box with the name of the
+!>  scalar variable, its residual value, and the number of iterations it has
+!>  undergone.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Info_Type)             :: Info
-  integer,          intent(in) :: r         ! row
-  integer,          intent(in) :: c         ! column
-  character(len=*), intent(in) :: name_var
-  real,             intent(in) :: res
-  integer,          intent(in) :: n_iter    ! number of iterations
+  class(Info_Type)             :: Info       !! parent, singleton object Info
+  integer,          intent(in) :: r          !! row in the info box
+  integer,          intent(in) :: c          !! column in the info box
+  character(len=*),  intent(in) :: name_var  !! name of the variable to print
+  real,              intent(in) :: res       !! residual after linear solver
+  integer, optional, intent(in) :: n_iter    !! iterations performed
+                                             !! in the linear solver
 !==============================================================================!
 
   if(First_Proc()) then
