@@ -23,14 +23,18 @@
 # endif
 
   ! Standard string length
-  integer, parameter :: VL =   4  !! variable name length
+  integer, parameter :: VL =   4
+    !! name length for T-Flows variables (such as 'u', 'v', 'w', 'kin, 'vof',
+    !! 'c_01, 'q_01', ...) used to identify them when specifying boundary and
+    !! initial conditions in the control file, and when reporting their
+    !! convergence characteristics on the terminal through Info_Mod
   integer, parameter :: SL =  80  !! standard string length (like page width)
   integer, parameter :: DL = 160  !! double string length (twice the page width)
 
   ! Maximum number of string items in a line
-  ! (for example when reading boundary conditions, options for PETSc)
-  integer, parameter :: MAX_STRING_ITEMS = 32  !! maximum number of string
-                                               !! items in a line
+  integer, parameter :: MAX_STRING_ITEMS = 32
+    !! maximum number of string items in a line used mostly to read options
+    !! for PETSc solvers, boundary and initial conditions, or porosity regions
 
   ! Double and single precision constants definitions
   integer, parameter :: DP = 8  !! double precisions for real and long integer
@@ -39,15 +43,14 @@
   ! Precision of integers and floating point numbers.  These parameters
   ! assume values according to what is in the makefile (which is a bad
   ! practice but that's another story).  But that's not enough for program
-  ! to work.  All MPI-based routines would need to have MPI_INTEGER8
-  ! instead of MPI_INTEGER.
-  ! Also, you will have to link the program with proper METIS library, check
-  ! all the makefiles for details on that.
+  ! to work.  All MPI-based routines would need to distinguish MPI_INTEGER
+  ! from MPI_INTEGER8.  Also, you will have to link the program with proper
+  ! METIS library, check all the makefiles for details on that.
   integer, parameter :: IP = sizeof(1)   !! integer precision
   integer, parameter :: LP = IP          !! logical precision (always the same
                                          !! as integer precision in Fortran)
-  integer, parameter :: RP = sizeof(1.0) !! real number precision (inherited
-                                         !! from makefiles)
+  integer, parameter :: RP = sizeof(1.0) !! real number precision (in this form
+                                         !! it is inherited from makefiles)
 
   ! Version of the .cfn and .dim files
   ! (First four digits are the year, last two the month)
