@@ -1,10 +1,18 @@
 !==============================================================================!
   subroutine Set_Singular(Sol, phi)
 !------------------------------------------------------------------------------!
+!>  The Set_Singular subroutine in the Solver_Mod module plays an important
+!>  role in preparing the solver for handling singular matrices. This
+!>  functionality is especially relevant when dealing with matrices that might
+!>  be deficient in rank or lack full invertibility, which is typically the
+!>  case for the pressure correction solution.  Just like her sister "Run",
+!>  the subroutine shows how encapsulation of decision making on wheather to
+!>  use native or PETSc solvers works in practice in T-Flows.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Solver_Type) :: Sol
-  type(Var_Type)     :: phi
+  class(Solver_Type) :: Sol  !! parent class
+  type(Var_Type)     :: phi  !! unknown variable
 !-----------------------------------[Locals]-----------------------------------!
   type(Matrix_Type), pointer :: A
   integer                    :: i, ni

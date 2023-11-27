@@ -1,9 +1,16 @@
 !==============================================================================!
   integer function Solver_Mod_Linear_Solvers_Code(name)
 !------------------------------------------------------------------------------!
+!>  This function in Solver_Mod module converts a textual representation of
+!>  the linear solvers used into its corresponding numerical code. The function
+!>  ensures that the user input from the control file is accurately translated
+!>  to a predefined numerical value that Process can act upon.  The codes for
+!>  native and PETSc solvers are defined in Solver_Mod itself.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL) :: name
+  character(SL) :: name  !! string specifying the solvers to use.  It can have
+                         !! only two values: 'NATIVE' or 'PETSC'
 !==============================================================================!
 
   select case(name)

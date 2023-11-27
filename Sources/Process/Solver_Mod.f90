@@ -3,7 +3,15 @@
 !==============================================================================!
   module Solver_Mod
 !------------------------------------------------------------------------------!
-!   This is a module which will entail native and PETSc solvers                !
+!>  The Solver_Mod module in T-Flows serves as a crucial abstraction layer for
+!>  linear solvers within the software. It encapsulates the functionalities of
+!>  both native solvers and PETSc solvers, offering a unified interface for
+!>  their operations.  The design allows for easy toggling between different
+!>  solver types without necessitating changes in the interaction with solvers
+!>  in other parts of the code.  Despite the common purpose of solving linear
+!>  systems, the implementation of native and PETSc solvers within this module
+!>  is markedly different. This diversity renders Solver_Mod as one of the most
+!>  heterogeneous modules in the entire T-Flows package.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Var_Mod
