@@ -6,21 +6,74 @@
                          tol, fin_res,             &
                          blend_matrix)
 !------------------------------------------------------------------------------!
+!>  The subroutine Solve_Petsc in the Petsc_Mod module is an integral
+!>  component for solving linear systems in T-Flows using PETSc solvers.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Matrix and vector preparation:                                           !
+!     - Conditionally copies values from T-Flows' matrix A to PETSc's matrix   !
+!       Pet % A. This step is necessary for updating the PETSc matrix with     !
+!       the latest values from the simulation and is performed if the matrix   !
+!       wasn't previously copied or if the blend_matrix flag is true.          !
+!     - Fills PETSc vectors Pet % x (solution vector) and Pet % b (right-hand  !
+!       side) with values from T-Flows' vectors x and b.                       !
+!   * Solver and preconditioner setup:                                         !
+!     - Sets up the PETSc Krylov Subspace (KSP) solver and preconditioner      !
+!       based on user-defined options (solver, prec).                          !
+!     - Handles the specification of preconditioner options (prec_opts),       !
+!       allowing for granular control over the preconditioning process.        !
+!     - Sets the initial guess for the solver to non-zero, allowing the solver !
+!       to start from the existing solution estimate, which can enhance        !
+!       convergence in iterative simulations.                                  !
+!   * Solver execution:                                                        !
+!     - Sets tolerances for the solver based on the provided tol value and     !
+!       the maximum number of iterations miter.                                !
+!     - Calls the PETSc solver to solve the linear system. This process        !
+!       involves iterative methods and can be computationally intensive,       !
+!       depending on the complexity of the system.                             !
+!     - Retrieves the number of iterations performed (niter) and the final     !
+!       residual norm (fin_res), providing insights into the solver's          !
+!       performance and convergence.                                           !
+!   * Solution retrieval:                                                      !
+!     - Upon successful convergence, copies the solution from the PETSc vector !
+!       back to T-Flows' vector x. This step ensures that the computed         !
+!       solution is available in T-Flows for further processing or analysis.   !
+!   * Efficiency considerations:                                               !
+!     - Profiling is used around key sections (matrix copying, preconditioner  !
+!       setup) to monitor performance and identify potential bottlenecks.      !
+!     - The subroutine is optimized to minimize unnecessary operations. For    !
+!       instance, matrix copying and preconditioner setup are conditionally    !
+!       executed to avoid redundant computations.                              !
+!   * Robustness and flexibility:                                              !
+!     - The subroutine is designed to be robust against solver convergence     !
+!       issues, checking the convergence reason and handling cases where the   !
+!       solver does not converge.                                              !
+!     - The flexible design allows for various solver and preconditioner       !
+!       configurations, making it adaptable to different simulation scenarios  !
+!       and requirements.                                                      !
+!   * Interaction with PETSc:                                                  !
+!     - Extensive use of C_Petsc_* interface functions for direct interaction  !
+!       with PETSc's C API, reflecting a consistent approach to integrate      !
+!       PETSc functionalities within T-Flows.                                  !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)          :: Pet
-  character(*),  intent(in)  :: solver                       ! solver
-  character(*),  intent(in)  :: prec                         ! preconditioner
-  character(SL), intent(in)  :: prec_opts(MAX_STRING_ITEMS)  ! prec. options
-  type(Matrix_Type)          :: A
+  class(Petsc_Type)          :: Pet      !! parent object of the Petsc_Type
+  character(*),  intent(in)  :: solver   !! name of the solver to use
+  character(*),  intent(in)  :: prec     !! name of the preconditioner to use
+  character(SL), intent(in)  :: prec_opts(MAX_STRING_ITEMS)
+    !! list of options passed to preconditioner from the control file
+  type(Matrix_Type)          :: A        !! matrix in T-Flows format
   real                       :: x(-Pet % pnt_grid % n_bnd_cells :  &
-                                   Pet % pnt_grid % n_cells)
-  real                       :: b( Pet % pnt_grid % n_cells)
-  integer,       intent(in)  :: miter
-  integer,       intent(out) :: niter
-  real,          intent(in)  :: tol      ! tolerance
-  real,          intent(out) :: fin_res  ! final residual
+                                   Pet % pnt_grid % n_cells)  !! unknown vector
+  real                       :: b( Pet % pnt_grid % n_cells)  !! source vector
+  integer,       intent(in)  :: miter    !! maximum number of iterations
+  integer,       intent(out) :: niter    !! performed number of iterations
+  real,          intent(in)  :: tol      !! target solver tolerance
+  real,          intent(out) :: fin_res  !! final residual after linear solver
   logical,       intent(in)  :: blend_matrix
+    !! flag indicating if the system matrix is blended with upwind terms
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: i, j, k
   character(SL) :: solvers  ! fortran string to store solver

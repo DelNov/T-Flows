@@ -1,12 +1,62 @@
 !==============================================================================!
   subroutine Create_Petsc(Pet, A, var_name, petsc_rank)
 !------------------------------------------------------------------------------!
+!>  The subroutine Create_Petsc in the Petsc_Mod module plays a crucial role
+!>  in setting up PETSc for solving linear systems in T-Flows.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization:                                                          !
+!     - Increments a call count to keep track of how many times the function   !
+!       is invoked. This count is used to assign a unique rank (petsc_rank)    !
+!       to each PETSc instance.                                                !
+!     - Performs general PETSc initialization during the first call. It        !
+!       includes initializing PETSc, processing user-defined PETSc options,    !
+!       and setting up profiling if requested.                                 !
+!   * PETSc options processing:                                                !
+!     - Parses options provided in the petsc_options array. These options can  !
+!       control various aspects of PETSc, like solver parameters or logging    !
+!       and profiling settings.                                                !
+!     - Handles profiling options specifically, enabling PETSc's logging       !
+!       features when requested.                                               !
+!   * Variable-specific setup                                                  !
+!     - Links the Pet object to the grid associated with the matrix A. This    !
+!       connection is crucial for understanding the variable's spatial         !
+!       discretization and its role in the overall simulation.                 !
+!     - Outputs initialization status, indicating the start of PETSc setup     !
+!       for the specific variable.                                             !
+!   * Matrix and vector creation:                                              !
+!     - Sets the total number of unknowns and the number of unknowns in the    !
+!       current processor, essential for parallel computations.                !
+!     - Initializes PETSc matrix and vectors (A, x, b) necessary for solving   !
+!       the linear system.                                                     !
+!     - Determines the type of PETSc matrix (MATAIJ) and pre-allocates it      !
+!       based on the expected sparsity pattern.                                !
+!     - Pre-allocation involves calculating the number of non-zero entries in  !
+!       the matrix for efficient memory usage and parallel performance.        !
+!   * Solver initialization:                                                   !
+!     - Creates the PETSc solver (ksp) context, setting the stage for defining !
+!       solver parameters and solving methods later in the simulation process. !
+!   * Dynamic interaction with PETSc:                                          !
+!     - The subroutine makes several calls to C_Petsc_* functions, which are   !
+!       C interfaces to PETSc functions. This design choice ensures a more     !
+!       direct and transparent interaction with PETSc, aligning T-Flows        !
+!       closely with PETSc's standard practices and documentation.             !
+!   * Flexibility and efficiency:                                              !
+!     - By allowing detailed specification of PETSc options and careful        !
+!       handling of matrix and solver initialization, this subroutine provides !
+!       flexibility in setting up linear solvers according to the needs of     !
+!       different variables or simulation conditions.                          !
+!     - The approach aims to balance computational efficiency (through         !
+!       pre-allocation and tailored solver setup) with the complexity of       !
+!       handling a powerful external library like PETSc.                       !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)    :: Pet
-  type(Matrix_Type)    :: A
-  character(VL)        :: var_name
-  integer, intent(out) :: petsc_rank
+  class(Petsc_Type)    :: Pet         !! parent object of the Petsc_Type
+  type(Matrix_Type)    :: A           !! matrix in T-Flows native format
+  character(VL)        :: var_name    !! variable name
+  integer, intent(out) :: petsc_rank  !! rank of the Petsc object instance
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),    pointer :: Grid
   integer                     :: i, j, k

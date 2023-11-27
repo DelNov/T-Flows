@@ -1,10 +1,31 @@
 !==============================================================================!
   subroutine Destroy_Petsc(Pet, var_name)
 !------------------------------------------------------------------------------!
+!>  The subroutine Destroy_Petsc in the Petsc_Mod module is responsible for
+!>  properly deallocating and destroying PETSc objects associated with a
+!>  given variable in T-Flows.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Nullify pointers:                                                        !
+!     - Sets the pointer to the grid (pnt_grid) in the Pet object to null.     !
+!       This action disconnects the PETSc object from its associated grid.     !
+!   * Resetting variables:                                                     !
+!     - Resets the total number of unknowns (m_upper) and the number of        !
+!       unknowns in the current processor (m_lower) to zero.                   !
+!   * Destroying PETSc objects:                                                !
+!     - Destroys the PETSc matrix (A)                                          !
+!     - Destroys the PETSc vectors (x and b)                                   !
+!     - Destroys the PETSc KSP solver context (ksp)                            !
+!   * Logging and process indication:                                          !
+!     - If running on the first process, it prints messages indicating the     !
+!       start and completion of the PETSc destruction process for a specific   !
+!       variable, given by var_name.                                           !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type) :: Pet
-  character(VL)     :: var_name
+  class(Petsc_Type) :: Pet       !! parent object of the Petsc_Type
+  character(VL)     :: var_name  !! variable name
 !==============================================================================!
 
   nullify(Pet % pnt_grid)

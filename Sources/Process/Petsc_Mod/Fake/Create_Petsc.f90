@@ -1,12 +1,19 @@
 !==============================================================================!
   subroutine Create_Petsc(Pet, A, var_name, petsc_rank)
 !------------------------------------------------------------------------------!
+!>  This subroutine serves as placeholders or dummy variant when PETSc is
+!>  not available in the system.  The functionality here is intentionally
+!>  minimal, primarily serving to maintain code structure and compatibility
+!>  in environments where PETSc is not used.  The only functionality in this
+!>  subroutine is to issue a warning if a user tries to use PETSc solvers (by
+!>  specifying so in the control file), but they are not available in the code.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Petsc_Type)    :: Pet
-  type(Matrix_Type)    :: A
-  character(VL)        :: var_name
-  integer, intent(out) :: petsc_rank
+  class(Petsc_Type)    :: Pet         !! parent object of the Petsc_Type
+  type(Matrix_Type)    :: A           !! matrix in T-Flows native format
+  character(VL)        :: var_name    !! variable name
+  integer, intent(out) :: petsc_rank  !! rank of the Petsc object instance
 !-----------------------------------[Locals]-----------------------------------!
   logical, save :: called = .false.
 !------------------------------[Unused arguments]------------------------------!
