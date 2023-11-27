@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Iter_Type), intent(inout) :: Iter  !! parent, singleton object Iter
-  real,             intent(in)    :: val   !! desired tolerance
+  real,             intent(in)    :: val   !! target tolerance being set
 !==============================================================================!
 
   Iter % tolerance = val

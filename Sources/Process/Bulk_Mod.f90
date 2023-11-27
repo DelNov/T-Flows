@@ -44,11 +44,11 @@
     real :: flux_z    !! volume flow rate in z direction [m^3/s]
 
     ! Desired volume flow rates in x-, y-, z- direction (set in control file)
-    real :: flux_x_o  !! desired volume flow rate in x direction [m^3/s]
-    real :: flux_y_o  !! desired volume flow rate in y direction [m^3/s]
-    real :: flux_z_o  !! desired volume flow rate in z direction [m^3/s]
+    real :: flux_x_o  !! target volume flow rate in x direction [m^3/s]
+    real :: flux_y_o  !! target volume flow rate in y direction [m^3/s]
+    real :: flux_z_o  !! target volume flow rate in z direction [m^3/s]
 
-    ! Pressure drop to achieve desired volume flux
+    ! Pressure drop to achieve the target volume flow rates
     real :: p_drop_x  !! pressure drop in x direction [N/m^3] = [kg/m^2/s^2]
     real :: p_drop_y  !! pressure drop in y direction [N/m^3] = [kg/m^2/s^2]
     real :: p_drop_z  !! pressure drop in z direction [N/m^3] = [kg/m^2/s^2]
