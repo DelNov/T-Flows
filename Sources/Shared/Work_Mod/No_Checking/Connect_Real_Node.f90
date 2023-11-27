@@ -6,7 +6,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Work_Type)                    :: Work    !! the singleton Work object
-  integer, contiguous, pointer        :: a01(:)  !! real pointer
+  real, contiguous, pointer           :: a01(:)  !! real pointer
   real, contiguous, pointer, optional :: a02(:), a03(:), a04(:),  &
                                          a05(:), a06(:), a07(:),  &
                                          a08(:), a09(:), a10(:),  &

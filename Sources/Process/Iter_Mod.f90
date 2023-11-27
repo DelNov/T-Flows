@@ -48,7 +48,7 @@
   !----------------------!
   !   Singleton object   !
   !----------------------!
-  type(Time_Type) :: Iter  !! singleton type object of type Iter_Type defined
+  type(Iter_Type) :: Iter  !! singleton type object of type Iter_Type defined
                            !! globally for synchronization of its data members
                            !! and easier access to its member functions
   contains
