@@ -2,18 +2,39 @@
   subroutine Var_Mod_Create_Solution(phi, A, name_phi, name_flux,  &
                                      reuse_pet)
 !------------------------------------------------------------------------------!
-!   This is to allocate a variable for a solution with usual algorithm.        !
-!   Variables such as velocities and pressures should be allocated with it.    !
+!>  This subroutine is designed to allocate and initialize a Var_Type variable
+!>  whose values are obtained from a solution of partial diffetential equations.
+!>  Examples of such variable include velocity components, temperature,
+!>  variables used in turbulence modeling (k, eps, f22, ...), VOF, pressure
+!>  correction and even wall distance or potential for velocity initialization.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   One could think of storing pointer to the Grid as well.                    !
+!   * It links the variable (phi) to its corresponding grid (Grid) and matrix  !
+!     (A), indicating the structure and relationships necessary for the solver.!
+!   * PETSc Integration: If PETSc is enabled (conditional compilation), the    !
+!     subroutine either creates a new PETSc instance for the variable or       !
+!     reuses an existing one, depending on the reuse_pet parameter. This       !
+!     unique PETSc instance per variable approach is consistent with the       !
+!     overall design philosophy of Var_Mod.                                    !
+!   * Initialization: Allocates memory for the variable's current, old, and    !
+!     older-than-old values (n, o, oo), as well as for boundary values,        !
+!     fluxes, and gradient components. It also initializes these arrays to     !
+!     zero and sets up boundary condition types.                               !
+!   * Flexibility: The subroutine offers flexibility in managing the linear    !
+!     solver settings for each variable, aligning with the module's approach   !
+!     to handle each variable's solver requirements individually.              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)             :: phi
-  type(Matrix_Type),  target :: A
-  character(len=*)           :: name_phi
-  character(len=*)           :: name_flux
+  type(Var_Type)             :: phi        !! variable object being created
+  type(Matrix_Type),  target :: A          !! system matrix to
+  character(len=*)           :: name_phi   !! variable's name, connects the
+    !! variable to boundary and initial conditions specified in control file
+  character(len=*)           :: name_flux  !! name of variable's flux,
+    !! connects variable to boundary condition values in control file
   integer,          optional :: reuse_pet
+    !! if true, existing PETSc instance, useful for velocity components
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
 !==============================================================================!

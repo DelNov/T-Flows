@@ -1,9 +1,27 @@
 !==============================================================================!
   subroutine Var_Mod_Destroy_Solution(phi)
 !------------------------------------------------------------------------------!
+!>  This subroutine is responsible for deallocating and cleaning up a complex
+!>  variable (created by Var_Mod_Create_Solution) whose value is obtained by
+!>  solving partial differential equations.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Comprehensive cleanup: The subroutine methodically deallocates the       !
+!     current, old, and older-than-old values, boundary values, fluxes,        !
+!     gradient components, and boundary condition types.                       !
+!   * PETSc integration: If PETSc is enabled, the subroutine also takes care   !
+!     of destroying the PETSc instance associated with the variable. This is   !
+!     crucial for maintaining the integrity of the PETSc environment and       !
+!     freeing up resources used by PETSc.                                      !
+!   * Finalization steps: After deallocating all data and destroying PETSc     !
+!     instances (if applicable), the subroutine resets the variable's name     !
+!     and flux name. This step signifies the complete removal of the variable  !
+!     from the simulation.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type) :: phi
+  type(Var_Type) :: phi  !! variable object being destroyed
 !==============================================================================!
 
   ! Nullify pointers to grid and matrix

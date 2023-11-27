@@ -1,14 +1,30 @@
 !==============================================================================!
   subroutine Var_Mod_Create_New_Only(phi, Grid, name_phi)
 !------------------------------------------------------------------------------!
-!   This is to allocate a simplified uknown, holding only current value,       !
-!   such as pressure for example.                                              !
+!>  This subroutine allocates a simplified unknown variable, which holds only
+!>  its current value (n) and graduents (x, y, z).  It's apt for variables
+!>  like pressure or smoothed variant of VOF, which are calculated from other
+!>  variables' values, either by accumulation or convolution (smoothing).
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Associates the variable (phi) with its grid (Grid) and sets its name     !
+!     (name_phi). It doesn't link to a matrix as the variable isn't solved     !
+!     through a PDE.                                                           !
+!   * Simplification: Unlike Var_Mod_Create_Solution, this subroutine only     !
+!     allocates and initializes the current value and the variable's gradient  !
+!     and boundary values. It omits aspects like old values and linear solver  !
+!     parameters, as they are not needed for this type of variable.            !
+!   * Usage: Ideal for variables that require less complexity in terms of      !
+!     storage and computation, focusing on current values, gradients, and      !
+!     boundary conditions.                                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Var_Type)          :: phi
-  type(Grid_Type), target :: Grid
-  character(len=*)        :: name_phi
+  type(Var_Type)          :: phi        !! variable object being created
+  type(Grid_Type), target :: Grid       !! grid on which it is defined
+  character(len=*)        :: name_phi   !! variable's name, connects the
+    !! variable to boundary and initial conditions specified in control file
 !==============================================================================!
 
   ! Store Grid for which the variable is defined
