@@ -1,12 +1,13 @@
 !==============================================================================!
   pure subroutine Calculate_Cell_Volume(Pol, vol)
 !------------------------------------------------------------------------------!
-!   Calculate cell's volume, this information is not stored in Polyhedron      !
+!>  This subroutine is designed to calculate polyhedral cell's volume.
+!>  This information is not stored in the Polyhedron_Type object.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type), intent(in)  :: Pol
-  real,                   intent(out) :: vol
+  class(Polyhedron_Type), intent(in)  :: Pol  !! parent class
+  real,                   intent(out) :: vol  !! polyhedral cell's volume
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i_nod, j_nod, i, j, s
   real    :: dv, xc, yc, zc, xf, yf, zf

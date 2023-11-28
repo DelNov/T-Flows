@@ -1,12 +1,18 @@
 !==============================================================================!
   subroutine Plot_Polyhedron_Vtk(Pol, head, rank)
 !------------------------------------------------------------------------------!
+!>  This subroutine is designed to visually inspect polyhedrons extracted from
+!>  computational grids for further processin with Isoap library.  It takes
+!>  a Polyhedron_Type object, a string head, and an integer rank as inputs.
+!>  The subroutine generates a .vtk file named using head and rank, and
+!>  writes the polyhedron data into this file.  This allows for a graphical
+!>  inspection of extracted polyhedra in vtk-compatible visualization tools.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Pol
-  character(*)           :: head
-  integer, intent(in)    :: rank
+  class(Polyhedron_Type) :: Pol   !! parent class
+  character(*)           :: head  !! used for name creation, like a header
+  integer, intent(in)    :: rank  !! used as a supplement to the file name
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: ip, is, iv, fu, ndata, npoly
   character(len=80) :: filename  ! don't use SL for separate compilation

@@ -1,6 +1,16 @@
 !---------------------------------------------------------------------!
 !                              ISOPOL                                 !
 !---------------------------------------------------------------------!
+!>  Original Isoap's subroutine to insert and arrange the iso-vertices,
+!>  called from main Isoap function.
+!>  No modifications have been made to the original code from the
+!>  authors to align with T-Flows coding conventions. This decision is
+!>  to maintain compatibility with potential future updates or
+!>  corrections from the original authors. Given the complex nature of
+!>  these algorithms, which are not entirely within our current domain
+!>  of expertise, preserving the original structure and logic is deemed
+!>  the most prudent approach.
+!---------------------------------------------------------------------!
 ! On entry:                                                           !
 !==========                                                           !
 ! IA       = tag value of each vertex of the polyhedron (0 or 1)      !

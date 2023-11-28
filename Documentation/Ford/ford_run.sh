@@ -130,12 +130,14 @@ if [[ "$1" == *"Process"* ]]; then
     sed -i "\|Comm_Mod/Sequential|d" "$file"
     sed -i "\|Work_Mod/No_Checking|d" "$file"
     sed -i "\|Petsc_Mod/Fake|d" "$file"
+    sed -i "/exclude from FORD/d" "$file"
   done
 else
   find ./Temporary -type f -name "*.?90" | while read -r file; do
     # Use sed with a different delimiter to delete lines containing the sequence
     sed -i "\|Comm_Mod/Parallel|d" "$file"
     sed -i "\|Work_Mod/No_Checking|d" "$file"
+    sed -i "/exclude from FORD/d" "$file"
   done
 fi
 
@@ -147,4 +149,4 @@ ford ford_project.md
 #----------
 # Clean up
 #----------
-rm -fR $src_temp
+# rm -fR $src_temp

@@ -1,11 +1,18 @@
 !==============================================================================!
   subroutine Plot_Iso_Polygons_Vtk(Iso, head, rank)
 !------------------------------------------------------------------------------!
+!>  This subroutine is designed to visually inspect iso-polygons extracted by
+!>  the Isoap library from T-Flows solutions with volume of fluid (VOF) method.
+!>  It takes an Iso_Polygons_Type object, a string head, and an integer rank as
+!>  inputs. The subroutine generates a .vtk file named using head and rank, and
+!>  writes the iso-polygon data into this file.  This allows for a graphical
+!>  representation of the iso-polygons in vtk-compatible visualization tools.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Iso_Polygons_Type) :: Iso
-  character(*)             :: head
-  integer, intent(in)      :: rank
+  class(Iso_Polygons_Type) :: Iso   !! parent class
+  character(*)             :: head  !! used for name creation, like a header
+  integer, intent(in)      :: rank  !! used as a supplement to the file name
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i, ip, is, iv, fu
   integer           :: npoly, ndata, ntp

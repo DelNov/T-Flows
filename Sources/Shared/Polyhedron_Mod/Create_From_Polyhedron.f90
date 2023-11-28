@@ -1,10 +1,15 @@
 !==============================================================================!
   subroutine Create_From_Polyhedron(Destination, Source)
 !------------------------------------------------------------------------------!
+!>  This subroutine is essentially as a copy constructor. It duplicates a
+!>  Polyhedron_Type object (Source) into another (Destination).  This
+!>  subroutine ensures that the Destination polyhedron becomes an exact
+!>  copy of the Source polyhedron.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type) :: Destination
-  type (Polyhedron_Type) :: Source
+  class(Polyhedron_Type) :: Destination  !! polyhedron being created
+  type (Polyhedron_Type) :: Source       !! polyhedron being coppied
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, s
 !==============================================================================!

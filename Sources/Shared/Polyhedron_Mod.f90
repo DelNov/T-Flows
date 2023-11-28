@@ -4,10 +4,14 @@
 !==============================================================================!
   module Polyhedron_Mod
 !------------------------------------------------------------------------------!
-!   This module is to deal with single polyhedron as used in Isoap "library"   !
-!   More details here: https://data.mendeley.com/datasets/4rcf98s74c           !
-!                                                                              !
-!   Conditional compilation allows to test Isoap outside of T-Flows.           !
+!>  This module integrates with the Isoap library, focusing on single polyhedron
+!>  handling. It defines Polyhedron_Type with data members and procedures for
+!>  easier interaction with Isoap's polyhedron structures. This module also
+!>  supports conditional compilation for testing outside of T-Flows, enhancing
+!>  its versatility and ease of testing and verification.
+!------------------------------------------------------------------------------!
+!   Note 1: Isoap library is here https://data.mendeley.com/datasets/4rcf98s74c!
+!   Note 2: Conditional compilation allows to test Isoap outside of T-Flows.   !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
 # if T_FLOWS_COMPILATION == 1
@@ -25,84 +29,89 @@
   !---------------------!
   type Polyhedron_Type
 
-    integer                              :: n_nodes        ! ntp
-    integer                              :: n_faces        ! nts
-    integer, allocatable, dimension(:)   :: faces_n_nodes  ! nipv (ns)
-    integer, allocatable, dimension(:,:) :: faces_n        ! ipv  (ns,nv)
-    real,    allocatable, dimension(:,:) :: nodes_xyz      ! vertp(nv,3)
-    real,    allocatable, dimension(:)   :: phi            ! (nv)
-    real                                 :: phi_iso
-    integer, allocatable, dimension(:)   :: global_node(:)
-    logical                              :: allocated = .false.
+    integer              :: n_nodes           !! ntp          in Isoap
+    integer              :: n_faces           !! nts          in Isoap
+    integer, allocatable :: faces_n_nodes(:)  !! nipv (ns)    in Isoap
+    integer, allocatable :: faces_n    (:,:)  !! ipv  (ns,nv) in Isoap
+    real,    allocatable :: nodes_xyz  (:,:)  !! vertp(nv,3)  in Isoap
+    real,    allocatable :: phi          (:)  !! (nv)
+    real                 :: phi_iso
+    integer, allocatable :: global_node  (:)
+    logical              :: allocated = .false.
 
     contains
       procedure          :: Allocate_Polyhedron
-#     if T_FLOWS_COMPILATION == 1
+#   if T_FLOWS_COMPILATION == 1
       procedure, private :: Calculate_Cell_Centroid
       procedure          :: Calculate_Cell_Volume
       procedure, private :: Calculate_Face_Centroid
       procedure          :: Create_From_Polyhedron
-#     endif
-      procedure          :: Create_Complexcell
-      procedure          :: Create_Cube
-      procedure          :: Create_Cutcube
-      procedure          :: Create_Distortedcube
-      procedure          :: Create_Dodecahedron
-      procedure          :: Create_Drilledcube
-      procedure          :: Create_Hollowedcube
-      procedure          :: Create_Icosahedron
-      procedure          :: Create_Nchexahedron
-      procedure          :: Create_Pentapyramid
-      procedure          :: Create_Scube
-      procedure          :: Create_Sdodecahedron
-      procedure          :: Create_Sicosahedron
-      procedure          :: Create_Tetrahedron
-      procedure          :: Create_Zigzagcell
-#     if T_FLOWS_COMPILATION == 1
+#   else
+      procedure          :: Create_Complexcell    ! exclude from FORD
+      procedure          :: Create_Cube           ! exclude from FORD
+      procedure          :: Create_Cutcube        ! exclude from FORD
+      procedure          :: Create_Distortedcube  ! exclude from FORD
+      procedure          :: Create_Dodecahedron   ! exclude from FORD
+      procedure          :: Create_Drilledcube    ! exclude from FORD
+      procedure          :: Create_Hollowedcube   ! exclude from FORD
+      procedure          :: Create_Icosahedron    ! exclude from FORD
+      procedure          :: Create_Nchexahedron   ! exclude from FORD
+      procedure          :: Create_Pentapyramid   ! exclude from FORD
+      procedure          :: Create_Scube          ! exclude from FORD
+      procedure          :: Create_Sdodecahedron  ! exclude from FORD
+      procedure          :: Create_Sicosahedron   ! exclude from FORD
+      procedure          :: Create_Tetrahedron    ! exclude from FORD
+      procedure          :: Create_Zigzagcell     ! exclude from FORD
+#   endif
+#   if T_FLOWS_COMPILATION == 1
       procedure          :: Extract_From_Grid
-#     endif
-      procedure, private :: Func_1
-      procedure, private :: Func_2
-      procedure, private :: Func_3
-      procedure          :: Pick_A_Test_Case
+#   else
+      procedure, private :: Func_1                ! exclude from FORD
+      procedure, private :: Func_2                ! exclude from FORD
+      procedure, private :: Func_3                ! exclude from FORD
+      procedure          :: Pick_A_Test_Case      ! exclude from FORD
+#   endif
       procedure          :: Plot_Polyhedron_Vtk
 
   end type
 
   ! Singleton type Polyhedron object
-  type(Polyhedron_Type), target :: Polyhedron
+  type(Polyhedron_Type), target :: Polyhedron !! singleton object for
+              !! easier access to inerfaces between T-Flows and Isoap
 
   contains
 
 #   include "Polyhedron_Mod/Allocate_Polyhedron.f90"
-#   if T_FLOWS_COMPILATION == 1
+# if T_FLOWS_COMPILATION == 1
 #   include "Polyhedron_Mod/Calculate_Cell_Centroid.f90"
 #   include "Polyhedron_Mod/Calculate_Cell_Volume.f90"
 #   include "Polyhedron_Mod/Calculate_Face_Centroid.f90"
 #   include "Polyhedron_Mod/Create_From_Polyhedron.f90"
-#   endif
-#   include "Polyhedron_Mod/Create_Complexcell.f90"
-#   include "Polyhedron_Mod/Create_Cube.f90"
-#   include "Polyhedron_Mod/Create_Cutcube.f90"
-#   include "Polyhedron_Mod/Create_Distortedcube.f90"
-#   include "Polyhedron_Mod/Create_Dodecahedron.f90"
-#   include "Polyhedron_Mod/Create_Drilledcube.f90"
-#   include "Polyhedron_Mod/Create_Hollowedcube.f90"
-#   include "Polyhedron_Mod/Create_Icosahedron.f90"
-#   include "Polyhedron_Mod/Create_Nchexahedron.f90"
-#   include "Polyhedron_Mod/Create_Pentapyramid.f90"
-#   include "Polyhedron_Mod/Create_Scube.f90"
-#   include "Polyhedron_Mod/Create_Sdodecahedron.f90"
-#   include "Polyhedron_Mod/Create_Sicosahedron.f90"
-#   include "Polyhedron_Mod/Create_Tetrahedron.f90"
-#   include "Polyhedron_Mod/Create_Zigzagcell.f90"
-#   if T_FLOWS_COMPILATION == 1
+# else
+#   include "Polyhedron_Mod/Create_Complexcell.f90"    ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Cube.f90"           ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Cutcube.f90"        ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Distortedcube.f90"  ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Dodecahedron.f90"   ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Drilledcube.f90"    ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Hollowedcube.f90"   ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Icosahedron.f90"    ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Nchexahedron.f90"   ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Pentapyramid.f90"   ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Scube.f90"          ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Sdodecahedron.f90"  ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Sicosahedron.f90"   ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Tetrahedron.f90"    ! exclude from FORD
+#   include "Polyhedron_Mod/Create_Zigzagcell.f90"     ! exclude from FORD
+# endif
+# if T_FLOWS_COMPILATION == 1
 #   include "Polyhedron_Mod/Extract_From_Grid.f90"
-#   endif
-#   include "Polyhedron_Mod/Func_1.f90"
-#   include "Polyhedron_Mod/Func_2.f90"
-#   include "Polyhedron_Mod/Func_3.f90"
-#   include "Polyhedron_Mod/Pick_A_Test_Case.f90"
+# else
+#   include "Polyhedron_Mod/Func_1.f90"                ! exclude from FORD
+#   include "Polyhedron_Mod/Func_2.f90"                ! exclude from FORD
+#   include "Polyhedron_Mod/Func_3.f90"                ! exclude from FORD
+#   include "Polyhedron_Mod/Pick_A_Test_Case.f90"      ! exclude from FORD
+# endif
 #   include "Polyhedron_Mod/Plot_Polyhedron_Vtk.f90"
 
   end module

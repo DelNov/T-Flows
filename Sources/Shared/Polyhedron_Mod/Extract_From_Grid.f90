@@ -1,12 +1,31 @@
 !==============================================================================!
   subroutine Extract_From_Grid(Pol, Grid, cell, phi_n)
 !------------------------------------------------------------------------------!
+!>  The Extract_From_Grid subroutine in Polyhedron_Mod is designed to convert
+!>  a T-Flows cell from a computational grid into a polyhedron compatible with
+!>  the Isoap library.  The subroutine takes a Polyhedron_Type object, a
+!>  Grid_Type object, a cell identifier, and an optional real array phi_n as
+!>  inputs. It uses various internal procedures and local variables to transform
+!>  the grid cell into a polyhedron compatible with Isoap's requirements.
+!>  The debug mode can be enabled for additional output files.
+!------------------------------------------------------------------------------!
+!   Functionaity                                                               !
+!                                                                              !
+!   * Allocates memory for the polyhedron if not already done.                 !
+!   * Initializes the polyhedron by resetting its properties.                  !
+!   * Extracts the number of nodes and faces from the specified cell.          !
+!   * Copies node coordinates and optional nodal phi values to the             !
+!     polyhedron.                                                              !
+!   * Determines local node indices for each polyhedron cell, ensuring         !
+!     correct node order for Isoap processing.                                 !
+!   * Optionally, plots the extracted cell for verification.                   !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Polyhedron_Type),  intent(out) :: Pol
-  type(Grid_Type), target, intent(in)  :: Grid
-  integer,                 intent(in)  :: cell
-  real,          optional, intent(in)  :: phi_n(:)
+  class(Polyhedron_Type),  intent(out) :: Pol       !! parent class
+  type(Grid_Type), target, intent(in)  :: Grid      !! grid object
+  integer,                 intent(in)  :: cell      !! cell number
+  real,          optional, intent(in)  :: phi_n(:)  !! values at cell's nodes
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
