@@ -1,16 +1,25 @@
 !==============================================================================!
   subroutine User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 !------------------------------------------------------------------------------!
-!   Create interface between two grids.                                        !
+!>  User_Mod_Interface_Exchange is crucial for simulations involving fluid flow
+!>  across multiple domains.
+!------------------------------------------------------------------------------!
+!   Functionality (for the case of fluid flow crossing domains)                !
+!                                                                              !
+!   * Transferring velocity components (u, v, w) to the interface buffers      !
+!     for each domain pair.                                                    !
+!   * Applying the buffered velocity values from one domain to the boundary    !
+!     cells of the other, ensuring a consistent flow field across domain       !
+!     boundaries.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Interface_Type)        :: inter(MD, MD)
-  type(Field_Type),    target :: Flow(MD)
-  type(Turb_Type),     target :: Turb(MD)
-  type(Vof_Type),      target :: Vof(MD)
-  type(Swarm_Type),    target :: Swarm(MD)
-  integer, intent(in)         :: n_dom
+  type(Interface_Type)        :: inter(MD, MD)  !! parent Interface_Type
+  type(Field_Type),    target :: Flow(MD)       !! flows involved in simulation
+  type(Turb_Type),     target :: Turb(MD)       !! turbulent fields in simulation
+  type(Vof_Type),      target :: Vof(MD)        !! volume of fluid functions
+  type(Swarm_Type),    target :: Swarm(MD)      !! swarms of particles
+  integer, intent(in)         :: n_dom          !! number of domains
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: U = 1,  &  ! store u-velocity component as first ...
                         V = 2,  &  ! ... v-velocity components as second ...

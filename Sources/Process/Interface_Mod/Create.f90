@@ -1,30 +1,39 @@
 !==============================================================================!
   subroutine Interface_Mod_Create(inter, Grid, n_dom)
 !------------------------------------------------------------------------------!
-!   Create interface between two grids.                                        !
+!>  The subroutine Interface_Mod_Create is designed for creating interfaces
+!>  between two grids in a simulation environment.  It systematically allocates
+!>  the entire interface, stores pertinent face and cell data for both sides of
+!>  the interface, and manages processor offsets. The procedure involves sorting
+!>  arrays by coordinates, establishing a mapping of local cells to the global
+!>  interface, and finally storing this mapping information in designated arrays
+!>  for inside cells, boundary cells, and global faces at the interface.
+!>  This subroutine is crucial for simulations that require data exchange
+!>  between different domains, ensuring accurate and efficient interfacing.
+!------------------------------------------------------------------------------!￼
+!   Functionality                                                              !
 !                                                                              !
-!   The subroutine works in the following way:                                 !
-!   1. It allocates the entire interface on all processors.                    !
-!   2. For both sides of the interface (1 and 2) it stores face coordinates    !
-!      (xf_1 to zf_2), cell inside (ic_1, ic_2), bundary cells (ib_1, ib_2).   !
-!      and processor ids (ip_1, ip_2).                                         !
-!   3. While doing the step above, it takes care of the offsets of each        !
-!      processor (off_1 and off_2).                                            !
-!   4. Then takes global summs of all the arrays mentioned in step 2.          !
-!   5. Sorts the above arrays by their x, y and z coordinates, carrying        !
-!      information on cells inside (ic_1, ic), boundary cells (ib_1, ib_2)     !
-!      and processor ids (ip_1, ip_2)                                          !
-!   6. The sorting from step 5 gives mapping of local cells inside, and local  !
-!      boundary cells to the global interface.                                 !
-!   7. The mapping information is finally stored in arrays cell_1, cell_2      !
-!      (for inside cells), bcel_1, bcel_2 for boundary cells and face_1        !
-!      and face_2 for global faces at the interface.                           !
+!   * It allocates the entire interface on all processors.                     !
+!   * For both sides of the interface (1 and 2) it stores face coordinates     !
+!     (xf_1 to zf_2), cell inside (ic_1, ic_2), bundary cells (ib_1, ib_2).    !
+!     and processor ids (ip_1, ip_2).                                          !
+!   * While doing the step above, it takes care of the offsets of each         !
+!     processor (off_1 and off_2).                                             !
+!   * Then takes global summs of all the arrays mentioned in step 2.           !
+!   * Sorts the above arrays by their x, y and z coordinates, carrying         !
+!     information on cells inside (ic_1, ic), boundary cells (ib_1, ib_2)      !
+!     and processor ids (ip_1, ip_2)                                           !
+!   * The sorting from step 5 gives mapping of local cells inside, and local   !
+!     boundary cells to the global interface.                                  !
+!   * The mapping information is finally stored in arrays cell_1, cell_2       !
+!     (for inside cells), bcel_1, bcel_2 for boundary cells and face_1         !
+!     and face_2 for global faces at the interface.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Interface_Type)    :: inter(MD, MD)
-  type(Grid_Type), target :: Grid(MD)
-  integer                 :: n_dom
+  type(Interface_Type)    :: inter(MD, MD)  !! parent Interface_Type
+  type(Grid_Type), target :: Grid(MD)       !! grids involved in simulation
+  integer                 :: n_dom          !! number of computational domains
 !-----------------------------------[Locals]-----------------------------------!
   integer,         allocatable :: off_1(:)
   integer,         allocatable :: off_2(:)

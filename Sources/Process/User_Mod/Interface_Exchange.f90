@@ -1,16 +1,37 @@
 !==============================================================================!
   subroutine User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 !------------------------------------------------------------------------------!
-!   Create interface between two grids.                                        !
+!>  User_Mod_Interface_Exchange is a critical subroutine for simulations
+!>  involving multiple domains, where it manages the exchange of data across
+!>  domain interfaces.
+!------------------------------------------------------------------------------!
+!   Functionality (for the case of conjugate heat transfer)                    !
+!                                                                              !
+!   * Verification of the presence of multiple domains and heat transfer.      !
+!   * Transference of variables (such as temperature, conductivity, and wall   !
+!     distance) to interface buffers through Interface_Mod_To_Buffer calls.    !
+!     Note that the Interface_Mod_To_Buffer also exchanges the values in the   !
+!     buffers.  After this call, each domain will have values from             !
+!     neighbouring domains at her disposal.                                    !
+!   * Application of buffered values to impose tailored boundary conditions    !
+!     within each domain, crucial for simulations with interactive domain      !
+!     behavior, like conjugate heat transfer.                                  !
+!------------------------------------------------------------------------------!
+!   Note                                                                       !
+!                                                                              !
+!   * Although this example deals with the case of conjugate heat transfer     !
+!     problems only, it gives a general overview on how to deal with exchange  !
+!     of data at domain interfaces.  Another useful example can be found here: !
+!     [root]/Tests/Laminar/Copy_Inlet/User_Mod/Interface_Exchange.f90          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Interface_Type)     :: inter(MD, MD)
-  type(Field_Type), target :: Flow(MD)
-  type(Turb_Type),  target :: Turb(MD)
-  type(Vof_Type),   target :: Vof(MD)
-  type(Swarm_Type), target :: Swarm(MD)
-  integer,      intent(in) :: n_dom
+  type(Interface_Type)     :: inter(MD, MD)  !! parent Interface_Type
+  type(Field_Type), target :: Flow(MD)       !! flows involved in simulation
+  type(Turb_Type),  target :: Turb(MD)       !! turbulent fields in simulation
+  type(Vof_Type),   target :: Vof(MD)        !! volume of fluid functions
+  type(Swarm_Type), target :: Swarm(MD)      !! swarms of particles
+  integer,      intent(in) :: n_dom          !! number of domains
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...

@@ -1,17 +1,33 @@
 !==============================================================================!
   subroutine Interface_Mod_To_Buffer(inter, var1, var2, v, boundary)
 !------------------------------------------------------------------------------!
-!   Copy values of specified variables to buffer.                              !
+!>  Interface_Mod_To_Buffer is responsible for transferring specified variable
+!>  values to a buffer for inter-grid communication. It handles both inside
+!>  cell values and boundary values, based on the provided optional parameter.
+!>  This subroutine is essential for ensuring accurate and synchronized data
+!>  exchange across different computational domains, particularly in
+!>  simulations involving multiple grids or domains with different conditions.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Determines whether to exchange inside or boundary values.                !
+!   * Initializes values at the interface to zero.                             !
+!   * For each side of the interface, it assigns values from the respective    !
+!     domain's cells to the interface buffer.                                  !
+!   * Performs a global summation of the values in the buffers for             !
+!     synchronization across all domains and all processes.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Interface_Type) :: inter
+  type(Interface_Type) :: inter  !! parent Interface_Type
   real                 :: var1(-inter % pnt_grid1 % n_bnd_cells :  &
                                 inter % pnt_grid1 % n_cells)
+    !! values to be exchanged from the first grid
   real                 :: var2(-inter % pnt_grid2 % n_bnd_cells :  &
                                 inter % pnt_grid2 % n_cells)
-  integer              :: v         ! variable number
-  logical, optional    :: boundary  ! exchange boundary values (not inside)
+    !! values to be exchanged from the second grid
+  integer              :: v         !! variable rank
+  logical, optional    :: boundary  !! true to exchange boundary values
 !-----------------------------------[Locals]-----------------------------------!
   integer :: n1, n2, b, c, n, n_tot
   logical :: inside                 ! exchange inside values (not boundary)
