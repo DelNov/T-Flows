@@ -4,17 +4,42 @@
                                   val, fs, fp,            &
                                   data_offset, sweep)
 !------------------------------------------------------------------------------!
-!   Writes one real scalar defined over cells.                                 !
+!>  The Save_Vtu_Scalar_Real subroutine is designed to write a single real
+!>  scalar variable defined over cells into a .vtu file as a single record.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Preparatory work: Connects a real cell buffer for data handling and      !
+!     sets the plotting precision.                                             !
+!   * Data handling: Based on the 'sweep' stage, it either writes the header   !
+!     data for the variable or the actual scalar values to the file.           !
+!   * Data writing: Scalar values are written into the file in an appended     !
+!     format, taking into account whether the data is for internal or boundary !
+!     cells.                                                                   !
+!   * Data offset management: Updates the data offset after writing, ensuring  !
+!     accurate placement of subsequent data in the file.                       !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * Buffer connection: A buffer is connected to handle the scalar values.    !
+!   * Header writing: In the first sweep, the subroutine writes the XML header !
+!     for the scalar variable, including its name and data type.               !
+!   * Data writing: In the second sweep, it writes the actual scalar values.   !
+!     This includes processing values for either internal or boundary cells    !
+!     based on the 'plot_inside' flag.                                         !
+!   * Closing operations: Finally, it updates the data offset and disconnects  !
+!     the buffer, completing the subroutine's operations.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Results_Type) :: Results
-  character(len=*)    :: var_name
-  logical             :: plot_inside     ! plot results inside?
-  real                :: val(:)
-  integer             :: fs, fp          ! file unit sequential and parallel
-  integer             :: data_offset
-  integer             :: sweep           ! is it the first or second sweep
+  class(Results_Type) :: Results      !! parent class
+  character(len=*)    :: var_name     !! name of the variable
+  logical             :: plot_inside  !! true to plots inside,
+                                      !! false to plot on the boundary
+  real                :: val(:)       !! variable's values
+  integer             :: fs, fp       !! file unit sequential and parallel
+  integer             :: data_offset  !! offset in the .vtu file
+  integer             :: sweep        !! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)               :: data_size
   integer                   :: i, c1, c2, c_f, c_l

@@ -6,18 +6,42 @@
                                     fs, fp,                  &
                                     data_offset, sweep)
 !------------------------------------------------------------------------------!
-!   Writes one real symmetric tensor defined over cells.                       !
+!>  Save_Vtu_Tensor_6_Real focuses on writing a real symmetric tensor defined  !
+!>  over cells to a .vtu file as a single record.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Preparations: Sets up plotting precision and allocates a buffer for      !
+!     data management.                                                         !
+!   * Data processing: Depending on the sweep stage, writes the XML header for !
+!     the tensor variable or the tensor data itself to the file.               !
+!   * Data writing: Writes the tensor values in an appended format, addressing !
+!     both internal and boundary cells, as indicated by 'plot_inside'.         !
+!   * Data offset management: Updates the data offset after writing to maintain!
+!     correct positioning for subsequent data in the file.                     !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * Buffer allocation: Allocates a buffer to store tensor data.              !
+!   * Header Writing: In the first sweep, writes the XML header for the tensor !
+!     variable, including its name and data format.                            !
+!   * Data writing: In the second sweep, writes the actual tensor values.      !
+!     This step considers whether the data is for internal or boundary cells   !
+!     based on the 'plot_inside' flag.                                         !
+!   * Closing operations: Updates the data offset and finalizes the subroutine !
+!     tasks.                                                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Results_Type) :: Results
-  character(len=*)    :: var_name
-  logical             :: plot_inside     ! plot results inside?
-  real                :: val_11(:), val_22(:), val_33(:)
-  real                :: val_12(:), val_13(:), val_23(:)
-  integer             :: fs, fp          ! file unit sequential and parallel
-  integer             :: data_offset
-  integer             :: sweep           ! is it the first or second sweep
+  class(Results_Type) :: Results      !! parent class
+  character(len=*)    :: var_name     !! name of the variable
+  logical             :: plot_inside  !! true to plots inside,
+                                      !! false to plot on the boundary
+  real                :: val_11(:), val_22(:), val_33(:)  !! tensor component
+  real                :: val_12(:), val_13(:), val_23(:)  !! tensor component
+  integer             :: fs, fp       !! file unit sequential and parallel
+  integer             :: data_offset  !! offset in the .vtu file
+  integer             :: sweep        !! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
   integer       :: i, c1, c2, c_f, c_l

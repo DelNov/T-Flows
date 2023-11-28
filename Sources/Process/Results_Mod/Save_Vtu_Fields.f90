@@ -1,19 +1,82 @@
 !==============================================================================!
-  subroutine Save_Vtu_Results(Results, Flow, Turb, Vof, Swarm,  &
-                              plot_inside, domain)
+  subroutine Save_Vtu_Fields(Results, Flow, Turb, Vof, Swarm,  &
+                             plot_inside, domain)
 !------------------------------------------------------------------------------!
-!   Writes results in VTU file format (for VisIt and Paraview)                 !
+!>  The Save_Vtu_Fields subroutine is a comprehensive and central
+!>  function for writing simulation results in the VTU (VTK Unstructured
+!>  Grid) file format, which is compatible with visualization tools like
+!>  VisIt and ParaView. This subroutine handles the intricacies of
+!>  formatting and outputting a wide range of simulation data, making it
+!>  crucial for post-processing and analysis
 !------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Flexible output: Capable of outputting results for both internal         !
+!     domain cells (plot_inside) and boundary cells. This flexibility allows   !
+!     users to focus on specific areas of interest in the simulation           !
+!   * Variable handling: Manages a variety of simulation variables             !
+!     including velocity, pressure, temperature, turbulent quantities, and     !
+!     more. It ensures these variables are properly formatted and written to   !
+!     the VTU file.                                                            !
+!   * Grid and cell data management: Calculates and prepares grid and cell     !
+!     data, including coordinates, connectivity, offsets, and types, which     !
+!     are essential components of the VTU format.                              !
+!   * Polyhedral cell support: Specifically handles polyhedral cells, a        !
+!     complex aspect often encountered in unstructured grid simulations.       !
+!   * Scalar and vector data writing: Incorporates functions to write both     !
+!     scalar and vector data, catering to different types of physical          !
+!     quantities in the simulation.                                            !
+!   * Integration with turbulence modeling: Seamlessly integrates with         !
+!     various turbulence models in T-Flows, ensuring that relevant turbulent   !
+!     quantities are included in the results.                                  !
+!   * Boundary condition processing: Includes special handling for boundary    !
+!     cells, enabling detailed analysis of boundary conditions and near-wall   !
+!     phenomena.                                                               !
+!   * Support for large-scale turbulence simulation statistics: Facilitates    !
+!     the output of statistical data crucial for understanding turbulence,     !
+!     particularly in large-scale simulations.                                 !
+!   * Python script generation: Generates Python scripts for extracting        !
+!     boundary conditions, enhancing post-processing capabilities with         !
+!     external tools.                                                          !
+!   * File management: Handles the creation and management of VTU and PVTU     !
+!     files, ensuring proper file structure and format for visualization       !
+!     tools.                                                                   !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * Initialization: Sets up precision, aliases, grid pointers, and checks    !
+!     conditions for boundary plotting.                                        !
+!   * Buffer allocation and grid data preparation: Allocates memory for        !
+!     various buffers and prepares grid-related data, including node           !
+!     coordinates and cell connections.                                        !
+!   * File creation and header writing: Creates VTU and PVTU files, writing    !
+!     necessary headers for unstructured grid data.                            !
+!   * Data writing in two sweeps:                                              !
+!     - First sweep: Writes header information for various data types          !
+!       including nodes, cells, and results.                                   !
+!     - Second sweep: Appends actual data to the files, including              !
+!       coordinates, connectivity, offsets, types, and simulation results.     !
+!   * Results output: Outputs a wide range of simulation results, including    !
+!     physical properties, turbulence data, and specific cell data.            !
+!   * Polyhedral cells handling: Manages data specific to polyhedral cells,    !
+!     if present.                                                              !
+!   * Footer writing and file closure: Finalizes the VTU and PVTU files by     !
+!     writing footers and closing files.                                       !
+!   * Python script generation for boundary conditions: Optionally             !
+!     generates Python scripts for extracting and analyzing boundary           !
+!     conditions.                                                              !
+!   * Cleanup: Disconnects from various data buffers and stops the profiler.   !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type)         :: Results
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
-  type(Swarm_Type),    target :: Swarm
-  logical                     :: plot_inside  ! plot results inside?
-  integer,           optional :: domain
+  class(Results_Type)         :: Results      !! parent class
+  type(Field_Type),    target :: Flow         !! flow field
+  type(Turb_Type),     target :: Turb         !! turbulence models
+  type(Vof_Type),      target :: Vof          !! volume of fluid
+  type(Swarm_Type),    target :: Swarm        !! swarms of particles
+  logical                     :: plot_inside  !! true to plots inside,
+                                              !! false to plot on the boundary
+  integer,           optional :: domain       !! computational domain
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer     :: Grid
   type(Var_Type),  pointer     :: phi
@@ -975,7 +1038,7 @@
     !---------------------------------------------------------------------!
 
     ! Engage only for boundary plots (not inside means on the boundary)
-    if( .not. plot_inside ) then 
+    if( .not. plot_inside ) then
 
       ! Initialize working variables to zero
       save_01(:) = 0.0
@@ -986,7 +1049,7 @@
       do s = 1, Grid % n_faces
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)
-        if(c2 < 0) then 
+        if(c2 < 0) then
           save_01(c2) = Flow % u % n(c1)
           save_02(c2) = Flow % v % n(c1)
           save_03(c2) = Flow % w % n(c1)

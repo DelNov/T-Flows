@@ -4,19 +4,43 @@
                                   val_1, val_2, val_3, fs, fp,  &
                                   data_offset, sweep)
 !------------------------------------------------------------------------------!
-!   Writes one real vector defined over cells.                                 !
+!>  Save_Vtu_Vector_Real is engineered to write a real vector variable defined
+!>  over cells into a .vtu file as a single record.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Preparatory work: It sets up precision for plotting and allocates a      !
+!     buffer for data handling.                                                !
+!   * Data processing: Based on the sweep stage, it writes either the XML      !
+!     header for the vector variable or the actual vector data to the file.    !
+!   * Data writing: Vector values are written in an appended format,           !
+!     considering whether the data is for inside or boundary cells.            !
+!   * Data offset update: Updates the data offset post writing, ensuring       !
+!     correct placement of subsequent data in the file.                        !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * Buffer allocation: Allocates a buffer to store the vector data.          !
+!   * Header writing: In the first sweep, the subroutine writes the XML header !
+!     for the vector variable, including its name and data format.             !
+!   * Data writing: In the second sweep, it writes the actual vector values.   !
+!     This step accounts for whether the data is for internal or boundary cells!
+!     based on the 'plot_inside' flag.                                         !
+!   * Closing operations: Finally, updates the data offset and completes the   !
+!     subroutine's tasks.                                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Results_Type) :: Results
-  character(len=*)    :: var_name
-  logical             :: plot_inside     ! plot results inside?
-  real                :: val_1(:)
-  real                :: val_2(:)
-  real                :: val_3(:)
-  integer             :: fs, fp          ! file unit sequential and parallel
-  integer             :: data_offset
-  integer             :: sweep           ! is it the first or second sweep
+  class(Results_Type) :: Results      !! parent class
+  character(len=*)    :: var_name     !! name of the variable
+  logical             :: plot_inside  !! true to plots inside,
+                                      !! false to plot on the boundary
+  real                :: val_1(:)     !! vector component
+  real                :: val_2(:)     !! vector component
+  real                :: val_3(:)     !! vector component
+  integer             :: fs, fp       !! file unit sequential and parallel
+  integer             :: data_offset  !! offset in .vtu file
+  integer             :: sweep        !!! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)       :: data_size
   integer           :: i, c1, c2, c_f, c_l

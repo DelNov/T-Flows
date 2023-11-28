@@ -1,13 +1,30 @@
 !==============================================================================!
   subroutine Save_Vtu_Front(Results, Front, domain)
 !------------------------------------------------------------------------------!
-!   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
+!>  Save_Vtu_Front is tailored for writing surface vertices in ,vu file format,
+!>  compatible with visualization tools like VisIt and ParaView.  It focuses on
+!>  detailing the geometry of the surfaces (such as interfaces between two
+!>  phases in VOF) within the simulation domain, capturing essential features
+!>  like curvatures, coordinates, and neighboring relationships.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Precision setting: Adjusts plotting precision (intp and floatp).         !
+!   * File initialization: Sets up and opens files for writing surface data.   !
+!   * XML header creation: Prepares the XML structure for .vtu file format.    !
+!   * Vertex data processing: Writes vertex coordinates and relevant point     !
+!     data, including particle IDs, number of neighbors, and node curvatures.  !
+!   * Cell topology: Outlines cell connectivity, types, and offsets.           !
+!   * Cell data writing: Details additional cell properties like the number    !
+!     of neighboring elements, surface normals, areas, coordinates, and        !
+!     curvatures.                                                              !
+!   * XML footer formation: Finalizes the XML structure and closes the files.  !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type), intent(in) :: Results
-  type(Front_Type), target        :: Front
-  integer, optional               :: domain
+  class(Results_Type), intent(in) :: Results  !! parent class
+  type(Front_Type), target        :: Front    !! front object to save
+  integer, optional               :: domain   !! computational domain rank
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
   integer                  :: v, e     ! vertex and element counters

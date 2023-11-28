@@ -7,19 +7,41 @@
                                     fs, fp,                  &
                                     data_offset, sweep)
 !------------------------------------------------------------------------------!
-!   Writes one real non-symmetric tensor defined over cells.                   !
+!>  Save_Vtu_Tensor_9_Real is designed to write a real, non-symmetric tensor
+!>  defined over cells to a .vtu file as a single record.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initial Setup: Establishes plotting precision and manages the data       !
+!     range for the tensor components.                                         !
+!   * Data Handling: Depending on the sweep stage, this subroutine either      !
+!     writes the XML header for the tensor or the tensor data itself.          !
+!   * Data Writing: Writes the tensor values in an appended format, addressing !
+!     both internal and boundary cells as specified by 'plot_inside'.          !
+!   * Offset Management: Updates the data offset post-writing to ensure        !
+!     correct placement of subsequent data in the file.                        !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * Header Preparation: In the first sweep, writes the XML header for the    !
+!     tensor variable, including its name and data components.                 !
+!   * Tensor Data Writing: In the second sweep, writes the actual tensor       !
+!     values for either internal or boundary cells based on 'plot_inside'.     !
+!   * Final Steps: Updates the data offset and completes the subroutine's      !
+!     operations.                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Results_Type) :: Results
-  character(len=*)    :: var_name
-  logical             :: plot_inside     ! plot results inside?
-  real                :: val_11(:), val_12(:), val_13(:)
-  real                :: val_21(:), val_22(:), val_23(:)
-  real                :: val_31(:), val_32(:), val_33(:)
-  integer             :: fs, fp          ! file unit sequential and parallel
-  integer             :: data_offset
-  integer             :: sweep           ! is it the first or second sweep
+  class(Results_Type) :: Results      !! parent class
+  character(len=*)    :: var_name     !! name of the variable
+  logical             :: plot_inside  !! true to plots inside,
+                                      !! false to plot on the boundary
+  real                :: val_11(:), val_12(:), val_13(:)  !! tensor component
+  real                :: val_21(:), val_22(:), val_23(:)  !! tensor component
+  real                :: val_31(:), val_32(:), val_33(:)  !! tensor component
+  integer             :: fs, fp       !! file unit sequential and parallel
+  integer             :: data_offset  !! offset in the .vtu file
+  integer             :: sweep        !! is it the first or second sweep
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)   :: data_size
   integer       :: c1, c2, c_f, c_l

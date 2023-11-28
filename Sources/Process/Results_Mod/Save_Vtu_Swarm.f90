@@ -1,13 +1,43 @@
 !==============================================================================!
   subroutine Save_Vtu_Swarm(Results, Swarm, domain)
 !------------------------------------------------------------------------------!
-!   Writes particles in VTU file format (for VisIt and Paraview)               !
+!>  Save_Vtu_Swarm is dedicated to exporting data related to particles (swarms) !
+!>  in .vtu format for visualization in tools like VisIt and ParaView.  It      !
+!>  focuses on capturing and formatting the state, properties, and dynamics     !
+!>  of particles within the simulation domain
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initial checks and setup: It performs initial checks on the number of    !
+!     particles and sets precision for plotting.                               !
+!   * Data handling: Aliases are taken for the Swarm, and particles are        !
+!     exchanged among processors.                                              !
+!   * Count remaining particles: The subroutine counts the particles that      !
+!     have not escaped.                                                        !
+!   * Early exit conditions: It checks if there are no remaining particles     !
+!     and exits if true.                                                       !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * File setup: If the First_Proc() condition is true, it sets up the        !
+!     file name and opens the file for writing.                                !
+!   * XML header: Writes the XML header for the .vtu file.                     !
+!   * Particle data: The subroutine iteratively writes the data of each        !
+!     particle that hasn't escaped. This includes coordinates, velocities,     !
+!     and various properties like density, diameter, and processor             !
+!     information.                                                             !
+!   * Particle states: Also records information about particles' deposited     !
+!     and trapped states.                                                      !
+!   * Closing the file: After writing all relevant data, it closes the XML     !
+!     structure and the file.                                                  !
+!   * End of subroutine: The subroutine ends after handling all the            !
+!     particle data and closing the file.                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type),      intent(in) :: Results
-  type(Swarm_Type), target             :: Swarm
-  integer, optional,        intent(in) :: domain
+  class(Results_Type),      intent(in) :: Results  !! parent class
+  type(Swarm_Type), target             :: Swarm    !! swarm object to save
+  integer, optional,        intent(in) :: domain   !! computational domain rank
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Field_Type),    pointer :: Flow

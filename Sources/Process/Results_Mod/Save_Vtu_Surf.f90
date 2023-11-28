@@ -1,12 +1,47 @@
 !==============================================================================!
   subroutine Save_Vtu_Surf(Results, Surf)
 !------------------------------------------------------------------------------!
-!   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
+!>  The Save_Vtu_Surf subroutine is responsible for writing surface vertices
+!>  in .vtu file format, compatible with visualization tools like VisIt and
+!>  ParaView.  This subroutine primarily deals with surfacing structures
+!>  (most often created as interfaces between two phases in VOF), capturing
+!>  their  geometric details and properties for visualization purposes.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initial setup: Ensures the necessary precision for plotting is set and   !
+!     checks if the number of vertices to be processed is sufficient.          !
+!   * File creation: A .surf.vtu file is created, specifically for storing     !
+!     surface-related data.                                                    !
+!   * XML header: Constructs the necessary XML structure for the VTU file,     !
+!     including the number of vertices and elements involved.                  !
+!   * Vertex data: Iteratively writes the coordinates of each vertex, along    !
+!     with other vertex-specific information like the number of neighbors and  !
+!     curvature.                                                               !
+!   * Element data: Writes the connectivity of elements, their types, and      !
+!     other attributes like neighboring element count, surface normals, and    !
+!     curvatures.                                                              !
+!   * Finalization: Closes the XML structure and the file, completing the      !
+!     process of saving the surface data.                                      !
+!------------------------------------------------------------------------------!
+!   Workflow                                                                   !
+!                                                                              !
+!   * File setup: The subroutine begins by preparing the file name and opening !
+!     the file for writing, restricted to the first processor.                 !
+!   * Writing header: It then writes the XML header, specifying the VTU format !
+!     and other metadata.                                                      !
+!   * Processing vertices: For each vertex in the surface structure, its       !
+!     coordinates and additional data (e.g., curvature) are written.           !
+!   * Processing elements: The subroutine then iterates over each element in   !
+!     the surface structure, writing data about its connectivity, type, and    !
+!     other attributes.                                                        !
+!   * Completing data write: After finishing with vertices and elements, the   !
+!     subroutine writes the end tags for the XML structure and closes the file.!
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Results_Type),     intent(in) :: Results
-  type(Surf_Type), target, intent(in) :: Surf
+  class(Results_Type),     intent(in) :: Results  !! parent class
+  type(Surf_Type), target, intent(in) :: Surf     !! surface object to save
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
   integer                  :: v, e     ! vertex and element counters
