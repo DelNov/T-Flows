@@ -1,13 +1,17 @@
 !==============================================================================!
   subroutine Face_Mod_Allocate(phi, Grid, name_phi)
 !------------------------------------------------------------------------------!
-!   This is to allocate a face-based uknown with new and old values.           !
+!>  This subroutine is designed to allocate memory for a face-centered variable
+!>  in a computational grid. It sets up the variable phi with new (n), old (o),
+!>  and older (oo) values, as well as an average guessed value (avg). Each of
+!>  these arrays is allocated to the size of the total number of faces in the
+!>  given grid, and their values are initially set to zero.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Face_Type)         :: phi
-  type(Grid_Type), target :: Grid
-  character(len=*)        :: name_phi
+  type(Face_Type)         :: phi       !! parent Face_Type
+  type(Grid_Type), target :: Grid      !! grid on the variable is defined
+  character(len=*)        :: name_phi  !! name of the variable
 !==============================================================================!
 
   ! Store grid for which the variable is defined
