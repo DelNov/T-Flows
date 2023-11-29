@@ -1,13 +1,25 @@
 !==============================================================================!
   subroutine Compute_Distance_Function_And_Vof(Front, cell_dist, vof)
 !------------------------------------------------------------------------------!
-!   Computes distance from a surface                                           !
+!>  This subroutine calculates the distance from a surface and stores it
+!>  in parameter 'cell_dist'.  It computes a distance function and updates
+!>  (corrects) the VOF field for each cell in a computational domain.
+!>  At the time of writing this documentation, this subroutine was not used.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Establishing connections to the real cell data.                          !
+!   * Iterating through vertices to determine the nearest cells and create a   !
+!     list of surrounding nodes and cells.                                     !
+!   * Comparing distance measures to find the minimum and maximum distances.   !
+!   * Transforming these distances into a specific function and finally        !
+!     computing the VOF based on this function.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  type(Var_Type)            :: cell_dist
-  type(Var_Type)            :: vof
+  class(Front_Type), target :: Front      !! parent class
+  type(Var_Type)            :: cell_dist  !! variable which stores distances
+  type(Var_Type)            :: vof        !! variable representing VOF
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer  :: Grid
   real                      :: dist

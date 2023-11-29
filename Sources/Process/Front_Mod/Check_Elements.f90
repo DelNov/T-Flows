@@ -1,11 +1,31 @@
 !==============================================================================!
   subroutine Check_Elements(Front)
 !------------------------------------------------------------------------------!
-!   Finds connectivity for sides and elements                                  !
+!>  This subroutine is integral to ensuring the integrity of the front object.
+!>  It verifies each element's construction by comparing the summation of
+!>  vertex indices against the collective indices of its sides. This check
+!>  ensures that the elements are correctly formed and linked, critical for
+!>  maintaining the structural coherence of the front. If discrepancies are
+!>  found, detailed diagnostics are provided, pinpointing the exact location
+!>  and nature of the inconsistencies for effective troubleshooting.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * It iterates through each element (Elem) in the front.                    !
+!   * For each element, it calculates two sums:                                !
+!     - sum_ijk sums the vertex indices of the element.                        !
+!     - sum_cd sums the vertex indices from the sides of the element.          !
+!   * It checks whether the ratio of sum_cd to sum_ijk is equal to 2. If not,  !
+!     this indicates a potential inconsistency in the element's formation.     !
+!   * In case of inconsistency, detailed information about the problematic     !
+!     element, its sides, and corresponding cell nodes are printed for         !
+!     debugging.                                                               !
+!   * If any inconsistency is found, an error message is triggered,            !
+!     indicating an issue in forming elements’ neighbors.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Front_Type), target :: Front  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Side_Type), pointer :: side(:)
   type(Elem_Type), pointer :: Elem(:)

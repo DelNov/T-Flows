@@ -1,13 +1,34 @@
 !==============================================================================!
   subroutine Place_Front_At_Value(Front, sharp, verbose)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value 0.5                            !
+!>  This subroutine is essential for defining a front in simulations,
+!>  particularly for phase interfaces in VOF methods. It constructs the front
+!>  where a specified field variable, typically the VOF function, reaches a
+!>  value of 0.5, indicating the interface between two phases.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initializing the front structure for fresh computation.                  !
+!   * Interpolating cell values to nodes.                                      !
+!   * Iterating through all cells to locate surface vertices.                  !
+!   * Employing the Isoap algorithm to extract polygons representing the       !
+!     interface.                                                               !1
+!   * Storing results from Isoap into T-Flows' front object.                   !
+!   * Compressing front vertices for efficient representation and less memory  !
+!     usage.                                                                   !
+!   * Establishing connectivity among elements and sides of the front.         !
+!   * Calculating geometric quantities like centroids and normals of elements. !
+!   * Marking cells and intersecting faces with elements for phase transfer    !
+!     calculations.                                                            !
+!   * Optionally saving debug information for visualization.                   !
+!------------------------------------------------------------------------------!
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  type(Var_Type),    target :: sharp
-  logical                   :: verbose
+  class(Front_Type), target :: Front    !! parent class
+  type(Var_Type),    target :: sharp    !! variable for front placement,
+                                        !! typically a sharp VOF function
+  logical                   :: verbose  !! controls the output verbosity
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!

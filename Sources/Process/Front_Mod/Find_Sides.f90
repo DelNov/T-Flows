@@ -1,12 +1,25 @@
 !==============================================================================!
   subroutine Find_Sides(Front, verbose)
 !------------------------------------------------------------------------------!
-!   Finds connectivity for sides and elements                                  !
+!>  This subroutine is designed establishing the connectivity of sides and
+!>  elements in a front structure.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Compiling all possible sides from the elements.                          !
+!   * Sorting sides based on vertex indices for efficiency.                    !
+!   * Compressing sides by merging duplicates, where a side is shared by two   !
+!     elements.                                                                !
+!   * Assigning correct elements and vertices to each unique side.             !
+!   * Counting the sides that are either shared by two elements or belong      !
+!     to only one.                                                             !
+!   * Updating the total count of unique sides and their distribution          !
+!     among elements.                                                          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  logical                   :: verbose
+  class(Front_Type), target :: Front    !! parent class
+  logical                   :: verbose  !! controls verbosity of the output
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)

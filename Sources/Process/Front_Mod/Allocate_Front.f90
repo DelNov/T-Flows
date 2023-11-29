@@ -1,12 +1,18 @@
 !==============================================================================!
   subroutine Allocate_Front(Front, Flow)
 !------------------------------------------------------------------------------!
-!   Memory allocation for front                                                !
+!>  This subroutine is responsible for memory allocation and initialization of
+!>  the front structure in Process. It assigns pointers to the relevant flow
+!>  and grid objects and sets the front to divide the surface mesh among
+!>  processors. The subroutine allocates memory for elements, vertices, and
+!>  sides of the front, along with boundary nodes and data structures for cell
+!>  and face intersections.  The subroutine concludes by initializing the
+!>  front's local variables to set up for further processing.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  type(Field_Type),  target :: Flow
+  class(Front_Type), target :: Front  !! parent class
+  type(Field_Type),  target :: Flow   !! flow field for which it is defined
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   integer                  :: nb, nc, nf

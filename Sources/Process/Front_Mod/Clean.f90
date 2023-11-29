@@ -1,11 +1,22 @@
 !==============================================================================!
   subroutine Clean_Front(Front)
 !------------------------------------------------------------------------------!
-!   Cleans the front                                                           !
+!>  This subroutine clears the data structures associated with a front.
+!>  It resets the front structure, removing all elements, vertices, and sides,
+!>  preparing it for reuse or disposal.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Deallocates the Elem array, which holds the front elements, and resets   !
+!     the number of elements (n_elems) to zero.                                !
+!   * Deallocates the Vert array, responsible for storing the vertices of      !
+!     the front, and sets the number of vertices (n_verts) to zero.            !
+!   * Deallocates the side array, which contains the sides of the front,       !
+!     and resets the number of sides (n_sides) to zero.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type),  target :: Front
+  class(Front_Type),  target :: Front  !! parent class
 !==============================================================================!
 
   !-----------------------------!

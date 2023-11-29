@@ -1,11 +1,20 @@
 !==============================================================================!
   subroutine Calculate_Element_Centroids(Front)
 !------------------------------------------------------------------------------!
-!   Calculates element centroids                                               !
+!>  This subroutine is responsible for calculating the centroids of elements
+!>  in a front.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Iterating through all elements in the front.                             !
+!   * Initializing the centroid coordinates (x, y, z) of each element to zero. !
+!   * Accumulating the coordinates of each vertex that forms an element.       !
+!   * Dividing the total coordinates by the number of vertices to find the     !
+!     average, thus determining the centroid's position.                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Front_Type), target :: Front  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

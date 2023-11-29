@@ -1,9 +1,21 @@
 !==============================================================================!
   subroutine Find_Vertex_Elements(Front)
 !------------------------------------------------------------------------------!
+!>  This subroutine plays a crucial role in determining the relationship
+!>  between vertices and elements of a front.  It is typically called before
+!>  executing Calculate_Element_Centroids and Calculate_Element_Normals, which
+!>  rely on the vertex-to-element relationship established here.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initializing each vertex's element count and associated elements to zero.!
+!   * Iterating over each element to identify the vertices it contains.        !
+!   * For each vertex, incrementing the number of neighboring elements and     !
+!     storing the element identifiers.                                         !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Front_Type), target :: Front  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

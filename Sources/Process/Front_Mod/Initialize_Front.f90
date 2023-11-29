@@ -1,11 +1,17 @@
 !==============================================================================!
   subroutine Initialize_Front(Front)
 !------------------------------------------------------------------------------!
-!   Surface genesis                                                            !
+!>  This subroutine is designed for initializing the front structure in a
+!>  computational simulation. It focuses on setting up all the elements,
+!>  vertices, and sides of the front. It iterates through each element, vertex,
+!>  and side, setting their attributes to the default values.  The rimary role
+!>  of this subroutine is to ensure that the front object starts from a clean,
+!>  default state, ready for further processing and manipulation within the
+!>  simulation environment.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Front_Type), target :: Front  !! parent class
 !----------------------------------[Locals]------------------------------------!
   integer :: v, e, s
 !==============================================================================!

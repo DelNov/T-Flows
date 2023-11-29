@@ -4,7 +4,14 @@
 !==============================================================================!
   module Front_Mod
 !------------------------------------------------------------------------------!
-!   Module for Lagrangian particle tracking                                    !
+!>  This module is designed for generating and managing a front, typically an
+!>  interface between two phases in VOF context. This module constructs the
+!>  front using polygons spanned across the numerical mesh, thus it can be said
+!>  that it is "mesh-dependent". It places polygon vertices at cell edges,
+!>  aligning them with specific values of a field variable (typiciall the
+!>  0.5 iso-surface in VOF ranging from 0 to 1). Through Front_Type which is
+!>  defined in this module, it introduces a range of functionalities for
+!>  managing and saving a front in .vtu format for post-processing.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
@@ -21,15 +28,15 @@
   !----------------!
   type Front_Type
 
-    type(Grid_Type),  pointer :: pnt_grid  ! Grid for which it is defined
-    type(Field_Type), pointer :: pnt_flow  ! flow field for which it is defined
+    type(Grid_Type),  pointer :: pnt_grid  !! grid for which it is defined
+    type(Field_Type), pointer :: pnt_flow  !! flow field for which it is defined
 
-    integer                      :: n_elems
-    integer                      :: n_verts
-    integer                      :: n_sides
-    type(Vert_Type), allocatable :: Vert(:)
-    type(Elem_Type), allocatable :: Elem(:)
-    type(Side_Type), allocatable :: side(:)
+    integer                      :: n_elems  !! number of elements
+    integer                      :: n_verts  !! number of vertices
+    integer                      :: n_sides  !! number of sides
+    type(Vert_Type), allocatable :: Vert(:)  !! list of vertices
+    type(Elem_Type), allocatable :: Elem(:)  !! list of elements
+    type(Side_Type), allocatable :: side(:)  !! list of sides
 
     ! Bounding nodes for each vertex (derives from Isoap usage)
     integer, allocatable :: b_node_1(:)

@@ -1,12 +1,26 @@
 !==============================================================================!
   subroutine Mark_Cells_And_Faces(Front, phi)
 !------------------------------------------------------------------------------!
-!   Mark cells and find faces at surface                                       !
+!>  The subroutine Mark_Cells_And_Faces in the Front_Mod module marks cells
+!>  and identifies faces (cells and faces being grid and not front entities)
+!>  intersecting with a front in a computational grid.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Zeroing values for elements in cells and intersecting faces to zero.     !
+!   * Marking cells that contain elements of the front.                        !
+!   * Iterating through grid faces to detect intersections with the surface,   !
+!     based on the phi variable.                                               !
+!   * Performing linear interpolation to find the coordinates where the grid   !
+!     faces intersect the surface.                                             !
+!   * Flagging these faces and storing their intersection coordinates.         !
+!   * Commented part: Comparing the number of marked faces with elements.      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  type(Var_Type),    target :: phi
+  class(Front_Type), target :: Front  !! parent class
+  type(Var_Type),    target :: phi    !! variable for front placement,
+                                      !! typically a sharp VOF function
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid

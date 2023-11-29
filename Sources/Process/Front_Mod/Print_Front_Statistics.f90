@@ -1,9 +1,27 @@
 !==============================================================================!
   subroutine Print_Front_Statistics(Front)
 !------------------------------------------------------------------------------!
+!>  This calculates and displays various statistics of a front mesh.  It is
+!>  typically involved at the beginning of a time step in Process, just after
+!>  the front has been created which, in turn, is invoked after advancing the
+!>  VOF function for the new time step.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Calculation of side lengths for each side in the front.                  !
+!   * Determination of extreme side size ratios, such as the maximum and       !
+!     minimum ratios.                                                          !
+!   * Computing the total surface area of the front.                           !
+!   * Counting the number of elements, vertices, and sides, including a        !
+!     global sum for parallel execution.                                       !
+!   * Finding the maximum and minimum element areas and side lengths.          !
+!   * Reporting the percentage of vertices with a certain number of neighbors. !
+!   * Outputs these statistics, providing insights into the front mesh's       !
+!     geometric properties.                                                    !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type),  target :: Front
+  class(Front_Type),  target :: Front  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

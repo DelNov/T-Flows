@@ -1,12 +1,17 @@
 !==============================================================================!
   subroutine Save_Debug_Front_Vtu(Front, time_step)
 !------------------------------------------------------------------------------!
-!   Writes surface vertices in VTU file format (for VisIt and Paraview)        !
+!>  This subroutine is designed to create visual representations of a front
+!>  object for debugging and analysis purposes. This subroutine generates the
+!>  .vtu files only for sequential runs, but for parallel runs also creates
+!>  a .pvtu file.  In addition to writing vertex coordinates (which is clearly
+!>  a must), the subroutine also writes indices, curvatures, and neighboring
+!>  elements and curvatures for detailed examination.
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Front_Type), target :: Front
-  integer                   :: time_step
+  class(Front_Type), target :: Front      !! parent class
+  integer                   :: time_step  !! current time step
 !----------------------------------[Locals]------------------------------------!
   type(Vert_Type), pointer :: Vert
   type(Grid_Type), pointer :: Grid

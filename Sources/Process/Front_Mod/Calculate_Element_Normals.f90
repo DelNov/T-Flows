@@ -1,11 +1,24 @@
 !==============================================================================!
   subroutine Calculate_Element_Normals(Front)
 !------------------------------------------------------------------------------!
-!   Calculates element normals                                                 !
+!>  This subroutine calculates the normals of elements in a front.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Iterating through all elements.                                          !
+!   * Initializing the area and surface vectors (sx, sy, sz) of each element   !
+!     to zero.                                                                 !
+!   * Calculating cross products between vectors formed by vertices of each    !
+!     element to determine the area and orientation.                           !
+!   * Summing these cross products to find the total surface vector for each   !
+!     element.                                                                 !
+!   * Dividing the total surface vector by the total area to compute the       !
+!     normal vector.                                                           !
+!   * Verifying the orientation of each element.                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Front_Type), target :: Front  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

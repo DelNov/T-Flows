@@ -1,12 +1,24 @@
 !==============================================================================!
   subroutine Compress_Front_Vertices(Front, verbose)
 !------------------------------------------------------------------------------!
-!   Compresses vertices' list                                                  !
+!>  This subroutine optimizes the front's vertex list by eliminating redundant
+!>  vertices. This compression is essential for efficient processing and memory
+!>  usage in complex simulations.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Verifying the uniqueness of elements' vertices.                          !
+!   * Sorting vertices based on coordinates and associated node numbers.       !
+!   * Compressing vertices that coincide spatially.                            !
+!   * Correcting vertex coordinates and updating element vertices accordingly. !
+!   * Final verification to ensure no duplicated vertices in elements.         !
+!   * Calculating the total number of unique vertices, essential for           !
+!     simulations distributed across multiple processors.                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
-  logical                   :: verbose
+  class(Front_Type), target :: Front    !! parent class
+  logical                   :: verbose  !! controls the output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

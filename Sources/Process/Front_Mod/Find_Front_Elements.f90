@@ -1,11 +1,24 @@
 !==============================================================================!
   subroutine Find_Front_Elements(Front)
 !------------------------------------------------------------------------------!
-!   Finds connectivity for sides and elements                                  !
+!>  This subroutine establishes connectivity between sides and elements of a
+!>  front object.  This process ensures that each element in the front object
+!>  is correctly linked to its neighboring elements and sides, crucial for
+!>  accurate front representation and analysis.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Iterating through sides to identify adjacent elements and their          !
+!     corresponding vertices.                                                  !
+!   * For each side, determining the elements on either side (elements a and   !
+!     b) and their associated vertices.                                        !
+!   * Checking if the vertices of these elements match the side's vertices.    !
+!   * Updating the elements' information with the identified sides and their   !
+!     neighboring elements.                                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Front_Type), target :: Front
+  class(Front_Type), target :: Front  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
