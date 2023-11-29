@@ -1,3 +1,12 @@
 Here are the vim syntax files for T-Flows.
 
-Don't overlook the .vim directory here
+Don't overlook the .vim sub-directory here!
+
+If you want T-Flows, control file and .geo file syntax highlighting in
+vim, link the .vim subdirectory from here to your home directory with
+this:
+
+ln -i -s $PWD/.vim/ $HOME/
+
+or a similar command.  Important is that .vim from your $HOME points
+to the .vim subdirectory here.
