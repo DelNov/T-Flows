@@ -1,5 +1,5 @@
 ---
-project: T-Flows
+project: Process
 output_dir: ./Html
 author: T-Flows Development Team
 email: "your.email@example.com"
@@ -14,15 +14,15 @@ src_dir: ./Temporary
 <!-- <p><img alt="T-Flows Logo" src="../../../logo_100_percent.png" title="Program Logo"></p> -->
 <!-- </div>                                                                                   -->
 
-## 4. Process
+## Introduction
 
 Describe the T-Flows Process module here...
 
-### Getting Started
+### Features
 
 ...
 
-### Features
+### Getting started
 
 ...
 
