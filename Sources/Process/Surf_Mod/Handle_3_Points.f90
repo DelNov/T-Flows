@@ -1,12 +1,35 @@
 !==============================================================================!
   subroutine Handle_3_Points(Surf, surf_v)
 !------------------------------------------------------------------------------!
-!   Surface intersects cell at three points                                    !
+!>  The Handle_3_Points subroutine in the Surf_Type is a specialized function
+!>  designed to handle the scenario where a surface intersects a cell at three
+!>  points, forming a triangular element.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias assignment: Sets up aliases for the number of vertices (nv), the   !
+!     number of elements (ne), vertices (Vert), and elements (Elem) for easier !
+!     reference and manipulation.                                              !
+!   * Element creation:                                                        !
+!     - Increments the element count and defines a new element with three      !
+!       vertices.                                                              !
+!     - Assigns the last three vertices in the surface mesh to the new element.!
+!   * Vector calculation:                                                      !
+!     - Computes vectors a and b based on the positions of the vertices.       !
+!       Vector a connects points 2 and 1; vector b connects points 3 and 1.    !
+!     - Calculates the cross product of vectors a and b to determine the       !
+!       orientation of the triangle in space.                                  !
+!   * Orientation adjustment:                                                  !
+!     - Checks the orientation of the newly formed triangle relative to the    !
+!       surface vector (surf_v).                                               !
+!     - If the dot product of the surface vector and the triangle's normal     !
+!       (from the cross product) is negative, the subroutine adjusts the       !
+!       vertex order to ensure correct orientation.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  real, dimension(3)       :: surf_v
+  class(Surf_Type), target :: Surf    !! parent class
+  real, dimension(3)       :: surf_v  !! surface vector
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

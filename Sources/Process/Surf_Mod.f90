@@ -5,7 +5,19 @@
 !==============================================================================!
   module Surf_Mod
 !------------------------------------------------------------------------------!
-!   Module for Lagrangian particle tracking                                    !
+!>  The Surf_Mod module in T-Flows is an advanced alternative to Front_Mod
+!>  (from which it derived), designed for generating high-quality mesh surfaces
+!>  independent of the underlying computational grid.  This independence makes
+!>  Surf_Mod more versatile and capable of creating more refined meshes,
+!>  especially beneficial in simulations involving complex interfaces.
+!>  However, it has its share of shortcomings, such as more challenging
+!>  parallelization and incompatibility with background polyhedral grids.
+!>  Surf_Mod, derived from Front_Type, includes functionalities such as mesh
+!>  refinement, smoothing, and handling complex geometrical points. These
+!>  enable precise representation of surfaces defined by scalar fields (VOF).
+!>  It is worth noting that Surf_Mod works with triangular grids only, and
+!>  that the algorithms for improving the mesh quality all come from TRIPOS
+!>  (https://github.com/Niceno/TRIPOS)
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Front_Mod
@@ -16,6 +28,11 @@
   !---------------!
   !   Surf type   !
   !---------------!
+  !> he Surf_Type, an extension of Front_Type, focuses on the manipulation of
+  !> triangular grids, facilitating high-quality mesh generation independent
+  !> of the underlying computational grid. This type includes specialized
+  !> functionalities for mesh improvement, mesh smoothing and curvatures
+  !> calculation.
   type, extends(Front_Type) :: Surf_Type
 
     ! Logical array if cell has particles

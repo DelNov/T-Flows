@@ -8,13 +8,29 @@
 !------------------------------------------------------------------------------!
 !   Functionality                                                              !
 !                                                                              !
-!   * Iterating through sides to identify adjacent elements and their          !
-!     corresponding vertices.                                                  !
-!   * For each side, determining the elements on either side (elements a and   !
-!     b) and their associated vertices.                                        !
-!   * Checking if the vertices of these elements match the side's vertices.    !
-!   * Updating the elements' information with the identified sides and their   !
-!     neighboring elements.                                                    !
+!   * Alias assignment: Sets up aliases for vertices (Vert), sides (side),     !
+!     elements (Elem), and their respective counts (nv, ns, ne) for simplified !
+!     reference in the code.                                                   !
+!   * Iterating through sides:                                                 !
+!     - The subroutine iterates through each side in the front object. For     !
+!       each side, it identifies the adjacent elements (referred to as         !
+!       elements a and b) and their associated vertices.                       !
+!   * Connectivity establishment:                                              !
+!     - For each side, the subroutine determines the elements on either side   !
+!       of it. It then identifies the corresponding vertices of these elements.!
+!     - The subroutine checks if the vertices of these elements match the      !
+!       side's vertices.                                                       !
+!   * Updating element information:                                            !
+!     - Upon finding a match, the subroutine updates the element's information !
+!       with the identified side and the neighboring elements. This includes   !
+!       updating the side and neighboring element arrays (s and e) and their   !
+!       respective counts (ns and nne).                                        !
+!   * Processing for both sides of each element:                               !
+!     - The subroutine processes both elements adjacent to a side (elements a  !
+!       and b), ensuring comprehensive establishment of connectivity.          !
+!     - For each element, it checks and updates connectivity for all pairs of  !
+!       vertices. This ensures that all edges of each element are considered   !
+!       in the connectivity establishment.                                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

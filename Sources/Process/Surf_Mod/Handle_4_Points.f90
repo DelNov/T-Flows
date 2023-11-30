@@ -1,13 +1,46 @@
 !==============================================================================!
   subroutine Handle_4_Points(Surf, surf_v, enforce_triangles)
 !------------------------------------------------------------------------------!
-!   Surface intersects cell at four points                                     !
+!>  The Handle_4_Points subroutine efficiently manages the creation of surface
+!>  elements when an interface intersects a cell at four points. It determines
+!>  the optimal arrangement of these points to form either a single
+!>  quadrilateral element or two triangular elements, based on the specified
+!>  enforcement of triangular elements.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias and variable setup: Establishes aliases for the number of          !
+!     vertices (nv), elements (ne), and pointers to vertices (Vert) and        !
+!     elements (Elem). Also, sets up permutations for vertex orderings.        !
+!   * Permutation testing:                                                     !
+!     - Iterates through different permutations of the four intersecting       !
+!       vertices to find an arrangement where the vertices form a coherent     !
+!       surface element(s).                                                    !
+!     - For each permutation, calculates vectors between vertices and their    !
+!       cross products to determine the surface normals.                       !
+!   * Orientation checking:                                                    !
+!     - Checks the orientation of the potential elements by comparing the dot  !
+!       product of the surface vector (surf_v) with the calculated normals.    !
+!     - Selects the permutation where the normals align correctly with the     !
+!       surface vector.                                                        !
+!   * Element formation:                                                       !
+!     - Depending on the enforce_triangles flag:                               !
+!       > If not enforcing triangles, creates one quadrilateral element with   !
+!         the four vertices.                                                   !
+!       > If enforcing triangles, creates two triangular elements from the     !
+!         four vertices.                                                       !
+!     - Assigns vertices to the new element(s) based on the successful         !
+!       permutation.                                                           !
+!   * Error Handling:                                                          !
+!     - Includes a message and error handling if no suitable permutation is    !
+!       found, indicating a critical issue in the surface generation process.  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  real                     :: surf_v(3)
-  logical                  :: enforce_triangles
+  class(Surf_Type), target :: Surf               !! parent class
+  real                     :: surf_v(3)          !! surface vector
+  logical                  :: enforce_triangles  !! controls if creation of
+                                                 !! triangles is enforced
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

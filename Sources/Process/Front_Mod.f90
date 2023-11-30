@@ -5,13 +5,16 @@
   module Front_Mod
 !------------------------------------------------------------------------------!
 !>  This module is designed for generating and managing a front, typically an
-!>  interface between two phases in VOF context. This module constructs the
+!>  interface between two phases in a VOF context. This module constructs the
 !>  front using polygons spanned across the numerical mesh, thus it can be said
 !>  that it is "mesh-dependent". It places polygon vertices at cell edges,
-!>  aligning them with specific values of a field variable (typiciall the
-!>  0.5 iso-surface in VOF ranging from 0 to 1). Through Front_Type which is
-!>  defined in this module, it introduces a range of functionalities for
-!>  managing and saving a front in .vtu format for post-processing.
+!>  aligning them these with specific field variable values, typically the 0.5
+!>  iso-surface in a VOF context, where values range from 0 to 1. Through
+!>  Front_Type which is defined in this module, it introduces a range of
+!>  functionalities for managing and saving a front in .vtu format for
+!>  post-processing.  The principal functionality of this module, to extract
+!>  surface polygons based on field functions, is based on Isoap library
+!>  (https://data.mendeley.com/datasets/4rcf98s74c) and through Isoap_Mod.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Field_Mod
@@ -26,6 +29,9 @@
   !----------------!
   !   Front type   !
   !----------------!
+  !> This type incorporates various elements, vertices, and sides to form a
+  !> mesh that aligns with specific field values. It also holds functionalities
+  !> for creating and manipulating front and saving it in .vtu format.
   type Front_Type
 
     type(Grid_Type),  pointer :: pnt_grid  !! grid for which it is defined

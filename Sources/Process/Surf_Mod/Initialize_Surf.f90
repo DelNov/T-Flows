@@ -1,11 +1,17 @@
 !==============================================================================!
   subroutine Initialize_Surf(Surf)
 !------------------------------------------------------------------------------!
-!   Surface genesis                                                            !
+!>  This subroutine is designed for initializing the surface object in a
+!>  computational simulation. It focuses on setting up all the elements,
+!>  vertices, and sides of the surface. It iterates through each element,
+!>  vertex, and side, setting their attributes to the default values.  The
+!>  primary role of this subroutine is to ensure that the front object starts
+!>  from a clean, default state, ready for further processing and manipulation
+!>  within the simulation environment.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !----------------------------------[Locals]------------------------------------!
   integer :: v, e, s
 !==============================================================================!

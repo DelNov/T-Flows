@@ -1,6 +1,35 @@
 !==============================================================================!
   subroutine Distribute_Smooth(Surf, smooth)
 !------------------------------------------------------------------------------!
+!>  This subroutine manages the distribution of a smooth variable (represented
+!>  by smooth) to the vertices of the surface mesh. This distribution is
+!>  essential for ensuring that each vertex has the correct data values.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias setup:                                                             !
+!     - Establishes aliases for the grid (Grid), vertices (Vert), and the      !
+!       number of vertices (nv). This setup simplifies code navigation and     !
+!       enhances clarity.                                                      !
+!   * Sequential and parallel processing:                                      !
+!     - Differentiates between sequential and parallel execution environments. !
+!     - In a sequential run, the subroutine directly assigns the smooth        !
+!       variable values to each vertex based on its nearest cell in the grid.  !
+!     - In a parallel run, the process involves accumulating and averaging the !
+!       smooth variable values from different processors to ensure consistency !
+!       across the entire mesh.                                                !
+!   * Smooth variable distribution in parallel runs:                           !
+!     - Initializes buffer arrays to accumulate values for each vertex across  !
+!       different processors.                                                  !
+!     - Iterates through each vertex and fetches the corresponding smooth      !
+!       variable values from its nearest cell.                                 !
+!     - Performs global summation of these values across all processors to     !
+!       ensure each vertex receives the correct averaged data.                 !
+!   * Updating Vertex Data:                                                    !
+!     - After the global summation, updates each vertex's smooth variable      !
+!       values by averaging the accumulated data. This step is crucial for     !
+!       maintaining consistency in the mesh data representation.               !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Surf_Type),  target :: Surf

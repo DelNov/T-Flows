@@ -1,12 +1,17 @@
 !==============================================================================!
   subroutine Allocate_Surf(Surf, Flow)
 !------------------------------------------------------------------------------!
-!   Surface genesis                                                            !
+!>  This subroutine is responsible for memory allocation and initialization of
+!>  the surface object in Process. It assigns pointers to the relevant flow
+!>  and grid objects.  The subroutine allocates memory for elements, vertices,
+!>  and sides on the surface, along with data structures for data exchange if
+!>  parallel runs.  The subroutine concludes by initializing the surface's
+!>  local variables to set up for further processing.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  type(Field_Type), target :: Flow
+  class(Surf_Type), target :: Surf  !! parent class
+  type(Field_Type), target :: Flow  !! flow field for which it is defined
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
 !==============================================================================!

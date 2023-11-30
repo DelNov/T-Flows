@@ -1,9 +1,45 @@
 !==============================================================================!
   subroutine Distribute_Cell_Coords(Surf)
 !------------------------------------------------------------------------------!
+!>  This subroutine is designed for distributing surface mesh coordinates
+!>  across all processors in a parallel computing environment using MPI. It
+!>  ensures that each processor gets the necessary data for vertices of the
+!>  surface mesh, facilitating calculations in distributed computing systems.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias setup:                                                             !
+!     - Establishes aliases for the grid (Grid) and vertices (Vert), and the   !
+!       number of vertices (nv). This simplification enhances code readability !
+!       and navigation.                                                        !
+!   * Sequential and parallel processing:                                      !
+!     - Differentiates between sequential and parallel execution environments. !
+!     - In a sequential run, directly assigns cell coordinates (x, y, z) from  !
+!       the grid to each vertex based on its nearest cell.                     !
+!     - In a parallel run, handles the distribution of cell coordinates across !
+!       multiple processors.                                                   !
+!   * Buffer initialization in parallel runs:                                  !
+!     - Initializes buffer arrays (buff_x, buff_y, buff_z) to store cell       !
+!       coordinates and a count array (buff_n) for each vertex across          !
+!       different processors.                                                  !
+!   * Accumulation of coordinates:                                             !
+!     - Iterates through each vertex in a parallel environment.                !
+!     - Accumulates the x, y, and z coordinates from the vertex's nearest      !
+!       cell if the cell is present in the current processor.                  !
+!     - Keeps track of the number of accumulations in buff_n.                  !
+!   * Global summation:                                                        !
+!     - Performs a global summation of the buffer arrays across all processors !
+!       using Global % Sum_Real_Array and Global % Sum_Int_Array. This step    !
+!       ensures that each vertex receives data aggregated from all processors. !
+!   * Updating vertex coordinates:                                             !
+!     - After the global summation, updates each vertex's cell coordinates     !
+!       by averaging the accumulated data. This process is crucial for         !
+!       maintaining consistent cell coordinate data across the mesh in a       !
+!       parallel computing environment.                                        !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: Vert(:)

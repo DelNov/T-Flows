@@ -2,7 +2,7 @@
   subroutine Clean_Front(Front)
 !------------------------------------------------------------------------------!
 !>  This subroutine clears the data structures associated with a front.
-!>  It resets the front structure, removing all elements, vertices, and sides,
+!>  It resets the front object, removing all elements, vertices, and sides,
 !>  preparing it for reuse or disposal.
 !------------------------------------------------------------------------------!
 !   Functionality                                                              !

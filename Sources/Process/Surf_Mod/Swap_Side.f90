@@ -1,13 +1,43 @@
 !==============================================================================!
   subroutine Swap_Side(Surf, s)
 !------------------------------------------------------------------------------!
-!  This function calculates radii of inscribed and circumscribed circle        !
-!  for a given element (int e)                                                 !
+!>  Swap_Side focuses on reconfiguring the mesh by altering the connections
+!>  and orientations of elements and sides around a specified side (s). This
+!>  process is crucial for implementation of the algorithm in Relax_Topology
+!>  and Relax_Geometry. This algorithm of mesh relaxation is taken from
+!>  TRIPOS (https://github.com/Niceno/TRIPOS)
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias setup:                                                             !
+!     - Establishes aliases for pointers to vertices (Vert), elements (Elem),  !
+!      and sides (side) to simplify code navigation and enhance clarity.       !
+!   * Retrieving side and element information:                                 !
+!     - Retrieves information about the target side (s) and the elements (ea   !
+!       and eb) adjacent to this side. Also, obtains the vertices (a, b, c, d) !
+!       that are connected by this side and its adjacent elements.             !
+!   * Initialization of variables:                                             !
+!     - Initializes variables to track the neighboring elements and sides of   !
+!       ea and eb.                                                             !
+!   * Reconfiguring elements and sides:                                        !
+!     - Changes the orientation of elements ea and eb by adjusting their       !
+!       vertex and side connections. This reconfiguration is based on the      !
+!       current mesh structure and the intended changes in the topology.       !
+!     - Adjusts the orientation of the target side (s) to align with the       !
+!       new configuration of elements ea and eb.                               !
+!   * Updating neighboring elements and sides:                                 !
+!     - Updates the neighboring elements and sides of ea and eb to reflect     !
+!       the new mesh configuration. This step ensures consistency in the       !
+!       mesh's topological structure after the swapping operation.             !
+!   * Consistency checks:                                                      !
+!     - Performs consistency checks to verify that the new topology is valid   !
+!       and does not introduce any errors or inconsistencies in the mesh.      !
+!       This is a critical step to maintain the integrity of the mesh.         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  integer                  :: s
+  class(Surf_Type), target :: Surf  !! parent class
+  integer                  :: s     !! side to swap
 !-----------------------------------[Locals]-----------------------------------!
   integer                  :: a, b, c, d, ea, eb
   integer                  :: eac, ead, ebc, ebd

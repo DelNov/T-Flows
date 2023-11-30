@@ -1,14 +1,22 @@
 !==============================================================================!
   subroutine Calculate_Curvatures_From_Verts(Surf)
 !------------------------------------------------------------------------------!
-!   Calculates surface curvatures from vertices (all neighbous, five to seven  !
-!   on the average) and distributes the values to elements.                    !
-!                                                                              !
-!   This is the intermediate order of curvature calculation in the code.       !
+!>  The subroutine Calculate_Curvatures_From_Verts in the Surf_Mod module
+!>  calculates surface curvatures by considering all neighboring vertices
+!>  around a given vertex, typically ranging from five to seven neighbors.
+!>  This method represents an intermediate level of curvature calculation
+!>  in terms of complexity and accuracy. It employs a more sophisticated
+!>  approach than Calculate_Curvatures_From_Edges by using a larger set of
+!>  points for curvature estimation. This increased detail allows for more
+!>  accurate curvature values, which are crucial for correctly modeling
+!>  surface tension in VOF interface tracking. The calculated curvatures
+!>  are then distributed to the elements. This enhanced approach is
+!>  significant for simulations where precise curvature estimations impact
+!>  the physical accuracy of the modeled phenomena.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4) :: a
   real, dimension(4)   :: b

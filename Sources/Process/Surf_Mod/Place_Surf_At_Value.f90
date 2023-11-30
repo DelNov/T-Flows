@@ -1,14 +1,51 @@
 !==============================================================================!
   subroutine Place_Surf_At_Value(Surf, sharp, smooth, verbose)
 !------------------------------------------------------------------------------!
-!   Places surface where variable phi has value 0.5                            !
+!>  This subroutine is crucial for defining the position of the surface within
+!>  a computational domain based on a specified value of a scalar field. It
+!>  operates by identifying intersection points within the computational grid
+!>  where the scalar field value transitions through the specified threshold,
+!>  facilitating the creation of a detailed and accurate representation of the
+!>  fluid interface.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and connection: Connects to the real node of the scalar   !
+!     field and initializes the surface.                                       !
+!   * Alias setup and interpolation: Sets up aliases for grid, flow, vertices, !
+!     and elements, and interpolates cell values to nodes.                     !
+!   * Gradient calculation: Computes gradients of the scalar field for more    !
+!     accurate surface placement.                                              !
+!   * Vertex identification and placement:                                     !
+!     - Iterates through grid cells, identifying vertices where the scalar     !
+!       field intersects the specified value.                                  !
+!     - Calculates the precise position of these vertices based on linear      !
+!       interpolation between grid nodes.                                      !
+!   * Element formation:                                                       !
+!     * Determines the number of vertices intersecting in each cell and forms  !
+!       elements based on these vertices.                                      !
+!     * Handles different cases (3-point, 4-point, etc.) using specific        !
+!       subroutines for each scenario.                                         !
+!     * Ensures that elements formed are valid and consistent.                 !
+!   * Parallel processing considerations: In parallel runs, distributes the    !
+!     mesh to ensure consistency across processors using Distribute_Mesh.      !
+!   * Vertex compression: Compresses surface vertices to eliminate duplicates  !
+!     and optimize the mesh.                                                   !
+!   * Connectivity and verification: Establishes sides and elements, checks    !
+!     for consistency and accuracy in the mesh.                                !
+!   * Nearest cell and node identification: For each vertex, finds the nearest !
+!     cell and node in the computational grid.                                 !
+!   * Smooth function value and gradient storage: Distributes the smooth       !
+!     function value and its gradients to vertices.                            !
+!   * Geometrical calculations: Computes centroids and normals for elements,   !
+!     enhancing the geometric accuracy of the mesh.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type),  target :: Surf
-  type(Var_Type),    target :: sharp
-  type(Var_Type),    target :: smooth
-  logical                   :: verbose
+  class(Surf_Type),  target :: Surf     !! parent class
+  type(Var_Type),    target :: sharp    !! sharp scalar function (mostly VOF)
+  type(Var_Type),    target :: smooth   !! smoothed scalar function
+  logical                   :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow

@@ -1,15 +1,19 @@
 !==============================================================================!
   subroutine Calculate_Curvatures_From_Elems(Surf)
 !------------------------------------------------------------------------------!
-!   Calculates surface curvatures from elements (using its own vertices and    !
-!   the vertices from neighbouring elements, around twelve points) and         !
-!   distributes the valies to the vertices.                                    !
-!                                                                              !
-!   This is the highest order of curvature calculation in the code.            !
+!>  The subroutine Calculate_Curvatures_From_Elems in the Surf_Mod module is
+!>  the most advanced and accurate method for calculating surface curvatures
+!>  in the code. It computes curvatures using each element's vertices and
+!>  those of neighboring elements, typically involving around twelve points.
+!>  This method offers the highest level of curvature calculation accuracy by
+!>  utilizing a larger, more comprehensive set of points. These calculated
+!>  curvatures are then distributed to the vertices. The precision of this
+!>  method is crucial for accurately modeling surface phenomena, particularly
+!>  in simulations where surface tension forces are critical.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4) :: a
   real, dimension(4)   :: b

@@ -1,10 +1,19 @@
 !==============================================================================!
   subroutine Advance_Vertices(Surf, Flow)
 !------------------------------------------------------------------------------!
+!>  The subroutine Advance_Vertices is integral to the Surf_Mod module, where
+!>  it facilitates the dynamic movement of surface vertices.  This movement
+!>  resembles particles adhering to a surface.  Specifically, the subroutine
+!>  employs the flow object to extrapolate velocities from the static mesh
+!>  (Eulerian framework) to the surface vertices (Lagrangian framework). Each
+!>  vertex is then advanced explicitly based on these velocities. This approach
+!>  ensures that the vertices accurately follow the flow field, adapting to
+!>  changes in the surrounding fluid flow.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type),  target :: Surf
-  class(Field_Type), target :: Flow
+  class(Surf_Type),  target :: Surf  !! parent class
+  class(Field_Type), target :: Flow  !! flow field transporting the surface
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: Vert(:)

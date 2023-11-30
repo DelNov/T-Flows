@@ -1,12 +1,16 @@
 !==============================================================================!
   subroutine Improve_Mesh_Quality(Surf, smooth)
 !------------------------------------------------------------------------------!
-!   Improves the mesh quality for the surface                                  !
+!>  The Improve_Mesh_Quality subroutine focuses on optimizing the mesh
+!>  structure of a surface object. This optimization is achieved through a
+!>  series of relaxation and smoothing operations that improve the topological
+!>  and geometrical characteristics of the mesh.  This strategy of improving
+!>  the mesh quality is taken from TRIPOS (https://github.com/Niceno/TRIPOS)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  type(Var_Type),   target :: smooth
+  class(Surf_Type), target :: Surf    !! parent class
+  type(Var_Type),   target :: smooth  !! smooth variant of the scalar field
 !-----------------------------------[Locals]-----------------------------------!
   integer :: j
 !==============================================================================!

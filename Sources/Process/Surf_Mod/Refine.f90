@@ -1,12 +1,16 @@
 !==============================================================================!
   subroutine Refine(Surf, n_biggest)
 !------------------------------------------------------------------------------!
-!   Refines ten biggest elements on the surface Surf                           !
+!>  This subroutine is tasked with refining the surface mesh by selectively
+!>  targeting and subdividing the largest elements. By specifying the number
+!>  of elements to refine (through n_biggest), the subroutine can concentrate
+!>  refinement efforts on the most significant elements.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  integer                  :: n_biggest  ! number of biggest elements for ref.
+  class(Surf_Type), target :: Surf       !! parent class
+  integer                  :: n_biggest  !! number of biggest elements
+                                         !! for refinement
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)

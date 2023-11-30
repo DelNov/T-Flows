@@ -1,14 +1,19 @@
 !==============================================================================!
   subroutine Calculate_Curvatures_From_Edges(Surf)
 !------------------------------------------------------------------------------!
-!   Calculates surface curvatures from edges (four points) and distributes     !
-!   the values to elements and nodes.                                          !
-!                                                                              !
-!   This is the lowest order of curvature calculation in the code.             !
+!>  The subroutine Calculate_Curvatures_From_Edges in the Surf_Mod module
+!>  focuses on calculating surface curvatures from edges, involving four
+!>  points, and subsequently distributing these values to the corresponding
+!>  elements and nodes.  As the simplest and least accurate method among three
+!>  available in the module, it employs a lower order of curvature calculation.
+!>  This process involves constructing spheres at each side, determining their
+!>  centers and radii, and averaging the curvature contributions to the
+!>  elements and nodes.  Such curvature calculations are critical for
+!>  estimating surface tension forces in VOF interface tracking methods.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   real, dimension(4,4)  :: a
   real, dimension(4)    :: b

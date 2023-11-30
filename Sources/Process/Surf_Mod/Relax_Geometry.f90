@@ -1,9 +1,15 @@
 !==============================================================================!
   subroutine Relax_Geometry(Surf)
 !------------------------------------------------------------------------------!
+!>  This subroutine is designed to optimize the geometric layout of a surface
+!>  mesh. Unlike Relax_Topology, which uses the number of elements surrounding
+!>  each node as a criterion for quality, Relax_Geometry evaluates and adjusts
+!>  the mesh based on the ratio of the sides connecting nodes. It only leads
+!>  to minor improvements in mesh qulity.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
@@ -21,8 +27,15 @@
   side => Surf % side
   Elem => Surf % Elem
 
+  ! Boundary identification
   call Surf % Find_Boundaries()
 
+  !-----------------------------------!
+  !   Iterative geometry relaxation   !
+  !- - - - - - - - - - - - - - - - - -+------------------------------!
+  !   Executes a loop to adjust the geometry of the mesh, focusing   !
+  !   on achieving a more uniform distribution of side lengths.      !
+  !------------------------------------------------------------------!
   do t = 6, 3, -1
     do s = 1, ns
 

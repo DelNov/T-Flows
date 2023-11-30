@@ -1,15 +1,41 @@
 !==============================================================================!
   subroutine Distribute_Mesh(Surf, verbose)
 !------------------------------------------------------------------------------!
-!   For parallel runs, surface is, unlike front, shared among the processors.  !
-!   In other words, each processor holds a copy of the entire surface.  This   !
-!   procedure distributes mesh which is initialy (after intersecting with      !
-!   edges) divided over processors to be the same everywhere.
+!>  This subroutine is essential for distributing the surface data across all
+!>  processors in parallel simulations. Unlike Front_Type, which is divided
+!>  among processors, Surf_Type shares the entire surface mesh among all
+!>  processors. This subroutine synchronizes the mesh data, ensuring that each
+!>  processor has the same mesh information, facilitating consistent
+!>  computation across the parallel environment.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and cleaning buffers: Sets up aliases for easier          !
+!     reference and cleans buffers to prepare for data distribution.           !
+!   * Estimation of mesh size per processor: Calculates the number of          !
+!     vertices and elements each processor will handle and aggregates this     !
+!     information globally.                                                    !
+!   * Verbose output: Optionally prints cumulative numbers of elements and     !
+!     vertices found, useful for debugging and verification in verbose mode.   !
+!   * Accumulation calculation: Determines the cumulative number of vertices   !
+!     and elements each processor is responsible for up to the current.        !
+!   * Exchange of vertex coordinates: Populates buffers with vertex            !
+!     coordinates and exchanges this information among processors.             !
+!   * Summation of buffer arrays: Aggregates the buffered vertex coordinates   !
+!     and element vertices across all processors.                              !
+!   * Final assignment of coordinates and elements: Assigns the aggregated     !
+!     vertex coordinates and elements back to the respective arrays, ensuring  !
+!     each processor has complete and updated mesh information.                !
+!   * Mesh size update: Updates the total number of vertices and elements in   !
+!     the Surf_Type to reflect the complete mesh.                              !
+!   * Ensuring consistency: After execution, all processors have complete and  !
+!     consistent information about the entire mesh, crucial for the integrity  !
+!     of parallel simulations.                                                 !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type),  target :: Surf
-  logical                   :: verbose
+  class(Surf_Type),  target :: Surf     !! parent class
+  logical                   :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow

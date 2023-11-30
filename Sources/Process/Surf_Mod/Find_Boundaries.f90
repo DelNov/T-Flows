@@ -1,11 +1,14 @@
 !==============================================================================!
   subroutine Find_Boundaries(Surf)
 !------------------------------------------------------------------------------!
-!   Looks for boundary sides and vertices                                      !
+!>  Find_Boundaries identifies which sides and vertices of the surface mesh
+!>  are located on the boundaries. This process involves checking each side
+!>  to determine if it constitutes a boundary side and then propagating this
+!>  information to the vertices connected to these sides.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)

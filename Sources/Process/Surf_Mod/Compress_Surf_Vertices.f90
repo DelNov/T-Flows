@@ -1,12 +1,30 @@
 !==============================================================================!
   subroutine Compress_Surf_Vertices(Surf, verbose)
 !------------------------------------------------------------------------------!
-!   Compresses vertices' list                                                  !
+!>  This subroutine optimizes the surfaces's vertex list by eliminating
+!>  redundant vertices. This compression is essential for efficient processing
+!>  and memory usage in complex simulations.  Although Surf_Mod extends
+!>  Front_Mod (which has ha function with the same name and functionality)
+!>  the fact that front object deals with general polygons and surface uses
+!>  only triangular elements, makes these subroutines different.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Element sanity check: Ensures each element has unique vertices.          !
+!   * Vertex sorting: Orders vertices by coordinates for efficient processing. !
+!   * Vertex counting: Determines the number of unique vertices, avoiding      !
+!     duplicates.                                                              !
+!   * Vertex coordinate copying: Updates coordinates to reflect compression.   !
+!   * Element vertex correction: Adjusts vertex references in elements         !
+!     post-compression.                                                        !
+!   * Final verification: Confirms no repeated vertices in elements.           !
+!   * Total vertex Calculation: Computes the overall unique vertex count,      !
+!     important for distributed computing environments.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  logical                   :: verbose
+  class(Surf_Type), target :: Surf      !! parent class
+  logical                  :: verbose   !! controls verbosity of the output
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Elem_Type), pointer :: Elem(:)
@@ -22,7 +40,9 @@
   Vert => Surf % Vert
   Elem => Surf % Elem
 
-  ! Check sanity of the elements so far
+  !-----------------------------------------!
+  !   Check sanity of the elements so far   !
+  !-----------------------------------------!
   do e = 1, ne
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv
@@ -37,6 +57,9 @@
     end do
   end do
 
+  !----------------------------------------!
+  !   Sort vertices by their coordinates   !
+  !----------------------------------------!
   if(nv > 0) then
     allocate(xv(nv));     xv    = 0.0
     allocate(yv(nv));     yv    = 0.0
@@ -45,9 +68,12 @@
     allocate(new_n(nv));  new_n = 0
 
     do v = 1, nv
+      ! Store vertex coordinates ...
       xv(v) = Vert(v) % x_n
       yv(v) = Vert(v) % y_n
       zv(v) = Vert(v) % z_n
+
+      ! ... vertex numbers ...
       ni(v) = v
     end do
     call Sort % Three_Real_Carry_Int(xv, yv, zv, ni)
@@ -103,7 +129,9 @@
     end do
   end if
 
-  ! Store compressed number of vertices
+  !--------------------------------------------!
+  !   Work out compressed number of vertices   !
+  !--------------------------------------------!
   nv     = n_vert
   nv_tot = n_vert
   if(Surf % mesh_divided) then
@@ -113,7 +141,9 @@
     print '(a40,i8)', ' # Compressed number of vertices:       ', nv_tot
   end if
 
-  ! Check sanity of the elements in the end
+  !---------------------------------------------!
+  !   Check sanity of the elements in the end   !
+  !---------------------------------------------!
   do e = 1, ne
     do i_ver = 1, Elem(e) % nv-1
       do j_ver = i_ver+1, Elem(e) % nv

@@ -1,10 +1,55 @@
 !==============================================================================!
   subroutine Smooth_Surf(Surf, smooth)
 !------------------------------------------------------------------------------!
+!>  Smooth_Surf is focused on optimizing the mesh's geometric layout by
+!>  smoothing out irregularities and enhancing uniformity. This process
+!>  involves adjusting vertex positions based on neighboring vertices and
+!>  surface normals, ensuring that the mesh accurately represents the physical
+!>  surface without unnecessary undulations or sharp angles.  This functions
+!>  is based on TRIPOS's (https://github.com/Niceno/TRIPOS) but since this
+!>  version is 3D, couldn't quite be the same.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias setup:                                                             !
+!     - Establishes aliases for pointers to vertices (Vert), elements (Elem),  !
+!       sides (side), and the grid (Grid). This setup simplifies code          !
+!       navigation and enhances clarity.                                       !
+!   * Initialization:                                                          !
+!     - Initializes variables for counting neighboring elements (nne) and      !
+!       accumulating the sum of coordinates (sumx, sumy, sumz) for each vertex.!
+!   * Boundary identification:                                                 !
+!     - Calls Find_Boundaries to update information about which vertices are   !
+!       on boundaries, crucial for ensuring these vertices are treated         !
+!       appropriately during the smoothing process.                            !
+!   * Smoothing iterations:                                                    !
+!     - Executes multiple iterations (3 in this case) to progressively smooth  !
+!       the mesh.                                                              !
+!     - For each vertex, computes the sum of coordinates of neighboring        !
+!       vertices.                                                              !
+!     - Adjusts the position of each vertex based on these sums and the number !
+!       of neighboring elements, moving it towards the centroid of its         !
+!       neighbors.
+!   * Boundary vertex handling:                                                !
+!     - Checks if a vertex is on a boundary and excludes it from the smoothing !
+!       process to preserve the mesh's external geometry.                      !
+!   * Surface normal adjustment:                                               !
+!     - After moving vertices, adjusts their positions in the direction of the !
+!       surface normal. This step ensures that the vertices align with the     !
+!       underlying physical surface.                                           !
+!   * Re-distribution of smooth variable:                                      !
+!     - After each smoothing iteration, re-distributes the smooth variable,    !
+!       which likely represents a physical quantity (e.g., temperature,        !
+!       pressure) that needs to be updated according to new vertex positions.  !
+!   * Correction of vertex position:                                           !
+!     - Corrects the position of each vertex by moving it along the surface    !
+!       normal based on the smooth variable. This ensures that the mesh        !
+!       conforms to the desired physical characteristics of the surface.       !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  type(Var_Type),   target :: smooth
+  class(Surf_Type), target :: Surf    !! parent class
+  type(Var_Type),   target :: smooth  !! smooth variant of the scalar field
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Vert_Type), pointer :: Vert(:)

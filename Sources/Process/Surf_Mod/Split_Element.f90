@@ -1,12 +1,49 @@
 !==============================================================================!
   subroutine Split_Element(Surf, e)
 !------------------------------------------------------------------------------!
-!   Create new vertex in the center of existing element specified with e       !
+!>  Split_Element focuses on refining a given element in the surface mesh by
+!>  creating a new vertex at the center of the element and then reconfiguring
+!>  the surrounding mesh elements and sides.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias Setup:                                                             !
+!     - Establishes aliases for the number of vertices (nv), sides (ns), and   !
+!       elements (ne), as well as pointers to vertices (Vert), sides (side),   !
+!       and elements (Elem). This setup simplifies references and enhances     !
+!       code readability.                                                      !
+!   * New Vertex Creation:                                                     !
+!     - Increments the vertex count (nv) and creates a new vertex at the       !
+!       center of the target element (e). This new vertex's coordinates are    !
+!       calculated as the average of the existing vertices of the element,     !
+!       effectively placing it at the element's centroid.                      !
+!   * Defining New Sides and Elements:                                         !
+!     - Creates new sides and elements to accommodate the addition of the new  !
+!       vertex. This involves reconfiguring the existing mesh topology around  !
+!       the target element.                                                    !
+!     - Ensures that the new sides and elements are properly connected and     !
+!       oriented.                                                              !
+!   * Updating Mesh Topology:                                                  !
+!     - Adjusts the connections between the new and existing mesh elements     !
+!       and sides. This includes updating the neighboring elements and sides   !
+!       of both the new and existing elements to reflect the new mesh          !
+!       configuration.                                                         !
+!     - Performs a series of checks and updates to ensure that the new mesh    !
+!       topology is consistent and valid.                                      !
+!   * Checking for Consistency:                                                !
+!     - Includes a series of checks to validate the new mesh topology. This    !
+!       is crucial to ensure that the mesh remains consistent and accurate     !
+!       after the refinement process.                                          !
+!   * Error Handling:                                                          !
+!     - The subroutine includes error checks and stops to handle cases where   !
+!       the mesh refinement might lead to inconsistent or invalid              !
+!       configurations. This is important for maintaining the integrity of     !
+!       the mesh and avoiding potential issues in subsequent simulations.      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
-  integer                  :: e
+  class(Surf_Type), target :: Surf !! parent class
+  integer                  :: e    !! element to refine
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)

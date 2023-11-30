@@ -2,7 +2,7 @@
   subroutine Allocate_Front(Front, Flow)
 !------------------------------------------------------------------------------!
 !>  This subroutine is responsible for memory allocation and initialization of
-!>  the front structure in Process. It assigns pointers to the relevant flow
+!>  the front object in Process. It assigns pointers to the relevant flow
 !>  and grid objects and sets the front to divide the surface mesh among
 !>  processors. The subroutine allocates memory for elements, vertices, and
 !>  sides of the front, along with boundary nodes and data structures for cell

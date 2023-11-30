@@ -1,11 +1,37 @@
 !==============================================================================!
   subroutine Find_Surf_Elements(Surf)
 !------------------------------------------------------------------------------!
-!   Compresses sides' list                                                     !
+!>  Thus subroutine establishes the relationships between elements and their
+!>  adjacent sides in a surface mesh. This process involves iterating through
+!>  each side and determining the adjacent elements, ensuring that each element
+!>  is correctly linked to its neighbors and sides, essential for the integrity
+!>  and accuracy of the surface representation.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Alias assignment: Sets up aliases for vertices (Vert), sides (side),     !
+!     elements (Elem), and their respective counts (nv, ns, ne) for simplified !
+!     reference in the code.                                                   !
+!   * Connectivity establishment:                                              !
+!     - Iterates through all the sides in the surface mesh.                    !
+!     - For each side, identifies adjacent elements (referred to as element a  !
+!       and element b) and their associated vertices.                          !
+!     - Checks if the vertices of the side match with the vertices of the      !
+!       adjacent elements.                                                     !
+!     - If a match is found, updates the element's information with the side   !
+!       and the neighboring element. This includes updating the side and       !
+!       neighboring element arrays (s and e) and their respective counts (ns   !
+!       and nne).                                                              !
+!   * Element a and Element b processing:                                      !
+!     - Handles both elements on either side of a side (element a and b)       !
+!       ensuring that both elements' connectivity is established.              !
+!     - For each element, checks and updates connectivity for all three        !
+!       possible pairs of vertices (ensuring all edges of the element are      !
+!       considered).                                                           !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Surf_Type), target :: Surf
+  class(Surf_Type), target :: Surf  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   type(Vert_Type), pointer :: Vert(:)
   type(Side_Type), pointer :: side(:)
