@@ -148,6 +148,21 @@
   }
 
   /*---------------------------------------------------------------------------+
+  |  MatSetValues                                                              |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Mat/MatSetValues/                   |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_set_values_(Mat         * A,
+                               PetscInt    * m,
+                               PetscInt    * row,
+                               PetscInt    * n,
+                               PetscInt    * col,
+                               PetscScalar * values) {
+
+    err = MatSetValues(*A, *m, row, *n, col, values, INSERT_VALUES);
+  }
+
+  /*---------------------------------------------------------------------------+
   |  MatSetValue's sister; this one adds, rather than inserts values           |
   |                                                                            |
   |  https://petsc.org/release/manualpages/Mat/MatSetValue/                    |
@@ -158,6 +173,21 @@
                               PetscScalar * value) {
 
     err = MatSetValue(*A, *row, *col, *value, ADD_VALUES);
+  }
+
+  /*---------------------------------------------------------------------------+
+  |  MatSetValues' sister; this one adds, rather than inserts values           |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Mat/MatSetValues/                   |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_mat_add_values_(Mat         * A,
+                               PetscInt    * m,
+                               PetscInt    * row,
+                               PetscInt    * n,
+                               PetscInt    * col,
+                               PetscScalar * values) {
+
+    err = MatSetValues(*A, *m, row, *n, col, values, ADD_VALUES);
   }
 
   /*---------------------------------------------------------------------------+
@@ -294,6 +324,16 @@
   }
 
   /*---------------------------------------------------------------------------+
+  |  VecSetValue's sister; this one adds, rather than inserts values           |
+  |                                                                            |
+  |  https://petsc.org/release/manualpages/Vec/VecSetValue/                    |
+  +---------------------------------------------------------------------------*/
+  void c_petsc_vec_add_value_(Vec * v, PetscInt * row, PetscScalar * value) {
+
+    err = VecSetValue(*v, *row, *value, ADD_VALUES);
+  }
+
+  /*---------------------------------------------------------------------------+
   |  VecAssemblyBegin and VecAssemblyEnd                                       |
   |                                                                            |
   |  https://petsc.org/release/manualpages/Vec/VecAssemblyBegin/               |
@@ -312,8 +352,8 @@
   +---------------------------------------------------------------------------*/
   void c_petsc_vec_get_values_(Vec         * v,
                                PetscInt    * ni,
-                             PetscInt    * row,
-                             PetscScalar * value) {
+                               PetscInt    * row,
+                               PetscScalar * value) {
 
     err = VecGetValues(*v, *ni, row, value);
   }
