@@ -1,23 +1,61 @@
 !==============================================================================!
   subroutine Initialize_Variables(Process, Flow, Turb, Vof, Swarm, Sol)
 !------------------------------------------------------------------------------!
-!   Initialize dependent variables.  (It is a bit of a mess still)             !
-!                                                                              !
-!   It is important to remember that this procedure is called only if backup   !
-!   file wasn't read.  Hence, if you initialize something here which should    !
-!   be kept after restart, it should be stored in backup file.
+!>  This subroutine initializes dependent variables in the simulation. It is   !
+!>  crucial to note that it only executes if a backup file was not read.       !
+!>  Therefore, any variable initialized here and needed post-restart should be !
+!>  stored in the backup file.                                                 !
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use User_Mod
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and setup                                                 !
+!     - The subroutine begins by setting up the necessary local variables,     !
+!       pointers, and default values for initial conditions. It also includes  !
+!       module User_Mod for potential user-defined initialization routines.    !
+!     - Aliases are set up for grid, bulk properties, velocity flux,           !
+!       turbulence model variables, and others. This helps in accessing these  !
+!       elements more efficiently throughout the subroutine.                   !
+!     - The subroutine checks for the presence of initial condition            !
+!       definitions in the control file and proceeds accordingly.              !
+!   * Initial conditions from file                                             !
+!     - If initial conditions are specified in a file, the subroutine reads    !
+!       the file and assigns values to variables such as velocity components,  !
+!       temperature, scalar quantities, turbulent quantities, etc., based on   !
+!       the data provided in the file.                                         !
+!     - This includes handling of complex initial conditions like profiles     !
+!       along planes or lines, necessitating spatial interpolations.           !
+!   * Initial conditions from control file                                     !
+!     - If initial conditions are not specified in a file, the subroutine      !
+!       reads them directly from the control file. This includes setting       !
+!       default values for various variables like velocity components,         !
+!       temperature, turbulence model parameters, etc.                         !
+!     - Each variable is initialized across the computational grid, taking     !
+!       into account its specific requirements and boundary conditions.        !
+!   * Additional initializations                                               !
+!     - The subroutine handles the initialization of volume fractions for      !
+!       multiphase flows (VOF model) and sets up initial conditions for the    !
+!       swarm model if used.                                                   !
+!     - It also initializes the boundary fluxes and computes bulk properties   !
+!       like inflow volume, identifying different types of boundary faces      !
+!       (inflow, outflow, walls, etc.).                                        !
+!     - A check is performed to determine if the simulation has pressure       !
+!       outflow boundaries, impacting the setup of the pressure matrix in the  !
+!       solver.                                                                !
+!   * Final preparations and checks                                            !
+!     - The subroutine concludes with final preparations, including time       !
+!       initialization and reporting of initialized variables and boundary     !
+!       face counts.                                                           !
+!     - A user-modifiable routine User_Mod_Initialize_Variables is called at   !
+!       the end, allowing for custom initializations as needed.                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)        :: Process
-  type(Field_Type),   target :: Flow
-  type(Turb_Type),    target :: Turb
-  type(Vof_Type)             :: Vof
-  type(Swarm_Type)           :: Swarm
-  type(Solver_Type)          :: Sol
+  class(Process_Type)        :: Process  !! parent class
+  type(Field_Type),   target :: Flow     !! flow object
+  type(Turb_Type),    target :: Turb     !! turbulence object
+  type(Vof_Type)             :: Vof      !! VOF object
+  type(Swarm_Type)           :: Swarm    !! swarm object
+  type(Solver_Type)          :: Sol      !! solver object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Bulk_Type),  pointer :: bulk

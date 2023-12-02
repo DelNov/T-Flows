@@ -5,9 +5,15 @@
 !==============================================================================!
   module Process_Mod
 !------------------------------------------------------------------------------!
-!   Collection of functions used in the Process program.  In honesty, it was   !
-!   introduced to get rid of the Fortran header files with interfaces which,   !
-!   in effect, was needed for Intel compiler to work in the debug mode.        !
+!>  The Process_Mod module is a centralized collection of functions crucial for
+!>  conducting a CFD simulations. The module was primarily introduced to
+!>  streamline the process of variable checking in Fortran and to enhance
+!>  compatibility with the Intel compiler, especially in debug mode.  Still,
+!>  it entails a wide range of procedures that are integral to various stages
+!>  of CFD simulation. These include functions for initial variable set up,
+!>  computing momentum (implicit and explicit), pressure, correcting velocity,
+!>  computing energy, scalar variables, volume balancing, implementing the
+!>  Rhie & Chow algorithm, PISO algorithm and updading boundary conditions.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Results_Mod
@@ -20,6 +26,9 @@
   !------------------!
   !   Process type   !
   !------------------!
+  !> Encapsulation of procedures that manage the CFD solution algorithm.
+  !> It is a framework which bundles together essential functions that
+  !> manage various aspects of the CFD solution process.
   type Process_Type
 
     contains
@@ -39,8 +48,8 @@
 
   end type
 
-  type(Process_Type) :: Process
-
+  type(Process_Type) :: Process  !! singleton object of Process_Type, introduced
+                                 !! to allow easy access to its procedures
   contains
 
 #   include "Process_Mod/Balance_Volume.f90"

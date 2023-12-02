@@ -1,26 +1,43 @@
 !==============================================================================!
   subroutine Balance_Volume(Process, Flow, Vof)
 !------------------------------------------------------------------------------!
-!   Modifies fluxes and velocities at outflows to conserve the volume.         !
-!   It is called from Compute_Pressure because there we need strict            !
-!   volume conservation to achieve convergence of pressure linear solver.      !
+!>  This subroutine is responsible for modifying volume fluxes and velocities
+!>  at outflows to ensure volume conservation. It is crucial for maintaining
+!>  the accuracy of simulations, especially in the context of pressure
+!>  calculations where strict volume conservation is necessary to achieve
+!>  convergence of the pressure linear solver.
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-!  use Const_Mod
-!  use Comm_Mod
-!  use Grid_Mod
-!  use Field_Mod
-!  use Var_Mod,   only: Var_Type
-!  use Face_Mod,  only: Face_Type
-!  use Bulk_Mod,  only: Bulk_Type
-!  use Math_Mod
-!  use Vof_Mod
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Sets up necessary pointers and variables, including      !
+!     grid, flow field, and volume fluxes. Establishes aliases for momentum    !
+!     variables.                                                               !
+!   * Boundary flux update: Updates fluxes at boundaries based on the latest   !
+!     velocities. These updates may not inherently conserve volume,            !
+!     necessitating further adjustments.                                       !
+!   * Phase change volume adjustment: If mass transfer is involved (like in    !
+!     VOF simulations), adjusts the volume source term to account for phase    !
+!     change induced volume changes.                                           !
+!   * Outflow volume calculation: Calculates the total volume flux and area    !
+!     of outflow boundaries, which are essential for balancing the total       !
+!     volume in and out of the computational domain.                           !
+!   * Volume flux balance: Computes all boundary volume fluxes (both in and    !
+!     out) and adjusts velocities and fluxes at outflow boundaries to balance  !
+!     the total volume flux, ensuring volume conservation.                     !
+!   * Velocity and flux correction: Applies corrections to velocities and      !
+!     fluxes at outflow boundaries based on calculated factors to maintain     !
+!     volume balance across the computational domain.                          !
+!   * Buffer refresh: Updates the buffers for velocity components due to       !
+!     modifications in velocity fields during the volume balancing process.    !
+!   * Performance monitoring: The subroutine monitors its execution            !
+!     performance to optimize simulation processes and identify potential      !
+!     computational bottlenecks.                                               !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Vof_Type),      target :: Vof
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Vof_Type),      target :: Vof      !! VOF object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk

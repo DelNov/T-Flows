@@ -1,15 +1,51 @@
 !==============================================================================!
   subroutine Compute_Energy(Process, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
-!   Purpose: Solve transport equation for scalar (such as temperature)         !
+!>  The subroutine Compute_Energy in T-Flows is designed to solve energy (in
+!>  practical terms enthalpy) conservation equations, and the enthalpy in
+!>  essence yields temperature fields.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Intialization and setup: The subroutine starts with initializing various !
+!     local variables and pointers, such as those pointing to the grid, flow   !
+!     field, and solvers. It sets up aliases for efficient access to these     !
+!     data structures and starts a profiler for monitoring performance.        !
+!   * Equation discretization: This subroutine discretizes the energy          !
+!     transport equation. It computes terms related to advection and diffusion,!
+!     taking into account the effects of heat transfer, thermal conductivity,  !
+!     and capacity. This includes handling the gradients of temperature and    !
+!     the computation of various heat fluxes.                                  !
+!   * Spatial discretization and matrix assembly: The subroutine iterates      !
+!     through all the faces of the computational grid to calculate the         !
+!     coefficients of the discretized energy equation. It assembles the system !
+!     matrix for the energy equations, considering diffusion fluxes, cross     !
+!     diffusion, and heat transfer at interfaces for cases with mass transfer. !
+!   * Under-Relaxation and solving equations: It applies under-relaxation to   !
+!     the equations, then calls the appropriate linear solver to solve the     !
+!     discretized equations for temperature. The subroutine handles both the   !
+!     explicit and implicit parts of diffusion fluxes.                         !
+!   * Post-processing and boundary updates: After solving the equations, the   !
+!     subroutine updates the boundary values for energy and refreshes buffers. !
+!     This step ensures that boundary conditions are correctly applied to the  !
+!     newly computed temperature fields. It also includes gradient computation !
+!     post-solution, considering mass transfer scenarios.                      !
+!   * User-defined functions: Throughout its execution, Compute_Energy invokes !
+!     various user-defined functions for additional customization. These       !
+!     functions enable users to integrate specific behaviors or calculations   !
+!     at different stages of the energy computation process.                   !
+!   * Performance monitoring: The subroutine consistently monitors its         !
+!     performance, contributing to the analysis and optimization of the        !
+!     simulation. This monitoring helps in identifying bottlenecks and         !
+!     optimizing the simulation process for better efficiency.                 !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Turb_Type),     target :: Turb     !! turbulence object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  type(Solver_Type),   target :: Sol      !! solver object
 !-----------------------------------[Locals]-----------------------------------! 
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t

@@ -1,24 +1,51 @@
 !==============================================================================!
   subroutine Rhie_And_Chow(Process, Flow, Vof, Nat)
 !------------------------------------------------------------------------------!
-!   Computes face velocitites with Rhie and Chow interpolation method          !
+!>  The Rhie_And_Chow subroutine in T-Flows is employed to calculate face
+!>  velocities using the Rhie and Chow interpolation method. This method is
+!>  integral for ensuring a non-oscillatory, stable solution for the face
+!>  velocities in the computational fluid dynamics simulations.
 !------------------------------------------------------------------------------!
-!   Remember one important thing:                                              !
+!   Functionality                                                              !
 !                                                                              !
-!   sigma * kappa * dc/dx ~ dp/dx  [N / m^3]                                   !
+!   * Initialization and setup: Initiates by establishing necessary variables  !
+!     and pointers for the grid, flow field, and other parameters. It also     !
+!     sets up the profiler for tracking performance and efficiency.            !
+!   * Pressure and surface tension handling: The subroutine accounts for both  !
+!     pressure gradients and surface tension effects in the flow. It           !
+!     integrates these effects by modifying the pressure terms to include      !
+!     surface tension contributions where applicable, especially in VOF        !
+!     simulations.                                                             !
+!   * Velocity correction: Adjusts cell-centered velocities based on various   !
+!     corrections like Choi's correction and Gu's correction. This step        !
+!     involves subtracting unsteady terms and body forces from the velocities. !
+!   * Flux computation: Computes the mass or volume fluxes at the cell faces   !
+!     by considering interpolated velocity, pressure gradients, and additional !
+!     corrections. This is a crucial step in maintaining the accuracy and      !
+!     stability of the flow solution.                                          !
+!   * User-defined functions: Incorporates user-defined functions to allow     !
+!     for specific customizations and behaviors within the interpolation       !
+!     process.                                                                 !
+!   * Performance monitoring: Monitors the subroutine's performance throughout !
+!     its execution, contributing to the analysis and optimization of the      !
+!     simulation process.                                                      !
+!------------------------------------------------------------------------------!
+!   Note                                                                       !
 !                                                                              !
-!   Meaning also that:                                                         !
+!   * Remember one important thing:                                            !
+!     > sigma * kappa * dc/dx ~ dp/dx  [N / m^3]                               !
 !                                                                              !
-!   sigma * kappa * (c2 - c1) ~ (p2 - p1)  [N / m^2]                           !
+!   * Meaning also that:                                                       !
+!     > sigma * kappa * (c2 - c1) ~ (p2 - p1)  [N / m^2]                       !
 !                                                                              !
-!   and these terms are bundled together in this function.                     !
+!   * and these terms are bundled together in this function.                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Vof_Type),      target :: Vof
-  type(Native_Type),   target :: Nat
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  type(Native_Type),   target :: Nat      !! native solver object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, p

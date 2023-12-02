@@ -1,16 +1,49 @@
 !==============================================================================!
   subroutine Compute_Momentum(Process, Flow, Turb, Vof, Por, Sol)
 !------------------------------------------------------------------------------!
-!   Discretizes and solves momentum conservation equations                     !
+!>  The subroutine Compute_Momentum in T-Flows is designed to solve momentum
+!>  conservation equations.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and setup: It initializes various local variables and     !
+!     pointers to the necessary data structures like the grid, flow field, and !
+!     turbulence models. This includes setting up aliases for efficient data   !
+!     access and starting the profiler for performance monitoring.             !
+!   * Equation discretization: The subroutine discretizes the momentum         !
+!     equations. It computes terms related to advection, diffusion, and        !
+!     various forces acting on the fluid. This includes dealing with stresses, !
+!     buoyancy forces, global pressure drops, and any other forces defined by  !
+!     the user.                                                                !
+!   * Spatial discretization and matrix assembly: The subroutine goes through  !
+!     all the faces of the computational grid to calculate the coefficients of !
+!     the discretized momentum equation. It handles the assembly of the system !
+!     matrix for the momentum equations, accounting for various terms like     !
+!     viscous stresses and cross diffusion.                                    !
+!   * Under-relaxation and solving equations: It applies under-relaxation to   !
+!     the equations if not in the prime part of the PISO algorithm. Then, it   !
+!     calls the appropriate linear solver to solve the discretized equations   !
+!     for each velocity component.                                             !
+!   * Post-processing and boundary updates: After solving the equations, the   !
+!     subroutine updates the boundary values for momentum and refreshes        !
+!     buffers. This step ensures that the boundary conditions are correctly    !
+!     applied to the newly computed velocity fields.                           !
+!   * User-defined functions: Throughout its execution, the subroutine calls   !
+!     various user-defined functions for additional customization.  These      !
+!     functions allow users to insert specific behaviors or calculations at    !
+!     different stages of the momentum computation process.                    !
+!   * Performance monitoring: Throughout its execution, the subroutine         !
+!     monitors its performance, aiding in the analysis and optimization of the !
+!     simulation.                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
-  type(Porosity_Type), target :: Por
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Turb_Type),     target :: Turb     !! turbulence object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  type(Solver_Type),   target :: Sol      !! solver object
+  type(Porosity_Type), target :: Por      !! porosity object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk

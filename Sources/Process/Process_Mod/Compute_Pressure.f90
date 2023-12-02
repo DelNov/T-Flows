@@ -1,14 +1,44 @@
 !==============================================================================!
   subroutine Compute_Pressure(Process, Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
-!   Forms and solves pressure equation for the SIMPLE method.                  !
+!>  The subroutine Compute_Pressure in T-Flows is primarily focused on forming
+!>  and solving the pressure equation for the SIMPLE method.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and setup: Commences with initializing essential          !
+!     variables and pointers, such as those for the grid, flow field, volume   !
+!     fluxes, and pressure variables. Also starts the performance profiler.    !
+!   * Equation discretization: This subroutine discretizes the pressure        !
+!     equation as per the SIMPLE algorithm. It takes into account the volume   !
+!     fluxes at boundaries and implements the Rhie and Chow interpolation to   !
+!     avoid checkerboard pressure patterns.                                    !
+!   * Spatial discretization and matrix assembly: It iterates through all the  !
+!     faces of the computational grid to compute coefficients of the           !
+!     discretized pressure equation. It assembles the system matrix,           !
+!     considering internal and boundary fluxes, and additional sources due to  !
+!     mass transfer in VOF simulations.                                        !
+!   * Solving equations: The subroutine employs a linear solver to solve the   !
+!     discretized pressure correction equation. It normalizes the pressure     !
+!     solution to aid convergence and handles the singularity of the pressure  !
+!     matrix in incompressible flow simulations.                               !
+!   * Post-processing: After solving the equations, updates the pressure field !
+!     by adding pressure corrections. It normalizes the updated pressure field !
+!     to remove any arbitrary constants, and recalculates the pressure         !
+!     gradients for the updated pressure field.                                !
+!   * User-defined functions: Invokes various user-defined functions at        !
+!     specific stages for additional customization and integration of specific !
+!     behaviors into the pressure computation process.                         !
+!   * Performance monitoring: Consistently monitors performance to assist in   !
+!     the analysis and optimization of the simulation, helping identify        !
+!     potential bottlenecks.                                                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  type(Solver_Type),   target :: Sol      !! solver object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk

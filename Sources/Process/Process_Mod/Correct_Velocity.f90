@@ -1,14 +1,39 @@
 !==============================================================================!
   subroutine Correct_Velocity(Process, Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
-!   Corrects the velocities, and mass (or volume) fluxes on cell faces.        !
+!>  The subroutine Correct_Velocity in T-Flows is dedicated to adjusting the
+!>  velocities and volume flow rates on cell faces. This is a crucial step
+!>  in ensuring that the computed flow field conserves volume.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and setup: Begins by setting up necessary variables and   !
+!     pointers, including those for the grid, flow field, and solver matrices. !
+!     It also initializes the profiler for performance tracking.               !
+!   * Velocity and flux correction: Implements corrections to the velocity     !
+!     fields (u, v, w) using the pressure corrections calculated in the        !
+!     pressure solver. These corrections are essential to ensure a divergence- !
+!     free velocity field, satisfying the continuity equation.                 !
+!   * Flux correction at faces: Adjusts the volume flow rates at the           !
+!     internal faces of cells, based on the pressure corrections, to maintain  !
+!     the consistency and accuracy of the flow field.                          !
+!   * Error calculation: Calculates the maximum volume error with the newly    !
+!     corrected fluxes, providing a measure of the divergence in the flow.     !
+!   * CFL and Peclet number calculation: Computes the CFL and Peclet numbers   !
+!     for the flow, which are critical for assessing the stability and         !
+!     convection dominance in the numerical simulation.                        !
+!   * User-defined functions: Calls user-defined functions at specific points  !
+!     for additional customization and integration of specific behaviors into  !
+!     the velocity correction process.                                         !
+!   * Performance monitoring: Continuously monitors the performance of the     !
+!     subroutine, aiding in optimization and analysis of the simulation.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  type(Solver_Type),   target :: Sol      !! solver object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Bulk_Type),   pointer :: bulk

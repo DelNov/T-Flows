@@ -1,6 +1,10 @@
 !==============================================================================!
   subroutine Logo_Pro(Process)
 !------------------------------------------------------------------------------!
+!>  Prints Process's logo on the terminal.  Along with it, also prints in which
+!>  precision (single or double) were the floating point numbers compiled
+!>  and if the Process was compiled with or without PETSc solvers.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type) :: Process

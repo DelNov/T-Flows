@@ -1,14 +1,38 @@
 !==============================================================================!
   subroutine Convective_Outflow(Process, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
-!   Extrapoloate variables on the boundaries where needed.                     !
+!>  This subroutine implements convective outlflow condition from A. Bottaro.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Sets up pointers and aliases for grid, flow field,       !
+!     turbulence, and multiphase variables. Prepares for boundary value        !
+!     extrapolation based on the simulation timestep.                          !
+!   * Momentum extrapolation: Depending on the simulation timestep, updates    !
+!     the momentum variables (u, v, w) at outflow boundaries using either a    !
+!     direct extrapolation or a convective method.                             !
+!   * Turbulence variables: Updates turbulence quantities like kinetic energy, !
+!     dissipation, and stress tensors at convective outflow boundaries based   !
+!     on the turbulence model (K-epsilon, Spalart-Allmaras, RSM, etc.).        !
+!   * Scalar variables: For simulations with scalar transport, extrapolates    !
+!     scalar variables at outflow boundaries using a similar approach as       !
+!     momentum variables.                                                      !
+!   * Energy variables: In simulations involving heat transfer, updates        !
+!     temperature at outflow boundaries, considering the flow's bulk velocity  !
+!     and temperature gradients.                                               !
+!   * Boundary condition handling: Applies different extrapolation strategies  !
+!     depending on whether the simulation timestep is before or after a        !
+!     specified threshold (BEGIN). This allows for finer control over boundary !
+!     value updates during the simulation.                                     !
+!   * Performance monitoring: Monitors the subroutine's performance, aiding    !
+!     in optimizing simulation efficiency and accuracy.                        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Turb_Type),     target :: Turb     !! turbulence object
+  type(Vof_Type),      target :: Vof      !! VOF object
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: BEGIN = 12
 !-----------------------------------[Locals]-----------------------------------!

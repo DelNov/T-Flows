@@ -1,16 +1,49 @@
 !==============================================================================!
   subroutine Compute_Scalar(Process, Flow, Turb, Vof, Sol, sc)
 !------------------------------------------------------------------------------!
-!   Purpose: Solve transport equation for user defined scalar.                 !
+!>  The subroutine Compute_Scalar in T-Flows is dedicated to solving transport
+!>  equations for scalar quantities such as concentrations or passive scalars.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization and setup: Begins by setting up necessary local variables !
+!     and pointers to important data structures like the grid and scalar field.!
+!     This includes establishing aliases for efficient data access and         !
+!     starting a profiler for performance monitoring.                          !
+!   * Equation discretization: It discretizes the scalar transport equations,  !
+!     computing terms related to advection and diffusion. This includes        !
+!     handling gradients of scalar quantities and the computation of diffusive !
+!     fluxes.                                                                  !
+!   * Spatial discretization and matrix assembly: Iterates through all grid    !
+!     faces to calculate coefficients of the discretized scalar equation.      !
+!     Assembles the system matrix for the scalar equations, considering        !
+!     diffusive fluxes and cross diffusion.                                    !
+!   * Under-Relaxation and solving equations: Applies under-relaxation to      !
+!     the equations and then uses the linear solver to solve the discretized   !
+!     equations for the scalar quantities. The subroutine handles both         !
+!     explicit and implicit parts of diffusive fluxes.                         !
+!   * Post-processing and boundary updates: After solving the equations,       !
+!     updates the boundary values for scalar quantities and refreshes buffers. !
+!     This step ensures that boundary conditions are correctly applied to the  !
+!     newly computed scalar fields. Also includes gradient computation         !
+!     post-solution.                                                           !
+!   * User-defined functions: Throughout its execution, Compute_Scalar invokes !
+!     various user-defined functions for additional customization. These       !
+!     functions enable users to integrate specific behaviors or calculations   !
+!     at different stages of the scalar computation process.                   !
+!   * Performance monitoring: The subroutine consistently monitors its         !
+!     performance, contributing to the analysis and optimization of the        !
+!     simulation. This monitoring helps in identifying bottlenecks and         !
+!     optimizing the simulation process for better efficiency.                 !
 !------------------------------------------------------------------------------!
   implicit none
 !-----------------------------------[Arguments]--------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
-  type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: sc
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Turb_Type),     target :: Turb     !! turbulence object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  type(Solver_Type),   target :: Sol      !! solver object
+  integer, intent(in)         :: sc       !! scalar rank
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw

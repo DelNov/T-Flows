@@ -1,32 +1,53 @@
 !==============================================================================!
   subroutine Update_Boundary_Values(Process, Flow, Turb, Vof, update)
 !------------------------------------------------------------------------------!
-!   Update variables on the boundaries (boundary cells) where needed.          !
-!   It does not update volume fluxes at boundaries - keep it like that.        !
-!   Fluxes inside are calculated inside Compute_Pressure, and fluxes at        !
-!   boundaries are updated in Balance_Volume                                   !
-!                                                                              !
-!   Ideally, this function should be called before each calculation of         !
-!   gradients, but it is hardly so.  Maybe one could even think of calling     !
-!   it from calculation of variables and updating those which match name       !
-!   of the variable.                                                           !
+!>  This subroutine is designed to update variables on the boundaries (boundary
+!>  cells) where needed.  It does not update volume fluxes at boundaries -
+!>  which is good and you should keep it like that. Keep in minda that fluxes
+!>  inside are calculated inside Compute_Pressure, and fluxes at boundaries
+!>  are updated in Balance_Volume.
 !------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Comm_Mod
-  use Field_Mod,      only: Field_Type
-  use Turb_Mod
-  use Grid_Mod
-  use Control_Mod
-  use Vof_Mod
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization: Sets up pointers and variables, including grid, flow     !
+!     field, and turbulence models. Establishes aliases for various variables  !
+!     such as momentum, energy, and turbulence quantities.                     !
+!   * Update control: Depending on the 'update' parameter, selectively updates !
+!     boundary values for momentum, turbulence, multiphase variables, energy,  !
+!     or scalars.                                                              !
+!   * Momentum update: For momentum updates, extrapolates boundary values for  !
+!     velocity components (u, v, w) at outflow, pressure, or symmetry regions. !
+!   * Multiphase update: If involved, updates the boundary values for the VOF  !
+!     function at relevant boundaries.                                         !
+!   * Turbulence update: Updates turbulence quantities like kinetic energy,    !
+!     dissipation, and stress tensors at boundary faces, depending on the      !
+!     turbulence model used (k-epsilon, Spalart-Allmaras, RSM, etc.).          !
+!   * Energy update: For heat transfer simulations, updates temperature or     !
+!     heat flux at boundaries based on wall conditions and specified           !
+!     turbulence models. It includes both the 'old' and 'new' ways of handling !
+!     wall temperature/flux calculations.                                      !
+!   * Scalars update: For simulations with scalar transport, updates scalar    !
+!     variables at boundaries considering wall conditions and diffusivity.     !
+!   * Error checking: Ensures the 'update' parameter is valid and throws an    !
+!     error if an invalid parameter is passed.                                 !
+!   * Performance monitoring: Monitors the execution of the subroutine for     !
+!     optimization and efficiency.                                             !
+!------------------------------------------------------------------------------!
+!   Note                                                                       !
+!                                                                              !
+!   * Ideally, this function should be called before each calculation of       !
+!     gradients, but it is hardly so.  Maybe one could even think of calling   !
+!     it from calculation of variables and updating those which match name     !
+!     of the variable.                                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
-  character(*)                :: update
+  class(Process_Type)         :: Process  !! parent class
+  type(Field_Type),    target :: Flow     !! flow object
+  type(Turb_Type),     target :: Turb     !! turbulence object
+  type(Vof_Type),      target :: Vof      !! VOF object
+  character(*)                :: update   !! character switch to control
+                                          !! which variables to update
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
