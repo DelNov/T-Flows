@@ -2,6 +2,58 @@
 
 !==============================================================================!
   program Process_Prog
+!------------------------------------------------------------------------------!
+!>  This is the main function of the T-Flows' sub-program Process.  It manages
+!>  the entire workflow of CFD simulations. It processes the complex interplay
+!>  of initializing the computing environment, preparing grids, initializing
+!>  solvers, handling domain interactions, and managing data across various
+!>  computational stages. From executing core computational routines to
+!>  conducting post-processing and smoothly transitioning to program exit,
+!>  this function stands as a critical component of Process, ensuring that
+!>  every step of the simulation is executed correctly and in synchronization
+!>  with other parts of the code.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initialization:                                                          !
+!     - Sets up profiler for performance tracking.                             !
+!     - Initializes control file names for the root and individual domains.    !
+!     - Initializes time and backup-related variables.                         !
+!     - Starts parallel execution if necessary.                                !
+!     - Displays the program logo.                                             !
+!   * Control file processing:                                                 !
+!     - Opens and reads control files for root and domain-specific settings.   !
+!     - Initializes Info_Mod for managing information and logging.             !
+!     Grid and field preparation:                                              !
+!     - Loads and prepares grids for each domain.                              !
+!     - Allocates memory for working arrays, essential for RSM models.         !
+!     - Sets up time steps and reads control information for physical models.  !
+!   * Memory allocation for variables:                                         !
+!     - Allocates memory for flow fields, turbulence, VOF, swarms, and solvers.!
+!     - Initializes numerical schemes and boundary conditions.                 !
+!   * Interface creation and backup loading:                                   !
+!     - Creates interfaces between domains.                                    !
+!     - Loads backup files if directed and initializes variables accordingly.  !
+!   * Time loop setup:                                                         !
+!     - Sets intervals for backup and results saving.                          !
+!     - Computes wall distance and performs potential initialization.          !
+!   * Main time loop:                                                          !
+!     - Iteratively processes each time step.                                  !
+!     - Handles turbulence models, interface tracking, and                     !
+!       Lagrangian particle tracking model.                                    !
+!     - Executes the PISO algorithm for pressure-velocity coupling.            !
+!     - Updates boundary values and solves for energy and scalar fields.       !
+!     - Manages data exchange between domains.                                 !
+!     - Performs post-iteration tasks, including user-defined functions.       !
+!   * Result saving and exiting:                                               !
+!     - Saves results at specified intervals.                                  !
+!     - Checks for exit conditions based on time or external signals.          !
+!     - Calls user functions at the end of the simulation.                     !
+!   * Finalization:                                                            !
+!     - Closes monitoring files and performs final user function calls.        !
+!     - Finalizes work arrays, profiler and solvers.                           !
+!     - Ends parallel execution and exits the program.                         !
+!------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Process_Mod
 !------------------------------------------------------------------------------!
