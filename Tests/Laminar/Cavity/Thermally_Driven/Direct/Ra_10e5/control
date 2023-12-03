@@ -5,12 +5,12 @@
   HEAT_TRANSFER    yes
   BUOYANCY         thermal
 
-  NUMBER_OF_TIME_STEPS     600
+  NUMBER_OF_TIME_STEPS     120
 
   RESULTS_SAVE_INTERVAL    300
   BACKUP_SAVE_INTERVAL     300
 
-  TIME_STEP               1.0
+  TIME_STEP                  5.0
 
 #-------------------
 # Monitoring points 
@@ -43,6 +43,7 @@
 #----------------------
 # Numerical parameters
 #----------------------
+  LINEAR_SOLVERS                petsc
   PRESSURE_MOMENTUM_COUPLING    simple
 
   SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
@@ -54,13 +55,15 @@
   ADVECTION_SCHEME_FOR_MOMENTUM    minmod
   ADVECTION_SCHEME_FOR_ENERGY      minmod
 
+  BLEND_SYSTEM_MATRICES            yes
+
 #------------------------
 # Linear solver settings
 #------------------------
   PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
-  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
-  TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
-  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-7
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-6
+  TOLERANCE_FOR_ENERGY_SOLVER        1.e-6
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-9
   TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
   MAX_ITERATIONS_FOR_PRESSURE_SOLVER   120
