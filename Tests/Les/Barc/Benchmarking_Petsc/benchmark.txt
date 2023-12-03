@@ -1,33 +1,33 @@
 -------+-----------+-----------+-----------
 Run:     Solvers:    Blending:   4 CPUs:
 -------+-----------+-----------+-----------
-01     | native    | yes       | 12:13 min  -> original run, as is except for
+A      | native    | yes       | 12:13 min  -> original run, as is except for
        | CG        |           |   733 sec     changing PISO to SIMPLE and
        |           |           |               running for 120 time steps
 -------+-----------+-----------+-----------
-02     | native    | no        | 16:41 min  -> no blending lead to slower
+B      | native    | no        | 16:41 min  -> no blending lead to slower
        | CG        |           |  1001 sec     calculations in the solver
        |           |           |               leading to 36% slower run :-(
 -------+-----------+-----------+-----------
-03     | PETSc     | yes       |  9:95 min  -> surprising, even 19% faster
-       | CG        |           |   599 sec     than the original (01) run
+C      | PETSc     | yes       |  9:95 min  -> surprising, even 19% faster
+       | CG        |           |   599 sec     than the original (A) run
        |           |           |
 -------+-----------+-----------+-----------
-04     | PETSc     | no        | 13:04 min  -> as observed in native case, no
+D      | PETSc     | no        | 13:04 min  -> as observed in native case, no
        | CG        |           |   784 sec     blending gives ~30% slower time
-       |           |           |               (compared to 03)
+       |           |           |               (compared to C)
 -------+-----------+-----------+-----------
-05     | PETSc     | yes       | 30:18 min  -> painfully slow, setting up the
+E      | PETSc     | yes       | 30:18 min  -> painfully slow, setting up the
        | AMG       |           |  1818 sec     amg matrices (agglomerating) took
-       |           |           |               its toll; 248% increase over 01
+       |           |           |               its toll; 248% increase over A
 -------+-----------+-----------+-----------
-06     | PETSc     | no        | 17:14 min  -> although 41% slower than 01, it
-       | AMG       |           |  1034 sec     is 43% faster than 05, meaning
+F      | PETSc     | no        | 17:14 min  -> although 41% slower than A, it
+       | AMG       |           |  1034 sec     is 43% faster than E, meaning
        |           |           |               that no blending led to huge
 -------+-----------+-----------+-----------    savings in CPU time here
 
 It is not a clear cut, unfortunatelly, like nothing in life.  As things are now,
-native solvers are not a bad choice (case 01).  However, case 03 managed to run
+native solvers are not a bad choice (case A).  However, case C managed to run
 even faster than the native solver, maybe because the efficiency of matrix copy
 has improved (see commit 0cf1935bc1857f328d9283e3cfd3922d1cfab3ac).
 

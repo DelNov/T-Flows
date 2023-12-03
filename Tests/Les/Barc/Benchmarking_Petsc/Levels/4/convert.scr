@@ -1,0 +1,22 @@
+# Full mesh name (with extension)
+barc_4.8m_cells.msh
+
+# Create dual mesh?
+no
+
+# Geometrical scaling
+skip
+
+# Boundary cell centers' position
+2
+
+# Periodicity
+6
+skip
+
+# Wall distance
+3
+
+# Probe 1d
+skip
+
