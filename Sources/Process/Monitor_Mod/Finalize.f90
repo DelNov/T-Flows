@@ -1,10 +1,10 @@
 !==============================================================================!
   subroutine Finalize(Monitor)
 !------------------------------------------------------------------------------!
-!> This subroutine is tasked with closing all monitoring files at the end of a
-!> simulation in T-Flows. It goes through each monitoring point defined in the
-!> Monitor object and, if the point is within the domain of the current
-!> processor, it closes the associated file stream.
+!>  This subroutine is tasked with closing all monitoring files at the end of a
+!>  simulation in T-Flows. It goes through each monitoring point defined in the
+!>  Monitor object and, if the point is within the domain of the current
+!>  processor, it closes the associated file stream.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
