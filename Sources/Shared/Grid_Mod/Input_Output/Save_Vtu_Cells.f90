@@ -38,6 +38,10 @@
   integer, allocatable :: i_buffer(:)
 !==============================================================================!
 
+  ! A very rudimentary test to check if regions are set
+  Assert(Grid % region % f_cell(Grid % n_regions) .eq.              1)
+  Assert(Grid % region % l_cell(Grid % n_regions) .eq. Grid % n_cells)
+
   call Profiler % Start('Save_Vtu_Cells')
 
   ! Set precision for plotting (intp and floatp variables)
@@ -45,13 +49,13 @@
 
   ! Count connections in this subdomain, you will need it later
   n_conns = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) n_conns = n_conns + abs(Grid % cells_n_nodes(c))
   end do
 
   ! Count face data for polyhedral cells, you will need it later
   n_polyg = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
       if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
         n_polyg = n_polyg + 1                  ! add one for number of polyfaces
@@ -67,13 +71,13 @@
   ! Allocate memory for local buffers
   allocate(r_buffer(max(Grid % n_nodes * 3, Grid % n_cells * 6)))
   n1 = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     n1 = n1 + max(abs(Grid % cells_n_nodes(c)), Grid % cells_n_faces(c))
   end do
 
   ! Still counting
   n2 = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
       if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
         n2 = n2 + 1
@@ -238,6 +242,16 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * RP  ! prepare for next
 
+  ! Cell centers
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type='//floatp          //  &
+                    ' Name="Grid Cell Centers [m]"'     //  &
+                    ' NumberOfComponents="3"'           //  &
+                    ' format="appended"'                //  &
+                    ' offset="' // trim(str1) //'">'    // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_sub * RP * 3  ! prepare for next
+
   ! Cell inertia
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//floatp          //  &
@@ -297,7 +311,7 @@
   data_size = int(n_conns * IP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
 
       ! Tetrahedral, pyramid, wedge and hexahedral cells
@@ -327,7 +341,7 @@
   write(fu) data_size
   i = 0
   cell_offset = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       cell_offset = cell_offset + abs(Grid % cells_n_nodes(c))
       i=i+1;  i_buffer(i) = cell_offset
@@ -339,7 +353,7 @@
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1
       if(Grid % cells_n_nodes(c) .eq. 4) i_buffer(i) = VTK_TETRA
@@ -358,7 +372,7 @@
     data_size = int(n_polyg * IP, SP)
     write(fu) data_size
     i = 0
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
         if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
           i=i+1
@@ -393,7 +407,7 @@
     write(fu) data_size
     i = 0
     cell_offset = 0
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       if(Grid % new_c(c) .ne. 0) then            ! cell is in this subdomain
         if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
           cell_offset = cell_offset + 1          ! to store number of polyfaces
@@ -420,7 +434,7 @@
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  i_buffer(i) = Grid % Comm % cell_proc(c)
     end if
@@ -431,7 +445,7 @@
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  i_buffer(i) = Grid % Omp % cell_thread(c)
     end if
@@ -442,7 +456,7 @@
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  i_buffer(i) = abs(Grid % cells_n_nodes(c))
     end if
@@ -453,7 +467,7 @@
   data_size = int(n_cells_sub * RP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  r_buffer(i) = Grid % wall_dist(c)
     end if
@@ -464,9 +478,22 @@
   data_size = int(n_cells_sub * RP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  r_buffer(i) = Grid % vol(c)
+    end if
+  end do
+  write(fu) r_buffer(1:i)
+
+  ! Cell centers
+  data_size = int(n_cells_sub * RP * 3, SP)
+  write(fu) data_size
+  i = 0
+  do c = Cells_In_Domain()
+    if(Grid % new_c(c) .ne. 0) then
+      i=i+1;  r_buffer(i) = Grid % xc(c)
+      i=i+1;  r_buffer(i) = Grid % yc(c)
+      i=i+1;  r_buffer(i) = Grid % zc(c)
     end if
   end do
   write(fu) r_buffer(1:i)
@@ -475,7 +502,7 @@
   data_size = int(n_cells_sub * RP * 6, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  r_buffer(i) = Grid % ixx(c)
       i=i+1;  r_buffer(i) = Grid % iyy(c)
@@ -491,7 +518,7 @@
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
   i = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  i_buffer(i) = Grid % por(c)
     end if
