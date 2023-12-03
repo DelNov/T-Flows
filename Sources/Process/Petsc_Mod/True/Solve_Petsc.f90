@@ -75,7 +75,7 @@
   logical,       intent(in)  :: blend_matrix
     !! flag indicating if the system matrix is blended with upwind terms
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: i, j, k
+  integer       :: i, j, k, j_loc, a_glo_j(256)
   character(SL) :: solvers  ! fortran string to store solver
   character(SL) :: precs    ! fortran string to store preconditioner
   integer       :: l        ! length of the two strings above
@@ -88,14 +88,19 @@
   !-----------------------------------------------------------!
   if(.not. Pet % matrix_coppied .or. blend_matrix) then
     call Profiler % Start('Solve_Petsc (matrix copy)')
+
     do i = 1, Pet % m_lower
       do j = A % row(i), A % row(i+1)-1
         k = A % col(j)
-        call C_Petsc_Mat_Set_Value(Pet % A,     &  ! matrix
-                                   A % glo(i),  &  ! row
-                                   A % glo(k),  &  ! column
-                                   A % val(j))     ! matrix entry
+        j_loc = j - A % row(i) + 1   ! local j counter for this row
+        a_glo_j(j_loc) = A % glo(k)  ! fill up the column global number
       end do
+      call C_Petsc_Mat_Set_Values(Pet % A,     &        ! matrix
+                                  1,           &        ! one row at a time
+                                  A % glo(i),  &        ! global row number
+                                  j_loc,       &        ! number of columns
+                                  a_glo_j,     &        ! global column numbers
+                                  A % val(A % row(i)))  ! matrix entries
     end do
 
     ! The following two calls are needed after calls to MatSetValue
