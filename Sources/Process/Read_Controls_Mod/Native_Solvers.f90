@@ -1,19 +1,25 @@
 !==============================================================================!
   subroutine Native_Solvers(Rc, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
-!   Reads details about native solvers from control file.                      !
+!>  This subroutine is designed to read and set up the parameters for various
+!>  native (home-brewed) solvers from the control file.  It configures solvers
+!>  for different aspects of the flow simulation such as momentum, pressure,
+!>  wall distance, potential, heat transfer, multiphase flow, passive scalars,
+!>  and turbulence quantities.
+!------------------------------------------------------------------------------!
+!   Note on good practice                                                      !
 !                                                                              !
-!   Good practice: default values, outlined in Documents/all_control_keywords, !
-!   should be defined only in Control_Mod, not be scattered around the code.   !
-!   In other words, Control_Mod changes less frequently than other parts of    !
-!   the code, so it is safer to place default values there.                    !
+!   * Default values, outlined in Documents/all_control_keywords, should be    !
+!     defined only in Control_Mod, not be scattered around the code.  In other !
+!     words, Control_Mod changes less frequently than other parts of the code, !
+!     so it is safer to place default values there.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type), target              :: Flow
-  type(Turb_Type),  target              :: Turb
-  type(Vof_Type),   target              :: Vof
+  class(Read_Controls_Type), intent(in) :: Rc    !! parent class
+  type(Field_Type), target              :: Flow  !! flow object
+  type(Turb_Type),  target              :: Turb  !! turbulence object
+  type(Vof_Type),   target              :: Vof   !! VOF object
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi

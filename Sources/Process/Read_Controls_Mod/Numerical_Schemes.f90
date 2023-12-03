@@ -1,18 +1,70 @@
 !==============================================================================!
   subroutine Numerical_Schemes(Rc, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
-!   Reads details about numerical schemes from control file.                   !
+!>  This subroutine is tasked with configuring the numerical schemes based on
+!>  settings specified in the control file.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   Good practice: default values, outlined in Documents/all_control_keywords, !
-!   should be defined only in Control_Mod, not be scattered around the code.   !
-!   In other words, Control_Mod changes less frequently than other parts of    !
+!   * Initial setup:                                                           !
+!     - Prints a notification message on the first processor indicating the    !
+!       start of reading discretization scheme information.                    !
+!     - Establishes an alias (Grid) for Flow % pnt_grid.                       !
+!   * Pressure-velocity coupling algorithm:                                    !
+!     - Determines the basic algorithm for pressure-velocity coupling (like    !
+!       SIMPLE, PISO) from the control file.                                   !
+!     - Sets the number of PISO corrections if the PISO method is chosen.      !
+!     - Configures Choi and Gu corrections for the Rhie-Chow method, if        !
+!       applicable.                                                            !
+!   * Gradient computation methods:                                            !
+!     - Reads tolerance and maximum iterations for gradient computations using !
+!       the Gauss and Least Squares methods.                                   !
+!   * Momentum-related schemes:                                                !
+!     - Loops through the velocity components (u, v, w) and sets up their      !
+!       respective numerical schemes:                                          !
+!       > Advection and time integration schemes.                              !
+!       > Blending coefficients and under-relaxation factors.                  !
+!       > Gradient computation methods.                                        !
+!       > Options for blending system matrices.                                !
+!   * Pressure-related schemes:                                                !
+!     - Configures the under-relaxation factor for pressure.                   !
+!     - Sets the gradient method for pressure computation.                     !
+!     - Manages options for blending system matrices for pressure.             !
+!   * Wall distance related schemes:                                           !
+!     - Sets up the gradient method for computing wall distance.               !
+!     - Manages options for blending system matrices for wall distance.        !
+!   * Heat transfer related schemes (if applicable):                           !
+!     - Configures advection, time integration, blending coefficient,          !
+!       under-relaxation factor, and gradient method for energy equations.     !
+!     - Manages blending system matrices for heat transfer.                    !
+!   * Multiphase flow related schemes (if applicable):                         !
+!     - Sets advection, time integration, blending coefficient,                !
+!       under-relaxation factor, and gradient method for VOF function.         !
+!     - Configures various parameters for VOF, such as Courant number,         !
+!       substep cycles, and curvature smoothing cycles.                        !
+!     - Manages blending system matrices for multiphase flow.                  !
+!   * Passive scalars related schemes:                                         !
+!     - Loops through the scalar variables (if any) and configures their       !
+!       numerical schemes, similar to the procedure for momentum and heat      !
+!       transfer.                                                              !
+!   * Turbulence related schemes:                                              !
+!     - Loops through the turbulence variables (like kinetic energy,           !
+!       dissipation rate, etc.) and sets up their respective numerical schemes.!
+!     - Manages blending system matrices for turbulence.                       !
+!------------------------------------------------------------------------------!
+!   Note on good practice                                                      !
+!                                                                              !
+!   * Default values, outlined in Documents/all_control_keywords, should be    !
+!     defined only in Control_Mod, not be scattered around the code.  In other !
+!     words, Control_Mod changes less frequently than other parts of the code, !
+!     so it is safer to place default values there.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type), target              :: Flow
-  type(Turb_Type),  target              :: Turb
-  type(Vof_Type),   target              :: Vof
+  class(Read_Controls_Type), intent(in) :: Rc    !! parent class
+  type(Field_Type), target              :: Flow  !! flow object
+  type(Turb_Type),  target              :: Turb  !! turbulence object
+  type(Vof_Type),   target              :: Vof   !! VOF object
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: tq, ui, phi

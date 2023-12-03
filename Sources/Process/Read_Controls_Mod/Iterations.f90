@@ -1,9 +1,10 @@
 !==============================================================================!
   subroutine Iterations(Rc)
 !------------------------------------------------------------------------------!
-!   Reads control file for variables which control outer iteration loop        !
+!>  This is a rather concise subroutine which reads control file for variables
+!>  controlling outer iteration loop, meaning the SIMPLE/PISO loop.
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
+  class(Read_Controls_Type), intent(in) :: Rc  !! parent class
 !-----------------------------------[Locals]-----------------------------------!
   integer :: max_out     ! max number of inner iterations
   integer :: min_out     ! min number of inner iterations

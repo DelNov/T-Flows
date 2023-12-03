@@ -1,17 +1,19 @@
 !==============================================================================!
   subroutine Petsc_Solvers(Rc, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
-!   Reads options for PETSc solver from control file.                          !
-!   I don't put it together with Read_Control_Numerical because I am afraid    !
-!   it could grow a lot as we learn new PETSc options and want more from it    !
+!>  This subroutine is designed to read and set up the parameters for various
+!>  PETSc solvers from the control file.  It configures solvers for different
+!>  aspects of the flow simulation such as momentum, pressure, wall distance,
+!>  potential, heat transfer, multiphase flow, passive scalars, turbulence
+!>  quantities, and also reads options to be passed to PETSc library.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type),  target             :: Flow
-  type(Turb_Type),   target             :: Turb
-  type(Vof_Type),    target             :: Vof
-  type(Solver_Type), target             :: Sol
+  class(Read_Controls_Type), intent(in) :: Rc    !! parent class
+  type(Field_Type),  target             :: Flow  !! flow object
+  type(Turb_Type),   target             :: Turb  !! turbulence object
+  type(Vof_Type),    target             :: Vof   !! VOF object
+  type(Solver_Type), target             :: Sol   !! solver object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, p, fun

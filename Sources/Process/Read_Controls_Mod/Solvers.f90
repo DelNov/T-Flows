@@ -1,15 +1,18 @@
 !==============================================================================!
   subroutine Solvers(Rc, Flow, Turb, Vof, Sol)
 !------------------------------------------------------------------------------!
-!   Reads which linear solvers to use, and calls appropriate branches.         !
+!>  This subroutine is designed to determine which linear solvers (native
+!>  or PETSc) will be used for the simulation, based on the settings specified
+!>  in the control file.  If PETSc solvers are specified in the control file
+!>  but the Process was compiled without PETSc support, an error is thrown.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type),  target             :: Flow
-  type(Turb_Type),   target             :: Turb
-  type(Vof_Type),    target             :: Vof
-  type(Solver_Type), target             :: Sol
+  class(Read_Controls_Type), intent(in) :: Rc    !! parent class
+  type(Field_Type),  target             :: Flow  !! flow object
+  type(Turb_Type),   target             :: Turb  !! turbulence object
+  type(Vof_Type),    target             :: Vof   !! VOF object
+  type(Solver_Type), target             :: Sol   !! solver object
 !----------------------------------[Locals]------------------------------------!
   character(SL) :: name
 !==============================================================================!

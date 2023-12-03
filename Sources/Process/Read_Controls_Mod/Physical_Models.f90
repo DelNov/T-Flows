@@ -1,19 +1,63 @@
 !==============================================================================!
   subroutine Physical_Models(Rc, Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
-!   Reads details about physical models from control file.                     !
+!>  This subroutine is responsible for reading and setting up various physical
+!>  models based on the information provided in the control file.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   Good practice: default values, outlined in Documents/all_control_keywords, !
-!   should be defined only in Control_Mod, not be scattered around the code.   !
-!   In other words, Control_Mod changes less frequently than other parts of    !
+!   * Initialization: It starts with a message indicating the beginning of     !
+!     the process of reading physical model information.                       !
+!   * Time steps: Reads the number of time steps for the simulation.           !
+!   * Heat transfer and buoyancy:                                              !
+!     - Configures heat transfer settings.                                     !
+!     - Sets up the gravitational vector.                                      !
+!     - Determines the buoyancy model based on the name (e.g., DENSITY,        !
+!       THERMAL, NONE).                                                        !
+!     - Sets reference density, temperature, volume expansion coefficient,     !
+!       turbulent Prandtl and Schmidt numbers, and temperature extrapolation   !
+!       at walls.                                                              !
+!   * Turbulence model:                                                        !
+!     - Determines the turbulence model to use.                                !
+!     - If a Reynolds stress model is used, it reads the variant of the        !
+!       turbulence model (e.g., STABILIZED).                                   !
+!   * Rough walls and Monin-Obukhov length:                                    !
+!     - Configures if walls are rough and if the Monin-Obukhov similarity      !
+!       theory is used.                                                        !
+!   * Turbulence statistics: Determines if turbulence statistics should be     !
+!     gathered based on the turbulence model and the number of time steps.     !
+!   * Turbulent heat flux Model: Sets up the model for turbulent heat flux     !
+!     (e.g., SGDH, GGDH).                                                      !
+!   * Hybrid LES/RANS switching: If a hybrid LES/RANS model is used, it        !
+!     configures the type of switching (e.g., SWITCH_DISTANCE).                !
+!   * Model constants initialization: Initializes constants for various        !
+!     turbulence models.                                                       !
+!   * Pressure drops and volume flow rates: Sets up pressure drops and volume  !
+!     flow rates for bulk properties.                                          !
+!   * Number of scalars: Reads the number of scalar fields to be simulated.    !
+!   * Interface tracking: Configures the settings for interface tracking in    !
+!     multiphase flows.                                                        !
+!   * Particle tracking: If particle tracking is enabled, it reads settings    !
+!     for particle properties, including density, diameter, restitution        !
+!     coefficient, subgrid-scale models, and the number of sub-steps for       !
+!     swarm statistics.                                                        !
+!   * Finalization: The subroutine ends by applying the configured settings    !
+!     to the respective fields and variables in the simulation.                !
+!------------------------------------------------------------------------------!
+!   Note on good practice                                                      !
+!                                                                              !
+!   * Default values, outlined in Documents/all_control_keywords, should be    !
+!     defined only in Control_Mod, not be scattered around the code.  In other !
+!     words, Control_Mod changes less frequently than other parts of the code, !
+!     so it is safer to place default values there.                            !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type), target              :: Flow
-  type(Turb_Type),  target              :: Turb
-  type(Vof_Type),   target              :: Vof
-  type(Swarm_Type), target              :: Swarm
+  class(Read_Controls_Type), intent(in) :: Rc     !! parent class
+  type(Field_Type), target              :: Flow   !! flow object
+  type(Turb_Type),  target              :: Turb   !! turbulence object
+  type(Vof_Type),   target              :: Vof    !! VOF object
+  type(Swarm_Type), target              :: Swarm  !! swarm object
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name

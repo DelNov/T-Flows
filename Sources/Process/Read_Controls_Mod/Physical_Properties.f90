@@ -1,14 +1,17 @@
 !==============================================================================!
   subroutine Physical_Properties(Rc, Flow, Vof, Swarm)
 !------------------------------------------------------------------------------!
-!   Reads physical properties from control file.                               !
+!>  This subroutine is designed to read the control file and set up the
+!>  physical properties of the fluid for single and multi-phase flow
+!>  simulations.  The subroutine focuses only on constant physical properties.
+!>  Any variation in physical properties should be adressed in user functions.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type)                      :: Flow
-  type(Vof_Type)                        :: Vof
-  type(Swarm_Type)                      :: Swarm
+  class(Read_Controls_Type), intent(in) :: Rc     !! parent class
+  type(Field_Type)                      :: Flow   !! flow object
+  type(Vof_Type)                        :: Vof    !! VOF object
+  type(Swarm_Type)                      :: Swarm  !! swarm object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   real                     :: dens_const, visc_const

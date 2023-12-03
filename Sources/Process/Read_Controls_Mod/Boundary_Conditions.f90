@@ -1,15 +1,52 @@
 !==============================================================================!
   subroutine Boundary_Conditions(Rc, Flow, Turb, Vof, Turb_Planes)
 !------------------------------------------------------------------------------!
-!   Reads boundary condition from control file                                 !
+!>  This subroutine is designed to read and apply boundary conditions from the
+!>  control file to the flow, turbulence models, VOF, and turbulent planes.
+!>  The procedure is lengthy and intricate, reflecting the complexity of
+!>  boundary condition implementation in CFD simulations.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initial setup:                                                           !
+!     - Prints a message to indicate the start of reading boundary conditions. !
+!     - Establishes aliases for various variables and fields like velocity     !
+!       components, temperature, pressure, scalars, etc.                       !
+!   * Roughness coefficients:                                                  !
+!     - Reads wall roughness coefficients if specified in the control file.    !
+!   * Counting boundary types:                                                 !
+!     - Processes the control file to count the number of boundary condition   !
+!       types and extract their names. This step is crucial for correctly      !
+!       applying different types of conditions across the domain.              !
+!   * Reading boundary conditions:                                             !
+!     - Iterates over each boundary region and reads the specified boundary    !
+!       conditions for different variables such as velocity, temperature, and  !
+!       turbulence quantities.                                                 !
+!     - Supports different types of boundary conditions like INFLOW, WALL,     !
+!       OUTFLOW, SYMMETRY, etc.                                                !
+!     - Handles both constant values and profiles specified in external files. !
+!     - Interpolates values for boundary cells based on the nearest points in  !
+!       the provided profile.                                                  !
+!   * Synthetic turbulence generation:                                         !
+!     - Reads and sets up synthetic eddies based on control file inputs,       !
+!       crucial for turbulence simulations.                                    !
+!   * Final assignments:                                                       !
+!     - Copies boundary condition values to the corresponding fields in the    !
+!       flow and turbulence models.                                            !
+!     - Identifies near-wall cells, which is important for certain aspects of  !
+!       turbulence models in wall-bounded flow simulations.                    !
+!   * Parallel processing considerations:                                      !
+!     - Includes steps to ensure consistent boundary condition application     !
+!       across different processors in a parallel computing environment.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc
-  type(Field_Type), target              :: Flow
-  type(Turb_Type),  target              :: Turb
-  type(Vof_Type),   target              :: Vof
-  type(Turb_Plane_Type)                 :: Turb_Planes
+  class(Read_Controls_Type), intent(in) :: Rc           !! parent class
+  type(Field_Type), target              :: Flow         !! flow object
+  type(Turb_Type),  target              :: Turb         !! turbulence object
+  type(Vof_Type),   target              :: Vof          !! VOF object
+  type(Turb_Plane_Type)                 :: Turb_Planes  !! turbulence planes
+                                                        !! object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, p, fun

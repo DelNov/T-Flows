@@ -5,10 +5,11 @@
 !==============================================================================!
   module Read_Controls_Mod
 !------------------------------------------------------------------------------!
-!   Module containig functions for reading control file.  They are, to some    !
-!   extent, independent from each other, but they all do similar tasks, are    !
-!   named simularly, so why to have them scattered in the working directory?   !
-!   Besides, being inside a module will enforce argument checking.             !
+!>  This module consolidates functions for reading and interpreting the control
+!>  file used in the Process program of T-Flows.  This module streamlines the
+!>  configuration of simulations by organizing parameters related to boundary
+!>  conditions, physical models, numerical schemes, linear solvers' details
+!>  and physical properties.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Swarm_Mod
@@ -24,6 +25,10 @@
   !-----------------------!
   !   Read control type   !
   !-----------------------!
+  !> This type encapsulates various procedures, each responsible for parsing
+  !> specific sections of the control file.  Specific sections here mean
+  !> sections for boundary conditions, numerical schemes, linear solvers'
+  !> setting, physical models and physical properties.
   type Read_Controls_Type
 
     contains
@@ -38,7 +43,8 @@
 
   end type
 
-  type(Read_Controls_Type) :: Read_Control
+  type(Read_Controls_Type) :: Read_Control  !! singleton type object of the
+    !! Read_Controls_Type, defined for easier access to its procedures
 
   contains
 
