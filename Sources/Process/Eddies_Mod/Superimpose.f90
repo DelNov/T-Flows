@@ -1,12 +1,36 @@
 !==============================================================================!
-  subroutine Eddies_Mod_Superimpose(eddies)
+  subroutine Superimpose_Eddies(Eddies)
 !------------------------------------------------------------------------------!
-!   Superimpose eddies on velocity field                                     !
+!>  This subroutine is designed to superimpose the effects of eddies onto the
+!>  velocity field, useful for some aspects scale-resolving simulations.
+!>  The subroutine effectively superimposes rotational velocities induced by
+!>  the eddies onto the existing velocity field at the boundary cells.
+!>  This superimposition simulates the effect of turbulence entering the
+!>  computational domain.
 !------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * The subroutine first resets the velocity field at the boundary cells     !
+!     to their baseline values.                                                !
+!   * It then goes through different passes, each corresponding to a p         !
+!     otential periodic direction in the computational domain. In each pass,   !
+!     the subroutine adjusts the positions of the eddies based on the          !
+!     periodicity of the grid. This is done to manage eddies passing through   !
+!     periodic boundary conditions in the domain,                              !
+!   * For each boundary cell within the specified boundary condition plane,    !
+!     the subroutine calculates the contributions from all eddies. It          !
+!     considers each eddy's position, radius, length, and sense of rotation.   !
+!   * The influence of each eddy on a boundary cell is calculated using a      !
+!     Gaussian-like distribution to dampen the velocity induced by the eddy    !
+!     based on its distance from the cell. The Gaussian distribution ensures   !
+!     that the influence of each eddy diminishes with distance.                !
+!   * The velocities induced by the eddies are then scaled based on the        !
+!     intensity parameter of the eddies structure and added to the existing    !
+!     velocities of the boundary cells.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Eddies_Type), target :: eddies
+  class(Eddies_Type), target :: Eddies  !! parent class; collection of eddies
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
@@ -16,11 +40,11 @@
 !==============================================================================!
 
   ! Take aliases to object particle Flow around
-  Grid => eddies % pnt_grid
-  Flow => eddies % pnt_flow
+  Grid => Eddies % pnt_grid
+  Flow => Eddies % pnt_flow
 
   do c = -Grid % n_bnd_cells, -1
-    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
+    if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. Eddies % bc_name) then
       Flow % u % n(c) = Flow % u % b(c)
       Flow % v % n(c) = Flow % v % b(c)
       Flow % w % n(c) = Flow % w % b(c)
@@ -49,38 +73,38 @@
 
     ! Select cell for each cell randomly
     do c = -Grid % n_bnd_cells, -1
-      if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. eddies % bc_name) then
+      if(Grid % Bnd_Cond_Name_At_Cell(c) .eq. Eddies % bc_name) then
 
         xc = Grid % xc(c)
         yc = Grid % yc(c)
         zc = Grid % zc(c)
 
-        do e = 1, eddies % n_eddies
-          xe  = eddies % eddy(e) % x + delta_x
-          ye  = eddies % eddy(e) % y + delta_y
-          ze  = eddies % eddy(e) % z + delta_z
-          re  = eddies % eddy(e) % radius
-          le  = eddies % eddy(e) % length
-          sgn = eddies % eddy(e) % sense
+        do e = 1, Eddies % n_eddies
+          xe  = Eddies % eddy(e) % x + delta_x
+          ye  = Eddies % eddy(e) % y + delta_y
+          ze  = Eddies % eddy(e) % z + delta_z
+          re  = Eddies % eddy(e) % radius
+          le  = Eddies % eddy(e) % length
+          sgn = Eddies % eddy(e) % sense
 
           ! Sigmas for Gaussian distribution
           sig_x = re / 2.0
           sig_y = re / 2.0
           sig_z = re / 2.0
-          if(eddies % x_plane < HUGE) sig_x = le / 2.0
-          if(eddies % y_plane < HUGE) sig_y = le / 2.0
-          if(eddies % z_plane < HUGE) sig_z = le / 2.0
+          if(Eddies % x_plane < HUGE) sig_x = le / 2.0
+          if(Eddies % y_plane < HUGE) sig_y = le / 2.0
+          if(Eddies % z_plane < HUGE) sig_z = le / 2.0
 
           ! Linear rotation
-          if(eddies % x_plane < HUGE) then
+          if(Eddies % x_plane < HUGE) then
             uc = 0.0
             vc = sgn * (ze - zc) / re
             wc = sgn * (yc - ye) / re
-          else if(eddies % y_plane < HUGE) then
+          else if(Eddies % y_plane < HUGE) then
             uc = sgn * (ze - zc) / re
             vc = 0.0
             wc = sgn * (xc - xe) / re
-          else if(eddies % z_plane < HUGE) then
+          else if(Eddies % z_plane < HUGE) then
             uc = sgn * (yc - ye) / re
             vc = sgn * (xe - xc) / re
             wc = 0.0
@@ -100,9 +124,9 @@
           wc = wc * exp(-0.5*((zc-ze)/sig_z)**2)
 
           ! Scale them so that intensity turns to be equal to one
-          uc = uc * ONE_THIRD * 10.0 * eddies % intensity
-          vc = vc * ONE_THIRD * 10.0 * eddies % intensity
-          wc = wc * ONE_THIRD * 10.0 * eddies % intensity
+          uc = uc * ONE_THIRD * 10.0 * Eddies % intensity
+          vc = vc * ONE_THIRD * 10.0 * Eddies % intensity
+          wc = wc * ONE_THIRD * 10.0 * Eddies % intensity
 
           Flow % u % n(c) = Flow % u % n(c) + uc
           Flow % v % n(c) = Flow % v % n(c) + vc

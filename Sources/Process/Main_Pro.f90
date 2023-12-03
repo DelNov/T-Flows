@@ -69,8 +69,8 @@
   type(Turb_Type)       :: Turb(MD)        ! turbulence modelling
   type(Vof_Type)        :: Vof(MD)         ! multiphase modelling with vof
   type(Solver_Type)     :: Sol(MD)         ! native and PETSc linear solvers
-  type(Turb_Plane_Type) :: turb_planes(MD) ! holder for synthetic turbulences
-  type(Monitor_Type)    :: monitor(MD)     ! monitors
+  type(Turb_Plane_Type) :: Turb_Planes(MD) ! holder for synthetic turbulences
+  type(Monitor_Type)    :: Monitor(MD)     ! monitors
   type(Porosity_Type)   :: Por(MD)         ! porosity
   type(Interface_Type)  :: inter(MD,MD)    ! interfaces between domains
   integer               :: n_stat_t        ! first time step for turb. statistic
@@ -177,7 +177,7 @@
 
     call Read_Control % Physical_Properties(Flow(d), Vof(d), Swarm(d))
     call Read_Control % Boundary_Conditions(Flow(d), Turb(d), Vof(d),   &
-                                            turb_planes(d))
+                                            Turb_Planes(d))
   end do
 
   ! Create interfaces
@@ -274,9 +274,9 @@
       call Control % Switch_To_Domain(d)  ! not sure if this call is needed
 
       ! Update turbulent planes
-      do tp = 1, turb_planes(d) % n_planes
-        call Eddies_Mod_Superimpose(turb_planes(d) % plane(tp))
-        call Eddies_Mod_Advance    (turb_planes(d) % plane(tp))
+      do tp = 1, Turb_Planes(d) % n_planes
+        call Turb_Planes(d) % Plane(tp) % Superimpose_Eddies()
+        call Turb_Planes(d) % Plane(tp) % Advance_Eddies()
       end do
 
       if(d .eq. 1) call Time % Increase_Time(Flow(d) % dt)

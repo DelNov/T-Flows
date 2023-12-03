@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Boundary_Conditions(Rc, Flow, Turb, Vof, turb_planes)
+  subroutine Boundary_Conditions(Rc, Flow, Turb, Vof, Turb_Planes)
 !------------------------------------------------------------------------------!
 !   Reads boundary condition from control file                                 !
 !------------------------------------------------------------------------------!
@@ -9,7 +9,7 @@
   type(Field_Type), target              :: Flow
   type(Turb_Type),  target              :: Turb
   type(Vof_Type),   target              :: Vof
-  type(Turb_Plane_Type)                 :: turb_planes
+  type(Turb_Plane_Type)                 :: Turb_Planes
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, p, fun
@@ -770,27 +770,27 @@ STOP
   !   Read data on synthetic eddies   !
   !                                   !
   !-----------------------------------!
-  turb_planes % n_planes = 0
+  Turb_Planes % n_planes = 0
   do bc = Boundary_Regions()  ! imagine there are as many eddies as bcs
     call Control % Position_At_Two_Keys('SYNTHETIC_EDDIES',        &
                                         Grid % region % name(bc),  &
                                         found,                     &
                                         .false.)
     if(found) then
-      turb_planes % n_planes = turb_planes % n_planes + 1
+      Turb_Planes % n_planes = Turb_Planes % n_planes + 1
       call Control % Read_Int_Item_On ('NUMBER_OF_EDDIES', 24, edd_n, .false.)
       call Control % Read_Real_Item_On('MAX_EDDY_RADIUS',  .2, edd_r, .false.)
       call Control % Read_Real_Item_On('EDDY_INTENSITY',   .1, edd_i, .false.)
-      call Eddies_Mod_Allocate(turb_planes % plane(turb_planes % n_planes),  &
-                               edd_n,                                        &
-                               edd_r,                                        &
-                               edd_i,                                        &
-                               Flow,                                         &
-                               Grid % region % name(bc))
+      call Turb_Planes % Plane(Turb_Planes % n_planes) % Create_Eddies(    &
+                             edd_n,                                        &
+                             edd_r,                                        &
+                             edd_i,                                        &
+                             Flow,                                         &
+                             Grid % region % name(bc))
     end if
   end do
-  if(turb_planes % n_planes > 0 .and. First_Proc()) then
-    print *, '# Found ', turb_planes % n_planes, ' turbulent planes'
+  if(Turb_Planes % n_planes > 0 .and. First_Proc()) then
+    print *, '# Found ', Turb_Planes % n_planes, ' turbulent planes'
   end if
 
   !---------------------------------------!
