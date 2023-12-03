@@ -12,6 +12,6 @@
 !==============================================================================!
 
   call Control % Read_Int_Item('MAX_ITERATIONS_FOR_ENERGY_SOLVER',  &
-                                5, val, verbose)
+                                6, val, verbose)
 
   end subroutine
