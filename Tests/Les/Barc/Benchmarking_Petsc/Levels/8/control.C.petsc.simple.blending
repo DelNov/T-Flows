@@ -1,0 +1,89 @@
+#--------------
+# Problem name
+#--------------
+  PROBLEM_NAME        barc_9.6m_cells
+  PROFILER_INFO       seconds
+
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS    100000
+
+#---------------
+# Time stepping
+#---------------
+  TIME_STEP                            0.002
+  NUMBER_OF_TIME_STEPS               120
+  RESULTS_SAVE_INTERVAL             1000
+  BACKUP_SAVE_INTERVAL              1000
+
+  WALL_TIME_MAX_HOURS            1000000
+
+#---------------------
+# Physical properties
+#---------------------
+  DYNAMIC_VISCOSITY      3.3333333e-4
+  MASS_DENSITY           1
+
+  TURBULENCE_MODEL       les_dynamic
+
+  POINT_FOR_MONITORING_PLANES   -5.0  -0.5  2.5
+
+#----------------------
+# Numerical parameters
+#----------------------
+  PRESSURE_MOMENTUM_COUPLING            simple
+  BLEND_SYSTEM_MATRICES                 yes
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   1.0
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE   0.95
+  TOLERANCE_FOR_SIMPLE_ALGORITHM        1.0e-3
+  MIN_SIMPLE_ITERATIONS                 2
+  MAX_SIMPLE_ITERATIONS                25
+
+  TIME_INTEGRATION_SCHEME               parabolic
+
+  ADVECTION_SCHEME_FOR_MOMENTUM	       smart
+  # BLENDING_COEFFICIENT_FOR_MOMENTUM     0.8
+
+#--------------------------
+# Linear solver parameters
+#--------------------------
+  LINEAR_SOLVERS                        petsc
+  TOLERANCE_FOR_POTENTIAL_SOLVER        1.0e-4
+  TOLERANCE_FOR_WALL_DISTANCE_SOLVER    1.0e-4
+
+  TOLERANCE_FOR_PRESSURE_SOLVER         1.0e-3
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  960
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER   25
+
+#-------------------
+# Initial conditions
+#-------------------
+  INITIAL_CONDITION
+    VARIABLES        u     v     w
+    VALUES           1.0   0.0   0.0
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION IN
+    TYPE             inflow
+    VARIABLES         u     v     w
+    VALUES            1.0   0.0   0.0
+
+  BOUNDARY_CONDITION OUT
+    TYPE             convective
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
+
+  BOUNDARY_CONDITION WALL
+    TYPE             wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
+
+  BOUNDARY_CONDITION TOP
+    TYPE             wall
+    VARIABLES         u     v     w
+    VALUES            1.0   0.0   0.0
+
+  BOUNDARY_CONDITION BOTTOM
+    TYPE             wall
+    VARIABLES         u     v     w
+    VALUES            1.0   0.0   0.0

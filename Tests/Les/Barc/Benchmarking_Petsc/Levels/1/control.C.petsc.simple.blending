@@ -11,7 +11,7 @@
 #---------------
   TIME_STEP                            0.002
   NUMBER_OF_TIME_STEPS               120
-  RESULTS_SAVE_INTERVAL              100
+  RESULTS_SAVE_INTERVAL             1000
   BACKUP_SAVE_INTERVAL              1000
 
   WALL_TIME_MAX_HOURS            1000000
