@@ -147,7 +147,7 @@
            Grid % cells_n_nodes(i),                           &
           (nodes(j), j = 1, Grid % cells_n_nodes(i))
 
-    call Adjust_First_Dim(Grid % cells_n_nodes(i), Grid % cells_n)
+    call Enlarge % Matrix_Int(Grid % cells_n, i=Grid % cells_n_nodes(i))
     do j = 1, Grid % cells_n_nodes(i)
       Grid % cells_n(j, i) = nodes(j)
     end do

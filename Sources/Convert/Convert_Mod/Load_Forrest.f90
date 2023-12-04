@@ -144,7 +144,8 @@
     n0 = t * Grid(1) % n_faces
     do s = 1, Grid(1) % n_faces
       Grid(2) % faces_n_nodes(n0+s) = Grid(1) % faces_n_nodes(s)
-      call Adjust_First_Dim(Grid(2) % faces_n_nodes(n0+s), Grid(2) % faces_n)
+      call Enlarge % Matrix_Int(Grid(2) % faces_n,  &
+                                i=Grid(2) % faces_n_nodes(n0+s))
       do i_nod = 1, Grid(2) % faces_n_nodes(s)
         Grid(2) % faces_n(i_nod, n0 + s) =  &
         Grid(1) % faces_n(i_nod, s) + Grid(1) % n_nodes * t

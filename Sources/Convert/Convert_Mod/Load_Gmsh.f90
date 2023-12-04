@@ -568,7 +568,8 @@
         c = new(c)                   ! use T-Flows numbering
 
         Grid % cells_n_nodes(c) = n_nods
-        call Adjust_First_Dim(n_nods, Grid % cells_n)
+!       call Adjust_First_Dim(n_nods, Grid % cells_n)
+        call Enlarge % Matrix_Int(Grid % cells_n, n_nods, 1)
         do k = 1, n_nods
           read(Line % tokens(k+1), *) Grid % cells_n(k, c)
         end do
@@ -581,7 +582,8 @@
         c = new(c)              ! use T-Flows numbering
 
         Grid % cells_n_nodes(c) = n_nods
-        call Adjust_First_Dim(n_nods, Grid % cells_n)
+!       call Adjust_First_Dim(n_nods, Grid % cells_n)
+        call Enlarge % Matrix_Int(Grid % cells_n, n_nods, 1)
         do k = 1, n_nods
           Grid % cells_n(k, c) = int(int8_array(k+1))
         end do

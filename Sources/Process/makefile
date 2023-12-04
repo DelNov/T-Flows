@@ -327,6 +327,7 @@ endif
 
 # Modules in shared directory
 SRC_F_MOD = Const_Mod.f90         \
+            Memory_Mod.f90        \
             Region_Mod.f90        \
             String_Mod.f90        \
             Comm_Mod.f90          \
@@ -393,9 +394,7 @@ SRC_C_FUN = C_Petsc_Interface.c
 SRC_F_FUN = Main_Pro.f90
 
 # Sources for all shared functions
-SRC_F_FUN += Adjust_Dim.f90        \
-             Adjust_First_Dim.f90  \
-             Key_Ind.f90
+SRC_F_FUN += Key_Ind.f90
 
 #----------------------------------------------------------------------
 #   List of objects generated from the list of modules and functions

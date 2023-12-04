@@ -186,12 +186,13 @@
                    'This is critical.  Exiting!',                          &
                    file=__FILE__, line=__LINE__)
       else
-        call Adjust_First_Dim(abs(Grid % cells_n_nodes(c)), Grid % cells_n)
+        call Enlarge % Matrix_Int(Grid % cells_n,  &
+                            i=abs(Grid % cells_n_nodes(c)))
         tot = tot + abs(Grid % cells_n_nodes(c))
       end if
     end if
   end do
-  call Adjust_Dim(tot, i_buffer)
+  call Enlarge % Array_Int(i_buffer, tot)
 
   ! Cells' nodes
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
@@ -231,12 +232,13 @@
                    'This is critical.  Exiting!',                          &
                    file=__FILE__, line=__LINE__)
       else
-        call Adjust_First_Dim(Grid % cells_n_faces(c), Grid % cells_f)
+        call Enlarge % Matrix_Int(Grid % cells_f,  &
+                                i=Grid % cells_n_faces(c))
         tot = tot + Grid % cells_n_faces(c)
       end if
     end if
   end do
-  call Adjust_Dim(tot, i_buffer)
+  call Enlarge % Array_Int(i_buffer, tot)
 
   ! Cells' faces
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
@@ -292,11 +294,11 @@
                  'This is critical.  Exiting!',                          &
                  file=__FILE__, line=__LINE__)
     else
-      call Adjust_First_Dim(Grid % faces_n_nodes(s), Grid % faces_n)
+      call Enlarge % Matrix_Int(Grid % faces_n, i=Grid % faces_n_nodes(s))
       tot = tot + Grid % faces_n_nodes(s)
     end if
   end do
-  call Adjust_Dim(tot, i_buffer)
+  call Enlarge % Array_Int(i_buffer, tot)
 
   ! Faces' nodes
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
@@ -322,7 +324,7 @@
 
   ! Faces' cells
   tot = (nf + ns) * 2;
-  call Adjust_Dim(tot, i_buffer)
+  call Enlarge % Array_Int(i_buffer, tot)
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
   i = 0
   do s = 1, nf + ns

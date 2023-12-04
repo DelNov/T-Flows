@@ -71,8 +71,8 @@
           Grid % cells_n(4,-Grid % n_bnd_cells) = Grid % cells_n(HEX(j,4),i)
 
           Grid % faces_n_nodes(Grid % n_faces) = 4
-          call Adjust_First_Dim(4, Grid % faces_n)
-          call Adjust_First_Dim(4, Grid % cells_n)
+          call Enlarge % Matrix_Int(Grid % faces_n, i=4)
+          call Enlarge % Matrix_Int(Grid % cells_n, i=4)
           Grid % faces_n(1:4, Grid % n_faces)  =   &
           Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
@@ -86,8 +86,8 @@
             Grid % cells_n(4,-Grid % n_bnd_cells)=Grid % cells_n(WED(j,4),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 4
-            call Adjust_First_Dim(4, Grid % faces_n)
-            call Adjust_First_Dim(4, Grid % cells_n)
+            call Enlarge % Matrix_Int(Grid % faces_n, i=4)
+            call Enlarge % Matrix_Int(Grid % cells_n, i=4)
             Grid % faces_n(1:4, Grid % n_faces)  =   &
             Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
@@ -98,8 +98,8 @@
             Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(WED(j,3),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 3
-            call Adjust_First_Dim(3, Grid % faces_n)
-            call Adjust_First_Dim(3, Grid % cells_n)
+            call Enlarge % Matrix_Int(Grid % faces_n, i=3)
+            call Enlarge % Matrix_Int(Grid % cells_n, i=3)
             Grid % faces_n(1:3, Grid % n_faces)  =   &
             Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
@@ -113,8 +113,8 @@
             Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(TET(j,3),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 3
-            call Adjust_First_Dim(3, Grid % faces_n)
-            call Adjust_First_Dim(3, Grid % cells_n)
+            call Enlarge % Matrix_Int(Grid % faces_n, i=3)
+            call Enlarge % Matrix_Int(Grid % cells_n, i=3)
             Grid % faces_n(1:3, Grid % n_faces)  =   &
             Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if
@@ -129,8 +129,8 @@
             Grid % cells_n(4,-Grid % n_bnd_cells)=Grid % cells_n(PYR(j,4),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 4
-            call Adjust_First_Dim(4, Grid % faces_n)
-            call Adjust_First_Dim(4, Grid % cells_n)
+            call Enlarge % Matrix_Int(Grid % faces_n, i=4)
+            call Enlarge % Matrix_Int(Grid % cells_n, i=4)
             Grid % faces_n(1:4, Grid % n_faces)  =   &
             Grid % cells_n(1:4,-Grid % n_bnd_cells)
 
@@ -141,8 +141,8 @@
             Grid % cells_n(3,-Grid % n_bnd_cells)=Grid % cells_n(PYR(j,3),i)
 
             Grid % faces_n_nodes(Grid % n_faces) = 3
-            call Adjust_First_Dim(3, Grid % faces_n)
-            call Adjust_First_Dim(3, Grid % cells_n)
+            call Enlarge % Matrix_Int(Grid % faces_n, i=3)
+            call Enlarge % Matrix_Int(Grid % cells_n, i=3)
             Grid % faces_n(1:3, Grid % n_faces)  =   &
             Grid % cells_n(1:3,-Grid % n_bnd_cells)
           end if

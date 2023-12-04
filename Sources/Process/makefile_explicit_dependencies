@@ -282,29 +282,13 @@ Eddies_Mod/*.f90
 # Dependencies for: ./Process_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Process_Mod.o:\
-$(DIR_OBJECT)/Vof_Mod.o \
-Vof_Mod/*/*.f90 \
-$(DIR_OBJECT)/User_Mod.o \
-User_Mod/*.f90 \
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Results_Mod.o \
 Results_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
 Read_Controls_Mod/*.f90 \
 Process_Mod/*.f90 \
 $(DIR_OBJECT)/Monitor_Mod.o \
-Monitor_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+Monitor_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Matrix_Mod.f90
@@ -315,32 +299,6 @@ Matrix_Mod/*/*.f90 \
 Matrix_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Process_Mod/Update_Boundary_Values.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Update_Boundary_Values.o:\
-$(DIR_OBJECT)/Vof_Mod.o \
-Vof_Mod/*/*.f90 \
-$(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Process_Mod/Initialize_Variables.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Initialize_Variables.o:\
-$(DIR_OBJECT)/User_Mod.o \
-User_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Native_Mod.f90
@@ -503,6 +461,8 @@ $(DIR_OBJECT)/Omp_Mod.o \
 $(DIR_SHARED)/Omp_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Mod.o \
 $(DIR_SHARED)/Metis_Mod/*.f90 \
+$(DIR_OBJECT)/Memory_Mod.o \
+$(DIR_SHARED)/Memory_Mod/*.f90 \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
@@ -556,6 +516,12 @@ $(DIR_SHARED)/String_Mod/*.f90 \
 $(DIR_OBJECT)/Message_Mod.o \
 $(DIR_SHARED)/Message_Mod/*.f90 \
 $(DIR_SHARED)/File_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Memory_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Memory_Mod.o:\
+$(DIR_SHARED)/Memory_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Work_Mod.f90

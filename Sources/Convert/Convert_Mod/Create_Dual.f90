@@ -299,7 +299,7 @@
 
     ! Form Dual's faces' nodes
     Dual % faces_n_nodes(f_d) = cnt
-    call Adjust_First_Dim(cnt, Dual % faces_n)
+    call Enlarge % Matrix_Int(Dual % faces_n, i=cnt)
     Dual % faces_n(1:cnt,f_d) = n_d_list(1:cnt)
 
     ! Copy node coordinates
@@ -328,7 +328,7 @@
 
       ! Add extra node to Dual's faces' nodes
       Dual % faces_n_nodes(f_d) = cnt + 1
-      call Adjust_First_Dim(cnt + 1, Dual % faces_n)
+      call Enlarge % Matrix_Int(Dual % faces_n, i=cnt+1)
       Dual % faces_n(cnt + 1:cnt + 1, f_d) = d_nn
 
       ! Copy extra node coordinates
@@ -414,7 +414,7 @@
           ! Additional boundary cell in the Dual grid
           b_d  = curr_b_d - node_data(n_p)
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
-          call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
+          call Enlarge % Matrix_Int(Dual % cells_n, i=Dual % cells_n_nodes(b_d))
           Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = cell_to_node(c)
           Dual % region % at_cell(b_d) = bc
 
@@ -449,13 +449,13 @@
           ! This node_to_face was stored in the previous step
           f_d = node_to_face(n_p)
           Dual % faces_n_nodes(f_d) = Dual % faces_n_nodes(f_d) + 1
-          call Adjust_First_Dim(Dual % faces_n_nodes(f_d), Dual % faces_n)
+          call Enlarge % Matrix_Int(Dual % faces_n, i=Dual % faces_n_nodes(f_d))
           Dual % faces_n(Dual % faces_n_nodes(f_d), f_d) = edge_to_node(e)
 
           ! This node_to_cell was stored in the previous step
           b_d = node_to_cell(n_p)
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
-          call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
+          call Enlarge % Matrix_Int(Dual % cells_n, i=Dual % cells_n_nodes(b_d))
           Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = edge_to_node(e)
         end do  ! i_nod for edge, goes from 1 to 2
 
@@ -486,11 +486,13 @@
               Dual % zn(n_d) = Prim % zn(n_p)
 
               Dual % faces_n_nodes(f_d) = Dual % faces_n_nodes(f_d) + 1
-              call Adjust_First_Dim(Dual % faces_n_nodes(f_d), Dual % faces_n)
+              call Enlarge % Matrix_Int(Dual % faces_n,  &
+                                        i=Dual % faces_n_nodes(f_d))
               Dual % faces_n(Dual % faces_n_nodes(f_d), f_d) = n_d
 
               Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
-              call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
+              call Enlarge % Matrix_Int(Dual % cells_n,  &
+                                        i=Dual % cells_n_nodes(b_d))
               Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = n_d
 
               ! Mark that the face has been injected a sharp corner
@@ -556,8 +558,8 @@
     !----------------------------------------------------!
     Dual % cells_n_faces(c1) = Dual % cells_n_faces(c1) + 1
     Dual % cells_n_faces(c2) = Dual % cells_n_faces(c2) + 1
-    call Adjust_First_Dim(Dual % cells_n_faces(c1), Dual % cells_f)
-    call Adjust_First_Dim(Dual % cells_n_faces(c2), Dual % cells_f)
+    call Enlarge % Matrix_int(Dual % cells_f, i=Dual % cells_n_faces(c1))
+    call Enlarge % Matrix_int(Dual % cells_f, i=Dual % cells_n_faces(c2))
     Dual % cells_f(Dual % cells_n_faces(c1), c1) = s
     Dual % cells_f(Dual % cells_n_faces(c2), c2) = s
 
@@ -573,7 +575,7 @@
         if(n1 .eq. n) goto 1
       end do  ! j_nod
       Dual % cells_n_nodes(c1) = Dual % cells_n_nodes(c1) + 1
-      call Adjust_First_Dim(Dual % cells_n_nodes(c1), Dual % cells_n)
+      call Enlarge % Matrix_Int(Dual % cells_n, i=Dual % cells_n_nodes(c1))
       Dual % cells_n(Dual % cells_n_nodes(c1), c1) = n
 1     continue
 
@@ -583,7 +585,7 @@
         if(n2 .eq. n) goto 2
       end do  ! j_nod
       Dual % cells_n_nodes(c2) = Dual % cells_n_nodes(c2) + 1
-      call Adjust_First_Dim(Dual % cells_n_nodes(c2), Dual % cells_n)
+      call Enlarge % Matrix_Int(Dual % cells_n, i=Dual % cells_n_nodes(c2))
       Dual % cells_n(Dual % cells_n_nodes(c2), c2) = n
 2     continue
 
