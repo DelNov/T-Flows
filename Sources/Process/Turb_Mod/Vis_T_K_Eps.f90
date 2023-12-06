@@ -132,7 +132,9 @@
           ! "CFD simulation of the near-neutral atmospheric boundary layer:
           ! New temperature inlet profile consistent with wall functions"
 
-          if(Turb % rough_walls) beta = 0.0
+          if(z_o .gt. TINY) then
+            beta = 0.0
+          end if
 
           ebf = Turb % Ebf_Scalar(c1, pr)
           Turb % con_w(c1) =    Turb % y_plus(c1)                         &
@@ -142,10 +144,13 @@
                          + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
         end if
 
-        if(Flow % n_scalars > 0) then
+        if(Flow % n_scalars .gt. 0) then
           sc   = Flow % Schmidt_Numb(c1)            ! laminar Schmidt number
           beta = Turb % Beta_Scalar(sc, sc_t)
           ebf  = Turb % Ebf_Scalar(c1, pr)
+          if(z_o .gt. TINY) then
+            beta = 0.0
+          end if
           Turb % diff_w(c1) =  Turb % y_plus(c1)                    &
                * (Flow % viscosity(c1)/Flow % density(c1))          &
                / (  Turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &
