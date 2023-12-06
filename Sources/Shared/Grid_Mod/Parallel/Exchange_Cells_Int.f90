@@ -25,8 +25,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type) :: Grid  !! computational grid
-  integer          :: phi(-Grid % n_bnd_cells:Grid % n_cells)
+  class(Grid_Type)        :: Grid  !! computational grid
+  integer, intent(inout)  :: phi(-Grid % n_bnd_cells:Grid % n_cells)
     !! integer array defined over bounardy and internal cells to be exchanged
 !-----------------------------------[Locals]-----------------------------------!
   integer :: ln, c1, c2, len_s, len_r, sub

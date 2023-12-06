@@ -1,22 +1,23 @@
 !==============================================================================!
-  subroutine Grad_Three_Components_No_Refresh(Flow, phi, phi_x, phi_y, phi_z)
+  subroutine Grad_Three_Components_No_Refresh(Flow, Grid, phi,  &
+                                              phi_x, phi_y, phi_z)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by a least squares method,     !
-!   without refershing the buffers.                                            !
+!>  Calculates all three components of a gradient of generic variable phi by
+!>  the least squares method, without refreshing the buffers.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type), target :: Flow
-  real,    intent(in)       :: phi ( -Flow % pnt_grid % n_bnd_cells  &
-                                     :Flow % pnt_grid % n_cells)
-  real,    intent(out)      :: phi_x( -Flow % pnt_grid % n_bnd_cells  &
-                                      :Flow % pnt_grid % n_cells)
-  real,    intent(out)      :: phi_y( -Flow % pnt_grid % n_bnd_cells  &
-                                      :Flow % pnt_grid % n_cells)
-  real,    intent(out)      :: phi_z( -Flow % pnt_grid % n_bnd_cells  &
-                                      :Flow % pnt_grid % n_cells)
+  class(Field_Type), target :: Flow  !! parent flow object
+  type(Grid_Type),   target :: Grid  !! grid object
+  real,    intent(in)       :: phi  (-Grid % n_bnd_cells:Grid % n_cells)
+    !! field whose gradients are being calculated
+  real,    intent(out)      :: phi_x(-Grid % n_bnd_cells:Grid % n_cells)
+    !! calculated gradient component x
+  real,    intent(out)      :: phi_y(-Grid % n_bnd_cells:Grid % n_cells)
+    !! calculated gradient component y
+  real,    intent(out)      :: phi_z(-Grid % n_bnd_cells:Grid % n_cells)
+    !! calculated gradient component z
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: Grid
   real,    contiguous, pointer :: dx(:), dy(:), dz(:), grad_c2c(:,:)
   integer, contiguous, pointer :: faces_c(:,:)
   integer                      :: s, c1, c2, reg
@@ -30,7 +31,6 @@
   ! Take alias
   ! OpenMP doesn't unerstand Fortran's members (%), that's why ...
   ! ... aliases for faces_c, grad_c2c, dx, dy and dz are needed
-  Grid     => Flow % pnt_grid
   dx       => Grid % dx
   dy       => Grid % dy
   dz       => Grid % dz

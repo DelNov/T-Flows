@@ -170,15 +170,15 @@
     m_23_f(c) = m_23_a / vol_e
   end do
 
-  call Flow % Grad(u_f(-nb:nc), u % x,  &  ! dU/dx
-                                u % y,  &  ! dU/dy
-                                u % z)     ! dU/dz
-  call Flow % Grad(v_f(-nb:nc), v % x,  &  ! dV/dx
-                                v % y,  &  ! dV/dy
-                                v % z)     ! dV/dz
-  call Flow % Grad(w_f(-nb:nc), w % x,  &  ! dW/dx
-                                w % y,  &  ! dW/dy
-                                w % z)     ! dW/dz
+  call Flow % Grad(Grid, u_f(-nb:nc), u % x,  &  ! dU/dx
+                                      u % y,  &  ! dU/dy
+                                      u % z)     ! dU/dz
+  call Flow % Grad(Grid, v_f(-nb:nc), v % x,  &  ! dV/dx
+                                      v % y,  &  ! dV/dy
+                                      v % z)     ! dV/dz
+  call Flow % Grad(Grid, w_f(-nb:nc), w % x,  &  ! dW/dx
+                                      w % y,  &  ! dW/dy
+                                      w % z)     ! dW/dz
 
   do c = Cells_In_Domain_And_Buffers()
     l_g  = Grid % vol(c)**ONE_THIRD

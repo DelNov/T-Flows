@@ -25,9 +25,9 @@
   nb = Grid % n_bnd_cells
 
   ! Compute gradients of wall distance
-  call Flow % Grad(Grid % wall_dist, h_w_x(-nb:nc),  &
-                                     h_w_y(-nb:nc),  &
-                                     h_w_z(-nb:nc))
+  call Flow % Grad(Grid, Grid % wall_dist, h_w_x(-nb:nc),  &
+                                           h_w_y(-nb:nc),  &
+                                           h_w_z(-nb:nc))
 
   ! Normalize gradients
   do c = Cells_In_Domain_And_Buffers()

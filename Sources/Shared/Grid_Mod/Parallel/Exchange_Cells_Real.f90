@@ -31,7 +31,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)           :: Grid    !! computational grid
-  real                       :: phi(-Grid % n_bnd_cells:Grid % n_cells)
+  real, intent(inout)        :: phi(-Grid % n_bnd_cells:Grid % n_cells)
     !! real array defined over boundary and internal cells to be exchanged
   character(len=*), optional :: caller  !! string to log call's necessity
 !-----------------------------------[Locals]-----------------------------------!

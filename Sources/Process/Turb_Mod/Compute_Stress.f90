@@ -73,9 +73,9 @@
   end if
 
   ! Gradients
-  call Flow % Grad(phi % n, phi_x(-nb:nc),  &
-                            phi_y(-nb:nc),  &
-                            phi_z(-nb:nc))
+  call Flow % Grad(Grid, phi % n, phi_x(-nb:nc),  &
+                                  phi_y(-nb:nc),  &
+                                  phi_z(-nb:nc))
 
   !---------------!
   !               !
@@ -229,9 +229,9 @@
       end do
     end if
 
-    call Flow % Grad_Component(u1uj_phij(-nb:nc), 1, u1uj_phij_x(-nb:nc))
-    call Flow % Grad_Component(u2uj_phij(-nb:nc), 2, u2uj_phij_y(-nb:nc))
-    call Flow % Grad_Component(u3uj_phij(-nb:nc), 3, u3uj_phij_z(-nb:nc))
+    call Flow % Grad_Component(Grid, u1uj_phij(-nb:nc), 1, u1uj_phij_x(-nb:nc))
+    call Flow % Grad_Component(Grid, u2uj_phij(-nb:nc), 2, u2uj_phij_y(-nb:nc))
+    call Flow % Grad_Component(Grid, u3uj_phij(-nb:nc), 3, u3uj_phij_z(-nb:nc))
 
     do c = Cells_In_Domain_And_Buffers()
       b(c) = b(c) + (  u1uj_phij_x(c)  &

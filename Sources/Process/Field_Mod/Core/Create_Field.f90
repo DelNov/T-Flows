@@ -1,12 +1,29 @@
 !==============================================================================!
   subroutine Create_Field(Flow, A)
 !------------------------------------------------------------------------------!
-!   Allocates memory for the entire field.
+!>  Allocates memory for the entire field in Process.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Establishes a pointer to the grid associated with the flow field.        !
+!   * Allocates memory for physical properties like density, viscosity,        !
+!     capacity, and conductivity.                                              !
+!   * Allocates memory for gradient matrices needed for calculations of        !
+!     gradients in the flow field.                                             !
+!   * Sets up the variables for the solution of Navier-Stokes equations,       !
+!     including velocity components, potential for initial velocity            !
+!     computation, pressure, and pressure correction.                          !
+!   * Handles specific allocations for enthalpy conservation (temperature)     !
+!     if heat transfer is involved in the simulation.                          !
+!   * Initializes variables related to the Rhie and Chow interpolation method, !
+!     such as forces on fluid cells and faces.                                 !
+!   * Allocates memory for passive scalars if they are used in the simulation. !
+!   * Initializes counters for calculations involving Gauss gradient method.   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type), target :: Flow
-  type(Matrix_Type), target :: A
+  class(Field_Type), target :: Flow  !! parent flow object
+  type(Matrix_Type), target :: A     !! matrix object used with this field
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w
@@ -34,12 +51,9 @@
   allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
 
   !----------------------------------!
-  !   Memory for gradient matrices   !  (are the latter two used at all?)
+  !   Memory for gradient matrices   !
   !----------------------------------!
   allocate(Flow % grad_c2c(6, nc));  Flow % grad_c2c(:,:) = 0.0
-  allocate(Flow % grad_f2c(6, nc));  Flow % grad_f2c(:,:) = 0.0
-  allocate(Flow % grad_n2c(6, nc));  Flow % grad_n2c(:,:) = 0.0
-  allocate(Flow % grad_c2n(6, nn));  Flow % grad_c2n(:,:) = 0.0
 
   !----------------------------!
   !   Navier-Stokes equation   !

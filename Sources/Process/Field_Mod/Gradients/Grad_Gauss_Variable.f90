@@ -1,18 +1,32 @@
 !==============================================================================!
   subroutine Grad_Gauss_Variable(Flow, phi)
 !------------------------------------------------------------------------------!
-!   Tries to find gradients with Gaussian in an iterative fashion.  It works   !
-!   really bad for tetrahedral grids with no initial values of gradients, and  !
-!   a more elaborate approach is therefore needed, which will probably be in   !
-!   Grad_Gauss_Pressure, when introduced.
+!>  This subroutine is designed to calculate gradients of a generic variable
+!>  (denoted as phi) using Gauss's theorem. It is an iterative procedure that
+!>  continuously refines the gradient calculation for improved accuracy.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   With OpenMP, this procedure got a speedup of 1.6 on 1M mesh and 4 threads. !
-!   I reckon there is not so much potential for improving this, few loops.     !
+!   * Gradient calculation: The subroutine calculates the gradients of a       !
+!     specified variable within the flow field using Gauss's theorem.          !
+!   * Iterative refinement: The process involves an iterative refinement       !
+!     approach to ensure accuracy, particularly in complex flow fields.        !
+!   * Applicability: While primarily designed for general variables, it        !
+!     is still used from withing the Grad_Gauss_Pressure inside an iterative   !
+!     process of computing the gradients of pressure and pressure corrections. !
+!------------------------------------------------------------------------------!
+!   Notes                                                                      !
+!                                                                              !
+!   * It works really badly for tetrahedral grids with no initial values of    !
+!     gradients, and  a more elaborate approach is therefore needed, probably  !
+!     similar to the one already implemented in Grad_Gauss_Pressure.           !
+!   * With OpenMP, this procedure got a speedup of 1.6 on 1M mesh & 4 threads. !
+!     (I reckon there is not so much potential for improving this, few loops.  !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Field_Type), target :: Flow
-  type(Var_Type),    target :: phi
+  class(Field_Type), target :: Flow  !! parent flow object
+  type(Var_Type),    target :: phi   !! variable whose gradients are calculated
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer  :: Grid
   integer                   :: s, iter
@@ -44,7 +58,7 @@
                                             phi % x, phi % y, phi % z)
 
     ! Update gradients from the values at faces
-    call Flow % Grad_Gauss(phi_f_n, phi % x, phi % y, phi % z)
+    call Flow % Grad_Gauss(Grid, phi_f_n, phi % x, phi % y, phi % z)
 
     ! Take the difference between two iterations to find residual
     ! and copy the new value to the old value along the way

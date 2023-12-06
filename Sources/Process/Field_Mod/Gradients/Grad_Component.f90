@@ -1,19 +1,21 @@
 !==============================================================================!
-  subroutine Grad_Component(Flow, phi, i, phii)
+  subroutine Grad_Component(Flow, Grid, phi, i, phii)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by the least squares method,   !
-!   with refershing the buffers.                                               !
+!>  Calculates one gradient component of generic variable phi by the least
+!>  squares method, with refreshing the buffers of the variable values before
+!>  the calculation and of the calculated gradient components.  (There is a
+!>  procedure which does the same, but it doesn't refereshes the buffers.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type), target :: Flow
-  real                      :: phi ( -Flow % pnt_grid % n_bnd_cells  &
-                                     :Flow % pnt_grid % n_cells)
-  integer, intent(in)       :: i
-  real,    intent(out)      :: phii( -Flow % pnt_grid % n_bnd_cells  &
-                                     :Flow % pnt_grid % n_cells)
+  class(Field_Type), intent(in)    :: Flow  !! parent flow object
+  type(Grid_Type),   intent(in)    :: Grid  !! grid object
+  real,              intent(inout) :: phi (-Grid % n_bnd_cells:Grid % n_cells)
+    !! field whose gradients are being calculated
+  integer,           intent(in)    :: i     !! gradient component (1 to 3)
+  real,              intent(out)   :: phii(-Grid % n_bnd_cells:Grid % n_cells)
+    !! calculated gradient in direction specified by i
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
   integer                  :: s, c1, c2, reg
   real                     :: dphi1, dphi2
 !-----------------------------[Local parameters]-------------------------------!
@@ -22,8 +24,9 @@
                                                          5, 6, 3 /), shape(MAP))
 !==============================================================================!
 
-  ! Take alias
-  Grid => Flow % pnt_grid
+  ! Aret these checks overkill?
+  Assert(i > 0)
+  Assert(i < 4)
 
   ! Refresh buffers
   call Grid % Exchange_Cells_Real(phi)

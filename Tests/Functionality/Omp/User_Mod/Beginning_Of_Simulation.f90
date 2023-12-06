@@ -79,8 +79,8 @@
     !$omp private(s, c1, c2, thr)  &
     !$omp shared (faces_c, sur, f_val, c_val1, c_val2)
     thr = omp_get_thread_num() + 1
-    do s = Grid % Vect % thread % f_face(thr),  &
-           Grid % Vect % thread % l_face(thr)
+    do s = Grid % Omp % thread % f_face(thr),  &
+           Grid % Omp % thread % l_face(thr)
       c1 = faces_c(1, s)
       c2 = faces_c(2, s)
       f_val(s) = c_val1(c1) * sur(s)  &

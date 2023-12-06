@@ -1,12 +1,16 @@
 !==============================================================================!
   subroutine Grad_Pressure(Flow, p)
 !------------------------------------------------------------------------------!
-!   Calculates pressure (or pressure correction) gradient field flow           !
+!>  This subroutine is designed to calculate the gradient of pressure or
+!>  pressure correction in a flow field.  It branches to one of the two methods
+!>  for gradient computation: Gauss's theorem-based method and the least
+!>  squares method and the choice is based on the grad_method attribute of
+!>  the p (pressure or pressure correction) variable.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type) :: Flow
-  type(Var_Type)    :: p
+  class(Field_Type) :: Flow  !! parent flow object
+  type(Var_Type)    :: p     !! pressure or pressure correction
 !==============================================================================!
 
   ! Branch into the method of choice for pressure

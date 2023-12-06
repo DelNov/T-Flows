@@ -55,7 +55,7 @@
 !  vel_ref= sqrt(t_diff*abs(grav_z)*Flow % beta)
   vel_ref = 21.28e-6
 
-  call Flow % Grad_Component(Turb % t_mean, 3, tz_mean)
+  call Flow % Grad_Component(Grid, Turb % t_mean, 3, tz_mean)
   call Flow % Grad_Variable(t)
   call Flow % Grad_Variable(Flow % w)
 

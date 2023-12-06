@@ -1,14 +1,33 @@
 !==============================================================================!
   subroutine Grad_Gauss_Pressure(Flow, p)
 !------------------------------------------------------------------------------!
-!   Tries to find pressure gradients with Gaussian in an iterative fashion.    !
+!>  This subroutine is responsible for computing the gradient of pressure or
+!>  pressure correction using Gauss's theorem. It's an iterative method
+!>  designed to refine the calculation of pressure gradients in a flow field.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   With OpenMP, this procedure got a speedup of 3.5 on 1M mesh and 4 threads. !
+!   * Initial gradient calculation: The subroutine starts by using a least     !
+!     squares method (by calling Grad_Least_Pressure) to initialize the        !
+!     gradient computation.                                                    !
+!   * Iterative refinement:                                                    !
+!     - Boundary gradient extrapolation: Gradients at boundary cells are       !
+!       extrapolated from the interior cells.                                  !
+!     - Iterative Updates: In several iterations, the subroutine refines the   !!
+!       gradient calculation by accumulating and averaging gradient values     !
+!       from neighboring cells.                                                !
+!     - Final Gauss's theorem application: After refining the gradient         !
+!       estimates, Gauss's theorem is applied to compute the final gradient    !
+!       of pressure or pressure correction.
+!------------------------------------------------------------------------------!
+!   Note                                                                       !
+!                                                                              !
+!   * With OpenMP, this procedure got a speedup of 3.5 on 1M mesh & 4 threads. !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Field_Type), target :: Flow
-  type(Var_Type),    target :: p     ! should be pressure or pressure correction
+  class(Field_Type), target :: Flow  !! parent object class
+  type(Var_Type),    target :: p     !! pressure or pressure correction
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type),     pointer :: Grid
   integer                      :: s, c, c1, c2, iter, reg
@@ -74,12 +93,6 @@
   end do
   !$omp end parallel do
 
-  ! It seems these are not needed
-  !? call Grid % Exchange_Cells_Real(p % x)
-  !? call Grid % Exchange_Cells_Real(p % y)
-  !? call Grid % Exchange_Cells_Real(p % z)
-  !? all Grid % Exchange_Cells_Int(c_visited)
-
   !------------------------------------------------!
   !   Extrapolate in several iterations, as long   !
   !   as there are cells which are not computed.   !
@@ -110,9 +123,6 @@
       end if
     end do
     !$omp end parallel do
-
-    ! It seems this is not needed
-    !? call Grid % Exchange_Cells_Int(c_visited)
 
     ! Browse throough cells, and calculate final values ...
     ! ... of gradients in the cells which have been visited

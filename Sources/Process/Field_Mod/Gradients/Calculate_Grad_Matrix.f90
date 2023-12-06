@@ -1,13 +1,41 @@
 !==============================================================================!
   subroutine Calculate_Grad_Matrix(Flow)
 !------------------------------------------------------------------------------!
-!   Calculates gradient matrix.                                                !
+!>  This subroutine is designed to calculate the gradient matrix for all cells
+!>  in a computational domain. This matrix is fundamental for calculation of
+!>  gradients with the least squares method.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   (Has a sister in Vof_Mod/Utilitis/Calculate_Grad_Matrix_With_Front)        !
+!   * Initialization: The subroutine begins by initializing the gradient       !
+!     matrices for cells. This includes setting initial values to zero for     !
+!     each cell in the domain.                                                 !
+!   * Gradient matrix computation:                                             !
+!     - The subroutine iteratively computes the gradient matrix by browsing    !
+!       through the faces of each cell. It covers both boundary cells and      !
+!       faces inside the domain.                                               !
+!     - For each cell, it calculates the components of the gradient matrix     !
+!       based on the cell's dimensions and position relative to its            !
+!       neighboring cells.                                                     !
+!     - This involves accumulating contributions from each face of the cell    !
+!       to the respective components of the gradient matrix.                   !
+!   * Matrix inversion:                                                        !
+!     - Once the gradient matrix for each cell is computed, the subroutine     !
+!       calculates the inverse of this matrix.                                 !
+!     - The inversion is necessary for later computations in the fluid flow    !
+!       simulation, particularly for calculating gradients of flow properties  !
+!       like velocity and pressure.                                            !
+!   * Debugging upport:                                                        !
+!     - The subroutine includes a DEBUG flag that, when enabled, triggers the  !
+!       recording and saving of the gradient matrices for further inspection.  !
+!------------------------------------------------------------------------------!
+!   Note                                                                       !
+!                                                                              !
+!   * It Has a sister in Vof_Mod/Utilitis/Calculate_Grad_Matrix_With_Front     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type) :: Flow
+  class(Field_Type) :: Flow  !! parent flow object
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!

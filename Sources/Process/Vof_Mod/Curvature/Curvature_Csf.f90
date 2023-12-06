@@ -128,9 +128,9 @@
   !--------------------!
 
   ! Find divergence of normals
-  call Flow % Grad_Component(Vof % nx(-nb:nc), 1, div_x(-nb:nc))
-  call Flow % Grad_Component(Vof % ny(-nb:nc), 2, div_y(-nb:nc))
-  call Flow % Grad_Component(Vof % nz(-nb:nc), 3, div_z(-nb:nc))
+  call Flow % Grad_Component(Grid, Vof % nx(-nb:nc), 1, div_x(-nb:nc))
+  call Flow % Grad_Component(Grid, Vof % ny(-nb:nc), 2, div_y(-nb:nc))
+  call Flow % Grad_Component(Grid, Vof % nz(-nb:nc), 3, div_z(-nb:nc))
 
   ! It might be an overkill to browse boundary cells here
   do reg = Boundary_And_Inside_Regions()

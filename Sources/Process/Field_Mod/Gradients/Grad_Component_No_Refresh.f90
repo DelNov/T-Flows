@@ -1,19 +1,20 @@
 !==============================================================================!
-  subroutine Grad_Component_No_Refresh(Flow, phi, i, phii)
+  subroutine Grad_Component_No_Refresh(Flow, Grid, phi, i, phii)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of generic variable phi by a least squares method,     !
-!   without refershing the buffers.                                            !
+!>  Calculates one gradient component of generic variable phi by a least
+!>  squares method, without refreshing the buffers.  (There is a procedure
+!>  which does the same, but it refereshes the buffers.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type), target :: Flow
-  real,    intent(in)       :: phi ( -Flow % pnt_grid % n_bnd_cells  &
-                                     :Flow % pnt_grid % n_cells)
-  integer, intent(in)       :: i
-  real,    intent(out)      :: phii( -Flow % pnt_grid % n_bnd_cells  &
-                                     :Flow % pnt_grid % n_cells)
+  class(Field_Type), target :: Flow  !! parent flow object
+  type(Grid_Type),   target :: Grid  !! grid object
+  real,       intent(inout) :: phi (-Grid % n_bnd_cells:Grid % n_cells)
+    !! field whose gradients are being calculated
+  integer,    intent(in)    :: i     !! gradient component (1 to 3)
+  real,       intent(out)   :: phii(-Grid % n_bnd_cells:Grid % n_cells)
+    !! calculated gradient component i
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: Grid
   real,    contiguous, pointer :: dx(:), dy(:), dz(:), grad_c2c(:,:)
   integer, contiguous, pointer :: faces_c(:,:)
   integer                      :: s, c1, c2, reg
@@ -24,10 +25,13 @@
                                                          5, 6, 3 /), shape(MAP))
 !==============================================================================!
 
+  ! Aret these checks overkill?
+  Assert(i > 0)
+  Assert(i < 4)
+
   ! Take alias
   ! OpenMP doesn't unerstand Fortran's members (%), that's why ...
   ! ... aliases for faces_c, grad_c2c, dx, dy and dz are needed
-  Grid     => Flow % pnt_grid
   dx       => Grid % dx
   dy       => Grid % dy
   dz       => Grid % dz

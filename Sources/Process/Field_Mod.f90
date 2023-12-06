@@ -4,9 +4,30 @@
 !==============================================================================!
   module Field_Mod
 !------------------------------------------------------------------------------!
-!   Module for basic flow field plus temperature.                              !
-!   It is a bit of a mumbo-jumbo at this moment, it will furhter have to       !
-!   differentiate into numerical and physica parts.                            !
+!>  The Field_Mod module is designed to manage various aspects of flow fields.
+!>  It can handle both flow fields (like velocity and pressure) and scalar
+!>  fields (such as temperature and scalars), making it applicable to a wide
+!>  range of fluid flow problems.  The Field_Mod doesn't hold any variables
+!>  describing turbulence characteristics (such as k, epsilon, zeta, f,
+!>  statistical averages, ...) as these are stored in module Turb_Mod.
+!>  Limited aspects of multiphase sitation are present in this module.
+!------------------------------------------------------------------------------!
+!   Features                                                                   !
+!                                                                              !
+!   * Physical properties: It stores essential fluid properties like density,  !
+!     viscosity, heat capacity, and thermal conductivity.                      !
+!   * Flow variables: It encompasses velocity components (u, v, w), pressure,  !
+!     and pressure correction variables, fundamental to flow simulations.      !
+!   * Thermodynamics and scalars: The module manages temperature-related       !
+!     properties and scalar quantities, indicating its applicability in        !
+!     thermal problems and scalar transport processes.                         !
+!   * Numerical aspects: It includes some aspects related to numerical         !
+!     methods, such as pressure-velocity coupling algorithms, gradient         !
+!     computation methods, and interpolation procedures.                       !
+!   * Utilities: The module contains utility procedures for gradient           !
+!     calculation, buoyancy forces computation, Courant number calculation,    !
+!     and more, which are essential for the accurate and efficient simulation  !
+!     of fluid flows.                                                          !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Face_Mod
@@ -21,71 +42,78 @@
   !----------------!
   !   Field type   !
   !----------------!
+  !> Encapsulates necessary variables, physical proerties and some numerical
+  !> procedures to describe a fluid flow with heat transfer and scalar
+  !> transport.  The variables it holds include velocity components, temparture
+  !> and scalars, as well as fields to describe their physical properties.
+  !> Methods for calculating gradients are an additional and important feature
+  !> also entailed in this type.
   type Field_Type
 
-    type(Matrix_Type), pointer :: pnt_matrix  ! pointer to the matrix
-    type(Grid_Type),   pointer :: pnt_grid    ! grid for which it is defined
+    type(Matrix_Type), pointer :: pnt_matrix  !! pointer to the matrix
+    type(Grid_Type),   pointer :: pnt_grid    !! grid for which it is defined
 
     !-------------------------!
     !   Physical properties   !
     !-------------------------!
 
     ! Defined in cell centers
-    real, allocatable :: capacity(:)      ! [J/kg/K]
-    real, allocatable :: conductivity(:)  ! [W/(m K)]
-    real, allocatable :: density(:)       ! [kg/m^3]
-    real, allocatable :: viscosity(:)     ! [kg/m/s]
-    real              :: diffusivity      ! [m^2/s]
+    real, allocatable :: capacity(:)      !! [J/kg/K]
+    real, allocatable :: conductivity(:)  !! [W/(m K)]
+    real, allocatable :: density(:)       !! [kg/m^3]
+    real, allocatable :: viscosity(:)     !! [kg/m/s]
+    real              :: diffusivity      !! [m^2/s]
 
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !
     !---------------------------------------------------!
 
     ! Velocity components
-    type(Var_Type) :: u    ! [m/s]
-    type(Var_Type) :: v    ! [m/s]
-    type(Var_Type) :: w    ! [m/s]
+    type(Var_Type) :: u    !! velocity component [m/s]
+    type(Var_Type) :: v    !! velocity component [m/s]
+    type(Var_Type) :: w    !! velocity component [m/s]
 
     ! Shear and wall stress are used in a number of turbulence models
-    real, allocatable :: shear(:)  ! [1/s]
-    real, allocatable :: vort(:)   ! [1/s]
+    real, allocatable :: shear(:)  !! shear [1/s]
+    real, allocatable :: vort(:)   !! vorticity [1/s]
 
     ! Pressure-like potential for initial velocity field
     real, allocatable :: potential(:)
 
-    ! Volumetric flux through cell faces
-    type(Face_Type) :: v_flux  ! [m^3/s]
+    ! Volume flow rate through cell faces
+    type(Face_Type) :: v_flux  !! volume flow rate [m^3/s]
 
     ! Pressure and pressure correction
-    type(Var_Type) :: p    ! [N/m^2] = [kg/m/s^2]
-    type(Var_Type) :: pp   ! [N/m^2] = [kg/m/s^2]
-    type(Var_Type) :: pot  ! pressure-like potential for initial velocity field
+    type(Var_Type) :: p    !! pressure            [N/m^2] = [kg/m/s^2]
+    type(Var_Type) :: pp   !! pressure correction [N/m^2] = [kg/m/s^2]
+    type(Var_Type) :: pot  !! pressure-like potential used
+                           !! to initialize velocity field
 
     ! Wall distance used for computation from partial differential equation
-    type(Var_Type) :: wall_dist
+    type(Var_Type) :: wall_dist  !! wall disetance [m]
 
     ! Internal forces on the fluid.
     ! These includes forces due to discretization (cross diffusion terms),
     ! boundary conditions (diffusive or advective), under-relaxation
-    real, allocatable :: fx(:)
-    real, allocatable :: fy(:)
-    real, allocatable :: fz(:)
+    real, allocatable :: fx(:)  !! force component [N]
+    real, allocatable :: fy(:)  !! force component [N]
+    real, allocatable :: fz(:)  !! force component [N]
 
-    ! External "body" forces on the fluid.
+    ! External "body" forces densities (per unit volume) on the fluid.
     ! These includes body forces such as: buoyancy, gravity, surface tension
     ! These need special treatment according to Mencinger and Zun (2007) for
     ! proper linking with Rhie and Chow algorithm.  Therefore, two variants
     ! are included: face based forces and cell based forces.  The cell based
     ! forces must be derived from face based forces and properly linked.
-    real, allocatable :: cell_fx(:)  ! [N/m^3]
-    real, allocatable :: cell_fy(:)  ! [N/m^3]
-    real, allocatable :: cell_fz(:)  ! [N/m^3]
-    real, allocatable :: face_fx(:)  ! [N/m^3]
-    real, allocatable :: face_fy(:)  ! [N/m^3]
-    real, allocatable :: face_fz(:)  ! [N/m^3]
+    real, allocatable :: cell_fx(:)  !! force density component at cells [N/m^3]
+    real, allocatable :: cell_fy(:)  !! force density component at cells [N/m^3]
+    real, allocatable :: cell_fz(:)  !! force density component at cells [N/m^3]
+    real, allocatable :: face_fx(:)  !! force density component at faces [N/m^3]
+    real, allocatable :: face_fy(:)  !! force density component at faces [N/m^3]
+    real, allocatable :: face_fz(:)  !! force density component at faces [N/m^3]
 
     ! Reference density (for buoyancy)
-    real :: dens_ref
+    real :: dens_ref  !! reference density, used to compute buoyancy terms
 
     ! True if it has outlets (needed for a fix in Compute_Pressure)
     !
@@ -100,43 +128,43 @@
     !
     ! Update on June 2, 2022: Unified all outlet boundaries into one
     ! to be able to tell PETSc if matrix for pressure is singular
-    logical :: has_pressure
+    logical :: has_pressure  !! true if field has pressure outlet
 
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !
     !-------------------------------------------------!
 
     ! Variables determining if we are dealing with heat transfer and buoyancy
-    logical :: heat_transfer
+    logical :: heat_transfer  !! true if heat transfer is invloved
 
     ! Phase change (called mass_transfer to be consistent with heat_transfer)
-    logical :: mass_transfer
+    logical :: mass_transfer  !! true if there is phase change in the field
 
     ! Temperature
-    type(Var_Type) :: t  ! [K]
+    type(Var_Type) :: t  !! temperature [K]
 
     ! Heat flux to the domain (important for periodic case with heat transfer)
     real :: heat_flux, heated_area, heat  ! [W/m^2], [m^2], [W]
 
     ! Reference temperature and volume expansion coefficient (for buoyancy)
-    real :: t_ref  ! [K]
-    real :: beta   ! [1/K]
+    real :: t_ref  !! reference temperature used for buoyancy terms [K]
+    real :: beta   !! volume expansion coefficient [1/K]
 
     ! Exponential extrapolation of temperature to the walls
     logical :: exp_temp_wall
 
     ! Scalars (like chemical species for example)
-    integer                     :: n_scalars
-    type(Var_Type), allocatable :: scalar(:)
+    integer                     :: n_scalars  !! number of (passive) scalars
+    type(Var_Type), allocatable :: scalar(:)  !! storage for scalars
 
     ! Bulk velocities, pressure drops, etc.
-    type(Bulk_Type) :: bulk
-
+    type(Bulk_Type) :: bulk  !! holder of volume flow rates through domain and,
+                             !! associated with that, bulk velocities
     !------------------------------------------!
     !   Associated with multiphase situation   !
     !------------------------------------------!
-    logical :: with_particles
-    logical :: with_interface
+    logical :: with_particles  !! flow is laden with particles
+    logical :: with_interface  !! flow has interfaces (described with VOF)
 
     !--------------------------!
     !   Numerical parameters   !
@@ -153,20 +181,14 @@
     real :: cfl_max, pe_max
 
     ! Time step used in this field
-    real :: dt  ! [s]
+    real :: dt  !! time step in this field [s]
 
     ! Volume error after pressure correction
     ! (It used to be called mass_err and was a local variable)
     real :: vol_res
 
-    ! Gradient matrices for:
-    ! - cells to cells (c2c)
-    ! - nodes to cells (n2c), and
-    ! - cells to nodes (c2n)
-    real, allocatable :: grad_c2c(:,:)
-    real, allocatable :: grad_f2c(:,:)
-    real, allocatable :: grad_n2c(:,:)
-    real, allocatable :: grad_c2n(:,:)
+    ! Gradient matrices for cells to cells (c2c)
+    real, allocatable :: grad_c2c(:,:)  !! gradient matrices [1/m^2]
 
     ! Tolerance and maximum iterations for Gauss gradients
     real    :: gauss_tol
@@ -176,7 +198,9 @@
     integer :: gauss_calls
 
     ! Is buoyancy thermally- or density-driven?
-    integer :: buoyancy
+    integer :: buoyancy  !! indicates if buoyancy is modeled by Boussinesq
+                         !! approach (thermally-driven) or by variations in
+                         !! density (density-driven)
 
     ! Gravity must be part of field for conjugate heat transfer models
     real :: grav_x, grav_y, grav_z
@@ -198,18 +222,10 @@
       !   Procedures for gradient computation   !
       !-----------------------------------------!
       procedure          :: Calculate_Grad_Matrix
-      ! procedure          :: Calculate_Grad_Matrix_Cell_By_Cell    ! not used
-      ! procedure          :: Calculate_Grad_Matrix_For_Cell        ! not used
-      ! procedure          :: Calculate_Grad_Matrix_Faces_To_Cells  ! not used
-      ! procedure          :: Calculate_Grad_Matrix_Nodes_To_Cells  ! not used
-      ! procedure          :: Calculate_Grad_Matrix_Cells_To_Nodes  ! not used
       procedure          :: Grad
       procedure          :: Grad_Component
       procedure, private :: Grad_Component_No_Refresh
       procedure, private :: Grad_Three_Components_No_Refresh
-      ! procedure          :: Grad_Component_Faces_To_Cells         ! not used
-      ! procedure          :: Grad_Component_Nodes_To_Cells         ! not used
-      ! procedure          :: Grad_Component_Cells_To_Nodes         ! not used
       procedure          :: Grad_Gauss
       procedure, private :: Grad_Gauss_Pressure
       procedure, private :: Grad_Gauss_Variable
@@ -222,8 +238,6 @@
       !   Procedures for interpolation   !
       !----------------------------------!
       procedure :: Interpolate_Cells_To_Nodes
-      ! procedure :: Interpolate_Nodes_To_Cells
-      ! procedure :: Interpolate_Nodes_To_Faces
       procedure :: Interpolate_To_Faces_Harmonic
       procedure :: Interpolate_To_Faces_Linear
 
@@ -263,18 +277,10 @@
     !   Procedures for gradient computation   !
     !-----------------------------------------!
 #   include "Field_Mod/Gradients/Calculate_Grad_Matrix.f90"
-!   include "Field_Mod/Gradients/Calculate_Grad_Matrix_Cell_By_Cell.f90"
-!   include "Field_Mod/Gradients/Calculate_Grad_Matrix_For_Cell.f90"
-!   include "Field_Mod/Gradients/Calculate_Grad_Matrix_Faces_To_Cells.f90"
-!   include "Field_Mod/Gradients/Calculate_Grad_Matrix_Nodes_To_Cells.f90"
-!   include "Field_Mod/Gradients/Calculate_Grad_Matrix_Cells_To_Nodes.f90"
 #   include "Field_Mod/Gradients/Grad.f90"
 #   include "Field_Mod/Gradients/Grad_Component.f90"
 #   include "Field_Mod/Gradients/Grad_Component_No_Refresh.f90"
 #   include "Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90"
-!   include "Field_Mod/Gradients/Grad_Component_Faces_To_Cells.f90"
-!   include "Field_Mod/Gradients/Grad_Component_Nodes_To_Cells.f90"
-!   include "Field_Mod/Gradients/Grad_Component_Cells_To_Nodes.f90"
 #   include "Field_Mod/Gradients/Grad_Gauss.f90"
 #   include "Field_Mod/Gradients/Grad_Gauss_Pressure.f90"
 #   include "Field_Mod/Gradients/Grad_Gauss_Variable.f90"
@@ -287,8 +293,6 @@
     !   Procedures for interpolation   !
     !----------------------------------!
 #   include "Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90"
-!   include "Field_Mod/Interpolations/Interpolate_Nodes_To_Cells.f90"
-!   include "Field_Mod/Interpolations/Interpolate_Nodes_To_Faces.f90"
 #   include "Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90"
 #   include "Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90"
 

@@ -1,27 +1,33 @@
 !==============================================================================!
-  subroutine Grad_Gauss(Flow, phi_f, phi_x, phi_y, phi_z)
+  subroutine Grad_Gauss(Flow, Grid, phi_f, phi_x, phi_y, phi_z)
 !------------------------------------------------------------------------------!
-!   Calculates gradients in cells from values in face with Gauss' theorem.     !
-!   It heavily relies on the accuracy of values in faces, which are not        !
-!   calculated here, and the primary use of this function is to be used as     !
-!   embedded in an iterative algorithm which also updates face values.         !
-!   See also it's sister function Interpolate_To_Faces from this module, and   !
-!   its parent function Grad_Gauss_Variable, also from this module.            !
+!>  Calculates gradient of generic variable phi by the Gauss' theorem
+!>  and stores its three components in arrays phi_x, phi_y and phi_z.
+!>  This subroutine refreshes the buffers of the variable before calculating
+!>  the gradients, and of the calculated gradient components.
+!------------------------------------------------------------------------------!
+!   Notes                                                                      !
 !                                                                              !
-!   With OpenMP, this procedure got a speedup of 3.5 on 1M mesh and 4 threads. !
+!   * It heavily relies on the accuracy of values in faces, which are not      !
+!     calculated here, and the primary use of this function is to be used as   !
+!     embedded in an iterative algorithm which also updates face values.       !
+!   * See also it's sister function Interpolate_To_Faces from this module,     !
+!     and its parent function Grad_Gauss_Variable, also from this module.      !
+!   * With OpenMP, this procedure got a speedup of 3.5 on 1M mesh & 4 threads. !
 !------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
-  class(Field_Type), target :: Flow
-  real                      :: phi_f(1:Flow % pnt_grid % n_faces)
-  real                      :: phi_x( -Flow % pnt_grid % n_bnd_cells:  &
-                                       Flow % pnt_grid % n_cells)
-  real                      :: phi_y( -Flow % pnt_grid % n_bnd_cells:  &
-                                       Flow % pnt_grid % n_cells)
-  real                      :: phi_z( -Flow % pnt_grid % n_bnd_cells:  &
-                                       Flow % pnt_grid % n_cells)
+  class(Field_Type), target :: Flow  !! parent flow object
+  type(Grid_Type),   target :: Grid  !! grid object
+  real                      :: phi_f(1:Grid % n_faces)
+    !! face values of the field whose gradients are being calculated
+  real                      :: phi_x( -Grid % n_bnd_cells:Grid % n_cells)
+    !! x component of the calculated gradient
+  real                      :: phi_y( -Grid % n_bnd_cells:Grid % n_cells)
+    !! y component of the calculated gradient
+  real                      :: phi_z( -Grid % n_bnd_cells:Grid % n_cells)
+    !! z component of the calculated gradient
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type),     pointer :: Grid
   real,    contiguous, pointer :: sx(:), sy(:), sz(:), vol(:)
   integer, contiguous, pointer :: faces_c(:,:)
   integer                      :: s, c1, c2, c, reg
@@ -32,7 +38,6 @@
   ! Take alias
   ! OpenMP doesn't unerstand Fortran's members (%), that's ...
   ! ... why aliases for faces_c, sx, sy, sz and vol are needed
-  Grid    => Flow % pnt_grid
   faces_c => Grid % faces_c
   sx      => Grid % sx
   sy      => Grid % sy

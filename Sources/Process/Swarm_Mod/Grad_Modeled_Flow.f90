@@ -44,8 +44,8 @@
 
   ! Storing the gradients of v2_mod in Work_Mod arrays
   ! (dv^2/dx, dv^2/dy, dv^2/dz)
-  call Flow % Grad_Component(Swarm % v2_mod, 1, Swarm % v2_mod_x)
-  call Flow % Grad_Component(Swarm % v2_mod, 2, Swarm % v2_mod_y)
-  call Flow % Grad_Component(Swarm % v2_mod, 3, Swarm % v2_mod_z)
+  call Flow % Grad_Component(Grid, Swarm % v2_mod, 1, Swarm % v2_mod_x)
+  call Flow % Grad_Component(Grid, Swarm % v2_mod, 2, Swarm % v2_mod_y)
+  call Flow % Grad_Component(Grid, Swarm % v2_mod, 3, Swarm % v2_mod_z)
 
   end subroutine

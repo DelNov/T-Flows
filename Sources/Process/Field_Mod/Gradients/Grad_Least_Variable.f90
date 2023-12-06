@@ -1,22 +1,33 @@
 !==============================================================================!
   subroutine Grad_Least_Variable(Flow, var)
 !------------------------------------------------------------------------------!
-!   Calculates gradient of a variable from field Flow with least squares       !
+!>  This subroutine calculates the gradient of a generic variable using the
+!>  least squares method.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
 !                                                                              !
-!   With OpenMP, this procedure got a speedup of 3.2 on 1M mesh and 4 threads. !
-!   Yet, in the tests, it was called only to initialize Gaussian methods and   !
-!   the measuring times where therefore short.  The numbers may be innacurate. !
-!   It should be tested on a case with least squares only.                     !
+!   * Buffer refresh: Initiates by refreshing the buffers for the target       !
+!     variable (var % n) to ensure up-to-date data across all processors.      !
+!   * Gradient calculation: Uses a least squares method to compute the         !
+!     gradient components (var % x, var % y, and var % z) of the variable.     !
+!     This method is executed without refreshing buffers between component     !
+!     calculations, enhancing computational efficiency.                        !
+!   * Buffer refresh for gradients: Post gradient computation, the buffers     !
+!     for each gradient component are refreshed to maintain data consistency   !
+!     across the computational domain.                                         !
+!------------------------------------------------------------------------------!
+!   Notes                                                                      !
 !                                                                              !
-!   On a case with least squares only, speed-up was 3.3, still not whopping.   !
-!                                                                              !
-!   But, the new version, the one which call all three components at once,     !
-!   showed a speed-up of 3.7 on 1M mesh and 4 threads, which is good.          !
+!   * The procedure has shown a moderate speedup with OpenMP on a 1M mesh and  !
+!     4 threads. Although initial tests indicated a speedup of 3.2, further    !
+!     tests with least squares only demonstrated a speedup of 3.3. A refined   !
+!     version executing all three components at once achieved a speedup of     !
+!     3.7, highlighting its efficiency in a OMP parallel environment.          !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type) :: Flow
-  type(Var_Type)    :: var
+  class(Field_Type) :: Flow  !! parent flow object
+  type(Var_Type)    :: var   !! variable whose gradients are calculated
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
 !==============================================================================!
@@ -29,13 +40,8 @@
   ! Refresh buffers for variable
   call Grid % Exchange_Cells_Real(var % n)
 
-  ! Old: Compute individual gradients without refreshing buffers
-  ! call Flow % Grad_Component_No_Refresh(var % n, 1, var % x)  ! dp/dx
-  ! call Flow % Grad_Component_No_Refresh(var % n, 2, var % y)  ! dp/dy
-  ! call Flow % Grad_Component_No_Refresh(var % n, 3, var % z)  ! dp/dz
-
   ! New: Compute all gradient components without refreshing buffers
-  call Flow % Grad_Three_Components_No_Refresh(var % n,  &
+  call Flow % Grad_Three_Components_No_Refresh(Grid, var % n,  &
                                                var % x, var % y, var % z)
 
   ! Refresh buffers for gradient components
