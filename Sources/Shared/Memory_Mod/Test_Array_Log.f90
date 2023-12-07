@@ -8,6 +8,8 @@
   class(Memory_Type),   intent(in) :: Mem   !! parent class
   logical, allocatable, intent(in) :: a(:)  !! opearand array
   integer,              intent(in) :: i     !! array index
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Mem)
 !==============================================================================!
 
   Test_Array_Log = (i >= lbound(a, 1) .and. i <= ubound(a, 1))

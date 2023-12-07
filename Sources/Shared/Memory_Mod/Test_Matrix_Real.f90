@@ -8,6 +8,8 @@
   class(Memory_Type), intent(in) :: Mem     !! parent class
   real, allocatable,  intent(in) :: a(:,:)  !! operand matrix
   integer,            intent(in) :: i, j    !! matrix index
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Mem)
 !==============================================================================!
 
   Test_Matrix_Real = (i >= lbound(a, 1) .and. i <= ubound(a, 1) .and. &

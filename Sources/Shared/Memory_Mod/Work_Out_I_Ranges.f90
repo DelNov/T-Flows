@@ -1,7 +1,6 @@
 !==============================================================================!
-  subroutine Work_Out_I_Ranges(Mem, i, i_range, i_inc,  &
-                                    i_lower, i_upper,   &
-                                    file, line)
+  subroutine Work_Out_I_Ranges(Mem, i, i_range, i_lower, i_upper,   &
+                                    file, line, is_allocated)
 !------------------------------------------------------------------------------!
 !>  Work out the ranges for rows (first index, index i)
 !------------------------------------------------------------------------------!
@@ -10,11 +9,13 @@
   class(Memory_Type), intent(in)  :: Mem         !! parent class
   integer, optional,  intent(in)  :: i           !! matrix index
   integer, optional,  intent(in)  :: i_range(2)  !! range in i
-  integer, optional,  intent(in)  :: i_inc       !! size increment
   integer,            intent(out) :: i_lower     !! lower bound of i
   integer,            intent(out) :: i_upper     !! upper bound of i
   character(*),       intent(in)  :: file
   integer,            intent(in)  :: line
+  logical,            intent(in)  :: is_allocated
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Mem)
 !==============================================================================!
 
   !-------------------------------------------!
@@ -28,11 +29,13 @@
       i_lower = i
       i_upper = i
     else
-      ! Neither i, nor the i_range is present
-      call Message % Error(48,                                               &
-                      'Wrong invocation, either i or i_range should be  '//  &
-                      'specified!  This error is critical.  Exiting!',       &
-                      file=file, line=line)
+      ! Neither i, nor the i_range is present and the entity is not allocated
+      if(.not. is_allocated) then
+        call Message % Error(48,                                               &
+                        'Wrong invocation, either i or i_range should be  '//  &
+                        'specified!  This error is critical.  Exiting!',       &
+                        file=file, line=line)
+      end if
     end if
   else
     if(.not. present(i)) then

@@ -35,10 +35,10 @@
   !-------------------------------------------------------!
   !   Work out the ranges in i and j (rows and columns)   !
   !-------------------------------------------------------!
-  call Mem % Work_Out_I_Ranges(i, i_range, i_inc, i_lower, i_upper,  &
-                               __FILE__, __LINE__)
-  call Mem % Work_Out_J_Ranges(j, j_range, j_inc, j_lower, j_upper,  &
-                               __FILE__, __LINE__)
+  call Mem % Work_Out_I_Ranges(i, i_range, i_lower, i_upper,  &
+                               __FILE__, __LINE__, allocated(a))
+  call Mem % Work_Out_J_Ranges(j, j_range, j_lower, j_upper,  &
+                               __FILE__, __LINE__, allocated(a))
 
   !--------------------------------------------------------------------!
   !   If not allocated, allocate it with the smallest range possible   !

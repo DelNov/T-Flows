@@ -26,8 +26,8 @@
   !-------------------------------------!
   !   Work out the ranges in i (rows)   !
   !-------------------------------------!
-  call Mem % Work_Out_I_Ranges(i, i_range, i_inc, i_lower, i_upper,  &
-                               __FILE__, __LINE__)
+  call Mem % Work_Out_I_Ranges(i, i_range, i_lower, i_upper,  &
+                               __FILE__, __LINE__, allocated(a))
 
   !--------------------------------------------------------------------!
   !   If not allocated, allocate it with the smallest range possible   !
