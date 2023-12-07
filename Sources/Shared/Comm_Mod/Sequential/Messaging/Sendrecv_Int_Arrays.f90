@@ -11,12 +11,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Comm_Type), intent(in)  :: Comm          !! communication object
-  integer,          intent(in)  :: len_s         !! send length
-  integer,          intent(in)  :: phi_s(len_s)  !! send buffer
-  integer,          intent(in)  :: len_r         !! receive length
-  integer,          intent(out) :: phi_r(len_r)  !! receive buffer
-  integer,          intent(in)  :: dest          !! destination processor
+  class(Comm_Type), intent(in) :: Comm          !! communication object
+  integer,          intent(in) :: len_s         !! send length
+  integer,          intent(in) :: phi_s(len_s)  !! send buffer
+  integer,          intent(in) :: len_r         !! receive length
+  integer,          intent(in) :: phi_r(len_r)  !! receive buffer
+  integer,          intent(in) :: dest          !! destination processor
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Comm)
   Unused(len_s)

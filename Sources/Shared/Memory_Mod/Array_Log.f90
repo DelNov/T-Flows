@@ -1,19 +1,19 @@
 !==============================================================================!
-  subroutine Array_Int(Mem, a, i, i_range, i_inc)
+  subroutine Array_Log(Mem, a, i, i_range, i_inc)
 !------------------------------------------------------------------------------!
-!>  Enlarges an integer array a to include the index i, or range of indices
+!>  Enlarges a logical array a to include the index i, or range of indices
 !>  specified by i_range.  Optional i_inc specifies the increment to increase
 !>  memory in chunks, avoiding too frequent memory management procedures.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Memory_Type),   intent(in)    :: Mem         !! parent class
-  integer, allocatable, intent(inout) :: a(:)        !! operand array
+  logical, allocatable, intent(inout) :: a(:)        !! operand array
   integer, optional,    intent(in)    :: i           !! array index
   integer, optional,    intent(in)    :: i_range(2)  !! array range
   integer, optional,    intent(in)    :: i_inc       !! index increment
 !-----------------------------------[Locals]-----------------------------------!
-  integer, allocatable :: temp(:)
+  logical, allocatable :: temp(:)
   integer              :: new_i_lower
   integer              :: new_i_upper
   integer              :: i_lower     = 1
@@ -41,14 +41,14 @@
          'This error is critical.  Exiting!',                         &
          file=__FILE__, line=__LINE__)
     end if
-    a = 0
+    a = .false.
   end if
 
   !----------------------------------------------!
   !   If array is not large enough, enlarge it   !
   !----------------------------------------------!
-  if(     .not. Mem % Test_Array_Int(a, i_lower)  &
-     .or. .not. Mem % Test_Array_Int(a, i_upper)  ) then
+  if(     .not. Mem % Test_Array_Log(a, i_lower)  &
+     .or. .not. Mem % Test_Array_Log(a, i_upper)  ) then
 
     ! Set up the increment in i
     if(present(i_inc)) then
@@ -70,7 +70,7 @@
          'This error is critical.  Exiting!',                         &
          file=__FILE__, line=__LINE__)
     end if
-    temp = 0
+    temp = .false.
 
     ! Copy old data to new array
     temp(lbound(a,1):ubound(a,1)) = a

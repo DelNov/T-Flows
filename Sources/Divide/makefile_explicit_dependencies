@@ -208,7 +208,11 @@ $(DIR_SHARED)/File_Mod/*.f90
 # Dependencies for: ./Memory_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Memory_Mod.o:\
-$(DIR_SHARED)/Memory_Mod/*.f90 
+$(DIR_OBJECT)/Message_Mod.o \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_SHARED)/Memory_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Work_Mod.f90

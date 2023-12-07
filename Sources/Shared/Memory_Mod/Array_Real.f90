@@ -1,42 +1,75 @@
 !==============================================================================!
-  subroutine Array_Real(Mem, a, i, i_inc)
+  subroutine Array_Real(Mem, a, i, i_range, i_inc)
 !------------------------------------------------------------------------------!
-!>  Enlarges a real array a to include the index i.  Optional i_inc
-!>  specifies the increment to increase memory in chunks, avoiding too frequent
-!>  calls to memory management procedures.
+!>  Enlarges a real array a to include the index i, or range of indices
+!>  specified by i_range.  Optional i_inc specifies the increment to increase
+!>  memory in chunks, avoiding too frequent memory management procedures.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Memory_Type), intent(in)    :: Mem    !! parent class
-  real, allocatable,  intent(inout) :: a(:)   !! operand array
-  integer,            intent(in)    :: i      !! array index
-  integer, optional,  intent(in)    :: i_inc  !! index increment
+  class(Memory_Type), intent(in)    :: Mem         !! parent class
+  real, allocatable,  intent(inout) :: a(:)        !! operand array
+  integer, optional,  intent(in)    :: i           !! array index
+  integer, optional,  intent(in)    :: i_range(2)  !! array range
+  integer, optional,  intent(in)    :: i_inc       !! index increment
 !-----------------------------------[Locals]-----------------------------------!
   real, allocatable :: temp(:)
-  integer           :: new_lower1, new_upper1
+  integer           :: new_i_lower
+  integer           :: new_i_upper
+  integer           :: i_lower     = 1
+  integer           :: i_upper     = 1
   integer           :: i_increment = 0
+  integer           :: error_code       ! allocation error code
+  character(DL)     :: error_message    ! allocation error message
 !==============================================================================!
 
-  ! If not allocated, allocate it with the smallest range possible
-  if(.not. allocated(a)) allocate(a(i:i))
+  !-------------------------------------!
+  !   Work out the ranges in i (rows)   !
+  !-------------------------------------!
+  call Mem % Work_Out_I_Ranges(i, i_range, i_inc, i_lower, i_upper,  &
+                               __FILE__, __LINE__)
+
+  !--------------------------------------------------------------------!
+  !   If not allocated, allocate it with the smallest range possible   !
+  !--------------------------------------------------------------------!
+  if(.not. allocated(a)) then
+    allocate(a(i_lower:i_upper), stat=error_code, errmsg=error_message)
+    if(error_code .ne. 0) then
+      call Message % Error(72,                                        &
+         'Failed to allocate requested memory.  Message from the '//  &
+         'compiler reads: "'//trim(error_message)//'". '          //  &
+         'This error is critical.  Exiting!',                         &
+         file=__FILE__, line=__LINE__)
+    end if
+    a = 0.0
+  end if
 
   !----------------------------------------------!
   !   If array is not large enough, enlarge it   !
   !----------------------------------------------!
-  if(.not. Mem % Probe_Real_Array(a, i)) then
+  if(     .not. Mem % Test_Array_Real(a, i_lower)  &
+     .or. .not. Mem % Test_Array_Real(a, i_upper)  ) then
 
-    ! Set up the i increment
+    ! Set up the increment in i
     if(present(i_inc)) then
-!     Assert(i_inc > 0)
+      Assert(i_inc > 0)
       i_increment = i_inc
     end if
 
     ! Calculate new bounds
-    new_lower1 = min(lbound(a, 1), i - i_increment)
-    new_upper1 = max(ubound(a, 1), i + i_increment)
+    new_i_lower = min(lbound(a, 1), i_lower - i_increment)
+    new_i_upper = max(ubound(a, 1), i_upper + i_increment)
 
     ! Allocate temp array with new bounds and initialize
-    allocate(temp(new_lower1:new_upper1))
+    allocate(temp(new_i_lower:new_i_upper),  &
+             stat=error_code, errmsg=error_message)
+    if(error_code .ne. 0) then
+      call Message % Error(72,                                        &
+         'Failed to allocate requested memory.  Message from the '//  &
+         'compiler reads: "'//trim(error_message)//'". '          //  &
+         'This error is critical.  Exiting!',                         &
+         file=__FILE__, line=__LINE__)
+    end if
     temp = 0.0
 
     ! Copy old data to new array

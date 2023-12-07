@@ -18,14 +18,17 @@
   Grid % n_bnd_cells = nb
 
   ! Allocate cell center coordinates and initialize to zero
-  allocate(Grid % xc(-nb:nc));  Grid % xc(:) = 0.0
-  allocate(Grid % yc(-nb:nc));  Grid % yc(:) = 0.0
-  allocate(Grid % zc(-nb:nc));  Grid % zc(:) = 0.0
+  call Enlarge % Array_Real(Grid % xc, i_range=(/-nb, nc/))
+  call Enlarge % Array_Real(Grid % yc, i_range=(/-nb, nc/))
+  call Enlarge % Array_Real(Grid % zc, i_range=(/-nb, nc/))
 
   ! Memory for cells' volumes, delta and wall distance
   allocate(Grid % vol           (-nb:nc));  Grid % vol           (:) = 0.0
   allocate(Grid % wall_dist     (-nb:nc));  Grid % wall_dist     (:) = 0.0
   allocate(Grid % cell_near_wall(-nb:nc));  Grid % cell_near_wall(:) = .false.
+  call Enlarge % Array_Real(Grid % vol,            i_range=(/-nb, nc/))
+  call Enlarge % Array_Real(Grid % wall_dist,      i_range=(/-nb, nc/))
+  call Enlarge % Array_Log (Grid % cell_near_wall, i_range=(/-nb, nc/))
 
   ! Memory for cells' inertia tensors
   allocate(Grid % ixx(-nb:nc));  Grid % ixx(:) = 0.0

@@ -1,16 +1,15 @@
 !==============================================================================!
-  logical function Probe_Real_Matrix(Mem, a, i, j)
+  logical function Test_Array_Real(Mem, a, i)
 !------------------------------------------------------------------------------!
-!>  Checks if indices i and j are within bounds of real matrix a
+!>  Checks if index i is within bounds of real array a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Memory_Type), intent(in) :: Mem     !! parent class
-  real, allocatable,  intent(in) :: a(:,:)  !! operand matrix
-  integer,            intent(in) :: i, j    !! matrix index
+  class(Memory_Type), intent(in) :: Mem   !! parent class
+  real, allocatable,  intent(in) :: a(:)  !! opearand array
+  integer,            intent(in) :: i     !! array index
 !==============================================================================!
 
-  Probe_Real_Matrix = (i >= lbound(a, 1) .and. i <= ubound(a, 1) .and. &
-                       j >= lbound(a, 2) .and. j <= ubound(a, 2))
+  Test_Array_Real = (i >= lbound(a, 1) .and. i <= ubound(a, 1))
 
   end function

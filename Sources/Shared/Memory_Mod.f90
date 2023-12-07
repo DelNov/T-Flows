@@ -1,3 +1,5 @@
+#include "../Shared/Assert.h90"
+
 !==============================================================================!
   module Memory_Mod
 !------------------------------------------------------------------------------!
@@ -6,6 +8,10 @@
 !>  both arrays and matrices, supporting both integer and real data types. It
 !>  is designed around a Memory_Type type that contains all the necessary
 !>  procedures for memory operations.
+!------------------------------------------------------------------------------!
+!----------------------------------[Modules]-----------------------------------!
+  use Message_Mod
+  use Assert_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -18,13 +24,19 @@
 
     contains
       procedure          :: Array_Int
+      procedure          :: Array_Log
       procedure          :: Array_Real
       procedure          :: Matrix_Int
+      procedure          :: Matrix_Log
       procedure          :: Matrix_Real
-      procedure, private :: Probe_Int_Array
-      procedure, private :: Probe_Int_Matrix
-      procedure, private :: Probe_Real_Array
-      procedure, private :: Probe_Real_Matrix
+      procedure, private :: Test_Array_Int
+      procedure, private :: Test_Array_Log
+      procedure, private :: Test_Array_Real
+      procedure, private :: Test_Matrix_Int
+      procedure, private :: Test_Matrix_Log
+      procedure, private :: Test_Matrix_Real
+      procedure, private :: Work_Out_I_Ranges
+      procedure, private :: Work_Out_J_Ranges
 
   end type
 
@@ -32,14 +44,20 @@
                                 !! accessing memory management procedures
 
   contains
-    include "Memory_Mod/Array_Int.f90"
-    include "Memory_Mod/Array_Real.f90"
-    include "Memory_Mod/Matrix_Int.f90"
-    include "Memory_Mod/Matrix_Real.f90"
-    include "Memory_Mod/Probe_Int_Array.f90"
-    include "Memory_Mod/Probe_Int_Matrix.f90"
-    include "Memory_Mod/Probe_Real_Array.f90"
-    include "Memory_Mod/Probe_Real_Matrix.f90"
+#   include "Memory_Mod/Array_Int.f90"
+#   include "Memory_Mod/Array_Log.f90"
+#   include "Memory_Mod/Array_Real.f90"
+#   include "Memory_Mod/Matrix_Int.f90"
+#   include "Memory_Mod/Matrix_Log.f90"
+#   include "Memory_Mod/Matrix_Real.f90"
+#   include "Memory_Mod/Test_Array_Int.f90"
+#   include "Memory_Mod/Test_Array_Log.f90"
+#   include "Memory_Mod/Test_Array_Real.f90"
+#   include "Memory_Mod/Test_Matrix_Int.f90"
+#   include "Memory_Mod/Test_Matrix_Log.f90"
+#   include "Memory_Mod/Test_Matrix_Real.f90"
+#   include "Memory_Mod/Work_Out_I_Ranges.f90"
+#   include "Memory_Mod/Work_Out_J_Ranges.f90"
 
   end module
 

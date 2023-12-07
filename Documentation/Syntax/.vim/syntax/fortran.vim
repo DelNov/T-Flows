@@ -433,7 +433,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
   syn keyword fortranTypeTflows    Eddy_Type  Eddies_Type  Turb_Plane_Type  Memory_Type
-  syn keyword fortranObjectTflows  Eddies  Plane  Turb_Planes               Enlarge
+  syn keyword fortranObjectTflows  Eddies  Plane  Turb_Planes               Enlarge  Mem
 " Items which follow are not really objects, but I don't know where else to put them
   syn keyword fortranObjectTflows  This_Proc  N_Procs  First_Proc  Sequential_Run  Parallel_Run
   syn keyword fortranPetscTflows  C_Petsc_Finalize  C_Petsc_Initialize  C_Petsc_Ksp_Converged_Reason  C_Petsc_Ksp_Create  C_Petsc_Ksp_Destroy

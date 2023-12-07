@@ -327,13 +327,13 @@ endif
 
 # Modules in shared directory
 SRC_F_MOD = Const_Mod.f90         \
-            Memory_Mod.f90        \
             Region_Mod.f90        \
             String_Mod.f90        \
             Comm_Mod.f90          \
             Assert_Mod.f90        \
             Tokenizer_Mod.f90     \
             Message_Mod.f90       \
+            Memory_Mod.f90        \
             Omp_Mod.f90           \
             Math_Mod.f90          \
             Swap_Mod.f90          \
