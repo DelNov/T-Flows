@@ -1,21 +1,18 @@
 !==============================================================================!
-  subroutine Matrix_Log(Mem, a, i, j, i_range, j_range, i_inc, j_inc)
+  subroutine Matrix_Log(Mem, a, i, j, i_inc, j_inc)
 !------------------------------------------------------------------------------!
-!>  Enlarges a logical matrix to include the indices i and j, or ranges
-!>  of indices specified in i_range and j_range.  For each dimension, either
-!>  an index or a range should be specified, but it is fine to specify one
-!>  dimension with index and the other with range.  Optional i_inc and j_inc
-!>  specify the increment to increase memory in chunks, avoiding too frequent
-!>  calls to memory management procedures.
+!>  Enlarges a logical matrix to include the ranges of indices specified in
+!>  i and j.  Optional i_inc and j_inc specify the increment to increase memory
+!>  in chunks, avoiding too frequent calls to memory management procedures.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Memory_Type),   intent(in)    :: Mem           !! parent class
-  logical, allocatable, intent(inout) :: a(:,:)        !! operand matrix
-  integer, optional,    intent(in)    :: i, j          !! matrix index
-  integer, optional,    intent(in)    :: i_range(2)    !! matrix range in i
-  integer, optional,    intent(in)    :: j_range(2)    !! matrix range in j
-  integer, optional,    intent(in)    :: i_inc, j_inc  !! size increment
+  class(Memory_Type),   intent(in)    :: Mem     !! parent class
+  logical, allocatable, intent(inout) :: a(:,:)  !! operand matrix
+  integer, optional,    intent(in)    :: i(:)    !! matrix range in i
+  integer, optional,    intent(in)    :: j(:)    !! matrix range in j
+  integer, optional,    intent(in)    :: i_inc   !! size increment
+  integer, optional,    intent(in)    :: j_inc   !! size increment
 !-----------------------------------[Locals]-----------------------------------!
   logical, allocatable :: temp(:,:)
   integer              :: new_i_lower
@@ -32,19 +29,21 @@
   character(DL)        :: error_message    ! allocation error message
 !==============================================================================!
 
-  !-------------------------------------------------------!
-  !   Work out the ranges in i and j (rows and columns)   !
-  !-------------------------------------------------------!
-  call Mem % Work_Out_I_Ranges(i, i_range, i_lower, i_upper,  &
-                               __FILE__, __LINE__, allocated(a))
-  call Mem % Work_Out_J_Ranges(j, j_range, j_lower, j_upper,  &
-                               __FILE__, __LINE__, allocated(a))
+  if(present(i)) Assert(size(i) .eq. 2)
+  if(present(j)) Assert(size(j) .eq. 2)
 
-  !--------------------------------------------------------------------!
-  !   If not allocated, allocate it with the smallest range possible   !
-  !--------------------------------------------------------------------!
+  !----------------------------------------------------------------!
+  !   If not allocated, allocate, initialize and get out of here   !
+  !----------------------------------------------------------------!
   if(.not. allocated(a)) then
-    allocate(a(i_lower:i_upper, j_lower:j_upper),  &
+
+    ! Check validity of the arguments
+    Assert(present(i) .and. present(j))
+    Assert(i(1) .le. i(2))
+    Assert(j(1) .le. j(2))
+
+    ! Allocate memory
+    allocate(a(i(1):i(2), j(1):j(2)),  &
              stat=error_code, errmsg=error_message)
     if(error_code .ne. 0) then
       call Message % Error(72,                                        &
@@ -53,12 +52,32 @@
          'This error is critical.  Exiting!',                         &
          file=__FILE__, line=__LINE__)
     end if
+
+    ! Initialize
     a = .false.
+
+    ! Get out
+    return
   end if
 
-  !-----------------------------------------------!
-  !   If matrix is not large enough, enlarge it   !
-  !-----------------------------------------------!
+  !------------------------------------------!
+  !   If here, matrix was allocated, check   !
+  !    if it is big enough and enlarge it    !
+  !------------------------------------------!
+  if(present(i)) then
+    i_lower = i(1)
+    i_upper = i(2)
+  else
+    i_lower = lbound(a,1)
+    i_upper = ubound(a,1)
+  end if
+  if(present(j)) then
+    i_lower = j(1)
+    i_upper = j(2)
+  else
+    j_lower = lbound(a,2)
+    j_upper = ubound(a,2)
+  end if
   if(     .not. Mem % Test_Matrix_Log(a, i_lower, j_lower)  &
      .or. .not. Mem % Test_Matrix_Log(a, i_upper, j_lower)  &
      .or. .not. Mem % Test_Matrix_Log(a, i_lower, j_upper)  &

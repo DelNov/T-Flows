@@ -574,7 +574,7 @@
 
   ! This looks like a convenient time to adjust the dimenson for cells' nodes
   call Enlarge % Matrix_Int(Grid % cells_n,  &
-                            i=maxval(Grid % cells_n_nodes(1:n_cells)))
+                            i=(/1,maxval(Grid % cells_n_nodes(1:n_cells))/))
 
   print '(a60)', ' #=========================================================='
   print '(a60)', ' # Summary of interior cell shapes:                         '
@@ -654,7 +654,7 @@
               call File % Read_Line(fu)
               read(Line % tokens(1), *) n_face_nodes
               Grid % faces_n_nodes(s) = n_face_nodes
-              call Enlarge % Matrix_Int(Grid % faces_n, i=n_face_nodes)
+              call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,n_face_nodes/))
               do i_nod = 1, n_face_nodes
                 read(Line % tokens(1+i_nod), '(z160)') Grid % faces_n(i_nod, s)
               end do
@@ -664,7 +664,7 @@
               call File % Read_Binary_Int4_Array(fu, 1)
               n_face_nodes = int4_array(1)
               call File % Read_Binary_Int4_Array(fu, n_face_nodes)
-              call Enlarge % Matrix_Int(Grid % faces_n, i=n_face_nodes)
+              call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,n_face_nodes/))
               do i_nod = 1, n_face_nodes
                 Grid % faces_n(i_nod, s) = int4_array(i_nod)
               end do
@@ -677,7 +677,7 @@
           else
             if(zone_type .eq. FACE_TRI)  n_face_nodes = 3
             if(zone_type .eq. FACE_QUAD) n_face_nodes = 4
-            call Enlarge % Matrix_Int(Grid % faces_n, i=n_face_nodes)
+            call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,n_face_nodes/))
             if(ascii) then
               call File % Read_Line(fu)
               do i_nod = 1, n_face_nodes
@@ -803,7 +803,7 @@
     if(c2 .lt. 0) then
       n = Grid % faces_n_nodes(s)
       Grid % cells_n_nodes(c2) = n
-      call Enlarge % Matrix_Int(Grid % cells_n, i=n)
+      call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,n/))
       Grid % cells_n(1:n, c2)  = Grid % faces_n(1:n, s)
     end if
   end do
@@ -1063,7 +1063,7 @@
       ! Perform a unique sort to remove duplicates
       call Sort % Unique_Int(all_nodes(1:n), n)
 
-      call Enlarge % Matrix_Int(Grid % cells_n, i=n)
+      call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,n/))
       Grid % cells_n(1:n, c)  = all_nodes(1:n)
       Grid % cells_n_nodes(c) = -n
 

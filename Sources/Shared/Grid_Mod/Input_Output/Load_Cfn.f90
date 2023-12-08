@@ -186,13 +186,14 @@
                    'This is critical.  Exiting!',                          &
                    file=__FILE__, line=__LINE__)
       else
+        ! Enlarge first dimension (i) for increased number of nodes
         call Enlarge % Matrix_Int(Grid % cells_n,  &
-                            i=abs(Grid % cells_n_nodes(c)))
+                                  i=(/1,abs(Grid % cells_n_nodes(c))/))
         tot = tot + abs(Grid % cells_n_nodes(c))
       end if
     end if
   end do
-  call Enlarge % Array_Int(i_buffer, tot)
+  call Enlarge % Array_Int(i_buffer, (/1,tot/))
 
   ! Cells' nodes
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
@@ -233,12 +234,12 @@
                    file=__FILE__, line=__LINE__)
       else
         call Enlarge % Matrix_Int(Grid % cells_f,  &
-                                i=Grid % cells_n_faces(c))
+                                  i=(/1,Grid % cells_n_faces(c)/))
         tot = tot + Grid % cells_n_faces(c)
       end if
     end if
   end do
-  call Enlarge % Array_Int(i_buffer, tot)
+  call Enlarge % Array_Int(i_buffer, (/1,tot/))
 
   ! Cells' faces
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
@@ -294,11 +295,11 @@
                  'This is critical.  Exiting!',                          &
                  file=__FILE__, line=__LINE__)
     else
-      call Enlarge % Matrix_Int(Grid % faces_n, i=Grid % faces_n_nodes(s))
+      call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,Grid % faces_n_nodes(s)/))
       tot = tot + Grid % faces_n_nodes(s)
     end if
   end do
-  call Enlarge % Array_Int(i_buffer, tot)
+  call Enlarge % Array_Int(i_buffer, (/1,tot/))
 
   ! Faces' nodes
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
@@ -324,7 +325,7 @@
 
   ! Faces' cells
   tot = (nf + ns) * 2;
-  call Enlarge % Array_Int(i_buffer, tot)
+  call Enlarge % Array_Int(i_buffer, (/1,tot/))
   read(fu) i_buffer(1:tot)  ! guzzle the whole buffer at once
   i = 0
   do s = 1, nf + ns

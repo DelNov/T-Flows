@@ -145,7 +145,7 @@
     do s = 1, Grid(1) % n_faces
       Grid(2) % faces_n_nodes(n0+s) = Grid(1) % faces_n_nodes(s)
       call Enlarge % Matrix_Int(Grid(2) % faces_n,  &
-                                i=Grid(2) % faces_n_nodes(n0+s))
+                                i=(/1,Grid(2) % faces_n_nodes(n0+s)/))
       do i_nod = 1, Grid(2) % faces_n_nodes(s)
         Grid(2) % faces_n(i_nod, n0 + s) =  &
         Grid(1) % faces_n(i_nod, s) + Grid(1) % n_nodes * t

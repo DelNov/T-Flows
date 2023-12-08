@@ -456,7 +456,7 @@
           n = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i ! 1st node
 
           ! Nodes
-          call Enlarge % Matrix_Int(Grid % cells_n, i=8)
+          call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,8/))
           Grid % cells_n(1,c) = n
           Grid % cells_n(2,c) = n+1
           Grid % cells_n(3,c) = n+ni
@@ -467,7 +467,7 @@
           Grid % cells_n(8,c) = Grid % cells_n(4,c)+ni*nj
 
           ! Neighbours
-          call Enlarge % Matrix_Int(Grid % cells_c, i=6)
+          call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,6/))
           Grid % cells_c(1,c) = c-ci*cj
           Grid % cells_c(2,c) = c-ci
           Grid % cells_c(3,c) = c+1

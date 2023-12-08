@@ -1,17 +1,16 @@
 !==============================================================================!
-  subroutine Array_Real(Mem, a, i, i_range, i_inc)
+  subroutine Array_Real(Mem, a, i, i_inc)
 !------------------------------------------------------------------------------!
-!>  Enlarges a real array a to include the index i, or range of indices
-!>  specified by i_range.  Optional i_inc specifies the increment to increase
-!>  memory in chunks, avoiding too frequent memory management procedures.
+!>  Enlarges a real array a to include the range of indices specified by i.
+!>  Optional i_inc specifies the increment to increase memory in chunks,
+!>  avoiding too frequent memory management procedures.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Memory_Type), intent(in)    :: Mem         !! parent class
-  real, allocatable,  intent(inout) :: a(:)        !! operand array
-  integer, optional,  intent(in)    :: i           !! array index
-  integer, optional,  intent(in)    :: i_range(2)  !! array range
-  integer, optional,  intent(in)    :: i_inc       !! index increment
+  class(Memory_Type), intent(in)    :: Mem    !! parent class
+  real, allocatable,  intent(inout) :: a(:)   !! operand array
+  integer,            intent(in)    :: i(:)   !! array range
+  integer, optional,  intent(in)    :: i_inc  !! index increment
 !-----------------------------------[Locals]-----------------------------------!
   real, allocatable :: temp(:)
   integer           :: new_i_lower
@@ -23,17 +22,20 @@
   character(DL)     :: error_message    ! allocation error message
 !==============================================================================!
 
-  !-------------------------------------!
-  !   Work out the ranges in i (rows)   !
-  !-------------------------------------!
-  call Mem % Work_Out_I_Ranges(i, i_range, i_lower, i_upper,  &
-                               __FILE__, __LINE__, allocated(a))
+  ! Array range must be specified in an array with the length of two
+  Assert(size(i) .eq. 2)
 
-  !--------------------------------------------------------------------!
-  !   If not allocated, allocate it with the smallest range possible   !
-  !--------------------------------------------------------------------!
+  !----------------------------------------------------------------!
+  !   If not allocated, allocate, initialize and get out of here   !
+  !----------------------------------------------------------------!
   if(.not. allocated(a)) then
-    allocate(a(i_lower:i_upper), stat=error_code, errmsg=error_message)
+
+    ! Check validity of the arguments
+    Assert(i(1) .le. i(2))
+
+    ! Allocate memory
+    allocate(a(i(1):i(2)),  &
+             stat=error_code, errmsg=error_message)
     if(error_code .ne. 0) then
       call Message % Error(72,                                        &
          'Failed to allocate requested memory.  Message from the '//  &
@@ -41,12 +43,20 @@
          'This error is critical.  Exiting!',                         &
          file=__FILE__, line=__LINE__)
     end if
+
+    ! Initialize
     a = 0.0
+
+    ! Get out
+    return
   end if
 
-  !----------------------------------------------!
-  !   If array is not large enough, enlarge it   !
-  !----------------------------------------------!
+  !-----------------------------------------!
+  !   If here, array was allocated, check   !
+  !   if it is big enough and enlarge it    !
+  !-----------------------------------------!
+  i_lower = i(1)
+  i_upper = i(2)
   if(     .not. Mem % Test_Array_Real(a, i_lower)  &
      .or. .not. Mem % Test_Array_Real(a, i_upper)  ) then
 

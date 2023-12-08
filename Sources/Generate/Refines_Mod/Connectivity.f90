@@ -45,8 +45,12 @@
   !   Count the boundary cells   !
   !                              !
   !------------------------------!
-  Grid % n_bnd_cells = 0                           ! initialize n. of bnd. cells
-  call Enlarge % Matrix_Int(Grid % cells_c, i=24)  ! adjust dimension of cells_c
+
+  ! Initialize number of boundary cells
+  Grid % n_bnd_cells = 0
+
+  ! Adjust dimension of cells_c
+  call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,24/))
 
   do c = 1, Grid % n_cells
     do m = 1, 24   ! neighbour cells
@@ -66,8 +70,12 @@
   !   Create the array with   !
   !   information on faces    !
   !---------------------------!
-  Grid % n_faces = 0                              ! initialize number of sides
-  call Enlarge % Matrix_Int(Grid % faces_n, i=4)  ! adjust dimension of faces_n
+
+  ! Initialize number of sides
+  Grid % n_faces = 0
+
+  ! Adjust dimension of faces_n
+  call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,4/))
 
   do run = 1, 2
 

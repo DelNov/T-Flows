@@ -147,8 +147,8 @@
   !   Main loop to fill the faces_c structure   !
   !                                             !
   !---------------------------------------------!
-  call Enlarge % Matrix_Int(Grid % cells_c, i=max_fac)  ! i_fac goes to max_fac
-  call Enlarge % Matrix_Int(Grid % faces_n, i=max_nod)  ! i_nod goes to max_nod
+  call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,max_fac/))
+  call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,max_nod/))
   Assert(maxval(maxval(Grid % cells_c, dim=2), dim=1) == 0)
 
   do n3 = 1, cnt

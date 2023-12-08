@@ -36,8 +36,6 @@
       procedure, private :: Test_Matrix_Int
       procedure, private :: Test_Matrix_Log
       procedure, private :: Test_Matrix_Real
-      procedure, private :: Work_Out_I_Ranges
-      procedure, private :: Work_Out_J_Ranges
 
   end type
 
@@ -57,8 +55,6 @@
 #   include "Memory_Mod/Test_Matrix_Int.f90"
 #   include "Memory_Mod/Test_Matrix_Log.f90"
 #   include "Memory_Mod/Test_Matrix_Real.f90"
-#   include "Memory_Mod/Work_Out_I_Ranges.f90"
-#   include "Memory_Mod/Work_Out_J_Ranges.f90"
 
   end module
 

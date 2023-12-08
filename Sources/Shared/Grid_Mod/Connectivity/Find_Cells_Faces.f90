@@ -40,7 +40,7 @@
       c = Grid % faces_c(i_cel, s)  ! would be c1 and c2 in most of the code
 
       Grid % cells_n_faces(c) = Grid % cells_n_faces(c) + 1
-      call Enlarge % Matrix_Int(Grid % cells_f, i=Grid % cells_n_faces(c))
+      call Enlarge % Matrix_Int(Grid % cells_f, i=(/1,Grid % cells_n_faces(c)/))
       Grid % cells_f(Grid % cells_n_faces(c), c) = s
 
       sh = Grid % faces_s(s)        ! take the shadow face

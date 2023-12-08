@@ -102,7 +102,7 @@
     if(Line % tokens(1) == 'f') then
       s = s + 1
       Grid % faces_n_nodes(s) = Line % n_tokens - 1
-      call Enlarge % Matrix_Int(Grid % faces_n, i=Grid % faces_n_nodes(s))
+      call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,Grid % faces_n_nodes(s)/))
       do i_nod = 1, Grid % faces_n_nodes(s)
         tok = Line % tokens(i_nod + 1)
         i = index(tok, '/')
