@@ -902,24 +902,26 @@
     na1=node_n2(na,1)
     na2=node_n2(na,2)
 
-    if( (twin_n(na1,0) .ne. 0).and.(twin_n(na2,0) .ne. 0) ) then
+    if( (Grid % twin_n(na1,0) .ne. 0) .and.  &
+        (Grid % twin_n(na2,0) .ne. 0) ) then
 
       do nb=na+1,nn_2
         nb0=node_n2(nb,0)
         nb1=node_n2(nb,1)
         nb2=node_n2(nb,2)
 
-        if( (twin_n(nb1,0) .ne. 0).and.(twin_n(nb2,0) .ne. 0) ) then
+        if( (Grid % twin_n(nb1,0) .ne. 0) .and.  &
+            (Grid % twin_n(nb2,0) .ne. 0) ) then
 
-          if( (Gen_Mod_Are_Nodes_Twins(na1,nb1) .and.   &
-               Gen_Mod_Are_Nodes_Twins(na2,nb2)) .or.   &
-              (Gen_Mod_Are_Nodes_Twins(na1,nb2) .and.   &
-               Gen_Mod_Are_Nodes_Twins(na2,nb1))  ) then
-            if (.not. Gen_Mod_Are_Nodes_Twins(na0,nb0)) then
-              twin_n(na0,0)=twin_n(na0,0)+1
-              twin_n(na0,twin_n(na0,0))=nb0
-              twin_n(nb0,0)=twin_n(nb0,0)+1
-              twin_n(nb0,twin_n(nb0,0))=na0
+          if( (Grid % Are_Nodes_Twins(na1,nb1) .and.   &
+               Grid % Are_Nodes_Twins(na2,nb2)) .or.   &
+              (Grid % Are_Nodes_Twins(na1,nb2) .and.   &
+               Grid % Are_Nodes_Twins(na2,nb1))  ) then
+            if (.not. Grid % Are_Nodes_Twins(na0,nb0)) then
+              Grid % twin_n(na0,0)=Grid % twin_n(na0,0)+1
+              Grid % twin_n(na0,Grid % twin_n(na0,0))=nb0
+              Grid % twin_n(nb0,0)=Grid % twin_n(nb0,0)+1
+              Grid % twin_n(nb0,Grid % twin_n(nb0,0))=na0
             end if
           end if
         end if
@@ -932,24 +934,26 @@
     na1=node_n4(na,1)
     na2=node_n4(na,4) ! diagonal
 
-    if( (twin_n(na1,0) .ne. 0).and.(twin_n(na2,0) .ne. 0) ) then
+    if( (Grid % twin_n(na1,0) .ne. 0) .and.  &
+        (Grid % twin_n(na2,0) .ne. 0) ) then
 
       do nb=na+1,nn_4
         nb0=node_n4(nb,0)
         nb1=node_n4(nb,1)
         nb2=node_n4(nb,4) ! diagonal
 
-        if( (twin_n(nb1,0) .ne. 0).and.(twin_n(nb2,0) .ne. 0) ) then
+        if( (Grid % twin_n(nb1,0) .ne. 0) .and.  &
+            (Grid % twin_n(nb2,0) .ne. 0) ) then
 
-          if( (Gen_Mod_Are_Nodes_Twins(na1,nb1) .and.  &
-               Gen_Mod_Are_Nodes_Twins(na2,nb2)) .or.  &
-              (Gen_Mod_Are_Nodes_Twins(na1,nb2) .and.  &
-               Gen_Mod_Are_Nodes_Twins(na2,nb1))  ) then
-            if (.not. Gen_Mod_Are_Nodes_Twins(na0,nb0)) then
-              twin_n(na0,0)=twin_n(na0,0)+1
-              twin_n(na0,twin_n(na0,0))=nb0
-              twin_n(nb0,0)=twin_n(nb0,0)+1
-              twin_n(nb0,twin_n(nb0,0))=na0
+          if( (Grid % Are_Nodes_Twins(na1,nb1) .and.  &
+               Grid % Are_Nodes_Twins(na2,nb2)) .or.  &
+              (Grid % Are_Nodes_Twins(na1,nb2) .and.  &
+               Grid % Are_Nodes_Twins(na2,nb1))  ) then
+            if (.not. Grid % Are_Nodes_Twins(na0,nb0)) then
+              Grid % twin_n(na0,0)=Grid % twin_n(na0,0)+1
+              Grid % twin_n(na0,Grid % twin_n(na0,0))=nb0
+              Grid % twin_n(nb0,0)=Grid % twin_n(nb0,0)+1
+              Grid % twin_n(nb0,Grid % twin_n(nb0,0))=na0
             end if
           end if
         end if

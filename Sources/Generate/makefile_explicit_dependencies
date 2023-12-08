@@ -7,8 +7,6 @@ $(DIR_OBJECT)/Point_Mod.o \
 $(DIR_OBJECT)/Line_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 \
 Domain_Mod/*.f90 \
 $(DIR_OBJECT)/Block_Mod.o 
 
@@ -19,9 +17,7 @@ $(DIR_OBJECT)/Refines_Mod.o:\
 Refines_Mod/*.f90 \
 $(DIR_OBJECT)/Point_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Refines_Mod/Connectivity.f90
@@ -46,8 +42,6 @@ $(DIR_OBJECT)/Refines_Mod.o \
 Refines_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 \
 Generate_Mod/*.f90 \
 $(DIR_OBJECT)/Domain_Mod.o \
 Domain_Mod/*.f90 
@@ -63,9 +57,7 @@ $(DIR_OBJECT)/Const_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Print_Generate_Statistics.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Gen_Mod.o \
-$(DIR_SHARED)/Gen_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Generate_Mod/Calculate_Geometry.f90
@@ -128,12 +120,6 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Swap_Mod.o:\
 $(DIR_SHARED)/Swap_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Gen_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Gen_Mod.o:\
-$(DIR_SHARED)/Gen_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Polyhedron_Mod.f90
@@ -230,6 +216,7 @@ $(DIR_OBJECT)/Metis_Mod.o \
 $(DIR_SHARED)/Metis_Mod/*.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
 $(DIR_SHARED)/Memory_Mod/*.f90 \
+$(DIR_SHARED)/Memory_Mod_01.tgz \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
@@ -290,7 +277,10 @@ $(DIR_SHARED)/File_Mod/*.f90
 $(DIR_OBJECT)/Memory_Mod.o:\
 $(DIR_OBJECT)/Message_Mod.o \
 $(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_SHARED)/Memory_Mod/*.f90 
+$(DIR_SHARED)/Memory_Mod/*.f90 \
+$(DIR_SHARED)/Memory_Mod_01.tgz \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Work_Mod.f90

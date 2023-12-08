@@ -98,11 +98,11 @@
                                   Grid % max_n_bnd_cells,  &
                                   Grid % max_n_nodes)
 
-  ! Variables still declared in Gen_Mod.h90:
-  allocate (face_c_to_c(Grid % max_n_faces,2))
-  face_c_to_c = 0
-  allocate (twin_n(Grid % max_n_nodes,0:8))
-  twin_n (:,:) = 0
+  ! Variables which used to be declared in Gen_Mod:
+  allocate(Grid % face_c_to_c(Grid % max_n_faces,2))
+  Grid % face_c_to_c = 0
+  allocate (Grid % twin_n(Grid % max_n_nodes,0:8))
+  Grid % twin_n(:,:) = 0
 
   print *, '# Allocation successfull !'
 
@@ -352,18 +352,23 @@
   !   Periodic boundaries   !
   !-------------------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *)  n_periodic_cond  ! number of periodic boundaries
-  print '(a38,i7)', '# Number of periodic boundaries:     ', n_periodic_cond
+  read(Line % tokens(1), *)  Dom % n_periodic_cond
+  print '(a38,i7)', '# Number of periodic boundaries:     ',  &
+                     Dom % n_periodic_cond
 
-  allocate (periodic_cond(n_periodic_cond,8))
+  allocate(Dom % periodic_cond(Dom % n_periodic_cond,8))
 
-  do n=1,n_periodic_cond
+  do n=1,Dom % n_periodic_cond
     call File % Read_Line(fu)
-    read(Line % whole, *) dum, periodic_cond(n,1), periodic_cond(n,2),  &
-                               periodic_cond(n,3), periodic_cond(n,4)
+    read(Line % whole, *) dum, Dom % periodic_cond(n,1),  &
+                               Dom % periodic_cond(n,2),  &
+                               Dom % periodic_cond(n,3),  &
+                               Dom % periodic_cond(n,4)
     call File % Read_Line(fu)
-    read(Line % whole, *)      periodic_cond(n,5), periodic_cond(n,6),  &
-                               periodic_cond(n,7), periodic_cond(n,8)
+    read(Line % whole, *)      Dom % periodic_cond(n,5),  &
+                               Dom % periodic_cond(n,6),  &
+                               Dom % periodic_cond(n,7),  &
+                               Dom % periodic_cond(n,8)
   end do
 
   !---------------------!

@@ -5,7 +5,6 @@
 !>  of the code. It integrates several specialized modules (Point_Mod, Line_Mod,
 !>  Block_Mod and Range_Mod) to define a computational grid.
 !------------------------------------------------------------------------------!
-  use Gen_Mod                      ! a relict from the past
   use Point_Mod, only: Point_Type
   use Line_Mod,  only: Line_Type
   use Block_Mod, only: Block_Type
@@ -27,6 +26,9 @@
     integer :: n_lines    !! number of lines defined in the .dom file
     integer :: n_ranges   !! number of refinement regions
     integer :: n_smooths  !! number of smoothing regions
+
+    integer              :: n_periodic_cond       !! number of periodic bounds.
+    integer, allocatable ::   periodic_cond(:,:)  !! store periodic conditions
 
     type(Point_Type), allocatable :: points(:)  !! array to store points
     type(Block_Type), allocatable :: blocks(:)  !! array to store blocks

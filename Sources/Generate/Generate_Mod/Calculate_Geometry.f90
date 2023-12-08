@@ -229,7 +229,7 @@
           n_per = n_per + 1
 
           ! Find the coordinates of ...
-          m = face_c_to_c(s,2)
+          m = Grid % face_c_to_c(s,2)
 
           if(Grid % faces_n_nodes(s) .eq. 4) then
 

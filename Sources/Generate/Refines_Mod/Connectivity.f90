@@ -88,18 +88,18 @@
 
           ! Which volumes are connected with side Grid % n_faces
           Grid % faces_c(1, Grid % n_faces) = c1
-          Grid % faces_c(2, Grid % n_faces) = c2 
+          Grid % faces_c(2, Grid % n_faces) = c2
 
           ! Which is c2 neighbour of c1 and vice versa
           do c = 1,24
-            if(Grid % cells_c(c,c1) .eq. c2) then 
-              face_c_to_c(Grid % n_faces,1) = c
+            if(Grid % cells_c(c,c1) .eq. c2) then
+              Grid % face_c_to_c(Grid % n_faces,1) = c
             end if
 
             if(c2 > 0) then
-              if(Grid % cells_c(c,c2) .eq. c1) then 
-                face_c_to_c(Grid % n_faces,2) = c
-              end if 
+              if(Grid % cells_c(c,c2) .eq. c1) then
+                Grid % face_c_to_c(Grid % n_faces,2) = c
+              end if
             end if
           end do
 
@@ -107,13 +107,13 @@
           if(c2  > 0) then
             if(ref % cell_level(c2) > ref % cell_level(c1)) then
               Grid % faces_n(1,Grid % n_faces) =  &
-                Grid % cells_n( fn(face_c_to_c(Grid % n_faces,2),4), c2 )
+                Grid % cells_n( fn(Grid % face_c_to_c(Grid % n_faces,2),4), c2 )
               Grid % faces_n(2,Grid % n_faces) =  &
-                Grid % cells_n( fn(face_c_to_c(Grid % n_faces,2),3), c2 )
+                Grid % cells_n( fn(Grid % face_c_to_c(Grid % n_faces,2),3), c2 )
               Grid % faces_n(3,Grid % n_faces) =  &
-                Grid % cells_n( fn(face_c_to_c(Grid % n_faces,2),2), c2 )
+                Grid % cells_n( fn(Grid % face_c_to_c(Grid % n_faces,2),2), c2 )
               Grid % faces_n(4,Grid % n_faces) =  &
-                Grid % cells_n( fn(face_c_to_c(Grid % n_faces,2),1), c2 )
+                Grid % cells_n( fn(Grid % face_c_to_c(Grid % n_faces,2),1), c2 )
             else
               Grid % faces_n(1,Grid % n_faces) = Grid % cells_n( fn(m,1), c1 )
               Grid % faces_n(2,Grid % n_faces) = Grid % cells_n( fn(m,2), c1 )

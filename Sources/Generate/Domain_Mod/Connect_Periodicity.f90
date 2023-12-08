@@ -48,15 +48,15 @@
   integer :: trans1(3,3), trans2(3,3)
 !==============================================================================!
 
-  ! Initialise twin_n
+  ! Initialise Grid % twin_n
   do n = 1, Grid % max_n_nodes
-    twin_n(n,0) = 0
+    Grid % twin_n(n,0) = 0
   end do
 
   !-----------------------------------------------------!
   !   Search through all block and all of their faces   !
   !-----------------------------------------------------!
-  do p = 1, n_periodic_cond
+  do p = 1, Dom % n_periodic_cond
     do b2 = 1, size(Dom % blocks)
       do b1 = 1, size(Dom % blocks)
         do f2 = 1, 6    ! faces of the second block
@@ -79,14 +79,14 @@
             n23 = Dom % blocks(b2) % faces(f2, 3)
             n24 = Dom % blocks(b2) % faces(f2, 4)
 
-            p11=periodic_cond(p, 1)
-            p12=periodic_cond(p, 2)
-            p13=periodic_cond(p, 3)
-            p14=periodic_cond(p, 4)
-            p21=periodic_cond(p, 5)
-            p22=periodic_cond(p, 6)
-            p23=periodic_cond(p, 7)
-            p24=periodic_cond(p, 8)
+            p11 = Dom % periodic_cond(p, 1)
+            p12 = Dom % periodic_cond(p, 2)
+            p13 = Dom % periodic_cond(p, 3)
+            p14 = Dom % periodic_cond(p, 4)
+            p21 = Dom % periodic_cond(p, 5)
+            p22 = Dom % periodic_cond(p, 6)
+            p23 = Dom % periodic_cond(p, 7)
+            p24 = Dom % periodic_cond(p, 8)
 
             ! Check if they are connected
             if( ( ((n11 .eq. p11).and.(n13 .eq. p13)) .or.                &
@@ -279,15 +279,15 @@
                   n2 = Grid % new_n(n2)
 
                   ! Check if they are already connected
-                  do n=1, twin_n(n1,0)
-                    if(Gen_Mod_Are_Nodes_Twins(n1,n2)) goto 1
+                  do n=1, Grid % twin_n(n1,0)
+                    if(Grid % Are_Nodes_Twins(n1,n2)) goto 1
                   end do
 
                   ! If they were not, connect them
-                  twin_n(n1,0)=twin_n(n1,0)+1
-                  twin_n(n1,twin_n(n1,0))=n2
-                  twin_n(n2,0)=twin_n(n2,0)+1
-                  twin_n(n2,twin_n(n2,0))=n1
+                  Grid % twin_n(n1,0)=Grid % twin_n(n1,0)+1
+                  Grid % twin_n(n1,Grid % twin_n(n1,0))=n2
+                  Grid % twin_n(n2,0)=Grid % twin_n(n2,0)+1
+                  Grid % twin_n(n2,Grid % twin_n(n2,0))=n1
 
 1               end do  ! jg
               end do    ! ig
@@ -305,17 +305,17 @@
   !   is also my twin   !
   !---------------------!
   do n1=1,Grid % n_nodes
-    do i1=1,twin_n(n1,0)
-      n2=twin_n(n1,i1)
-      do i2=1,twin_n(n2,0)
-        n3=twin_n(n2,i2)   ! twins from n2
+    do i1=1,Grid % twin_n(n1,0)
+      n2=Grid % twin_n(n1,i1)
+      do i2=1,Grid % twin_n(n2,0)
+        n3=Grid % twin_n(n2,i2)   ! twins from n2
         new=n3
-        do i3=1,twin_n(n1,0)
-          if( (twin_n(n1,i3) .eq. n3) .or. (n3 .eq. n1) ) new=0
+        do i3=1,Grid % twin_n(n1,0)
+          if( (Grid % twin_n(n1,i3) .eq. n3) .or. (n3 .eq. n1) ) new=0
         end do
         if(new .eq. n3) then
-          twin_n(n1,0)=twin_n(n1,0)+1
-          twin_n(n1,twin_n(n1,0))=n3
+          Grid % twin_n(n1,0)=Grid % twin_n(n1,0)+1
+          Grid % twin_n(n1,Grid % twin_n(n1,0))=n3
         end if
       end do
     end do

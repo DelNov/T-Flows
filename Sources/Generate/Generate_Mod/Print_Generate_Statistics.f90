@@ -4,7 +4,6 @@
 !>  Prints some statistical data about the Grid on the terminal.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Gen_Mod,  only: twin_n
   use Grid_Mod, only: Grid_Type
 !------------------------------------------------------------------------------!
   implicit none
@@ -68,7 +67,7 @@
   do j = 1, 8
     numb = 0
     do i = 1, Grid % n_nodes
-      if(twin_n(i,0) .eq. j) numb=numb+1
+      if(Grid % twin_n(i,0) .eq. j) numb=numb+1
     end do
     if(numb .ne. 0) then
       print 6, '# Number of nodes with ', j, ' twins     : ', numb

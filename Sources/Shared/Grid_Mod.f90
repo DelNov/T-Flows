@@ -146,6 +146,10 @@
     real, allocatable :: f (:)
     real, allocatable :: fw(:)
 
+    ! For each face, which neighbours are to each other cells which meet there.
+    ! The name derives from "face cell to cell".  Used in Generate only
+    integer, allocatable :: face_c_to_c(:,:)
+
     !-------------------------!
     !  Node-based variables   !
     !-------------------------!
@@ -156,10 +160,14 @@
     type(Region_Type) :: region  !! boundary condition regions
 
     !  Maximum number of cells, boundary cells and faces
-    ! (Used for tentative memory allocation in Generator)
+    ! (Used for tentative memory allocation in Generate)
     integer :: max_n_nodes      !! max. number of nodes (used only in Generate)
     integer :: max_n_bnd_cells  !! max. number of bnd. cells (only in Generate)
     integer :: max_n_faces      !! max. number of faces (used only in Generate)
+
+    ! Twin (periodic) nodes, used only in Generate
+    integer, allocatable :: twin_n(:,:)  !! for each node, list of
+                                         !! twins, periodic nodes
 
     ! New numbers for nodes, cells, faces and edges
     integer, allocatable :: new_n(:)  !! new node numbers (when renumbering)
@@ -197,6 +205,7 @@
     type(Omp_Type) :: Omp  !! used in OMP vectorization
 
     contains
+      procedure :: Are_Nodes_Twins
       procedure :: Allocate_Cells
       procedure :: Allocate_Faces
       procedure :: Allocate_Nodes
@@ -275,6 +284,7 @@
 #   include "Grid_Mod/Calculate/Calculate_Wall_Distance.f90"
 #   include "Grid_Mod/Calculate/Calculate_Weights_Cells_To_Nodes.f90"
 #   include "Grid_Mod/Calculate/Calculate_Weights_Nodes_To_Cells.f90"
+#   include "Grid_Mod/Connectivity/Are_Nodes_Twins.f90"
 #   include "Grid_Mod/Connectivity/Check_Cells_Closure.f90"
 #   include "Grid_Mod/Connectivity/Correct_Face_Surfaces.f90"
 #   include "Grid_Mod/Connectivity/Determine_Regions_Ranges.f90"

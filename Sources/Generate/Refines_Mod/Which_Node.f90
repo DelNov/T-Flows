@@ -28,9 +28,9 @@
   end do
 
   ! If it failed try his twins also
-  do j=1,twin_n(n,0)
+  do j=1,Grid % twin_n(n,0)
     do i=1,8
-      if( Grid % cells_n(i,c) .eq. twin_n(n,j)) then
+      if( Grid % cells_n(i,c) .eq. Grid % twin_n(n,j)) then
         goto 1
       end if
     end do
