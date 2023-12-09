@@ -22,7 +22,7 @@
 !     - Determines the positions of the faces of the block (xf1, yf1, zf1,     !
 !       etc.) based on the corner coordinates                                  !
 !     -  If a node on a face has not been previously positioned (indicated     !
-!        by a coordinate greater than TERA), calculates its position;          !
+!        by a node_positioned set to .false.), calculates its position;        !
 !        otherwise, uses the existing position.                                !
 !   * Node Position Assignment:                                                !
 !     - If the node's position has not been previously set, it calculates      !
@@ -65,7 +65,7 @@
   n6 = Grid % n_nodes + (nk-1)*ni*nj + ( j-1)*ni + i     !  ->  k .eq. nk
 
   ! Face I
-  if(Grid % xn(n1) .gt. TERA) then
+  if(.not. Grid % node_positioned(n1)) then
     xf1=( (real(ni-i)*xt(1) + real(i-1)*xt(2)) * real(nj-j) +   &
           (real(ni-i)*xt(3) + real(i-1)*xt(4)) * real(j-1)  )   &
        /  (real(ni-1)*real(nj-1))
@@ -83,7 +83,7 @@
   end if
 
   ! Face VI
-  if(Grid % xn(n6) .gt. TERA) then
+  if(.not. Grid % node_positioned(n6)) then
     xf6=( (real(ni-i)*xt(5) + real(i-1)*xt(6)) * real(nj-j) +   &
           (real(ni-i)*xt(7) + real(i-1)*xt(8)) * real(j-1)  )   &
        /  (real(ni-1)*real(nj-1))
@@ -100,7 +100,7 @@
   end if
 
   ! Face III
-  if(Grid % xn(n3) .gt. TERA) then
+  if(.not. Grid % node_positioned(n3)) then
     xf3=( (real(ni-i)*xt(1) + real(i-1)*xt(2)) * real(nk-k) +   &
           (real(ni-i)*xt(5) + real(i-1)*xt(6)) * real(k-1)  )   &
        /  (real(ni-1)*real(nk-1))
@@ -117,7 +117,7 @@
   end if
 
   ! Face V
-  if(Grid % xn(n5) .gt. TERA) then
+  if(.not. Grid % node_positioned(n5)) then
     xf5=( (real(ni-i)*xt(3) + real(i-1)*xt(4)) * real(nk-k) +   &
           (real(ni-i)*xt(7) + real(i-1)*xt(8)) * real(k-1)  )   &
        /  (real(ni-1)*real(nk-1))
@@ -134,7 +134,7 @@
   end if
 
   ! Face II
-  if(Grid % xn(n2) .gt. TERA) then
+  if(.not. Grid % node_positioned(n2)) then
     xf2=( (real(nj-j)*xt(1) + real(j-1)*xt(3)) * real(nk-k) +   &
           (real(nj-j)*xt(5) + real(j-1)*xt(7)) * real(k-1)  )   &
        /  (real(nj-1)*real(nk-1))
@@ -151,7 +151,7 @@
   end if
 
   ! Face IV
-  if(Grid % xn(n4) .gt. TERA) then
+  if(.not. Grid % node_positioned(n4)) then
     xf4=( (real(nj-j)*xt(2) + real(j-1)*xt(4)) * real(nk-k) +   &
           (real(nj-j)*xt(6) + real(j-1)*xt(8)) * real(k-1)  )   &
        /  (real(nj-1)*real(nk-1))
@@ -167,7 +167,7 @@
     zf4 = Grid % zn(n4)
   end if
 
-  if( Grid % xn(n) .gt. TERA ) then
+  if(.not. Grid % node_positioned(n)) then
     Grid % xn(n) = ( xf1*real(nk-k) + xf6*real(k-1) ) * wx16 / real(nk-1)  &
                  + ( xf2*real(ni-i) + xf4*real(i-1) ) * wx24 / real(ni-1)  &
                  + ( xf3*real(nj-j) + xf5*real(j-1) ) * wx35 / real(nj-1)

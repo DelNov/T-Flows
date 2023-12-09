@@ -165,9 +165,10 @@
     integer :: max_n_bnd_cells  !! max. number of bnd. cells (only in Generate)
     integer :: max_n_faces      !! max. number of faces (used only in Generate)
 
-    ! Twin (periodic) nodes, used only in Generate
-    integer, allocatable :: twin_n(:,:)  !! for each node, list of
-                                         !! twins, periodic nodes
+    ! Twin (periodic) nodes, and node_positioned are used only in Generate
+    integer, allocatable :: twin_n(:,:)         !! for each node, list of
+                                                !! twins, periodic nodes
+    logical, allocatable :: node_positioned(:)  !! true if node is positioned
 
     ! New numbers for nodes, cells, faces and edges
     integer, allocatable :: new_n(:)  !! new node numbers (when renumbering)

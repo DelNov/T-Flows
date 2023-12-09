@@ -36,11 +36,11 @@
   integer :: trans(3,2)
 !==============================================================================!
 
-  ! Setting coordinates to PETA here serves later as indicator if
+  ! Setting node_positioned to false here serves later as indicator if
   ! coordinates this particular node has been calculated or not
   ! (For example in Domain_Mod_Distribute_Nodes Domain_Mod_Laplace)
   do n = 1, Grid % max_n_nodes
-    Grid % xn(n) = PETA
+    Grid % node_positioned(n) = .false.
   end do
 
   !------------------------------------!

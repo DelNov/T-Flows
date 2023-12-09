@@ -31,4 +31,9 @@
     allocate(Grid % old_n(n));  Grid % old_n(:) = 0
   end if
 
+  ! This is used only in initial stages of Generate, inside Domain_Mod really
+  if(PROGRAM_NAME .eq. 'Generate') then
+    allocate(Grid % node_positioned(n));  Grid % node_positioned(:) = .false.
+  end if
+
   end subroutine
