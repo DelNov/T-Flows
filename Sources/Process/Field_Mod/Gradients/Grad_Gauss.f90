@@ -31,6 +31,8 @@
   real,    contiguous, pointer :: sx(:), sy(:), sz(:), vol(:)
   integer, contiguous, pointer :: faces_c(:,:)
   integer                      :: s, c1, c2, c, reg
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Flow)
 !==============================================================================!
 
   call Profiler % Start('Grad_Gauss')
