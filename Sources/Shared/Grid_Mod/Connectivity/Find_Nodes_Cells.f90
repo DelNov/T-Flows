@@ -2,7 +2,7 @@
   subroutine Find_Nodes_Cells(Grid)
 !------------------------------------------------------------------------------!
 !>  This subroutine identifies and lists all cells surrounding each node
-!>  within the computational grid. It is particularly crucial for Lagrangian
+!>  within the computational grid. It is particularly important for Lagrangian
 !>  particle tracking, as it provides the necessary spatial information to
 !>  accurately trace particle paths through the grid.
 !------------------------------------------------------------------------------!
