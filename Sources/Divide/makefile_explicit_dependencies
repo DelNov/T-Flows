@@ -50,12 +50,6 @@ $(DIR_OBJECT)/Swap_Mod.o:\
 $(DIR_SHARED)/Swap_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Gen_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Gen_Mod.o:\
-$(DIR_SHARED)/Gen_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Polyhedron_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Polyhedron_Mod.o:\

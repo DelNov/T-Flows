@@ -7,8 +7,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Refines_Type) :: ref  !! refinement region
-  integer            :: nl   !! number of levels
+  type(Refines_Type)  :: ref  !! refinement region
+  integer, intent(in) :: nl   !! number of levels
 !==============================================================================!
 
   ref % n_levels  = nl

@@ -249,9 +249,13 @@
                      + Grid % zn(Grid % cells_n(fn(m,3), c2))  &
                      + Grid % zn(Grid % cells_n(fn(m,4), c2)))
 
+            ! What counts in this expansion, is the number of shadows
+            call Grid % Allocate_Faces(Grid % n_faces, n_per, GROWTH_MARGIN)
+
             ! Store the shadow face nodes
             nn = Grid % faces_n_nodes(s)
             nf = Grid % n_faces + n_per   ! new face number
+
             Grid % faces_n_nodes(nf) = nn
             Grid % faces_n(1:nn, nf) = Grid % cells_n(fn(m,1:nn), c2)
 

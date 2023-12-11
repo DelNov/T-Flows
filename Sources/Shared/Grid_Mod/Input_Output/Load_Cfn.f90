@@ -389,12 +389,7 @@
   !   Boundary   !
   !--------------!
 
-  ! Physical boundary cells (and all the faces)
-  ! (This opens the oportunity to store bounary condition info in ...
-  !  ... the faces thus ridding us of the "if(c2 < 0) then" checks)
-  allocate (Grid % region % at_cell(-nb:-1))
-  call File % Buffered_Read_Int_Array(fu, Grid % region % at_cell(-nb:-1))
-
+  ! This should move to Grid % Allocate_Faces
   allocate (Grid % region % at_face(1:nf))
   Grid % region % at_face(1:nf) = 0
 

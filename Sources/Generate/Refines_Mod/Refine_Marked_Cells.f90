@@ -81,10 +81,10 @@
   nn_8 = 0
 
   ! Allocate local memory
-  allocate (node_n2(Grid % max_n_nodes,0:2));     node_n2        = 0
-  allocate (node_n4(Grid % max_n_nodes,0:4));     node_n4        = 0
-  allocate (node_n8(Grid % max_n_nodes,0:8));     node_n8        = 0
-  allocate (cell_points_to(Grid % max_n_nodes));  cell_points_to = 0
+  call Enlarge % Matrix_Int(node_n2, i=(/1,Grid % n_nodes/), j=(/0,2/))
+  call Enlarge % Matrix_Int(node_n4, i=(/1,Grid % n_nodes/), j=(/0,4/))
+  call Enlarge % Matrix_Int(node_n8, i=(/1,Grid % n_nodes/), j=(/0,8/))
+  call Enlarge % Array_Int(cell_points_to, i=(/1,Grid % n_nodes/))
 
   !---------------------!
   !                     !
@@ -97,6 +97,12 @@
       cell_points_to(c) = Grid % n_cells   ! now points to cr8
     end if
   end do
+
+  ! Expand cell arrays to accomodate new cells
+  ! (At this stage, only Grid % n_cells matters)
+  call Grid % Allocate_Cells(Grid % n_cells, Grid % n_bnd_cells)
+  call Enlarge % Array_Int(cell_points_to, i=(/1,Grid % n_nodes/))
+  call Refines_Mod_Allocate_Cells(ref, Grid % n_cells, Grid % n_bnd_cells)
 
   do c = 1, n_cells_old
 
@@ -121,7 +127,7 @@
     !   Refined cells   !
     !                   !
     !-------------------!
-    if( ref % cell_marked(c) ) then  ! only refined
+    if( ref % cell_marked(c) ) then  ! only refined; ends at line 826
 
       !------------------------------------!
       !   Take care of neighboring cells   !
@@ -286,538 +292,557 @@
                               + Refines_Mod_Which_Node(ref,Grid,c6,n8)
       end if
 
-    !------------------------!
-    !   Take care of nodes   !
-    !------------------------!
+      !------------------------!
+      !   Take care of nodes   !
+      !------------------------!
 
-    !------------------------!
-    !   Nodes on the edges   !
-    !------------------------!
-    n12 = 0     !
-    n13 = 0     !         8-----n68-----6
-    n24 = 0     !        /|            /|
-    n34 = 0     !      n78|          n56|
-    n15 = 0     !      / n48         / n26
-    n26 = 0     !     7-----n57-----5   |
-    n37 = 0     !     |   |         |   |
-    n48 = 0     !     |   4- - -n24-| - 2
-    n56 = 0     !    n37 /         n15 /
-    n57 = 0     !     |n34          |n12
-    n68 = 0     !     |/            |/
-    n78 = 0     !     3-----n13-----1
+      !------------------------!
+      !   Nodes on the edges   !
+      !------------------------!
+      n12 = 0     !
+      n13 = 0     !         8-----n68-----6
+      n24 = 0     !        /|            /|
+      n34 = 0     !      n78|          n56|
+      n15 = 0     !      / n48         / n26
+      n26 = 0     !     7-----n57-----5   |
+      n37 = 0     !     |   |         |   |
+      n48 = 0     !     |   4- - -n24-| - 2
+      n56 = 0     !    n37 /         n15 /
+      n57 = 0     !     |n34          |n12
+      n68 = 0     !     |/            |/
+      n78 = 0     !     3-----n13-----1
 
-    ! n12
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n1 .and. node_n2(n,2) .eq. n2 ) .or.  &
-          ( node_n2(n,1) .eq. n2 .and. node_n2(n,2) .eq. n1) ) then
-        n12 = node_n2(n,0)
+      ! n12
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n1 .and. node_n2(n,2) .eq. n2 ) .or.  &
+            ( node_n2(n,1) .eq. n2 .and. node_n2(n,2) .eq. n1) ) then
+          n12 = node_n2(n,0)
+        end if
+      end do
+      if (n12 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n12 = Grid % n_nodes
+        node_n2(nn_2,0) = n12
+        node_n2(nn_2,1) = n1
+        node_n2(nn_2,2) = n2
+        Grid % xn(n12) = .5 * (Grid % xn(n1) + Grid % xn(n2))
+        Grid % yn(n12) = .5 * (Grid % yn(n1) + Grid % yn(n2))
+        Grid % zn(n12) = .5 * (Grid % zn(n1) + Grid % zn(n2))
       end if
-    end do
-    if (n12 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n12 = Grid % n_nodes
-      node_n2(nn_2,0) = n12
-      node_n2(nn_2,1) = n1
-      node_n2(nn_2,2) = n2
-      Grid % xn(n12) = .5 * (Grid % xn(n1) + Grid % xn(n2))
-      Grid % yn(n12) = .5 * (Grid % yn(n1) + Grid % yn(n2))
-      Grid % zn(n12) = .5 * (Grid % zn(n1) + Grid % zn(n2))
-    end if
 
-    ! n13
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n1 .and. node_n2(n,2) .eq. n3 ) .or.  &
-          ( node_n2(n,1) .eq. n3 .and. node_n2(n,2) .eq. n1) ) then
-        n13 = node_n2(n,0)
+      ! n13
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n1 .and. node_n2(n,2) .eq. n3 ) .or.  &
+            ( node_n2(n,1) .eq. n3 .and. node_n2(n,2) .eq. n1) ) then
+          n13 = node_n2(n,0)
+        end if
+      end do
+      if (n13 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n13 = Grid % n_nodes
+        node_n2(nn_2,0) = n13
+        node_n2(nn_2,1) = n1
+        node_n2(nn_2,2) = n3
+        Grid % xn(n13) = .5 * (Grid % xn(n1) + Grid % xn(n3))
+        Grid % yn(n13) = .5 * (Grid % yn(n1) + Grid % yn(n3))
+        Grid % zn(n13) = .5 * (Grid % zn(n1) + Grid % zn(n3))
       end if
-    end do
-    if (n13 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n13 = Grid % n_nodes
-      node_n2(nn_2,0) = n13
-      node_n2(nn_2,1) = n1
-      node_n2(nn_2,2) = n3
-      Grid % xn(n13) = .5 * (Grid % xn(n1) + Grid % xn(n3))
-      Grid % yn(n13) = .5 * (Grid % yn(n1) + Grid % yn(n3))
-      Grid % zn(n13) = .5 * (Grid % zn(n1) + Grid % zn(n3))
-    end if
 
-    ! n24
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n2 .and. node_n2(n,2) .eq. n4 ) .or.  &
-          ( node_n2(n,1) .eq. n4 .and. node_n2(n,2) .eq. n2) ) then
-        n24 = node_n2(n,0)
+      ! n24
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n2 .and. node_n2(n,2) .eq. n4 ) .or.  &
+            ( node_n2(n,1) .eq. n4 .and. node_n2(n,2) .eq. n2) ) then
+          n24 = node_n2(n,0)
+        end if
+      end do
+      if (n24 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n24 = Grid % n_nodes
+        node_n2(nn_2,0) = n24
+        node_n2(nn_2,1) = n2
+        node_n2(nn_2,2) = n4
+        Grid % xn(n24) = .5 * (Grid % xn(n2) + Grid % xn(n4))
+        Grid % yn(n24) = .5 * (Grid % yn(n2) + Grid % yn(n4))
+        Grid % zn(n24) = .5 * (Grid % zn(n2) + Grid % zn(n4))
       end if
-    end do
-    if (n24 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n24 = Grid % n_nodes
-      node_n2(nn_2,0) = n24
-      node_n2(nn_2,1) = n2
-      node_n2(nn_2,2) = n4
-      Grid % xn(n24) = .5 * (Grid % xn(n2) + Grid % xn(n4))
-      Grid % yn(n24) = .5 * (Grid % yn(n2) + Grid % yn(n4))
-      Grid % zn(n24) = .5 * (Grid % zn(n2) + Grid % zn(n4))
-    end if
 
-    ! n34
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n3 .and. node_n2(n,2) .eq. n4 ) .or.  &
-          ( node_n2(n,1) .eq. n4 .and. node_n2(n,2) .eq. n3) ) then
-        n34 = node_n2(n,0)
+      ! n34
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n3 .and. node_n2(n,2) .eq. n4 ) .or.  &
+            ( node_n2(n,1) .eq. n4 .and. node_n2(n,2) .eq. n3) ) then
+          n34 = node_n2(n,0)
+        end if
+      end do
+      if (n34 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n34 = Grid % n_nodes
+        node_n2(nn_2,0) = n34
+        node_n2(nn_2,1) = n3
+        node_n2(nn_2,2) = n4
+        Grid % xn(n34) = .5 * (Grid % xn(n3) + Grid % xn(n4))
+        Grid % yn(n34) = .5 * (Grid % yn(n3) + Grid % yn(n4))
+        Grid % zn(n34) = .5 * (Grid % zn(n3) + Grid % zn(n4))
       end if
-    end do
-    if (n34 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n34 = Grid % n_nodes
-      node_n2(nn_2,0) = n34
-      node_n2(nn_2,1) = n3
-      node_n2(nn_2,2) = n4
-      Grid % xn(n34) = .5 * (Grid % xn(n3) + Grid % xn(n4))
-      Grid % yn(n34) = .5 * (Grid % yn(n3) + Grid % yn(n4))
-      Grid % zn(n34) = .5 * (Grid % zn(n3) + Grid % zn(n4))
-    end if
 
-    ! n15
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n1 .and. node_n2(n,2) .eq. n5 ) .or.  &
-          ( node_n2(n,1) .eq. n5 .and. node_n2(n,2) .eq. n1) ) then
-        n15 = node_n2(n,0)
+      ! n15
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n1 .and. node_n2(n,2) .eq. n5 ) .or.  &
+            ( node_n2(n,1) .eq. n5 .and. node_n2(n,2) .eq. n1) ) then
+          n15 = node_n2(n,0)
+        end if
+      end do
+      if (n15 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n15 = Grid % n_nodes
+        node_n2(nn_2,0) = n15
+        node_n2(nn_2,1) = n1
+        node_n2(nn_2,2) = n5
+        Grid % xn(n15) = .5 * (Grid % xn(n1) + Grid % xn(n5))
+        Grid % yn(n15) = .5 * (Grid % yn(n1) + Grid % yn(n5))
+        Grid % zn(n15) = .5 * (Grid % zn(n1) + Grid % zn(n5))
       end if
-    end do
-    if (n15 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n15 = Grid % n_nodes
-      node_n2(nn_2,0) = n15
-      node_n2(nn_2,1) = n1
-      node_n2(nn_2,2) = n5
-      Grid % xn(n15) = .5 * (Grid % xn(n1) + Grid % xn(n5))
-      Grid % yn(n15) = .5 * (Grid % yn(n1) + Grid % yn(n5))
-      Grid % zn(n15) = .5 * (Grid % zn(n1) + Grid % zn(n5))
-    end if
 
-    ! n26
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n2 .and. node_n2(n,2) .eq. n6 ) .or.  &
-          ( node_n2(n,1) .eq. n6 .and. node_n2(n,2) .eq. n2) ) then
-        n26 = node_n2(n,0)
+      ! n26
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n2 .and. node_n2(n,2) .eq. n6 ) .or.  &
+            ( node_n2(n,1) .eq. n6 .and. node_n2(n,2) .eq. n2) ) then
+          n26 = node_n2(n,0)
+        end if
+      end do
+      if (n26 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n26 = Grid % n_nodes
+        node_n2(nn_2,0) = n26
+        node_n2(nn_2,1) = n2
+        node_n2(nn_2,2) = n6
+        Grid % xn(n26) = .5 * (Grid % xn(n2) + Grid % xn(n6))
+        Grid % yn(n26) = .5 * (Grid % yn(n2) + Grid % yn(n6))
+        Grid % zn(n26) = .5 * (Grid % zn(n2) + Grid % zn(n6))
       end if
-    end do
-    if (n26 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n26 = Grid % n_nodes
-      node_n2(nn_2,0) = n26
-      node_n2(nn_2,1) = n2
-      node_n2(nn_2,2) = n6
-      Grid % xn(n26) = .5 * (Grid % xn(n2) + Grid % xn(n6))
-      Grid % yn(n26) = .5 * (Grid % yn(n2) + Grid % yn(n6))
-      Grid % zn(n26) = .5 * (Grid % zn(n2) + Grid % zn(n6))
-    end if
 
-    ! n37
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n3 .and. node_n2(n,2) .eq. n7 ) .or.  &
-          ( node_n2(n,1) .eq. n7 .and. node_n2(n,2) .eq. n3) ) then
-        n37 = node_n2(n,0)
+      ! n37
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n3 .and. node_n2(n,2) .eq. n7 ) .or.  &
+            ( node_n2(n,1) .eq. n7 .and. node_n2(n,2) .eq. n3) ) then
+          n37 = node_n2(n,0)
+        end if
+      end do
+      if (n37 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n37 = Grid % n_nodes
+        node_n2(nn_2,0) = n37
+        node_n2(nn_2,1) = n3
+        node_n2(nn_2,2) = n7
+        Grid % xn(n37) = .5 * (Grid % xn(n3) + Grid % xn(n7))
+        Grid % yn(n37) = .5 * (Grid % yn(n3) + Grid % yn(n7))
+        Grid % zn(n37) = .5 * (Grid % zn(n3) + Grid % zn(n7))
       end if
-    end do
-    if (n37 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n37 = Grid % n_nodes
-      node_n2(nn_2,0) = n37
-      node_n2(nn_2,1) = n3
-      node_n2(nn_2,2) = n7
-      Grid % xn(n37) = .5 * (Grid % xn(n3) + Grid % xn(n7))
-      Grid % yn(n37) = .5 * (Grid % yn(n3) + Grid % yn(n7))
-      Grid % zn(n37) = .5 * (Grid % zn(n3) + Grid % zn(n7))
-    end if
 
-    ! n48
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n4 .and. node_n2(n,2) .eq. n8 ) .or.  &
-          ( node_n2(n,1) .eq. n8 .and. node_n2(n,2) .eq. n4) ) then
-        n48 = node_n2(n,0)
+      ! n48
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n4 .and. node_n2(n,2) .eq. n8 ) .or.  &
+            ( node_n2(n,1) .eq. n8 .and. node_n2(n,2) .eq. n4) ) then
+          n48 = node_n2(n,0)
+        end if
+      end do
+      if (n48 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n48 = Grid % n_nodes
+        node_n2(nn_2,0) = n48
+        node_n2(nn_2,1) = n4
+        node_n2(nn_2,2) = n8
+        Grid % xn(n48) = .5 * (Grid % xn(n4) + Grid % xn(n8))
+        Grid % yn(n48) = .5 * (Grid % yn(n4) + Grid % yn(n8))
+        Grid % zn(n48) = .5 * (Grid % zn(n4) + Grid % zn(n8))
       end if
-    end do
-    if (n48 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n48 = Grid % n_nodes
-      node_n2(nn_2,0) = n48
-      node_n2(nn_2,1) = n4
-      node_n2(nn_2,2) = n8
-      Grid % xn(n48) = .5 * (Grid % xn(n4) + Grid % xn(n8))
-      Grid % yn(n48) = .5 * (Grid % yn(n4) + Grid % yn(n8))
-      Grid % zn(n48) = .5 * (Grid % zn(n4) + Grid % zn(n8))
-    end if
 
-    ! n56
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n5 .and. node_n2(n,2) .eq. n6 ) .or.  &
-          ( node_n2(n,1) .eq. n6 .and. node_n2(n,2) .eq. n5) ) then
-        n56 = node_n2(n,0)
+      ! n56
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n5 .and. node_n2(n,2) .eq. n6 ) .or.  &
+            ( node_n2(n,1) .eq. n6 .and. node_n2(n,2) .eq. n5) ) then
+          n56 = node_n2(n,0)
+        end if
+      end do
+      if (n56 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n56 = Grid % n_nodes
+        node_n2(nn_2,0) = n56
+        node_n2(nn_2,1) = n5
+        node_n2(nn_2,2) = n6
+        Grid % xn(n56) = .5 * (Grid % xn(n5) + Grid % xn(n6))
+        Grid % yn(n56) = .5 * (Grid % yn(n5) + Grid % yn(n6))
+        Grid % zn(n56) = .5 * (Grid % zn(n5) + Grid % zn(n6))
       end if
-    end do
-    if (n56 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n56 = Grid % n_nodes
-      node_n2(nn_2,0) = n56
-      node_n2(nn_2,1) = n5
-      node_n2(nn_2,2) = n6
-      Grid % xn(n56) = .5 * (Grid % xn(n5) + Grid % xn(n6))
-      Grid % yn(n56) = .5 * (Grid % yn(n5) + Grid % yn(n6))
-      Grid % zn(n56) = .5 * (Grid % zn(n5) + Grid % zn(n6))
-    end if
 
-    ! n57
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n5 .and. node_n2(n,2) .eq. n7 ) .or.  &
-          ( node_n2(n,1) .eq. n7 .and. node_n2(n,2) .eq. n5) ) then
-        n57 = node_n2(n,0)
+      ! n57
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n5 .and. node_n2(n,2) .eq. n7 ) .or.  &
+            ( node_n2(n,1) .eq. n7 .and. node_n2(n,2) .eq. n5) ) then
+          n57 = node_n2(n,0)
+        end if
+      end do
+      if (n57 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n57 = Grid % n_nodes
+        node_n2(nn_2,0) = n57
+        node_n2(nn_2,1) = n5
+        node_n2(nn_2,2) = n7
+        Grid % xn(n57) = .5 * (Grid % xn(n5) + Grid % xn(n7))
+        Grid % yn(n57) = .5 * (Grid % yn(n5) + Grid % yn(n7))
+        Grid % zn(n57) = .5 * (Grid % zn(n5) + Grid % zn(n7))
       end if
-    end do
-    if (n57 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n57 = Grid % n_nodes
-      node_n2(nn_2,0) = n57
-      node_n2(nn_2,1) = n5
-      node_n2(nn_2,2) = n7
-      Grid % xn(n57) = .5 * (Grid % xn(n5) + Grid % xn(n7))
-      Grid % yn(n57) = .5 * (Grid % yn(n5) + Grid % yn(n7))
-      Grid % zn(n57) = .5 * (Grid % zn(n5) + Grid % zn(n7))
-    end if
 
-    ! n68
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n6 .and. node_n2(n,2) .eq. n8 ) .or.  &
-          ( node_n2(n,1) .eq. n8 .and. node_n2(n,2) .eq. n6) ) then
-        n68 = node_n2(n,0)
+      ! n68
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n6 .and. node_n2(n,2) .eq. n8 ) .or.  &
+            ( node_n2(n,1) .eq. n8 .and. node_n2(n,2) .eq. n6) ) then
+          n68 = node_n2(n,0)
+        end if
+      end do
+      if (n68 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n68 = Grid % n_nodes
+        node_n2(nn_2,0) = n68
+        node_n2(nn_2,1) = n6
+        node_n2(nn_2,2) = n8
+        Grid % xn(n68) = .5 * (Grid % xn(n6) + Grid % xn(n8))
+        Grid % yn(n68) = .5 * (Grid % yn(n6) + Grid % yn(n8))
+        Grid % zn(n68) = .5 * (Grid % zn(n6) + Grid % zn(n8))
       end if
-    end do
-    if (n68 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n68 = Grid % n_nodes
-      node_n2(nn_2,0) = n68
-      node_n2(nn_2,1) = n6
-      node_n2(nn_2,2) = n8
-      Grid % xn(n68) = .5 * (Grid % xn(n6) + Grid % xn(n8))
-      Grid % yn(n68) = .5 * (Grid % yn(n6) + Grid % yn(n8))
-      Grid % zn(n68) = .5 * (Grid % zn(n6) + Grid % zn(n8))
-    end if
 
-    ! n78
-    do n = 1, nn_2
-      if( ( node_n2(n,1) .eq. n7 .and. node_n2(n,2) .eq. n8 ) .or.  &
-          ( node_n2(n,1) .eq. n8 .and. node_n2(n,2) .eq. n7) ) then
-        n78 = node_n2(n,0)
+      ! n78
+      do n = 1, nn_2
+        if( ( node_n2(n,1) .eq. n7 .and. node_n2(n,2) .eq. n8 ) .or.  &
+            ( node_n2(n,1) .eq. n8 .and. node_n2(n,2) .eq. n7) ) then
+          n78 = node_n2(n,0)
+        end if
+      end do
+      if (n78 .eq. 0) then
+        nn_2 = nn_2 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        n78 = Grid % n_nodes
+        node_n2(nn_2,0) = n78
+        node_n2(nn_2,1) = n7
+        node_n2(nn_2,2) = n8
+        Grid % xn(n78) = .5 * (Grid % xn(n7) + Grid % xn(n8))
+        Grid % yn(n78) = .5 * (Grid % yn(n7) + Grid % yn(n8))
+        Grid % zn(n78) = .5 * (Grid % zn(n7) + Grid % zn(n8))
       end if
-    end do
-    if (n78 .eq. 0) then
-      nn_2 = nn_2 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      n78 = Grid % n_nodes
-      node_n2(nn_2,0) = n78
-      node_n2(nn_2,1) = n7
-      node_n2(nn_2,2) = n8
-      Grid % xn(n78) = .5 * (Grid % xn(n7) + Grid % xn(n8))
-      Grid % yn(n78) = .5 * (Grid % yn(n7) + Grid % yn(n8))
-      Grid % zn(n78) = .5 * (Grid % zn(n7) + Grid % zn(n8))
-    end if
 
-    !-------------------------!
-    !   Then nodes on faces   !
-    !-------------------------!
-    nf1 = 0
-    nf2 = 0
-    nf3 = 0
-    nf4 = 0
-    nf5 = 0
-    nf6 = 0
+      !-------------------------!
+      !   Then nodes on faces   !
+      !-------------------------!
+      nf1 = 0
+      nf2 = 0
+      nf3 = 0
+      nf4 = 0
+      nf5 = 0
+      nf6 = 0
 
-    ! nf1
-    do n = 1, nn_4
-      if( ( node_n4(n,1) .eq. n1 .and. node_n4(n,4) .eq. n4 ) .or.  &
-          ( node_n4(n,1) .eq. n4 .and. node_n4(n,4) .eq. n1 ) .or.  &
-          ( node_n4(n,1) .eq. n2 .and. node_n4(n,4) .eq. n3 ) .or.  &
-          ( node_n4(n,1) .eq. n3 .and. node_n4(n,4) .eq. n2 ) ) then
-        nf1 = node_n4(n,0)
+      ! nf1
+      do n = 1, nn_4
+        if( ( node_n4(n,1) .eq. n1 .and. node_n4(n,4) .eq. n4 ) .or.  &
+            ( node_n4(n,1) .eq. n4 .and. node_n4(n,4) .eq. n1 ) .or.  &
+            ( node_n4(n,1) .eq. n2 .and. node_n4(n,4) .eq. n3 ) .or.  &
+            ( node_n4(n,1) .eq. n3 .and. node_n4(n,4) .eq. n2 ) ) then
+          nf1 = node_n4(n,0)
+        end if
+      end do
+      if (nf1 .eq. 0) then
+        nn_4 = nn_4 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        nf1 = Grid % n_nodes
+        node_n4(nn_4,0) = nf1
+        node_n4(nn_4,1) = n1
+        node_n4(nn_4,2) = n2
+        node_n4(nn_4,3) = n3
+        node_n4(nn_4,4) = n4
+        Grid % xn(nf1) = 0.25 * (Grid % xn(n1) + Grid % xn(n2) +  &
+                                 Grid % xn(n3) + Grid % xn(n4))
+        Grid % yn(nf1) = 0.25 * (Grid % yn(n1) + Grid % yn(n2) +  &
+                                 Grid % yn(n3) + Grid % yn(n4))
+        Grid % zn(nf1) = 0.25 * (Grid % zn(n1) + Grid % zn(n2) +  &
+                                 Grid % zn(n3) + Grid % zn(n4))
       end if
-    end do
-    if (nf1 .eq. 0) then
-      nn_4 = nn_4 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      nf1 = Grid % n_nodes
-      node_n4(nn_4,0) = nf1
-      node_n4(nn_4,1) = n1
-      node_n4(nn_4,2) = n2
-      node_n4(nn_4,3) = n3
-      node_n4(nn_4,4) = n4
-      Grid % xn(nf1) = 0.25 * (Grid % xn(n1) + Grid % xn(n2) +  &
-                               Grid % xn(n3) + Grid % xn(n4))
-      Grid % yn(nf1) = 0.25 * (Grid % yn(n1) + Grid % yn(n2) +  &
-                               Grid % yn(n3) + Grid % yn(n4))
-      Grid % zn(nf1) = 0.25 * (Grid % zn(n1) + Grid % zn(n2) +  &
-                               Grid % zn(n3) + Grid % zn(n4))
-    end if
 
-    ! nf2
-    do n = 1, nn_4
-      if( ( node_n4(n,1) .eq. n1 .and. node_n4(n,4) .eq. n6 ) .or.  &
-          ( node_n4(n,1) .eq. n6 .and. node_n4(n,4) .eq. n1 ) .or.  &
-          ( node_n4(n,1) .eq. n2 .and. node_n4(n,4) .eq. n5 ) .or.  &
-          ( node_n4(n,1) .eq. n5 .and. node_n4(n,4) .eq. n2 ) ) then
-        nf2 = node_n4(n,0)
+      ! nf2
+      do n = 1, nn_4
+        if( ( node_n4(n,1) .eq. n1 .and. node_n4(n,4) .eq. n6 ) .or.  &
+            ( node_n4(n,1) .eq. n6 .and. node_n4(n,4) .eq. n1 ) .or.  &
+            ( node_n4(n,1) .eq. n2 .and. node_n4(n,4) .eq. n5 ) .or.  &
+            ( node_n4(n,1) .eq. n5 .and. node_n4(n,4) .eq. n2 ) ) then
+          nf2 = node_n4(n,0)
+        end if
+      end do
+      if (nf2 .eq. 0) then
+        nn_4 = nn_4 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        nf2 = Grid % n_nodes
+        node_n4(nn_4,0) = nf2
+        node_n4(nn_4,1) = n1
+        node_n4(nn_4,2) = n2
+        node_n4(nn_4,3) = n5
+        node_n4(nn_4,4) = n6
+        Grid % xn(nf2) = 0.25 * (Grid % xn(n1) + Grid % xn(n2) +  &
+                                 Grid % xn(n5) + Grid % xn(n6))
+        Grid % yn(nf2) = 0.25 * (Grid % yn(n1) + Grid % yn(n2) +  &
+                                 Grid % yn(n5) + Grid % yn(n6))
+        Grid % zn(nf2) = 0.25 * (Grid % zn(n1) + Grid % zn(n2) +  &
+                                 Grid % zn(n5) + Grid % zn(n6))
       end if
-    end do
-    if (nf2 .eq. 0) then
-      nn_4 = nn_4 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      nf2 = Grid % n_nodes
-      node_n4(nn_4,0) = nf2
-      node_n4(nn_4,1) = n1
-      node_n4(nn_4,2) = n2
-      node_n4(nn_4,3) = n5
-      node_n4(nn_4,4) = n6
-      Grid % xn(nf2) = 0.25 * (Grid % xn(n1) + Grid % xn(n2) +  &
-                               Grid % xn(n5) + Grid % xn(n6))
-      Grid % yn(nf2) = 0.25 * (Grid % yn(n1) + Grid % yn(n2) +  &
-                               Grid % yn(n5) + Grid % yn(n6))
-      Grid % zn(nf2) = 0.25 * (Grid % zn(n1) + Grid % zn(n2) +  &
-                               Grid % zn(n5) + Grid % zn(n6))
-    end if
 
-    ! nf3
-    do n = 1, nn_4
-      if( ( node_n4(n,1) .eq. n2 .and. node_n4(n,4) .eq. n8 ) .or.  &
-          ( node_n4(n,1) .eq. n8 .and. node_n4(n,4) .eq. n2 ) .or.  &
-          ( node_n4(n,1) .eq. n4 .and. node_n4(n,4) .eq. n6 ) .or.  &
-          ( node_n4(n,1) .eq. n6 .and. node_n4(n,4) .eq. n4 ) ) then
-        nf3 = node_n4(n,0)
+      ! nf3
+      do n = 1, nn_4
+        if( ( node_n4(n,1) .eq. n2 .and. node_n4(n,4) .eq. n8 ) .or.  &
+            ( node_n4(n,1) .eq. n8 .and. node_n4(n,4) .eq. n2 ) .or.  &
+            ( node_n4(n,1) .eq. n4 .and. node_n4(n,4) .eq. n6 ) .or.  &
+            ( node_n4(n,1) .eq. n6 .and. node_n4(n,4) .eq. n4 ) ) then
+          nf3 = node_n4(n,0)
+        end if
+      end do
+      if (nf3 .eq. 0) then
+        nn_4 = nn_4 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        nf3 = Grid % n_nodes
+        node_n4(nn_4,0) = nf3
+        node_n4(nn_4,1) = n2
+        node_n4(nn_4,2) = n4
+        node_n4(nn_4,3) = n6
+        node_n4(nn_4,4) = n8
+        Grid % xn(nf3) = 0.25 * (Grid % xn(n2) + Grid % xn(n4) +  &
+                                 Grid % xn(n6) + Grid % xn(n8))
+        Grid % yn(nf3) = 0.25 * (Grid % yn(n2) + Grid % yn(n4) +  &
+                                 Grid % yn(n6) + Grid % yn(n8))
+        Grid % zn(nf3) = 0.25 * (Grid % zn(n2) + Grid % zn(n4) +  &
+                                 Grid % zn(n6) + Grid % zn(n8))
       end if
-    end do
-    if (nf3 .eq. 0) then
-      nn_4 = nn_4 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      nf3 = Grid % n_nodes
-      node_n4(nn_4,0) = nf3
-      node_n4(nn_4,1) = n2
-      node_n4(nn_4,2) = n4
-      node_n4(nn_4,3) = n6
-      node_n4(nn_4,4) = n8
-      Grid % xn(nf3) = 0.25 * (Grid % xn(n2) + Grid % xn(n4) +  &
-                               Grid % xn(n6) + Grid % xn(n8))
-      Grid % yn(nf3) = 0.25 * (Grid % yn(n2) + Grid % yn(n4) +  &
-                               Grid % yn(n6) + Grid % yn(n8))
-      Grid % zn(nf3) = 0.25 * (Grid % zn(n2) + Grid % zn(n4) +  &
-                               Grid % zn(n6) + Grid % zn(n8))
-    end if
 
-    ! nf4
-    do n = 1, nn_4
-      if( ( node_n4(n,1) .eq. n3 .and. node_n4(n,4) .eq. n8 ) .or.  &
-          ( node_n4(n,1) .eq. n8 .and. node_n4(n,4) .eq. n3 ) .or.  &
-          ( node_n4(n,1) .eq. n4 .and. node_n4(n,4) .eq. n7 ) .or.  &
-          ( node_n4(n,1) .eq. n7 .and. node_n4(n,4) .eq. n4 ) ) then
-        nf4 = node_n4(n,0)
+      ! nf4
+      do n = 1, nn_4
+        if( ( node_n4(n,1) .eq. n3 .and. node_n4(n,4) .eq. n8 ) .or.  &
+            ( node_n4(n,1) .eq. n8 .and. node_n4(n,4) .eq. n3 ) .or.  &
+            ( node_n4(n,1) .eq. n4 .and. node_n4(n,4) .eq. n7 ) .or.  &
+            ( node_n4(n,1) .eq. n7 .and. node_n4(n,4) .eq. n4 ) ) then
+          nf4 = node_n4(n,0)
+        end if
+      end do
+      if (nf4 .eq. 0) then
+        nn_4 = nn_4 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        nf4 = Grid % n_nodes
+        node_n4(nn_4,0) = nf4
+        node_n4(nn_4,1) = n3
+        node_n4(nn_4,2) = n4
+        node_n4(nn_4,3) = n7
+        node_n4(nn_4,4) = n8
+        Grid % xn(nf4) = 0.25 * (Grid % xn(n3) + Grid % xn(n4) +  &
+                                 Grid % xn(n7) + Grid % xn(n8))
+        Grid % yn(nf4) = 0.25 * (Grid % yn(n3) + Grid % yn(n4) +  &
+                                 Grid % yn(n7) + Grid % yn(n8))
+        Grid % zn(nf4) = 0.25 * (Grid % zn(n3) + Grid % zn(n4) +  &
+                                 Grid % zn(n7) + Grid % zn(n8))
       end if
-    end do
-    if (nf4 .eq. 0) then
-      nn_4 = nn_4 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      nf4 = Grid % n_nodes
-      node_n4(nn_4,0) = nf4
-      node_n4(nn_4,1) = n3
-      node_n4(nn_4,2) = n4
-      node_n4(nn_4,3) = n7
-      node_n4(nn_4,4) = n8
-      Grid % xn(nf4) = 0.25 * (Grid % xn(n3) + Grid % xn(n4) +  &
-                               Grid % xn(n7) + Grid % xn(n8))
-      Grid % yn(nf4) = 0.25 * (Grid % yn(n3) + Grid % yn(n4) +  &
-                               Grid % yn(n7) + Grid % yn(n8))
-      Grid % zn(nf4) = 0.25 * (Grid % zn(n3) + Grid % zn(n4) +  &
-                               Grid % zn(n7) + Grid % zn(n8))
-    end if
 
-    ! nf5
-    do n = 1, nn_4
-      if( ( node_n4(n,1) .eq. n1 .and. node_n4(n,4) .eq. n7 ) .or.  &
-          ( node_n4(n,1) .eq. n7 .and. node_n4(n,4) .eq. n1 ) .or.  &
-          ( node_n4(n,1) .eq. n3 .and. node_n4(n,4) .eq. n5 ) .or.  &
-          ( node_n4(n,1) .eq. n5 .and. node_n4(n,4) .eq. n3 ) ) then
-        nf5 = node_n4(n,0)
+      ! nf5
+      do n = 1, nn_4
+        if( ( node_n4(n,1) .eq. n1 .and. node_n4(n,4) .eq. n7 ) .or.  &
+            ( node_n4(n,1) .eq. n7 .and. node_n4(n,4) .eq. n1 ) .or.  &
+            ( node_n4(n,1) .eq. n3 .and. node_n4(n,4) .eq. n5 ) .or.  &
+            ( node_n4(n,1) .eq. n5 .and. node_n4(n,4) .eq. n3 ) ) then
+          nf5 = node_n4(n,0)
+        end if
+      end do
+      if (nf5 .eq. 0) then
+        nn_4 = nn_4 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        nf5 = Grid % n_nodes
+        node_n4(nn_4,0) = nf5
+        node_n4(nn_4,1) = n1
+        node_n4(nn_4,2) = n3
+        node_n4(nn_4,3) = n5
+        node_n4(nn_4,4) = n7
+        Grid % xn(nf5) = 0.25 * (Grid % xn(n1) + Grid % xn(n3) +  &
+                                 Grid % xn(n5) + Grid % xn(n7))
+        Grid % yn(nf5) = 0.25 * (Grid % yn(n1) + Grid % yn(n3) +  &
+                                 Grid % yn(n5) + Grid % yn(n7))
+        Grid % zn(nf5) = 0.25 * (Grid % zn(n1) + Grid % zn(n3) +  &
+                                 Grid % zn(n5) + Grid % zn(n7))
       end if
-    end do
-    if (nf5 .eq. 0) then
-      nn_4 = nn_4 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      nf5 = Grid % n_nodes
-      node_n4(nn_4,0) = nf5
-      node_n4(nn_4,1) = n1
-      node_n4(nn_4,2) = n3
-      node_n4(nn_4,3) = n5
-      node_n4(nn_4,4) = n7
-      Grid % xn(nf5) = 0.25 * (Grid % xn(n1) + Grid % xn(n3) +  &
-                               Grid % xn(n5) + Grid % xn(n7))
-      Grid % yn(nf5) = 0.25 * (Grid % yn(n1) + Grid % yn(n3) +  &
-                               Grid % yn(n5) + Grid % yn(n7))
-      Grid % zn(nf5) = 0.25 * (Grid % zn(n1) + Grid % zn(n3) +  &
-                               Grid % zn(n5) + Grid % zn(n7))
-    end if
 
-    ! nf6
-    do n = 1, nn_4
-      if( ( node_n4(n,1) .eq. n5 .and. node_n4(n,4) .eq. n8 ) .or.  &
-          ( node_n4(n,1) .eq. n8 .and. node_n4(n,4) .eq. n5 ) .or.  &
-          ( node_n4(n,1) .eq. n6 .and. node_n4(n,4) .eq. n7 ) .or.  &
-          ( node_n4(n,1) .eq. n7 .and. node_n4(n,4) .eq. n6 ) ) then
-        nf6 = node_n4(n,0)
+      ! nf6
+      do n = 1, nn_4
+        if( ( node_n4(n,1) .eq. n5 .and. node_n4(n,4) .eq. n8 ) .or.  &
+            ( node_n4(n,1) .eq. n8 .and. node_n4(n,4) .eq. n5 ) .or.  &
+            ( node_n4(n,1) .eq. n6 .and. node_n4(n,4) .eq. n7 ) .or.  &
+            ( node_n4(n,1) .eq. n7 .and. node_n4(n,4) .eq. n6 ) ) then
+          nf6 = node_n4(n,0)
+        end if
+      end do
+      if (nf6 .eq. 0) then
+        nn_4 = nn_4 + 1
+        Grid % n_nodes = Grid % n_nodes  + 1
+        call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+        nf6 = Grid % n_nodes
+        node_n4(nn_4,0) = nf6
+        node_n4(nn_4,1) = n5
+        node_n4(nn_4,2) = n6
+        node_n4(nn_4,3) = n7
+        node_n4(nn_4,4) = n8
+        Grid % xn(nf6) = 0.25 * (Grid % xn(n5) + Grid % xn(n6) +  &
+                                 Grid % xn(n7) + Grid % xn(n8))
+        Grid % yn(nf6) = 0.25 * (Grid % yn(n5) + Grid % yn(n6) +  &
+                                 Grid % yn(n7) + Grid % yn(n8))
+        Grid % zn(nf6) = 0.25 * (Grid % zn(n5) + Grid % zn(n6) +  &
+                                 Grid % zn(n7) + Grid % zn(n8))
       end if
-    end do
-    if (nf6 .eq. 0) then
-      nn_4 = nn_4 + 1
-      Grid % n_nodes  = Grid % n_nodes  + 1
-      nf6 = Grid % n_nodes
-      node_n4(nn_4,0) = nf6
-      node_n4(nn_4,1) = n5
-      node_n4(nn_4,2) = n6
-      node_n4(nn_4,3) = n7
-      node_n4(nn_4,4) = n8
-      Grid % xn(nf6) = 0.25 * (Grid % xn(n5) + Grid % xn(n6) +  &
-                               Grid % xn(n7) + Grid % xn(n8))
-      Grid % yn(nf6) = 0.25 * (Grid % yn(n5) + Grid % yn(n6) +  &
-                               Grid % yn(n7) + Grid % yn(n8))
-      Grid % zn(nf6) = 0.25 * (Grid % zn(n5) + Grid % zn(n6) +  &
-                               Grid % zn(n7) + Grid % zn(n8))
-    end if
 
-    !----------------------------------------!
-    !   Eventually, the node in the middle   !
-    !----------------------------------------!
-    nn_8 = nn_8 + 1
-    Grid % n_nodes  = Grid % n_nodes + 1
-    n0  = Grid % n_nodes
-    node_n8(nn_8,0) = n0
-    node_n8(nn_8,1) = n1
-    node_n8(nn_8,2) = n2
-    node_n8(nn_8,3) = n3
-    node_n8(nn_8,4) = n4
-    node_n8(nn_8,5) = n5
-    node_n8(nn_8,6) = n6
-    node_n8(nn_8,7) = n7
-    node_n8(nn_8,8) = n8
-    Grid % xn(n0) = .125*(Grid % xn(n1) + Grid % xn(n2) + &
-                          Grid % xn(n3) + Grid % xn(n4) + &
-                          Grid % xn(n5) + Grid % xn(n6) + &
-                          Grid % xn(n7) + Grid % xn(n8))
-    Grid % yn(n0) = .125*(Grid % yn(n1) + Grid % yn(n2) + &
-                          Grid % yn(n3) + Grid % yn(n4) + &
-                          Grid % yn(n5) + Grid % yn(n6) + &
-                          Grid % yn(n7) + Grid % yn(n8))
-    Grid % zn(n0) = .125*(Grid % zn(n1) + Grid % zn(n2) + &
-                          Grid % zn(n3) + Grid % zn(n4) + &
-                          Grid % zn(n5) + Grid % zn(n6) + &
-                          Grid % zn(n7) + Grid % zn(n8))
+      !----------------------------------------!
+      !   Eventually, the node in the middle   !
+      !----------------------------------------!
+      nn_8 = nn_8 + 1
+      Grid % n_nodes = Grid % n_nodes + 1
+      call Grid % Allocate_Nodes(Grid % n_nodes, GROWTH_MARGIN)
+      n0  = Grid % n_nodes
+      node_n8(nn_8,0) = n0
+      node_n8(nn_8,1) = n1
+      node_n8(nn_8,2) = n2
+      node_n8(nn_8,3) = n3
+      node_n8(nn_8,4) = n4
+      node_n8(nn_8,5) = n5
+      node_n8(nn_8,6) = n6
+      node_n8(nn_8,7) = n7
+      node_n8(nn_8,8) = n8
+      Grid % xn(n0) = .125*(Grid % xn(n1) + Grid % xn(n2) + &
+                            Grid % xn(n3) + Grid % xn(n4) + &
+                            Grid % xn(n5) + Grid % xn(n6) + &
+                            Grid % xn(n7) + Grid % xn(n8))
+      Grid % yn(n0) = .125*(Grid % yn(n1) + Grid % yn(n2) + &
+                            Grid % yn(n3) + Grid % yn(n4) + &
+                            Grid % yn(n5) + Grid % yn(n6) + &
+                            Grid % yn(n7) + Grid % yn(n8))
+      Grid % zn(n0) = .125*(Grid % zn(n1) + Grid % zn(n2) + &
+                            Grid % zn(n3) + Grid % zn(n4) + &
+                            Grid % zn(n5) + Grid % zn(n6) + &
+                            Grid % zn(n7) + Grid % zn(n8))
 
-    !----------------------------!
-    !   Set nodes to new cells   !
-    !----------------------------!
+      !----------------------------!
+      !   Set nodes to new cells   !
+      !----------------------------!
 
-    ! cr1 -!
-    Grid % cells_n(1,cr1) = n1
-    Grid % cells_n(2,cr1) = n12
-    Grid % cells_n(3,cr1) = n13
-    Grid % cells_n(4,cr1) = nf1
-    Grid % cells_n(5,cr1) = n15
-    Grid % cells_n(6,cr1) = nf2
-    Grid % cells_n(7,cr1) = nf5
-    Grid % cells_n(8,cr1) = n0
+      ! cr1 -!
+      Grid % cells_n(1,cr1) = n1
+      Grid % cells_n(2,cr1) = n12
+      Grid % cells_n(3,cr1) = n13
+      Grid % cells_n(4,cr1) = nf1
+      Grid % cells_n(5,cr1) = n15
+      Grid % cells_n(6,cr1) = nf2
+      Grid % cells_n(7,cr1) = nf5
+      Grid % cells_n(8,cr1) = n0
 
-    ! cr2 -!
-    Grid % cells_n(1,cr2) = n12
-    Grid % cells_n(2,cr2) = n2
-    Grid % cells_n(3,cr2) = nf1
-    Grid % cells_n(4,cr2) = n24
-    Grid % cells_n(5,cr2) = nf2
-    Grid % cells_n(6,cr2) = n26
-    Grid % cells_n(7,cr2) = n0
-    Grid % cells_n(8,cr2) = nf3
+      ! cr2 -!
+      Grid % cells_n(1,cr2) = n12
+      Grid % cells_n(2,cr2) = n2
+      Grid % cells_n(3,cr2) = nf1
+      Grid % cells_n(4,cr2) = n24
+      Grid % cells_n(5,cr2) = nf2
+      Grid % cells_n(6,cr2) = n26
+      Grid % cells_n(7,cr2) = n0
+      Grid % cells_n(8,cr2) = nf3
 
-    ! cr3 -!
-    Grid % cells_n(1,cr3) = n13
-    Grid % cells_n(2,cr3) = nf1
-    Grid % cells_n(3,cr3) = n3
-    Grid % cells_n(4,cr3) = n34
-    Grid % cells_n(5,cr3) = nf5
-    Grid % cells_n(6,cr3) = n0
-    Grid % cells_n(7,cr3) = n37
-    Grid % cells_n(8,cr3) = nf4
+      ! cr3 -!
+      Grid % cells_n(1,cr3) = n13
+      Grid % cells_n(2,cr3) = nf1
+      Grid % cells_n(3,cr3) = n3
+      Grid % cells_n(4,cr3) = n34
+      Grid % cells_n(5,cr3) = nf5
+      Grid % cells_n(6,cr3) = n0
+      Grid % cells_n(7,cr3) = n37
+      Grid % cells_n(8,cr3) = nf4
 
-    ! cr4 -!
-    Grid % cells_n(1,cr4) = nf1
-    Grid % cells_n(2,cr4) = n24
-    Grid % cells_n(3,cr4) = n34
-    Grid % cells_n(4,cr4) = n4
-    Grid % cells_n(5,cr4) = n0
-    Grid % cells_n(6,cr4) = nf3
-    Grid % cells_n(7,cr4) = nf4
-    Grid % cells_n(8,cr4) = n48
+      ! cr4 -!
+      Grid % cells_n(1,cr4) = nf1
+      Grid % cells_n(2,cr4) = n24
+      Grid % cells_n(3,cr4) = n34
+      Grid % cells_n(4,cr4) = n4
+      Grid % cells_n(5,cr4) = n0
+      Grid % cells_n(6,cr4) = nf3
+      Grid % cells_n(7,cr4) = nf4
+      Grid % cells_n(8,cr4) = n48
 
-    ! cr5 -!
-    Grid % cells_n(1,cr5) = n15
-    Grid % cells_n(2,cr5) = nf2
-    Grid % cells_n(3,cr5) = nf5
-    Grid % cells_n(4,cr5) = n0
-    Grid % cells_n(5,cr5) = n5
-    Grid % cells_n(6,cr5) = n56
-    Grid % cells_n(7,cr5) = n57
-    Grid % cells_n(8,cr5) = nf6
+      ! cr5 -!
+      Grid % cells_n(1,cr5) = n15
+      Grid % cells_n(2,cr5) = nf2
+      Grid % cells_n(3,cr5) = nf5
+      Grid % cells_n(4,cr5) = n0
+      Grid % cells_n(5,cr5) = n5
+      Grid % cells_n(6,cr5) = n56
+      Grid % cells_n(7,cr5) = n57
+      Grid % cells_n(8,cr5) = nf6
 
-    ! cr6 -!
-    Grid % cells_n(1,cr6) = nf2
-    Grid % cells_n(2,cr6) = n26
-    Grid % cells_n(3,cr6) = n0
-    Grid % cells_n(4,cr6) = nf3
-    Grid % cells_n(5,cr6) = n56
-    Grid % cells_n(6,cr6) = n6
-    Grid % cells_n(7,cr6) = nf6
-    Grid % cells_n(8,cr6) = n68
+      ! cr6 -!
+      Grid % cells_n(1,cr6) = nf2
+      Grid % cells_n(2,cr6) = n26
+      Grid % cells_n(3,cr6) = n0
+      Grid % cells_n(4,cr6) = nf3
+      Grid % cells_n(5,cr6) = n56
+      Grid % cells_n(6,cr6) = n6
+      Grid % cells_n(7,cr6) = nf6
+      Grid % cells_n(8,cr6) = n68
 
-    ! cr7 -!
-    Grid % cells_n(1,cr7) = nf5
-    Grid % cells_n(2,cr7) = n0
-    Grid % cells_n(3,cr7) = n37
-    Grid % cells_n(4,cr7) = nf4
-    Grid % cells_n(5,cr7) = n57
-    Grid % cells_n(6,cr7) = nf6
-    Grid % cells_n(7,cr7) = n7
-    Grid % cells_n(8,cr7) = n78
+      ! cr7 -!
+      Grid % cells_n(1,cr7) = nf5
+      Grid % cells_n(2,cr7) = n0
+      Grid % cells_n(3,cr7) = n37
+      Grid % cells_n(4,cr7) = nf4
+      Grid % cells_n(5,cr7) = n57
+      Grid % cells_n(6,cr7) = nf6
+      Grid % cells_n(7,cr7) = n7
+      Grid % cells_n(8,cr7) = n78
 
-    ! cr8 -!
-    Grid % cells_n(1,cr8) = n0
-    Grid % cells_n(2,cr8) = nf3
-    Grid % cells_n(3,cr8) = nf4
-    Grid % cells_n(4,cr8) = n48
-    Grid % cells_n(5,cr8) = nf6
-    Grid % cells_n(6,cr8) = n68
-    Grid % cells_n(7,cr8) = n78
-    Grid % cells_n(8,cr8) = n8
+      ! cr8 -!
+      Grid % cells_n(1,cr8) = n0
+      Grid % cells_n(2,cr8) = nf3
+      Grid % cells_n(3,cr8) = nf4
+      Grid % cells_n(4,cr8) = n48
+      Grid % cells_n(5,cr8) = nf6
+      Grid % cells_n(6,cr8) = n68
+      Grid % cells_n(7,cr8) = n78
+      Grid % cells_n(8,cr8) = n8
 
     !-----------------------!
     !                       !
     !   Non-refined cells   !
     !                       !
     !-----------------------!
-    else
+    else  ! this if started at 130
 
       if(ref % cell_marked(c1)) then  ! neighbor 1 refined
         Grid % cells_c( 1,c) = cell_points_to(c1)-8   &
@@ -885,8 +910,8 @@
                              + Refines_Mod_Which_Node(ref,Grid,c6,n8)
       end if
 
-    end if
-  end do
+    end if  ! if cell is refined or not
+  end do    ! browse through all loops
 
   print *, '# Number of nodes after the refinement: ', Grid % n_nodes
   print *, '# Number of cells after the refinement: ', Grid % n_cells
@@ -1003,7 +1028,7 @@
     end if
   end do
 
-  do c=Grid % n_cells-del+1, Grid % max_n_nodes   ! erase old data
+  do c=Grid % n_cells-del+1, Grid % n_cells       ! erase old data
     do n = 1, 24                                  ! n is neighbour now
       Grid % cells_c( n, c ) = 0
     end do
@@ -1012,10 +1037,5 @@
   Grid % n_cells = Grid % n_cells - del
 
   print *, '# Number of cells after the renumeration: ', Grid % n_cells
-
-  deallocate(node_n2)
-  deallocate(node_n4)
-  deallocate(node_n8)
-  deallocate(cell_points_to)
 
   end subroutine

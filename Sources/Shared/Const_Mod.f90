@@ -106,4 +106,7 @@
   integer, parameter :: MAX_VARS_INTERFACE = 9  !! maximum number of variables
                                                 !! exchanged at the interface
                                                 !! between two domains
+  ! Steps for expanding the memory in Generate
+  integer, parameter :: GROWTH_MARGIN = 8192  !! steps for expanding
+                                              !! memory in Generate
   end module

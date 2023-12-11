@@ -23,9 +23,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Refines_Type) :: ref       !! type holding information on refinement
-  type(Grid_Type)    :: Grid      !! grid being generated (refined here)
-  logical            :: real_run  !! false for trial run, true for real run
+  type(Refines_Type)  :: ref       !! type holding information on refinement
+  type(Grid_Type)     :: Grid      !! grid being generated (refined here)
+  logical, intent(in) :: real_run  !! false for trial run, true for real run
 !-----------------------------------[Locals]-----------------------------------!
   integer                 :: c, c1, c2, m, run
   integer, dimension(6,4) :: fn  ! link faces' nodes for a hexahedral cell
@@ -56,6 +56,21 @@
     do m = 1, 24   ! neighbour cells
       if(Grid % cells_c(m,c) < 0) then
         Grid % n_bnd_cells = Grid % n_bnd_cells + 1
+      end if
+    end do
+  end do
+
+  ! Adjust dimension for all cell-based variables
+  ! At this stage, it will basically adjust number of boundary cells
+  call Grid % Allocate_Cells(Grid % n_cells, Grid % n_bnd_cells)
+
+  ! Re-initialize number of boundary cells
+  Grid % n_bnd_cells = 0
+
+  do c = 1, Grid % n_cells
+    do m = 1, 24   ! neighbour cells
+      if(Grid % cells_c(m,c) < 0) then
+        Grid % n_bnd_cells = Grid % n_bnd_cells + 1
 
         ! Remember the boundary region, take positive value for region
         Grid % region % at_cell(-Grid % n_bnd_cells) =  -Grid % cells_c(m,c)
@@ -71,7 +86,24 @@
   !   information on faces    !
   !---------------------------!
 
+  call Refines_Mod_Allocate_Cells(ref, Grid % n_cells, Grid % n_bnd_cells)
+
   ! Initialize number of sides
+  Grid % n_faces = 0
+
+  do run = 1, 2
+    do c1 = 1, Grid % n_cells
+      do m = 1, 24 ! through all the neighbouring cells
+        c2 = Grid % cells_c(m, c1)
+        if( (run .eq. 1) .and. (c2 > c1)  .or.  &
+            (run .eq. 2) .and. (c2 < 0) ) then
+          Grid % n_faces = Grid % n_faces + 1
+        end if
+      end do
+    end do
+  end do
+
+  ! Re-initialize number of sides
   Grid % n_faces = 0
 
   ! Adjust dimension of faces_n
@@ -82,9 +114,14 @@
     do c1 = 1, Grid % n_cells
       do m = 1, 24 ! through all the neighbouring cells
         c2 = Grid % cells_c(m, c1)
+
         if( (run .eq. 1) .and. (c2 > c1)  .or.  &
             (run .eq. 2) .and. (c2 < 0) ) then
           Grid % n_faces = Grid % n_faces + 1
+
+          ! What counts in this expansion, is the number of faces, not shadows
+          call Grid % Allocate_Faces(Grid % n_faces, Grid % n_shadows,  &
+                                     GROWTH_MARGIN)
 
           ! Which volumes are connected with side Grid % n_faces
           Grid % faces_c(1, Grid % n_faces) = c1
@@ -104,7 +141,7 @@
           end do
 
           ! Nodes of a side Grid % n_faces
-          if(c2  > 0) then
+          if(c2 > 0) then
             if(ref % cell_level(c2) > ref % cell_level(c1)) then
               Grid % faces_n(1,Grid % n_faces) =  &
                 Grid % cells_n( fn(Grid % face_c_to_c(Grid % n_faces,2),4), c2 )
@@ -144,18 +181,6 @@
         end if
       end do
     end do
-  end if
-
-  !--------------------------------------!
-  !   Is there enough allocated memory   !
-  !--------------------------------------!
-  if( Grid % n_faces  > Grid % max_n_faces ) then
-    print *, '# ERROR in Generator'
-    print *, '# The number sides is: ',              Grid % n_faces
-    print *, '# There is space available only for:', Grid % max_n_faces
-    print *, '# Increase the number of faces in .dom file'
-    print *, '# and recompile the code. Good Luck !'
-    stop
   end if
 
   end subroutine

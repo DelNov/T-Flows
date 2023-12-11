@@ -159,12 +159,6 @@
 
     type(Region_Type) :: region  !! boundary condition regions
 
-    !  Maximum number of cells, boundary cells and faces
-    ! (Used for tentative memory allocation in Generate)
-    integer :: max_n_nodes      !! max. number of nodes (used only in Generate)
-    integer :: max_n_bnd_cells  !! max. number of bnd. cells (only in Generate)
-    integer :: max_n_faces      !! max. number of faces (used only in Generate)
-
     ! Twin (periodic) nodes, and node_positioned are used only in Generate
     integer, allocatable :: twin_n(:,:)         !! for each node, list of
                                                 !! twins, periodic nodes

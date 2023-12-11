@@ -1,23 +1,19 @@
 !==============================================================================!
-  subroutine Array_Real(Mem, a, i, i_inc)
+  subroutine Array_Real(Mem, a, i)
 !------------------------------------------------------------------------------!
 !>  Enlarges a real array a to include the range of indices specified by i.
-!>  Optional i_inc specifies the increment to increase memory in chunks,
-!>  avoiding too frequent memory management procedures.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Memory_Type), intent(in)    :: Mem    !! parent class
   real, allocatable,  intent(inout) :: a(:)   !! operand array
   integer,            intent(in)    :: i(:)   !! array range
-  integer, optional,  intent(in)    :: i_inc  !! index increment
 !-----------------------------------[Locals]-----------------------------------!
   real, allocatable :: temp(:)
   integer           :: new_i_lower
   integer           :: new_i_upper
   integer           :: i_lower     = 1
   integer           :: i_upper     = 1
-  integer           :: i_increment = 0
   integer           :: error_code       ! allocation error code
   character(DL)     :: error_message    ! allocation error message
 !==============================================================================!
@@ -60,15 +56,9 @@
   if(     .not. Mem % Test_Array_Real(a, i_lower)  &
      .or. .not. Mem % Test_Array_Real(a, i_upper)  ) then
 
-    ! Set up the increment in i
-    if(present(i_inc)) then
-      Assert(i_inc > 0)
-      i_increment = i_inc
-    end if
-
     ! Calculate new bounds
-    new_i_lower = min(lbound(a, 1), i_lower - i_increment)
-    new_i_upper = max(ubound(a, 1), i_upper + i_increment)
+    new_i_lower = min(lbound(a, 1), i_lower)
+    new_i_upper = max(ubound(a, 1), i_upper)
 
     ! Allocate temp array with new bounds and initialize
     allocate(temp(new_i_lower:new_i_upper),  &

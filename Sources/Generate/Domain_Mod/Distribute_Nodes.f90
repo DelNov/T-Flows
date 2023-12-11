@@ -64,6 +64,8 @@
   if(w > 0.0) then
     ddt = ( 2.0*(1.0-w) ) / ( real(n)*(real(n)-1.0)*(1.0+w) )
     t=0.0
+    node = Grid % n_nodes + ni*nj*nk  ! estimated last node
+    call Grid % Allocate_Nodes(node)  ! expand nodes
     do i=is,ie
       do j=js,je
         do k=ks,ke
@@ -71,30 +73,36 @@
             dt=1.0/real(n)+(real(i)-0.5*(real(n)+1)) * ddt
             t=t+dt
             node = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
-            if( (i < ie).and.(.not. Grid % node_positioned(node)) ) then
-              Grid % xn(node) = x0 + t*delx
-              Grid % yn(node) = y0 + t*dely
-              Grid % zn(node) = z0 + t*delz
+            if(i < ie) then
+              if(.not. Grid % node_positioned(node)) then
+                Grid % xn(node) = x0 + t*delx
+                Grid % yn(node) = y0 + t*dely
+                Grid % zn(node) = z0 + t*delz
+              end if
             end if
           end if
           if( je .ne. js ) then
             dt=1.0/real(n)+(real(j)-0.5*(real(n)+1)) * ddt
             t=t+dt
             node = Grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
-            if( (j < je).and.(.not. Grid % node_positioned(node)) ) then
-              Grid % xn(node) = x0 + t*delx
-              Grid % yn(node) = y0 + t*dely
-              Grid % zn(node) = z0 + t*delz
+            if(j < je) then
+              if(.not. Grid % node_positioned(node)) then
+                Grid % xn(node) = x0 + t*delx
+                Grid % yn(node) = y0 + t*dely
+                Grid % zn(node) = z0 + t*delz
+              end if
             end if
           end if
           if( ke .ne. ks ) then
             dt=1.0/real(n)+(real(k)-0.5*(real(n)+1)) * ddt
             t=t+dt
             node = Grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
-            if( (k < ke).and.(.not. Grid % node_positioned(node)) ) then
-              Grid % xn(node) = x0 + t*delx
-              Grid % yn(node) = y0 + t*dely
-              Grid % zn(node) = z0 + t*delz
+            if(k < ke) then
+              if(.not. Grid % node_positioned(node)) then
+                Grid % xn(node) = x0 + t*delx
+                Grid % yn(node) = y0 + t*dely
+                Grid % zn(node) = z0 + t*delz
+              end if
             end if
           end if
         end do

@@ -49,9 +49,7 @@
 !==============================================================================!
 
   ! Initialise Grid % twin_n
-  do n = 1, Grid % max_n_nodes
-    Grid % twin_n(n,0) = 0
-  end do
+  Grid % twin_n = 0
 
   !-----------------------------------------------------!
   !   Search through all block and all of their faces   !

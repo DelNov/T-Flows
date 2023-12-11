@@ -235,7 +235,6 @@ SRC_F_MOD = Const_Mod.f90      \
             Profiler_Mod.f90   \
             Math_Mod.f90       \
             File_Mod.f90       \
-            Gen_Mod.f90        \
             Vtk_Mod.f90        \
             Metis_Mod.f90      \
             Swap_Mod.f90       \

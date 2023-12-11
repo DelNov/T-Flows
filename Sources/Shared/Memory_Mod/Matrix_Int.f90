@@ -1,9 +1,8 @@
 !==============================================================================!
-  subroutine Matrix_Int(Mem, a, i, j, i_inc, j_inc)
+  subroutine Matrix_Int(Mem, a, i, j)
 !------------------------------------------------------------------------------!
 !>  Enlarges an integer matrix to include the ranges of indices specified in
-!>  i and j.  Optional i_inc and j_inc specify the increment to increase memory
-!>  in chunks, avoiding too frequent calls to memory management procedures.
+!>  i and j.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -11,8 +10,6 @@
   integer, allocatable, intent(inout) :: a(:,:)  !! operand matrix
   integer, optional,    intent(in)    :: i(:)    !! matrix range in i
   integer, optional,    intent(in)    :: j(:)    !! matrix range in j
-  integer, optional,    intent(in)    :: i_inc   !! size increment
-  integer, optional,    intent(in)    :: j_inc   !! size increment
 !-----------------------------------[Locals]-----------------------------------!
   integer, allocatable :: temp(:,:)
   integer              :: new_i_lower
@@ -21,10 +18,8 @@
   integer              :: new_j_upper
   integer              :: i_lower     = 1
   integer              :: i_upper     = 1
-  integer              :: i_increment = 0
   integer              :: j_lower     = 1
   integer              :: j_upper     = 1
-  integer              :: j_increment = 0
   integer              :: error_code       ! allocation error code
   character(DL)        :: error_message    ! allocation error message
 !==============================================================================!
@@ -72,8 +67,8 @@
     i_upper = ubound(a,1)
   end if
   if(present(j)) then
-    i_lower = j(1)
-    i_upper = j(2)
+    j_lower = j(1)
+    j_upper = j(2)
   else
     j_lower = lbound(a,2)
     j_upper = ubound(a,2)
@@ -83,23 +78,11 @@
      .or. .not. Mem % Test_Matrix_Int(a, i_lower, j_upper)  &
      .or. .not. Mem % Test_Matrix_Int(a, i_upper, j_upper)  ) then
 
-    ! Set up the increment in i
-    if(present(i_inc)) then
-      Assert(i_inc > 0)
-      i_increment = i_inc
-    end if
-
-    ! Set up the increment in j
-    if(present(j_inc)) then
-      Assert(j_inc > 0)
-      j_increment = j_inc
-    end if
-
     ! Calculate new bounds
-    new_i_lower = min(lbound(a, 1), i_lower - i_increment)
-    new_i_upper = max(ubound(a, 1), i_upper + i_increment)
-    new_j_lower = min(lbound(a, 2), j_lower - j_increment)
-    new_j_upper = max(ubound(a, 2), j_upper + j_increment)
+    new_i_lower = min(lbound(a, 1), i_lower)
+    new_i_upper = max(ubound(a, 1), i_upper)
+    new_j_lower = min(lbound(a, 2), j_lower)
+    new_j_upper = max(ubound(a, 2), j_upper)
 
     ! Allocate temp array with new bounds and initialize
     allocate(temp(new_i_lower:new_i_upper, new_j_lower:new_j_upper),  &

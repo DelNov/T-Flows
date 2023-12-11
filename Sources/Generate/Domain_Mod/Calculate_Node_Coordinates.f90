@@ -39,9 +39,7 @@
   ! Setting node_positioned to false here serves later as indicator if
   ! coordinates this particular node has been calculated or not
   ! (For example in Domain_Mod_Distribute_Nodes Domain_Mod_Laplace)
-  do n = 1, Grid % max_n_nodes
-    Grid % node_positioned(n) = .false.
-  end do
+  Grid % node_positioned(:) = .false.
 
   !------------------------------------!
   !   Calculate the node coordinates   !
@@ -55,6 +53,9 @@
     ni = Dom % blocks(b) % resolutions(1)
     nj = Dom % blocks(b) % resolutions(2)
     nk = Dom % blocks(b) % resolutions(3)
+
+    ! Ensure there is enough nodes for this block, add ni*nj*nk
+    call Grid % Allocate_Nodes(Grid % n_nodes + ni*nj*nk)
 
     ! ( 1 )
     n = Grid % n_nodes + ( 1-1)*ni*nj + ( 1-1)*ni +  1
@@ -441,19 +442,24 @@
       end do
     end if
 
-    !-----------------------------------------!
-    !   Set the control volume nodes (CellN)  !
-    !    and  the control volume neighbours   !
-    !-----------------------------------------!
+    !--------------------------------------------!
+    !   Set the control volume nodes (cells_n)   !
+    !     and the control volume neighbours      !
+    !--------------------------------------------!
     ci = ni-1
     cj = nj-1
     ck = nk-1
+
+    ! Ensure there is enough cells for this block, add ci*cj*ck
+    call Grid % Allocate_Cells(Grid % n_cells + ci*cj*ck, Grid % n_bnd_cells)
 
     do k=1,ck
       do j=1,cj
         do i=1,ci
           c = Grid % n_cells + (k-1)*ci*cj + (j-1)*ci + i ! cell
           n = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i ! 1st node
+
+          Assert(c .le. ubound(Grid % cells_c, 2))
 
           ! Nodes
           call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,8/))
@@ -483,6 +489,12 @@
           if(k .eq. 1)  Grid % cells_c(1,c) =-1
           if(k .eq. ck) Grid % cells_c(6,c) =-1
 
+          Assert(Grid % cells_c(5,c) .le. ubound(Grid % cells_c, 2))
+          Assert(Grid % cells_c(3,c) .le. ubound(Grid % cells_c, 2))
+          Assert(Grid % cells_c(2,c) .le. ubound(Grid % cells_c, 2))
+          Assert(Grid % cells_c(4,c) .le. ubound(Grid % cells_c, 2))
+          Assert(Grid % cells_c(1,c) .le. ubound(Grid % cells_c, 2))
+          Assert(Grid % cells_c(6,c) .le. ubound(Grid % cells_c, 2))
         end do
       end do
     end do

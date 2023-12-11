@@ -1,39 +1,58 @@
 !==============================================================================!
-  subroutine Allocate_Nodes(Grid, nn)
+  subroutine Allocate_Nodes(Grid, nn, margin)
 !------------------------------------------------------------------------------!
 !>  Allocates memory for node-based data (arrays and matrices), for geometrical
 !>  (xn, yn, zn ...) and connectivity data (new_n, old_n, Comm % node_glo).
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)    :: Grid  !! grid under consideration
-  integer, intent(in) :: nn    !! number of nodes in the grid
+  class(Grid_Type)              :: Grid    !! grid being expanded
+  integer, intent(in)           :: nn      !! number of nodes in the grid
+  integer, intent(in), optional :: margin  !! margin for allocation
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: n
+  integer :: n, nn_m
 !==============================================================================!
 
-  ! Store the number of nodes for the grid
-  Grid % n_nodes = nn
+  ! If node-based arrays are allocated and they
+  ! are bigger than requested, get out of here
+  if(allocated(Grid % xn)) then
+    if(nn .le. ubound(Grid % xn, 1)) then
+      return
+    end if
+  end if
+
+  ! Process the margin if specified
+  nn_m = nn
+  if(present(margin)) then
+    Assert(margin .ge. 0)
+    nn_m = nn + margin
+  end if
+
+  print '(a,i9)', ' # Expanding memory for nodes to size: ', nn_m
 
   ! Allocate memory for node coordinates
-  allocate(Grid % xn(1:nn));  Grid % xn(:) = 0.0
-  allocate(Grid % yn(1:nn));  Grid % yn(:) = 0.0
-  allocate(Grid % zn(1:nn));  Grid % zn(:) = 0.0
+  call Enlarge % Array_Real(Grid % xn, i=(/1,nn_m/))
+  call Enlarge % Array_Real(Grid % yn, i=(/1,nn_m/))
+  call Enlarge % Array_Real(Grid % zn, i=(/1,nn_m/))
 
-  allocate(Grid % Comm % node_glo(1:nn));  Grid % Comm % node_glo(:) = 0
-  do n = 1, nn
+  call Enlarge % Array_Int(Grid % Comm % node_glo, i=(/1,nn_m/))
+  do n = 1, nn_m
     Grid % Comm % node_glo(n) = n
   end do
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  if(PROGRAM_NAME .ne. "Process") then
-    allocate(Grid % new_n(n));  Grid % new_n(:) = 0
-    allocate(Grid % old_n(n));  Grid % old_n(:) = 0
+  if(PROGRAM_NAME .ne. 'Process') then
+    call Enlarge % Array_Int(Grid % new_n, i=(/1,nn_m/))
+    call Enlarge % Array_Int(Grid % old_n, i=(/1,nn_m/))
   end if
 
-  ! This is used only in initial stages of Generate, inside Domain_Mod really
   if(PROGRAM_NAME .eq. 'Generate') then
-    allocate(Grid % node_positioned(n));  Grid % node_positioned(:) = .false.
+    ! This variable used to be in Gen_Mod for a long time and
+    ! is used only in Generate to take care of periodicity
+    call Enlarge % Matrix_Int(Grid % twin_n, i=(/1,nn_m/), j=(/0,8/))
+
+    ! This is used only in initial stages of Generate, inside Domain_Mod really
+    call Enlarge % Array_Log(Grid % node_positioned, i=(/1,nn_m/))
   end if
 
   end subroutine

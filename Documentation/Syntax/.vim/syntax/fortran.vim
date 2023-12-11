@@ -378,6 +378,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      HUGE  TINY  HUGE_INT  EULER  PI
   syn keyword fortranConstant      ONE_THIRD  TWO_THIRDS  ONE_SIXTH
   syn keyword fortranConstant      MD  MAX_VARS_INTERFACE  MAX_TURBULENT_PLANES
+  syn keyword fortranConstant      GROWTH_MARGIN
 " Constants from Tokenizer_Mod
   syn keyword fortranConstant      MAX_TOKENS
 " Constants related to indentation (I think they are defined in a few places - bad!

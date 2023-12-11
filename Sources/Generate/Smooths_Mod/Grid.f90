@@ -40,10 +40,10 @@
 !==============================================================================!
 
   ! Allocate memory for additional arrays
-  allocate(x_node_new(Grid % max_n_nodes));         x_node_new    = 0
-  allocate(y_node_new(Grid % max_n_nodes));         y_node_new    = 0
-  allocate(z_node_new(Grid % max_n_nodes));         z_node_new    = 0
-  allocate(node_to_nodes(Grid % max_n_nodes,0:40)); node_to_nodes = 0
+  call Enlarge % Array_Real(x_node_new,    i=(/1,Grid % n_nodes/))
+  call Enlarge % Array_Real(y_node_new,    i=(/1,Grid % n_nodes/))
+  call Enlarge % Array_Real(z_node_new,    i=(/1,Grid % n_nodes/))
+  call Enlarge % Matrix_Int(node_to_nodes, i=(/1,Grid % n_nodes/), j=(/0,40/))
 
   print *, '# Now smoothing the cells. This may take a while !'
 
@@ -195,10 +195,5 @@
       end do      ! through nodes
     end do
   end do
-
-  deallocate(x_node_new)
-  deallocate(y_node_new)
-  deallocate(z_node_new)
-  deallocate(node_to_nodes)
 
   end subroutine

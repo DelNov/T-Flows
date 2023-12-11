@@ -16,7 +16,6 @@
 !==============================================================================!
 
   ! Allocate memory
-  ! =--> carefull: there is no checking!
   call Grid % Allocate_Nodes(Grid % n_nodes)
   call Grid % Allocate_Cells(Grid % n_cells,   Grid % n_bnd_cells * F)
 
@@ -28,9 +27,6 @@
   else
     call Grid % Allocate_Faces(Grid % n_faces, 0)
   end if
-
-  allocate(Grid % region % at_cell(-Grid % n_bnd_cells * F:-1))
-  Grid % region % at_cell = 0
 
   ! (Dirty) trick to allocate additional memory for cities
   Grid % n_bnd_cells = Grid % n_bnd_cells / F

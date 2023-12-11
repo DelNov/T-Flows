@@ -1,81 +1,107 @@
 !==============================================================================!
-  subroutine Allocate_Cells(Grid, nc, nb)
+  subroutine Allocate_Cells(Grid, nc, nb, margin)
 !------------------------------------------------------------------------------!
 !>  Allocates memory for cell-based data (arrays and matrices), for geometrical
 !>  (xc, yc, zc, vol ...) and connectivity data (cells_n, cells_f, ...).
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)    :: Grid  !! grid under consideration
-  integer, intent(in) :: nc    !! number of cells inside
-  integer, intent(in) :: nb    !! number of cells on the bounday
+  class(Grid_Type)              :: Grid    !! grid being expanded
+  integer, intent(in)           :: nc      !! number of cells inside
+  integer, intent(in)           :: nb      !! number of cells on the bounday
+  integer, intent(in), optional :: margin  !! margin for allocation
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c
+  integer :: c, nc_m, nb_m
 !==============================================================================!
 
-  ! Store number of cells and boundary cells
-  Grid % n_cells     = nc
-  Grid % n_bnd_cells = nb
-
-  ! Allocate cell center coordinates and initialize to zero
-  allocate(Grid % xc(-nb:nc));  Grid % xc(:) = 0.0
-  allocate(Grid % yc(-nb:nc));  Grid % yc(:) = 0.0
-  allocate(Grid % zc(-nb:nc));  Grid % zc(:) = 0.0
-
-  ! Memory for cells' volumes, delta and wall distance
-  allocate(Grid % vol           (-nb:nc));  Grid % vol           (:) = 0.0
-  allocate(Grid % wall_dist     (-nb:nc));  Grid % wall_dist     (:) = 0.0
-  allocate(Grid % cell_near_wall(-nb:nc));  Grid % cell_near_wall(:) = .false.
-
-  ! Memory for cells' inertia tensors
-  allocate(Grid % ixx(-nb:nc));  Grid % ixx(:) = 0.0
-  allocate(Grid % iyy(-nb:nc));  Grid % iyy(:) = 0.0
-  allocate(Grid % izz(-nb:nc));  Grid % izz(:) = 0.0
-  allocate(Grid % ixy(-nb:nc));  Grid % ixy(:) = 0.0
-  allocate(Grid % ixz(-nb:nc));  Grid % ixz(:) = 0.0
-  allocate(Grid % iyz(-nb:nc));  Grid % iyz(:) = 0.0
-
-  ! Allocate as litle as possible
-  allocate(Grid % cells_n(4, -nb:nc));  Grid % cells_n(:,:) = 0
-  allocate(Grid % cells_f(4, -nb:nc));  Grid % cells_f(:,:) = 0
-  if(PROGRAM_NAME .eq. "Generate" .or.  &
-     PROGRAM_NAME .eq. "Convert") then
-    allocate(Grid % cells_c(4, -nb:nc));  Grid % cells_c(:,:) = 0
+  ! If cell-based arrays are allocated and they
+  ! are bigger than requested, get out of here
+  if(allocated(Grid % xc)) then
+    if(-nb .ge. lbound(Grid % xc, 1) .and. nc .le. ubound(Grid % xc, 1)) then
+      return
+    end if
   end if
 
-  allocate(Grid % cells_bnd_face(-nb:-1));  Grid % cells_bnd_face(:) = 0
+  ! Process the margin if specified
+  nc_m = nc
+  nb_m = nb
+  if(present(margin)) then
+    Assert(margin .ge. 0)
+    nc_m = nc + margin
+    nb_m = nb + margin
+  end if
+
+  print '(a,2i9)', ' # Expanding memory for cells to size: ', nc, nb
+
+  ! Allocate cell center coordinates and initialize to zero
+  call Enlarge % Array_Real(Grid % xc, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % yc, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % zc, i=(/-nb_m,nc_m/))
+
+  ! Memory for cells' volumes, delta and wall distance
+  call Enlarge % Array_Real(Grid % vol,            i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % wall_dist,      i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Log (Grid % cell_near_wall, i=(/-nb_m,nc_m/))
+
+  ! Memory for cells' inertia tensors
+  call Enlarge % Array_Real(Grid % ixx, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % iyy, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % izz, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % ixy, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % ixz, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Real(Grid % iyz, i=(/-nb_m,nc_m/))
+
+  ! Allocate as litle as possible
+  call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,4/), j=(/-nb_m,nc_m/))
+  call Enlarge % Matrix_Int(Grid % cells_f, i=(/1,4/), j=(/-nb_m,nc_m/))
+  if(PROGRAM_NAME .eq. 'Generate' .or.  &
+     PROGRAM_NAME .eq. 'Convert') then
+    call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,4/), j=(/-nb_m,nc_m/))
+  end if
+
+  ! This is used only in Swarm_Mod for bouncing particles
+  if(PROGRAM_NAME .eq. 'Process') then
+    call Enlarge % Array_Int(Grid % cells_bnd_face, i=(/-nb_m,-1/))
+  end if
 
   ! Number of nodes, faces and cells at each cell
   ! (Actually, cells_n_faces and cells_n_cells should be the same)
-  allocate(Grid % cells_n_nodes(-nb:nc));  Grid % cells_n_nodes(:) = 0
-  allocate(Grid % cells_n_faces(-nb:nc));  Grid % cells_n_faces(:) = 0
-  if(PROGRAM_NAME .eq. "Generate" .or.  &
-     PROGRAM_NAME .eq. "Convert") then
-    allocate(Grid % cells_n_cells(-nb:nc));  Grid % cells_n_cells(:) = 0
+  call Enlarge % Array_Int(Grid % cells_n_nodes, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Int(Grid % cells_n_faces, i=(/-nb_m,nc_m/))
+  if(PROGRAM_NAME .eq. 'Generate' .or.  &
+     PROGRAM_NAME .eq. 'Convert') then
+    call Enlarge % Array_Int(Grid % cells_n_cells, i=(/-nb_m,nc_m/))
   end if
 
   ! Boundary condition region in a given direction
   ! (These go up to 6 because they are needed for
   !  non-polyhedral meshes creted in Gambit/Gmsh)
-  allocate(Grid % cells_bnd_region(6, -nb:nc))
+  if(PROGRAM_NAME .eq. 'Generate' .or.  &
+     PROGRAM_NAME .eq. 'Convert') then
+    call Enlarge % Matrix_Int(Grid % cells_bnd_region, i=(/1,6/),  &
+                                                       j=(/-nb_m,nc_m/))
+  end if
+
+  ! Array to hold boundary regions tags at boundary cells
+  call Enlarge % Array_Int(Grid % region % at_cell, i=(/-nb_m,-1/))
 
   ! Allocate cell-based porous regions
-  allocate(Grid % por(-nb:nc));  Grid % por(:) = 0
+  call Enlarge % Array_Int(Grid % por, i=(/-nb_m,nc_m/))
 
   ! Allocate processor i.d.
-  allocate(Grid % Comm % cell_proc(-nb:nc));  Grid % Comm % cell_proc(:) = 0
-  allocate(Grid % Comm % cell_glo (-nb:nc))
-  do c = -nb, nc
+  call Enlarge % Array_Int(Grid % Comm % cell_proc, i=(/-nb_m,nc_m/))
+  call Enlarge % Array_Int(Grid % Comm % cell_glo,  i=(/-nb_m,nc_m/))
+  do c = -nb_m, nc_m
     Grid % Comm % cell_glo(c) = c
   end do
 
   ! Allocate thread i.d.
-  allocate(Grid % Omp % cell_thread(-nb:nc));  Grid % Omp % cell_thread(:) = 0
+  call Enlarge % Array_Int(Grid % Omp % cell_thread, i=(/-nb_m,nc_m/))
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  if(PROGRAM_NAME .ne. "Process") then
-    allocate(Grid % new_c(-nb:nc));  Grid % new_c(:) = 0
-    allocate(Grid % old_c(-nb:nc));  Grid % old_c(:) = 0
+  if(PROGRAM_NAME .ne. 'Process') then
+    call Enlarge % Array_Int(Grid % new_c, i=(/-nb_m,nc_m/))
+    call Enlarge % Array_Int(Grid % old_c, i=(/-nb_m,nc_m/))
   end if
 
   end subroutine

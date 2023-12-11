@@ -34,13 +34,15 @@
   type(Grid_Type)      :: Grid      !! computational grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: b, i, l, s, i_fac, n, n1, n2, n3, n4, dumi, fu
-  integer       :: n_faces_check, n_nodes_check
-  integer       :: ni, nj, nk, npnt, nsurf
+  integer       :: npnt, nsurf
   character(SL) :: dum
   character(SL) :: domain_name
   character(SL) :: answer
   real          :: xt(8), yt(8), zt(8)
   integer       :: fn(6,4)
+  integer :: tent_n_nodes      ! tentative number of nodes
+  integer :: tent_n_bnd_cells  ! tentative number of boundary cells
+  integer :: tent_n_faces      ! tentative number of faces
 !------------------------------------------------------------------------------!
   include 'Block_Numbering.h90'
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -71,38 +73,29 @@
   !   Max. number of nodes (cells), boundary faces and cell faces   !
   !-----------------------------------------------------------------!
   call File % Read_Line(fu)
-  read(Line % tokens(1), *) Grid % max_n_nodes
-  read(Line % tokens(2), *) Grid % max_n_bnd_cells
-  read(Line % tokens(3), *) Grid % max_n_faces
+  read(Line % tokens(1), *) tent_n_nodes
+  read(Line % tokens(2), *) tent_n_bnd_cells
+  read(Line % tokens(3), *) tent_n_faces
 
   !---------------------!
   !   Allocate memory   !
   !---------------------!
   print '(a)',      ' # Allocating memory for: '
-  print '(a,i9,a)', ' #', Grid % max_n_nodes,     ' nodes and cells'
-  print '(a,i9,a)', ' #', Grid % max_n_bnd_cells, ' boundary cells'
-  print '(a,i9,a)', ' #', Grid % max_n_faces,     ' cell faces'
-
-  allocate (Grid % region % at_cell(-Grid % max_n_bnd_cells-1:-1))
-  Grid % region % at_cell = 0
+  print '(a,i9,a)', ' #', tent_n_nodes,     ' nodes and cells'
+  print '(a,i9,a)', ' #', tent_n_bnd_cells, ' boundary cells'
+  print '(a,i9,a)', ' #', tent_n_faces,     ' cell faces'
 
   ! Variables in Grid_Mod
-  call Grid % Allocate_Nodes(Grid % max_n_nodes)
+  call Grid % Allocate_Nodes(tent_n_nodes)
 
-  call Grid % Allocate_Cells(Grid % max_n_nodes,      &
-                             Grid % max_n_bnd_cells)
+  call Grid % Allocate_Cells(tent_n_nodes,      &
+                             tent_n_bnd_cells)
 
-  call Grid % Allocate_Faces(Grid % max_n_faces, 0)
+  call Grid % Allocate_Faces(tent_n_faces, 0)
 
-  call Refines_Mod_Allocate_Cells(ref,                     &
-                                  Grid % max_n_bnd_cells,  &
-                                  Grid % max_n_nodes)
-
-  ! Variables which used to be declared in Gen_Mod:
-  allocate(Grid % face_c_to_c(Grid % max_n_faces,2))
-  Grid % face_c_to_c = 0
-  allocate (Grid % twin_n(Grid % max_n_nodes,0:8))
-  Grid % twin_n(:,:) = 0
+  call Refines_Mod_Allocate_Cells(ref,              &
+                                  tent_n_nodes,      &
+                                  tent_n_bnd_cells)
 
   print *, '# Allocation successfull !'
 
@@ -269,45 +262,6 @@
                           Dom % blocks(b) % face_weights(i_fac,2),  &
                           Dom % blocks(b) % face_weights(i_fac,2)
   end do
-
-  !---------------------------------------!
-  !   Is there enough allocated memory?   !
-  !---------------------------------------!
-
-  ! Nodes & faces
-  n_nodes_check = 0
-  n_faces_check = 0
-  do b = 1, Dom % n_blocks
-    ni = Dom % blocks(b) % resolutions(1)
-    nj = Dom % blocks(b) % resolutions(2)
-    nk = Dom % blocks(b) % resolutions(3)
-    n_nodes_check=n_nodes_check + ni*nj*nk
-    n_faces_check=n_faces_check + ni*nj*nk + 2*( (ni*nj)+(nj*nk)+(ni*nk) )
-  end do
-
-  if( (n_faces_check > Grid % max_n_faces) .or.  &
-      (n_nodes_check > Grid % max_n_nodes) ) then
-    print *, '# Error message from T-Flows:'
-  end if
-
-  if( n_faces_check  > Grid % max_n_faces ) then
-    print *, '# The estimated number of faces is :', n_faces_check
-    print *, '# There is space available only for:', Grid % max_n_faces
-    print *, '# Increase the parameter Grid % max_n_faces in the input file'
-    print *, '# and re-run the code !'
-  end if
-
-  if( n_nodes_check  > Grid % max_n_nodes ) then
-    print *, '# The estimated number of nodes is :', n_nodes_check
-    print *, '# There is space available only for:', Grid % max_n_nodes
-    print *, '# Increase the parameter Grid % max_n_nodes in the input file'
-    print *, '# and re-run the code !'
-  end if
-
-  if( (n_faces_check > Grid % max_n_faces) .or.  &
-      (n_nodes_check > Grid % max_n_nodes) ) then
-    stop
-  end if
 
   !---------------------------------------!
   !   Boundary conditions and materials   !

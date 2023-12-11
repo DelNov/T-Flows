@@ -41,8 +41,6 @@
   print 3, '# Number of non zero matrix entries:',   nonz
   print 4, '# Average stencil size             :',   real(nonz)  &
                                                    / real(Grid % n_cells)
-  print 3, '# Max number of nodes and cells    :',   Grid % max_n_nodes
-  print 3, '# Max number of boundary cells     :',   Grid % max_n_bnd_cells
   print 5, '#------------------------------------------------'
 3 format (a37, i8)
 4 format (a37, f8.3)
