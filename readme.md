@@ -3451,7 +3451,7 @@ for pressure reads:
    PREC_OPTS·····
    TOLERANCE     1.0e-3
 ```
-Here we set ```cg``` to be the solver pressure, we direct preconditier to
+Here we set ```cg``` to be the solver for pressure, we direct preconditier to
 algebraic multigrid from [HYPRE](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
 and we set the tolerance to 1.0e-3.  The line with ```PREC_OPTS``` is empty, we
 are not sending any options to preconditioner.
