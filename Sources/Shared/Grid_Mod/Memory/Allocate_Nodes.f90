@@ -13,6 +13,11 @@
   integer :: n, nn_m
 !==============================================================================!
 
+  ! Generator has growing number of faces, don't set them here
+  if(PROGRAM_NAME .ne. 'Generate') then
+    Grid % n_nodes = nn
+  end if
+
   ! If node-based arrays are allocated and they
   ! are bigger than requested, get out of here
   if(allocated(Grid % xn)) then

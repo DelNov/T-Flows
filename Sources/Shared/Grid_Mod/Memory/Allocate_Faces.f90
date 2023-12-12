@@ -14,6 +14,12 @@
   integer :: m
 !==============================================================================!
 
+  ! Generator has growing number of faces, don't set them here
+  if(PROGRAM_NAME .ne. 'Generate') then
+    Grid % n_faces   = nf
+    Grid % n_shadows = ns
+  end if
+
   ! If face-based arrays are allocated and they
   ! are bigger than requested, get out of here
   if(allocated(Grid % faces_n_nodes)) then

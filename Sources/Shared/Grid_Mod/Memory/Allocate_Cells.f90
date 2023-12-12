@@ -14,6 +14,12 @@
   integer :: c, nc_m, nb_m
 !==============================================================================!
 
+  ! Generator has growing number of cells, don't set them here
+  if(PROGRAM_NAME .ne. 'Generate') then
+    Grid % n_cells     = nc
+    Grid % n_bnd_cells = nb
+  end if
+
   ! If cell-based arrays are allocated and they
   ! are bigger than requested, get out of here
   if(allocated(Grid % xc)) then
