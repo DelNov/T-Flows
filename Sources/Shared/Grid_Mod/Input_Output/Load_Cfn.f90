@@ -389,9 +389,8 @@
   !   Boundary   !
   !--------------!
 
-  ! This should move to Grid % Allocate_Faces
-  allocate (Grid % region % at_face(1:nf))
-  Grid % region % at_face(1:nf) = 0
+  ! Physical boundary cells
+  call File % Buffered_Read_Int_Array(fu, Grid % region % at_cell(-nb:-1))
 
   call Grid % Determine_Regions_Ranges()
 

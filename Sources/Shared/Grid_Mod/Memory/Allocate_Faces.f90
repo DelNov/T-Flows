@@ -85,7 +85,10 @@
     call Enlarge % Array_Int(Grid % old_f, i=(/1,nf+ns+m/))
   end if
 
-  ! Variables which used to be declared in Gen_Mod:
+  ! Array to hold boundary regions tags at faces
+  call Enlarge % Array_Int(Grid % region % at_face, i=(/1,nf+ns+m/))
+
+  ! Variable which used to be declared in Gen_Mod:
   if(PROGRAM_NAME .eq. 'Generate') then
     call Enlarge % Matrix_Int(Grid % face_c_to_c, i=(/1,nf+ns+m/), j=(/1,2/))
   end if
