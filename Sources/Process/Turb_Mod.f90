@@ -216,6 +216,7 @@
       procedure :: Monin_Obukov_Thermal
 
       procedure :: Les
+      procedure :: Rsm
 
   end type
 
@@ -360,5 +361,6 @@
 #   include "Turb_Mod/Monin_Obukov_Thermal.f90"
 
 #   include "Turb_Mod/Les.f90"
+#   include "Turb_Mod/Rsm.f90"
 
   end module
