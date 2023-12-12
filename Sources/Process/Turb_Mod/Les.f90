@@ -9,10 +9,10 @@
   logical          :: Les
 !==============================================================================!
 
-  ! First assume it is true
+  ! First assume it is false
   Les = .false.
 
-  ! Then check one by one and eliminate if necessary
+  ! Then check one by one and set to true if necessary
   if(Turb % model .eq. LES_SMAGORINSKY) then
     Les = .true.
     return
