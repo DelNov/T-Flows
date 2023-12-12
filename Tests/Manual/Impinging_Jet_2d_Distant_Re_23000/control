@@ -51,7 +51,7 @@
 #------------------------
 # Linear solver settings
 #------------------------
-  LINEAR_SOLVERS                     petsc
+  LINEAR_SOLVERS                     native
   PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
   TOLERANCE_FOR_MOMENTUM_SOLVER          1.e-7
   TOLERANCE_FOR_PRESSURE_SOLVER          1.e-5
