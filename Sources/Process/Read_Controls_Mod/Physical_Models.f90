@@ -184,20 +184,10 @@
   call Control % Read_Int_Item('STARTING_TIME_STEP_FOR_TURB_STATISTICS',  &
                                HUGE_INT, n_stat, .false.)
 
-  !-------------------------------------------------------------------!
-  !   For scale-resolving simulations, engage turbulence statistics   !
-  !-------------------------------------------------------------------!
-  if((Turb % model .eq. LES_SMAGORINSKY         .or.   &
-      Turb % model .eq. LES_DYNAMIC             .or.   &
-      Turb % model .eq. LES_WALE                .or.   &
-      Turb % model .eq. LES_TVM                 .or.   &
-      Turb % model .eq. DNS                     .or.   &
-      Turb % model .eq. DES_SPALART             .or.   &
-      Turb % model .eq. HYBRID_LES_PRANDTL      .or.   &
-      Turb % model .eq. HYBRID_LES_RANS         .or.   &
-      Turb % model .eq. K_EPS                   .or.   &
-      Turb % model .eq. K_EPS_ZETA_F)           .and.  &
-     n_times > n_stat) then  ! last line covers unsteady RANS models
+  !----------------------------------!
+  !   Engage turbulence statistics   !
+  !----------------------------------!
+  if(n_times > n_stat) then
 
     if(First_Proc()) then
       print *, '# NOTE! Scale resolving simulation used; ' // &
