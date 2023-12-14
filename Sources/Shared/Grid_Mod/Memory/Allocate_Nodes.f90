@@ -33,7 +33,10 @@
     nn_m = nn + margin
   end if
 
-  print '(a,i9)', ' # Expanding memory for nodes to size: ', nn_m
+  ! I can't figure out how to print something meaningful in parallel here
+  if(Sequential_Run()) then
+    print '(a,i9)', ' # Expanding memory for nodes to size: ', nn_m
+  end if
 
   ! Allocate memory for node coordinates
   call Enlarge % Array_Real(Grid % xn, i=(/1,nn_m/))

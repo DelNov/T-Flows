@@ -35,7 +35,10 @@
     m = m + margin
   end if
 
-  print '(a,2i9)', ' # Expanding memory for faces to size: ', nf, ns
+  ! I can't figure out how to print something meaningful in parallel here
+  if(Sequential_Run()) then
+    print '(a,2i9)', ' # Expanding memory for faces to size: ', nf, ns
+  end if
 
   ! Number of nodes at each face (determines face's shape really)
   call Enlarge % Array_Int (Grid % faces_n_nodes, i=(/1,nf+ns+m/))
