@@ -245,6 +245,7 @@
       !---------------!
       !   Utilities   !
       !---------------!
+      procedure :: Adjust_P_Drops
       procedure :: Alias_Energy
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
@@ -300,6 +301,7 @@
     !---------------!
     !   Utilities   !
     !---------------!
+#   include "Field_Mod/Utilities/Adjust_P_Drops.f90"
 #   include "Field_Mod/Utilities/Alias_Energy.f90"
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
 #   include "Field_Mod/Utilities/Buoyancy_Forces.f90"

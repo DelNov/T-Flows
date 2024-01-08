@@ -1,3 +1,5 @@
+#include "../Shared/Browse.h90"
+
 !==============================================================================!
   module Bulk_Mod
 !------------------------------------------------------------------------------!
@@ -67,7 +69,6 @@
 
   contains
 
-#   include "Bulk_Mod/Adjust_P_Drops.f90"
 #   include "Bulk_Mod/Monitoring_Planes_Areas.f90"
 #   include "Bulk_Mod/Print_Areas.f90"
 

@@ -395,7 +395,7 @@
       call User_Mod_Calculate_Mean(Turb(d), n_stat_t)
 
       ! Adjust pressure drops to keep the mass fluxes constant
-      call Bulk_Mod_Adjust_P_Drops(Flow(d) % bulk, Flow(d) % dt)
+      call Flow(d) % Adjust_P_Drops()
 
       ! Lagrangian particle tracking
       if(Flow(d) % with_particles) then

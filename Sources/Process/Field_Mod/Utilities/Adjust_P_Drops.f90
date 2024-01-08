@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Bulk_Mod_Adjust_P_Drops(bulk, dt)
+  subroutine Adjust_P_Drops(Flow)
 !------------------------------------------------------------------------------!
 !>  Adjusts pressure drops in the Bulk_Mod module to maintain constant volume
 !>  flow rate in the computational domain. This subroutine is based on the
@@ -13,44 +13,51 @@
 !                                                                              !
 !   * First Newtons law:                                                       !
 !                                                                              !
-!     F = m * a                                                                !
+!     force = mass * acc                        [kg * m/s^2 = N]               !
 !                                                                              !
-!     where:                                                                   !
+!   * Necessary acceleration (to achieve the desired volume flux) is then:     !
 !                                                                              !
-!     a = dv / dt = dFlux / dt * 1 / (A * rho)                                 !
-!     m = rho * v                                                              !
-!     F = Pdrop * l * A = Pdrop * v                                            !
+!     acc = (v_flux_o - v_flux) / dt / area     [m^3/s / s / m^2 = m/s^2]      !
 !                                                                              !
-!     finally:                                                                 !
+!   * In a periodic channel, force is related to pressure drop as:             !
 !                                                                              !
-!     Pdrop * v = rho * v * dFlux / dt * 1 / (A * rho)                         !
+!     p_drop * volume = force                   [kg/m^2/s^2 * m^3 = N]         !
 !                                                                              !
-!     after cancelling: v and rho, it yields:                                  !
+!   * Or:                                                                      !
 !                                                                              !
-!     Pdrop = dFlux/dt/A                                                       !
+!     p_drop = force / volume =                                                !
+!            = mass / volume * acc                                             !
+!            = rho * (v_flux_o - v_flux) / dt / area                           !
 !                                                                              !
-!   Note                                                                       !
-!                                                                              !
-!   * There seems to be a missing consideration for fluid density in the       !
-!     calculation, which should be factored in the mass term of Newton's law.  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Bulk_Type)  :: bulk  !! bulk flow properties
-  real, intent(in) :: dt    !! computational time step
+  class(Field_Type), target :: Flow  !! parent class
+!-----------------------------------[Locals]-----------------------------------!
+  type(Bulk_Type), pointer :: bulk
+  type(Grid_Type), pointer :: Grid
+  real                     :: rho
 !==============================================================================!
 
+  ! Take aliases
+  Grid => Flow % pnt_grid
+  bulk => Flow % bulk
+
+  ! Work out the mean density of the fluid body
+  rho = Flow % Volume_Average(Flow % density)
+
+  ! Once density is computed, continue with necessary pressure drops
   if( abs(bulk % flux_x_o) >= TINY ) then
-    bulk % p_drop_x = (bulk % flux_x_o - bulk % flux_x)  &
-                       / (dt * bulk % area_x + TINY)
+    bulk % p_drop_x = rho * (bulk % flux_x_o - bulk % flux_x)  &
+                    / (Flow % dt * bulk % area_x + TINY)
   end if
   if( abs(bulk % flux_y_o) >= TINY ) then
-    bulk % p_drop_y = (bulk % flux_y_o - bulk % flux_y)  &
-                       / (dt * bulk % area_y + TINY)
+    bulk % p_drop_y = rho * (bulk % flux_y_o - bulk % flux_y)  &
+                    / (Flow % dt * bulk % area_y + TINY)
   end if
   if( abs(bulk % flux_z_o) >= TINY ) then
-    bulk % p_drop_z = (bulk % flux_z_o - bulk % flux_z)  &
-                       / (dt * bulk % area_z + TINY)
+    bulk % p_drop_z = rho * (bulk % flux_z_o - bulk % flux_z)  &
+                    / (Flow % dt * bulk % area_z + TINY)
   end if
 
   end subroutine
