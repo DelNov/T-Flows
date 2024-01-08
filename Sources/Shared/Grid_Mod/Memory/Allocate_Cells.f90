@@ -37,7 +37,10 @@
     nb_m = nb + margin
   end if
 
-  print '(a,2i9)', ' # Expanding memory for cells to size: ', nc, nb
+  ! I can't figure out how to print something meaningful in parallel here
+  if(Sequential_Run()) then
+    print '(a,2i9)', ' # Expanding memory for cells to size: ', nc, nb
+  end if
 
   ! Allocate cell center coordinates and initialize to zero
   call Enlarge % Array_Real(Grid % xc, i=(/-nb_m,nc_m/))
