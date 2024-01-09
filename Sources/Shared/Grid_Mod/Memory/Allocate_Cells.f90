@@ -70,7 +70,11 @@
 
   ! This is used only in Swarm_Mod for bouncing particles
   if(PROGRAM_NAME .eq. 'Process') then
-    call Enlarge % Array_Int(Grid % cells_bnd_face, i=(/-nb_m,-1/))
+    if(nb_m .gt. 0) then  ! this check is not crazy, a (sub)domain might
+                          ! have no boundary cells, all could be periodic
+                          ! or simply not touching any boundary regions
+      call Enlarge % Array_Int(Grid % cells_bnd_face, i=(/-nb_m,-1/))
+    end if
   end if
 
   ! Number of nodes, faces and cells at each cell
@@ -92,7 +96,11 @@
   end if
 
   ! Array to hold boundary regions tags at boundary cells
-  call Enlarge % Array_Int(Grid % region % at_cell, i=(/-nb_m,-1/))
+  if(nb_m .gt. 0) then  ! this check is not crazy, a (sub)domain might
+                        ! have no boundary cells, all could be periodic
+                        ! or simply not touching any boundary regions
+    call Enlarge % Array_Int(Grid % region % at_cell, i=(/-nb_m,-1/))
+  end if
 
   ! Allocate cell-based porous regions
   call Enlarge % Array_Int(Grid % por, i=(/-nb_m,nc_m/))
