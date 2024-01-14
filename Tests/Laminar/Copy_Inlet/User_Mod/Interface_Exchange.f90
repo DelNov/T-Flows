@@ -34,18 +34,18 @@
   !-------------------------------------------!
   do d1 = 1, n_dom
     do d2 = 1, n_dom
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % u % n,     &
-                                   Flow(d2) % u % n,     &
-                                   U)
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % v % n,     &
-                                   Flow(d2) % v % n,     &
-                                   V)
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % w % n,     &
-                                   Flow(d2) % w % n,     &
-                                   W)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % u % n,  &
+                                  Flow(d2) % u % n,  &
+                                  U)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % v % n,  &
+                                  Flow(d2) % v % n,  &
+                                  V)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % w % n,  &
+                                  Flow(d2) % w % n,  &
+                                  W)
     end do
   end do
 

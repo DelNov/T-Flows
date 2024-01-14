@@ -67,41 +67,41 @@
     do d2 = 1, n_dom
 
       ! Send temperature to interface
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % t % n,     &
-                                   Flow(d2) % t % n,     &
-                                   T)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % t % n,  &
+                                  Flow(d2) % t % n,  &
+                                  T)
 
       ! Send conductivities as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),            &
-                                   Flow(d1) % conductivity,  &
-                                   Flow(d2) % conductivity,  &
-                                   K)
+      call Interface_Mod_Exchange(inter(d1, d2),            &
+                                  Flow(d1) % conductivity,  &
+                                  Flow(d2) % conductivity,  &
+                                  K)
 
       ! Send wall distance to the interface
-      call Interface_Mod_To_Buffer(inter(d1, d2),                    &
-                                   Flow(d1) % pnt_grid % wall_dist,  &
-                                   Flow(d2) % pnt_grid % wall_dist,  &
-                                   WD)
+      call Interface_Mod_Exchange(inter(d1, d2),                    &
+                                  Flow(d1) % pnt_grid % wall_dist,  &
+                                  Flow(d2) % pnt_grid % wall_dist,  &
+                                  WD)
 
       ! Send inside scalar 1 as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),             &
-                                   Flow(d1) % scalar(1) % n,  &
-                                   Flow(d2) % scalar(1) % n,  &
-                                   C)
+      call Interface_Mod_Exchange(inter(d1, d2),             &
+                                  Flow(d1) % scalar(1) % n,  &
+                                  Flow(d2) % scalar(1) % n,  &
+                                  C)
 
       ! Send pressure as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),             &
-                                   Flow(d1) % p % n,          &
-                                   Flow(d2) % p % n,          &
-                                   P)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % p % n,  &
+                                  Flow(d2) % p % n,  &
+                                  P)
 
       ! Send boundary scalar 1 as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),             &
-                                   Flow(d1) % scalar(1) % n,  &
-                                   Flow(d2) % scalar(1) % n,  &
-                                   CB,                        &
-                                   boundary = .true.)
+      call Interface_Mod_Exchange(inter(d1, d2),             &
+                                  Flow(d1) % scalar(1) % n,  &
+                                  Flow(d2) % scalar(1) % n,  &
+                                  CB,                        &
+                                  boundary = .true.)
 
     end do
   end do

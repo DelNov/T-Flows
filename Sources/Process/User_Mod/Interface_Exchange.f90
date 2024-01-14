@@ -9,8 +9,8 @@
 !                                                                              !
 !   * Verification of the presence of multiple domains and heat transfer.      !
 !   * Transference of variables (such as temperature, conductivity, and wall   !
-!     distance) to interface buffers through Interface_Mod_To_Buffer calls.    !
-!     Note that the Interface_Mod_To_Buffer also exchanges the values in the   !
+!     distance) to interface buffers through Interface_Mod_Exchange calls.     !
+!     Note that the Interface_Mod_Exchange also exchanges the values in the    !
 !     buffers.  After this call, each domain will have values from             !
 !     neighbouring domains at her disposal.                                    !
 !   * Application of buffered values to impose tailored boundary conditions    !
@@ -54,33 +54,33 @@
     if(.not. Flow(d1) % heat_transfer) return
   end do
 
-  !-------------------------------------------!
-  !                                           !
-  !   Store the desired values to interface   !
-  !                                           !
-  !-------------------------------------------!
+  !------------------------------------------!
+  !                                          !
+  !   Exchange desired values to interface   !
+  !                                          !
+  !------------------------------------------!
   do d1 = 1, n_dom
     do d2 = 1, n_dom
 
       ! Send temperature to interface
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % t % n,     &
-                                   Flow(d2) % t % n,     &
-                                   T)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % t % n,  &
+                                  Flow(d2) % t % n,  &
+                                  T)
 
       ! Send conductivities as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),            &
-                                   Flow(d1) % conductivity,  &
-                                   Flow(d2) % conductivity,  &
-                                   K)
+      call Interface_Mod_Exchange(inter(d1, d2),            &
+                                  Flow(d1) % conductivity,  &
+                                  Flow(d2) % conductivity,  &
+                                  K)
 
       ! Send wall distance to the interface
-      call Interface_Mod_To_Buffer(inter(d1, d2),                    &
-                                   Flow(d1) % pnt_grid % wall_dist,  &
-                                   Flow(d2) % pnt_grid % wall_dist,  &
-                                   WD)
-    end do
-  end do
+      call Interface_Mod_Exchange(inter(d1, d2),                    &
+                                  Flow(d1) % pnt_grid % wall_dist,  &
+                                  Flow(d2) % pnt_grid % wall_dist,  &
+                                  WD)
+    end do  ! d2
+  end do    ! d1
 
   !------------------------------------------------------!
   !                                                      !
@@ -155,7 +155,7 @@
                               / (     k1 / wd1 +      k2 / wd2)
 
       end do
-    end do
-  end do
+    end do    ! d2
+  end do      ! d1
 
   end subroutine

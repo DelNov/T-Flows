@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Interface_Mod_To_Buffer(inter, var1, var2, v, boundary)
+  subroutine Interface_Mod_Exchange(inter, var1, var2, v, boundary)
 !------------------------------------------------------------------------------!
 !   Copy values of specified variables to buffer.                              !
 !------------------------------------------------------------------------------!
