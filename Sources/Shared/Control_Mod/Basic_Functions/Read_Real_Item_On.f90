@@ -3,7 +3,7 @@
 !------------------------------------------------------------------------------!
 !   Working horse function to read real values (argument "val") behind a       !
 !   keyword (argument "keyword") in control file.  If not found, a default     !
-!   vaue specified in argument "def" is used.
+!   value specified in argument "def" is used.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
