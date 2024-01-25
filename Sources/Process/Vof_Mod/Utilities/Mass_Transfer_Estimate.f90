@@ -23,6 +23,7 @@
   real                         :: dx1, dy1, dz1, dx2, dy2, dz2, d1, d2, st
   real                         :: dx1_n, dy1_n, dz1_n, dx2_n, dy2_n, dz2_n
   real                         :: q_0, q_1, sum_m_dot, sum_nab_t
+  real                         :: c_lee, tmp_new, mdot_old
 !==============================================================================!
 
   ! Take aliases
@@ -32,7 +33,7 @@
   t     => Flow % t
 
   ! If not a problem with mass transfer, get out of here
-  if(.not. Flow % mass_transfer) return
+  if(Flow % mass_transfer_model == 0) return
 
   call Work % Connect_Real_Cell(elem_sx, elem_sy, elem_sz)
   call Work % Connect_Int_Cell(elem_used)
@@ -61,21 +62,22 @@
   !   phases toward the cells at the interface   !
   !                                              !
   !----------------------------------------------!
+  if (Flow % mass_transfer_model == 1) then
+    ! Intialize t_0 and t_1 ...
+    Vof % t_0 % x(1:) = t % x(1:)
+    Vof % t_0 % y(1:) = t % y(1:)
+    Vof % t_0 % z(1:) = t % z(1:)
+    Vof % t_1 % x(1:) = t % x(1:)
+    Vof % t_1 % y(1:) = t % y(1:)
+    Vof % t_1 % z(1:) = t % z(1:)
 
-  ! Intialize t_0 and t_1 ...
-  Vof % t_0 % x(1:) = t % x(1:)
-  Vof % t_0 % y(1:) = t % y(1:)
-  Vof % t_0 % z(1:) = t % z(1:)
-  Vof % t_1 % x(1:) = t % x(1:)
-  Vof % t_1 % y(1:) = t % y(1:)
-  Vof % t_1 % z(1:) = t % z(1:)
-
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % x, towards=0)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % y, towards=0)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % z, towards=0)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % x, towards=1)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % y, towards=1)
-  call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % z, towards=1)
+    call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % x, towards=0)
+    call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % y, towards=0)
+    call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % z, towards=0)
+    call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % x, towards=1)
+    call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % y, towards=1)
+    call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_0 % z, towards=1)
+  endif
 
   !-------------------------------------------!
   !                                           !
@@ -211,27 +213,53 @@
   !   Mass transfer with extrapolated gradients   !
   !                                               !
   !-----------------------------------------------!
-  do c = Cells_In_Domain_And_Buffers()
-    if(elem_used(c) > 0) then
-      e  = Front % elem_in_cell(c)
-      if(e > 0) then
+  if (Flow % mass_transfer_model ==1) then
+    do c = Cells_In_Domain_And_Buffers()
+      if(elem_used(c) > 0) then
+        e  = Front % elem_in_cell(c)
+        if(e > 0) then
+          ! Units: W/(mK) * K/m * m^2 = W
+          q_0 = (  Vof % t_0 % x(c) * elem_sx(c)    &
+                 + Vof % t_0 % y(c) * elem_sy(c)    &
+                 + Vof % t_0 % z(c) * elem_sz(c) ) * Vof % phase_cond(0)
+          ! Heat flux to the interface in cell c from phase 1
+          ! Units: W/(mK) * K/m * m^2 = W
+          q_1 = (  Vof % t_1 % x(c) * elem_sx(c)    &
+                 + Vof % t_1 % y(c) * elem_sy(c)    &
+                + Vof % t_1 % z(c) * elem_sz(c) ) * Vof % phase_cond(1)
 
-        ! Units: W/(mK) * K/m * m^2 = W
-        q_0 = (  Vof % t_0 % x(c) * elem_sx(c)    &
-               + Vof % t_0 % y(c) * elem_sy(c)    &
-               + Vof % t_0 % z(c) * elem_sz(c) ) * Vof % phase_cond(0)
-        ! Heat flux to the interface in cell c from phase 1
-        ! Units: W/(mK) * K/m * m^2 = W
-        q_1 = (  Vof % t_1 % x(c) * elem_sx(c)    &
-               + Vof % t_1 % y(c) * elem_sy(c)    &
-               + Vof % t_1 % z(c) * elem_sz(c) ) * Vof % phase_cond(1)
-
-       Vof % m_dot(c) = (q_1 - q_0) / 2.26e+6
+          ! Units: W / (J/kg) = kg/s
+          Vof % m_dot(c) = (q_1 - q_0) / Vof % latent_heat
+        end if
       end if
-    end if
+    end do
+    endif
 
-  end do
+  !-----------------------------------------------!
+  !                                               !
+  !   Mass transfer modified Lee model            !
+  !                                               !
+  !-----------------------------------------------!
+  if (Flow % mass_transfer_model ==2) then
+    do c = Cells_In_Domain_And_Buffers()
+      if(elem_used(c) > 0) then
+        e  = Front % elem_in_cell(c)
+        if(e > 0) then
+          c_lee = 10000.0                   ! CONDENSATION
+          if (t % n(c) > Vof % t_sat) then  ! VAPORIZATION
+                  c_lee = 20000.0
+          endif
+          Vof % m_dot(c) = c_lee * Flow%capacity(c) * Flow%density(c) &
+                         * (t % n(c) - Vof % t_sat) &
+                         * (sqrt(elem_sx(c)**2.0+elem_sy(c)**2.0+elem_sz(c)**2.0)) &
+                         * (Grid%vol(c)**(1.0/3.0)) &
+                         / Vof % latent_heat
+        end if
+      end if
+    end do
+  endif
 
+  ! Sum
   sum_m_dot = 0.0
   sum_nab_t = 0.0
   elem = 0
