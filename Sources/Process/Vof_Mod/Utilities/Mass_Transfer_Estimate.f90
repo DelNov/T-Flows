@@ -35,6 +35,16 @@
   ! If not a problem with mass transfer, get out of here
   if(Flow % mass_transfer_model == 0) return
 
+  if(Math % Approx_Real(Vof % latent_heat, 1.0) ) then
+    if (First_Proc()) then
+      print '(a,PE12.4)', 'LATENT_HEAT=',Vof % latent_heat
+      print '(a)', 'You might forget to define LATENT_HEAT in control'
+    endif
+    call Message % Error(60,                                                   &
+                       'This error is critical.  Exiting.',                    &
+                       file=__FILE__, line=__LINE__, one_proc=.true.)
+  endif
+
   call Work % Connect_Real_Cell(elem_sx, elem_sy, elem_sz)
   call Work % Connect_Int_Cell(elem_used)
 
@@ -233,7 +243,7 @@
         end if
       end if
     end do
-    endif
+  endif
 
   !-----------------------------------------------!
   !                                               !
