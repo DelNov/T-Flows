@@ -17,7 +17,7 @@
   Grid => Vof % pnt_grid
   Flow => Vof % pnt_flow
 
-  if(.not. Flow % mass_transfer) return
+  if(Flow % mass_transfer_model == 0) return
 
   ! Distinguish between liquid and vapor
   call Vof % Get_Vapour_And_Liquid_Phase(vapour, liquid)
