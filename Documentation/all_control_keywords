@@ -118,7 +118,7 @@
   LATENT_HEAT                              |         1.0                   |   physical property
   MASS_DENSITY                             |         1.0                   |   physical property
   MASS_FLOW_RATES                          |         0.0,  0.0,  0.0       |   any triplet of real numbers
-  MASS_TRANSFER                            |         no                    |   yes
+  MASS_TRANSFER                            |         no                    |   yes or Lee with two coefficients
   MAX_PARTICLES                            |         0                     |   any number >= 0
   NUMBER_OF_DOMAINS                        |         1                     |   from 1 to 4
   NUMBER_OF_PHASES                         |         1                     |   2
