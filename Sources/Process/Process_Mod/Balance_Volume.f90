@@ -67,7 +67,7 @@
   !   Added volume due to phase change   !
   !                                      !
   !--------------------------------------!
-  if(Flow % mass_transfer) then
+  if(Flow % mass_transfer_model /=0) then
     call Vof % Mass_Transfer_Added_Volume(bulk % vol_src)
   end if
 

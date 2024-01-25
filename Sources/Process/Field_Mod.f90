@@ -110,7 +110,8 @@
     logical :: heat_transfer
 
     ! Phase change (called mass_transfer to be consistent with heat_transfer)
-    logical :: mass_transfer
+    ! 0 = no mass transfer, 1 = temperature gradient, 2 = Lee model
+    integer :: mass_transfer_model
 
     ! Temperature
     type(Var_Type) :: t  ! [K]

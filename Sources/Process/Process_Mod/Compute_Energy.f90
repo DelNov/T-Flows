@@ -94,7 +94,7 @@
   end if
 
   ! Gradients
-  if(.not. Flow % mass_transfer) then
+  if(Flow % mass_transfer_model == 0) then
     call Flow % Grad_Variable(t)
 
   ! If mass transfer, estimate the mass transfer due to heat fluxes,
@@ -131,7 +131,7 @@
 
     call Turb % Face_Cond_And_Stress(con_eff, t_stress, s)
 
-    if(Flow % mass_transfer) then
+    if(Flow % mass_transfer_model /=0) then
       if(Vof % fun % n(c1) < 0.5 .and.  &
          Vof % fun % n(c2) < 0.5) con_eff = Vof % phase_cond(0)
       if(Vof % fun % n(c1) > 0.5 .and.  &
@@ -178,7 +178,7 @@
     !   In case of mass transfer, detach the two phases   !
     !      and add heat transferred to the interface      !
     !-----------------------------------------------------!
-    if(Flow % mass_transfer) then
+    if(Flow % mass_transfer_model ==1) then
       if(Vof % Front % intersects_face(s)) then
         a12  = 0.0
         a21  = 0.0
@@ -227,6 +227,15 @@
 
   end do  ! through sides
 
+  ! heat sink or source due to mass transfer
+  if(Flow % mass_transfer_model ==2) then
+    ! HEAT SINK or SOURCE for LEE MODEL YOHEI
+    do c = Cells_In_Domain_And_Buffers()
+      ! Units: (kg/s) * (J/kg) = W
+      b(c) = b(c) - Vof % m_dot(c) * Vof % latent_heat
+    end do
+  end if
+
   !----------------------------------------------!
   !   Explicitly treated diffusion heat fluxes   !
   !   cross diffusion, and heat from interface   !
@@ -250,7 +259,7 @@
   !--------------------!
   do c = -Grid % n_bnd_cells, Grid % n_cells
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
-    if(Flow % mass_transfer) then
+    if(Flow % mass_transfer_model /=0) then
       if(Vof % fun % n(c) > 0.5) then
         cap_dens(c) = Vof % phase_capa(1) * Vof % phase_dens(1)
       else if(Vof % fun % n(c) < 0.5) then
@@ -289,7 +298,7 @@
   call Info % Iter_Fill_At(1, 6, t % name, t % res, t % niter)
 
   ! Gradients
-  if(.not. Flow % mass_transfer) then
+  if(Flow % mass_transfer_model == 0) then
     call Flow % Grad_Variable(t)
 
   ! If mass transfer, compute gradients with saturation temperature
