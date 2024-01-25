@@ -539,7 +539,7 @@
         save_03(c1) = Flow % t % z(c1)
       end do
 
-      if(.not. Flow % mass_transfer) then
+      if(Flow % mass_transfer_model == 0) then
         call Flow % Grad_Variable(Flow % t)
       else
         call Vof % Calculate_Grad_Matrix_With_Front()
