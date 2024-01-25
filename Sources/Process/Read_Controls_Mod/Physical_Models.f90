@@ -256,7 +256,7 @@
   if(Flow % with_interface) then
     call Control % Track_Front  (Vof % track_front,   .true.)
     call Control % Track_Surface(Vof % track_surface, .true.)
-    call Control % Mass_Transfer(Flow % mass_transfer)
+    call Control % Mass_Transfer(Flow % mass_transfer_model, Vof % c_lee)
   end if
 
   !-----------------------!
