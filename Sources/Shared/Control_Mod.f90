@@ -30,6 +30,7 @@
       procedure :: Position_At_Three_Keys
       procedure :: Read_Char_Item
       procedure :: Read_Char_Item_On
+      procedure :: Read_Char_Real_Vector
       procedure :: Read_Int_Item
       procedure :: Read_Int_Item_On
       procedure :: Read_Keyless_Strings_On
@@ -205,6 +206,7 @@
 #   include "Control_Mod/Basic_Functions/Position_At_Three_Keys.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item_On.f90"
+#   include "Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90"
