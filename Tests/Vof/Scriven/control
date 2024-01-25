@@ -1,0 +1,100 @@
+#----------
+# Prologue
+#----------
+ PROBLEM_NAME           bubble
+ HEAT_TRANSFER          yes
+ INTERFACE_TRACKING     yes
+ TRACK_FRONT            yes
+ REPORT_VOLUME_BALANCE  yes
+ 
+ NUMBER_OF_TIME_STEPS   120
+
+ RESULTS_SAVE_INTERVAL   10 
+ BACKUP_SAVE_INTERVAL    10000
+
+ TIME_STEP               2.0e-5
+ 
+#-------------------
+# Monitoring points
+#-------------------
+ NUMBER_OF_MONITORING_POINTS    0
+   MONITORING_POINT_001         0.5  0.1  0.75
+
+ POINT_FOR_MONITORING_PLANES    0.5  0.1  0.75
+
+#-----------------
+# Physical models
+#-----------------
+# Phase 1 is liquid
+ PHASE_DENSITIES          0.597       958.4       
+ PHASE_VISCOSITIES        1.22e-2     2.8e-1      
+ PHASE_CONDUCTIVITIES     0.025       0.677       
+ PHASE_CAPACITIES         2030.0      4216.0      
+ SURFACE_TENSION          0.059
+ MASS_TRANSFER            yes
+ SATURATION_TEMPERATURE   100
+ LATENT_HEAT            2.26e+6
+ TURBULENCE_MODEL       none
+ GRAVITATIONAL_VECTOR   0.0 0.0 0.0
+
+#----------------------
+# Numerical parameters
+#----------------------
+ PRESSURE_MOMENTUM_COUPLING   simple piso
+
+ SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7   1.0
+ SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3   0.99
+ SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.7   0.99
+
+ TIME_INTEGRATION_SCHEME  linear
+
+ ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+ ADVECTION_SCHEME_FOR_VOF         cicsam
+
+#------------------------
+# Linear solver settings
+#------------------------
+ PRECONDITIONER_FOR_SYSTEM_MATRIX        incomplete_cholesky
+ TOLERANCE_FOR_ENERGY_SOLVER             1.e-8
+ TOLERANCE_FOR_MOMENTUM_SOLVER           1.e-8
+ TOLERANCE_FOR_PRESSURE_SOLVER           1.e-8
+ TOLERANCE_FOR_SIMPLE_ALGORITHM          1.e-04
+ TOLERANCE_FOR_VOF_SOLVER                1.e-8
+ MAX_ITERATIONS_FOR_PRESSURE_SOLVER     200
+ MAX_SIMPLE_ITERATIONS                  12
+ MIN_SIMPLE_ITERATIONS                   6
+ MAX_SMOOTHING_CYCLES_CURVATURE_VOF     12
+ MAX_SMOOTHING_CYCLES_NORMAL_VOF         0
+
+ GU_CORRECTION               yes
+ CHOI_CORRECTION             yes
+
+ GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
+ GRADIENT_METHOD_FOR_VOF             gauss_theorem
+#MAX_GAUSS_GRADIENTS_ITERATIONS    200
+ TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-4
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w     vof
+    VALUES              0.0   0.0   0.0   1.0
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION    wall
+    TYPE                outflow  (or: inflow/ outflow / pressure / convective / symmetry )
+    VARIABLES           u     v     w     v     q
+    VALUES              0.0   0.0   0.0   1.0   0.0 
+# BOUNDARY_CONDITION     upper_wall
+#    TYPE                convective
+#    VAVARIABLES         u      v     w     vof     q
+#    VALUES              0.00  0.0   0.0   1.0     0.0
+#  BOUNDARY_CONDITION    symmetry
+#    TYPE                symmetry
+#    VARIABLES           u      v     w     vof     q
+#    VALUES              0.00  0.0   0.0   1.0     0.0
+
+
