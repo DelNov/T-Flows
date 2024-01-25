@@ -84,6 +84,18 @@
     logical :: track_front    ! simple but ugly
     logical :: track_surface  ! complicated but beautiful
 
+    ! Coefficient of Lee for mass transfer rate
+    ! m_dot [kg/s] = c_lee(1) * (T - Tsat) * A * V**(1/3) / latent_heat  for T <  Tsat
+    !              = c_lee(2) * (T - Tsat) * A * V**(1/3) / latent_heat  for T >= Tsat
+    ! m_dot [kg/s]: positive for vaporization, negative for condensation
+    ! c_lee [1/s] : (1) coefficient for condensation, (2) for vaporisation
+    ! A [m2]      : area of interface in cell
+    ! V [m3]      : cell volume
+    ! phase(0) and phase(1) are supporsed to be vapor and liquid phases, respectively.
+    ! c_lee(1): phase(0) -> phase(1)
+    ! c_lee(2): phase(1) -> phase(0)
+    real    :: c_lee(2)       ! [1/s] 
+
     contains
 
       !----------------------------------------!
