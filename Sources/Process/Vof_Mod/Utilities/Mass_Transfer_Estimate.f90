@@ -33,11 +33,11 @@
   t     => Flow % t
 
   ! If not a problem with mass transfer, get out of here
-  if(Flow % mass_transfer_model == 0) return
+  if(Flow % mass_transfer_model == NO_MASS_TRANSFER) return
 
   if(Math % Approx_Real(Vof % latent_heat, 1.0) ) then
     if (First_Proc()) then
-      print '(a,PE12.4)', 'LATENT_HEAT=',Vof % latent_heat
+      print '(a,1pe12.4)', ' # Latent heat is: ', Vof % latent_heat
       print '(a)', 'You might forget to define LATENT_HEAT in control'
     endif
     call Message % Error(60,                                                   &
@@ -72,7 +72,8 @@
   !   phases toward the cells at the interface   !
   !                                              !
   !----------------------------------------------!
-  if (Flow % mass_transfer_model == 1) then
+  if(Flow % mass_transfer_model .eq. TEMPERATURE_GRADIENTS) then
+
     ! Intialize t_0 and t_1 ...
     Vof % t_0 % x(1:) = t % x(1:)
     Vof % t_0 % y(1:) = t % y(1:)
@@ -81,6 +82,7 @@
     Vof % t_1 % y(1:) = t % y(1:)
     Vof % t_1 % z(1:) = t % z(1:)
 
+    ! ... and extrapolate to front
     call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % x, towards=0)
     call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % y, towards=0)
     call Vof % Extrapolate_Normal_To_Front(Flow, Vof % t_1 % z, towards=0)
@@ -223,7 +225,7 @@
   !   Mass transfer with extrapolated gradients   !
   !                                               !
   !-----------------------------------------------!
-  if (Flow % mass_transfer_model ==1) then
+  if(Flow % mass_transfer_model .eq. TEMPERATURE_GRADIENTS) then
     do c = Cells_In_Domain_And_Buffers()
       if(elem_used(c) > 0) then
         e  = Front % elem_in_cell(c)
@@ -250,7 +252,7 @@
   !   Mass transfer modified Lee model            !
   !                                               !
   !-----------------------------------------------!
-  if (Flow % mass_transfer_model ==2) then
+  if(Flow % mass_transfer_model .eq. LEE) then
     do c = Cells_In_Domain_And_Buffers()
       if(elem_used(c) > 0) then
         e  = Front % elem_in_cell(c)
@@ -259,7 +261,7 @@
           if (t % n(c) > Vof % t_sat) then  ! VAPORIZATION
                   c_lee = 20000.0
           endif
-          Vof % m_dot(c) = c_lee * Flow%capacity(c) * Flow%density(c) &
+          Vof % m_dot(c) = c_lee * Flow % capacity(c) * Flow % density(c) &
                          * (t % n(c) - Vof % t_sat) &
                          * (sqrt(elem_sx(c)**2.0+elem_sy(c)**2.0+elem_sz(c)**2.0)) &
                          * (Grid%vol(c)**(1.0/3.0)) &

@@ -26,12 +26,12 @@
 # Physical models
 #-----------------
 # Phase 1 is liquid
- PHASE_DENSITIES          0.597       958.4       
- PHASE_VISCOSITIES        1.22e-2     2.8e-1      
- PHASE_CONDUCTIVITIES     0.025       0.677       
- PHASE_CAPACITIES         2030.0      4216.0      
+ PHASE_DENSITIES          0.597       958.4
+ PHASE_VISCOSITIES        1.22e-2     2.8e-1
+ PHASE_CONDUCTIVITIES     0.025       0.677
+ PHASE_CAPACITIES         2030.0      4216.0
  SURFACE_TENSION          0.059
- MASS_TRANSFER            yes
+ MASS_TRANSFER_MODEL      temperature_gradients
  SATURATION_TEMPERATURE   100
  LATENT_HEAT            2.26e+6
  TURBULENCE_MODEL       none

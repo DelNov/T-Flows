@@ -39,8 +39,7 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
     fun % n(c) = 0.0
   end do
 
-  ! Ellipsoid:
-  !WRITE(*,*)"call Vof_Initialization_Ellipsoid"
+  ! Ellipsoid
   call Vof_Initialization_Ellipsoid(Vof)
 
   call Grid % Exchange_Cells_Real(fun % n)
@@ -91,10 +90,10 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
     end if
   end do
 
-  DEALLOCATE(r_in, tpr_in)
-  
+  deallocate(r_in, tpr_in)
+
   call Flow % Grad_Variable(t)
-  
+
   end subroutine
 
   !SUBROUTINE tpr_interpolate(dist,r_in,tpr_in,ndata)
@@ -102,7 +101,7 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
     INTEGER::ndata,i
     REAL::dist,r_in(ndata),tpr_in(ndata),ratio
     DO i = 1, ndata-1
-      if (r_in(i)<=dist .AND. dist<r_in(i+1)<dist) then
+      if (r_in(i)<=dist .AND. dist<r_in(i+1)) then
         ratio = (dist-r_in(i))/(r_in(i+1)-r_in(i))
         tpr_interpolate = tpr_in(i)*(1.0-ratio) + tpr_in(i+1)*ratio
         CYCLE

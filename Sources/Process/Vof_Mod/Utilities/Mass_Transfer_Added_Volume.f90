@@ -22,7 +22,7 @@
   ! Integrate added volume
   added_vol = 0.0
 
-  if(Flow % mass_transfer_model == 0) return
+  if(Flow % mass_transfer_model .eq. NO_MASS_TRANSFER) return
 
   ! Distinguish between vapour and liquid
   call Vof % Get_Vapour_And_Liquid_Phase(vapour, liquid)

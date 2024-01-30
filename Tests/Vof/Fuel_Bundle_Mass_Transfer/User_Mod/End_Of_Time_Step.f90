@@ -48,8 +48,8 @@
   range_max = xy_cent + half_range
 
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
-    if (range_min < Grid % xc(c) .AND. Grid % xc(c) < range_max .AND.  &
-        range_min < Grid % yc(c) .AND. Grid % yc(c) < range_max ) then
+    if (range_min < Grid % xc(c) .and. Grid % xc(c) < range_max .and.  &
+        range_min < Grid % yc(c) .and. Grid % yc(c) < range_max ) then
     vol_vb = vol_vb + Grid % vol(c) * (1.0-fun % n(c))
     endif
   end do
@@ -62,7 +62,7 @@
     call File % Append_For_Writing_Ascii('volume.out', fu)
 
     ! With sphericity 3D
-    write(fu,'(4(2X,E18.10E2))') Time % Get_Time(), vol_l, vol_v, vol_vb
+    write(fu,'(4(2x,e18.10e2))') Time % Get_Time(), vol_l, vol_v, vol_vb
     close(fu)
   end if
 

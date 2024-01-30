@@ -146,7 +146,8 @@
       procedure :: Scalars_Diffusivity
       procedure :: Interface_Tracking
       procedure :: Particle_Tracking
-      procedure :: Mass_Transfer
+      procedure :: Mass_Transfer_Model
+      procedure :: Lee_Model_Coefficients
       procedure :: Heat_Transfer
       procedure :: Buoyancy
       procedure :: Reference_Temperature
@@ -358,7 +359,8 @@
     ! Multiphase flow
 #   include "Control_Mod/Physics/Interface_Tracking.f90"
 #   include "Control_Mod/Physics/Particle_Tracking.f90"
-#   include "Control_Mod/Physics/Mass_Transfer.f90"
+#   include "Control_Mod/Physics/Mass_Transfer_Model.f90"
+#   include "Control_Mod/Physics/Lee_Model_Coefficients.f90"
 
     ! Heat transfer
 #   include "Control_Mod/Physics/Heat_Transfer.f90"

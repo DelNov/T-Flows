@@ -50,7 +50,7 @@
   allocate(Vof % surf_fy(-nb:nc));  Vof % surf_fy(-nb:nc) = 0.0
   allocate(Vof % surf_fz(-nb:nc));  Vof % surf_fz(-nb:nc) = 0.0
 
-  if(Flow % mass_transfer_model /=0) then
+  if(Flow % mass_transfer_model .ne. NO_MASS_TRANSFER) then
     allocate(Vof % a12(nf));        Vof % a12(1:nf)     = 0.0
     allocate(Vof % a21(nf));        Vof % a21(1:nf)     = 0.0
     allocate(Vof % m_dot(-nb:nc));  Vof % m_dot(-nb:nc) = 0.0

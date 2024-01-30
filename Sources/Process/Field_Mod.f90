@@ -110,7 +110,8 @@
     logical :: heat_transfer
 
     ! Phase change (called mass_transfer to be consistent with heat_transfer)
-    ! 0 = no mass transfer, 1 = temperature gradient, 2 = Lee model
+    ! It can assume the value of one of the parameters defined a bit further
+    ! below in this file: NO_MASS_TRANSFER, TEMPERATURE_GRADIENTS or LEE
     integer :: mass_transfer_model
 
     ! Temperature
@@ -252,6 +253,11 @@
   integer, parameter :: NO_BUOYANCY      = 60013
   integer, parameter :: DENSITY_DRIVEN   = 60017
   integer, parameter :: THERMALLY_DRIVEN = 60029
+
+  ! Parameters storing the mass transfer model
+  integer, parameter :: NO_MASS_TRANSFER      = 60037
+  integer, parameter :: TEMPERATURE_GRADIENTS = 60041
+  integer, parameter :: LEE                   = 60077
 
   contains
 

@@ -2,7 +2,7 @@
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
                                        n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
-!          This function is computing benchmark for rising bubble.             !
+!   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -34,20 +34,20 @@
   surface = 0.0
   ne = 0
 !  alpha_l = Vof%phase_cond(1)/(Vof%phase_capa(1)*Vof%phase_dens(1))
-  
+
 ! do c = Cells_In_Domain()
   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
     b_volume = b_volume + Grid % vol(c) * (1.0 - fun % n(c))
     e  = Vof % Front % elem_in_cell(c)
     if(e > 0) then
-      ne = ne + 1      
+      ne = ne + 1
       surface = surface + Elem(e) % area
     end if
   end do
-        
+
   call Global % Sum_Real(ne)
-  call Global % Sum_Real(surface)  
-  call Global % Sum_Real(b_volume) 
+  call Global % Sum_Real(surface)
+  call Global % Sum_Real(b_volume)
   rad_volume = (3.0*b_volume/(4*PI))**(1.0/3.0)
 
   ! Write to file
@@ -56,5 +56,5 @@
     write(fu,'(4(2X,E16.8))') Time % Get_Time(), surface, b_volume, rad_volume
     close(fu)
   end if
-  
+
   end subroutine

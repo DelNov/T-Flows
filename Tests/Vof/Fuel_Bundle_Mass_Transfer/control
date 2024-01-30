@@ -10,7 +10,8 @@
  HEAT_TRANSFER       yes
  INTERFACE_TRACKING  yes
  TRACK_FRONT         yes !TRACK_FRONT is new  Why do we need both INTERFACE_TRACKING and TRACK_FRONT?
- MASS_TRANSFER       Lee   10000.0  20000.0
+ MASS_TRANSFER_MODEL lee
+ LEE_MODEL_COEFFICIENTS  10000.0  20000.0
 
 #-----------------
 # Time step

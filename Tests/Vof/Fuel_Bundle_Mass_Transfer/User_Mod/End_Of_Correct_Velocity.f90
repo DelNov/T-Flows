@@ -26,14 +26,13 @@
   p    => Flow % p
   M    => Sol % Nat % M
 
-  DO c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     if (Grid % zc(c) > 3.65e-2) then
       u % n(c) = 0.0
       v % n(c) = 0.0
       w % n(c) = w_inlet
-    endif
-  ENDDO
-
+    end if
+  end do
 
   ! Calculate velocity magnitude for normalization
   vel_max = MICRO
@@ -43,11 +42,11 @@
   call Global % Max_Real(vel_max)
   vel_max_before = vel_max
 
-  DO c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     u % n(c) = min ( max( u % n(c), -vlimit), vlimit)
     v % n(c) = min ( max( v % n(c), -vlimit), vlimit)
     w % n(c) = min ( max( w % n(c), -vlimit), vlimit)
-  ENDDO
+  end do
 
   ! Calculate velocity magnitude for normalization
   vel_max = MICRO
@@ -55,6 +54,7 @@
     vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
   end do
   call Global % Max_Real(vel_max)
-  IF (First_proc()) WRITE(*,'(a,2E10.2)')"User_Mod_End_Of_Correct_Velocity:vel_max=",vel_max_before, vel_max
+  IF (First_proc()) write(*,'(a,2e10.2)') __FILE__//' vel_max = ',  &
+                                          vel_max_before, vel_max
 
   end subroutine

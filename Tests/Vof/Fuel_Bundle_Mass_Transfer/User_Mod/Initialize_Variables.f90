@@ -30,7 +30,7 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
   end do
 
   ! Ellipsoid:
-  WRITE(*,*)"call Vof_Initialization_Ellipsoid"
+  write(*,*) "call Vof_Initialization_Ellipsoid"
   call Vof_Initialization_Ellipsoid(Vof)
 
   call Grid % Exchange_Cells_Real(fun % n)
