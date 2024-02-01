@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Distribute_Nodes(Dom, Grid, b, w,   &
+  subroutine Distribute_Nodes(Dom, Grid, b, bw,   &
                               is, js, ks, ie, je, ke)
 !------------------------------------------------------------------------------!
 !>  This subroutine places nodes on a line defined by local block positions.
@@ -14,7 +14,7 @@
 !     than 2, the subroutine returns immediately, as no distribution is        !
 !     needed.                                                                  !
 !   * Node distribution logic:                                                 !
-!     - Linear distribution (positive weight): If the weight (w) is positive,  !
+!     - Linear distribution (positive weight): If the weight (bw) is positive, !
 !       it distributes the nodes linearly between the start and end points,    !
 !       adjusting the node positions based on a computed delta shift (dt).     !
 !     - Hyperbolic distribution (negative weight): For negative weights, it    !
@@ -35,7 +35,7 @@
   integer, intent(in) :: b           !! current block
   integer, intent(in) :: is, js, ks  !! starting index in a logical direction
   integer, intent(in) :: ie, je, ke  !! ending index in a logical direction
-  real,    intent(in) :: w           !! weight of the block
+  real,    intent(in) :: bw          !! weight of the block
 !----------------------------------[Calling]-----------------------------------!
   real :: atanh
 !-----------------------------------[Locals]-----------------------------------!
@@ -61,8 +61,8 @@
   !-------------------------!
   !   Linear distribution   !
   !-------------------------!
-  if(w > 0.0) then
-    ddt = ( 2.0*(1.0-w) ) / ( real(n)*(real(n)-1.0)*(1.0+w) )
+  if(bw > 0.0) then
+    ddt = ( 2.0*(1.0-bw) ) / ( real(n)*(real(n)-1.0)*(1.0+bw) )
     t=0.0
     node = Grid % n_nodes + ni*nj*nk  ! estimated last node
     call Grid % Allocate_Nodes(node)  ! expand nodes
@@ -114,14 +114,14 @@
   !-----------------------------!
   else
     case = 0
-    if     ((w  >  -0.5).and.(w <=  -0.25)) then
-      pr = 1.0 - abs(0.5 - abs(w))
+    if     ((bw  >  -0.5).and.(bw <=  -0.25)) then
+      pr = 1.0 - abs(0.5 - abs(bw))
       case = 1
-    else if((w >=  -0.75).and.(w  <  -0.5)) then
-      pr = 1.0 - abs(0.5 - abs(w))
+    else if((bw >=  -0.75).and.(bw  <  -0.5)) then
+      pr = 1.0 - abs(0.5 - abs(bw))
       case = 2
     else
-      pr = -w
+      pr = -bw
       case = 3
     end if
 
