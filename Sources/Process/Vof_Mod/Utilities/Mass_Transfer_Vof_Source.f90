@@ -20,7 +20,7 @@
   Flow => Vof % pnt_flow
 
   ! If not a problem with mass transfer, get out of here
-  if(.not. Flow % mass_transfer) return
+  if(Flow % mass_transfer_model .eq. NO_MASS_TRANSFER) return
 
   ! Distinguish between liquid and vapor
   call Vof % Get_Vapour_And_Liquid_Phase(vapour, liquid)

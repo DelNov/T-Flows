@@ -41,6 +41,7 @@
       procedure :: Position_At_Three_Keys
       procedure :: Read_Char_Item
       procedure :: Read_Char_Item_On
+      procedure :: Read_Char_Real_Vector
       procedure :: Read_Int_Item
       procedure :: Read_Int_Item_On
       procedure :: Read_Keyless_Strings_On
@@ -58,6 +59,7 @@
       procedure :: Save_Backup_Name
       procedure :: Save_Initial_Condition
       procedure :: Save_Results_At_Boundaries
+      procedure :: Save_Results_Units
       procedure :: Wall_Time_Max_Hours
       procedure :: Backup_Save_Interval
       procedure :: Results_Save_Interval
@@ -155,7 +157,8 @@
       procedure :: Scalars_Diffusivity
       procedure :: Interface_Tracking
       procedure :: Particle_Tracking
-      procedure :: Mass_Transfer
+      procedure :: Mass_Transfer_Model
+      procedure :: Lee_Model_Coefficients
       procedure :: Heat_Transfer
       procedure :: Buoyancy
       procedure :: Reference_Temperature
@@ -217,6 +220,7 @@
 #   include "Control_Mod/Basic_Functions/Position_At_Three_Keys.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Char_Item_On.f90"
+#   include "Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item.f90"
 #   include "Control_Mod/Basic_Functions/Read_Int_Item_On.f90"
 #   include "Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90"
@@ -238,6 +242,7 @@
 #   include "Control_Mod/Input_Output/Save_Backup_Name.f90"
 #   include "Control_Mod/Input_Output/Save_Initial_Condition.f90"
 #   include "Control_Mod/Input_Output/Save_Results_At_Boundaries.f90"
+#   include "Control_Mod/Input_Output/Save_Results_Units.f90"
 #   include "Control_Mod/Input_Output/Wall_Time_Max_Hours.f90"
 
     ! Save
@@ -367,7 +372,8 @@
     ! Multiphase flow
 #   include "Control_Mod/Physics/Interface_Tracking.f90"
 #   include "Control_Mod/Physics/Particle_Tracking.f90"
-#   include "Control_Mod/Physics/Mass_Transfer.f90"
+#   include "Control_Mod/Physics/Mass_Transfer_Model.f90"
+#   include "Control_Mod/Physics/Lee_Model_Coefficients.f90"
 
     ! Heat transfer
 #   include "Control_Mod/Physics/Heat_Transfer.f90"

@@ -42,7 +42,8 @@
   type Results_Type
 
     logical :: boundary        !! set to true to save results at boundaries
-    logical :: initial         !! set to treu to save intial condition
+    logical :: units           !! set to true to save variable name with unit
+    logical :: initial         !! set to true to save intial condition
     integer :: interval        !! result save interval
     integer :: interval_swarm  !! result save interval for particles
 
@@ -60,6 +61,7 @@
       procedure, private :: Save_Vtu_Vector_Real
       procedure, private :: Time_To_Save_Results
       procedure, private :: Time_To_Save_Swarm
+      procedure, private :: Var_Name
 
   end type
 
@@ -72,12 +74,13 @@
 #   include "Results_Mod/Save_Vtu_Front.f90"
 #   include "Results_Mod/Save_Vtu_Scalar_Int.f90"
 #   include "Results_Mod/Save_Vtu_Scalar_Real.f90"
+#   include "Results_Mod/Save_Vtu_Surf.f90"
 #   include "Results_Mod/Save_Vtu_Swarm.f90"
 #   include "Results_Mod/Save_Vtu_Tensor_6_Real.f90"
 #   include "Results_Mod/Save_Vtu_Tensor_9_Real.f90"
 #   include "Results_Mod/Save_Vtu_Vector_Real.f90"
-#   include "Results_Mod/Save_Vtu_Surf.f90"
 #   include "Results_Mod/Time_To_Save_Results.f90"
 #   include "Results_Mod/Time_To_Save_Swarm.f90"
+#   include "Results_Mod/Var_Name.f90"
 
   end module

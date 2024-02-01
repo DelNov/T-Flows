@@ -295,7 +295,36 @@
   if(Flow % with_interface) then
     call Control % Track_Front  (Vof % track_front,   .true.)
     call Control % Track_Surface(Vof % track_surface, .true.)
-    call Control % Mass_Transfer(Flow % mass_transfer)
+    call Control % Mass_Transfer_Model(name,          .true.)
+    select case(name)
+
+      case('NONE')
+        Flow % mass_transfer_model = NO_MASS_TRANSFER
+      case('TEMPERATURE_GRADIENTS')
+        Flow % mass_transfer_model = TEMPERATURE_GRADIENTS
+      case('LEE')
+        Flow % mass_transfer_model = LEE
+
+      case default
+        call Message % Error(60,                                              &
+                             'Unknown mass transfer model: '//trim(name)  //  &
+                             '.  Possible entries are: NONE, TEMPERATURE' //  &
+                             '_GRADIENTS and LEE. \n Exiting!')
+    end select
+
+    ! For the Lee model, also read its two coefficients
+    if(Flow % mass_transfer_model .eq. LEE) then
+      call Control % Lee_Model_Coefficients(Vof % c_lee, .true.)
+
+      if(Math % Approx_Real(Vof % c_lee(1), 0.0) .and.  &
+         Math % Approx_Real(Vof % c_lee(2), 0.0) ) then
+        call Message % Error(66,                                              &
+                     'Mass transfer model is specified to Lee model but ' //  &
+                     'the Lee model coefficients are not specified. The ' //  &
+                     'entry LEE_MODEL_COEFFICIENTS is missing in the    ' //  &
+                     'control file. \n \n Exiting!')
+      end if
+    end if
   end if
 
   !-----------------------!

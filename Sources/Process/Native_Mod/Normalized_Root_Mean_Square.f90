@@ -17,7 +17,7 @@
   real,                      intent(in) :: x(:)  !! unknown vector
   real,            optional, intent(in) :: norm  !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
-  real                          :: rms, x_max, x_min
+  real                          :: rms, x_max, x_min, x_max_min
   integer                       :: i
   real,    contiguous,  pointer :: a_val(:)
   integer, contiguous,  pointer :: a_dia(:)
@@ -60,11 +60,18 @@
   call Global % Max_Real(x_max)
 
   ! Create a plateau for very small sources and values
-  if( (x_max-x_min) < NANO .and. rms < NANO ) then
-    rms = PICO
-  else
-    rms = rms / (x_max - x_min + TINY)
-  end if
+  !if( (x_max-x_min) < NANO .and. rms < NANO ) then
+  !  rms = PICO
+  !else
+  !  rms = rms / (x_max - x_min + TINY)
+  !end if
+
+  ! avoid roundoff error and divided-by-zero
+  ! don't do rms = rms / (x_max - x_min + TINY)
+  ! because e.g. 1.0 - 1.0 + 1e-30 = 0.0
+  x_max_min = x_max - x_min
+  x_max_min = max (x_max_min, TINY)
+  rms = rms / x_max_min
 
   Normalized_Root_Mean_Square = rms
 

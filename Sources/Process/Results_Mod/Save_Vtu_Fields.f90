@@ -82,18 +82,17 @@
   type(Var_Type),  pointer     :: phi
   integer(SP)                  :: data_size
   integer                      :: data_offset, cell_offset, i_fac, reg
-  integer                      :: s, n, n_conns, n_polyg, sc, f7, f8, f9, run
-  integer                      :: i, j, n1, n2, s1, s2, c, c1, c2, c_f, c_l
+  integer                      :: s, n, n_conns, n_polyg, sc, f8, f9, run
+  integer                      :: s1, s2, c1, c2, c_f, c_l
   real                         :: dist1, dist2
-  character(SL)                :: name_out_7, name_out_8, name_out_9, name_mean
-  character(SL)                :: str1, str2
+  character(SL)                :: name_out_8, name_out_9, name_mean
+  character(SL)                :: str1, str2, str_time, str_var
   integer, pointer, contiguous :: int_save(:), type_save(:), offs_save(:)
   real,    pointer, contiguous :: save_01(:), save_02(:), save_03(:)
   real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
   real,    pointer, contiguous :: var_ins(:)
   real,    pointer, contiguous :: v2_calc(:), kin_vis_t(:), phi_save(:)
-  real,    allocatable         :: r_buffer(:)
-  integer, allocatable         :: i_buffer(:)
+  logical, pointer             :: units
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
 !==============================================================================!
@@ -104,7 +103,8 @@
   call Vtk_Mod_Set_Precision()
 
   ! Take aliases
-  Grid => Flow % pnt_grid
+  Grid  => Flow % pnt_grid
+  units => Results % units
 
   if(.not. plot_inside .and. .not. Results % boundary) return
 
@@ -129,40 +129,13 @@
     c_l = -1
     if(.not. PLOT_BUFFERS) then
       do c_f = -Grid % n_bnd_cells, -1
-        if( Cell_In_This_Proc(c_f)) exit
+        if( Grid % Comm % cell_proc(c_f) .eq. This_Proc()) exit
       end do
       do c_l = -1, -Grid % n_bnd_cells, -1
-        if( Cell_In_This_Proc(c_l)) exit
+        if( Grid % Comm % cell_proc(c_l) .eq. This_Proc()) exit
       end do
     end if
   end if
-
-  !------------------------------------------------------------------!
-  !   Count the required buffer sizes and allocate memory for them   !
-  !------------------------------------------------------------------!
-
-  ! Count the size of integer buffer for non-polyhedral cells
-  n1 = 0
-  do c = c_f, c_l
-    n1 = n1 + max(abs(Grid % cells_n_nodes(c)), Grid % cells_n_faces(c))
-  end do
-
-  ! Still counting, but now for polyhedral cells
-  n2 = 0
-  do c = c_f, c_l
-    if(Grid % cells_n_nodes(c) .lt. 0) then  ! found a polyhedron
-      n2 = n2 + 1
-      do i_fac = 1, Grid % cells_n_faces(c)  ! and all polyfaces
-        s = Grid % cells_f(i_fac, c)
-        n = Grid % faces_n_nodes(s)
-        n2 = n2 + 1                          ! to store number of nodes
-        n2 = n2 + n                          ! to store each node
-      end do
-    end if
-  end do
-
-  allocate(i_buffer(max(Grid % n_nodes, max(n1,n2))))
-  allocate(r_buffer(Grid % n_nodes * 3))
 
   !-------------------------------------------------------------------------!
   !   Count connections and polygons in this Grid, you will need it later   !
@@ -227,6 +200,7 @@
   end if
   call File % Open_For_Writing_Binary(name_out_9, f9)
 
+  write(str_time,'(E16.9)')Time % Get_Time()
   !------------!
   !            !
   !   Header   !
@@ -236,12 +210,24 @@
     write(f8) IN_0 // '<?xml version="1.0"?>'              // LF
     write(f8) IN_0 // '<VTKFile type="PUnstructuredGrid">' // LF
     write(f8) IN_1 // '<PUnstructuredGrid GhostLevel="1">' // LF
+    write(f8) IN_2 // '<PFieldData>'                       // LF
+    ! TIME must be capitalized for visit
+    write(f8) IN_3 // '<PDataArray type="Float64" Name="TIME" ' // &
+                  'NumberOfTuples="1" format="ascii"> ' // trim(str_time) // LF
+    write(f8) IN_3 // '</PDataArray>'                      // LF
+    write(f8) IN_2 // '</PFieldData>'                      // LF
   end if
 
   write(f9) IN_0 // '<?xml version="1.0"?>'                           // LF
   write(f9) IN_0 // '<VTKFile type="UnstructuredGrid" version="0.1" ' //  &
                     'byte_order="LittleEndian">'                      // LF
   write(f9) IN_1 // '<UnstructuredGrid>'                              // LF
+  write(f9) IN_2 // '<FieldData>'                                     // LF
+  ! TIME must be capitalized for visit
+  write(f9) IN_3 // '<DataArray type="Float64" Name="TIME" ' // & 
+                    'NumberOfTuples="1" format="ascii">' // trim(str_time) // LF
+  write(f9) IN_3 // '</DataArray>'                                    // LF
+  write(f9) IN_2 // '</FieldData>'                                    // LF
 
   write(str1,'(i0.0)') Grid % n_nodes
   if(plot_inside) then
@@ -382,8 +368,6 @@
   !----------------!
   do run = 1, 2
 
-    call Profiler % Start('Save_Vtu_Results (grid remnants)')
-
     !------------------------------------------!
     !   Save remnants of the Grid definition   !
     !------------------------------------------!
@@ -392,39 +376,26 @@
       ! Save the nodes' coordinates
       data_size = int(Grid % n_nodes * RP * 3, SP)
       write(f9) data_size
-      i = 0
       do n = 1, Grid % n_nodes
-        i = i + 1;  r_buffer(i) = Grid % xn(n)
-        i = i + 1;  r_buffer(i) = Grid % yn(n)
-        i = i + 1;  r_buffer(i) = Grid % zn(n)
+        write(f9) Grid % xn(n), Grid % yn(n), Grid % zn(n)
       end do
-      write(f9) r_buffer(1:i)
 
       ! Save connections
       data_size = int(n_conns * IP, SP)
       write(f9) data_size
       if(plot_inside) then
-        i = 0
         do c1 = c_f, c_l
 
           ! Tetrahedral, pyramid, wedge and hexahedral cells
           if( any( Grid % cells_n_nodes(c1) .eq. (/4,5,6,8/)  ) ) then
-            do j = 1, Grid % cells_n_nodes(c1)
-              i = i + 1
-              i_buffer(i) = Grid % cells_n(j, c1) - 1  ! VTU counts from 0
-            end do
+            write(f9) (Grid % cells_n(1:Grid % cells_n_nodes(c1), c1))-1
 
           ! Polyhedral cells
           else if(Grid % cells_n_nodes(c1) .lt. 0) then
-            do j = 1, -Grid % cells_n_nodes(c1)
-              i = i + 1
-              i_buffer(i) = Grid % cells_n(j, c1) - 1  ! VTU counts from 0
-            end do
+            write(f9) (Grid % cells_n(1:-Grid % cells_n_nodes(c1), c1))-1
 
           end if
         end do
-        write(f9) i_buffer(1:i)
-
       else  ! plot only boundary
         do c2 = c_f, c_l
 
@@ -449,11 +420,9 @@
         data_size = int(n_polyg * IP, SP)
         write(f9) data_size
 
-        i = 0
         do c1 = c_f, c_l
           if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
-            i = i + 1
-            i_buffer(i) = Grid % cells_n_faces(c1)  ! write number of polygons
+            write(f9) Grid % cells_n_faces(c1)      ! write number of polygons
             do i_fac = 1, Grid % cells_n_faces(c1)  ! write nodes of each polygn
               s = Grid % cells_f(i_fac, c1)
               if(Grid % faces_s(s) .ne. 0) then  ! face has a shadow, if it ...
@@ -469,23 +438,16 @@
                 if(dist2 < dist1) s = s2
               end if
               n = Grid % faces_n_nodes(s)
-              i = i + 1
-              i_buffer(i) = n
-              do j = 1, n
-                i = i + 1
-                i_buffer(i) = Grid % faces_n(j, s) - 1   ! VTU counts from 0
-              end do
+              write(f9) n, (Grid % faces_n(1:n, s))-1
             end do
           end if
         end do
-        write(f9) i_buffer(1:i)
 
         ! Write polyhedral cells' faces offsets
         data_size = int((c_l-c_f+1) * IP, SP)
         write(f9) data_size
 
         cell_offset = 0
-        i = 0
         do c1 = c_f, c_l
           if(Grid % cells_n_nodes(c1) .lt. 0) then  ! found a polyhedron
             cell_offset = cell_offset + 1           ! to store number of polygs
@@ -494,38 +456,41 @@
               n = Grid % faces_n_nodes(s)
               cell_offset = cell_offset + 1 + n
             end do
-            i = i + 1
-            i_buffer(i) = cell_offset
+            write(f9) cell_offset
 
           ! Not a polyhedron, offsets are not needed and set to -1
           else
-            i = i + 1
-            i_buffer(i) = -1
+            write(f9) -1
           end if
 
         end do
-        write(f9) i_buffer(1:i)
 
       end if  ! n_polyg > 0
 
     end if
 
-    call Profiler % Stop('Save_Vtu_Results (grid remnants)')
-
     !--------------------!
     !   Cell processor   !
     !--------------------!
-    int_save(c_f:c_l) = Grid % Comm % cell_proc(c_f:c_l)
-    call Results % Save_Vtu_Scalar_Int("Grid Processor [1]", plot_inside,  &
-                                       int_save(c_f:c_l),                  &
-                                       f8, f9, data_offset, run)
+    do c1 = c_f, c_l
+      int_save(c1) = Grid % Comm % cell_proc(c1)
+    end do
+    do c2 = c_f, c_l
+      int_save(c2) = Grid % Comm % cell_proc(c2)
+    end do
+
+    str_var = Var_Name("Grid Processor","[1]", units)
+    call Results % Save_Vtu_Scalar_Int(trim(str_var), plot_inside,   &
+                                    int_save(c_f:c_l),               &
+                                    f8, f9, data_offset, run)
 
     !-----------------!
     !   Cell thread   !
     !-----------------!
     int_save(c_f:c_l) = Grid % Omp % cell_thread(c_f:c_l)
-    call Results % Save_Vtu_Scalar_Int("Grid Thread [1]", plot_inside,  &
-                                       int_save(c_f:c_l),               &
+    str_var = Var_Name("Grid Thread","[1]", units)
+    call Results % Save_Vtu_Scalar_Int(trim(str_var), plot_inside,   &
+                                       int_save(c_f:c_l),            &
                                        f8, f9, data_offset, run)
 
     !-------------------!
@@ -533,8 +498,9 @@
     !-------------------!
     if(present(domain)) then
       int_save(c_f:c_l) = domain
-      call Results % Save_Vtu_Scalar_Int("Grid Domain [1]", plot_inside, &
-                                         int_save(c_f:c_l),              &
+      str_var = Var_Name("Grid Domain","[1]", units)
+      call Results % Save_Vtu_Scalar_Int(trim(str_var), plot_inside,   &
+                                         int_save(c_f:c_l),            &
                                          f8, f9, data_offset, run)
     end if
 
@@ -543,42 +509,47 @@
     !----------------------!
     if(.not. plot_inside) then
       int_save(c_f:c_l) = Grid % region % at_cell(c_f:c_l)
-      call Results % Save_Vtu_Scalar_Int("Boundary Condition [1]",        &
-                                         plot_inside, int_save(c_f:c_l),  &
+      str_var = Var_Name("Boundary Condition","[1]", units)
+      call Results % Save_Vtu_Scalar_Int(trim(str_var),plot_inside,    &
+                                         int_save(c_f:c_l),            &
                                          f8, f9, data_offset, run)
     end if
 
     !--------------!
     !   Velocity   !
     !--------------!
-    call Results % Save_Vtu_Vector_Real("Velocity [m/s]", plot_inside,  &
-                                        Flow % u % n(c_f:c_l),          &
-                                        Flow % v % n(c_f:c_l),          &
-                                        Flow % w % n(c_f:c_l),          &
+    str_var = Var_Name("Velocity","[m/s]", units)
+    call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
+                                        Flow % u % n(c_f:c_l),        &
+                                        Flow % v % n(c_f:c_l),        &
+                                        Flow % w % n(c_f:c_l),        &
                                         f8, f9, data_offset, run)
     !--------------------!
     !   Courant number   !
     !--------------------!
     if(plot_inside) then
       call Flow % Calculate_Courant_In_Cells(save_01)
-      call Results % Save_Vtu_Scalar_Real("Courant Number [1]", plot_inside,  &
-                                          save_01(c_f:c_l),                   &
+      str_var = Var_Name("Courant Number","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
+                                          save_01(c_f:c_l),            &
                                           f8, f9, data_offset, run)
     end if
 
     !---------------!
     !   Potential   !
     !---------------!
-    call Results % Save_Vtu_Scalar_Real("Potential [m^2/s]", plot_inside,  &
-                                        Flow % potential(c_f:c_l),         &
+    str_var = Var_Name("Potential","[m^2/s]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Flow % potential(c_f:c_l),    &
                                         f8, f9, data_offset, run)
 
     !--------------------------------------!
     !   Pressure correction and pressure   !
     !--------------------------------------!
-    call Results % Save_Vtu_Scalar_Real("Pressure Correction [Pa]",  &
-                                        plot_inside,                 &
-                                        Flow % pp % n(c_f:c_l),      &
+    str_var = Var_Name("Pressure Correction","[Pa]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var),            &
+                                        plot_inside,              &
+                                        Flow % pp % n(c_f:c_l),   &
                                         f8, f9, data_offset, run)
     save_01(:) = 0.0
     save_02(:) = 0.0
@@ -588,14 +559,16 @@
       save_02(c1) = Flow % pp % y(c1) * Grid % vol(c1)
       save_03(c1) = Flow % pp % z(c1) * Grid % vol(c1)
     end do
-    call Results % Save_Vtu_Vector_Real("Pressure Correction Force [N]",  &
-                                        plot_inside,                      &
-                                        save_01(c_f:c_l),                 &
-                                        save_02(c_f:c_l),                 &
-                                        save_03(c_f:c_l),                 &
+    str_var = Var_Name("Pressure Correction Force","[N]", units)
+    call Results % Save_Vtu_Vector_Real(trim(str_var),      &
+                                        plot_inside,        &
+                                        save_01(c_f:c_l),   &
+                                        save_02(c_f:c_l),   &
+                                        save_03(c_f:c_l),   &
                                         f8, f9, data_offset, run)
 
-    call Results % Save_Vtu_Scalar_Real("Pressure [Pa]", plot_inside,  &
+    str_var = Var_Name("Pressure","[Pa]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
                                         Flow % p % n(c_f:c_l),         &
                                         f8, f9, data_offset, run)
     save_01(:) = 0.0
@@ -606,18 +579,21 @@
       save_02(c1) = Flow % p % y(c1) * Grid % vol(c1)
       save_03(c1) = Flow % p % z(c1) * Grid % vol(c1)
     end do
-    call Results % Save_Vtu_Vector_Real("PressureForce [N]", plot_inside,  &
-                                        save_01(c_f:c_l),                  &
-                                        save_02(c_f:c_l),                  &
-                                        save_03(c_f:c_l),                  &
+
+    str_var = Var_Name("PressureForce","[N]", units)
+    call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
+                                        save_01(c_f:c_l),             &
+                                        save_02(c_f:c_l),             &
+                                        save_03(c_f:c_l),             &
                                         f8, f9, data_offset, run)
 
     !-----------------!
     !   Temperature   !
     !-----------------!
     if(Flow % heat_transfer) then
-      call Results % Save_Vtu_Scalar_Real("Temperature [K]", plot_inside,  &
-                                          Flow % t % n(c_f:c_l),           &
+      str_var = Var_Name("Temperature","[K]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Flow % t % n(c_f:c_l),        &
                                           f8, f9, data_offset, run)
       save_01(:) = 0.0
       save_02(:) = 0.0
@@ -628,65 +604,53 @@
         save_03(c1) = Flow % t % z(c1)
       end do
 
-      if(Flow % mass_transfer) then
+      if(Flow % mass_transfer_model .eq. NO_MASS_TRANSFER) then
+        call Flow % Grad_Variable(Flow % t)
+      else
         call Vof % Calculate_Grad_Matrix_With_Front()
         call Vof % Grad_Variable_With_Front(Flow % t, Vof % t_sat)
         call Flow % Calculate_Grad_Matrix()
-      else
-        call Flow % Grad_Variable(Flow % t)
       end if
 
-      ! Single-phase or mixture (in case of multiphase) gradients
-      call Results % Save_Vtu_Vector_Real("Temperature Gradients [K/m]",  &
-                                          plot_inside,                    &
-                                          save_01(c_f:c_l),               &
-                                          save_02(c_f:c_l),               &
-                                          save_03(c_f:c_l),               &
+      str_var = Var_Name("Temperature Gradients","[K/m]", units)
+      call Results % Save_Vtu_Vector_Real(trim(str_var),      &
+                                          plot_inside,        &
+                                          save_01(c_f:c_l),   &
+                                          save_02(c_f:c_l),   &
+                                          save_03(c_f:c_l),   &
                                           f8, f9, data_offset, run)
 
-      ! Phase gradients (for cases with mass transfer)
-      if(Flow % mass_transfer) then
-        call Results % Save_Vtu_Vector_Real(                                &
-                                 "Temperature Gradients from Phase 0 [K/m]",&
-                                            plot_inside,                    &
-                                            Vof % t_0 % x(c_f:c_l),         &
-                                            Vof % t_0 % y(c_f:c_l),         &
-                                            Vof % t_0 % z(c_f:c_l),         &
-                                            f8, f9, data_offset, run)
-        call Results % Save_Vtu_Vector_Real(                                &
-                                 "Temperature Gradients from Phase 1 [K/m]",&
-                                            plot_inside,                    &
-                                            Vof % t_1 % x(c_f:c_l),         &
-                                            Vof % t_1 % y(c_f:c_l),         &
-                                            Vof % t_1 % z(c_f:c_l),         &
-                                            f8, f9, data_offset, run)
-      end if
     end if
 
     !-------------------------!
     !   Physical properties   !
     !-------------------------!
-    call Results % Save_Vtu_Scalar_Real("Physical Density [kg/m^3]",      &
-                                        plot_inside,                      &
-                                        Flow % density(c_f:c_l),          &
+    str_var = Var_Name("Physical Density","[kg/m^3]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var),                  &
+                                        plot_inside,                    &
+                                        Flow % density(c_f:c_l),        &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Physical Viscosity [Pa s]",      &
-                                        plot_inside,                      &
-                                        Flow % viscosity(c_f:c_l),        &
+    str_var = Var_Name("Physical Viscosity","[Pa s]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var),                  &
+                                        plot_inside,                    &
+                                        Flow % viscosity(c_f:c_l),      &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Physical Conductivity [W/m/K]",  &
-                                        plot_inside,                      &
-                                        Flow % conductivity(c_f:c_l),     &
+    str_var = Var_Name("Physical Conductivity","[W/m/K]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var),                  &
+                                        plot_inside,                    &
+                                        Flow % conductivity(c_f:c_l),   &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Physical Capacity [J/K]",        &
-                                        plot_inside,                      &
-                                        Flow % capacity(c_f:c_l),         &
+    str_var = Var_Name("Physical Capacity","[J/kg/K]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var),                  &
+                                        plot_inside,                    &
+                                        Flow % capacity(c_f:c_l),       &
                                         f8, f9, data_offset, run)
 
     if(Turb % rough_walls) then
-      call Results % Save_Vtu_Scalar_Real("Roughness Coefficient z_o [1]",  &
-                                          plot_inside,                      &
-                                          Turb % z_o(c_f:c_l),              &
+      str_var = Var_Name("Roughness Coefficient z_o","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
+                                          plot_inside,                   &
+                                          Turb % z_o(c_f:c_l),           &
                                           f8, f9, data_offset, run)
 
     end if
@@ -695,34 +659,40 @@
     !   Volume fraction   !
     !---------------------!
     if(Flow % with_interface) then
-      call Results % Save_Vtu_Scalar_Real("Vof Sharp [1]",                  &
-                                          plot_inside,                      &
-                                          Vof % fun % n(c_f:c_l),           &
+      str_var = Var_Name("Vof Sharp","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
+                                          plot_inside,                   &
+                                          Vof % fun % n(c_f:c_l),        &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real("Vof Smooth [1]",                 &
-                                          plot_inside,                      &
-                                          Vof % smooth % n(c_f:c_l),        &
+      str_var = Var_Name("Vof Smooth","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
+                                          plot_inside,                   &
+                                          Vof % smooth % n(c_f:c_l),     &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real("Vof Curvature [1/m]",            &
-                                          plot_inside,                      &
-                                          Vof % curv(c_f:c_l),              &
+      str_var = Var_Name("Vof Curvature","[1/m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
+                                          plot_inside,                   &
+                                          Vof % curv(c_f:c_l),           &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Vector_Real("Vof SurfaceNormals [1]",         &
-                                          plot_inside,                      &
-                                          Vof % nx(c_f:c_l),                &
-                                          Vof % ny(c_f:c_l),                &
-                                          Vof % nz(c_f:c_l),                &
+      str_var = Var_Name("Vof SurfaceNormals","[1]", units)
+      call Results % Save_Vtu_Vector_Real(trim(str_var),                 &
+                                          plot_inside,                   &
+                                          Vof % nx(c_f:c_l),             &
+                                          Vof % ny(c_f:c_l),             &
+                                          Vof % nz(c_f:c_l),             &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Vector_Real("Vof SurfaceTensionForce [N]",    &
-                                          plot_inside,                      &
-                                          Vof % surf_fx(c_f:c_l),           &
-                                          Vof % surf_fy(c_f:c_l),           &
-                                          Vof % surf_fz(c_f:c_l),           &
+      str_var = Var_Name("Vof SurfaceTensionForce","[N]", units)
+      call Results % Save_Vtu_Vector_Real(trim(str_var),                 &
+                                          plot_inside,                   &
+                                          Vof % surf_fx(c_f:c_l),        &
+                                          Vof % surf_fy(c_f:c_l),        &
+                                          Vof % surf_fz(c_f:c_l),        &
                                           f8, f9, data_offset, run)
       if (allocated(Vof % m_dot)) then
-        call Results % Save_Vtu_Scalar_Real("Vof MassTransfer [kg/m^3/s]",  &
-                                            plot_inside,                    &
-                                            Vof % m_dot(c_f:c_l),           &
+        str_var = Var_Name("Vof MassTransfer","[kg/m^3/s]", units)
+        call Results % Save_Vtu_Scalar_Real(trim(str_var),               &
+                                            plot_inside,                 &
+                                            Vof % m_dot(c_f:c_l),        &
                                             f8, f9, data_offset, run)
       end if
     end if
@@ -731,11 +701,13 @@
     !   Number of impacts and reflections   !
     !---------------------------------------!
     if(Flow % with_particles .and. .not. plot_inside) then
-      call Results % Save_Vtu_Scalar_Real("Particles Reflected [1]",     &
+      str_var = Var_Name("Particles Reflected","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
                                           plot_inside,                   &
                                           Swarm % n_reflected(c_f:c_l),  &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real("Particles Deposited [1]",     &
+      str_var = Var_Name("Particles Deposited","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
                                           plot_inside,                   &
                                           Swarm % n_deposited(c_f:c_l),  &
                                           f8, f9, data_offset, run)
@@ -745,10 +717,8 @@
     !   Save scalars   !
     !------------------!
     do sc = 1, Flow % n_scalars
-      write(str1,     '(a23)')  "Scalar XX [independent]"
-      write(str1(8:9),'(i2.2)') sc
       phi => Flow % scalar(sc)
-      call Results % Save_Vtu_Scalar_Real(str1, plot_inside,         &
+      call Results % Save_Vtu_Scalar_Real(phi % name, plot_inside,   &
                                           phi % n(c_f:c_l),          &
                                           f8, f9, data_offset, run)
     end do
@@ -760,8 +730,9 @@
     do c1 = c_f, c_l
       phi_save(c1) = (Flow % vort(c1)**2 - Flow % shear(c1)**2)/4.
     end do
-    call Results % Save_Vtu_Scalar_Real("Q Criterion [1/s^2]", plot_inside,   &
-                                        phi_save(c_f:c_l),                    &
+    str_var = Var_Name("Q Criterion","[1/s^2]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var),plot_inside,   &
+                                        phi_save(c_f:c_l),           &
                                         f8, f9, data_offset, run)
 
     !--------------------------!
@@ -774,20 +745,18 @@
        Turb % model .eq. HYBRID_LES_RANS       .or.  &
        Turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
        Turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
-      call Results % Save_Vtu_Scalar_Real(                         &
-                            "Turbulent Kinetic Energy [m^2/s^2]",  &
-                            plot_inside,                           &
-                            Turb % kin % n(c_f:c_l),               &
+      str_var = Var_Name("Turbulent Kinetic Energy","[m^2/s^2]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                            Turb % kin % n(c_f:c_l),                    &
                             f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real(                         &
-                            "Turbulent Dissipation [m^2/s^3]",     &
-                            plot_inside,                           &
-                            Turb % eps % n(c_f:c_l),               &
+      str_var = Var_Name("Turbulent Dissipation","[m^2/s^3]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                            Turb % eps % n(c_f:c_l),                    &
                             f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real(                                    &
-                            "Turbulent Kinetic Energy Production [m^2/s^3]",  &
-                            plot_inside,                                      &
-                            Turb % p_kin(c_f:c_l),                            &
+      str_var = Var_Name("Turbulent Kinetic Energy Production","[m^2/s^3]",  &
+                          units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                            Turb % p_kin(c_f:c_l),                      &
                             f8, f9, data_offset, run)
     end if
 
@@ -802,28 +771,29 @@
 !                                         plot_inside,                        &
 !                                         v2_calc (c_f:c_l),                  &
 !                                         f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real("Turbulent Quantity Zeta [1]",      &
-                                          plot_inside,                        &
-                                          Turb % zeta % n(c_f:c_l),           &
+      str_var = Var_Name("Turbulent Quantity Zeta","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
+                                          Turb % zeta % n(c_f:c_l),    &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real("Turbulent Quantity F22 [1]",       &
-                                          plot_inside,                        &
-                                          Turb % f22  % n(c_f:c_l),           &
+      str_var = Var_Name("Turbulent Quantity F22","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
+                                          Turb % f22  % n(c_f:c_l),    &
                                           f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Vtu_Scalar_Real("Turbulent Quantity T2 [K^2]",    &
-                                            plot_inside,                      &
-                                            Turb % t2 % n(c_f:c_l),           &
+        str_var = Var_Name("Turbulent Quantity T2","[K^2]", units)
+        call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
+                                            Turb % t2 % n(c_f:c_l),      &
                                             f8, f9, data_offset, run)
 !       call Results % Save_Vtu_Scalar_Real("Turbulent T2 Production [K^2/s]",&
 !                                           plot_inside,                      &
 !                                           Turb % p_t2(c_f:c_l),             &
 !                                           f8, f9, data_offset, run)
-        call Results % Save_Vtu_Vector_Real("Turbulent Heat Flux [K m/s]",    &
-                                            plot_inside,                      &
-                                            Turb % ut % n(c_f:c_l),           &
-                                            Turb % vt % n(c_f:c_l),           &
-                                            Turb % wt % n(c_f:c_l),           &
+        ! unit wrong ???
+        str_var = Var_Name("Turbulent Heat Flux","[K m/s]", units)
+        call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,  &
+                                            Turb % ut % n(c_f:c_l),      &
+                                            Turb % vt % n(c_f:c_l),      &
+                                            Turb % wt % n(c_f:c_l),      &
                                             f8, f9, data_offset, run)
 !        call Results % Save_Vtu_Scalar_Real("Turbulent Quantity Alpha L",    &
 !                                            plot_inside,                     &
@@ -837,54 +807,48 @@
     end if
 
     if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Results % Save_Vtu_Scalar_Real("Turbulent Quantity F22 [1]",  &
-                                          plot_inside,                   &
-                                          Turb % f22 % n(c_f:c_l),       &
+      str_var = Var_Name("Turbulent Quantity F22","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
+                                          Turb % f22 % n(c_f:c_l),     &
                                           f8, f9, data_offset, run)
     end if
 
     ! Save vis and vis_t
     if(Turb % model .eq. DES_SPALART .or.  &
        Turb % model .eq. SPALART_ALLMARAS) then
-      call Results % Save_Vtu_Scalar_Real("Turbulent Viscosity [Pa s]",  &
-                                          plot_inside,                   &
-                                          Turb % vis % n(c_f:c_l),       &
+      str_var = Var_Name("Turbulent Viscosity","[Pa s]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % vis % n(c_f:c_l),      &
                                           f8, f9, data_offset, run)
-      call Results % Save_Vtu_Scalar_Real("Vorticity Magnitude [1/s]",   &
-                                          plot_inside,                   &
-                                          Flow % vort(c_f:c_l),          &
+      str_var = Var_Name("Vorticity Magnitude","[1/s]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Flow % vort(c_f:c_l),         &
                                           f8, f9, data_offset, run)
     end if
 
+    kin_vis_t(:) = 0.0
     if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        Turb % model .ne. HYBRID_LES_RANS     .and.  &
        Turb % model .ne. DNS) then
-      do c = c_f, c_l  ! implied loop was causing errors with Intel compiler
-        kin_vis_t(c) = Turb % vis_t(c) / Flow % viscosity(c)
-      end do
-      call Results % Save_Vtu_Scalar_Real(                                   &
-                                  "Eddy Over Molecular Viscosity [1]",       &
-                                  plot_inside,                               &
-                                  kin_vis_t(c_f:c_l),                        &
+      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      str_var = Var_Name("Eddy Over Molecular Viscosity","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                  kin_vis_t(c_f:c_l),                   &
                                   f8, f9, data_offset, run)
     end if
 
     if(Turb % model .eq. HYBRID_LES_RANS) then
-      do c = c_f, c_l  ! implied loop was causing errors with Intel compiler
-        kin_vis_t(c) = Turb % vis_t(c) / Flow % viscosity(c)
-      end do
-      call Results % Save_Vtu_Scalar_Real(                                   &
-                                  "Rans Eddy Over Molecular Viscosity [1]",  &
-                                  plot_inside,                               &
-                                  kin_vis_t(c_f:c_l),                        &
+      kin_vis_t(:) = 0.0
+      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      str_var = Var_Name("Rans Eddy Over Molecular Viscosity","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                  kin_vis_t(c_f:c_l),                   &
                                   f8, f9, data_offset, run)
-      do c = c_f, c_l  ! implied loop was causing errors with Intel compiler
-        kin_vis_t(c) = Turb % vis_t_sgs(c) / Flow % viscosity(c)
-      end do
-      call Results % Save_Vtu_Scalar_Real(                                   &
-                                  "Sgs Eddy Over Molecular Viscosity [1]",   &
-                                  plot_inside,                               &
-                                  kin_vis_t(c_f:c_l),                        &
+      kin_vis_t(:) = 0.0
+      kin_vis_t(c_f:c_l) = Turb % vis_t_sgs(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      str_var = Var_Name("Sgs Eddy Over Molecular Viscosity","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                  kin_vis_t(c_f:c_l),                   &
                                   f8, f9, data_offset, run)
     end if
 
@@ -893,32 +857,32 @@
        Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
 
       ! Note: follows the order in which Paraview stores tensors
-      call Results % Save_Vtu_Tensor_6_Real("Reynolds Stress [m^2/s^2]",     &
-                                            plot_inside,                     &
-                                            Turb % uu % n(c_f:c_l),          &
-                                            Turb % vv % n(c_f:c_l),          &
-                                            Turb % ww % n(c_f:c_l),          &
-                                            Turb % uv % n(c_f:c_l),          &
-                                            Turb % vw % n(c_f:c_l),          &
-                                            Turb % uw % n(c_f:c_l),          &
+      str_var = Var_Name("Reynolds Stress","[m^2/s^2]", units)
+      call Results % Save_Vtu_Tensor_6_Real(trim(str_var), plot_inside,   &
+                                            Turb % uu % n(c_f:c_l),       &
+                                            Turb % vv % n(c_f:c_l),       &
+                                            Turb % ww % n(c_f:c_l),       &
+                                            Turb % uv % n(c_f:c_l),       &
+                                            Turb % vw % n(c_f:c_l),       &
+                                            Turb % uw % n(c_f:c_l),       &
                                             f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Vtu_Vector_Real("Turbulent Heat Flux [K m/s]",   &
-                                            plot_inside,                     &
-                                            Turb % ut % n(c_f:c_l),          &
-                                            Turb % vt % n(c_f:c_l),          &
-                                            Turb % wt % n(c_f:c_l),          &
+        str_var = Var_Name("Turbulent Heat Flux","[K m/s]", units)
+        call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
+                                            Turb % ut % n(c_f:c_l),       &
+                                            Turb % vt % n(c_f:c_l),       &
+                                            Turb % wt % n(c_f:c_l),       &
                                             f8, f9, data_offset, run)
       end if
     end if
 
     ! Statistics for large-scale simulations of turbulence
     if(Turb % statistics) then
-      call Results % Save_Vtu_Vector_Real("Mean Velocity [m/s]",             &
-                                          plot_inside,                       &
-                                          Turb % u_mean(c_f:c_l),            &
-                                          Turb % v_mean(c_f:c_l),            &
-                                          Turb % w_mean(c_f:c_l),            &
+      str_var = Var_Name("Mean Velocity","[m/s]", units)
+      call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
+                                          Turb % u_mean(c_f:c_l),       &
+                                          Turb % v_mean(c_f:c_l),       &
+                                          Turb % w_mean(c_f:c_l),       &
                                           f8, f9, data_offset, run)
       save_01(:) = 0.0
       save_02(:) = 0.0
@@ -936,21 +900,19 @@
         save_05(c1) = Turb % vw_res(c1) - Turb % v_mean(c1) * Turb % w_mean(c1)
         save_06(c1) = Turb % uw_res(c1) - Turb % u_mean(c1) * Turb % w_mean(c1)
       end do
-      call Results % Save_Vtu_Tensor_6_Real(                               &
-                                        "Mean Reynolds Stress [m^s/s^2]",  &
-                                        plot_inside,                       &
-                                        save_01(c_f:c_l),                  &
-                                        save_02(c_f:c_l),                  &
-                                        save_03(c_f:c_l),                  &
-                                        save_04(c_f:c_l),                  &
-                                        save_05(c_f:c_l),                  &
-                                        save_06(c_f:c_l),                  &
+      str_var = Var_Name("Mean Reynolds Stress","[m^s/s^2]", units)
+      call Results % Save_Vtu_Tensor_6_Real(trim(str_var), plot_inside,   &
+                                        save_01(c_f:c_l),                 &
+                                        save_02(c_f:c_l),                 &
+                                        save_03(c_f:c_l),                 &
+                                        save_04(c_f:c_l),                 &
+                                        save_05(c_f:c_l),                 &
+                                        save_06(c_f:c_l),                 &
                                         f8, f9, data_offset, run)
       if(Flow % heat_transfer) then
-        call Results % Save_Vtu_Scalar_Real(                               &
-                                        "Mean Temperature [K]",            &
-                                        plot_inside,                       &
-                                        Turb % t_mean(c_f:c_l),            &
+        str_var = Var_Name("Mean Temperature","[K]", units)
+        call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Turb % t_mean(c_f:c_l),           &
                                         f8, f9, data_offset, run)
         phi_save(:) = 0.0
         save_01(:) = 0.0
@@ -962,17 +924,15 @@
           save_02(c1)  = Turb % vt_res(c1) - Turb % v_mean(c1)*Turb % t_mean(c1)
           save_03(c1)  = Turb % wt_res(c1) - Turb % w_mean(c1)*Turb % t_mean(c1)
         end do
-        call Results % Save_Vtu_Scalar_Real(                                 &
-                                        "Mean Turbulent Quantity T2 [K^2]",  &
-                                        plot_inside,                         &
-                                        phi_save(c_f:c_l),                   &
+        str_var = Var_Name("Mean Turbulent Quantity T2","[K^2]", units)
+        call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        phi_save(c_f:c_l),                &
                                         f8, f9, data_offset, run)
-        call Results % Save_Vtu_Vector_Real(                                 &
-                                        "Mean Turbulent Heat Flux [K m/s]",  &
-                                        plot_inside,                         &
-                                        save_01(c_f:c_l),                    &
-                                        save_02(c_f:c_l),                    &
-                                        save_03(c_f:c_l),                    &
+        str_var = Var_Name("Mean Turbulent Heat Flux","[K m/s]", units)
+        call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
+                                        save_01(c_f:c_l),                 &
+                                        save_02(c_f:c_l),                 &
+                                        save_03(c_f:c_l),                 &
                                         f8, f9, data_offset, run)
       end if
 
@@ -993,44 +953,41 @@
     ! Save y+ for all turbulence models
     if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
        Turb % model .ne. DNS) then
-      call Results % Save_Vtu_Scalar_Real("Turbulent Quantity Y Plus [1]",  &
-                                          plot_inside,                      &
-                                          Turb % y_plus(c_f:c_l),           &
+      str_var = Var_Name("Turbulent Quantity Y Plus","[1]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % y_plus(c_f:c_l),       &
                                           f8, f9, data_offset, run)
     end if
 
     ! Wall distance and delta, important for all models
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Volume [m^3]",              &
-                                        plot_inside,                           &
-                                        Grid % vol(c_f:c_l),                   &
+    str_var = Var_Name("Grid Cell Volume","[m^3]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Grid % vol(c_f:c_l),          &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Tensor_6_Real("Grid Cell Inertia [m^2]",           &
-                                          plot_inside,                         &
-                                          Grid % ixx(c_f:c_l),                 &
-                                          Grid % iyy(c_f:c_l),                 &
-                                          Grid % izz(c_f:c_l),                 &
-                                          Grid % ixy(c_f:c_l),                 &
-                                          Grid % iyz(c_f:c_l),                 &
-                                          Grid % ixz(c_f:c_l),                 &
+    str_var = Var_Name("Grid Cell Inertia","[m^2]", units)
+    call Results % Save_Vtu_Tensor_6_Real(trim(str_var), plot_inside,   &
+                                          Grid % ixx(c_f:c_l),          &
+                                          Grid % iyy(c_f:c_l),          &
+                                          Grid % izz(c_f:c_l),          &
+                                          Grid % ixy(c_f:c_l),          &
+                                          Grid % iyz(c_f:c_l),          &
+                                          Grid % ixz(c_f:c_l),          &
                                           f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Int("Grid Porous Region [1]", plot_inside,  &
-                                       Grid % por(c_f:c_l),                    &
-                                       f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Wall Distance [m]",              &
-                                        plot_inside,                           &
-                                        Grid % wall_dist(c_f:c_l),             &
+    str_var = Var_Name("Grid Wall Distance","[m]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Grid % wall_dist(c_f:c_l),    &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Max [m]",             &
-                                        plot_inside,                           &
-                                        Turb % h_max(c_f:c_l),                 &
+    str_var = Var_Name("Grid Cell Delta Max","[m]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Turb % h_max(c_f:c_l),        &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Min [m]",             &
-                                        plot_inside,                           &
-                                        Turb % h_min(c_f:c_l),                 &
+    str_var = Var_Name("Grid Cell Delta Min","[m]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Turb % h_min(c_f:c_l),        &
                                         f8, f9, data_offset, run)
-    call Results % Save_Vtu_Scalar_Real("Grid Cell Delta Wall [m]",            &
-                                        plot_inside,                           &
-                                        Turb % h_w  (c_f:c_l),                 &
+    str_var = Var_Name("Grid Cell Delta Wall","[m]", units)
+    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                        Turb % h_w  (c_f:c_l),        &
                                         f8, f9, data_offset, run)
 
     !---------------------------------------------------------------------!
@@ -1077,9 +1034,9 @@
           end do
         end do
 
-        call Results % Save_Vtu_Scalar_Real("T.K.E. Near Wall [m^2/s^2]",  &
-                                            plot_inside,                   &
-                                            var_ins(c_f:c_l),              &
+        str_var = Var_Name("T.K.E. Near Wall","[m^2/s^2]", units)
+        call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                            var_ins(c_f:c_l),             &
                                             f8, f9, data_offset, run)
 
         ! Copy internal values to boundary
@@ -1093,9 +1050,9 @@
           end do
         end do
 
-        call Results % Save_Vtu_Scalar_Real("y+ Near Wall [1]",         &
-                                            plot_inside,                &
-                                            var_ins(c_f:c_l),           &
+        str_var = Var_Name("y+ Near Wall","[1]", units)
+        call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
+                                            var_ins(c_f:c_l),            &
                                             f8, f9, data_offset, run)
 
         do sc = 1, Flow % n_scalars
@@ -1208,33 +1165,6 @@
     write(f8) IN_1 // '</PUnstructuredGrid>' // LF
     write(f8) IN_0 // '</VTKFile>'           // LF
     close(f8)
-  end if
-
-  !----------------------------------------------------------!
-  !                                                          !
-  !   Create Python scripts to extract boundary conditions   !
-  !                                                          !
-  !----------------------------------------------------------!
-  if(First_Proc() .and. .not. plot_inside) then
-    call File % Set_Name(name_out_7,                    &
-                         appendix  = '-extract-bnd',    &
-                         extension = '.py',             &
-                         domain    = domain)
-    call File % Open_For_Writing_Ascii(name_out_7, f7)
-    write(f7, '(a)') "from paraview.simple import *"
-    write(f7, '(a)') "paraview.simple._DisableFirstRenderCameraReset()"
-    write(f7, '(a)') ""
-    write(f7, '(a)') "CurrentFile = FindSource('"//trim(name_out_8)//"')"
-    do reg = Boundary_Regions()
-      write(f7, '(a)') ""
-      write(f7, '(a)')    "threshold = Threshold(Input=CurrentFile)"
-      write(f7, '(a,f4.2,a,f4.2,a)') "threshold.ThresholdRange = [",  &
-                                     reg-0.01,  ", ", reg+0.01, "]"
-      str1 = trim(Grid % region % name(reg))
-      call String % To_Lower_Case(str1)
-      write(f7, '(a)') "RenameSource('"//trim(str1)//"', threshold)"
-    end do
-    close(f7)
   end if
 
   call Work % Disconnect_Int_Cell(int_save, type_save, offs_save)
