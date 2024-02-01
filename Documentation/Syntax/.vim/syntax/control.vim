@@ -163,9 +163,9 @@ syn keyword controlKeyword   HEAT_TRANSFER
 syn keyword controlKeyword   HYBRID_LES_RANS_SWITCH
 syn keyword controlKeyword   INTERFACE_TRACKING
 syn keyword controlKeyword   LATENT_HEAT
+syn keyword controlKeyword   LEE_MODEL_COEFFICIENTS
 syn keyword controlKeyword   MASS_DENSITY
-syn keyword controlKeyword   VOLUME_FLOW_RATES
-syn keyword controlKeyword   MASS_TRANSFER
+syn keyword controlKeyword   MASS_TRANSFER_MODEL
 syn keyword controlKeyword   MAX_PARTICLES
 syn keyword controlKeyword   NUMBER_OF_DOMAINS
 syn keyword controlKeyword   NUMBER_OF_PHASES
@@ -203,6 +203,7 @@ syn keyword controlKeyword   TURBULENT_HEAT_FLUX_MODEL
 syn keyword controlKeyword   TURBULENT_PRANDTL_NUMBER
 syn keyword controlKeyword   TURBULENT_SCHMIDT_NUMBER
 syn keyword controlKeyword   VOLUME_EXPANSION_COEFFICIENT
+syn keyword controlKeyword   VOLUME_FLOW_RATES
 " Porous regions
 syn keyword controlKeyword   NUMBER_OF_POROUS_REGIONS
 syn keyword controlKeyword   POROUS_REGION_001
@@ -244,6 +245,7 @@ syn keyword controlPhysicalModels        thermal  density
 syn keyword controlTurbulenceModels      k_eps_zeta_f  k_eps  les_tvm  les_wal  les_dynamic  les_smagorinsky  hybrid_les_rans  hybrid_les_prandtl
 syn keyword controlTurbulenceModels      des_spalart  spalart_allmaras  dns  rsm_hanjalic_jakirlic  rsm_manceau_hanjalic  dns  none
 syn keyword controlTurbulenceModels      high_re  low_re  ggdh  sgdh  afm
+syn keyword controlMassTransferModels    temperature_gradients  lee
 
 " ==============================================================================
 " The default methods for highlighting. Can be overridden later.
@@ -257,6 +259,7 @@ hi def link controlLinearSolvers         Keyword
 hi def link controlNumericalParameters   Keyword
 hi def link controlPhysicalModels        Keyword
 hi def link controlTurbulenceModels      Keyword
+hi def link controlMassTransferModels    Keyword
 
 let b:current_syntax = "control"
 
