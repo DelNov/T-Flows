@@ -63,8 +63,8 @@
     real,    allocatable :: val(:)    !! value
     real,    allocatable :: fc (:)    !! bare matrix entry for face
     real,    allocatable :: sav(:)    !! saved momentum diagonal value
-    integer, allocatable :: col(:)    !! beginning of each row
-    integer, allocatable :: row(:)    !! column positions
+    integer, allocatable :: col(:)    !! column positions
+    integer, allocatable :: row(:)    !! beginning of each row
     integer, allocatable :: dia(:)    !! diagonal positions
     integer, allocatable :: pos(:,:)  !! position in the matrix
     integer, allocatable :: glo(:)    !! global cell number for PETSc
