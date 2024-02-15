@@ -257,9 +257,9 @@
       if(elem_used(c) > 0) then
         e  = Front % elem_in_cell(c)
         if(e > 0) then
-          c_lee = 10000.0                   ! CONDENSATION
+          c_lee = Vof % c_lee(1)            ! CONDENSATION
           if (t % n(c) > Vof % t_sat) then  ! VAPORIZATION
-                  c_lee = 20000.0
+                  c_lee = Vof % c_lee(2)
           endif
           Vof % m_dot(c) = c_lee * Flow % capacity(c) * Flow % density(c) &
                          * (t % n(c) - Vof % t_sat) &
