@@ -107,6 +107,6 @@
                                                 !! exchanged at the interface
                                                 !! between two domains
   ! Steps for expanding the memory in Generate
-  integer, parameter :: GROWTH_MARGIN = 8192  !! steps for expanding
-                                              !! memory in Generate
+  integer, parameter :: GROWTH_MARGIN =  131072 !! steps for expanding
+                                                !! memory in Generate
   end module
