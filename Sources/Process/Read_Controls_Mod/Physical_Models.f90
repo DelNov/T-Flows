@@ -325,6 +325,8 @@
                      'control file. \n \n Exiting!')
       end if
     end if
+  else
+    Flow % mass_transfer_model = NO_MASS_TRANSFER
   end if
 
   !-----------------------!
