@@ -64,7 +64,8 @@
   call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,4/), j=(/-nb_m,nc_m/))
   call Enlarge % Matrix_Int(Grid % cells_f, i=(/1,4/), j=(/-nb_m,nc_m/))
   if(PROGRAM_NAME .eq. 'Generate' .or.  &
-     PROGRAM_NAME .eq. 'Convert') then
+     PROGRAM_NAME .eq. 'Convert'  .or.  &
+     PROGRAM_NAME .eq. 'Process') then
     call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,4/), j=(/-nb_m,nc_m/))
   end if
 
@@ -82,7 +83,8 @@
   call Enlarge % Array_Int(Grid % cells_n_nodes, i=(/-nb_m,nc_m/))
   call Enlarge % Array_Int(Grid % cells_n_faces, i=(/-nb_m,nc_m/))
   if(PROGRAM_NAME .eq. 'Generate' .or.  &
-     PROGRAM_NAME .eq. 'Convert') then
+     PROGRAM_NAME .eq. 'Convert'  .or.  &
+     PROGRAM_NAME .eq. 'Process') then
     call Enlarge % Array_Int(Grid % cells_n_cells, i=(/-nb_m,nc_m/))
   end if
 
