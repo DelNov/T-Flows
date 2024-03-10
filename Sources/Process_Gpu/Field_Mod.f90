@@ -84,11 +84,6 @@
     ! (It used to be called mass_err and was a local variable)
     real :: vol_res
 
-    ! Pressure drops
-    real :: p_drop_x = 0.0  !! [kg/(m^2 s^2)]
-    real :: p_drop_y = 0.0  !! [kg/(m^2 s^2)]
-    real :: p_drop_z = 0.0  !! [kg/(m^2 s^2)]
-
     ! Gradient matrices for cells to cells (c2c)
     real, allocatable :: grad_c2c(:,:)  !! gradient matrices [1/m^2]
 

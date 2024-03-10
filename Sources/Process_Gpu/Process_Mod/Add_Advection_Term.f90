@@ -16,10 +16,10 @@
   real,    contiguous, pointer :: ui_n(:)
   real,    contiguous, pointer :: b(:)
   real,    contiguous, pointer :: v_flux(:)
-  integer, contiguous, pointer :: cells_n_cells(:)
-  integer, contiguous, pointer :: cells_c(:,:), cells_f(:,:)
+  integer, contiguous, pointer :: grid_cells_n_cells(:)
+  integer, contiguous, pointer :: grid_cells_c(:,:), grid_cells_f(:,:)
   real                         :: b_tmp, den_u1, den_u2, ui_c, dens, blend
-  integer                      :: s, c1, c2, i_cel, n
+  integer                      :: s, c1, c2, i_cel, grid_n_cells
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -27,15 +27,15 @@
   call Profiler % Start('Add_Advection_Term')
 
   ! Take some aliases
-  Grid          => Flow % pnt_grid
-  b             => Flow % Nat % b
-  v_flux        => Flow % v_flux
-  cells_n_cells => Grid % cells_n_cells
-  cells_c       => Grid % cells_c
-  cells_f       => Grid % cells_f
-  n             =  Grid % n_cells
-  dens          =  Flow % density
-  blend         =  Flow % blend
+  Grid               => Flow % pnt_grid
+  b                  => Flow % Nat % b
+  v_flux             => Flow % v_flux
+  grid_cells_n_cells => Grid % cells_n_cells
+  grid_cells_c       => Grid % cells_c
+  grid_cells_f       => Grid % cells_f
+  grid_n_cells       =  Grid % n_cells
+  dens               =  Flow % density
+  blend              =  Flow % blend
 
   ! Still on aliases
   if(comp .eq. 1) ui_n => Flow % u % n
@@ -48,12 +48,12 @@
   !-------------------------------------------!
 
   !$acc parallel loop
-  do c1 = 1, n
+  do c1 = 1, grid_n_cells
     b_tmp = b(c1)
     !$acc loop seq
-    do i_cel = 1, cells_n_cells(c1)
-      c2 = cells_c(i_cel, c1)
-      s  = cells_f(i_cel, c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
+      c2 = grid_cells_c(i_cel, c1)
+      s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
         ui_c = 0.5 * (ui_n(c1) + ui_n(c2))  ! centered value
         ! Unit: kg / m^3 * m /s = kg / (m^2 s)

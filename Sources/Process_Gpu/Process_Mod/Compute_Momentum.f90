@@ -12,7 +12,11 @@
   real,              pointer :: ui_n(:)
   real,              pointer :: b(:)
   real                       :: tol
-  integer                    :: n
+  integer                    :: n, s, c1, c2, reg
+# if T_FLOWS_DEBUG == 1
+    character(4) :: name_b = 'bX_Y'
+    character(3) :: name_u = 'X_Y'
+# endif
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -28,6 +32,15 @@
   b    => Flow % Nat % b
   n    =  Grid % n_cells
 
+  ! Check
+  do reg = Boundary_Regions()
+    do s = Faces_In_Region(reg)
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      Assert(c2 .lt. 0)
+    end do
+  end do
+
   ! Still on aliases
   if(comp .eq. 1) ui_n => Flow % u % n
   if(comp .eq. 2) ui_n => Flow % v % n
@@ -38,19 +51,14 @@
   call Process % Insert_Diffusion_Bc(Flow, comp=comp)
   call Process % Add_Inertial_Term  (Flow, comp=comp)
   call Process % Add_Advection_Term (Flow, comp=comp)
-  call Process % Add_Body_Force_Term(Flow, comp=comp)
   call Process % Add_Pressure_Term  (Flow, comp=comp)
 
 # if T_FLOWS_DEBUG == 1
-  !@ if(comp .eq. 1) call Grid % Save_Debug_Vtu("bu_0",                 &
-  !@                                             inside_name="u_force", &
-  !@                                             inside_cell=b)
-  !@ if(comp .eq. 2) call Grid % Save_Debug_Vtu("bv_0",                 &
-  !@                                             inside_name="v_force", &
-  !@                                             inside_cell=b)
-  !@ if(comp .eq. 3) call Grid % Save_Debug_Vtu("bw_0",                 &
-  !@                                             inside_name="w_force", &
-  !@                                             inside_cell=b)
+    write(name_b(4:4), '(i1)') Iter % Current()
+    if(comp .eq. 1) write(name_b(2:2), '(a1)') 'u'
+    if(comp .eq. 2) write(name_b(2:2), '(a1)') 'v'
+    if(comp .eq. 3) write(name_b(2:2), '(a1)') 'w'
+    call Grid % Save_Debug_Vtu(name_b, inside_name=name_b, inside_cell=b)
 # endif
 
   ! Call linear solver
@@ -59,15 +67,11 @@
   call Profiler % Stop('CG_for_Momentum')
 
 # if T_FLOWS_DEBUG == 1
-  !@ if(comp .eq. 1) call Grid % Save_Debug_Vtu("u_0",                 &
-  !@                                             scalar_name="u_comp", &
-  !@                                             scalar_cell=ui_n)
-  !@ if(comp .eq. 2) call Grid % Save_Debug_Vtu("v_0",                 &
-  !@                                             scalar_name="v_comp", &
-  !@                                             scalar_cell=ui_n)
-  !@ if(comp .eq. 3) call Grid % Save_Debug_Vtu("w_0",                 &
-  !@                                             scalar_name="w_comp", &
-  !@                                             scalar_cell=ui_n)
+    write(name_u(3:3), '(i1)') Iter % Current()
+    if(comp .eq. 1) write(name_u(1:1), '(a1)') 'u'
+    if(comp .eq. 2) write(name_u(1:1), '(a1)') 'v'
+    if(comp .eq. 3) write(name_u(1:1), '(a1)') 'w'
+    call Grid % Save_Debug_Vtu(name_u, scalar_name=name_u, scalar_cell=ui_n)
 # endif
 
   call Profiler % Stop('Compute_Momentum')

@@ -13,7 +13,7 @@
 !------------------------------------------------------------------------------!
   use Assert_Mod
   use Profiler_Mod
-  use Field_Mod
+  use Iter_Mod
   use Gpu_Mod
   use Control_Mod
 !------------------------------------------------------------------------------!
@@ -32,7 +32,6 @@
       procedure :: Form_Diffusion_Matrix
       procedure :: Insert_Diffusion_Bc
       procedure :: Add_Advection_Term
-      procedure :: Add_Body_Force_Term
       procedure :: Add_Inertial_Term
       procedure :: Add_Pressure_Term
       procedure :: Correct_Velocity
@@ -53,7 +52,6 @@
 #   include "Process_Mod/Form_Diffusion_Matrix.f90"
 #   include "Process_Mod/Insert_Diffusion_Bc.f90"
 #   include "Process_Mod/Add_Advection_Term.f90"
-#   include "Process_Mod/Add_Body_Force_Term.f90"
 #   include "Process_Mod/Add_Inertial_Term.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
 #   include "Process_Mod/Correct_Velocity.f90"
