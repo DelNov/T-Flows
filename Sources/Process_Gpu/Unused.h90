@@ -1,0 +1,5 @@
+!==============================================================================!
+!   Definition of the macro which avoids too many warnings while compiling.    !
+!------------------------------------------------------------------------------!
+
+# define Unused(p)  associate(p => p); end associate

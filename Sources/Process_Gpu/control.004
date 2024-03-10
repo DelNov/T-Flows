@@ -1,0 +1,16 @@
+  PROBLEM_NAME        test_004_cube
+
+  BOUNDARY_CONDITION symmetry_plane
+    TYPE             symmetry
+    VARIABLES        u
+    VALUES           0.0
+
+  BOUNDARY_CONDITION lower_wall
+    TYPE             wall
+    VARIABLES        u
+    VALUES           1.0
+
+  BOUNDARY_CONDITION upper_wall
+    TYPE             wall
+    VARIABLES        u
+    VALUES          -1.0

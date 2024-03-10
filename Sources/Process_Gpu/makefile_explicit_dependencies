@@ -1,0 +1,357 @@
+#---------------------------------------------------
+# Dependencies for: ./Test_004.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_004.o:\
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
+$(DIR_OBJECT)/Process_Mod.o \
+Process_Mod/*.f90 \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Linalg_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Linalg_Mod.o:\
+$(DIR_OBJECT)/Sparse_Mod.o \
+Sparse_Mod/*.f90 \
+Linalg_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Var_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Var_Mod.o:\
+Var_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Test_001.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_001.o:\
+$(DIR_OBJECT)/Process_Mod.o \
+Process_Mod/*.f90 \
+$(DIR_OBJECT)/Linalg_Mod.o \
+Linalg_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Native_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Native_Mod.o:\
+Native_Mod/*.f90 \
+$(DIR_OBJECT)/Linalg_Mod.o \
+Linalg_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Time_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Time_Mod.o:\
+Time_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Iter_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Iter_Mod.o:\
+Iter_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Process_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Process_Mod.o:\
+$(DIR_OBJECT)/Profiler_Mod.o \
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+Process_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Test_006.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_006.o:\
+$(DIR_OBJECT)/Time_Mod.o \
+Time_Mod/*.f90 \
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
+$(DIR_OBJECT)/Process_Mod.o \
+Process_Mod/*.f90 \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 \
+$(DIR_OBJECT)/Iter_Mod.o \
+Iter_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Test_003.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_003.o:\
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Test_005.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_005.o:\
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Read_Controls_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Read_Controls_Mod.o:\
+Read_Controls_Mod/*.f90 \
+$(DIR_OBJECT)/Iter_Mod.o \
+Iter_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Field_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Field_Mod.o:\
+$(DIR_OBJECT)/Sparse_Mod.o \
+Sparse_Mod/*.f90 \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Test_002.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_002.o:\
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Gpu_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Gpu_Mod.o:\
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 \
+Gpu_Mod/*/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Sparse_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Sparse_Mod.o:\
+Sparse_Mod/*.f90 \
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Comm_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Comm_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./String_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/String_Mod.o:\
+$(DIR_SHARED)/String_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Message_Mod.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Omp_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Omp_Mod.o:\
+$(DIR_OBJECT)/Region_Mod.o \
+$(DIR_SHARED)/Omp_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Profiler_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Profiler_Mod.o:\
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Tokenizer_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Tokenizer_Mod.o:\
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Metis_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Metis_Mod.o:\
+$(DIR_SHARED)/Metis_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Control_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Control_Mod.o:\
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Region_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Region_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Math_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Math_Mod.o:\
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Grid_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Grid_Mod.o:\
+$(DIR_OBJECT)/Vtk_Mod.o \
+$(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_OBJECT)/Sort_Mod.o \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Region_Mod.o \
+$(DIR_OBJECT)/Profiler_Mod.o \
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Omp_Mod.o \
+$(DIR_SHARED)/Omp_Mod/*.f90 \
+$(DIR_OBJECT)/Metis_Mod.o \
+$(DIR_SHARED)/Metis_Mod/*.f90 \
+$(DIR_OBJECT)/Memory_Mod.o \
+$(DIR_SHARED)/Memory_Mod/*.f90 \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Sort_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Sort_Mod.o:\
+$(DIR_OBJECT)/Swap_Mod.o \
+$(DIR_SHARED)/Swap_Mod/*.f90 \
+$(DIR_SHARED)/Sort_Mod/*/*.f90 \
+$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./File_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/File_Mod.o:\
+$(DIR_OBJECT)/String_Mod.o \
+$(DIR_SHARED)/String_Mod/*.f90 \
+$(DIR_OBJECT)/Message_Mod.o \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_SHARED)/File_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Vtk_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Vtk_Mod.o:\
+$(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Swap_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Swap_Mod.o:\
+$(DIR_SHARED)/Swap_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Dashed_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Dashed_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thick_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thick_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thin_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thin_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Assert_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Assert_Mod.o:\
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Memory_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Memory_Mod.o:\
+$(DIR_OBJECT)/Message_Mod.o \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_SHARED)/Memory_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
+
