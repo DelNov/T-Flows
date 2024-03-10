@@ -189,11 +189,22 @@
   do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
-    Assert(c2 > 0)
+    Assert(c2 .gt. 0)
   end do
 
   !-------------!
   !   Check 2   !
+  !-------------!
+  do reg = Boundary_Regions()
+    do s = Faces_In_Region(reg)
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      Assert(c2 .lt. 0)
+    end do
+  end do
+
+  !-------------!
+  !   Check 3   !
   !-------------!
   last_face_only_inside = 0
   first_face_in_buffers = HUGE_INT  ! first face in buffers
@@ -222,7 +233,7 @@
   end if
 
   !-------------!
-  !   Check 3   !
+  !   Check 4   !
   !-------------!
   do reg = Boundary_Regions()
     do s = Faces_In_Region(reg)
