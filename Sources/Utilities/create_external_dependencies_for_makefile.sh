@@ -10,8 +10,8 @@
 # This script does it for you.
 
 # folder structure
-CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Process/
-SHAR_DIR=$PWD/../Shared            # Process  src folder
+CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Process_?pu/
+SHAR_DIR=$PWD/../Shared            # Process_?pu  src folder
 
 # tmp file name and location
 tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
@@ -98,7 +98,7 @@ function search_string_in_list() {
 #   Make file explicit dependencies constructor   #
 #-------------------------------------------------#
 function make_file_explicit_dependencies() {
-  # $1 - folder to create makefile list (Generate, Divide, Process, ..)
+  # $1 - folder to create makefile list (Generate, Divide, Process_?pu, ..)
 
   # create empty file or remove all content
   cd $1; cp /dev/null $tmp_file
@@ -254,7 +254,7 @@ function check_if_lauched_in_correct_folder() {
   stop_execution=false
 
   case "${CURR_DIR##*/}" in
-    "Process"|"Divide"|"Convert"|"Generate")
+    "Process_Cpu"|"Process_Gpu"|"Divide"|"Convert"|"Generate")
     parent_dir="$(dirname "$CURR_DIR")"
     if [ ! "${parent_dir##*/}" == "Sources" ]; then
       echo "$parent_dir"
@@ -267,7 +267,8 @@ function check_if_lauched_in_correct_folder() {
   esac
 
   if [ $stop_execution == true ]; then
-    echo This script can only be launched from Generate/, Convert/, Divide/, Process/ folders of T-Flows
+    echo This script can only be launched from Generate/, Convert/,
+    echo Divide/, Process_Cpu/ and Process_Gpu/ folders of T-Flows
     echo Launch it this way: bash ../Utilities/create_makefile_dependencies.sh
     exit 3
   fi
