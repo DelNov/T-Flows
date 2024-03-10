@@ -42,16 +42,6 @@
       procedure :: Native_Transfer_To_Device
       procedure :: Native_Destroy_On_Device
 
-      ! Procedures to copy portions of grid to device
-      ! procedure :: Grid_Cell_Cell_Connectivity_Copy_To_Device
-      ! procedure :: Grid_Cell_Cell_Connectivity_Destroy_On_Device
-      ! procedure :: Grid_Cell_Coordinates_Copy_To_Device
-      ! procedure :: Grid_Cell_Coordinates_Destroy_On_Device
-      ! procedure :: Grid_Cell_Volumes_Copy_To_Device
-      ! procedure :: Grid_Cell_Volumes_Destroy_On_Device
-      ! procedure :: Grid_Face_Cell_Connectivity_Copy_To_Device
-      ! procedure :: Grid_Face_Cell_Connectivity_Destroy_On_Device
-
   end type
 
   type(Gpu_Type) :: Gpu
@@ -79,15 +69,5 @@
     ! Procedures to copy native solver to device
 #   include "Gpu_Mod/Native/Transfer_To_Device.f90"
 #   include "Gpu_Mod/Native/Destroy_On_Device.f90"
-
-    ! Procedures to copy portions of grid to device
-!   include "Gpu_Mod/Grid/Cell_Cell_Connectivity_Copy_To_Device.f90"
-!   include "Gpu_Mod/Grid/Cell_Cell_Connectivity_Destroy_On_Device.f90"
-!   include "Gpu_Mod/Grid/Cell_Coordinates_Copy_To_Device.f90"
-!   include "Gpu_Mod/Grid/Cell_Coordinates_Destroy_On_Device.f90"
-!   include "Gpu_Mod/Grid/Cell_Volumes_Copy_To_Device.f90"
-!   include "Gpu_Mod/Grid/Cell_Volumes_Destroy_On_Device.f90"
-!   include "Gpu_Mod/Grid/Face_Cell_Connectivity_Copy_To_Device.f90"
-!   include "Gpu_Mod/Grid/Face_Cell_Connectivity_Destroy_On_Device.f90"
 
   end module
