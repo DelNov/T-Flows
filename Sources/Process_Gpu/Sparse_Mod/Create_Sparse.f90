@@ -7,7 +7,7 @@
   type(Grid_Type), target :: Grid    !! grid on which it is created
 !-----------------------------------[Locals]-----------------------------------!
   integer :: non_z, run
-  integer :: c, i_cel, d, s, c1, c2
+  integer :: c, i_cel, s, c1, c2
   integer :: col_a, col_b, row_a, row_b, pos_a, pos_b
 !==============================================================================!
 
@@ -28,27 +28,27 @@
     !----------------------------------!
     !   Browse through all the cells   !
     !----------------------------------!
-    do c = 1, Grid % n_cells
+    do c1 = 1, Grid % n_cells
 
       ! Set this row index, one cell will be present for sure, own self
-      if(run .eq. 2) A % row(c) = non_z + 1
+      if(run .eq. 2) A % row(c1) = non_z + 1
 
       !-------------------------------------------------------!
       !   Store the central entry, be it in obstacle or not   !
       !-------------------------------------------------------!
       non_z = non_z + 1
-      if(run .eq. 2) A % col(non_z) = c
+      if(run .eq. 2) A % col(non_z) = c1
 
-      do i_cel = 1, Grid % cells_n_cells(c)
-        d = Grid % cells_c(i_cel, c)
+      do i_cel = 1, Grid % cells_n_cells(c1)
+        c2 = Grid % cells_c(i_cel, c1)
 
-        if(d .gt. 0) then
+        if(c2 .gt. 0) then
           non_z = non_z + 1
-          if(run .eq. 2) A % col(non_z) = d
-        end if    ! d is inside cell
+          if(run .eq. 2) A % col(non_z) = c2
+        end if    ! c2 is inside cell
       end do      ! i_cel
 
-    end do        ! c
+    end do        ! c1
 
     print '(a,i15)', ' # Number of nonzeros: ', non_z
 

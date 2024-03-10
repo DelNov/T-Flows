@@ -8,9 +8,7 @@
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
-  real,            pointer :: b(:), ui_n(:), grid_s(:), grid_d(:)
-  integer,         pointer :: grid_faces_c(:,:)
-  integer,         pointer :: grid_reg_f_face(:), grid_reg_l_face(:)
+  real,            pointer :: b(:), ui_n(:)
   real                     :: visc, m12
   integer                  :: reg, s, c1, c2
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -20,14 +18,9 @@
   call Profiler % Start('Insert_Diffusion_Bc')
 
   ! Take some aliases
-  Grid             => Flow % pnt_grid
-  b                => Flow % Nat % b
-  grid_s           => Grid % s
-  grid_d           => Grid % d
-  grid_reg_f_face  => Grid % region % f_face
-  grid_reg_l_face  => Grid % region % l_face
-  grid_faces_c     => Grid % faces_c
-  visc             =  Flow % viscosity
+  Grid => Flow % pnt_grid
+  b    => Flow % Nat % b
+  visc =  Flow % viscosity
 
   if(comp .eq. 1) ui_n => Flow % u % n
   if(comp .eq. 2) ui_n => Flow % v % n

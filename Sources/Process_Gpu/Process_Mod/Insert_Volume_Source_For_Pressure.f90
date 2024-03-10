@@ -30,44 +30,21 @@
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  real,    contiguous, pointer :: b(:), u_n(:), v_n(:), w_n(:)
-  real,    contiguous, pointer :: p_n(:), p_x(:), p_y(:), p_z(:)
-  real,    contiguous, pointer :: v_flux(:), v_m(:)
-  real,    contiguous, pointer :: grid_sx(:), grid_sy(:), grid_sz(:), fc(:)
-  integer, contiguous, pointer :: grid_faces_c(:,:)
-  integer, contiguous, pointer :: cells_n_cells(:)
-  integer, contiguous, pointer :: grid_cells_c(:,:), grid_cells_f(:,:)
-  real                         :: a12, b_tmp, max_abs_val
-  real                         :: u_f, v_f, w_f
-  integer                      :: s, c1, c2, nb, nf, i_cel, c
-  integer                      :: grid_n_cells
+  real, contiguous, pointer :: b(:)
+  real, contiguous, pointer :: v_flux(:), v_m(:), fc(:)
+  real                      :: a12, b_tmp, max_abs_val
+  real                      :: u_f, v_f, w_f
+  integer                   :: s, c1, c2, i_cel, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
 
   call Profiler % Start('Insert_Volume_Source_For_Pressure')
 
-  b             => Flow % Nat % b
-  v_m           => Flow % Nat % M % v_m
-  fc            => Flow % Nat % M % fc
-  p_n           => Flow % p % n
-  p_x           => Flow % p % x
-  p_y           => Flow % p % y
-  p_z           => Flow % p % z
-  u_n           => Flow % u % n
-  v_n           => Flow % v % n
-  w_n           => Flow % w % n
-  v_flux        => Flow % v_flux
-  grid_faces_c  => Flow % pnt_grid % faces_c
-  nb            =  Flow % pnt_grid % n_bnd_cells
-  grid_n_cells  =  Flow % pnt_grid % n_cells
-  nf            =  Flow % pnt_grid % n_faces
-  grid_sx       => Flow % pnt_grid % sx
-  grid_sy       => Flow % pnt_grid % sy
-  grid_sz       => Flow % pnt_grid % sz
-  cells_n_cells => Flow % pnt_grid % cells_n_cells
-  grid_cells_c  => Flow % pnt_grid % cells_c
-  grid_cells_f  => Flow % pnt_grid % cells_f
+  b      => Flow % Nat % b
+  v_m    => Flow % Nat % M % v_m
+  fc     => Flow % Nat % M % fc
+  v_flux => Flow % v_flux
 
   ! Nullify the volume source
   !$acc kernels
@@ -79,7 +56,7 @@
   !-------------------------------------------!
 
   !$acc parallel loop
-  do s = nb + 1, nf
+  do s = grid_n_bnd_cells + 1, grid_n_faces
 
     c1 = grid_faces_c(1,s)
     c2 = grid_faces_c(2,s)
@@ -114,7 +91,7 @@
 
     b_tmp = b(c1)
     !$acc loop seq
-    do i_cel = 1, cells_n_cells(c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then

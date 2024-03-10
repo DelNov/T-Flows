@@ -16,10 +16,9 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
-  real, contiguous, pointer :: b(:), p_i(:), grid_vol(:)
+  real, contiguous, pointer :: b(:), p_i(:)
   real                      :: p_d_i
-  integer                   :: c, grid_n_cells
+  integer                   :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -27,10 +26,7 @@
   call Profiler % Start('Add_Pressure_Term')
 
   ! Take some aliases
-  Grid         => Flow % pnt_grid
-  b            => Flow % Nat % b
-  grid_vol     => Grid % vol
-  grid_n_cells =  Grid % n_cells
+  b => Flow % Nat % b
 
   ! Still on aliases
   if(comp .eq. 1) p_i   => Flow % p % x

@@ -14,8 +14,40 @@
   implicit none
 !==============================================================================!
 
+  ! Frequently used aliases (don't know where to put them yet)
+  real, contiguous, pointer :: u_n(:), u_o(:)
+  real, contiguous, pointer :: v_n(:), v_o(:)
+  real, contiguous, pointer :: w_n(:), w_o(:)
+  real, contiguous, pointer :: pp_n(:)
+  real, contiguous, pointer :: pp_x(:)
+  real, contiguous, pointer :: pp_y(:)
+  real, contiguous, pointer :: pp_z(:)
+  real, contiguous, pointer :: p_n(:)
+  real, contiguous, pointer :: p_x(:)
+  real, contiguous, pointer :: p_y(:)
+  real, contiguous, pointer :: p_z(:)
+
+  integer :: grid_n_cells
+  integer :: grid_n_faces
+  integer :: grid_n_bnd_cells
+
+  integer, contiguous, pointer :: grid_faces_c(:,:)
+  integer, contiguous, pointer :: grid_cells_c(:,:)
+  integer, contiguous, pointer :: grid_cells_f(:,:)
+  integer, contiguous, pointer :: grid_cells_n_cells(:)
+  integer, contiguous, pointer :: grid_reg_f_face(:)
+  integer, contiguous, pointer :: grid_reg_l_face(:)
+  real,    contiguous, pointer :: grid_vol(:)
+  real,    contiguous, pointer :: grid_sx(:)
+  real,    contiguous, pointer :: grid_sy(:)
+  real,    contiguous, pointer :: grid_sz(:)
+  real,    contiguous, pointer :: grid_s(:)
+  real,    contiguous, pointer :: grid_d(:)
+
   !----------------!
+  !                !
   !   Field type   !
+  !                !
   !----------------!
   type Field_Type
 
@@ -41,7 +73,6 @@
     type(Var_Type) :: u    !! velocity component [m/s]
     type(Var_Type) :: v    !! velocity component [m/s]
     type(Var_Type) :: w    !! velocity component [m/s]
-
 
     ! Pressure-like potential for initial velocity field
     real, allocatable :: potential(:)
@@ -96,6 +127,7 @@
       !   Core functionality   !
       !------------------------!
       procedure :: Create_Field
+      procedure :: Update_Aliases
 
       !-----------------------------------------!
       !   Procedures for gradient computation   !
@@ -117,6 +149,7 @@
     !   Core functionality   !
     !------------------------!
 #   include "Field_Mod/Core/Create_Field.f90"
+#   include "Field_Mod/Core/Update_Aliases.f90"
 
     !-----------------------------------------!
     !   Procedures for gradient computation   !

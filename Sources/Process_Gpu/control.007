@@ -6,7 +6,7 @@
 #--------------------------
 # Time-integration related
 #--------------------------
-  NUMBER_OF_TIME_STEPS   60
+  NUMBER_OF_TIME_STEPS  240
   TIME_STEP                 0.00005
 
   RESULTS_SAVE_INTERVAL   120

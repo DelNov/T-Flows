@@ -14,9 +14,6 @@
 !------------------------------------------------------------------------------!
   type(Grid_Type)          :: Grid(MD)      ! computational grid
   type(Field_Type), target :: Flow(MD)      ! flow field
-  real,            pointer :: ui_n(:), ui_o(:)
-  real,            pointer :: vi_n(:), vi_o(:)
-  real,            pointer :: wi_n(:), wi_o(:)
   real                     :: ts, te
   integer                  :: n, c, ldt
   character(11)            :: name_vel     = 'TTTT_II_uvw'
@@ -127,12 +124,8 @@
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % z)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v_flux)
 
-  ui_n => Flow(1) % u % n
-  ui_o => Flow(1) % u % o
-  vi_n => Flow(1) % v % n
-  vi_o => Flow(1) % v % o
-  wi_n => Flow(1) % w % n
-  wi_o => Flow(1) % w % o
+  ! This should be done for each domain, whenever a new domain is solved
+  call Flow(1) % Update_Aliases()
 
   !------------------------------------------!
   !                                          !
@@ -161,9 +154,9 @@
     ! Preparation for the new time step
     !$acc parallel loop
     do c = 1, n
-      ui_o(c) = ui_n(c)
-      vi_o(c) = vi_n(c)
-      wi_o(c) = wi_n(c)
+      u_o(c) = u_n(c)
+      v_o(c) = v_n(c)
+      w_o(c) = w_n(c)
     end do
     !$acc end parallel
 

@@ -7,10 +7,8 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
-  real, contiguous, pointer :: ui_o(:)
-  real, contiguous, pointer :: b(:), grid_vol(:)
-  integer                   :: c, grid_n_cells
+  real, contiguous, pointer :: ui_o(:), b(:)
+  integer                   :: c
   real                      :: dens, dt
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
@@ -19,12 +17,9 @@
   call Profiler % Start('Add_Inertial_Term')
 
   ! Take some aliases
-  Grid         => Flow % pnt_grid
-  b            => Flow % Nat % b
-  grid_vol     => Grid % vol
-  grid_n_cells =  Grid % n_cells
-  dens         =  Flow % density
-  dt           =  Flow % dt
+  b    => Flow % Nat % b
+  dens =  Flow % density
+  dt   =  Flow % dt
 
   if(comp .eq. 1) ui_o => Flow % u % o
   if(comp .eq. 2) ui_o => Flow % v % o

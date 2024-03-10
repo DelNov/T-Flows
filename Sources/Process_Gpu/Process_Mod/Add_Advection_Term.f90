@@ -12,14 +12,11 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),     pointer :: Grid
-  real,    contiguous, pointer :: ui_n(:)
-  real,    contiguous, pointer :: b(:)
-  real,    contiguous, pointer :: v_flux(:)
-  integer, contiguous, pointer :: grid_cells_n_cells(:)
-  integer, contiguous, pointer :: grid_cells_c(:,:), grid_cells_f(:,:)
-  real                         :: b_tmp, den_u1, den_u2, ui_c, dens, blend
-  integer                      :: s, c1, c2, i_cel, grid_n_cells
+  real, contiguous, pointer :: ui_n(:)
+  real, contiguous, pointer :: b(:)
+  real, contiguous, pointer :: v_flux(:)
+  real                      :: b_tmp, den_u1, den_u2, ui_c, dens, blend
+  integer                   :: s, c1, c2, i_cel
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -27,15 +24,10 @@
   call Profiler % Start('Add_Advection_Term')
 
   ! Take some aliases
-  Grid               => Flow % pnt_grid
-  b                  => Flow % Nat % b
-  v_flux             => Flow % v_flux
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c       => Grid % cells_c
-  grid_cells_f       => Grid % cells_f
-  grid_n_cells       =  Grid % n_cells
-  dens               =  Flow % density
-  blend              =  Flow % blend
+  b      => Flow % Nat % b
+  v_flux => Flow % v_flux
+  dens   =  Flow % density
+  blend  =  Flow % blend
 
   ! Still on aliases
   if(comp .eq. 1) ui_n => Flow % u % n
