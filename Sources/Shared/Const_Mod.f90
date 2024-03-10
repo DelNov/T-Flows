@@ -58,6 +58,9 @@
   integer, parameter :: VERSION_DIM    = 202304  !! version of the .dim files
   integer, parameter :: VERSION_BACKUP = 202304  !! version of the backup files
 
+  ! This is used when estimating how much memory is used on GPUs
+  integer, parameter :: GIGABYTE = 1024**3  !! number of bytes in a giga byte
+
   !----------------------------------------!
   !   A few handy mathematical constants   !
   !----------------------------------------!
