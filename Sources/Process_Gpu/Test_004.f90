@@ -10,13 +10,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  type(Sparse_Type), pointer :: A
-  type(Grid_Type)            :: Grid  ! computational grid
-  type(Field_Type),   target :: Flow  ! flow field
-  real,              pointer :: b(:), x(:)
-  real                       :: ts, te
-  integer                    :: n
-  character(len=11)          :: root_control = 'control.004'
+  type(Sparse_Con_Type), pointer :: Acon
+  type(Sparse_Val_Type), pointer :: Aval
+  type(Grid_Type)                :: Grid  ! computational grid
+  type(Field_Type),       target :: Flow  ! flow field
+  real,                  pointer :: b(:), x(:)
+  real                           :: ts, te
+  integer                        :: n
+  character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
 
   print '(a)', ' #====================================================='
@@ -61,18 +62,20 @@
   call Process % Insert_Diffusion_Bc(Flow, comp=1)
 
   ! Take the aliases now
-  A => Flow % Nat % M
-  b => Flow % Nat % b
-  x => Flow % u % n
+  Acon => Flow % Nat % C
+  Aval => Flow % Nat % M
+  b    => Flow % Nat % b
+  x    => Flow % u % n
 
   ! Initialize solution
   x(:) = 0.0
 
   ! Before copying matrix components, create a preconditioning diagonal
-  call Flow % Nat % Prec_Form(A)
+  call Flow % Nat % Prec_Form(Acon, Aval)
 
   ! Copy components of the linear system to the device
-  call Gpu % Sparse_Copy_To_Device(A)
+  call Gpu % Sparse_Con_Copy_To_Device(Acon)
+  call Gpu % Sparse_Val_Copy_To_Device(Aval)
   call Gpu % Vector_Real_Copy_To_Device(x)
   call Gpu % Vector_Real_Copy_To_Device(b)
 
@@ -84,7 +87,7 @@
   !-----------------------------------------------!
   print '(a)', ' # Performing a demo of the preconditioned CG method'
   call cpu_time(ts)
-  call Flow % Nat % Cg(A, x, b, n, PICO)
+  call Flow % Nat % Cg(Acon, Aval, x, b, n, PICO)
   call cpu_time(te)
 
   ! Copy results back to host
@@ -97,7 +100,8 @@
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_face)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_face)
 
-  call Gpu % Sparse_Destroy_On_Device(A)
+  call Gpu % Sparse_Con_Destroy_On_Device(Acon)
+  call Gpu % Sparse_Val_Destroy_On_Device(Aval)
   call Gpu % Vector_Real_Destroy_On_Device(x)
   call Gpu % Vector_Real_Destroy_On_Device(b)
 

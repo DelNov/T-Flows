@@ -35,8 +35,10 @@
       procedure :: Matrix_Real_Destroy_On_Device
 
       ! Procedures to copy sparse matrices to device
-      procedure :: Sparse_Copy_To_Device
-      procedure :: Sparse_Destroy_On_Device
+      procedure :: Sparse_Con_Copy_To_Device
+      procedure :: Sparse_Con_Destroy_On_Device
+      procedure :: Sparse_Val_Copy_To_Device
+      procedure :: Sparse_Val_Destroy_On_Device
 
       ! Procedures to copy native solver to device
       procedure :: Native_Transfer_To_Device
@@ -63,8 +65,10 @@
 #   include "Gpu_Mod/Matrix/Real_Destroy_On_Device.f90"
 
     ! Procedures to copy vectors to device
-#   include "Gpu_Mod/Sparse/Copy_To_Device.f90"
-#   include "Gpu_Mod/Sparse/Destroy_On_Device.f90"
+#   include "Gpu_Mod/Sparse_Con/Copy_To_Device.f90"
+#   include "Gpu_Mod/Sparse_Con/Destroy_On_Device.f90"
+#   include "Gpu_Mod/Sparse_Val/Copy_To_Device.f90"
+#   include "Gpu_Mod/Sparse_Val/Destroy_On_Device.f90"
 
     ! Procedures to copy native solver to device
 #   include "Gpu_Mod/Native/Transfer_To_Device.f90"

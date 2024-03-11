@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg(Nat, A, x, b, miter, tol)
+  subroutine Cg(Nat, Acon, Aval, x, b, miter, tol)
 !------------------------------------------------------------------------------!
 !   Note: This is an alternative algorithm and I am honestly not sure where    !
 !         I have found it any more, but it avoids one "if" block during the    !
@@ -9,15 +9,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type), target, intent(inout) :: Nat      !! parent class
-  type(Sparse_Type),  target, intent(in)    :: A        !! system matrix
+  class(Native_Type),    target, intent(inout) :: Nat      !! parent class
+  type(Sparse_Con_Type), target, intent(in)    :: Acon     !! connect matrix
+  type(Sparse_Val_Type), target, intent(in)    :: Aval     !! values matrix
   real,                       intent(out)   :: x(-Nat % pnt_grid % n_bnd_cells:&
                                                   Nat % pnt_grid % n_cells)
     !! unknown vector, the solution of the linear system
-  real,                       intent(inout) :: b( Nat % pnt_grid % n_cells)
+  real,                          intent(inout) :: b( Nat % pnt_grid % n_cells)
     !! right-hand side vector
-  integer,                    intent(in)    :: miter    !! maximum iterations
-  real,                       intent(in)    :: tol
+  integer,                       intent(in)    :: miter    !! max iterations
+  real,                          intent(in)    :: tol
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:)
@@ -26,7 +27,7 @@
 !==============================================================================!
 
   ! Take aliases
-  d_inv => A % d_inv
+  d_inv => Aval % d_inv
   p     => Nat % p
   q     => Nat % q
   r     => Nat % r
@@ -36,8 +37,8 @@
   !----------------!
   !   r = b - Ax   !     =-->  (q used for temporary storing Ax)
   !----------------!
-  call Linalg % Mat_X_Vec(nc, q, A, x(1:nc))        ! Ax = A * x
-  call Linalg % Vec_P_Sca_X_Vec(nc, r, b, -1.0, q)  ! r  = b - Ax
+  call Linalg % Mat_X_Vec(nc, q, Acon, Aval, x(1:nc))  ! Ax = A * x
+  call Linalg % Vec_P_Sca_X_Vec(nc, r, b, -1.0, q)     ! r  = b - Ax
 
   ! Check first residual
   call Linalg % Vec_D_Vec(nc, res, r, r)  ! res = r * r
@@ -63,7 +64,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Linalg % Mat_X_Vec(nc, q, A, p)   ! q  = A * p
+    call Linalg % Mat_X_Vec(nc, q, Acon, Aval, p)   ! q  = A * p
 
     !---------------------------!
     !   alfa =  rho / (p * q)   !

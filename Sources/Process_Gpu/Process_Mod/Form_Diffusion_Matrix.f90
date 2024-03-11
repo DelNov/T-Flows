@@ -7,11 +7,12 @@
   type(Field_Type),    target :: Flow
   real,              optional :: dt                 !! time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: Grid
-  type(Sparse_Type), pointer :: M
-  integer                    :: c, s, c1, c2, reg
-  real                       :: visc, dens, m12
-  real, allocatable          :: work(:)
+  type(Grid_Type),       pointer :: Grid
+  type(Sparse_Con_Type), pointer :: Mcon
+  type(Sparse_Val_Type), pointer :: Mval
+  integer                        :: c, s, c1, c2, reg
+  real                           :: visc, dens, m12
+  real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -20,14 +21,15 @@
 
   ! Take some aliases
   Grid => Flow % pnt_grid
-  M    => Flow % Nat % M
+  Mcon => Flow % Nat % C
+  Mval => Flow % Nat % M
   dens =  Flow % density
   visc =  Flow % viscosity
 
   !---------------------------!
   !   Discretize the matrix   !
   !---------------------------!
-  M % val(:) = 0.0
+  Mval % val(:) = 0.0
 
   !--------------------------------------------------!
   !   Compute neighbouring coefficients over faces   !
@@ -48,10 +50,10 @@
     m12 = visc * Grid % s(s) / Grid % d(s)
     Assert(m12 .gt. 0.0)
 
-    M % val(M % pos(1,s)) = -m12
-    M % val(M % pos(2,s)) = -m12
-    M % val(M % dia(c1))  = M % val(M % dia(c1)) + m12
-    M % val(M % dia(c2))  = M % val(M % dia(c2)) + m12
+    Mval % val(Mcon % pos(1,s)) = -m12
+    Mval % val(Mcon % pos(2,s)) = -m12
+    Mval % val(Mcon % dia(c1))  = Mval % val(Mcon % dia(c1)) + m12
+    Mval % val(Mcon % dia(c2))  = Mval % val(Mcon % dia(c2)) + m12
   end do
 
   ! Increase central coefficient for walls
@@ -67,7 +69,7 @@
         m12 = visc * Grid % s(s) / Grid % d(s)
         Assert(m12 .gt. 0.0)
 
-        M % val(M % dia(c1))  = M % val(M % dia(c1)) + m12
+        Mval % val(Mcon % dia(c1))  = Mval % val(Mcon % dia(c1)) + m12
       end do
     end if
   end do
@@ -77,7 +79,8 @@
   !------------------------------------!
   if(present(dt)) then
     do c = 1, Grid % n_cells
-      M % val(M % dia(c)) = M % val(M % dia(c)) + dens * Grid % vol(c) / dt
+      Mval % val(Mcon % dia(c)) = Mval % val(Mcon % dia(c))  &
+                                + dens * Grid % vol(c) / dt
     end do
   end if
 
@@ -86,13 +89,13 @@
   !   That is a novelty here, it doesn't exist in T-Flows   !
   !---------------------------------------------------------!
   do c = 1, Grid % n_cells
-    M % v_m(c) = Grid % vol(c) / M % val(M % dia(c))
+    Mval % v_m(c) = Grid % vol(c) / Mval % val(Mcon % dia(c))
   end do
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells
-    work(c) = M % val(M % dia(c))
+    work(c) = Mval % val(Mcon % dia(c))
     ! or: work(c) = M % row(c+1) - M % row(c) ?
   end do
   call Grid % Save_Debug_Vtu("m_diagonal",              &

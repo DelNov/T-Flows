@@ -51,8 +51,7 @@
   !----------------!
   type Field_Type
 
-    type(Sparse_Type), pointer :: pnt_matrix  !! pointer to the matrix
-    type(Grid_Type),   pointer :: pnt_grid    !! grid for which it is defined
+    type(Grid_Type), pointer :: pnt_grid    !! grid for which it is defined
 
     !-------------------------!
     !   Physical properties   !

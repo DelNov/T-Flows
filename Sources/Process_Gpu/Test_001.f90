@@ -9,14 +9,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  type(Sparse_Type), pointer :: A
-  real, allocatable          :: b(:), c(:)
-  type(Grid_Type)            :: Grid
-  type(Field_Type),   target :: Flow                   ! flow field
-  integer,         parameter :: N_STEPS = 1200  ! spend enough time on device
-  real                       :: ts, te
-  integer                    :: n, step
-  character(len=11)          :: root_control    = 'control.001'
+  type(Sparse_Con_Type), pointer :: Acon
+  type(Sparse_Val_Type), pointer :: Aval
+  real, allocatable              :: b(:), c(:)
+  type(Grid_Type)                :: Grid
+  type(Field_Type),       target :: Flow            ! flow field
+  integer,             parameter :: N_STEPS = 1200  ! spend some time on device
+  real                           :: ts, te
+  integer                        :: n, step
+  character(len=11)              :: root_control    = 'control.001'
 !==============================================================================!
 
   print '(a)', ' #===================================================='
@@ -46,7 +47,8 @@
   call Process % Form_Diffusion_Matrix(Flow)
 
   ! Take the alias now
-  A => Flow % Nat % M
+  Acon => Flow % Nat % C
+  Aval => Flow % Nat % M
 
   allocate(b(n))
   allocate(c(n))
@@ -55,7 +57,8 @@
 
   ! Copy operand matrix and vector to the device ...
   ! ... and reserve memory for result vector on device
-  call Gpu % Sparse_Copy_To_Device(A)
+  call Gpu % Sparse_Con_Copy_To_Device(Acon)
+  call Gpu % Sparse_Val_Copy_To_Device(Aval)
   call Gpu % Vector_Real_Copy_To_Device(b)
   call Gpu % Vector_Real_Create_On_Device(c)
 
@@ -65,7 +68,7 @@
   print '(a,i6,a)', ' # Performing ', N_STEPS, ' sparse-matrix vector products'
   call cpu_time(ts)
   do step = 1, N_STEPS
-    call Linalg % Mat_X_Vec(n, c, A, b)
+    call Linalg % Mat_X_Vec(n, c, Acon, Aval, b)
   end do
   call cpu_time(te)
 
@@ -73,7 +76,8 @@
   call Gpu % Vector_Update_Host(c)
 
   ! Destroy data on the device, you don't need them anymore
-  call Gpu % Sparse_Destroy_On_Device(A)
+  call Gpu % Sparse_Con_Destroy_On_Device(Acon)
+  call Gpu % Sparse_Val_Destroy_On_Device(Aval)
   call Gpu % Vector_Real_Destroy_On_Device(b)
   call Gpu % Vector_Real_Destroy_On_Device(c)
 

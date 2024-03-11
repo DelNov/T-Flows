@@ -6,11 +6,12 @@
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: Grid
-  type(Sparse_Type), pointer :: A
-  real, contiguous,  pointer :: pp_n(:), b(:)
-  real                       :: tol
-  integer                    :: n
+  type(Grid_Type),       pointer :: Grid
+  type(Sparse_Con_Type), pointer :: Acon
+  type(Sparse_Val_Type), pointer :: Aval
+  real, contiguous,      pointer :: pp_n(:), b(:)
+  real                           :: tol
+  integer                        :: n
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -19,7 +20,8 @@
 
   ! Take some aliases
   Grid => Flow % pnt_grid
-  A    => Flow % Nat % A
+  Acon => Flow % Nat % C
+  Aval => Flow % Nat % A
   pp_n => Flow % pp % n
   b    => Flow % Nat % b
   n    =  Flow % pnt_grid % n_cells
@@ -36,7 +38,7 @@
 
   ! Call linear solver
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(A, pp_n, b, n, tol)
+  call Flow % Nat % Cg(Acon, Aval, pp_n, b, n, tol)
   call Profiler % Stop('CG_for_Pressure')
 
 # if T_FLOWS_DEBUG == 1

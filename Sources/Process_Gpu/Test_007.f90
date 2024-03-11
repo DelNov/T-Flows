@@ -68,8 +68,8 @@
 
   ! Form preconditioning matrices on host
   ! (Must be before transferring them)
-  call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % M)
-  call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % A)
+  call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % C, Flow(1) % Nat % M)
+  call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % C, Flow(1) % Nat % A)
 
   print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix()
@@ -83,10 +83,13 @@
   Flow(1) % v % o(1:n) = 0.0
   Flow(1) % w % o(1:n) = 0.0
 
+  ! You are going to need connectivity matrix on device
+  call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
+
   ! OK, once you formed the preconditioners, you
   ! will want to keep these matrices on the device
-  call Gpu % Sparse_Copy_To_Device(Flow(1) % Nat % M)
-  call Gpu % Sparse_Copy_To_Device(Flow(1) % Nat % A)
+  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % M)
+  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A)
 
   ! and that bloody right-hand-side vector too
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)

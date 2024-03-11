@@ -30,11 +30,12 @@
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: Grid
-  type(Sparse_Type), pointer :: A, M
-  integer                    :: s, c1, c2, c
-  real                       :: a12
-  real, allocatable          :: work(:)
+  type(Grid_Type),       pointer :: Grid
+  type(Sparse_Con_Type), pointer :: Acon
+  type(Sparse_Val_Type), pointer :: Aval, Mval
+  integer                        :: s, c1, c2, c
+  real                           :: a12
+  real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -43,8 +44,9 @@
 
   ! Take some aliases
   Grid => Flow % pnt_grid
-  A    => Flow % Nat % A
-  M    => Flow % Nat % M
+  Acon => Flow % Nat % C
+  Aval => Flow % Nat % A
+  Mval => Flow % Nat % M
 
   !----------------------------------------------!
   !   This will create race conditions on GPUs   !
@@ -55,20 +57,22 @@
 
     ! Calculate coeficients for the pressure matrix
     ! Units: m * m^3 s / kg = m^4 s / kg
-    a12 = A % fc(s) * 0.5 * (M % v_m(c1) + M % v_m(c2))
-    A % val(A % pos(1,s)) = -a12
-    A % val(A % pos(2,s)) = -a12
-    A % val(A % dia(c1))  = A % val(A % dia(c1)) + a12
-    A % val(A % dia(c2))  = A % val(A % dia(c2)) + a12
+    a12 = Acon % fc(s) * 0.5 * (Mval % v_m(c1) + Mval % v_m(c2))
+    Aval % val(Acon % pos(1,s)) = -a12
+    Aval % val(Acon % pos(2,s)) = -a12
+    Aval % val(Acon % dia(c1))  = Aval % val(Acon % dia(c1)) + a12
+    Aval % val(Acon % dia(c2))  = Aval % val(Acon % dia(c2)) + a12
 
   end do
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells
-    work(c) = A % val(A % dia(c))
+    work(c) = Aval % val(Acon % dia(c))
   end do
-  call Grid % Save_Debug_Vtu("a_diagonal", inside_name="a_diagonal", inside_cell=work)
+  call Grid % Save_Debug_Vtu("a_diagonal",              &
+                             inside_name="a_diagonal",  &
+                             inside_cell=work)
 # endif
 
   call Profiler % Stop('Form_Pressure_Matrix')

@@ -10,8 +10,9 @@
   ! Store the pointer to the grid
   Nat % pnt_grid => Grid
 
-  call Nat % A % Create_Sparse(Grid)
-  call Nat % M % Create_Sparse_From_Sparse(Nat % A)
+  call Nat % C % Create_Sparse_Con(Grid)
+  call Nat % A % Create_Sparse_Val(Nat % C)
+  call Nat % M % Create_Sparse_Val(Nat % C)
 
   ! Right-hand side vector us part of this
   allocate(Nat % b(Grid % n_cells))
