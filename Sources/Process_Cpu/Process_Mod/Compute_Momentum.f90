@@ -370,7 +370,7 @@
     !   correction in Rhie_And_Chow is not needed    !
     !------------------------------------------------!
     do c = Cells_In_Domain()
-      M % sav(c) = M % val(M % dia(c))
+      M % v_m(c) = Grid % vol(c) / M % val(M % dia(c))
     end do
 
     !----------------------------------------------!
@@ -415,7 +415,7 @@
   call Process % Update_Boundary_Values(Flow, Turb, Vof, 'MOMENTUM')
 
   ! Refresh buffers for M % sav before discretizing for pressure
-  call Grid % Exchange_Cells_Real(M % sav)
+  call Grid % Exchange_Cells_Real(M % v_m)
 
   ! User function
   call User_Mod_End_Of_Compute_Momentum(Flow, Turb, Vof, Sol)

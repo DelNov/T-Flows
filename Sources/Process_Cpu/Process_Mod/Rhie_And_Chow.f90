@@ -75,18 +75,9 @@
   col    => Vof % fun
   A      => Nat % A
   M      => Nat % M
+  v_m    => Nat % M % v_m
   sigma  =  Vof % surface_tension
   call Flow % Alias_Momentum(u, v, w)
-
-  !--------------------------------------!
-  !   Store Grid % vol(c) / M % sav(c)   !
-  !--------------------------------------!
-  ! Units here: m^3 s / kg
-  ! Remember:  M   is big in liquid, small in gas
-  ! meaaning:  v_m is big in gas, small in liquid
-  do c = 1, Grid % n_cells
-    v_m(c) = Grid % vol(c) / M % sav(c)
-  end do
 
   !------------------------------------------------------------------!
   !   Store pressure gradients in cells and differences over faces   !
@@ -161,7 +152,7 @@
 
       do c = 1, Grid % n_cells
         ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
-        t_m(c) = (Grid % vol(c) * Flow % density(c) / Flow % dt) / M % sav(c)
+        t_m(c) = v_m(c) * Flow % density(c) / Flow % dt
 
         u_c(c) = u_c(c) - (w_o * u % o(c) + w_oo * u % oo(c)) * t_m(c)
         v_c(c) = v_c(c) - (w_o * v % o(c) + w_oo * v % oo(c)) * t_m(c)

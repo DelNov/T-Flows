@@ -45,7 +45,7 @@
   allocate(A % row(  Grid % n_cells + 1));                A % row=0
   allocate(A % dia(  Grid % n_cells));                    A % dia=0
   allocate(A % fc (  Grid % n_faces));                    A % fc =0.0
-  allocate(A % sav( -Grid % n_bnd_cells:Grid % n_cells)); A % sav=0.0
+  allocate(A % v_m( -Grid % n_bnd_cells:Grid % n_cells)); A % v_m=0.0
   allocate(A % pos(2,Grid % n_faces));                    A % pos=0
 
   !-------------------------------------!

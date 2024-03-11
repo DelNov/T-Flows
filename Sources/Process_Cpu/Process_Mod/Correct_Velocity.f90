@@ -73,9 +73,9 @@
 
   ! Normal correction
   do c = 1, Grid % n_cells
-    u % n(c) = u % n(c) - pp % x(c) * Grid % vol(c) / M % sav(c)
-    v % n(c) = v % n(c) - pp % y(c) * Grid % vol(c) / M % sav(c)
-    w % n(c) = w % n(c) - pp % z(c) * Grid % vol(c) / M % sav(c)
+    u % n(c) = u % n(c) - pp % x(c) * M % v_m(c)
+    v % n(c) = v % n(c) - pp % y(c) * M % v_m(c)
+    w % n(c) = w % n(c) - pp % z(c) * M % v_m(c)
   end do
 
   !----------------------------------------------------------------!

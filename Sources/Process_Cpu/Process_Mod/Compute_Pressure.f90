@@ -158,7 +158,7 @@
       b(c1) = b(c1) - v_flux % n(s)
 
       if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
-        a12 = A % fc(s) * Grid % vol(c1) / M % sav(c1)
+        a12 = A % fc(s) * M % v_m(c1)
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
       end if
     end if
@@ -181,8 +181,8 @@
   !@    if(c2 > 0) then
   !@
   !@      ! Unit: (m^3 s)/kg
-  !@      v_m_c1 = Grid % vol(c1) / M % sav(c1)
-  !@      v_m_c2 = Grid % vol(c2) / M % sav(c2)
+  !@      v_m_c1 = M % v_m(c1)
+  !@      v_m_c2 = M % v_m(c2)
   !@      v_m_f  = fs * v_m_c1 + (1.0-fs) * v_m_c2
   !@
   !@      ! Interpolate pressure gradients

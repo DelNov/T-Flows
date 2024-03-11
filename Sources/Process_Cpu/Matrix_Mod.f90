@@ -12,7 +12,7 @@
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!------------------------------------------------------------------------------!
+!==============================================================================!
 
   !--------------------------------------------------------------------!
   !   Matrix type                                                      !
@@ -62,11 +62,11 @@
     integer              :: nonzeros  !! number of nonzero entries
     real,    allocatable :: val(:)    !! value
     real,    allocatable :: fc (:)    !! bare matrix entry for face
-    real,    allocatable :: sav(:)    !! saved momentum diagonal value
     integer, allocatable :: col(:)    !! column positions
     integer, allocatable :: row(:)    !! beginning of each row
     integer, allocatable :: dia(:)    !! diagonal positions
-    integer, allocatable :: pos(:,:)  !! position in the matrix
+    integer, allocatable :: pos(:,:)  !! face-based position of the matrix
+    real,    allocatable :: v_m(:)    !! cell volume over momentum diagonal
     integer, allocatable :: glo(:)    !! global cell number for PETSc
                                       !! which is different from T-Flows
                                       !! and stars from zero
