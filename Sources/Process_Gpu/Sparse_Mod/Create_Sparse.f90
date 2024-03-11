@@ -57,8 +57,6 @@
     !--------------------------------------------------------------!
     if(run .eq. 1) then
       A % nonzeros = non_z
-      A % n = Grid % n_cells
-      Assert(A % n .eq. Grid % n_cells)
       allocate(A % row(Grid % n_cells+1));   A % row = 0
       allocate(A % dia(Grid % n_cells));     A % dia = 0
       allocate(A % col(non_z));              A % col = 0
