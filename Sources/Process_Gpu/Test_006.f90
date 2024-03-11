@@ -84,6 +84,7 @@
   ! well as cell connectivity and cell coordinates on the
   ! device (they are all needed for gradients), ...
   call Gpu % Matrix_Real_Copy_To_Device(Flow(1) % grad_c2c)
+  call Gpu % Matrix_Int_Copy_To_Device(Grid(1) % faces_c)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % cells_n_cells)
   call Gpu % Matrix_Int_Copy_To_Device(Grid(1) % cells_c)
   call Gpu % Matrix_Int_Copy_To_Device(Grid(1) % cells_f)
