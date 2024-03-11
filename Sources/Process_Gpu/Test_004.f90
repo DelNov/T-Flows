@@ -48,6 +48,16 @@
 
   ! Discretize the matrix for diffusion
   call Process % Form_Diffusion_Matrix(Flow)
+
+  call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)
+  call Gpu % Vector_Real_Copy_To_Device(Grid % s)
+  call Gpu % Vector_Real_Copy_To_Device(Grid % d)
+  call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_face)
+  call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_face)
+
+  ! Important before calling functions in Process which are ported to GPUs)
+  call Flow % Update_Aliases()
+
   call Process % Insert_Diffusion_Bc(Flow, comp=1)
 
   ! Take the aliases now
@@ -80,7 +90,13 @@
   ! Copy results back to host
   call Gpu % Vector_Update_Host(x)
 
-  ! Destroy data on the device, you don't need them anymore
+  ! Destroy all data on the device, you don't need them anymore
+  call Gpu % Matrix_Int_Destroy_On_Device(Grid % faces_c)
+  call Gpu % Vector_Real_Destroy_On_Device(Grid % s)
+  call Gpu % Vector_Real_Destroy_On_Device(Grid % d)
+  call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_face)
+  call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_face)
+
   call Gpu % Sparse_Destroy_On_Device(A)
   call Gpu % Vector_Real_Destroy_On_Device(x)
   call Gpu % Vector_Real_Destroy_On_Device(b)
