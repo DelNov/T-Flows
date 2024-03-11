@@ -62,7 +62,6 @@
       allocate(A % col(non_z));              A % col = 0
       allocate(A % val(non_z));              A % val = 0
       allocate(A % fc (Grid % n_faces));     A % fc  = 0
-      allocate(A % mir(non_z));              A % mir = 0
       Assert(Grid % n_faces .gt. 0)
       allocate(A % pos(2, Grid % n_faces));  A % pos   = 0
       allocate(A % d_inv(Grid % n_cells));   A % d_inv = 0
@@ -99,29 +98,6 @@
       end if
     end do
 1   continue
-  end do
-
-  !----------------------!
-  !                      !
-  !   Find it's mirror   !
-  !                      !
-  !----------------------!
-  do row_a = 1, Grid % n_cells
-    do pos_a = A % row(row_a), A % row(row_a + 1) - 1
-      col_a = A % col(pos_a)  ! at this point you have row_a and col_a
-
-      row_b = col_a
-      do pos_b = A % row(row_b), A % row(row_b + 1) - 1
-        col_b = A % col(pos_b)  ! at this point you have row_b and col_b
-
-        if( (col_b == row_a) .and. (row_b == col_a) ) then
-          A % mir(pos_a) = pos_b
-          A % mir(pos_b) = pos_a
-          goto 2  ! done with the inner loop, get out
-        end if
-      end do
-2     continue
-    end do
   end do
 
   !-----------------------------------!

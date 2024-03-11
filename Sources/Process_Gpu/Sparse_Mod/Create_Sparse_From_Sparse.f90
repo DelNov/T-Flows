@@ -28,7 +28,6 @@
   allocate (A % col(A % nonzeros))
   allocate (A % row(Grid % n_cells+1))
   allocate (A % dia(Grid % n_cells))
-  allocate (A % mir(A % nonzeros))
   allocate (A % pos(2, Grid % n_faces))
   allocate (A % d_inv(Grid % n_cells))
   allocate (A % v_m  (Grid % n_cells))
@@ -39,7 +38,6 @@
   do i = 1, A % nonzeros
     A % val(i) = B % val(i)
     A % col(i) = B % col(i)
-    A % mir(i) = B % mir(i)
   end do
   do i = 1, Grid % n_faces
     A % fc(i)    = B % fc(i)
@@ -60,7 +58,6 @@
   A % col(:)   = B % col(:)
   A % row(:)   = B % row(:)
   A % dia(:)   = B % dia(:)
-  A % mir(:)   = B % mir(:)
   A % pos(:,:) = B % pos(:,:)
   A % d_inv(:) = B % d_inv(:)
   A % v_m  (:) = B % v_m  (:)
