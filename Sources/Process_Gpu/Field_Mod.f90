@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Field_Mod
@@ -30,6 +31,7 @@
   integer :: grid_n_cells
   integer :: grid_n_faces
   integer :: grid_n_bnd_cells
+  integer :: grid_n_buff_cells
 
   integer, contiguous, pointer :: grid_faces_c(:,:)
   integer, contiguous, pointer :: grid_cells_c(:,:)
@@ -38,6 +40,12 @@
   integer, contiguous, pointer :: grid_reg_f_face(:)
   integer, contiguous, pointer :: grid_reg_l_face(:)
   real,    contiguous, pointer :: grid_vol(:)
+  real,    contiguous, pointer :: grid_xc(:)
+  real,    contiguous, pointer :: grid_yc(:)
+  real,    contiguous, pointer :: grid_zc(:)
+  real,    contiguous, pointer :: grid_dx(:)
+  real,    contiguous, pointer :: grid_dy(:)
+  real,    contiguous, pointer :: grid_dz(:)
   real,    contiguous, pointer :: grid_sx(:)
   real,    contiguous, pointer :: grid_sy(:)
   real,    contiguous, pointer :: grid_sz(:)
@@ -137,8 +145,11 @@
       !---------------!
       !   Utilities   !
       !---------------!
+      procedure :: Adjust_P_Drops
       procedure :: Alias_Energy
       procedure :: Alias_Momentum
+      procedure :: Calculate_Bulk_Fluxes
+      procedure :: Volume_Average
 
   end type
 
@@ -160,7 +171,10 @@
     !---------------!
     !   Utilities   !
     !---------------!
+#   include "Field_Mod/Utilities/Adjust_P_Drops.f90"
 #   include "Field_Mod/Utilities/Alias_Energy.f90"
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
+#   include "Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90"
+#   include "Field_Mod/Utilities/Volume_Average.f90"
 
   end module

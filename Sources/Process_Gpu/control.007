@@ -3,13 +3,18 @@
 #--------------
   PROBLEM_NAME  test_007_matrix
 
-#--------------------------
-# Time-integration related
-#--------------------------
-  NUMBER_OF_TIME_STEPS  240
+#---------------
+# Time stepping
+#---------------
+  NUMBER_OF_TIME_STEPS  1200
   TIME_STEP                 0.00005
 
   RESULTS_SAVE_INTERVAL   120
+
+#-------------------
+# Monitoring points
+#-------------------
+  POINT_FOR_MONITORING_PLANES  0.015  0.03  0.0255
 
 #----------------------
 # Numerical parameters
@@ -23,8 +28,20 @@
 #---------------------
 # Physical properties
 #---------------------
-  MASS_DENSITY       1.0
-  DYNAMIC_VISCOSITY    0.00001
+  MASS_DENSITY       1.2047
+  DYNAMIC_VISCOSITY  1.8205e-5
+
+#-------------------------------------------------
+# Prescribed volume flow rate
+#
+# Re = 13000
+# nu = 1.5112e-5
+# h  = 0.051
+# Re = Ub * h / nu = 13000
+# Ub = Re * nu / h = 3.852  [m/s]
+# V* = Ub * 0.051 * 0.06 = 0.011787  [kg/s]
+#-------------------------------------------------
+  VOLUME_FLOW_RATES  0.0118   0.0   0.0
 
 #---------------------
 # Boundary conditions
@@ -44,6 +61,3 @@
     VARIABLES        u     v     w
     VALUES           0.0   0.0   0.0
 
-# Volume flow rates are still innactive
-  PRESSURE_DROPS     0.036   0.00    0.00
-  VOLUME_FLOW_RATES  7.28    0.00    0.00

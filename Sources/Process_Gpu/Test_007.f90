@@ -37,6 +37,16 @@
   print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
+  ! Plane for calcution of overall mass fluxes
+  call Control % Point_For_Monitoring_Planes(Flow(1) % bulk % xp,  &
+                                             Flow(1) % bulk % yp,  &
+                                             Flow(1) % bulk % zp)
+  ! Prepare ...
+  call Bulk_Mod_Monitoring_Planes_Areas(Flow(1) % bulk, Grid(1))
+
+  ! Print the areas of monitoring planes
+  call Bulk_Mod_Print_Areas(Flow(1) % bulk)
+
   print '(a)', ' # Reading physical models'
   call Read_Control % Physical_Models(Flow(1))
 
@@ -75,11 +85,11 @@
   call Flow(1) % Calculate_Grad_Matrix()
 
   ! Initialize solution
-  Flow(1) % u % n(1:n) = 0.1
+  Flow(1) % u % n(1:n) = 3.8
   Flow(1) % v % n(1:n) = 0.0
   Flow(1) % w % n(1:n) = 0.0
 
-  Flow(1) % u % o(1:n) = 0.1
+  Flow(1) % u % o(1:n) = 3.8
   Flow(1) % v % o(1:n) = 0.0
   Flow(1) % w % o(1:n) = 0.0
 
@@ -106,6 +116,9 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % xc)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % yc)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % zc)
+  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % dx)
+  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % dy)
+  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % dz)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sx)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sy)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sz)
@@ -213,6 +226,13 @@
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
     end do  ! iterations
+
+    ! Calculate bulk fluxes and adjust pressure drops
+    call Flow(1) % Calculate_Bulk_Fluxes(Flow(1) % v_flux)
+    call Flow(1) % Adjust_P_Drops()
+
+    PRINT *, Flow(1) % bulk % u
+    PRINT *, Flow(1) % bulk % p_drop_x
 
     if(mod(Time % Curr_Dt(), 12) .eq. 0) then
       call Gpu % Vector_Update_Host(Flow(1) % u % n)
