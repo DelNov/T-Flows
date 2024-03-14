@@ -83,7 +83,7 @@
   call Enlarge % Array_Int(Grid % Omp % face_thread, i=(/1,nf+ns+m/))
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  if(PROGRAM_NAME .ne. "Process") then
+  if(PROGRAM_NAME(1:7) .ne. "Process") then
     call Enlarge % Array_Int(Grid % new_f, i=(/1,nf+ns+m/))
     call Enlarge % Array_Int(Grid % old_f, i=(/1,nf+ns+m/))
   end if

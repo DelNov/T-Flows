@@ -34,7 +34,7 @@
   integer,          intent(in)    :: d     !! domain rank (number)
 !==============================================================================!
 
-  Assert(PROGRAM_NAME .eq. 'Process')
+  Assert(PROGRAM_NAME(1:7) .eq. 'Process')
 
   call Control % Read_Problem_Name(problem_name(d))
 

@@ -63,14 +63,14 @@
   ! Allocate as litle as possible
   call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,4/), j=(/-nb_m,nc_m/))
   call Enlarge % Matrix_Int(Grid % cells_f, i=(/1,4/), j=(/-nb_m,nc_m/))
-  if(PROGRAM_NAME .eq. 'Generate' .or.  &
-     PROGRAM_NAME .eq. 'Convert'  .or.  &
-     PROGRAM_NAME .eq. 'Process') then
+  if(PROGRAM_NAME      .eq. 'Generate' .or.  &
+     PROGRAM_NAME      .eq. 'Convert'  .or.  &
+     PROGRAM_NAME(1:7) .eq. 'Process') then
     call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,4/), j=(/-nb_m,nc_m/))
   end if
 
   ! This is used only in Swarm_Mod for bouncing particles
-  if(PROGRAM_NAME .eq. 'Process') then
+  if(PROGRAM_NAME(1:7) .eq. 'Process') then
     if(nb_m .gt. 0) then  ! this check is not crazy, a (sub)domain might
                           ! have no boundary cells, all could be periodic
                           ! or simply not touching any boundary regions
@@ -82,9 +82,9 @@
   ! (Actually, cells_n_faces and cells_n_cells should be the same)
   call Enlarge % Array_Int(Grid % cells_n_nodes, i=(/-nb_m,nc_m/))
   call Enlarge % Array_Int(Grid % cells_n_faces, i=(/-nb_m,nc_m/))
-  if(PROGRAM_NAME .eq. 'Generate' .or.  &
-     PROGRAM_NAME .eq. 'Convert'  .or.  &
-     PROGRAM_NAME .eq. 'Process') then
+  if(PROGRAM_NAME      .eq. 'Generate' .or.  &
+     PROGRAM_NAME      .eq. 'Convert'  .or.  &
+     PROGRAM_NAME(1:7) .eq. 'Process') then
     call Enlarge % Array_Int(Grid % cells_n_cells, i=(/-nb_m,nc_m/))
   end if
 
@@ -118,7 +118,7 @@
   call Enlarge % Array_Int(Grid % Omp % cell_thread, i=(/-nb_m,nc_m/))
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  if(PROGRAM_NAME .ne. 'Process') then
+  if(PROGRAM_NAME(1:7) .ne. 'Process') then
     call Enlarge % Array_Int(Grid % new_c, i=(/-nb_m,nc_m/))
     call Enlarge % Array_Int(Grid % old_c, i=(/-nb_m,nc_m/))
   end if

@@ -94,7 +94,7 @@
   !   If there is more than one thread, distribute them   !
   !                                                       !
   !-------------------------------------------------------!
-  if(PROGRAM_NAME == "Process" .and.  &
+  if(PROGRAM_NAME(1:7) == 'Process' .and.  &
      Omp % n_threads > 1) then
 
     !--------------------------!
