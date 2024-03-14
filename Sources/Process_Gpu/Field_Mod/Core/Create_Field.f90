@@ -17,6 +17,16 @@
   nc = Grid % n_cells
   ns = Grid % n_faces
 
+  !---------------------------------------------!
+  !   Allocate memory for physical properties   !
+  !---------------------------------------------!
+  allocate(Flow % density     (-nb:nc));  Flow % density(:)      = 0.0
+  allocate(Flow % viscosity   (-nb:nc));  Flow % viscosity(:)    = 0.0
+  if(Flow % heat_transfer) then
+    allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
+    allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
+  end if
+
   !--------------------------------------------------------------!
   !   Create native solvers (matrices A, M, right hand side b,   !
   !   helping vectors for CG method such as p, q, r and d_inv)   !

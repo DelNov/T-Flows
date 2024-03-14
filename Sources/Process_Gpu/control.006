@@ -6,10 +6,10 @@
 #--------------------------
 # Time-integration related
 #--------------------------
-  NUMBER_OF_TIME_STEPS   1200
+  NUMBER_OF_TIME_STEPS   120 
   TIME_STEP                 0.0125
 
-  RESULTS_SAVE_INTERVAL   120
+  RESULTS_SAVE_INTERVAL   12 
 
 #----------------------
 # Numerical parameters

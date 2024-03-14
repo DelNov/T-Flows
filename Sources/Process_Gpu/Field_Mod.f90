@@ -53,9 +53,7 @@
   real,    contiguous, pointer :: grid_d(:)
 
   !----------------!
-  !                !
   !   Field type   !
-  !                !
   !----------------!
   type Field_Type
 
@@ -65,12 +63,12 @@
     !   Physical properties   !
     !-------------------------!
 
-    ! Defined as constants
-    real :: capacity     = 1.0     !! [J/kg/K]
-    real :: conductivity = 0.01    !! [W/(m K)]
-    real :: density      = 1.0     !! [kg / m^3]
-    real :: viscosity    = 0.001   !! [kg / (m s)]
-    real :: diffusivity  = 1.0e-6  !! [m^2/s]
+    ! Defined in cell centers
+    real, allocatable :: capacity(:)      !! [J/kg/K]
+    real, allocatable :: conductivity(:)  !! [W/(m K)]
+    real, allocatable :: density(:)       !! [kg/m^3]
+    real, allocatable :: viscosity(:)     !! [kg/m/s]
+    real              :: diffusivity      !! [m^2/s]
 
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !
@@ -114,6 +112,9 @@
     ! Bulk velocities, pressure drops, etc.
     type(Bulk_Type) :: bulk  !! holder of volume flow rates through domain and,
                              !! associated with that, bulk velocities
+
+    ! Maximum CFL and Pe numbers
+    real :: cfl_max, pe_max
 
     ! Time step used in this field
     real :: dt  !! time step in this field [s]

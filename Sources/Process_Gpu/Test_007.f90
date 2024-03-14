@@ -16,6 +16,7 @@
   type(Field_Type), target :: Flow(MD)      ! flow field
   real                     :: ts, te
   integer                  :: n, c, ldt
+  logical                  :: exit_now
   character(11)            :: name_vel     = 'TTTT_II_uvw'
   character( 9)            :: name_p       = 'TTTT_II_p'
 !@character(10)            :: name_pp      = 'TTTT_II_pp'
@@ -63,6 +64,9 @@
 
   print '(a)', ' # Creating a flow field'
   call Flow(1) % Create_Field(Grid(1))
+
+  print '(a)', ' # Reading physical properties'
+  call Read_Control % Physical_Properties(Flow(1))
 
   ! I am not sure when to call this, but this is a good guess
   call Read_Control % Boundary_Conditions(Flow(1))
@@ -173,6 +177,12 @@
   call Time % Set_First_Dt(0)
   call Time % Set_Last_Dt(ldt)
 
+  call Control % Results_Save_Interval (Results % interval, verbose=.true.)
+
+  ! Allocate CPU memory for working arrays (currently used for saving)
+  call Work % Allocate_Work(Grid, n_r_cell=8,  n_r_face=0,  n_r_node=0,  &
+                                  n_i_cell=6,  n_i_face=0,  n_i_node=0)
+
   print '(a)', ' # Performing a demo of the computing momentum equations'
   call cpu_time(ts)
   do while (Time % Needs_More_Steps())
@@ -234,19 +244,12 @@
     PRINT *, Flow(1) % bulk % u
     PRINT *, Flow(1) % bulk % p_drop_x
 
-    if(mod(Time % Curr_Dt(), 12) .eq. 0) then
+    if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
       call Gpu % Vector_Update_Host(Flow(1) % u % n)
       call Gpu % Vector_Update_Host(Flow(1) % v % n)
       call Gpu % Vector_Update_Host(Flow(1) % w % n)
       call Gpu % Vector_Update_Host(Flow(1) % p % n)
-      call Grid(1) % Save_Debug_Vtu(name_vel,                         &
-                                    vector_name="velocity",           &
-                                    vector_cell=(/Flow(1) % u % n,    &
-                                                  Flow(1) % v % n,    &
-                                                  Flow(1) % w % n/))
-      call Grid(1) % Save_Debug_Vtu(name_p,                         &
-                                    scalar_name="pressure",         &
-                                    scalar_cell=Flow(1) % p % n)
+      call Results % Main_Results(1, Flow(1), exit_now)
     end if
 
   end do    ! time steps
@@ -257,17 +260,12 @@
   call Gpu % Vector_Update_Host(Flow(1) % v % n)
   call Gpu % Vector_Update_Host(Flow(1) % w % n)
   call Gpu % Vector_Update_Host(Flow(1) % p % n)
-  call Grid(1) % Save_Debug_Vtu(name_vel,                       &
-                                vector_name="velocity",         &
-                                vector_cell=(/Flow(1) % u % n,  &
-                                              Flow(1) % v % n,  &
-                                              Flow(1) % w % n/))
-  call Grid(1) % Save_Debug_Vtu(name_p,                    &
-                             scalar_name="pressure",       &
-                             scalar_cell=Flow(1) % p % n)
+  call Results % Main_Results(1, Flow(1), exit_now)
+
+  call Work % Finalize_Work()
 
   call Profiler % Stop('Test_007')
 
-  call Profiler % Statistics(indent=1)
+  call Profiler % Statistics(indent=24)
 
   end subroutine

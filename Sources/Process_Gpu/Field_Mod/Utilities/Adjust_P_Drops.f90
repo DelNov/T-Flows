@@ -44,7 +44,7 @@
   bulk => Flow % bulk
 
   ! Work out the mean density of the fluid body
-  rho = Flow % density
+  rho = Flow % Volume_Average(Flow % density)
 
   ! Once density is computed, continue with necessary pressure drops
   if( abs(bulk % flux_x_o) >= TINY ) then

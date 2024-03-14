@@ -234,7 +234,8 @@ SRC_F_MOD = Const_Mod.f90         \
             Profiler_Mod.f90      \
             Vtk_Mod.f90           \
             Metis_Mod.f90         \
-            Grid_Mod.f90
+            Grid_Mod.f90          \
+            Work_Mod.f90
 
 # Modules in shared directories
 SRC_F_MOD += Bulk_Mod.f90           \
@@ -246,6 +247,8 @@ SRC_F_MOD += Bulk_Mod.f90           \
              Time_Mod.f90           \
              Field_Mod.f90          \
              Iter_Mod.f90           \
+             Info_Mod.f90           \
+             Results_Mod.f90        \
              Read_Controls_Mod.f90  \
              Process_Mod.f90
 

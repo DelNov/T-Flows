@@ -7,9 +7,8 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: ui_o(:), b(:)
+  real, contiguous, pointer :: ui_o(:), b(:), dens(:)
   integer                   :: c
-  real                      :: dens, dt
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -18,8 +17,7 @@
 
   ! Take some aliases
   b    => Flow % Nat % b
-  dens =  Flow % density
-  dt   =  Flow % dt
+  dens => Flow % density
 
   if(comp .eq. 1) ui_o => Flow % u % o
   if(comp .eq. 2) ui_o => Flow % v % o
@@ -27,7 +25,7 @@
 
   !$acc parallel loop independent
   do c = 1, grid_n_cells
-    b(c) = b(c) + dens * ui_o(c) * grid_vol(c) / dt
+    b(c) = b(c) + dens(c) * ui_o(c) * grid_vol(c) / Flow % dt
   end do
   !$acc end parallel
 

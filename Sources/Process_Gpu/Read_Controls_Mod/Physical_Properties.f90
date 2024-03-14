@@ -29,13 +29,17 @@
   ! Read constant (defualt) values
   call Control % Dynamic_Viscosity   (visc_const)
   call Control % Mass_Density        (dens_const)
-  call Control % Heat_Capacity       (capa_const)
-  call Control % Thermal_Conductivity(cond_const)
+  if(Flow % heat_transfer) then
+    call Control % Heat_Capacity       (capa_const)
+    call Control % Thermal_Conductivity(cond_const)
+  end if
   call Control % Scalars_Diffusivity (Flow % diffusivity)
 
-  Flow % density      = dens_const
-  Flow % viscosity    = visc_const
-  Flow % capacity     = capa_const
-  Flow % conductivity = cond_const
+  Flow % density     (:) = dens_const
+  Flow % viscosity   (:) = visc_const
+  if(Flow % heat_transfer) then
+    Flow % capacity    (:) = capa_const
+    Flow % conductivity(:) = cond_const
+  end if
 
   end subroutine

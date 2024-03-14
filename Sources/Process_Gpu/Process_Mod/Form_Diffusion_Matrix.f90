@@ -10,8 +10,9 @@
   type(Grid_Type),       pointer :: Grid
   type(Sparse_Con_Type), pointer :: Mcon
   type(Sparse_Val_Type), pointer :: Mval
+  real, contiguous,      pointer :: visc(:), dens(:)
   integer                        :: c, s, c1, c2, reg
-  real                           :: visc, dens, m12
+  real                           :: m12
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
@@ -23,8 +24,8 @@
   Grid => Flow % pnt_grid
   Mcon => Flow % Nat % C
   Mval => Flow % Nat % M
-  dens =  Flow % density
-  visc =  Flow % viscosity
+  dens => Flow % density
+  visc => Flow % viscosity
 
   !---------------------------!
   !   Discretize the matrix   !
@@ -47,7 +48,7 @@
 
     ! Calculate coeficients for the momentum matrix
     ! Units: ............
-    m12 = visc * Grid % s(s) / Grid % d(s)
+    m12 = 0.5 * (visc(c1)+visc(c2)) * Grid % s(s) / Grid % d(s)
     Assert(m12 .gt. 0.0)
 
     Mval % val(Mcon % pos(1,s)) = -m12
@@ -66,7 +67,7 @@
         Assert(c1 .gt. 0)
         Assert(c2 .lt. 0)
 
-        m12 = visc * Grid % s(s) / Grid % d(s)
+        m12 = visc(c1) * Grid % s(s) / Grid % d(s)
         Assert(m12 .gt. 0.0)
 
         Mval % val(Mcon % dia(c1))  = Mval % val(Mcon % dia(c1)) + m12
@@ -80,7 +81,7 @@
   if(present(dt)) then
     do c = 1, Grid % n_cells
       Mval % val(Mcon % dia(c)) = Mval % val(Mcon % dia(c))  &
-                                + dens * Grid % vol(c) / dt
+                                + dens(c) * Grid % vol(c) / dt
     end do
   end if
 

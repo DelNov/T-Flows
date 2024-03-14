@@ -32,16 +32,12 @@ $(DIR_SHARED)/Grid_Mod/*/*.f90
 # Dependencies for: ./Test_007.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_007.o:\
-$(DIR_OBJECT)/Time_Mod.o \
-Time_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
 Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
 Process_Mod/*.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
-$(DIR_OBJECT)/Iter_Mod.o \
-Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 \
 Gpu_Mod/*.f90 
@@ -70,7 +66,6 @@ Linalg_Mod/*.f90
 # Dependencies for: ./Time_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Time_Mod.o:\
-Time_Mod/*.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
@@ -79,14 +74,12 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Bulk_Mod.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-Bulk_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Iter_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Iter_Mod.o:\
-Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Component.005 \
 Field_Mod/*/Grad_Component.004 \
@@ -99,11 +92,11 @@ Field_Mod/*/*.f90
 # Dependencies for: ./Process_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Process_Mod.o:\
+$(DIR_OBJECT)/Results_Mod.o \
+Results_Mod/*.f90 \
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
 Process_Mod/*.f90 \
-$(DIR_OBJECT)/Iter_Mod.o \
-Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 \
 Gpu_Mod/*.f90 \
@@ -117,16 +110,12 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 # Dependencies for: ./Test_006.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_006.o:\
-$(DIR_OBJECT)/Time_Mod.o \
-Time_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
 Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
 Process_Mod/*.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
-$(DIR_OBJECT)/Iter_Mod.o \
-Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 \
 Gpu_Mod/*.f90 
@@ -138,6 +127,18 @@ $(DIR_OBJECT)/Test_003.o:\
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 \
 Gpu_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Info_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Info_Mod.o:\
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_005.f90
@@ -155,12 +156,26 @@ Field_Mod/*/Grad_Component.001 \
 Field_Mod/*/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Results_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Results_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+Results_Mod/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Read_Controls_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Read_Controls_Mod.o:\
 Read_Controls_Mod/*.f90 \
-$(DIR_OBJECT)/Iter_Mod.o \
-Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Component.005 \
 Field_Mod/*/Grad_Component.004 \
@@ -183,8 +198,6 @@ Field_Mod/*/Grad_Component.003 \
 Field_Mod/*/Grad_Component.002 \
 Field_Mod/*/Grad_Component.001 \
 Field_Mod/*/*.f90 \
-$(DIR_OBJECT)/Bulk_Mod.o \
-Bulk_Mod/*.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
@@ -372,7 +385,6 @@ $(DIR_SHARED)/File_Mod/*.f90
 # Dependencies for: ./Polyhedron_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Polyhedron_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*/*.f90 \
 $(DIR_SHARED)/Work_Mod/*.f90 \

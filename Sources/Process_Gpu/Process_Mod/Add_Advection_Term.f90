@@ -12,10 +12,8 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: ui_n(:)
-  real, contiguous, pointer :: b(:)
-  real, contiguous, pointer :: v_flux(:)
-  real                      :: b_tmp, den_u1, den_u2, ui_c, dens, blend
+  real, contiguous, pointer :: ui_n(:), b(:), v_flux(:), dens(:)
+  real                      :: b_tmp, den_u1, den_u2, dens_f, ui_c, blend
   integer                   :: s, c1, c2, i_cel
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
@@ -26,7 +24,7 @@
   ! Take some aliases
   b      => Flow % Nat % b
   v_flux => Flow % v_flux
-  dens   =  Flow % density
+  dens   => Flow % density
   blend  =  Flow % blend
 
   ! Still on aliases
@@ -49,8 +47,9 @@
       if(c2 .gt. 0) then
         ui_c = 0.5 * (ui_n(c1) + ui_n(c2))  ! centered value
         ! Unit: kg / m^3 * m /s = kg / (m^2 s)
-        den_u1 = dens * ((1.0-blend) * ui_n(c1) + blend * ui_c)
-        den_u2 = dens * ((1.0-blend) * ui_n(c2) + blend * ui_c)
+        dens_f = 0.5 * (dens(c1) + dens(c2))
+        den_u1 = dens_f * ((1.0-blend) * ui_n(c1) + blend * ui_c)
+        den_u2 = dens_f * ((1.0-blend) * ui_n(c2) + blend * ui_c)
         ! Unit: kg / (m^2 s) * m^3 / s = kg m / s^2 = N
         b_tmp = b_tmp - den_u1 * max(v_flux(s), 0.0) * merge(1,0, c1.lt.c2)
         b_tmp = b_tmp - den_u2 * min(v_flux(s), 0.0) * merge(1,0, c1.lt.c2)

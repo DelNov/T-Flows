@@ -24,6 +24,13 @@
   ! Take aliases
   bulk => Flow % bulk
 
+  !-------------------------------------------!
+  !                                           !
+  !   Related to heat transfer and bouyancy   !
+  !                                           !
+  !-------------------------------------------!
+  call Control % Heat_Transfer(Flow % heat_transfer, verbose = .true.)
+
   !------------------------------------!
   !                                    !
   !   Pressure drops and mass fluxes   !
