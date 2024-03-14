@@ -9,7 +9,8 @@ Process_Mod/*.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Linalg_Mod.f90
@@ -42,7 +43,8 @@ Native_Mod/*.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_001.f90
@@ -53,7 +55,8 @@ Process_Mod/*.f90 \
 $(DIR_OBJECT)/Linalg_Mod.o \
 Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Native_Mod.f90
@@ -99,15 +102,11 @@ $(DIR_OBJECT)/Process_Mod.o:\
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
 Process_Mod/*.f90 \
+$(DIR_OBJECT)/Iter_Mod.o \
+Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/Grad_Component.005 \
-Field_Mod/*/Grad_Component.004 \
-Field_Mod/*/Grad_Component.003 \
-Field_Mod/*/Grad_Component.002 \
-Field_Mod/*/Grad_Component.001 \
-Field_Mod/*/*.f90 \
+Gpu_Mod/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Control_Mod/*.f90 \
@@ -129,14 +128,16 @@ Native_Mod/*.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_003.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_003.o:\
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_005.f90
@@ -144,6 +145,7 @@ Gpu_Mod/*/*.f90
 $(DIR_OBJECT)/Test_005.o:\
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Component.005 \
 Field_Mod/*/Grad_Component.004 \
@@ -191,7 +193,8 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_002.o:\
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Gpu_Mod.f90
@@ -200,6 +203,7 @@ $(DIR_OBJECT)/Gpu_Mod.o:\
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
 Gpu_Mod/*/*.f90 \
+Gpu_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
@@ -368,6 +372,7 @@ $(DIR_SHARED)/File_Mod/*.f90
 # Dependencies for: ./Polyhedron_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Polyhedron_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*/*.f90 \
 $(DIR_SHARED)/Work_Mod/*.f90 \
