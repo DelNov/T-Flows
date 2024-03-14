@@ -41,9 +41,7 @@
 !==============================================================================!
 
   !----------------!
-  !                !
   !   Field type   !
-  !                !
   !----------------!
   !> Encapsulates necessary variables, physical proerties and some numerical
   !> procedures to describe a fluid flow with heat transfer and scalar
