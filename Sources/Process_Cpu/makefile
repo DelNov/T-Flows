@@ -177,6 +177,8 @@ ifeq ($(FORTRAN), intel)
   endif
   OPT_F_COMP_USER = $(OPT_F_COMP)
 
+  $(info # Using Intel Fortran compiler with options: $(OPT_F_COMP))
+
 #------------
 #   Nvidia
 #------------
@@ -201,6 +203,8 @@ else ifeq ($(FORTRAN), nvidia)
     OPT_F_COMP += -mp
   endif
   OPT_F_COMP_USER = $(OPT_F_COMP)
+
+  $(info # Using Nvidia Fortran compiler with options: $(OPT_F_COMP))
 
 #---------
 #   Gnu
@@ -232,6 +236,7 @@ else
   OPT_F_COMP_USER += -Wno-unused-dummy-argument
   OPT_F_COMP_USER += -Wno-unused-variable
 
+  $(info # Using GNU Fortran compiler with options: $(OPT_F_COMP))
 endif
 
 # Set initial options for C compiler - this is probably not needed
