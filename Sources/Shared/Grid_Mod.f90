@@ -228,6 +228,7 @@
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
+      procedure :: Exchange_Inside_Cells_Real
       procedure :: Face_Normal
       procedure :: Faces_Surface
       procedure :: Find_Cells_Faces
@@ -314,6 +315,7 @@
 #   include "Grid_Mod/Parallel/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Real.f90"
+#   include "Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90"
 #   include "Grid_Mod/Parallel/Form_Cells_Comm.f90"
 #   include "Grid_Mod/Parallel/Form_Maps_For_Backup.f90"
 #   include "Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90"
