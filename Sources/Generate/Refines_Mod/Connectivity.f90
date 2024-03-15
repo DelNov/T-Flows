@@ -121,7 +121,7 @@
 
           ! What counts in this expansion, is the number of faces, not shadows
           call Grid % Allocate_Faces(Grid % n_faces, Grid % n_shadows,  &
-                                     GROWTH_MARGIN)
+                                     Grid % n_faces)
 
           ! Which volumes are connected with side Grid % n_faces
           Grid % faces_c(1, Grid % n_faces) = c1
