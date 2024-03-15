@@ -19,7 +19,7 @@
   real, allocatable              :: b(:), c(:)
   type(Grid_Type)                :: Grid
   type(Field_Type),       target :: Flow            ! flow field
-  integer,             parameter :: N_STEPS = 1     ! spend some time on device
+  integer,             parameter :: N_STEPS = 1200  ! spend some time on device
   real                           :: ts, te
   integer                        :: nc, ni, step
   character(len=11)              :: root_control    = 'control.001'
@@ -107,11 +107,10 @@
 
   O_Print '(a,f12.3,a)', ' # Time elapsed for TEST 1: ', te-ts, ' [s]'
 
-# if T_FLOWS_DEBUG == 1
+  ! Save the results too, handy for parallel version
   call Grid % Save_Debug_Vtu("result",              &
                              inside_name="Result",  &
                              inside_cell=c)
-# endif
 
   call Global % End_Parallel
   stop
