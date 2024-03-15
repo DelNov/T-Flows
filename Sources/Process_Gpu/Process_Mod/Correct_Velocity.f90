@@ -37,7 +37,7 @@
 
   ! Units: kg m / s^2 * s / kg = m / s
   !$acc parallel loop independent
-  do c = 1, grid_n_cells
+  do c = 1, grid_n_cells - grid_n_buff_cells
     u_n(c) = u_n(c) - pp_x(c) * v_m(c)
     v_n(c) = v_n(c) - pp_y(c) * v_m(c)
     w_n(c) = w_n(c) - pp_z(c) * v_m(c)
@@ -50,7 +50,7 @@
 
   ! Units: m * m^3 * s / kg * kg / (m s^2) = m^3 / s
   !$acc parallel loop independent
-  do s = grid_n_bnd_cells + 1, grid_n_faces
+  do s = grid_reg_f_face(grid_n_regions), grid_reg_l_face(grid_n_regions)
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 

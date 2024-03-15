@@ -56,7 +56,7 @@
   !-------------------------------------------!
 
   !$acc parallel loop
-  do s = grid_n_bnd_cells + 1, grid_n_faces
+  do s = grid_reg_f_face(grid_n_regions), grid_reg_l_face(grid_n_regions)
 
     c1 = grid_faces_c(1,s)
     c2 = grid_faces_c(2,s)
@@ -87,7 +87,7 @@
   !----------------------------------------------------!
 
   !$acc parallel loop
-  do c1 = 1, grid_n_cells
+  do c1 = 1, grid_n_cells - grid_n_buff_cells
 
     b_tmp = b(c1)
     !$acc loop seq
@@ -112,7 +112,7 @@
   !------------------------------------------------------------------!
   max_abs_val = 0.0
   !$acc parallel loop reduction(max:max_abs_val)
-  do c = 1, grid_n_cells
+  do c = 1, grid_n_cells - grid_n_buff_cells
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
   print '(a,es12.3)', ' # Max. volume balance error '//  &

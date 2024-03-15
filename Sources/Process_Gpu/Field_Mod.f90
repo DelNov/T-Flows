@@ -32,6 +32,7 @@
   integer :: grid_n_faces
   integer :: grid_n_bnd_cells
   integer :: grid_n_buff_cells
+  integer :: grid_n_regions
 
   integer, contiguous, pointer :: grid_faces_c(:,:)
   integer, contiguous, pointer :: grid_cells_c(:,:)

@@ -34,6 +34,7 @@
   grid_n_faces      = Grid % n_faces
   grid_n_bnd_cells  = Grid % n_bnd_cells
   grid_n_buff_cells = Grid % Comm % n_buff_cells
+  grid_n_regions    = Grid % n_regions
 
   grid_faces_c       => Grid % faces_c
   grid_cells_c       => Grid % cells_c
