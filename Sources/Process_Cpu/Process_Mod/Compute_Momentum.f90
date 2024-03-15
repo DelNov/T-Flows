@@ -414,7 +414,7 @@
   ! (These do not, in general, obey volume conservation.)
   call Process % Update_Boundary_Values(Flow, Turb, Vof, 'MOMENTUM')
 
-  ! Refresh buffers for M % sav before discretizing for pressure
+  ! Refresh buffers for M % v_m before discretizing for pressure
   call Grid % Exchange_Cells_Real(M % v_m)
 
   ! User function

@@ -20,8 +20,8 @@
   !---------------------------------------------!
   !   Allocate memory for physical properties   !
   !---------------------------------------------!
-  allocate(Flow % density     (-nb:nc));  Flow % density(:)      = 0.0
-  allocate(Flow % viscosity   (-nb:nc));  Flow % viscosity(:)    = 0.0
+  allocate(Flow % density  (-nb:nc));  Flow % density(:)   = 0.0
+  allocate(Flow % viscosity(-nb:nc));  Flow % viscosity(:) = 0.0
   if(Flow % heat_transfer) then
     allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
     allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
