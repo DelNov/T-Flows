@@ -17,7 +17,6 @@
     ! Sparse-matrix with vector product
     if(arg .eq. '1') then
       call Test_001()
-      goto 1
 
     ! Vector vector dot product
     else if(arg .eq. '2') then

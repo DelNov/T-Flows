@@ -1,1 +1,2 @@
-PROBLEM_NAME  test_001_cube
+  PROBLEM_NAME  test_001_cube
+  DYNAMIC_VISCOSITY  1.0
