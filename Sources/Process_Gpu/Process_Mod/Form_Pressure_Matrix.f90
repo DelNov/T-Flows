@@ -51,9 +51,12 @@
   !----------------------------------------------!
   !   This will create race conditions on GPUs   !
   !----------------------------------------------!
-  do s = Grid % n_bnd_cells + 1, Grid % n_faces
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
+
+    Assert(c1 .gt. 0)
+    Assert(c2 .gt. 0)
 
     ! Calculate coeficients for the pressure matrix
     ! Units: m * m^3 s / kg = m^4 s / kg

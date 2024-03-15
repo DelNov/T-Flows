@@ -14,7 +14,11 @@
   real                :: b(n)  !! operand vector
 !==============================================================================!
 
+  ! Compute vector dot product on the device attached to this processor ...
   call Lin % Vec_D_Vec_Acc(dot, n, a, b)
+
+  ! ... then make a global sum over all processors.
+  call Global % Sum_Real(dot)
 
   end subroutine
 

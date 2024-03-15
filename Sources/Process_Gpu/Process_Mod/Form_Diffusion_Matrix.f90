@@ -3,9 +3,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)         :: Proc
-  type(Field_Type),    target :: Flow
-  real,              optional :: dt                 !! time step
+  class(Process_Type)      :: Proc
+  type(Field_Type), target :: Flow
+  real,           optional :: dt                 !! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),       pointer :: Grid
   type(Sparse_Con_Type), pointer :: Mcon
@@ -13,7 +13,9 @@
   real, contiguous,      pointer :: visc(:), dens(:)
   integer                        :: c, s, c1, c2, reg
   real                           :: m12
-  real, allocatable              :: work(:)
+# if T_FLOWS_DEBUG == 1
+    real, allocatable :: work(:)
+# endif
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -39,7 +41,7 @@
   !--------------------------------------------------!
 
   ! Browse though all faces inside domain
-  do s = Grid % n_bnd_cells + 1, Grid % n_faces
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -79,28 +81,30 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    do c = 1, Grid % n_cells
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
       Mval % val(Mcon % dia(c)) = Mval % val(Mcon % dia(c))  &
                                 + dens(c) * Grid % vol(c) / dt
     end do
   end if
 
-  !---------------------------------------------------------!
-  !   Store volume divided by central coeff. for momentum   !
-  !   That is a novelty here, it doesn't exist in T-Flows   !
-  !---------------------------------------------------------!
+  !--------------------------------------------------------------!
+  !   Store volume divided by central coefficient for momentum   !
+  !   and refresh its buffers before discretizing the pressure   !
+  !--------------------------------------------------------------!
   do c = 1, Grid % n_cells
     Mval % v_m(c) = Grid % vol(c) / Mval % val(Mcon % dia(c))
   end do
+  call Grid % Exchange_Cells_Real(Mval % v_m)
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells
-    work(c) = Mval % val(Mcon % dia(c))
-    ! or: work(c) = M % row(c+1) - M % row(c) ?
+    ! or: work(c) = Mval % val(Mcon % dia(c))
+    work(c) = Mcon % row(c+1) - Mcon % row(c)
   end do
+  call Grid % Exchange_Inside_Cells_Real(work)
   call Grid % Save_Debug_Vtu("m_diagonal",              &
-                             inside_name="m_diagonal",  &
+                             inside_name="M_Diagonal",  &
                              inside_cell=work)
 # endif
 

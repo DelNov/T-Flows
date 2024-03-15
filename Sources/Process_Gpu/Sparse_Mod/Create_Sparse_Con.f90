@@ -25,10 +25,13 @@
 
     non_z = 0    ! reset the counter of non-zero entries
 
-    !----------------------------------!
-    !   Browse through all the cells   !
-    !----------------------------------!
-    do c1 = 1, Grid % n_cells
+    !---------------------------------------------------!
+    !   Browse through cells and also through buffers   !
+    !- - - - - - - - - - - - - - - - - - - - - - - - - -!
+    !   (When I was avoiding cells in buffers, I had    !
+    !   "holes" in CSR format and a lot of troubles)    !
+    !---------------------------------------------------!
+    do c1 = Cells_In_Domain_And_Buffers()
 
       ! Set this row index, one cell will be present for sure, own self
       if(run .eq. 2) Con % row(c1) = non_z + 1
@@ -77,7 +80,7 @@
   !   Sort each row in ascending order   !
   !                                      !
   !--------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     call Sort % Int_Array(Con % col(Con % row(c) : Con % row(c+1)-1))
   end do
 
@@ -86,7 +89,7 @@
   !   Find positions of diagonals   !
   !                                 !
   !---------------------------------!
-  do row_a = 1, Grid % n_cells
+  do row_a = Cells_In_Domain_And_Buffers()
     do pos_a = Con % row(row_a), Con % row(row_a + 1) - 1
       col_a = Con % col(pos_a)  ! at this point you have row_a and col_a
       if(col_a == row_a) then
@@ -116,7 +119,7 @@
   !   Connect faces with matrix entries   !
   !                                       !
   !---------------------------------------!
-  do s = Grid % n_bnd_cells + 1, Grid % n_faces
+  do s = Faces_In_Domain_And_At_Buffers()
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -129,13 +132,36 @@
     end do
 
     ! ... where is matrix(c2,c1)
-    do c=Con % row(c2),Con % row(c2+1)-1
+    do c = Con % row(c2),Con % row(c2+1)-1
       if(Con % col(c) .eq. c1) then
         Con % pos(2, s) = c
         exit
       end if
     end do
 
+    ! These connections shouldn't be left at zeroes
+    Assert(Con % pos(1,s) .ne. 0)
+    Assert(Con % pos(2,s) .ne. 0)
+
+  end do
+
+  !------------------------------------------------!
+  !                                                !
+  !   Perform a test: face-based matrix pointers   !
+  !   must be inside the bounds defined by "row"   !
+  !                                                !
+  !------------------------------------------------!
+  do s = Faces_In_Domain_And_At_Buffers()
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
+
+    Assert(Con % pos(1,s) .ge. Con % row(c1))
+    Assert(Con % pos(1,s) .le. Con % row(c1+1)-1)
+
+    if(c2 .gt. 0) then
+      Assert(Con % pos(2,s) .ge. Con % row(c2))
+      Assert(Con % pos(2,s) .le. Con % row(c2+1)-1)
+    end if
   end do
 
   end subroutine

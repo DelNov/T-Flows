@@ -34,14 +34,23 @@
   !----------------!
   !   r = b - Ax   !     =-->  (q used for temporary storing Ax)
   !----------------!
-  call Linalg % Mat_X_Vec(nc, q, A, x(1:nc))        ! Ax = A * x
-  call Linalg % Vec_P_Sca_X_Vec(nc, r, b, -1.0, q)  ! r  = b - Ax
+  call Linalg % Mat_X_Vec(nc, q, Acon, Aval, x(1:nc))  ! Ax = A * x
+  call Linalg % Vec_P_Sca_X_Vec(nc, r, b, -1.0, q)     ! r  = b - Ax
+
+  ! Check first residual
+  call Linalg % Vec_D_Vec(nc, res, r, r)  ! res = r * r
+  if(res < tol) return
 
   !-----------!
   !   p = r   !
   !-----------!
   call Linalg % Vec_Copy(nc, p, r)
 
+  !--------------------------!
+  !                          !
+  !   Start the iterations   !
+  !                          !
+  !--------------------------!
   do iter = 1, miter
 
     !---------------!
@@ -73,7 +82,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Linalg % Mat_X_Vec(nc, q, A, p)   ! q  = A * p
+    call Linalg % Mat_X_Vec(nc, q, Acon, Aval, p)   ! q  = A * p
 
     !---------------------------!
     !   alfa =  rho / (p * q)   !
@@ -100,7 +109,17 @@
   end do
   iter = iter - 1
 
+  !-----------------------!
+  !                       !
+  !   End of iterations   !
+  !                       !
+  !-----------------------!
 1 continue
   print '(a,i12,es12.3)', ' iter, res = ', iter, res
+
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call Grid % Exchange_Inside_Cells_Real(x(1:nc))
 
   end subroutine

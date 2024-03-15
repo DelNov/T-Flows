@@ -59,6 +59,11 @@
   !-----------!
   call Linalg % Vec_Copy(nc, p, q)
 
+  !--------------------------!
+  !                          !
+  !   Start the iterations   !
+  !                          !
+  !--------------------------!
   do iter = 1, miter
 
     !------------!
@@ -109,7 +114,17 @@
   end do
   iter = iter - 1
 
+  !-----------------------!
+  !                       !
+  !   End of iterations   !
+  !                       !
+  !-----------------------!
 1 continue
   print '(a,i12,es12.3)', ' iter, res = ', iter, res
+
+  !-------------------------------------------!
+  !   Refresh the solution vector's buffers   !
+  !-------------------------------------------!
+  call Grid % Exchange_Inside_Cells_Real(x(1:nc))
 
   end subroutine
