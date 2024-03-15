@@ -14,7 +14,7 @@
 !==============================================================================!
 
   ! Generator has growing number of faces, don't set them here
-  if(PROGRAM_NAME .ne. 'Generate') then
+  if(PROGRAM_NAME(1:6) .ne. 'Genera') then
     Grid % n_nodes = nn
   end if
 
@@ -49,12 +49,12 @@
   end do
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  if(PROGRAM_NAME(1:7) .ne. 'Process') then
+  if(PROGRAM_NAME(1:6) .ne. 'Proces') then
     call Enlarge % Array_Int(Grid % new_n, i=(/1,nn_m/))
     call Enlarge % Array_Int(Grid % old_n, i=(/1,nn_m/))
   end if
 
-  if(PROGRAM_NAME .eq. 'Generate') then
+  if(PROGRAM_NAME(1:6) .eq. 'Genera') then
     ! This variable used to be in Gen_Mod for a long time and
     ! is used only in Generate to take care of periodicity
     call Enlarge % Matrix_Int(Grid % twin_n, i=(/1,nn_m/), j=(/0,8/))

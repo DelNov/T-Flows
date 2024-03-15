@@ -40,7 +40,7 @@
   integer, allocatable :: thread(:), cell(:), old_proc(:)
 !==============================================================================!
 
-  Assert(PROGRAM_NAME(1:7) .eq. 'Process')
+  Assert(PROGRAM_NAME(1:6) .eq. 'Proces')
 
   mcc = size(Grid % cells_c, 1)
   mcn = size(Grid % cells_n, 1)

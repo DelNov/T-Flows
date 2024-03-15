@@ -15,7 +15,7 @@
 !==============================================================================!
 
   ! Generator has growing number of faces, don't set them here
-  if(PROGRAM_NAME .ne. 'Generate') then
+  if(PROGRAM_NAME(1:6) .ne. 'Genera') then
     Grid % n_faces   = nf
     Grid % n_shadows = ns
   end if
@@ -83,7 +83,7 @@
   call Enlarge % Array_Int(Grid % Omp % face_thread, i=(/1,nf+ns+m/))
 
   ! Allocate new and old numbers (this is so often used, maybe is better here)
-  if(PROGRAM_NAME(1:7) .ne. "Process") then
+  if(PROGRAM_NAME(1:6) .ne. 'Proces') then
     call Enlarge % Array_Int(Grid % new_f, i=(/1,nf+ns+m/))
     call Enlarge % Array_Int(Grid % old_f, i=(/1,nf+ns+m/))
   end if
@@ -92,7 +92,7 @@
   call Enlarge % Array_Int(Grid % region % at_face, i=(/1,nf+ns+m/))
 
   ! Variable which used to be declared in Gen_Mod:
-  if(PROGRAM_NAME .eq. 'Generate') then
+  if(PROGRAM_NAME(1:6) .eq. 'Genera') then
     call Enlarge % Matrix_Int(Grid % face_c_to_c, i=(/1,nf+ns+m/), j=(/1,2/))
   end if
 
