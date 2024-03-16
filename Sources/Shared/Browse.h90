@@ -83,3 +83,9 @@
 # define Cell_In_This_Proc(cell)     \
     Grid % Comm % cell_proc(cell) .eq. This_Proc()
 
+!----------------------------------------------------------------------!
+!   These two are also not for browsing ... maybe I should find some   !
+!    other place to define these things which go with communication    !
+!----------------------------------------------------------------------!
+# define O_Print if(First_Proc()) print
+# define A_Print print
