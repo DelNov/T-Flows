@@ -1,5 +1,7 @@
   PROBLEM_NAME        test_004_cube
 
+  DYNAMIC_VISCOSITY  1.0
+
   BOUNDARY_CONDITION symmetry_plane
     TYPE             symmetry
     VARIABLES        u
