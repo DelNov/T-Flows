@@ -42,6 +42,17 @@ DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
 VPATH = $(DIR_SHARED):.
 
+#--------------------------------------
+#   Dissengage GPU for Intel and Gnu
+#--------------------------------------
+ifeq ($(FORTRAN), intel)
+  GPU = no
+endif
+
+ifeq ($(FORTRAN), gnu)
+  GPU = no
+endif
+
 # Program name (This should hardly change)
 PROGRAM_NAME = Process_Cpu
 ifeq ($(GPU), yes)
@@ -92,7 +103,12 @@ $(info #=======================================================================)
 $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
-$(info #   make <FORTRAN=nvidia/gnu/intel> <GPU=yes/no> <DEBUG=no/yes>         )
+$(info #   make <FORTRAN=nvidia/gnu/intel> <GPU=yes/no> <REAL=double/single>   )
+$(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=quick/heap> <OMP=no/yes>  )
+$(info #                                                                       )
+$(info # Notes:                                                                )
+$(info #   1. The first item, for each of the options above, is the default.   )
+$(info #   2. If you use gnu or intel compiler, GPU will be set to "no"        )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make              - compile with nvidia compiler and GPU support    )
@@ -189,7 +205,7 @@ OPT_LINK = $(OPT_F_COMP)
 ifeq ($(MPI), yes)
   ifeq ($(FCOMP),)
     ifeq ($(FORTRAN), intel)
-      FC = mpiifort
+      FC = mpiifx
     else
       FC = mpif90
     endif
