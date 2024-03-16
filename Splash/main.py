@@ -3,7 +3,8 @@ import tkinter.messagebox
 import customtkinter
 import sys
 import subprocess
-
+import time
+import threading
 
 customtkinter.set_appearance_mode("Dark")
 customtkinter.set_default_color_theme("dark-blue")
@@ -36,33 +37,42 @@ class App(customtkinter.CTk):
         self.frame_left.grid_rowconfigure(8, minsize=20)
         self.frame_left.grid_rowconfigure(11, minsize=10)
 
+        # Initialize the timer parameters
+        self.start_time = time.time()
+        self.elapsed_time_label = customtkinter.CTkLabel(master=self.frame_right,
+                                                  text="Elapsed Time: 00:00:00",
+                                                  font=("Roboto Medium", 14))
+        self.elapsed_time_label.grid(row=9, column=2, rowspan=2, sticky="nsew", padx=20, pady=10)
+
+        # 
         self.label_1 = customtkinter.CTkLabel(master=self.frame_left, text="SplashFlows")
         self.label_1.grid(row=1, column=0, pady=10, padx=10)
         self.label_1.configure(font=("Roboto Medium", 16))
     
+        # Initialize the parameters for T-Flows sub-programs
         self.process_check_var = tkinter.IntVar(value=0)
         self.generate_check_var = tkinter.IntVar(value=0)
         self.divide_check_var = tkinter.IntVar(value=0)
         self.convert_check_var = tkinter.IntVar(value=0)
 
+        # Configuration of the compile button and T-Flows pillers
+        self.compile_button = customtkinter.CTkButton(master=self.frame_left, text="Compile Code",
+                                                 command=self.compile_code)
         self.process_checkbox = customtkinter.CTkCheckBox(master=self.frame_left, text="Process", variable=self.process_check_var)
         self.generate_checkbox = customtkinter.CTkCheckBox(master=self.frame_left, text="Generate", variable=self.generate_check_var)
         self.divide_checkbox = customtkinter.CTkCheckBox(master=self.frame_left, text="Divide", variable=self.divide_check_var)
         self.convert_checkbox = customtkinter.CTkCheckBox(master=self.frame_left, text="Convert", variable=self.convert_check_var)
-
+        
+        # Compile the selected T-Flows sub-programs
+        self.compile_button.grid(row=6, column=0, pady=10, padx=20)
+        
+        # T-Flows pillers
         self.process_checkbox.grid(row=7, column=0, pady=10, padx=20)
         self.generate_checkbox.grid(row=8, column=0, pady=10, padx=20)
         self.divide_checkbox.grid(row=9, column=0, pady=10, padx=20)
         self.convert_checkbox.grid(row=10, column=0, pady=10, padx=20)
 
-    
-##        self.compile_button = customtkinter.CTkButton(master=self.frame_left, text="Compile Code",
-##                                              fg_color=("gray75", "gray30"), command=self.compile_code)
-##        self.compile_button.grid(row=6, column=0, pady=10, padx=20)  # Adjust grid placement as needed
         
-        self.compile_button = customtkinter.CTkButton(master=self.frame_left, text="Compile Code",
-                                                 command=self.compile_code)
-        self.compile_button.grid(row=6, column=0, pady=10, padx=20)
         
         # Switch for changing program theme
         self.switch_2 = customtkinter.CTkSwitch(master=self.frame_left, text="Dark Mode",
@@ -81,7 +91,7 @@ class App(customtkinter.CTk):
         self.frame_info.columnconfigure(0, weight=1)
         
         # Create a Text widget for displaying the compilation output (text box)
-        self.output_text = tkinter.Text(master=self.frame_info, height=20, width=80, bg="black", fg="white", wrap=tkinter.WORD)
+        self.output_text = tkinter.Text(master=self.frame_info, height=30, width=120, bg="black", fg="white", wrap=tkinter.WORD)
         self.output_text.grid(row=0, column=0, sticky="nsew", padx=15, pady=15)
 
         # Create a Scrollbar and attach it to the Text widget
@@ -99,51 +109,12 @@ class App(customtkinter.CTk):
 
         self.radio_var = tkinter.IntVar(value=0)
 
-        self.label_radio_group = customtkinter.CTkLabel(master=self.frame_right,
-                                                        text="CTkRadioButton Group:")
-        self.label_radio_group.grid(row=0, column=2, columnspan=1, pady=20, padx=10, sticky="")
-
-        self.radio_button_1 = customtkinter.CTkRadioButton(master=self.frame_right,
-                                                           variable=self.radio_var,
-                                                           value=0)
-        self.radio_button_1.grid(row=1, column=2, pady=10, padx=20, sticky="n")
-
-        self.radio_button_2 = customtkinter.CTkRadioButton(master=self.frame_right,
-                                                           variable=self.radio_var,
-                                                           value=1)
-        self.radio_button_2.grid(row=2, column=2, pady=10, padx=20, sticky="n")
-
-        self.radio_button_3 = customtkinter.CTkRadioButton(master=self.frame_right,
-                                                           variable=self.radio_var,
-                                                           value=2)
-        self.radio_button_3.grid(row=3, column=2, pady=10, padx=20, sticky="n")
-
         self.slider_1 = customtkinter.CTkSlider(master=self.frame_right, from_=0, to=1,
                                                  number_of_steps=3, command=self.progressbar.set)
         self.slider_1.grid(row=4, column=0, columnspan=2, pady=10, padx=20, sticky="we")
 
         self.slider_2 = customtkinter.CTkSlider(master=self.frame_right, command=self.progressbar.set)
         self.slider_2.grid(row=5, column=0, columnspan=2, pady=10, padx=20, sticky="we")
-
-        self.slider_button_1 = customtkinter.CTkButton(master=self.frame_right, height=25,
-                                                        text="CTkButton", command=self.button_event)
-        self.slider_button_1.grid(row=4, column=2, columnspan=1, pady=10, padx=20, sticky="we")
-
-        self.slider_button_2 = customtkinter.CTkButton(master=self.frame_right, height=25,
-                                                        text="CTkButton", command=self.button_event)
-        self.slider_button_2.grid(row=5, column=2, columnspan=1, pady=10, padx=20, sticky="we")
-
-        self.checkbox_button_1 = customtkinter.CTkButton(master=self.frame_right, height=25,
-                                                          text="CTkButton", border_width=3,
-                                                          fg_color=None, command=self.button_event)
-        self.checkbox_button_1.grid(row=6, column=2, columnspan=1, pady=10, padx=20, sticky="we")
-
-        self.check_box_1 = customtkinter.CTkCheckBox(master=self.frame_right, text="CTkCheckBox")
-        self.check_box_1.grid(row=6, column=0, pady=10, padx=20, sticky="w")
-
-        self.check_box_2 = customtkinter.CTkCheckBox(master=self.frame_right, text="CTkCheckBox")
-        self.check_box_2.grid(row=6, column=1, pady=10, padx=20, sticky="w")
-
 
         # Plan B: save me with the terminal :/
         self.entry = customtkinter.CTkEntry(master=self.frame_right, width=120,
@@ -154,17 +125,14 @@ class App(customtkinter.CTk):
                                                 command=self.execute_command)
         self.button_5.grid(row=8, column=2, columnspan=1, pady=20, padx=20, sticky="we")
 
-
-
-        self.radio_button_1.select()
+        #self.radio_button_1.select()
         self.switch_2.select()
         self.slider_1.set(0.2)
         self.slider_2.set(0.7)
         self.progressbar.set(0.5)
-        self.slider_button_1.configure(state=tkinter.DISABLED, text="Disabled Button")
-        self.radio_button_3.configure(state=tkinter.DISABLED)
-        self.check_box_1.configure(state=tkinter.DISABLED, text="CheckBox disabled")
-        self.check_box_2.select()
+        
+        # Call the timer function to start counting the time 
+        self.update_elapsed_time()
 
     def execute_command(self):
         # Retrieve the command from the entry widget
@@ -183,8 +151,7 @@ class App(customtkinter.CTk):
             # For macOS
             subprocess.Popen(['open', '-a', 'Terminal', command])
         else:
-            print(f"Unsupported platform: {sys.platform}")
-            
+            print(f"Unsupported platform: {sys.platform}")      
         
     def compile_code(self):
         self.output_text.delete('1.0', tkinter.END)  # Clear the Text widget at the start
@@ -224,7 +191,16 @@ class App(customtkinter.CTk):
 
         if compile_success:
             self.output_text.insert(tkinter.END, "Compilation successful for all selected subprograms!")
-        
+    
+    def update_elapsed_time(self):
+        elapsed_time = int(time.time() - self.start_time)
+        hours, remainder = divmod(elapsed_time, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        # Update the label's text to show the elapsed time in a HH:MM:SS format
+        self.elapsed_time_label.configure(text=f"Elapsed Time: {hours:02d}:{minutes:02d}:{seconds:02d}")
+        # Schedule the next update call to this method after 1000ms (1 second)
+        self.after(1000, self.update_elapsed_time)
+
              
     def button_event(self):
         print("Button pressed")
