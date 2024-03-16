@@ -17,7 +17,7 @@
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, s, i_cel, sh, n, pnt_to, pnt_from, fail_count
+  integer :: c, c1, c2, s, i_cel, i_fac, sh, n, pnt_to, pnt_from, fail_count
   real    :: xc1, yc1, zc1, xc2, yc2, zc2
   real    :: d_s, min_d, max_d, sx, sy, sz
   real    :: dist(3), surf(3)
@@ -334,22 +334,16 @@
   !                                                  !
   !--------------------------------------------------!
   Grid % cells_n_cells(:) = 0
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
-
-    if(c2 .ne. 0) then  ! could be a face at the edge of a buffer and nothing
+  do c1 = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
+    do i_fac = 1, Grid % cells_n_faces(c1)
+      s = Grid % cells_f(i_fac, c1)
       Grid % cells_n_cells(c1) = Grid % cells_n_cells(c1) + 1
-      Grid % cells_n_cells(c2) = Grid % cells_n_cells(c2) + 1
 
       call Enlarge % Matrix_Int(Grid % cells_c,  &
                                 i = (/1, Grid % cells_n_cells(c1)/))
-      call Enlarge % Matrix_Int(Grid % cells_c,  &
-                                i = (/1, Grid % cells_n_cells(c2)/))
-
+      c2 = Grid % faces_c(1,s) + Grid % faces_c(2,s) - c1
       Grid % cells_c(Grid % cells_n_cells(c1), c1) = c2
-      Grid % cells_c(Grid % cells_n_cells(c2), c2) = c1
-    end if
+    end do
   end do
 
   !-------------------------------------!
@@ -364,6 +358,18 @@
   end do
 
   ! Test 2
+  do c1 = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
+    if(Grid % Comm % cell_proc(c1) .eq. This_Proc()) then
+      Assert(Grid % cells_n_cells(c1) .eq. Grid % cells_n_faces(c1))
+    end if
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
+      Assert(Grid % faces_c(1,s) + Grid % faces_c(2,s) .eq. c1 + c2)
+    end do
+  end do
+
+  ! Test 3
   do c = -Grid % n_bnd_cells, Grid % n_cells
     do i_cel = 1, Grid % cells_n_cells(c)
       Assert(Grid % cells_c(i_cel, c) .ne. 0)

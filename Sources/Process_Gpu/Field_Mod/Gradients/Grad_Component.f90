@@ -27,7 +27,7 @@
   ! Try to estimate gradients cell-wise
   ! (face-wise leades to race conditions on GPUs)
   !$acc parallel loop independent
-  do c1 = 1, Grid % n_cells
+  do c1 = 1, Grid % n_cells - Grid % Comm % n_buff_cells
 
     phii_tmp = 0.0
 
@@ -56,5 +56,7 @@
 
   end do
   !$acc end parallel
+
+  call Grid % Exchange_Cells_Real(phii)
 
   end subroutine
