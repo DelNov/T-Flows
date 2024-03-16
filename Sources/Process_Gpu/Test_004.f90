@@ -1,3 +1,5 @@
+#include "../Shared/Browse.h90"
+
 !==============================================================================!
   subroutine Test_004
 !------------------------------------------------------------------------------!
@@ -20,29 +22,36 @@
   character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
 
-  print '(a)', ' #====================================================='
-  print '(a)', ' # TEST 4: Call Conjugate Gradient from Native_Mod'
-  print '(a)', ' #====================================================='
+  call Global % Start_Parallel
 
-  print '(a)', ' # Opening the control file '//root_control
+  call Profiler % Start('Test_004')
+
+  O_Print '(a)', ' #====================================================='
+  O_Print '(a)', ' # TEST 4: Call Conjugate Gradient from Native_Mod'
+  O_Print '(a)', ' #====================================================='
+
+  O_Print '(a)', ' # Opening the control file '//root_control
   call Control % Open_Root_File(root_control)
 
-  print '(a)', ' # Creating a grid'
+  O_Print '(a)', ' # Creating a grid'
   call Grid % Load_And_Prepare_For_Processing(1)
 
   n = Grid % n_cells
-  print '(a,i12)',    ' # The problem size is: ', n
-  print '(a,es12.3)', ' # Solver tolerace is : ', PICO
+  O_Print '(a,i12)',    ' # The problem size is: ', n
+  O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
-  print '(a)', ' #----------------------------------------------------'
-  print '(a)', ' # Be careful with memory usage.  If you exceed the'
-  print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
-  print '(a)', ' # card has the program will become memory bound no'
-  print '(a)', ' # matter how you wrote it, and it may even crash.'
-  print '(a)', ' #----------------------------------------------------'
+  O_Print '(a)', ' #----------------------------------------------------'
+  O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
+  O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
+  O_Print '(a)', ' # card has the program will become memory bound no'
+  O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
+  O_Print '(a)', ' #----------------------------------------------------'
 
-  print '(a)', ' # Creating a field'
+  O_Print '(a)', ' # Creating a field'
   call Flow % Create_Field(Grid)
+
+  O_Print '(a)', ' # Reading physical properties'
+  call Read_Control % Physical_Properties(Flow)
 
   ! I am not sure when to call this, but this is a good guess
   call Read_Control % Boundary_Conditions(Flow)
@@ -85,7 +94,7 @@
   !-----------------------------------------------!
   !   Performing a fake time loop on the device   !
   !-----------------------------------------------!
-  print '(a)', ' # Performing a demo of the preconditioned CG method'
+  O_Print '(a)', ' # Performing a demo of the preconditioned CG method'
   call cpu_time(ts)
   call Flow % Nat % Cg(Acon, Aval, x, b, n, PICO)
   call cpu_time(te)
@@ -108,18 +117,24 @@
   call Gpu % Native_Destroy_On_Device(Flow % Nat)
 
   ! Print result
-  print '(a,es12.3)', ' vector u(1  ):', x(1)
-  print '(a,es12.3)', ' vector u(2  ):', x(2)
-  print '(a,es12.3)', ' vector u(3  ):', x(3)
-  print '(a,es12.3)', ' vector u(n-2):', x(Grid % n_cells-2)
-  print '(a,es12.3)', ' vector u(n-1):', x(Grid % n_cells-1)
-  print '(a,es12.3)', ' vector u(n  ):', x(Grid % n_cells)
+  O_Print '(a,es12.3)', ' vector u(1  ):', x(1)
+  O_Print '(a,es12.3)', ' vector u(2  ):', x(2)
+  O_Print '(a,es12.3)', ' vector u(3  ):', x(3)
+  O_Print '(a,es12.3)', ' vector u(n-2):', x(Grid % n_cells-2)
+  O_Print '(a,es12.3)', ' vector u(n-1):', x(Grid % n_cells-1)
+  O_Print '(a,es12.3)', ' vector u(n  ):', x(Grid % n_cells)
 
   ! Save results
   call Grid % Save_Debug_Vtu("solution",       &
                              scalar_name="u",  &
                              scalar_cell=x)
 
-  print '(a,f12.3,a)', ' # Time elapsed for TEST 4: ', te-ts, ' [s]'
+  O_Print '(a,f12.3,a)', ' # Time elapsed for TEST 4: ', te-ts, ' [s]'
+
+  call Profiler % Stop('Test_004')
+
+  call Profiler % Statistics(indent=24)
+
+  call Global % End_Parallel
 
   end subroutine

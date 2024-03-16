@@ -14,6 +14,17 @@
   real               :: ts, te
 !==============================================================================!
 
+  call Global % Start_Parallel
+
+  ! Check if it was run in parallel
+  if(Parallel_Run()) then
+    call Message % Error(60, 'This test make no sense in parallel, '//  &
+                             'run it sequentially', one_proc=.true.)
+    call Global % Wait()
+    call Global % End_Parallel
+    stop
+  end if
+
   print '(a)', ' #===================================================='
   print '(a)', ' # TEST 3: Performing vector operations:'
   print '(a)', ' #         c = a + s * b  and  c = a - s * b'

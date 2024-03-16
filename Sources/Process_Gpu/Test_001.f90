@@ -1,5 +1,4 @@
-#define O_Print if(First_Proc()) print
-#define A_Print print
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   subroutine Test_001
@@ -113,6 +112,5 @@
                              inside_cell=c)
 
   call Global % End_Parallel
-  stop
 
   end subroutine

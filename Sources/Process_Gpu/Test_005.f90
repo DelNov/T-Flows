@@ -1,3 +1,5 @@
+#include "../Shared/Browse.h90"
+
 !==============================================================================!
   subroutine Test_005
 !------------------------------------------------------------------------------!
@@ -19,43 +21,50 @@
   character(len=11)  :: root_control    = 'control.005'
 !==============================================================================!
 
-  print '(a)', ' #===================================================='
-  print '(a)', ' # TEST 5: Creating a flow field and gradient matrix'
-  print '(a)', ' #===================================================='
+  call Global % Start_Parallel
 
-  print '(a)', ' # Opening the control file '//root_control
+  call Profiler % Start('Test_005')
+
+  O_Print '(a)', ' #===================================================='
+  O_Print '(a)', ' # TEST 5: Creating a flow field and gradient matrix'
+  O_Print '(a)', ' #===================================================='
+
+  O_Print '(a)', ' # Opening the control file '//root_control
   call Control % Open_Root_File(root_control)
 
-  print '(a)', ' # Creating a grid'
+  O_Print '(a)', ' # Creating a grid'
   call Grid % Load_And_Prepare_For_Processing(1)
 
   n = Grid % n_cells
-  print '(a, i12)', ' # The problem size is: ', n
+  O_Print '(a, i12)', ' # The problem size is: ', n
 
-  print '(a)', ' #----------------------------------------------------'
-  print '(a)', ' # Be careful with memory usage.  If you exceed the'
-  print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
-  print '(a)', ' # card has the program will become memory bound no'
-  print '(a)', ' # matter how you wrote it, and it may even crash.'
-  print '(a)', ' #----------------------------------------------------'
+  O_Print '(a)', ' #----------------------------------------------------'
+  O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
+  O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
+  O_Print '(a)', ' # card has the program will become memory bound no'
+  O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
+  O_Print '(a)', ' #----------------------------------------------------'
 
-  print '(a)', ' # Creating a field'
+  O_Print '(a)', ' # Creating a field'
   call Flow % Create_Field(Grid)
 
-  print '(a)', ' # Allocating and initializing arrays for gradients'
+  O_Print '(a)', ' # Allocating and initializing arrays for gradients'
   allocate(phi_x(-Grid % n_bnd_cells:Grid % n_cells));  phi_x(:) = 0.0
   allocate(phi_y(-Grid % n_bnd_cells:Grid % n_cells));  phi_y(:) = 0.0
   allocate(phi_z(-Grid % n_bnd_cells:Grid % n_cells));  phi_z(:) = 0.0
 
-  print '(a)', ' # Initialize phi with something'
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  O_Print '(a)', ' # Initialize phi with something'
+  do c = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
     Flow % p % n(c) = 0.111111 * Grid % xc(c)**2  &
                     + 0.222222 * Grid % yc(c)**2  &
                     + 0.333333 * Grid % zc(c)**2
   end do
-  call Grid % Save_Debug_Vtu("init", scalar_name="init", scalar_cell=Flow % p % n)
+  call Grid % Exchange_Cells_Real(Flow % p % n)
+  call Grid % Save_Debug_Vtu("init",              &
+                             scalar_name="init",  &
+                             scalar_cell=Flow % p % n)
 
-  print '(a)', ' # Calculating gradient matrix for the field'
+  O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow % Calculate_Grad_Matrix()
 
   ! Copy what you need for gradient calculation to the device
@@ -73,12 +82,13 @@
   call Gpu % Vector_Real_Create_On_Device(phi_y)
   call Gpu % Vector_Real_Create_On_Device(phi_z)
 
-  print '(a,i6,a)', ' # Calculating gradients of the field over ',  &
+  O_Print '(a,i6,a)', ' # Calculating gradients of the field over ',  &
                     N_STEPS, ' pseudo time steps'
   call cpu_time(ts)
   do step = 1, N_STEPS
-    if(mod(step, 12) .eq. 0)  &
-      print '(a,i12,es12.3)', ' time step = ', step
+    if(mod(step, 12) .eq. 0) then
+      O_Print '(a,i12,es12.3)', ' time step = ', step
+    end if
     call Flow % Grad_Component(Grid, Flow % p % n, 1, phi_x)
     call Flow % Grad_Component(Grid, Flow % p % n, 2, phi_y)
     call Flow % Grad_Component(Grid, Flow % p % n, 3, phi_z)
@@ -89,7 +99,9 @@
   call Gpu % Vector_Update_Host(phi_x)
   call Gpu % Vector_Update_Host(phi_y)
   call Gpu % Vector_Update_Host(phi_z)
-  call Grid % Save_Debug_Vtu("grad_0", vector_name="graed_0", vector_cell=(/phi_x, phi_y, phi_z/))
+  call Grid % Save_Debug_Vtu("grad",              &
+                             vector_name="grad",  &
+                             vector_cell=(/phi_x, phi_y, phi_z/))
 
   ! Destroy data on the device, you don't need them anymore
   call Gpu % Matrix_Real_Destroy_On_Device(Flow % grad_c2c)
@@ -106,6 +118,12 @@
   call Gpu % Vector_Real_Destroy_On_Device(phi_y)
   call Gpu % Vector_Real_Destroy_On_Device(phi_z)
 
-  print '(a,f12.3,a)', ' # Time elapsed for TEST 5: ', te-ts, ' [s]'
+  O_Print '(a,f12.3,a)', ' # Time elapsed for TEST 5: ', te-ts, ' [s]'
+
+  call Profiler % Stop('Test_005')
+
+  call Profiler % Statistics(indent=24)
+
+  call Global % End_Parallel
 
   end subroutine

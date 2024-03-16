@@ -1,5 +1,9 @@
+#include "../Shared/Browse.h90"
+
 !==============================================================================!
   subroutine Test_002
+!------------------------------------------------------------------------------!
+!>  Tests vector vector dot product.
 !------------------------------------------------------------------------------!
   use Gpu_Mod
 !------------------------------------------------------------------------------!
@@ -11,6 +15,17 @@
   integer            :: step
   real               :: dot, ts, te
 !==============================================================================!
+
+  call Global % Start_Parallel
+
+  ! Check if it was run in parallel
+  if(Parallel_Run()) then
+    call Message % Error(60, 'This test make no sense in parallel, '//  &
+                             'run it sequentially', one_proc=.true.)
+    call Global % Wait()
+    call Global % End_Parallel
+    stop
+  end if
 
   print '(a)', ' #================================================='
   print '(a)', ' # TEST 2: Performing a vector vector dot product'
