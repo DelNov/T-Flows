@@ -10,7 +10,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   real    :: bulk_flux_x, bulk_xp, bulk_flux_y, bulk_yp, bulk_flux_z, bulk_zp
   integer :: c1, c2, s, i_cel
-  real    :: xc1, yc1, zc1, xc2, yc2, zc2, wgt
 !==============================================================================!
 
   ! Set local variables which will not confuse OpenACC
