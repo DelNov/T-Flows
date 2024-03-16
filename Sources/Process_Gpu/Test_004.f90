@@ -17,13 +17,12 @@
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
   real,                  pointer :: b(:), x(:)
-  real                           :: ts, te
   integer                        :: n
   character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
 
+  ! Start the parallel run and the profiler
   call Global % Start_Parallel
-
   call Profiler % Start('Test_004')
 
   O_Print '(a)', ' #====================================================='
@@ -95,9 +94,9 @@
   !   Performing a fake time loop on the device   !
   !-----------------------------------------------!
   O_Print '(a)', ' # Performing a demo of the preconditioned CG method'
-  call cpu_time(ts)
+  call Profiler % Start('Useful_Work')
   call Flow % Nat % Cg(Acon, Aval, x, b, n, PICO)
-  call cpu_time(te)
+  call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host
   call Gpu % Vector_Update_Host(x)
@@ -125,16 +124,13 @@
   O_Print '(a,es12.3)', ' vector u(n  ):', x(Grid % n_cells)
 
   ! Save results
-  call Grid % Save_Debug_Vtu("solution",       &
-                             scalar_name="u",  &
-                             scalar_cell=x)
+  call Grid % Save_Debug_Vtu("result",              &
+                             inside_name="Result",  &
+                             inside_cell=x)
 
-  O_Print '(a,f12.3,a)', ' # Time elapsed for TEST 4: ', te-ts, ' [s]'
-
+  ! End the profiler and the parallel run
   call Profiler % Stop('Test_004')
-
   call Profiler % Statistics(indent=24)
-
   call Global % End_Parallel
 
   end subroutine

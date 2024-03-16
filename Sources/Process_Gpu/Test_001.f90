@@ -19,12 +19,13 @@
   type(Grid_Type)                :: Grid
   type(Field_Type),       target :: Flow            ! flow field
   integer,             parameter :: N_STEPS = 1200  ! spend some time on device
-  real                           :: ts, te
   integer                        :: nc, ni, step
-  character(len=11)              :: root_control    = 'control.001'
+  character(len=11)              :: root_control = 'control.001'
 !==============================================================================!
 
+  ! Start the parallel run and the profiler
   call Global % Start_Parallel
+  call Profiler % Start('Test_001')
 
   O_Print '(a)', ' #===================================================='
   O_Print '(a)', ' # TEST 1: Performing a sparse-matrix vector product'
@@ -78,11 +79,11 @@
   !   Performing a fake time loop on the device   !
   !-----------------------------------------------!
   O_Print '(a,i6,a)', ' # Performing ', N_STEPS, ' sparse-matrix vector products'
-  call cpu_time(ts)
+  call Profiler % Start('Useful_Work')
   do step = 1, N_STEPS
     call Linalg % Mat_X_Vec(ni, c(1:nc), Acon, Aval, b(1:nc))
   end do
-  call cpu_time(te)
+  call Profiler % Stop('Useful_Work')
 
   ! Mat_X_Vec gives good values in inside cells, but not in buffers. For
   ! linear solvers those might be sufficient for the rest of the algorithm,
@@ -104,13 +105,14 @@
   O_Print '(a,es12.3)', ' vector c(n-1):', c(Grid % n_cells - 1)
   O_Print '(a,es12.3)', ' vector c(n  ):', c(Grid % n_cells)
 
-  O_Print '(a,f12.3,a)', ' # Time elapsed for TEST 1: ', te-ts, ' [s]'
-
-  ! Save the results too, handy for parallel version
+  ! Save results
   call Grid % Save_Debug_Vtu("result",              &
                              inside_name="Result",  &
                              inside_cell=c)
 
+  ! End the profiler and the parallel run
+  call Profiler % Stop('Test_001')
+  call Profiler % Statistics(indent=24)
   call Global % End_Parallel
 
   end subroutine

@@ -13,10 +13,12 @@
   integer, parameter :: N = 800*800*800
   integer, parameter :: N_STEPS = 1200  ! spend enough time on device
   integer            :: step
-  real               :: dot, ts, te
+  real               :: dot
 !==============================================================================!
 
+  ! Start the parallel run and the profiler
   call Global % Start_Parallel
+  call Profiler % Start('Test_002')
 
   ! Check if it was run in parallel
   if(Parallel_Run()) then
@@ -58,11 +60,11 @@
   print '(a,i6,a)', ' # Performing a vector vector dot product ',  &
                     N_STEPS, ' times'
 
-  call cpu_time(ts)
+  call Profiler % Start('Useful_Work')
   do step = 1, N_STEPS
     call Linalg % Vec_D_Vec(N, dot, a, b)
   end do
-  call cpu_time(te)
+  call Profiler % Stop('Useful_Work')
 
   ! Destroy data on the device, you don't need them anymore
   call Gpu % Vector_Real_Destroy_On_Device(a)
@@ -72,6 +74,9 @@
   print '(a,es12.3)', ' Dot product is: ', dot
   print '(a,es12.3)', ' Correct result: ', a(1) * b(1) * N
 
-  print '(a,f12.3,a)', ' # Time elapsed for TEST 2: ', te-ts, ' [s]'
+  ! End the profiler and the parallel run
+  call Profiler % Stop('Test_002')
+  call Profiler % Statistics(indent=24)
+  call Global % End_Parallel
 
   end subroutine

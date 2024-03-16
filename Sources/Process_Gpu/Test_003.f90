@@ -11,10 +11,11 @@
   integer, parameter :: N = 600*600*600
   integer, parameter :: N_STEPS = 1200  ! spend enough time on device
   integer            :: step
-  real               :: ts, te
 !==============================================================================!
 
+  ! Start the parallel run and the profiler
   call Global % Start_Parallel
+  call Profiler % Start('Test_003')
 
   ! Check if it was run in parallel
   if(Parallel_Run()) then
@@ -39,7 +40,7 @@
   print '(a)', ' # matter how you wrote it, and it may even crash.'
   print '(a)', ' #----------------------------------------------------'
 
-  print '(a)', ' # Creating three vectors'
+  print '(a)', ' # Creating four vectors'
   allocate(a(N))
   allocate(b(N))
   allocate(c(N))
@@ -59,12 +60,13 @@
   !-----------------------------------------------!
   print '(a,i6,a)', ' # Performing a sparse-matrix vector product',  &
                     N_STEPS, ' times'
-  call cpu_time(ts)
+
+  call Profiler % Start('Useful_Work')
   do step = 1, N_STEPS
     call Linalg % Vec_P_Sca_X_Vec(N, c, a,  2.0, b)  ! result should be  5
     call Linalg % Vec_P_Sca_X_Vec(N, d, c, -2.0, b)  ! result should be  1
   end do
-  call cpu_time(te)
+  call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host
   call Gpu % Vector_Update_Host(c)
@@ -86,6 +88,9 @@
   print '(a,es12.3)', ' vector c(N-1):', d(N-1)
   print '(a,es12.3)', ' vector c(N  ):', d(N  )
 
-  print '(a,f12.3,a)', ' # Time elapsed for TEST 3: ', te-ts, ' [s]'
+  ! End the profiler and the parallel run
+  call Profiler % Stop('Test_003')
+  call Profiler % Statistics(indent=24)
+  call Global % End_Parallel
 
   end subroutine

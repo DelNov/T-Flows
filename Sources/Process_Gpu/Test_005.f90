@@ -16,13 +16,12 @@
   real, allocatable  :: phi_y(:)        ! gradient in y direction
   real, allocatable  :: phi_z(:)        ! gradient in z direction
   integer, parameter :: N_STEPS = 120   ! spend enough time on device
-  real               :: ts, te
   integer            :: n, c, step
-  character(len=11)  :: root_control    = 'control.005'
+  character(len=11)  :: root_control = 'control.005'
 !==============================================================================!
 
+  ! Start the parallel run and the profiler
   call Global % Start_Parallel
-
   call Profiler % Start('Test_005')
 
   O_Print '(a)', ' #===================================================='
@@ -84,7 +83,7 @@
 
   O_Print '(a,i6,a)', ' # Calculating gradients of the field over ',  &
                     N_STEPS, ' pseudo time steps'
-  call cpu_time(ts)
+  call Profiler % Start('Useful_Work')
   do step = 1, N_STEPS
     if(mod(step, 12) .eq. 0) then
       O_Print '(a,i12,es12.3)', ' time step = ', step
@@ -93,7 +92,7 @@
     call Flow % Grad_Component(Grid, Flow % p % n, 2, phi_y)
     call Flow % Grad_Component(Grid, Flow % p % n, 3, phi_z)
   end do
-  call cpu_time(te)
+  call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host
   call Gpu % Vector_Update_Host(phi_x)
@@ -118,12 +117,9 @@
   call Gpu % Vector_Real_Destroy_On_Device(phi_y)
   call Gpu % Vector_Real_Destroy_On_Device(phi_z)
 
-  O_Print '(a,f12.3,a)', ' # Time elapsed for TEST 5: ', te-ts, ' [s]'
-
+  ! End the profiler and the parallel run
   call Profiler % Stop('Test_005')
-
   call Profiler % Statistics(indent=24)
-
   call Global % End_Parallel
 
   end subroutine
