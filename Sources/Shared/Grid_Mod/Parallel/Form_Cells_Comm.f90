@@ -30,15 +30,22 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid  !! computational grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: sub, ms, mr, cnt, n_fail, i, j
-  integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, i_cel
+  integer              :: sub, ms, mr, cnt, n_fail, i, j, i_cel, j_cel, i_nod
+  integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, n
+  integer              :: n_cells_near_buffers
+  integer, allocatable :: cells_near_buffers(:)
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
   integer, allocatable :: need_cell(:,:), from_proc(:,:)
   integer, allocatable :: send_sort(:), recv_sort(:)
   integer, allocatable :: glo(:)  ! used for checking the communication
+  logical, allocatable :: node_in_buffer(:)
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
+
+  if(First_Proc()) print '(a)', ' # Forming cells communication patterns ...'
+
+  call Profiler % Start('Form_Cells_Com')
 
   if(Sequential_Run()) return
 
@@ -47,6 +54,37 @@
   allocate(recv_buff_cnt(N_Procs(), N_Procs()))
   allocate(send_cells(-Grid % n_bnd_cells:Grid % n_cells))
   allocate(recv_cells(-Grid % n_bnd_cells:Grid % n_cells))
+
+  ! Find which cells are near buffers, it speeds up the procedure quite a bit
+  allocate(node_in_buffer(Grid % n_nodes));  node_in_buffer(:) = .false.
+  do c = Cells_In_Buffers()
+    do i_nod = 1, Grid % cells_n_nodes(c)
+      n = Grid % cells_n(i_nod, c)
+      node_in_buffer(n) = .true.
+    end do
+  end do
+  n_cells_near_buffers = 0
+  do c = Cells_In_Domain()
+    do i_nod = 1, Grid % cells_n_nodes(c)
+      n = Grid % cells_n(i_nod, c)
+      if(node_in_buffer(n)) then
+        n_cells_near_buffers = n_cells_near_buffers + 1
+        exit
+      end if
+    end do
+  end do
+  allocate(cells_near_buffers(n_cells_near_buffers))
+  n_cells_near_buffers = 0
+  do c = Cells_In_Domain()
+    do i_nod = 1, Grid % cells_n_nodes(c)
+      n = Grid % cells_n(i_nod, c)
+      if(node_in_buffer(n)) then
+        n_cells_near_buffers = n_cells_near_buffers + 1
+        cells_near_buffers(n_cells_near_buffers) = c
+        exit
+      end if
+    end do
+  end do
 
   !-------------------------------!
   !   Count buffer cells inside   !
@@ -177,6 +215,8 @@
   allocate(Grid % Comm % cells_send(N_Procs()))
   allocate(Grid % Comm % cells_recv(N_Procs()))
 
+  call Profiler % Start('Form_Cells_Com, Form Send/Recv Buffers')
+
   !-----------------------------------!
   !                                   !
   !   Form send and receive buffers   !
@@ -222,14 +262,16 @@
       send_cells(:) = 0
       do i_cel = 1, n_max_buff_cells
         if(from_proc(i_cel, sub) .eq. This_Proc()) then
-          do c = Cells_In_Domain()
+          do j_cel = 1, n_cells_near_buffers
+            c = cells_near_buffers(j_cel)
             if(Grid % Comm % cell_glo(c) .eq. need_cell(i_cel, sub)) then
               send_cells(c) = sub                                  ! identify
               cnt = cnt + 1
+              goto 1
             end if
           end do
-
         end if
+1       continue
       end do
       if(DEBUG) then  ! c)
         if(send_buff_cnt(This_Proc(), sub).gt.0) then
@@ -294,6 +336,8 @@
     end if  ! sub .ne. This_Proc()
   end do    ! sub
 
+  call Profiler % Stop('Form_Cells_Com, Form Send/Recv Buffers')
+
   !-------------------------------------!
   !   Avoid faces in the buffers only   !
   !   (This also leaves shadows out)    !
@@ -326,5 +370,9 @@
                          'are subdomains. \n \n This error is critical.',     &
                          file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
+
+  if(First_Proc()) print '(a)', ' # Done !'
+
+  call Profiler % Stop('Form_Cells_Com')
 
   end subroutine
