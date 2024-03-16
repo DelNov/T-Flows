@@ -1,0 +1,40 @@
+16.3.2024
+---------
+
+Creating a graphical user interface (GUI) for a Fortran 90 computational fluid dynamics (CFD) code is a great way to make it more accessible to both students and professionals. For such a project, especially considering it's open source, you'll want to choose a programming language for the GUI that is both widely used and has strong support for scientific computing. The available options for a programming language to use in that scope:
+
+1. Python
+Why? Python is one of the most popular languages for scientific computing thanks to its simplicity and the powerful libraries available, such as NumPy, SciPy, and Matplotlib. For GUI development, it offers several frameworks like Tkinter (which is included with Python), PyQt or PySide (which use Qt), and wxPython.
+Integration with Fortran: Python can easily integrate with Fortran code using libraries such as f2py, part of NumPy, which can wrap Fortran code to make it callable from Python. This can allow your Fortran CFD code to run in the background as a computational engine while interfacing with a Python-based GUI for input and visualization.
+
+2. C++ with Qt
+Why? C++ offers more control over system resources and performance, which might be relevant depending on the complexity of the GUI and the CFD simulations. Qt is a powerful framework for building cross-platform GUI applications and has excellent support for graphics and complex GUI features.
+Integration with Fortran: Integrating C++ with Fortran can be done through the use of the ISO C Binding. This is a feature of modern Fortran standards (Fortran 2003 and later) that provides a standard way to interface Fortran with C, and by extension, with C++ code (with some care regarding name mangling and linkage).
+
+3. Julia
+Why? Julia is a newer language that has been gaining popularity in the scientific and numerical computing community. It combines the ease of use of Python with the performance of C, making it an excellent choice for applications that require fast computations.
+Integration with Fortran: Julia can directly call Fortran (and C) functions, making it easy to use your existing Fortran code with minimal modification.
+
+4. JavaScript with Electron
+Why? If you aim for a cross-platform desktop application and are comfortable with web technologies, Electron allows you to build GUIs using HTML, CSS, and JavaScript. This can be particularly appealing for creating modern and highly interactive interfaces.
+Integration with Fortran: Integrating JavaScript with Fortran would involve more steps, typically requiring a back-end server in a language that can interface directly with Fortran (like Python) and then communicating with the Electron front-end via HTTP requests or WebSocket.
+
+
+Note!
+=====
+This template is a robust starting point for creating a GUI for your Fortran 90 CFD code using Python with customtkinter. The template showcases various widgets like buttons, labels, sliders, switches, radio buttons, checkboxes, and a progress bar, arranged in a responsive layout. It also features a dark mode toggle, illustrating the use of customtkinter's appearance mode settings. Here's how you can adapt this template for your CFD program:
+
+1- Identify the Main Functions: Determine the core functionalities your GUI needs to offer to interact with your Fortran CFD code. This could include file input/output, simulation control (start, pause, stop), parameter adjustments, and visualization options.
+
+2- Map Out the GUI Structure: Decide where and how these functionalities will be represented in the GUI. For example, file operations might go on the left panel, simulation controls could be placed in the center, and visualization settings might fit well on the right.
+
+3- Integrate with Fortran Code: You'll need a way to call your Fortran code from Python. This can be done using various methods, such as compiling the Fortran code as a shared library and using ctypes or numpy's f2py to call it, or through subprocesses for simpler interactions. Design your Python functions to interact with the Fortran code accordingly.
+
+4- Customize Widgets for CFD Operations: Customize the template's widgets to control and interact with your CFD code. For example, sliders can adjust simulation parameters like Reynolds number or mesh size, buttons can start or stop simulations, and checkboxes could toggle between different boundary conditions or visualization modes.
+
+5- Implement Callback Functions: Modify or add new callback functions (like button_event and change_mode in the template) to handle the specific actions your GUI needs to perform, such as starting a simulation, updating parameters, or processing output data.
+
+6- Enhance User Feedback: Consider adding more dynamic elements like updating the progress bar based on simulation progress, displaying output logs, or even integrating matplotlib plots for real-time visualization of results.
+
+7- Test and Iterate: As with any development process, it's important to test your GUI with end-users and iterate based on feedback. This is especially critical for usability and ensuring that the GUI effectively meets the needs of students and professionals using your CFD code.
+
