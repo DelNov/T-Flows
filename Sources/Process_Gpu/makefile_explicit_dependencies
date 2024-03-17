@@ -44,6 +44,8 @@ Gpu_Mod/*/*.f90
 # Dependencies for: ./Test_001.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_001.o:\
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
 Process_Mod/*.f90 \
 $(DIR_OBJECT)/Linalg_Mod.o \
@@ -77,6 +79,20 @@ $(DIR_SHARED)/Grid_Mod/*/*.f90
 # Dependencies for: ./Iter_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Iter_Mod.o:\
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Test_008.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Test_008.o:\
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Component.005 \
 Field_Mod/*/Grad_Component.004 \
@@ -215,9 +231,6 @@ $(DIR_OBJECT)/Const_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Sparse_Mod.o:\
 Sparse_Mod/*.f90 \
-$(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*/*.f90 \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
 
