@@ -1,0 +1,21 @@
+# Enter the grid file name you are importing (with ext.):
+test_008_disc.msh
+
+# Would you like to create a dual grid? (yes/no)
+no
+
+# Enter scaling factor for geometry: 
+skip
+
+# Position the boundary cell centres:
+2
+
+# Enter the ordinal number(s) of periodic-boundary condition(s)
+skip
+
+# Calculating distance from the walls
+skip
+
+# Insert non-homogeneous direction 
+skip
+

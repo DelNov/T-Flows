@@ -49,6 +49,11 @@
       call Test_007()
       goto 1
 
+    ! Volume balance in a rotating velocity field
+    else if(arg .eq. '8') then
+      call Test_008()
+      goto 1
+
     end if
 
   end if
@@ -69,7 +74,8 @@
   print '(a)', '   4 - conjugate gradient solver'
   print '(a)', '   5 - field creation and gradient calculation'
   print '(a)', '   6 - solution of the Navier-Stokes equations'
-  print '(a)', '   7   matrix of cubes case'
+  print '(a)', '   7 - matrix of cubes case'
+  print '(a)', '   8 - volume balance in a rotating velocity field.'
 
 1 continue
 
