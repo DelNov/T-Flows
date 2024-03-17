@@ -95,8 +95,7 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - v_flux(s) * merge(1,0, c1.lt.c2)
-        b_tmp = b_tmp + v_flux(s) * merge(1,0, c1.gt.c2)
+        b_tmp = b_tmp - v_flux(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
     !$acc end loop
@@ -115,8 +114,12 @@
   do c = 1, grid_n_cells - grid_n_buff_cells
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
-  print '(a,es12.3)', ' # Max. volume balance error '//  &
-                      'before correction: ', max_abs_val
+
+  ! Find global maximum over all processors
+  call Global % Max_Real(max_abs_val)
+
+  O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
+                        'before correction: ', max_abs_val
 
   call Profiler % Stop('Insert_Volume_Source_For_Pressure')
 
