@@ -12,8 +12,8 @@ customtkinter.set_default_color_theme("dark-blue")
 
 class App(customtkinter.CTk):
 
-    WIDTH = 780
-    HEIGHT = 520
+    WIDTH = 1200
+    HEIGHT = 700
 
     def __init__(self):
         super().__init__()
@@ -44,7 +44,7 @@ class App(customtkinter.CTk):
                                                   font=("Roboto Medium", 14))
         self.elapsed_time_label.grid(row=9, column=2, rowspan=2, sticky="nsew", padx=20, pady=10)
 
-        # 
+        # SplashFlows title and logo
         self.label_1 = customtkinter.CTkLabel(master=self.frame_left, text="SplashFlows")
         self.label_1.grid(row=1, column=0, pady=10, padx=10)
         self.label_1.configure(font=("Roboto Medium", 16))
