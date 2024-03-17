@@ -1,3 +1,5 @@
+#include "../Shared/Browse.h90"
+
 !==============================================================================!
   subroutine Test_006
 !------------------------------------------------------------------------------!
@@ -25,34 +27,36 @@
   character(11)            :: root_control = 'control.006'
 !==============================================================================!
 
+  ! Start the parallel run and the profiler
+  call Global % Start_Parallel
   call Profiler % Start('Test_006')
 
-  print '(a)', ' #====================================================='
-  print '(a)', ' # TEST 6: Solution of Navier-Stokes equations'
-  print '(a)', ' #====================================================='
+  O_Print '(a)', ' #====================================================='
+  O_Print '(a)', ' # TEST 6: Solution of Navier-Stokes equations'
+  O_Print '(a)', ' #====================================================='
 
-  print '(a)', ' # Opening the control file '//root_control
+  O_Print '(a)', ' # Opening the control file '//root_control
   call Control % Open_Root_File(root_control)
   call Control % Time_Step(Flow(1) % dt, verbose=.true.)
 
-  print '(a)', ' # Creating a grid'
+  O_Print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
   n = Grid(1) % n_cells
-  print '(a, i12)',   ' # The problem size is: ', n
-  print '(a,es12.3)', ' # Solver tolerace is : ', PICO
+  O_Print '(a, i12)',   ' # The problem size is: ', n
+  O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
-  print '(a)', ' #----------------------------------------------------'
-  print '(a)', ' # Be careful with memory usage.  If you exceed the'
-  print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
-  print '(a)', ' # card has the program will become memory bound no'
-  print '(a)', ' # matter how you wrote it, and it may even crash.'
-  print '(a)', ' #----------------------------------------------------'
+  O_Print '(a)', ' #----------------------------------------------------'
+  O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
+  O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
+  O_Print '(a)', ' # card has the program will become memory bound no'
+  O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
+  O_Print '(a)', ' #----------------------------------------------------'
 
-  print '(a)', ' # Creating a flow field'
+  O_Print '(a)', ' # Creating a flow field'
   call Flow(1) % Create_Field(Grid(1))
 
-  print '(a)', ' # Reading physical properties'
+  O_Print '(a)', ' # Reading physical properties'
   call Read_Control % Physical_Properties(Flow(1))
 
   ! I am not sure when to call this, but this is a good guess
@@ -64,7 +68,7 @@
   ! ... followed by discretization of pressure equation
   call Process % Form_Pressure_Matrix(Flow(1))
 
-  print '(a)', ' # Reading native solvers'
+  O_Print '(a)', ' # Reading native solvers'
   call Read_Control % Native_Solvers(Flow(1))
 
   ! Form preconditioning matrices on host
@@ -72,7 +76,7 @@
   call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % C, Flow(1) % Nat % M)
   call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % C, Flow(1) % Nat % A)
 
-  print '(a)', ' # Calculating gradient matrix for the field'
+  O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix()
 
   ! You are going to need connectivity matrix on device
@@ -161,12 +165,12 @@
   call Work % Allocate_Work(Grid, n_r_cell=8,  n_r_face=0,  n_r_node=0,  &
                                   n_i_cell=6,  n_i_face=0,  n_i_node=0)
 
-  print '(a)', ' # Performing a demo of the computing momentum equations'
+  O_Print '(a)', ' # Performing a demo of the computing momentum equations'
   call cpu_time(ts)
   do while (Time % Needs_More_Steps())
-    print '(a)',            ' #=========================='
-    print '(a,i12,es12.3)', ' # Time step = ', Time % Curr_Dt()
-    print '(a)',            ' #--------------------------'
+    O_Print '(a)',            ' #=========================='
+    O_Print '(a,i12,es12.3)', ' # Time step = ', Time % Curr_Dt()
+    O_Print '(a)',            ' #--------------------------'
 
     ! Preparation for the new time step
     !$acc parallel loop
@@ -194,21 +198,21 @@
 !@    write(name_grad_pp(6:7), '(i2.2)') Iter % Current()
 !@    write(name_grad_p (6:7), '(i2.2)') Iter % Current()
 
-      print '(a)', ' # Solving u'
+      O_Print '(a)', ' # Solving u'
       call Process % Compute_Momentum(Flow(1), comp=1)
 
-      print '(a)', ' # Solving v'
+      O_Print '(a)', ' # Solving v'
       call Process % Compute_Momentum(Flow(1), comp=2)
 
-      print '(a)', ' # Solving w'
+      O_Print '(a)', ' # Solving w'
       call Process % Compute_Momentum(Flow(1), comp=3)
 
-      print '(a)', ' # Solving pp'
+      O_Print '(a)', ' # Solving pp'
       call Process % Compute_Pressure(Flow(1))
 
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
 
-      print '(a)', ' # Correcting velocity'
+      O_Print '(a)', ' # Correcting velocity'
       call Process % Correct_Velocity(Flow(1))
 
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
@@ -235,8 +239,9 @@
 
   call Work % Finalize_Work()
 
+  ! End the profiler and the parallel run
   call Profiler % Stop('Test_006')
-
   call Profiler % Statistics(indent=24)
+  call Global % End_Parallel
 
   end subroutine
