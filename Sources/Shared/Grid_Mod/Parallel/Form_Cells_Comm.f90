@@ -43,11 +43,11 @@
   logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
+  if(Sequential_Run()) return
+
   if(First_Proc()) print '(a)', ' # Forming cells communication patterns ...'
 
   call Profiler % Start('Form_Cells_Com')
-
-  if(Sequential_Run()) return
 
   ! Allocate memory for locally used arrays
   allocate(send_buff_cnt(N_Procs(), N_Procs()))
