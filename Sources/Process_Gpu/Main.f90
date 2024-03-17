@@ -1,9 +1,13 @@
+#include "../Shared/Browse.h90"
+
 !==============================================================================!
   program Main
+!----------------------------------[Modules]-----------------------------------!
+  use Comm_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  character(80) :: arg
+  character(SL) :: arg
 !==============================================================================!
 
   !-----------------------------------------!
@@ -61,21 +65,25 @@
   !----------------------------------------------------------------------!
   !   If you are here, something was wrong with command line arguments   !
   !----------------------------------------------------------------------!
-  print '(a)', ' Failed to invoke the program correctly.'
-  print '(a)', ' Correct invocation is:'
-  print '(a)', ''
-  print '(a)', ' ./Program <test>'
-  print '(a)', ''
-  print '(a)', ' where <test> can be from 1 to 5 depending if you want to test:'
-  print '(a)', '   1 - sparse-matrix vector product'
-  print '(a)', '   2 - vector vector dot product'
-  print '(a)', '   3 - operations: c = a + scalar * b and'
-  print '(a)', '                   c = a - scalar * b'
-  print '(a)', '   4 - conjugate gradient solver'
-  print '(a)', '   5 - field creation and gradient calculation'
-  print '(a)', '   6 - volume balance in a rotating velocity field.'
-  print '(a)', '   7 - solution of the Navier-Stokes equations'
-  print '(a)', '   8 - matrix of cubes case'
+  call Global % Start_Parallel
+
+  O_Print '(a)', ' Failed to invoke the program correctly.'
+  O_Print '(a)', ' Correct invocation is:'
+  O_Print '(a)', ''
+  O_Print '(a)', ' ./Program <test>'
+  O_Print '(a)', ''
+  O_Print '(a)', ' where <test> can be from 1 to 5 depending if you want to test:'
+  O_Print '(a)', '   1 - sparse-matrix vector product'
+  O_Print '(a)', '   2 - vector vector dot product'
+  O_Print '(a)', '   3 - operations: c = a + scalar * b and'
+  O_Print '(a)', '                   c = a - scalar * b'
+  O_Print '(a)', '   4 - conjugate gradient solver'
+  O_Print '(a)', '   5 - field creation and gradient calculation'
+  O_Print '(a)', '   6 - volume balance in a rotating velocity field.'
+  O_Print '(a)', '   7 - solution of the Navier-Stokes equations'
+  O_Print '(a)', '   8 - matrix of cubes case'
+
+  call Global % End_Parallel
 
 1 continue
 

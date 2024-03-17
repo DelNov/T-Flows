@@ -3,10 +3,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sparse_Con_Type)   :: Con   !! parent connectivity matrix class
+  class(Sparse_Con_Type)  :: Con   !! parent connectivity matrix class
   type(Grid_Type), target :: Grid  !! grid on which it is created
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: non_z, run
+  integer :: non_z, non_z_glo, run
   integer :: c, i_cel, s, c1, c2
   integer :: col_a, row_a, pos_a
 !==============================================================================!
@@ -14,7 +14,7 @@
   ! Store pointer to the grid
   Con % pnt_grid => Grid
 
-  print '(a)', ' # Creating a sparse matrix'
+  O_Print '(a)', ' # Creating a sparse connectivity matrix'
 
   !--------------------------------!
   !                                !
@@ -53,7 +53,12 @@
 
     end do        ! c1
 
-    print '(a,i15)', ' # Number of nonzeros: ', non_z
+    ! Work out the and print number of non-zeros over all processors, globally
+    if(run .eq. 1) then
+      non_z_glo = non_z
+      call Global % Sum_Int(non_z_glo)
+      O_Print '(a,i15)', ' # Number of nonzeros: ', non_z_glo
+    end if
 
     !--------------------------------------------------------------!
     !   If this is the end of the first run, allocate the memory   !

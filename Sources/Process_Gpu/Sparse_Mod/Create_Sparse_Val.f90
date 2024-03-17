@@ -15,7 +15,7 @@
   ! Store pointer to the grid
   Aval % pnt_grid => Grid
 
-  print '(a)', ' # Creating a sparse value matrix'
+  O_Print '(a)', ' # Creating a sparse value matrix'
 
   allocate(Aval % val  (Acon % nonzeros));  Aval % val   = 0
   allocate(Aval % d_inv(Grid % n_cells));   Aval % d_inv = 0
