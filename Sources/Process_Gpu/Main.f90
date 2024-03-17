@@ -39,17 +39,17 @@
       call Test_005()
       goto 1
 
-    ! An attempt to solve Navier-Stokes equations
+    ! Volume balance in a rotating velocity field
     else if(arg .eq. '6') then
       call Test_006()
       goto 1
 
-    ! An attempt to solve Navier-Stokes equations
+    ! Navier-Stokes solutions in the lid driven cavity
     else if(arg .eq. '7') then
       call Test_007()
       goto 1
 
-    ! Volume balance in a rotating velocity field
+    ! Navier-Stokes solutions over the matrix of cubes test case
     else if(arg .eq. '8') then
       call Test_008()
       goto 1
@@ -73,9 +73,9 @@
   print '(a)', '                   c = a - scalar * b'
   print '(a)', '   4 - conjugate gradient solver'
   print '(a)', '   5 - field creation and gradient calculation'
-  print '(a)', '   6 - solution of the Navier-Stokes equations'
-  print '(a)', '   7 - matrix of cubes case'
-  print '(a)', '   8 - volume balance in a rotating velocity field.'
+  print '(a)', '   6 - volume balance in a rotating velocity field.'
+  print '(a)', '   7 - solution of the Navier-Stokes equations'
+  print '(a)', '   8 - matrix of cubes case'
 
 1 continue
 
