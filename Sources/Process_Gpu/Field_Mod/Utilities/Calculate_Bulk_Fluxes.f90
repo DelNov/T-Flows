@@ -45,7 +45,7 @@
           !$acc atomic update
           bulk_flux_x = bulk_flux_x + v_flux(s)
         end if
-        if(grid_xc(c1) >= bulk_xp .and. grid_xc(c2) + grid_dx(s) < bulk_xp) then
+        if(grid_xc(c1) >= bulk_xp .and. grid_xc(c1) + grid_dx(s) < bulk_xp) then
           !$acc atomic update
           bulk_flux_x = bulk_flux_x - v_flux(s)
         end if
@@ -57,7 +57,7 @@
           !$acc atomic update
           bulk_flux_y = bulk_flux_y + v_flux(s)
         end if
-        if(grid_yc(c1) >= bulk_yp .and. grid_yc(c2) + grid_dy(s) < bulk_yp) then
+        if(grid_yc(c1) >= bulk_yp .and. grid_yc(c1) + grid_dy(s) < bulk_yp) then
           !$acc atomic update
           bulk_flux_y = bulk_flux_y - v_flux(s)
         end if
@@ -69,7 +69,7 @@
           !$acc atomic update
           bulk_flux_z = bulk_flux_z + v_flux(s)
         end if
-        if(grid_zc(c1) >= bulk_zp .and. grid_zc(c2) + grid_dz(s) < bulk_zp) then
+        if(grid_zc(c1) >= bulk_zp .and. grid_zc(c1) + grid_dz(s) < bulk_zp) then
           !$acc atomic update
           bulk_flux_z = bulk_flux_z - v_flux(s)
         end if
