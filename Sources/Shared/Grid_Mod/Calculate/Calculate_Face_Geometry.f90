@@ -334,7 +334,7 @@
   !                                                  !
   !--------------------------------------------------!
   Grid % cells_n_cells(:) = 0
-  do c1 = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c1 = -Grid % n_bnd_cells, Grid % n_cells
     do i_fac = 1, Grid % cells_n_faces(c1)
       s = Grid % cells_f(i_fac, c1)
       Grid % cells_n_cells(c1) = Grid % cells_n_cells(c1) + 1
@@ -351,14 +351,14 @@
   !-------------------------------------!
 
   ! Test 1
-  do c = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % Comm % cell_proc(c) .eq. This_Proc()) then
       Assert(Grid % cells_n_cells(c) .eq. Grid % cells_n_faces(c))
     end if
   end do
 
   ! Test 2
-  do c1 = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c1 = -Grid % n_bnd_cells, Grid % n_cells
     if(Grid % Comm % cell_proc(c1) .eq. This_Proc()) then
       Assert(Grid % cells_n_cells(c1) .eq. Grid % cells_n_faces(c1))
     end if
