@@ -119,7 +119,7 @@
   !                       !
   !-----------------------!
 1 continue
-  print '(a,i12,es12.3)', ' iter, res = ', iter, res
+  O_Print '(a,i12,es12.3)', ' iter, res = ', iter, res
 
   !-------------------------------------------!
   !   Refresh the solution vector's buffers   !
