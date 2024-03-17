@@ -94,17 +94,18 @@
   do c = 1, Grid % n_cells
     Mval % v_m(c) = Grid % vol(c) / Mval % val(Mcon % dia(c))
   end do
-  call Grid % Exchange_Cells_Real(Mval % v_m)
+  call Grid % Exchange_Inside_Cells_Real(Mval % v_m)
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells
     ! or: work(c) = Mval % val(Mcon % dia(c))
-    work(c) = Mcon % row(c+1) - Mcon % row(c)
+    ! or: work(c) = Mcon % row(c+1) - Mcon % row(c)
+    work(c) = Mval % v_m(c)
   end do
   call Grid % Exchange_Inside_Cells_Real(work)
-  call Grid % Save_Debug_Vtu("m_diagonal",              &
-                             inside_name="M_Diagonal",  &
+  call Grid % Save_Debug_Vtu("v_m",              &
+                             inside_name="v_m",  &
                              inside_cell=work)
 # endif
 
