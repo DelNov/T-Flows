@@ -24,7 +24,7 @@
   if(comp .eq. 3) ui_o => Flow % w % o
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells
+  do c = 1, grid_n_cells - grid_n_buff_cells
     b(c) = b(c) + dens(c) * ui_o(c) * grid_vol(c) / Flow % dt
   end do
   !$acc end parallel

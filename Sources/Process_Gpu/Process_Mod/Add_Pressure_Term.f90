@@ -37,7 +37,7 @@
   if(comp .eq. 3) p_d_i =  Flow % bulk % p_drop_z
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells
+  do c = 1, grid_n_cells - grid_n_buff_cells
     b(c) = b(c) + (p_d_i - p_i(c)) * grid_vol(c)
   end do
   !$acc end parallel

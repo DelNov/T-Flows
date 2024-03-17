@@ -17,6 +17,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), v_flux(:)
   real, contiguous, pointer :: v_m(:), fc(:)
+  type(Grid_Type),  pointer :: Grid
   real                      :: a12, b_tmp, max_abs_val
   integer                   :: c, s, c1, c2, i_cel
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -30,6 +31,7 @@
   v_m    => Flow % Nat % M % v_m
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
+  Grid   => Flow % pnt_grid
 
   !----------------------!
   !   Correct velocity   !
@@ -43,6 +45,11 @@
     w_n(c) = w_n(c) - pp_z(c) * v_m(c)
   end do
   !$acc end parallel
+
+  ! Update buffers for velocities over all processors
+  call Grid % Exchange_Cells_Real(u_n)
+  call Grid % Exchange_Cells_Real(v_n)
+  call Grid % Exchange_Cells_Real(w_n)
 
   !---------------------------------------------!
   !   Correct volume fluxes inside the domain   !
@@ -68,7 +75,7 @@
   !$acc end kernels
 
   !$acc parallel loop independent
-  do c1 = 1, grid_n_cells
+  do c1 = 1, grid_n_cells - grid_n_buff_cells
 
     b_tmp = b(c1)
     !$acc loop seq
@@ -76,8 +83,7 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - v_flux(s) * merge(1,0, c1.lt.c2)
-        b_tmp = b_tmp + v_flux(s) * merge(1,0, c1.gt.c2)
+        b_tmp = b_tmp - v_flux(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
     !$acc end loop
@@ -88,16 +94,26 @@
   end do
   !$acc end parallel
 
+# if T_FLOWS_DEBUG == 1
+  call Grid % Save_Debug_Vtu("bp_1",               &
+                             inside_name="vol_src", &
+                             inside_cell=b)
+# endif
+
   !------------------------------------------------------------------!
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
   !$acc parallel loop reduction(max:max_abs_val)
-  do c = 1, grid_n_cells
+  do c = 1, grid_n_cells - grid_n_buff_cells
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
-  print '(a,es12.3)', ' # Max. volume balance error '//  &
-                      'after correction: ', max_abs_val
+
+  ! Find maximum volume balance error over all processors
+  call Global % Max_Real(max_abs_val)
+
+  O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
+                        'after correction: ', max_abs_val
 
   !-----------------------------------!
   !     Update the pressure field     !
@@ -105,10 +121,13 @@
   !-----------------------------------!
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells
+  do c = 1, grid_n_cells - grid_n_buff_cells
     p_n(c) = p_n(c) + 0.2 * pp_n(c)
   end do
   !$acc end parallel
+
+  ! Update buffers for presssure over all processors
+  call Grid % Exchange_Cells_Real(p_n)
 
   call Profiler % Stop('Correct_Velocity')
 

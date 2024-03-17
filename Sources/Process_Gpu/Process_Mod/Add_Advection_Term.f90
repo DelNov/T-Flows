@@ -38,7 +38,7 @@
   !-------------------------------------------!
 
   !$acc parallel loop
-  do c1 = 1, grid_n_cells
+  do c1 = 1, grid_n_cells - grid_n_buff_cells
     b_tmp = b(c1)
     !$acc loop seq
     do i_cel = 1, grid_cells_n_cells(c1)
