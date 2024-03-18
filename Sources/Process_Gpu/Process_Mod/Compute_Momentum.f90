@@ -7,10 +7,14 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Con_Type), pointer :: Mcon
   type(Sparse_Val_Type), pointer :: Mval
+  type(Sparse_Con_Type), pointer :: Mcon
+  real,                  pointer :: m_val(:)
+  integer,               pointer :: m_dia(:)
   real,                  pointer :: b(:)
-  real                           :: tol
+  real,                  pointer :: ui_n(:)
+  real                           :: tol, urf
+  integer                        :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -21,24 +25,43 @@
   Assert(comp .le. 3)
 
   ! Take some aliases
-  Mcon => Flow % Nat % C
-  Mval => Flow % Nat % M
-  b    => Flow % Nat % b
+  Mval  => Flow % Nat % M
+  Mcon  => Flow % Nat % C
+  m_val => Flow % Nat % M % val
+  m_dia => Flow % Nat % C % dia
+  b     => Flow % Nat % b
+  if(comp .eq. 1) ui_n => u_n
+  if(comp .eq. 2) ui_n => v_n
+  if(comp .eq. 3) ui_n => w_n
 
-  ! The tolerances are the same for all components
+  ! Tolerances and under-relaxations are the same for all components
   tol = Flow % u % tol
+  urf = Flow % u % urf
 
-  ! Insert proper sources (forces) to momentum equations
+  !----------------------------------------------------------!
+  !   Insert proper sources (forces) to momentum equations   !
+  !----------------------------------------------------------!
   call Process % Insert_Diffusion_Bc(Flow, comp=comp)
   call Process % Add_Inertial_Term  (Flow, comp=comp)
   call Process % Add_Advection_Term (Flow, comp=comp)
   call Process % Add_Pressure_Term  (Flow, comp=comp)
 
-  ! Call linear solver
+  !------------------------------------------!
+  !      Part 2 of the under-relaxation      !
+  !   (Part 1 is in Form_Diffusion_Matrix)   !
+  !------------------------------------------!
+
+  !$acc parallel loop independent
+  do c = 1, grid_n_cells - grid_n_buff_cells
+    b(c) = b(c) + m_val(m_dia(c)) * (1.0 - urf) * ui_n(c)
+  end do
+  !$acc end parallel
+
+  !------------------------!
+  !   Call linear solver   !
+  !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  if(comp .eq. 1) call Flow % Nat % Cg(Mcon, Mval, u_n, b, grid_n_cells, tol)
-  if(comp .eq. 2) call Flow % Nat % Cg(Mcon, Mval, v_n, b, grid_n_cells, tol)
-  if(comp .eq. 3) call Flow % Nat % Cg(Mcon, Mval, w_n, b, grid_n_cells, tol)
+  call Flow % Nat % Cg(Mcon, Mval, ui_n, b, grid_n_cells, tol)
   call Profiler % Stop('CG_for_Momentum')
 
   call Profiler % Stop('Compute_Momentum')

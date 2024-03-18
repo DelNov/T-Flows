@@ -6,8 +6,8 @@
 #--------------------------
 # Time-integration related
 #--------------------------
-  NUMBER_OF_TIME_STEPS   1200
   TIME_STEP                 0.0125
+  NUMBER_OF_TIME_STEPS   1200
 
   RESULTS_SAVE_INTERVAL   120
 
@@ -19,6 +19,11 @@
   MIN_SIMPLE_ITERATIONS              4
   TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-12
   TOLERANCE_FOR_PRESSURE_SOLVER      1.e-12
+
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
+
+  MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   4
 
 #---------------------
 # Physical properties

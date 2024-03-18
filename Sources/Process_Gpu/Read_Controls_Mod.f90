@@ -35,6 +35,7 @@
       procedure          :: Boundary_Conditions
       procedure          :: Iterations
       procedure          :: Native_Solvers
+      procedure          :: Numerical_Schemes
       procedure          :: Physical_Models
       procedure          :: Physical_Properties
 
@@ -49,6 +50,7 @@
 #   include "Read_Controls_Mod/Boundary_Conditions.f90"
 #   include "Read_Controls_Mod/Iterations.f90"
 #   include "Read_Controls_Mod/Native_Solvers.f90"
+#   include "Read_Controls_Mod/Numerical_Schemes.f90"
 #   include "Read_Controls_Mod/Physical_Models.f90"
 #   include "Read_Controls_Mod/Physical_Properties.f90"
 

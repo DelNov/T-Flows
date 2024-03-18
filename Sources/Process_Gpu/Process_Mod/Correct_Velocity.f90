@@ -18,7 +18,7 @@
   real, contiguous, pointer :: b(:), v_flux(:)
   real, contiguous, pointer :: v_m(:), fc(:)
   type(Grid_Type),  pointer :: Grid
-  real                      :: a12, b_tmp, max_abs_val
+  real                      :: a12, b_tmp, max_abs_val, pp_urf
   integer                   :: c, s, c1, c2, i_cel
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
@@ -32,6 +32,7 @@
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
   Grid   => Flow % pnt_grid
+  pp_urf =  Flow % pp % urf
 
   !----------------------!
   !   Correct velocity   !
@@ -122,7 +123,7 @@
 
   !$acc parallel loop independent
   do c = 1, grid_n_cells - grid_n_buff_cells
-    p_n(c) = p_n(c) + 0.2 * pp_n(c)
+    p_n(c) = p_n(c) + pp_urf * pp_n(c)
   end do
   !$acc end parallel
 

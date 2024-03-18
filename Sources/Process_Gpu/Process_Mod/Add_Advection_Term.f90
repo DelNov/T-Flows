@@ -25,7 +25,7 @@
   b      => Flow % Nat % b
   v_flux => Flow % v_flux
   dens   => Flow % density
-  blend  =  Flow % blend
+  blend  =  Flow % u % blend
 
   ! Still on aliases
   if(comp .eq. 1) ui_n => Flow % u % n

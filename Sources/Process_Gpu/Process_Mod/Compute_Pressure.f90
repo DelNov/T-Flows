@@ -27,7 +27,9 @@
   n    =  Flow % pnt_grid % n_cells
   tol  =  Flow % pp % tol
 
-  ! Insert proper source (volume source) to pressure equation
+  !---------------------------------------------------------------!
+  !   Insert proper source (volume source) to pressure equation   !
+  !---------------------------------------------------------------!
   call Process % Insert_Volume_Source_For_Pressure(Flow)
 
 # if T_FLOWS_DEBUG == 1
@@ -36,7 +38,9 @@
   !@                           inside_cell=b)
 # endif
 
-  ! Call linear solver
+  !------------------------!
+  !   Call linear solver   !
+  !------------------------!
   call Profiler % Start('CG_for_Pressure')
   call Flow % Nat % Cg(Acon, Aval, pp_n, b, n, tol)
   call Profiler % Stop('CG_for_Pressure')

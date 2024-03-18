@@ -51,7 +51,7 @@
   !   Iterativelly improve gradients   !
   !                                    !
   !------------------------------------!
-  do iter = 1, 4
+  do iter = 1, Flow % least_miter
 
     !--------------------------------------!
     !   Extrapolate values to boundaries   !

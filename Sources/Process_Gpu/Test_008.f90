@@ -75,6 +75,9 @@
   ! I am not sure when to call this, but this is a good guess
   call Read_Control % Boundary_Conditions(Flow(1))
 
+  ! Read numerical models from control file (after the memory is allocated)
+  call Read_Control % Numerical_Schemes(Flow(1))
+
   ! Discretize momentum equations ...
   call Process % Form_Diffusion_Matrix(Flow(1), dt=Flow(1) % dt)
 

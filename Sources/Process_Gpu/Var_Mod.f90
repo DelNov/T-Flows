@@ -34,9 +34,11 @@
     integer, allocatable :: bnd_cond_type(:)
 
     ! Parameters for numerical solution of the variable
+    real          :: blend         !! upwind blending (1.0 central; 0.0 upwind)
+    real          :: tol = PICO    !! linear solver tolerance
+    real          :: urf           !! under-relaxation factor
     integer       :: miter         !! max number of iterations for variable
 
-    real :: tol = PICO  !! linear solver tolerance
   end type
 
   contains

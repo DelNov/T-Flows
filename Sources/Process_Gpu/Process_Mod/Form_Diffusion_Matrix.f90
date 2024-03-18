@@ -12,9 +12,9 @@
   type(Sparse_Val_Type), pointer :: Mval
   real, contiguous,      pointer :: visc(:), dens(:)
   integer                        :: c, s, c1, c2, reg
-  real                           :: m12
+  real                           :: m12, urf
 # if T_FLOWS_DEBUG == 1
-    real, allocatable :: work(:)
+  real, allocatable :: work(:)
 # endif
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
@@ -28,6 +28,9 @@
   Mval => Flow % Nat % M
   dens => Flow % density
   visc => Flow % viscosity
+  urf  =  Flow % u % urf
+
+  Assert(urf > 0.0)
 
   !---------------------------!
   !   Discretize the matrix   !
@@ -91,10 +94,18 @@
   !   Store volume divided by central coefficient for momentum   !
   !   and refresh its buffers before discretizing the pressure   !
   !--------------------------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     Mval % v_m(c) = Grid % vol(c) / Mval % val(Mcon % dia(c))
   end do
   call Grid % Exchange_Inside_Cells_Real(Mval % v_m)
+
+  !-------------------------------------!
+  !   Part 1 of the under-relaxation    !
+  !   (Part 2 is in Compute_Momentum)   !
+  !-------------------------------------!
+  do c = Cells_In_Domain()
+    Mval % val(Mcon % dia(c)) = Mval % val(Mcon % dia(c)) / urf
+  end do
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

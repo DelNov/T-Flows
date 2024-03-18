@@ -127,9 +127,8 @@
     ! Gradient matrices for cells to cells (c2c)
     real, allocatable :: grad_c2c(:,:)  !! gradient matrices [1/m^2]
 
-    ! Some numerical parameters
-    real :: blend  !! bleding coefficient for momentum
-
+    ! Tolerance and maximum iterations for Gauss gradients
+    integer :: least_miter
     contains
 
       !------------------------!
