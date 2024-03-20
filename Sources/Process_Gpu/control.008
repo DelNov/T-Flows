@@ -11,11 +11,6 @@
 
   RESULTS_SAVE_INTERVAL   120
 
-#-------------------
-# Monitoring points
-#-------------------
-  POINT_FOR_MONITORING_PLANES  0.015  0.03  0.0255
-
 #----------------------
 # Numerical parameters
 #----------------------
@@ -37,7 +32,7 @@
   DYNAMIC_VISCOSITY  1.8205e-5
 
 #-------------------------------------------------
-# Prescribed volume flow rate
+# Prescribed bulk velocity
 #
 # Re = 13000
 # nu = 1.5112e-5
