@@ -50,6 +50,7 @@
   real,    contiguous, pointer :: grid_sx(:)
   real,    contiguous, pointer :: grid_sy(:)
   real,    contiguous, pointer :: grid_sz(:)
+  real,    contiguous, pointer :: grid_s(:)
 
   !----------------!
   !   Field type   !
