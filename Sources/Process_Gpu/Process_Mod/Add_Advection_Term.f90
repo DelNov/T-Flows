@@ -12,9 +12,10 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),  pointer :: Grid
   real, contiguous, pointer :: ui_n(:), b(:), v_flux(:), dens(:)
   real                      :: b_tmp, den_u1, den_u2, dens_f, ui_c, blend
-  integer                   :: s, c1, c2, i_cel
+  integer                   :: s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -25,6 +26,7 @@
   b      => Flow % Nat % b
   v_flux => Flow % v_flux
   dens   => Flow % density
+  Grid   => Flow % pnt_grid
   blend  =  Flow % u % blend
 
   ! Still on aliases
@@ -61,6 +63,45 @@
     b(c1) = b_tmp
   end do
   !$acc end parallel
+
+  !-------------------------------------------!
+  !   Browse through all the boundary cells   !
+  !      (This can be accelerted on GPU)      !
+  !-------------------------------------------!
+
+  do reg = Boundary_Regions()
+
+    ! Inflow and convective depend on boundary values since they are
+    ! either given (inflow) or meticulously worked out (convective)
+    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+
+      !$acc parallel loop
+      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
+        c2 = grid_faces_c(1,s)  ! boundary cell
+
+        ! Just plain upwind here
+        b(c1) = b(c1) - dens(c1) * ui_n(c2) * v_flux(s)
+      end do
+      !$acc end parallel
+
+    end if
+
+    ! Outflow is just a vanishing derivative, use the value from the inside
+    if(Grid % region % type(reg) .eq. OUTFLOW) then
+
+      !$acc parallel loop
+      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
+
+        ! Just plain upwind here
+        b(c1) = b(c1) - dens(c1) * ui_n(c1) * v_flux(s)
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
   call Profiler % Stop('Add_Advection_Term')
 

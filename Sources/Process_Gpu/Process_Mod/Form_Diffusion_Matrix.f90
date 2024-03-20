@@ -64,7 +64,8 @@
 
   ! Increase central coefficient for walls
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL) then
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
       do s = Faces_In_Region(reg)
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)

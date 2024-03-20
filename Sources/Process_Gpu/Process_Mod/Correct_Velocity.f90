@@ -19,7 +19,7 @@
   real, contiguous, pointer :: v_m(:), fc(:)
   type(Grid_Type),  pointer :: Grid
   real                      :: a12, b_tmp, max_abs_val, pp_urf
-  integer                   :: c, s, c1, c2, i_cel
+  integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -35,7 +35,9 @@
   pp_urf =  Flow % pp % urf
 
   !----------------------!
+  !                      !
   !   Correct velocity   !
+  !                      !
   !----------------------!
 
   ! Units: kg m / s^2 * s / kg = m / s
@@ -53,7 +55,9 @@
   call Grid % Exchange_Cells_Real(w_n)
 
   !---------------------------------------------!
+  !                                             !
   !   Correct volume fluxes inside the domain   !
+  !                                             !
   !---------------------------------------------!
 
   ! Units: m * m^3 * s / kg * kg / (m s^2) = m^3 / s
@@ -69,11 +73,19 @@
   !$acc end parallel
 
   !-------------------------------!
+  !                               !
   !   Re-compute volume sources   !
+  !                               !
+  !- - - - - - - - - - - - - - - -!
+  !   This step is for checking   !
   !-------------------------------!
   !$acc kernels
   b(:) = 0
   !$acc end kernels
+
+  !---------------------------------!
+  !   First consider inside faces   !
+  !---------------------------------!
 
   !$acc parallel loop independent
   do c1 = 1, grid_n_cells - grid_n_buff_cells
@@ -94,6 +106,25 @@
 
   end do
   !$acc end parallel
+
+  !-----------------------------!
+  !   Then the boundary faces   !
+  !-----------------------------!
+
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+
+      !$acc parallel loop
+      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
+        b(c1) = b(c1) - v_flux(s)
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
 # if T_FLOWS_DEBUG == 1
   call Grid % Save_Debug_Vtu("bp_1",               &
@@ -118,10 +149,9 @@
   !@                       'after correction: ', max_abs_val
   call Info % Iter_Fill_At(1, 5, 'dum', max_abs_val)
 
-  !-----------------------------------!
-  !     Update the pressure field     !
-  !   (hard-coded under-relaxation)   !
-  !-----------------------------------!
+  !-------------------------------!
+  !   Update the pressure field   !
+  !-------------------------------!
 
   !$acc parallel loop independent
   do c = 1, grid_n_cells - grid_n_buff_cells

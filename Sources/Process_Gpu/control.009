@@ -6,10 +6,9 @@
 #---------------
 # Time stepping
 #---------------
-  TIME_STEP                     0.01
-  NUMBER_OF_TIME_STEPS      24
-
-  RESULTS_SAVE_INTERVAL   1
+  TIME_STEP                   0.01
+  NUMBER_OF_TIME_STEPS     1800
+  RESULTS_SAVE_INTERVAL      30
 
 #----------------------
 # Numerical parameters

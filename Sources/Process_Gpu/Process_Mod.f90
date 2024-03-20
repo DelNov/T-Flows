@@ -38,6 +38,7 @@
       procedure :: Add_Inertial_Term
       procedure :: Add_Pressure_Term
       procedure :: Correct_Velocity
+      procedure :: Update_Boundary_Values
 
       ! Related to pressure solution
       procedure :: Compute_Pressure
@@ -58,6 +59,7 @@
 #   include "Process_Mod/Add_Inertial_Term.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
 #   include "Process_Mod/Correct_Velocity.f90"
+#   include "Process_Mod/Update_Boundary_Values.f90"
 
     ! Related to pressure solution
 #   include "Process_Mod/Compute_Pressure.f90"

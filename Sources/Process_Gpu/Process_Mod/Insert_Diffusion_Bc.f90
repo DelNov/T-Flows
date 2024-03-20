@@ -35,7 +35,8 @@
   !$acc end kernels
 
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL) then
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
 
       !$acc parallel loop independent
       do s = grid_reg_f_face(reg), grid_reg_l_face(reg)

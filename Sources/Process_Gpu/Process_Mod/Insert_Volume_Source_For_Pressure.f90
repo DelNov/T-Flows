@@ -30,11 +30,13 @@
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
+  type(Grid_Type),  pointer :: Grid
   real, contiguous, pointer :: b(:)
   real, contiguous, pointer :: v_flux(:), v_m(:), fc(:)
   real                      :: a12, b_tmp, max_abs_val
   real                      :: u_f, v_f, w_f
-  integer                   :: s, c1, c2, i_cel, c
+  real                      :: area_in, area_out, vol_in, vol_out, ratio
+  integer                   :: s, c1, c2, i_cel, c, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -45,15 +47,97 @@
   v_m    => Flow % Nat % M % v_m
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
+  Grid   => Flow % pnt_grid
 
   ! Nullify the volume source
   !$acc kernels
   b(:) = 0.0
   !$acc end kernels
 
+  !------------------------------------------!
+  !                                          !
+  !   Calculate / update volume flow rates   !
+  !                                          !
+  !------------------------------------------!
+
+  !----------------------------------------------------!
+  !   Calculate volume fluxes through boundary faces   !
+  !----------------------------------------------------!
+  do reg = Boundary_Regions()
+
+    !$acc parallel loop
+    do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+      c2 = grid_faces_c(2,s)  ! boundary cell
+      v_flux(s) = u_n(c2) * grid_sx(s)  &
+                + v_n(c2) * grid_sy(s)  &
+                + w_n(c2) * grid_sz(s)
+    end do
+    !$acc end parallel
+
+  end do
+
   !-------------------------------------------!
-  !   Calculate volume fluxes through faces   !
+  !   Calcululate inflow and outflow volume   !
+  !   flow rates and inlet and outlet areas   !
   !-------------------------------------------!
+  vol_in   = 0.0
+  vol_out  = 0.0
+  area_in  = 0.0
+  area_out = 0.0
+
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. INFLOW) then
+
+      !$acc parallel loop reduction(+:area_in,vol_in)
+      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        area_in = area_in + grid_s(s)
+        vol_in  = vol_in  - v_flux(s)
+      end do
+      !$acc end parallel loop
+
+    end if
+
+    if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+
+      !$acc parallel loop reduction(+:area_out,vol_out)
+      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        area_out = area_out + grid_s(s)
+        vol_out  = vol_out  + v_flux(s)
+      end do
+      !$acc end parallel
+
+    end if
+  end do
+
+  call Global % Sum_Reals(vol_in, area_in)
+
+  !-----------------------------------------------------------------!
+  !   If there is volume imbalance in the source for the pressure   !
+  !   (correction) equation, pressure will converge poorly, if at   !
+  !   all. Thus, correct the outlet fluxes to enforce the balance   !
+  !-----------------------------------------------------------------!
+  if(.not. Math % Approx_Real(vol_in, vol_out, FEMTO)) then
+    ratio = vol_in / vol_out
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
+         Grid % region % type(reg) .eq. CONVECT) then
+
+        !$acc parallel loop
+        do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+          v_flux(s) = v_flux(s) * ratio
+        end do
+        !$acc end parallel
+
+      end if
+    end do
+  end if
+
+  !--------------------------------------------------!
+  !   Calculate volume fluxes through inside faces   !
+  !- - - - - - - - - - - - - - - - - - - - - - - - - !
+  !   This is application of Rhie & Chow technique   !
+  !--------------------------------------------------!
 
   !$acc parallel loop
   do s = grid_reg_f_face(grid_n_regions), grid_reg_l_face(grid_n_regions)
@@ -82,9 +166,15 @@
   end do
   !$acc end parallel
 
-  !----------------------------------------------------!
-  !   Calculate volume sources with corrected fluxes   !
-  !----------------------------------------------------!
+  !---------------------------------------------------------------------!
+  !                                                                     !
+  !   Calculate volume sources for the pressure (correction) equation   !
+  !                                                                     !
+  !---------------------------------------------------------------------!
+
+  !---------------------------------!
+  !   First consider inside faces   !
+  !---------------------------------!
 
   !$acc parallel loop
   do c1 = 1, grid_n_cells - grid_n_buff_cells
@@ -105,6 +195,25 @@
 
   end do
   !$acc end parallel
+
+  !-----------------------------!
+  !   Then the boundary faces   !
+  !-----------------------------!
+
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+
+      !$acc parallel loop
+      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
+        b(c1) = b(c1) - v_flux(s)
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
   !------------------------------------------------------------------!
   !   Find the cell with the maximum volume imbalance and print it   !
