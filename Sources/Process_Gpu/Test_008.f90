@@ -127,7 +127,6 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sy)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sz)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % s)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % d)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)
@@ -178,6 +177,7 @@
   call Time % Set_Last_Dt(ldt)
 
   call Control % Results_Save_Interval (Results % interval, verbose=.true.)
+  call Control % Save_Results_At_Boundaries(Results % boundary)
 
   ! Allocate CPU memory for working arrays (currently used for saving)
   call Work % Allocate_Work(Grid, n_r_cell=8,  n_r_face=0,  n_r_node=0,  &
