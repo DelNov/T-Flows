@@ -68,6 +68,11 @@
 
   end do
 
+  ! De-singularize the system matrix ... just like this, ad-hoc
+  do c = Cells_In_Domain()
+    Aval % val(Acon % dia(c)) = Aval % val(Acon % dia(c)) * (1.0 + MICRO)
+  end do
+
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells
