@@ -18,7 +18,7 @@
   real, contiguous, pointer :: b(:), v_flux(:)
   real, contiguous, pointer :: v_m(:), fc(:)
   type(Grid_Type),  pointer :: Grid
-  real                      :: a12, b_tmp, max_abs_val, pp_urf
+  real                      :: a12, b_tmp, max_abs_val
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
@@ -32,7 +32,6 @@
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
   Grid   => Flow % pnt_grid
-  pp_urf =  Flow % pp % urf
 
   !----------------------!
   !                      !
@@ -148,19 +147,6 @@
   !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
   !@                       'after correction: ', max_abs_val
   call Info % Iter_Fill_At(1, 5, 'dum', max_abs_val)
-
-  !-------------------------------!
-  !   Update the pressure field   !
-  !-------------------------------!
-
-  !$acc parallel loop independent
-  do c = 1, grid_n_cells - grid_n_buff_cells
-    p_n(c) = p_n(c) + pp_urf * pp_n(c)
-  end do
-  !$acc end parallel
-
-  ! Update buffers for presssure over all processors
-  call Grid % Exchange_Cells_Real(p_n)
 
   call Profiler % Stop('Correct_Velocity')
 

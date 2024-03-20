@@ -9,9 +9,9 @@
   type(Grid_Type),       pointer :: Grid
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
-  real, contiguous,      pointer :: pp_n(:), b(:)
-  real                           :: tol, fin_res
-  integer                        :: m, n
+  real, contiguous,      pointer :: b(:)
+  real                           :: tol, fin_res, pp_urf, p_max, p_min
+  integer                        :: m, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -19,13 +19,14 @@
   call Profiler % Start('Compute_Pressure')
 
   ! Take some aliases
-  Grid => Flow % pnt_grid
-  Acon => Flow % Nat % C
-  Aval => Flow % Nat % A
-  pp_n => Flow % pp % n
-  b    => Flow % Nat % b
-  m    =  Flow % pnt_grid % n_cells
-  tol  =  Flow % pp % tol
+  Grid   => Flow % pnt_grid
+  Acon   => Flow % Nat % C
+  Aval   => Flow % Nat % A
+  pp_n   => Flow % pp % n
+  b      => Flow % Nat % b
+  m      =  Flow % pnt_grid % n_cells
+  tol    =  Flow % pp % tol
+  pp_urf =  Flow % pp % urf
 
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
@@ -47,10 +48,47 @@
 
   call Info % Iter_Fill_At(1, 4, 'PP', fin_res, n)
 
+  !-------------------------------!
+  !   Update the pressure field   !
+  !-------------------------------!
+
+  !$acc parallel loop independent
+  do c = 1, grid_n_cells - grid_n_buff_cells
+    p_n(c) = p_n(c) + pp_urf * pp_n(c)
+  end do
+  !$acc end parallel
+
+  ! Update buffers for presssure over all processors
+  call Grid % Exchange_Cells_Real(p_n)
+
+  !-------------------------------------------------------------!
+  !   Shift the pressure field so that the mean value is zero   !
+  !-------------------------------------------------------------!
+  p_max = -HUGE
+  p_min = +HUGE
+
+  !$acc parallel loop reduction(max:p_max) reduction(min:p_min)
+  do c = 1, grid_n_cells - grid_n_buff_cells
+    p_max = max(p_max, p_n(c))
+    p_min = min(p_min, p_n(c))
+  end do
+
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
+
+  !$acc parallel loop independent
+  do c = 1, grid_n_cells - grid_n_buff_cells
+    p_n(c) = p_n(c) - 0.5 * (p_max + p_min)
+  end do
+  !$acc end parallel
+
 # if T_FLOWS_DEBUG == 1
-    call Grid % Save_Debug_Vtu("pp_0",          &
+    call Grid % Save_Debug_Vtu("pp_0",           &
                                scalar_name="pp", &
                                scalar_cell=pp_n)
+    call Grid % Save_Debug_Vtu("p_0",            &
+                               scalar_name="p",  &
+                               scalar_cell=p_n)
 # endif
 
   call Profiler % Stop('Compute_Pressure')
