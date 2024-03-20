@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg(Nat, Acon, Aval, x, b, miter, tol)
+  subroutine Cg(Nat, Acon, Aval, x, b, miter, niter, tol, fin_res)
 !------------------------------------------------------------------------------!
 !   Note: This is an alternative algorithm and I am honestly not sure where    !
 !         I have found it any more, but it avoids one "if" block during the    !
@@ -18,7 +18,9 @@
   real, intent(inout) :: b( Nat % pnt_grid % n_cells)
                          !! right-hand side vector
   integer, intent(in)    :: miter    !! maximum iterations
+  integer, intent(out)   :: niter    !! performed iterations
   real,    intent(in)    :: tol      !! target solver tolerance
+  real,    intent(out)   :: fin_res  !! achieved residual
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:)
@@ -43,6 +45,10 @@
 
   ! Check first residual
   call Linalg % Vec_D_Vec(ni, res, r(1:ni), r(1:ni))  ! res = r * r
+
+  fin_res = res
+  niter   = 0
+
   if(res < tol) return
 
   !---------------!
@@ -108,9 +114,6 @@
     !--------------------!
     call Linalg % Vec_D_Vec(ni, res, r(1:ni), r(1:ni))
 
-    if(mod(iter,32) .eq. 0) then
-      O_Print '(a,i12,es12.3)', ' iter, res = ', iter, res
-    end if
     if(res .lt. tol) goto 1
 
     rho_old = rho
@@ -123,7 +126,9 @@
   !                       !
   !-----------------------!
 1 continue
-  O_Print '(a,i12,es12.3)', ' iter, res = ', iter, res
+
+  fin_res = res
+  niter   = iter
 
   !-------------------------------------------!
   !   Refresh the solution vector's buffers   !

@@ -17,7 +17,8 @@
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
   real,                  pointer :: b(:), x(:)
-  integer                        :: n
+  integer                        :: m, n
+  real                           :: fin_res
   character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
 
@@ -35,8 +36,8 @@
   O_Print '(a)', ' # Creating a grid'
   call Grid % Load_And_Prepare_For_Processing(1)
 
-  n = Grid % n_cells
-  O_Print '(a,i12)',    ' # The problem size is: ', n
+  m = Grid % n_cells
+  O_Print '(a,i12)',    ' # The problem size is: ', m
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
   O_Print '(a)', ' #----------------------------------------------------'
@@ -95,7 +96,7 @@
   !-----------------------------------------------!
   O_Print '(a)', ' # Performing a demo of the preconditioned CG method'
   call Profiler % Start('Useful_Work')
-  call Flow % Nat % Cg(Acon, Aval, x, b, n, PICO)
+  call Flow % Nat % Cg(Acon, Aval, x, b, m, n, PICO, fin_res)
   call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host

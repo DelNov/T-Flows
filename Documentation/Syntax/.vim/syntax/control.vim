@@ -154,6 +154,7 @@ syn keyword controlKeyword   PREC_OPTS
 syn keyword controlKeyword   TOLERANCE
 " Physics
 syn keyword controlKeyword   ANGULAR_VELOCITY_VECTOR
+syn keyword controlKeyword   BULK_VELOCITIES
 syn keyword controlKeyword   BUOYANCY
 syn keyword controlKeyword   DYNAMIC_VISCOSITY
 syn keyword controlKeyword   EXTRAPOLATE_TEMPERATURE_EXP

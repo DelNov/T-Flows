@@ -39,9 +39,9 @@
   call Control % Pressure_Drops(bulk % p_drop_x,  &
                                 bulk % p_drop_y,  &
                                 bulk % p_drop_z)
-  call Control % Volume_Flow_Rates(bulk % flux_x_o,  &
-                                   bulk % flux_y_o,  &
-                                   bulk % flux_z_o)
+  call Control % Bulk_Velocities(bulk % u_o,  &
+                                 bulk % v_o,  &
+                                 bulk % w_o)
 
   !-----------------------!
   !                       !

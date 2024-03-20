@@ -148,6 +148,7 @@
       procedure :: Skewness_Correction_Vof
 
       ! Physics
+      procedure :: Bulk_Velocities
       procedure :: Number_Of_Domains
       procedure :: Dynamic_Viscosity
       procedure :: Heat_Capacity
@@ -175,7 +176,6 @@
       procedure :: Turbulent_Schmidt_Number
       procedure :: Turbulent_Heat_Flux_Model
       procedure :: Turbulent_Scalar_Flux_Model
-      procedure :: Angular_Velocity_Vector
       procedure :: Gravitational_Vector
       procedure :: Volume_Flow_Rates
       procedure :: Pressure_Drops
@@ -396,7 +396,7 @@
 #   include "Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90"
 
     ! Other environmental conditions
-#   include "Control_Mod/Physics/Angular_Velocity_Vector.f90"
+#   include "Control_Mod/Physics/Bulk_Velocities.f90"
 #   include "Control_Mod/Physics/Gravitational_Vector.f90"
 #   include "Control_Mod/Physics/Pressure_Drops.f90"
 #   include "Control_Mod/Physics/Point_For_Monitoring_Planes.f90"

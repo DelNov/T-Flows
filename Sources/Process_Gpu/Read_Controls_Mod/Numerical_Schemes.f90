@@ -26,6 +26,13 @@
   ! Take alias
   Grid => Flow % pnt_grid
 
+  !------------------------------------------!
+  !   Pressure velocity coupling algorithm   !
+  !------------------------------------------!
+
+  ! Report volume balance (in a separate file)
+  call Control % Report_Volume_Balance(Flow % rep_vol_balance, .false.)
+
   !----------------------------------!
   !   Gradient computation methods   !
   !----------------------------------!

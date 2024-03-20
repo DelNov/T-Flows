@@ -7,7 +7,7 @@
 # Time stepping
 #---------------
   TIME_STEP                 0.00002
-  NUMBER_OF_TIME_STEPS  6000
+  NUMBER_OF_TIME_STEPS 12000
 
   RESULTS_SAVE_INTERVAL   120
 
@@ -44,9 +44,8 @@
 # h  = 0.051
 # Re = Ub * h / nu = 13000
 # Ub = Re * nu / h = 3.852  [m/s]
-# V* = Ub * 0.051 * 0.06 = 0.011787  [kg/s]
 #-------------------------------------------------
-  VOLUME_FLOW_RATES  0.0118   0.0   0.0
+  BULK_VELOCITIES   3.852   0.0   0.0
 
 #---------------------
 # Boundary conditions

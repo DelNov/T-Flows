@@ -118,8 +118,9 @@
   ! Find global maximum over all processors
   call Global % Max_Real(max_abs_val)
 
-  O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
-                        'before correction: ', max_abs_val
+  !@ Use this for REPORT_VOLUME_BALANCE somehow?
+  !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
+  !@                       'before correction: ', max_abs_val
 
   call Profiler % Stop('Insert_Volume_Source_For_Pressure')
 

@@ -10,8 +10,8 @@
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
   real, contiguous,      pointer :: pp_n(:), b(:)
-  real                           :: tol
-  integer                        :: n
+  real                           :: tol, fin_res
+  integer                        :: m, n
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -24,7 +24,7 @@
   Aval => Flow % Nat % A
   pp_n => Flow % pp % n
   b    => Flow % Nat % b
-  n    =  Flow % pnt_grid % n_cells
+  m    =  Flow % pnt_grid % n_cells
   tol  =  Flow % pp % tol
 
   !---------------------------------------------------------------!
@@ -42,8 +42,10 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, pp_n, b, n, tol)
+  call Flow % Nat % Cg(Acon, Aval, pp_n, b, m, n, tol, fin_res)
   call Profiler % Stop('CG_for_Pressure')
+
+  call Info % Iter_Fill_At(1, 4, 'PP', fin_res, n)
 
 # if T_FLOWS_DEBUG == 1
   !@ call Grid % Save_Debug_Vtu("pp_0",          &

@@ -39,6 +39,9 @@
   call Control % Open_Root_File(root_control)
   call Control % Time_Step(Flow(1) % dt, verbose=.true.)
 
+  ! Initialize Info_Mod
+  call Info % Start_Info()
+
   O_Print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
@@ -171,9 +174,14 @@
   O_Print '(a)', ' # Performing a demo of the computing momentum equations'
   call cpu_time(ts)
   do while (Time % Needs_More_Steps())
-    O_Print '(a)',            ' #=========================='
-    O_Print '(a,i12,es12.3)', ' # Time step = ', Time % Curr_Dt()
-    O_Print '(a)',            ' #--------------------------'
+
+    ! Start info boxes
+    call Info % Time_Start()
+    call Info % Iter_Start()
+    call Info % Bulk_Start()
+
+    call Info % Time_Fill(Time % Curr_Dt(), Time % Get_Time())
+    call Info % Time_Print()
 
     ! Preparation for the new time step
     !$acc parallel loop
@@ -195,32 +203,33 @@
     !-----------------------------------!
     do while (Iter % Needs_More_Iterations(Flow, 1))
 
+      ! Beginning of iteration
+      call Info % Iter_Fill(Iter % Current())
+
 !@    write(name_vel    (6:7), '(i2.2)') Iter % Current()
 !@    write(name_p      (6:7), '(i2.2)') Iter % Current()
 !@    write(name_pp     (6:7), '(i2.2)') Iter % Current()
 !@    write(name_grad_pp(6:7), '(i2.2)') Iter % Current()
 !@    write(name_grad_p (6:7), '(i2.2)') Iter % Current()
 
-      O_Print '(a)', ' # Solving u'
       call Process % Compute_Momentum(Flow(1), comp=1)
-
-      O_Print '(a)', ' # Solving v'
       call Process % Compute_Momentum(Flow(1), comp=2)
-
-      O_Print '(a)', ' # Solving w'
       call Process % Compute_Momentum(Flow(1), comp=3)
 
-      O_Print '(a)', ' # Solving pp'
       call Process % Compute_Pressure(Flow(1))
 
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-
-      O_Print '(a)', ' # Correcting velocity'
       call Process % Correct_Velocity(Flow(1))
-
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
+      ! End of the current iteration
+      call Info % Iter_Print(1)
+
     end do  ! iterations
+
+
+    ! Print the bulk values from the Info_Mod
+    call Info % Bulk_Print(Flow(1), 1, 1)
 
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
       call Gpu % Vector_Update_Host(Flow(1) % u % n)

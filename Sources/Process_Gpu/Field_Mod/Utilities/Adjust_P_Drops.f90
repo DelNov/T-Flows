@@ -17,7 +17,7 @@
 !                                                                              !
 !   * Necessary acceleration (to achieve the desired volume flux) is then:     !
 !                                                                              !
-!     acc = (v_flux_o - v_flux) / dt / area     [m^3/s / s / m^2 = m/s^2]      !
+!     acc = (u_bulk_o - u_bulk) / dt            [m/s / s = m/s^2]              !
 !                                                                              !
 !   * In a periodic channel, force is related to pressure drop as:             !
 !                                                                              !
@@ -25,9 +25,9 @@
 !                                                                              !
 !   * Or:                                                                      !
 !                                                                              !
-!     p_drop = force / volume =                                                !
-!            = mass / volume * acc                                             !
-!            = rho * (v_flux_o - v_flux) / dt / area                           !
+!     p_drop = force / volume =                 [N/m^3        = kg/s^2/m^2]    !
+!            = mass / volume * acc              [kg/m^3*m/s^2 = kg/s^2/m^2]    !
+!            = rho * (u_bulk_o - u_bulk) / dt   [kg/m^3*m/s/s = kg/s^2/m^2]    !
 !                                                                              !
 !------------------------------------------------------------------------------!
   implicit none
@@ -47,17 +47,15 @@
   rho = Flow % Volume_Average(Flow % density)
 
   ! Once density is computed, continue with necessary pressure drops
-  if( abs(bulk % flux_x_o) >= TINY ) then
-    bulk % p_drop_x = rho * (bulk % flux_x_o - bulk % flux_x)  &
-                    / (Flow % dt * bulk % area_x + TINY)
+
+  if(abs(bulk % u_o) >= TINY ) then
+    bulk % p_drop_x = max(rho * (bulk % u_o - bulk % u) / Flow % dt, 0.0)
   end if
-  if( abs(bulk % flux_y_o) >= TINY ) then
-    bulk % p_drop_y = rho * (bulk % flux_y_o - bulk % flux_y)  &
-                    / (Flow % dt * bulk % area_y + TINY)
+  if(abs(bulk % v_o) >= TINY ) then
+    bulk % p_drop_y = max(rho * (bulk % v_o - bulk % v) / Flow % dt, 0.0)
   end if
-  if( abs(bulk % flux_z_o) >= TINY ) then
-    bulk % p_drop_z = rho * (bulk % flux_z_o - bulk % flux_z)  &
-                    / (Flow % dt * bulk % area_z + TINY)
+  if(abs(bulk % w_o) >= TINY ) then
+    bulk % p_drop_x = max(rho * (bulk % w_o - bulk % w) / Flow % dt, 0.0)
   end if
 
   end subroutine

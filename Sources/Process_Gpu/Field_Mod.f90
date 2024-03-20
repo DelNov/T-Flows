@@ -114,6 +114,13 @@
     type(Bulk_Type) :: bulk  !! holder of volume flow rates through domain and,
                              !! associated with that, bulk velocities
 
+    !--------------------------!
+    !   Numerical parameters   !
+    !--------------------------!
+
+    ! Pressure velocity coupling algorithm
+    logical :: rep_vol_balance
+
     ! Maximum CFL and Pe numbers
     real :: cfl_max, pe_max
 
@@ -149,7 +156,7 @@
       procedure :: Adjust_P_Drops
       procedure :: Alias_Energy
       procedure :: Alias_Momentum
-      procedure :: Calculate_Bulk_Fluxes
+      procedure :: Calculate_Bulk_Velocities
       procedure :: Volume_Average
 
   end type
@@ -175,7 +182,7 @@
 #   include "Field_Mod/Utilities/Adjust_P_Drops.f90"
 #   include "Field_Mod/Utilities/Alias_Energy.f90"
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
-#   include "Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90"
+#   include "Field_Mod/Utilities/Calculate_Bulk_Velocities.f90"
 #   include "Field_Mod/Utilities/Volume_Average.f90"
 
   end module

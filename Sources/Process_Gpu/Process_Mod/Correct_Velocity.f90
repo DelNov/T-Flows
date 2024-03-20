@@ -113,8 +113,10 @@
   ! Find maximum volume balance error over all processors
   call Global % Max_Real(max_abs_val)
 
-  O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
-                        'after correction: ', max_abs_val
+  !@ Use this for REPORT_VOLUME_BALANCE somehow?
+  !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
+  !@                       'after correction: ', max_abs_val
+  call Info % Iter_Fill_At(1, 5, 'dum', max_abs_val)
 
   !-----------------------------------!
   !     Update the pressure field     !

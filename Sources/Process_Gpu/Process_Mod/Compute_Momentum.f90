@@ -13,8 +13,8 @@
   integer,               pointer :: m_dia(:)
   real,                  pointer :: b(:)
   real,                  pointer :: ui_n(:)
-  real                           :: tol, urf
-  integer                        :: c
+  real                           :: tol, fin_res, urf
+  integer                        :: m, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Proc)
 !==============================================================================!
@@ -25,11 +25,13 @@
   Assert(comp .le. 3)
 
   ! Take some aliases
-  Mval  => Flow % Nat % M
-  Mcon  => Flow % Nat % C
-  m_val => Flow % Nat % M % val
-  m_dia => Flow % Nat % C % dia
-  b     => Flow % Nat % b
+  Mval    => Flow % Nat % M
+  Mcon    => Flow % Nat % C
+  m_val   => Flow % Nat % M % val
+  m_dia   => Flow % Nat % C % dia
+  b       => Flow % Nat % b
+  m       =  Flow % pnt_grid % n_cells
+  fin_res = 0.0
   if(comp .eq. 1) ui_n => u_n
   if(comp .eq. 2) ui_n => v_n
   if(comp .eq. 3) ui_n => w_n
@@ -61,8 +63,12 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(Mcon, Mval, ui_n, b, grid_n_cells, tol)
+  call Flow % Nat % Cg(Mcon, Mval, ui_n, b, m, n, tol, fin_res)
   call Profiler % Stop('CG_for_Momentum')
+
+  if(comp.eq.1) call Info % Iter_Fill_At(1, 1, 'U', fin_res, n)
+  if(comp.eq.2) call Info % Iter_Fill_At(1, 2, 'V', fin_res, n)
+  if(comp.eq.3) call Info % Iter_Fill_At(1, 3, 'W', fin_res, n)
 
   call Profiler % Stop('Compute_Momentum')
 
