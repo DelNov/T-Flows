@@ -14,7 +14,7 @@
   !--------------!
   type Var_Type
 
-    type(Grid_Type), pointer :: pnt_grid    !! the grid on which it's defined
+    type(Grid_Type), pointer :: pnt_grid  !! the grid on which it's defined
 
     character(VL) :: name       !! variable name, always upper case and
                                 !! very short (4, defined in Const_Mod)

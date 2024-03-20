@@ -52,8 +52,8 @@
     Assert(c2 .gt. 0)
 
     ! Calculate coeficients for the momentum matrix
-    ! Units: ............
-    m12 = 0.5 * (visc(c1)+visc(c2)) * Grid % s(s) / Grid % d(s)
+    ! Units: kg / m / s * m = kg / s
+    m12 = 0.5 * (visc(c1)+visc(c2)) * Mcon % fc(s)
     Assert(m12 .gt. 0.0)
 
     Mval % val(Mcon % pos(1,s)) = -m12
@@ -72,9 +72,10 @@
         Assert(c1 .gt. 0)
         Assert(c2 .lt. 0)
 
-        m12 = visc(c1) * Grid % s(s) / Grid % d(s)
+        m12 = visc(c1) * Mcon % fc(s)
         Assert(m12 .gt. 0.0)
 
+        ! Units: kg / m / s * m = kg / s
         Mval % val(Mcon % dia(c1))  = Mval % val(Mcon % dia(c1)) + m12
       end do
     end if
@@ -84,7 +85,7 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       Mval % val(Mcon % dia(c)) = Mval % val(Mcon % dia(c))  &
                                 + dens(c) * Grid % vol(c) / dt
     end do
@@ -109,7 +110,7 @@
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain()
     ! or: work(c) = Mval % val(Mcon % dia(c))
     ! or: work(c) = Mcon % row(c+1) - Mcon % row(c)
     work(c) = Mval % v_m(c)

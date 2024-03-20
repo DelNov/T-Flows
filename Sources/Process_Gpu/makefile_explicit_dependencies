@@ -41,6 +41,13 @@ $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Main.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Main.o:\
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Test_001.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_001.o:\
@@ -91,15 +98,14 @@ Field_Mod/*/*.f90
 # Dependencies for: ./Test_008.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_008.o:\
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
+$(DIR_OBJECT)/Process_Mod.o \
+Process_Mod/*.f90 \
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/Grad_Component.005 \
-Field_Mod/*/Grad_Component.004 \
-Field_Mod/*/Grad_Component.003 \
-Field_Mod/*/Grad_Component.002 \
-Field_Mod/*/Grad_Component.001 \
-Field_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Process_Mod.f90
@@ -122,14 +128,15 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 # Dependencies for: ./Test_006.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_006.o:\
-$(DIR_OBJECT)/Read_Controls_Mod.o \
-Read_Controls_Mod/*.f90 \
-$(DIR_OBJECT)/Process_Mod.o \
-Process_Mod/*.f90 \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+Gpu_Mod/*/*.f90 \
+$(DIR_OBJECT)/Field_Mod.o \
+Field_Mod/*/Grad_Component.005 \
+Field_Mod/*/Grad_Component.004 \
+Field_Mod/*/Grad_Component.003 \
+Field_Mod/*/Grad_Component.002 \
+Field_Mod/*/Grad_Component.001 \
+Field_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_003.f90
@@ -142,6 +149,7 @@ Gpu_Mod/*/*.f90
 # Dependencies for: ./Info_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Info_Mod.o:\
+Info_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Component.005 \
 Field_Mod/*/Grad_Component.004 \
@@ -172,6 +180,7 @@ $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*/*.f90 \
 $(DIR_SHARED)/Work_Mod/*.f90 \
 Results_Mod/*.f90 \
+Info_Mod/*.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Component.005 \
 Field_Mod/*/Grad_Component.004 \
@@ -207,6 +216,7 @@ Field_Mod/*/Grad_Component.003 \
 Field_Mod/*/Grad_Component.002 \
 Field_Mod/*/Grad_Component.001 \
 Field_Mod/*/*.f90 \
+$(DIR_OBJECT)/Bulk_Mod.o \
 $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 

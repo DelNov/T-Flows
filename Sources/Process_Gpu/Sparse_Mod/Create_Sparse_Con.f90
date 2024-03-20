@@ -115,8 +115,12 @@
     Assert(Grid % s(s) .gt. TINY)
     Assert(Grid % d(s) .gt. TINY)
 
-    Con % fc(s) = Grid % s(s) / Grid % d(s)
-
+    Con % fc(s) = (   Grid % sx(s) * Grid % sx(s)    &
+                    + Grid % sy(s) * Grid % sy(s)    &
+                    + Grid % sz(s) * Grid % sz(s) )  &
+                 / (  Grid % dx(s) * Grid % sx(s)    &
+                    + Grid % dy(s) * Grid % sy(s)    &
+                    + Grid % dz(s) * Grid % sz(s) )
   end do
 
   !---------------------------------------!

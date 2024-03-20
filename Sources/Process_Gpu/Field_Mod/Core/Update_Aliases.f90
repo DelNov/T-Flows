@@ -54,7 +54,5 @@
   grid_sx  => Grid % sx
   grid_sy  => Grid % sy
   grid_sz  => Grid % sz
-  grid_s   => Grid % s
-  grid_d   => Grid % d
 
   end subroutine

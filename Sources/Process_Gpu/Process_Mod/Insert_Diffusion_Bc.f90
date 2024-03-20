@@ -8,7 +8,7 @@
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
-  real, contiguous, pointer :: b(:), ui_n(:), visc(:)
+  real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:)
   real                      :: m12
   integer                   :: reg, s, c1, c2
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -20,6 +20,7 @@
   ! Take some aliases
   Grid => Flow % pnt_grid
   b    => Flow % Nat % b
+  fc   => Flow % Nat % C % fc
   visc => Flow % viscosity
 
   if(comp .eq. 1) ui_n => Flow % u % n
@@ -40,7 +41,7 @@
       do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
         c1 = grid_faces_c(1,s)
         c2 = grid_faces_c(2,s)
-        m12 = visc(c1) * grid_s(s) / grid_d(s)
+        m12 = visc(c1) * fc(s)
         b(c1) = b(c1) + m12 * ui_n(c2)
       end do
       !$acc end parallel
