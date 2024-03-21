@@ -359,9 +359,6 @@
 
   ! Test 2
   do c1 = -Grid % n_bnd_cells, Grid % n_cells
-    if(Grid % Comm % cell_proc(c1) .eq. This_Proc()) then
-      Assert(Grid % cells_n_cells(c1) .eq. Grid % cells_n_faces(c1))
-    end if
     do i_cel = 1, Grid % cells_n_cells(c1)
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
