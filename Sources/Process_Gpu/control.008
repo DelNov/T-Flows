@@ -7,7 +7,7 @@
 # Time stepping
 #---------------
   TIME_STEP                 0.00002
-  NUMBER_OF_TIME_STEPS 12000
+  NUMBER_OF_TIME_STEPS 18000
 
   RESULTS_SAVE_INTERVAL   120
 
