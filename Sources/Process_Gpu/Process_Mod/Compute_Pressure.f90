@@ -58,12 +58,9 @@
   end do
   !$acc end parallel
 
-  ! Update buffers for presssure over all processors
-  call Grid % Exchange_Cells_Real(p_n)
-
-  !-------------------------------------------------------------!
-  !   Shift the pressure field so that the mean value is zero   !
-  !-------------------------------------------------------------!
+  !---------------------------------------------------------------!
+  !   Shift the pressure field so that the median value is zero   !
+  !---------------------------------------------------------------!
   p_max = -HUGE
   p_min = +HUGE
 
@@ -81,6 +78,9 @@
     p_n(c) = p_n(c) - 0.5 * (p_max + p_min)
   end do
   !$acc end parallel
+
+  ! Update buffers for presssure over all processors
+  call Grid % Exchange_Cells_Real(p_n)
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("pp_0",           &
