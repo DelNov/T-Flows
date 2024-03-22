@@ -431,6 +431,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  A  M  Mat      vector         Sol            Nat               Pet            Work_Pet  Member
   syn keyword fortranTypeTflows    Process_Type   Pattern_Type   Isoap_Type     Polyhedron_Type   Stl_Type       Iso_Polygons_Type
   syn keyword fortranObjectTflows  Process        Pat            Isoap          Polyhedron  Pol   Stl            Iso_Polygons  Iso
+  syn keyword fortranTypeTflows    Gpu_Type
+  syn keyword fortranObjectTflows  Gpu
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
   syn keyword fortranTypeTflows    Eddy_Type  Eddies_Type  Turb_Plane_Type  Memory_Type
