@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(Process, Flow, update)
+  subroutine Update_Boundary_Values(Process, Flow, Grid, update)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -9,21 +9,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Process_Type)         :: Process  !! parent class
-  type(Field_Type),    target :: Flow     !! flow object
-  character(*)                :: update   !! character switch to control
-                                          !! which variables to update
+  class(Process_Type)      :: Process  !! parent class
+  type(Field_Type), target :: Flow     !! flow object
+  type(Grid_Type)          :: Grid
+  character(*)             :: update   !! character switch to control
+                                       !! which variables to update
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
   integer                  :: c1, c2, s, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Update_Boundary_Values')
-
-  ! Take aliases
-  Grid => Flow % pnt_grid
 
   call String % To_Upper_Case(update)
 
@@ -48,9 +45,9 @@
          Grid % region % type(reg) .eq. SYMMETRY) then
 
         !$acc parallel loop
-        do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-          c1 = grid_faces_c(1,s)  ! inside cell
-          c2 = grid_faces_c(1,s)  ! boundary cell
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)  ! inside cell
+          c2 = Grid % faces_c(1,s)  ! boundary cell
 
           u_n(c2) = u_n(c1)
           v_n(c2) = v_n(c1)

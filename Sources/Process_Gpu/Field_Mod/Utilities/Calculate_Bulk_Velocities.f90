@@ -1,11 +1,12 @@
 !==============================================================================!
-  subroutine Calculate_Bulk_Velocities(Flow)
+  subroutine Calculate_Bulk_Velocities(Flow, Grid)
 !------------------------------------------------------------------------------!
 !   Calculate volume fluxes through whole domain.                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow
+  type(Grid_Type)           :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   real    :: bulk_u, bulk_v, bulk_w, vol
   integer :: c
@@ -28,18 +29,15 @@
   vol = 0.0
 
   !$acc parallel loop
-  do c = 1, grid_n_cells - grid_n_buff_cells
-    bulk_u = bulk_u + u_n(c) * grid_vol(c)
-    bulk_v = bulk_v + v_n(c) * grid_vol(c)
-    bulk_w = bulk_w + w_n(c) * grid_vol(c)
-    vol = vol + grid_vol(c)
+  do c = Cells_In_Domain()
+    bulk_u = bulk_u + u_n(c) * Grid % vol(c)
+    bulk_v = bulk_v + v_n(c) * Grid % vol(c)
+    bulk_w = bulk_w + w_n(c) * Grid % vol(c)
+    vol = vol + Grid % vol(c)
   end do
   !$acc end parallel
 
-  call Global % Sum_Real(bulk_u)
-  call Global % Sum_Real(bulk_v)
-  call Global % Sum_Real(bulk_w)
-  call Global % Sum_Real(vol)
+  call Global % Sum_Reals(bulk_u, bulk_v, bulk_w, vol)
 
   ! Bulk velocities
   Flow % bulk % u = bulk_u / vol

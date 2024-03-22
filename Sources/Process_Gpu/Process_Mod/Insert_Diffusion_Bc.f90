@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Insert_Diffusion_Bc(Proc, Flow, comp)
+  subroutine Insert_Diffusion_Bc(Proc, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
   real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:)
   real                      :: m12
   integer                   :: reg, s, c1, c2
@@ -18,7 +18,6 @@
   call Profiler % Start('Insert_Diffusion_Bc')
 
   ! Take some aliases
-  Grid => Flow % pnt_grid
   b    => Flow % Nat % b
   fc   => Flow % Nat % C % fc
   visc => Flow % viscosity
@@ -39,9 +38,9 @@
        Grid % region % type(reg) .eq. INFLOW) then
 
       !$acc parallel loop independent
-      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-        c1 = grid_faces_c(1,s)
-        c2 = grid_faces_c(2,s)
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
         m12 = visc(c1) * fc(s)
         b(c1) = b(c1) + m12 * ui_n(c2)
       end do

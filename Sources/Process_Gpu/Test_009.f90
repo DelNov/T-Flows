@@ -212,17 +212,17 @@
 !@    write(name_grad_pp(6:7), '(i2.2)') Iter % Current()
 !@    write(name_grad_p (6:7), '(i2.2)') Iter % Current()
 
-      call Process % Compute_Momentum(Flow(1), comp=1)
-      call Process % Compute_Momentum(Flow(1), comp=2)
-      call Process % Compute_Momentum(Flow(1), comp=3)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=1)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=2)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=3)
 
-      call Process % Compute_Pressure(Flow(1))
+      call Process % Compute_Pressure(Flow(1), Grid(1))
 
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-      call Process % Correct_Velocity(Flow(1))
+      call Process % Correct_Velocity(Flow(1), Grid(1))
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
-      call Process % Update_Boundary_Values(Flow(1), 'ALL')
+      call Process % Update_Boundary_Values(Flow(1), Grid(1), 'ALL')
 
       ! End of the current iteration
       call Info % Iter_Print(1)

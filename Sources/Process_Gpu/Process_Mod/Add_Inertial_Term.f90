@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Add_Inertial_Term(Proc, Flow, comp)
+  subroutine Add_Inertial_Term(Proc, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: ui_o(:), b(:), dens(:)
@@ -24,8 +25,8 @@
   if(comp .eq. 3) ui_o => Flow % w % o
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells - grid_n_buff_cells
-    b(c) = b(c) + dens(c) * ui_o(c) * grid_vol(c) / Flow % dt
+  do c = Cells_In_Domain()
+    b(c) = b(c) + dens(c) * ui_o(c) * Grid % vol(c) / Flow % dt
   end do
   !$acc end parallel
 

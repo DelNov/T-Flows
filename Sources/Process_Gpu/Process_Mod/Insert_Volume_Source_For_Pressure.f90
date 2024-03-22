@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Insert_Volume_Source_For_Pressure(Proc, Flow)
+  subroutine Insert_Volume_Source_For_Pressure(Proc, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -29,8 +29,8 @@
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
   real, contiguous, pointer :: b(:)
   real, contiguous, pointer :: v_flux(:), v_m(:), fc(:)
   real                      :: a12, b_tmp, max_abs_val
@@ -47,7 +47,6 @@
   v_m    => Flow % Nat % M % v_m
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
-  Grid   => Flow % pnt_grid
 
   ! Nullify the volume source
   !$acc kernels
@@ -66,11 +65,11 @@
   do reg = Boundary_Regions()
 
     !$acc parallel loop
-    do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-      c2 = grid_faces_c(2,s)  ! boundary cell
-      v_flux(s) = u_n(c2) * grid_sx(s)  &
-                + v_n(c2) * grid_sy(s)  &
-                + w_n(c2) * grid_sz(s)
+    do s = Faces_In_Region(reg)
+      c2 = Grid % faces_c(2,s)  ! boundary cell
+      v_flux(s) = u_n(c2) * Grid % sx(s)  &
+                + v_n(c2) * Grid % sy(s)  &
+                + w_n(c2) * Grid % sz(s)
     end do
     !$acc end parallel
 
@@ -89,8 +88,8 @@
     if(Grid % region % type(reg) .eq. INFLOW) then
 
       !$acc parallel loop reduction(+:area_in,vol_in)
-      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-        area_in = area_in + grid_s(s)
+      do s = Faces_In_Region(reg)
+        area_in = area_in + Grid % s(s)
         vol_in  = vol_in  - v_flux(s)
       end do
       !$acc end parallel loop
@@ -101,8 +100,8 @@
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$acc parallel loop reduction(+:area_out,vol_out)
-      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-        area_out = area_out + grid_s(s)
+      do s = Faces_In_Region(reg)
+        area_out = area_out + Grid % s(s)
         vol_out  = vol_out  + v_flux(s)
       end do
       !$acc end parallel
@@ -124,7 +123,7 @@
          Grid % region % type(reg) .eq. CONVECT) then
 
         !$acc parallel loop
-        do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
+        do s = Faces_In_Region(reg)
           v_flux(s) = v_flux(s) * ratio
         end do
         !$acc end parallel
@@ -140,10 +139,10 @@
   !--------------------------------------------------!
 
   !$acc parallel loop
-  do s = grid_reg_f_face(grid_n_regions), grid_reg_l_face(grid_n_regions)
+  do s = Faces_In_Domain_And_At_Buffers()
 
-    c1 = grid_faces_c(1,s)
-    c2 = grid_faces_c(2,s)
+    c1 = Grid % faces_c(1,s)
+    c2 = Grid % faces_c(2,s)
 
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
@@ -160,7 +159,7 @@
     ! Volume flux without the cell-centered pressure gradient
     ! but with the staggered pressure difference
     ! Units:  m^4 s / kg * kg / (m s^2) = m^3 / s
-    v_flux(s) = u_f * grid_sx(s) + v_f * grid_sy(s) + w_f * grid_sz(s)  &
+    v_flux(s) = u_f * Grid % sx(s) + v_f * Grid % sy(s) + w_f * Grid % sz(s)  &
               + a12 * (p_n(c1) - p_n(c2))
 
   end do
@@ -177,13 +176,13 @@
   !---------------------------------!
 
   !$acc parallel loop
-  do c1 = 1, grid_n_cells - grid_n_buff_cells
+  do c1 = Cells_In_Domain()
 
     b_tmp = b(c1)
     !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
         b_tmp = b_tmp - v_flux(s) * merge(1,-1, c1.lt.c2)
       end if
@@ -206,8 +205,8 @@
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$acc parallel loop
-      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-        c1 = grid_faces_c(1,s)  ! inside cell
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)  ! inside cell
         b(c1) = b(c1) - v_flux(s)
       end do
       !$acc end parallel
@@ -220,7 +219,7 @@
   !------------------------------------------------------------------!
   max_abs_val = 0.0
   !$acc parallel loop reduction(max:max_abs_val)
-  do c = 1, grid_n_cells - grid_n_buff_cells
+  do c = Cells_In_Domain()
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
 

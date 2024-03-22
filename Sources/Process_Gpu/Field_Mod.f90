@@ -28,30 +28,6 @@
   real, contiguous, pointer :: p_y(:)
   real, contiguous, pointer :: p_z(:)
 
-  integer :: grid_n_cells
-  integer :: grid_n_faces
-  integer :: grid_n_bnd_cells
-  integer :: grid_n_buff_cells
-  integer :: grid_n_regions
-
-  integer, contiguous, pointer :: grid_faces_c(:,:)
-  integer, contiguous, pointer :: grid_cells_c(:,:)
-  integer, contiguous, pointer :: grid_cells_f(:,:)
-  integer, contiguous, pointer :: grid_cells_n_cells(:)
-  integer, contiguous, pointer :: grid_reg_f_face(:)
-  integer, contiguous, pointer :: grid_reg_l_face(:)
-  real,    contiguous, pointer :: grid_vol(:)
-  real,    contiguous, pointer :: grid_xc(:)
-  real,    contiguous, pointer :: grid_yc(:)
-  real,    contiguous, pointer :: grid_zc(:)
-  real,    contiguous, pointer :: grid_dx(:)
-  real,    contiguous, pointer :: grid_dy(:)
-  real,    contiguous, pointer :: grid_dz(:)
-  real,    contiguous, pointer :: grid_sx(:)
-  real,    contiguous, pointer :: grid_sy(:)
-  real,    contiguous, pointer :: grid_sz(:)
-  real,    contiguous, pointer :: grid_s(:)
-
   !----------------!
   !   Field type   !
   !----------------!

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Advection_Term(Proc, Flow, comp)
+  subroutine Add_Advection_Term(Proc, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
 !   Thoroughly re-vamped for the GPU_2                                         !
 !------------------------------------------------------------------------------!
@@ -10,9 +10,9 @@
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),  pointer :: Grid
   real, contiguous, pointer :: ui_n(:), b(:), v_flux(:), dens(:)
   real                      :: b_tmp, den_u1, den_u2, dens_f, ui_c, blend
   integer                   :: s, c1, c2, i_cel, reg
@@ -26,7 +26,6 @@
   b      => Flow % Nat % b
   v_flux => Flow % v_flux
   dens   => Flow % density
-  Grid   => Flow % pnt_grid
   blend  =  Flow % u % blend
 
   ! Still on aliases
@@ -40,12 +39,12 @@
   !-------------------------------------------!
 
   !$acc parallel loop
-  do c1 = 1, grid_n_cells - grid_n_buff_cells
+  do c1 = Cells_In_Domain()
     b_tmp = b(c1)
     !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
         ui_c = 0.5 * (ui_n(c1) + ui_n(c2))  ! centered value
         ! Unit: kg / m^3 * m /s = kg / (m^2 s)
@@ -77,9 +76,9 @@
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$acc parallel loop
-      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-        c1 = grid_faces_c(1,s)  ! inside cell
-        c2 = grid_faces_c(1,s)  ! boundary cell
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)  ! inside cell
+        c2 = Grid % faces_c(1,s)  ! boundary cell
 
         ! Just plain upwind here
         b(c1) = b(c1) - dens(c1) * ui_n(c2) * v_flux(s)
@@ -92,8 +91,8 @@
     if(Grid % region % type(reg) .eq. OUTFLOW) then
 
       !$acc parallel loop
-      do s = grid_reg_f_face(reg), grid_reg_l_face(reg)
-        c1 = grid_faces_c(1,s)  ! inside cell
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)  ! inside cell
 
         ! Just plain upwind here
         b(c1) = b(c1) - dens(c1) * ui_n(c1) * v_flux(s)

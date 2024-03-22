@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Proc, Flow)
+  subroutine Compute_Pressure(Proc, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),       pointer :: Grid
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
   real, contiguous,      pointer :: b(:)
@@ -19,10 +19,8 @@
   call Profiler % Start('Compute_Pressure')
 
   ! Take some aliases
-  Grid   => Flow % pnt_grid
   Acon   => Flow % Nat % C
   Aval   => Flow % Nat % A
-  pp_n   => Flow % pp % n
   b      => Flow % Nat % b
   m      =  Flow % pnt_grid % n_cells
   tol    =  Flow % pp % tol
@@ -31,7 +29,7 @@
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
   !---------------------------------------------------------------!
-  call Process % Insert_Volume_Source_For_Pressure(Flow)
+  call Process % Insert_Volume_Source_For_Pressure(Flow, Grid)
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("bp_0",               &
@@ -53,7 +51,7 @@
   !-------------------------------!
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells - grid_n_buff_cells
+  do c = Cells_In_Domain()
     p_n(c) = p_n(c) + pp_urf * pp_n(c)
   end do
   !$acc end parallel
@@ -65,7 +63,7 @@
   p_min = +HUGE
 
   !$acc parallel loop reduction(max:p_max) reduction(min:p_min)
-  do c = 1, grid_n_cells - grid_n_buff_cells
+  do c = Cells_In_Domain()
     p_max = max(p_max, p_n(c))
     p_min = min(p_min, p_n(c))
   end do
@@ -74,7 +72,7 @@
   call Global % Min_Real(p_min)
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells - grid_n_buff_cells
+  do c = Cells_In_Domain()
     p_n(c) = p_n(c) - 0.5 * (p_max + p_min)
   end do
   !$acc end parallel

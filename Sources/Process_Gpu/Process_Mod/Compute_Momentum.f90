@@ -1,10 +1,11 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Proc, Flow, comp)
+  subroutine Compute_Momentum(Process, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Mval
@@ -16,7 +17,7 @@
   real                           :: tol, fin_res, urf
   integer                        :: m, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Compute_Momentum')
@@ -43,10 +44,10 @@
   !----------------------------------------------------------!
   !   Insert proper sources (forces) to momentum equations   !
   !----------------------------------------------------------!
-  call Process % Insert_Diffusion_Bc(Flow, comp=comp)
-  call Process % Add_Inertial_Term  (Flow, comp=comp)
-  call Process % Add_Advection_Term (Flow, comp=comp)
-  call Process % Add_Pressure_Term  (Flow, comp=comp)
+  call Process % Insert_Diffusion_Bc(Flow, Grid, comp=comp)
+  call Process % Add_Inertial_Term  (Flow, Grid, comp=comp)
+  call Process % Add_Advection_Term (Flow, Grid, comp=comp)
+  call Process % Add_Pressure_Term  (Flow, Grid, comp=comp)
 
   !------------------------------------------!
   !      Part 2 of the under-relaxation      !
@@ -54,7 +55,7 @@
   !------------------------------------------!
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells - grid_n_buff_cells
+  do c = Cells_In_Domain()
     b(c) = b(c) + m_val(m_dia(c)) * (1.0 - urf) * ui_n(c)
   end do
   !$acc end parallel

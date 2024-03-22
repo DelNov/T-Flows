@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Pressure_Term(Proc, Flow, comp)
+  subroutine Add_Pressure_Term(Proc, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -14,6 +14,7 @@
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Proc
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), p_i(:)
@@ -37,8 +38,8 @@
   if(comp .eq. 3) p_d_i =  Flow % bulk % p_drop_z
 
   !$acc parallel loop independent
-  do c = 1, grid_n_cells - grid_n_buff_cells
-    b(c) = b(c) + (p_d_i - p_i(c)) * grid_vol(c)
+  do c = Cells_In_Domain()
+    b(c) = b(c) + (p_d_i - p_i(c)) * Grid % vol(c)
   end do
   !$acc end parallel
 

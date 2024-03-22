@@ -224,14 +224,14 @@
 !@    write(name_grad_pp(6:7), '(i2.2)') Iter % Current()
 !@    write(name_grad_p (6:7), '(i2.2)') Iter % Current()
 
-      call Process % Compute_Momentum(Flow(1), comp=1)
-      call Process % Compute_Momentum(Flow(1), comp=2)
-      call Process % Compute_Momentum(Flow(1), comp=3)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=1)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=2)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=3)
 
-      call Process % Compute_Pressure(Flow(1))
+      call Process % Compute_Pressure(Flow(1), Grid(1))
 
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-      call Process % Correct_Velocity(Flow(1))
+      call Process % Correct_Velocity(Flow(1), Grid(1))
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
       ! End of the current iteration
@@ -240,7 +240,7 @@
     end do  ! iterations
 
     ! Calculate bulk fluxes and adjust pressure drops
-    call Flow(1) % Calculate_Bulk_Velocities()
+    call Flow(1) % Calculate_Bulk_Velocities(Grid(1))
     call Flow(1) % Adjust_P_Drops()
 
     ! Print the bulk values from the Info_Mod

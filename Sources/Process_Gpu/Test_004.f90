@@ -68,7 +68,7 @@
   ! Important before calling functions in Process which are ported to GPUs)
   call Flow % Update_Aliases()
 
-  call Process % Insert_Diffusion_Bc(Flow, comp=1)
+  call Process % Insert_Diffusion_Bc(Flow, Grid, comp=1)
 
   ! Take the aliases now
   Acon => Flow % Nat % C

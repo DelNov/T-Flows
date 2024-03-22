@@ -49,6 +49,12 @@
   O_Print '(a, i12)',   ' # The problem size is: ', n
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
+
+  do c = -Grid(1) % n_bnd_cells, -1
+    print *, Grid(1) % region % at_cell(c)
+  end do
+
+
   O_Print '(a)', ' #----------------------------------------------------'
   O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
   O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
@@ -212,14 +218,14 @@
 !@    write(name_grad_pp(6:7), '(i2.2)') Iter % Current()
 !@    write(name_grad_p (6:7), '(i2.2)') Iter % Current()
 
-      call Process % Compute_Momentum(Flow(1), comp=1)
-      call Process % Compute_Momentum(Flow(1), comp=2)
-      call Process % Compute_Momentum(Flow(1), comp=3)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=1)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=2)
+      call Process % Compute_Momentum(Flow(1), Grid(1), comp=3)
 
-      call Process % Compute_Pressure(Flow(1))
+      call Process % Compute_Pressure(Flow(1), Grid(1))
 
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-      call Process % Correct_Velocity(Flow(1))
+      call Process % Correct_Velocity(Flow(1), Grid(1))
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
       ! End of the current iteration
