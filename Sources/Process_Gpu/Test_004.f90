@@ -17,7 +17,7 @@
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
   real,                  pointer :: b(:), x(:)
-  integer                        :: m, n
+  integer                        :: nc, n
   real                           :: fin_res
   character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
@@ -36,8 +36,8 @@
   O_Print '(a)', ' # Creating a grid'
   call Grid % Load_And_Prepare_For_Processing(1)
 
-  m = Grid % n_cells
-  O_Print '(a,i12)',    ' # The problem size is: ', m
+  nc = Grid % n_cells
+  O_Print '(a,i12)',    ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
   O_Print '(a)', ' #----------------------------------------------------'
@@ -59,9 +59,11 @@
   ! Read numerical models from control file (after the memory is allocated)
   call Read_Control % Numerical_Schemes(Flow)
 
+  ! Transfer the necessary grid components to the device
   call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)
-  call Gpu % Vector_Real_Copy_To_Device(Grid % s)
-  call Gpu % Vector_Real_Copy_To_Device(Grid % d)
+  call Gpu % Vector_Int_Copy_To_Device(Grid % cells_n_cells)
+  call Gpu % Matrix_Int_Copy_To_Device(Grid % cells_c)
+  call Gpu % Matrix_Int_Copy_To_Device(Grid % cells_f)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_cell)
@@ -76,28 +78,34 @@
   b    => Flow % Nat % b
   x    => Flow % u % n
 
-  ! Initialize solution
-  x(:) = 0.0
+  ! Initialize solution (start from 1 not to overwrite boundary conditions)
+  x(1:nc) = 0.0
 
-  ! Copy components of the linear system to the device ...
+  ! Copy components of the linear system to the device
   call Gpu % Sparse_Con_Copy_To_Device(Acon)
   call Gpu % Sparse_Val_Copy_To_Device(Aval)
   call Gpu % Vector_Real_Copy_To_Device(x)
   call Gpu % Vector_Real_Copy_To_Device(b)
 
-  ! ... then discretize the system on the device (I hope)
-  call Process % Form_Momentum_Matrix(Flow, Grid)
-  call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)
-
   ! Allocate vectors related to CG algorithm on the device
   call Gpu % Native_Transfer_To_Device(Flow % Nat)
+
+  ! Copy physical properties as well
+  call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)
+  call Gpu % Vector_Real_Copy_To_Device(Flow % density)
+
+  !-------------------------------------------------!
+  !   Discretize the linear system for conduction   !
+  !-------------------------------------------------!
+  call Process % Form_Momentum_Matrix(Flow, Grid)
+  call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)
 
   !-----------------------------------------------!
   !   Performing a fake time loop on the device   !
   !-----------------------------------------------!
   O_Print '(a)', ' # Performing a demo of the preconditioned CG method'
   call Profiler % Start('Useful_Work')
-  call Flow % Nat % Cg(Acon, Aval, x, b, m, n, PICO, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, x, b, nc, n, PICO, fin_res)
   call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host
@@ -105,8 +113,9 @@
 
   ! Destroy all data on the device, you don't need them anymore
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % faces_c)
-  call Gpu % Vector_Real_Destroy_On_Device(Grid % s)
-  call Gpu % Vector_Real_Destroy_On_Device(Grid % d)
+  call Gpu % Vector_Int_Destroy_On_Device(Grid % cells_n_cells)
+  call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_c)
+  call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_f)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_face)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_face)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_cell)

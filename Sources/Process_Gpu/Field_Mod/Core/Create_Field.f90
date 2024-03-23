@@ -27,6 +27,9 @@
     allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
   end if
 
+  ! Helping array to discretize pressure Poisson equation
+  allocate(Flow % v_m(nc));  Flow % v_m(:) = 0.0
+
   !--------------------------------------------------------------!
   !   Create native solvers (matrices A, M, right hand side b,   !
   !   helping vectors for CG method such as p, q, r and d_inv)   !

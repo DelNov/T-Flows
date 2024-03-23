@@ -71,23 +71,16 @@
   O_Print '(a)', ' # Reading native solvers'
   call Read_Control % Native_Solvers(Flow(1))
 
-  ! Form preconditioning matrices on host
-  ! (Must be before transferring them)
-  call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % C, Flow(1) % Nat % M)
-  call Flow(1) % Nat % Prec_Form(Flow(1) % Nat % C, Flow(1) % Nat % A)
-
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix()
 
-  ! You are going to need connectivity matrix on device
+  ! You are going to need connectivity matrix on device ...
+  ! ... as well as matrices for momentum and pressure
   call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
-
-  ! OK, once you formed the preconditioners, you
-  ! will want to keep these matrices on the device
   call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % M)
   call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A)
 
-  ! and that bloody right-hand-side vector too
+  ! ... and the right-hand-side vector too
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)
 
   ! In addition to system matrices of your discretized
@@ -124,6 +117,8 @@
   ! for them all (b) and the variables whose gradients are
   ! being computed (pp % n and p % n) as well as gradient com
   ! ponents (pp % x, pp % y, pp % z, p % x, p % y and p % z)
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % viscosity)
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % density)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % pp % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % n)
@@ -139,6 +134,7 @@
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % y)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % z)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v_flux)
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v_m)
 
   ! This should be done for each domain, whenever a new domain is solved
   call Flow(1) % Update_Aliases()

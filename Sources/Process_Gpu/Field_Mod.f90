@@ -65,6 +65,9 @@
     type(Var_Type) :: p    !! pressure            [N/m^2] = [kg/m/s^2]
     type(Var_Type) :: pp   !! pressure correction [N/m^2] = [kg/m/s^2]
 
+    ! Used in pressure discretization
+    real, allocatable :: v_m(:)    !! cell volume over momentum diagonal
+
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !
     !-------------------------------------------------!

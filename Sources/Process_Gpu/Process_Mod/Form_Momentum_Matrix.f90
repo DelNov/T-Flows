@@ -28,11 +28,11 @@
   Mcon => Flow % Nat % C
   Mval => Flow % Nat % M
   val  => Flow % Nat % M % val  ! +
-  v_m  => Flow % Nat % M % v_m  ! +
   dia  => Flow % Nat % C % dia  ! +
   pos  => Flow % Nat % C % pos  ! +
   fc   => Flow % Nat % C % fc   ! +
 ! row  => Flow % Nat % C % row
+  v_m  => Flow % v_m
   dens => Flow % density
   visc => Flow % viscosity
   urf  =  Flow % u % urf

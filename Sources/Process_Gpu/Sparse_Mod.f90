@@ -93,7 +93,6 @@
     type(Grid_Type), pointer :: pnt_grid  !! pointer to grid
 
     real,    allocatable :: val(:)    !! value
-    real,    allocatable :: v_m(:)    !! cell volume over momentum diagonal
     real,    allocatable :: d_inv(:)  !! inverse dia. for preconditioner
 
     contains

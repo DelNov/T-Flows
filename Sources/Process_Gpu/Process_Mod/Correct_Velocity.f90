@@ -28,9 +28,9 @@
 
   ! Take some aliases
   b      => Flow % Nat % b
-  v_m    => Flow % Nat % M % v_m
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
+  v_m    => Flow % v_m
 
   !----------------------!
   !                      !

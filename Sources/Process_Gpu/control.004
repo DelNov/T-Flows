@@ -2,6 +2,8 @@
 
   DYNAMIC_VISCOSITY  1.0
 
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   1.0
+
   BOUNDARY_CONDITION symmetry_plane
     TYPE             symmetry
     VARIABLES        u

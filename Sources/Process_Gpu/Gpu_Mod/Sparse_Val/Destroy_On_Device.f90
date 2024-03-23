@@ -18,12 +18,10 @@
 
   !$acc exit data delete(Aval % val)
   !$acc exit data delete(Aval % d_inv)
-  !$acc exit data delete(Aval % v_m)
 
 # if T_FLOWS_GPU == 1
     Gpu % gb_used = Gpu % gb_used - (  real(sizeof(Aval % val))    &
-                                     + real(sizeof(Aval % d_inv))  &
-                                     + real(sizeof(Aval % v_m))) / GIGABYTE
+                                     + real(sizeof(Aval % d_inv))) / GIGABYTE
     print '(a,f7.3,a)', ' # '//__FILE__//' :', Gpu % gb_used, ' GB on device'
 # endif
 

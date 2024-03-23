@@ -49,11 +49,11 @@
   Aval => Flow % Nat % A
   Mval => Flow % Nat % M
   val  => Flow % Nat % A % val  ! +
-  v_m  => Flow % Nat % M % v_m  ! +
   dia  => Flow % Nat % C % dia  ! +
   pos  => Flow % Nat % C % pos  ! +
   fc   => Flow % Nat % C % fc
   nz   =  Flow % Nat % C % nonzeros
+  v_m  => Flow % v_m
 
   !$acc kernels
   do i = 1, nz

@@ -35,7 +35,6 @@
     contains
       procedure :: Cg             !! conjugate gradient solver
       procedure :: Create_Native  !! creates native solver context
-      procedure :: Prec_Form      !! forms a preconditioning matrix
 
   end type
 
@@ -43,6 +42,5 @@
 
 #   include "Native_Mod/Cg.f90"
 #   include "Native_Mod/Create_Native.f90"
-#   include "Native_Mod/Prec_Form.f90"
 
   end module
