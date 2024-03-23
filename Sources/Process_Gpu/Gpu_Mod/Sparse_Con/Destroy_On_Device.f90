@@ -19,11 +19,15 @@
   !$acc exit data delete(Acon % fc)
   !$acc exit data delete(Acon % row)
   !$acc exit data delete(Acon % col)
+  !$acc exit data delete(Acon % dia)
+  !$acc exit data delete(Acon % pos)
 
 # if T_FLOWS_GPU == 1
     Gpu % gb_used = Gpu % gb_used - (  real(sizeof(Acon % fc))     &
                                      + real(sizeof(Acon % row))    &
-                                     + real(sizeof(Acon % col))) / GIGABYTE
+                                     + real(sizeof(Acon % col))    &
+                                     + real(sizeof(Acon % dia))    &
+                                     + real(sizeof(Acon % pos))) / GIGABYTE
     print '(a,f7.3,a)', ' # '//__FILE__//' :', Gpu % gb_used, ' GB on device'
 # endif
 
