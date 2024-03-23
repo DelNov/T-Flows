@@ -71,12 +71,6 @@
   ! Read numerical models from control file (after the memory is allocated)
   call Read_Control % Numerical_Schemes(Flow(1))
 
-  ! Discretize momentum equations ...
-  call Process % Form_Diffusion_Matrix(Flow(1), Grid(1), dt=Flow(1) % dt)
-
-  ! ... followed by discretization of pressure equation
-  call Process % Form_Pressure_Matrix(Flow(1), Grid(1))
-
   O_Print '(a)', ' # Reading native solvers'
   call Read_Control % Native_Solvers(Flow(1))
 
@@ -178,7 +172,7 @@
   call Time % Set_First_Dt(0)
   call Time % Set_Last_Dt(ldt)
 
-  call Control % Results_Save_Interval (Results % interval, verbose=.true.)
+  call Control % Results_Save_Interval     (Results % interval, verbose=.true.)
   call Control % Save_Results_At_Boundaries(Results % boundary)
 
   ! Allocate CPU memory for working arrays (currently used for saving)

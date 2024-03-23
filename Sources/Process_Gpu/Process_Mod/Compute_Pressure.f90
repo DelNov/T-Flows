@@ -26,6 +26,11 @@
   tol    =  Flow % pp % tol
   pp_urf =  Flow % pp % urf
 
+  !-----------------------------------------------!
+  !   Discretize the pressure Poisson equations   !
+  !-----------------------------------------------!
+  call Process % Form_Pressure_Matrix(Flow, Grid)
+
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
   !---------------------------------------------------------------!

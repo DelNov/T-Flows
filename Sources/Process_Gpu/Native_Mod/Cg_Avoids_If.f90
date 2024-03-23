@@ -37,6 +37,13 @@
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
 
+  !---------------------!
+  !   Preconditioning   !
+  !---------------------!
+
+  ! Scalar over diagonal
+  call Linalg % Sca_O_Dia(ni, d_inv, 1.0, Acon, Aval)
+
   !----------------!
   !   r = b - Ax   !     =-->  (q used for temporary storing Ax)
   !----------------!

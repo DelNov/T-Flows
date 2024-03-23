@@ -41,18 +41,27 @@
   tol = Flow % u % tol
   urf = Flow % u % urf
 
+  !----------------------------------------------------!
+  !   Discretize the momentum conservation equations   !
+  !----------------------------------------------------!
+
+  ! Once is enough, it is the same for all components
+  if(comp .eq. 1) then
+    call Process % Form_Momentum_Matrix(Flow, Grid, dt=Flow % dt)
+  end if
+
   !----------------------------------------------------------!
   !   Insert proper sources (forces) to momentum equations   !
   !----------------------------------------------------------!
-  call Process % Insert_Diffusion_Bc(Flow, Grid, comp=comp)
+  call Process % Insert_Momentum_Bc(Flow, Grid, comp=comp)
   call Process % Add_Inertial_Term  (Flow, Grid, comp=comp)
   call Process % Add_Advection_Term (Flow, Grid, comp=comp)
   call Process % Add_Pressure_Term  (Flow, Grid, comp=comp)
 
-  !------------------------------------------!
-  !      Part 2 of the under-relaxation      !
-  !   (Part 1 is in Form_Diffusion_Matrix)   !
-  !------------------------------------------!
+  !-----------------------------------------!
+  !      Part 2 of the under-relaxation     !
+  !   (Part 1 is in Form_Momentum_Matrix)   !
+  !-----------------------------------------!
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()

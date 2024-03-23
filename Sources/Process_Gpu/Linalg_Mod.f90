@@ -18,6 +18,8 @@
     contains
       procedure          :: Mat_X_Vec
       procedure, private :: Mat_X_Vec_Acc
+      procedure          :: Sca_O_Dia
+      procedure, private :: Sca_O_Dia_Acc
       procedure          :: Vec_Copy
       procedure, private :: Vec_Copy_Acc
       procedure          :: Vec_D_Vec
@@ -41,6 +43,8 @@
   contains
 #   include "Linalg_Mod/Mat_X_Vec.f90"
 #   include "Linalg_Mod/Mat_X_Vec_Acc.f90"
+#   include "Linalg_Mod/Sca_O_Dia.f90"
+#   include "Linalg_Mod/Sca_O_Dia_Acc.f90"
 #   include "Linalg_Mod/Vec_Copy.f90"
 #   include "Linalg_Mod/Vec_Copy_Acc.f90"
 #   include "Linalg_Mod/Vec_D_Vec.f90"

@@ -79,9 +79,6 @@
   ! Initialize solution
   x(:) = 0.0
 
-  ! Before copying matrix components, create a preconditioning diagonal
-  call Flow % Nat % Prec_Form(Acon, Aval)
-
   ! Copy components of the linear system to the device ...
   call Gpu % Sparse_Con_Copy_To_Device(Acon)
   call Gpu % Sparse_Val_Copy_To_Device(Aval)
@@ -89,8 +86,8 @@
   call Gpu % Vector_Real_Copy_To_Device(b)
 
   ! ... then discretize the system on the device (I hope)
-  call Process % Form_Diffusion_Matrix(Flow, Grid)
-  call Process % Insert_Diffusion_Bc(Flow, Grid, comp=1)
+  call Process % Form_Momentum_Matrix(Flow, Grid)
+  call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)
 
   ! Allocate vectors related to CG algorithm on the device
   call Gpu % Native_Transfer_To_Device(Flow % Nat)

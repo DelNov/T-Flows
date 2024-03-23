@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Insert_Diffusion_Bc(Process, Flow, Grid, comp)
+  subroutine Insert_Momentum_Bc(Process, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -15,7 +15,7 @@
   Unused(Process)
 !==============================================================================!
 
-  call Profiler % Start('Insert_Diffusion_Bc')
+  call Profiler % Start('Insert_Momentum_Bc')
 
   ! Take some aliases
   b    => Flow % Nat % b
@@ -49,6 +49,6 @@
     end if
   end do
 
-  call Profiler % Stop('Insert_Diffusion_Bc')
+  call Profiler % Stop('Insert_Momentum_Bc')
 
   end subroutine

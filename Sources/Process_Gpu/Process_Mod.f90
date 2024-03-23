@@ -32,8 +32,8 @@
 
       ! Related to momentum conservation
       procedure :: Compute_Momentum
-      procedure :: Form_Diffusion_Matrix
-      procedure :: Insert_Diffusion_Bc
+      procedure :: Form_Momentum_Matrix
+      procedure :: Insert_Momentum_Bc
       procedure :: Add_Advection_Term
       procedure :: Add_Inertial_Term
       procedure :: Add_Pressure_Term
@@ -53,8 +53,8 @@
 
     ! Related to momentum conservation
 #   include "Process_Mod/Compute_Momentum.f90"
-#   include "Process_Mod/Form_Diffusion_Matrix.f90"
-#   include "Process_Mod/Insert_Diffusion_Bc.f90"
+#   include "Process_Mod/Form_Momentum_Matrix.f90"
+#   include "Process_Mod/Insert_Momentum_Bc.f90"
 #   include "Process_Mod/Add_Advection_Term.f90"
 #   include "Process_Mod/Add_Inertial_Term.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
