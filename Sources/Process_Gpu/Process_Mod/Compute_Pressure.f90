@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Compute_Pressure(Proc, Flow, Grid)
+  subroutine Compute_Pressure(Process, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
@@ -13,7 +13,7 @@
   real                           :: tol, fin_res, pp_urf, p_max, p_min
   integer                        :: m, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Compute_Pressure')

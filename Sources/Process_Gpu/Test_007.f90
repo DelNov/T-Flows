@@ -17,7 +17,7 @@
   type(Grid_Type)          :: Grid(MD)      ! computational grid
   type(Field_Type), target :: Flow(MD)      ! flow field
   real                     :: ts, te
-  integer                  :: n, c, ldt
+  integer                  :: nc, c, ldt
   logical                  :: exit_now
   character(11)            :: name_vel     = 'TTTT_II_uvw'
   character( 9)            :: name_p       = 'TTTT_II_p'
@@ -45,15 +45,9 @@
   O_Print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
-  n = Grid(1) % n_cells
-  O_Print '(a, i12)',   ' # The problem size is: ', n
+  nc = Grid(1) % n_cells
+  O_Print '(a, i12)',   ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
-
-
-  do c = -Grid(1) % n_bnd_cells, -1
-    print *, Grid(1) % region % at_cell(c)
-  end do
-
 
   O_Print '(a)', ' #----------------------------------------------------'
   O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
@@ -75,10 +69,10 @@
   call Read_Control % Numerical_Schemes(Flow(1))
 
   ! Discretize momentum equations ...
-  call Process % Form_Diffusion_Matrix(Flow(1), dt=Flow(1) % dt)
+  call Process % Form_Diffusion_Matrix(Flow(1), Grid(1), dt=Flow(1) % dt)
 
   ! ... followed by discretization of pressure equation
-  call Process % Form_Pressure_Matrix(Flow(1))
+  call Process % Form_Pressure_Matrix(Flow(1), Grid(1))
 
   O_Print '(a)', ' # Reading native solvers'
   call Read_Control % Native_Solvers(Flow(1))
@@ -124,6 +118,8 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)
+  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_cell)
+  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_cell)
 
   ! ... and the vectors of the native suite of solvers
   call Gpu % Native_Transfer_To_Device(Flow(1) % Nat)
@@ -191,7 +187,7 @@
 
     ! Preparation for the new time step
     !$acc parallel loop
-    do c = 1, n
+    do c = 1, nc
       u_o(c) = u_n(c)
       v_o(c) = v_n(c)
       w_o(c) = w_n(c)

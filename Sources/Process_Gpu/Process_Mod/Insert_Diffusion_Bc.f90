@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Insert_Diffusion_Bc(Proc, Flow, Grid, comp)
+  subroutine Insert_Diffusion_Bc(Process, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
   integer                  :: comp
@@ -12,7 +12,7 @@
   real                      :: m12
   integer                   :: reg, s, c1, c2
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Insert_Diffusion_Bc')

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Insert_Volume_Source_For_Pressure(Proc, Flow, Grid)
+  subroutine Insert_Volume_Source_For_Pressure(Process, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -27,7 +27,7 @@
 !     p%x, p%y, p%z   [kg/(m^2 s^2)]                                           !
 !     b               [m^3/s]                                                  !
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
@@ -38,7 +38,7 @@
   real                      :: area_in, area_out, vol_in, vol_out, ratio
   integer                   :: s, c1, c2, i_cel, c, reg
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Insert_Volume_Source_For_Pressure')

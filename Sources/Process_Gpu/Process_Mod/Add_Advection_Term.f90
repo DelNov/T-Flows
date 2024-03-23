@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Advection_Term(Proc, Flow, Grid, comp)
+  subroutine Add_Advection_Term(Process, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
 !   Thoroughly re-vamped for the GPU_2                                         !
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !   Dimension of the system under consideration                                !
 !     [M]{u} = {b}   [kgm/s^2]   [N]                                           !
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
   integer                  :: comp
@@ -17,7 +17,7 @@
   real                      :: b_tmp, den_u1, den_u2, dens_f, ui_c, blend
   integer                   :: s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Add_Advection_Term')

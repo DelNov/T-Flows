@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Pressure_Term(Proc, Flow, Grid, comp)
+  subroutine Add_Pressure_Term(Process, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !   Pressure gradient times volume:                                            !
 !     p % x * vol  [kg/(m^2 s^2) * m^3 = kg m / s^2 = N]                       !
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
   integer                  :: comp
@@ -21,7 +21,7 @@
   real                      :: p_d_i
   integer                   :: c
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Add_Pressure_Term')

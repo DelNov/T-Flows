@@ -1,9 +1,9 @@
 !==============================================================================!
-  subroutine Add_Inertial_Term(Proc, Flow, Grid, comp)
+  subroutine Add_Inertial_Term(Process, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
   integer                  :: comp
@@ -11,7 +11,7 @@
   real, contiguous, pointer :: ui_o(:), b(:), dens(:)
   integer                   :: c
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Add_Inertial_Term')

@@ -17,7 +17,7 @@
   type(Grid_Type)          :: Grid(MD)      ! computational grid
   type(Field_Type), target :: Flow(MD)      ! flow field
   real                     :: ts, te
-  integer                  :: n, c, ldt
+  integer                  :: nc, c, ldt
   logical                  :: exit_now
   character(11)            :: name_vel     = 'TTTT_II_uvw'
   character( 9)            :: name_p       = 'TTTT_II_p'
@@ -48,8 +48,8 @@
   O_Print '(a)', ' # Reading physical models'
   call Read_Control % Physical_Models(Flow(1))
 
-  n = Grid(1) % n_cells
-  O_Print '(a, i12)',   ' # The problem size is: ', n
+  nc = Grid(1) % n_cells
+  O_Print '(a, i12)',   ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
   O_Print '(a)', ' #----------------------------------------------------'
@@ -72,10 +72,10 @@
   call Read_Control % Numerical_Schemes(Flow(1))
 
   ! Discretize momentum equations ...
-  call Process % Form_Diffusion_Matrix(Flow(1), dt=Flow(1) % dt)
+  call Process % Form_Diffusion_Matrix(Flow(1), Grid(1), dt=Flow(1) % dt)
 
   ! ... followed by discretization of pressure equation
-  call Process % Form_Pressure_Matrix(Flow(1))
+  call Process % Form_Pressure_Matrix(Flow(1), Grid(1))
 
   O_Print '(a)', ' # Reading native solvers'
   call Read_Control % Native_Solvers(Flow(1))
@@ -89,13 +89,13 @@
   call Flow(1) % Calculate_Grad_Matrix()
 
   ! Initialize solution
-  Flow(1) % u % n(1:n) = 3.8
-  Flow(1) % v % n(1:n) = 0.0
-  Flow(1) % w % n(1:n) = 0.0
+  Flow(1) % u % n(1:nc) = 3.8
+  Flow(1) % v % n(1:nc) = 0.0
+  Flow(1) % w % n(1:nc) = 0.0
 
-  Flow(1) % u % o(1:n) = 3.8
-  Flow(1) % v % o(1:n) = 0.0
-  Flow(1) % w % o(1:n) = 0.0
+  Flow(1) % u % o(1:nc) = 3.8
+  Flow(1) % v % o(1:nc) = 0.0
+  Flow(1) % w % o(1:nc) = 0.0
 
   ! You are going to need connectivity matrix on device
   call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
@@ -130,6 +130,8 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)
+  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_cell)
+  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_cell)
 
   ! ... and the vectors of the native suite of solvers
   call Gpu % Native_Transfer_To_Device(Flow(1) % Nat)
@@ -197,7 +199,7 @@
 
     ! Preparation for the new time step
     !$acc parallel loop
-    do c = 1, n
+    do c = 1, nc
       u_o(c) = u_n(c)
       v_o(c) = v_n(c)
       w_o(c) = w_n(c)

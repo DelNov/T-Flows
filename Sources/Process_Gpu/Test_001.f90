@@ -55,7 +55,7 @@
   call Read_Control % Physical_Properties(Flow)
 
   ! Discretize the matrix for diffusion
-  call Process % Form_Diffusion_Matrix(Flow)
+  call Process % Form_Diffusion_Matrix(Flow, Grid)
 
   ! Take the alias now
   Acon => Flow % Nat % C

@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Form_Diffusion_Matrix(Proc, Flow, dt)
+  subroutine Form_Diffusion_Matrix(Process, Flow, Grid, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
   real,           optional :: dt                 !! time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),       pointer :: Grid
   type(Sparse_Con_Type), pointer :: Mcon
   type(Sparse_Val_Type), pointer :: Mval
   real, contiguous,      pointer :: visc(:), dens(:)
@@ -17,13 +17,12 @@
   real, allocatable :: work(:)
 # endif
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Form_Diffusion_Matrix')
 
   ! Take some aliases
-  Grid => Flow % pnt_grid
   Mcon => Flow % Nat % C
   Mval => Flow % Nat % M
   dens => Flow % density

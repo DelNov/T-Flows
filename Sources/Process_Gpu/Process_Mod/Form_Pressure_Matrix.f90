@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Form_Pressure_Matrix(Proc, Flow)
+  subroutine Form_Pressure_Matrix(Process, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -27,23 +27,22 @@
 !     p%x, p%y, p%z   [kg / (m^2 s^2)]                                         !
 !     b               [m^3 / s]                                                !
 !------------------------------------------------------------------------------!
-  class(Process_Type)      :: Proc
+  class(Process_Type)      :: Process
   type(Field_Type), target :: Flow
+  type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),       pointer :: Grid
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval, Mval
   integer                        :: s, c1, c2, c
   real                           :: a12
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Proc)
+  Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Form_Pressure_Matrix')
 
   ! Take some aliases
-  Grid => Flow % pnt_grid
   Acon => Flow % Nat % C
   Aval => Flow % Nat % A
   Mval => Flow % Nat % M
