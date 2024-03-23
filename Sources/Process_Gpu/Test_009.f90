@@ -19,11 +19,6 @@
   real                     :: ts, te
   integer                  :: nc, c, ldt
   logical                  :: exit_now
-  character(11)            :: name_vel     = 'TTTT_II_uvw'
-  character( 9)            :: name_p       = 'TTTT_II_p'
-!@character(10)            :: name_pp      = 'TTTT_II_pp'
-!@character(14)            :: name_grad_p  = 'TTTT_II_grad_p'
-!@character(15)            :: name_grad_pp = 'TTTT_II_grad_pp'
   character(11)            :: root_control = 'control.009'
 !==============================================================================!
 
@@ -77,8 +72,8 @@
   ! You are going to need connectivity matrix on device ...
   ! ... as well as matrices for momentum and pressure
   call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
-  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % M)
-  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A)
+  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_UVW))
+  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_PP))
 
   ! ... and the right-hand-side vector too
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)
@@ -184,12 +179,6 @@
     end do
     !$acc end parallel
 
-    write(name_vel    (1:4), '(i4.4)') Time % Curr_Dt()
-    write(name_p      (1:4), '(i4.4)') Time % Curr_Dt()
-!@  write(name_pp     (1:4), '(i4.4)') Time % Curr_Dt()
-!@  write(name_grad_pp(1:4), '(i4.4)') Time % Curr_Dt()
-!@  write(name_grad_p (1:4), '(i4.4)') Time % Curr_Dt()
-
     !-----------------------------------!
     !   Iterations within a time step   !
     !-----------------------------------!
@@ -197,12 +186,6 @@
 
       ! Beginning of iteration
       call Info % Iter_Fill(Iter % Current())
-
-!@    write(name_vel    (6:7), '(i2.2)') Iter % Current()
-!@    write(name_p      (6:7), '(i2.2)') Iter % Current()
-!@    write(name_pp     (6:7), '(i2.2)') Iter % Current()
-!@    write(name_grad_pp(6:7), '(i2.2)') Iter % Current()
-!@    write(name_grad_p (6:7), '(i2.2)') Iter % Current()
 
       call Process % Compute_Momentum(Flow(1), Grid(1), comp=1)
       call Process % Compute_Momentum(Flow(1), Grid(1), comp=2)

@@ -11,7 +11,7 @@
   type(Sparse_Con_Type), pointer :: Mcon
   type(Sparse_Val_Type), pointer :: Mval
   real,      contiguous, pointer :: val(:), v_m(:), fc(:)
-  integer,   contiguous, pointer :: dia(:), pos(:,:), row(:)
+  integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: visc(:), dens(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: m12, urf
@@ -24,14 +24,21 @@
 
   call Profiler % Start('Form_Momentum_Matrix')
 
-  ! Take some aliases
+  !------------------------------------------------------------!
+  !   First take some aliases, which is quite elaborate here   !
+  !------------------------------------------------------------!
   Mcon => Flow % Nat % C
-  Mval => Flow % Nat % M
-  val  => Flow % Nat % M % val  ! +
-  dia  => Flow % Nat % C % dia  ! +
-  pos  => Flow % Nat % C % pos  ! +
-  fc   => Flow % Nat % C % fc   ! +
-! row  => Flow % Nat % C % row
+  if(Flow % Nat % use_one_matrix) then
+    Mval => Flow % Nat % A(MATRIX_ONE)
+    val  => Flow % Nat % A(MATRIX_ONE) % val
+  else
+    Mval => Flow % Nat % A(MATRIX_UVW)
+    val  => Flow % Nat % A(MATRIX_UVW) % val
+    if(Flow % Nat % A(MATRIX_UVW) % formed) return
+  end if
+  dia  => Flow % Nat % C % dia
+  pos  => Flow % Nat % C % pos
+  fc   => Flow % Nat % C % fc
   v_m  => Flow % v_m
   dens => Flow % density
   visc => Flow % viscosity
@@ -114,6 +121,11 @@
     val(dia(c)) = val(dia(c)) / urf
   end do
   !$acc end parallel
+
+  !-------------------------------!
+  !   Mark the matrix as formed   !
+  !-------------------------------!
+  Mval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

@@ -92,8 +92,10 @@
 
     type(Grid_Type), pointer :: pnt_grid  !! pointer to grid
 
-    real,    allocatable :: val(:)    !! value
-    real,    allocatable :: d_inv(:)  !! inverse dia. for preconditioner
+    logical :: formed = .false.  !! set to true when matrix is formed
+
+    real, allocatable :: val(:)    !! value
+    real, allocatable :: d_inv(:)  !! inverse diagonal for preconditioner
 
     contains
       procedure :: Create_Sparse_Val

@@ -59,7 +59,7 @@
 
   ! Take the alias now
   Acon => Flow % Nat % C
-  Aval => Flow % Nat % M
+  Aval => Flow % Nat % A(MATRIX_UVW)
 
   allocate(b(nc))
   allocate(c(nc))

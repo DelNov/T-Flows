@@ -32,7 +32,7 @@
   type(Grid_Type), intent(in) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Con_Type), pointer :: Acon
-  type(Sparse_Val_Type), pointer :: Aval, Mval
+  type(Sparse_Val_Type), pointer :: Aval
   real,      contiguous, pointer :: val(:), v_m(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   integer                        :: s, c1, c2, c, i_cel, i, nz
@@ -46,11 +46,16 @@
 
   ! Take some aliases
   Acon => Flow % Nat % C
-  Aval => Flow % Nat % A
-  Mval => Flow % Nat % M
-  val  => Flow % Nat % A % val  ! +
-  dia  => Flow % Nat % C % dia  ! +
-  pos  => Flow % Nat % C % pos  ! +
+  if(Flow % Nat % use_one_matrix) then
+    Aval => Flow % Nat % A(MATRIX_ONE)
+    val  => Flow % Nat % A(MATRIX_ONE) % val
+  else
+    Aval => Flow % Nat % A(MATRIX_PP)
+    val  => Flow % Nat % A(MATRIX_PP) % val
+    if(Flow % Nat % A(MATRIX_PP) % formed) return
+  end if
+  dia  => Flow % Nat % C % dia
+  pos  => Flow % Nat % C % pos
   fc   => Flow % Nat % C % fc
   nz   =  Flow % Nat % C % nonzeros
   v_m  => Flow % v_m
@@ -92,6 +97,11 @@
     val(dia(c)) = val(dia(c)) * (1.0 + MICRO)
   end do
   !$acc end parallel
+
+  !-------------------------------!
+  !   Mark the matrix as formed   !
+  !-------------------------------!
+  Aval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

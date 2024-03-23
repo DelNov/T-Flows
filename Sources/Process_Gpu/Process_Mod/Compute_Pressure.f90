@@ -10,8 +10,8 @@
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
   real, contiguous,      pointer :: b(:)
-  real                           :: tol, fin_res, pp_urf, p_max, p_min
-  integer                        :: m, n, c
+  real                           :: tol, fin_res, urf, p_max, p_min
+  integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -19,12 +19,16 @@
   call Profiler % Start('Compute_Pressure')
 
   ! Take some aliases
-  Acon   => Flow % Nat % C
-  Aval   => Flow % Nat % A
-  b      => Flow % Nat % b
-  m      =  Flow % pnt_grid % n_cells
-  tol    =  Flow % pp % tol
-  pp_urf =  Flow % pp % urf
+  Acon => Flow % Nat % C
+  if(Flow % Nat % use_one_matrix) then
+    Aval => Flow % Nat % A(MATRIX_ONE)
+  else
+    Aval => Flow % Nat % A(MATRIX_PP)
+  end if
+  b    => Flow % Nat % b
+  nc   =  Flow % pnt_grid % n_cells
+  tol  =  Flow % pp % tol
+  urf  =  Flow % pp % urf
 
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
@@ -46,7 +50,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, pp_n, b, m, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, pp_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Pressure')
 
   call Info % Iter_Fill_At(1, 4, 'PP', fin_res, n)
@@ -57,7 +61,7 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    p_n(c) = p_n(c) + pp_urf * pp_n(c)
+    p_n(c) = p_n(c) + urf * pp_n(c)
   end do
   !$acc end parallel
 

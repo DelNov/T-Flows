@@ -11,8 +11,12 @@
   Nat % pnt_grid => Grid
 
   call Nat % C % Create_Sparse_Con(Grid)
-  call Nat % A % Create_Sparse_Val(Nat % C)
-  call Nat % M % Create_Sparse_Val(Nat % C)
+  if(Nat % use_one_matrix) then
+    call Nat % A(MATRIX_ONE) % Create_Sparse_Val(Nat % C)
+  else
+    call Nat % A(MATRIX_UVW) % Create_Sparse_Val(Nat % C)
+    call Nat % A(MATRIX_PP)  % Create_Sparse_Val(Nat % C)
+  end if
 
   ! Right-hand side vector us part of this
   allocate(Nat % b(Grid % n_cells))

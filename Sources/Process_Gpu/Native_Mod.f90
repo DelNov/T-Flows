@@ -1,4 +1,4 @@
-#include "../Shared/Browse.h90"  ! needed for O_Print :-/
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Native_Mod
@@ -7,6 +7,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  integer, parameter :: MATRIX_UVW  =  1
+  integer, parameter :: MATRIX_PP   =  2
+  integer, parameter :: MATRIX_T    =  3
+  integer, parameter :: MATRIX_ONE  =  1
 
   !-----------------!
   !   Native type   !
@@ -18,11 +23,11 @@
     ! Connectivity matrix
     type(Sparse_Con_Type) :: C  !! connectivity matrix for all variables
 
-    ! Matrix for all variables except momentum
-    type(Sparse_Val_Type) :: A  !! system value matrix entries for pressure
+    ! Matrices for all variables.  In this early stage of development,
+    ! index 1 will belong to momentum, index 2 to pressure
+    type(Sparse_Val_Type) :: A(3)  !! system value matrices
 
-    ! Matrix for momentum equations
-    type(Sparse_Val_Type) :: M  !! system value matrix entries for momentum
+    logical :: use_one_matrix = .true.  !! matrix space reused?
 
     ! Right-hand side vector for all variables
     real, allocatable :: b(:)

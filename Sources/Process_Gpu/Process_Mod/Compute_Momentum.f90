@@ -10,12 +10,12 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Mval
   type(Sparse_Con_Type), pointer :: Mcon
-  real,                  pointer :: m_val(:)
-  integer,               pointer :: m_dia(:)
+  real,                  pointer :: val(:)
+  integer,               pointer :: dia(:)
   real,                  pointer :: b(:)
   real,                  pointer :: ui_n(:)
   real                           :: tol, fin_res, urf
-  integer                        :: m, n, c
+  integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -25,14 +25,22 @@
   Assert(comp .ge. 1)
   Assert(comp .le. 3)
 
-  ! Take some aliases
-  Mval    => Flow % Nat % M
-  Mcon    => Flow % Nat % C
-  m_val   => Flow % Nat % M % val
-  m_dia   => Flow % Nat % C % dia
-  b       => Flow % Nat % b
-  m       =  Flow % pnt_grid % n_cells
+  !------------------------------------------------------------!
+  !   First take some aliases, which is quite elaborate here   !
+  !------------------------------------------------------------!
+  Mcon => Flow % Nat % C
+  if(Flow % Nat % use_one_matrix) then
+    Mval => Flow % Nat % A(MATRIX_ONE)
+    val  => Flow % Nat % A(MATRIX_ONE) % val
+  else
+    Mval => Flow % Nat % A(MATRIX_UVW)
+    val  => Flow % Nat % A(MATRIX_UVW) % val
+  end if
+  dia  => Flow % Nat % C % dia
+  b    => Flow % Nat % b
+  nc   =  Flow % pnt_grid % n_cells
   fin_res = 0.0
+
   if(comp .eq. 1) ui_n => u_n
   if(comp .eq. 2) ui_n => v_n
   if(comp .eq. 3) ui_n => w_n
@@ -65,7 +73,7 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    b(c) = b(c) + m_val(m_dia(c)) * (1.0 - urf) * ui_n(c)
+    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * ui_n(c)
   end do
   !$acc end parallel
 
@@ -73,7 +81,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(Mcon, Mval, ui_n, b, m, n, tol, fin_res)
+  call Flow % Nat % Cg(Mcon, Mval, ui_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Momentum')
 
   if(comp.eq.1) call Info % Iter_Fill_At(1, 1, 'U', fin_res, n)

@@ -74,7 +74,7 @@
 
   ! Take the aliases now
   Acon => Flow % Nat % C
-  Aval => Flow % Nat % M
+  Aval => Flow % Nat % A(MATRIX_UVW)
   b    => Flow % Nat % b
   x    => Flow % u % n
 
