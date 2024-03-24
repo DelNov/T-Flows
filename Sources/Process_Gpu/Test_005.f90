@@ -12,9 +12,6 @@
 !------------------------------------------------------------------------------!
   type(Grid_Type)    :: Grid            ! computational grid
   type(Field_Type)   :: Flow            ! flow field
-  real, allocatable  :: phi_x(:)        ! gradient in x direction
-  real, allocatable  :: phi_y(:)        ! gradient in y direction
-  real, allocatable  :: phi_z(:)        ! gradient in z direction
   integer, parameter :: N_STEPS = 120   ! spend enough time on device
   integer            :: n, c, step
   character(len=11)  :: root_control = 'control.005'
@@ -47,11 +44,6 @@
   O_Print '(a)', ' # Creating a field'
   call Flow % Create_Field(Grid)
 
-  O_Print '(a)', ' # Allocating and initializing arrays for gradients'
-  allocate(phi_x(-Grid % n_bnd_cells:Grid % n_cells));  phi_x(:) = 0.0
-  allocate(phi_y(-Grid % n_bnd_cells:Grid % n_cells));  phi_y(:) = 0.0
-  allocate(phi_z(-Grid % n_bnd_cells:Grid % n_cells));  phi_z(:) = 0.0
-
   O_Print '(a)', ' # Initialize phi with something'
   do c = -Grid % n_bnd_cells, Grid % n_cells - Grid % Comm % n_buff_cells
     Flow % p % n(c) = 0.111111 * Grid % xc(c)**2  &
@@ -77,9 +69,9 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid % dy)
   call Gpu % Vector_Real_Copy_To_Device(Grid % dz)
   call Gpu % Vector_Real_Copy_To_Device(Flow % p % n)
-  call Gpu % Vector_Real_Create_On_Device(phi_x)
-  call Gpu % Vector_Real_Create_On_Device(phi_y)
-  call Gpu % Vector_Real_Create_On_Device(phi_z)
+  call Gpu % Vector_Real_Create_On_Device(Flow % p % x)
+  call Gpu % Vector_Real_Create_On_Device(Flow % p % y)
+  call Gpu % Vector_Real_Create_On_Device(Flow % p % z)
 
   O_Print '(a,i6,a)', ' # Calculating gradients of the field over ',  &
                     N_STEPS, ' pseudo time steps'
@@ -88,19 +80,21 @@
     if(mod(step, 12) .eq. 0) then
       O_Print '(a,i12,es12.3)', ' time step = ', step
     end if
-    call Flow % Grad_Component(Grid, Flow % p % n, 1, phi_x)
-    call Flow % Grad_Component(Grid, Flow % p % n, 2, phi_y)
-    call Flow % Grad_Component(Grid, Flow % p % n, 3, phi_z)
+    call Flow % Grad_Component(Grid, Flow % p % n, 1, Flow % p % x)
+    call Flow % Grad_Component(Grid, Flow % p % n, 2, Flow % p % y)
+    call Flow % Grad_Component(Grid, Flow % p % n, 3, Flow % p % z)
   end do
   call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host
-  call Gpu % Vector_Update_Host(phi_x)
-  call Gpu % Vector_Update_Host(phi_y)
-  call Gpu % Vector_Update_Host(phi_z)
-  call Grid % Save_Debug_Vtu("grad",              &
-                             vector_name="grad",  &
-                             vector_cell=(/phi_x, phi_y, phi_z/))
+  call Gpu % Vector_Update_Host(Flow % p % x)
+  call Gpu % Vector_Update_Host(Flow % p % y)
+  call Gpu % Vector_Update_Host(Flow % p % z)
+  call Grid % Save_Debug_Vtu("grad",                      &
+                             vector_name="grad",          &
+                             vector_cell=(/Flow % p % x,  &
+                                           Flow % p % y,  &
+                                           Flow % p % z/))
 
   ! Destroy data on the device, you don't need them anymore
   call Gpu % Matrix_Real_Destroy_On_Device(Flow % grad_c2c)
@@ -113,9 +107,9 @@
   call Gpu % Vector_Real_Destroy_On_Device(Grid % dy)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % dz)
   call Gpu % Vector_Real_Destroy_On_Device(Flow % p % n)
-  call Gpu % Vector_Real_Destroy_On_Device(phi_x)
-  call Gpu % Vector_Real_Destroy_On_Device(phi_y)
-  call Gpu % Vector_Real_Destroy_On_Device(phi_z)
+  call Gpu % Vector_Real_Destroy_On_Device(Flow % p % x)
+  call Gpu % Vector_Real_Destroy_On_Device(Flow % p % y)
+  call Gpu % Vector_Real_Destroy_On_Device(Flow % p % z)
 
   ! End the profiler and the parallel run
   call Profiler % Stop('Test_005')

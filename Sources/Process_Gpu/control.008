@@ -7,7 +7,7 @@
 # Time stepping
 #---------------
   TIME_STEP                 0.00002
-  NUMBER_OF_TIME_STEPS 18000
+  NUMBER_OF_TIME_STEPS  18000
 
   RESULTS_SAVE_INTERVAL   120
 
@@ -24,6 +24,8 @@
   SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
 
   MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   4
+
+  USE_ONE_MATRIX   no
 
 #---------------------
 # Physical properties

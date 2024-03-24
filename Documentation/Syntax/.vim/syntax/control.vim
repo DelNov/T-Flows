@@ -138,6 +138,7 @@ syn keyword controlKeyword   TOLERANCE_FOR_SCALARS_SOLVER
 syn keyword controlKeyword   TOLERANCE_FOR_TURBULENCE_SOLVER
 syn keyword controlKeyword   TOLERANCE_FOR_VOF_SOLVER
 syn keyword controlKeyword   TOLERANCE_FOR_WALL_DISTANCE_SOLVER
+syn keyword controlKeyword   USE_ONE_MATRIX
 " PETSc options
 syn keyword controlKeyword   PETSC_OPTIONS
 syn keyword controlKeyword   PETSC_OPTIONS_FOR_MOMENTUM

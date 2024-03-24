@@ -27,7 +27,12 @@
     ! index 1 will belong to momentum, index 2 to pressure
     type(Sparse_Val_Type) :: A(3)  !! system value matrices
 
-    logical :: use_one_matrix = .true.  !! matrix space reused?
+    ! If the following data member is set to .true., all variables will
+    ! be discretized in one memory space, one matrix.  Economic memory-
+    ! wise, but more time is spent on forming matrices.  If, however,
+    ! it is set to .false., each variable will have its own memory space
+    ! for its matrix.  That will use more memory, but will be faster.
+    logical :: use_one_matrix  !! matrix space reused?
 
     ! Right-hand side vector for all variables
     real, allocatable :: b(:)

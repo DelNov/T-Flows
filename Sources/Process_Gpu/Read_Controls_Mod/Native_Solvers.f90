@@ -26,6 +26,11 @@
   ! Take alias
   Grid => Flow % pnt_grid
 
+  !-------------------------------!
+  !   Related to matrix storage   !
+  !-------------------------------!
+  call Control % Use_One_Matrix(Flow % Nat % use_one_matrix, .true.)
+
   !-------------------------!
   !   Related to momentum   !
   !-------------------------!
