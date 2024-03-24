@@ -72,8 +72,12 @@
   ! You are going to need connectivity matrix on device ...
   ! ... as well as matrices for momentum and pressure
   call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
-  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_UVW))
-  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_PP))
+  if(Flow(1) % Nat % use_one_matrix) then
+    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_ONE))
+  else
+    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_UVW))
+    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_PP))
+  endif
 
   ! ... and the right-hand-side vector too
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)
@@ -97,6 +101,7 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sy)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sz)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % s)
+  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % d)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)

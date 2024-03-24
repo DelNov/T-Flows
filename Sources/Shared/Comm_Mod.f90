@@ -125,6 +125,8 @@
       procedure :: Lor_Log_Array
       procedure :: Max_Int
       procedure :: Max_Real
+      procedure :: Max_Real_Array
+      procedure :: Max_Reals
       procedure :: Min_Int
       procedure :: Min_Real
       procedure :: Start_Parallel
@@ -195,6 +197,8 @@
 #   include "Comm_Mod/Parallel/Global/Lor_Log.f90"
 #   include "Comm_Mod/Parallel/Global/Lor_Log_Array.f90"
 #   include "Comm_Mod/Parallel/Global/Max_Real.f90"
+#   include "Comm_Mod/Parallel/Global/Max_Real_Array.f90"
+#   include "Comm_Mod/Parallel/Global/Max_Reals.f90"
 #   include "Comm_Mod/Parallel/Global/Min_Real.f90"
 #   include "Comm_Mod/Parallel/Global/Max_Int.f90"
 #   include "Comm_Mod/Parallel/Global/Min_Int.f90"
@@ -244,6 +248,8 @@
 #   include "Comm_Mod/Sequential/Global/Lor_Log.f90"
 #   include "Comm_Mod/Sequential/Global/Lor_Log_Array.f90"
 #   include "Comm_Mod/Sequential/Global/Max_Real.f90"
+#   include "Comm_Mod/Sequential/Global/Max_Real_Array.f90"
+#   include "Comm_Mod/Sequential/Global/Max_Reals.f90"
 #   include "Comm_Mod/Sequential/Global/Min_Real.f90"
 #   include "Comm_Mod/Sequential/Global/Max_Int.f90"
 #   include "Comm_Mod/Sequential/Global/Min_Int.f90"

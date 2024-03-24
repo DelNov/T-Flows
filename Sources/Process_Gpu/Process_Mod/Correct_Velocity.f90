@@ -18,7 +18,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), v_flux(:)
   real, contiguous, pointer :: v_m(:), fc(:)
+  real, contiguous, pointer :: visc(:), dens(:)
   real                      :: a12, b_tmp, max_abs_val
+  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -31,6 +33,8 @@
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
   v_m    => Flow % v_m
+  dens   => Flow % density
+  visc   => Flow % viscosity
 
   !----------------------!
   !                      !
@@ -142,6 +146,36 @@
   ! Find maximum volume balance error over all processors
   call Global % Max_Real(max_abs_val)
 
+  !------------------------------!
+  !   Calculate the CFL number   !
+  !     and the Peclet number    !
+  !------------------------------!
+  cfl_max = 0.0
+  pe_max  = 0.0
+
+  !$acc parallel loop independent reduction(max:cfl_max, pe_max)
+  do s = Faces_In_Domain_And_At_Buffers()
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
+
+    nu_f = 0.5 * (   (visc(c1) + visc(c2))  &
+                   / (dens(c1) + dens(c2)) )
+
+    cfl_t   = abs(v_flux(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
+    pe_t    = abs(v_flux(s)) / fc(s) / nu_f
+    cfl_max = max( cfl_max, cfl_t )
+    pe_max  = max( pe_max,  pe_t  )
+
+  end do
+  !$acc end parallel
+
+  Flow % cfl_max = cfl_max
+  Flow % pe_max  = pe_max
+
+  ! Find maximum CFL and Peclet numbers over all processors
+  call Global % Max_Reals(Flow % cfl_max, Flow % pe_max)
+
+  !-------------------------------!
   !@ Use this for REPORT_VOLUME_BALANCE somehow?
   !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
   !@                       'after correction: ', max_abs_val

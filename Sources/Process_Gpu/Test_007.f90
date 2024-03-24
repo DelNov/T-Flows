@@ -40,6 +40,9 @@
   O_Print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
+  O_Print '(a)', ' # Reading physical models'
+  call Read_Control % Physical_Models(Flow(1))
+
   nc = Grid(1) % n_cells
   O_Print '(a, i12)',   ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
@@ -72,8 +75,12 @@
   ! You are going to need connectivity matrix on device ...
   ! ... as well as matrices for momentum and pressure
   call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
-  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_UVW))
-  call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_PP))
+  if(Flow(1) % Nat % use_one_matrix) then
+    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_ONE))
+  else
+    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_UVW))
+    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_PP))
+  endif
 
   ! ... and the right-hand-side vector too
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)
@@ -97,6 +104,7 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sy)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sz)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % s)
+  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % d)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)
@@ -197,11 +205,16 @@
       call Process % Correct_Velocity(Flow(1), Grid(1))
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
+      call Process % Update_Boundary_Values(Flow(1), Grid(1), 'ALL')
+
       ! End of the current iteration
       call Info % Iter_Print(1)
 
     end do  ! iterations
 
+    ! Calculate bulk fluxes and adjust pressure drops
+    call Flow(1) % Calculate_Bulk_Velocities(Grid(1))
+    call Flow(1) % Adjust_P_Drops()
 
     ! Print the bulk values from the Info_Mod
     call Info % Bulk_Print(Flow(1), 1, 1)

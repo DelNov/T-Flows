@@ -113,6 +113,7 @@
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sy)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sz)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % s)
+  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % d)
   call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)
