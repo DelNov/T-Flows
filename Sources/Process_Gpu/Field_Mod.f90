@@ -128,6 +128,8 @@
       procedure :: Calculate_Grad_Matrix
       procedure :: Grad_Component
       procedure :: Grad_Pressure
+      procedure :: Grad_Variable
+
       !---------------!
       !   Utilities   !
       !---------------!
@@ -153,6 +155,7 @@
 #   include "Field_Mod/Gradients/Calculate_Grad_Matrix.f90"
 #   include "Field_Mod/Gradients/Grad_Component.f90"
 #   include "Field_Mod/Gradients/Grad_Pressure.f90"
+#   include "Field_Mod/Gradients/Grad_Variable.f90"
 
     !---------------!
     !   Utilities   !
