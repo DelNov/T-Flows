@@ -41,7 +41,8 @@
     include '../Shared/Probe_1d_Nodes.h90'
   end interface
 !------------------------------[Local parameters]------------------------------!
-  logical, parameter :: DEBUG = .false.
+  logical, parameter :: DEBUG    = .false.
+  logical, parameter :: SAVE_CAS = .false.
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type) :: Grid(2)        ! grid to be converted and its dual
   character(SL)   :: answer
@@ -229,6 +230,11 @@
                                   Grid(g) % n_cells)
     call Grid(g) % Save_Vtu_Faces((/0, 0/))
     call Grid(g) % Save_Vtu_Faces((/0, 0/), plot_shadows=.true.)
+
+    ! Save Fluent's .cas file
+    if(SAVE_CAS) then
+      call Convert % Save_Fluent(Grid(g))
+    end if
 
     if( (g-n_grids) .eq. 0) then
       ! Create a template control file for this domain
