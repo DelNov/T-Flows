@@ -1,14 +1,16 @@
 !==============================================================================!
-  subroutine Add_Inertial_Term(Process, Flow, Grid, comp)
+  subroutine Add_Inertial_Term(Process, phi, Flow, Grid, coef_a, coef_b)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
+  type(Var_Type),   target :: phi
   type(Field_Type), target :: Flow
-  type(Grid_Type)          :: Grid
-  integer                  :: comp
+  type(Grid_Type),  target :: Grid
+  real                     :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
+  real                     :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: ui_o(:), b(:), dens(:)
+  real, contiguous, pointer :: phi_o(:), b(:), vol(:)
   integer                   :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -17,16 +19,13 @@
   call Profiler % Start('Add_Inertial_Term')
 
   ! Take some aliases
-  b    => Flow % Nat % b
-  dens => Flow % density
-
-  if(comp .eq. 1) ui_o => Flow % u % o
-  if(comp .eq. 2) ui_o => Flow % v % o
-  if(comp .eq. 3) ui_o => Flow % w % o
+  vol   => Grid % vol
+  b     => Flow % Nat % b
+  phi_o => phi % o
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    b(c) = b(c) + dens(c) * ui_o(c) * Grid % vol(c) / Flow % dt
+    b(c) = b(c) + coef_a(c) * coef_b(c) * phi_o(c) * vol(c) / Flow % dt
   end do
   !$acc end parallel
 

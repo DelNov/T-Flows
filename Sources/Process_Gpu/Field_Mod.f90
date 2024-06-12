@@ -46,6 +46,9 @@
     real, allocatable :: viscosity(:)     !! [kg/m/s]
     real              :: diffusivity      !! [m^2/s]
 
+    ! Helping variable for easier forming of conservation equations
+    real, allocatable :: ones(:)          !! [1]
+
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !
     !---------------------------------------------------!

@@ -61,9 +61,29 @@
   !----------------------------------------------------------!
   !   Insert proper sources (forces) to momentum equations   !
   !----------------------------------------------------------!
+
+  ! From boundary conditions
   call Process % Insert_Momentum_Bc(Flow, Grid, comp=comp)
-  call Process % Add_Inertial_Term  (Flow, Grid, comp=comp)
-  call Process % Add_Advection_Term (Flow, Grid, comp=comp)
+
+  ! Inertial and advection terms
+  if(comp .eq. 1) then
+    call Process % Add_Inertial_Term(Flow % u, Flow, Grid,  &
+                                     Flow % density, Flow % ones)
+    call Process % Add_Advection_Term(Flow % u, Flow, Grid,  &
+                                      Flow % density, Flow % ones)
+  else if(comp .eq. 2) then
+    call Process % Add_Inertial_Term(Flow % v, Flow, Grid,  &
+                                     Flow % density, Flow % ones)
+    call Process % Add_Advection_Term(Flow % v, Flow, Grid,  &
+                                      Flow % density, Flow % ones)
+  else if(comp .eq. 3) then
+    call Process % Add_Inertial_Term(Flow % w, Flow, Grid,  &
+                                     Flow % density, Flow % ones)
+    call Process % Add_Advection_Term(Flow % w, Flow, Grid,  &
+                                      Flow % density, Flow % ones)
+  end if
+
+  ! Pressure force
   call Process % Add_Pressure_Term  (Flow, Grid, comp=comp)
 
   !-----------------------------------------!

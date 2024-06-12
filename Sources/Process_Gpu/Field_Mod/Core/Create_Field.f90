@@ -26,6 +26,7 @@
     allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
     allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
   end if
+  allocate(Flow % ones(-nb:nc));  Flow % ones(:) = 1.0
 
   ! Helping array to discretize pressure Poisson equation
   allocate(Flow % v_m(nc));  Flow % v_m(:) = 0.0

@@ -122,6 +122,7 @@
   ! ponents (pp % x, pp % y, pp % z, p % x, p % y and p % z)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % density)
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % ones)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % pp % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % n)
