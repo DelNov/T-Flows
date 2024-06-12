@@ -55,7 +55,10 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Flow, Grid, dt=Flow % dt)
+    call Process % Form_Momentum_Matrix(Mcon, Mval, Flow, Grid,       &
+                                        Flow % density, Flow % ones,  &
+                                        Flow % viscosity,             &
+                                        dt = Flow % dt)
   end if
 
   !----------------------------------------------------------!

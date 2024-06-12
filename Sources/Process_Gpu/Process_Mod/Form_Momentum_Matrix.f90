@@ -1,20 +1,23 @@
 !==============================================================================!
-  subroutine Form_Momentum_Matrix(Process, Flow, Grid, dt)
+  subroutine Form_Momentum_Matrix(Process, Mcon, Mval, Flow, Grid,  &
+                                  coef_a, coef_b, diff_coef, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Grid_Type), intent(in) :: Grid
-  real,  optional, intent(in) :: dt       !! time step
+  class(Process_Type)           :: Process
+  type(Sparse_Con_Type), target :: Mcon
+  type(Sparse_Val_Type), target :: Mval
+  type(Field_Type),      target :: Flow
+  type(Grid_Type),   intent(in) :: Grid
+  real                          :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
+  real                          :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
+  real                          :: diff_coef(-Grid % n_bnd_cells:Grid % n_cells)
+  real,  optional,   intent(in) :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Con_Type), pointer :: Mcon
-  type(Sparse_Val_Type), pointer :: Mval
   real,      contiguous, pointer :: val(:), v_m(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  real,      contiguous, pointer :: visc(:), dens(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: m12, urf
+  real                           :: a12, urf
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: work(:)
 # endif
@@ -27,23 +30,19 @@
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
-  Mcon => Flow % Nat % C
-  if(Flow % Nat % use_one_matrix) then
-    Mval => Flow % Nat % A(MATRIX_ONE)
-    val  => Flow % Nat % A(MATRIX_ONE) % val
-  else
-    Mval => Flow % Nat % A(MATRIX_UVW)
-    val  => Flow % Nat % A(MATRIX_UVW) % val
+
+  ! If each varible uses its own matrix
+  if(.not. Flow % Nat % use_one_matrix) then
     if(Flow % Nat % A(MATRIX_UVW) % formed) return
   end if
-  dia  => Flow % Nat % C % dia
-  pos  => Flow % Nat % C % pos
-  fc   => Flow % Nat % C % fc
-  v_m  => Flow % v_m
-  dens => Flow % density
-  visc => Flow % viscosity
-  urf  =  Flow % u % urf
-  nz   =  Flow % Nat % C % nonzeros
+
+  val => Mval % val
+  dia => Mcon % dia
+  pos => Mcon % pos
+  fc  => Mcon % fc
+  nz  =  Mcon % nonzeros
+  v_m => Flow % v_m
+  urf =  Flow % u % urf
 
   Assert(urf > 0.0)
 
@@ -67,20 +66,20 @@
 
       ! Coefficients inside the domain
       if(c2 .gt. 0) then
-        m12 = 0.5 * (visc(c1)+visc(c2)) * fc(s)
+        a12 = 0.5 * (diff_coef(c1)+diff_coef(c2)) * fc(s)
         if(c1 .lt. c2) then
-          val(pos(1,s)) = -m12
-          val(pos(2,s)) = -m12
+          val(pos(1,s)) = -a12
+          val(pos(2,s)) = -a12
         end if
-        val(dia(c1)) = val(dia(c1)) + m12
+        val(dia(c1)) = val(dia(c1)) + a12
 
       ! Coefficients at the boundaries
       else
         reg = Grid % region % at_cell(c2)
         if(Grid % region % type(reg) .eq. WALL .or.  &
            Grid % region % type(reg) .eq. INFLOW) then
-          m12 = visc(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + m12
+          a12 = diff_coef(c1) * fc(s)
+          val(dia(c1)) = val(dia(c1)) + a12
         end if
       end if
     end do
@@ -95,7 +94,7 @@
   if(present(dt)) then
     !$acc parallel loop independent
     do c = Cells_In_Domain()
-      val(dia(c)) = val(dia(c)) + dens(c) * Grid % vol(c) / dt
+      val(dia(c)) = val(dia(c)) + coef_a(c) * coef_b(c) * Grid % vol(c) / dt
     end do
     !$acc end parallel
   end if
