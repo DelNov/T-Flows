@@ -28,14 +28,11 @@
   end if
   allocate(Flow % ones(-nb:nc));  Flow % ones(:) = 1.0
 
-  ! Helping array to discretize pressure Poisson equation
-  allocate(Flow % v_m(nc));  Flow % v_m(:) = 0.0
-
   !--------------------------------------------------------------!
   !   Create native solvers (matrices A, M, right hand side b,   !
   !   helping vectors for CG method such as p, q, r and d_inv)   !
   !--------------------------------------------------------------!
-  print '(a)', ' # Creating field''s native solver'
+  O_Print '(a)', ' # Creating field''s native solver'
   call Flow % Nat % Create_Native(Grid)
 
   !----------------------------------!
@@ -43,20 +40,37 @@
   !----------------------------------!
   allocate(Flow % grad_c2c(6, nc));  Flow % grad_c2c(:,:) = 0.0
 
-  !------------------------!
-  !   Memory for unknows   !
-  !------------------------!
+  !----------------------------!
+  !   Navier-Stokes equation   !
+  !----------------------------!
 
-  ! Momentum equations
+  ! Allocate memory for velocity components
   call Var_Mod_Create_Variable(Flow % u, Grid)
   call Var_Mod_Create_Variable(Flow % v, Grid)
   call Var_Mod_Create_Variable(Flow % w, Grid)
 
-  ! Pressure
+  ! Allocate memory for pressure correction and pressure
   call Var_Mod_Create_Variable(Flow % pp, Grid)  ! pressure correction
   call Var_Mod_Create_Variable(Flow % p,  Grid)  ! pressure
 
-  ! Volume fluxes through faces
+  ! Helping array to discretize pressure Poisson equation
+  allocate(Flow % v_m(nc));  Flow % v_m(:) = 0.0
+
+  ! Allocate memory for volumetric fluxes
   allocate(Flow % v_flux(ns))
+
+  !-----------------------------------------!
+  !   Enthalpy conservation (temperature)   !
+  !-----------------------------------------!
+  if(Flow % heat_transfer) then
+    call Var_Mod_Create_Variable(Flow % t, Grid)
+  end if ! heat_transfer
+
+  !--------------------------------------------------------------!
+  !   Create native solvers (matrices A, M, right hand side b,   !
+  !   helping vectors for CG method such as p, q, r and d_inv)   !
+  !--------------------------------------------------------------!
+  O_Print '(a)', ' # Creating field''s native solver'
+  call Flow % Nat % Create_Native(Grid)
 
   end subroutine

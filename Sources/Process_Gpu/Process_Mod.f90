@@ -30,12 +30,14 @@
 
     contains
 
-      ! Related to momentum conservation
-      procedure :: Compute_Momentum
-      procedure :: Form_Momentum_Matrix
-      procedure :: Insert_Momentum_Bc
+      ! General conservation equation
+      procedure :: Form_System_Matrix
       procedure :: Add_Advection_Term
       procedure :: Add_Inertial_Term
+
+      ! Related to momentum conservation
+      procedure :: Compute_Momentum
+      procedure :: Insert_Momentum_Bc
       procedure :: Add_Pressure_Term
       procedure :: Correct_Velocity
       procedure :: Update_Boundary_Values
@@ -45,18 +47,24 @@
       procedure :: Form_Pressure_Matrix
       procedure :: Insert_Volume_Source_For_Pressure
 
+      ! Energy / Enthalpy
+      procedure :: Compute_Energy
+      procedure :: Insert_Energy_Bc
+
   end type
 
   type(Process_Type) :: Process
 
   contains
 
-    ! Related to momentum conservation
-#   include "Process_Mod/Compute_Momentum.f90"
-#   include "Process_Mod/Form_Momentum_Matrix.f90"
-#   include "Process_Mod/Insert_Momentum_Bc.f90"
+    ! General conservation equation
+#   include "Process_Mod/Form_System_Matrix.f90"
 #   include "Process_Mod/Add_Advection_Term.f90"
 #   include "Process_Mod/Add_Inertial_Term.f90"
+
+    ! Related to momentum conservation
+#   include "Process_Mod/Compute_Momentum.f90"
+#   include "Process_Mod/Insert_Momentum_Bc.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
 #   include "Process_Mod/Correct_Velocity.f90"
 #   include "Process_Mod/Update_Boundary_Values.f90"
@@ -65,5 +73,9 @@
 #   include "Process_Mod/Compute_Pressure.f90"
 #   include "Process_Mod/Form_Pressure_Matrix.f90"
 #   include "Process_Mod/Insert_Volume_Source_For_Pressure.f90"
+
+    ! Energy / Enthalpy
+#   include "Process_Mod/Compute_Energy.f90"
+#   include "Process_Mod/Insert_Energy_Bc.f90"
 
   end module

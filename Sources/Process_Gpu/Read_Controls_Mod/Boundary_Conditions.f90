@@ -43,15 +43,15 @@
   p      => Flow % p
   scalar => Flow % scalar
 
-  call Flow % Alias_Momentum    (u, v, w)
+  call Flow % Alias_Momentum(u, v, w)
 
   !----------------------------------------------------------------!
   !   Count number of types per boundary condition, total number   !
   !        of types specified, and also extract their names        !
   !----------------------------------------------------------------!
   types_per_reg(:) = 0
-  types_file(:)      = .false.
-  c_types            = 0
+  types_file(:)    = .false.
+  c_types          = 0
 
   do bc = Boundary_Regions()
     call Control % Position_At_Two_Keys('BOUNDARY_CONDITION',      &
@@ -210,10 +210,10 @@
         do c = Cells_In_Region(bc)
 
           ! For velocity and pressure
-          i = Key_Ind('U',   keys, nks); if(i > 0) u % b(c) = vals(i)
-          i = Key_Ind('V',   keys, nks); if(i > 0) v % b(c) = vals(i)
-          i = Key_Ind('W',   keys, nks); if(i > 0) w % b(c) = vals(i)
-          i = Key_Ind('P',   keys, nks); if(i > 0) p % b(c) = vals(i)
+          i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = vals(i)
+          i = Key_Ind('V', keys, nks); if(i > 0) v % b(c) = vals(i)
+          i = Key_Ind('W', keys, nks); if(i > 0) w % b(c) = vals(i)
+          i = Key_Ind('P', keys, nks); if(i > 0) p % b(c) = vals(i)
 
           ! Temperature
           if(Flow % heat_transfer) then
@@ -276,8 +276,6 @@
         if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y' .or.  &
            keys(1) .eq. 'X' .and. keys(2) .eq. 'Z' .or.  &
            keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
-
-STOP
 
           ! Set the closest point
           do c = Cells_In_Region(bc)

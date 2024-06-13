@@ -25,4 +25,9 @@
   p_y => Flow % p % y
   p_z => Flow % p % z
 
+  if(Flow % heat_transfer) then
+    t_n => Flow % t % n
+    t_o => Flow % t % o
+  end if
+
   end subroutine

@@ -27,6 +27,7 @@
   real, contiguous, pointer :: p_x(:)
   real, contiguous, pointer :: p_y(:)
   real, contiguous, pointer :: p_z(:)
+  real, contiguous, pointer :: t_n(:), t_o(:)
 
   !----------------!
   !   Field type   !

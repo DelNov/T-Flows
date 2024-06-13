@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine Form_Momentum_Matrix(Process, Mcon, Mval, Flow, Grid,  &
-                                  coef_a, coef_b, diff_coef, dt)
+  subroutine Form_System_Matrix(Process, Mcon, Mval, Flow, Grid,  &
+                                coef_a, coef_b, diff_coef, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -25,7 +25,7 @@
   Unused(Process)
 !==============================================================================!
 
-  call Profiler % Start('Form_Momentum_Matrix')
+  call Profiler % Start('Form_System_Matrix')
 
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
@@ -139,6 +139,6 @@
                              inside_cell=work)
 # endif
 
-  call Profiler % Stop('Form_Momentum_Matrix')
+  call Profiler % Stop('Form_System_Matrix')
 
   end subroutine

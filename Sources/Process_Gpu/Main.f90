@@ -63,6 +63,11 @@
       call Test_009()
       goto 1
 
+    ! Rayleigh-Benard convection
+    else if(arg .eq. '10') then
+      call Test_010()
+      goto 1
+
     end if
 
   end if
@@ -88,6 +93,7 @@
   O_Print '(a)', '   7 - solution of the Navier-Stokes equations'
   O_Print '(a)', '   8 - matrix of cubes case'
   O_Print '(a)', '   9 - flow over a backward facing step'
+  O_Print '(a)', '  10 - Reyleigh-Benard convection'
 
   call Global % End_Parallel
 

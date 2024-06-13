@@ -55,10 +55,10 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Mcon, Mval, Flow, Grid,       &
-                                        Flow % density, Flow % ones,  &
-                                        Flow % viscosity,             &
-                                        dt = Flow % dt)
+    call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,       &
+                                      Flow % density, Flow % ones,  &
+                                      Flow % viscosity,             &
+                                      dt = Flow % dt)
   end if
 
   !----------------------------------------------------------!
@@ -89,10 +89,10 @@
   ! Pressure force
   call Process % Add_Pressure_Term  (Flow, Grid, comp=comp)
 
-  !-----------------------------------------!
-  !      Part 2 of the under-relaxation     !
-  !   (Part 1 is in Form_Momentum_Matrix)   !
-  !-----------------------------------------!
+  !---------------------------------------!
+  !    Part 2 of the under-relaxation     !
+  !   (Part 1 is in Form_System_Matrix)   !
+  !---------------------------------------!
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
