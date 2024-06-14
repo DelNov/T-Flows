@@ -23,6 +23,9 @@
   b     => Flow % Nat % b
   phi_o => phi % o
 
+  ! Unit for momentum: [kg/m^3 * 1 * m/s * m^3 / s = kg m / s^2 = N]
+  ! Unit for energy:   [kg/m^3 * J/kg/K * K * m^3 / s = J / s = W]
+
   !$acc parallel loop independent
   do c = Cells_In_Domain()
     b(c) = b(c) + coef_a(c) * coef_b(c) * phi_o(c) * vol(c) / Flow % dt

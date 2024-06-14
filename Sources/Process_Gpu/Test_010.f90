@@ -40,6 +40,9 @@
   O_Print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
+  O_Print '(a)', ' # Reading physical models'
+  call Read_Control % Physical_Models(Flow(1))
+
   nc = Grid(1) % n_cells
   O_Print '(a, i12)',   ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
@@ -50,9 +53,6 @@
   O_Print '(a)', ' # card has the program will become memory bound no'
   O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
   O_Print '(a)', ' #----------------------------------------------------'
-
-  O_Print '(a)', '# Reading physical models'
-  call Read_Control % Physical_Models(Flow(1))
 
   O_Print '(a)', ' # Creating a flow field'
   call Flow(1) % Create_Field(Grid(1))
@@ -71,6 +71,20 @@
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix()
+
+  ! Initialize solution
+  Flow(1) % u % n(1:nc) = 0.0
+  Flow(1) % v % n(1:nc) = 0.0
+  Flow(1) % w % n(1:nc) = 0.0
+
+  Flow(1) % u % o(1:nc) = 0.0
+  Flow(1) % v % o(1:nc) = 0.0
+  Flow(1) % w % o(1:nc) = 0.0
+
+  if(Flow(1) % heat_transfer) then
+    Flow(1) % t % n(1:nc) = 10.0
+    Flow(1) % t % o(1:nc) = 10.0
+  end if
 
   ! You are going to need connectivity matrix on device ...
   ! ... as well as matrices for momentum and pressure
@@ -122,6 +136,11 @@
   ! ponents (pp % x, pp % y, pp % z, p % x, p % y and p % z)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % density)
+  if(Flow(1) % heat_transfer) then
+    call Gpu % Vector_Real_Copy_To_Device(Flow(1) % conductivity)
+    call Gpu % Vector_Real_Copy_To_Device(Flow(1) % capacity)
+  end if
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % work)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % pp % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % n)

@@ -13,6 +13,7 @@
   type(Field_Type), target              :: Flow   !! flow object
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
+  character(SL)            :: name
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Rc)
 !==============================================================================!
@@ -30,6 +31,26 @@
   !                                           !
   !-------------------------------------------!
   call Control % Heat_Transfer(Flow % heat_transfer, verbose = .true.)
+  call Control % Gravitational_Vector(Flow % grav_x,  &
+                                      Flow % grav_y,  &
+                                      Flow % grav_z, .true.)
+  call Control % Buoyancy(name, .true.)
+  select case(name)
+    case('NONE')
+      Flow % buoyancy = NO_BUOYANCY
+    case('DENSITY')
+      Flow % buoyancy = DENSITY_DRIVEN
+    case('THERMAL')
+      Flow % buoyancy = THERMALLY_DRIVEN
+    case default
+      call Message % Error(60,                                       &
+                           'Unknown buoyancy model: '//trim(name)//  &
+                           '.  \n Exiting!')
+  end select
+
+  call Control % Reference_Density           (Flow % dens_ref, .true.)
+  call Control % Reference_Temperature       (Flow % t_ref,    .true.)
+  call Control % Volume_Expansion_Coefficient(Flow % beta,     .true.)
 
   !------------------------------------!
   !                                    !

@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Form_System_Matrix(Process, Mcon, Mval, Flow, Grid,  &
-                                coef_a, coef_b, diff_coef, dt)
+                                coef_a, coef_b, diff_coef, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -12,12 +12,13 @@
   real                          :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
   real                          :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
   real                          :: diff_coef(-Grid % n_bnd_cells:Grid % n_cells)
+  real                          :: urf
   real,  optional,   intent(in) :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), v_m(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, urf
+  real                           :: a12
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: work(:)
 # endif
@@ -42,7 +43,6 @@
   fc  => Mcon % fc
   nz  =  Mcon % nonzeros
   v_m => Flow % v_m
-  urf =  Flow % u % urf
 
   Assert(urf > 0.0)
 

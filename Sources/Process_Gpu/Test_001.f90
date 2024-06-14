@@ -55,9 +55,11 @@
   call Read_Control % Physical_Properties(Flow)
 
   ! Discretize the matrix for diffusion
+  Flow % work(:) = 1.0
   call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,       &
-                                    Flow % density, Flow % ones,  &
-                                    Flow % viscosity)
+                                    Flow % density, Flow % work,  &
+                                    Flow % viscosity,             &
+                                    1.0)
 
   ! Take the alias now
   Acon => Flow % Nat % C

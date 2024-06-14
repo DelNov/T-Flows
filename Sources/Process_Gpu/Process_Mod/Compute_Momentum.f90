@@ -12,7 +12,7 @@
   type(Sparse_Con_Type), pointer :: Mcon
   real,                  pointer :: val(:)
   integer,               pointer :: dia(:)
-  real,                  pointer :: b(:)
+  real,                  pointer :: b(:), ones(:)
   real,                  pointer :: ui_n(:)
   real                           :: tol, fin_res, urf
   integer                        :: nc, n, c
@@ -36,6 +36,8 @@
     Mval => Flow % Nat % A(MATRIX_UVW)
     val  => Flow % Nat % A(MATRIX_UVW) % val
   end if
+
+  ones => Flow % work
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
   nc   =  Flow % pnt_grid % n_cells
@@ -49,16 +51,23 @@
   tol = Flow % u % tol
   urf = Flow % u % urf
 
+  ! Set work variable (Buoyancy_Forces uses it!)
+  !$acc parallel loop independent
+  do c = Cells_In_Domain()
+    ones(c) = 1.0
+  end do
+  !$acc end parallel
+
   !----------------------------------------------------!
   !   Discretize the momentum conservation equations   !
   !----------------------------------------------------!
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,       &
-                                      Flow % density, Flow % ones,  &
-                                      Flow % viscosity,             &
-                                      dt = Flow % dt)
+    call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,  &
+                                      Flow % density, ones,    &
+                                      Flow % viscosity,        &
+                                      urf, dt = Flow % dt)
   end if
 
   !----------------------------------------------------------!
@@ -68,26 +77,36 @@
   ! From boundary conditions
   call Process % Insert_Momentum_Bc(Flow, Grid, comp=comp)
 
+  ! Buoyancy forces
+  call Flow % Buoyancy_Forces(Grid, comp)
+
+  ! Set work variable (Buoyancy_Forces uses it!)
+  !$acc parallel loop independent
+  do c = Cells_In_Domain()
+    ones(c) = 1.0
+  end do
+  !$acc end parallel
+
   ! Inertial and advection terms
   if(comp .eq. 1) then
     call Process % Add_Inertial_Term(Flow % u, Flow, Grid,  &
-                                     Flow % density, Flow % ones)
+                                     Flow % density, ones)
     call Process % Add_Advection_Term(Flow % u, Flow, Grid,  &
-                                      Flow % density, Flow % ones)
+                                      Flow % density, ones)
   else if(comp .eq. 2) then
     call Process % Add_Inertial_Term(Flow % v, Flow, Grid,  &
-                                     Flow % density, Flow % ones)
+                                     Flow % density, ones)
     call Process % Add_Advection_Term(Flow % v, Flow, Grid,  &
-                                      Flow % density, Flow % ones)
+                                      Flow % density, ones)
   else if(comp .eq. 3) then
     call Process % Add_Inertial_Term(Flow % w, Flow, Grid,  &
-                                     Flow % density, Flow % ones)
+                                     Flow % density, ones)
     call Process % Add_Advection_Term(Flow % w, Flow, Grid,  &
-                                      Flow % density, Flow % ones)
+                                      Flow % density, ones)
   end if
 
   ! Pressure force
-  call Process % Add_Pressure_Term  (Flow, Grid, comp=comp)
+  call Process % Add_Pressure_Term(Flow, Grid, comp=comp)
 
   !---------------------------------------!
   !    Part 2 of the under-relaxation     !

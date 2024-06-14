@@ -16,6 +16,7 @@
   else
     call Nat % A(MATRIX_UVW) % Create_Sparse_Val(Nat % C)
     call Nat % A(MATRIX_PP)  % Create_Sparse_Val(Nat % C)
+    call Nat % A(MATRIX_T)   % Create_Sparse_Val(Nat % C)
   end if
 
   ! Right-hand side vector us part of this

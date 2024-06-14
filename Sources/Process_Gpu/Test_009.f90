@@ -40,6 +40,9 @@
   O_Print '(a)', ' # Creating a grid'
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
+  O_Print '(a)', ' # Reading physical models'
+  call Read_Control % Physical_Models(Flow(1))
+
   nc = Grid(1) % n_cells
   O_Print '(a, i12)',   ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
@@ -119,6 +122,7 @@
   ! ponents (pp % x, pp % y, pp % z, p % x, p % y and p % z)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % density)
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % work)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % pp % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % n)
@@ -175,8 +179,11 @@
     call Info % Time_Fill(Time % Curr_Dt(), Time % Get_Time())
     call Info % Time_Print()
 
-    ! Preparation for the new time step
-    !$acc parallel loop
+    !---------------------------------------!
+    !   Preparation for the new time step   !
+    !---------------------------------------!
+
+    !$acc parallel loop independent
     do c = 1, nc
       u_o(c) = u_n(c)
       v_o(c) = v_n(c)

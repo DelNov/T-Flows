@@ -48,7 +48,7 @@
   call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,           &
                                     Flow % density, Flow % capacity,  &
                                     Flow % conductivity,              &
-                                    dt = Flow % dt)
+                                    urf, dt = Flow % dt)
 
   !----------------------------------------------------------!
   !   Insert proper sources (forces) to momentum equations   !
@@ -80,6 +80,12 @@
   call Profiler % Start('CG_for_Energy')
   call Flow % Nat % Cg(Mcon, Mval, t_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Energy')
+
+# if T_FLOWS_DEBUG == 1
+    call Grid % Save_Debug_Vtu("t_0",           &
+                               scalar_name="t", &
+                               scalar_cell=t_n)
+# endif
 
   call Info % Iter_Fill_At(1, 6, 'T', fin_res, n)
 

@@ -47,8 +47,8 @@
     real, allocatable :: viscosity(:)     !! [kg/m/s]
     real              :: diffusivity      !! [m^2/s]
 
-    ! Helping variable for easier forming of conservation equations
-    real, allocatable :: ones(:)          !! [1]
+    ! Helping variable
+    real, allocatable :: work(:)
 
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !
@@ -71,6 +71,10 @@
 
     ! Used in pressure discretization
     real, allocatable :: v_m(:)    !! cell volume over momentum diagonal
+
+    ! Reference density (for buoyancy)
+    real :: dens_ref  !! reference density, used to compute buoyancy terms
+
 
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !
@@ -118,6 +122,15 @@
 
     ! Tolerance and maximum iterations for Gauss gradients
     integer :: least_miter
+
+    ! Is buoyancy thermally- or density-driven?
+    integer :: buoyancy  !! indicates if buoyancy is modeled by Boussinesq
+                         !! approach (thermally-driven) or by variations in
+                         !! density (density-driven)
+
+    ! Gravity must be part of field for conjugate heat transfer models
+    real :: grav_x, grav_y, grav_z
+
     contains
 
       !------------------------!
@@ -140,10 +153,16 @@
       procedure :: Adjust_P_Drops
       procedure :: Alias_Energy
       procedure :: Alias_Momentum
+      procedure :: Buoyancy_Forces
       procedure :: Calculate_Bulk_Velocities
       procedure :: Volume_Average
 
   end type
+
+  ! Parameters for type of buoyancy
+  integer, parameter :: NO_BUOYANCY      = 60013
+  integer, parameter :: DENSITY_DRIVEN   = 60017
+  integer, parameter :: THERMALLY_DRIVEN = 60029
 
   contains
 
@@ -167,6 +186,7 @@
 #   include "Field_Mod/Utilities/Adjust_P_Drops.f90"
 #   include "Field_Mod/Utilities/Alias_Energy.f90"
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
+#   include "Field_Mod/Utilities/Buoyancy_Forces.f90"
 #   include "Field_Mod/Utilities/Calculate_Bulk_Velocities.f90"
 #   include "Field_Mod/Utilities/Volume_Average.f90"
 

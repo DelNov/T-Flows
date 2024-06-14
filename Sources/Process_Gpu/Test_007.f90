@@ -122,7 +122,7 @@
   ! ponents (pp % x, pp % y, pp % z, p % x, p % y and p % z)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % density)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % ones)
+  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % work)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % pp % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % n)
@@ -179,8 +179,11 @@
     call Info % Time_Fill(Time % Curr_Dt(), Time % Get_Time())
     call Info % Time_Print()
 
-    ! Preparation for the new time step
-    !$acc parallel loop
+    !---------------------------------------!
+    !   Preparation for the new time step   !
+    !---------------------------------------!
+
+    !$acc parallel loop independent
     do c = 1, nc
       u_o(c) = u_n(c)
       v_o(c) = v_n(c)
