@@ -47,6 +47,8 @@
     if(i .eq. 1) ui => Flow % u
     if(i .eq. 2) ui => Flow % v
     if(i .eq. 3) ui => Flow % w
+    call Control % Time_Integration_Scheme                    (name)
+    ui % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control % Blending_Coefficient_For_Momentum    (ui % blend)
     call Control % Simple_Underrelaxation_For_Momentum  (ui % urf)
   end do
@@ -60,6 +62,8 @@
   !   Related to heat transfer   !
   !------------------------------!
   if(Flow % heat_transfer) then
+    call Control % Time_Integration_Scheme                          (name)
+    Flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control % Blending_Coefficient_For_Energy  (Flow % t % blend)
     call Control % Simple_Underrelaxation_For_Energy(Flow % t % urf)
   end if
@@ -69,6 +73,8 @@
   !--------------------------------!
   do sc = 1, Flow % n_scalars
     phi => Flow % scalar(sc)
+    call Control % Time_Integration_Scheme                     (name)
+    phi % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control % Blending_Coefficient_For_Scalars            (phi % blend)
     call Control % Simple_Underrelaxation_For_Scalars          (phi % urf)
   end do

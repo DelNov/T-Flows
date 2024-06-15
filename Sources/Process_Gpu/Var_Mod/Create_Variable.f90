@@ -25,7 +25,9 @@
   ! Values in the new (n), old (o) and older than old (oo) time step
   allocate(phi % n (-Grid % n_bnd_cells:Grid % n_cells));  phi % n  = 0.0
   allocate(phi % o (-Grid % n_bnd_cells:Grid % n_cells));  phi % o  = 0.0
-  allocate(phi % oo(-Grid % n_bnd_cells:Grid % n_cells));  phi % oo = 0.0
+  if(phi % td_scheme .eq. PARABOLIC) then
+    allocate(phi % oo(-Grid % n_bnd_cells:Grid % n_cells));  phi % oo = 0.0
+  end if
 
   ! Variable's boundary value
   allocate (phi % b(-Grid % n_bnd_cells:-1));  phi % b = 0.0

@@ -17,6 +17,7 @@
   use Gpu_Mod
   use Control_Mod
   use Results_Mod
+  use Read_Controls_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -40,6 +41,7 @@
       procedure :: Insert_Momentum_Bc
       procedure :: Add_Pressure_Term
       procedure :: Correct_Velocity
+      procedure :: Initialize_Variables
       procedure :: Update_Boundary_Values
 
       ! Related to pressure solution
@@ -53,8 +55,8 @@
 
   end type
 
-  type(Process_Type) :: Process
-
+  type(Process_Type) :: Process  !! singleton object of Process_Type, introduced
+                                 !! to allow easy access to its procedures
   contains
 
     ! General conservation equation
@@ -67,6 +69,7 @@
 #   include "Process_Mod/Insert_Momentum_Bc.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
 #   include "Process_Mod/Correct_Velocity.f90"
+#   include "Process_Mod/Initialize_Variables.f90"
 #   include "Process_Mod/Update_Boundary_Values.f90"
 
     ! Related to pressure solution

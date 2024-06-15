@@ -1,26 +1,28 @@
 #include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Field_Mod
 !----------------------------------[Modules]-----------------------------------!
   use Assert_Mod
+  use Face_Mod
   use Bulk_Mod
   use Sparse_Mod
   use Native_Mod
   use Var_mod
+  use Numerics_Mod
   use Profiler_mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
   ! Frequently used aliases (don't know where to put them yet)
-  real, contiguous, pointer :: u_n(:), u_o(:)
-  real, contiguous, pointer :: v_n(:), v_o(:)
-  real, contiguous, pointer :: w_n(:), w_o(:)
-  real, contiguous, pointer :: pp_n(:)
-  real, contiguous, pointer :: p_n(:)
-  real, contiguous, pointer :: t_n(:), t_o(:)
+  real, contiguous, pointer :: u_n(:), u_o(:), u_oo(:)
+  real, contiguous, pointer :: v_n(:), v_o(:), v_oo(:)
+  real, contiguous, pointer :: w_n(:), w_o(:), w_oo(:)
+  real, contiguous, pointer :: p_n(:), pp_n(:)
+  real, contiguous, pointer :: t_n(:), t_o(:), t_oo(:)
 
   !----------------!
   !   Field type   !
@@ -56,7 +58,7 @@
     real, allocatable :: potential(:)
 
     ! Volume flow rate through cell faces
-    real, allocatable :: v_flux(:)  !! volume flow rate [m^3/s]
+    type(Face_Type) :: v_flux  !! volume flow rate [m^3/s]
 
     ! Pressure and pressure correction
     type(Var_Type) :: p    !! pressure            [N/m^2] = [kg/m/s^2]

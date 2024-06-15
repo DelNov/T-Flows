@@ -60,7 +60,7 @@
   allocate(Flow % v_m(nc));  Flow % v_m(:) = 0.0
 
   ! Allocate memory for volumetric fluxes
-  allocate(Flow % v_flux(ns))
+  call Face_Mod_Allocate(Flow % v_flux, Grid, 'V_FL')
 
   !-----------------------------------------!
   !   Enthalpy conservation (temperature)   !

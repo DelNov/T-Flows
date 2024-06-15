@@ -10,8 +10,7 @@
   type(Var_Type)                           :: phi   !! some variable
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: phi_x(:), phi_y(:), phi_z(:)
-  integer                   :: c, c1, c2, iter
-  real                      :: dx, dy, dz
+  integer                   :: c
 !==============================================================================!
 
   call Profiler % Start('Grad_Variable')

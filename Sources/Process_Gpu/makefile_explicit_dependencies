@@ -24,6 +24,15 @@ Linalg_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Var_Mod.o:\
 Var_Mod/*.f90 \
+$(DIR_OBJECT)/Numerics_Mod.o \
+Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Face_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Face_Mod.o:\
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
 
@@ -106,6 +115,14 @@ $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Numerics_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Numerics_Mod.o:\
+Numerics_Mod/*.f90 \
+$(DIR_OBJECT)/Message_Mod.o \
+$(DIR_SHARED)/Message_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_008.f90
@@ -234,6 +251,8 @@ Field_Mod/*/*.f90
 $(DIR_OBJECT)/Field_Mod.o:\
 $(DIR_OBJECT)/Sparse_Mod.o \
 Sparse_Mod/*.f90 \
+$(DIR_OBJECT)/Numerics_Mod.o \
+Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
 Field_Mod/*/Grad_Component.005 \

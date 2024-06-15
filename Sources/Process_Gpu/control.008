@@ -6,10 +6,9 @@
 #---------------
 # Time stepping
 #---------------
-  TIME_STEP                 0.00002
-  NUMBER_OF_TIME_STEPS  18000
-
-  RESULTS_SAVE_INTERVAL   120
+  TIME_STEP                  0.00002
+  NUMBER_OF_TIME_STEPS   24000
+  RESULTS_SAVE_INTERVAL   1200
 
 #----------------------
 # Numerical parameters
@@ -43,6 +42,13 @@
 # Ub = Re * nu / h = 3.852  [m/s]
 #-------------------------------------------------
   BULK_VELOCITIES   3.852   0.0   0.0
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w
+    VALUES              3.8   0.0   0.0
 
 #---------------------
 # Boundary conditions

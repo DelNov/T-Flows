@@ -16,6 +16,17 @@
 # endif
 !==============================================================================!
 
+  ! Copy matrix and the right hand side to the device
+  call Gpu % Sparse_Con_Copy_To_Device(Nat % C)
+  if(Nat % use_one_matrix) then
+    call Gpu % Sparse_Val_Copy_To_Device(Nat % A(MATRIX_ONE))
+  else
+    call Gpu % Sparse_Val_Copy_To_Device(Nat % A(MATRIX_UVW))
+    call Gpu % Sparse_Val_Copy_To_Device(Nat % A(MATRIX_PP))
+  endif
+
+  call Gpu % Vector_Real_Copy_To_Device(Nat % b)
+
   ! Create (allocate) memory for helping vectors on device
   !$acc enter data create(Nat % p)
   !$acc enter data create(Nat % q)

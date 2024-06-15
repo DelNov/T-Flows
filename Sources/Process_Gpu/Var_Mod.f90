@@ -4,6 +4,15 @@
 !==============================================================================!
   module Var_Mod
 !------------------------------------------------------------------------------!
+!>  Module Var_Mod defines Var_Type which is, in turn, used to define all
+!>  dependent variables in the T-Flows' solver Process.  Thus, individual
+!>  velocity components, temperature, pressure and pressure corrections are all
+!>  objects of Var_Type.  The Var_Type holds data fields to store its current
+!>  value (n for new) old value (o for old) and older than old (oo) value.
+!>  In addition, it also holds many linear solver parameters, such as desired
+!>  solver tolerance levels required in linear solvers.
+!------------------------------------------------------------------------------!
+  use Numerics_Mod
   use Grid_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -33,6 +42,7 @@
 
     ! Parameters for numerical solution of the variable
     real          :: blend         !! upwind blending (1.0 central; 0.0 upwind)
+    integer       :: td_scheme     !! time-disretization scheme
     real          :: tol = PICO    !! linear solver tolerance
     real          :: urf           !! under-relaxation factor
     integer       :: miter         !! max number of iterations for variable

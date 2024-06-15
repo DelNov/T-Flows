@@ -3,7 +3,7 @@
 !==============================================================================!
   subroutine Test_007
 !------------------------------------------------------------------------------!
-!>  Tests calling of the CG algorithm from the Native_Mod
+!>  Tests solution of the Navier-Stokes equation
 !------------------------------------------------------------------------------!
   use Native_Mod
   use Read_Controls_Mod
@@ -17,9 +17,9 @@
   type(Grid_Type)          :: Grid(MD)      ! computational grid
   type(Field_Type), target :: Flow(MD)      ! flow field
   real                     :: ts, te
-  integer                  :: nc, c, ldt
+  integer                  :: nc, ldt
   logical                  :: exit_now
-  character(11)            :: root_control = 'control.007'
+  character(7)             :: root_control = 'control'
 !==============================================================================!
 
   ! Start the parallel run and the profiler
@@ -72,37 +72,16 @@
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix()
 
-  ! Initialize solution
-  Flow(1) % u % n(1:nc) = 0.0
-  Flow(1) % v % n(1:nc) = 0.0
-  Flow(1) % w % n(1:nc) = 0.0
+  ! Initialize variables
+  call Process % Initialize_Variables(Flow(1))
 
-  Flow(1) % u % o(1:nc) = 0.0
-  Flow(1) % v % o(1:nc) = 0.0
-  Flow(1) % w % o(1:nc) = 0.0
-
-  ! You are going to need connectivity matrix on device ...
-  ! ... as well as matrices for momentum and pressure
-  call Gpu % Sparse_Con_Copy_To_Device(Flow(1) % Nat % C)
-  if(Flow(1) % Nat % use_one_matrix) then
-    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_ONE))
-  else
-    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_UVW))
-    call Gpu % Sparse_Val_Copy_To_Device(Flow(1) % Nat % A(MATRIX_PP))
-  endif
-
-  ! ... and the right-hand-side vector too
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)
-
-  ! In addition to system matrices of your discretized equations
-  ! you will want to have grid's characteristics on the device
+  !----------------------------------------------------------!
+  !   Copy all useful data to the device, that means grid,   !
+  !   field and solvers                                      !
+  !----------------------------------------------------------!
   call Gpu % Grid_Copy_To_Device(Grid(1))
-
-  ! ... and the vectors of the native suite of solvers
-  call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
-
-  ! Transfer everyting you need from the field to the device
   call Gpu % Field_Copy_To_Device(Flow(1))
+  call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
 
   ! This should be done for each domain, whenever a new domain is solved
   call Flow(1) % Update_Aliases()
@@ -142,26 +121,6 @@
 
     call Info % Time_Fill(Time % Curr_Dt(), Time % Get_Time())
     call Info % Time_Print()
-
-    !---------------------------------------!
-    !   Preparation for the new time step   !
-    !---------------------------------------!
-
-    !$acc parallel loop independent
-    do c = 1, nc
-      u_o(c) = u_n(c)
-      v_o(c) = v_n(c)
-      w_o(c) = w_n(c)
-    end do
-    !$acc end parallel
-
-    if(Flow(1) % heat_transfer) then
-      !$acc parallel loop independent
-      do c = 1, nc
-        t_o(c) = t_n(c)
-      end do
-      !$acc end parallel
-    end if
 
     !-----------------------------------!
     !   Iterations within a time step   !

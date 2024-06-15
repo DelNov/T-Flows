@@ -67,7 +67,7 @@
   do s = 1, Grid % n_faces
     u_f =  Grid % yf(s)
     v_f = -Grid % xf(s)
-    Flow % v_flux(s) = u_f * Grid % sx(s) + v_f * Grid % sy(s)
+    Flow % v_flux % n(s) = u_f * Grid % sx(s) + v_f * Grid % sy(s)
   end do
 
   allocate(b(Grid % n_cells))
@@ -84,7 +84,7 @@
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - Flow % v_flux(s) * merge(1,-1, c1.lt.c2)
+        b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
     b(c1) = b_tmp

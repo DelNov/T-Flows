@@ -9,12 +9,12 @@
 !                                                                              !
 !   Dimensions of certain variables:                                           !
 !                                                                              !
-!     M               [kg/s]                                                   !
-!     u, v, w         [m/s]                                                    !
-!     b               [kg m/s^2]     [N]                                       !
-!     p, pp           [kg/(m s^2)]   [N/m^2]                                   !
-!     p%x, p%y, p%z   [kg/(m^2 s^2)]                                           !
-!     v_flux          [m^3/s]                                                  !
+!     M                    [kg/s]                                              !
+!     u, v, w              [m/s]                                               !
+!     b                    [kg m/s^2]     [N]                                  !
+!     p, pp                [kg/(m s^2)]   [N/m^2]                              !
+!     p % x, p % y, p % z  [kg/(m^2 s^2)]                                      !
+!     v_flux % n           [m^3/s]                                             !
 !------------------------------------------------------------------------------!
 !   Discretized pressure-Poisson equation reads:                               !
 !                                                                              !
@@ -32,7 +32,7 @@
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:)
-  real, contiguous, pointer :: v_flux(:), v_m(:), fc(:)
+  real, contiguous, pointer :: v_flux_n(:), v_m(:), fc(:)
   real                      :: a12, b_tmp, max_abs_val
   real                      :: u_f, v_f, w_f
   real                      :: area_in, area_out, vol_in, vol_out, ratio
@@ -46,10 +46,10 @@
   ! Take some aliases
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
-  b      => Flow % Nat % b
-  fc     => Flow % Nat % C % fc
-  v_flux => Flow % v_flux
-  v_m    => Flow % v_m
+  b        => Flow % Nat % b
+  fc       => Flow % Nat % C % fc
+  v_flux_n => Flow % v_flux % n
+  v_m      => Flow % v_m
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'P')
@@ -79,9 +79,9 @@
     !$acc parallel loop
     do s = Faces_In_Region(reg)
       c2 = Grid % faces_c(2,s)  ! boundary cell
-      v_flux(s) = u_n(c2) * Grid % sx(s)  &
-                + v_n(c2) * Grid % sy(s)  &
-                + w_n(c2) * Grid % sz(s)
+      v_flux_n(s) = u_n(c2) * Grid % sx(s)  &
+                  + v_n(c2) * Grid % sy(s)  &
+                  + w_n(c2) * Grid % sz(s)
     end do
     !$acc end parallel
 
@@ -102,7 +102,7 @@
       !$acc parallel loop reduction(+:area_in,vol_in)
       do s = Faces_In_Region(reg)
         area_in = area_in + Grid % s(s)
-        vol_in  = vol_in  - v_flux(s)
+        vol_in  = vol_in  - v_flux_n(s)
       end do
       !$acc end parallel loop
 
@@ -114,7 +114,7 @@
       !$acc parallel loop reduction(+:area_out,vol_out)
       do s = Faces_In_Region(reg)
         area_out = area_out + Grid % s(s)
-        vol_out  = vol_out  + v_flux(s)
+        vol_out  = vol_out  + v_flux_n(s)
       end do
       !$acc end parallel
 
@@ -136,7 +136,7 @@
 
         !$acc parallel loop
         do s = Faces_In_Region(reg)
-          v_flux(s) = v_flux(s) * ratio
+          v_flux_n(s) = v_flux_n(s) * ratio
         end do
         !$acc end parallel
 
@@ -171,8 +171,10 @@
     ! Volume flux without the cell-centered pressure gradient
     ! but with the staggered pressure difference
     ! Units:  m^4 s / kg * kg / (m s^2) = m^3 / s
-    v_flux(s) = u_f * Grid % sx(s) + v_f * Grid % sy(s) + w_f * Grid % sz(s)  &
-              + a12 * (p_n(c1) - p_n(c2))
+    v_flux_n(s) = u_f * Grid % sx(s)  &
+                + v_f * Grid % sy(s)  &
+                + w_f * Grid % sz(s)  &
+                + a12 * (p_n(c1) - p_n(c2))
 
   end do
   !$acc end parallel
@@ -196,7 +198,7 @@
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - v_flux(s) * merge(1,-1, c1.lt.c2)
+        b_tmp = b_tmp - v_flux_n(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
     !$acc end loop
@@ -219,7 +221,7 @@
       !$acc parallel loop
       do s = Faces_In_Region(reg)
         c1 = Grid % faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - v_flux(s)
+        b(c1) = b(c1) - v_flux_n(s)
       end do
       !$acc end parallel
 

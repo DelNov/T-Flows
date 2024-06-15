@@ -48,24 +48,14 @@
       call Test_006()
       goto 1
 
-    ! Navier-Stokes solutions in the lid driven cavity
+    ! Navier-Stokes solutions
     else if(arg .eq. '7') then
       call Test_007()
       goto 1
 
-    ! Navier-Stokes solutions over the matrix of cubes test case
+    ! Turbulent flow simulations
     else if(arg .eq. '8') then
       call Test_008()
-      goto 1
-
-    ! Navier-Stokes solutions over the matrix for the backstep flow
-    else if(arg .eq. '9') then
-      call Test_009()
-      goto 1
-
-    ! Rayleigh-Benard convection
-    else if(arg .eq. '10') then
-      call Test_010()
       goto 1
 
     end if
@@ -91,9 +81,7 @@
   O_Print '(a)', '   5 - field creation and gradient calculation'
   O_Print '(a)', '   6 - volume balance in a rotating velocity field.'
   O_Print '(a)', '   7 - solution of the Navier-Stokes equations'
-  O_Print '(a)', '   8 - matrix of cubes case'
-  O_Print '(a)', '   9 - flow over a backward facing step'
-  O_Print '(a)', '  10 - Reyleigh-Benard convection'
+  O_Print '(a)', '   8 - turbulent flow simulations (under development)'
 
   call Global % End_Parallel
 

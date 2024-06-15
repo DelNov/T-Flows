@@ -33,15 +33,20 @@
   call Gpu % Vector_Real_Copy_To_Device(Flow % u % o)
   call Gpu % Vector_Real_Copy_To_Device(Flow % v % o)
   call Gpu % Vector_Real_Copy_To_Device(Flow % w % o)
-  call Gpu % Vector_Real_Copy_To_Device(Flow % u % oo)
-  call Gpu % Vector_Real_Copy_To_Device(Flow % v % oo)
-  call Gpu % Vector_Real_Copy_To_Device(Flow % w % oo)
-  call Gpu % Vector_Real_Copy_To_Device(Flow % v_flux)
+  if(Flow % u % td_scheme .eq. PARABOLIC) then
+    call Gpu % Vector_Real_Copy_To_Device(Flow % u % oo)
+    call Gpu % Vector_Real_Copy_To_Device(Flow % v % oo)
+    call Gpu % Vector_Real_Copy_To_Device(Flow % w % oo)
+  end if
+  call Gpu % Vector_Real_Copy_To_Device(Flow % v_flux % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow % v_m)
+
   if(Flow % heat_transfer) then
     call Gpu % Vector_Real_Copy_To_Device(Flow % t % n)
     call Gpu % Vector_Real_Copy_To_Device(Flow % t % o)
-    call Gpu % Vector_Real_Copy_To_Device(Flow % t % oo)
+    if(Flow % t % td_scheme .eq. PARABOLIC) then
+      call Gpu % Vector_Real_Copy_To_Device(Flow % t % oo)
+    end if
   end if
 
   ! You are going to need physical properties as well

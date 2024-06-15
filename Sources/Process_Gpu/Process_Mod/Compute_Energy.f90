@@ -12,7 +12,6 @@
   real,                  pointer :: val(:)
   integer,               pointer :: dia(:)
   real,                  pointer :: b(:)
-  real,                  pointer :: ui_n(:)
   real                           :: tol, fin_res, urf
   integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -40,6 +39,26 @@
   ! Tolerances and under-relaxations are the same for all components
   tol = Flow % t % tol
   urf = Flow % t % urf
+
+  !---------------------------------------------------!
+  !   Update old values (o) and older than old (oo)   !
+  !---------------------------------------------------!
+  if(Iter % Current() .eq. 1) then
+
+    if(Flow % t % td_scheme .eq. PARABOLIC) then
+      !$acc parallel loop independent
+      do c = Cells_In_Domain_And_Buffers()
+        t_oo(c) = t_o(c)
+      end do
+      !$acc end parallel
+    end if
+
+    !$acc parallel loop independent
+    do c = Cells_In_Domain_And_Buffers()
+      t_o(c) = t_n(c)
+    end do
+    !$acc end parallel
+  end if
 
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !

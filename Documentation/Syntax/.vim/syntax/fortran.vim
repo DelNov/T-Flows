@@ -454,7 +454,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain_And_At_Buffers
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers  Cell_In_This_Proc
   syn keyword fortranMacroTflows   Cells_At_Boundaries  Cells_At_Boundaries_In_Domain_And_Buffers
-  syn keyword fortranMacroTflows   Assert  Unused
+  syn keyword fortranMacroTflows   Assert  Unused  O_Print  A_Print
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real  Key_Ind
 "---------------------------------------------------------------------[T-Flows]-

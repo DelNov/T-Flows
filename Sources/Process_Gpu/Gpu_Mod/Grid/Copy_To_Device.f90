@@ -10,7 +10,7 @@
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
-    Unused(Flow)
+    Unused(Grid)
 # endif
 !==============================================================================!
 

@@ -13,9 +13,9 @@
   real,                  pointer :: val(:)
   integer,               pointer :: dia(:)
   real,                  pointer :: b(:), ones(:)
-  real,                  pointer :: ui_n(:)
+  real,                  pointer :: ui_n(:), ui_o(:), ui_oo(:)
   real                           :: tol, fin_res, urf
-  integer                        :: nc, n, c
+  integer                        :: nb, nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -40,12 +40,23 @@
   ones => Flow % work
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
+  nb   =  Flow % pnt_grid % n_bnd_cells
   nc   =  Flow % pnt_grid % n_cells
   fin_res = 0.0
 
-  if(comp .eq. 1) ui_n => u_n
-  if(comp .eq. 2) ui_n => v_n
-  if(comp .eq. 3) ui_n => w_n
+  if(comp .eq. 1) then
+    ui_n  => u_n
+    ui_o  => u_o
+    ui_oo => u_oo
+  else if(comp .eq. 2) then
+    ui_n  => v_n
+    ui_o  => v_o
+    ui_oo => v_oo
+  else if(comp .eq. 3) then
+    ui_n  => w_n
+    ui_o  => w_o
+    ui_oo => w_oo
+  end if
 
   ! Tolerances and under-relaxations are the same for all components
   tol = Flow % u % tol
@@ -57,6 +68,26 @@
     ones(c) = 1.0
   end do
   !$acc end parallel
+
+  !---------------------------------------------------!
+  !   Update old values (o) and older than old (oo)   !
+  !---------------------------------------------------!
+  if(Iter % Current() .eq. 1) then
+
+    if(Flow % u % td_scheme .eq. PARABOLIC) then
+      !$acc parallel loop independent
+      do c = Cells_In_Domain_And_Buffers()
+        ui_oo(c) = ui_o(c)
+      end do
+      !$acc end parallel
+    end if
+
+    !$acc parallel loop independent
+    do c = Cells_In_Domain_And_Buffers()
+      ui_o(c) = ui_n(c)
+    end do
+    !$acc end parallel
+  end if
 
   !----------------------------------------------------!
   !   Discretize the momentum conservation equations   !
