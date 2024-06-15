@@ -516,42 +516,11 @@
                                         plot_inside,              &
                                         Flow % pp % n(c_f:c_l),   &
                                         f8, f9, data_offset, run)
-    save_01(:) = 0.0
-    save_02(:) = 0.0
-    save_03(:) = 0.0
-    do c1 = c_f, c_l
-      save_01(c1) = Flow % pp % x(c1) * Grid % vol(c1)
-      save_02(c1) = Flow % pp % y(c1) * Grid % vol(c1)
-      save_03(c1) = Flow % pp % z(c1) * Grid % vol(c1)
-    end do
-    str_var = Results % Var_Name("Pressure Correction Force","[N]", units)
-    call Results % Save_Vtu_Vector_Real(trim(str_var),      &
-                                        plot_inside,        &
-                                        save_01(c_f:c_l),   &
-                                        save_02(c_f:c_l),   &
-                                        save_03(c_f:c_l),   &
-                                        f8, f9, data_offset, run)
 
     str_var = Results % Var_Name("Pressure","[Pa]", units)
     call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
                                         Flow % p % n(c_f:c_l),         &
                                         f8, f9, data_offset, run)
-    save_01(:) = 0.0
-    save_02(:) = 0.0
-    save_03(:) = 0.0
-    do c1 = c_f, c_l
-      save_01(c1) = Flow % p % x(c1) * Grid % vol(c1)
-      save_02(c1) = Flow % p % y(c1) * Grid % vol(c1)
-      save_03(c1) = Flow % p % z(c1) * Grid % vol(c1)
-    end do
-
-    str_var = Results % Var_Name("PressureForce","[N]", units)
-    call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
-                                        save_01(c_f:c_l),             &
-                                        save_02(c_f:c_l),             &
-                                        save_03(c_f:c_l),             &
-                                        f8, f9, data_offset, run)
-
     !-----------------!
     !   Temperature   !
     !-----------------!

@@ -20,13 +20,13 @@
   real, contiguous, pointer :: v_n(:), v_o(:)
   real, contiguous, pointer :: w_n(:), w_o(:)
   real, contiguous, pointer :: pp_n(:)
-  real, contiguous, pointer :: pp_x(:)
-  real, contiguous, pointer :: pp_y(:)
-  real, contiguous, pointer :: pp_z(:)
+! real, contiguous, pointer :: pp_x(:)
+! real, contiguous, pointer :: pp_y(:)
+! real, contiguous, pointer :: pp_z(:)
   real, contiguous, pointer :: p_n(:)
-  real, contiguous, pointer :: p_x(:)
-  real, contiguous, pointer :: p_y(:)
-  real, contiguous, pointer :: p_z(:)
+! real, contiguous, pointer :: p_x(:)
+! real, contiguous, pointer :: p_y(:)
+! real, contiguous, pointer :: p_z(:)
   real, contiguous, pointer :: t_n(:), t_o(:)
 
   !----------------!
@@ -119,6 +119,11 @@
 
     ! Gradient matrices for cells to cells (c2c)
     real, allocatable :: grad_c2c(:,:)  !! gradient matrices [1/m^2]
+    real, allocatable :: phi_x(:)       !! gradient of phi in x direction
+    real, allocatable :: phi_y(:)       !! gradient of phi in y direction
+    real, allocatable :: phi_z(:)       !! gradient of phi in z direction
+    character(VL) :: stores_gradients_of  !! name of the variable whose
+                                          !! gradients are now computed
 
     ! Tolerance and maximum iterations for Gauss gradients
     integer :: least_miter

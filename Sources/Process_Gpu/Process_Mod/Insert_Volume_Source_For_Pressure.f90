@@ -31,7 +31,7 @@
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:)
+  real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:)
   real, contiguous, pointer :: v_flux(:), v_m(:), fc(:)
   real                      :: a12, b_tmp, max_abs_val
   real                      :: u_f, v_f, w_f
@@ -43,10 +43,22 @@
 
   call Profiler % Start('Insert_Volume_Source_For_Pressure')
 
+  ! Take some aliases
+  ! GPU version doesn't work if you use directly Flow % whatever_variable
+  ! These aliases are really needed, not just some gimmick to shorten the code
   b      => Flow % Nat % b
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
   v_m    => Flow % v_m
+
+  ! Check if you have pressure gradients at hand and then set aliases properly
+  Assert(Flow % stores_gradients_of .eq. 'P')
+
+  ! GPU version doesn't work if you use directly Flow % phi_x, _y and _z
+  ! These aliases are really needed, not just some gimmick to shorten the code
+  p_x => Flow % phi_x
+  p_y => Flow % phi_y
+  p_z => Flow % phi_z
 
   ! Nullify the volume source
   !$acc kernels

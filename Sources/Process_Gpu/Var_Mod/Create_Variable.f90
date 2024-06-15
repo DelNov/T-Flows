@@ -1,14 +1,26 @@
 !==============================================================================!
-  subroutine Var_Mod_Create_Variable(phi, Grid)
+  subroutine Var_Mod_Create_Variable(phi, Grid, name_phi, name_flux)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Var_Type)          :: phi   !! variable object being created
   type(Grid_Type), target :: Grid  !! grid on which it is defined
+  character(len=*)        :: name_phi   !! variable's name, connects the
+    !! variable to boundary and initial conditions specified in control file
+  character(len=*)        :: name_flux  !! name of variable's flux,
+    !! connects variable to boundary condition values in control file
 !==============================================================================!
 
   ! Store Grid for which the variable is defined
   phi % pnt_grid => Grid
+
+  ! Variable names must be short, up to 4 (VL) characters long
+  Assert(len(name_phi)  .le. VL)
+  Assert(len(name_flux) .le. VL)
+
+  ! Store variable name
+  phi % name      = name_phi
+  phi % flux_name = name_flux
 
   ! Values in the new (n) and the old (o) time step
   allocate (phi % n(-Grid % n_bnd_cells:Grid % n_cells));  phi % n = 0.0
@@ -27,10 +39,5 @@
   ! ... thus get rid of the "if(c2 < 0) then" checks
   allocate (phi % bnd_cond_type(-Grid % n_bnd_cells : Grid % n_faces))
   phi % bnd_cond_type = 0
-
-  ! Gradient components
-  allocate (phi % x(-Grid % n_bnd_cells:Grid % n_cells));  phi % x = 0.0
-  allocate (phi % y(-Grid % n_bnd_cells:Grid % n_cells));  phi % y = 0.0
-  allocate (phi % z(-Grid % n_bnd_cells:Grid % n_cells));  phi % z = 0.0
 
   end subroutine

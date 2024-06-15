@@ -23,9 +23,6 @@
     real, allocatable :: n(:)   !! new value (current time step)
     real, allocatable :: o(:)   !! old value (previous time step)
     real, allocatable :: b(:)   !! boundary value
-    real, allocatable :: x(:)   !! x component of variable's gradient
-    real, allocatable :: y(:)   !! y component of variable's gradient
-    real, allocatable :: z(:)   !! z component of variable's gradient
     real, allocatable :: q(:)   !! wall flux of the variable
     real              :: res    !! residual after linear solver
 

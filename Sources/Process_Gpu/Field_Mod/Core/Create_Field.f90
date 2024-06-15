@@ -39,19 +39,22 @@
   !   Memory for gradient matrices   !
   !----------------------------------!
   allocate(Flow % grad_c2c(6, nc));  Flow % grad_c2c(:,:) = 0.0
+  allocate(Flow % phi_x(-nb:nc));  Flow % phi_x(:) = 0.0
+  allocate(Flow % phi_y(-nb:nc));  Flow % phi_y(:) = 0.0
+  allocate(Flow % phi_z(-nb:nc));  Flow % phi_z(:) = 0.0
 
   !----------------------------!
   !   Navier-Stokes equation   !
   !----------------------------!
 
   ! Allocate memory for velocity components
-  call Var_Mod_Create_Variable(Flow % u, Grid)
-  call Var_Mod_Create_Variable(Flow % v, Grid)
-  call Var_Mod_Create_Variable(Flow % w, Grid)
+  call Var_Mod_Create_Variable(Flow % u, Grid, 'U', '')
+  call Var_Mod_Create_Variable(Flow % v, Grid, 'V', '')
+  call Var_Mod_Create_Variable(Flow % w, Grid, 'W', '')
 
   ! Allocate memory for pressure correction and pressure
-  call Var_Mod_Create_Variable(Flow % pp, Grid)  ! pressure correction
-  call Var_Mod_Create_Variable(Flow % p,  Grid)  ! pressure
+  call Var_Mod_Create_Variable(Flow % pp, Grid, 'PP', '')
+  call Var_Mod_Create_Variable(Flow % p,  Grid, 'P',  '')
 
   ! Helping array to discretize pressure Poisson equation
   allocate(Flow % v_m(nc));  Flow % v_m(:) = 0.0
@@ -63,7 +66,7 @@
   !   Enthalpy conservation (temperature)   !
   !-----------------------------------------!
   if(Flow % heat_transfer) then
-    call Var_Mod_Create_Variable(Flow % t, Grid)
+    call Var_Mod_Create_Variable(Flow % t, Grid, 'T', 'Q')
   end if ! heat_transfer
 
   !--------------------------------------------------------------!

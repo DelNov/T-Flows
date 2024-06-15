@@ -16,14 +16,7 @@
   w_o => Flow % w % o
 
   pp_n => Flow % pp % n
-  pp_x => Flow % pp % x
-  pp_y => Flow % pp % y
-  pp_z => Flow % pp % z
-
-  p_n => Flow % p % n
-  p_x => Flow % p % x
-  p_y => Flow % p % y
-  p_z => Flow % p % z
+  p_n  => Flow % p  % n
 
   if(Flow % heat_transfer) then
     t_n => Flow % t % n

@@ -2,6 +2,12 @@
 !   Definition of browsing macros in T-Flows.                                  !
 !------------------------------------------------------------------------------!
 
+!------------------------------!
+!                              !
+!   Browsing through regions   !
+!                              !
+!------------------------------!
+
 !--------------------------------------------!
 !   To browse through all boundary regions   !
 !--------------------------------------------!
@@ -33,6 +39,12 @@
 # define All_Regions()  \
     1, Grid % n_bnd_regions + 5
 
+!----------------------------!
+!                            !
+!   Browsing through faces   !
+!                            !
+!----------------------------!
+
 !----------------------------------------------------------!
 !   These are boundary faces for a given boundary region   !
 !----------------------------------------------------------!
@@ -44,9 +56,22 @@
 !   These are faces in the domain, and in buffers ...     !
 !   ... where at least one cell (c1) is the inside cell   !
 !---------------------------------------------------------!
-# define Faces_In_Domain_And_At_Buffers()          \
-    Grid % region % f_face(Grid % n_regions),      \
+# define Faces_In_Domain_And_At_Buffers()      \
+    Grid % region % f_face(Grid % n_regions),  \
     Grid % region % l_face(Grid % n_regions)
+
+!----------------------------!
+!                            !
+!   Browsing through cells   !
+!                            !
+!----------------------------!
+
+!-------------------------------------------------------!
+!   These are boundary cells for all boundary regions   !
+!-------------------------------------------------------!
+# define Cells_At_Boundaries()  \
+    Grid % region % f_cell(1),  \
+    Grid % region % l_cell(Grid % n_bnd_regions)
 
 !----------------------------------------------------------!
 !   These are boundary cells for a given boundary region   !
@@ -76,11 +101,25 @@
     Grid % region % f_cell(Grid % n_regions + 1),  \
     Grid % region % l_cell(Grid % n_regions + 1)
 
+!-----------------------------------------------!
+!   Cells at boundaries and inside the domain   !
+!-----------------------------------------------!
+# define Cells_At_Boundaries_And_In_Domain()  \
+    Grid % region % f_cell(1),                \
+    Grid % region % l_cell(Grid % n_regions)
+
+!---------------------------------------------------------------!
+!   Cells at boundaries, inside the domain and in the buffers   !
+!---------------------------------------------------------------!
+# define Cells_At_Boundaries_In_Domain_And_Buffers()  \
+    Grid % region % f_cell(1),                        \
+    Grid % region % l_cell(Grid % n_regions + 1)
+
 !------------------------------------------------------------------------!
 !   This one is not strictly for browsing, but I don't know where else   !
 !    to put it.  I tried in Comm_Mod, but didn't work for some reason    !
 !------------------------------------------------------------------------!
-# define Cell_In_This_Proc(cell)     \
+# define Cell_In_This_Proc(cell)  \
     Grid % Comm % cell_proc(cell) .eq. This_Proc()
 
 !----------------------------------------------------------------------!

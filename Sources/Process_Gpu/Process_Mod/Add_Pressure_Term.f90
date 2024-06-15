@@ -29,10 +29,12 @@
   ! Take some aliases
   b => Flow % Nat % b
 
+  Assert(Flow % stores_gradients_of .eq. 'P')
+
   ! Still on aliases
-  if(comp .eq. 1) p_i   => Flow % p % x
-  if(comp .eq. 2) p_i   => Flow % p % y
-  if(comp .eq. 3) p_i   => Flow % p % z
+  if(comp .eq. 1) p_i   => Flow % phi_x
+  if(comp .eq. 2) p_i   => Flow % phi_y
+  if(comp .eq. 3) p_i   => Flow % phi_z
   if(comp .eq. 1) p_d_i =  Flow % bulk % p_drop_x
   if(comp .eq. 2) p_d_i =  Flow % bulk % p_drop_y
   if(comp .eq. 3) p_d_i =  Flow % bulk % p_drop_z

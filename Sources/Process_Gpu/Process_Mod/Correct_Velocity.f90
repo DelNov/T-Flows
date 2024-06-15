@@ -17,7 +17,7 @@
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), v_flux(:)
-  real, contiguous, pointer :: v_m(:), fc(:)
+  real, contiguous, pointer :: v_m(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
   real                      :: a12, b_tmp, max_abs_val
   real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
@@ -29,12 +29,23 @@
   call Profiler % Start('Correct_Velocity')
 
   ! Take some aliases
+  ! GPU version doesn't work if you use directly Flow % whatever_variable
+  ! These aliases are really needed, not just some gimmick to shorten the code
   b      => Flow % Nat % b
   fc     => Flow % Nat % C % fc
   v_flux => Flow % v_flux
   v_m    => Flow % v_m
   dens   => Flow % density
   visc   => Flow % viscosity
+
+  ! Check if you have pressure gradients at hand and then set aliases properly
+  Assert(Flow % stores_gradients_of .eq. 'PP')
+
+  ! GPU version doesn't work if you use directly Flow % phi_x, _y and _z
+  ! These aliases are really needed, not just some gimmick to shorten the code
+  pp_x => Flow % phi_x
+  pp_y => Flow % phi_y
+  pp_z => Flow % phi_z
 
   !----------------------!
   !                      !
