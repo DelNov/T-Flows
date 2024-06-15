@@ -88,7 +88,7 @@
   call Gpu % Vector_Real_Copy_To_Device(b)
 
   ! Allocate vectors related to CG algorithm on the device
-  call Gpu % Native_Transfer_To_Device(Flow % Nat)
+  call Gpu % Native_Copy_To_Device(Flow % Nat)
 
   ! Copy physical properties as well
   call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)

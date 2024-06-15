@@ -22,6 +22,7 @@
                                 !! very short (4, defined in Const_Mod)
     real, allocatable :: n(:)   !! new value (current time step)
     real, allocatable :: o(:)   !! old value (previous time step)
+    real, allocatable :: oo(:)  !! time step before old (older than old)
     real, allocatable :: b(:)   !! boundary value
     real, allocatable :: q(:)   !! wall flux of the variable
     real              :: res    !! residual after linear solver

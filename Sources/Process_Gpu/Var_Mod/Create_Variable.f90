@@ -22,15 +22,16 @@
   phi % name      = name_phi
   phi % flux_name = name_flux
 
-  ! Values in the new (n) and the old (o) time step
-  allocate (phi % n(-Grid % n_bnd_cells:Grid % n_cells));  phi % n = 0.0
-  allocate (phi % o(-Grid % n_bnd_cells:Grid % n_cells));  phi % o = 0.0
+  ! Values in the new (n), old (o) and older than old (oo) time step
+  allocate(phi % n (-Grid % n_bnd_cells:Grid % n_cells));  phi % n  = 0.0
+  allocate(phi % o (-Grid % n_bnd_cells:Grid % n_cells));  phi % o  = 0.0
+  allocate(phi % oo(-Grid % n_bnd_cells:Grid % n_cells));  phi % oo = 0.0
 
   ! Variable's boundary value
-  allocate (phi % b(-Grid % n_bnd_cells:-1));  phi % b = 0.
+  allocate (phi % b(-Grid % n_bnd_cells:-1));  phi % b = 0.0
 
   ! Variable's boundary flux
-  allocate (phi % q(-Grid % n_bnd_cells:-1));  phi % q = 0.
+  allocate (phi % q(-Grid % n_bnd_cells:-1));  phi % q = 0.0
 
   ! Boundary cell type (important for scalars, since they
   ! can have different boundary conditions at the walls)

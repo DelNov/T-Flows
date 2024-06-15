@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Native_Transfer_To_Device(Gpu, Nat)
+  subroutine Native_Copy_To_Device(Gpu, Nat)
 !------------------------------------------------------------------------------!
 !>  Copy the preconditioner (d_inv) to the GPU and create memory for helping
 !>  arrays from native solver on GPU.  As said before, It can't copy and create

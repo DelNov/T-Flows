@@ -94,65 +94,15 @@
   ! ... and the right-hand-side vector too
   call Gpu % Vector_Real_Copy_To_Device(Flow(1) % Nat % b)
 
-  ! In addition to system matrices of your discretized
-  ! equations, you will want to have gradient matrices, as
-  ! well as cell connectivity and cell coordinates on the
-  ! device (they are all needed for gradients), ...
-  call Gpu % Matrix_Real_Copy_To_Device(Flow(1) % grad_c2c)
-  call Gpu % Vector_Real_Create_On_Device(Flow(1) % phi_x)
-  call Gpu % Vector_Real_Create_On_Device(Flow(1) % phi_y)
-  call Gpu % Vector_Real_Create_On_Device(Flow(1) % phi_z)
-  call Gpu % Matrix_Int_Copy_To_Device(Grid(1) % faces_c)
-  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % cells_n_cells)
-  call Gpu % Matrix_Int_Copy_To_Device(Grid(1) % cells_c)
-  call Gpu % Matrix_Int_Copy_To_Device(Grid(1) % cells_f)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % xc)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % yc)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % zc)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % dx)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % dy)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % dz)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sx)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sy)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % sz)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % s)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % d)
-  call Gpu % Vector_Real_Copy_To_Device(Grid(1) % vol)
-  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_face)
-  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_face)
-  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % f_cell)
-  call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_cell)
+  ! In addition to system matrices of your discretized equations
+  ! you will want to have grid's characteristics on the device
+  call Gpu % Grid_Copy_To_Device(Grid(1))
 
   ! ... and the vectors of the native suite of solvers
-  call Gpu % Native_Transfer_To_Device(Flow(1) % Nat)
+  call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
 
-  ! OK, fine, now you have all sort of matrices and supporting
-  ! data on the device, but you will also need variables sol-
-  ! ved for (pp % n, u % n, v % n and w % n), universal source
-  ! for them all (b) and the variables whose gradients are
-  ! being computed (pp % n and p % n) as well as gradient com
-  ! ponents (pp % x, pp % y, pp % z, p % x, p % y and p % z)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % viscosity)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % density)
-  if(Flow(1) % heat_transfer) then
-    call Gpu % Vector_Real_Copy_To_Device(Flow(1) % conductivity)
-    call Gpu % Vector_Real_Copy_To_Device(Flow(1) % capacity)
-  end if
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % work)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % pp % n)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % p % n)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % n)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v % n)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % w % n)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % u % o)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v % o)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % w % o)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v_flux)
-  call Gpu % Vector_Real_Copy_To_Device(Flow(1) % v_m)
-  if(Flow(1) % heat_transfer) then
-    call Gpu % Vector_Real_Copy_To_Device(Flow(1) % t % n)
-    call Gpu % Vector_Real_Copy_To_Device(Flow(1) % t % o)
-  end if
+  ! Transfer everyting you need from the field to the device
+  call Gpu % Field_Copy_To_Device(Flow(1))
 
   ! This should be done for each domain, whenever a new domain is solved
   call Flow(1) % Update_Aliases()
@@ -253,13 +203,7 @@
     call Info % Bulk_Print(Flow(1), 1, 1)
 
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
-      call Gpu % Vector_Update_Host(Flow(1) % u % n)
-      call Gpu % Vector_Update_Host(Flow(1) % v % n)
-      call Gpu % Vector_Update_Host(Flow(1) % w % n)
-      call Gpu % Vector_Update_Host(Flow(1) % p % n)
-      if(Flow(1) % heat_transfer) then
-        call Gpu % Vector_Update_Host(Flow(1) % t % n)
-      end if
+      call Gpu % Field_Update_Host(Flow(1))
       call Results % Main_Results(1, Flow(1), exit_now)
     end if
 
@@ -267,13 +211,7 @@
   call cpu_time(te)
 
   ! Save results
-  call Gpu % Vector_Update_Host(Flow(1) % u % n)
-  call Gpu % Vector_Update_Host(Flow(1) % v % n)
-  call Gpu % Vector_Update_Host(Flow(1) % w % n)
-  call Gpu % Vector_Update_Host(Flow(1) % p % n)
-  if(Flow(1) % heat_transfer) then
-    call Gpu % Vector_Update_Host(Flow(1) % t % n)
-  end if
+  call Gpu % Field_Update_Host(Flow(1))
   call Results % Main_Results(1, Flow(1), exit_now)
 
   call Work % Finalize_Work()

@@ -9,7 +9,6 @@
   use Sparse_Mod
   use Native_Mod
   use Var_mod
-  use Gpu_mod
   use Profiler_mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -20,13 +19,7 @@
   real, contiguous, pointer :: v_n(:), v_o(:)
   real, contiguous, pointer :: w_n(:), w_o(:)
   real, contiguous, pointer :: pp_n(:)
-! real, contiguous, pointer :: pp_x(:)
-! real, contiguous, pointer :: pp_y(:)
-! real, contiguous, pointer :: pp_z(:)
   real, contiguous, pointer :: p_n(:)
-! real, contiguous, pointer :: p_x(:)
-! real, contiguous, pointer :: p_y(:)
-! real, contiguous, pointer :: p_z(:)
   real, contiguous, pointer :: t_n(:), t_o(:)
 
   !----------------!

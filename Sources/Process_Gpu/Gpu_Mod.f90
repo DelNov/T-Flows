@@ -1,10 +1,10 @@
-#include "Unused.h90"
+#include "../Shared/Browse.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Gpu_Mod
 !----------------------------------[Modules]-----------------------------------!
-  use Const_Mod
-  use Native_Mod
+  use Field_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -41,8 +41,17 @@
       procedure :: Sparse_Val_Destroy_On_Device
 
       ! Procedures to copy native solver to device
-      procedure :: Native_Transfer_To_Device
+      procedure :: Native_Copy_To_Device
       procedure :: Native_Destroy_On_Device
+
+      ! Procedures to copy field to device
+      procedure :: Field_Copy_To_Device
+      procedure :: Field_Destroy_On_Device
+      procedure :: Field_Update_Host
+
+      ! Procedures to copy grid to device
+      procedure :: Grid_Copy_To_Device
+      procedure :: Grid_Destroy_On_Device
 
   end type
 
@@ -71,7 +80,16 @@
 #   include "Gpu_Mod/Sparse_Val/Destroy_On_Device.f90"
 
     ! Procedures to copy native solver to device
-#   include "Gpu_Mod/Native/Transfer_To_Device.f90"
+#   include "Gpu_Mod/Native/Copy_To_Device.f90"
 #   include "Gpu_Mod/Native/Destroy_On_Device.f90"
+
+    ! Procedures to copy field to device
+#   include "Gpu_Mod/Field/Copy_To_Device.f90"
+#   include "Gpu_Mod/Field/Destroy_On_Device.f90"
+#   include "Gpu_Mod/Field/Update_Host.f90"
+
+    ! Procedures to copy grid to device
+#   include "Gpu_Mod/Grid/Copy_To_Device.f90"
+#   include "Gpu_Mod/Grid/Destroy_On_Device.f90"
 
   end module

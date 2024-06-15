@@ -124,7 +124,7 @@
   call Gpu % Vector_Int_Copy_To_Device(Grid(1) % region % l_cell)
 
   ! ... and the vectors of the native suite of solvers
-  call Gpu % Native_Transfer_To_Device(Flow(1) % Nat)
+  call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
 
   ! OK, fine, now you have all sort of matrices and supporting
   ! data on the device, but you will also need variables sol-

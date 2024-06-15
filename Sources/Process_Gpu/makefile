@@ -260,9 +260,9 @@ SRC_F_MOD += Bulk_Mod.f90           \
              Linalg_Mod.f90         \
              Native_Mod.f90         \
              Var_Mod.f90            \
-             Gpu_Mod.f90            \
              Time_Mod.f90           \
              Field_Mod.f90          \
+             Gpu_Mod.f90            \
              Iter_Mod.f90           \
              Info_Mod.f90           \
              Results_Mod.f90        \
