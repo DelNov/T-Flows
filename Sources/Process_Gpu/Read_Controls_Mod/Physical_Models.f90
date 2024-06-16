@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Physical_Models(Rc, Flow)
+  subroutine Physical_Models(Rc, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -11,6 +11,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Controls_Type), intent(in) :: Rc     !! parent class
   type(Field_Type), target              :: Flow   !! flow object
+  type(Turb_Type),  target              :: Turb   !! turbulence object
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name
@@ -51,6 +52,32 @@
   call Control % Reference_Density           (Flow % dens_ref, .true.)
   call Control % Reference_Temperature       (Flow % t_ref,    .true.)
   call Control % Volume_Expansion_Coefficient(Flow % beta,     .true.)
+
+  !---------------------------!
+  !                           !
+  !   Related to turbulence   !
+  !                           !
+  !---------------------------!
+  call Control % Turbulence_Model(name, .true.)
+  select case(name)
+
+    case('NONE')
+      Turb % model = NO_TURBULENCE_MODEL
+    case('LES_SMAGORINSKY')
+      Turb % model = LES_SMAGORINSKY
+
+    case default
+      call Message % Error(60,                                         &
+                           'Unknown turbulence model: '//trim(name)//  &
+                           '.  \n Exiting!')
+  end select
+
+  !-------------------------------------------------------------------------!
+  !   Initialization of model constants depending on the turbulence model   !
+  !-------------------------------------------------------------------------!
+  if(Turb % model .eq. LES_SMAGORINSKY) then
+    call Control % Smagorinsky_Constant(c_smag, .true.)
+  end if
 
   !------------------------------------!
   !                                    !

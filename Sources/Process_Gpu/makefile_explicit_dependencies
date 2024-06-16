@@ -12,6 +12,13 @@ $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Turb_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Turb_Mod.o:\
+Turb_Mod/*.f90 \
+Info_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Linalg_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Linalg_Mod.o:\
@@ -40,6 +47,8 @@ $(DIR_SHARED)/Grid_Mod/*/*.f90
 # Dependencies for: ./Test_007.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_007.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
 Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
@@ -104,19 +113,6 @@ Field_Mod/*/Grad_Component.001 \
 Field_Mod/*/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Test_009.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Test_009.o:\
-$(DIR_OBJECT)/Read_Controls_Mod.o \
-Read_Controls_Mod/*.f90 \
-$(DIR_OBJECT)/Process_Mod.o \
-Process_Mod/*.f90 \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 \
-$(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Numerics_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Numerics_Mod.o:\
@@ -128,19 +124,8 @@ $(DIR_SHARED)/Message_Mod/*.f90
 # Dependencies for: ./Test_008.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_008.o:\
-$(DIR_OBJECT)/Read_Controls_Mod.o \
-Read_Controls_Mod/*.f90 \
-$(DIR_OBJECT)/Process_Mod.o \
-Process_Mod/*.f90 \
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 \
-$(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Test_010.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Test_010.o:\
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
 Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
@@ -156,6 +141,8 @@ Gpu_Mod/*/*.f90
 $(DIR_OBJECT)/Process_Mod.o:\
 $(DIR_OBJECT)/Results_Mod.o \
 Results_Mod/*.f90 \
+$(DIR_OBJECT)/Read_Controls_Mod.o \
+Read_Controls_Mod/*.f90 \
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
 Process_Mod/*.f90 \
@@ -276,14 +263,9 @@ Gpu_Mod/*/*.f90
 # Dependencies for: ./Gpu_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Gpu_Mod.o:\
-Gpu_Mod/*/*.f90 \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/Grad_Component.005 \
-Field_Mod/*/Grad_Component.004 \
-Field_Mod/*/Grad_Component.003 \
-Field_Mod/*/Grad_Component.002 \
-Field_Mod/*/Grad_Component.001 \
-Field_Mod/*/*.f90 
+$(DIR_OBJECT)/Turb_Mod.o \
+Turb_Mod/*.f90 \
+Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Sparse_Mod.f90

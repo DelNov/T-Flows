@@ -9,8 +9,8 @@
 # Time stepping
 #---------------
   TIME_STEP                                    0.05
-  NUMBER_OF_TIME_STEPS                     1200 
-  RESULTS_SAVE_INTERVAL                      300
+  NUMBER_OF_TIME_STEPS                     1200
+  RESULTS_SAVE_INTERVAL                     300
 
   USE_ONE_MATRIX                             yes
 
@@ -28,6 +28,8 @@
   THERMAL_CONDUCTIVITY   21.28e-5
   DYNAMIC_VISCOSITY      15.11e-5
   HEAT_CAPACITY          1.0
+
+  TURBULENCE_MODEL    les_smagorinsky
 
 #----------------------
 # Numerical parameters

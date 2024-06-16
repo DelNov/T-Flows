@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Fields(Results, Flow,  &
+  subroutine Save_Vtu_Fields(Results, Flow, Turb,  &
                              plot_inside, domain)
 !------------------------------------------------------------------------------!
 !>  The Save_Vtu_Fields subroutine is a comprehensive and central
@@ -71,6 +71,7 @@
 !--------------------------------[Arguments]-----------------------------------!
   class(Results_Type), target :: Results      !! parent class
   type(Field_Type),    target :: Flow         !! flow field
+  type(Turb_Type),     target :: Turb         !! turbulence models
   logical                     :: plot_inside  !! true to plots inside,
                                               !! false to plot on the boundary
   integer,           optional :: domain       !! computational domain
@@ -88,6 +89,7 @@
   real,    pointer, contiguous :: save_01(:), save_02(:), save_03(:)
   real,    pointer, contiguous :: save_04(:), save_05(:), save_06(:)
   real,    pointer, contiguous :: var_ins(:)
+  real,    pointer, contiguous ::             kin_vis_t(:)
   logical, pointer             :: units
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: PLOT_BUFFERS = .false.  ! .true. is good for debugging
@@ -107,6 +109,7 @@
   call Work % Connect_Int_Cell(int_save, type_save, offs_save)
   call Work % Connect_Real_Cell(save_01, save_02, save_03,  &
                                 save_04, save_05, save_06)
+  call Work % Connect_Real_Cell(                  kin_vis_t          )
 
   !------------------------------------------------!
   !   Mark the beginnings and end of cell ranges   !
@@ -567,6 +570,28 @@
                                           f8, f9, data_offset, run)
     end do
 
+    !--------------------------!
+    !   Turbulent quantities   !
+    !--------------------------!
+
+   kin_vis_t(:) = 0.0
+    if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+      kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
+      str_var = Results % Var_Name("Eddy Over Molecular Viscosity","[1]",  &
+                                   units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,      &
+                                          kin_vis_t(c_f:c_l),              &
+                                          f8, f9, data_offset, run)
+    end if
+
+    ! Wall distance and delta, important for all models
+    if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+      str_var = Results % Var_Name("Grid Wall Distance","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Grid % wall_dist(c_f:c_l),    &
+                                          f8, f9, data_offset, run)
+    end if
+
     !----------------------!
     !                      !
     !   End of cell data   !
@@ -628,6 +653,7 @@
   call Work % Disconnect_Int_Cell(int_save, type_save, offs_save)
   call Work % Disconnect_Real_Cell(save_01, save_02, save_03,  &
                                    save_04, save_05, save_06)
+  call Work % Disconnect_Real_Cell(                  kin_vis_t          )
 
   call Profiler % Stop('Save_Vtu_Results')
 

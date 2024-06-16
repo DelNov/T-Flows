@@ -103,7 +103,7 @@
   call Turb % Alias_T2          (t2)
 
   area  = 0.0
-  if (First_Proc()) print '(a,a)', ' # Grid name: ', trim(Grid % name)
+  O_Print '(a,a)', ' # Grid name: ', trim(Grid % name)
 
   ! Found the line where boundary condition definition is defined
   call Control % Position_At_One_Key('INITIAL_CONDITION', &

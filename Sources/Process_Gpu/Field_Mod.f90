@@ -54,6 +54,10 @@
     type(Var_Type) :: v    !! velocity component [m/s]
     type(Var_Type) :: w    !! velocity component [m/s]
 
+    ! Shear and wall stress are used in a number of turbulence models
+    real, allocatable :: shear(:)  !! shear [1/s]
+    real, allocatable :: vort(:)   !! vorticity [1/s]
+
     ! Pressure-like potential for initial velocity field
     real, allocatable :: potential(:)
 
@@ -155,6 +159,7 @@
       procedure :: Alias_Momentum
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Bulk_Velocities
+      procedure :: Calculate_Shear_And_Vorticity
       procedure :: Volume_Average
 
   end type
@@ -188,6 +193,7 @@
 #   include "Field_Mod/Utilities/Alias_Momentum.f90"
 #   include "Field_Mod/Utilities/Buoyancy_Forces.f90"
 #   include "Field_Mod/Utilities/Calculate_Bulk_Velocities.f90"
+#   include "Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90"
 #   include "Field_Mod/Utilities/Volume_Average.f90"
 
   end module

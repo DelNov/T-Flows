@@ -10,16 +10,18 @@
   use Process_Mod
   use Time_Mod
   use Iter_Mod
+  use Turb_Mod
   use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   type(Grid_Type)          :: Grid(MD)      ! computational grid
   type(Field_Type), target :: Flow(MD)      ! flow field
+  type(Turb_Type)          :: Turb(MD)      ! turbulence models for flows
   real                     :: ts, te
   integer                  :: nc, ldt
   logical                  :: exit_now
-  character(11)            :: root_control = 'control.008'
+  character(7)             :: root_control = 'control'
 !==============================================================================!
 
   ! Start the parallel run and the profiler
@@ -41,7 +43,7 @@
   call Grid(1) % Load_And_Prepare_For_Processing(1)
 
   O_Print '(a)', ' # Reading physical models'
-  call Read_Control % Physical_Models(Flow(1))
+  call Read_Control % Physical_Models(Flow(1), Turb(1))
 
   nc = Grid(1) % n_cells
   O_Print '(a, i12)',   ' # The problem size is: ', nc
@@ -56,6 +58,9 @@
 
   O_Print '(a)', ' # Creating a flow field'
   call Flow(1) % Create_Field(Grid(1))
+
+  O_Print '(a)', ' # Creating turbulent models space'
+  call Turb(1)  % Create_Turb(Flow(1), Grid(1))
 
   O_Print '(a)', ' # Reading physical properties'
   call Read_Control % Physical_Properties(Flow(1))
@@ -73,15 +78,16 @@
   call Flow(1) % Calculate_Grad_Matrix()
 
   ! Initialize variables
-  call Process % Initialize_Variables(Flow(1))
+  call Process % Initialize_Variables(Turb(1), Flow(1))
 
   !----------------------------------------------------------!
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
   !----------------------------------------------------------!
-  call Gpu % Grid_Copy_To_Device(Grid(1))
+  call Gpu % Grid_Copy_To_Device(Grid(1), Turb(1))
   call Gpu % Field_Copy_To_Device(Flow(1))
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
+  call Gpu % Turb_Copy_To_Device(Turb(1), Flow(1))
 
   ! This should be done for each domain, whenever a new domain is solved
   call Flow(1) % Update_Aliases()
@@ -107,8 +113,8 @@
   call Control % Save_Results_At_Boundaries(Results % boundary)
 
   ! Allocate CPU memory for working arrays (currently used for saving)
-  call Work % Allocate_Work(Grid, n_r_cell=8,  n_r_face=0,  n_r_node=0,  &
-                                  n_i_cell=6,  n_i_face=0,  n_i_node=0)
+  call Work % Allocate_Work(Grid, n_r_cell=12,  n_r_face=0,  n_r_node=0,  &
+                                  n_i_cell= 6,  n_i_face=0,  n_i_node=0)
 
   O_Print '(a)', ' # Performing a demo of the computing momentum equations'
   call cpu_time(ts)
@@ -121,6 +127,9 @@
 
     call Info % Time_Fill(Time % Curr_Dt(), Time % Get_Time())
     call Info % Time_Print()
+
+    ! Turbulence models initializations
+    call Turb(1) % Init_Turb(Flow(1), Grid(1))
 
     !-----------------------------------!
     !   Iterations within a time step   !
@@ -143,6 +152,9 @@
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
       call Process % Correct_Velocity(Flow(1), Grid(1))
 
+      ! Deal with turbulence
+      call Turb(1) % Main_Turb(Flow(1), Grid(1))
+
       if(Flow(1) % heat_transfer) then
         call Process % Compute_Energy(Flow(1), Grid(1))
       end if
@@ -162,16 +174,20 @@
     call Info % Bulk_Print(Flow(1), 1, 1)
 
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
+      call Gpu % Turb_Update_Host(Turb(1), Flow(1))
       call Gpu % Field_Update_Host(Flow(1))
-      call Results % Main_Results(1, Flow(1), exit_now)
+      call Gpu % Grid_Update_Host(Grid(1), Turb(1))
+      call Results % Main_Results(1, Flow(1), Turb(1), exit_now)
     end if
 
   end do    ! time steps
   call cpu_time(te)
 
   ! Save results
+  call Gpu % Turb_Update_Host(Turb(1), Flow(1))
   call Gpu % Field_Update_Host(Flow(1))
-  call Results % Main_Results(1, Flow(1), exit_now)
+  call Gpu % Grid_Update_Host(Grid(1), Turb(1))
+  call Results % Main_Results(1, Flow(1), Turb(1), exit_now)
 
   call Work % Finalize_Work()
 

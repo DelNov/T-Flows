@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Copy_To_Device(Gpu, Grid)
+  subroutine Grid_Copy_To_Device(Gpu, Grid, Turb)
 !------------------------------------------------------------------------------!
 !>  Copy all the grid variables you need in your simulation to GPU.
 !------------------------------------------------------------------------------!
@@ -7,10 +7,12 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type) :: Gpu   !! parent class
   type(Grid_Type) :: Grid  !! grid to transfer to device
+  type(Turb_Type) :: Turb  !! to check if wall distance should be coppied
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
     Unused(Grid)
+    Unused(Turb)
 # endif
 !==============================================================================!
 
@@ -42,6 +44,9 @@
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_cell)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_cell)
+  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+    call Gpu % Vector_Real_Copy_To_Device(Grid % wall_dist)
+  end if
 
   end subroutine
 

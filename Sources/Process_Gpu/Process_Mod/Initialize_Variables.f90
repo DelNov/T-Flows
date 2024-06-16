@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(Process, Flow)
+  subroutine Initialize_Variables(Process, Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it sets initial conditions releated to momentum and enthalpy
@@ -10,6 +10,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)        :: Process  !! parent class
+  type(Turb_Type),    target :: Turb     !! turbulence object
   type(Field_Type),   target :: Flow     !! flow object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
@@ -30,7 +31,7 @@
   ! Default values for initial conditions
   character(3) :: u_def   = '0.0',  v_def    = '0.0',  w_def   = '0.0'
   character(3) :: t_def   = '0.0',                     phi_def = '0.0'
-  character(3) :: vf_def   = '0.0'
+  character(3) :: vf_def  = '0.0'
   character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
   character(3) :: vis_def = '0.0',  zeta_def = '0.0'
   character(3) :: uu_def  = '0.0',  vv_def   = '0.0',  ww_def  = '0.0'

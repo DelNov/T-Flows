@@ -81,7 +81,9 @@
   O_Print '(a)', '   5 - field creation and gradient calculation'
   O_Print '(a)', '   6 - volume balance in a rotating velocity field.'
   O_Print '(a)', '   7 - solution of the Navier-Stokes equations'
+  O_Print '(a)', '       (depending to where control file points)'
   O_Print '(a)', '   8 - turbulent flow simulations (under development)'
+  O_Print '(a)', '       (depending to where control file points)'
 
   call Global % End_Parallel
 

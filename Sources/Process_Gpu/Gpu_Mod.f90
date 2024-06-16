@@ -4,7 +4,17 @@
 !==============================================================================!
   module Gpu_Mod
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod
+!>  Handles GPU data transfer and management for T-Flows.
+!>
+!>  This module provides the infrastructure for handling all GPU-related
+!>  data transfer within T-Flows. It manages the memory on the GPU, based on
+!>  allocation, copying, and destruction of various T-Flows' data structures
+!>  such as vectors, matrices, fields, and grid data.
+!>
+!>  Each procedure within the module is dedicated to a specific type of
+!>  data or operation, ensuring efficient interaction with the GPU.
+!----------------------------------[Modules]-----------------------------------!
+  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -52,6 +62,12 @@
       ! Procedures to copy grid to device
       procedure :: Grid_Copy_To_Device
       procedure :: Grid_Destroy_On_Device
+      procedure :: Grid_Update_Host
+
+      ! Procedures to copy turbulence variables to device
+      procedure :: Turb_Copy_To_Device
+      procedure :: Turb_Destroy_On_Device
+      procedure :: Turb_Update_Host
 
   end type
 
@@ -91,5 +107,11 @@
     ! Procedures to copy grid to device
 #   include "Gpu_Mod/Grid/Copy_To_Device.f90"
 #   include "Gpu_Mod/Grid/Destroy_On_Device.f90"
+#   include "Gpu_Mod/Grid/Update_Host.f90"
+
+    ! Procedures to copy turbulence variables to device
+#   include "Gpu_Mod/Turb/Copy_To_Device.f90"
+#   include "Gpu_Mod/Turb/Destroy_On_Device.f90"
+#   include "Gpu_Mod/Turb/Update_Host.f90"
 
   end module
