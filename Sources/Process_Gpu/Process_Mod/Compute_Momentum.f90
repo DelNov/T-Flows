@@ -113,7 +113,7 @@
 
   ! Set work variable (Buoyancy_Forces uses it!)
   !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  do c = Cells_In_Domain_And_Buffers()
     ones(c) = 1.0
   end do
   !$acc end parallel
