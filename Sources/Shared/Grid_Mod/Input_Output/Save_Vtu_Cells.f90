@@ -556,17 +556,23 @@
 
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
                             ' Name="Grid Processor [1]"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
                             ' Name="Grid Thread [1]"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
+                            ' Name="Grid Number Of Nodes [1]"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp      //  &
                             ' Name="Grid Wall Distance [m]"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp      //  &
                             ' Name="Grid Cell Volume [m^3]"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp  //  &
-                            ' Name="Grid Cell Inertia [m^2]"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp    //  &
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp      //  &
+                            ' Name="Grid Cell Centers [m]"'  //  &
+                            ' NumberOfComponents="3"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp      //  &
+                            ' Name="Grid Cell Inertia [m^2]"'//  &
+                            ' NumberOfComponents="6"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
                             ' Name="Grid Cell Porosity Region [1]"/>'
     write(fu,'(a,a)') IN_2, '</PCellData>'
 
