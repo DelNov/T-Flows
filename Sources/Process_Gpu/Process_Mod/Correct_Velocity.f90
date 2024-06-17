@@ -56,16 +56,16 @@
   ! Units: kg m / s^2 * s / kg = m / s
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    u_n(c) = u_n(c) - pp_x(c) * v_m(c)
-    v_n(c) = v_n(c) - pp_y(c) * v_m(c)
-    w_n(c) = w_n(c) - pp_z(c) * v_m(c)
+    Flow % u % n(c) = Flow % u % n(c) - pp_x(c) * v_m(c)
+    Flow % v % n(c) = Flow % v % n(c) - pp_y(c) * v_m(c)
+    Flow % w % n(c) = Flow % w % n(c) - pp_z(c) * v_m(c)
   end do
   !$acc end parallel
 
   ! Update buffers for velocities over all processors
-  call Grid % Exchange_Cells_Real(u_n)
-  call Grid % Exchange_Cells_Real(v_n)
-  call Grid % Exchange_Cells_Real(w_n)
+  call Grid % Exchange_Cells_Real(Flow % u % n)
+  call Grid % Exchange_Cells_Real(Flow % v % n)
+  call Grid % Exchange_Cells_Real(Flow % w % n)
 
   !---------------------------------------------!
   !                                             !
@@ -81,7 +81,7 @@
 
     a12 = -fc(s) * 0.5 * (v_m(c1) + v_m(c2))
 
-    v_flux_n(s) = v_flux_n(s) + (pp_n(c2) - pp_n(c1)) * a12
+    v_flux_n(s) = v_flux_n(s) + (Flow % pp % n(c2) - Flow % pp % n(c1)) * a12
   end do
   !$acc end parallel
 

@@ -20,7 +20,7 @@
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12
 # if T_FLOWS_DEBUG == 1
-  real, allocatable :: work(:)
+  real, allocatable :: temp(:)
 # endif
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -127,16 +127,16 @@
   Mval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
-  allocate(work(Grid % n_cells));  work(:) = 0.0
+  allocate(temp(Grid % n_cells));  temp(:) = 0.0
   do c = Cells_In_Domain()
-    ! or: work(c) = val(dia(c))
-    ! or: work(c) = Mcon % row(c+1) - Mcon % row(c)
-    work(c) = v_m(c)
+    ! or: temp(c) = val(dia(c))
+    ! or: temp(c) = Mcon % row(c+1) - Mcon % row(c)
+    temp(c) = v_m(c)
   end do
-  call Grid % Exchange_Inside_Cells_Real(work)
+  call Grid % Exchange_Inside_Cells_Real(temp)
   call Grid % Save_Debug_Vtu("v_m",              &
                              inside_name="v_m",  &
-                             inside_cell=work)
+                             inside_cell=temp)
 # endif
 
   call Profiler % Stop('Form_System_Matrix')

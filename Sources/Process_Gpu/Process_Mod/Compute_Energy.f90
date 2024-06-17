@@ -9,9 +9,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Mval
   type(Sparse_Con_Type), pointer :: Mcon
-  real,                  pointer :: val(:)
-  integer,               pointer :: dia(:)
-  real,                  pointer :: b(:)
+  real,      contiguous, pointer :: val(:)
+  integer,   contiguous, pointer :: dia(:)
+  real,      contiguous, pointer :: b(:)
   real                           :: tol, fin_res, urf
   integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -33,7 +33,7 @@
   end if
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
-  nc   =  Flow % pnt_grid % n_cells
+  nc   =  Grid % n_cells
   fin_res = 0.0
 
   ! Tolerances and under-relaxations are the same for all components
@@ -48,14 +48,14 @@
     if(Flow % t % td_scheme .eq. PARABOLIC) then
       !$acc parallel loop independent
       do c = Cells_In_Domain_And_Buffers()
-        t_oo(c) = t_o(c)
+        Flow % t % oo(c) = Flow % t % o(c)
       end do
       !$acc end parallel
     end if
 
     !$acc parallel loop independent
     do c = Cells_In_Domain_And_Buffers()
-      t_o(c) = t_n(c)
+      Flow % t % o(c) = Flow % t % n(c)
     end do
     !$acc end parallel
   end if
@@ -89,7 +89,7 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * t_n(c)
+    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * Flow % t % n(c)
   end do
   !$acc end parallel
 
@@ -97,13 +97,13 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Mcon, Mval, t_n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Mcon, Mval, Flow % t % n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Energy')
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("t_0",           &
                                scalar_name="t", &
-                               scalar_cell=t_n)
+                               scalar_cell=Flow % t % n)
 # endif
 
   call Info % Iter_Fill_At(1, 6, 'T', fin_res, n)

@@ -17,19 +17,10 @@
   implicit none
 !==============================================================================!
 
-  ! Frequently used aliases (don't know where to put them yet)
-  real, contiguous, pointer :: u_n(:), u_o(:), u_oo(:)
-  real, contiguous, pointer :: v_n(:), v_o(:), v_oo(:)
-  real, contiguous, pointer :: w_n(:), w_o(:), w_oo(:)
-  real, contiguous, pointer :: p_n(:), pp_n(:)
-  real, contiguous, pointer :: t_n(:), t_o(:), t_oo(:)
-
   !----------------!
   !   Field type   !
   !----------------!
   type Field_Type
-
-    type(Grid_Type), pointer :: pnt_grid    !! grid for which it is defined
 
     !-------------------------!
     !   Physical properties   !
@@ -141,7 +132,6 @@
       !   Core functionality   !
       !------------------------!
       procedure :: Create_Field
-      procedure :: Update_Aliases
 
       !-----------------------------------------!
       !   Procedures for gradient computation   !
@@ -175,7 +165,6 @@
     !   Core functionality   !
     !------------------------!
 #   include "Field_Mod/Core/Create_Field.f90"
-#   include "Field_Mod/Core/Update_Aliases.f90"
 
     !-----------------------------------------!
     !   Procedures for gradient computation   !

@@ -15,7 +15,7 @@
   character(*)             :: update   !! character switch to control
                                        !! which variables to update
 !-----------------------------------[Locals]-----------------------------------!
-  integer                  :: c1, c2, s, reg
+  integer :: c1, c2, s, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -49,9 +49,9 @@
           c1 = Grid % faces_c(1,s)  ! inside cell
           c2 = Grid % faces_c(1,s)  ! boundary cell
 
-          u_n(c2) = u_n(c1)
-          v_n(c2) = v_n(c1)
-          w_n(c2) = w_n(c1)
+          Flow % u % n(c2) = Flow % u % n(c1)
+          Flow % v % n(c2) = Flow % v % n(c1)
+          Flow % w % n(c2) = Flow % w % n(c1)
         end do  ! faces
         !$acc end parallel
 

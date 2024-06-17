@@ -45,9 +45,9 @@
   ! I there is no gravity in the direction comp, get out of here
   if(abs(grav_i) < TINY) return
 
-  !$acc parallel loop
-  do c1 = Cells_In_Domain()
-    work(c1) = 0.0
+  !$acc parallel loop independent
+  do c = Cells_In_Domain()
+    work(c) = 0.0
   end do
   !$acc end parallel
 
@@ -67,7 +67,7 @@
       if(c2 .gt. 0) then
 
         ! Temperature and density at the face
-        temp_f = 0.5 * (t_n(c1) + t_n(c2))
+        temp_f = 0.5 * (Flow % t % n(c1) + Flow % t % n(c2))
         dens_f = 0.5 * (Flow % density(c1) + Flow % density(c2))
 
         ! Units here: [kg/m^3 K]
@@ -98,7 +98,7 @@
 
       ! Temperature at the face is identical to
       ! the temperature at the boundary cell
-      temp_f = t_n(c2)
+      temp_f = Flow % t % n(c2)
       dens_f = Flow % density(c1)  ! or in c2?
 
       ! Units here: [kg/m^3 K]
@@ -117,9 +117,9 @@
   !   Correct the units for body forces   !
   !---------------------------------------!
 
-  !$acc parallel loop
-  do c1 = Cells_In_Domain()
-    b(c1) = b(c1) + work(c1)
+  !$acc parallel loop independent
+  do c = Cells_In_Domain()
+    b(c) = b(c) + work(c)
   end do
   !$acc end parallel
 

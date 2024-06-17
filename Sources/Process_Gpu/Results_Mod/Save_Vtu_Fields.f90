@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Fields(Results, Flow, Turb,  &
+  subroutine Save_Vtu_Fields(Results, Turb, Flow, Grid,  &
                              plot_inside, domain)
 !------------------------------------------------------------------------------!
 !>  The Save_Vtu_Fields subroutine is a comprehensive and central
@@ -70,13 +70,13 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Results_Type), target :: Results      !! parent class
-  type(Field_Type),    target :: Flow         !! flow field
   type(Turb_Type),     target :: Turb         !! turbulence models
+  type(Field_Type),    target :: Flow         !! flow field
+  type(Grid_Type)             :: Grid         !! computational grid
   logical                     :: plot_inside  !! true to plots inside,
                                               !! false to plot on the boundary
   integer,           optional :: domain       !! computational domain
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer     :: Grid
   type(Var_Type),  pointer     :: phi
   integer(SP)                  :: data_size
   integer                      :: data_offset, cell_offset, i_fac, reg
@@ -101,7 +101,6 @@
   call Vtk_Mod_Set_Precision()
 
   ! Take aliases
-  Grid  => Flow % pnt_grid
   units => Results % units
 
   if(.not. plot_inside .and. .not. Results % boundary) return

@@ -30,9 +30,9 @@
 
   !$acc parallel loop
   do c = Cells_In_Domain()
-    bulk_u = bulk_u + u_n(c) * Grid % vol(c)
-    bulk_v = bulk_v + v_n(c) * Grid % vol(c)
-    bulk_w = bulk_w + w_n(c) * Grid % vol(c)
+    bulk_u = bulk_u + Flow % u % n(c) * Grid % vol(c)
+    bulk_v = bulk_v + Flow % v % n(c) * Grid % vol(c)
+    bulk_w = bulk_w + Flow % w % n(c) * Grid % vol(c)
     vol = vol + Grid % vol(c)
   end do
   !$acc end parallel

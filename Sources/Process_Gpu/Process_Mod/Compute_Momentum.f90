@@ -10,10 +10,10 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Mval
   type(Sparse_Con_Type), pointer :: Mcon
-  real,                  pointer :: val(:)
-  integer,               pointer :: dia(:)
-  real,                  pointer :: b(:), ones(:)
-  real,                  pointer :: ui_n(:), ui_o(:), ui_oo(:)
+  real,      contiguous, pointer :: val(:)
+  integer,   contiguous, pointer :: dia(:)
+  real,      contiguous, pointer :: b(:), ones(:)
+  real,      contiguous, pointer :: ui_n(:), ui_o(:), ui_oo(:)
   real                           :: tol, fin_res, urf
   integer                        :: nb, nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -40,22 +40,22 @@
   ones => Flow % work
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
-  nb   =  Flow % pnt_grid % n_bnd_cells
-  nc   =  Flow % pnt_grid % n_cells
+  nb   =  Grid % n_bnd_cells
+  nc   =  Grid % n_cells
   fin_res = 0.0
 
   if(comp .eq. 1) then
-    ui_n  => u_n
-    ui_o  => u_o
-    ui_oo => u_oo
+    ui_n  => Flow % u % n
+    ui_o  => Flow % u % o
+    ui_oo => Flow % u % oo
   else if(comp .eq. 2) then
-    ui_n  => v_n
-    ui_o  => v_o
-    ui_oo => v_oo
+    ui_n  => Flow % v % n
+    ui_o  => Flow % v % o
+    ui_oo => Flow % v % oo
   else if(comp .eq. 3) then
-    ui_n  => w_n
-    ui_o  => w_o
-    ui_oo => w_oo
+    ui_n  => Flow % w % n
+    ui_o  => Flow % w % o
+    ui_oo => Flow % w % oo
   end if
 
   ! Tolerances and under-relaxations are the same for all components
@@ -63,6 +63,7 @@
   urf = Flow % u % urf
 
   ! Set work variable (Buoyancy_Forces uses it!)
+
   !$acc parallel loop independent
   do c = Cells_In_Domain()
     ones(c) = 1.0

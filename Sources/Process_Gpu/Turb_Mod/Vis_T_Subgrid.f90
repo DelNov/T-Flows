@@ -33,7 +33,9 @@
       ! Tangential velocity.  Here it assumed that, as you approach the
       ! wall, the tangential velocity component is dominant and that the
       ! magnitude of velocity is close to tangential component.
-      u_tan = sqrt(u_n(c)**2 + v_n(c)**2 + w_n(c)**2)
+      u_tan = sqrt(  Flow % u % n(c)**2  &
+                   + Flow % v % n(c)**2  &
+                   + Flow % w % n(c)**2)
 
       ! Calculate u_tau, y+ and perform Van Driest damping
       u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c))**B_POW)   &

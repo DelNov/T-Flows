@@ -1,21 +1,17 @@
 !==============================================================================!
-  real function Volume_Average(Flow, val)
+  real function Volume_Average(Flow, Grid, val)
 !------------------------------------------------------------------------------!
 !   Calculates the volume average of the values in array val                   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type) :: Flow
-  real              :: val( - Flow % pnt_grid % n_bnd_cells  &
-                            : Flow % pnt_grid % n_cells)
+  class(Field_Type) :: Flow  !! parent flow field class
+  type(Grid_Type)   :: Grid  !! grid on which the flow is defined
+  real              :: val(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
-  integer                  :: c
-  real                     :: sum_val, tot_vol
+  integer :: c
+  real    :: sum_val, tot_vol
 !==============================================================================!
-
-  ! Take alias
-  Grid => Flow % pnt_grid
 
   ! Initialize sums
   sum_val = 0.0

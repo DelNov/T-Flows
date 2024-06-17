@@ -1,24 +1,21 @@
 !==============================================================================!
-  subroutine Calculate_Grad_Matrix(Flow)
+  subroutine Calculate_Grad_Matrix(Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type) :: Flow  !! parent flow object
+  type(Grid_Type)   :: Grid  !! grid on which the flow is defined
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer  :: Grid
   integer                   :: c, c1, c2, s
   real                      :: dx_c1, dy_c1, dz_c1, dx_c2, dy_c2, dz_c2
   real                      :: jac, g_inv(6)
 # if T_FLOWS_DEBUG == 1
   integer           :: i
-  real, allocatable :: work(:)
+  real, allocatable :: temp(:)
 # endif
 !==============================================================================!
 
   call Profiler % Start('Calculate_Grad_Matrix')
-
-  ! Take alias
-  Grid => Flow % pnt_grid
 
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
@@ -125,17 +122,17 @@
   call Profiler % Stop('Calculate_Grad_Matrix')
 
 # if T_FLOWS_DEBUG == 1
-  allocate(work(Grid % n_cells))
+  allocate(temp(Grid % n_cells))
   do i = 1, 6
     do c = 1, Grid % n_cells
-      work(c) = Flow % grad_c2c(i,c)
+      temp(c) = Flow % grad_c2c(i,c)
     end do
-    if(i==1) call Grid % Save_Debug_Vtu("g1",inside_name="g1",inside_cell=work)
-    if(i==2) call Grid % Save_Debug_Vtu("g2",inside_name="g2",inside_cell=work)
-    if(i==3) call Grid % Save_Debug_Vtu("g3",inside_name="g3",inside_cell=work)
-    if(i==4) call Grid % Save_Debug_Vtu("g4",inside_name="g4",inside_cell=work)
-    if(i==5) call Grid % Save_Debug_Vtu("g5",inside_name="g5",inside_cell=work)
-    if(i==6) call Grid % Save_Debug_Vtu("g6",inside_name="g6",inside_cell=work)
+    if(i==1) call Grid % Save_Debug_Vtu("g1",inside_name="g1",inside_cell=temp)
+    if(i==2) call Grid % Save_Debug_Vtu("g2",inside_name="g2",inside_cell=temp)
+    if(i==3) call Grid % Save_Debug_Vtu("g3",inside_name="g3",inside_cell=temp)
+    if(i==4) call Grid % Save_Debug_Vtu("g4",inside_name="g4",inside_cell=temp)
+    if(i==5) call Grid % Save_Debug_Vtu("g5",inside_name="g5",inside_cell=temp)
+    if(i==6) call Grid % Save_Debug_Vtu("g6",inside_name="g6",inside_cell=temp)
   end do
 # endif
 

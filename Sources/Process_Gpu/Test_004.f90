@@ -16,7 +16,7 @@
   type(Sparse_Val_Type), pointer :: Aval
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
-  real,                  pointer :: b(:), x(:)
+  real,      contiguous, pointer :: b(:), x(:)
   integer                        :: nc, n
   real                           :: fin_res
   character(len=11)              :: root_control = 'control.004'
@@ -51,13 +51,13 @@
   call Flow % Create_Field(Grid)
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow)
+  call Read_Control % Physical_Properties(Flow, Grid)
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Flow)
+  call Read_Control % Boundary_Conditions(Flow, Grid)
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Flow)
+  call Read_Control % Numerical_Schemes(Flow, Grid)
 
   ! Transfer the necessary grid components to the device
   call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)
@@ -68,9 +68,6 @@
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_cell)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_cell)
-
-  ! Important before calling functions in Process which are ported to GPUs)
-  call Flow % Update_Aliases()
 
   ! Take the aliases now
   Acon => Flow % Nat % C

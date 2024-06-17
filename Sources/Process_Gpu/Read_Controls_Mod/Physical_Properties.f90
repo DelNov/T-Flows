@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Physical_Properties(Rc, Flow)
+  subroutine Physical_Properties(Rc, Flow, Grid)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -11,8 +11,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Controls_Type), intent(in) :: Rc     !! parent class
   type(Field_Type)                      :: Flow   !! flow object
+  type(Grid_Type)                       :: Grid  !! grid object
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type), pointer :: Grid
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -20,11 +20,7 @@
 !==============================================================================!
 
   ! Give some sign
-  if(First_Proc())  &
-    print '(a)', ' # Reading about physical properties'
-
-  ! Take alias
-  Grid => Flow % pnt_grid
+  O_Print '(a)', ' # Reading about physical properties'
 
   ! Read constant (defualt) values
   call Control % Dynamic_Viscosity   (visc_const)

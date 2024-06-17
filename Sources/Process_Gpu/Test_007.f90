@@ -20,7 +20,6 @@
   type(Turb_Type)          :: Turb(MD)      ! turbulence models for flows
   real                     :: ts, te
   integer                  :: nc, ldt
-  logical                  :: exit_now
   character(7)             :: root_control = 'control'
 !==============================================================================!
 
@@ -63,34 +62,31 @@
   call Turb(1)  % Create_Turb(Flow(1), Grid(1))
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow(1))
+  call Read_Control % Physical_Properties(Flow(1), Grid(1))
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Flow(1))
+  call Read_Control % Boundary_Conditions(Flow(1), Grid(1))
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Flow(1))
+  call Read_Control % Numerical_Schemes(Flow(1), Grid(1))
 
   O_Print '(a)', ' # Reading native solvers'
-  call Read_Control % Native_Solvers(Flow(1))
+  call Read_Control % Native_Solvers(Flow(1), Grid(1))
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
-  call Flow(1) % Calculate_Grad_Matrix()
+  call Flow(1) % Calculate_Grad_Matrix(Grid(1))
 
   ! Initialize variables
-  call Process % Initialize_Variables(Turb(1), Flow(1))
+  call Process % Initialize_Variables(Turb(1), Flow(1), Grid(1))
 
   !----------------------------------------------------------!
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
   !----------------------------------------------------------!
-  call Gpu % Grid_Copy_To_Device(Grid(1), Turb(1))
+  call Gpu % Grid_Copy_To_Device(Turb(1), Grid(1))
   call Gpu % Field_Copy_To_Device(Flow(1))
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
   call Gpu % Turb_Copy_To_Device(Turb(1), Flow(1))
-
-  ! This should be done for each domain, whenever a new domain is solved
-  call Flow(1) % Update_Aliases()
 
   !------------------------------------------!
   !                                          !
@@ -168,7 +164,7 @@
 
     ! Calculate bulk fluxes and adjust pressure drops
     call Flow(1) % Calculate_Bulk_Velocities(Grid(1))
-    call Flow(1) % Adjust_P_Drops()
+    call Flow(1) % Adjust_P_Drops(Grid(1))
 
     ! Print the bulk values from the Info_Mod
     call Info % Bulk_Print(Flow(1), 1, 1)
@@ -176,8 +172,8 @@
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
       call Gpu % Turb_Update_Host(Turb(1), Flow(1))
       call Gpu % Field_Update_Host(Flow(1))
-      call Gpu % Grid_Update_Host(Grid(1), Turb(1))
-      call Results % Main_Results(1, Flow(1), Turb(1), exit_now)
+      call Gpu % Grid_Update_Host(Turb(1), Grid(1))
+      call Results % Main_Results(Turb(1), Flow(1), Grid(1), 1)
     end if
 
   end do    ! time steps
@@ -186,8 +182,8 @@
   ! Save results
   call Gpu % Turb_Update_Host(Turb(1), Flow(1))
   call Gpu % Field_Update_Host(Flow(1))
-  call Gpu % Grid_Update_Host(Grid(1), Turb(1))
-  call Results % Main_Results(1, Flow(1), Turb(1), exit_now)
+  call Gpu % Grid_Update_Host(Turb(1), Grid(1))
+  call Results % Main_Results(Turb(1), Flow(1), Grid(1), 1)
 
   call Work % Finalize_Work()
 

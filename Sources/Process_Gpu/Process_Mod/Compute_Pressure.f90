@@ -25,10 +25,10 @@
   else
     Aval => Flow % Nat % A(MATRIX_PP)
   end if
-  b    => Flow % Nat % b
-  nc   =  Flow % pnt_grid % n_cells
-  tol  =  Flow % pp % tol
-  urf  =  Flow % pp % urf
+  b   => Flow % Nat % b
+  tol =  Flow % pp % tol
+  urf =  Flow % pp % urf
+  nc  =  Grid % n_cells
 
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
@@ -50,7 +50,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, pp_n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Pressure')
 
   call Info % Iter_Fill_At(1, 4, 'PP', fin_res, n)
@@ -61,7 +61,7 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    p_n(c) = p_n(c) + urf * pp_n(c)
+    Flow % p % n(c) = Flow % p % n(c) + urf * Flow % pp % n(c)
   end do
   !$acc end parallel
 
@@ -73,8 +73,8 @@
 
   !$acc parallel loop reduction(max:p_max) reduction(min:p_min)
   do c = Cells_In_Domain()
-    p_max = max(p_max, p_n(c))
-    p_min = min(p_min, p_n(c))
+    p_max = max(p_max, Flow % p % n(c))
+    p_min = min(p_min, Flow % p % n(c))
   end do
 
   call Global % Max_Real(p_max)
@@ -82,20 +82,20 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    p_n(c) = p_n(c) - 0.5 * (p_max + p_min)
+    Flow % p % n(c) = Flow % p % n(c) - 0.5 * (p_max + p_min)
   end do
   !$acc end parallel
 
   ! Update buffers for presssure over all processors
-  call Grid % Exchange_Cells_Real(p_n)
+  call Grid % Exchange_Cells_Real(Flow % p % n)
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("pp_0",           &
                                scalar_name="pp", &
-                               scalar_cell=pp_n)
+                               scalar_cell=Flow % pp % n)
     call Grid % Save_Debug_Vtu("p_0",            &
                                scalar_name="p",  &
-                               scalar_cell=p_n)
+                               scalar_cell=Flow % p % n)
 # endif
 
   call Profiler % Stop('Compute_Pressure')

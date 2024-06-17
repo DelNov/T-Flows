@@ -79,9 +79,9 @@
     !$acc parallel loop
     do s = Faces_In_Region(reg)
       c2 = Grid % faces_c(2,s)  ! boundary cell
-      v_flux_n(s) = u_n(c2) * Grid % sx(s)  &
-                  + v_n(c2) * Grid % sy(s)  &
-                  + w_n(c2) * Grid % sz(s)
+      v_flux_n(s) = Flow % u % n(c2) * Grid % sx(s)  &
+                  + Flow % v % n(c2) * Grid % sy(s)  &
+                  + Flow % w % n(c2) * Grid % sz(s)
     end do
     !$acc end parallel
 
@@ -158,9 +158,12 @@
 
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
-    u_f = 0.5 * (u_n(c1) + p_x(c1) * v_m(c1) + u_n(c2) + p_x(c2) * v_m(c2))
-    v_f = 0.5 * (v_n(c1) + p_y(c1) * v_m(c1) + v_n(c2) + p_y(c2) * v_m(c2))
-    w_f = 0.5 * (w_n(c1) + p_z(c1) * v_m(c1) + w_n(c2) + p_z(c2) * v_m(c2))
+    u_f = 0.5 * (  Flow % u % n(c1) + p_x(c1) * v_m(c1)  &
+                 + Flow % u % n(c2) + p_x(c2) * v_m(c2))
+    v_f = 0.5 * (  Flow % v % n(c1) + p_y(c1) * v_m(c1)  &
+                 + Flow % v % n(c2) + p_y(c2) * v_m(c2))
+    w_f = 0.5 * (  Flow % w % n(c1) + p_z(c1) * v_m(c1)  &
+                 + Flow % w % n(c2) + p_z(c2) * v_m(c2))
 
     ! This is a bit of a code repetition, the
     ! same thing is in the Form_Pressure_Matrix
@@ -174,7 +177,7 @@
     v_flux_n(s) = u_f * Grid % sx(s)  &
                 + v_f * Grid % sy(s)  &
                 + w_f * Grid % sz(s)  &
-                + a12 * (p_n(c1) - p_n(c2))
+                + a12 * (Flow % p % n(c1) - Flow % p % n(c2))
 
   end do
   !$acc end parallel

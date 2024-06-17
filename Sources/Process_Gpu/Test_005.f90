@@ -56,7 +56,7 @@
                              scalar_cell=Flow % p % n)
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
-  call Flow % Calculate_Grad_Matrix()
+  call Flow % Calculate_Grad_Matrix(Grid)
 
   ! Copy what you need for gradient calculation to the device
   call Gpu % Matrix_Real_Copy_To_Device(Flow % grad_c2c)

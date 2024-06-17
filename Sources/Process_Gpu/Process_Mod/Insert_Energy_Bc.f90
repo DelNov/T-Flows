@@ -37,7 +37,7 @@
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)
         a12 = cond(c1) * fc(s)
-        b(c1) = b(c1) + a12 * t_n(c2)
+        b(c1) = b(c1) + a12 * Flow % t % n(c2)
       end do
       !$acc end parallel
 

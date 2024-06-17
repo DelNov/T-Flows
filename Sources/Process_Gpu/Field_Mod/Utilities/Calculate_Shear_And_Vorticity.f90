@@ -56,9 +56,9 @@
       u_x => Flow % phi_x
       w_y => Flow % phi_y
       v_z => Flow % phi_z
-      call Flow % Grad_Component(Grid, u_n, 1, u_x)
-      call Flow % Grad_Component(Grid, w_n, 2, w_y)
-      call Flow % Grad_Component(Grid, v_n, 3, v_z)
+      call Flow % Grad_Component(Grid, Flow % u % n, 1, u_x)
+      call Flow % Grad_Component(Grid, Flow % w % n, 2, w_y)
+      call Flow % Grad_Component(Grid, Flow % v % n, 3, v_z)
 
       !$acc parallel loop independent
       do c = Cells_In_Domain()
@@ -74,9 +74,9 @@
       w_x => Flow % phi_x
       v_y => Flow % phi_y
       u_z => Flow % phi_z
-      call Flow % Grad_Component(Grid, w_n, 1, w_x)
-      call Flow % Grad_Component(Grid, v_n, 2, v_y)
-      call Flow % Grad_Component(Grid, u_n, 3, u_z)
+      call Flow % Grad_Component(Grid, Flow % w % n, 1, w_x)
+      call Flow % Grad_Component(Grid, Flow % v % n, 2, v_y)
+      call Flow % Grad_Component(Grid, Flow % u % n, 3, u_z)
 
       !$acc parallel loop independent
       do c = Cells_In_Domain()
@@ -92,9 +92,9 @@
       v_x => Flow % phi_x
       u_y => Flow % phi_y
       w_z => Flow % phi_z
-      call Flow % Grad_Component(Grid, v_n, 1, v_x)
-      call Flow % Grad_Component(Grid, u_n, 2, u_y)
-      call Flow % Grad_Component(Grid, w_n, 3, w_z)
+      call Flow % Grad_Component(Grid, Flow % v % n, 1, v_x)
+      call Flow % Grad_Component(Grid, Flow % u % n, 2, u_y)
+      call Flow % Grad_Component(Grid, Flow % w % n, 3, w_z)
 
       !$acc parallel loop independent
       do c = Cells_In_Domain()

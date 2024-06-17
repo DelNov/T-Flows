@@ -52,7 +52,7 @@
   call Flow % Create_Field(Grid)
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow)
+  call Read_Control % Physical_Properties(Flow, Grid)
 
   ! Discretize the matrix for diffusion
   Flow % work(:) = 1.0

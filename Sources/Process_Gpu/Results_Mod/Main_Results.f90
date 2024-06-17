@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Main_Results(Results, n_dom, Flow, Turb, exit_now)
+  subroutine Main_Results(Results, Turb, Flow, Grid, n_dom)
 !------------------------------------------------------------------------------!
 !>  The Main_Results subroutine serves as the central function for saving
 !>  results in T-Flows. It orchestrates the process of saving numerical results
@@ -26,12 +26,12 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Results_Type) :: Results    !! parent class
   integer             :: n_dom      !! number of domains
-  type(Field_Type)    :: Flow(MD)   !! flow fields
   type(Turb_Type)     :: Turb(MD)   !! turbulence modelling variables
-  logical             :: exit_now   !! true for premature exit
+  type(Field_Type)    :: Flow(MD)   !! flow fields
+  type(Grid_Type)     :: Grid(MD)   !! computational grids
 !----------------------------------[Locals]------------------------------------!
-  integer :: d         ! domain counter
-  logical :: save_now
+  integer :: d                   ! domain counter
+  logical :: exit_now, save_now
 !==============================================================================!
 
   ! Get out of here if you don't want to save initial conditions all right
@@ -52,9 +52,9 @@
 
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)
-      call Results % Save_Vtu_Fields(Flow(d), Turb(d),                    &
+      call Results % Save_Vtu_Fields(Turb(d), Flow(d), Grid(d),      &
                                      plot_inside=.true., domain=d)
-      call Results % Save_Vtu_Fields(Flow(d), Turb(d),                    &
+      call Results % Save_Vtu_Fields(Turb(d), Flow(d), Grid(d),      &
                                      plot_inside=.false., domain=d)
 
     end do  ! through domains

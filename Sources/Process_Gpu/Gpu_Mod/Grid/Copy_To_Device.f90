@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Grid_Copy_To_Device(Gpu, Grid, Turb)
+  subroutine Grid_Copy_To_Device(Gpu, Turb, Grid)
 !------------------------------------------------------------------------------!
 !>  Copy all the grid variables you need in your simulation to GPU.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type) :: Gpu   !! parent class
-  type(Grid_Type) :: Grid  !! grid to transfer to device
   type(Turb_Type) :: Turb  !! to check if wall distance should be coppied
+  type(Grid_Type) :: Grid  !! grid to transfer to device
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
-    Unused(Grid)
     Unused(Turb)
+    Unused(Grid)
 # endif
 !==============================================================================!
 

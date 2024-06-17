@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Adjust_P_Drops(Flow)
+  subroutine Adjust_P_Drops(Flow, Grid)
 !------------------------------------------------------------------------------!
 !>  Adjusts pressure drops in the Bulk_Mod module to maintain constant volume
 !>  flow rate in the computational domain. This subroutine is based on the
@@ -32,19 +32,18 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type), target :: Flow  !! parent class
+  class(Field_Type), target :: Flow  !! parent class for the flow
+  type(Grid_Type)           :: Grid  !! grid on which the flow is defined
 !-----------------------------------[Locals]-----------------------------------!
   type(Bulk_Type), pointer :: bulk
-  type(Grid_Type), pointer :: Grid
   real                     :: rho
 !==============================================================================!
 
   ! Take aliases
-  Grid => Flow % pnt_grid
   bulk => Flow % bulk
 
   ! Work out the mean density of the fluid body
-  rho = Flow % Volume_Average(Flow % density)
+  rho = Flow % Volume_Average(Grid, Flow % density)
 
   ! Once density is computed, continue with necessary pressure drops
 

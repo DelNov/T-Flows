@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Native_Solvers(Rc, Flow)
+  subroutine Native_Solvers(Rc, Flow, Grid)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -11,8 +11,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Controls_Type), intent(in) :: Rc    !! parent class
   type(Field_Type), target              :: Flow  !! flow object
+  type(Grid_Type)                       :: Grid  !! grid object
 !----------------------------------[Locals]------------------------------------!
-  type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: ui, phi
   integer                  :: i, sc
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -20,11 +20,7 @@
 !==============================================================================!
 
   ! Give some sign
-  if(First_Proc())  &
-    print '(a)', ' # Reading info about native (home-brewed) solvers'
-
-  ! Take alias
-  Grid => Flow % pnt_grid
+  O_Print '(a)', ' # Reading info about native (home-brewed) solvers'
 
   !-------------------------------!
   !   Related to matrix storage   !

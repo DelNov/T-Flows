@@ -3,14 +3,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type), target :: Flow  !! parent flow object
-  type(Grid_Type),   target :: Grid
+  class(Field_Type) :: Flow  !! parent flow object
+  type(Grid_Type)   :: Grid  !! grid on which the flow is defined
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nb, nc, ns
 !==============================================================================!
-
-  ! Store the pointer to a Grid
-  Flow % pnt_grid => Grid
 
   ! Take some aliases
   nb = Grid % n_bnd_cells

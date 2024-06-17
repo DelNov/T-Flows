@@ -9,8 +9,8 @@
 # Time stepping
 #---------------
   TIME_STEP                                    0.05
-  NUMBER_OF_TIME_STEPS                     1200
-  RESULTS_SAVE_INTERVAL                     300
+  NUMBER_OF_TIME_STEPS                     6000
+  RESULTS_SAVE_INTERVAL                     600
 
   USE_ONE_MATRIX                             yes
 

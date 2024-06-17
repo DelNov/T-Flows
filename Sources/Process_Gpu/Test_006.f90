@@ -16,7 +16,7 @@
 !------------------------------------------------------------------------------!
   type(Grid_Type)   :: Grid            ! computational grid
   type(Field_Type)  :: Flow            ! flow field
-  integer           :: n, c, s, c1, c2, i_cel
+  integer           :: c, s, c1, c2, i_cel
   real              :: u_f, v_f, b_tmp
   real, allocatable :: b(:)
   character(len=11) :: root_control = 'control.006'
