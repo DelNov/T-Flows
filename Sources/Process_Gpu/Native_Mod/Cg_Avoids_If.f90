@@ -4,8 +4,8 @@
 !   Note: This is an alternative algorithm and I am honestly not sure where    !
 !         I have found it any more, but it avoids one "if" block during the    !
 !         iterations.  It gives exactly the same result as the original Cg.    !
-!         This verision was implemented in SFS package, and I wanted to make   !
-!         sure it is the same as the original Cg.                              !
+!         although it is slighly faster.  This verision was implemented in     !
+!         SFS, and I wanted to make sure it is the same as the original Cg.    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -24,7 +24,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:)
-  real                       :: alpha, beta, pq, rho, rho_old, res
+  real                       :: fn, alpha, beta, pq, rho, rho_old, res
   integer                    :: nt, ni, iter
 !==============================================================================!
 
@@ -37,11 +37,16 @@
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
 
+  !---------------------------------!
+  !   Normalize the linear system   !
+  !---------------------------------!
+  call Linalg % Sys_Normalize(ni, fn, Acon, Aval, b)
+
   !---------------------!
   !   Preconditioning   !
   !---------------------!
 
-  ! Scalar over diagonal
+  ! Scalar over diagonal (to take the mystery out: computes d_inv)
   call Linalg % Sca_O_Dia(ni, d_inv, 1.0, Acon, Aval)
 
   !----------------!
@@ -56,7 +61,7 @@
   fin_res = res
   niter   = 0
 
-  if(res < tol) return
+  if(res .lt. tol) goto 2
 
   !---------------!
   !   z = r \ M   !    =--> (q used for z)
@@ -141,5 +146,11 @@
   !   Refresh the solution vector's buffers   !
   !-------------------------------------------!
   call Grid % Exchange_Inside_Cells_Real(x(1:nt))
+
+  !-------------------------------!
+  !   Restore the linear system   !
+  !-------------------------------!
+2 continue
+  call Linalg % Sys_Restore(ni, fn, Acon, Aval, b)
 
   end subroutine

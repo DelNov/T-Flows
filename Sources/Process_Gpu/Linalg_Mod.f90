@@ -20,6 +20,10 @@
       procedure, private :: Mat_X_Vec_Acc
       procedure          :: Sca_O_Dia
       procedure, private :: Sca_O_Dia_Acc
+      procedure          :: Sys_Normalize
+      procedure, private :: Sys_Normalize_Acc
+      procedure          :: Sys_Restore
+      procedure, private :: Sys_Restore_Acc
       procedure          :: Vec_Copy
       procedure, private :: Vec_Copy_Acc
       procedure          :: Vec_D_Vec
@@ -45,6 +49,10 @@
 #   include "Linalg_Mod/Mat_X_Vec_Acc.f90"
 #   include "Linalg_Mod/Sca_O_Dia.f90"
 #   include "Linalg_Mod/Sca_O_Dia_Acc.f90"
+#   include "Linalg_Mod/Sys_Normalize.f90"
+#   include "Linalg_Mod/Sys_Normalize_Acc.f90"
+#   include "Linalg_Mod/Sys_Restore.f90"
+#   include "Linalg_Mod/Sys_Restore_Acc.f90"
 #   include "Linalg_Mod/Vec_Copy.f90"
 #   include "Linalg_Mod/Vec_Copy_Acc.f90"
 #   include "Linalg_Mod/Vec_D_Vec.f90"

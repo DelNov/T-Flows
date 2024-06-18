@@ -1,9 +1,11 @@
 !==============================================================================!
-  subroutine Cg(Nat, Acon, Aval, x, b, miter, tol)
+  subroutine Cg(Nat, Acon, Aval, x, b, miter, niter, tol, fin_res)
 !------------------------------------------------------------------------------!
 !   Note: This algorithm is based on: "Templates for the Solution of Linear    !
 !         Systems: Building Blocks for Iterative Methods", available for       !
 !         download here: https://netlib.org/linalg/html_templates/report.html  !
+!         A version which avoids "if" statement inside the Cg loop is also     !
+!         implemented in the sister source, and is slighlty faster than this.  !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -16,11 +18,13 @@
   real, intent(inout) :: b( Nat % pnt_grid % n_cells)
                          !! right-hand side vector
   integer, intent(in)    :: miter    !! maximum iterations
+  integer, intent(out)   :: niter    !! performed iterations
   real,    intent(in)    :: tol      !! target solver tolerance
+  real,    intent(out)   :: fin_res  !! achieved residual
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:)
-  real                       :: alpha, beta, pq, rho, rho_old, res
+  real                       :: fn, alpha, beta, pq, rho, rho_old, res
   integer                    :: nt, ni, iter
 !==============================================================================!
 
@@ -33,11 +37,16 @@
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
 
+  !---------------------------------!
+  !   Normalize the linear system   !
+  !---------------------------------!
+  call Linalg % Sys_Normalize(ni, fn, Acon, Aval, b)
+
   !---------------------!
   !   Preconditioning   !
   !---------------------!
 
-  ! Scalar over diagonal
+  ! Scalar over diagonal (to take the mystery out: computes d_inv)
   call Linalg % Sca_O_Dia(ni, d_inv, 1.0, Acon, Aval)
 
   !----------------!
@@ -48,7 +57,11 @@
 
   ! Check first residual
   call Linalg % Vec_D_Vec(ni, res, r(1:ni), r(1:ni))  ! res = r * r
-  if(res < tol) return
+
+  fin_res = res
+  niter   = 0
+
+  if(res .lt. tol) goto 2
 
   !-----------!
   !   p = r   !
@@ -111,9 +124,6 @@
     !--------------------!
     call Linalg % Vec_D_Vec(ni, res, r(1:ni), r(1:ni))
 
-    if(mod(iter,32) .eq. 0) then
-      O_Print '(a,i12,es12.3)', ' iter, res = ', iter, res
-    end if
     if(res .lt. tol) goto 1
 
     rho_old = rho
@@ -126,11 +136,19 @@
   !                       !
   !-----------------------!
 1 continue
-  O_Print '(a,i12,es12.3)', ' iter, res = ', iter, res
+
+  fin_res = res
+  niter   = iter
 
   !-------------------------------------------!
   !   Refresh the solution vector's buffers   !
   !-------------------------------------------!
   call Grid % Exchange_Inside_Cells_Real(x(1:nt))
+
+  !-------------------------------!
+  !   Restore the linear system   !
+  !-------------------------------!
+2 continue
+  call Linalg % Sys_Restore(ni, fn, Acon, Aval, b)
 
   end subroutine
