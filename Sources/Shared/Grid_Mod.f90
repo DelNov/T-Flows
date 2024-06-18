@@ -1,5 +1,6 @@
 #include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
+#include "../Shared/Macros.h90"
 
 !==============================================================================!
   module Grid_Mod

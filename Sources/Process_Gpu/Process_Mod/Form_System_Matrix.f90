@@ -1,19 +1,20 @@
 !==============================================================================!
-  subroutine Form_System_Matrix(Process, Mcon, Mval, Flow, Grid,  &
-                                coef_a, coef_b, diff_coef, urf, dt)
+  subroutine Form_System_Matrix(Process, Acon, Aval, Flow, Grid,  &
+                                coef_a, coef_b, diff_coef, urf, dt, save_v_m)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)           :: Process
-  type(Sparse_Con_Type), target :: Mcon
-  type(Sparse_Val_Type), target :: Mval
+  type(Sparse_Con_Type), target :: Acon
+  type(Sparse_Val_Type), target :: Aval
   type(Field_Type),      target :: Flow
   type(Grid_Type),   intent(in) :: Grid
   real                          :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
   real                          :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
   real                          :: diff_coef(-Grid % n_bnd_cells:Grid % n_cells)
   real                          :: urf
-  real,  optional,   intent(in) :: dt       !! time step
+  real,    optional, intent(in) :: dt       !! time step
+  logical, optional, intent(in) :: save_v_m
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), v_m(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
@@ -37,20 +38,20 @@
     if(Flow % Nat % A(MATRIX_UVW) % formed) return
   end if
 
-  val => Mval % val
-  dia => Mcon % dia
-  pos => Mcon % pos
-  fc  => Mcon % fc
-  nz  =  Mcon % nonzeros
+  val => Aval % val
+  dia => Acon % dia
+  pos => Acon % pos
+  fc  => Acon % fc
+  nz  =  Acon % nonzeros
   v_m => Flow % v_m
 
   Assert(urf > 0.0)
 
-  !$acc kernels
+  !$acc parallel loop independent
   do i = 1, nz
     val(i) = 0.0
   end do
-  !$acc end kernels
+  !$acc end parallel
 
   !--------------------------------------------------!
   !   Compute neighbouring coefficients over cells   !
@@ -66,7 +67,7 @@
 
       ! Coefficients inside the domain
       if(c2 .gt. 0) then
-        a12 = 0.5 * (diff_coef(c1)+diff_coef(c2)) * fc(s)
+        a12 = Face_Value(s, diff_coef(c1), diff_coef(c2)) * fc(s)
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12
@@ -103,13 +104,17 @@
   !   Store volume divided by central coefficient for momentum   !
   !   and refresh its buffers before discretizing the pressure   !
   !--------------------------------------------------------------!
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
-    v_m(c) = Grid % vol(c) / val(dia(c))
-  end do
-  !$acc end parallel
+  if(present(save_v_m)) then
+    if(save_v_m) then
+      !$acc parallel loop independent
+      do c = Cells_In_Domain()
+        v_m(c) = Grid % vol(c) / val(dia(c))
+      end do
+      !$acc end parallel
 
-  call Grid % Exchange_Inside_Cells_Real(v_m)
+      call Grid % Exchange_Inside_Cells_Real(v_m)
+    end if
+  end if
 
   !-------------------------------------!
   !   Part 1 of the under-relaxation    !
@@ -124,13 +129,13 @@
   !-------------------------------!
   !   Mark the matrix as formed   !
   !-------------------------------!
-  Mval % formed = .true.
+  Aval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0
   do c = Cells_In_Domain()
     ! or: temp(c) = val(dia(c))
-    ! or: temp(c) = Mcon % row(c+1) - Mcon % row(c)
+    ! or: temp(c) = Acon % row(c+1) - Acon % row(c)
     temp(c) = v_m(c)
   end do
   call Grid % Exchange_Inside_Cells_Real(temp)

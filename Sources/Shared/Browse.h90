@@ -115,16 +115,3 @@
     Grid % region % f_cell(1),                        \
     Grid % region % l_cell(Grid % n_regions + 1)
 
-!------------------------------------------------------------------------!
-!   This one is not strictly for browsing, but I don't know where else   !
-!    to put it.  I tried in Comm_Mod, but didn't work for some reason    !
-!------------------------------------------------------------------------!
-# define Cell_In_This_Proc(cell)  \
-    Grid % Comm % cell_proc(cell) .eq. This_Proc()
-
-!----------------------------------------------------------------------!
-!   These two are also not for browsing ... maybe I should find some   !
-!    other place to define these things which go with communication    !
-!----------------------------------------------------------------------!
-# define O_Print if(First_Proc()) print
-# define A_Print print

@@ -33,7 +33,7 @@
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
   !-----------------------------------------------!
-  call Process % Form_Pressure_Matrix(Flow, Grid)
+  call Process % Form_Pressure_Matrix(Acon, Aval, Flow, Grid)
 
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
@@ -41,7 +41,7 @@
   call Process % Insert_Volume_Source_For_Pressure(Flow, Grid)
 
 # if T_FLOWS_DEBUG == 1
-    call Grid % Save_Debug_Vtu("bp_0",               &
+    call Grid % Save_Debug_Vtu("bp_0",                &
                                inside_name="vol_src", &
                                inside_cell=b)
 # endif

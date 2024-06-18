@@ -12,8 +12,7 @@
   character(SL) :: val
 !==============================================================================!
 
-  call Control % Read_Char_Item('USE_ONE_MATRIX',   &
-                                'yes', val, verbose)
+  call Control % Read_Char_Item('USE_ONE_MATRIX', 'yes', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then

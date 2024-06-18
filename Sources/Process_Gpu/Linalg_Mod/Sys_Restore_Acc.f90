@@ -14,8 +14,8 @@
   real               :: d_inv(n)    !! inverted diagonal entries
   real               :: b(n)        !! right hand side vector
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: sum_n, i
-  real    :: avg_a, sum_a, fn_inv
+  integer :: i
+  real    :: fn_inv
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Lin)
 !==============================================================================!

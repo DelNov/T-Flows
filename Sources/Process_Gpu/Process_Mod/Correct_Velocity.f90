@@ -79,7 +79,7 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
 
-    a12 = -fc(s) * 0.5 * (v_m(c1) + v_m(c2))
+    a12 = -fc(s) * Face_Value(s, v_m(c1), v_m(c2))
 
     v_flux_n(s) = v_flux_n(s) + (Flow % pp % n(c2) - Flow % pp % n(c1)) * a12
   end do
@@ -169,8 +169,7 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
 
-    nu_f = 0.5 * (   (visc(c1) + visc(c2))  &
-                   / (dens(c1) + dens(c2)) )
+    nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
 
     cfl_t   = abs(v_flux_n(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
     pe_t    = abs(v_flux_n(s)) / fc(s) / nu_f

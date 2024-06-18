@@ -1,4 +1,5 @@
 #include "../Shared/Browse.h90"
+#include "../Shared/Macros.h90"
 
 !==============================================================================!
   subroutine Test_005

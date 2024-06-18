@@ -67,8 +67,8 @@
       if(c2 .gt. 0) then
 
         ! Temperature and density at the face
-        temp_f = 0.5 * (Flow % t % n(c1) + Flow % t % n(c2))
-        dens_f = 0.5 * (Flow % density(c1) + Flow % density(c2))
+        temp_f = Face_Value(s, Flow % t % n(c1),   Flow % t % n(c2))
+        dens_f = Face_Value(s, Flow % density(c1), Flow % density(c2))
 
         ! Units here: [kg/m^3 K]
         b_f = dens_f * (Flow % t_ref - temp_f)

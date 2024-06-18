@@ -8,8 +8,8 @@
   type(Grid_Type)          :: Grid
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Val_Type), pointer :: Mval
-  type(Sparse_Con_Type), pointer :: Mcon
+  type(Sparse_Val_Type), pointer :: Aval
+  type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), ones(:)
@@ -28,12 +28,12 @@
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
-  Mcon => Flow % Nat % C
+  Acon => Flow % Nat % C
   if(Flow % Nat % use_one_matrix) then
-    Mval => Flow % Nat % A(MATRIX_ONE)
+    Aval => Flow % Nat % A(MATRIX_ONE)
     val  => Flow % Nat % A(MATRIX_ONE) % val
   else
-    Mval => Flow % Nat % A(MATRIX_UVW)
+    Aval => Flow % Nat % A(MATRIX_UVW)
     val  => Flow % Nat % A(MATRIX_UVW) % val
   end if
 
@@ -96,10 +96,10 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,  &
+    call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,  &
                                       Flow % density, ones,    &
                                       Flow % viscosity,        &
-                                      urf, dt = Flow % dt)
+                                      urf, dt = Flow % dt, save_v_m = .true.)
   end if
 
   !----------------------------------------------------------!
@@ -112,7 +112,7 @@
   ! Buoyancy forces
   call Flow % Buoyancy_Forces(Grid, comp)
 
-  ! Set work variable (Buoyancy_Forces uses it!)
+  ! Set work variable back to one (Buoyancy_Forces uses it!)
   !$acc parallel loop independent
   do c = Cells_In_Domain_And_Buffers()
     ones(c) = 1.0
@@ -155,7 +155,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(Mcon, Mval, ui_n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, ui_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Momentum')
 
   if(comp.eq.1) call Info % Iter_Fill_At(1, 1, 'U', fin_res, n)

@@ -17,11 +17,20 @@
   sum_val = 0.0
   tot_vol = 0.0
 
-  ! Integrate them over cells, avoiding buffers
+  !-------------------------------------------------!
+  !   Integrate them over cells, avoiding buffers   !
+  !-------------------------------------------------!
+
+  ! For this to work properly on GPUs, one should make sure that variable
+  ! "val" is coppied to GPU.  So far it was only density which was sent
+  ! here, so things should work.  But it is probably good to stay alert.
+
+  !$acc parallel loop reduction(+:sum_val,tot_vol)
   do c = Cells_In_Domain()
     sum_val = sum_val + val(c) * Grid % vol(c)
     tot_vol = tot_vol + Grid % vol(c)
   end do
+  !$acc end parallel
 
   ! Perform sums over all processors
   call Global % Sum_Real(sum_val)

@@ -1,12 +1,7 @@
 #include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
+#include "../Shared/Macros.h90"
 #include "../Shared/Unused.h90"
-
-! A couple of macros to shorten the syntax a bit
-#define Inc(X, Y)  X = X + Y
-#define Dec(X, Y)  X = X - Y
-#define Div(X, Y)  X = X / Y
-#define Mul(X, Y)  X = X * Y
 
 !==============================================================================!
   module Process_Mod

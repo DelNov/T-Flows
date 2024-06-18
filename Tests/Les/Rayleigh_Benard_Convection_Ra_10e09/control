@@ -5,6 +5,9 @@
 
   HEAT_TRANSFER   yes
 
+#---------------
+# Time stepping
+#---------------
   TIME_STEP                                    0.05
   NUMBER_OF_TIME_STEPS                      4230
   STARTING_TIME_STEP_FOR_TURB_STATISTICS    4222
@@ -26,6 +29,9 @@
   GRAVITATIONAL_VECTOR           0.0,  0.0,  -0.03215
   REFERENCE_TEMPERATURE          10.0 
 
+#---------------------
+# Physical properties
+#---------------------
   MASS_DENSITY           1.0
   THERMAL_CONDUCTIVITY   21.28e-6 
   DYNAMIC_VISCOSITY      15.11e-6  

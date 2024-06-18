@@ -45,11 +45,10 @@
       if(c2 .gt. 0) then
 
         ! Centered value
-        phi_c = 0.5 * (phi_n(c1) + phi_n(c2))
+        phi_c = Face_Value(s, phi_n(c1), phi_n(c2))
 
         ! Value of the coefficient at the cel face
-        coef_f = 0.5 * (  coef_a(c1) * coef_b(c1)  &
-                        + coef_a(c2) * coef_b(c2))
+        coef_f = Face_Value(s, coef_a(c1)*coef_b(c1), coef_a(c2)*coef_b(c2))
 
         ! Coefficient multiplied with variable, with upwind blending
         coef_phi1 = coef_f * ((1.0-blend) * phi_n(c1) + blend * phi_c)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Form_Pressure_Matrix(Process, Flow, Grid)
+  subroutine Form_Pressure_Matrix(Process, Acon, Aval, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -27,12 +27,12 @@
 !     p%x, p%y, p%z   [kg / (m^2 s^2)]                                         !
 !     b               [m^3 / s]                                                !
 !------------------------------------------------------------------------------!
-  class(Process_Type)         :: Process
-  type(Field_Type),    target :: Flow
-  type(Grid_Type), intent(in) :: Grid
+  class(Process_Type)           :: Process
+  type(Sparse_Con_Type), target :: Acon
+  type(Sparse_Val_Type), target :: Aval
+  type(Field_Type),      target :: Flow
+  type(Grid_Type),   intent(in) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Con_Type), pointer :: Acon
-  type(Sparse_Val_Type), pointer :: Aval
   real,      contiguous, pointer :: val(:), v_m(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   integer                        :: s, c1, c2, c, i_cel, i, nz
@@ -44,16 +44,11 @@
 
   call Profiler % Start('Form_Pressure_Matrix')
 
-  ! Take some aliases
-  Acon => Flow % Nat % C
-  if(Flow % Nat % use_one_matrix) then
-    Aval => Flow % Nat % A(MATRIX_ONE)
-    val  => Flow % Nat % A(MATRIX_ONE) % val
-  else
-    Aval => Flow % Nat % A(MATRIX_PP)
-    val  => Flow % Nat % A(MATRIX_PP) % val
+  if(.not. Flow % Nat % use_one_matrix) then
     if(Flow % Nat % A(MATRIX_PP) % formed) return
   end if
+
+  val  => Aval % val
   dia  => Flow % Nat % C % dia
   pos  => Flow % Nat % C % pos
   fc   => Flow % Nat % C % fc
@@ -78,7 +73,7 @@
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        a12 = fc(s) * 0.5 * (v_m(c1) + v_m(c2))
+        a12 = fc(s) * Face_Value(s, v_m(c1), v_m(c2))
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12

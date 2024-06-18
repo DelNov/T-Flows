@@ -1,0 +1,21 @@
+!==============================================================================!
+!   Definition of other (non-browsing) macros in T-Flows.                      !
+!------------------------------------------------------------------------------!
+
+!---------------------------------------------------------------!
+!   Shorten the syntax to check if cell is in this processors   !
+!---------------------------------------------------------------!
+# define Cell_In_This_Proc(cell)  \
+    Grid % Comm % cell_proc(cell) .eq. This_Proc()
+
+!-------------------------------------------------------------!
+!   Print from one processor (O) or from all processors (A)   !
+!-------------------------------------------------------------!
+# define O_Print if(First_Proc()) print
+# define A_Print print
+
+!-----------------------------------------------------------------!
+!   Simplified face value - before true implementation kicks in   !
+!-----------------------------------------------------------------!
+# define Face_Value(S, A, B) 0.5 * ((A) + (B))
+
