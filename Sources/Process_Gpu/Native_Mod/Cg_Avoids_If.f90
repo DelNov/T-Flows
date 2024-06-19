@@ -28,11 +28,10 @@
   integer                    :: nt, ni, iter
 !==============================================================================!
 
+  call Work % Connect_Real_Cell(p, q, r)
+
   ! Take aliases
   d_inv => Aval % d_inv
-  p     => Nat % p
-  q     => Nat % q
-  r     => Nat % r
   Grid  => Nat % pnt_grid
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
@@ -52,7 +51,7 @@
   !----------------!
   !   r = b - Ax   !     =-->  (q used for temporary storing Ax)
   !----------------!
-  call Linalg % Mat_X_Vec(nt, q, Acon, Aval, x(1:nt))  ! q = A * x
+  call Linalg % Mat_X_Vec(nt, q(1:ni), Acon, Aval, x(1:nt))  ! q = A * x
   call Linalg % Vec_P_Sca_X_Vec(ni, r(1:ni), b(1:ni), -1.0, q(1:ni))
 
   ! Check first residual
@@ -88,7 +87,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Linalg % Mat_X_Vec(nt, q(1:nt), Acon, Aval, p(1:nt))
+    call Linalg % Mat_X_Vec(nt, q(1:ni), Acon, Aval, p(1:nt))
 
     !---------------------------!
     !   alfa =  rho / (p * q)   !
@@ -152,5 +151,7 @@
   !-------------------------------!
 2 continue
   call Linalg % Sys_Restore(ni, fn, Acon, Aval, b)
+
+  call Work % Disconnect_Real_Cell(p, q, r)
 
   end subroutine

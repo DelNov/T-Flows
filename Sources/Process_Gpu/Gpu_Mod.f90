@@ -1,3 +1,4 @@
+#include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
 #include "../Shared/Macros.h90"
 #include "../Shared/Unused.h90"
@@ -70,6 +71,12 @@
       procedure :: Turb_Destroy_On_Device
       procedure :: Turb_Update_Host
 
+
+      ! Procedures to create working arrays to device
+      ! (No need to copy them, they are temporrary by nature)
+      procedure :: Work_Create_On_Device
+      procedure :: Work_Destroy_On_Device
+
   end type
 
   type(Gpu_Type) :: Gpu
@@ -114,5 +121,9 @@
 #   include "Gpu_Mod/Turb/Copy_To_Device.f90"
 #   include "Gpu_Mod/Turb/Destroy_On_Device.f90"
 #   include "Gpu_Mod/Turb/Update_Host.f90"
+
+    ! Procedures to create working arrays to device
+#   include "Gpu_Mod/Work/Create_On_Device.f90"
+#   include "Gpu_Mod/Work/Destroy_On_Device.f90"
 
   end module

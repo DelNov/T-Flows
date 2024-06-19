@@ -80,6 +80,10 @@
   ! Initialize variables
   call Process % Initialize_Variables(Turb(1), Flow(1), Grid(1))
 
+  ! Allocate CPU memory for working arrays (currently used for saving)
+  call Work % Allocate_Work(Grid, n_r_cell=12,  n_r_face=0,  n_r_node=0,  &
+                                  n_i_cell= 6,  n_i_face=0,  n_i_node=0)
+
   !----------------------------------------------------------!
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
@@ -88,6 +92,7 @@
   call Gpu % Field_Copy_To_Device(Flow(1))
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
   call Gpu % Turb_Copy_To_Device(Turb(1), Flow(1))
+  call Gpu % Work_Create_On_Device(Work)
 
   !------------------------------------------!
   !                                          !
@@ -108,10 +113,6 @@
 
   call Control % Results_Save_Interval     (Results % interval, verbose=.true.)
   call Control % Save_Results_At_Boundaries(Results % boundary)
-
-  ! Allocate CPU memory for working arrays (currently used for saving)
-  call Work % Allocate_Work(Grid, n_r_cell=12,  n_r_face=0,  n_r_node=0,  &
-                                  n_i_cell= 6,  n_i_face=0,  n_i_node=0)
 
   O_Print '(a)', ' # Performing a demo of the computing momentum equations'
   call cpu_time(ts)
