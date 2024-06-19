@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Work_Type)                    :: Work    !! the singleton Work object
+  class(Work_Type), target            :: Work    !! the singleton Work object
   real, contiguous, pointer           :: a01(:)  !! real pointer
   real, contiguous, pointer, optional :: a02(:), a03(:), a04(:),  &
                                          a05(:), a06(:), a07(:),  &
@@ -26,13 +26,13 @@
 
   Work % last_r_node = Work % last_r_node + 1
   Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-  a01 => Work % r_node(Work % last_r_node) % ptr
+  a01 => Work % r_node(Work % last_r_node) % array
   a01(:) = 0.0
 
   if(present(a02)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a02 => Work % r_node(Work % last_r_node) % ptr
+    a02 => Work % r_node(Work % last_r_node) % array
     a02(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -42,7 +42,7 @@
   if(present(a03)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a03 => Work % r_node(Work % last_r_node) % ptr
+    a03 => Work % r_node(Work % last_r_node) % array
     a03(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -52,7 +52,7 @@
   if(present(a04)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a04 => Work % r_node(Work % last_r_node) % ptr
+    a04 => Work % r_node(Work % last_r_node) % array
     a04(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -62,7 +62,7 @@
   if(present(a05)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a05 => Work % r_node(Work % last_r_node) % ptr
+    a05 => Work % r_node(Work % last_r_node) % array
     a05(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -72,7 +72,7 @@
   if(present(a06)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a06 => Work % r_node(Work % last_r_node) % ptr
+    a06 => Work % r_node(Work % last_r_node) % array
     a06(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -82,7 +82,7 @@
   if(present(a07)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a07 => Work % r_node(Work % last_r_node) % ptr
+    a07 => Work % r_node(Work % last_r_node) % array
     a07(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -92,7 +92,7 @@
   if(present(a08)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a08 => Work % r_node(Work % last_r_node) % ptr
+    a08 => Work % r_node(Work % last_r_node) % array
     a08(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -102,7 +102,7 @@
   if(present(a09)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a09 => Work % r_node(Work % last_r_node) % ptr
+    a09 => Work % r_node(Work % last_r_node) % array
     a09(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -112,7 +112,7 @@
   if(present(a10)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a10 => Work % r_node(Work % last_r_node) % ptr
+    a10 => Work % r_node(Work % last_r_node) % array
     a10(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -122,7 +122,7 @@
   if(present(a11)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a11 => Work % r_node(Work % last_r_node) % ptr
+    a11 => Work % r_node(Work % last_r_node) % array
     a11(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -132,7 +132,7 @@
   if(present(a12)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a12 => Work % r_node(Work % last_r_node) % ptr
+    a12 => Work % r_node(Work % last_r_node) % array
     a12(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -142,7 +142,7 @@
   if(present(a13)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a13 => Work % r_node(Work % last_r_node) % ptr
+    a13 => Work % r_node(Work % last_r_node) % array
     a13(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -152,7 +152,7 @@
   if(present(a14)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a14 => Work % r_node(Work % last_r_node) % ptr
+    a14 => Work % r_node(Work % last_r_node) % array
     a14(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -162,7 +162,7 @@
   if(present(a15)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a15 => Work % r_node(Work % last_r_node) % ptr
+    a15 => Work % r_node(Work % last_r_node) % array
     a15(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')
@@ -172,7 +172,7 @@
   if(present(a16)) then
     Work % last_r_node = Work % last_r_node + 1
     Work % max_r_node  = max(Work % max_r_node, Work % last_r_node)
-    a16 => Work % r_node(Work % last_r_node) % ptr
+    a16 => Work % r_node(Work % last_r_node) % array
     a16(:) = 0.0
   else
     call Profiler % Stop('Work_Mod')

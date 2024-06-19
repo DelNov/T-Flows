@@ -21,8 +21,8 @@
   allocate(Work % r_face(n))
 
   do i = 1, n
-    allocate(Work % r_face(i) % ptr(1:nf))
-    Work % r_face(i) % ptr(:) = 0.0
+    allocate(Work % r_face(i) % array(1:nf))
+    Work % r_face(i) % array(:) = 0.0
   end do
 
   Work % last_r_face = 0

@@ -22,8 +22,8 @@
   allocate(Work % r_cell(n))
 
   do i = 1, n
-    allocate(Work % r_cell(i) % ptr(-nb:nc))
-    Work % r_cell(i) % ptr(:) = 0.0
+    allocate(Work % r_cell(i) % array(-nb:nc))
+    Work % r_cell(i) % array(:) = 0.0
   end do
 
   Work % last_r_cell = 0

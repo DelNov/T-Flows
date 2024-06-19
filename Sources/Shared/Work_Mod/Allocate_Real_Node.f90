@@ -21,8 +21,8 @@
   allocate(Work % r_node(n))
 
   do i = 1, n
-    allocate(Work % r_node(i) % ptr(1:nn))
-    Work % r_node(i) % ptr(:) = 0.0
+    allocate(Work % r_node(i) % array(1:nn))
+    Work % r_node(i) % array(:) = 0.0
   end do
 
   Work % last_r_node = 0
