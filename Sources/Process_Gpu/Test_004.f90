@@ -95,9 +95,9 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  Flow % work(:) = 1.0
+  Flow % temp(:) = 1.0
   call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,       &
-                                    Flow % density, Flow % work,  &
+                                    Flow % density, Flow % temp,  &
                                     Flow % viscosity,             &
                                     1.0)
   call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)

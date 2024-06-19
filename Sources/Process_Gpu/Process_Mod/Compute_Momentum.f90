@@ -37,7 +37,7 @@
     val  => Flow % Nat % A(MATRIX_UVW) % val
   end if
 
-  ones => Flow % work
+  ones => Flow % temp
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
   nb   =  Grid % n_bnd_cells
@@ -62,7 +62,7 @@
   tol = Flow % u % tol
   urf = Flow % u % urf
 
-  ! Set work variable (Buoyancy_Forces uses it!)
+  ! Set temp variable (Buoyancy_Forces uses it!)
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
@@ -112,7 +112,7 @@
   ! Buoyancy forces
   call Flow % Buoyancy_Forces(Grid, comp)
 
-  ! Set work variable back to one (Buoyancy_Forces uses it!)
+  ! Set temp variable back to one (Buoyancy_Forces uses it!)
   !$acc parallel loop independent
   do c = Cells_In_Domain_And_Buffers()
     ones(c) = 1.0

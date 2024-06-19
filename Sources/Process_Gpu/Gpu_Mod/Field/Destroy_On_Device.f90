@@ -24,7 +24,7 @@
 # endif
 
   ! Destroy all the field variables
-  call Gpu % Vector_Real_Destroy_On_Device(Flow % work)
+  call Gpu % Vector_Real_Destroy_On_Device(Flow % temp)
   call Gpu % Vector_Real_Destroy_On_Device(Flow % pp % n)
   call Gpu % Vector_Real_Destroy_On_Device(Flow % p % n)
   call Gpu % Vector_Real_Destroy_On_Device(Flow % u % n)

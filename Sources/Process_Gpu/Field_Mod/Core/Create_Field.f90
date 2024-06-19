@@ -23,7 +23,7 @@
     allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
     allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
   end if
-  allocate(Flow % work(-nb:nc));  Flow % work(:) = 0.0
+  allocate(Flow % temp(-nb:nc));  Flow % temp(:) = 0.0
 
   !--------------------------------------------------------------!
   !   Create native solvers (matrices A, M, right hand side b,   !

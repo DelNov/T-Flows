@@ -9,7 +9,7 @@
   type(Grid_Type),   target :: Grid
   integer, intent(in)       :: comp  ! component
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), xic(:), xif(:), si(:), dxi(:), work(:)
+  real, contiguous, pointer :: b(:), xic(:), xif(:), si(:), dxi(:), temp(:)
   real                      :: b_tmp, b_f, xic1, xic2, x_f, grav_i
   real                      :: dens_f, temp_f
   integer                   :: c, c1, c2, s, i_cel, reg
@@ -20,7 +20,7 @@
 
   ! Take some aliases
   b    => Flow % Nat % b
-  work => Flow % work
+  temp => Flow % temp
 
   if(comp .eq. 1) then
     dxi    => Grid % dx;
@@ -47,7 +47,7 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    work(c) = 0.0
+    temp(c) = 0.0
   end do
   !$acc end parallel
 
@@ -80,7 +80,7 @@
     !$acc end loop
 
     ! Unit here: [kg m/s^2 = N]
-    work(c1) = b_tmp * Flow % beta * grav_i
+    temp(c1) = b_tmp * Flow % beta * grav_i
   end do
   !$acc end parallel
 
@@ -105,7 +105,7 @@
       b_f = dens_f * (Flow % t_ref - temp_f)
 
       ! Units here: [kg m/s^2 = N]
-      work(c1) = work(c1) + b_f * abs(si(s) * dxi(s))  &
+      temp(c1) = temp(c1) + b_f * abs(si(s) * dxi(s))  &
                * Flow % beta * grav_i
 
     end do
@@ -119,7 +119,7 @@
 
   !$acc parallel loop independent
   do c = Cells_In_Domain()
-    b(c) = b(c) + work(c)
+    b(c) = b(c) + temp(c)
   end do
   !$acc end parallel
 
@@ -127,7 +127,7 @@
   append = 'buoyancy_force__'
   write(append(16:16), '(i1.1)') comp
   call Grid % Save_Debug_Vtu(append,  &
-                             scalar_cell=work, scalar_name='bf')
+                             scalar_cell=temp, scalar_name='bf')
 # endif
 
   end subroutine
