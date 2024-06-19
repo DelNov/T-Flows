@@ -18,21 +18,19 @@
 !==============================================================================!
 
   !---------------------!
-  !  Real poiner type   !
+  !  Real arrays type   !
   !---------------------!
-  !> Simple container of a real, contiguous pointer.  It was introduced to
-  !> facilitate creation of variable size arrays containing pointers only.
-  type Real_Pointer_Type
-    real, pointer, contiguous :: ptr(:)
+  !> Simple container of a real allocatable arrays.
+  type Real_Arrays_Type
+    real, allocatable :: array(:)
   end type
 
   !------------------------!
-  !  Integer poiner type   !
+  !  Integer arrays type   !
   !------------------------!
-  !> Simple container of an integer contiguous pointer.  It was introduced to
-  !> facilitate creation of variable size arrays containing pointers only.
-  type Int_Pointer_Type
-    integer, pointer, contiguous :: ptr(:)
+  !> Simple container of a integer allocatable arrays.
+  type Int_Arrays_Type
+    integer, allocatable :: array(:)
   end type
 
   !--------------!
@@ -44,14 +42,14 @@
   type Work_Type
 
     ! Real working arrays
-    type(Real_Pointer_Type), allocatable :: r_cell(:)  !! cell-based work array
-    type(Real_Pointer_Type), allocatable :: r_face(:)  !! face-based work array
-    type(Real_Pointer_Type), allocatable :: r_node(:)  !! node-based work array
+    type(Real_Arrays_Type), allocatable :: r_cell(:)  !! cell-based work array
+    type(Real_Arrays_Type), allocatable :: r_face(:)  !! face-based work array
+    type(Real_Arrays_Type), allocatable :: r_node(:)  !! node-based work array
 
     ! Integer working arrays
-    type(Int_Pointer_Type), allocatable :: i_cell(:)  !! cell-based work array
-    type(Int_Pointer_Type), allocatable :: i_face(:)  !! face-based work array
-    type(Int_Pointer_Type), allocatable :: i_node(:)  !! node-based work array
+    type(Int_Arrays_Type), allocatable :: i_cell(:)  !! cell-based work array
+    type(Int_Arrays_Type), allocatable :: i_face(:)  !! face-based work array
+    type(Int_Arrays_Type), allocatable :: i_node(:)  !! node-based work array
 
     ! Floating "pointers" for all arrays
     integer, private :: last_r_cell  !! pointer to last used real cell-array
@@ -106,6 +104,14 @@
       procedure          :: Disconnect_Real_Node
       procedure          :: Finalize_Work
 
+      ! Functions to access private data members
+      procedure :: Allocated_Real_Cell_Arrays
+      procedure :: Allocated_Real_Face_Arrays
+      procedure :: Allocated_Real_Node_Arrays
+      procedure :: Allocated_Int_Cell_Arrays
+      procedure :: Allocated_Int_Face_Arrays
+      procedure :: Allocated_Int_Node_Arrays
+
   end type
 
   ! Singleton object Work
@@ -150,5 +156,40 @@
 #   include "Work_Mod/No_Checking/Disconnect_Real_Node.f90"
 #   include "Work_Mod/No_Checking/Finalize_Work.f90"
 #endif
+
+    !-------------------------------------------------------------!
+    !   Small functions to allow access to private data members   !
+    !    (There is really no need to describe them one by one)    !
+    !-------------------------------------------------------------!
+
+    integer function Allocated_Real_Cell_Arrays(Work)
+      class(Work_Type) :: Work
+      Allocated_Real_Cell_Arrays = Work % req_r_cell
+    end function
+
+    integer function Allocated_Real_Face_Arrays(Work)
+      class(Work_Type) :: Work
+      Allocated_Real_Face_Arrays = Work % req_r_face
+    end function
+
+    integer function Allocated_Real_Node_Arrays(Work)
+      class(Work_Type) :: Work
+      Allocated_Real_Node_Arrays = Work % req_r_node
+    end function
+
+    integer function Allocated_Int_Cell_Arrays(Work)
+      class(Work_Type) :: Work
+      Allocated_Int_Cell_Arrays = Work % req_i_cell
+    end function
+
+    integer function Allocated_Int_Face_Arrays(Work)
+      class(Work_Type) :: Work
+      Allocated_Int_Face_Arrays = Work % req_i_face
+    end function
+
+    integer function Allocated_Int_Node_Arrays(Work)
+      class(Work_Type) :: Work
+      Allocated_Int_Node_Arrays = Work % req_i_node
+    end function
 
   end module
