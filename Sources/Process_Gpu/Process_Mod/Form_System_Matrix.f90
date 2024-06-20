@@ -46,8 +46,9 @@
 
   Assert(urf > 0.0)
 
-  !$acc parallel loop independent
-  do i = 1, nz
+  !$acc parallel loop independent  &
+  !$acc present(val)
+  do i = 1, nz  ! all present
     val(i) = 0.0
   end do
   !$acc end parallel
@@ -56,13 +57,16 @@
   !   Compute neighbouring coefficients over cells   !
   !--------------------------------------------------!
 
-  !$acc parallel loop independent
-  do c1 = Cells_In_Domain()  ! that should be sufficient
+  !$acc parallel loop independent                                &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         val, pos, diff_coef, fc, dia)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
 
     !$acc loop seq
-    do i_cel = 1, Grid % cells_n_cells(c1)
-      c2 = Grid % cells_c(i_cel, c1)
-      s  = Grid % cells_f(i_cel, c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
+      c2 = grid_cells_c(i_cel, c1)
+      s  = grid_cells_f(i_cel, c1)
 
       ! Coefficients inside the domain
       if(c2 .gt. 0) then
@@ -92,9 +96,12 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    !$acc parallel loop independent
-    do c = Cells_In_Domain()
-      val(dia(c)) = val(dia(c)) + coef_a(c) * coef_b(c) * Grid % vol(c) / dt
+    !$acc parallel loop independent                        &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+    !$acc         grid_vol,                                &
+    !$acc         val, dia, coef_a, coef_b)
+    do c = Cells_In_Domain_Gpu()  ! all present
+      val(dia(c)) = val(dia(c)) + coef_a(c) * coef_b(c) * grid_vol(c) / dt
     end do
     !$acc end parallel
   end if
@@ -105,9 +112,11 @@
   !--------------------------------------------------------------!
   if(present(save_v_m)) then
     if(save_v_m) then
-      !$acc parallel loop independent &
-      !$acc present(grid_region_f_cell, grid_region_l_cell, grid_vol)
-      do c = Cells_In_Domain_Gpu()
+      !$acc parallel loop independent                        &
+      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+      !$acc         grid_vol,                                &
+      !$acc         flow_v_m, val, dia)
+      do c = Cells_In_Domain_Gpu()  ! all present
         flow_v_m(c) = grid_vol(c) / val(dia(c))
       end do
       !$acc end parallel
@@ -121,8 +130,10 @@
   !   Part 1 of the under-relaxation    !
   !   (Part 2 is in Compute_Momentum)   !
   !-------------------------------------!
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         val, dia)
+  do c = Cells_In_Domain_Gpu()  ! all present
     val(dia(c)) = val(dia(c)) / urf
   end do
   !$acc end parallel
@@ -134,7 +145,7 @@
 
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0
-  do c = Cells_In_Domain()
+  do c = Cells_In_Domain()  ! this is for debugging, don't do it on GPU
     ! or: temp(c) = val(dia(c))
     ! or: temp(c) = Acon % row(c+1) - Acon % row(c)
     temp(c) = flow_v_m(c)

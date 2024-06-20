@@ -46,10 +46,10 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
-      !$acc parallel loop independent  &
+      !$acc parallel loop independent                        &
       !$acc present(grid_region_f_cell, grid_region_l_cell,  &
       !$acc         flow_t_n, flow_t_o)
-      do c = Cells_In_Domain_And_Buffers_Gpu()
+      do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
         flow_t_oo(c) = flow_t_o(c)
       end do
       !$acc end parallel
@@ -58,7 +58,7 @@
     !$acc parallel loop independent                        &
     !$acc present(grid_region_f_cell, grid_region_l_cell,  &
     !$acc         flow_t_n, flow_t_o)
-    do c = Cells_In_Domain_And_Buffers_Gpu()
+    do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
       flow_t_o(c) = flow_t_n(c)
     end do
     !$acc end parallel
@@ -68,9 +68,9 @@
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
 
-  call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,           &
-                                    Flow % density, Flow % capacity,  &
-                                    Flow % conductivity,              &
+  call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,       &
+                                    flow_density, flow_capacity,  &
+                                    flow_conductivity,            &
                                     urf, dt = Flow % dt)
 
   !----------------------------------------------------------!
@@ -82,9 +82,9 @@
 
   ! Inertial and advection terms
   call Process % Add_Inertial_Term(Flow % t, Flow, Grid,  &
-                                   Flow % density, Flow % capacity)
+                                   flow_density, flow_capacity)
   call Process % Add_Advection_Term(Flow % t, Flow, Grid,  &
-                                    Flow % density, Flow % capacity)
+                                    flow_density, flow_capacity)
 
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !
@@ -93,8 +93,8 @@
 
   !$acc parallel loop independent                        &
   !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         flow_t_n)
-  do c = Cells_In_Domain_Gpu()
+  !$acc         b, val, dia, flow_t_n)
+  do c = Cells_In_Domain_Gpu()  ! all present
     b(c) = b(c) + val(dia(c)) * (1.0 - urf) * flow_t_n(c)
   end do
   !$acc end parallel

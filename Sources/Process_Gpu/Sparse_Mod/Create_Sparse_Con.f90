@@ -35,7 +35,7 @@
     !   (When I was avoiding cells in buffers, I had    !
     !   "holes" in CSR format and a lot of troubles)    !
     !---------------------------------------------------!
-    do c1 = Cells_In_Domain_And_Buffers()
+    do c1 = Cells_In_Domain_And_Buffers()  ! this whole routine is on CPU
 
       ! Set this row index, one cell will be present for sure, own self
       if(run .eq. 2) Con % row(c1) = non_z + 1
@@ -89,7 +89,7 @@
   !   Sort each row in ascending order   !
   !                                      !
   !--------------------------------------!
-  do c = Cells_In_Domain_And_Buffers()
+  do c = Cells_In_Domain_And_Buffers()  ! this whole routine is on CPU
     call Sort % Int_Array(Con % col(Con % row(c) : Con % row(c+1)-1))
   end do
 
@@ -98,7 +98,7 @@
   !   Find positions of diagonals   !
   !                                 !
   !---------------------------------!
-  do row_a = Cells_In_Domain_And_Buffers()
+  do row_a = Cells_In_Domain_And_Buffers()  ! this whole routine is on CPU
     do pos_a = Con % row(row_a), Con % row(row_a + 1) - 1
       col_a = Con % col(pos_a)  ! at this point you have row_a and col_a
       if(col_a == row_a) then
@@ -132,7 +132,7 @@
   !   Connect faces with matrix entries   !
   !                                       !
   !---------------------------------------!
-  do s = Faces_In_Domain_And_At_Buffers()
+  do s = Faces_In_Domain_And_At_Buffers()  ! this whole routine is on CPU
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
@@ -164,7 +164,7 @@
   !   must be inside the bounds defined by "row"   !
   !                                                !
   !------------------------------------------------!
-  do s = Faces_In_Domain_And_At_Buffers()
+  do s = Faces_In_Domain_And_At_Buffers()  ! this whole routine is on CPU
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 

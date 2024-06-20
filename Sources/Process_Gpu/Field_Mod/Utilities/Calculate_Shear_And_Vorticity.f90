@@ -55,9 +55,10 @@
       call Flow % Grad_Component(Grid, flow_w_n, 2, w_y)
       call Flow % Grad_Component(Grid, flow_v_n, 3, v_z)
 
-      !$acc parallel loop independent  &
-      !$acc present(flow_shear, flow_vort, u_x, w_y, v_z)
-      do c = Cells_In_Domain()
+      !$acc parallel loop independent                        &
+      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+      !$acc         flow_shear, flow_vort, u_x, w_y, v_z)
+      do c = Cells_In_Domain_Gpu()  ! all present
         flow_shear(c) = u_x(c)**2 + 0.5 * (v_z(c) + w_y(c))**2
         flow_vort (c) =           - 0.5 * (v_z(c) - w_y(c))**2
       end do
@@ -74,9 +75,10 @@
       call Flow % Grad_Component(Grid, flow_v_n, 2, v_y)
       call Flow % Grad_Component(Grid, flow_u_n, 3, u_z)
 
-      !$acc parallel loop independent  &
-      !$acc present(flow_shear, flow_vort, w_x, v_y, u_z)
-      do c = Cells_In_Domain()
+      !$acc parallel loop independent                        &
+      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+      !$acc         flow_shear, flow_vort, w_x, v_y, u_z)
+      do c = Cells_In_Domain_Gpu()  ! all present
         flow_shear(c) = flow_shear(c) + v_y(c)**2 + 0.5 * (u_z(c) + w_x(c))**2
         flow_vort (c) = flow_vort (c)             - 0.5 * (u_z(c) - w_x(c))**2
       end do
@@ -93,9 +95,10 @@
       call Flow % Grad_Component(Grid, flow_u_n, 2, u_y)
       call Flow % Grad_Component(Grid, flow_w_n, 3, w_z)
 
-      !$acc parallel loop independent  &
-      !$acc present(flow_shear, flow_vort, v_x, u_y, w_z)
-      do c = Cells_In_Domain()
+      !$acc parallel loop independent                        &
+      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+      !$acc         flow_shear, flow_vort, v_x, u_y, w_z)
+      do c = Cells_In_Domain_Gpu()  ! all present
         flow_shear(c) = flow_shear(c) + w_z(c)**2 + 0.5 * (v_x(c) + u_y(c))**2
         flow_vort (c) = flow_vort (c)             - 0.5 * (v_x(c) - u_y(c))**2
       end do

@@ -67,8 +67,8 @@
   !$acc parallel loop independent                                &
   !$acc present(grid_region_f_cell, grid_region_l_cell,          &
   !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         flow_v_m)
-  do c1 = Cells_In_Domain_Gpu()  ! going through buffers should not be needed
+  !$acc         fc, val, pos, dia, flow_v_m)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
 
     !$acc loop seq
     do i_cel = 1, grid_cells_n_cells(c1)
@@ -89,9 +89,10 @@
   !$acc end parallel
 
   ! De-singularize the system matrix ... just like this, ad-hoc
-  !$acc parallel loop independent  &
-  !$acc present(grid_region_f_cell, grid_region_l_cell)
-  do c = Cells_In_Domain_Gpu()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         val, dia)
+  do c = Cells_In_Domain_Gpu()  ! all present
     val(dia(c)) = val(dia(c)) * (1.0 + MICRO)
   end do
   !$acc end parallel
@@ -103,7 +104,7 @@
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
-  do c = 1, Grid % n_cells
+  do c = 1, Grid % n_cells  ! this is for debugging and should be on CPU
     work(c) = val(dia(c))
   end do
   call Grid % Save_Debug_Vtu("a_diagonal",              &

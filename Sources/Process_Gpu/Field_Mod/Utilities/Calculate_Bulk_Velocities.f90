@@ -29,9 +29,10 @@
   vol = 0.0
 
   !$acc parallel loop reduction(+:bulk_u, bulk_v, bulk_w, vol)  &
-  !$acc present(grid_vol,                                       &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,         &
+  !$acc         grid_vol,                                       &
   !$acc         flow_u_n, flow_v_n, flow_w_n)
-  do c = Cells_In_Domain()
+  do c = Cells_In_Domain_Gpu()  ! all present
     bulk_u = bulk_u + flow_u_n(c) * grid_vol(c)
     bulk_v = bulk_v + flow_v_n(c) * grid_vol(c)
     bulk_w = bulk_w + flow_w_n(c) * grid_vol(c)

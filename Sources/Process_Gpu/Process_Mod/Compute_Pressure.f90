@@ -59,9 +59,10 @@
   !   Update the pressure field   !
   !-------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(flow_p_n, flow_pp_n)
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         flow_p_n, flow_pp_n)
+  do c = Cells_In_Domain_Gpu()  ! all present
     flow_p_n(c) = flow_p_n(c) + urf * flow_pp_n(c)
   end do
   !$acc end parallel
@@ -73,8 +74,9 @@
   p_min = +HUGE
 
   !$acc parallel loop reduction(max:p_max) reduction(min:p_min)  &
-  !$acc present(flow_p_n)
-  do c = Cells_In_Domain()
+  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         flow_p_n)
+  do c = Cells_In_Domain_Gpu()  ! all present
     p_max = max(p_max, flow_p_n(c))
     p_min = min(p_min, flow_p_n(c))
   end do
@@ -82,9 +84,10 @@
   call Global % Max_Real(p_max)
   call Global % Min_Real(p_min)
 
-  !$acc parallel loop independent  &
-  !$acc present(flow_p_n)
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         flow_p_n)
+  do c = Cells_In_Domain_Gpu()  ! all present
     flow_p_n(c) = flow_p_n(c) - 0.5 * (p_max + p_min)
   end do
   !$acc end parallel

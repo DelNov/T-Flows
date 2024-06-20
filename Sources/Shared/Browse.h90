@@ -63,8 +63,8 @@
     Grid % region % f_face(Grid % n_regions),  \
     Grid % region % l_face(Grid % n_regions)
 # define Faces_In_Domain_And_At_Buffers_Gpu()  \
-    grid_region_f_face(Grid % n_regions),      \
-    grid_region_l_face(Grid % n_regions)
+    grid_region_f_face(grid_n_regions),        \
+    grid_region_l_face(grid_n_regions)
 
 !----------------------------!
 !                            !
@@ -80,7 +80,7 @@
     Grid % region % l_cell(Grid % n_bnd_regions)
 # define Cells_At_Boundaries_Gpu()  \
     grid_region_f_cell(1),          \
-    grid_region_l_cell(Grid % n_bnd_regions)
+    grid_region_l_cell(grid_n_bnd_regions)
 
 !----------------------------------------------------------!
 !   These are boundary cells for a given boundary region   !
@@ -99,8 +99,8 @@
       Grid % region % f_cell(Grid % n_regions),  \
       Grid % region % l_cell(Grid % n_regions)
 # define Cells_In_Domain_Gpu()               \
-      grid_region_f_cell(Grid % n_regions),  \
-      grid_region_l_cell(Grid % n_regions)
+      grid_region_f_cell(grid_n_regions),  \
+      grid_region_l_cell(grid_n_regions)
 
 !--------------------------------------------------------------------------!
 !   Entails cells in the domain (without buffers), plus the buffer cells   !
@@ -108,9 +108,9 @@
 # define Cells_In_Domain_And_Buffers()             \
     Grid % region % f_cell(Grid % n_regions),      \
     Grid % region % l_cell(Grid % n_regions + 1)
-# define Cells_In_Domain_And_Buffers_Gpu()     \
-    grid_region_f_cell(Grid % n_regions),      \
-    grid_region_l_cell(Grid % n_regions + 1)
+# define Cells_In_Domain_And_Buffers_Gpu()   \
+    grid_region_f_cell(grid_n_regions),      \
+    grid_region_l_cell(grid_n_regions + 1)
 
 !-----------------------!
 !   Buffer cells only   !
@@ -118,9 +118,9 @@
 # define Cells_In_Buffers()                        \
     Grid % region % f_cell(Grid % n_regions + 1),  \
     Grid % region % l_cell(Grid % n_regions + 1)
-# define Cells_In_Buffers_Gpu()                    \
-    grid_region_f_cell(Grid % n_regions + 1),  \
-    grid_region_l_cell(Grid % n_regions + 1)
+# define Cells_In_Buffers_Gpu()              \
+    grid_region_f_cell(grid_n_regions + 1),  \
+    grid_region_l_cell(grid_n_regions + 1)
 
 !-----------------------------------------------!
 !   Cells at boundaries and inside the domain   !
@@ -130,7 +130,7 @@
     Grid % region % l_cell(Grid % n_regions)
 # define Cells_At_Boundaries_And_In_Domain_Gpu()  \
     grid_region_f_cell(1),                        \
-    grid_region_l_cell(Grid % n_regions)
+    grid_region_l_cell(grid_n_regions)
 
 !---------------------------------------------------------------!
 !   Cells at boundaries, inside the domain and in the buffers   !
@@ -140,5 +140,5 @@
     Grid % region % l_cell(Grid % n_regions + 1)
 # define Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  \
     grid_region_f_cell(1),                                \
-    grid_region_l_cell(Grid % n_regions + 1)
+    grid_region_l_cell(grid_n_regions + 1)
 

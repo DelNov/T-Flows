@@ -15,7 +15,7 @@
   real                     :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
   real                     :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), v_flux_n(:), phi_n(:)
+  real, contiguous, pointer :: b(:), phi_n(:)
   real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c, blend
   integer                   :: s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -25,23 +25,25 @@
   call Profiler % Start('Add_Advection_Term')
 
   ! Take some aliases
-  b        => Flow % Nat % b
-  v_flux_n => Flow % v_flux % n
-  phi_n    => phi % n
-  blend    =  Flow % u % blend
+  b     => Flow % Nat % b
+  phi_n => phi % n
+  blend =  Flow % u % blend
 
   !-------------------------------------------!
   !   Browse through all the interior cells   !
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
 
-  !$acc parallel loop
-  do c1 = Cells_In_Domain()
+  !$acc parallel loop                                            &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         b, phi_n, coef_a, coef_b, flow_v_flux_n)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
     b_tmp = b(c1)
     !$acc loop seq
-    do i_cel = 1, Grid % cells_n_cells(c1)
-      c2 = Grid % cells_c(i_cel, c1)
-      s  = Grid % cells_f(i_cel, c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
+      c2 = grid_cells_c(i_cel, c1)
+      s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
 
         ! Centered value
@@ -54,10 +56,10 @@
         coef_phi1 = coef_f * ((1.0-blend) * phi_n(c1) + blend * phi_c)
         coef_phi2 = coef_f * ((1.0-blend) * phi_n(c2) + blend * phi_c)
 
-        b_tmp = b_tmp - coef_phi1 * max(v_flux_n(s), 0.0) * merge(1,0, c1.lt.c2)
-        b_tmp = b_tmp - coef_phi2 * min(v_flux_n(s), 0.0) * merge(1,0, c1.lt.c2)
-        b_tmp = b_tmp + coef_phi2 * max(v_flux_n(s), 0.0) * merge(1,0, c1.gt.c2)
-        b_tmp = b_tmp + coef_phi1 * min(v_flux_n(s), 0.0) * merge(1,0, c1.gt.c2)
+        b_tmp = b_tmp - coef_phi1 * max(flow_v_flux_n(s), 0.0) * merge(1,0, c1.lt.c2)
+        b_tmp = b_tmp - coef_phi2 * min(flow_v_flux_n(s), 0.0) * merge(1,0, c1.lt.c2)
+        b_tmp = b_tmp + coef_phi2 * max(flow_v_flux_n(s), 0.0) * merge(1,0, c1.gt.c2)
+        b_tmp = b_tmp + coef_phi1 * min(flow_v_flux_n(s), 0.0) * merge(1,0, c1.gt.c2)
       end if
     end do
     !$acc end loop
@@ -77,14 +79,16 @@
     if(Grid % region % type(reg) .eq. INFLOW  .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop  &
-      !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
-      do s = Faces_In_Region_Gpu(reg)
+      !$acc parallel loop                                    &
+      !$acc present(grid_region_f_face, grid_region_l_face,  &
+      !$acc         grid_faces_c,                            &
+      !$acc         b, coef_a, coef_b, phi_n, flow_v_flux_n)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         c1 = grid_faces_c(1,s)  ! inside cell
         c2 = grid_faces_c(1,s)  ! boundary cell
 
         ! Just plain upwind here
-        b(c1) = b(c1) - coef_a(c1) * coef_b(c1) * phi_n(c2) * v_flux_n(s)
+        b(c1) = b(c1) - coef_a(c1) * coef_b(c1) * phi_n(c2) * flow_v_flux_n(s)
       end do
       !$acc end parallel
 
@@ -93,13 +97,15 @@
     ! Outflow is just a vanishing derivative, use the value from the inside
     if(Grid % region % type(reg) .eq. OUTFLOW) then
 
-      !$acc parallel loop  &
-      !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
+      !$acc parallel loop                                    &
+      !$acc present(grid_region_f_face, grid_region_l_face,  &
+      !$acc         grid_faces_c,                            &
+      !$acc         b, coef_a, coef_b, phi_n, flow_v_flux_n)
       do s = Faces_In_Region_Gpu(reg)
         c1 = grid_faces_c(1,s)  ! inside cell
 
         ! Just plain upwind here
-        b(c1) = b(c1) - coef_a(c1) * coef_b(c1) * phi_n(c1) * v_flux_n(s)
+        b(c1) = b(c1) - coef_a(c1) * coef_b(c1) * phi_n(c1) * flow_v_flux_n(s)
       end do
       !$acc end parallel
 

@@ -200,7 +200,7 @@
         call String % To_Upper_Case(keys(i))
       end do
 
-      do c = Cells_In_Domain_And_Buffers()
+      do c = Cells_In_Domain_And_Buffers()  ! this whole routine is on CPU
 
         !--------------!
         !   Momentum   !

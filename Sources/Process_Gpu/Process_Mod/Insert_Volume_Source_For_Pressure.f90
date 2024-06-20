@@ -80,8 +80,8 @@
     !$acc parallel loop                                                  &
     !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
     !$acc         grid_sx, grid_sy, grid_sz,                             &
-    !$acc         flow_v_flux_n)
-    do s = Faces_In_Region_Gpu(reg)
+    !$acc         u_n, v_n, w_n, flow_v_flux_n)
+    do s = Faces_In_Region_Gpu(reg)  ! all present
       c2 = grid_faces_c(2,s)  ! boundary cell
       flow_v_flux_n(s) = u_n(c2) * grid_sx(s)  &
                        + v_n(c2) * grid_sy(s)  &
@@ -107,7 +107,7 @@
       !$acc present(grid_region_f_face, grid_region_l_face,  &
       !$acc         grid_s,                                  &
       !$acc         flow_v_flux_n)
-      do s = Faces_In_Region_Gpu(reg)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         area_in = area_in + grid_s(s)
         vol_in  = vol_in  - flow_v_flux_n(s)
       end do
@@ -122,7 +122,7 @@
       !$acc present(grid_region_f_face, grid_region_l_face,  &
       !$acc         grid_s,                                  &
       !$acc         flow_v_flux_n)
-      do s = Faces_In_Region_Gpu(reg)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         area_out = area_out + grid_s(s)
         vol_out  = vol_out  + flow_v_flux_n(s)
       end do
@@ -147,7 +147,7 @@
         !$acc parallel loop                                    &
         !$acc present(grid_region_f_face, grid_region_l_face,  &
         !$acc         flow_v_flux_n)
-        do s = Faces_In_Region_Gpu(reg)
+        do s = Faces_In_Region_Gpu(reg)  ! all present
           flow_v_flux_n(s) = flow_v_flux_n(s) * ratio
         end do
         !$acc end parallel
@@ -168,7 +168,7 @@
   !$acc         grid_sx, grid_sy, grid_sz,                &
   !$acc         u_n, v_n, w_n, p_x, p_y, p_z,             &
   !$acc         flow_v_m, flow_v_flux_n, flow_p_n)
-  do s = Faces_In_Domain_And_At_Buffers_Gpu()
+  do s = Faces_In_Domain_And_At_Buffers_Gpu()  ! all present
 
     c1 = grid_faces_c(1,s)
     c2 = grid_faces_c(2,s)
@@ -209,8 +209,8 @@
   !$acc parallel loop                                            &
   !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
   !$acc         grid_region_f_cell, grid_region_l_cell,          &
-  !$acc         flow_v_flux_n)
-  do c1 = Cells_In_Domain_Gpu()
+  !$acc         flow_v_flux_n, b)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
 
     b_tmp = b(c1)
     !$acc loop seq
@@ -240,8 +240,8 @@
 
       !$acc parallel loop                                                  &
       !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
-      !$acc         flow_v_flux_n)
-      do s = Faces_In_Region_Gpu(reg)
+      !$acc         flow_v_flux_n, b)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         c1 = grid_faces_c(1,s)  ! inside cell
         b(c1) = b(c1) - flow_v_flux_n(s)
       end do
@@ -254,9 +254,10 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop reduction(max:max_abs_val)  &
-  !$acc present(grid_region_f_cell, grid_region_l_cell)
-  do c = Cells_In_Domain_Gpu()
+  !$acc parallel loop reduction(max:max_abs_val)         &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         b)
+  do c = Cells_In_Domain_Gpu()  ! all present
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
 

@@ -60,6 +60,8 @@
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_face)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_cell)
   call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_cell)
+  grid_n_regions     =  Grid % n_regions
+  grid_n_bnd_regions =  Grid % n_bnd_regions
   grid_region_f_face => Grid % region % f_face
   grid_region_l_face => Grid % region % l_face
   grid_region_f_cell => Grid % region % f_cell

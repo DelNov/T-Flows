@@ -26,10 +26,11 @@
 
   ! Estimate gradients cell-wise (face-wise leades to race conditions on GPUs)
   !$acc parallel loop independent                                &
-  !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
   !$acc         grid_dx, grid_dy, grid_dz,                       &
-  !$acc         flow_grad_c2c)
-  do c1 = Cells_In_Domain()
+  !$acc         flow_grad_c2c, phii)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
 
     phii_tmp = 0.0
 
@@ -38,19 +39,14 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       dphi = phi(c2)-phi(c1)
-      dx = grid_dx(s)
-      dy = grid_dy(s)
-      dz = grid_dz(s)
       if(c2 .gt. 0 .and. c1 .gt. c2) then
-        dx = -dx
-        dy = -dy
-        dz = -dz
+        dphi = -dphi
       end if
 
-      phii_tmp = phii_tmp                                    &
-               + dphi * (  flow_grad_c2c(MAP(i,1),c1) * dx   &
-                         + flow_grad_c2c(MAP(i,2),c1) * dy   &
-                         + flow_grad_c2c(MAP(i,3),c1) * dz)
+      phii_tmp = phii_tmp                                            &
+               + dphi * (  flow_grad_c2c(MAP(i,1),c1) * grid_dx(s)   &
+                         + flow_grad_c2c(MAP(i,2),c1) * grid_dy(s)   &
+                         + flow_grad_c2c(MAP(i,3),c1) * grid_dz(s))
     end do
     !$acc end loop
 

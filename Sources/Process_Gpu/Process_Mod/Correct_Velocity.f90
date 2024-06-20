@@ -30,10 +30,10 @@
   ! Take some aliases
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
-  b        => Flow % Nat % b
-  fc       => Flow % Nat % C % fc
-  dens     => Flow % density
-  visc     => Flow % viscosity
+  b    => Flow % Nat % b
+  fc   => Flow % Nat % C % fc
+  dens => flow_density
+  visc => flow_viscosity
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'PP')
@@ -51,9 +51,10 @@
   !----------------------!
 
   ! Units: kg m / s^2 * s / kg = m / s
-  !$acc parallel loop independent  &
-  !$acc present(flow_u_n, flow_v_n, flow_w_n, flow_v_m)
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                         &
+  !$acc present(grid_region_f_cell,  grid_region_l_cell,  &
+  !$acc         flow_u_n, flow_v_n, flow_w_n, flow_v_m, pp_x, pp_y, pp_z)
+  do c = Cells_In_Domain_Gpu()  ! all present
     flow_u_n(c) = flow_u_n(c) - pp_x(c) * flow_v_m(c)
     flow_v_n(c) = flow_v_n(c) - pp_y(c) * flow_v_m(c)
     flow_w_n(c) = flow_w_n(c) - pp_z(c) * flow_v_m(c)
@@ -72,10 +73,11 @@
   !---------------------------------------------!
 
   ! Units: m * m^3 * s / kg * kg / (m s^2) = m^3 / s
-  !$acc parallel loop independent  &
-  !$acc present(grid_faces_c,      &
+  !$acc parallel loop independent                         &
+  !$acc present(grid_region_f_face,  grid_region_l_face,  &
+  !$acc         grid_faces_c,                             &
   !$acc         flow_pp_n, flow_v_m, flow_v_flux_n)
-  do s = Faces_In_Domain_And_At_Buffers()
+  do s = Faces_In_Domain_And_At_Buffers_Gpu()  ! all present
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
@@ -103,8 +105,8 @@
   !$acc parallel loop independent                                &
   !$acc present(grid_cells_c, grid_cells_f,                      &
   !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         flow_v_flux_n)
-  do c1 = Cells_In_Domain_Gpu()
+  !$acc         flow_v_flux_n, b)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
 
     b_tmp = b(c1)
     !$acc loop seq
@@ -135,8 +137,8 @@
       !$acc parallel loop                                     &
       !$acc present(grid_region_f_face,  grid_region_l_face,  &
       !$acc         grid_faces_c,                             &
-      !$acc         flow_v_flux_n)
-      do s = Faces_In_Region_Gpu(reg)
+      !$acc         flow_v_flux_n, b)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         c1 = grid_faces_c(1,s)  ! inside cell
         b(c1) = b(c1) - flow_v_flux_n(s)
       end do
@@ -155,9 +157,10 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop reduction(max:max_abs_val)  &
-  !$acc present(grid_region_f_cell, grid_region_l_cell)
-  do c = Cells_In_Domain_Gpu()
+  !$acc parallel loop reduction(max:max_abs_val)         &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         b)
+  do c = Cells_In_Domain_Gpu()  ! all present
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
 
@@ -174,14 +177,15 @@
   !$acc parallel loop independent reduction(max:cfl_max, pe_max)  &
   !$acc present(grid_region_f_face, grid_region_l_face,           &
   !$acc         grid_faces_c,                                     &
-  !$acc         flow_v_flux_n)
-  do s = Faces_In_Domain_And_At_Buffers_Gpu()
+  !$acc         grid_d,                                           &
+  !$acc         visc, dens, flow_v_flux_n)
+  do s = Faces_In_Domain_And_At_Buffers_Gpu()  ! all present
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
     nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
 
-    cfl_t   = abs(flow_v_flux_n(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
+    cfl_t   = abs(flow_v_flux_n(s)) * Flow % dt / (fc(s) * grid_d(s)**2)
     pe_t    = abs(flow_v_flux_n(s)) / fc(s) / nu_f
     cfl_max = max( cfl_max, cfl_t )
     pe_max  = max( pe_max,  pe_t  )

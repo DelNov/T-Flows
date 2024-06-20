@@ -39,9 +39,12 @@
   if(comp .eq. 2) p_d_i =  Flow % bulk % p_drop_y
   if(comp .eq. 3) p_d_i =  Flow % bulk % p_drop_z
 
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
-    b(c) = b(c) + (p_d_i - p_i(c)) * Grid % vol(c)
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         grid_vol,                                &
+  !$acc         b, p_i)
+  do c = Cells_In_Domain_Gpu()  ! all present
+    b(c) = b(c) + (p_d_i - p_i(c)) * grid_vol(c)
   end do
   !$acc end parallel
 

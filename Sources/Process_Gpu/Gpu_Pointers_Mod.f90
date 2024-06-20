@@ -19,6 +19,7 @@
   integer, contiguous, pointer :: grid_cells_n_cells(:)
   integer, contiguous, pointer :: grid_cells_c(:,:)
   integer, contiguous, pointer :: grid_cells_f(:,:)
+  integer                      :: grid_n_regions,  grid_n_bnd_regions
   integer, contiguous, pointer :: grid_region_f_cell(:), grid_region_l_cell(:)
   integer, contiguous, pointer :: grid_region_f_face(:), grid_region_l_face(:)
   real,    contiguous, pointer :: grid_dx(:), grid_dy(:), grid_dz(:)
@@ -35,5 +36,7 @@
   real, contiguous, pointer :: flow_p_n(:), flow_pp_n(:), flow_v_m(:)
   real, contiguous, pointer :: flow_shear(:), flow_vort(:), flow_v_flux_n(:)
   real, contiguous, pointer :: flow_grad_c2c(:,:)
+  real, contiguous, pointer :: flow_density(:),  flow_viscosity(:)
+  real, contiguous, pointer :: flow_capacity(:), flow_conductivity(:)
 
   end module

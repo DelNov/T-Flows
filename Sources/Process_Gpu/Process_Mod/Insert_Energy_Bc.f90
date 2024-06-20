@@ -34,8 +34,8 @@
 
       !$acc parallel loop independent  &
       !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
-      !$acc         flow_t_n)
-      do s = Faces_In_Region_Gpu(reg)
+      !$acc         cond, fc, b, flow_t_n)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         c1 = grid_faces_c(1,s)
         c2 = grid_faces_c(2,s)
         a12 = cond(c1) * fc(s)

@@ -46,17 +46,17 @@
   fin_res = 0.0
 
   if(comp .eq. 1) then
-    ui_n  => Flow % u % n
-    ui_o  => Flow % u % o
-    ui_oo => Flow % u % oo
+    ui_n  => flow_u_n
+    ui_o  => flow_u_o
+    ui_oo => flow_u_oo
   else if(comp .eq. 2) then
-    ui_n  => Flow % v % n
-    ui_o  => Flow % v % o
-    ui_oo => Flow % v % oo
+    ui_n  => flow_v_n
+    ui_o  => flow_v_o
+    ui_oo => flow_v_oo
   else if(comp .eq. 3) then
-    ui_n  => Flow % w % n
-    ui_o  => Flow % w % o
-    ui_oo => Flow % w % oo
+    ui_n  => flow_w_n
+    ui_o  => flow_w_o
+    ui_oo => flow_w_oo
   end if
 
   ! Tolerances and under-relaxations are the same for all components
@@ -65,8 +65,10 @@
 
   ! Set temp variable (Buoyancy_Forces uses it!)
 
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         ones)
+  do c = Cells_In_Domain_Gpu()  ! all present
     ones(c) = 1.0
   end do
   !$acc end parallel
@@ -77,15 +79,19 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % u % td_scheme .eq. PARABOLIC) then
-      !$acc parallel loop independent
-      do c = Cells_In_Domain_And_Buffers()
+      !$acc parallel loop independent                        &
+      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+      !$acc         ui_oo, ui_o)
+      do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
         ui_oo(c) = ui_o(c)
       end do
       !$acc end parallel
     end if
 
-    !$acc parallel loop independent
-    do c = Cells_In_Domain_And_Buffers()
+    !$acc parallel loop independent                        &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+    !$acc         ui_o, ui_n)
+    do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
       ui_o(c) = ui_n(c)
     end do
     !$acc end parallel
@@ -98,8 +104,8 @@
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
     call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,  &
-                                      Flow % density, ones,    &
-                                      Flow % viscosity,        &
+                                      flow_density, ones,      &
+                                      flow_viscosity,          &
                                       urf, dt = Flow % dt, save_v_m = .true.)
   end if
 
@@ -114,8 +120,10 @@
   call Flow % Buoyancy_Forces(Grid, comp)
 
   ! Set temp variable back to one (Buoyancy_Forces uses it!)
-  !$acc parallel loop independent
-  do c = Cells_In_Domain_And_Buffers()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         ones)
+  do c = Cells_In_Domain_And_Buffers_Gpu()
     ones(c) = 1.0
   end do
   !$acc end parallel
@@ -123,19 +131,19 @@
   ! Inertial and advection terms
   if(comp .eq. 1) then
     call Process % Add_Inertial_Term(Flow % u, Flow, Grid,  &
-                                     Flow % density, ones)
+                                     flow_density, ones)
     call Process % Add_Advection_Term(Flow % u, Flow, Grid,  &
-                                      Flow % density, ones)
+                                      flow_density, ones)
   else if(comp .eq. 2) then
     call Process % Add_Inertial_Term(Flow % v, Flow, Grid,  &
-                                     Flow % density, ones)
+                                     flow_density, ones)
     call Process % Add_Advection_Term(Flow % v, Flow, Grid,  &
-                                      Flow % density, ones)
+                                      flow_density, ones)
   else if(comp .eq. 3) then
     call Process % Add_Inertial_Term(Flow % w, Flow, Grid,  &
-                                     Flow % density, ones)
+                                     flow_density, ones)
     call Process % Add_Advection_Term(Flow % w, Flow, Grid,  &
-                                      Flow % density, ones)
+                                      flow_density, ones)
   end if
 
   ! Pressure force
@@ -146,8 +154,10 @@
   !   (Part 1 is in Form_System_Matrix)   !
   !---------------------------------------!
 
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         b, val, dia, ui_n)
+  do c = Cells_In_Domain_Gpu()  ! all present
     b(c) = b(c) + val(dia(c)) * (1.0 - urf) * ui_n(c)
   end do
   !$acc end parallel

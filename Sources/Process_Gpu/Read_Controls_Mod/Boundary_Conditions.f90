@@ -173,7 +173,7 @@
         !--------------------------------------------------!
 
         ! Distribute b.c. tags only.
-        do c = Cells_In_Region(bc)
+        do c = Cells_In_Region(bc)  ! this whole routine is on CPU
 
           ! Temperature
           if(Flow % heat_transfer) then
@@ -206,7 +206,7 @@
         end do    ! Cells_In_Region
 
         ! Distribute b.c. values
-        do c = Cells_In_Region(bc)
+        do c = Cells_In_Region(bc)  ! this whole routine is on CPU
 
           ! For velocity and pressure
           i = Key_Ind('U', keys, nks); if(i > 0) u % b(c) = vals(i)
@@ -277,7 +277,7 @@
            keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
 
           ! Set the closest point
-          do c = Cells_In_Region(bc)
+          do c = Cells_In_Region(bc)  ! this whole routine is on CPU
 
             ! Distribute b.c. types
 
@@ -371,7 +371,7 @@
         !----------------------------!
         else  ! dir .eq. "XPL" ...
 
-          do c = Cells_In_Region(bc)
+          do c = Cells_In_Region(bc)  ! this whole routine is on CPU
 
             do m = 1, n_points-1
               here = .false.
@@ -578,7 +578,7 @@
   !                                       !
   !---------------------------------------!
   do bc = Boundary_Regions()
-    do c = Cells_In_Region(bc)
+    do c = Cells_In_Region(bc)  ! this whole routine is on CPU
 
       u % n(c) = u % b(c)
       v % n(c) = v % b(c)
@@ -604,7 +604,7 @@
   do bc = Boundary_Regions()
     if(Grid % region % type(bc) .eq. WALL   .or.  &
        Grid % region % type(bc) .eq. WALLFL) then
-      do s = Faces_In_Region(bc)
+      do s = Faces_In_Region(bc)  ! this whole routine is on CPU
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)
 

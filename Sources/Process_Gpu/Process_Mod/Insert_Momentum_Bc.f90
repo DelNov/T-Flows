@@ -22,9 +22,9 @@
   fc   => Flow % Nat % C % fc
   visc => Flow % viscosity
 
-  if(comp .eq. 1) ui_n => Flow % u % n
-  if(comp .eq. 2) ui_n => Flow % v % n
-  if(comp .eq. 3) ui_n => Flow % w % n
+  if(comp .eq. 1) ui_n => flow_u_n
+  if(comp .eq. 2) ui_n => flow_v_n
+  if(comp .eq. 3) ui_n => flow_w_n
 
   !-----------------------------------------------------------------------!
   !   Handle boundary conditions on the right-hand side (in the source)   !
@@ -37,9 +37,11 @@
     if(Grid % region % type(reg) .eq. WALL .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop independent  &
-      !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
-      do s = Faces_In_Region_Gpu(reg)
+      !$acc parallel loop independent                        &
+      !$acc present(grid_region_f_face, grid_region_l_face,  &
+      !$acc         grid_faces_c,                            &
+      !$acc         visc, fc, b, ui_n)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
         c1 = grid_faces_c(1,s)
         c2 = grid_faces_c(2,s)
         m12 = visc(c1) * fc(s)

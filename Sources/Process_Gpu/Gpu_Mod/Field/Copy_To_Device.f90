@@ -70,9 +70,13 @@
   ! You are going to need physical properties as well
   call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow % density)
+  flow_viscosity => Flow % viscosity
+  flow_density   => Flow % density
   if(Flow % heat_transfer) then
     call Gpu % Vector_Real_Copy_To_Device(Flow % conductivity)
     call Gpu % Vector_Real_Copy_To_Device(Flow % capacity)
+    flow_conductivity => Flow % conductivity
+    flow_capacity     => Flow % capacity
   end if
 
   ! Also copy whatever you need to compute gradients

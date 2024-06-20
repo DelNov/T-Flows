@@ -9,7 +9,7 @@
   type(Grid_Type),   target :: Grid
   integer, intent(in)       :: comp  ! component
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), xic(:), xif(:), si(:), dxi(:), temp(:)
+  real, contiguous, pointer :: b(:), grid_si(:), grid_dxi(:), temp(:)
   real                      :: b_tmp, b_f, xic1, xic2, x_f, grav_i
   real                      :: dens_f, temp_f
   integer                   :: c, c1, c2, s, i_cel, reg
@@ -23,30 +23,26 @@
   temp => Flow % temp
 
   if(comp .eq. 1) then
-    dxi    => grid_dx;
-    xic    => grid_xc;
-    xif    => Grid % xf;
-    si     => grid_sx;
-    grav_i =  Flow % grav_x
+    grid_dxi => grid_dx;
+    grid_si  => grid_sx;
+    grav_i   =  Flow % grav_x
   else if(comp .eq. 2) then
-    dxi    => grid_dy;
-    xic    => grid_yc;
-    xif    => Grid % yf;
-    si     => grid_sy;
-    grav_i =  Flow % grav_y
+    grid_dxi => grid_dy;
+    grid_si  => grid_sy;
+    grav_i   =  Flow % grav_y
   else if(comp .eq. 3) then
-    dxi    => grid_dz;
-    xic    => grid_zc;
-    xif    => Grid % zf;
-    si     => grid_sz;
-    grav_i =  Flow % grav_z
+    grid_dxi => grid_dz;
+    grid_si  => grid_sz;
+    grav_i   =  Flow % grav_z
   end if
 
   ! I there is no gravity in the direction comp, get out of here
   if(abs(grav_i) < TINY) return
 
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         temp)
+  do c = Cells_In_Domain_Gpu()  ! all present
     temp(c) = 0.0
   end do
   !$acc end parallel
@@ -57,10 +53,11 @@
   !-------------------------------------------!
 
   !$acc parallel loop                                            &
-  !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         si, dxi,                                         &
-  !$acc         flow_t_n)
-  do c1 = Cells_In_Domain()
+  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         grid_si, grid_dxi,                               &
+  !$acc         flow_density, flow_t_n)
+  do c1 = Cells_In_Domain_Gpu()  ! all present
     b_tmp = 0.0
 
     !$acc loop seq
@@ -70,14 +67,14 @@
       if(c2 .gt. 0) then
 
         ! Temperature and density at the face
-        temp_f = Face_Value(s, flow_t_n(c1), flow_t_n(c2))
-        dens_f = Face_Value(s, Flow % density(c1), Flow % density(c2))
+        temp_f = Face_Value(s, flow_t_n(c1),     flow_t_n(c2))
+        dens_f = Face_Value(s, flow_density(c1), flow_density(c2))
 
         ! Units here: [kg/m^3 K]
         b_f = dens_f * (Flow % t_ref - temp_f)
 
         ! Units here: [kg K]
-        b_tmp = b_tmp + b_f * 0.5 * abs(si(s) * dxi(s))
+        b_tmp = b_tmp + b_f * 0.5 * abs(grid_si(s) * grid_dxi(s))
       end if
     end do
     !$acc end loop
@@ -96,21 +93,22 @@
 
     !$acc parallel loop  &
     !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c,  &
-    !$acc         si, dxi, flow_t_n)
-    do s = Faces_In_Region_Gpu(reg)
+    !$acc         grid_si, grid_dxi,                                     &
+    !$acc         flow_density,  flow_t_n, temp)
+    do s = Faces_In_Region_Gpu(reg)  ! all present
       c1 = grid_faces_c(1,s)  ! inside cell
       c2 = grid_faces_c(1,s)  ! boundary cell
 
       ! Temperature at the face is identical to
       ! the temperature at the boundary cell
       temp_f = flow_t_n(c2)
-      dens_f = Flow % density(c1)  ! or in c2?
+      dens_f = flow_density(c1)  ! or in c2?
 
       ! Units here: [kg/m^3 K]
       b_f = dens_f * (Flow % t_ref - temp_f)
 
       ! Units here: [kg m/s^2 = N]
-      temp(c1) = temp(c1) + b_f * abs(si(s) * dxi(s))  &
+      temp(c1) = temp(c1) + b_f * abs(grid_si(s) * grid_dxi(s))  &
                * Flow % beta * grav_i
 
     end do
@@ -122,8 +120,10 @@
   !   Correct the units for body forces   !
   !---------------------------------------!
 
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         temp)
+  do c = Cells_In_Domain_Gpu()
     b(c) = b(c) + temp(c)
   end do
   !$acc end parallel

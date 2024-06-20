@@ -44,10 +44,11 @@
          Grid % region % type(reg) .eq. PRESSURE .or.  &
          Grid % region % type(reg) .eq. SYMMETRY) then
 
-        !$acc parallel loop                                                  &
-        !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c,  &
+        !$acc parallel loop                                    &
+        !$acc present(grid_region_f_face, grid_region_l_face,  &
+        !$acc         grid_faces_c,                            &
         !$acc         flow_u_n, flow_v_n, flow_w_n)
-        do s = Faces_In_Region_Gpu(reg)
+        do s = Faces_In_Region_Gpu(reg)  ! all present
           c1 = grid_faces_c(1,s)  ! inside cell
           c2 = grid_faces_c(1,s)  ! boundary cell
 

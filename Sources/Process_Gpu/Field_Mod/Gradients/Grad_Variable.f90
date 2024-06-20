@@ -26,8 +26,10 @@
   !   Nullify arrays on the device   !
   !----------------------------------!
 
-  !$acc parallel loop independent
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         phi_x,   phi_y,   phi_z)
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  ! all present
     phi_x(c) = 0.0
     phi_y(c) = 0.0
     phi_z(c) = 0.0
