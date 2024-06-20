@@ -24,15 +24,16 @@
   real,    contiguous, pointer :: grid_dx(:), grid_dy(:), grid_dz(:)
   real,    contiguous, pointer :: grid_sx(:), grid_sy(:), grid_sz(:)
   real,    contiguous, pointer :: grid_xc(:), grid_yc(:), grid_zc(:)
-  real,    contiguous, pointer :: grid_d(:), grid_s(:), grid_vol(:)
+  real,    contiguous, pointer :: grid_d(:), grid_s(:)
+  real,    contiguous, pointer :: grid_vol(:), grid_wall_dist(:)
 
   ! Access to Flow members
   real, contiguous, pointer :: flow_t_n(:), flow_t_o(:), flow_t_oo(:)
   real, contiguous, pointer :: flow_u_n(:), flow_u_o(:), flow_u_oo(:)
   real, contiguous, pointer :: flow_v_n(:), flow_v_o(:), flow_v_oo(:)
   real, contiguous, pointer :: flow_w_n(:), flow_w_o(:), flow_w_oo(:)
-  real, contiguous, pointer :: flow_p_n(:), flow_pp_n(:)
-  real, contiguous, pointer :: flow_shear(:), flow_vort(:)
+  real, contiguous, pointer :: flow_p_n(:), flow_pp_n(:), flow_v_m(:)
+  real, contiguous, pointer :: flow_shear(:), flow_vort(:), flow_v_flux_n(:)
   real, contiguous, pointer :: flow_grad_c2c(:,:)
 
   end module

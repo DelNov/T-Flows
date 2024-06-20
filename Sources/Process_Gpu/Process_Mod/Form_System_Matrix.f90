@@ -16,7 +16,7 @@
   real,    optional, intent(in) :: dt       !! time step
   logical, optional, intent(in) :: save_v_m
 !-----------------------------------[Locals]-----------------------------------!
-  real,      contiguous, pointer :: val(:), v_m(:), fc(:)
+  real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12
@@ -43,7 +43,6 @@
   pos => Acon % pos
   fc  => Acon % fc
   nz  =  Acon % nonzeros
-  v_m => Flow % v_m
 
   Assert(urf > 0.0)
 
@@ -106,13 +105,15 @@
   !--------------------------------------------------------------!
   if(present(save_v_m)) then
     if(save_v_m) then
-      !$acc parallel loop independent
-      do c = Cells_In_Domain()
-        v_m(c) = Grid % vol(c) / val(dia(c))
+      !$acc parallel loop independent &
+      !$acc present(grid_region_f_cell, grid_region_l_cell, grid_vol)
+      do c = Cells_In_Domain_Gpu()
+        flow_v_m(c) = grid_vol(c) / val(dia(c))
       end do
       !$acc end parallel
 
-      call Grid % Exchange_Inside_Cells_Real(v_m)
+      ! This call is needed, the above loop goes through inside cells only
+      call Grid % Exchange_Inside_Cells_Real(flow_v_m)
     end if
   end if
 
@@ -136,7 +137,7 @@
   do c = Cells_In_Domain()
     ! or: temp(c) = val(dia(c))
     ! or: temp(c) = Acon % row(c+1) - Acon % row(c)
-    temp(c) = v_m(c)
+    temp(c) = flow_v_m(c)
   end do
   call Grid % Exchange_Inside_Cells_Real(temp)
   call Grid % Save_Debug_Vtu("v_m",              &

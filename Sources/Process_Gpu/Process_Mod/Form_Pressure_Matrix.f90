@@ -33,7 +33,7 @@
   type(Field_Type),      target :: Flow
   type(Grid_Type),   intent(in) :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  real,      contiguous, pointer :: val(:), v_m(:), fc(:)
+  real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   integer                        :: s, c1, c2, c, i_cel, i, nz
   real                           :: a12
@@ -53,7 +53,6 @@
   pos  => Flow % Nat % C % pos
   fc   => Flow % Nat % C % fc
   nz   =  Flow % Nat % C % nonzeros
-  v_m  => Flow % v_m
 
   !$acc kernels
   do i = 1, nz
@@ -65,9 +64,10 @@
   !   This is cell based and will not create race conditions on GPUs   !
   !--------------------------------------------------------------------!
 
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f)
+  !$acc parallel loop independent                                &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         flow_v_m)
   do c1 = Cells_In_Domain_Gpu()  ! going through buffers should not be needed
 
     !$acc loop seq
@@ -75,7 +75,7 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        a12 = fc(s) * Face_Value(s, v_m(c1), v_m(c2))
+        a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12

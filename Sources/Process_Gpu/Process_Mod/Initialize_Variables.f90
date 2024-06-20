@@ -7,6 +7,10 @@
 !>  Process_Gpu, this source file will get closer and closer to its origin
 !>  from Process_Cpu.
 !------------------------------------------------------------------------------!
+!   Note:                                                                      !
+!                                                                              !
+!   * This subroutine is executed on CPU (host) only.                          !
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)        :: Process  !! parent class

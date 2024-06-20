@@ -486,13 +486,13 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     grid_dx  grid_dy  grid_dz
   syn keyword fortranGPUTflows     grid_sx  grid_sy  grid_sz
   syn keyword fortranGPUTflows     grid_xc  grid_yc  grid_zc
-  syn keyword fortranGPUTflows     grid_d  grid_s  grid_vol
+  syn keyword fortranGPUTflows     grid_d  grid_s  grid_vol  grid_wall_dist
   syn keyword fortranGPUTflows     flow_u_n  flow_u_o  flow_u_oo
   syn keyword fortranGPUTflows     flow_v_n  flow_v_o  flow_v_oo
   syn keyword fortranGPUTflows     flow_w_n  flow_w_o  flow_w_oo
   syn keyword fortranGPUTflows     flow_t_n  flow_t_o  flow_t_oo
-  syn keyword fortranGPUTflows     flow_p_n  flow_pp_n
-  syn keyword fortranGPUTflows     flow_shear  flow_vort
+  syn keyword fortranGPUTflows     flow_p_n  flow_pp_n  flow_v_m
+  syn keyword fortranGPUTflows     flow_shear  flow_vort  flow_v_flux_n
   syn keyword fortranGPUTflows     flow_grad_c2c
 
 " CUDA fortran

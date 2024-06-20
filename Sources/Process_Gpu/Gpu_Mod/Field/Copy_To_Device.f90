@@ -53,6 +53,8 @@
   end if
   call Gpu % Vector_Real_Copy_To_Device(Flow % v_flux % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow % v_m)
+  flow_v_flux_n => Flow % v_flux % n
+  flow_v_m      => Flow % v_m
 
   if(Flow % heat_transfer) then
     call Gpu % Vector_Real_Copy_To_Device(Flow % t % n)

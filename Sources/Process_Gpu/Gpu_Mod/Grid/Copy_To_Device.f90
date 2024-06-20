@@ -66,6 +66,7 @@
   grid_region_l_cell => Grid % region % l_cell
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
     call Gpu % Vector_Real_Copy_To_Device(Grid % wall_dist)
+    grid_wall_dist => Grid % wall_dist
   end if
 
   end subroutine

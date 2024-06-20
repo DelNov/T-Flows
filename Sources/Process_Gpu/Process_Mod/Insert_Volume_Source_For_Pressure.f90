@@ -31,9 +31,8 @@
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:)
+  real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:), fc(:)
   real, contiguous, pointer :: u_n(:), v_n(:), w_n(:)
-  real, contiguous, pointer :: v_flux_n(:), v_m(:), fc(:)
   real                      :: a12, b_tmp, max_abs_val
   real                      :: u_f, v_f, w_f
   real                      :: area_in, area_out, vol_in, vol_out, ratio
@@ -49,8 +48,6 @@
   ! These aliases are really needed, not just some gimmick to shorten the code
   b        => Flow % Nat % b
   fc       => Flow % Nat % C % fc
-  v_flux_n => Flow % v_flux % n
-  v_m      => Flow % v_m
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'P')
@@ -80,13 +77,15 @@
   !----------------------------------------------------!
   do reg = Boundary_Regions()
 
-    !$acc parallel loop  &
-    !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face)
+    !$acc parallel loop                                                  &
+    !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
+    !$acc         grid_sx, grid_sy, grid_sz,                             &
+    !$acc         flow_v_flux_n)
     do s = Faces_In_Region_Gpu(reg)
       c2 = grid_faces_c(2,s)  ! boundary cell
-      v_flux_n(s) = u_n(c2) * Grid % sx(s)  &
-                  + v_n(c2) * Grid % sy(s)  &
-                  + w_n(c2) * Grid % sz(s)
+      flow_v_flux_n(s) = u_n(c2) * grid_sx(s)  &
+                       + v_n(c2) * grid_sy(s)  &
+                       + w_n(c2) * grid_sz(s)
     end do
     !$acc end parallel
 
@@ -104,11 +103,13 @@
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop reduction(+:area_in,vol_in)  &
-      !$acc present(grid_region_f_face, grid_region_l_face)
+      !$acc parallel loop reduction(+:area_in,vol_in)        &
+      !$acc present(grid_region_f_face, grid_region_l_face,  &
+      !$acc         grid_s,                                  &
+      !$acc         flow_v_flux_n)
       do s = Faces_In_Region_Gpu(reg)
-        area_in = area_in + Grid % s(s)
-        vol_in  = vol_in  - v_flux_n(s)
+        area_in = area_in + grid_s(s)
+        vol_in  = vol_in  - flow_v_flux_n(s)
       end do
       !$acc end parallel loop
 
@@ -117,11 +118,13 @@
     if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop reduction(+:area_out,vol_out)  &
-      !$acc present(grid_region_f_face, grid_region_l_face)
+      !$acc parallel loop reduction(+:area_out,vol_out)      &
+      !$acc present(grid_region_f_face, grid_region_l_face,  &
+      !$acc         grid_s,                                  &
+      !$acc         flow_v_flux_n)
       do s = Faces_In_Region_Gpu(reg)
-        area_out = area_out + Grid % s(s)
-        vol_out  = vol_out  + v_flux_n(s)
+        area_out = area_out + grid_s(s)
+        vol_out  = vol_out  + flow_v_flux_n(s)
       end do
       !$acc end parallel
 
@@ -141,10 +144,11 @@
       if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
          Grid % region % type(reg) .eq. CONVECT) then
 
-        !$acc parallel loop  &
-        !$acc present(grid_region_f_face, grid_region_l_face)
+        !$acc parallel loop                                    &
+        !$acc present(grid_region_f_face, grid_region_l_face,  &
+        !$acc         flow_v_flux_n)
         do s = Faces_In_Region_Gpu(reg)
-          v_flux_n(s) = v_flux_n(s) * ratio
+          flow_v_flux_n(s) = flow_v_flux_n(s) * ratio
         end do
         !$acc end parallel
 
@@ -162,7 +166,8 @@
   !$acc present(grid_faces_c,                             &
   !$acc         grid_region_f_face, grid_region_l_face,   &
   !$acc         grid_sx, grid_sy, grid_sz,                &
-  !$acc         u_n, v_n, w_n, p_x, p_y, p_z, v_m, flow_p_n)
+  !$acc         u_n, v_n, w_n, p_x, p_y, p_z,             &
+  !$acc         flow_v_m, flow_v_flux_n, flow_p_n)
   do s = Faces_In_Domain_And_At_Buffers_Gpu()
 
     c1 = grid_faces_c(1,s)
@@ -170,23 +175,23 @@
 
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
-    u_f = Face_Value(s, u_n(c1)+p_x(c1)*v_m(c1), u_n(c2)+p_x(c2)*v_m(c2))
-    v_f = Face_Value(s, v_n(c1)+p_y(c1)*v_m(c1), v_n(c2)+p_y(c2)*v_m(c2))
-    w_f = Face_Value(s, w_n(c1)+p_z(c1)*v_m(c1), w_n(c2)+p_z(c2)*v_m(c2))
+    u_f = Face_Value(s, u_n(c1) + p_x(c1)*flow_v_m(c1),  u_n(c2) + p_x(c2)*flow_v_m(c2))
+    v_f = Face_Value(s, v_n(c1) + p_y(c1)*flow_v_m(c1),  v_n(c2) + p_y(c2)*flow_v_m(c2))
+    w_f = Face_Value(s, w_n(c1) + p_z(c1)*flow_v_m(c1),  w_n(c2) + p_z(c2)*flow_v_m(c2))
 
     ! This is a bit of a code repetition, the
     ! same thing is in the Form_Pressure_Matrix
     ! Anyhow, units are given here are
     !  Units: m * m^3 s / kg = m^4 s / kg
-    a12 = fc(s) * Face_Value(s, v_m(c1), v_m(c2))
+    a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
 
     ! Volume flux without the cell-centered pressure gradient
     ! but with the staggered pressure difference
     ! Units:  m^4 s / kg * kg / (m s^2) = m^3 / s
-    v_flux_n(s) = u_f * grid_sx(s)  &
-                + v_f * grid_sy(s)  &
-                + w_f * grid_sz(s)  &
-                + a12 * (flow_p_n(c1) - flow_p_n(c2))
+    flow_v_flux_n(s) = u_f * grid_sx(s)  &
+                     + v_f * grid_sy(s)  &
+                     + w_f * grid_sz(s)  &
+                     + a12 * (flow_p_n(c1) - flow_p_n(c2))
 
   end do
   !$acc end parallel
@@ -203,7 +208,8 @@
 
   !$acc parallel loop                                            &
   !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         grid_region_f_cell, grid_region_l_cell)
+  !$acc         grid_region_f_cell, grid_region_l_cell,          &
+  !$acc         flow_v_flux_n)
   do c1 = Cells_In_Domain_Gpu()
 
     b_tmp = b(c1)
@@ -212,7 +218,7 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - v_flux_n(s) * merge(1,-1, c1.lt.c2)
+        b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
     !$acc end loop
@@ -232,11 +238,12 @@
        Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop  &
-      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face)
+      !$acc parallel loop                                                  &
+      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
+      !$acc         flow_v_flux_n)
       do s = Faces_In_Region_Gpu(reg)
         c1 = grid_faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - v_flux_n(s)
+        b(c1) = b(c1) - flow_v_flux_n(s)
       end do
       !$acc end parallel
 

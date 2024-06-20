@@ -16,8 +16,7 @@
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), v_flux_n(:)
-  real, contiguous, pointer :: v_m(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
+  real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
   real                      :: a12, b_tmp, max_abs_val
   real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
@@ -33,8 +32,6 @@
   ! These aliases are really needed, not just some gimmick to shorten the code
   b        => Flow % Nat % b
   fc       => Flow % Nat % C % fc
-  v_flux_n => Flow % v_flux % n
-  v_m      => Flow % v_m
   dens     => Flow % density
   visc     => Flow % viscosity
 
@@ -55,11 +52,11 @@
 
   ! Units: kg m / s^2 * s / kg = m / s
   !$acc parallel loop independent  &
-  !$acc present(flow_u_n, flow_v_n, flow_w_n)
+  !$acc present(flow_u_n, flow_v_n, flow_w_n, flow_v_m)
   do c = Cells_In_Domain()
-    flow_u_n(c) = flow_u_n(c) - pp_x(c) * v_m(c)
-    flow_v_n(c) = flow_v_n(c) - pp_y(c) * v_m(c)
-    flow_w_n(c) = flow_w_n(c) - pp_z(c) * v_m(c)
+    flow_u_n(c) = flow_u_n(c) - pp_x(c) * flow_v_m(c)
+    flow_v_n(c) = flow_v_n(c) - pp_y(c) * flow_v_m(c)
+    flow_w_n(c) = flow_w_n(c) - pp_z(c) * flow_v_m(c)
   end do
   !$acc end parallel
 
@@ -77,14 +74,14 @@
   ! Units: m * m^3 * s / kg * kg / (m s^2) = m^3 / s
   !$acc parallel loop independent  &
   !$acc present(grid_faces_c,      &
-  !$acc         flow_pp_n)
+  !$acc         flow_pp_n, flow_v_m, flow_v_flux_n)
   do s = Faces_In_Domain_And_At_Buffers()
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
-    a12 = -fc(s) * Face_Value(s, v_m(c1), v_m(c2))
+    a12 = -fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
 
-    v_flux_n(s) = v_flux_n(s) + (flow_pp_n(c2) - flow_pp_n(c1)) * a12
+    flow_v_flux_n(s) = flow_v_flux_n(s) + (flow_pp_n(c2) - flow_pp_n(c1)) * a12
   end do
   !$acc end parallel
 
@@ -103,9 +100,11 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f)
-  do c1 = Cells_In_Domain()
+  !$acc parallel loop independent                                &
+  !$acc present(grid_cells_c, grid_cells_f,                      &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         flow_v_flux_n)
+  do c1 = Cells_In_Domain_Gpu()
 
     b_tmp = b(c1)
     !$acc loop seq
@@ -113,7 +112,7 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - v_flux_n(s) * merge(1,-1, c1.lt.c2)
+        b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
     !$acc end loop
@@ -133,11 +132,13 @@
        Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop  &
-      !$acc present(grid_region_f_face,  grid_region_l_face,  grid_faces_c)
+      !$acc parallel loop                                     &
+      !$acc present(grid_region_f_face,  grid_region_l_face,  &
+      !$acc         grid_faces_c,                             &
+      !$acc         flow_v_flux_n)
       do s = Faces_In_Region_Gpu(reg)
         c1 = grid_faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - v_flux_n(s)
+        b(c1) = b(c1) - flow_v_flux_n(s)
       end do
       !$acc end parallel
 
@@ -171,15 +172,17 @@
   pe_max  = 0.0
 
   !$acc parallel loop independent reduction(max:cfl_max, pe_max)  &
-  !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
+  !$acc present(grid_region_f_face, grid_region_l_face,           &
+  !$acc         grid_faces_c,                                     &
+  !$acc         flow_v_flux_n)
   do s = Faces_In_Domain_And_At_Buffers_Gpu()
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
     nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
 
-    cfl_t   = abs(v_flux_n(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
-    pe_t    = abs(v_flux_n(s)) / fc(s) / nu_f
+    cfl_t   = abs(flow_v_flux_n(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
+    pe_t    = abs(flow_v_flux_n(s)) / fc(s) / nu_f
     cfl_max = max( cfl_max, cfl_t )
     pe_max  = max( pe_max,  pe_t  )
 
