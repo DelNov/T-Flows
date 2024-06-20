@@ -60,9 +60,9 @@
   p_x => Flow % phi_x
   p_y => Flow % phi_y
   p_z => Flow % phi_z
-  u_n => Flow % u % n
-  v_n => Flow % v % n
-  w_n => Flow % w % n
+  u_n => flow_u_n
+  v_n => flow_v_n
+  w_n => flow_w_n
 
   ! Nullify the volume source
   !$acc kernels
@@ -80,9 +80,10 @@
   !----------------------------------------------------!
   do reg = Boundary_Regions()
 
-    !$acc parallel loop
-    do s = Faces_In_Region(reg)
-      c2 = Grid % faces_c(2,s)  ! boundary cell
+    !$acc parallel loop  &
+    !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face)
+    do s = Faces_In_Region_Gpu(reg)
+      c2 = grid_faces_c(2,s)  ! boundary cell
       v_flux_n(s) = u_n(c2) * Grid % sx(s)  &
                   + v_n(c2) * Grid % sy(s)  &
                   + w_n(c2) * Grid % sz(s)
@@ -103,8 +104,9 @@
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop reduction(+:area_in,vol_in)
-      do s = Faces_In_Region(reg)
+      !$acc parallel loop reduction(+:area_in,vol_in)  &
+      !$acc present(grid_region_f_face, grid_region_l_face)
+      do s = Faces_In_Region_Gpu(reg)
         area_in = area_in + Grid % s(s)
         vol_in  = vol_in  - v_flux_n(s)
       end do
@@ -115,8 +117,9 @@
     if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop reduction(+:area_out,vol_out)
-      do s = Faces_In_Region(reg)
+      !$acc parallel loop reduction(+:area_out,vol_out)  &
+      !$acc present(grid_region_f_face, grid_region_l_face)
+      do s = Faces_In_Region_Gpu(reg)
         area_out = area_out + Grid % s(s)
         vol_out  = vol_out  + v_flux_n(s)
       end do
@@ -138,8 +141,9 @@
       if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
          Grid % region % type(reg) .eq. CONVECT) then
 
-        !$acc parallel loop
-        do s = Faces_In_Region(reg)
+        !$acc parallel loop  &
+        !$acc present(grid_region_f_face, grid_region_l_face)
+        do s = Faces_In_Region_Gpu(reg)
           v_flux_n(s) = v_flux_n(s) * ratio
         end do
         !$acc end parallel
@@ -154,11 +158,15 @@
   !   This is application of Rhie & Chow technique   !
   !--------------------------------------------------!
 
-  !$acc parallel loop
-  do s = Faces_In_Domain_And_At_Buffers()
+  !$acc parallel loop                                     &
+  !$acc present(grid_faces_c,                             &
+  !$acc         grid_region_f_face, grid_region_l_face,   &
+  !$acc         grid_sx, grid_sy, grid_sz,                &
+  !$acc         u_n, v_n, w_n, p_x, p_y, p_z, v_m, flow_p_n)
+  do s = Faces_In_Domain_And_At_Buffers_Gpu()
 
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+    c1 = grid_faces_c(1,s)
+    c2 = grid_faces_c(2,s)
 
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
@@ -175,10 +183,10 @@
     ! Volume flux without the cell-centered pressure gradient
     ! but with the staggered pressure difference
     ! Units:  m^4 s / kg * kg / (m s^2) = m^3 / s
-    v_flux_n(s) = u_f * Grid % sx(s)  &
-                + v_f * Grid % sy(s)  &
-                + w_f * Grid % sz(s)  &
-                + a12 * (Flow % p % n(c1) - Flow % p % n(c2))
+    v_flux_n(s) = u_f * grid_sx(s)  &
+                + v_f * grid_sy(s)  &
+                + w_f * grid_sz(s)  &
+                + a12 * (flow_p_n(c1) - flow_p_n(c2))
 
   end do
   !$acc end parallel
@@ -193,14 +201,16 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  !$acc parallel loop
-  do c1 = Cells_In_Domain()
+  !$acc parallel loop                                            &
+  !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         grid_region_f_cell, grid_region_l_cell)
+  do c1 = Cells_In_Domain_Gpu()
 
     b_tmp = b(c1)
     !$acc loop seq
-    do i_cel = 1, Grid % cells_n_cells(c1)
-      c2 = Grid % cells_c(i_cel, c1)
-      s  = Grid % cells_f(i_cel, c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
+      c2 = grid_cells_c(i_cel, c1)
+      s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
         b_tmp = b_tmp - v_flux_n(s) * merge(1,-1, c1.lt.c2)
       end if
@@ -222,9 +232,10 @@
        Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)  ! inside cell
+      !$acc parallel loop  &
+      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face)
+      do s = Faces_In_Region_Gpu(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
         b(c1) = b(c1) - v_flux_n(s)
       end do
       !$acc end parallel
@@ -236,8 +247,9 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop reduction(max:max_abs_val)
-  do c = Cells_In_Domain()
+  !$acc parallel loop reduction(max:max_abs_val)  &
+  !$acc present(grid_region_f_cell, grid_region_l_cell)
+  do c = Cells_In_Domain_Gpu()
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
 

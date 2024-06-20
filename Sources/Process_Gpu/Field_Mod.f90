@@ -9,6 +9,7 @@
   use Assert_Mod
   use Face_Mod
   use Bulk_Mod
+  use Gpu_Pointers_Mod
   use Sparse_Mod
   use Native_Mod
   use Var_mod

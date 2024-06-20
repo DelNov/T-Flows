@@ -28,12 +28,14 @@
 
   vol = 0.0
 
-  !$acc parallel loop
+  !$acc parallel loop reduction(+:bulk_u, bulk_v, bulk_w, vol)  &
+  !$acc present(grid_vol,                                       &
+  !$acc         flow_u_n, flow_v_n, flow_w_n)
   do c = Cells_In_Domain()
-    bulk_u = bulk_u + Flow % u % n(c) * Grid % vol(c)
-    bulk_v = bulk_v + Flow % v % n(c) * Grid % vol(c)
-    bulk_w = bulk_w + Flow % w % n(c) * Grid % vol(c)
-    vol = vol + Grid % vol(c)
+    bulk_u = bulk_u + flow_u_n(c) * grid_vol(c)
+    bulk_v = bulk_v + flow_v_n(c) * grid_vol(c)
+    bulk_w = bulk_w + flow_w_n(c) * grid_vol(c)
+    vol = vol + grid_vol(c)
   end do
   !$acc end parallel
 

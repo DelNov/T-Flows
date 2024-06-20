@@ -77,10 +77,11 @@
     if(Grid % region % type(reg) .eq. INFLOW  .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)  ! inside cell
-        c2 = Grid % faces_c(1,s)  ! boundary cell
+      !$acc parallel loop  &
+      !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
+      do s = Faces_In_Region_Gpu(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
+        c2 = grid_faces_c(1,s)  ! boundary cell
 
         ! Just plain upwind here
         b(c1) = b(c1) - coef_a(c1) * coef_b(c1) * phi_n(c2) * v_flux_n(s)
@@ -92,9 +93,10 @@
     ! Outflow is just a vanishing derivative, use the value from the inside
     if(Grid % region % type(reg) .eq. OUTFLOW) then
 
-      !$acc parallel loop
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)  ! inside cell
+      !$acc parallel loop  &
+      !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
+      do s = Faces_In_Region_Gpu(reg)
+        c1 = grid_faces_c(1,s)  ! inside cell
 
         ! Just plain upwind here
         b(c1) = b(c1) - coef_a(c1) * coef_b(c1) * phi_n(c1) * v_flux_n(s)

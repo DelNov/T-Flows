@@ -20,7 +20,7 @@
   Unused(Lin)
 !==============================================================================!
 
-  !$acc kernels
+  !$acc kernels present(a, b)
   do i = 1, n
     a(i) = b(i)
   end do

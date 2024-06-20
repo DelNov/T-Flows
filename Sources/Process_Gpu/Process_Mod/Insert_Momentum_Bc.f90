@@ -37,10 +37,11 @@
     if(Grid % region % type(reg) .eq. WALL .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop independent
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      !$acc parallel loop independent  &
+      !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c)
+      do s = Faces_In_Region_Gpu(reg)
+        c1 = grid_faces_c(1,s)
+        c2 = grid_faces_c(2,s)
         m12 = visc(c1) * fc(s)
         b(c1) = b(c1) + m12 * ui_n(c2)
       end do

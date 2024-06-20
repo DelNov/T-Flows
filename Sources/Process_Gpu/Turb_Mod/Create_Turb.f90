@@ -37,7 +37,6 @@
     ! Shear and vorticity are defined in the Field_Mod
     allocate(Flow % shear(-nb:nc));  Flow % shear = 0.0
     allocate(Flow % vort (-nb:nc));  Flow % vort  = 0.0
-
   end if
 
   end subroutine

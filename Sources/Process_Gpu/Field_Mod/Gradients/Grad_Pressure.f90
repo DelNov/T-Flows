@@ -44,12 +44,15 @@
     !   Extrapolate values to boundaries   !
     !--------------------------------------!
 
-    !$acc parallel loop independent
+    !$acc parallel loop independent           &
+    !$acc present(grid_cells_c,               &
+    !$acc         grid_xc, grid_yc, grid_zc,  &
+    !$acc         phi_x,   phi_y,   phi_z)
     do c2 = Cells_At_Boundaries()
-      c1 = Grid % cells_c(1,c2)
-      dx = Grid % xc(c2) - Grid % xc(c1)
-      dy = Grid % yc(c2) - Grid % yc(c1)
-      dz = Grid % zc(c2) - Grid % zc(c1)
+      c1 = grid_cells_c(1,c2)
+      dx = grid_xc(c2) - grid_xc(c1)
+      dy = grid_yc(c2) - grid_yc(c1)
+      dz = grid_zc(c2) - grid_zc(c1)
       phi % n(c2) = phi % n(c1) + phi_x(c1) * dx  &
                                 + phi_y(c1) * dy  &
                                 + phi_z(c1) * dz

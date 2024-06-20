@@ -25,10 +25,11 @@
   ! "val" is coppied to GPU.  So far it was only density which was sent
   ! here, so things should work.  But it is probably good to stay alert.
 
-  !$acc parallel loop reduction(+:sum_val,tot_vol)
+  !$acc parallel loop reduction(+:sum_val,tot_vol)  &
+  !$acc present(grid_vol)
   do c = Cells_In_Domain()
-    sum_val = sum_val + val(c) * Grid % vol(c)
-    tot_vol = tot_vol + Grid % vol(c)
+    sum_val = sum_val + val(c) * grid_vol(c)
+    tot_vol = tot_vol + grid_vol(c)
   end do
   !$acc end parallel
 

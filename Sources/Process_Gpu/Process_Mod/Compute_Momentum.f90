@@ -22,6 +22,8 @@
 
   call Profiler % Start('Compute_Momentum')
 
+  call Work % Connect_Real_Cell(ones)
+
   Assert(comp .ge. 1)
   Assert(comp .le. 3)
 
@@ -37,7 +39,6 @@
     val  => Flow % Nat % A(MATRIX_UVW) % val
   end if
 
-  ones => Flow % temp
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
   nb   =  Grid % n_bnd_cells
@@ -161,6 +162,8 @@
   if(comp.eq.1) call Info % Iter_Fill_At(1, 1, 'U', fin_res, n)
   if(comp.eq.2) call Info % Iter_Fill_At(1, 2, 'V', fin_res, n)
   if(comp.eq.3) call Info % Iter_Fill_At(1, 3, 'W', fin_res, n)
+
+  call Work % Disconnect_Real_Cell(ones)
 
   call Profiler % Stop('Compute_Momentum')
 

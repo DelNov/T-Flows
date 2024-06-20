@@ -46,16 +46,20 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
-      !$acc parallel loop independent
-      do c = Cells_In_Domain_And_Buffers()
-        Flow % t % oo(c) = Flow % t % o(c)
+      !$acc parallel loop independent  &
+      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+      !$acc         flow_t_n, flow_t_o)
+      do c = Cells_In_Domain_And_Buffers_Gpu()
+        flow_t_oo(c) = flow_t_o(c)
       end do
       !$acc end parallel
     end if
 
-    !$acc parallel loop independent
-    do c = Cells_In_Domain_And_Buffers()
-      Flow % t % o(c) = Flow % t % n(c)
+    !$acc parallel loop independent                        &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+    !$acc         flow_t_n, flow_t_o)
+    do c = Cells_In_Domain_And_Buffers_Gpu()
+      flow_t_o(c) = flow_t_n(c)
     end do
     !$acc end parallel
   end if
@@ -87,9 +91,11 @@
   !   (Part 1 is in Form_System_Matrix)   !
   !---------------------------------------!
 
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
-    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * Flow % t % n(c)
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         flow_t_n)
+  do c = Cells_In_Domain_Gpu()
+    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * flow_t_n(c)
   end do
   !$acc end parallel
 
@@ -97,13 +103,13 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Mcon, Mval, Flow % t % n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Mcon, Mval, flow_t_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Energy')
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("t_0",           &
                                scalar_name="t", &
-                               scalar_cell=Flow % t % n)
+                               scalar_cell=flow_t_n)
 # endif
 
   call Info % Iter_Fill_At(1, 6, 'T', fin_res, n)

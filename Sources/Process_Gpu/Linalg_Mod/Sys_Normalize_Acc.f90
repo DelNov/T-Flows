@@ -26,7 +26,7 @@
 
   sum_a = 0.0
 
-  !$acc parallel loop reduction(+:sum_a)
+  !$acc parallel loop present(a_val, a_dia) reduction(+:sum_a)
   do i = 1, n
     sum_a = sum_a + a_val(a_dia(i))
   end do
@@ -49,13 +49,13 @@
   !   Scale the matrix and the right hand side vector   !
   !-----------------------------------------------------!
 
-  !$acc parallel loop independent
+  !$acc parallel loop independent present(a_val)
   do i = 1, nz
     a_val(i) = a_val(i) * fn
   end do
   !$acc end parallel
 
-  !$acc parallel loop independent
+  !$acc parallel loop independent present(b, d_inv)
   do i = 1, n
     b(i)     = b(i)     * fn
     d_inv(i) = d_inv(i) * fn_inv

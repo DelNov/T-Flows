@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Calculate_Shear_And_Vorticity(Flow, Grid)
 !------------------------------------------------------------------------------!
-!   Computes the magnitude of the shear stress.                                !
+!   Computes the magnitude of the flow_shear stress.                                !
 !------------------------------------------------------------------------------!
 !   Shear of the velocity vield is a tensor define as:                         !
 !                                                                              !
@@ -9,7 +9,7 @@
 !                                                                              !
 !   Shear's magnitude is computed as:                                          !
 !                                                                              !
-!   shear = sqrt( 2 * s_ij * s_ij )                                            !
+!   flow_shear = sqrt( 2 * s_ij * s_ij )                                            !
 !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - !
 !   Rotation of a velocity field is defined as:                                !
 !                                                                              !
@@ -20,13 +20,13 @@
 !   Vorticity is twice the rotation vector, hence                              !
 !                                                                              !
 !                                                                              !
-!   vort = ∇ x u = (dw/dy-dv/dz) i + (du/dz-dw/dx) j + (dv/dx-du/dy) k         !
+!   flow_vort = ∇ x u = (dw/dy-dv/dz) i + (du/dz-dw/dx) j + (dv/dx-du/dy) k         !
 !                                                                              !
 !                = v_x i + v_y j + v_z k                                       !
 !                                                                              !
-!   Vorticity magnitude would be the magnitude of vorticity vector             !
+!   Vorticity magnitude would be the magnitude of flow_vorticity vector             !
 !                                                                              !
-!   |vort| = sqrt(v_x^2 + v_y^2 + v_z^2)                                       !
+!   |flow_vort| = sqrt(v_x^2 + v_y^2 + v_z^2)                                       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -36,16 +36,11 @@
   real, contiguous, pointer :: u_x(:), u_y(:), u_z(:),  &
                                v_x(:), v_y(:), v_z(:),  &
                                w_x(:), w_y(:), w_z(:)
-  real, contiguous, pointer :: shear(:), vort(:)
   integer                   :: c, run
 !==============================================================================!
 
-  ! Take aliases
-  shear => Flow % shear
-  vort  => Flow % vort
-
   !---------------------------------!
-  !   Compute shear in three runs   !
+  !   Compute flow_shear in three runs   !
   !---------------------------------!
   do run = 1, 3
 
@@ -56,14 +51,15 @@
       u_x => Flow % phi_x
       w_y => Flow % phi_y
       v_z => Flow % phi_z
-      call Flow % Grad_Component(Grid, Flow % u % n, 1, u_x)
-      call Flow % Grad_Component(Grid, Flow % w % n, 2, w_y)
-      call Flow % Grad_Component(Grid, Flow % v % n, 3, v_z)
+      call Flow % Grad_Component(Grid, flow_u_n, 1, u_x)
+      call Flow % Grad_Component(Grid, flow_w_n, 2, w_y)
+      call Flow % Grad_Component(Grid, flow_v_n, 3, v_z)
 
-      !$acc parallel loop independent
+      !$acc parallel loop independent  &
+      !$acc present(flow_shear, flow_vort, u_x, w_y, v_z)
       do c = Cells_In_Domain()
-        shear(c) = u_x(c)**2 + 0.5 * (v_z(c) + w_y(c))**2
-        vort (c) =           - 0.5 * (v_z(c) - w_y(c))**2
+        flow_shear(c) = u_x(c)**2 + 0.5 * (v_z(c) + w_y(c))**2
+        flow_vort (c) =           - 0.5 * (v_z(c) - w_y(c))**2
       end do
       !$acc end parallel
 
@@ -74,14 +70,15 @@
       w_x => Flow % phi_x
       v_y => Flow % phi_y
       u_z => Flow % phi_z
-      call Flow % Grad_Component(Grid, Flow % w % n, 1, w_x)
-      call Flow % Grad_Component(Grid, Flow % v % n, 2, v_y)
-      call Flow % Grad_Component(Grid, Flow % u % n, 3, u_z)
+      call Flow % Grad_Component(Grid, flow_w_n, 1, w_x)
+      call Flow % Grad_Component(Grid, flow_v_n, 2, v_y)
+      call Flow % Grad_Component(Grid, flow_u_n, 3, u_z)
 
-      !$acc parallel loop independent
+      !$acc parallel loop independent  &
+      !$acc present(flow_shear, flow_vort, w_x, v_y, u_z)
       do c = Cells_In_Domain()
-        shear(c) = shear(c) + v_y(c)**2 + 0.5 * (u_z(c) + w_x(c))**2
-        vort (c) = vort (c)             - 0.5 * (u_z(c) - w_x(c))**2
+        flow_shear(c) = flow_shear(c) + v_y(c)**2 + 0.5 * (u_z(c) + w_x(c))**2
+        flow_vort (c) = flow_vort (c)             - 0.5 * (u_z(c) - w_x(c))**2
       end do
       !$acc end parallel
 
@@ -92,14 +89,15 @@
       v_x => Flow % phi_x
       u_y => Flow % phi_y
       w_z => Flow % phi_z
-      call Flow % Grad_Component(Grid, Flow % v % n, 1, v_x)
-      call Flow % Grad_Component(Grid, Flow % u % n, 2, u_y)
-      call Flow % Grad_Component(Grid, Flow % w % n, 3, w_z)
+      call Flow % Grad_Component(Grid, flow_v_n, 1, v_x)
+      call Flow % Grad_Component(Grid, flow_u_n, 2, u_y)
+      call Flow % Grad_Component(Grid, flow_w_n, 3, w_z)
 
-      !$acc parallel loop independent
+      !$acc parallel loop independent  &
+      !$acc present(flow_shear, flow_vort, v_x, u_y, w_z)
       do c = Cells_In_Domain()
-        shear(c) = shear(c) + w_z(c)**2 + 0.5 * (v_x(c) + u_y(c))**2
-        vort (c) = vort (c)             - 0.5 * (v_x(c) - u_y(c))**2
+        flow_shear(c) = flow_shear(c) + w_z(c)**2 + 0.5 * (v_x(c) + u_y(c))**2
+        flow_vort (c) = flow_vort (c)             - 0.5 * (v_x(c) - u_y(c))**2
       end do
       !$acc end parallel
 

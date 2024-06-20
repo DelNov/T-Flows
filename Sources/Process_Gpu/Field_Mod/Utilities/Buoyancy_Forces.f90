@@ -23,22 +23,22 @@
   temp => Flow % temp
 
   if(comp .eq. 1) then
-    dxi    => Grid % dx;
-    xic    => Grid % xc;
+    dxi    => grid_dx;
+    xic    => grid_xc;
     xif    => Grid % xf;
-    si     => Grid % sx;
+    si     => grid_sx;
     grav_i =  Flow % grav_x
   else if(comp .eq. 2) then
-    dxi    => Grid % dy;
-    xic    => Grid % yc;
+    dxi    => grid_dy;
+    xic    => grid_yc;
     xif    => Grid % yf;
-    si     => Grid % sy;
+    si     => grid_sy;
     grav_i =  Flow % grav_y
   else if(comp .eq. 3) then
-    dxi    => Grid % dz;
-    xic    => Grid % zc;
+    dxi    => grid_dz;
+    xic    => grid_zc;
     xif    => Grid % zf;
-    si     => Grid % sz;
+    si     => grid_sz;
     grav_i =  Flow % grav_z
   end if
 
@@ -56,18 +56,21 @@
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
 
-  !$acc parallel loop
+  !$acc parallel loop                                            &
+  !$acc present(grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
+  !$acc         si, dxi,                                         &
+  !$acc         flow_t_n)
   do c1 = Cells_In_Domain()
     b_tmp = 0.0
 
     !$acc loop seq
-    do i_cel = 1, Grid % cells_n_cells(c1)
-      c2 = Grid % cells_c(i_cel, c1)
-      s  = Grid % cells_f(i_cel, c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
+      c2 = grid_cells_c(i_cel, c1)
+      s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
 
         ! Temperature and density at the face
-        temp_f = Face_Value(s, Flow % t % n(c1),   Flow % t % n(c2))
+        temp_f = Face_Value(s, flow_t_n(c1), flow_t_n(c2))
         dens_f = Face_Value(s, Flow % density(c1), Flow % density(c2))
 
         ! Units here: [kg/m^3 K]
@@ -91,14 +94,16 @@
 
   do reg = Boundary_Regions()
 
-    !$acc parallel loop
-    do s = Faces_In_Region(reg)
-      c1 = Grid % faces_c(1,s)  ! inside cell
-      c2 = Grid % faces_c(1,s)  ! boundary cell
+    !$acc parallel loop  &
+    !$acc present(grid_region_f_face, grid_region_l_face, grid_faces_c,  &
+    !$acc         si, dxi, flow_t_n)
+    do s = Faces_In_Region_Gpu(reg)
+      c1 = grid_faces_c(1,s)  ! inside cell
+      c2 = grid_faces_c(1,s)  ! boundary cell
 
       ! Temperature at the face is identical to
       ! the temperature at the boundary cell
-      temp_f = Flow % t % n(c2)
+      temp_f = flow_t_n(c2)
       dens_f = Flow % density(c1)  ! or in c2?
 
       ! Units here: [kg/m^3 K]

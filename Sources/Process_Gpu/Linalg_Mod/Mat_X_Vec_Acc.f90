@@ -56,7 +56,7 @@
   Unused(Lin)
 !==============================================================================!
 
-  !$acc kernels
+  !$acc kernels present(a_row, a_col, a_val, b, c)
   do i = 1, n
     temp = 0.0
     do ij = a_row(i), a_row(i+1) - 1

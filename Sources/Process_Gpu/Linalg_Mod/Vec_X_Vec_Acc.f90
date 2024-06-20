@@ -17,7 +17,7 @@
   Unused(Lin)
 !==============================================================================!
 
-  !$acc kernels
+  !$acc kernels present(a, b, c)
   do i = 1, n
     c(i) = a(i) * b(i)
   end do

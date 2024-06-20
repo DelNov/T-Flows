@@ -65,13 +65,15 @@
   !   This is cell based and will not create race conditions on GPUs   !
   !--------------------------------------------------------------------!
 
-  !$acc parallel loop independent
-  do c1 = Cells_In_Domain()  ! going through buffers should not be needed
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f)
+  do c1 = Cells_In_Domain_Gpu()  ! going through buffers should not be needed
 
     !$acc loop seq
-    do i_cel = 1, Grid % cells_n_cells(c1)
-      c2 = Grid % cells_c(i_cel, c1)
-      s  = Grid % cells_f(i_cel, c1)
+    do i_cel = 1, grid_cells_n_cells(c1)
+      c2 = grid_cells_c(i_cel, c1)
+      s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
         a12 = fc(s) * Face_Value(s, v_m(c1), v_m(c2))
         if(c1 .lt. c2) then
@@ -87,8 +89,9 @@
   !$acc end parallel
 
   ! De-singularize the system matrix ... just like this, ad-hoc
-  !$acc parallel loop independent
-  do c = Cells_In_Domain()
+  !$acc parallel loop independent  &
+  !$acc present(grid_region_f_cell, grid_region_l_cell)
+  do c = Cells_In_Domain_Gpu()
     val(dia(c)) = val(dia(c)) * (1.0 + MICRO)
   end do
   !$acc end parallel

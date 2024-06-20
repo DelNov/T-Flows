@@ -17,6 +17,7 @@
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
   real, allocatable              :: b(:), c(:)
+  real,      contiguous, pointer :: temp(:)
   type(Grid_Type)                :: Grid
   type(Field_Type),       target :: Flow            ! flow field
   integer,             parameter :: N_STEPS = 1200  ! spend some time on device
@@ -27,6 +28,8 @@
   ! Start the parallel run and the profiler
   call Global % Start_Parallel
   call Profiler % Start('Test_001')
+
+  call Work % Connect_Real_Cell(temp)
 
   O_Print '(a)', ' #===================================================='
   O_Print '(a)', ' # TEST 1: Performing a sparse-matrix vector product'
@@ -56,10 +59,10 @@
   call Read_Control % Physical_Properties(Flow, Grid)
 
   ! Discretize the matrix for diffusion
-  Flow % temp(:) = 1.0
-  call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,       &
-                                    Flow % density, Flow % temp,  &
-                                    Flow % viscosity,             &
+  temp(:) = 1.0
+  call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,  &
+                                    Flow % density, temp,    &
+                                    Flow % viscosity,        &
                                     1.0)
 
   ! Take the alias now
@@ -114,6 +117,8 @@
   call Grid % Save_Debug_Vtu("result",              &
                              inside_name="Result",  &
                              inside_cell=c)
+
+  call Work % Disconnect_Real_Cell(temp)
 
   ! End the profiler and the parallel run
   call Profiler % Stop('Test_001')

@@ -452,8 +452,12 @@ if b:fortran_dialect == "f08"
 " Macros might need a special group of their own.
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain_And_At_Buffers
-  syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers  Cell_In_This_Proc
+  syn keyword fortranMacroTflows   All_Regions  Faces_In_Region_Gpu  Faces_In_Domain_And_At_Buffers_Gpu
+  syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
   syn keyword fortranMacroTflows   Cells_At_Boundaries  Cells_At_Boundaries_In_Domain_And_Buffers
+  syn keyword fortranMacroTflows   Cells_In_Region_Gpu  Cells_In_Domain_Gpu  Cells_In_Domain_And_Buffers_Gpu  Cells_In_Buffers_Gpu
+  syn keyword fortranMacroTflows   Cells_At_Boundaries_Gpu  Cells_At_Boundaries_In_Domain_And_Buffers_Gpu
+  syn keyword fortranMacroTflows   Cell_In_This_Proc
   syn keyword fortranMacroTflows   Assert  Unused  O_Print  A_Print  Face_Value
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real  Key_Ind
@@ -471,6 +475,25 @@ if b:fortran_dialect == "f08"
   syn keyword fortranMpiTflows     MPI_INTEGER  MPI_LOGICAL  MPI_DOUBLE_PRECISION  MPI_REAL
   syn keyword fortranMpiTflows     MPI_LOR  MPI_SUM  MPI_MAX  MPI_MIN  MPI_MODE_WRONLY  MPI_MODE_CREATE
 "--------------------------------------------------------------[MPI in T-Flows]-
+
+"================================================[Links for OpenACC in T-Flows]=
+  syn keyword fortranGPUTflows     grid_faces_c
+  syn keyword fortranGPUTflows     grid_cells_n_cells
+  syn keyword fortranGPUTflows     grid_cells_c
+  syn keyword fortranGPUTflows     grid_cells_f
+  syn keyword fortranGPUTflows     grid_region_f_cell  grid_region_l_cell
+  syn keyword fortranGPUTflows     grid_region_f_face  grid_region_l_face
+  syn keyword fortranGPUTflows     grid_dx  grid_dy  grid_dz
+  syn keyword fortranGPUTflows     grid_sx  grid_sy  grid_sz
+  syn keyword fortranGPUTflows     grid_xc  grid_yc  grid_zc
+  syn keyword fortranGPUTflows     grid_d  grid_s  grid_vol
+  syn keyword fortranGPUTflows     flow_u_n  flow_u_o  flow_u_oo
+  syn keyword fortranGPUTflows     flow_v_n  flow_v_o  flow_v_oo
+  syn keyword fortranGPUTflows     flow_w_n  flow_w_o  flow_w_oo
+  syn keyword fortranGPUTflows     flow_t_n  flow_t_o  flow_t_oo
+  syn keyword fortranGPUTflows     flow_p_n  flow_pp_n
+  syn keyword fortranGPUTflows     flow_shear  flow_vort
+  syn keyword fortranGPUTflows     flow_grad_c2c
 
 " CUDA fortran
   syn keyword fortranTypeCUDA      host global device value
@@ -624,6 +647,7 @@ hi def link fortranConstantTflows  fortranConstant
 hi def link fortranTypeTflows      fortranType
 hi def link fortranObjectTflows    fortranIntrinsic
 hi def link fortranMpiTflows       fortranIntrinsic
+hi def link fortranGPUTflows       fortranIntrinsic
 hi def link fortranPetscTflows     fortranIntrinsic
 hi def link fortranMacroTflows     fortranIntrinsic
 hi def link fortranGlobalTflows    Todo

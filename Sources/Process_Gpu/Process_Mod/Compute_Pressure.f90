@@ -50,7 +50,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, flow_pp_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Pressure')
 
   call Info % Iter_Fill_At(1, 4, 'PP', fin_res, n)
@@ -59,9 +59,10 @@
   !   Update the pressure field   !
   !-------------------------------!
 
-  !$acc parallel loop independent
+  !$acc parallel loop independent  &
+  !$acc present(flow_p_n, flow_pp_n)
   do c = Cells_In_Domain()
-    Flow % p % n(c) = Flow % p % n(c) + urf * Flow % pp % n(c)
+    flow_p_n(c) = flow_p_n(c) + urf * flow_pp_n(c)
   end do
   !$acc end parallel
 
@@ -71,18 +72,20 @@
   p_max = -HUGE
   p_min = +HUGE
 
-  !$acc parallel loop reduction(max:p_max) reduction(min:p_min)
+  !$acc parallel loop reduction(max:p_max) reduction(min:p_min)  &
+  !$acc present(flow_p_n)
   do c = Cells_In_Domain()
-    p_max = max(p_max, Flow % p % n(c))
-    p_min = min(p_min, Flow % p % n(c))
+    p_max = max(p_max, flow_p_n(c))
+    p_min = min(p_min, flow_p_n(c))
   end do
 
   call Global % Max_Real(p_max)
   call Global % Min_Real(p_min)
 
-  !$acc parallel loop independent
+  !$acc parallel loop independent  &
+  !$acc present(flow_p_n)
   do c = Cells_In_Domain()
-    Flow % p % n(c) = Flow % p % n(c) - 0.5 * (p_max + p_min)
+    flow_p_n(c) = flow_p_n(c) - 0.5 * (p_max + p_min)
   end do
   !$acc end parallel
 

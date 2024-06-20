@@ -18,7 +18,7 @@
   Unused(Lin)
 !==============================================================================!
 
-  !$acc kernels
+  !$acc kernels present(b, a_val, a_dia)
   do i = 1, n
     b(i) = s / a_val(a_dia(i))
   end do

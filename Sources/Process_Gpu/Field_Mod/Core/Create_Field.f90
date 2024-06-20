@@ -3,8 +3,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Field_Type) :: Flow  !! parent flow object
-  type(Grid_Type)   :: Grid  !! grid on which the flow is defined
+  class(Field_Type), target :: Flow  !! parent flow object
+  type(Grid_Type),   target :: Grid  !! grid on which the flow is defined
 !-----------------------------------[Locals]-----------------------------------!
   integer :: nb, nc, ns
 !==============================================================================!
@@ -36,9 +36,9 @@
   !   Memory for gradient matrices   !
   !----------------------------------!
   allocate(Flow % grad_c2c(6, nc));  Flow % grad_c2c(:,:) = 0.0
-  allocate(Flow % phi_x(-nb:nc));  Flow % phi_x(:) = 0.0
-  allocate(Flow % phi_y(-nb:nc));  Flow % phi_y(:) = 0.0
-  allocate(Flow % phi_z(-nb:nc));  Flow % phi_z(:) = 0.0
+  allocate(Flow % phi_x(-nb:nc));    Flow % phi_x(:) = 0.0
+  allocate(Flow % phi_y(-nb:nc));    Flow % phi_y(:) = 0.0
+  allocate(Flow % phi_z(-nb:nc));    Flow % phi_z(:) = 0.0
 
   !----------------------------!
   !   Navier-Stokes equation   !

@@ -29,13 +29,13 @@
   !   Scale the matrix and the right hand side vector   !
   !-----------------------------------------------------!
 
-  !$acc parallel loop independent
+  !$acc parallel loop independent present(a_val)
   do i = 1, nz
     a_val(i) = a_val(i) * fn_inv
   end do
   !$acc end parallel
 
-  !$acc parallel loop independent
+  !$acc parallel loop independent present(b, d_inv)
   do i = 1, n
     b(i)     = b(i)     * fn_inv
     d_inv(i) = d_inv(i) * fn
