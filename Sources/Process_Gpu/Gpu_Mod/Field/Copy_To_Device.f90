@@ -26,7 +26,6 @@
 # endif
 
   ! Copy all the field variables
-  call Gpu % Vector_Real_Copy_To_Device(Flow % temp)
   call Gpu % Vector_Real_Copy_To_Device(Flow % pp % n)
   call Gpu % Vector_Real_Copy_To_Device(Flow % p % n)
   flow_pp_n => Flow % pp % n

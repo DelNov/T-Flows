@@ -19,8 +19,7 @@
 !==============================================================================!
 
   ! Take some aliases
-  b    => Flow % Nat % b
-  temp => Flow % temp
+  b => Flow % Nat % b
 
   if(comp .eq. 1) then
     grid_dxi => grid_dx;
@@ -38,6 +37,8 @@
 
   ! I there is no gravity in the direction comp, get out of here
   if(abs(grav_i) < TINY) return
+
+  call Work % Connect_Real_Cell(temp)
 
   !$acc parallel loop independent                        &
   !$acc present(grid_region_f_cell, grid_region_l_cell,  &
@@ -134,5 +135,7 @@
   call Grid % Save_Debug_Vtu(append,  &
                              scalar_cell=temp, scalar_name='bf')
 # endif
+
+  call Work % Disconnect_Real_Cell(temp)
 
   end subroutine

@@ -35,9 +35,6 @@
     real, allocatable :: viscosity(:)     !! [kg/m/s]
     real              :: diffusivity      !! [m^2/s]
 
-    ! Temporary array (it is relict of the time before Work was on GPUs)
-    real, allocatable :: temp(:)
-
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !
     !---------------------------------------------------!
