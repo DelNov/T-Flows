@@ -11,7 +11,7 @@
   type(Sparse_Con_Type), pointer :: Mcon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
-  real,      contiguous, pointer :: b(:)
+  real,      contiguous, pointer :: b(:), dens_capa(:)
   real                           :: tol, fin_res, urf
   integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -19,6 +19,17 @@
 !==============================================================================!
 
   call Profiler % Start('Compute_Energy')
+
+  call Work % Connect_Real_Cell(dens_capa)
+
+  ! Fill up the dens_capa array
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         dens_capa, flow_density, flow_capacity)
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  ! all present
+    dens_capa(c) = flow_density(c) * flow_capacity(c)
+  end do
+  !$acc end parallel
 
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
@@ -68,9 +79,8 @@
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
 
-  call Process % Form_System_Matrix(Mcon, Mval, Flow, Grid,       &
-                                    flow_density, flow_capacity,  &
-                                    flow_conductivity,            &
+  call Process % Form_Energy_Matrix(Mcon, Mval, Flow, Grid,        &
+                                    dens_capa, flow_conductivity,  &
                                     urf, dt = Flow % dt)
 
   !----------------------------------------------------------!
@@ -81,14 +91,12 @@
   call Process % Insert_Energy_Bc(Flow, Grid)
 
   ! Inertial and advection terms
-  call Process % Add_Inertial_Term(Flow % t, Flow, Grid,  &
-                                   flow_density, flow_capacity)
-  call Process % Add_Advection_Term(Flow % t, Flow, Grid,  &
-                                    flow_density, flow_capacity)
+  call Process % Add_Inertial_Term(Flow % t, Flow, Grid, dens_capa)
+  call Process % Add_Advection_Term(Flow % t, Flow, Grid, dens_capa)
 
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !
-  !   (Part 1 is in Form_System_Matrix)   !
+  !   (Part 1 is in Form_Energy_Matrix)   !
   !---------------------------------------!
 
   !$acc parallel loop independent                        &
@@ -113,6 +121,8 @@
 # endif
 
   call Info % Iter_Fill_At(1, 6, 'T', fin_res, n)
+
+  call Work % Disconnect_Real_Cell(dens_capa)
 
   call Profiler % Stop('Compute_Energy')
 

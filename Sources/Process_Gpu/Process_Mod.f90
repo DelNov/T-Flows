@@ -27,12 +27,12 @@
     contains
 
       ! General conservation equation
-      procedure :: Form_System_Matrix
       procedure :: Add_Advection_Term
       procedure :: Add_Inertial_Term
 
       ! Related to momentum conservation
       procedure :: Compute_Momentum
+      procedure :: Form_Momentum_Matrix
       procedure :: Insert_Momentum_Bc
       procedure :: Add_Pressure_Term
       procedure :: Correct_Velocity
@@ -46,6 +46,7 @@
 
       ! Energy / Enthalpy
       procedure :: Compute_Energy
+      procedure :: Form_Energy_Matrix
       procedure :: Insert_Energy_Bc
 
   end type
@@ -55,12 +56,12 @@
   contains
 
     ! General conservation equation
-#   include "Process_Mod/Form_System_Matrix.f90"
 #   include "Process_Mod/Add_Advection_Term.f90"
 #   include "Process_Mod/Add_Inertial_Term.f90"
 
     ! Related to momentum conservation
 #   include "Process_Mod/Compute_Momentum.f90"
+#   include "Process_Mod/Form_Momentum_Matrix.f90"
 #   include "Process_Mod/Insert_Momentum_Bc.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
 #   include "Process_Mod/Correct_Velocity.f90"
@@ -74,6 +75,7 @@
 
     ! Energy / Enthalpy
 #   include "Process_Mod/Compute_Energy.f90"
+#   include "Process_Mod/Form_Energy_Matrix.f90"
 #   include "Process_Mod/Insert_Energy_Bc.f90"
 
   end module

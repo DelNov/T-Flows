@@ -103,10 +103,9 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,  &
-                                      flow_density, ones,      &
-                                      flow_viscosity,          &
-                                      urf, dt = Flow % dt, save_v_m = .true.)
+    call Process % Form_Momentum_Matrix(Acon, Aval, Flow, Grid,        &
+                                        flow_density, flow_viscosity,  &
+                                        urf, dt = Flow % dt)
   end if
 
   !----------------------------------------------------------!
@@ -130,20 +129,14 @@
 
   ! Inertial and advection terms
   if(comp .eq. 1) then
-    call Process % Add_Inertial_Term(Flow % u, Flow, Grid,  &
-                                     flow_density, ones)
-    call Process % Add_Advection_Term(Flow % u, Flow, Grid,  &
-                                      flow_density, ones)
+    call Process % Add_Inertial_Term (Flow % u, Flow, Grid, flow_density)
+    call Process % Add_Advection_Term(Flow % u, Flow, Grid, flow_density)
   else if(comp .eq. 2) then
-    call Process % Add_Inertial_Term(Flow % v, Flow, Grid,  &
-                                     flow_density, ones)
-    call Process % Add_Advection_Term(Flow % v, Flow, Grid,  &
-                                      flow_density, ones)
+    call Process % Add_Inertial_Term (Flow % v, Flow, Grid, flow_density)
+    call Process % Add_Advection_Term(Flow % v, Flow, Grid, flow_density)
   else if(comp .eq. 3) then
-    call Process % Add_Inertial_Term(Flow % w, Flow, Grid,  &
-                                     flow_density, ones)
-    call Process % Add_Advection_Term(Flow % w, Flow, Grid,  &
-                                      flow_density, ones)
+    call Process % Add_Inertial_Term (Flow % w, Flow, Grid, flow_density)
+    call Process % Add_Advection_Term(Flow % w, Flow, Grid, flow_density)
   end if
 
   ! Pressure force

@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine Form_System_Matrix(Process, Acon, Aval, Flow, Grid,  &
-                                coef_a, coef_b, diff_coef, urf, dt, save_v_m)
+  subroutine Form_Momentum_Matrix(Process, Acon, Aval, Flow, Grid,  &
+                                  dens, visc, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -9,12 +9,10 @@
   type(Sparse_Val_Type), target :: Aval
   type(Field_Type),      target :: Flow
   type(Grid_Type),   intent(in) :: Grid
-  real                          :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
-  real                          :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
-  real                          :: diff_coef(-Grid % n_bnd_cells:Grid % n_cells)
+  real                          :: dens(-Grid % n_bnd_cells:Grid % n_cells)
+  real                          :: visc(-Grid % n_bnd_cells:Grid % n_cells)
   real                          :: urf
   real,    optional, intent(in) :: dt       !! time step
-  logical, optional, intent(in) :: save_v_m
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
@@ -27,7 +25,7 @@
   Unused(Process)
 !==============================================================================!
 
-  call Profiler % Start('Form_System_Matrix')
+  call Profiler % Start('Form_Momentum_Matrix')
 
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
@@ -60,7 +58,7 @@
   !$acc parallel loop independent                                &
   !$acc present(grid_region_f_cell, grid_region_l_cell,          &
   !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         val, pos, diff_coef, fc, dia)
+  !$acc         val, pos, visc, fc, dia)
   do c1 = Cells_In_Domain_Gpu()  ! all present
 
     !$acc loop seq
@@ -70,7 +68,7 @@
 
       ! Coefficients inside the domain
       if(c2 .gt. 0) then
-        a12 = Face_Value(s, diff_coef(c1), diff_coef(c2)) * fc(s)
+        a12 = Face_Value(s, visc(c1), visc(c2)) * fc(s)
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12
@@ -82,7 +80,7 @@
         reg = Grid % region % at_cell(c2)
         if(Grid % region % type(reg) .eq. WALL .or.  &
            Grid % region % type(reg) .eq. INFLOW) then
-          a12 = diff_coef(c1) * fc(s)
+          a12 = visc(c1) * fc(s)
           val(dia(c1)) = val(dia(c1)) + a12
         end if
       end if
@@ -99,9 +97,9 @@
     !$acc parallel loop independent                        &
     !$acc present(grid_region_f_cell, grid_region_l_cell,  &
     !$acc         grid_vol,                                &
-    !$acc         val, dia, coef_a, coef_b)
+    !$acc         val, dia, dens)
     do c = Cells_In_Domain_Gpu()  ! all present
-      val(dia(c)) = val(dia(c)) + coef_a(c) * coef_b(c) * grid_vol(c) / dt
+      val(dia(c)) = val(dia(c)) + dens(c) * grid_vol(c) / dt
     end do
     !$acc end parallel
   end if
@@ -110,21 +108,17 @@
   !   Store volume divided by central coefficient for momentum   !
   !   and refresh its buffers before discretizing the pressure   !
   !--------------------------------------------------------------!
-  if(present(save_v_m)) then
-    if(save_v_m) then
-      !$acc parallel loop independent                        &
-      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-      !$acc         grid_vol,                                &
-      !$acc         flow_v_m, val, dia)
-      do c = Cells_In_Domain_Gpu()  ! all present
-        flow_v_m(c) = grid_vol(c) / val(dia(c))
-      end do
-      !$acc end parallel
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         grid_vol,                                &
+  !$acc         flow_v_m, val, dia)
+  do c = Cells_In_Domain_Gpu()  ! all present
+    flow_v_m(c) = grid_vol(c) / val(dia(c))
+  end do
+  !$acc end parallel
 
-      ! This call is needed, the above loop goes through inside cells only
-      call Grid % Exchange_Inside_Cells_Real(flow_v_m)
-    end if
-  end if
+  ! This call is needed, the above loop goes through inside cells only
+  call Grid % Exchange_Inside_Cells_Real(flow_v_m)
 
   !-------------------------------------!
   !   Part 1 of the under-relaxation    !
@@ -156,6 +150,6 @@
                              inside_cell=temp)
 # endif
 
-  call Profiler % Stop('Form_System_Matrix')
+  call Profiler % Stop('Form_Momentum_Matrix')
 
   end subroutine

@@ -18,7 +18,6 @@
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
   real,      contiguous, pointer :: b(:), x(:)
-  real,      contiguous, pointer :: temp(:)
   integer                        :: nc, n
   real                           :: fin_res
   character(len=11)              :: root_control = 'control.004'
@@ -27,8 +26,6 @@
   ! Start the parallel run and the profiler
   call Global % Start_Parallel
   call Profiler % Start('Test_004')
-
-  call Work % Connect_Real_Cell(temp)
 
   O_Print '(a)', ' #====================================================='
   O_Print '(a)', ' # TEST 4: Call Conjugate Gradient from Native_Mod'
@@ -98,11 +95,9 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  temp(:) = 1.0
-  call Process % Form_System_Matrix(Acon, Aval, Flow, Grid,  &
-                                    Flow % density, temp,    &
-                                    Flow % viscosity,        &
-                                    1.0)
+  call Process % Form_Momentum_Matrix(Acon, Aval, Flow, Grid,            &
+                                      Flow % density, Flow % viscosity,  &
+                                      1.0)
   call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)
 
   !-----------------------------------------------!
@@ -145,8 +140,6 @@
   call Grid % Save_Debug_Vtu("result",              &
                              scalar_name="Result",  &
                              scalar_cell=x)
-
-  call Work % Disconnect_Real_Cell(temp)
 
   ! End the profiler and the parallel run
   call Profiler % Stop('Test_004')

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Inertial_Term(Process, phi, Flow, Grid, coef_a, coef_b)
+  subroutine Add_Inertial_Term(Process, phi, Flow, Grid, coef)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -7,10 +7,9 @@
   type(Var_Type),   target :: phi
   type(Field_Type), target :: Flow
   type(Grid_Type),  target :: Grid
-  real                     :: coef_a(-Grid % n_bnd_cells:Grid % n_cells)
-  real                     :: coef_b(-Grid % n_bnd_cells:Grid % n_cells)
+  real                     :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: phi_o(:), b(:), vol(:)
+  real, contiguous, pointer :: phi_o(:), b(:)
   integer                   :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -28,9 +27,9 @@
   !$acc parallel loop independent                        &
   !$acc present(grid_region_f_cell, grid_region_l_cell,  &
   !$acc         grid_vol,                                &
-  !$acc         b, phi_o, coef_a, coef_b)
+  !$acc         b, phi_o, coef)
   do c = Cells_In_Domain_Gpu()
-    b(c) = b(c) + coef_a(c) * coef_b(c) * phi_o(c) * grid_vol(c) / Flow % dt
+    b(c) = b(c) + coef(c) * phi_o(c) * grid_vol(c) / Flow % dt
   end do
   !$acc end parallel
 
