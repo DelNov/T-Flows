@@ -29,6 +29,14 @@
     call Gpu % Vector_Update_Host(Turb % vis_t)
   end if
 
+  !----------------!
+  !   Wale model   !
+  !----------------!
+  if(Turb % model .eq. LES_WALE) then
+    call Gpu % Vector_Update_Host(Turb % vis_t)
+    call Gpu % Vector_Update_Host(Turb % wale_v)
+  end if
+
   !------------------------------------------------!
   !   Variables needed for all turbulence models   !
   !------------------------------------------------!

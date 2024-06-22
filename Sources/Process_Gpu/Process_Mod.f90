@@ -11,6 +11,7 @@
   use Iter_Mod
   use Gpu_Mod
   use Control_Mod
+  use Turb_Mod
   use Results_Mod
   use Read_Controls_Mod
 !------------------------------------------------------------------------------!

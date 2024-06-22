@@ -81,7 +81,7 @@
   call Process % Initialize_Variables(Turb(1), Flow(1), Grid(1))
 
   ! Allocate CPU memory for working arrays (currently used for saving)
-  call Work % Allocate_Work(Grid, n_r_cell=12,  n_r_face=0,  n_r_node=0,  &
+  call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=0,  n_r_node=0,  &
                                   n_i_cell= 6,  n_i_face=0,  n_i_node=0)
 
   !----------------------------------------------------------!
@@ -140,9 +140,9 @@
       ! New in GPU version: compute pressure gradients here
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
-      call Process % Compute_Momentum(Flow(1), Grid(1), comp=1)
-      call Process % Compute_Momentum(Flow(1), Grid(1), comp=2)
-      call Process % Compute_Momentum(Flow(1), Grid(1), comp=3)
+      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=1)
+      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=2)
+      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=3)
 
       call Process % Compute_Pressure(Flow(1), Grid(1))
 
@@ -154,7 +154,7 @@
       call Turb(1) % Main_Turb(Flow(1), Grid(1))
 
       if(Flow(1) % heat_transfer) then
-        call Process % Compute_Energy(Flow(1), Grid(1))
+        call Process % Compute_Energy(Turb(1), Flow(1), Grid(1))
       end if
 
       call Process % Update_Boundary_Values(Flow(1), Grid(1), 'ALL')

@@ -1,21 +1,21 @@
 !==============================================================================!
-  subroutine Form_Momentum_Matrix(Process, Acon, Aval, Flow, Grid,  &
-                                  dens, visc, urf, dt)
+  subroutine Form_Momentum_Matrix(Process, Turb, Flow, Grid, Acon, Aval,  &
+                                  urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)           :: Process
-  type(Sparse_Con_Type), target :: Acon
-  type(Sparse_Val_Type), target :: Aval
+  type(Turb_Type)               :: Turb
   type(Field_Type),      target :: Flow
   type(Grid_Type),   intent(in) :: Grid
-  real                          :: dens(-Grid % n_bnd_cells:Grid % n_cells)
-  real                          :: visc(-Grid % n_bnd_cells:Grid % n_cells)
+  type(Sparse_Con_Type), target :: Acon
+  type(Sparse_Val_Type), target :: Aval
   real                          :: urf
   real,    optional, intent(in) :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
+  real,      contiguous, pointer :: dens(:), visc(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12
 # if T_FLOWS_DEBUG == 1
@@ -42,7 +42,38 @@
   fc  => Acon % fc
   nz  =  Acon % nonzeros
 
+  call Work % Connect_Real_Cell(visc)
+
   Assert(urf > 0.0)
+
+  !-----------------------------------------------!
+  !   Initialize density and efficent viscosity   !
+  !-----------------------------------------------!
+  dens => flow_density
+
+  ! Just copy molecular viscosity to effectice
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         flow_viscosity, visc)
+  do c = Cells_In_Domain_And_Buffers_Gpu()
+    visc(c) = flow_viscosity(c)
+  end do
+  !$acc end parallel
+
+  ! If there is a turbulence model, add turbulent viscosity
+  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+    !$acc parallel loop independent                        &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+    !$acc         flow_viscosity, visc)
+    do c = Cells_In_Domain_And_Buffers_Gpu()
+      visc(c) = visc(c) + turb_vis_t(c)
+    end do
+    !$acc end parallel
+  end if
+
+  !---------------------------------------!
+  !   Initialize matrix entries to zero   !
+  !---------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(val)
@@ -149,6 +180,8 @@
                              inside_name="v_m",  &
                              inside_cell=temp)
 # endif
+
+  call Work % Disconnect_Real_Cell(visc)
 
   call Profiler % Stop('Form_Momentum_Matrix')
 

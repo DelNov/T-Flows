@@ -244,7 +244,7 @@ syn keyword controlNumericalParameters   cicsam  upwind  stacs
 syn keyword controlNumericalParameters   yes  no
 syn keyword controlNumericalParameters   percentage  seconds
 syn keyword controlPhysicalModels        thermal  density
-syn keyword controlTurbulenceModels      k_eps_zeta_f  k_eps  les_tvm  les_wal  les_dynamic  les_smagorinsky  hybrid_les_rans  hybrid_les_prandtl
+syn keyword controlTurbulenceModels      k_eps_zeta_f  k_eps  les_tvm  les_wale  les_dynamic  les_smagorinsky  hybrid_les_rans  hybrid_les_prandtl
 syn keyword controlTurbulenceModels      des_spalart  spalart_allmaras  dns  rsm_hanjalic_jakirlic  rsm_manceau_hanjalic  dns  none
 syn keyword controlTurbulenceModels      high_re  low_re  ggdh  sgdh  afm
 syn keyword controlMassTransferModels    temperature_gradients  lee

@@ -31,11 +31,20 @@
     call Gpu % Vector_Real_Destroy_On_Device(Turb % vis_t)
   end if
 
+  !----------------!
+  !   Wale model   !
+  !----------------!
+  if(Turb % model .eq. LES_WALE) then
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % wale_v)
+  end if
+
   !------------------------------------------------!
   !   Variables needed for all turbulence models   !
   !------------------------------------------------!
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
 
+    ! Variables needed for all turbulence models
     call Gpu % Vector_Real_Destroy_On_Device(Turb % y_plus)
 
     ! These two belong to Field_Mod

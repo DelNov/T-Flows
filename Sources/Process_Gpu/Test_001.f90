@@ -19,6 +19,7 @@
   real, allocatable              :: b(:), c(:)
   type(Grid_Type)                :: Grid
   type(Field_Type),       target :: Flow            ! flow field
+  type(Turb_Type)                :: Turb
   integer,             parameter :: N_STEPS = 1200  ! spend some time on device
   integer                        :: nc, ni, step
   character(len=11)              :: root_control = 'control.001'
@@ -56,9 +57,7 @@
   call Read_Control % Physical_Properties(Flow, Grid)
 
   ! Discretize the matrix for diffusion
-  call Process % Form_Momentum_Matrix(Acon, Aval, Flow, Grid,             &
-                                      Flow % density, Flow % viscosity,  &
-                                      1.0)
+  call Process % Form_Momentum_Matrix(Turb, Flow, Grid, Acon, Aval, 1.0)
 
   ! Take the alias now
   Acon => Flow % Nat % C

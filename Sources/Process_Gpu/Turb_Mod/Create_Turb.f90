@@ -27,6 +27,18 @@
 
   end if ! LES_SMAGORINSKY
 
+  !----------------!
+  !   Wale model   !
+  !----------------!
+  if(Turb % model .eq. LES_WALE) then
+
+    allocate(Turb % wale_v(-nb:nc));  Turb % wale_v = 0.
+
+    ! Other variables such as time scale, length scale and production
+    allocate(Turb % vis_t   (-nb:nc));  Turb % vis_t   = 0.
+
+  end if
+
   !------------------------------------------------!
   !   Variables needed for all turbulence models   !
   !------------------------------------------------!

@@ -22,36 +22,62 @@
   real    :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !==============================================================================!
 
+  !---------------!
+  !               !
+  !   SGS terms   !
+  !               !
+  !---------------!
   if(Turb % model .eq. LES_SMAGORINSKY) then
 
-    !$acc parallel loop independent private(u_tau, u_tan)
-    do c = Cells_In_Domain_And_Buffers()
-      lf = Grid % vol(c)**ONE_THIRD
+    !$acc parallel loop independent private(u_tau, u_tan)               &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,               &
+    !$acc         grid_vol, grid_wall_dist,                             &
+    !$acc         flow_viscosity, flow_density,                         &
+    !$acc         flow_u_n, flow_v_n, flow_w_n, flow_shear, flow_vort,  &
+    !$acc         turb_y_plus, turb_vis_t)
+    do c = Cells_In_Domain_And_Buffers_Gpu()
+      lf = grid_vol(c)**ONE_THIRD
 
-      nu = Flow % viscosity(c) / Flow % density(c)
+      nu = flow_viscosity(c) / flow_density(c)
 
       ! Tangential velocity.  Here it assumed that, as you approach the
       ! wall, the tangential velocity component is dominant and that the
       ! magnitude of velocity is close to tangential component.
-      u_tan = sqrt(  Flow % u % n(c)**2  &
-                   + Flow % v % n(c)**2  &
-                   + Flow % w % n(c)**2)
+      u_tan = sqrt(  flow_u_n(c)**2   &
+                   + flow_v_n(c)**2   &
+                   + flow_w_n(c)**2)
 
       ! Calculate u_tau, y+ and perform Van Driest damping
-      u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c))**B_POW)   &
+      u_tau = (u_tan/A_POW * (nu/grid_wall_dist(c))**B_POW)   &
               ** (1.0/(1.0+B_POW))
-      Turb % y_plus(c) = Grid % wall_dist(c) * u_tau / Flow % viscosity(c)
-      cs = c_smag * (1.0 - exp(-Turb % y_plus(c) / 25.0))
+      turb_y_plus(c) = grid_wall_dist(c) * u_tau / flow_viscosity(c)
+      cs = c_smag * (1.0 - exp(-turb_y_plus(c) / 25.0))
 
-      Turb % vis_t(c) = Flow % density(c)  &
-                      * (lf*lf)            &  ! delta^2
-                      * (cs*cs)            &  ! cs^2
-                      * Flow % shear(c)
+      turb_vis_t(c) = flow_density(c)  &
+                    * (lf*lf)          &  ! delta^2
+                    * (cs*cs)          &  ! cs^2
+                    * flow_shear(c)
+    end do
+    !$acc end parallel
+
+  else if(Turb % model .eq. LES_WALE) then
+
+    !$acc parallel loop independent                        &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+    !$acc         grid_vol,                                &
+    !$acc         flow_density,                            &
+    !$acc         turb_vis_t, turb_wale_v)
+    do c = Cells_In_Domain_And_Buffers_Gpu()
+      lf = grid_vol(c)**ONE_THIRD
+      turb_vis_t(c) = flow_density(c)  &
+                    * (lf*lf)          &  ! delta^2
+                    * (0.5*0.5)        &  ! cs^2
+                    * turb_wale_v(c)
     end do
     !$acc end parallel
 
   end if
 
-  call Grid % Exchange_Cells_Real(Turb % vis_t)
+  call Grid % Exchange_Cells_Real(turb_vis_t)
 
   end subroutine

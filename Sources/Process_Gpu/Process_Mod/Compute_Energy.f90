@@ -1,14 +1,15 @@
 !==============================================================================!
-  subroutine Compute_Energy(Process, Flow, Grid)
+  subroutine Compute_Energy(Process, Turb, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
+  type(Turb_Type)          :: Turb
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Val_Type), pointer :: Mval
-  type(Sparse_Con_Type), pointer :: Mcon
+  type(Sparse_Val_Type), pointer :: Aval
+  type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), dens_capa(:)
@@ -34,12 +35,12 @@
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
-  Mcon => Flow % Nat % C
+  Acon => Flow % Nat % C
   if(Flow % Nat % use_one_matrix) then
-    Mval => Flow % Nat % A(MATRIX_ONE)
+    Aval => Flow % Nat % A(MATRIX_ONE)
     val  => Flow % Nat % A(MATRIX_ONE) % val
   else
-    Mval => Flow % Nat % A(MATRIX_T)
+    Aval => Flow % Nat % A(MATRIX_T)
     val  => Flow % Nat % A(MATRIX_T) % val
   end if
   dia  => Flow % Nat % C % dia
@@ -78,10 +79,8 @@
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
-
-  call Process % Form_Energy_Matrix(Mcon, Mval, Flow, Grid,        &
-                                    dens_capa, flow_conductivity,  &
-                                    urf, dt = Flow % dt)
+  call Process % Form_Energy_Matrix(Turb, Flow, Grid, Acon, Aval,  &
+                                    urf, dt=Flow % dt)
 
   !----------------------------------------------------------!
   !   Insert proper sources (forces) to momentum equations   !
@@ -91,8 +90,8 @@
   call Process % Insert_Energy_Bc(Flow, Grid)
 
   ! Inertial and advection terms
-  call Process % Add_Inertial_Term(Flow % t, Flow, Grid, dens_capa)
-  call Process % Add_Advection_Term(Flow % t, Flow, Grid, dens_capa)
+  call Process % Add_Inertial_Term (Flow, Grid, Flow % t, dens_capa)
+  call Process % Add_Advection_Term(Flow, Grid, Flow % t, dens_capa)
 
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !
@@ -111,7 +110,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Mcon, Mval, flow_t_n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, flow_t_n, b, nc, n, tol, fin_res)
   call Profiler % Stop('CG_for_Energy')
 
 # if T_FLOWS_DEBUG == 1

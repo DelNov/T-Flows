@@ -1,21 +1,21 @@
 !==============================================================================!
-  subroutine Form_Energy_Matrix(Process, Acon, Aval, Flow, Grid,  &
-                                dens_capa, cond, urf, dt)
+  subroutine Form_Energy_Matrix(Process, Turb, Flow, Grid, Acon, Aval, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)           :: Process
-  type(Sparse_Con_Type), target :: Acon
-  type(Sparse_Val_Type), target :: Aval
+  type(Turb_Type)               :: Turb
   type(Field_Type),      target :: Flow
   type(Grid_Type),   intent(in) :: Grid
-  real                          :: dens_capa(-Grid % n_bnd_cells:Grid % n_cells)
-  real                          :: cond(-Grid % n_bnd_cells:Grid % n_cells)
+  type(Sparse_Con_Type), target :: Acon
+  type(Sparse_Val_Type), target :: Aval
   real                          :: urf
   real,    optional, intent(in) :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
+  real,      contiguous, pointer :: dens_capa(:)
+  real,      contiguous, pointer :: cond(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12
 # if T_FLOWS_DEBUG == 1
@@ -41,6 +41,8 @@
   pos => Acon % pos
   fc  => Acon % fc
   nz  =  Acon % nonzeros
+
+  call Work % Connect_Real_Cell(dens_capa)
 
   Assert(urf > 0.0)
 
@@ -120,6 +122,8 @@
   !   Mark the matrix as formed   !
   !-------------------------------!
   Aval % formed = .true.
+
+  call Work % Disconnect_Real_Cell(dens_capa)
 
   call Profiler % Stop('Form_Energy_Matrix')
 

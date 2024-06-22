@@ -14,7 +14,12 @@
   !   Start initializations of various turbulence models   !
   !--------------------------------------------------------!
 
-  if(Turb % model .eq. LES_SMAGORINSKY) then
+  if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+     Turb % model .eq. LES_WALE) then
+    call Flow % Calculate_Shear_And_Vorticity(Grid)
+    if(Turb % model .eq. LES_WALE) then
+      call Turb % Vis_T_Wale(Flow, Grid)
+    end if
     call Turb % Vis_T_Subgrid(Flow, Grid)
   end if
 

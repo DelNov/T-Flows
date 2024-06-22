@@ -93,7 +93,7 @@
   !$acc end parallel
 
   ! Update buffers for presssure over all processors
-  call Grid % Exchange_Cells_Real(Flow % p % n)
+  call Grid % Exchange_Cells_Real(flow_p_n)
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("pp_0",           &

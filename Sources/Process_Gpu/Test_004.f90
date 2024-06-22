@@ -17,6 +17,7 @@
   type(Sparse_Val_Type), pointer :: Aval
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
+  type(Turb_Type)                :: Turb
   real,      contiguous, pointer :: b(:), x(:)
   integer                        :: nc, n
   real                           :: fin_res
@@ -95,9 +96,7 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  call Process % Form_Momentum_Matrix(Acon, Aval, Flow, Grid,            &
-                                      Flow % density, Flow % viscosity,  &
-                                      1.0)
+  call Process % Form_Momentum_Matrix(Turb, Flow, Grid, Acon, Aval, 1.0)
   call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)
 
   !-----------------------------------------------!

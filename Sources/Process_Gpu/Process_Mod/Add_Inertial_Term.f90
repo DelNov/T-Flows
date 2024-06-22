@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Add_Inertial_Term(Process, phi, Flow, Grid, coef)
+  subroutine Add_Inertial_Term(Process, Flow, Grid, phi, coef)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Var_Type),   target :: phi
   type(Field_Type), target :: Flow
   type(Grid_Type),  target :: Grid
+  type(Var_Type),   target :: phi
   real                     :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: phi_o(:), b(:)

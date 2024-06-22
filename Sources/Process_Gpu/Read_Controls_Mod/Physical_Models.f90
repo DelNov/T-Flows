@@ -65,6 +65,8 @@
       Turb % model = NO_TURBULENCE_MODEL
     case('LES_SMAGORINSKY')
       Turb % model = LES_SMAGORINSKY
+    case('LES_WALE')
+      Turb % model = LES_WALE
 
     case default
       call Message % Error(60,                                         &

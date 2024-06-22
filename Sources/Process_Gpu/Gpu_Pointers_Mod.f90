@@ -9,6 +9,9 @@
 !   These are the links to other objects data members which are transferred    !
 !   to GPUs.  Shockingly, but this is the only way to tell Nvidia Fortran      !
 !   compiler that data is on the device.  This is really needed.               !
+!                                                                              !
+!   This module is, in essence, like an address book for Nvidia compiler.      !
+!   Mind you, also a globally available address book, these data is global.    !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   implicit none
@@ -38,5 +41,8 @@
   real, contiguous, pointer :: flow_grad_c2c(:,:)
   real, contiguous, pointer :: flow_density(:),  flow_viscosity(:)
   real, contiguous, pointer :: flow_capacity(:), flow_conductivity(:)
+
+  ! Access to Turb members
+  real, contiguous, pointer :: turb_y_plus(:), turb_vis_t(:), turb_wale_v(:)
 
   end module

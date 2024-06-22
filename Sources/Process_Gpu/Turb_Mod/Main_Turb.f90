@@ -14,7 +14,8 @@
   !   Start branching for various turbulence models   !
   !---------------------------------------------------!
 
-  if(Turb % model .eq. LES_SMAGORINSKY) then
+  if(Turb % model .eq. LES_SMAGORINSKY .or.  &
+     Turb % model .eq. LES_WALE) then
     call Flow % Calculate_Shear_And_Vorticity(Grid)
   end if
 

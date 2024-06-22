@@ -1,9 +1,10 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Process, Flow, Grid, comp)
+  subroutine Compute_Momentum(Process, Turb, Flow, Grid, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
+  type(Turb_Type)          :: Turb
   type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
   integer                  :: comp
@@ -12,7 +13,7 @@
   type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
-  real,      contiguous, pointer :: b(:), ones(:)
+  real,      contiguous, pointer :: b(:)
   real,      contiguous, pointer :: ui_n(:), ui_o(:), ui_oo(:)
   real                           :: tol, fin_res, urf
   integer                        :: nb, nc, n, c
@@ -21,8 +22,6 @@
 !==============================================================================!
 
   call Profiler % Start('Compute_Momentum')
-
-  call Work % Connect_Real_Cell(ones)
 
   Assert(comp .ge. 1)
   Assert(comp .le. 3)
@@ -63,16 +62,6 @@
   tol = Flow % u % tol
   urf = Flow % u % urf
 
-  ! Set temp variable (Buoyancy_Forces uses it!)
-
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         ones)
-  do c = Cells_In_Domain_Gpu()  ! all present
-    ones(c) = 1.0
-  end do
-  !$acc end parallel
-
   !---------------------------------------------------!
   !   Update old values (o) and older than old (oo)   !
   !---------------------------------------------------!
@@ -103,8 +92,7 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Acon, Aval, Flow, Grid,        &
-                                        flow_density, flow_viscosity,  &
+    call Process % Form_Momentum_Matrix(Turb, Flow, Grid, Acon, Aval,  &
                                         urf, dt = Flow % dt)
   end if
 
@@ -118,25 +106,16 @@
   ! Buoyancy forces
   call Flow % Buoyancy_Forces(Grid, comp)
 
-  ! Set temp variable back to one (Buoyancy_Forces uses it!)
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         ones)
-  do c = Cells_In_Domain_And_Buffers_Gpu()
-    ones(c) = 1.0
-  end do
-  !$acc end parallel
-
   ! Inertial and advection terms
   if(comp .eq. 1) then
-    call Process % Add_Inertial_Term (Flow % u, Flow, Grid, flow_density)
-    call Process % Add_Advection_Term(Flow % u, Flow, Grid, flow_density)
+    call Process % Add_Inertial_Term (Flow, Grid, Flow % u, flow_density)
+    call Process % Add_Advection_Term(Flow, Grid, Flow % u, flow_density)
   else if(comp .eq. 2) then
-    call Process % Add_Inertial_Term (Flow % v, Flow, Grid, flow_density)
-    call Process % Add_Advection_Term(Flow % v, Flow, Grid, flow_density)
+    call Process % Add_Inertial_Term (Flow, Grid, Flow % v, flow_density)
+    call Process % Add_Advection_Term(Flow, Grid, Flow % v, flow_density)
   else if(comp .eq. 3) then
-    call Process % Add_Inertial_Term (Flow % w, Flow, Grid, flow_density)
-    call Process % Add_Advection_Term(Flow % w, Flow, Grid, flow_density)
+    call Process % Add_Inertial_Term (Flow, Grid, Flow % w, flow_density)
+    call Process % Add_Advection_Term(Flow, Grid, Flow % w, flow_density)
   end if
 
   ! Pressure force
@@ -165,8 +144,6 @@
   if(comp.eq.1) call Info % Iter_Fill_At(1, 1, 'U', fin_res, n)
   if(comp.eq.2) call Info % Iter_Fill_At(1, 2, 'V', fin_res, n)
   if(comp.eq.3) call Info % Iter_Fill_At(1, 3, 'W', fin_res, n)
-
-  call Work % Disconnect_Real_Cell(ones)
 
   call Profiler % Stop('Compute_Momentum')
 

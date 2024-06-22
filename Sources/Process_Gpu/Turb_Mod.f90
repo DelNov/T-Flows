@@ -40,6 +40,8 @@
     ! Turbulent viscosity
     real, allocatable :: vis_t(:) ! [kg/(m s)]
 
+    ! Scale-resolving simulations
+    real, allocatable :: wale_v(:)
     ! Variable holding the turbulence model; its variant and statistics
     integer :: model
 
@@ -50,6 +52,7 @@
 
       ! Computation of turbulence viscosity
       procedure, private :: Vis_T_Subgrid
+      procedure, private :: Vis_T_Wale
 
   end type
 
@@ -57,6 +60,7 @@
   ! (Prime numbers starting from 30000)
   integer, parameter :: NO_TURBULENCE_MODEL   = 30011
   integer, parameter :: LES_SMAGORINSKY       = 30029
+  integer, parameter :: LES_WALE              = 30059
 
   !--------------------------------!
   !   Turbulence model constants   !
@@ -83,5 +87,6 @@
 #   include "Turb_Mod/Const_Les.f90"
     ! Computation of turbulence viscosity
 #   include "Turb_Mod/Vis_T_Subgrid.f90"
+#   include "Turb_Mod/Vis_T_Wale.f90"
 
   end module
