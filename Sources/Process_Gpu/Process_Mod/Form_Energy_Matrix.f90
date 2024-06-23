@@ -15,7 +15,7 @@
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: dens_capa(:)
-  real,      contiguous, pointer :: cond(:)
+  real,      contiguous, pointer :: cond_eff(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12
 # if T_FLOWS_DEBUG == 1
@@ -42,9 +42,45 @@
   fc  => Acon % fc
   nz  =  Acon % nonzeros
 
-  call Work % Connect_Real_Cell(dens_capa)
+  call Work % Connect_Real_Cell(cond_eff, dens_capa)
 
   Assert(urf > 0.0)
+
+  !--------------------------------------------------------------------------!
+  !   Initialize density times thermal capacity and effective conductivity   !
+  !--------------------------------------------------------------------------!
+
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         dens_capa, flow_density, flow_capacity)
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  ! all present
+    dens_capa(c) = flow_density(c) * flow_capacity(c)
+  end do
+  !$acc end parallel
+
+  ! Just copy molecular conductivity to effective
+  !$acc parallel loop independent                        &
+  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+  !$acc         cond_eff, flow_conductivity)
+  do c = Cells_In_Domain_And_Buffers_Gpu()
+    cond_eff(c) = flow_conductivity(c)
+  end do
+  !$acc end parallel
+
+  ! If there is a turbulence model, add turbulent conductivity
+  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+    !$acc parallel loop independent                        &
+    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
+    !$acc         cond_eff, turb_vis_t)
+    do c = Cells_In_Domain_And_Buffers_Gpu()
+      cond_eff(c) = cond_eff(c) + turb_vis_t(c) / 0.9  ! hard-coded Pr_t
+    end do
+    !$acc end parallel
+  end if
+
+  !---------------------------------------!
+  !   Initialize matrix entries to zero   !
+  !---------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(val)
@@ -57,10 +93,12 @@
   !   Compute neighbouring coefficients over cells   !
   !--------------------------------------------------!
 
+  ! Coefficients inside the domain
+
   !$acc parallel loop independent                                &
   !$acc present(grid_region_f_cell, grid_region_l_cell,          &
   !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         val, pos, cond, fc, dia)
+  !$acc         val, pos, cond_eff, fc, dia)
   do c1 = Cells_In_Domain_Gpu()  ! all present
 
     !$acc loop seq
@@ -68,29 +106,39 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
 
-      ! Coefficients inside the domain
       if(c2 .gt. 0) then
-        a12 = Face_Value(s, cond(c1), cond(c2)) * fc(s)
+        a12 = Face_Value(s, cond_eff(c1), cond_eff(c2)) * fc(s)
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12
         end if
         val(dia(c1)) = val(dia(c1)) + a12
 
-      ! Coefficients at the boundaries
-      else
-        reg = Grid % region % at_cell(c2)
-        if(Grid % region % type(reg) .eq. WALL .or.  &
-           Grid % region % type(reg) .eq. INFLOW) then
-          a12 = cond(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end if
       end if
     end do
     !$acc end loop
 
   end do
   !$acc end parallel
+
+  ! Coefficients on the boundaries
+
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
+
+      !$acc parallel loop                                                  &
+      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
+      !$acc         val, dia, cond_eff, fc, dia)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
+        c1 = grid_faces_c(1,s)  ! inside cell
+        a12 = cond_eff(c1) * fc(s)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
   !------------------------------------!
   !   Take care of the unsteady term   !
@@ -123,7 +171,7 @@
   !-------------------------------!
   Aval % formed = .true.
 
-  call Work % Disconnect_Real_Cell(dens_capa)
+  call Work % Disconnect_Real_Cell(cond_eff, dens_capa)
 
   call Profiler % Stop('Form_Energy_Matrix')
 

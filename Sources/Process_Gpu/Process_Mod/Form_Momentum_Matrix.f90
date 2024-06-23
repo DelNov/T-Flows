@@ -15,7 +15,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  real,      contiguous, pointer :: dens(:), visc(:)
+  real,      contiguous, pointer :: dens(:), visc_eff(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12
 # if T_FLOWS_DEBUG == 1
@@ -42,7 +42,7 @@
   fc  => Acon % fc
   nz  =  Acon % nonzeros
 
-  call Work % Connect_Real_Cell(visc)
+  call Work % Connect_Real_Cell(visc_eff)
 
   Assert(urf > 0.0)
 
@@ -51,12 +51,12 @@
   !-----------------------------------------------!
   dens => flow_density
 
-  ! Just copy molecular viscosity to effectice
+  ! Just copy molecular viscosity to effective
   !$acc parallel loop independent                        &
   !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         flow_viscosity, visc)
+  !$acc         visc_eff, flow_viscosity)
   do c = Cells_In_Domain_And_Buffers_Gpu()
-    visc(c) = flow_viscosity(c)
+    visc_eff(c) = flow_viscosity(c)
   end do
   !$acc end parallel
 
@@ -64,9 +64,9 @@
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
     !$acc parallel loop independent                        &
     !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-    !$acc         flow_viscosity, visc)
+    !$acc         visc_eff, turb_vis_t)
     do c = Cells_In_Domain_And_Buffers_Gpu()
-      visc(c) = visc(c) + turb_vis_t(c)
+      visc_eff(c) = visc_eff(c) + turb_vis_t(c)
     end do
     !$acc end parallel
   end if
@@ -86,10 +86,11 @@
   !   Compute neighbouring coefficients over cells   !
   !--------------------------------------------------!
 
+  ! Coefficients inside the domain
   !$acc parallel loop independent                                &
   !$acc present(grid_region_f_cell, grid_region_l_cell,          &
   !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         val, pos, visc, fc, dia)
+  !$acc         val, pos, visc_eff, fc, dia)
   do c1 = Cells_In_Domain_Gpu()  ! all present
 
     !$acc loop seq
@@ -99,27 +100,37 @@
 
       ! Coefficients inside the domain
       if(c2 .gt. 0) then
-        a12 = Face_Value(s, visc(c1), visc(c2)) * fc(s)
+        a12 = Face_Value(s, visc_eff(c1), visc_eff(c2)) * fc(s)
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12
         end if
         val(dia(c1)) = val(dia(c1)) + a12
-
-      ! Coefficients at the boundaries
-      else
-        reg = Grid % region % at_cell(c2)
-        if(Grid % region % type(reg) .eq. WALL .or.  &
-           Grid % region % type(reg) .eq. INFLOW) then
-          a12 = visc(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end if
       end if
     end do
     !$acc end loop
 
   end do
   !$acc end parallel
+
+  ! Coefficients on the boundaries
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
+
+      !$acc parallel loop                                                  &
+      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
+      !$acc         val, dia, visc_eff, fc, dia)
+      do s = Faces_In_Region_Gpu(reg)  ! all present
+        c1 = grid_faces_c(1,s)  ! inside cell
+        a12 = visc_eff(c1) * fc(s)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
   !------------------------------------!
   !   Take care of the unsteady term   !
@@ -181,7 +192,7 @@
                              inside_cell=temp)
 # endif
 
-  call Work % Disconnect_Real_Cell(visc)
+  call Work % Disconnect_Real_Cell(visc_eff)
 
   call Profiler % Stop('Form_Momentum_Matrix')
 
