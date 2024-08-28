@@ -33,12 +33,14 @@
 
   print '(a,i12)', ' # The problem size is: ', N
 
-  print '(a)', ' #----------------------------------------------------'
-  print '(a)', ' # Be careful with memory usage.  If you exceed the'
-  print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
-  print '(a)', ' # card has the program will become memory bound no'
-  print '(a)', ' # matter how you wrote it, and it may even crash.'
-  print '(a)', ' #----------------------------------------------------'
+# if T_FLOWS_GPU == 1
+    print '(a)', ' #----------------------------------------------------'
+    print '(a)', ' # Be careful with memory usage.  If you exceed the'
+    print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
+    print '(a)', ' # card has the program will become memory bound no'
+    print '(a)', ' # matter how you wrote it, and it may even crash.'
+    print '(a)', ' #----------------------------------------------------'
+# endif
 
   print '(a)', ' # Creating four vectors'
   allocate(a(N))

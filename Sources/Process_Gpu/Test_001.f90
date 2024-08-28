@@ -43,12 +43,14 @@
   ni = Grid % n_cells - Grid % Comm % n_buff_cells
   O_Print '(a,i12)', ' # The problem size is: ', ni
 
-  O_Print '(a)', ' #----------------------------------------------------'
-  O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
-  O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
-  O_Print '(a)', ' # card has the program will become memory bound no'
-  O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
-  O_Print '(a)', ' #----------------------------------------------------'
+# if T_FLOWS_GPU == 1
+    O_Print '(a)', ' #----------------------------------------------------'
+    O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
+    O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
+    O_Print '(a)', ' # card has the program will become memory bound no'
+    O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
+    O_Print '(a)', ' #----------------------------------------------------'
+# endif
 
   O_Print '(a)', ' # Creating a grid'
   call Flow % Create_Field(Grid)
