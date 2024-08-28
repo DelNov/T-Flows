@@ -33,7 +33,8 @@
   allocate (phi % b(-Grid % n_bnd_cells:-1));  phi % b = 0.0
 
   ! Variable's boundary flux
-  allocate (phi % q(-Grid % n_bnd_cells:-1));  phi % q = 0.0
+  ! (It has to go through inside cells to be able to call Exchange on it.)
+  allocate (phi % q(-Grid % n_bnd_cells:Grid % n_cells));  phi % q = 0.0
 
   ! Boundary cell type (important for scalars, since they
   ! can have different boundary conditions at the walls)
