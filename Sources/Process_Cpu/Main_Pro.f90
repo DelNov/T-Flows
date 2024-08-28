@@ -264,7 +264,9 @@
   call Results % Main_Results(n_dom, Flow, Turb, Vof, Swarm, exit_now)
 
   !-------------------------------------!
+  !                                     !
   !   The time loop really begins now   !
+  !                                     !
   !-------------------------------------!
   do while (Time % Needs_More_Steps())
 
