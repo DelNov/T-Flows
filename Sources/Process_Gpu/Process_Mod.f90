@@ -27,6 +27,9 @@
 
     contains
 
+      ! Splash screen
+      procedure :: Logo_Pro
+
       ! General conservation equation
       procedure :: Add_Advection_Term
       procedure :: Add_Inertial_Term
@@ -55,6 +58,9 @@
   type(Process_Type) :: Process  !! singleton object of Process_Type, introduced
                                  !! to allow easy access to its procedures
   contains
+
+    ! Splash screen
+#   include "Process_Mod/Logo_Pro.f90"
 
     ! General conservation equation
 #   include "Process_Mod/Add_Advection_Term.f90"
