@@ -9,6 +9,10 @@
   TIME_STEP                   0.01
   NUMBER_OF_TIME_STEPS     1800
   RESULTS_SAVE_INTERVAL      30
+  BACKUP_SAVE_INTERVAL      300
+  SAVE_INITIAL_CONDITION      yes
+
+! LOAD_BACKUP_NAME  test_009_backstep-ts001500.backup
 
 #----------------------
 # Numerical parameters

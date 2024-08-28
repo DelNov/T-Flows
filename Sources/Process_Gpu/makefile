@@ -254,7 +254,7 @@ SRC_F_MOD = Const_Mod.f90         \
             Grid_Mod.f90          \
             Work_Mod.f90
 
-# Modules in shared directories
+# Modules in local directory
 SRC_F_MOD += Gpu_Pointers_Mod.f90   \
              Bulk_Mod.f90           \
              Face_Mod.f90           \
@@ -269,6 +269,7 @@ SRC_F_MOD += Gpu_Pointers_Mod.f90   \
              Info_Mod.f90           \
              Turb_Mod.f90           \
              Gpu_Mod.f90            \
+             Backup_Mod.f90         \
              Results_Mod.f90        \
              Read_Controls_Mod.f90  \
              Process_Mod.f90

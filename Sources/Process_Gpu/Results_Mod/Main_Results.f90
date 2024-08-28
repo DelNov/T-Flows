@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Main_Results(Results, Turb, Flow, Grid, n_dom)
+  subroutine Main_Results(Results, Grid, Flow, Turb, n_dom)
 !------------------------------------------------------------------------------!
 !>  The Main_Results subroutine serves as the central function for saving
 !>  results in T-Flows. It orchestrates the process of saving numerical results
@@ -26,9 +26,9 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Results_Type) :: Results    !! parent class
   integer             :: n_dom      !! number of domains
-  type(Turb_Type)     :: Turb(MD)   !! turbulence modelling variables
-  type(Field_Type)    :: Flow(MD)   !! flow fields
   type(Grid_Type)     :: Grid(MD)   !! computational grids
+  type(Field_Type)    :: Flow(MD)   !! flow fields
+  type(Turb_Type)     :: Turb(MD)   !! turbulence modelling variables
 !----------------------------------[Locals]------------------------------------!
   integer :: d                   ! domain counter
   logical :: exit_now, save_now
@@ -42,6 +42,18 @@
 
   inquire(file='exit_now', exist=exit_now)
   inquire(file='save_now', exist=save_now)
+
+  ! Is it time to save the backup file?
+  if(Time % Curr_Dt() .eq. Time % Last_Dt() .or.  &
+     save_now                               .or.  &
+     exit_now                               .or.  &
+     Backup % Time_To_Save_Backup()         .or.  &
+     Info % Time_To_Exit()) then
+    do d = 1, n_dom
+      call Control % Switch_To_Domain(d)
+      call Backup % Save(Grid(d), Flow(d), Turb(d), dom=d)
+    end do
+  end if
 
   ! Is it time to save results for post-processing?
   if(Time % Curr_Dt() .eq. Time % Last_Dt() .or.  &

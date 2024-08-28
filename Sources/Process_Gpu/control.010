@@ -8,11 +8,14 @@
 #---------------
 # Time stepping
 #---------------
-  TIME_STEP                                    0.05
-  NUMBER_OF_TIME_STEPS                     600 
+  TIME_STEP                                   0.05
+  NUMBER_OF_TIME_STEPS                     2400
   RESULTS_SAVE_INTERVAL                     600
+  BACKUP_SAVE_INTERVAL                      300
 
   USE_ONE_MATRIX                             yes
+
+! LOAD_BACKUP_NAME  test_010_rb_conv-ts000300.backup
 
 #-----------------
 # Physical models
@@ -25,8 +28,8 @@
 # Physical properties
 #---------------------
   MASS_DENSITY           1.0
-  THERMAL_CONDUCTIVITY   21.28e-5
-  DYNAMIC_VISCOSITY      15.11e-5
+  THERMAL_CONDUCTIVITY   2.128e-6
+  DYNAMIC_VISCOSITY      1.511e-6
   HEAT_CAPACITY          1.0
 
   TURBULENCE_MODEL    les_smagorinsky

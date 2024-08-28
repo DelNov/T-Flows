@@ -2,7 +2,7 @@
 #include "../Shared/Macros.h90"
 
 !==============================================================================!
-  program Main
+  program Driver_Prog
 !----------------------------------[Modules]-----------------------------------!
   use Comm_Mod
 !------------------------------------------------------------------------------!
@@ -10,6 +10,18 @@
 !------------------------------------------------------------------------------!
   character(SL) :: arg
 !==============================================================================!
+
+  !----------------------------------------!
+  !   If there are no command arguments,   !
+  !    run the Process in its usual way    !
+  !----------------------------------------!
+  if(command_argument_count() .eq. 0) then
+
+    ! Turbulent flow simulations
+    call Process_Prog()
+    goto 1
+
+  end if
 
   !-----------------------------------------!
   !   Select a test to perform and run it   !
@@ -54,11 +66,6 @@
       call Test_007()
       goto 1
 
-    ! Turbulent flow simulations
-    else if(arg .eq. '8') then
-      call Test_008()
-      goto 1
-
     end if
 
   end if
@@ -82,8 +89,6 @@
   O_Print '(a)', '   5 - field creation and gradient calculation'
   O_Print '(a)', '   6 - volume balance in a rotating velocity field.'
   O_Print '(a)', '   7 - solution of the Navier-Stokes equations'
-  O_Print '(a)', '       (depending to where control file points)'
-  O_Print '(a)', '   8 - turbulent flow simulations (under development)'
   O_Print '(a)', '       (depending to where control file points)'
 
   call Global % End_Parallel

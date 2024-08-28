@@ -2,7 +2,7 @@
 #include "../Shared/Macros.h90"
 
 !==============================================================================!
-  subroutine Test_008
+  subroutine Process_Prog
 !------------------------------------------------------------------------------!
 !>  Tests turbulent flow simulations
 !------------------------------------------------------------------------------!
@@ -11,7 +11,7 @@
   use Process_Mod
   use Time_Mod
   use Iter_Mod
-  use Turb_Mod
+  use Backup_Mod
   use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
@@ -22,15 +22,14 @@
   real                     :: ts, te
   integer                  :: nc, ldt
   character(7)             :: root_control = 'control'
+  logical                  :: read_backup(MD)
 !==============================================================================!
 
   ! Start the parallel run and the profiler
   call Global % Start_Parallel
-  call Profiler % Start('Test_008')
+  call Profiler % Start('Main')
 
-  O_Print '(a)', ' #====================================================='
-  O_Print '(a)', ' # TEST 8: Turbulent flow simulations'
-  O_Print '(a)', ' #====================================================='
+  call Process % Logo_Pro()
 
   O_Print '(a)', ' # Opening the control file '//root_control
   call Control % Open_Root_File(root_control)
@@ -49,36 +48,44 @@
   O_Print '(a, i12)',   ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
-  O_Print '(a)', ' #----------------------------------------------------'
-  O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
-  O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
-  O_Print '(a)', ' # card has the program will become memory bound no'
-  O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
-  O_Print '(a)', ' #----------------------------------------------------'
+# if T_FLOWS_GPU == 1
+    O_Print '(a)', ' #----------------------------------------------------'
+    O_Print '(a)', ' # Be careful with memory usage.  If you exceed the'
+    O_Print '(a)', ' # 90% (as a rule of thumb) of the memory your GPU'
+    O_Print '(a)', ' # card has the program will become memory bound no'
+    O_Print '(a)', ' # matter how you wrote it, and it may even crash.'
+    O_Print '(a)', ' #----------------------------------------------------'
+# endif
 
   O_Print '(a)', ' # Creating a flow field'
   call Flow(1) % Create_Field(Grid(1))
 
   O_Print '(a)', ' # Creating turbulent models space'
-  call Turb(1)  % Create_Turb(Flow(1), Grid(1))
+  call Turb(1)  % Create_Turb(Grid(1), Flow(1))
+
+  ! Read backup now, before physical properties and boundary conditions
+  read_backup(:) = .false.   ! can turn .true. in Backup % Load
+  call Backup % Load(Grid(1), Flow(1), Turb(1), read_backup(1))
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow(1), Grid(1))
+  call Read_Control % Physical_Properties(Grid(1), Flow(1))
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Flow(1), Grid(1))
+  call Read_Control % Boundary_Conditions(Grid(1), Flow(1))
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Flow(1), Grid(1))
+  call Read_Control % Numerical_Schemes(Grid(1), Flow(1))
 
   O_Print '(a)', ' # Reading native solvers'
-  call Read_Control % Native_Solvers(Flow(1), Grid(1))
+  call Read_Control % Native_Solvers(Grid(1), Flow(1))
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix(Grid(1))
 
   ! Initialize variables
-  call Process % Initialize_Variables(Turb(1), Flow(1), Grid(1))
+  if(.not. read_backup(1)) then
+    call Process % Initialize_Variables(Grid(1), Flow(1), Turb(1))
+  end if
 
   ! Allocate CPU memory for working arrays (currently used for saving)
   call Work % Allocate_Work(Grid, n_r_cell=12,  n_r_face=0,  n_r_node=0,  &
@@ -88,10 +95,10 @@
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
   !----------------------------------------------------------!
-  call Gpu % Grid_Copy_To_Device  (Turb(1), Grid(1))
-  call Gpu % Field_Copy_To_Device (Turb(1), Flow(1))
+  call Gpu % Grid_Copy_To_Device  (Grid(1), Turb(1))
+  call Gpu % Field_Copy_To_Device (Flow(1), Turb(1))
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
-  call Gpu % Turb_Copy_To_Device  (Turb(1), Flow(1))
+  call Gpu % Turb_Copy_To_Device  (Flow(1), Turb(1))
   call Gpu % Work_Create_On_Device(Work)
 
   !------------------------------------------!
@@ -107,16 +114,31 @@
   call Read_Control % Iterations()
 
   ! Time stepping initializations
-  call Time % Set_Curr_Dt(0)
-  call Time % Set_First_Dt(0)
+  if(.not. read_backup(1)) then
+    call Time % Set_Time(0.0)
+    call Time % Set_Curr_Dt(0)
+    call Time % Set_First_Dt(0)
+  end if
   call Time % Set_Last_Dt(ldt)
 
+  call Control % Backup_Save_Interval      (Backup % interval, verbose=.true.)
   call Control % Results_Save_Interval     (Results % interval, verbose=.true.)
+  call Control % Save_Initial_Condition    (Results % initial,  verbose=.true.)
   call Control % Save_Results_At_Boundaries(Results % boundary)
 
-  O_Print '(a)', ' # Performing a demo of the computing momentum equations'
+  ! Save initial condition
+  call Results % Main_Results(Grid, Flow, Turb, 1)
+
   call cpu_time(ts)
+
+  !-------------------------------------!
+  !                                     !
+  !   The time loop really begins now   !
+  !                                     !
+  !-------------------------------------!
   do while (Time % Needs_More_Steps())
+
+    if(1 .eq. 1) call Time % Increase_Time(Flow(1) % dt)
 
     ! Start info boxes
     call Info % Time_Start()
@@ -127,7 +149,7 @@
     call Info % Time_Print()
 
     ! Turbulence models initializations
-    call Turb(1) % Init_Turb(Flow(1), Grid(1))
+    call Turb(1) % Init_Turb(Grid(1), Flow(1))
 
     !-----------------------------------!
     !   Iterations within a time step   !
@@ -140,24 +162,24 @@
       ! New in GPU version: compute pressure gradients here
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
-      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=1)
-      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=2)
-      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=3)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=1)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=2)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)
 
-      call Process % Compute_Pressure(Flow(1), Grid(1))
+      call Process % Compute_Pressure(Grid(1), Flow(1))
 
       ! Correct velocity components
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-      call Process % Correct_Velocity(Flow(1), Grid(1))
+      call Process % Correct_Velocity(Grid(1), Flow(1))
 
       ! Deal with turbulence
-      call Turb(1) % Main_Turb(Flow(1), Grid(1))
+      call Turb(1) % Main_Turb(Grid(1), Flow(1))
 
       if(Flow(1) % heat_transfer) then
-        call Process % Compute_Energy(Turb(1), Flow(1), Grid(1))
+        call Process % Compute_Energy(Grid(1), Flow(1), Turb(1))
       end if
 
-      call Process % Update_Boundary_Values(Flow(1), Grid(1), 'ALL')
+      call Process % Update_Boundary_Values(Grid(1), Flow(1), 'ALL')
 
       ! End of the current iteration
       call Info % Iter_Print(1)
@@ -171,26 +193,27 @@
     ! Print the bulk values from the Info_Mod
     call Info % Bulk_Print(Flow(1), 1, 1)
 
-    if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
-      call Gpu % Turb_Update_Host (Turb(1), Flow(1))
-      call Gpu % Field_Update_Host(Turb(1), Flow(1))
-      call Gpu % Grid_Update_Host (Turb(1), Grid(1))
-      call Results % Main_Results (Turb(1), Flow(1), Grid(1), 1)
+    if(mod(Time % Curr_Dt(), Results % interval) .eq. 0 .or.  &
+       mod(Time % Curr_Dt(), Backup % interval) .eq. 0) then
+      call Gpu % Turb_Update_Host (Flow(1), Turb(1))
+      call Gpu % Field_Update_Host(Flow(1), Turb(1))
+      call Gpu % Grid_Update_Host (Grid(1), Turb(1))
+      call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
     end if
 
   end do    ! time steps
   call cpu_time(te)
 
   ! Save results
-  call Gpu % Turb_Update_Host (Turb(1), Flow(1))
-  call Gpu % Field_Update_Host(Turb(1), Flow(1))
-  call Gpu % Grid_Update_Host (Turb(1), Grid(1))
-  call Results % Main_Results (Turb(1), Flow(1), Grid(1), 1)
+  call Gpu % Turb_Update_Host (Flow(1), Turb(1))
+  call Gpu % Field_Update_Host(Flow(1), Turb(1))
+  call Gpu % Grid_Update_Host (Grid(1), Turb(1))
+  call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
 
   call Work % Finalize_Work()
 
   ! End the profiler and the parallel run
-  call Profiler % Stop('Test_008')
+  call Profiler % Stop('Main')
   call Profiler % Statistics(indent=24)
   call Global % End_Parallel
 
