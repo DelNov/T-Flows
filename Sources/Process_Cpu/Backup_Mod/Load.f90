@@ -10,7 +10,7 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  logical                  :: bckp, present
+  logical                  :: bckp
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   type(Grid_Type), pointer :: Grid
@@ -19,6 +19,7 @@
   character(SL)            :: name_in, answer, name_mean
   integer                  :: vc, sc, ts
   integer(DP)              :: d
+  logical                  :: present
   real                     :: st  ! saved time, simulation time
 !==============================================================================!
 
@@ -116,10 +117,10 @@
   !------------------------------------------------------!
   !   Pressure, its gradients, and pressure correction   !
   !------------------------------------------------------!
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press',      Flow % p % n)
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press_x',    Flow % p % x)
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press_y',    Flow % p % y)
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press_z',    Flow % p % z)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press',      Flow % p  % n)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press_x',    Flow % p  % x)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press_y',    Flow % p  % y)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press_z',    Flow % p  % z)
   call Backup % Load_Cell_Real(Grid, d, vc, 'press_corr', Flow % pp % n)
   call Flow % Grad_Pressure(Flow % pp)
 
