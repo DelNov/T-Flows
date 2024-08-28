@@ -228,7 +228,7 @@
   !               !
   !---------------!
   call Control % Switch_To_Root()
-  call Control % Backup_Save_Interval      (backup % interval, verbose=.true.)
+  call Control % Backup_Save_Interval      (Backup % interval, verbose=.true.)
   call Control % Results_Save_Interval     (Results % interval, verbose=.true.)
   call Control % Save_Initial_Condition    (Results % initial,  verbose=.true.)
   call Control % Save_Results_At_Boundaries(Results % boundary)
