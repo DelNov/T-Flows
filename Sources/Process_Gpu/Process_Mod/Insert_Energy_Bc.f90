@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Insert_Energy_Bc(Process, Flow, Grid)
+  subroutine Insert_Energy_Bc(Process, Grid, Flow)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), cond(:)
   real                      :: a12

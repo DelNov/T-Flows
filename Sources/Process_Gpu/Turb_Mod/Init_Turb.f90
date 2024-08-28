@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Init_Turb(Turb, Flow, Grid)
+  subroutine Init_Turb(Turb, Grid, Flow)
 !------------------------------------------------------------------------------!
 !>  Turbulence model initializations (at the beginning of a time step)         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type) :: Turb  !! parent class
-  type(Field_Type) :: Flow  !! flow field
   type(Grid_Type)  :: Grid  !! numerical grid
+  type(Field_Type) :: Flow  !! flow field
 !==============================================================================!
 
   !--------------------------------------------------------!

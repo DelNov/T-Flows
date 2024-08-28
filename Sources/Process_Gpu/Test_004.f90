@@ -53,13 +53,13 @@
   call Flow % Create_Field(Grid)
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow, Grid)
+  call Read_Control % Physical_Properties(Grid, Flow)
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Flow, Grid)
+  call Read_Control % Boundary_Conditions(Grid, Flow)
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Flow, Grid)
+  call Read_Control % Numerical_Schemes(Grid, Flow)
 
   ! Transfer the necessary grid components to the device
   call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)
@@ -96,8 +96,8 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  call Process % Form_Momentum_Matrix(Turb, Flow, Grid, Acon, Aval, 1.0)
-  call Process % Insert_Momentum_Bc(Flow, Grid, comp=1)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Acon, Aval, 1.0)
+  call Process % Insert_Momentum_Bc(Grid, Flow, comp=1)
 
   !-----------------------------------------------!
   !   Performing a fake time loop on the device   !

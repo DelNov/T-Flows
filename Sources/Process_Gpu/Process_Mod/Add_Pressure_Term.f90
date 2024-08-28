@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Pressure_Term(Process, Flow, Grid, comp)
+  subroutine Add_Pressure_Term(Process, Grid, Flow, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -13,8 +13,8 @@
 !     p % x * vol  [kg/(m^2 s^2) * m^3 = kg m / s^2 = N]                       !
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), p_i(:)

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Add_Advection_Term(Process, Flow, Grid, phi, coef)
+  subroutine Add_Advection_Term(Process, Grid, Flow, phi, coef)
 !------------------------------------------------------------------------------!
 !   Thoroughly re-vamped for the GPU_2                                         !
 !------------------------------------------------------------------------------!
@@ -9,8 +9,8 @@
 !     [M]{u} = {b}   [kgm/s^2]   [N]                                           !
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
   type(Var_Type),   target :: phi
   real                     :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!

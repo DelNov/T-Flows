@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Boundary_Values(Process, Flow, Grid, update)
+  subroutine Update_Boundary_Values(Process, Grid, Flow, update)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -10,8 +10,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)      :: Process  !! parent class
+  type(Grid_Type)          :: Grid     !! grid object
   type(Field_Type), target :: Flow     !! flow object
-  type(Grid_Type)          :: Grid
   character(*)             :: update   !! character switch to control
                                        !! which variables to update
 !-----------------------------------[Locals]-----------------------------------!

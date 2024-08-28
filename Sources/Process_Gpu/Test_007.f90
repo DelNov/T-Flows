@@ -60,25 +60,25 @@
   call Flow(1) % Create_Field(Grid(1))
 
   O_Print '(a)', ' # Creating turbulent models space'
-  call Turb(1)  % Create_Turb(Flow(1), Grid(1))
+  call Turb(1)  % Create_Turb(Grid(1), Flow(1))
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow(1), Grid(1))
+  call Read_Control % Physical_Properties(Grid(1), Flow(1))
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Flow(1), Grid(1))
+  call Read_Control % Boundary_Conditions(Grid(1), Flow(1))
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Flow(1), Grid(1))
+  call Read_Control % Numerical_Schemes(Grid(1), Flow(1))
 
   O_Print '(a)', ' # Reading native solvers'
-  call Read_Control % Native_Solvers(Flow(1), Grid(1))
+  call Read_Control % Native_Solvers(Grid(1), Flow(1))
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix(Grid(1))
 
   ! Initialize variables
-  call Process % Initialize_Variables(Turb(1), Flow(1), Grid(1))
+  call Process % Initialize_Variables(Grid(1), Flow(1), Turb(1))
 
   ! Allocate CPU memory for working arrays (currently used for saving)
   call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=0,  n_r_node=0,  &
@@ -88,10 +88,10 @@
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
   !----------------------------------------------------------!
-  call Gpu % Grid_Copy_To_Device  (Turb(1), Grid(1))
-  call Gpu % Field_Copy_To_Device (Turb(1), Flow(1))
+  call Gpu % Grid_Copy_To_Device  (Grid(1), Turb(1))
+  call Gpu % Field_Copy_To_Device (Flow(1), Turb(1))
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
-  call Gpu % Turb_Copy_To_Device  (Turb(1), Flow(1))
+  call Gpu % Turb_Copy_To_Device  (Flow(1), Turb(1))
   call Gpu % Work_Create_On_Device(Work)
 
   !------------------------------------------!
@@ -127,7 +127,7 @@
     call Info % Time_Print()
 
     ! Turbulence models initializations
-    call Turb(1) % Init_Turb(Flow(1), Grid(1))
+    call Turb(1) % Init_Turb(Grid(1), Flow(1))
 
     !-----------------------------------!
     !   Iterations within a time step   !
@@ -140,24 +140,24 @@
       ! New in GPU version: compute pressure gradients here
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
 
-      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=1)
-      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=2)
-      call Process % Compute_Momentum(Turb(1), Flow(1), Grid(1), comp=3)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=1)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=2)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)
 
-      call Process % Compute_Pressure(Flow(1), Grid(1))
+      call Process % Compute_Pressure(Grid(1), Flow(1))
 
       ! Correct velocity components
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-      call Process % Correct_Velocity(Flow(1), Grid(1))
+      call Process % Correct_Velocity(Grid(1), Flow(1))
 
       ! Deal with turbulence
-      call Turb(1) % Main_Turb(Flow(1), Grid(1))
+      call Turb(1) % Main_Turb(Grid(1), Flow(1))
 
       if(Flow(1) % heat_transfer) then
-        call Process % Compute_Energy(Turb(1), Flow(1), Grid(1))
+        call Process % Compute_Energy(Grid(1), Flow(1), Turb(1))
       end if
 
-      call Process % Update_Boundary_Values(Flow(1), Grid(1), 'ALL')
+      call Process % Update_Boundary_Values(Grid(1), Flow(1), 'ALL')
 
       ! End of the current iteration
       call Info % Iter_Print(1)
@@ -172,20 +172,20 @@
     call Info % Bulk_Print(Flow(1), 1, 1)
 
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
-      call Gpu % Turb_Update_Host (Turb(1), Flow(1))
-      call Gpu % Field_Update_Host(Turb(1), Flow(1))
-      call Gpu % Grid_Update_Host (Turb(1), Grid(1))
-      call Results % Main_Results (Turb(1), Flow(1), Grid(1), 1)
+      call Gpu % Turb_Update_Host (Flow(1), Turb(1))
+      call Gpu % Field_Update_Host(Flow(1), Turb(1))
+      call Gpu % Grid_Update_Host (Grid(1), Turb(1))
+      call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
     end if
 
   end do    ! time steps
   call cpu_time(te)
 
   ! Save results
-  call Gpu % Turb_Update_Host (Turb(1), Flow(1))
-  call Gpu % Field_Update_Host(Turb(1), Flow(1))
-  call Gpu % Grid_Update_Host (Turb(1), Grid(1))
-  call Results % Main_Results (Turb(1), Flow(1), Grid(1), 1)
+  call Gpu % Turb_Update_Host (Flow(1), Turb(1))
+  call Gpu % Field_Update_Host(Flow(1), Turb(1))
+  call Gpu % Grid_Update_Host (Grid(1), Turb(1))
+  call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
 
   call Work % Finalize_Work()
 

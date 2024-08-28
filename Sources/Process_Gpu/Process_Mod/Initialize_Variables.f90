@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(Process, Turb, Flow, Grid)
+  subroutine Initialize_Variables(Process, Grid, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it sets initial conditions releated to momentum and enthalpy
@@ -14,9 +14,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)        :: Process  !! parent class
-  type(Turb_Type),    target :: Turb     !! turbulence object
-  type(Field_Type),   target :: Flow     !! flow object
   type(Grid_Type),    target :: Grid     !! grid object
+  type(Field_Type),   target :: Flow     !! flow object
+  type(Turb_Type),    target :: Turb     !! turbulence object
 !-----------------------------------[Locals]-----------------------------------!
   type(Bulk_Type),  pointer :: bulk
   type(Var_Type),   pointer :: u, v, w, t, phi

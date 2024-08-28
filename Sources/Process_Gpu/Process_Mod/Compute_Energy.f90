@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Compute_Energy(Process, Turb, Flow, Grid)
+  subroutine Compute_Energy(Process, Grid, Flow, Turb)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Turb_Type)          :: Turb
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
+  type(Turb_Type)          :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Aval
   type(Sparse_Con_Type), pointer :: Acon
@@ -79,7 +79,7 @@
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
-  call Process % Form_Energy_Matrix(Turb, Flow, Grid, Acon, Aval,  &
+  call Process % Form_Energy_Matrix(Grid, Flow, Turb, Acon, Aval,  &
                                     urf, dt=Flow % dt)
 
   !----------------------------------------------------------!
@@ -87,11 +87,11 @@
   !----------------------------------------------------------!
 
   ! From boundary conditions
-  call Process % Insert_Energy_Bc(Flow, Grid)
+  call Process % Insert_Energy_Bc(Grid, Flow)
 
   ! Inertial and advection terms
-  call Process % Add_Inertial_Term (Flow, Grid, Flow % t, dens_capa)
-  call Process % Add_Advection_Term(Flow, Grid, Flow % t, dens_capa)
+  call Process % Add_Inertial_Term (Grid, Flow, Flow % t, dens_capa)
+  call Process % Add_Advection_Term(Grid, Flow, Flow % t, dens_capa)
 
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !

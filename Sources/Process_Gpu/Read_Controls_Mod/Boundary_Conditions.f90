@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Boundary_Conditions(Rc, Flow, Grid)
+  subroutine Boundary_Conditions(Rc, Grid, Flow)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -10,8 +10,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Controls_Type), intent(in) :: Rc    !! parent class
-  type(Field_Type), target              :: Flow  !! flow object
   type(Grid_Type)                       :: Grid  !! grid object
+  type(Field_Type), target              :: Flow  !! flow object
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t, p
   type(Var_Type),  pointer :: scalar(:)

@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Compute_Momentum(Process, Turb, Flow, Grid, comp)
+  subroutine Compute_Momentum(Process, Grid, Flow, Turb, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Turb_Type)          :: Turb
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
+  type(Turb_Type)          :: Turb
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Aval
@@ -92,7 +92,7 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Turb, Flow, Grid, Acon, Aval,  &
+    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Acon, Aval,  &
                                         urf, dt = Flow % dt)
   end if
 
@@ -101,25 +101,25 @@
   !----------------------------------------------------------!
 
   ! From boundary conditions
-  call Process % Insert_Momentum_Bc(Flow, Grid, comp=comp)
+  call Process % Insert_Momentum_Bc(Grid, Flow, comp=comp)
 
   ! Buoyancy forces
   call Flow % Buoyancy_Forces(Grid, comp)
 
   ! Inertial and advection terms
   if(comp .eq. 1) then
-    call Process % Add_Inertial_Term (Flow, Grid, Flow % u, flow_density)
-    call Process % Add_Advection_Term(Flow, Grid, Flow % u, flow_density)
+    call Process % Add_Inertial_Term (Grid, Flow, Flow % u, flow_density)
+    call Process % Add_Advection_Term(Grid, Flow, Flow % u, flow_density)
   else if(comp .eq. 2) then
-    call Process % Add_Inertial_Term (Flow, Grid, Flow % v, flow_density)
-    call Process % Add_Advection_Term(Flow, Grid, Flow % v, flow_density)
+    call Process % Add_Inertial_Term (Grid, Flow, Flow % v, flow_density)
+    call Process % Add_Advection_Term(Grid, Flow, Flow % v, flow_density)
   else if(comp .eq. 3) then
-    call Process % Add_Inertial_Term (Flow, Grid, Flow % w, flow_density)
-    call Process % Add_Advection_Term(Flow, Grid, Flow % w, flow_density)
+    call Process % Add_Inertial_Term (Grid, Flow, Flow % w, flow_density)
+    call Process % Add_Advection_Term(Grid, Flow, Flow % w, flow_density)
   end if
 
   ! Pressure force
-  call Process % Add_Pressure_Term(Flow, Grid, comp=comp)
+  call Process % Add_Pressure_Term(Grid, Flow, comp=comp)
 
   !---------------------------------------!
   !    Part 2 of the under-relaxation     !

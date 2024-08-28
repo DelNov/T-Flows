@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Native_Solvers(Rc, Flow, Grid)
+  subroutine Native_Solvers(Rc, Grid, Flow)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -10,8 +10,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Read_Controls_Type), intent(in) :: Rc    !! parent class
-  type(Field_Type), target              :: Flow  !! flow object
   type(Grid_Type)                       :: Grid  !! grid object
+  type(Field_Type), target              :: Flow  !! flow object
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: ui, phi
   integer                  :: i, sc

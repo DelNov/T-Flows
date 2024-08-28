@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Correct_Velocity(Process, Flow, Grid)
+  subroutine Correct_Velocity(Process, Grid, Flow)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -13,8 +13,8 @@
 !     p % x * vol  [kg / (m^2 s^2) * m^3 = kg m / s^2 = N]                     !
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)

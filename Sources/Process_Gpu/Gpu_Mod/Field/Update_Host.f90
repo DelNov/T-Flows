@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Update_Host(Gpu, Turb, Flow)
+  subroutine Field_Update_Host(Gpu, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  Copy all the field variables (velocity, pressure, temperature, ...) you
 !>  might need for post-processing back to CPU

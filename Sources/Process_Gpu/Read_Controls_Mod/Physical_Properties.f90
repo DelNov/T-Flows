@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Physical_Properties(Rc, Flow, Grid)
+  subroutine Physical_Properties(Rc, Grid, Flow)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -9,12 +9,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Read_Controls_Type), intent(in) :: Rc     !! parent class
-  type(Field_Type)                      :: Flow   !! flow object
+  class(Read_Controls_Type), intent(in) :: Rc    !! parent class
   type(Grid_Type)                       :: Grid  !! grid object
+  type(Field_Type)                      :: Flow  !! flow object
 !-----------------------------------[Locals]-----------------------------------!
-  real                     :: dens_const, visc_const
-  real                     :: capa_const, cond_const
+  real :: dens_const, visc_const
+  real :: capa_const, cond_const
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Rc)
 !==============================================================================!

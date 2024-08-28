@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Copy_To_Device(Gpu, Turb, Flow)
+  subroutine Field_Copy_To_Device(Gpu, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  Copy all the field variables (velocity, pressure, temperature, ...) you
 !>  might need in your simulation to GPU.
@@ -7,8 +7,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type)          :: Gpu   !! parent class
-  type(Turb_Type)          :: Turb  !! to check if shear and vort are needed
   type(Field_Type), target :: Flow  !! field to transfer to device
+  type(Turb_Type)          :: Turb  !! to check if shear and vort are needed
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)

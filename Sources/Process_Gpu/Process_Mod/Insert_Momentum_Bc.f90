@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine Insert_Momentum_Bc(Process, Flow, Grid, comp)
+  subroutine Insert_Momentum_Bc(Process, Grid, Flow, comp)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Field_Type), target :: Flow
   type(Grid_Type)          :: Grid
+  type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:)

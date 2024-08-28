@@ -54,10 +54,10 @@
   call Flow % Create_Field(Grid)
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Flow, Grid)
+  call Read_Control % Physical_Properties(Grid, Flow)
 
   ! Discretize the matrix for diffusion
-  call Process % Form_Momentum_Matrix(Turb, Flow, Grid, Acon, Aval, 1.0)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Acon, Aval, 1.0)
 
   ! Take the alias now
   Acon => Flow % Nat % C

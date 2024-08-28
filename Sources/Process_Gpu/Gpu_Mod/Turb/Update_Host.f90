@@ -1,13 +1,13 @@
 !==============================================================================!
-  subroutine Turb_Update_Host(Gpu, Turb, Flow)
+  subroutine Turb_Update_Host(Gpu, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  Copy all the turbulence variables you need for post-processing back to CPU
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type)  :: Gpu   !! parent class
-  type(Turb_Type)  :: Turb  !! to check if wall distance should be updated
   type(Field_Type) :: Flow  !! field to transfer to device
+  type(Turb_Type)  :: Turb  !! turbulence quantities
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
