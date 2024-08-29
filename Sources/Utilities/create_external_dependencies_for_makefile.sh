@@ -28,7 +28,7 @@ tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+trap 'if [ $? -ne 0 ]; then echo "\"${last_command}\" command failed with exit code $?."; fi' EXIT
 
 #---------------------------------------#
 #   Produces correct module structure   #
@@ -37,7 +37,7 @@ function module_list() {
   # $1 - dir
 
   cd $1
-  # find file
+  # find file including soft links
   # with _Mod
   # remove ^./
   # not ^.
@@ -51,7 +51,7 @@ function module_list() {
   # turn ? to _Mod/*/
   # sort reverse unique
   # delete empty line
-  local result=$(find . -type f -print \
+  local result=$(find -L . -type f -print \
                | grep -i '_Mod' \
                | sed  -e 's%^\.\/%%' \
                | grep -v '^\.' \
