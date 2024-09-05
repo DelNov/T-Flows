@@ -17,11 +17,12 @@ MPI     ?= no
 OMP     ?= no
 SORT    ?= quick
 
-#--------------------------
-#   Variable definitions
-#--------------------------
+#-------------------------------------
+#   Check values passed to makefile
+#-------------------------------------
+include makefile_check_arguments
 
-# MPI
+# MPI in addition
 ifneq ($(MPI), yes)
   ifneq ($(MPI), no)
     $(info #=================================================================)
@@ -33,6 +34,12 @@ ifneq ($(MPI), yes)
   endif
 endif
 
+#--------------------------
+#
+#   Variable definitions
+#
+#--------------------------
+
 #---------------------------------------------------------------
 #   Directories for objects and modules. (No need to change.)
 #---------------------------------------------------------------
@@ -41,6 +48,11 @@ DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
 VPATH = $(DIR_SHARED):.
+
+#------------------------------
+#   Python for preprocessing
+#------------------------------
+PYTHON=python3
 
 #--------------------------------------
 #   Dissengage GPU for Intel and Gnu
@@ -279,8 +291,8 @@ SRC_F_MOD += Gpu_Pointers_Mod.f90   \
 #---------------
 
 # Sources for all functions are obtained by a shell command
-SRC_F_FUN = $(shell ls -1 *.f90			\
-                        | xargs -n1 basename	\
+SRC_F_FUN = $(shell ls -1 *.f90                        \
+                        | xargs -n1 basename   \
                         | grep -v -i _Mod)
 
 # Sources for all shared functions
@@ -294,6 +306,17 @@ SRC_F_FUN += Key_Ind.f90
 OBJ_F_MOD = $(SRC_F_MOD:%.f90=$(DIR_OBJECT)/%.o)
 OBJ_F_FUN = $(SRC_F_FUN:%.f90=$(DIR_OBJECT)/%.o)
 OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
+
+#---------------------------------------------------------
+#   Python Preprocessing Rule for .fpp files
+#---------------------------------------------------------
+# This rule preprocesses .fpp files into .f90 files
+%.f90: %.fpp
+	@echo "Preprocessing $< with Python to generate $@"
+	@$(PYTHON) t-flows-preprocessor.py $< $@
+
+# Add the .fpp files here, which need preprocessing to .f90
+SRC_FPP = Process_Mod/Compute_Energy.fpp
 
 #---------------------------------------------------------
 #   Default rule to build Fortran modules and functions
