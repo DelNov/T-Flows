@@ -316,7 +316,7 @@ OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
 	@$(PYTHON) t-flows-preprocessor.py $< $@
 
 # Add the .fpp files here, which need preprocessing to .f90
-SRC_FPP = Process_Mod/Compute_Energy.fpp
+SRC_FPP = $(shell find . -name "*.fpp")
 
 #---------------------------------------------------------
 #   Default rule to build Fortran modules and functions
