@@ -5,13 +5,13 @@
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)           :: Process
-  type(Grid_Type),   intent(in) :: Grid
-  type(Field_Type),      target :: Flow
-  type(Turb_Type)               :: Turb
-  type(Sparse_Con_Type), target :: Acon
-  type(Sparse_Val_Type), target :: Aval
-  real                          :: urf
-  real,    optional, intent(in) :: dt       !! time step
+  type(Grid_Type), intent(in), target :: Grid
+  type(Field_Type),            target :: Flow
+  type(Turb_Type),             target :: Turb
+  type(Sparse_Con_Type),       target :: Acon
+  type(Sparse_Val_Type),       target :: Aval
+  real                                :: urf
+  real,  optional, intent(in)         :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
@@ -52,20 +52,28 @@
   dens => flow_density
 
   ! Just copy molecular viscosity to effective
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         visc_eff, flow_viscosity)
-  do c = Cells_In_Domain_And_Buffers_Gpu()
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   visc_eff,  &
+  !$acc   flow_viscosity   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
     visc_eff(c) = flow_viscosity(c)
   end do
   !$acc end parallel
 
   ! If there is a turbulence model, add turbulent viscosity
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
-    !$acc parallel loop independent                        &
-    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-    !$acc         visc_eff, turb_vis_t)
-    do c = Cells_In_Domain_And_Buffers_Gpu()
+    !$acc parallel loop independent  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   visc_eff,  &
+    !$acc   turb_vis_t   &
+    !$acc )
+    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
       visc_eff(c) = visc_eff(c) + turb_vis_t(c)
     end do
     !$acc end parallel

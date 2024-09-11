@@ -59,31 +59,19 @@
   !$acc end parallel
 
   ! Just copy molecular conductivity to effective
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   cond_eff,  &
-  !$acc   flow_conductivity   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()
     cond_eff(c) = flow_conductivity(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! If there is a turbulence model, add turbulent conductivity
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
-    !$acc parallel loop independent  &
-    !$acc present(  &
-    !$acc   grid_region_f_cell,  &
-    !$acc   grid_region_l_cell,  &
-    !$acc   cond_eff,  &
-    !$acc   turb_vis_t   &
-    !$acc )
-    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
+    !$tf-acc loop begin
+    do c = Cells_In_Domain_And_Buffers()
       cond_eff(c) = cond_eff(c) + turb_vis_t(c) / 0.9  ! hard-coded Pr_t
     end do
-    !$acc end parallel
+    !$tf-acc loop end
   end if
 
   !---------------------------------------!

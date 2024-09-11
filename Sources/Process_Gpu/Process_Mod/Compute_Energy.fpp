@@ -58,22 +58,21 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
-      !$acc parallel loop independent                        &
-      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-      !$acc         flow_t_n, flow_t_o)
-      do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
-        flow_t_oo(c) = flow_t_o(c)
+
+      !$tf-acc loop begin
+      do c = Cells_In_Domain_And_Buffers()  ! all present
+        Flow % t % oo(c) = Flow % t % o(c)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
+
     end if
 
-    !$acc parallel loop independent                        &
-    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-    !$acc         flow_t_n, flow_t_o)
-    do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
-      flow_t_o(c) = flow_t_n(c)
+    !$tf-acc loop begin
+    do c = Cells_In_Domain_And_Buffers()  ! all present
+      Flow % t % o(c) = Flow % t % n(c)
     end do
-    !$acc end parallel
+    !$tf-acc loop end
+
   end if
 
   !--------------------------------------------------!

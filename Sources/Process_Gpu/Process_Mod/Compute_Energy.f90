@@ -58,22 +58,37 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
-      !$acc parallel loop independent                        &
-      !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-      !$acc         flow_t_n, flow_t_o)
-      do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
+
+      flow_t_oo => Flow % t % oo
+      flow_t_o => Flow % t % o
+      !$acc parallel loop independent  &
+      !$acc present(  &
+      !$acc   grid_region_f_cell,  &
+      !$acc   grid_region_l_cell,  &
+      !$acc   flow_t_oo,  &
+      !$acc   flow_t_o   &
+      !$acc )
+      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
         flow_t_oo(c) = flow_t_o(c)
       end do
       !$acc end parallel
+
     end if
 
-    !$acc parallel loop independent                        &
-    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-    !$acc         flow_t_n, flow_t_o)
-    do c = Cells_In_Domain_And_Buffers_Gpu()  ! all present
+    flow_t_o => Flow % t % o
+    flow_t_n => Flow % t % n
+    !$acc parallel loop independent  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   flow_t_o,  &
+    !$acc   flow_t_n   &
+    !$acc )
+    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
       flow_t_o(c) = flow_t_n(c)
     end do
     !$acc end parallel
+
   end if
 
   !--------------------------------------------------!
@@ -98,8 +113,6 @@
   !   (Part 1 is in Form_Energy_Matrix)   !
   !---------------------------------------!
 
-  grid_region_f_cell => Grid % region % f_cell
-  grid_region_l_cell => Grid % region % l_cell
   flow_t_n => Flow % t % n
   !$acc parallel loop  &
   !$acc present(  &

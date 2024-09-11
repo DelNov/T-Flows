@@ -68,30 +68,18 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % u % td_scheme .eq. PARABOLIC) then
-      !$acc parallel loop independent  &
-      !$acc present(  &
-      !$acc   grid_region_f_cell,  &
-      !$acc   grid_region_l_cell,  &
-      !$acc   ui_oo,  &
-      !$acc   ui_o   &
-      !$acc )
-      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
+      !$tf-acc loop begin
+      do c = Cells_In_Domain_And_Buffers()  ! all present
         ui_oo(c) = ui_o(c)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
     end if
 
-    !$acc parallel loop independent  &
-    !$acc present(  &
-    !$acc   grid_region_f_cell,  &
-    !$acc   grid_region_l_cell,  &
-    !$acc   ui_o,  &
-    !$acc   ui_n   &
-    !$acc )
-    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
+    !$tf-acc loop begin
+    do c = Cells_In_Domain_And_Buffers()  ! all present
       ui_o(c) = ui_n(c)
     end do
-    !$acc end parallel
+    !$tf-acc loop end
   end if
 
   !----------------------------------------------------!
@@ -134,19 +122,11 @@
   !   (Part 1 is in Form_System_Matrix)   !
   !---------------------------------------!
 
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
-  !$acc   dia,  &
-  !$acc   val,  &
-  !$acc   ui_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
     b(c) = b(c) + val(dia(c)) * (1.0 - urf) * ui_n(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !------------------------!
   !   Call linear solver   !

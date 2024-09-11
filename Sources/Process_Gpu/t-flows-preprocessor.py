@@ -107,6 +107,34 @@ input_file = sys.argv[1]
 output_file = sys.argv[2]
 
 indent = "   "
+RED    = "\033[31m"
+YELLOW = "\033[33m"
+CYAN   = "\033[36m"
+RESET  = "\033[0m"
+
+copy_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
+
+import re
+
+#==============================================================================#
+#                                                                              #
+#   Check if a string is in the file                                           #
+#                                                                              #
+#------------------------------------------------------------------------------#
+def Command_In_File(file_path, target_string):
+
+  # Remove spaces from the target string for comparison
+  cleaned_target = re.sub(r'\s+', '', target_string)
+
+  # Open the file and read its content
+  with open(file_path, 'r') as file:
+    file_content = file.read()
+
+  # Remove spaces from the file content
+  cleaned_file_content = re.sub(r'\s+', '', file_content)
+
+  # Check if the cleaned target string is in the cleaned file content
+  return cleaned_target in cleaned_file_content
 
 #==============================================================================#
 #                                                                              #
@@ -155,19 +183,26 @@ def Find_Arrays_In_Block(block):
 #------------------------------------------------------------------------------#
 def Process_Tfp_Block(block):
 
-  print("#======================")
-  print("#                      ")
-  print("# Preprocessing block: ")
-  print("#                      ")
-  print("#----------------------")
-  print(block)
+  print("")
+  print(f"{YELLOW}#======================{RESET}")
+  print(f"{YELLOW}#                      {RESET}")
+  print(f"{YELLOW}# Preprocessing block: {RESET}")
+  print(f"{YELLOW}#                      {RESET}")
+  print(f"{YELLOW}#----------------------{RESET}")
+  print(block, end="")
 
   # Initialize pointers and OpenACC clauses
   pointer_setup = ""
-  openacc_setup = (
-    indent + "!$acc parallel loop  &\n" +
-    indent + "!$acc present(  &\n"
-  )
+  openacc_setup = ""
+  if "Cells_In_Domain_And_Buffers" in block:
+    openacc_setup += (indent + "!$acc parallel loop independent  &\n")
+  else:
+    if "Cells_In_Domain" in block:
+      openacc_setup += (indent + "!$acc parallel loop  &\n")
+  if "Faces_In_Region" in block:
+    openacc_setup += (indent + "!$acc parallel loop  &\n")
+
+  openacc_setup += (indent + "!$acc present(  &\n")
 
   # Set to track processed variables to avoid duplicates
   processed_vars = set()
@@ -176,13 +211,15 @@ def Process_Tfp_Block(block):
   reduction_vars = set()
 
   # List of macros to exclude from processing as arrays
-  excluded_macros = {"Faces_In_Region", "Cells_In_Domain"}
+  excluded_macros = {"Faces_In_Region",
+                     "Cells_In_Domain", "Cells_In_Domain_And_Buffers"}
 
   #--------------------------------------------------#
   #   Special handling for Faces_In_Region variables #
   #--------------------------------------------------#
   if "Faces_In_Region" in block:
 
+    print("")
     print("  #-------------------------------")
     print("  # Block of type Faces_In_Region ")
     print("  #-------------------------------")
@@ -202,14 +239,57 @@ def Process_Tfp_Block(block):
   #--------------------------------------------------#
   #   Special handling for Cells_In_Domain variables #
   #--------------------------------------------------#
-  if "Cells_In_Domain" in block:
+  if "Cells_In_Domain" in block and not "Cells_In_Domain_And_Buffers" in block:
 
-    print("  #-------------------------------")
-    print("  # Block of type Cells_In_Domain ")
-    print("  #-------------------------------")
-    pointer_setup = (
-      indent + "grid_region_f_cell => Grid % region % f_cell\n" +
-      indent + "grid_region_l_cell => Grid % region % l_cell\n")
+    print("")
+    print(f"{CYAN}  #-------------------------------{RESET}")
+    print(f"{CYAN}  # Block of type Cells_In_Domain {RESET}")
+    print(f"{CYAN}  #-------------------------------{RESET}")
+
+    print("")
+    print(f"{RED}  # Pointers used in the block{RESET}")
+
+    commands = ("grid_region_f_cell => Grid % region % f_cell",
+                "grid_region_l_cell => Grid % region % l_cell")
+
+    for command in commands:
+      if not Command_In_File(copy_to_device_file, command):
+        pointer_setup += (indent + command + "\n")
+      else:
+        print("  ", command, " already in ", copy_to_device_file, sep="")
+
+    openacc_setup += (
+      indent + "!$acc   grid_region_f_cell,  &\n" +
+      indent + "!$acc   grid_region_l_cell,  &\n")
+    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
+    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
+
+    # Add these to the processed set to avoid duplicates
+    processed_vars.add('grid_region_f_cell')
+    processed_vars.add('grid_region_l_cell')
+
+  #----------------------------------------------------------------#
+  #   Special handling for Cells_In_Domain_And_Buffers variables   #
+  #----------------------------------------------------------------#
+  if "Cells_In_Domain_And_Buffers" in block:
+
+    print("")
+    print(f"{CYAN}  #-------------------------------------------{RESET}")
+    print(f"{CYAN}  # Block of type Cells_In_Domain_And_Buffers {RESET}")
+    print(f"{CYAN}  #-------------------------------------------{RESET}")
+
+    print("")
+    print(f"{RED}  # Pointers used in the block{RESET}")
+
+    commands = ("grid_region_f_cell => Grid % region % f_cell",
+                "grid_region_l_cell => Grid % region % l_cell")
+
+    for command in commands:
+      if not Command_In_File(copy_to_device_file, command):
+        pointer_setup += (indent + command + "\n")
+      else:
+        print("  ", command, " already in ", copy_to_device_file, sep="")
+
     openacc_setup += (
       indent + "!$acc   grid_region_f_cell,  &\n" +
       indent + "!$acc   grid_region_l_cell,  &\n")
@@ -253,10 +333,10 @@ def Process_Tfp_Block(block):
       if "%" in full_name:  # If it's part of a structure
         # Add to the pointer setup
         pointer_setup += f"{indent}{variable_name} => {full_name}\n"
-        print("    ", variable_name, "  (", full_name, ")", sep="")
+        print("  ", variable_name, "  (", full_name, ")", sep="")
 
       else:
-        print("    ", variable_name, sep="")
+        print("  ", variable_name, sep="")
 
       # Add to the OpenACC setup
       openacc_setup += f"{indent}!$acc   {variable_name},  &\n"
@@ -287,7 +367,10 @@ def Process_Tfp_Block(block):
     reduction_clause = "reduction(+:"
     reduction_clause += ",".join(reduction_vars)
     reduction_clause += ")"
-    openacc_setup = openacc_setup.replace("parallel loop", f"parallel loop {reduction_clause}")
+    openacc_setup = openacc_setup.replace(
+      "parallel loop",
+      f"parallel loop {reduction_clause}"
+    )
 
   # Append the closing parenthesis for OpenACC present clause
   openacc_setup += indent + "!$acc )\n"
@@ -295,7 +378,11 @@ def Process_Tfp_Block(block):
   # Replace the last comma with a space in the present clause
   last_comma_index = openacc_setup.rfind(",")
   if last_comma_index != -1:
-    openacc_setup = openacc_setup[:last_comma_index] + " " + openacc_setup[last_comma_index + 1:]
+    openacc_setup = (
+        openacc_setup[:last_comma_index]
+      + " "
+      + openacc_setup[last_comma_index + 1:]
+    )
 
   # Replace the 'do' loop with the OpenACC-parallelized version (if present)
   block = re.sub(
@@ -308,6 +395,13 @@ def Process_Tfp_Block(block):
   block = re.sub(
     r'Cells_In_Domain\(\)',
     'grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)',
+    block
+  )
+
+  # Replace the 'do' loop with the OpenACC-parallelized version (if present)
+  block = re.sub(
+    r'Cells_In_Domain_And_Buffers\(\)',
+    'grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)',
     block
   )
 
