@@ -110,10 +110,57 @@ indent = "   "
 
 #==============================================================================#
 #                                                                              #
+#   Function to find all arrays in a block                                     #
+#                                                                              #
+#------------------------------------------------------------------------------#
+def Find_Arrays_In_Block(block):
+
+  # Remove all comments
+  cleaned_block = re.sub(r'!.*', '', block)
+
+  # Remove operators but preserve spaces around '%' and '%' itself
+  cleaned_block = re.sub(r'(?<!%)\s(?!%)|[+\-*/^=&]', '', cleaned_block)
+
+  result = []
+  seen_arrays = set()  # Track arrays to avoid duplicates
+
+  # Browse through the reduced block and look for arrays
+  stack = []
+  for i, char in enumerate(cleaned_block):
+    if char == '(':
+      # The array name is just before the opening brace
+      array_name_end = i
+      # Go backwards to find where the array name starts
+      j = i - 1
+      while j >= 0 and cleaned_block[j] not in ['(', ')']:
+        j -= 1
+      array_name_start = j + 1
+      array_name = cleaned_block[array_name_start:array_name_end]
+
+      # Only consider valid array names (non-empty) and avoid duplicates
+      if array_name and array_name not in seen_arrays:
+        stack.append((array_name, i))
+        seen_arrays.add(array_name)  # Mark array as seen
+    elif char == ')' and stack:
+      array_name, open_paren_pos = stack.pop()
+      indices = cleaned_block[open_paren_pos + 1:i]
+      result.append((array_name, indices))
+
+  return result
+
+#==============================================================================#
+#                                                                              #
 #   Function to perform the transformation inside !$tf-acc blocks              #
 #                                                                              #
 #------------------------------------------------------------------------------#
 def Process_Tfp_Block(block):
+
+  print("#======================")
+  print("#                      ")
+  print("# Preprocessing block: ")
+  print("#                      ")
+  print("#----------------------")
+  print(block)
 
   # Initialize pointers and OpenACC clauses
   pointer_setup = ""
@@ -135,6 +182,10 @@ def Process_Tfp_Block(block):
   #   Special handling for Faces_In_Region variables #
   #--------------------------------------------------#
   if "Faces_In_Region" in block:
+
+    print("  #-------------------------------")
+    print("  # Block of type Faces_In_Region ")
+    print("  #-------------------------------")
     pointer_setup = (
       indent + "grid_region_f_face => Grid % region % f_face\n" +
       indent + "grid_region_l_face => Grid % region % l_face\n")
@@ -152,6 +203,10 @@ def Process_Tfp_Block(block):
   #   Special handling for Cells_In_Domain variables #
   #--------------------------------------------------#
   if "Cells_In_Domain" in block:
+
+    print("  #-------------------------------")
+    print("  # Block of type Cells_In_Domain ")
+    print("  #-------------------------------")
     pointer_setup = (
       indent + "grid_region_f_cell => Grid % region % f_cell\n" +
       indent + "grid_region_l_cell => Grid % region % l_cell\n")
@@ -174,7 +229,10 @@ def Process_Tfp_Block(block):
   #----------------------------------#
   #   Find all arrays in the block   #
   #----------------------------------#
-  arrays = array_pattern.findall(block)
+  arrays = Find_Arrays_In_Block(block)
+
+  print("")
+  print("  # Arrays found in the block ")
 
   #------------------------#
   #   Process each array   #
@@ -195,11 +253,16 @@ def Process_Tfp_Block(block):
       if "%" in full_name:  # If it's part of a structure
         # Add to the pointer setup
         pointer_setup += f"{indent}{variable_name} => {full_name}\n"
+        print("    ", variable_name, "  (", full_name, ")", sep="")
+
+      else:
+        print("    ", variable_name, sep="")
 
       # Add to the OpenACC setup
       openacc_setup += f"{indent}!$acc   {variable_name},  &\n"
 
-      # Replace occurrences of the original variable name with the pointer name in the block
+      # Replace occurrences of the original variable
+      # name with the pointer name in the block
       block = re.sub(re.escape(full_name), variable_name, block)
 
       # Mark variable as processed
@@ -304,6 +367,7 @@ with open(input_file, 'r') as infile:
 # Process each line and look for !$tf-acc blocks
 inside_tfp_block = False
 output_lines = []
+line_count = 0
 
 #----------------------------------------#
 #                                        #
@@ -311,6 +375,8 @@ output_lines = []
 #                                        #
 #----------------------------------------#
 for line in lines:
+
+  line_count = line_count + 1
 
   #----------------------------------------#
   #  If you find the !$tf-acc loop begin   #
@@ -338,6 +404,16 @@ for line in lines:
     # Process the whole tfp block and append it to output
     processed_block = Process_Tfp_Block("".join(tfp_block))
     output_lines.append(processed_block)
+
+  #------------------------------------------#
+  #  If you find an invalid !$tf-acc entry   #
+  #------------------------------------------#
+  elif line.strip().startswith("!$tf-acc"):
+    print("Invalid !$tf-acc directive on line", line_count, ":", line.strip())
+    print("Valid entries are: ")
+    print("   !$tf-acc loop begin")
+    print("   !$tf-acc loop end")
+    sys.exit(1)
 
   elif inside_tfp_block:
     tfp_block.append(line)
