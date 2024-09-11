@@ -4,9 +4,9 @@
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)      :: Process
-  type(Grid_Type)          :: Grid
+  type(Grid_Type),  target :: Grid
   type(Field_Type), target :: Flow
-  type(Turb_Type)          :: Turb
+  type(Turb_Type),  target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Aval
   type(Sparse_Con_Type), pointer :: Acon
@@ -98,13 +98,11 @@
   !   (Part 1 is in Form_Energy_Matrix)   !
   !---------------------------------------!
 
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         b, val, dia, flow_t_n)
-  do c = Cells_In_Domain_Gpu()  ! all present
-    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * flow_t_n(c)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * Flow % t % n(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !------------------------!
   !   Call linear solver   !
