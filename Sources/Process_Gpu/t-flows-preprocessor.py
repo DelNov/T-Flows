@@ -1,3 +1,96 @@
+#==============================================================================#
+#   This script is designed to automatically insert OpenACC directives into
+#   T-Flows' Process_Gpu code for the blocks marked with !$tf-acc comments.
+#
+#   It processes the input T-Flows code, detects specific array structures,
+#   handles them according to predefined rules, and inserts OpenACC directives
+#   for parallel processing.
+#
+#   It relies on the assumption that there is only a finite number of T-Flows'
+#   loop constructes, and that these can be automated with a script like this.
+#   This is not a procedure which would work for any Fortran code, but only
+#   to T-Flows, and even for T-Flows it relies on its strict coding standards.
+#
+#   Breakdown of the Script's Workflow
+#
+#   1. Argument Handling: The script expects two command-line arguments:
+#      - The input .fpp file containing Fortran code blocks.
+#      - The output .f90 file where the transformed code will be written.
+#
+#      If incorrect arguments are provided, the script will exit with error.
+#
+#   2. Initialization: The script initializes some helper variables:
+#
+#      - indent: Sets the indentation level to three spaces for aligning
+#        inserted OpenACC directives.
+#      - excluded_macros: Lists macros (sych as Faces_In_Region,
+#        Cells_In_Domain and many others) that will not be processed as arrays
+#        (since they are treated differently).
+#
+#   3. Main Logic - Process_Tfp_Block(block) Function: This function processes
+#      each !$tf-acc code block in the input file. Below is a step-by-step
+#      explanation of its functionality:
+#
+#      a. Initialize OpenACC Pointers and Clauses:
+#         - The script initializes the pointer_setup and openacc_setup
+#           strings, which are used to store OpenACC directives.
+#         - For each !$tf-acc block, it builds a list of variables that need
+#           to be "present" in the OpenACC data region. This list will be
+#           inserted into the OpenACC directives.
+#
+#      b. Handle Special Macros:
+#         - Faces_In_Region: If the block contains Faces_In_Region, the script
+#           assigns pointers to the corresponding grid structures (such as
+#           grid_region_f_face and grid_region_l_face) and adds them to the
+#           OpenACC present clause.
+#         - Cells_In_Domain: Similarly, if Cells_In_Domain is detected,
+#           pointers are created and the variables are added to the present
+#           clause.
+#
+#      c. Array Handling:
+#         - The script uses a regular expression to find arrays in the block
+#           (variables followed by parentheses) and creates pointer names for
+#           each array.
+#         - If the array is part of a structure (Grid % cells_c, for example),
+#           a pointer setup line is created to alias the array, and the array
+#           is added to the OpenACC present clause.
+#         - The script replaces occurrences of the full array name with its
+#           pointer name within the block.
+#
+#      d. Detect Reduction Variables:
+#         - The script checks for reduction operations (variables that
+#           accumulate values in a loop, such as var = var + something) using
+#           a regular expression.
+#         - If reduction variables are detected, it adds a reduction clause to
+#           the OpenACC directives.
+#
+#      e. Finalizing OpenACC Directives:
+#         - After processing the arrays and reduction variables, the
+#           openacc_setup string is completed by closing the present clause.
+#
+#      f. Insert OpenACC Parallel Directives:
+#         - The script looks for "do" loops in the block:
+#           > It finds the second "do" loop and inserts an OpenACC sequential
+#             loop directive (!$acc loop seq) before it.
+#           > The script also inserts "!$acc end parallel" after the last
+#             "end do" statement and "!$acc end loop" after the second-to-last
+#             "end do".
+#
+#   4. File Processing:
+#
+#      - The script reads the input file line by line, looking for "!$tf-acc"
+#        blocks.  When it finds the start of such a block ("!$tf-acc loop
+#        begin"), it begins accumulating lines into a buffer (tfp_block).
+#      - When the end of the block ("!$tf-acc loop end") is found, the script
+#        processes the entire block using the Process_Tfp_Block function,
+#        transforming it into a new block with OpenACC directives.
+#      - The transformed block is written to the output file.
+#
+#   5. Writing the Output:
+#
+#      - Once all "!$tf-acc" blocks are processed, the script writes the
+#        modified code into the output .f90 file.
+#------------------------------------------------------------------------------#
 import sys
 import re
 
@@ -20,7 +113,7 @@ indent = "   "
 #   Function to perform the transformation inside !$tf-acc blocks              #
 #                                                                              #
 #------------------------------------------------------------------------------#
-def process_tfp_block(block):
+def Process_Tfp_Block(block):
 
   # Initialize pointers and OpenACC clauses
   pointer_setup = ""
@@ -219,10 +312,10 @@ output_lines = []
 #----------------------------------------#
 for line in lines:
 
-  #-----------------------------------------------#
-  #  If you find the !$tf-acc single loop begin   #
-  #-----------------------------------------------#
-  if line.strip().startswith("!$tf-acc single loop begin"):
+  #----------------------------------------#
+  #  If you find the !$tf-acc loop begin   #
+  #----------------------------------------#
+  if line.strip().startswith("!$tf-acc loop begin"):
 
     # Adjust indentation
     i = line.find("!")
@@ -231,10 +324,10 @@ for line in lines:
     inside_tfp_block = True
     tfp_block = []
 
-  #---------------------------------#
-  #  If you find the !$tf-acc end   #
-  #---------------------------------#
-  elif line.strip().startswith("!$tf-acc end"):
+  #--------------------------------------#
+  #  If you find the !$tf-acc loop end   #
+  #--------------------------------------#
+  elif line.strip().startswith("!$tf-acc loop end"):
 
     # Adjust indentation
     i = line.find("!")
@@ -243,7 +336,7 @@ for line in lines:
     inside_tfp_block = False
 
     # Process the whole tfp block and append it to output
-    processed_block = process_tfp_block("".join(tfp_block))
+    processed_block = Process_Tfp_Block("".join(tfp_block))
     output_lines.append(processed_block)
 
   elif inside_tfp_block:
