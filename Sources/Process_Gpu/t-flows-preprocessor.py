@@ -106,11 +106,14 @@ if len(sys.argv) != 3:
 input_file = sys.argv[1]
 output_file = sys.argv[2]
 
-indent = "   "
-RED    = "\033[31m"
-YELLOW = "\033[33m"
-CYAN   = "\033[36m"
-RESET  = "\033[0m"
+indent  = "   "
+RED     = "\033[31m"
+GREEN   = "\033[32m"
+YELLOW  = "\033[33m"
+BLUE    = "\033[34m"
+MAGENTA = "\033[35m"
+CYAN    = "\033[36m"
+RESET   = "\033[0m"
 
 copy_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
 
@@ -189,11 +192,20 @@ def Find_Arrays_In_Block(block):
   # Remove "end"
   cleaned_block = re.sub(r'\bend\b', '', cleaned_block)
 
+  # Remove "abs"
+  cleaned_block = re.sub(r'\babs\b', '', cleaned_block)
+
   # Remove "max"
   cleaned_block = re.sub(r'\bmax\b', '', cleaned_block)
 
   # Remove "min"
   cleaned_block = re.sub(r'\bmin\b', '', cleaned_block)
+
+  # Remove "maxval"
+  cleaned_block = re.sub(r'\bmaxval\b', '', cleaned_block)
+
+  # Remove "minval"
+  cleaned_block = re.sub(r'\bminval\b', '', cleaned_block)
 
   # Remove "merge"
   cleaned_block = re.sub(r'\bmerge\b', '', cleaned_block)
@@ -277,6 +289,8 @@ def Process_Tfp_Block(block):
       openacc_setup += (indent + "!$acc parallel loop  &\n")
   if "Faces_In_Region" in block:
     openacc_setup += (indent + "!$acc parallel loop  &\n")
+  if "Faces_In_Domain_And_At_Buffers" in block:
+    openacc_setup += (indent + "!$acc parallel loop  &\n")
 
   openacc_setup += (indent + "!$acc present(  &\n")
 
@@ -288,13 +302,14 @@ def Process_Tfp_Block(block):
 
   # List of macros to exclude from processing as arrays
   excluded_macros = {"Faces_In_Region",
+                     "Faces_In_Domain_And_At_Buffers",
                      "Face_Value",
                      "Cells_In_Domain",
                      "Cells_In_Domain_And_Buffers"}
 
-  #--------------------------------------------------#
-  #   Special handling for Faces_In_Region variables #
-  #--------------------------------------------------#
+  #----------------------------------------------------#
+  #   Special handling for Faces_In_Region variables   #
+  #----------------------------------------------------#
   if "Faces_In_Region" in block:
 
     print("")
@@ -323,6 +338,30 @@ def Process_Tfp_Block(block):
     # Add these to the processed set to avoid duplicates
     processed_vars.add('grid_region_f_face')
     processed_vars.add('grid_region_l_face')
+
+  #-------------------------------------------------------------------#
+  #   Special handling for Faces_In_Domain_And_At_Buffers variables   #
+  #-------------------------------------------------------------------#
+  if "Faces_In_Domain_And_At_Buffers" in block:
+
+    print("")
+    print(f"{RED}  # Pointers used in the block{RESET}")
+
+    commands = ("grid_region_f_face => Grid % region % f_face",
+                "grid_region_l_face => Grid % region % l_face")
+
+    for command in commands:
+      if not Command_In_File(copy_to_device_file, command):
+        pointer_setup += (indent + command + "\n")
+      else:
+        print("  ", command, " already in ", copy_to_device_file, sep="")
+
+    openacc_setup += (
+      indent + "!$acc   grid_region_f_cell,  &\n" +
+      indent + "!$acc   grid_region_l_cell,  &\n")
+    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
+    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
+    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
 
   #--------------------------------------------------#
   #   Special handling for Cells_In_Domain variables #
@@ -381,6 +420,7 @@ def Process_Tfp_Block(block):
     openacc_setup += (
       indent + "!$acc   grid_region_f_cell,  &\n" +
       indent + "!$acc   grid_region_l_cell,  &\n")
+    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
     block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
     block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
 
@@ -476,6 +516,13 @@ def Process_Tfp_Block(block):
   block = re.sub(
     r'Faces_In_Region\(reg\)',
     'grid_region_f_face(reg), grid_region_l_face(reg)',
+    block
+  )
+
+  # Replace the 'do' loop with the OpenACC-parallelized version (if present)
+  block = re.sub(
+    r'Faces_In_Domain_And_At_Buffers\(\)',
+    'grid_region_f_face(grid_n_regions), grid_region_l_face(grid_n_regions)',
     block
   )
 
@@ -591,10 +638,15 @@ for line in lines:
   #  If you find an invalid !$tf-acc entry   #
   #------------------------------------------#
   elif line.strip().startswith("!$tf-acc"):
+    print(f"{RED}#============================#{RESET}")
+    print(f"{RED}#                            #{RESET}")
+    print(f"{RED}#   ERROR IN PREPROCESSING   #{RESET}")
+    print(f"{RED}#                            #{RESET}")
+    print(f"{RED}#============================#{RESET}")
     print("Invalid !$tf-acc directive on line", line_count, ":", line.strip())
     print("Valid entries are: ")
-    print("   !$tf-acc loop begin")
-    print("   !$tf-acc loop end")
+    print(f"{GREEN}   !$tf-acc loop begin{RESET}")
+    print(f"{GREEN}   !$tf-acc loop end{RESET}")
     sys.exit(1)
 
   elif inside_tfp_block:

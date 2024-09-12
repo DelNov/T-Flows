@@ -62,16 +62,11 @@
   w_n => flow_w_n
 
   ! Nullify the volume source
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()  ! all present
     b(c) = 0.0
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !------------------------------------------!
   !                                          !
@@ -84,34 +79,14 @@
   !----------------------------------------------------!
   do reg = Boundary_Regions()
 
-    grid_faces_c => Grid % faces_c
-    flow_v_flux_n => Flow % v_flux % n
-    flow_u_n => Flow % u % n
-    grid_sx => Grid % sx
-    flow_v_n => Flow % v % n
-    grid_sy => Grid % sy
-    flow_w_n => Flow % w % n
-    grid_sz => Grid % sz
-    !$acc parallel loop  &
-    !$acc present(  &
-    !$acc   grid_region_f_face,  &
-    !$acc   grid_region_l_face,  &
-    !$acc   grid_faces_c,  &
-    !$acc   flow_v_flux_n,  &
-    !$acc   flow_u_n,  &
-    !$acc   grid_sx,  &
-    !$acc   flow_v_n,  &
-    !$acc   grid_sy,  &
-    !$acc   flow_w_n,  &
-    !$acc   grid_sz   &
-    !$acc )
-    do s = grid_region_f_face(reg), grid_region_l_face(reg)
-      c2 = grid_faces_c(2,s)  ! boundary cell
-      flow_v_flux_n(s) = flow_u_n(c2) * grid_sx(s)  &
-                           + flow_v_n(c2) * grid_sy(s)  &
-                           + flow_w_n(c2) * grid_sz(s)
+    !$tf-acc loop begin
+    do s = Faces_In_Region(reg)
+      c2 = Grid % faces_c(2,s)  ! boundary cell
+      Flow % v_flux % n(s) = Flow % u % n(c2) * Grid % sx(s)  &
+                           + Flow % v % n(c2) * Grid % sy(s)  &
+                           + Flow % w % n(c2) * Grid % sz(s)
     end do
-    !$acc end parallel
+    !$tf-acc loop end
 
   end do
 
@@ -127,40 +102,24 @@
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. INFLOW) then
 
-      grid_s => Grid % s
-      flow_v_flux_n => Flow % v_flux % n
-      !$acc parallel loop reduction(+:area_in,vol_in)  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_s,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        area_in = area_in + grid_s(s)
-        vol_in  = vol_in  - flow_v_flux_n(s)
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        area_in = area_in + Grid % s(s)
+        vol_in  = vol_in  - Flow % v_flux % n(s)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
 
     if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      grid_s => Grid % s
-      flow_v_flux_n => Flow % v_flux % n
-      !$acc parallel loop reduction(+:vol_out,area_out)  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_s,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        area_out = area_out + grid_s(s)
-        vol_out  = vol_out  + flow_v_flux_n(s)
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        area_out = area_out + Grid % s(s)
+        vol_out  = vol_out  + Flow % v_flux % n(s)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
   end do
@@ -178,17 +137,11 @@
       if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
          Grid % region % type(reg) .eq. CONVECT) then
 
-        flow_v_flux_n => Flow % v_flux % n
-        !$acc parallel loop  &
-        !$acc present(  &
-        !$acc   grid_region_f_face,  &
-        !$acc   grid_region_l_face,  &
-        !$acc   flow_v_flux_n   &
-        !$acc )
-        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          flow_v_flux_n(s) = flow_v_flux_n(s) * ratio
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)  ! all present
+          Flow % v_flux % n(s) = Flow % v_flux % n(s) * ratio
         end do
-        !$acc end parallel
+        !$tf-acc loop end
 
       end if
     end do
@@ -200,26 +153,8 @@
   !   This is application of Rhie & Chow technique   !
   !--------------------------------------------------!
 
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   grid_faces_c,  &
-  !$acc   u_n,  &
-  !$acc   p_x,  &
-  !$acc   flow_v_m,  &
-  !$acc   v_n,  &
-  !$acc   p_y,  &
-  !$acc   w_n,  &
-  !$acc   p_z,  &
-  !$acc   fc,  &
-  !$acc   flow_v_flux_n,  &
-  !$acc   grid_sx,  &
-  !$acc   grid_sy,  &
-  !$acc   grid_sz,  &
-  !$acc   flow_p_n   &
-  !$acc )
-  do s = grid_region_f_face(grid_n_regions), grid_region_l_face(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do s = Faces_In_Domain_And_At_Buffers()  ! all present
 
     c1 = grid_faces_c(1,s)
     c2 = grid_faces_c(2,s)
@@ -246,7 +181,7 @@
                      + a12 * (flow_p_n(c1) - flow_p_n(c2))
 
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !---------------------------------------------------------------------!
   !                                                                     !
@@ -258,38 +193,23 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c => Grid % cells_c
-  grid_cells_f => Grid % cells_f
-  flow_v_flux_n => Flow % v_flux % n
-  !$acc parallel loop reduction(+:b_tmp)  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
-  !$acc   grid_cells_n_cells,  &
-  !$acc   grid_cells_c,  &
-  !$acc   grid_cells_f,  &
-  !$acc   flow_v_flux_n   &
-  !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c1 = Cells_In_Domain()  ! all present
 
     b_tmp = b(c1)
-  !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
+        b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
-  !$acc end loop
 
     ! Finish
     b(c1) = b_tmp
 
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-----------------------------!
   !   Then the boundary faces   !
@@ -300,21 +220,12 @@
        Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      grid_faces_c => Grid % faces_c
-      flow_v_flux_n => Flow % v_flux % n
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   b,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)   ! inside cell
-        b(c1) = b(c1) - flow_v_flux_n(s)
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)   ! inside cell
+        b(c1) = b(c1) - Flow % v_flux % n(s)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
   end do
@@ -323,16 +234,11 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Find global maximum over all processors
   call Global % Max_Real(max_abs_val)
