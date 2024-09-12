@@ -83,16 +83,12 @@
   !--------------------------------------------------!
 
   ! Coefficients inside the domain
-  !$acc parallel loop independent                                &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
-  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         val, pos, visc_eff, fc, dia)
-  do c1 = Cells_In_Domain_Gpu()  ! all present
+  !$tf-acc loop begin
+  do c1 = Cells_In_Domain()  ! all present
 
-    !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
 
       ! Coefficients inside the domain
       if(c2 .gt. 0) then
@@ -104,10 +100,9 @@
         val(dia(c1)) = val(dia(c1)) + a12
       end if
     end do
-    !$acc end loop
 
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Coefficients on the boundaries
   do reg = Boundary_Regions()
@@ -132,43 +127,35 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    !$acc parallel loop independent                        &
-    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-    !$acc         grid_vol,                                &
-    !$acc         val, dia, dens)
-    do c = Cells_In_Domain_Gpu()  ! all present
-      val(dia(c)) = val(dia(c)) + dens(c) * grid_vol(c) / dt
+    !$tf-acc loop begin
+    do c = Cells_In_Domain()  ! all present, was independent
+      val(dia(c)) = val(dia(c)) + dens(c) * Grid % vol(c) / dt
     end do
-    !$acc end parallel
+    !$tf-acc loop end
   end if
 
   !--------------------------------------------------------------!
   !   Store volume divided by central coefficient for momentum   !
   !   and refresh its buffers before discretizing the pressure   !
   !--------------------------------------------------------------!
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         grid_vol,                                &
-  !$acc         flow_v_m, val, dia)
-  do c = Cells_In_Domain_Gpu()  ! all present
-    flow_v_m(c) = grid_vol(c) / val(dia(c))
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present, was independent
+    Flow % v_m(c) = Grid % vol(c) / val(dia(c))
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! This call is needed, the above loop goes through inside cells only
-  call Grid % Exchange_Inside_Cells_Real(flow_v_m)
+  call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
 
   !-------------------------------------!
   !   Part 1 of the under-relaxation    !
   !   (Part 2 is in Compute_Momentum)   !
   !-------------------------------------!
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         val, dia)
-  do c = Cells_In_Domain_Gpu()  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present, was independent
     val(dia(c)) = val(dia(c)) / urf
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-------------------------------!
   !   Mark the matrix as formed   !

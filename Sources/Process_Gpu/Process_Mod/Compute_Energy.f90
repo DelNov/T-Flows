@@ -59,14 +59,14 @@
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
 
-      flow_t_oo => Flow % t % oo
       flow_t_o => Flow % t % o
+      flow_t_oo => Flow % t % oo
       !$acc parallel loop independent  &
       !$acc present(  &
       !$acc   grid_region_f_cell,  &
       !$acc   grid_region_l_cell,  &
-      !$acc   flow_t_oo,  &
-      !$acc   flow_t_o   &
+      !$acc   flow_t_o,  &
+      !$acc   flow_t_oo   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
         flow_t_oo(c) = flow_t_o(c)
@@ -119,8 +119,8 @@
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b,  &
-  !$acc   dia,  &
   !$acc   val,  &
+  !$acc   dia,  &
   !$acc   flow_t_n   &
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present

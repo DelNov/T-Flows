@@ -103,13 +103,25 @@
 
   ! Coefficients inside the domain
 
-  !$acc parallel loop independent                                &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,          &
-  !$acc         grid_cells_n_cells, grid_cells_c, grid_cells_f,  &
-  !$acc         val, pos, cond_eff, fc, dia)
-  do c1 = Cells_In_Domain_Gpu()  ! all present
+  grid_cells_n_cells => Grid % cells_n_cells
+  grid_cells_c => Grid % cells_c
+  grid_cells_f => Grid % cells_f
+  !$acc parallel loop  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   grid_cells_n_cells,  &
+  !$acc   grid_cells_c,  &
+  !$acc   grid_cells_f,  &
+  !$acc   cond_eff,  &
+  !$acc   fc,  &
+  !$acc   val,  &
+  !$acc   pos,  &
+  !$acc   dia   &
+  !$acc )
+  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
 
-    !$acc loop seq
+  !$acc loop seq
     do i_cel = 1, grid_cells_n_cells(c1)
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
@@ -124,7 +136,7 @@
 
       end if
     end do
-    !$acc end loop
+  !$acc end loop
 
   end do
   !$acc end parallel
@@ -152,11 +164,17 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    !$acc parallel loop independent                        &
-    !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-    !$acc         grid_vol,                                &
-    !$acc         val, dia, dens_capa)
-    do c = Cells_In_Domain_Gpu()  ! all present
+    grid_vol => Grid % vol
+    !$acc parallel loop  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   val,  &
+    !$acc   dia,  &
+    !$acc   dens_capa,  &
+    !$acc   grid_vol   &
+    !$acc )
+    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
       val(dia(c)) = val(dia(c)) + dens_capa(c) * grid_vol(c) / dt
     end do
     !$acc end parallel
@@ -166,10 +184,14 @@
   !   Part 1 of the under-relaxation   !
   !   (Part 2 is in Compute_Energy)    !
   !------------------------------------!
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         val, dia)
-  do c = Cells_In_Domain_Gpu()  ! all present
+  !$acc parallel loop  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   val,  &
+  !$acc   dia   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
     val(dia(c)) = val(dia(c)) / urf
   end do
   !$acc end parallel

@@ -50,7 +50,7 @@
         !$acc         flow_u_n, flow_v_n, flow_w_n)
         do s = Faces_In_Region_Gpu(reg)  ! all present
           c1 = grid_faces_c(1,s)  ! inside cell
-          c2 = grid_faces_c(1,s)  ! boundary cell
+          c2 = grid_faces_c(2,s)  ! boundary cell
 
           flow_u_n(c2) = flow_u_n(c1)
           flow_v_n(c2) = flow_v_n(c1)

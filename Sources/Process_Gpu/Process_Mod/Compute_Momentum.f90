@@ -72,8 +72,8 @@
       !$acc present(  &
       !$acc   grid_region_f_cell,  &
       !$acc   grid_region_l_cell,  &
-      !$acc   ui_oo,  &
-      !$acc   ui_o   &
+      !$acc   ui_o,  &
+      !$acc   ui_oo   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
         ui_oo(c) = ui_o(c)
@@ -139,8 +139,8 @@
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b,  &
-  !$acc   dia,  &
   !$acc   val,  &
+  !$acc   dia,  &
   !$acc   ui_n   &
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present

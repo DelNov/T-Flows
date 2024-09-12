@@ -143,38 +143,105 @@ def Command_In_File(file_path, target_string):
 #------------------------------------------------------------------------------#
 def Find_Arrays_In_Block(block):
 
+  #------------------------------------------------#
+  #   Remove standard Fortran control structures   #
+  #------------------------------------------------#
+
   # Remove all comments
   cleaned_block = re.sub(r'!.*', '', block)
+  print(cleaned_block)
 
-  # Remove operators but preserve spaces around '%' and '%' itself
-  cleaned_block = re.sub(r'(?<!%)\s(?!%)|[+\-*/^=&]', '', cleaned_block)
+  # Replace every occurrence of spaces followed by "%" with "@%"
+  # and every occurence of "%" followed by spacess with "%@"
+  cleaned_block = re.sub(r'\s+%', '@%', cleaned_block)
+  cleaned_block = re.sub(r'%\s+', '%@', cleaned_block)
 
-  result = []
+  # Save blocks for searching, it will be used later on
+  block_for_searching = re.sub(r'\s+%', ' %', block)
+  block_for_searching = re.sub(r'%\s+', '% ', block_for_searching)
+
+  # Remove "do"
+  # (This will remove "do" also from "end do" statements)
+  cleaned_block = re.sub(r'\bdo\b', '', cleaned_block)
+
+  # Remove "enddo" without spaces
+  # (Any "end do" is by now only "end", and "end" is treaed in the end)
+  cleaned_block = re.sub(r'\benddo\b', '', cleaned_block)
+
+  # Remove "if" followed by opening parentheses with or without spaces
+  # (Unlike "do" above, this will leave "end if" combinations around)
+  cleaned_block = re.sub(r'\bif\s*\(', '', cleaned_block)
+
+  # Remove "endif" with or without spaces in between
+  # (Since the command above left "end if" combinations around)
+  cleaned_block = re.sub(r'\bend\s*if\b', '', cleaned_block)
+
+  # Remove "then" preceded by a closing parenthesis with or without spaces
+  cleaned_block = re.sub(r'\)\s*then\b', '', cleaned_block)
+
+  # Remove "elseif"
+  # (If there was any "else if", the "if" part was already removed above)
+  cleaned_block = re.sub(r'\belseif\b', '', cleaned_block)
+
+  # Remove "else"
+  cleaned_block = re.sub(r'\belse\b', '', cleaned_block)
+
+  # Remove "end"
+  cleaned_block = re.sub(r'\bend\b', '', cleaned_block)
+
+  # Remove empty parentheses
+  cleaned_block = re.sub(r'\(\s*\)', '', cleaned_block)
+
+  # Remove "\n"
+  cleaned_block = re.sub(r"\n", "", cleaned_block)
+
+  # Remove "&"
+  cleaned_block = re.sub(r"&", "", cleaned_block)
+
+  result = set()
   seen_arrays = set()  # Track arrays to avoid duplicates
 
-  # Browse through the reduced block and look for arrays
-  stack = []
+  #----------------------------------------------------------#
+  #   Browse through the reduced block and look for arrays   #
+  #----------------------------------------------------------#
   for i, char in enumerate(cleaned_block):
     if char == '(':
       # The array name is just before the opening brace
       array_name_end = i
       # Go backwards to find where the array name starts
       j = i - 1
-      while j >= 0 and cleaned_block[j] not in ['(', ')']:
+      while j >= 0 and (cleaned_block[j] not in [' '] 
+                        and
+                        cleaned_block[j] not in ['(']):
         j -= 1
       array_name_start = j + 1
       array_name = cleaned_block[array_name_start:array_name_end]
 
       # Only consider valid array names (non-empty) and avoid duplicates
       if array_name and array_name not in seen_arrays:
-        stack.append((array_name, i))
-        seen_arrays.add(array_name)  # Mark array as seen
-    elif char == ')' and stack:
-      array_name, open_paren_pos = stack.pop()
-      indices = cleaned_block[open_paren_pos + 1:i]
-      result.append((array_name, indices))
+        seen_arrays.add(array_name)  # mark array as seen
+        array_name = re.sub(r'@', ' ', array_name)
+        result.add(array_name)
 
-  return result
+  #---------------------------------------------------------#
+  #   At this point, we have found all arrays, now search   #
+  #   through the original block to find their positions    #
+  #---------------------------------------------------------#
+
+  # Convert the result set to a list for further processing
+  array_list = list(result)
+
+  # Find the position of each array in the original block
+  array_positions = []
+  for array in array_list:
+    position = block_for_searching.find(array)
+    array_positions.append((array, position))
+
+  # Sort the arrays based on their positions
+  sorted_array_positions = sorted(array_positions, key=lambda x: x[1])
+
+  # Return only the array names in the order of their appearance
+  return [array[0] for array in sorted_array_positions]
 
 #==============================================================================#
 #                                                                              #
@@ -212,7 +279,9 @@ def Process_Tfp_Block(block):
 
   # List of macros to exclude from processing as arrays
   excluded_macros = {"Faces_In_Region",
-                     "Cells_In_Domain", "Cells_In_Domain_And_Buffers"}
+                     "Face_Value",
+                     "Cells_In_Domain",
+                     "Cells_In_Domain_And_Buffers"}
 
   #--------------------------------------------------#
   #   Special handling for Faces_In_Region variables #
@@ -319,7 +388,7 @@ def Process_Tfp_Block(block):
   #------------------------#
   for array in arrays:
 
-    full_name, indices = array
+    full_name = array
 
     # Create pointer variable name
     variable_name = full_name.replace(" % ", "_").lower()
