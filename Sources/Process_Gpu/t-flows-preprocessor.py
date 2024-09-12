@@ -189,6 +189,15 @@ def Find_Arrays_In_Block(block):
   # Remove "end"
   cleaned_block = re.sub(r'\bend\b', '', cleaned_block)
 
+  # Remove "max"
+  cleaned_block = re.sub(r'\bmax\b', '', cleaned_block)
+
+  # Remove "min"
+  cleaned_block = re.sub(r'\bmin\b', '', cleaned_block)
+
+  # Remove "merge"
+  cleaned_block = re.sub(r'\bmerge\b', '', cleaned_block)
+
   # Remove empty parentheses
   cleaned_block = re.sub(r'\(\s*\)', '', cleaned_block)
 
@@ -289,12 +298,22 @@ def Process_Tfp_Block(block):
   if "Faces_In_Region" in block:
 
     print("")
-    print("  #-------------------------------")
-    print("  # Block of type Faces_In_Region ")
-    print("  #-------------------------------")
-    pointer_setup = (
-      indent + "grid_region_f_face => Grid % region % f_face\n" +
-      indent + "grid_region_l_face => Grid % region % l_face\n")
+    print(f"{CYAN}  #-------------------------------{RESET}")
+    print(f"{CYAN}  # Block of type Faces_In_Region {RESET}")
+    print(f"{CYAN}  #-------------------------------{RESET}")
+
+    print("")
+    print(f"{RED}  # Pointers used in the block{RESET}")
+
+    commands = ("grid_region_f_face => Grid % region % f_face",
+                "grid_region_l_face => Grid % region % l_face")
+
+    for command in commands:
+      if not Command_In_File(copy_to_device_file, command):
+        pointer_setup += (indent + command + "\n")
+      else:
+        print("  ", command, " already in ", copy_to_device_file, sep="")
+
     openacc_setup += (
       indent + "!$acc   grid_region_f_face,  &\n" +
       indent + "!$acc   grid_region_l_face,  &\n")

@@ -24,20 +24,11 @@
   ! Unit for momentum: [kg/m^3 * 1 * m/s * m^3 / s = kg m / s^2 = N]
   ! Unit for energy:   [kg/m^3 * J/kg/K * K * m^3 / s = J / s = W]
 
-  grid_vol => Grid % vol
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
-  !$acc   coef,  &
-  !$acc   phi_o,  &
-  !$acc   grid_vol   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)
-    b(c) = b(c) + coef(c) * phi_o(c) * grid_vol(c) / Flow % dt
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()
+    b(c) = b(c) + coef(c) * phi_o(c) * Grid % vol(c) / Flow % dt
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   call Profiler % Stop('Add_Inertial_Term')
 

@@ -98,7 +98,7 @@
     !$acc         flow_density,  flow_t_n, temp)
     do s = Faces_In_Region_Gpu(reg)  ! all present
       c1 = grid_faces_c(1,s)  ! inside cell
-      c2 = grid_faces_c(1,s)  ! boundary cell
+      c2 = grid_faces_c(2,s)  ! boundary cell
 
       ! Temperature at the face is identical to
       ! the temperature at the boundary cell
