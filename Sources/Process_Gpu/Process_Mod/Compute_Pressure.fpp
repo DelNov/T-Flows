@@ -59,19 +59,11 @@
   !   Update the pressure field   !
   !-------------------------------!
 
-  flow_p_n => Flow % p % n
-  flow_pp_n => Flow % pp % n
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_p_n,  &
-  !$acc   flow_pp_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    flow_p_n(c) = flow_p_n(c) + urf * flow_pp_n(c)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    Flow % p % n(c) = Flow % p % n(c) + urf * Flow % pp % n(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !---------------------------------------------------------------!
   !   Shift the pressure field so that the median value is zero   !
@@ -79,33 +71,21 @@
   p_max = -HUGE
   p_min = +HUGE
 
-  flow_p_n => Flow % p % n
-  !$acc parallel loop reduction(max: p_max) reduction(min: p_min)  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_p_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    p_max = max(p_max, flow_p_n(c))
-    p_min = min(p_min, flow_p_n(c))
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    p_max = max(p_max, Flow % p % n(c))
+    p_min = min(p_min, Flow % p % n(c))
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   call Global % Max_Real(p_max)
   call Global % Min_Real(p_min)
 
-  flow_p_n => Flow % p % n
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_p_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    flow_p_n(c) = flow_p_n(c) - 0.5 * (p_max + p_min)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    Flow % p % n(c) = Flow % p % n(c) - 0.5 * (p_max + p_min)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Update buffers for presssure over all processors
   call Grid % Exchange_Cells_Real(Flow % p % n)

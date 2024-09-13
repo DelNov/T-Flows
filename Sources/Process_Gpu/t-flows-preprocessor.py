@@ -489,15 +489,15 @@ def Process_Tfp_Block(block):
   # Pattern to detect scalar reduction operations: var = var + something
   # or var = var - something. The regex ensures that the variable being
   # reduced is a scalar (no parentheses for indices).
-  reduction_pattern = re.compile(r'(\b\w+\b)\s*=\s*\1\s*[\+\-]')
+  reduction_pattern = re.compile(r'(\b\w+\b)\s*=\s*\1\s*[\+\-]\s*.+')
 
   # Pattern to detect max reduction operations: var = max(var, something)
   # The regex ensures that the variable being reduced is scalar (no parentheses).
-  max_pattern = re.compile(r'(\b\w+\b)\s*=\s*max\s*\(\s*\1\s*,\s*')
+  max_pattern = re.compile(r'(\b\w+\b)\s*=\s*max\s*\(\s*\1\s*,\s*.+\)')
 
   # Pattern to detect min reduction operations: var = min(var, something)
   # The regex ensures that the variable being reduced is scalar (no parentheses).
-  min_pattern = re.compile(r'(\b\w+\b)\s*=\s*min\s*\(\s*\1\s*,\s*')
+  min_pattern = re.compile(r'(\b\w+\b)\s*=\s*min\s*\(\s*\1\s*,\s*.+\)')
 
   # Find reduction variables in the block (only scalars, no arrays)
   reductions = reduction_pattern.findall(block)
