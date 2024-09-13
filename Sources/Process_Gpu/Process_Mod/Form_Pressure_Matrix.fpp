@@ -54,44 +54,24 @@
   fc  => Flow % Nat % C % fc
   nz  =  Flow % Nat % C % nonzeros
 
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   val   &
-  !$acc )
+  !$tf-acc loop begin
   do i = 1, nz
     val(i) = 0.0
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !--------------------------------------------------------------------!
   !   This is cell based and will not create race conditions on GPUs   !
   !--------------------------------------------------------------------!
 
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c => Grid % cells_c
-  grid_cells_f => Grid % cells_f
-  flow_v_m => Flow % v_m
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   grid_cells_n_cells,  &
-  !$acc   grid_cells_c,  &
-  !$acc   grid_cells_f,  &
-  !$acc   fc,  &
-  !$acc   flow_v_m,  &
-  !$acc   val,  &
-  !$acc   pos,  &
-  !$acc   dia   &
-  !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c1 = Cells_In_Domain()  ! all present
 
-  !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+        a12 = fc(s) * Face_Value(s, Flow % v_m(c1), Flow % v_m(c2))
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12
@@ -99,23 +79,16 @@
         val(dia(c1)) = val(dia(c1)) + a12
       end if
     end do
-  !$acc end loop
 
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! De-singularize the system matrix ... just like this, ad-hoc
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   val,  &
-  !$acc   dia   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
     val(dia(c)) = val(dia(c)) * (1.0 + MICRO)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-------------------------------!
   !   Mark the matrix as formed   !
