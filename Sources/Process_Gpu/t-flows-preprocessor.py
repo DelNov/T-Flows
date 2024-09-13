@@ -107,12 +107,31 @@ input_file = sys.argv[1]
 output_file = sys.argv[2]
 
 indent  = "   "
+
+# Regular Colors
+BLACK   = "\033[30m"
 RED     = "\033[31m"
 GREEN   = "\033[32m"
 YELLOW  = "\033[33m"
 BLUE    = "\033[34m"
 MAGENTA = "\033[35m"
 CYAN    = "\033[36m"
+WHITE   = "\033[37m"
+
+# Bright Colors
+BRIGHT_RED     = "\033[91m"
+BRIGHT_GREEN   = "\033[92m"
+BRIGHT_YELLOW  = "\033[93m"
+BRIGHT_BLUE    = "\033[94m"
+BRIGHT_MAGENTA = "\033[95m"
+BRIGHT_CYAN    = "\033[96m"
+BRIGHT_WHITE   = "\033[97m"
+
+# Text Styles
+BOLD      = "\033[1m"
+UNDERLINE = "\033[4m"
+REVERSED  = "\033[7m"
+
 RESET   = "\033[0m"
 
 copy_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
@@ -152,7 +171,6 @@ def Find_Arrays_In_Block(block):
 
   # Remove all comments
   cleaned_block = re.sub(r'!.*', '', block)
-  print(cleaned_block)
 
   # Replace every occurrence of spaces followed by "%" with "@%"
   # and every occurence of "%" followed by spacess with "%@"
@@ -278,24 +296,28 @@ def Find_Arrays_In_Block(block):
 def Process_Tfp_Block(block):
 
   print("")
-  print(f"{YELLOW}#======================{RESET}")
-  print(f"{YELLOW}#                      {RESET}")
-  print(f"{YELLOW}# Preprocessing block: {RESET}")
-  print(f"{YELLOW}#                      {RESET}")
-  print(f"{YELLOW}#----------------------{RESET}")
-  print(block, end="")
+  print(f"{BRIGHT_YELLOW}#======================={RESET}")
+  print(f"{BRIGHT_YELLOW}#                       {RESET}")
+  print(f"{BRIGHT_YELLOW}# Preprocessing a block {RESET}")
+  print(f"{BRIGHT_YELLOW}#                       {RESET}")
+  print(f"{BRIGHT_YELLOW}#-----------------------{RESET}")
+  print(f"{BRIGHT_CYAN}",  end="")
+  print(indent + "# Block before preprocessing:")
+  print(block,      end="")
+  print(f"{RESET}", end="")
 
   # Initialize pointers and OpenACC clauses
   pointer_setup = ""
   openacc_setup = ""
   if "Cells_In_Domain_And_Buffers" in block:
     openacc_setup += (indent + "!$acc parallel loop independent  &\n")
-  else:
-    if "Cells_In_Domain" in block:
-      openacc_setup += (indent + "!$acc parallel loop  &\n")
-  if "Faces_In_Region" in block:
+  elif "Cells_In_Domain" in block:
     openacc_setup += (indent + "!$acc parallel loop  &\n")
-  if "Faces_In_Domain_And_At_Buffers" in block:
+  elif "Faces_In_Region" in block:
+    openacc_setup += (indent + "!$acc parallel loop  &\n")
+  elif "Faces_In_Domain_And_At_Buffers" in block:
+    openacc_setup += (indent + "!$acc parallel loop  &\n")
+  else:
     openacc_setup += (indent + "!$acc parallel loop  &\n")
 
   openacc_setup += (indent + "!$acc present(  &\n")
@@ -317,11 +339,6 @@ def Process_Tfp_Block(block):
   #   Special handling for Faces_In_Region variables   #
   #----------------------------------------------------#
   if "Faces_In_Region" in block:
-
-    print("")
-    print(f"{CYAN}  #-------------------------------{RESET}")
-    print(f"{CYAN}  # Block of type Faces_In_Region {RESET}")
-    print(f"{CYAN}  #-------------------------------{RESET}")
 
     print("")
     print(f"{RED}  # Pointers used in the block{RESET}")
@@ -375,11 +392,6 @@ def Process_Tfp_Block(block):
   if "Cells_In_Domain" in block and not "Cells_In_Domain_And_Buffers" in block:
 
     print("")
-    print(f"{CYAN}  #-------------------------------{RESET}")
-    print(f"{CYAN}  # Block of type Cells_In_Domain {RESET}")
-    print(f"{CYAN}  #-------------------------------{RESET}")
-
-    print("")
     print(f"{RED}  # Pointers used in the block{RESET}")
 
     commands = ("grid_region_f_cell => Grid % region % f_cell",
@@ -405,11 +417,6 @@ def Process_Tfp_Block(block):
   #   Special handling for Cells_In_Domain_And_Buffers variables   #
   #----------------------------------------------------------------#
   if "Cells_In_Domain_And_Buffers" in block:
-
-    print("")
-    print(f"{CYAN}  #-------------------------------------------{RESET}")
-    print(f"{CYAN}  # Block of type Cells_In_Domain_And_Buffers {RESET}")
-    print(f"{CYAN}  #-------------------------------------------{RESET}")
 
     print("")
     print(f"{RED}  # Pointers used in the block{RESET}")
@@ -446,7 +453,7 @@ def Process_Tfp_Block(block):
   arrays = Find_Arrays_In_Block(block)
 
   print("")
-  print("  # Arrays found in the block ")
+  print(f"{RED}  # Arrays found in the block{RESET}")
 
   #------------------------#
   #   Process each array   #
@@ -606,6 +613,11 @@ def Process_Tfp_Block(block):
       + "end do\n" + indent + "!$acc end loop"
       + block[second_last_end_do_index + len("end do"):]
     )
+
+  print(f"{BRIGHT_GREEN}",  end="")
+  print(indent + "# Block after preprocessing:")
+  print(pointer_setup + openacc_setup + block, end="")
+  print(f"{RESET}", end="")
 
   # Return the modified block with the pointer setup at the beginning
   return pointer_setup + openacc_setup + block
