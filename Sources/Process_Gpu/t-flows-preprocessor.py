@@ -519,10 +519,17 @@ def Process_Tfp_Block(block):
   # The regex ensures that the variable being reduced is scalar (no parentheses).
   min_pattern = re.compile(r'(\b\w+\b)\s*=\s*min\s*\(\s*\1\s*,\s*.+\)')
 
-  # Find reduction variables in the block (only scalars, no arrays)
-  reductions = reduction_pattern.findall(block)
-  max_reductions = max_pattern.findall(block)
-  min_reductions = min_pattern.findall(block)
+  # Pattern to identify inner loop
+  no_inner_pattern = re.compile(r'do\s+[^!]*?(?:end\s*do|enddo)')
+
+  # Block without inner loops
+  cleaned_block = re.sub(no_inner_pattern, '', block)
+
+
+  # Find reduction variables in the cleaned_block (only scalars, no arrays)
+  reductions = reduction_pattern.findall(cleaned_block)
+  max_reductions = max_pattern.findall(cleaned_block)
+  min_reductions = min_pattern.findall(cleaned_block)
 
   # Set to track reduction variables (both +, - and max)
   reduction_vars = set(reductions)  # add scalar reduction variables to the set
