@@ -84,14 +84,6 @@
   !----------------------------------------------------!
   do reg = Boundary_Regions()
 
-    grid_faces_c => Grid % faces_c
-    flow_v_flux_n => Flow % v_flux % n
-    flow_u_n => Flow % u % n
-    grid_sx => Grid % sx
-    flow_v_n => Flow % v % n
-    grid_sy => Grid % sy
-    flow_w_n => Flow % w % n
-    grid_sz => Grid % sz
     !$acc parallel loop  &
     !$acc present(  &
     !$acc   grid_region_f_face,  &
@@ -127,8 +119,6 @@
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. INFLOW) then
 
-      grid_s => Grid % s
-      flow_v_flux_n => Flow % v_flux % n
       !$acc parallel loop reduction(+: vol_in,area_in)  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
@@ -147,8 +137,6 @@
     if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      grid_s => Grid % s
-      flow_v_flux_n => Flow % v_flux % n
       !$acc parallel loop reduction(+: area_out,vol_out)  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
@@ -178,7 +166,6 @@
       if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
          Grid % region % type(reg) .eq. CONVECT) then
 
-        flow_v_flux_n => Flow % v_flux % n
         !$acc parallel loop  &
         !$acc present(  &
         !$acc   grid_region_f_face,  &
@@ -200,12 +187,6 @@
   !   This is application of Rhie & Chow technique   !
   !--------------------------------------------------!
 
-  grid_faces_c => Grid % faces_c
-  flow_v_flux_n => Flow % v_flux % n
-  grid_sx => Grid % sx
-  grid_sy => Grid % sy
-  grid_sz => Grid % sz
-  flow_p_n => Flow % p % n
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -264,10 +245,6 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c => Grid % cells_c
-  grid_cells_f => Grid % cells_f
-  flow_v_flux_n => Flow % v_flux % n
   !$acc parallel loop reduction(+: b_tmp)  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -306,8 +283,6 @@
        Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      grid_faces_c => Grid % faces_c
-      flow_v_flux_n => Flow % v_flux % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &

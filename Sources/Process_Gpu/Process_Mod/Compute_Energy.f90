@@ -59,8 +59,6 @@
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
 
-      flow_t_o => Flow % t % o
-      flow_t_oo => Flow % t % oo
       !$acc parallel loop independent  &
       !$acc present(  &
       !$acc   grid_region_f_cell,  &
@@ -75,8 +73,6 @@
 
     end if
 
-    flow_t_o => Flow % t % o
-    flow_t_n => Flow % t % n
     !$acc parallel loop independent  &
     !$acc present(  &
     !$acc   grid_region_f_cell,  &
@@ -113,7 +109,6 @@
   !   (Part 1 is in Form_Energy_Matrix)   !
   !---------------------------------------!
 
-  flow_t_n => Flow % t % n
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &

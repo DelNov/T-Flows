@@ -33,10 +33,6 @@
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
 
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c => Grid % cells_c
-  grid_cells_f => Grid % cells_f
-  flow_v_flux_n => Flow % v_flux % n
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -96,8 +92,6 @@
     if(Grid % region % type(reg) .eq. INFLOW  .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      grid_faces_c => Grid % faces_c
-      flow_v_flux_n => Flow % v_flux % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
@@ -122,8 +116,6 @@
     ! Outflow is just a vanishing derivative, use the value from the inside
     if(Grid % region % type(reg) .eq. OUTFLOW) then
 
-      grid_faces_c => Grid % faces_c
-      flow_v_flux_n => Flow % v_flux % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &

@@ -67,10 +67,6 @@
   !   This is cell based and will not create race conditions on GPUs   !
   !--------------------------------------------------------------------!
 
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c => Grid % cells_c
-  grid_cells_f => Grid % cells_f
-  flow_v_m => Flow % v_m
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &

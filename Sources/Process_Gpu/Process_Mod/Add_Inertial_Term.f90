@@ -24,7 +24,6 @@
   ! Unit for momentum: [kg/m^3 * 1 * m/s * m^3 / s = kg m / s^2 = N]
   ! Unit for energy:   [kg/m^3 * J/kg/K * K * m^3 / s = J / s = W]
 
-  grid_vol => Grid % vol
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &

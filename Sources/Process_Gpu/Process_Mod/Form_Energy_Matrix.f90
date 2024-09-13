@@ -103,9 +103,6 @@
 
   ! Coefficients inside the domain
 
-  grid_cells_n_cells => Grid % cells_n_cells
-  grid_cells_c => Grid % cells_c
-  grid_cells_f => Grid % cells_f
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -164,7 +161,6 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    grid_vol => Grid % vol
     !$acc parallel loop  &
     !$acc present(  &
     !$acc   grid_region_f_cell,  &

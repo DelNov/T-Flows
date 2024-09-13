@@ -59,8 +59,6 @@
   !   Update the pressure field   !
   !-------------------------------!
 
-  flow_p_n => Flow % p % n
-  flow_pp_n => Flow % pp % n
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -79,7 +77,6 @@
   p_max = -HUGE
   p_min = +HUGE
 
-  flow_p_n => Flow % p % n
   !$acc parallel loop reduction(max: p_max) reduction(min: p_min)  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -95,7 +92,6 @@
   call Global % Max_Real(p_max)
   call Global % Min_Real(p_min)
 
-  flow_p_n => Flow % p % n
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &

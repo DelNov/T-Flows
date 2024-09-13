@@ -40,8 +40,6 @@
     if(Grid % region % type(reg) .eq. WALL .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      grid_faces_c => Grid % faces_c
-      flow_t_n => Flow % t % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &

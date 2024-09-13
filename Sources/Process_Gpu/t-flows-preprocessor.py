@@ -134,7 +134,8 @@ REVERSED  = "\033[7m"
 
 RESET   = "\033[0m"
 
-copy_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
+grid_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
+flow_to_device_file = "./Gpu_Mod/Field/Copy_To_Device.f90"
 
 import re
 
@@ -347,10 +348,10 @@ def Process_Tfp_Block(block):
                 "grid_region_l_face => Grid % region % l_face")
 
     for command in commands:
-      if not Command_In_File(copy_to_device_file, command):
+      if not Command_In_File(grid_to_device_file, command):
         pointer_setup += (indent + command + "\n")
       else:
-        print("  ", command, " already in ", copy_to_device_file, sep="")
+        print("  ", command, " already in ", grid_to_device_file, sep="")
 
     openacc_setup += (
       indent + "!$acc   grid_region_f_face,  &\n" +
@@ -374,10 +375,10 @@ def Process_Tfp_Block(block):
                 "grid_region_l_face => Grid % region % l_face")
 
     for command in commands:
-      if not Command_In_File(copy_to_device_file, command):
+      if not Command_In_File(grid_to_device_file, command):
         pointer_setup += (indent + command + "\n")
       else:
-        print("  ", command, " already in ", copy_to_device_file, sep="")
+        print("  ", command, " already in ", grid_to_device_file, sep="")
 
     openacc_setup += (
       indent + "!$acc   grid_region_f_cell,  &\n" +
@@ -398,10 +399,10 @@ def Process_Tfp_Block(block):
                 "grid_region_l_cell => Grid % region % l_cell")
 
     for command in commands:
-      if not Command_In_File(copy_to_device_file, command):
+      if not Command_In_File(grid_to_device_file, command):
         pointer_setup += (indent + command + "\n")
       else:
-        print("  ", command, " already in ", copy_to_device_file, sep="")
+        print("  ", command, " already in ", grid_to_device_file, sep="")
 
     openacc_setup += (
       indent + "!$acc   grid_region_f_cell,  &\n" +
@@ -425,10 +426,10 @@ def Process_Tfp_Block(block):
                 "grid_region_l_cell => Grid % region % l_cell")
 
     for command in commands:
-      if not Command_In_File(copy_to_device_file, command):
+      if not Command_In_File(grid_to_device_file, command):
         pointer_setup += (indent + command + "\n")
       else:
-        print("  ", command, " already in ", copy_to_device_file, sep="")
+        print("  ", command, " already in ", grid_to_device_file, sep="")
 
     openacc_setup += (
       indent + "!$acc   grid_region_f_cell,  &\n" +
@@ -473,11 +474,19 @@ def Process_Tfp_Block(block):
     if variable_name not in processed_vars:
       if "%" in full_name:  # If it's part of a structure
         # Add to the pointer setup
-        pointer_setup += f"{indent}{variable_name} => {full_name}\n"
-        print("  ", variable_name, "  (", full_name, ")", sep="")
+        command = f"{variable_name} => {full_name}"
 
-      else:
-        print("  ", variable_name, sep="")
+        if Command_In_File(grid_to_device_file, command):
+          print("  ", command, " already in ", grid_to_device_file, sep="")
+        elif Command_In_File(flow_to_device_file, command):
+          print("  ", command, " already in ", flow_to_device_file, sep="")
+        else:
+          print(f"{BRIGHT_RED}", end="")
+          print("  ", command, " not found neither in ", grid_to_device_file,
+                ",\n  nor in ", flow_to_device_file, ".", sep="", end="")
+          print(" Adding it to this block!")
+          pointer_setup += (indent + command + "\n")
+          print(f"{RESET}",      end="")
 
       # Add to the OpenACC setup
       openacc_setup += f"{indent}!$acc   {variable_name},  &\n"
@@ -541,7 +550,9 @@ def Process_Tfp_Block(block):
   #---------------------------------------------------------------#
   openacc_setup += indent + "!$acc )\n"
 
-  # Replace the last comma with a space in the present clause
+  #---------------------------------------------------------------#
+  #   Replace the last comma with a space in the present clause   #
+  #---------------------------------------------------------------#
   last_comma_index = openacc_setup.rfind(",")
   if last_comma_index != -1:
     openacc_setup = (
