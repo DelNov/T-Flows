@@ -25,40 +25,24 @@
   !   Handle boundary conditions on the right-hand side (in the source)   !
   !-----------------------------------------------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()  ! all present
     b(c) = 0.0
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. WALL .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      grid_faces_c => Grid % faces_c
-      flow_t_n => Flow % t % n
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   cond,  &
-      !$acc   fc,  &
-      !$acc   b,  &
-      !$acc   flow_t_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)
-        c2 = grid_faces_c(2,s)
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
         a12 = cond(c1) * fc(s)
-        b(c1) = b(c1) + a12 * flow_t_n(c2)
+        b(c1) = b(c1) + a12 * Flow % t % n(c2)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
   end do

@@ -39,19 +39,11 @@
   if(comp .eq. 2) p_d_i =  Flow % bulk % p_drop_y
   if(comp .eq. 3) p_d_i =  Flow % bulk % p_drop_z
 
-  grid_vol => Grid % vol
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
-  !$acc   p_i,  &
-  !$acc   grid_vol   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    b(c) = b(c) + (p_d_i - p_i(c)) * grid_vol(c)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    b(c) = b(c) + (p_d_i - p_i(c)) * Grid % vol(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   call Profiler % Stop('Add_Pressure_Term')
 
