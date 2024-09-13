@@ -63,8 +63,8 @@
       !$acc present(  &
       !$acc   grid_region_f_cell,  &
       !$acc   grid_region_l_cell,  &
-      !$acc   flow_t_o,  &
-      !$acc   flow_t_oo   &
+      !$acc   flow_t_oo,  &
+      !$acc   flow_t_o   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
         flow_t_oo(c) = flow_t_o(c)

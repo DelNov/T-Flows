@@ -10,7 +10,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)      :: Process  !! parent class
-  type(Grid_Type)          :: Grid     !! grid object
+  type(Grid_Type),  target :: Grid     !! grid object
   type(Field_Type), target :: Flow     !! flow object
   character(*)             :: update   !! character switch to control
                                        !! which variables to update
@@ -44,18 +44,23 @@
          Grid % region % type(reg) .eq. PRESSURE .or.  &
          Grid % region % type(reg) .eq. SYMMETRY) then
 
-        !$acc parallel loop                                    &
-        !$acc present(grid_region_f_face, grid_region_l_face,  &
-        !$acc         grid_faces_c,                            &
-        !$acc         flow_u_n, flow_v_n, flow_w_n)
-        do s = Faces_In_Region_Gpu(reg)  ! all present
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   flow_u_n,  &
+        !$acc   flow_v_n,  &
+        !$acc   flow_w_n   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)  ! inside cell
           c2 = grid_faces_c(2,s)  ! boundary cell
 
           flow_u_n(c2) = flow_u_n(c1)
           flow_v_n(c2) = flow_v_n(c1)
           flow_w_n(c2) = flow_w_n(c1)
-        end do  ! faces
+        end do
         !$acc end parallel
 
       end if    ! boundary condition

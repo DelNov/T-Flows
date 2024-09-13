@@ -239,10 +239,14 @@ def Find_Arrays_In_Block(block):
   cleaned_block = re.sub(r"&", "", cleaned_block)
 
   # Put spaces around mathematical operators
-  cleaned_block = re.sub(r"(?<! )\+(?! )", " + ", cleaned_block)
-  cleaned_block = re.sub(r"(?<! )-(?! )", " - ", cleaned_block)
-  cleaned_block = re.sub(r"(?<! )\*(?! )", " * ", cleaned_block)
-  cleaned_block = re.sub(r"(?<! )/(?! )", " / ", cleaned_block)
+  cleaned_block = re.sub(r'(?<!\s)\+', ' +', cleaned_block)
+  cleaned_block = re.sub(r'\+(?!\s)',  '+ ', cleaned_block)
+  cleaned_block = re.sub(r'\-(?!\s)',  '- ', cleaned_block)
+  cleaned_block = re.sub(r'(?<!\s)\-', ' -', cleaned_block)
+  cleaned_block = re.sub(r'(?<!\s)\*', ' *', cleaned_block)
+  cleaned_block = re.sub(r'\*(?!\s)',  '* ', cleaned_block)
+  cleaned_block = re.sub(r'(?<!\s)\/', ' /', cleaned_block)
+  cleaned_block = re.sub(r'\/(?!\s)',  '/ ', cleaned_block)
 
   result = set()
   seen_arrays = set()  # Track arrays to avoid duplicates
