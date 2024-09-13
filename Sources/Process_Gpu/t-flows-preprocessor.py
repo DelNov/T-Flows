@@ -486,27 +486,52 @@ def Process_Tfp_Block(block):
   #   Detect reduction variables within the do-loop    #
   #----------------------------------------------------#
 
-  # Pattern to detect reduction operations: var = var + something
-  # or var = var - something.  The regex ensures that the variable
-  # being reduced is a scalar (no parentheses for indices)
+  # Pattern to detect scalar reduction operations: var = var + something
+  # or var = var - something. The regex ensures that the variable being
+  # reduced is a scalar (no parentheses for indices).
   reduction_pattern = re.compile(r'(\b\w+\b)\s*=\s*\1\s*[\+\-]')
+
+  # Pattern to detect max reduction operations: var = max(var, something)
+  # The regex ensures that the variable being reduced is scalar (no parentheses).
+  max_pattern = re.compile(r'(\b\w+\b)\s*=\s*max\s*\(\s*\1\s*,\s*')
+
+  # Pattern to detect min reduction operations: var = min(var, something)
+  # The regex ensures that the variable being reduced is scalar (no parentheses).
+  min_pattern = re.compile(r'(\b\w+\b)\s*=\s*min\s*\(\s*\1\s*,\s*')
 
   # Find reduction variables in the block (only scalars, no arrays)
   reductions = reduction_pattern.findall(block)
-  for var in reductions:
-    reduction_vars.add(var)
+  max_reductions = max_pattern.findall(block)
+  min_reductions = min_pattern.findall(block)
+
+  # Set to track reduction variables (both +, - and max)
+  reduction_vars = set(reductions)  # add scalar reduction variables to the set
+  max_reduction_vars = set(max_reductions)  # add max reduction variables
+  min_reduction_vars = set(min_reductions)  # add min reduction variables
 
   # Add reduction clause if any reductions are found
-  if reduction_vars:
-    reduction_clause = "reduction(+:"
-    reduction_clause += ",".join(reduction_vars)
-    reduction_clause += ")"
+  if reduction_vars or max_reduction_vars or min_reduction_vars:
+    reduction_clause = []
+
+    if reduction_vars:
+      reduction_clause.append(f"reduction(+: {','.join(reduction_vars)})")
+    if max_reduction_vars:
+      reduction_clause.append(f"reduction(max: {','.join(max_reduction_vars)})")
+    if min_reduction_vars:
+      reduction_clause.append(f"reduction(min: {','.join(min_reduction_vars)})")
+
+    # Join both reduction clauses if present
+    final_reduction_clause = " ".join(reduction_clause)
+
+    # Replace the "parallel loop" with the appropriate reduction clause(s)
     openacc_setup = openacc_setup.replace(
       "parallel loop",
-      f"parallel loop {reduction_clause}"
+      f"parallel loop {final_reduction_clause}"
     )
 
-  # Append the closing parenthesis for OpenACC present clause
+  #---------------------------------------------------------------#
+  #   Append the closing parenthesis for OpenACC present clause   #
+  #---------------------------------------------------------------#
   openacc_setup += indent + "!$acc )\n"
 
   # Replace the last comma with a space in the present clause

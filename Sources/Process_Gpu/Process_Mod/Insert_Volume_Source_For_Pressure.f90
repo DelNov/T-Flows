@@ -129,7 +129,7 @@
 
       grid_s => Grid % s
       flow_v_flux_n => Flow % v_flux % n
-      !$acc parallel loop reduction(+:area_in,vol_in)  &
+      !$acc parallel loop reduction(+: vol_in,area_in)  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
       !$acc   grid_region_l_face,  &
@@ -149,7 +149,7 @@
 
       grid_s => Grid % s
       flow_v_flux_n => Flow % v_flux % n
-      !$acc parallel loop reduction(+:vol_out,area_out)  &
+      !$acc parallel loop reduction(+: area_out,vol_out)  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
       !$acc   grid_region_l_face,  &
@@ -200,6 +200,12 @@
   !   This is application of Rhie & Chow technique   !
   !--------------------------------------------------!
 
+  grid_faces_c => Grid % faces_c
+  flow_v_flux_n => Flow % v_flux % n
+  grid_sx => Grid % sx
+  grid_sy => Grid % sy
+  grid_sz => Grid % sz
+  flow_p_n => Flow % p % n
   !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -226,9 +232,9 @@
 
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
-    u_f = Face_Value(s, u_n(c1) + p_x(c1) * flow_v_m(c1),  u_n(c2) + p_x(c2) * flow_v_m(c2))
-    v_f = Face_Value(s, v_n(c1) + p_y(c1) * flow_v_m(c1),  v_n(c2) + p_y(c2) * flow_v_m(c2))
-    w_f = Face_Value(s, w_n(c1) + p_z(c1) * flow_v_m(c1),  w_n(c2) + p_z(c2) * flow_v_m(c2))
+    u_f = Face_Value(s, u_n(c1)+p_x(c1) * flow_v_m(c1),  u_n(c2)+p_x(c2) * flow_v_m(c2))
+    v_f = Face_Value(s, v_n(c1)+p_y(c1) * flow_v_m(c1),  v_n(c2)+p_y(c2) * flow_v_m(c2))
+    w_f = Face_Value(s, w_n(c1)+p_z(c1) * flow_v_m(c1),  w_n(c2)+p_z(c2) * flow_v_m(c2))
 
 
     ! This is a bit of a code repetition, the
@@ -241,9 +247,9 @@
     ! but with the staggered pressure difference
     ! Units:  m^4 s / kg * kg / (m s^2) = m^3 / s
     flow_v_flux_n(s) = u_f * grid_sx(s)  &
-                     + v_f * grid_sy(s)  &
-                     + w_f * grid_sz(s)  &
-                     + a12 * (flow_p_n(c1) - flow_p_n(c2))
+                         + v_f * grid_sy(s)  &
+                         + w_f * grid_sz(s)  &
+                         + a12 * (flow_p_n(c1) - flow_p_n(c2))
 
   end do
   !$acc end parallel
@@ -262,7 +268,7 @@
   grid_cells_c => Grid % cells_c
   grid_cells_f => Grid % cells_f
   flow_v_flux_n => Flow % v_flux % n
-  !$acc parallel loop reduction(+:b_tmp)  &
+  !$acc parallel loop reduction(+: b_tmp)  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -323,7 +329,7 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop  &
+  !$acc parallel loop reduction(max: max_abs_val)  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
