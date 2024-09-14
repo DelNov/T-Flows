@@ -155,8 +155,11 @@ def Command_In_File(file_path, target_string):
   with open(file_path, 'r') as file:
     file_content = file.read()
 
+  # Remove comments from the file content
+  cleaned_file_content = re.sub(r'!.*', '', file_content)
+
   # Remove spaces from the file content
-  cleaned_file_content = re.sub(r'\s+', '', file_content)
+  cleaned_file_content = re.sub(r'\s+', '', cleaned_file_content)
 
   # Check if the cleaned target string is in the cleaned file content
   return cleaned_target in cleaned_file_content
@@ -598,17 +601,28 @@ def Process_Tfp_Block(block):
     full_name = array
 
     # Create pointer variable name
-    variable_name = full_name.replace(" % ", "_").lower()
+    pointer_name = full_name.replace(" % ", "_").lower()
+
+    # Check if this pointer is declared
+    if "%" in full_name:  # If it's part of a structure
+      if not Command_In_File(gpu_pointers_file, pointer_name):
+        print(f"{RED}#============================#{RESET}")
+        print(f"{RED}#                            #{RESET}")
+        print(f"{RED}#   ERROR IN PREPROCESSING   #{RESET}")
+        print(f"{RED}#                            #{RESET}")
+        print(f"{RED}#============================#{RESET}")
+        print("  Variable", pointer_name,
+              "is not defined in", gpu_pointers_file)
 
     # Skip excluded macros (like Faces_In_Region)
     if any(macro in full_name for macro in excluded_macros):
       continue
 
     # Check if variable has already been processed
-    if variable_name not in processed_vars:
+    if pointer_name not in processed_vars:
       if "%" in full_name:  # If it's part of a structure
         # Add to the pointer setup
-        command = f"{variable_name} => {full_name}"
+        command = f"{pointer_name} => {full_name}"
 
         if Command_In_File(grid_to_device_file, command):
           print("  ", command, " already in ", grid_to_device_file, sep="")
@@ -618,22 +632,23 @@ def Process_Tfp_Block(block):
           print("  ", command, " already in ", turb_to_device_file, sep="")
         else:
           print(f"{BRIGHT_RED}", end="")
-          print("  ", command, " is not present in any of the three files:")
-          print("  ", grid_to_device_file, flow_to_device_file,
-                      turb_to_device_file)
-          print(" Adding it to this block!")
+          print(" ", command, " is not present in any of the three files:")
+          print(" ", grid_to_device_file, "\n ",
+                     flow_to_device_file, "\n ",
+                     turb_to_device_file)
+          print("  Adding it to this block!")
           pointer_setup += (indent + command + "\n")
           print(f"{RESET}",      end="")
 
       # Add to the OpenACC setup
-      present_setup += f"{indent}!$acc   {variable_name},  &\n"
+      present_setup += f"{indent}!$acc   {pointer_name},  &\n"
 
       # Replace occurrences of the original variable
       # name with the pointer name in the block
-      block = re.sub(re.escape(full_name), variable_name, block)
+      block = re.sub(re.escape(full_name), pointer_name, block)
 
       # Mark variable as processed
-      processed_vars.add(variable_name)
+      processed_vars.add(pointer_name)
 
   #----------------------------------------------------#
   #   Detect reduction variables within the do-loop    #
@@ -654,11 +669,6 @@ def Process_Tfp_Block(block):
 
   # Block without inner loops
   cleaned_block = Remove_Inner_Loops(block)
-
-  print(f"{BOLD}")
-  print(cleaned_block)
-  print(f"{RESET}")
-
 
   # Find reduction variables in the cleaned_block (only scalars, no arrays)
   reductions = reduction_pattern.findall(cleaned_block)
