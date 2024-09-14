@@ -117,16 +117,21 @@ $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=nvidia/gnu/intel> <GPU=yes/no> <REAL=double/single>   )
 $(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=quick/heap> <OMP=no/yes>  )
+$(info #        <clean/preprocess>                                             )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
 $(info #   2. If you use gnu or intel compiler, GPU will be set to "no"        )
+$(info #   3. Target "clean" removes all compiled files and binaries.          )
+$(info #   4. Target "preprocess" will only preprocess .fpp to .f90 files.     )
+$(info #      Effectivelly, this targets inserts OpenACC into Fortran sources. )
 $(info #                                                                       )
 $(info # Examples:                                                             )
 $(info #   make              - compile with nvidia compiler with GPU           )
 $(info #   make GPU=no       - compile with nvidia compiler without GPU        )
 $(info #   make FORTAN=intel - compile with intel compiler                     )
 $(info #   make DEBUG=yes    - compile with nvidia compiler in debug mode      )
+$(info #   make clean        - remove all compiled files and binaries          )
 $(info #-----------------------------------------------------------------------)
 
 #-------------------
@@ -356,3 +361,11 @@ include makefile_explicit_dependencies
 #---------------------
 clean:
 	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+
+#---------------------------------------------------------
+#   Preprocessing only target
+#---------------------------------------------------------
+# This target will only preprocess the .fpp files
+preprocess: $(SRC_FPP:.fpp=.f90)
+	@echo "Preprocessing complete."
+
