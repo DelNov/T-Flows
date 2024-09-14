@@ -119,7 +119,7 @@
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop reduction(+: area_in,vol_in)  &
+      !$acc parallel loop reduction(+: vol_in,area_in)  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
       !$acc   grid_region_l_face,  &
@@ -245,7 +245,7 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -304,7 +304,7 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop reduction(max: max_abs_val)  &
+  !$acc parallel loop reduction(max: max_abs_val) independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

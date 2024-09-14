@@ -72,8 +72,8 @@
       !$acc present(  &
       !$acc   grid_region_f_cell,  &
       !$acc   grid_region_l_cell,  &
-      !$acc   ui_o,  &
-      !$acc   ui_oo   &
+      !$acc   ui_oo,  &
+      !$acc   ui_o   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
         ui_oo(c) = ui_o(c)
@@ -134,7 +134,7 @@
   !   (Part 1 is in Form_System_Matrix)   !
   !---------------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

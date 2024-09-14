@@ -114,7 +114,7 @@
   !   (Part 1 is in Form_Energy_Matrix)   !
   !---------------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

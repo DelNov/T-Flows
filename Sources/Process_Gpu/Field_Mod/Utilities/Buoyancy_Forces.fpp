@@ -40,47 +40,29 @@
 
   call Work % Connect_Real_Cell(temp)
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   temp   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
     temp(c) = 0.0
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-------------------------------------------!
   !   Browse through all the interior cells   !
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   grid_cells_n_cells,  &
-  !$acc   grid_cells_c,  &
-  !$acc   grid_cells_f,  &
-  !$acc   temp,  &
-  !$acc   flow_t_n,  &
-  !$acc   flow_density,  &
-  !$acc   grid_si,  &
-  !$acc   grid_dxi   &
-  !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c1 = Cells_In_Domain()  ! all present
     b_tmp = 0.0
 
-  !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
 
         ! Temperature and density at the face
-        temp_f = Face_Value(s, flow_t_n(c1),   flow_t_n(c2))
-        dens_f = Face_Value(s, flow_density(c1), flow_density(c2))
+        temp_f = Face_Value(s, Flow % t % n(c1),   Flow % t % n(c2))
+        dens_f = Face_Value(s, Flow % density(c1), Flow % density(c2))
 
         ! Units here: [kg/m^3 K]
         b_f = dens_f * (Flow % t_ref - temp_f)
@@ -89,12 +71,11 @@
         b_tmp = b_tmp + b_f * 0.5 * abs(grid_si(s) * grid_dxi(s))
       end if
     end do
-  !$acc end loop
 
     ! Unit here: [kg m/s^2 = N]
     temp(c1) = b_tmp * Flow % beta * grav_i
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-------------------------------------------!
   !   Browse through all the boundary cells   !
@@ -103,25 +84,15 @@
 
   do reg = Boundary_Regions()
 
-    !$acc parallel loop  &
-    !$acc present(  &
-    !$acc   grid_region_f_face,  &
-    !$acc   grid_region_l_face,  &
-    !$acc   grid_faces_c,  &
-    !$acc   temp,  &
-    !$acc   flow_t_n,  &
-    !$acc   flow_density,  &
-    !$acc   grid_si,  &
-    !$acc   grid_dxi   &
-    !$acc )
-    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-      c1 = grid_faces_c(1, s)  ! inside cell
-      c2 = grid_faces_c(2, s)  ! boundary cell
+    !$tf-acc loop begin
+    do s = Faces_In_Region(reg)  ! all present
+      c1 = Grid % faces_c(1, s)  ! inside cell
+      c2 = Grid % faces_c(2, s)  ! boundary cell
 
       ! Temperature at the face is identical to
       ! the temperature at the boundary cell
-      temp_f = flow_t_n(c2)
-      dens_f = flow_density(c1)  ! or in c2?
+      temp_f = Flow % t % n(c2)
+      dens_f = Flow % density(c1)  ! or in c2?
 
       ! Units here: [kg/m^3 K]
       b_f = dens_f * (Flow % t_ref - temp_f)
@@ -131,7 +102,7 @@
                * Flow % beta * grav_i
 
     end do
-    !$acc end parallel
+    !$tf-acc loop end
 
   end do
 
@@ -139,17 +110,11 @@
   !   Correct the units for body forces   !
   !---------------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
-  !$acc   temp   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()
     b(c) = b(c) + temp(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
 # if T_FLOWS_DEBUG == 1
   append = 'buoyancy_force__'

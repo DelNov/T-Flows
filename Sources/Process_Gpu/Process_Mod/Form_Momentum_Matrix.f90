@@ -95,7 +95,7 @@
   !--------------------------------------------------!
 
   ! Coefficients inside the domain
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -160,7 +160,7 @@
   !   Take care of the unsteady term   !
   !------------------------------------!
   if(present(dt)) then
-    !$acc parallel loop  &
+    !$acc parallel loop independent  &
     !$acc present(  &
     !$acc   grid_region_f_cell,  &
     !$acc   grid_region_l_cell,  &
@@ -179,7 +179,7 @@
   !   Store volume divided by central coefficient for momentum   !
   !   and refresh its buffers before discretizing the pressure   !
   !--------------------------------------------------------------!
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -200,7 +200,7 @@
   !   Part 1 of the under-relaxation    !
   !   (Part 2 is in Compute_Momentum)   !
   !-------------------------------------!
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

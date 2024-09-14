@@ -39,7 +39,7 @@
   if(comp .eq. 2) p_d_i =  Flow % bulk % p_drop_y
   if(comp .eq. 3) p_d_i =  Flow % bulk % p_drop_z
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

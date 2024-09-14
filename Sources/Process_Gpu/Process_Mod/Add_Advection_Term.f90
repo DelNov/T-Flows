@@ -33,7 +33,7 @@
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

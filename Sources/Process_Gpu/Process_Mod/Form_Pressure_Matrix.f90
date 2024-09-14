@@ -67,7 +67,7 @@
   !   This is cell based and will not create race conditions on GPUs   !
   !--------------------------------------------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -101,7 +101,7 @@
   !$acc end parallel
 
   ! De-singularize the system matrix ... just like this, ad-hoc
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

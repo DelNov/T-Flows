@@ -55,20 +55,12 @@
       call Flow % Grad_Component(Grid, Flow % w % n, 2, w_y)
       call Flow % Grad_Component(Grid, Flow % v % n, 3, v_z)
 
-      !$acc parallel loop independent  &
-      !$acc present(  &
-      !$acc   grid_region_f_cell,  &
-      !$acc   grid_region_l_cell,  &
-      !$acc   flow_shear,  &
-      !$acc   u_x,  &
-      !$acc   v_z,  &
-      !$acc   w_y   &
-      !$acc )
-      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-        flow_shear(c) = u_x(c)**2 + .5 * (v_z(c)+w_y(c))**2
+      !$tf-acc loop begin
+      do c = Cells_In_Domain()  ! all present
+        Flow % shear(c) = u_x(c)**2 + .5 * (v_z(c)+w_y(c))**2
         Flow % vort (c) =           - .5 * (v_z(c)-w_y(c))**2
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     !---------------------------!
     !   Run #2: w_x, v_y, u_z   !
@@ -81,20 +73,12 @@
       call Flow % Grad_Component(Grid, Flow % v % n, 2, v_y)
       call Flow % Grad_Component(Grid, Flow % u % n, 3, u_z)
 
-      !$acc parallel loop independent  &
-      !$acc present(  &
-      !$acc   grid_region_f_cell,  &
-      !$acc   grid_region_l_cell,  &
-      !$acc   flow_shear,  &
-      !$acc   v_y,  &
-      !$acc   u_z,  &
-      !$acc   w_x   &
-      !$acc )
-      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-        flow_shear(c) = flow_shear(c) + v_y(c)**2 + .5 * (u_z(c)+w_x(c))**2
+      !$tf-acc loop begin
+      do c = Cells_In_Domain()  ! all present
+        Flow % shear(c) = Flow % shear(c) + v_y(c)**2 + .5 * (u_z(c)+w_x(c))**2
         Flow % vort (c) = Flow % vort (c)             - .5 * (u_z(c)-w_x(c))**2
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     !---------------------------!
     !   Run #3: v_x, u_y, w_z   !
@@ -107,20 +91,12 @@
       call Flow % Grad_Component(Grid, Flow % u % n, 2, u_y)
       call Flow % Grad_Component(Grid, Flow % w % n, 3, w_z)
 
-      !$acc parallel loop independent  &
-      !$acc present(  &
-      !$acc   grid_region_f_cell,  &
-      !$acc   grid_region_l_cell,  &
-      !$acc   flow_shear,  &
-      !$acc   w_z,  &
-      !$acc   v_x,  &
-      !$acc   u_y   &
-      !$acc )
-      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-        flow_shear(c) = flow_shear(c) + w_z(c)**2 + .5 * (v_x(c)+u_y(c))**2
+      !$tf-acc loop begin
+      do c = Cells_In_Domain()  ! all present
+        Flow % shear(c) = Flow % shear(c) + w_z(c)**2 + .5 * (v_x(c)+u_y(c))**2
         Flow % vort (c) = Flow % vort (c)             - .5 * (v_x(c)-u_y(c))**2
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
 

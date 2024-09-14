@@ -28,22 +28,14 @@
 
   vol = 0.0
 
-  !$acc parallel loop reduction(+: bulk_u,bulk_w,vol,bulk_v) independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_u_n,  &
-  !$acc   grid_vol,  &
-  !$acc   flow_v_n,  &
-  !$acc   flow_w_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    bulk_u = bulk_u + flow_u_n(c) * grid_vol(c)
-    bulk_v = bulk_v + flow_v_n(c) * grid_vol(c)
-    bulk_w = bulk_w + flow_w_n(c) * grid_vol(c)
-    vol = vol + grid_vol(c)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    bulk_u = bulk_u + Flow % u % n(c) * Grid % vol(c)
+    bulk_v = bulk_v + Flow % v % n(c) * Grid % vol(c)
+    bulk_w = bulk_w + Flow % w % n(c) * Grid % vol(c)
+    vol = vol + Grid % vol(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   call Global % Sum_Reals(bulk_u, bulk_v, bulk_w, vol)
 

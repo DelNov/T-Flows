@@ -40,24 +40,8 @@
   !   SGS terms   !
   !               !
   !---------------!
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   u_x,  &
-  !$acc   v_y,  &
-  !$acc   w_z,  &
-  !$acc   v_x,  &
-  !$acc   u_y,  &
-  !$acc   u_z,  &
-  !$acc   w_x,  &
-  !$acc   w_y,  &
-  !$acc   v_z,  &
-  !$acc   flow_shear,  &
-  !$acc   flow_vort,  &
-  !$acc   turb_wale_v   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()
     s11 = u_x(c)
     s22 = v_y(c)
     s33 = w_z(c)
@@ -78,8 +62,8 @@
     v31 = -v13
     v32 = -v23
 
-    shear2 = 0.5 * flow_shear(c) * flow_shear(c)
-    vort2  = 0.5 * flow_vort(c)  * flow_vort(c)
+    shear2 = 0.5 * Flow % shear(c) * Flow % shear(c)
+    vort2  = 0.5 * Flow % vort(c)  * Flow % vort(c)
 
     s11d =  s11*s11 + s12*s12 + s13*s13   &
          - (v11*v11 + v12*v12 + v13*v13)  &
@@ -108,7 +92,7 @@
     turb_wale_v(c) =  ( abs(sijd_sijd)**1.5 )    &
                    /  ( abs(shear2)**2.5 + abs(sijd_sijd)**1.25 + TINY)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   call Work % Disconnect_Real_Cell(u_x, u_y, u_z,  &
                                    v_x, v_y, v_z,  &

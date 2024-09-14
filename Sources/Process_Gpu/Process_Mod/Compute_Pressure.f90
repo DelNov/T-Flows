@@ -59,7 +59,7 @@
   !   Update the pressure field   !
   !-------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -77,7 +77,7 @@
   p_max = -HUGE
   p_min = +HUGE
 
-  !$acc parallel loop reduction(max: p_max) reduction(min: p_min)  &
+  !$acc parallel loop reduction(max: p_max) reduction(min: p_min) independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -92,7 +92,7 @@
   call Global % Max_Real(p_max)
   call Global % Min_Real(p_min)
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

@@ -51,24 +51,13 @@
   !----------------------!
 
   ! Units: kg m / s^2 * s / kg = m / s
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_u_n,  &
-  !$acc   pp_x,  &
-  !$acc   flow_v_m,  &
-  !$acc   flow_v_n,  &
-  !$acc   pp_y,  &
-  !$acc   flow_w_n,  &
-  !$acc   pp_z   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    flow_u_n(c) = flow_u_n(c) - pp_x(c) * flow_v_m(c)
-    flow_v_n(c) = flow_v_n(c) - pp_y(c) * flow_v_m(c)
-    flow_w_n(c) = flow_w_n(c) - pp_z(c) * flow_v_m(c)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    Flow % u % n(c) = Flow % u % n(c) - pp_x(c) * Flow % v_m(c)
+    Flow % v % n(c) = Flow % v % n(c) - pp_y(c) * Flow % v_m(c)
+    Flow % w % n(c) = Flow % w % n(c) - pp_z(c) * Flow % v_m(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Update buffers for velocities over all processors
   call Grid % Exchange_Cells_Real(Flow % u % n)
@@ -82,26 +71,17 @@
   !---------------------------------------------!
 
   ! Units: m * m^3 * s / kg * kg / (m s^2) = m^3 / s
-  !$acc parallel loop  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   grid_faces_c,  &
-  !$acc   fc,  &
-  !$acc   flow_v_m,  &
-  !$acc   flow_v_flux_n,  &
-  !$acc   flow_pp_n   &
-  !$acc )
-  do s = grid_region_f_face(grid_n_regions), grid_region_l_face(grid_n_regions)  ! all present
-    c1 = grid_faces_c(1, s)
-    c2 = grid_faces_c(2, s)
+  !$tf-acc loop begin
+  do s = Faces_In_Domain_And_At_Buffers()  ! all present
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
 
-    a12 = -fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+    a12 = -fc(s) * Face_Value(s, Flow % v_m(c1), Flow % v_m(c2))
 
-    flow_v_flux_n(s) = flow_v_flux_n(s)  &
-                         + (flow_pp_n(c2) - flow_pp_n(c1)) * a12
+    Flow % v_flux % n(s) = Flow % v_flux % n(s)  &
+                         + (Flow % pp % n(c2) - Flow % pp % n(c1)) * a12
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-------------------------------!
   !                               !
@@ -118,33 +98,22 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
-  !$acc   grid_cells_n_cells,  &
-  !$acc   grid_cells_c,  &
-  !$acc   grid_cells_f,  &
-  !$acc   flow_v_flux_n   &
-  !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c1 = Cells_In_Domain()  ! all present
 
     b_tmp = b(c1)
-  !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
+        b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
       end if
     end do
-  !$acc end loop
 
     b(c1) = b_tmp
 
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !-----------------------------!
   !   Then the boundary faces   !
@@ -155,19 +124,12 @@
        Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   b,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - flow_v_flux_n(s)
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)  ! inside cell
+        b(c1) = b(c1) - Flow % v_flux % n(s)
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
   end do
@@ -182,16 +144,11 @@
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
   max_abs_val = 0.0
-  !$acc parallel loop reduction(max: max_abs_val) independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   b   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
     max_abs_val = max(max_abs_val, abs(b(c)))
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Find maximum volume balance error over all processors
   call Global % Max_Real(max_abs_val)
@@ -203,30 +160,20 @@
   cfl_max = 0.0
   pe_max  = 0.0
 
-  !$acc parallel loop reduction(max: pe_max,cfl_max)  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   grid_faces_c,  &
-  !$acc   visc,  &
-  !$acc   dens,  &
-  !$acc   flow_v_flux_n,  &
-  !$acc   fc,  &
-  !$acc   grid_d   &
-  !$acc )
-  do s = grid_region_f_face(grid_n_regions), grid_region_l_face(grid_n_regions)  ! all present
-    c1 = grid_faces_c(1, s)
-    c2 = grid_faces_c(2, s)
+  !$tf-acc loop begin
+  do s = Faces_In_Domain_And_At_Buffers()  ! all present
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
 
     nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
 
-    cfl_t   = abs(flow_v_flux_n(s)) * Flow % dt / (fc(s) * grid_d(s)**2)
-    pe_t    = abs(flow_v_flux_n(s)) / fc(s) / nu_f
+    cfl_t   = abs(Flow % v_flux % n(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
+    pe_t    = abs(Flow % v_flux % n(s)) / fc(s) / nu_f
     cfl_max = max( cfl_max, cfl_t )
     pe_max  = max( pe_max,  pe_t  )
 
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   Flow % cfl_max = cfl_max
   Flow % pe_max  = pe_max

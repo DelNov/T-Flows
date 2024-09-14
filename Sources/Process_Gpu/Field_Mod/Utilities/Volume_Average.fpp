@@ -25,18 +25,12 @@
   ! "val" is coppied to GPU.  So far it was only density which was sent
   ! here, so things should work.  But it is probably good to stay alert.
 
-  !$acc parallel loop reduction(+: tot_vol,sum_val) independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   val,  &
-  !$acc   grid_vol   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    sum_val = sum_val + val(c) * grid_vol(c)
-    tot_vol = tot_vol + grid_vol(c)
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    sum_val = sum_val + val(c) * Grid % vol(c)
+    tot_vol = tot_vol + Grid % vol(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Perform sums over all processors
   call Global % Sum_Real(sum_val)

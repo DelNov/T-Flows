@@ -26,20 +26,13 @@
   !   Nullify arrays on the device   !
   !----------------------------------!
 
-  !$acc parallel loop independent &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   phi_x,  &
-  !$acc   phi_y,  &
-  !$acc   phi_z   &
-  !$acc )
-  do c = grid_region_f_cell(1), grid_region_l_cell(grid_n_regions+1)  ! all present
+  !$tf-acc loop begin
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()  ! all present
     phi_x(c) = 0.0
     phi_y(c) = 0.0
     phi_z(c) = 0.0
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !---------------------------------------------------------------!
   !   Compute pressure gradients again with extrapolated values   !
