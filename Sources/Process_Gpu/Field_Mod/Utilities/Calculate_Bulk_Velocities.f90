@@ -28,7 +28,7 @@
 
   vol = 0.0
 
-  !$acc parallel loop reduction(+: bulk_u,bulk_w,vol,bulk_v) independent  &
+  !$acc parallel loop reduction(+: bulk_u,bulk_v,bulk_w,vol) independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

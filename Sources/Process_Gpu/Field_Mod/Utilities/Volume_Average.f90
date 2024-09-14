@@ -25,7 +25,7 @@
   ! "val" is coppied to GPU.  So far it was only density which was sent
   ! here, so things should work.  But it is probably good to stay alert.
 
-  !$acc parallel loop reduction(+: tot_vol,sum_val) independent  &
+  !$acc parallel loop reduction(+: sum_val,tot_vol) independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

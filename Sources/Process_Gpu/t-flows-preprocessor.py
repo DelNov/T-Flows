@@ -311,8 +311,8 @@ def Find_Arrays_In_Block(block):
   cleaned_block = re.sub(r'(?<!\s)\/', ' /', cleaned_block)
   cleaned_block = re.sub(r'\/(?!\s)',  '/ ', cleaned_block)
 
-  result = set()
-  seen_arrays = set()  # Track arrays to avoid duplicates
+  result = {}
+  seen_arrays = {}  # track arrays to avoid duplicates
 
   #----------------------------------------------------------#
   #   Browse through the reduced block and look for arrays   #
@@ -332,9 +332,9 @@ def Find_Arrays_In_Block(block):
 
       # Only consider valid array names (non-empty) and avoid duplicates
       if array_name and array_name not in seen_arrays:
-        seen_arrays.add(array_name)  # mark array as seen
+        seen_arrays[array_name] = None  # mark array as seen
         array_name = re.sub(r'@', ' ', array_name)
-        result.add(array_name)
+        result[array_name] = None
 
   #---------------------------------------------------------#
   #   At this point, we have found all arrays, now search   #
@@ -395,10 +395,10 @@ def Process_Tfp_Block(block):
   present_setup += (indent + "!$acc present(  &\n")
 
   # Set to track processed variables to avoid duplicates
-  processed_vars = set()
+  processed_vars = {}
 
   # Set to track reduction variables
-  reduction_vars = set()
+  reduction_vars = {}
 
   # List of macros to exclude from processing as arrays
   excluded_macros = {"Cells_At_Boundaries_In_Domain_And_Buffers",
@@ -435,8 +435,8 @@ def Process_Tfp_Block(block):
     block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
 
     # Add these to the processed set to avoid duplicates
-    processed_vars.add('grid_region_f_face')
-    processed_vars.add('grid_region_l_face')
+    processed_vars['grid_region_f_face'] = None
+    processed_vars['grid_region_l_face'] = None
 
   #-------------------------------------------------------------------#
   #   Special handling for Faces_In_Domain_And_At_Buffers variables   #
@@ -456,12 +456,16 @@ def Process_Tfp_Block(block):
         print("  ", command, " already in ", grid_to_device_file, sep="")
 
     present_setup += (
-      indent + "!$acc   grid_region_f_cell,  &\n" +
-      indent + "!$acc   grid_region_l_cell,  &\n")
+      indent + "!$acc   grid_region_f_face,  &\n" +
+      indent + "!$acc   grid_region_l_face,  &\n")
     block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
     block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
-    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
+    block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
+    block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
+
+    # Add these to the processed set to avoid duplicates
+    processed_vars['grid_region_f_face'] = None
+    processed_vars['grid_region_l_face'] = None
 
   #--------------------------------------------------#
   #   Special handling for Cells_In_Domain variables #
@@ -489,8 +493,8 @@ def Process_Tfp_Block(block):
     block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
 
     # Add these to the processed set to avoid duplicates
-    processed_vars.add('grid_region_f_cell')
-    processed_vars.add('grid_region_l_cell')
+    processed_vars['grid_region_f_cell'] = None
+    processed_vars['grid_region_l_cell'] = None
 
   #----------------------------------------------------------------#
   #   Special handling for Cells_In_Domain_And_Buffers variables   #
@@ -518,8 +522,8 @@ def Process_Tfp_Block(block):
     block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
 
     # Add these to the processed set to avoid duplicates
-    processed_vars.add('grid_region_f_cell')
-    processed_vars.add('grid_region_l_cell')
+    processed_vars['grid_region_f_cell'] = None
+    processed_vars['grid_region_l_cell'] = None
 
   #---------------------------------------------------------------------#
   #   Handling of Cells_At_Boundaries_In_Domain_And_Buffers variables   #
@@ -547,8 +551,8 @@ def Process_Tfp_Block(block):
     block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
 
     # Add these to the processed set to avoid duplicates
-    processed_vars.add('grid_region_f_cell')
-    processed_vars.add('grid_region_l_cell')
+    processed_vars['grid_region_f_cell'] = None
+    processed_vars['grid_region_l_cell'] = None
 
   #-----------------------------------------------#
   #   Handling of Cells_At_Boundaries variables   #
@@ -576,8 +580,8 @@ def Process_Tfp_Block(block):
     block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
 
     # Add these to the processed set to avoid duplicates
-    processed_vars.add('grid_region_f_cell')
-    processed_vars.add('grid_region_l_cell')
+    processed_vars['grid_region_f_cell'] = None
+    processed_vars['grid_region_l_cell'] = None
 
   #-----------------------------------------------------#
   #   General handling for arrays in the remaining code #
@@ -648,7 +652,7 @@ def Process_Tfp_Block(block):
       block = re.sub(re.escape(full_name), pointer_name, block)
 
       # Mark variable as processed
-      processed_vars.add(pointer_name)
+      processed_vars[pointer_name] = None
 
   #----------------------------------------------------#
   #   Detect reduction variables within the do-loop    #
@@ -675,10 +679,10 @@ def Process_Tfp_Block(block):
   max_reductions = max_pattern.findall(cleaned_block)
   min_reductions = min_pattern.findall(cleaned_block)
 
-  # Set to track reduction variables (both +, - and max)
-  reduction_vars = set(reductions)  # add scalar reduction variables to the set
-  max_reduction_vars = set(max_reductions)  # add max reduction variables
-  min_reduction_vars = set(min_reductions)  # add min reduction variables
+  # Dictionaries to track reduction variables (both +, -, max, and min)
+  reduction_vars = {var: None for var in reductions}
+  max_reduction_vars = {var: None for var in max_reductions}
+  min_reduction_vars = {var: None for var in min_reductions}
 
   # Add reduction clause if any reductions are found
   if reduction_vars or max_reduction_vars or min_reduction_vars:

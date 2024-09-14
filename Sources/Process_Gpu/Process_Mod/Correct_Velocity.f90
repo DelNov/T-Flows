@@ -84,8 +84,8 @@
   ! Units: m * m^3 * s / kg * kg / (m s^2) = m^3 / s
   !$acc parallel loop  &
   !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
+  !$acc   grid_region_f_face,  &
+  !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
   !$acc   fc,  &
   !$acc   flow_v_m,  &
@@ -203,10 +203,10 @@
   cfl_max = 0.0
   pe_max  = 0.0
 
-  !$acc parallel loop reduction(max: pe_max,cfl_max)  &
+  !$acc parallel loop reduction(max: cfl_max,pe_max)  &
   !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
+  !$acc   grid_region_f_face,  &
+  !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
   !$acc   visc,  &
   !$acc   dens,  &

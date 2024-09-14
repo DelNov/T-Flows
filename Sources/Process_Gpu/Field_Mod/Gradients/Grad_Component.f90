@@ -29,8 +29,8 @@
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
-  !$acc   phii,  &
   !$acc   phi,  &
+  !$acc   phii,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
