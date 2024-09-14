@@ -136,11 +136,18 @@
        Grid % region % type(reg) .eq. WALLFL  .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop                                                  &
-      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
-      !$acc         val, dia, visc_eff, fc, dia)
-      do s = Faces_In_Region_Gpu(reg)  ! all present
-        c1 = grid_faces_c(1,s)  ! inside cell
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   visc_eff,  &
+      !$acc   fc,  &
+      !$acc   val,  &
+      !$acc   dia   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
         a12 = visc_eff(c1) * fc(s)
         val(dia(c1)) = val(dia(c1)) + a12
       end do

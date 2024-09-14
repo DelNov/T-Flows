@@ -50,10 +50,15 @@
   !   Initialize density times thermal capacity and effective conductivity   !
   !--------------------------------------------------------------------------!
 
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         dens_capa, flow_density, flow_capacity)
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  ! all present
+  !$acc parallel loop independent &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   dens_capa,  &
+  !$acc   flow_density,  &
+  !$acc   flow_capacity   &
+  !$acc )
+  do c = grid_region_f_cell(1), grid_region_l_cell(grid_n_regions+1)  ! all present
     dens_capa(c) = flow_density(c) * flow_capacity(c)
   end do
   !$acc end parallel
@@ -90,8 +95,10 @@
   !   Initialize matrix entries to zero   !
   !---------------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(val)
+  !$acc parallel loop  &
+  !$acc present(  &
+  !$acc   val   &
+  !$acc )
   do i = 1, nz  ! all present
     val(i) = 0.0
   end do
@@ -144,11 +151,18 @@
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop                                                  &
-      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
-      !$acc         val, dia, cond_eff, fc, dia)
-      do s = Faces_In_Region_Gpu(reg)  ! all present
-        c1 = grid_faces_c(1,s)  ! inside cell
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   cond_eff,  &
+      !$acc   fc,  &
+      !$acc   val,  &
+      !$acc   dia   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
         a12 = cond_eff(c1) * fc(s)
         val(dia(c1)) = val(dia(c1)) + a12
       end do

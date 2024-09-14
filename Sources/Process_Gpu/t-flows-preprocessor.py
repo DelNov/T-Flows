@@ -24,7 +24,7 @@
 #      - indent: Sets the indentation level to three spaces for aligning
 #        inserted OpenACC directives.
 #      - excluded_macros: Lists macros (sych as Faces_In_Region,
-#        Cells_In_Domain and many others) that will not be processed as arrays
+#        Cells_In_Domain and come others) that will not be processed as arrays
 #        (since they are treated differently).
 #
 #   3. Main Logic - Process_Tfp_Block(block) Function: This function processes
@@ -314,7 +314,9 @@ def Process_Tfp_Block(block):
   # Initialize pointers and OpenACC clauses
   pointer_setup = ""
   openacc_setup = ""
-  if "Cells_In_Domain_And_Buffers" in block:
+  if "Cells_At_Boundaries_In_Domain_And_Buffers" in block:
+    openacc_setup += (indent + "!$acc parallel loop independent &\n")
+  elif "Cells_In_Domain_And_Buffers" in block:
     openacc_setup += (indent + "!$acc parallel loop independent  &\n")
   elif "Cells_In_Domain" in block:
     openacc_setup += (indent + "!$acc parallel loop  &\n")
@@ -322,7 +324,7 @@ def Process_Tfp_Block(block):
     openacc_setup += (indent + "!$acc parallel loop  &\n")
   elif "Faces_In_Domain_And_At_Buffers" in block:
     openacc_setup += (indent + "!$acc parallel loop  &\n")
-  else:
+  else:  # this covers loops through non-zeroes
     openacc_setup += (indent + "!$acc parallel loop  &\n")
 
   openacc_setup += (indent + "!$acc present(  &\n")
@@ -334,11 +336,12 @@ def Process_Tfp_Block(block):
   reduction_vars = set()
 
   # List of macros to exclude from processing as arrays
-  excluded_macros = {"Faces_In_Region",
-                     "Faces_In_Domain_And_At_Buffers",
-                     "Face_Value",
+  excluded_macros = {"Cells_At_Boundaries_In_Domain_And_Buffers",
                      "Cells_In_Domain",
-                     "Cells_In_Domain_And_Buffers"}
+                     "Cells_In_Domain_And_Buffers",
+                     "Faces_In_Region",
+                     "Faces_In_Domain_And_At_Buffers",
+                     "Face_Value"}
 
   #----------------------------------------------------#
   #   Special handling for Faces_In_Region variables   #
@@ -422,6 +425,34 @@ def Process_Tfp_Block(block):
   #   Special handling for Cells_In_Domain_And_Buffers variables   #
   #----------------------------------------------------------------#
   if "Cells_In_Domain_And_Buffers" in block:
+
+    print("")
+    print(f"{RED}  # Pointers used in the block{RESET}")
+
+    commands = ("grid_region_f_cell => Grid % region % f_cell",
+                "grid_region_l_cell => Grid % region % l_cell")
+
+    for command in commands:
+      if not Command_In_File(grid_to_device_file, command):
+        pointer_setup += (indent + command + "\n")
+      else:
+        print("  ", command, " already in ", grid_to_device_file, sep="")
+
+    openacc_setup += (
+      indent + "!$acc   grid_region_f_cell,  &\n" +
+      indent + "!$acc   grid_region_l_cell,  &\n")
+    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
+    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
+    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
+
+    # Add these to the processed set to avoid duplicates
+    processed_vars.add('grid_region_f_cell')
+    processed_vars.add('grid_region_l_cell')
+
+  #---------------------------------------------------------------------#
+  #   Handling of Cells_At_Boundaries_In_Domain_And_Buffers variables   #
+  #---------------------------------------------------------------------#
+  if "Cells_At_Boundaries_In_Domain_And_Buffers" in block:
 
     print("")
     print(f"{RED}  # Pointers used in the block{RESET}")
@@ -599,6 +630,14 @@ def Process_Tfp_Block(block):
     'grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)',
     block
   )
+
+  # Replace the 'do' loop with the OpenACC-parallelized version (if present)
+  block = re.sub(
+    r'Cells_At_Boundaries_In_Domain_And_Buffers\(\)',
+    'grid_region_f_cell(1), grid_region_l_cell(grid_n_regions+1)',
+    block
+  )
+
 
   # Insert OpenACC directives before the second "do" loop
   first_do_index = block.find("do ")

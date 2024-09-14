@@ -24,13 +24,11 @@
   call Work % Connect_Real_Cell(dens_capa)
 
   ! Fill up the dens_capa array
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         dens_capa, flow_density, flow_capacity)
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  ! all present
-    dens_capa(c) = flow_density(c) * flow_capacity(c)
+  !$tf-acc loop begin
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()  ! all present
+    dens_capa(c) = Flow % density(c) * Flow % capacity(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !

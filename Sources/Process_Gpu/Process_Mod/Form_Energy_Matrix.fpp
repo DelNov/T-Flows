@@ -50,18 +50,16 @@
   !   Initialize density times thermal capacity and effective conductivity   !
   !--------------------------------------------------------------------------!
 
-  !$acc parallel loop independent                        &
-  !$acc present(grid_region_f_cell, grid_region_l_cell,  &
-  !$acc         dens_capa, flow_density, flow_capacity)
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers_Gpu()  ! all present
-    dens_capa(c) = flow_density(c) * flow_capacity(c)
+  !$tf-acc loop begin
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()  ! all present
+    dens_capa(c) = Flow % density(c) * Flow % capacity(c)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   ! Just copy molecular conductivity to effective
   !$tf-acc loop begin
   do c = Cells_In_Domain_And_Buffers()
-    cond_eff(c) = flow_conductivity(c)
+    cond_eff(c) = Flow % conductivity(c)
   end do
   !$tf-acc loop end
 
@@ -78,12 +76,11 @@
   !   Initialize matrix entries to zero   !
   !---------------------------------------!
 
-  !$acc parallel loop independent  &
-  !$acc present(val)
+  !$tf-acc loop begin
   do i = 1, nz  ! all present
     val(i) = 0.0
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   !--------------------------------------------------!
   !   Compute neighbouring coefficients over cells   !
@@ -118,15 +115,13 @@
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop                                                  &
-      !$acc present(grid_faces_c, grid_region_f_face, grid_region_l_face,  &
-      !$acc         val, dia, cond_eff, fc, dia)
-      do s = Faces_In_Region_Gpu(reg)  ! all present
-        c1 = grid_faces_c(1,s)  ! inside cell
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)   ! inside cell
         a12 = cond_eff(c1) * fc(s)
         val(dia(c1)) = val(dia(c1)) + a12
       end do
-      !$acc end parallel
+      !$tf-acc loop end
 
     end if
   end do

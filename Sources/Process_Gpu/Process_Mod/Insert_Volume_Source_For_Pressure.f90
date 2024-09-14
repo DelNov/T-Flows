@@ -137,7 +137,7 @@
     if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop reduction(+: area_out,vol_out)  &
+      !$acc parallel loop reduction(+: vol_out,area_out)  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
       !$acc   grid_region_l_face,  &
@@ -245,7 +245,7 @@
   !   First consider inside faces   !
   !---------------------------------!
 
-  !$acc parallel loop reduction(+: b_tmp)  &
+  !$acc parallel loop  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
