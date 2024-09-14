@@ -214,6 +214,9 @@ def Find_Arrays_In_Block(block):
   # Remove "abs"
   cleaned_block = re.sub(r'\babs\b', '', cleaned_block)
 
+  # Remove "exp"
+  cleaned_block = re.sub(r'\bexp\b', '', cleaned_block)
+
   # Remove "max"
   cleaned_block = re.sub(r'\bmax\b', '', cleaned_block)
 
@@ -228,6 +231,9 @@ def Find_Arrays_In_Block(block):
 
   # Remove "merge"
   cleaned_block = re.sub(r'\bmerge\b', '', cleaned_block)
+
+  # Remove "sqrt"
+  cleaned_block = re.sub(r'\bsqrt\b', '', cleaned_block)
 
   # Remove empty parentheses
   cleaned_block = re.sub(r'\(\s*\)', '', cleaned_block)
