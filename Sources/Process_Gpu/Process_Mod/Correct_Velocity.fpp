@@ -90,9 +90,11 @@
   !- - - - - - - - - - - - - - - -!
   !   This step is for checking   !
   !-------------------------------!
-  !$acc kernels
-  b(:) = 0
-  !$acc end kernels
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()  ! all present
+    b(c) = 0.0
+  end do
+  !$tf-acc loop end
 
   !---------------------------------!
   !   First consider inside faces   !

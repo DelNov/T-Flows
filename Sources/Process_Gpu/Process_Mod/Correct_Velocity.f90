@@ -110,9 +110,16 @@
   !- - - - - - - - - - - - - - - -!
   !   This step is for checking   !
   !-------------------------------!
-  !$acc kernels
-  b(:) = 0
-  !$acc end kernels
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   b   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
+    b(c) = 0.0
+  end do
+  !$acc end parallel
 
   !---------------------------------!
   !   First consider inside faces   !
