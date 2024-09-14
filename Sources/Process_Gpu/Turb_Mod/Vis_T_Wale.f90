@@ -106,7 +106,7 @@
 
     ! Below: 1.5 == 3/2; 2.5 == 5/2;  1.25 == 5/4
     turb_wale_v(c) =  ( abs(sijd_sijd)**1.5 )    &
-                   /  ( abs(shear2)**2.5 + abs(sijd_sijd)**1.25 + TINY)
+                     /  ( abs(shear2)**2.5 + abs(sijd_sijd)**1.25 + TINY)
   end do
   !$acc end parallel
 
