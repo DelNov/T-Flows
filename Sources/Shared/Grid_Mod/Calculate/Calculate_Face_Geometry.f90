@@ -335,15 +335,20 @@
   !--------------------------------------------------!
   Grid % cells_n_cells(:) = 0
   do c1 = -Grid % n_bnd_cells, Grid % n_cells
+    n = 0  ! counter for Grid % cells_n_cells
     do i_fac = 1, Grid % cells_n_faces(c1)
       s = Grid % cells_f(i_fac, c1)
-      Grid % cells_n_cells(c1) = Grid % cells_n_cells(c1) + 1
+      n = n + 1
 
-      call Enlarge % Matrix_Int(Grid % cells_c,  &
-                                i = (/1, Grid % cells_n_cells(c1)/))
+      call Enlarge % Matrix_Int(Grid % cells_c, i = (/1, n/))
       c2 = Grid % faces_c(1,s) + Grid % faces_c(2,s) - c1
-      Grid % cells_c(Grid % cells_n_cells(c1), c1) = c2
+      Grid % cells_c(n, c1) = c2
     end do
+    Grid % cells_n_cells(c1) = n
+
+    ! Sort cell's neighbours and carry faces along
+    call Sort % Int_Carry_Int(Grid % cells_c(1:n, c1),  &
+                              Grid % cells_f(1:n, c1))
   end do
 
   !-------------------------------------!
