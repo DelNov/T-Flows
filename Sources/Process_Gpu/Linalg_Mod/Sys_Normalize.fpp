@@ -1,24 +1,30 @@
 !==============================================================================!
-  subroutine Sys_Normalize_Acc(Lin, n, nz, fn, a_val, a_dia, d_inv, b)
+  subroutine Sys_Normalize(Lin, n, fn, Acon, Aval, b)
 !------------------------------------------------------------------------------!
-!>  Calculation scalar over matrix diagonal operation on a device.
+!>  Front-end for scaling (normalizing) a linear system of equations
+!------------------------------------------------------------------------------!
+!   Note: Using intent clause here, was causing slower runs and crashes        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Linalg_Type) :: Lin         !! parent class
-  integer            :: n           !! matrix and vector dimension
-  integer            :: nz          !! number of nonzeros
-  real,  intent(out) :: fn          !! resulting scaling factor
-  real               :: a_val(nz)   !! operand matrix values
-  integer            :: a_dia(n)    !! operand matrix positions of diagonals
-  real               :: d_inv(n)    !! inverted diagonal entries
-  real               :: b(n)        !! right hand side vector
+  class(Linalg_Type)            :: Lin   !! parent class
+  integer,  intent(in)          :: n     !! size of vectors
+  real,     intent(out)         :: fn    !! factor of normalization
+  type(Sparse_Con_Type), target :: Acon  !! operand connectivity matrix
+  type(Sparse_Val_Type), target :: Aval  !! operand values matrix
+  real                          :: b(n)  !! right hand side vector
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: sum_n, i
-  real    :: avg_a, sum_a, fn_inv
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Lin)
+  real,    pointer :: a_val(:), d_inv(:)
+  integer, pointer :: a_dia(:)
+  real             :: sum_a, avg_a, fn_inv
+  integer          :: sum_n, i, nz
 !==============================================================================!
+
+  ! Take aliases
+  nz    =  Acon % nonzeros
+  a_dia => Acon % dia
+  a_val => Aval % val
+  d_inv => Aval % d_inv
 
   !-------------------------------------!
   !   Sum all the diagonal entries up   !
@@ -26,11 +32,11 @@
 
   sum_a = 0.0
 
-  !$acc parallel loop present(a_val, a_dia) reduction(+:sum_a)
+  !$tf-acc loop begin
   do i = 1, n
     sum_a = sum_a + a_val(a_dia(i))
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   sum_n = n
 
@@ -49,18 +55,18 @@
   !   Scale the matrix and the right hand side vector   !
   !-----------------------------------------------------!
 
-  !$acc parallel loop independent present(a_val)
+  !$tf-acc loop begin
   do i = 1, nz
     a_val(i) = a_val(i) * fn
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
-  !$acc parallel loop independent present(b, d_inv)
+  !$tf-acc loop begin
   do i = 1, n
     b(i)     = b(i)     * fn
     d_inv(i) = d_inv(i) * fn_inv
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   end subroutine
 

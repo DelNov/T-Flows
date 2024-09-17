@@ -12,10 +12,21 @@
   real                :: dot   !! result of the dot product
   real                :: a(n)  !! operand vector
   real                :: b(n)  !! operand vector
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: i
 !==============================================================================!
 
-  ! Compute vector dot product on the device attached to this processor ...
-  call Lin % Vec_D_Vec_Acc(dot, n, a, b)
+  dot = 0.0
+
+  !$acc parallel loop reduction(+: dot) independent &
+  !$acc present(  &
+  !$acc   a,  &
+  !$acc   b   &
+  !$acc )
+  do i = 1, n
+    dot = dot + a(i) * b(i)
+  end do
+  !$acc end parallel
 
   ! ... then make a global sum over all processors.
   call Global % Sum_Real(dot)

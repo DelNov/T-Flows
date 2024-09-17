@@ -53,6 +53,7 @@ VPATH = $(DIR_SHARED):.
 #   Python for preprocessing
 #------------------------------
 PYTHON=python3
+PREPROCESSOR=tf-acc-gpu.py
 
 #--------------------------------------
 #   Dissengage GPU for Intel and Gnu
@@ -318,7 +319,7 @@ OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
 # This rule preprocesses .fpp files into .f90 files
 %.f90: %.fpp
 	@echo "Preprocessing $< with Python to generate $@"
-	@$(PYTHON) t-flows-preprocessor.py $< $@
+	@$(PYTHON) $(PREPROCESSOR) $< $@
 
 # Add the .fpp files here, which need preprocessing to .f90
 SRC_FPP = $(shell find . -name "*.fpp")

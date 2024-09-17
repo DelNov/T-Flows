@@ -31,27 +31,18 @@
   ! Refresh the operand vector over processor buffers ...
   call Grid % Exchange_Inside_Cells_Real(b(1:n))
 
-  !$acc parallel loop independent &
-  !$acc present(  &
-  !$acc   a_row,  &
-  !$acc   a_col,  &
-  !$acc   c,  &
-  !$acc   a_val,  &
-  !$acc   b   &
-  !$acc )
+  !$tf-acc loop begin
   do i = 1, n
     temp = 0.0
 
-  !$acc loop seq
     do ij = a_row(i), a_row(i+1) - 1
       j = a_col(ij)
       temp = temp + a_val(ij) * b(j)
     end do
-  !$acc end loop
 
     c(i) = temp
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   end subroutine
 

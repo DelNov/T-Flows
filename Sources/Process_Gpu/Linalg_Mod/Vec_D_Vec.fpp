@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Vec_Copy(Lin, n, a, b)
+  subroutine Vec_D_Vec(Lin, n, dot, A, B)
 !------------------------------------------------------------------------------!
 !>  Front-end for calculation of vector vector dot product.
 !------------------------------------------------------------------------------!
@@ -9,21 +9,23 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Linalg_Type)  :: Lin   !! parent class
   integer, intent(in) :: n     !! size of vectors
+  real                :: dot   !! result of the dot product
   real                :: a(n)  !! operand vector
   real                :: b(n)  !! operand vector
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
 !==============================================================================!
 
-  !$acc parallel loop independent &
-  !$acc present(  &
-  !$acc   a,  &
-  !$acc   b   &
-  !$acc )
+  dot = 0.0
+
+  !$tf-acc loop begin
   do i = 1, n
-    a(i) = b(i)
+    dot = dot + a(i) * b(i)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
+
+  ! ... then make a global sum over all processors.
+  call Global % Sum_Real(dot)
 
   end subroutine
 

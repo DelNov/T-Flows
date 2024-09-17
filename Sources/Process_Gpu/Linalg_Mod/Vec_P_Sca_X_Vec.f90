@@ -13,9 +13,20 @@
   real                :: a(n)  !! operand vector
   real                :: s     !! operand scalar
   real                :: b(n)  !! operand vector
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: i
 !==============================================================================!
 
-  call Lin % Vec_P_Sca_X_Vec_Acc(n, c, a, s, b)
+  !$acc parallel loop independent &
+  !$acc present(  &
+  !$acc   c,  &
+  !$acc   a,  &
+  !$acc   b   &
+  !$acc )
+  do i = 1, n
+    c(i) = a(i) + s * b(i)
+  end do
+  !$acc end parallel
 
   end subroutine
 

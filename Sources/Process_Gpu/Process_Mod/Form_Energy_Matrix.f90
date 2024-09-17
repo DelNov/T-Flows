@@ -95,7 +95,7 @@
   !   Initialize matrix entries to zero   !
   !---------------------------------------!
 
-  !$acc parallel loop  &
+  !$acc parallel loop independent &
   !$acc present(  &
   !$acc   val   &
   !$acc )

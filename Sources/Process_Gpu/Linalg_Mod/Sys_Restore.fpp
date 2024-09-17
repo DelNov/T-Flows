@@ -1,24 +1,28 @@
 !==============================================================================!
-  subroutine Sys_Restore_Acc(Lin, n, nz, fn, a_val, a_dia, d_inv, b)
+  subroutine Sys_Restore(Lin, n, fn, Acon, Aval, b)
 !------------------------------------------------------------------------------!
-!>  Restores a linear system to its original (de-normalized) state.
+!>  Front-end for restoring (de-normalizing) a linear system of equations
+!------------------------------------------------------------------------------!
+!   Note: Using intent clause here, was causing slower runs and crashes        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Linalg_Type) :: Lin         !! parent class
-  integer            :: n           !! matrix and vector dimension
-  integer            :: nz          !! number of nonzeros
-  real,  intent(in)  :: fn          !! resulting scaling factor
-  real               :: a_val(nz)   !! operand matrix values
-  integer            :: a_dia(n)    !! operand matrix positions of diagonals
-  real               :: d_inv(n)    !! inverted diagonal entries
-  real               :: b(n)        !! right hand side vector
+  class(Linalg_Type)            :: Lin   !! parent class
+  integer, intent(in)           :: n     !! size of vectors
+  real,    intent(in)           :: fn    !! factor of normalization
+  type(Sparse_Con_Type), target :: Acon  !! operand connectivity matrix
+  type(Sparse_Val_Type), target :: Aval  !! operand values matrix
+  real                          :: b(n)  !! right hand side vector
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i
-  real    :: fn_inv
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Lin)
+  real, pointer :: a_val(:), d_inv(:)
+  real          :: fn_inv
+  integer       :: i, nz
 !==============================================================================!
+
+  ! Take aliases
+  nz    =  Acon % nonzeros
+  a_val => Aval % val
+  d_inv => Aval % d_inv
 
   !------------------------------------------------!
   !   Work out the inverse of the scaling factor   !
@@ -29,18 +33,18 @@
   !   Scale the matrix and the right hand side vector   !
   !-----------------------------------------------------!
 
-  !$acc parallel loop independent present(a_val)
+  !$tf-acc loop begin
   do i = 1, nz
     a_val(i) = a_val(i) * fn_inv
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
-  !$acc parallel loop independent present(b, d_inv)
+  !$tf-acc loop begin
   do i = 1, n
     b(i)     = b(i)     * fn_inv
     d_inv(i) = d_inv(i) * fn
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   end subroutine
 

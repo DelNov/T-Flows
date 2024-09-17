@@ -12,12 +12,20 @@
   real                :: c(n)  !! result vector
   real                :: a(n)  !! operand vector
   real                :: b(n)  !! operand vector
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: i
 !==============================================================================!
 
-  call Lin % Vec_X_Vec_Acc(n,   &
-                           c,   &
-                           a,   &
-                           b)
+  !$acc parallel loop independent &
+  !$acc present(  &
+  !$acc   c,  &
+  !$acc   a,  &
+  !$acc   b   &
+  !$acc )
+  do i = 1, n
+    c(i) = a(i) * b(i)
+  end do
+  !$acc end parallel
 
   end subroutine
 

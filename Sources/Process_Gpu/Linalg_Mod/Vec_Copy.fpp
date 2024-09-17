@@ -15,15 +15,11 @@
   integer :: i
 !==============================================================================!
 
-  !$acc parallel loop independent &
-  !$acc present(  &
-  !$acc   a,  &
-  !$acc   b   &
-  !$acc )
+  !$tf-acc loop begin
   do i = 1, n
     a(i) = b(i)
   end do
-  !$acc end parallel
+  !$tf-acc loop end
 
   end subroutine
 

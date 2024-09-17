@@ -7,27 +7,33 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Linalg_Type)    :: Lin   !! parent class
-  integer, intent(in)   :: n     !! size of vectors
-  real                  :: b(n)  !! result vector
-  real                  :: s     !! scalar
-  type(Sparse_Con_Type) :: Acon  !! operand connectivity matrix
-  type(Sparse_Val_Type) :: Aval  !! operand values matrix
+  class(Linalg_Type)            :: Lin   !! parent class
+  integer, intent(in)           :: n     !! size of vectors
+  real                          :: b(n)  !! result vector
+  real                          :: s     !! scalar
+  type(Sparse_Con_Type), target :: Acon  !! operand connectivity matrix
+  type(Sparse_Val_Type), target :: Aval  !! operand values matrix
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: nz
+  integer, pointer :: a_dia(:)
+  real,    pointer :: a_val(:)
+  integer          :: i, nz
 !==============================================================================!
 
   ! Take aliases
-  nz = Acon % nonzeros
+  nz    =  Acon % nonzeros
+  a_dia => Acon % dia
+  a_val => Aval % val
 
-  ! ... and then compute matrix vector product
-  ! on the device attached to this processor
-  call Lin % Sca_O_Dia_Acc(n,           &
-                           nz,          &
-                           b,           &
-                           s,           &
-                           Aval % val,  &
-                           Acon % dia)
+  !$acc parallel loop independent &
+  !$acc present(  &
+  !$acc   b,  &
+  !$acc   a_val,  &
+  !$acc   a_dia   &
+  !$acc )
+  do i = 1, n
+    b(i) = s / a_val(a_dia(i))
+  end do
+  !$acc end parallel
 
   end subroutine
 

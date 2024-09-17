@@ -390,7 +390,7 @@ def Process_Tfp_Block(block):
   elif "Faces_In_Domain_And_At_Buffers" in block:
     present_setup += (indent + "!$acc parallel loop  &\n")
   else:  # this covers loops through non-zeroes
-    present_setup += (indent + "!$acc parallel loop  &\n")
+    present_setup += (indent + "!$acc parallel loop independent &\n")
 
   present_setup += (indent + "!$acc present(  &\n")
 
