@@ -65,8 +65,8 @@ if backend == "openmp":
   begin_parallel_loop_independent = "!$omp parallel do  &"
   begin_parallel_loop             = "!$omp parallel do  &"
   end_parallel_loop               = "!$omp end parallel do"
-  begin_sequential_loop           = "!$omp do"
-  end_sequential_loop             = "!$omp end do"
+  begin_sequential_loop           = ""
+  end_sequential_loop             = ""
   begin_present                   = ""
   end_present                     = ""
   begin_private                   = "!$omp private(  &"
@@ -639,21 +639,24 @@ def Process_Tfp_Block(block):
   )
 
 
-  # Insert OpenACC directives before the second "do" loop
-  first_do_index = block.find("do ")
-  if first_do_index != -1:
-    second_do_index = block.find("do ", first_do_index + 1)
-    if second_do_index != -1:
+  # Insert accelerator directives before the second "do" loop
+  # (This part is relevant only for OpenACC, since OpenMP does
+  #  not accept the inner sequential loop.)
+  if begin_sequential_loop:
+    first_do_index = block.find("do ")
+    if first_do_index != -1:
+      second_do_index = block.find("do ", first_do_index + 1)
+      if second_do_index != -1:
 
-      # Find the last end of line before the second do statement
-      last_eol_index = block.rfind("\n",  0, second_do_index)
+        # Find the last end of line before the second do statement
+        last_eol_index = block.rfind("\n",  0, second_do_index)
 
-      block = (
-          block[:last_eol_index + 1]
-        + indent
-        + begin_sequential_loop + "\n"
-        + block[last_eol_index + 1:]
-      )
+        block = (
+            block[:last_eol_index + 1]
+          + indent
+          + begin_sequential_loop + "\n"
+          + block[last_eol_index + 1:]
+        )
 
   # Add the end_parallel_loop at the end
   last_end_do_index = block.rfind("end do")
@@ -667,15 +670,16 @@ def Process_Tfp_Block(block):
     )
 
   # Now, search for the second-to-last end do before the first one
-  second_last_end_do_index = block[:last_end_do_index].rfind("end do")
-  if second_last_end_do_index != -1:
-    block = (
-        block[:second_last_end_do_index]
-      + "end do\n"
-      + indent
-      + end_sequential_loop
-      + block[second_last_end_do_index + len("end do"):]
-    )
+  if end_sequential_loop:
+    second_last_end_do_index = block[:last_end_do_index].rfind("end do")
+    if second_last_end_do_index != -1:
+      block = (
+          block[:second_last_end_do_index]
+        + "end do\n"
+        + indent
+        + end_sequential_loop
+        + block[second_last_end_do_index + len("end do"):]
+      )
 
   print(f"{BRIGHT_GREEN}",  end="")
   print(indent + "# Block after preprocessing:")
