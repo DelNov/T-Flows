@@ -114,9 +114,6 @@
     Grid % Comm % cell_glo(c) = c
   end do
 
-  ! Allocate thread i.d.
-  call Enlarge % Array_Int(Grid % Omp % cell_thread, i=(/-nb_m,nc_m/))
-
   ! Allocate new and old numbers (this is so often used, maybe is better here)
   if(PROGRAM_NAME(1:6) .ne. 'Proces') then
     call Enlarge % Array_Int(Grid % new_c, i=(/-nb_m,nc_m/))

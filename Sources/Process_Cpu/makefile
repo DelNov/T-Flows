@@ -21,7 +21,7 @@ SORT    ?= quick
 #-------------------------------------
 include makefile_check_arguments
 
-# MPI
+# MPI in addition
 ifneq ($(MPI), yes)
   ifneq ($(MPI), no)
     $(info #=================================================================)
@@ -342,7 +342,6 @@ SRC_F_MOD = Const_Mod.f90         \
             Tokenizer_Mod.f90     \
             Message_Mod.f90       \
             Memory_Mod.f90        \
-            Omp_Mod.f90           \
             Math_Mod.f90          \
             Swap_Mod.f90          \
             Sort_Mod.f90          \

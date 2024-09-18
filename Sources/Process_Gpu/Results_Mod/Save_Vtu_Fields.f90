@@ -469,15 +469,6 @@
                                     int_save(c_f:c_l),               &
                                     f8, f9, data_offset, run)
 
-    !-----------------!
-    !   Cell thread   !
-    !-----------------!
-    int_save(c_f:c_l) = Grid % Omp % cell_thread(c_f:c_l)
-    str_var = Results % Var_Name("Grid Thread","[1]", units)
-    call Results % Save_Vtu_Scalar_Int(trim(str_var), plot_inside,   &
-                                       int_save(c_f:c_l),            &
-                                       f8, f9, data_offset, run)
-
     !-------------------!
     !   Domain number   !
     !-------------------!

@@ -16,8 +16,8 @@
 !     cell-related information like cell types, offsets, etc.                  !
 !   * For polyhedral grids, additional steps are included to handle faces and  !
 !     their offsets.                                                           !
-!   * Cell data, such as processor ID, thread ID, number of nodes, wall        !
-!     distance, cell volume, cell inertia, and cell porosity, is appended.     !
+!   * Cell data, such as processor ID, number of nodes, wall distace, cell     !
+!     volume, cell inertia, and cell porosity, is appended.                    !
 !   * The subroutine concludes by closing the VTU file and, if necessary,      !
 !     creating a .pvtu file for multi-processor runs.                          !
 !------------------------------------------------------------------------------!
@@ -201,15 +201,6 @@
   write(str1, '(i0.0)') data_offset
   write(fu) IN_4 // '<DataArray type='//intp            //  &
                     ' Name="Grid Processor [1]"'        //  &
-                    ' format="appended"'                //  &
-                    ' offset="' // trim(str1) //'">'    // LF
-  write(fu) IN_4 // '</DataArray>' // LF
-  data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
-
-  ! Cell thread
-  write(str1, '(i0.0)') data_offset
-  write(fu) IN_4 // '<DataArray type='//intp            //  &
-                    ' Name="Grid Thread [1]"'           //  &
                     ' format="appended"'                //  &
                     ' offset="' // trim(str1) //'">'    // LF
   write(fu) IN_4 // '</DataArray>' // LF
@@ -441,17 +432,6 @@
   end do
   write(fu) i_buffer(1:i)
 
-  ! Cell thread
-  data_size = int(n_cells_sub * IP, SP)
-  write(fu) data_size
-  i = 0
-  do c = Cells_In_Domain()
-    if(Grid % new_c(c) .ne. 0) then
-      i=i+1;  i_buffer(i) = Grid % Omp % cell_thread(c)
-    end if
-  end do
-  write(fu) i_buffer(1:i)
-
   ! Number of nodes
   data_size = int(n_cells_sub * IP, SP)
   write(fu) data_size
@@ -558,8 +538,6 @@
     write(fu,'(a,a)') IN_2, '<PCellData>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
                             ' Name="Grid Processor [1]"/>'
-    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
-                            ' Name="Grid Thread [1]"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &
                             ' Name="Grid Number Of Nodes [1]"/>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//floatp      //  &

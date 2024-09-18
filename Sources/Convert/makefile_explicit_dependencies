@@ -173,8 +173,6 @@ $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Region_Mod.o \
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Omp_Mod.o \
-$(DIR_SHARED)/Omp_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Mod.o \
 $(DIR_SHARED)/Metis_Mod/*.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
@@ -193,15 +191,6 @@ $(DIR_SHARED)/Sort_Mod/*/*.f90 \
 $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Omp_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Omp_Mod.o:\
-$(DIR_OBJECT)/Region_Mod.o \
-$(DIR_SHARED)/Omp_Mod/*.f90 \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vtk_Mod.f90

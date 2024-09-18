@@ -42,10 +42,6 @@
   call Grid % Load_Cfn((/This_Proc(), N_Procs()/), domain=d)
   call Grid % Load_Dim((/This_Proc(), N_Procs()/), domain=d)
 
-  ! Determine threads for OpenMP runs
-  call Control % Max_Threads(Grid % Omp % d_threads, .true.)
-  call Grid % Determine_Threads()
-
   call Grid % Calculate_Face_Geometry()
 
   ! Find communication patterns

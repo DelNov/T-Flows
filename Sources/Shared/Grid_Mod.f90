@@ -19,7 +19,6 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Memory_Mod
-  use Omp_Mod
   use Profiler_Mod
   use File_Mod
   use Region_Mod
@@ -195,11 +194,6 @@
     !-------------------------------------------!
     type(Comm_Type) :: Comm  !! module for MPI communication, local to grid
 
-    !---------------------------------!
-    !   OMP class for manycore runs   !
-    !---------------------------------!
-    type(Omp_Type) :: Omp  !! used in OMP vectorization
-
     contains
       procedure :: Are_Nodes_Twins
       procedure :: Allocate_Cells
@@ -225,7 +219,6 @@
       procedure :: Correct_Face_Surfaces
       procedure :: Decompose
       procedure :: Determine_Regions_Ranges
-      procedure :: Determine_Threads
       procedure :: Exchange_Cells_Int
       procedure :: Exchange_Cells_Log
       procedure :: Exchange_Cells_Real
@@ -255,7 +248,6 @@
       procedure :: Save_Vtu_Faces
       procedure :: Search_Coordinate_Clusters
       procedure :: Sort_Cells_By_Coordinates
-      procedure :: Sort_Cells_By_Thread
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
       procedure :: Sort_Nodes_By_Coordinates
@@ -312,7 +304,6 @@
 #   include "Grid_Mod/Memory/Allocate_Nodes.f90"
 #   include "Grid_Mod/Memory/Allocate_Regions.f90"
 #   include "Grid_Mod/Parallel/Decompose.f90"
-#   include "Grid_Mod/Parallel/Determine_Threads.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Log.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Real.f90"
@@ -320,7 +311,6 @@
 #   include "Grid_Mod/Parallel/Form_Cells_Comm.f90"
 #   include "Grid_Mod/Parallel/Form_Maps_For_Backup.f90"
 #   include "Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90"
-#   include "Grid_Mod/Sorting/Sort_Cells_By_Thread.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"

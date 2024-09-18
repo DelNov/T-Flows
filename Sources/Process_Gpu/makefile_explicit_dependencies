@@ -405,8 +405,6 @@ $(DIR_SHARED)/Sort_Mod/*.f90 \
 $(DIR_OBJECT)/Region_Mod.o \
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Omp_Mod.o \
-$(DIR_SHARED)/Omp_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Mod.o \
 $(DIR_SHARED)/Metis_Mod/*.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
@@ -448,15 +446,6 @@ $(DIR_SHARED)/Grid_Mod/*/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Omp_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Omp_Mod.o:\
-$(DIR_OBJECT)/Region_Mod.o \
-$(DIR_SHARED)/Omp_Mod/*.f90 \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Tokenizer_Mod.f90

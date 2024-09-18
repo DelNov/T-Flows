@@ -79,9 +79,6 @@
   call Enlarge % Array_Real(Grid % f,  i=(/1,nf+ns+m/))
   call Enlarge % Array_Real(Grid % fw, i=(/1,nf+ns+m/))
 
-  ! Allocate thread i.d.
-  call Enlarge % Array_Int(Grid % Omp % face_thread, i=(/1,nf+ns+m/))
-
   ! Allocate new and old numbers (this is so often used, maybe is better here)
   if(PROGRAM_NAME(1:6) .ne. 'Proces') then
     call Enlarge % Array_Int(Grid % new_f, i=(/1,nf+ns+m/))
