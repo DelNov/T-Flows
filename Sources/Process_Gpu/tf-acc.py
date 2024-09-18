@@ -6,12 +6,17 @@ import re
 #   Expecting two arguments: input .fpp file and output .f90 file   #
 #                                                                   #
 #-------------------------------------------------------------------#
-if len(sys.argv) != 3:
-  print("Usage: python3 t-flows-preprocessor.py input.fpp output.f90")
+if len(sys.argv) != 4:
+  print("Usage: python3 tf-acc.py [openacc|openmp] input.fpp output.f90")
   sys.exit(1)
 
-input_file = sys.argv[1]
-output_file = sys.argv[2]
+backend     = sys.argv[1]
+input_file  = sys.argv[2]
+output_file = sys.argv[3]
+
+if backend not in ['openmp', 'openacc']:
+  print("Error: The first argument must be 'openmp' or 'openacc'.")
+  sys.exit(1)
 
 indent  = "   "
 
@@ -53,6 +58,19 @@ begin_sequential_loop           = "!$acc loop seq"
 end_sequential_loop             = "!$acc end loop"
 begin_present                   = "!$acc present(  &"
 end_present                     = "!$acc )"
+begin_private                   = ""
+end_private                     = ""
+
+if backend == "openmp":
+  begin_parallel_loop_independent = "!$omp parallel do  &"
+  begin_parallel_loop             = "!$omp parallel do  &"
+  end_parallel_loop               = "!$omp end parallel"
+  begin_sequential_loop           = "!$omp do"
+  end_sequential_loop             = "!$omp end do"
+  begin_present                   = ""
+  end_present                     = ""
+  begin_private                   = "!$omp private(  &"
+  end_private                     = "!$omp )"
 
 #==============================================================================#
 #                                                                              #
@@ -331,6 +349,9 @@ def Process_Tfp_Block(block):
   # Set to track reduction variables
   reduction_vars = {}
 
+  # Set to track reduction variables
+  temporary_vars = {}
+
   # List of macros to exclude from processing as arrays
   excluded_macros = {"Cells_At_Boundaries_In_Domain_And_Buffers",
                      "Cells_At_Boundaries",
@@ -402,6 +423,21 @@ def Process_Tfp_Block(block):
   block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
   block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
   block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
+
+  #-----------------------------------------------#
+  #                                               #
+  #   Find all temporary variables in the block   #
+  #    and write them all out as a directive      #
+  #        This is needed for OpenMP only!        #
+  #                                               #
+  #-----------------------------------------------#
+  temporary_vars = Find_Temporary_Variables(block)
+
+  if begin_private:
+    present_setup += (indent + begin_private + "\n")
+    for var in temporary_vars:
+      present_setup += (indent + "!$omp   " + var + ",  &\n")
+    present_setup += (indent + "!$omp )\n")
 
   #-----------------------------------------------------#
   #   General handling for arrays in the remaining code #

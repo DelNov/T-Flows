@@ -49,21 +49,30 @@ DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
 VPATH = $(DIR_SHARED):.
 
-#------------------------------
-#   Python for preprocessing
-#------------------------------
-PYTHON=python3
-PREPROCESSOR=tf-acc-gpu.py
-
-#--------------------------------------
-#   Dissengage GPU for Intel and Gnu
-#--------------------------------------
+#---------------------------------------------------
+#   Dissengage GPU for Intel and Gnu and for OpenMP
+#---------------------------------------------------
 ifeq ($(FORTRAN), intel)
   GPU = no
 endif
 
 ifeq ($(FORTRAN), gnu)
   GPU = no
+endif
+
+ifeq ($(OMP), yes)
+  GPU = no
+endif
+
+#------------------------------
+#   Python for preprocessing
+#------------------------------
+PYTHON       = python3
+PREPROCESSOR = tf-acc.py
+PREOPTION    = openacc
+
+ifeq ($(OMP), yes)
+  PREOPTION = openmp
 endif
 
 # Program name (This should hardly change)
@@ -319,7 +328,7 @@ OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
 # This rule preprocesses .fpp files into .f90 files
 %.f90: %.fpp
 	@echo "Preprocessing $< with Python to generate $@"
-	@$(PYTHON) $(PREPROCESSOR) $< $@
+	@$(PYTHON) $(PREPROCESSOR) $(PREOPTION) $< $@
 
 # Add the .fpp files here, which need preprocessing to .f90
 SRC_FPP = $(shell find . -name "*.fpp")
