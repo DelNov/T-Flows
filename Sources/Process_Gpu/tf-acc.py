@@ -64,7 +64,7 @@ end_private                     = ""
 if backend == "openmp":
   begin_parallel_loop_independent = "!$omp parallel do  &"
   begin_parallel_loop             = "!$omp parallel do  &"
-  end_parallel_loop               = "!$omp end parallel"
+  end_parallel_loop               = "!$omp end parallel do"
   begin_sequential_loop           = "!$omp do"
   end_sequential_loop             = "!$omp end do"
   begin_present                   = ""
@@ -347,7 +347,9 @@ def Process_Tfp_Block(block):
   processed_vars = {}
 
   # Set to track reduction variables
-  reduction_vars = {}
+  sum_reduction_vars = {}
+  max_reduction_vars = {}
+  min_reduction_vars = {}
 
   # Set to track reduction variables
   temporary_vars = {}
@@ -423,21 +425,6 @@ def Process_Tfp_Block(block):
   block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
   block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
   block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
-
-  #-----------------------------------------------#
-  #                                               #
-  #   Find all temporary variables in the block   #
-  #    and write them all out as a directive      #
-  #        This is needed for OpenMP only!        #
-  #                                               #
-  #-----------------------------------------------#
-  temporary_vars = Find_Temporary_Variables(block)
-
-  if begin_private:
-    present_setup += (indent + begin_private + "\n")
-    for var in temporary_vars:
-      present_setup += (indent + "!$omp   " + var + ",  &\n")
-    present_setup += (indent + "!$omp )\n")
 
   #-----------------------------------------------------#
   #   General handling for arrays in the remaining code #
@@ -537,16 +524,16 @@ def Process_Tfp_Block(block):
   min_reductions = min_pattern.findall(cleaned_block)
 
   # Dictionaries to track reduction variables (both +, -, max, and min)
-  reduction_vars = {var: None for var in reductions}
+  sum_reduction_vars = {var: None for var in reductions}
   max_reduction_vars = {var: None for var in max_reductions}
   min_reduction_vars = {var: None for var in min_reductions}
 
   # Add reduction clause if any reductions are found
-  if reduction_vars or max_reduction_vars or min_reduction_vars:
+  if sum_reduction_vars or max_reduction_vars or min_reduction_vars:
     reduction_clause = []
 
-    if reduction_vars:
-      reduction_clause.append(f"reduction(+: {','.join(reduction_vars)})")
+    if sum_reduction_vars:
+      reduction_clause.append(f"reduction(+: {','.join(sum_reduction_vars)})")
     if max_reduction_vars:
       reduction_clause.append(f"reduction(max: {','.join(max_reduction_vars)})")
     if min_reduction_vars:
@@ -575,6 +562,22 @@ def Process_Tfp_Block(block):
       present_setup = (  present_setup[:last_letter_index + 1]
                        + f" {final_reduction_clause}"
                        + present_setup[last_letter_index + 1:])
+
+  #-----------------------------------------------#
+  #   Find all temporary variables in the block   #
+  #    and write them all out as a directive      #
+  #        This is needed for OpenMP only!        #
+  #-----------------------------------------------#
+  temporary_vars = Find_Temporary_Variables(block)
+
+  if begin_private:
+    present_setup += (indent + begin_private + "\n")
+    for var in temporary_vars:
+      if (var not in sum_reduction_vars and
+          var not in max_reduction_vars and
+          var not in min_reduction_vars):
+        present_setup += (indent + "!$omp   " + var + ",  &\n")
+    present_setup += (indent + "!$omp )\n")
 
   #---------------------------------------------------------------#
   #   Append the closing parenthesis for OpenACC present clause   #

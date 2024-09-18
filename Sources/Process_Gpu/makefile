@@ -1,6 +1,6 @@
-#===============================================================================
+#-------------------------------------------------------------------------------
 #
-#   SFS Makefile
+#   Process Makefile
 #
 #-------------------------------------------------------------------------------
 
@@ -29,6 +29,18 @@ ifneq ($(MPI), yes)
     $(info # Error:                                                          )
     $(info #   Possible values for MPI are "yes" or "no" and they are        )
     $(info #   case sensitive.  You used the "$(MPI)", which is unknown.     )
+    $(info #-----------------------------------------------------------------)
+    $(error This error is critical, exiting!)
+  endif
+endif
+
+# GPU in addition
+ifneq ($(GPU), yes)
+  ifneq ($(GPU), no)
+    $(info #=================================================================)
+    $(info # Error:                                                          )
+    $(info #   Possible values for GPU are "yes" or "no" and they are        )
+    $(info #   case sensitive.  You used the "$(GPU)", which is unknown.     )
     $(info #-----------------------------------------------------------------)
     $(error This error is critical, exiting!)
   endif
@@ -127,7 +139,7 @@ $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=nvidia/gnu/intel> <GPU=yes/no> <REAL=double/single>   )
 $(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=quick/heap> <OMP=no/yes>  )
-$(info #        <clean/preprocess>                                             )
+$(info #        <MPI=no/yes> <clean/preprocess>                                )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
@@ -166,57 +178,97 @@ endif
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
-  FC = ifort
-  ifeq ($(DEBUG),yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -cpp -r8 -O0 -g -warn all -check all \
-               -debug all -fpe-all=0 -traceback
+  ifeq ($(FCOMP),)
+    FC = ifort
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -cpp -r8 -O3
+    FC = $(FCOMP)
+  endif
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP += -O0 -g -traceback -check bounds
+  else
+    OPT_F_COMP += -O2
+  endif
+  ifeq ($(PROF), yes)
+    OPT_F_COMP += -g -O2 -shared-intel -debug inline-debug-info  \
+                  -D TBB_USE_THREADING_TOOLS
+  endif
+  ifeq ($(REAL), double)
+    OPT_F_COMP += -r8
+  endif
+  ifeq ($(OMP), yes)
+    OPT_F_COMP += -qopenmp
+    ifeq ($(PROF), yes)
+      OPT_F_COMP += -qopenmp-link dynamic -parallel-source-info=2
+    endif
   endif
 
   # Disable suggestion to use new version of Fortran compiler
   OPT_F_COMP += -diag-disable=10448
 
   $(info # Using Intel Fortran compiler with options: $(OPT_F_COMP))
-endif
 
 #------------
 #   Nvidia
 #------------
 
 # Fortran == nvidia
-ifeq ($(FORTRAN), nvidia)
-  FC = nvfortran
-  ifeq ($(DEBUG),yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -cpp -r8 -O0 -g
+else ifeq ($(FORTRAN), nvidia)
+  ifeq ($(FCOMP),)
+    FC = nvfortran
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -cpp -r8 -O3
+    FC = $(FCOMP)
   endif
-  ifeq ($(GPU),yes)
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp -Mbackslash
+  ifeq ($(DEBUG), yes)
+    OPT_F_COMP += -O0 -g
+  else
+    OPT_F_COMP += -O3
+  endif
+  ifeq ($(REAL), double)
+    OPT_F_COMP += -r8
+  endif
+  ifeq ($(GPU), yes)
     OPT_F_COMP += -acc -Minfo=accel
+  endif
+  ifeq ($(OMP), yes)
+    OPT_F_COMP += -mp
   endif
 
   $(info # Using Nvidia Fortran compiler with options: $(OPT_F_COMP))
-endif
 
 #---------
 #   Gnu
 #---------
 
 # Fortran == gnu
-ifeq ($(FORTRAN), gnu)
-  FC = gfortran
-  ifeq ($(DEBUG),yes)
-    OPT_F_COMP = -J $(DIR_MODULE) -cpp -fdefault-real-8 -O0 -g  \
-                                  -ffree-line-length-none       \
-                                  -Wunused-parameter -Warray-temporaries -Wall
+else
+  ifeq ($(FCOMP),)
+    FC = gfortran
   else
-    OPT_F_COMP = -J $(DIR_MODULE) -cpp -fdefault-real-8 -O3     \
-                                  -ffree-line-length-none
+    FC = $(FCOMP)
+  endif
+  OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
+  ifeq ($(DEBUG), yes)
+   OPT_F_COMP += -O0 -g -fcheck=all -Wall -Wno-integer-division
+  else
+    OPT_F_COMP += -O3
+  endif
+  ifeq ($(PROF), yes)
+    OPT_F_COMP += -pg -g
+  endif
+  ifeq ($(REAL), double)
+    OPT_F_COMP += -fdefault-real-8
+  endif
+  ifeq ($(OMP), yes)
+    OPT_F_COMP += -fopenmp
   endif
 
   $(info # Using GNU Fortran compiler with options: $(OPT_F_COMP))
 endif
+
+# Set initial options for C compiler - this is probably not needed
+OPT_C_COMP = -cpp
 
 #-----------------------------------------------------------
 #   Set linker options to be the same as compiler options
