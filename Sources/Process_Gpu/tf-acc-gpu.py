@@ -1,96 +1,3 @@
-#==============================================================================#
-#   This script is designed to automatically insert OpenACC directives into
-#   T-Flows' Process_Gpu code for the blocks marked with !$tf-acc comments.
-#
-#   It processes the input T-Flows code, detects specific array structures,
-#   handles them according to predefined rules, and inserts OpenACC directives
-#   for parallel processing.
-#
-#   It relies on the assumption that there is only a finite number of T-Flows'
-#   loop constructes, and that these can be automated with a script like this.
-#   This is not a procedure which would work for any Fortran code, but only
-#   to T-Flows, and even for T-Flows it relies on its strict coding standards.
-#
-#   Breakdown of the Script's Workflow
-#
-#   1. Argument Handling: The script expects two command-line arguments:
-#      - The input .fpp file containing Fortran code blocks.
-#      - The output .f90 file where the transformed code will be written.
-#
-#      If incorrect arguments are provided, the script will exit with error.
-#
-#   2. Initialization: The script initializes some helper variables:
-#
-#      - indent: Sets the indentation level to three spaces for aligning
-#        inserted OpenACC directives.
-#      - excluded_macros: Lists macros (sych as Faces_In_Region,
-#        Cells_In_Domain and come others) that will not be processed as arrays
-#        (since they are treated differently).
-#
-#   3. Main Logic - Process_Tfp_Block(block) Function: This function processes
-#      each !$tf-acc code block in the input file. Below is a step-by-step
-#      explanation of its functionality:
-#
-#      a. Initialize OpenACC Pointers and Clauses:
-#         - The script initializes the pointer_setup and present_setup
-#           strings, which are used to store OpenACC directives.
-#         - For each !$tf-acc block, it builds a list of variables that need
-#           to be "present" in the OpenACC data region. This list will be
-#           inserted into the OpenACC directives.
-#
-#      b. Handle Special Macros:
-#         - Faces_In_Region: If the block contains Faces_In_Region, the script
-#           assigns pointers to the corresponding grid structures (such as
-#           grid_region_f_face and grid_region_l_face) and adds them to the
-#           OpenACC present clause.
-#         - Cells_In_Domain: Similarly, if Cells_In_Domain is detected,
-#           pointers are created and the variables are added to the present
-#           clause.
-#
-#      c. Array Handling:
-#         - The script uses a regular expression to find arrays in the block
-#           (variables followed by parentheses) and creates pointer names for
-#           each array.
-#         - If the array is part of a structure (Grid % cells_c, for example),
-#           a pointer setup line is created to alias the array, and the array
-#           is added to the OpenACC present clause.
-#         - The script replaces occurrences of the full array name with its
-#           pointer name within the block.
-#
-#      d. Detect Reduction Variables:
-#         - The script checks for reduction operations (variables that
-#           accumulate values in a loop, such as var = var + something) using
-#           a regular expression.
-#         - If reduction variables are detected, it adds a reduction clause to
-#           the OpenACC directives.
-#
-#      e. Finalizing OpenACC Directives:
-#         - After processing the arrays and reduction variables, the
-#           present_setup string is completed by closing the present clause.
-#
-#      f. Insert OpenACC Parallel Directives:
-#         - The script looks for "do" loops in the block:
-#           > It finds the second "do" loop and inserts an OpenACC sequential
-#             loop directive (!$acc loop seq) before it.
-#           > The script also inserts "!$acc end parallel" after the last
-#             "end do" statement and "!$acc end loop" after the second-to-last
-#             "end do".
-#
-#   4. File Processing:
-#
-#      - The script reads the input file line by line, looking for "!$tf-acc"
-#        blocks.  When it finds the start of such a block ("!$tf-acc loop
-#        begin"), it begins accumulating lines into a buffer (tfp_block).
-#      - When the end of the block ("!$tf-acc loop end") is found, the script
-#        processes the entire block using the Process_Tfp_Block function,
-#        transforming it into a new block with OpenACC directives.
-#      - The transformed block is written to the output file.
-#
-#   5. Writing the Output:
-#
-#      - Once all "!$tf-acc" blocks are processed, the script writes the
-#        modified code into the output .f90 file.
-#------------------------------------------------------------------------------#
 import sys
 import re
 
@@ -132,14 +39,20 @@ BOLD      = "\033[1m"
 UNDERLINE = "\033[4m"
 REVERSED  = "\033[7m"
 
-RESET   = "\033[0m"
+RESET = "\033[0m"
 
 grid_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
 flow_to_device_file = "./Gpu_Mod/Field/Copy_To_Device.f90"
 turb_to_device_file = "./Gpu_Mod/Turb/Copy_To_Device.f90"
 gpu_pointers_file   = "./Gpu_Pointers_Mod.f90"
 
-import re
+begin_parallel_loop_independent = "!$acc parallel loop independent  &"
+begin_parallel_loop             = "!$acc parallel loop  &"
+end_parallel_loop               = "!$acc end parallel"
+begin_sequential_loop           = "!$acc loop seq"
+end_sequential_loop             = "!$acc end loop"
+begin_present                   = "!$acc present(  &"
+end_present                     = "!$acc )"
 
 #==============================================================================#
 #                                                                              #
@@ -215,6 +128,27 @@ def Remove_Inner_Loops(block):
   cleaned_block = block[:inner_do_start] + block[inner_end_do_end:]
 
   return cleaned_block
+
+#==============================================================================#
+#                                                                              #
+#   Function to find temporary variables in a block                            #
+#                                                                              #
+#------------------------------------------------------------------------------#
+def Find_Temporary_Variables(block):
+
+  # Remove comments for cleaner parsing
+  cleaned_block = re.sub(r'!.*', '', block)
+
+  # Regex to detect variable assignments (excluding arrays)
+  assignment_pattern = re.compile(r'(\b\w+\b)\s*=\s*')
+
+  # Find all matches
+  matches = assignment_pattern.findall(cleaned_block)
+
+  # Filter out arrays and known global variables (arrays have parentheses)
+  temporary_vars = set(var for var in matches if '(' not in var)
+
+  return temporary_vars
 
 #==============================================================================#
 #                                                                              #
@@ -377,22 +311,19 @@ def Process_Tfp_Block(block):
   # Initialize pointers and OpenACC clauses
   pointer_setup = ""
   present_setup = ""
-  if "Cells_At_Boundaries_In_Domain_And_Buffers" in block:
-    present_setup += (indent + "!$acc parallel loop independent &\n")
-  elif "Cells_At_Boundaries" in block:
-    present_setup += (indent + "!$acc parallel loop independent &\n")
-  elif "Cells_In_Domain_And_Buffers" in block:
-    present_setup += (indent + "!$acc parallel loop independent  &\n")
-  elif "Cells_In_Domain" in block:
-    present_setup += (indent + "!$acc parallel loop independent  &\n")
-  elif "Faces_In_Region" in block:
-    present_setup += (indent + "!$acc parallel loop  &\n")
-  elif "Faces_In_Domain_And_At_Buffers" in block:
-    present_setup += (indent + "!$acc parallel loop  &\n")
-  else:  # this covers loops through non-zeroes
-    present_setup += (indent + "!$acc parallel loop independent &\n")
+  if ("Cells_At_Boundaries_In_Domain_And_Buffers" in block or
+      "Cells_At_Boundaries"                       in block or
+      "Cells_In_Domain"                           in block or
+      "Cells_In_Domain_And_Buffers"               in block):
+    present_setup += (indent + begin_parallel_loop_independent + "\n")
+  elif ("Faces_In_Region"                in block or
+        "Faces_In_Domain_And_At_Buffers" in block):
+    present_setup += (indent + begin_parallel_loop + "\n")
+  else:  # this covers loops through non-zeroes and all Linalg_Mod
+    present_setup += (indent + begin_parallel_loop_independent + "\n")
 
-  present_setup += (indent + "!$acc present(  &\n")
+  if begin_present:
+    present_setup += (indent + begin_present + "\n")
 
   # Set to track processed variables to avoid duplicates
   processed_vars = {}
@@ -409,42 +340,14 @@ def Process_Tfp_Block(block):
                      "Faces_In_Domain_And_At_Buffers",
                      "Face_Value"}
 
-  #----------------------------------------------------#
-  #   Special handling for Faces_In_Region variables   #
-  #----------------------------------------------------#
-  if "Faces_In_Region" in block:
+  print("")
+  print(f"{RED}  # Pointers used in the block{RESET}")
 
-    print("")
-    print(f"{RED}  # Pointers used in the block{RESET}")
-
-    commands = ("grid_region_f_face => Grid % region % f_face",
-                "grid_region_l_face => Grid % region % l_face")
-
-    for command in commands:
-      if not Command_In_File(grid_to_device_file, command):
-        pointer_setup += (indent + command + "\n")
-      else:
-        print("  ", command, " already in ", grid_to_device_file, sep="")
-
-    present_setup += (
-      indent + "!$acc   grid_region_f_face,  &\n" +
-      indent + "!$acc   grid_region_l_face,  &\n")
-    block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
-    block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
-
-    # Add these to the processed set to avoid duplicates
-    processed_vars['grid_region_f_face'] = None
-    processed_vars['grid_region_l_face'] = None
-
-  #-------------------------------------------------------------------#
-  #   Special handling for Faces_In_Domain_And_At_Buffers variables   #
-  #-------------------------------------------------------------------#
-  if "Faces_In_Domain_And_At_Buffers" in block:
-
-    print("")
-    print(f"{RED}  # Pointers used in the block{RESET}")
+  #-------------------------------------------------#
+  #   Special handling for Faces_In_... variables   #
+  #-------------------------------------------------#
+  if ("Faces_In_Region"                in block or
+      "Faces_In_Domain_And_At_Buffers" in block):
 
     commands = ("grid_region_f_face => Grid % region % f_face",
                 "grid_region_l_face => Grid % region % l_face")
@@ -455,54 +358,22 @@ def Process_Tfp_Block(block):
       else:
         print("  ", command, " already in ", grid_to_device_file, sep="")
 
-    present_setup += (
-      indent + "!$acc   grid_region_f_face,  &\n" +
-      indent + "!$acc   grid_region_l_face,  &\n")
-    block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
-    block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
+    if begin_present:
+      present_setup += (
+        indent + "!$acc   grid_region_f_face,  &\n" +
+        indent + "!$acc   grid_region_l_face,  &\n")
 
     # Add these to the processed set to avoid duplicates
     processed_vars['grid_region_f_face'] = None
     processed_vars['grid_region_l_face'] = None
 
-  #--------------------------------------------------#
-  #   Special handling for Cells_In_Domain variables #
-  #--------------------------------------------------#
-  if "Cells_In_Domain" in block and not "Cells_In_Domain_And_Buffers" in block:
-
-    print("")
-    print(f"{RED}  # Pointers used in the block{RESET}")
-
-    commands = ("grid_region_f_cell => Grid % region % f_cell",
-                "grid_region_l_cell => Grid % region % l_cell")
-
-    for command in commands:
-      if not Command_In_File(grid_to_device_file, command):
-        pointer_setup += (indent + command + "\n")
-      else:
-        print("  ", command, " already in ", grid_to_device_file, sep="")
-
-    present_setup += (
-      indent + "!$acc   grid_region_f_cell,  &\n" +
-      indent + "!$acc   grid_region_l_cell,  &\n")
-    block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
-    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
-
-    # Add these to the processed set to avoid duplicates
-    processed_vars['grid_region_f_cell'] = None
-    processed_vars['grid_region_l_cell'] = None
-
-  #----------------------------------------------------------------#
-  #   Special handling for Cells_In_Domain_And_Buffers variables   #
-  #----------------------------------------------------------------#
-  if "Cells_In_Domain_And_Buffers" in block:
-
-    print("")
-    print(f"{RED}  # Pointers used in the block{RESET}")
+  #------------------------------------------------------------------#
+  #   Special handling for Cells_In_... and Cells_At_... variables   #
+  #------------------------------------------------------------------#
+  if ("Cells_At_Boundaries_In_Domain_And_Buffers" in block or
+      "Cells_At_Boundaries"                       in block or
+      "Cells_In_Domain"                           in block or
+      "Cells_In_Domain_And_Buffers"               in block):
 
     commands = ("grid_region_f_cell => Grid % region % f_cell",
                 "grid_region_l_cell => Grid % region % l_cell")
@@ -513,75 +384,24 @@ def Process_Tfp_Block(block):
       else:
         print("  ", command, " already in ", grid_to_device_file, sep="")
 
-    present_setup += (
-      indent + "!$acc   grid_region_f_cell,  &\n" +
-      indent + "!$acc   grid_region_l_cell,  &\n")
-    block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
-    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
+    if begin_present:
+      present_setup += (
+        indent + "!$acc   grid_region_f_cell,  &\n" +
+        indent + "!$acc   grid_region_l_cell,  &\n")
 
     # Add these to the processed set to avoid duplicates
     processed_vars['grid_region_f_cell'] = None
     processed_vars['grid_region_l_cell'] = None
 
-  #---------------------------------------------------------------------#
-  #   Handling of Cells_At_Boundaries_In_Domain_And_Buffers variables   #
-  #---------------------------------------------------------------------#
-  if "Cells_At_Boundaries_In_Domain_And_Buffers" in block:
-
-    print("")
-    print(f"{RED}  # Pointers used in the block{RESET}")
-
-    commands = ("grid_region_f_cell => Grid % region % f_cell",
-                "grid_region_l_cell => Grid % region % l_cell")
-
-    for command in commands:
-      if not Command_In_File(grid_to_device_file, command):
-        pointer_setup += (indent + command + "\n")
-      else:
-        print("  ", command, " already in ", grid_to_device_file, sep="")
-
-    present_setup += (
-      indent + "!$acc   grid_region_f_cell,  &\n" +
-      indent + "!$acc   grid_region_l_cell,  &\n")
-    block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
-    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
-
-    # Add these to the processed set to avoid duplicates
-    processed_vars['grid_region_f_cell'] = None
-    processed_vars['grid_region_l_cell'] = None
-
-  #-----------------------------------------------#
-  #   Handling of Cells_At_Boundaries variables   #
-  #-----------------------------------------------#
-  if "Cells_At_Boundaries" in block and not "Cells_At_Boundaries_In_Domain_And_Buffers" in block:
-
-    print("")
-    print(f"{RED}  # Pointers used in the block{RESET}")
-
-    commands = ("grid_region_f_cell => Grid % region % f_cell",
-                "grid_region_l_cell => Grid % region % l_cell")
-
-    for command in commands:
-      if not Command_In_File(grid_to_device_file, command):
-        pointer_setup += (indent + command + "\n")
-      else:
-        print("  ", command, " already in ", grid_to_device_file, sep="")
-
-    present_setup += (
-      indent + "!$acc   grid_region_f_cell,  &\n" +
-      indent + "!$acc   grid_region_l_cell,  &\n")
-    block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-    block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-    block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
-    block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
-
-    # Add these to the processed set to avoid duplicates
-    processed_vars['grid_region_f_cell'] = None
-    processed_vars['grid_region_l_cell'] = None
+  #----------------------------------------------------#
+  #   These can, and should, be replaced in any case   #
+  #----------------------------------------------------#
+  block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
+  block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
+  block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
+  block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
+  block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
+  block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
 
   #-----------------------------------------------------#
   #   General handling for arrays in the remaining code #
@@ -645,7 +465,8 @@ def Process_Tfp_Block(block):
           print(f"{RESET}",      end="")
 
       # Add to the OpenACC setup
-      present_setup += f"{indent}!$acc   {pointer_name},  &\n"
+      if begin_present:
+        present_setup += f"{indent}!$acc   {pointer_name},  &\n"
 
       # Replace occurrences of the original variable
       # name with the pointer name in the block
@@ -698,16 +519,32 @@ def Process_Tfp_Block(block):
     # Join both reduction clauses if present
     final_reduction_clause = " ".join(reduction_clause)
 
-    # Replace the "parallel loop" with the appropriate reduction clause(s)
-    present_setup = present_setup.replace(
-      "parallel loop",
-      f"parallel loop {final_reduction_clause}"
-    )
+    # Add the appropriate reduction clause(s) at the end of first line
+    # Find the index of the first newline character
+    newline_index = present_setup.find("\n")
+
+    # Initialize a variable to track the position
+    # of the last letter in the first line
+    last_letter_index = -1
+
+    # If a newline character is found, search backward for the last letter
+    if newline_index != -1:
+      for i in range(newline_index - 1, -1, -1):
+        if present_setup[i].isalpha():
+          last_letter_index = i
+          break
+
+    # Insert the reduction clause after the last letter in the first line
+    if last_letter_index != -1:
+      present_setup = (  present_setup[:last_letter_index + 1]
+                       + f" {final_reduction_clause}"
+                       + present_setup[last_letter_index + 1:])
 
   #---------------------------------------------------------------#
   #   Append the closing parenthesis for OpenACC present clause   #
   #---------------------------------------------------------------#
-  present_setup += indent + "!$acc )\n"
+  if begin_present:
+    present_setup += indent + end_present + "\n"
 
   #---------------------------------------------------------------#
   #   Replace the last comma with a space in the present clause   #
@@ -775,18 +612,18 @@ def Process_Tfp_Block(block):
       block = (
           block[:last_eol_index + 1]
         + indent
-        + "!$acc loop seq\n"
+        + begin_sequential_loop + "\n"
         + block[last_eol_index + 1:]
       )
 
-  # Add the !$acc end parallel at the end
+  # Add the end_parallel_loop at the end
   last_end_do_index = block.rfind("end do")
   if last_end_do_index != -1:
     block = (
         block[:last_end_do_index]
       + "end do\n"
       + indent
-      + "!$acc end parallel"
+      + end_parallel_loop
       + block[last_end_do_index + len("end do"):]
     )
 
@@ -795,7 +632,9 @@ def Process_Tfp_Block(block):
   if second_last_end_do_index != -1:
     block = (
         block[:second_last_end_do_index]
-      + "end do\n" + indent + "!$acc end loop"
+      + "end do\n"
+      + indent
+      + end_sequential_loop
       + block[second_last_end_do_index + len("end do"):]
     )
 

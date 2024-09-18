@@ -54,7 +54,7 @@
   fc  => Flow % Nat % C % fc
   nz  =  Flow % Nat % C % nonzeros
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   val   &
   !$acc )

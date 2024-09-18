@@ -24,7 +24,7 @@
   call Work % Connect_Real_Cell(dens_capa)
 
   ! Fill up the dens_capa array
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

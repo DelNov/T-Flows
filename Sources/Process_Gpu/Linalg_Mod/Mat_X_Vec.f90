@@ -31,7 +31,7 @@
   ! Refresh the operand vector over processor buffers ...
   call Grid % Exchange_Inside_Cells_Real(b(1:n))
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   a_row,  &
   !$acc   a_col,  &

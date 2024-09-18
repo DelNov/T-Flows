@@ -26,7 +26,7 @@
   !   Nullify arrays on the device   !
   !----------------------------------!
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

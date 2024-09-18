@@ -32,7 +32,7 @@
 
   sum_a = 0.0
 
-  !$acc parallel loop reduction(+: sum_a) independent &
+  !$acc parallel loop independent reduction(+: sum_a)  &
   !$acc present(  &
   !$acc   a_val,  &
   !$acc   a_dia   &
@@ -59,7 +59,7 @@
   !   Scale the matrix and the right hand side vector   !
   !-----------------------------------------------------!
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   a_val   &
   !$acc )
@@ -68,7 +68,7 @@
   end do
   !$acc end parallel
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   b,  &
   !$acc   d_inv   &

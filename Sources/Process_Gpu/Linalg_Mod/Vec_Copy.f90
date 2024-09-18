@@ -15,7 +15,7 @@
   integer :: i
 !==============================================================================!
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   a,  &
   !$acc   b   &

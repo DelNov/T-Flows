@@ -18,7 +18,7 @@
 
   dot = 0.0
 
-  !$acc parallel loop reduction(+: dot) independent &
+  !$acc parallel loop independent reduction(+: dot)  &
   !$acc present(  &
   !$acc   a,  &
   !$acc   b   &

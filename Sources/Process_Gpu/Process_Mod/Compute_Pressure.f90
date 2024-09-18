@@ -77,7 +77,7 @@
   p_max = -HUGE
   p_min = +HUGE
 
-  !$acc parallel loop reduction(max: p_max) reduction(min: p_min) independent  &
+  !$acc parallel loop independent reduction(max: p_max) reduction(min: p_min)  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &

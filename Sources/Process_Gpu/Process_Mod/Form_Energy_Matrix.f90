@@ -50,7 +50,7 @@
   !   Initialize density times thermal capacity and effective conductivity   !
   !--------------------------------------------------------------------------!
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
@@ -95,7 +95,7 @@
   !   Initialize matrix entries to zero   !
   !---------------------------------------!
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   val   &
   !$acc )

@@ -33,7 +33,7 @@
   !   Scale the matrix and the right hand side vector   !
   !-----------------------------------------------------!
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   a_val   &
   !$acc )
@@ -42,7 +42,7 @@
   end do
   !$acc end parallel
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   b,  &
   !$acc   d_inv   &

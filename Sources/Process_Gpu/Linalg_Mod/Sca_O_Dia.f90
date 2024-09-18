@@ -24,7 +24,7 @@
   a_dia => Acon % dia
   a_val => Aval % val
 
-  !$acc parallel loop independent &
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   b,  &
   !$acc   a_val,  &
