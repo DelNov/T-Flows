@@ -1,6 +1,6 @@
 /*******************************************************************************
 *                                                                              *
-*  Cylinder and precursor domain                                               *
+*  U-bend and precursor domain                                                 *
 *                                                                              *
 *  This script can create either U-bend or its precursor, or both,             *
 *  depending if variables PRECURSOR and U_BEND are set to 1 here.              *
