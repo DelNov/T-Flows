@@ -58,14 +58,14 @@
   ! Find which cells are near buffers, it speeds up the procedure quite a bit
   allocate(node_in_buffer(Grid % n_nodes));  node_in_buffer(:) = .false.
   do c = Cells_In_Buffers()
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       node_in_buffer(n) = .true.
     end do
   end do
   n_cells_near_buffers = 0
   do c = Cells_In_Domain()
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       if(node_in_buffer(n)) then
         n_cells_near_buffers = n_cells_near_buffers + 1
@@ -76,7 +76,7 @@
   allocate(cells_near_buffers(n_cells_near_buffers))
   n_cells_near_buffers = 0
   do c = Cells_In_Domain()
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       if(node_in_buffer(n)) then
         n_cells_near_buffers = n_cells_near_buffers + 1

@@ -335,6 +335,9 @@
   !--------------------------------------------------!
   Grid % cells_n_cells(:) = 0
   do c1 = -Grid % n_bnd_cells, Grid % n_cells
+
+    if(c1 .eq. 0) cycle  ! skip cell zero
+
     n = 0  ! counter for Grid % cells_n_cells
     do i_fac = 1, Grid % cells_n_faces(c1)
       s = Grid % cells_f(i_fac, c1)
