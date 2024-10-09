@@ -13,8 +13,9 @@
 !==============================================================================!
 
   ! Give some sign
-  if(First_Proc())  &
+  if(First_Proc()) then
     print '(a)', ' # Creating the turbulence module'
+  end if
 
   ! Store pointers
   Turb % pnt_flow => Flow
@@ -27,9 +28,12 @@
   nc = Grid % n_cells
 
   ! Create deltas
-  allocate(Turb % h_max(-nb:nc));  Turb % h_max = 0.
-  allocate(Turb % h_min(-nb:nc));  Turb % h_min = 0.
-  allocate(Turb % h_w  (-nb:nc));  Turb % h_w   = 0.
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. HYBRID_LES_PRANDTL) then
+    allocate(Turb % h_max(-nb:nc));  Turb % h_max = 0.
+    allocate(Turb % h_min(-nb:nc));  Turb % h_min = 0.
+    allocate(Turb % h_w  (-nb:nc));  Turb % h_w   = 0.
+  end if
 
   allocate(Turb % tau_wall(-nb:nc));  Turb % tau_wall = 0.
   allocate(Turb % y_plus  (-nb:nc));  Turb % y_plus   = 0.

@@ -967,18 +967,22 @@
     call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
                                         Grid % wall_dist(c_f:c_l),    &
                                         f8, f9, data_offset, run)
-    str_var = Results % Var_Name("Grid Cell Delta Max","[m]", units)
-    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
-                                        Turb % h_max(c_f:c_l),        &
-                                        f8, f9, data_offset, run)
-    str_var = Results % Var_Name("Grid Cell Delta Min","[m]", units)
-    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
-                                        Turb % h_min(c_f:c_l),        &
-                                        f8, f9, data_offset, run)
-    str_var = Results % Var_Name("Grid Cell Delta Wall","[m]", units)
-    call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
-                                        Turb % h_w  (c_f:c_l),        &
-                                        f8, f9, data_offset, run)
+
+    if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+       Turb % model .eq. HYBRID_LES_PRANDTL) then
+      str_var = Results % Var_Name("Grid Cell Delta Max","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % h_max(c_f:c_l),        &
+                                          f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Grid Cell Delta Min","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % h_min(c_f:c_l),        &
+                                          f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Grid Cell Delta Wall","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % h_w  (c_f:c_l),        &
+                                          f8, f9, data_offset, run)
+    end if
 
     !---------------------------------------------------------------------!
     !   Variables in the first computational point, plotted at boundary   !
