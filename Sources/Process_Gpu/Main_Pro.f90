@@ -125,6 +125,7 @@
   call Control % Results_Save_Interval     (Results % interval, verbose=.true.)
   call Control % Save_Initial_Condition    (Results % initial,  verbose=.true.)
   call Control % Save_Results_At_Boundaries(Results % boundary)
+  call Control % Save_Results_Units        (Results % units)
 
   ! Save initial condition
   call Results % Main_Results(Grid, Flow, Turb, 1)
