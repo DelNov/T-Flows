@@ -534,6 +534,18 @@
                            ' NumberOfComponents="3"/>'
     write(fu,'(a,a)') IN_2, '</PPoints>'
 
+    write(fu,'(a,a)') IN_2, '<PCells>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="connectivity"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="offsets"/>'
+    write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="types"/>'
+
+    if(Grid % polyhedral) then
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="faces"/>'
+      write(fu,'(a,a)') IN_3, '<PDataArray type='//intp//' Name="faceoffsets"/>'
+    end if
+
+    write(fu,'(a,a)') IN_2, '</PCells>'
+
     ! Data section is not mandatory, but very useful
     write(fu,'(a,a)') IN_2, '<PCellData>'
     write(fu,'(a,a)') IN_3, '<PDataArray type='//intp        //  &

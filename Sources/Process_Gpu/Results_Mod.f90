@@ -28,6 +28,7 @@
       procedure :: Main_Results
 
       procedure, private :: Save_Vtu_Fields
+      procedure, private :: Save_Vtu_Header_Int
       procedure, private :: Save_Vtu_Scalar_Int
       procedure, private :: Save_Vtu_Scalar_Real
       procedure, private :: Save_Vtu_Tensor_6_Real
@@ -44,6 +45,7 @@
 
 #   include "Results_Mod/Main_Results.f90"
 #   include "Results_Mod/Save_Vtu_Fields.f90"
+#   include "Results_Mod/Save_Vtu_Header_Int.f90"
 #   include "Results_Mod/Save_Vtu_Scalar_Int.f90"
 #   include "Results_Mod/Save_Vtu_Scalar_Real.f90"
 #   include "Results_Mod/Save_Vtu_Tensor_6_Real.f90"

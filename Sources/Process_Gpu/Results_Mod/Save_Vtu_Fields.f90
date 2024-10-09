@@ -258,15 +258,14 @@
   !-----------!
   !   Cells   !
   !-----------!
+  if(Parallel_Run() .and. First_Proc())  then
+    write(f8) IN_3 // '<PCells>' // LF
+  end if
+
   write(f9) IN_3 // '<Cells>' // LF
 
   ! Cells' nodes
-  write(str1, '(i0.0)') data_offset
-  write(f9) IN_4 // '<DataArray type='//intp          //  &
-                    ' Name="connectivity"'            //  &
-                    ' format="appended"'              //  &
-                    ' offset="' // trim(str1) //'">'  // LF
-  write(f9) IN_4 // '</DataArray>' // LF
+  call Results % Save_Vtu_Header_Int("connectivity", f8, f9, data_offset)
   data_offset = data_offset + SP + n_conns * IP  ! prepare for next
 
   ! Fill up an array with cell offsets and save the header only
@@ -314,24 +313,18 @@
   if(n_polyg > 0) then
 
     ! Write polyhedral cells' faces
-    write(str1, '(i0.0)') data_offset
-    write(f9) IN_4 // '<DataArray type='//intp         //  &
-                      ' Name="faces"'                  //  &
-                      ' format="appended"'             //  &
-                      ' offset="' // trim(str1) //'">' // LF
-    write(f9) IN_4 // '</DataArray>' // LF
+    call Results % Save_Vtu_Header_Int("faces", f8, f9, data_offset)
     data_offset = data_offset + SP + n_polyg * IP  ! prepare for next
 
 
     ! Write polyhedral cells' faces offsets
-    write(str1, '(i0.0)') data_offset
-    write(f9) IN_4 // '<DataArray type='//intp         //  &
-                      ' Name="faceoffsets"'            //  &
-                      ' format="appended"'             //  &
-                      ' offset="' // trim(str1) //'">' // LF
-    write(f9) IN_4 // '</DataArray>' // LF
+    call Results % Save_Vtu_Header_Int("faceoffsets", f8, f9, data_offset)
     data_offset = data_offset + SP + (c_l-c_f+1) * IP  ! prepare for next
 
+  end if
+
+  if(Parallel_Run() .and. First_Proc())  then
+    write(f8) IN_3 // '</PCells>' // LF
   end if
 
   write(f9) IN_3 // '</Cells>'     // LF
