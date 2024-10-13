@@ -1,15 +1,39 @@
 //==============================================================================
 //
 //
+// Handling command line options
+//
+//
+//------------------------------------------------------------------------------
+If(!Exists(FLUID) || !Exists(SOLID))
+  Printf("Variables FLUID and/or SOLID are not defined from command line.");
+  Printf("The proper invokation of Gmsh for this scrip is, for example:");
+  Printf("");
+  Printf("gmsh -3 t_junction.geo -setnumber FLUID 1 -setnumber SOLID 0 -o fluid.msh");
+  Printf("");
+  Printf("to mesh only fluid domain, or:");
+  Printf("");
+  Printf("gmsh -3 t_junction.geo -setnumber FLUID 0 -setnumber SOLID 1 -o solid.msh");
+  Printf("");
+  Printf("to mesh only solid domain.");
+  Abort;
+EndIf
+
+//==============================================================================
+//
+//
 // Definition of constants
 //
 //
 //------------------------------------------------------------------------------
 LI =  4.0;
 LO = 12.0;
-R(1) = 0.6;  // core radius
+R(1) = 0.6;   // core radius
 R(2) = 0.9;  // boundary layer radius
 R(3) = 1.0;  // outer radius
+R(4) = 1.5;  // outer radius
+
+Printf("FLUID: %g", FLUID);
 
 // Number of nodes (resolutions for lines)
 N_CORE_ARC    = 11;      // number of nodes in the core
@@ -17,6 +41,7 @@ N_STREAM_I    = 41;      // number of nodes in the stream-wise direction
 N_STREAM_O    = 61;      // number of nodes in the stream-wise direction
 N_MIDDLE      =  9;
 N_BLAYER      =  7;
+N_SLAYER      =  5;
 
 // Progression for lines
 P_CORE_RAD    = 1.1;
@@ -24,6 +49,7 @@ P_STREAM_I    = 1.05;
 P_STREAM_O    = 1.05;
 P_MIDDLE      = 1.15;
 P_BLAYER      = 1.3;
+P_SLAYER      = 1.3;
 
 // Connector types (will be used to define resolution and progression)
 TYPE_ARC      = 111;  // all arches and ellipses
@@ -33,6 +59,7 @@ TYPE_CORE_TAN = 444;  // lines defining the core
 TYPE_MIDDLE   = 555;  // lines connecting core and boundary layer
 TYPE_STREAM_I = 666;  // lines in the streamwise directions in inlet
 TYPE_STREAM_O = 777;  // lines in the streamwise directions in outlet
+TYPE_SLAYER   = 888;  // lines in the solid layer
 
 // Tolerance for merging nodes
 NODE_MERGE_TOL = 1.0e-6;
@@ -155,7 +182,7 @@ Return
 Macro NLinesBetweenLayers  // connect eight lines from a central point
   For n In{ nf : nl }
     lc++;
-    pnt_1 = pnt_1st  + (n - 1);
+    pnt_1 = pnt_1st + (n - 1);
     pnt_2 = pnt_2nd + (n - 1);
     Printf("Creating line %g between layers from points: %g, %g",
            lc, pnt_1, pnt_2);
@@ -258,7 +285,7 @@ x = 0.0;  r = R(2);  Call NPointsAroundX;  // point 77 on
 r = R(2);  Call NPointsMinusX;             // point 85 on
 r = R(2);  Call NPointsPlusX;              // point 93 on
 
-// Points at the cylinder wall
+// Points at the wet cylinder wall
 nf = 1;  nl = 8;
 x = -LI;  r = R(3);  Call NPointsAroundX;  // point 101 on
 x = +LO;  r = R(3);  Call NPointsAroundX;  // point 109 on
@@ -266,6 +293,15 @@ z = +LI;  r = R(3);  Call NPointsAroundZ;  // point 117 on
 x = 0.0;  r = R(3);  Call NPointsAroundX;  // point 125 on
 r = R(3);  Call NPointsMinusX;             // point 133 on
 r = R(3);  Call NPointsPlusX;              // point 141 on
+
+// Points at the dry cylinder wall
+nf = 1;  nl = 8;
+x = -LI;  r = R(4);  Call NPointsAroundX;  // point 149 on
+x = +LO;  r = R(4);  Call NPointsAroundX;  // point 157 on
+z = +LI;  r = R(4);  Call NPointsAroundZ;  // point 165 on
+x = 0.0;  r = R(4);  Call NPointsAroundX;  // point 173 on
+r = R(4);  Call NPointsMinusX;             // point 181 on
+r = R(4);  Call NPointsPlusX;              // point 189 to 196
 
 //-------------------------------------------------------------
 // Try merging all the points after defining their coordinates
@@ -285,18 +321,20 @@ Call MergePoints;
 // 4 - connectors wrapping the bundary layers (arches and ellipses)
 // 5 - boundary layer radial connectors
 // 6 - connectors for the outer walls (arches and ellipses)
+// 7 - boundary layer radial connectors
+// 8 - connectors for the outer walls (arches and ellipses)
 //
 // Planes are ordered in the following way
-// 1 - at x min
-// 2 - at x max
-// 3 - at z max
+// 1 - at xmin
+// 2 - at xmax
+// 3 - at zmax
 // 4 - at x = 0
-// 5 - at x = 0 rotated by 45 degrees anticlockwise
-// 6 - at x = 0 rotated by 45 degrees clockwise
+// 5 - at x = 0 rotated by 45 degrees backslash
+// 6 - at x = 0 rotated by 45 degrees slash
 
-//--------------------------------------------
-// Center in the core in the radial direction
-//--------------------------------------------
+//------------------------------------------------
+// 1 - center in the core in the radial direction
+//------------------------------------------------
 
 // Lines in radial direction of the cores
 type = TYPE_CORE_RAD;
@@ -309,9 +347,9 @@ pnt_cent = 4;  pnt_1st = 29;  Call NLinesFromCenter;  // lines 13 - 16
 pnt_cent = 4;  pnt_1st = 37;  Call NLinesFromCenter;  // lines 17 - 20
 pnt_cent = 4;  pnt_1st = 45;  Call NLinesFromCenter;  // lines 21 - 24
 
-//----------------------------------------------------------------
-// Connectors wrapping the core (on the border with middle layer)
-//----------------------------------------------------------------
+//--------------------------------------------------------------------
+// 2 - connectors wrapping the core (on the border with middle layer)
+//--------------------------------------------------------------------
 type = TYPE_CORE_TAN;
 
 nf = 1;  nl = 8;
@@ -322,9 +360,9 @@ pnt_1st = 29;  Call NLinesAround;  // lines 49 - 56
 pnt_1st = 37;  Call NLinesAround;  // lines 57 - 64
 pnt_1st = 45;  Call NLinesAround;  // lines 65 - 72
 
-//--------------------------
-// Middle radial connectors
-//--------------------------
+//------------------------------
+// 3 - middle radial connectors
+//------------------------------
 type = TYPE_MIDDLE;
 
 nf = 1; nl = 8;
@@ -335,9 +373,9 @@ pnt_1st = 77;  pnt_2nd = 29;  Call NLinesBetweenLayers;
 pnt_1st = 85;  pnt_2nd = 37;  Call NLinesBetweenLayers;
 pnt_1st = 93;  pnt_2nd = 45;  Call NLinesBetweenLayers;
 
-//--------------------------------------------------------------
-// Connectors wrapping the bundary layers (arches and ellipses)
-//--------------------------------------------------------------
+//------------------------------------------------------------------
+// 4 - connectors wrapping the bundary layers (arches and ellipses)
+//------------------------------------------------------------------
 type = TYPE_ARC;
 
 nf = 1;  nl = 8;
@@ -348,9 +386,9 @@ pnt_1st = 77;  pnt_cent = 4;  Call NArcsAround;
 pnt_1st = 85;  pnt_cent = 4;  pnt_axis = 87;  Call NEllipseArcsAround;
 pnt_1st = 93;  pnt_cent = 4;  pnt_axis = 95;  Call NEllipseArcsAround;
 
-//----------------------------------
-// Boundary layer radial connectors
-//----------------------------------
+//--------------------------------------
+// 5 - boundary layer radial connectors
+//--------------------------------------
 type = TYPE_BLAYER;
 
 nf = 1; nl = 8;
@@ -361,9 +399,9 @@ pnt_1st = 125;  pnt_2nd = 77;  Call NLinesBetweenLayers;
 pnt_1st = 133;  pnt_2nd = 85;  Call NLinesBetweenLayers;
 pnt_1st = 141;  pnt_2nd = 93;  Call NLinesBetweenLayers;
 
-//--------------------------------------------------------------
-// Connectors wrapping the bundary layers (arches and ellipses)
-//--------------------------------------------------------------
+//------------------------------------------------------------------
+// 6 - connectors wrapping the bundary layers (arches and ellipses)
+//------------------------------------------------------------------
 type = TYPE_ARC;
 
 nf = 1;  nl = 8;
@@ -408,6 +446,45 @@ nf = 5; nl = 8;  pnt_1st =101;  pnt_2nd = 69;  Call NLinesBetweenLayersNeg;
 nf = 1; nl = 4;  pnt_1st =133;  pnt_2nd =117;  Call NLinesBetweenLayers;
 nf = 5; nl = 8;  pnt_1st =149;  pnt_2nd =117;  Call NLinesBetweenLayersNeg;
 
+//-----------------------------------
+// 7 - solid layer radial connectors
+//-----------------------------------
+type = TYPE_SLAYER;
+nf = 1; nl = 8;
+pnt_1st = 101;  pnt_2nd = 149;  Call NLinesBetweenLayers;
+pnt_1st = 109;  pnt_2nd = 157;  Call NLinesBetweenLayers;
+pnt_1st = 117;  pnt_2nd = 165;  Call NLinesBetweenLayers;  // at zmax
+pnt_1st = 125;  pnt_2nd = 173;  Call NLinesBetweenLayers;
+pnt_1st = 133;  pnt_2nd = 181;  Call NLinesBetweenLayers;
+pnt_1st = 141;  pnt_2nd = 189;  Call NLinesBetweenLayers;
+
+//----------------------------------------------------------------
+// 8 - connectors wrapping the solid layers (arches and ellipses)
+//----------------------------------------------------------------
+type = TYPE_ARC;
+nf = 1;  nl = 8;
+pnt_1st = 149;  pnt_cent = 1;  Call NArcsAround;
+pnt_1st = 157;  pnt_cent = 2;  Call NArcsAround;
+pnt_1st = 165;  pnt_cent = 3;  Call NArcsAround;
+pnt_1st = 173;  pnt_cent = 4;  Call NArcsAround;
+pnt_1st = 181;  pnt_cent = 4;  pnt_axis = 135;  Call NEllipseArcsAround;
+pnt_1st = 189;  pnt_cent = 4;  pnt_axis = 143;  Call NEllipseArcsAround;
+
+// Towards xmin: from axis, through core, boundary layers and pipe walls
+type = TYPE_STREAM_I;
+nf = 1; nl = 4;  pnt_1st =181;  pnt_2nd =149;  Call NLinesBetweenLayers;
+nf = 5; nl = 8;  pnt_1st =173;  pnt_2nd =149;  Call NLinesBetweenLayers;
+
+// Towards xmax: from axis, through core, boundary layers and pipe walls
+type = TYPE_STREAM_O;
+nf = 1; nl = 4;  pnt_1st =189;  pnt_2nd =157;  Call NLinesBetweenLayers;
+nf = 5; nl = 8;  pnt_1st =173;  pnt_2nd =157;  Call NLinesBetweenLayers;
+
+// Towards zmax
+type = TYPE_STREAM_I;
+nf = 1; nl = 4;  pnt_1st =181;  pnt_2nd =165;  Call NLinesBetweenLayers;
+nf = 5; nl = 8;  pnt_1st =197;  pnt_2nd =165;  Call NLinesBetweenLayersNeg;
+
 //-------------------------------------------
 // Set all connectors to be transfinite with
 //     proper resolution and progression
@@ -433,6 +510,9 @@ For l In{ 1 : lc }
   EndIf
   If(lin_type(l) == TYPE_STREAM_O)
     Transfinite Curve {l} = N_STREAM_O  Using Progression P_STREAM_O;
+  EndIf
+  If(lin_type(l) == TYPE_SLAYER)
+    Transfinite Curve {l} = N_SLAYER    Using Progression P_SLAYER;
   EndIf
 EndFor
 
@@ -527,7 +607,7 @@ sc++;  Curve Loop(sc) = {46, -322,  67, 321};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {47, -323,  66, 322};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {48, -316,  65, 323};  Plane Surface(sc) = {sc};
 
-// Surfaces in the middle at xmin leg
+// Surfaces in the middle at xmin leg ("orthogonal" to walls)
 sc++;  Curve Loop(sc) = {73, -266, -105, 274};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {74, -267, -106, 275};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {75, -268, -107, 276};  Plane Surface(sc) = {sc};
@@ -537,7 +617,7 @@ sc++;  Curve Loop(sc) = {78, -271, -102, 279};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {79, -272, -103, 280};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {80, -273, -104, 281};  Plane Surface(sc) = {sc};
 
-// Surfaces in the middle at xmin leg
+// Surfaces in the middle at xmin leg ("orthogonal" to walls)
 sc++;  Curve Loop(sc) = {81, -291, -113, 299};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {82, -292, -114, 300};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {83, -293, -115, 301};  Plane Surface(sc) = {sc};
@@ -547,7 +627,7 @@ sc++;  Curve Loop(sc) = {86, -296, -102, 304};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {87, -297, -103, 305};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {88, -298, -104, 306};  Plane Surface(sc) = {sc};
 
-// Surfaces in the middle at zmax leg
+// Surfaces in the middle at zmax leg ("orthogonal" to walls)
 sc++;  Curve Loop(sc) = {89, -316, -105, 324};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {90, -317, -106, 325};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {91, -318, -107, 326};  Plane Surface(sc) = {sc};
@@ -557,7 +637,7 @@ sc++;  Curve Loop(sc) = {94, -321, -116, 329};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {95, -322, -115, 330};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {96, -323, -114, 331};  Plane Surface(sc) = {sc};
 
-// Wrapping the boundary layer at xmin
+// Wrapping the boundary layer at xmin ("parallel" to walls)
 sc++;  Curve Loop(sc) = {121, -275, -153, 274};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {122, -276, -154, 275};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {123, -277, -155, 276};  Surface(sc) = {sc};
@@ -567,7 +647,7 @@ sc++;  Curve Loop(sc) = {126, -280, -150, 279};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {127, -281, -151, 280};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {128, -274, -152, 281};  Surface(sc) = {sc};
 
-// Wrapping the boundary layer at xmax
+// Wrapping the boundary layer at xmax ("parallel" to walls)
 sc++;  Curve Loop(sc) = {129, -300, -161, 299};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {130, -301, -162, 300};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {131, -302, -163, 301};  Surface(sc) = {sc};
@@ -577,7 +657,7 @@ sc++;  Curve Loop(sc) = {134, -305, -150, 304};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {135, -306, -151, 305};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {136, -299, -152, 306};  Surface(sc) = {sc};
 
-// Wrapping the boundary layer at zmax
+// Wrapping the boundary layer at zmax ("parallel" to walls)
 sc++;  Curve Loop(sc) = {137, -325, -153, 324};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {138, -326, -154, 325};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {139, -327, -155, 326};  Surface(sc) = {sc};
@@ -617,8 +697,8 @@ sc++;  Curve Loop(sc) = {190, -329, -212, 337};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {191, -330, -211, 338};  Plane Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {192, -331, -210, 339};  Plane Surface(sc) = {sc};
 
-Printf("Started defining outer walls with surface: %g", sc+1);
-wall_first = sc + 1;
+Printf("Started defining wetted walls with surface: %g", sc+1);
+wet_wall_first = sc + 1;
 
 // Outer walls at xmin
 sc++;  Curve Loop(sc) = {217, -283, -249, 282};  Surface(sc) = {sc};
@@ -650,8 +730,149 @@ sc++;  Curve Loop(sc) = {238, -338,  259, 337};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {239, -339,  258, 338};  Surface(sc) = {sc};
 sc++;  Curve Loop(sc) = {240, -332,  257, 339};  Surface(sc) = {sc};
 
-Printf("Finished defining outer walls with surface: %g", sc);
-wall_last = sc;
+Printf("Finished defining wetted walls with surface: %g", sc);
+wet_wall_last = sc;
+
+//-----------------------------------------------------------------
+// Surfaces orthogonal to axes (increment factors are 124 and 172)
+//-----------------------------------------------------------------
+
+// at xmin
+n = 217;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124-8, -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+
+// at xmax
+n = 225;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124-8, -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+
+// at zmax
+n = 233;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124-8, -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+
+// at core
+n = 241;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124-8, -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+n = 249;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124-8, -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+n = 257;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124,   -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+124-8, -n-172+1, -n-124+1};  Plane Surface(sc) = {sc};  n++;
+
+//---------------------
+// Streamwise surfaces
+//---------------------
+
+// Orthogonal to walls at xmin
+n = 282;
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90+8};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90};    Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90};    Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90};    Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90};    Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90+8};  Plane Surface(sc) = {sc};  n++;  // 287
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90+8};  Plane Surface(sc) = {sc};  n++;  // 288
+sc++;  Curve Loop(sc) = {n, n+58, -n-154, -n-90+8};  Plane Surface(sc) = {sc};  n++;
+
+n = 307;
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57};     Plane Surface(sc) = {sc};  n++;  // 307
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57-16};  Plane Surface(sc) = {sc};  n++;  // 308
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57-16};  Plane Surface(sc) = {sc};  n++;  // 309
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57-16};  Plane Surface(sc) = {sc};  n++;  // 310
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57-8};   Plane Surface(sc) = {sc};  n++;  // 311
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57};     Plane Surface(sc) = {sc};  n++;  // 312
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57};     Plane Surface(sc) = {sc};  n++;  // 313
+sc++;  Curve Loop(sc) = {n, n+41, -n-137, -n-57};     Plane Surface(sc) = {sc};  n++;  // 314
+
+// Orthogonal to walls at z min
+n = 332;
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -n-40+8};  Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -n-40};    Plane Surface(sc) = {sc};  n++;  // 333
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -n-40};    Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -n-40};    Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -n-40+8};  Plane Surface(sc) = {sc};  n++;  // 336
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -383};     Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -382};     Plane Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n+24, -n-120, -381};     Plane Surface(sc) = {sc};  n++;  // 339
+
+Printf("Started defining dry walls with surface: %g", sc+1);
+dry_wall_first = sc + 1;
+
+// Outer solid walls wrappings at xmin
+n = 436;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+24};  Surface(sc) = {sc};  n++;  // 440
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+24};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+24};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1+8, -n+24};  Surface(sc) = {sc};  n++;
+
+// Outer solid walls wrappings at xmax
+n = 444;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;  // 444
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+16};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;  // 448
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1+8, -n+32};  Surface(sc) = {sc};  n++;
+
+// Outer solid walls wrappings at xmax
+n = 452;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;  // 452
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,   -n+32};  Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,    431};   Surface(sc) = {sc};  n++;  // 456
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,    430};   Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1,    429};   Surface(sc) = {sc};  n++;
+sc++;  Curve Loop(sc) = {n, n-48, -n-1+8,  428};   Surface(sc) = {sc};  n++;
+
+Printf("Finished defining dry walls with surface: %g", sc);
+dry_wall_last = sc;
 
 //-------------------------------------------------------
 // Set all surfaces to be transfinite
@@ -671,12 +892,17 @@ Recursive Delete {
   Surface{ 19}; Surface{ 20};  // core surfaces in the central anticlockw set
   Surface{ 23}; Surface{ 24};  // core surfaces in the central clockwise set
   Surface{ 49}; Surface{ 50}; Surface{ 51}; Surface{ 52};  // middle orthogonal set
-  Surface{ 61}; Surface{ 62}; Surface{ 63}; Surface{ 64};  // middle anticlockwise
-  Surface{ 72}; Surface{ 71}; Surface{ 70}; Surface{ 69};  // middle clockwise
+  Surface{ 61}; Surface{ 62}; Surface{ 63}; Surface{ 64};  // middle backslash
+  Surface{ 72}; Surface{ 71}; Surface{ 70}; Surface{ 69};  // middle slash
   Surface{ 97}; Surface{ 98}; Surface{ 99}; Surface{100};  // blayer orthogonal
-  Surface{109}; Surface{110}; Surface{111}; Surface{112};  // bl anticlock
-  Surface{120}; Surface{119}; Surface{118}; Surface{117};  // bl clockwise
+  Surface{109}; Surface{110}; Surface{111}; Surface{112};  // blayer backslash
+  Surface{120}; Surface{119}; Surface{118}; Surface{117};  // blayer slash
+  Surface{277}; Surface{278}; Surface{279}; Surface{280};  // slayer orthogonal
+  Surface{289}; Surface{290}; Surface{291}; Surface{292};  // slayer backslash
+  Surface{297}; Surface{298}; Surface{299}; Surface{300};  // slayer slash
 }
+
+Coherence;
 
 //---------
 //
@@ -684,151 +910,250 @@ Recursive Delete {
 //
 //---------
 
+wet_volume_first = vc + 1;
+
 // Volumes in the core at xmin
 vc++;  Surface Loop(vc) = { 1, 17, 121, 133, 134, 122};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {1, 4, 29, 5, 7, 39, 38, 6};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = { 2, 18, 122, 135, 136, 123};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {9, 33, 4, 1, 8, 40, 39, 7};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = { 3, 15, 123, 137, 138, 124};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {10, 34, 35, 11, 9, 33, 4, 1};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = { 4, 16, 124, 139, 140, 121};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {11, 35, 36, 12, 1, 4, 29, 5};
+Transfinite Volume{vc};
 
 // Volumes in the core at xmax
 vc++;  Surface Loop(vc) = { 5, 21, 125, 141, 142, 126};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {4, 2, 13, 29, 47, 15, 14, 46};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = { 6, 22, 126, 143, 144, 127};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {33, 17, 2, 4, 48, 16, 15, 47};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = { 7, 15, 127, 145, 146, 128};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {34, 18, 19, 35, 33, 17, 2, 4};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = { 8, 16, 128, 147, 148, 125};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {35, 19, 20, 36, 4, 2, 13, 29};
+Transfinite Volume{vc};
 
 // Volumes in the core at zmax
 vc++;  Surface Loop(vc) = { 9, 17, 129, 149, 150, 130};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {39, 4, 29, 38, 23, 3, 21, 22};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {10, 18, 130, 151, 152, 131};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {40, 33, 4, 39, 24, 25, 3, 23};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {11, 22, 131, 153, 154, 132};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {33, 48, 47, 4, 25, 26, 27, 3};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {12, 21, 132, 155, 156, 129};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {4, 47, 46, 29, 3, 27, 28, 21};
+Transfinite Volume{vc};
 
 Printf("Core finished with volume %g", vc);
 
 // Volumes in the middle at xmin
 vc++;  Surface Loop(vc) = {25, 57, 133, 157, 181, 158};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {5, 29, 77, 53, 6, 38, 86, 54};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {26, 58, 134, 158, 182, 159};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {7, 39, 38, 6, 55, 87, 86, 54};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {27, 59, 135, 159, 183, 160};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {8, 40, 39, 7, 56, 88, 87, 55};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {28, 60, 136, 160, 184, 161};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {57, 81, 33, 9, 56, 88, 40, 8};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {29, 53, 137, 161, 185, 162};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {58, 82, 34, 10, 57, 81, 33, 9};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {30, 54, 138, 162, 186, 163};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {58, 82, 83, 59, 10, 34, 35, 11};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {31, 55, 139, 163, 187, 164};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {59, 83, 84, 60, 11, 35, 36, 12};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {32, 56, 140, 164, 188, 157};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {12, 36, 84, 60, 5, 29, 77, 53};
+Transfinite Volume{vc};
 
 // Volumes in the middle at xmax
 vc++;  Surface Loop(vc) = {33, 65, 165, 189, 166, 141};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {29, 13, 61, 77, 46, 14, 62, 94};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {34, 66, 166, 190, 167, 142};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {47, 15, 14, 46, 95, 63, 62, 94};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {35, 67, 167, 191, 168, 143};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {48, 16, 15, 47, 96, 64, 63, 95};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {36, 68, 168, 192, 169, 144};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {81, 65, 17, 33, 96, 64, 16, 48};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {37, 53, 169, 193, 170, 145};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {82, 66, 18, 34, 81, 65, 17, 33};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {38, 54, 170, 194, 171, 146};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {82, 66, 18, 34, 83, 67, 19, 35};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {39, 55, 171, 195, 172, 147};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {83, 67, 68, 84, 35, 19, 20, 36};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {40, 56, 172, 196, 165, 148};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {36, 20, 68, 84, 29, 13, 61, 77};
+Transfinite Volume{vc};
 
 // Volumes in the middle at zmax
 vc++;  Surface Loop(vc) = {41, 57, 149, 173, 197, 174};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {38, 29, 77, 86, 22, 21, 69, 70};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {42, 58, 150, 174, 198, 175};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {87, 39, 38, 86, 71, 23, 22, 70};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {43, 59, 151, 175, 199, 176};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {88, 40, 39, 87, 72, 24, 23, 71};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {44, 60, 152, 176, 200, 177};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {72, 73, 25, 24, 88, 81, 33, 40};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {45, 68, 153, 177, 201, 178};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {81, 96, 48, 33, 73, 74, 26, 25};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {46, 67, 154, 178, 202, 179};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {96, 95, 47, 48, 74, 75, 27, 26};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {47, 66, 155, 179, 203, 180};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {47, 95, 94, 46, 27, 75, 76, 28};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {48, 65, 156, 180, 204, 173};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {29, 46, 94, 77, 21, 28, 76, 69};
+Transfinite Volume{vc};
 
 Printf("Middle finished with volume %g", vc);
 
-// Volumes in the boundary layer at xmin (like middle at xmin +52 except second column in the lower part?)
+// Volumes in the boundary layer at xmin (like middle
+// at xmin +52 except second column in the lower part?)
 vc++;  Surface Loop(vc) = {73, 105, 181, 205, 229, 206};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {53, 77, 125, 101, 54, 86, 134, 102};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {74, 106, 182, 206, 230, 207};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {55, 87, 86, 54, 103, 135, 134, 102};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {75, 107, 183, 207, 231, 208};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {56, 88, 87, 55, 104, 136, 135, 103};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {76, 108, 184, 208, 232, 209};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {57, 81, 88, 56, 105, 129, 136, 104};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {77, 101, 185, 209, 233, 210};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {106, 130, 82, 58, 105, 129, 81, 57};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {78, 102, 186, 210, 234, 211};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {106, 130, 131, 107, 58, 82, 83, 59};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {79, 103, 187, 211, 235, 212};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {107, 131, 132, 108, 59, 83, 84, 60};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {80, 104, 188, 212, 236, 205};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {60, 84, 132, 108, 53, 77, 125, 101};
+Transfinite Volume{vc};
 
 // Volumes in the boundary layer at xmax
 vc++;  Surface Loop(vc) = {81, 113, 189, 213, 237, 214};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {77, 61, 109, 125, 94, 62, 110, 142};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {82, 114, 190, 214, 238, 215};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {95, 63, 62, 94, 143, 111, 110, 142};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {83, 115, 191, 215, 239, 216};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {96, 64, 63, 95, 144, 112, 111, 143};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {84, 116, 192, 216, 240, 217};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {129, 113, 65, 81, 144, 112, 64, 96};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {85, 101, 193, 217, 241, 218};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {130, 114, 66, 82, 129, 113, 65, 81};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {86, 102, 194, 218, 242, 219};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {130, 114, 115, 131, 82, 66, 67, 83};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {87, 103, 195, 219, 243, 220};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {131, 115, 116, 132, 83, 67, 68, 84};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {88, 104, 196, 220, 244, 213};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {132, 116, 109, 125, 84, 68, 61, 77};
-//+
+Transfinite Volume{vc};
+
 // Volumes in the boundary layer at zmax
 vc++;  Surface Loop(vc) = {89, 105, 197, 221, 245, 222};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {86, 77, 125, 134, 70, 69, 117, 118};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {90, 106, 198, 222, 246, 223};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {135, 87, 86, 134, 119, 71, 70, 118};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {91, 107, 199, 223, 247, 224};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {136, 88, 87, 135, 120, 72, 71, 119};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {92, 108, 200, 224, 248, 225};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {136, 129, 81, 88, 120, 121, 73, 72};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {93, 116, 201, 225, 249, 226};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {129, 144, 96, 81, 121, 122, 74, 73};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {94, 115, 202, 226, 250, 227};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {96, 144, 143, 95, 74, 122, 123, 75};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {95, 114, 203, 227, 251, 228};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {95, 143, 142, 94, 75, 123, 124, 76};
+Transfinite Volume{vc};
 vc++;  Surface Loop(vc) = {96, 113, 204, 228, 252, 221};  Volume(vc) = {vc};
-Transfinite Volume{vc} = {77, 94, 142, 125, 69, 76, 124, 117};
+Transfinite Volume{vc};
 
 Printf("Boundary layer finished with volume %g", vc);
 
-Physical Volume("FLUID") = { 1 : vc };
+wet_volume_last = vc;
+
+//--------------------------------------------------------------------
+//
+// Very important: call Cohrence just before the end - for without it
+// the parallel version will not work properly because the buffers,
+// being based on nodes, will not work if some nodes are duplicated
+//
+//--------------------------------------------------------------------
+Coherence;
+
+// Hide "*";
+// Show {
+//  Point{101}; Point{102}; Point{103}; Point{104}; Point{105}; Point{106}; Point{107}; Point{108}; Point{109}; Point{110}; Point{111}; Point{112}; Point{113}; Point{114}; Point{115}; Point{116}; Point{117}; Point{118}; Point{119}; Point{120}; Point{121}; Point{122}; Point{123}; Point{124}; Point{125}; Point{129}; Point{130}; Point{131}; Point{132}; Point{134}; Point{135}; Point{136}; Point{142}; Point{143}; Point{144}; Point{149}; Point{150}; Point{151}; Point{152}; Point{153}; Point{154}; Point{155}; Point{156}; Point{157}; Point{158}; Point{159}; Point{160}; Point{161}; Point{162}; Point{163}; Point{164}; Point{165}; Point{166}; Point{167}; Point{168}; Point{169}; Point{170}; Point{171}; Point{172}; Point{173}; Point{177}; Point{178}; Point{179}; Point{180}; Point{182}; Point{183}; Point{184}; Point{190}; Point{191}; Point{192}; Curve{217}; Curve{218}; Curve{219}; Curve{220}; Curve{221}; Curve{222}; Curve{223}; Curve{224}; Curve{225}; Curve{226}; Curve{227}; Curve{228}; Curve{229}; Curve{230}; Curve{231}; Curve{232}; Curve{233}; Curve{234}; Curve{235}; Curve{236}; Curve{237}; Curve{238}; Curve{239}; Curve{240}; Curve{245}; Curve{246}; Curve{247}; Curve{248}; Curve{249}; Curve{250}; Curve{251}; Curve{252}; Curve{257}; Curve{258}; Curve{259}; Curve{260}; Curve{282}; Curve{283}; Curve{284}; Curve{285}; Curve{286}; Curve{287}; Curve{288}; Curve{289}; Curve{307}; Curve{308}; Curve{309}; Curve{310}; Curve{311}; Curve{312}; Curve{313}; Curve{314}; Curve{332}; Curve{333}; Curve{334}; Curve{335}; Curve{336}; Curve{337}; Curve{338}; Curve{339}; Curve{340}; Curve{341}; Curve{342}; Curve{343}; Curve{344}; Curve{345}; Curve{346}; Curve{347}; Curve{348}; Curve{349}; Curve{350}; Curve{351}; Curve{352}; Curve{353}; Curve{354}; Curve{355}; Curve{356}; Curve{357}; Curve{358}; Curve{359}; Curve{360}; Curve{361}; Curve{362}; Curve{363}; Curve{364}; Curve{368}; Curve{369}; Curve{370}; Curve{371}; Curve{373}; Curve{374}; Curve{375}; Curve{381}; Curve{382}; Curve{383}; Curve{388}; Curve{389}; Curve{390}; Curve{391}; Curve{392}; Curve{393}; Curve{394}; Curve{395}; Curve{396}; Curve{397}; Curve{398}; Curve{399}; Curve{400}; Curve{401}; Curve{402}; Curve{403}; Curve{404}; Curve{405}; Curve{406}; Curve{407}; Curve{408}; Curve{409}; Curve{410}; Curve{411}; Curve{416}; Curve{417}; Curve{418}; Curve{419}; Curve{420}; Curve{421}; Curve{422}; Curve{423}; Curve{428}; Curve{429}; Curve{430}; Curve{431}; Curve{436}; Curve{437}; Curve{438}; Curve{439}; Curve{440}; Curve{441}; Curve{442}; Curve{443}; Curve{444}; Curve{445}; Curve{446}; Curve{447}; Curve{448}; Curve{449}; Curve{450}; Curve{451}; Curve{452}; Curve{453}; Curve{454}; Curve{455}; Curve{456}; Curve{457}; Curve{458}; Curve{459}; Surface{229}; Surface{230}; Surface{231}; Surface{232}; Surface{233}; Surface{234}; Surface{235}; Surface{236}; Surface{237}; Surface{238}; Surface{239}; Surface{240}; Surface{241}; Surface{242}; Surface{243}; Surface{244}; Surface{245}; Surface{246}; Surface{247}; Surface{248}; Surface{249}; Surface{250}; Surface{251}; Surface{252}; Surface{253}; Surface{254}; Surface{255}; Surface{256}; Surface{257}; Surface{258}; Surface{259}; Surface{260}; Surface{261}; Surface{262}; Surface{263}; Surface{264}; Surface{265}; Surface{266}; Surface{267}; Surface{268}; Surface{269}; Surface{270}; Surface{271}; Surface{272}; Surface{273}; Surface{274}; Surface{275}; Surface{276}; Surface{281}; Surface{282}; Surface{283}; Surface{284}; Surface{285}; Surface{286}; Surface{287}; Surface{288}; Surface{293}; Surface{294}; Surface{295}; Surface{296}; Surface{301}; Surface{302}; Surface{303}; Surface{304}; Surface{305}; Surface{306}; Surface{307}; Surface{308}; Surface{309}; Surface{310}; Surface{311}; Surface{312}; Surface{313}; Surface{314}; Surface{315}; Surface{316}; Surface{317}; Surface{318}; Surface{319}; Surface{320}; Surface{321}; Surface{322}; Surface{323}; Surface{324}; Surface{325}; Surface{326}; Surface{327}; Surface{328}; Surface{329}; Surface{330}; Surface{331}; Surface{332}; Surface{333}; Surface{334}; Surface{335}; Surface{336}; Surface{337}; Surface{338}; Surface{339}; Surface{340}; Surface{341}; Surface{342}; Surface{343}; Surface{344}; Surface{345}; Surface{346}; Surface{347}; Surface{348}; 
+// }
+
+dry_volume_first = vc + 1;
+
+// Volumes in the solid at xmin
+vc++;  Surface Loop(vc) = {253, 325, 285, 301, 229, 302};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {254, 326, 230, 286, 303, 302};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {255, 327, 231, 287, 304, 303};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {256, 328, 288, 304, 232, 305};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {257, 329, 305, 281, 306, 233};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {258, 330, 282, 307, 234, 306};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {259, 331, 283, 235, 308, 307};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {260, 332, 284, 236, 301, 308};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+
+// Volumes in the solid at xmax
+vc++;  Surface Loop(vc) = {261, 333, 293, 309, 237, 310};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {262, 334, 294, 238, 310, 311};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {263, 335, 295, 239, 312, 311};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {264, 336, 296, 312, 313, 240};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {265, 337, 281, 241, 313, 314};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {266, 338, 282, 242, 315, 314};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {267, 339, 283, 243, 316, 315};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {268, 340, 284, 316, 309, 244};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+
+// Volumes in the solid at zmax
+vc++;  Surface Loop(vc) = {341, 269, 318, 317, 285, 245};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {318, 270, 342, 246, 319, 286};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {271, 343, 287, 247, 320, 319};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {272, 344, 288, 321, 248, 320};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {273, 345, 321, 322, 296, 249};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {274, 346, 250, 322, 323, 295};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {275, 347, 324, 323, 251, 294};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+vc++;  Surface Loop(vc) = {276, 348, 317, 252, 293, 324};  Volume(vc) = {vc};
+Transfinite Volume{vc};
+
+dry_volume_last = vc;
+
+Printf("Solid finished with volume %g", vc);
+
+Coherence;
+
+If(FLUID == 1)
+  Physical Volume("FLUID") = { wet_volume_first : wet_volume_last };
+Else
+  For v In { wet_volume_first : wet_volume_last }
+    Recursive Delete {
+      Volume{v};
+    }
+  EndFor
+EndIf
+
+If(SOLID == 1)
+  Physical Volume("SOLID") = { dry_volume_first : dry_volume_last };
+Else
+  For v In { dry_volume_first : dry_volume_last }
+    Recursive Delete {
+      Volume{v};
+    }
+  EndFor
+EndIf
 
 //-------------------------
 //
@@ -836,8 +1161,13 @@ Physical Volume("FLUID") = { 1 : vc };
 //
 //-------------------------
 
-Physical Surface("PIPE_WALL") = { wall_first : wall_last };
+If(FLUID == 1)
+  Physical Surface("WET_WALL") = { wet_wall_first : wet_wall_last };
+EndIf
 
+If(SOLID == 1)
+  Physical Surface("DRY_WALL") = { dry_wall_first : dry_wall_last };
+EndIf
 
 Physical Surface("X_MIN") = {Surface In BoundingBox{-LI-TINY, -HUGE, -HUGE,
                                                     -LI+TINY, +HUGE, +HUGE}};
@@ -847,13 +1177,4 @@ Physical Surface("X_MAX") = {Surface In BoundingBox{+LO-TINY, -HUGE, -HUGE,
 
 Physical Surface("Z_MAX") = {Surface In BoundingBox{-HUGE, -HUGE, LI-TINY,
                                                     +HUGE, +HUGE, LI+TINY}};
-
-//--------------------------------------------------------------------
-//
-// Very important: call Cohrence just before the end - for without it
-// the parallel version will not work properly because the buffers,
-// being based on nodes, will not work if some nodes are duplicated
-//
-//--------------------------------------------------------------------
-// Coherence;
 
