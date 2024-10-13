@@ -158,19 +158,27 @@
   write(fu, '(a, 3z9, a)') "(12 (1 1 ", Grid % n_cells, 1, MIXED_ZONE, ") ("
 
   do c = 1, Grid % n_cells
-    select case (Grid % cells_n_nodes(c))
-      case (4)
-        write(fu, '(z2)', advance="no")  CELL_TETRA
-      case (5)
-        write(fu, '(z2)', advance="no")  CELL_PYRA
-      case (6)
-        write(fu, '(z2)', advance="no")  CELL_WEDGE
-      case (8)
-        write(fu, '(z2)', advance="no")  CELL_HEXA
-      case default
-        PRINT *, 'ERROR!'
-        STOP
-    end select
+
+    ! Take the number of nodes in the cell ...
+    n = Grid % cells_n_nodes(c)
+
+    ! ... and act accordingly
+    if(n .lt. 0) then
+      write(fu, '(z2)', advance="no")  CELL_POLY
+    else if(n .eq. 4) then
+      write(fu, '(z2)', advance="no")  CELL_TETRA
+    else if(n .eq. 5) then
+      write(fu, '(z2)', advance="no")  CELL_PYRA
+    else if(n .eq. 6) then
+      write(fu, '(z2)', advance="no")  CELL_WEDGE
+    else if(n .eq. 8) then
+      write(fu, '(z2)', advance="no")  CELL_HEXA
+    else
+      call Message % Error(80,                                             &
+                           'Unknown cell type and I don''t know why. '//   &
+                           'This error is critical. Exiting!',             &
+                           file=__FILE__, line=__LINE__, one_proc=.true.)
+    end if
   end do
   write(fu, '(a)')  "))"
 
