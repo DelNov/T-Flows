@@ -6,7 +6,12 @@
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION walls
+  BOUNDARY_CONDITION walls_outer
+    TYPE             wall
+    VARIABLES        u     v     w
+    VALUES           0.0   0.0   0.0
+
+  BOUNDARY_CONDITION walls_inner
     TYPE             wall
     VARIABLES        u     v     w
     VALUES           0.0   0.0   0.0
