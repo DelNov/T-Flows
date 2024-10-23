@@ -25,7 +25,7 @@ A = 50.0;
 P = 30.0;
 
 // Height of the volume
-SKY_HIGH    = 500.0;      // max height of the domain
+SKY_HIGH    = 550.0;      // max height of the domain
 URBAN_HIGH  = 175.0;      // height 25.0 above the buildings
 
 DELTA_H_MIN = URBAN_HIGH / N_LAYERS;
@@ -198,7 +198,7 @@ For b In { 1 : n_buildings }
 EndFor
 
 // This experimental algorithm could give better results
-Mesh.Algorithm = 8;
+// Mesh.Algorithm = 8;
 
 // Uncomment the following line to try the full-quad algorithm:
 // Mesh.RecombinationAlgorithm = 2; // or 3
