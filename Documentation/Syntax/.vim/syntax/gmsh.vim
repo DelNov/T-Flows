@@ -13,7 +13,7 @@ syn clear
 "-----------------------
 syn keyword gmshConditional If Else EndIf
 syn keyword gmshRepeat      For EndFor
-syn keyword gmshFunction    Function Return
+syn keyword gmshFunction    Function Macro Return
 
 "-------------
 " (2) Strings
