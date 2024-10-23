@@ -796,6 +796,15 @@
     end do
   end do
 
+
+  !---------------------------!
+  !   Find max z coordinate   !
+  !---------------------------!
+  z_max = -HUGE
+  do n = 1, Grid % n_nodes
+    z_max = max(z_max, Grid % zn(n))
+  end do
+
   !-------------------------------------!
   !   Smooth in the z direction a bit   !
   !-------------------------------------!
@@ -803,7 +812,8 @@
 
     ! Compute averaged z coordinate for each node
     do n = 1, Grid % n_nodes
-      if(nodes_n_nodes(n) > 0) then
+      if(nodes_n_nodes(n) > 0 .and. Grid % zn(n) < z_max) then
+
         z_avg = 0.0
         do i_nod = 1, nodes_n_nodes(n)
           z_avg = z_avg + Grid % zn(nodes_n(i_nod, n))
@@ -815,7 +825,7 @@
 
     ! Perform the actual smoothing
     do n = 1, Grid % n_nodes
-      if(nodes_n_nodes(n) > 0) then
+      if(nodes_n_nodes(n) > 0 .and. Grid % zn(n) < z_max) then
 
         ! No matter how small, some under-relaxation is needed here
         Grid % zn(n) = 0.1 * Grid % zn(n) + 0.9 * z_new(n)
