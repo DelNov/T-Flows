@@ -92,10 +92,10 @@
   !------------------------------------------------------!
   !   Pressure, its gradients, and pressure correction   !
   !------------------------------------------------------!
-  call Backup % Save_Cell_Real(Grid, d, vc, 'press',      Flow % p  % n)
-  call Backup % Save_Cell_Real(Grid, d, vc, 'press_x',    Flow % p  % x)
-  call Backup % Save_Cell_Real(Grid, d, vc, 'press_y',    Flow % p  % y)
-  call Backup % Save_Cell_Real(Grid, d, vc, 'press_z',    Flow % p  % z)
+  call Backup % Save_Cell_Real(Grid, d, vc, 'press',      Flow %  p % n)
+  call Backup % Save_Cell_Real(Grid, d, vc, 'press_x',    Flow %  p % x)
+  call Backup % Save_Cell_Real(Grid, d, vc, 'press_y',    Flow %  p % y)
+  call Backup % Save_Cell_Real(Grid, d, vc, 'press_z',    Flow %  p % z)
   call Backup % Save_Cell_Real(Grid, d, vc, 'press_corr', Flow % pp % n)
 
   !-------------------!
@@ -194,6 +194,29 @@
 
   end if
 
+  !-----------------!
+  !   S-A model     !
+  !-----------------!
+  if(Turb % model .eq. SPALART_ALLMARAS) then
+
+    ! K and epsilon
+    call Backup % Save_Variable(d, vc, 'vis', Turb % vis)
+
+    ! Other turbulent quantities
+    call Backup % Save_Cell_Real(Grid, d, vc, 'y_plus', Turb % y_plus)
+    call Backup % Save_Cell_Real(Grid, d, vc, 'vis_t',  Turb % vis_t )
+    call Backup % Save_Cell_Real(Grid, d, vc, 'vis_w',  Turb % vis_w )
+
+    ! Turbulence quantities connected with heat transfer
+    if(Flow % heat_transfer) then
+      call Backup % Save_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
+    end if
+
+  end if
+
+  !------------------------!
+  !   K-eps-zeta-f model   !
+  !------------------------!
   !----------------------------!
   !   Reynolds stress models   !
   !----------------------------!
