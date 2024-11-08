@@ -301,6 +301,8 @@
            Turb % model .eq. HYBRID_LES_RANS .or.  &
            Turb % model .eq. LES_DYNAMIC     .or.  &
            Turb % model .eq. LES_WALE        .or.  &
+           Turb % model .eq. SPALART_ALLMARAS.or.  &
+           Turb % model .eq. DES_SPALART     .or.  &
            Turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
@@ -457,8 +459,10 @@
 
           ! Wall temperature or heat fluxes for k-eps-zeta-f
           ! and high-re k-eps models. 
-          if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
-             Turb % model .eq. HYBRID_LES_RANS .or.  &
+          if(Turb % model .eq. K_EPS_ZETA_F     .or.  &
+             Turb % model .eq. HYBRID_LES_RANS  .or.  &
+             Turb % model .eq. SPALART_ALLMARAS .or.  &
+             Turb % model .eq. DES_SPALART      .or.  &
              Turb % model .eq. K_EPS) then
 
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
