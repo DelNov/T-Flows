@@ -78,6 +78,8 @@
   ! Effective conductivity at walls
   if(Turb % model .eq. K_EPS           .or.  &
      Turb % model .eq. K_EPS_ZETA_F    .or.  &
+     Turb % model .eq. SPALART_ALLMARAS.or.  &
+     Turb % model .eq. DES_SPALART     .or.  &
      Turb % model .eq. LES_SMAGORINSKY .or.  &
      Turb % model .eq. LES_DYNAMIC     .or.  &
      Turb % model .eq. LES_WALE        .or.  &

@@ -45,6 +45,8 @@
        Turb % model .eq. LES_TVM            .or.  &
        Turb % model .eq. HYBRID_LES_RANS    .or.  &
        Turb % model .eq. HYBRID_LES_PRANDTL .or.  &
+       Turb % model .eq. SPALART_ALLMARAS   .or.  &
+       Turb % model .eq. DES_SPALART        .or.  &
        Turb % model .eq. K_EPS              .or.  &
        Turb % model .eq. K_EPS_ZETA_F) then
       if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &

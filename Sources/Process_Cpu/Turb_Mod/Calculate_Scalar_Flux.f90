@@ -110,8 +110,10 @@
   !   Compute the sources at the walls   !
   !                                      !
   !--------------------------------------!
-  if(Turb % model .eq. K_EPS        .or.  &
-     Turb % model .eq. K_EPS_ZETA_F .or.  &
+  if(Turb % model .eq. K_EPS            .or.  &
+     Turb % model .eq. K_EPS_ZETA_F     .or.  &
+     Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART      .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
 
     do reg = Boundary_Regions()

@@ -31,7 +31,7 @@
       !---------------------------------!
       !   Compute the production term   !
       !---------------------------------!
-      x_rat  = vis % n(c) / Flow % viscosity(c)
+      x_rat  = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
       f_v1   = x_rat**3/(x_rat**3 + c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
       ss     = Flow % vort(c)   &
@@ -52,9 +52,9 @@
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      dif   = c_b2                                       &
-            * Flow % density(c)                          &
-            * (vis % x(c) + vis % y(c) + vis % z(c))**2  &
+      dif   = c_b2                                             &
+            * Flow % density(c)                                &
+            * (vis % x(c)**2 + vis % y(c)**2 + vis % z(c)**2)  &
             / vis % sigma
       b(c)  = b(c) + dif * Grid % vol(c)
     end do
@@ -68,7 +68,7 @@
       !---------------------------------!
       !   Compute the production term   !
       !---------------------------------!
-      x_rat  = vis % n(c) / Flow % viscosity(c)
+      x_rat  = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
       f_v1   = x_rat**3 / (x_rat**3 + c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
       ss     = Flow % vort(c) + vis % n(c) * f_v2 / (kappa**2 * dist**2)
@@ -87,9 +87,9 @@
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      dif   = c_b2                                       &
-            * Flow % density(c)                          &
-            * (vis % x(c) + vis % y(c) + vis % z(c))**2  &
+      dif   = c_b2                                             &
+            * Flow % density(c)                                &
+            * (vis % x(c)**2 + vis % y(c)**2 + vis % z(c)**2)  &
             / vis % sigma
       b(c)  = b(c) + dif * Grid % vol(c)
     end do
