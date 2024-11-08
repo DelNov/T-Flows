@@ -10,7 +10,7 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  logical                  :: bckp
+  logical                  :: bckp, present
 !-----------------------------------[Locals]-----------------------------------!
   type(Comm_Type), pointer :: Comm
   type(Grid_Type), pointer :: Grid
@@ -19,7 +19,6 @@
   character(SL)            :: name_in, answer, name_mean
   integer                  :: vc, sc, ts
   integer(DP)              :: d
-  logical                  :: present
   real                     :: st  ! saved time, simulation time
 !==============================================================================!
 
@@ -117,10 +116,10 @@
   !------------------------------------------------------!
   !   Pressure, its gradients, and pressure correction   !
   !------------------------------------------------------!
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press',      Flow % p  % n)
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press_x',    Flow % p  % x)
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press_y',    Flow % p  % y)
-  call Backup % Load_Cell_Real(Grid, d, vc, 'press_z',    Flow % p  % z)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press',      Flow % p % n)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press_x',    Flow % p % x)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press_y',    Flow % p % y)
+  call Backup % Load_Cell_Real(Grid, d, vc, 'press_z',    Flow % p % z)
   call Backup % Load_Cell_Real(Grid, d, vc, 'press_corr', Flow % pp % n)
   call Flow % Grad_Pressure(Flow % pp)
 
@@ -219,6 +218,25 @@
       call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
     end if
 
+  end if
+
+  !-----------------!
+  !   S-A model     !
+  !-----------------!
+  if(Turb % model .eq. SPALART_ALLMARAS) then
+
+    ! K and epsilon
+    call Backup % Load_Variable(d, vc, 'vis', Flow, Turb % vis)
+
+    ! Other turbulent quantities
+    call Backup % Load_Cell_Real(Grid, d, vc, 'y_plus', Turb % y_plus)
+    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_t',  Turb % vis_t )
+    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_w',  Turb % vis_w )
+
+    ! Turbulence quantities connected with heat transfer
+    if(Flow % heat_transfer) then
+      call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
+    end if
   end if
 
   !----------------------------!
