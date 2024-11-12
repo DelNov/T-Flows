@@ -229,7 +229,7 @@
 
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
-    call Turb % Src_Vis_Spalart_Almaras(Sol)
+    call Turb % Src_Vis_Spalart_Allmaras(Sol)
   end if
 
   !---------------------------------!

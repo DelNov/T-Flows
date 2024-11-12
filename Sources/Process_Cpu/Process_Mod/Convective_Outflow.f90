@@ -249,9 +249,9 @@
 
   end if
 
-  !---------------------!
-  !   Spalart-Almaras   !
-  !---------------------!
+  !----------------------!
+  !   Spalart-Allmaras   !
+  !----------------------!
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
 

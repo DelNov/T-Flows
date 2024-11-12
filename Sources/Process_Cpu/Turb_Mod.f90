@@ -187,7 +187,7 @@
       procedure, private :: Src_Rsm_Hanjalic_Jakirlic
       procedure, private :: Src_Rsm_Manceau_Hanjalic
       procedure, private :: Src_T2
-      procedure, private :: Src_Vis_Spalart_Almaras
+      procedure, private :: Src_Vis_Spalart_Allmaras
       procedure, private :: Src_Zeta_K_Eps_Zeta_F
 
       ! Computation of turbulence viscosity
@@ -331,7 +331,7 @@
 #   include "Turb_Mod/Src_Rsm_Hanjalic_Jakirlic.f90"
 #   include "Turb_Mod/Src_Rsm_Manceau_Hanjalic.f90"
 #   include "Turb_Mod/Src_T2.f90"
-#   include "Turb_Mod/Src_Vis_Spalart_Almaras.f90"
+#   include "Turb_Mod/Src_Vis_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90"
 
     ! Computation of turbulence viscosity

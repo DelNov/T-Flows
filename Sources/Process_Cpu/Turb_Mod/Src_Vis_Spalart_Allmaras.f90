@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Src_Vis_Spalart_Almaras(Turb, Sol)
+  subroutine Src_Vis_Spalart_Allmaras(Turb, Sol)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
