@@ -104,14 +104,14 @@
 
   ! Inertial and advection terms
   if(comp .eq. 1) then
-    call Process % Add_Inertial_Term (Grid, Flow, Flow % u, flow_density)
-    call Process % Add_Advection_Term(Grid, Flow, Flow % u, flow_density)
+    call Flow % Add_Inertial_Term (Grid, Flow % u, flow_density)
+    call Flow % Add_Advection_Term(Grid, Flow % u, flow_density)
   else if(comp .eq. 2) then
-    call Process % Add_Inertial_Term (Grid, Flow, Flow % v, flow_density)
-    call Process % Add_Advection_Term(Grid, Flow, Flow % v, flow_density)
+    call Flow % Add_Inertial_Term (Grid, Flow % v, flow_density)
+    call Flow % Add_Advection_Term(Grid, Flow % v, flow_density)
   else if(comp .eq. 3) then
-    call Process % Add_Inertial_Term (Grid, Flow, Flow % w, flow_density)
-    call Process % Add_Advection_Term(Grid, Flow, Flow % w, flow_density)
+    call Flow % Add_Inertial_Term (Grid, Flow % w, flow_density)
+    call Flow % Add_Advection_Term(Grid, Flow % w, flow_density)
   end if
 
   ! Pressure force

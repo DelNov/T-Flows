@@ -87,8 +87,8 @@
   call Process % Insert_Energy_Bc(Grid, Flow)
 
   ! Inertial and advection terms
-  call Process % Add_Inertial_Term (Grid, Flow, Flow % t, dens_capa)
-  call Process % Add_Advection_Term(Grid, Flow, Flow % t, dens_capa)
+  call Flow % Add_Inertial_Term (Grid, Flow % t, dens_capa)
+  call Flow % Add_Advection_Term(Grid, Flow % t, dens_capa)
 
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !

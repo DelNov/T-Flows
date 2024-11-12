@@ -30,10 +30,6 @@
       ! Splash screen
       procedure :: Logo_Pro
 
-      ! General conservation equation
-      procedure :: Add_Advection_Term
-      procedure :: Add_Inertial_Term
-
       ! Related to momentum conservation
       procedure :: Compute_Momentum
       procedure :: Form_Momentum_Matrix
@@ -61,10 +57,6 @@
 
     ! Splash screen
 #   include "Process_Mod/Logo_Pro.f90"
-
-    ! General conservation equation
-#   include "Process_Mod/Add_Advection_Term.f90"
-#   include "Process_Mod/Add_Inertial_Term.f90"
 
     ! Related to momentum conservation
 #   include "Process_Mod/Compute_Momentum.f90"
