@@ -45,17 +45,17 @@
   fin_res = 0.0
 
   if(comp .eq. 1) then
-    ui_n  => flow_u_n
-    ui_o  => flow_u_o
-    ui_oo => flow_u_oo
+    ui_n  => Flow % u % n
+    ui_o  => Flow % u % o
+    ui_oo => Flow % u % oo
   else if(comp .eq. 2) then
-    ui_n  => flow_v_n
-    ui_o  => flow_v_o
-    ui_oo => flow_v_oo
+    ui_n  => Flow % v % n
+    ui_o  => Flow % v % o
+    ui_oo => Flow % v % oo
   else if(comp .eq. 3) then
-    ui_n  => flow_w_n
-    ui_o  => flow_w_o
-    ui_oo => flow_w_oo
+    ui_n  => Flow % w % n
+    ui_o  => Flow % w % o
+    ui_oo => Flow % w % oo
   end if
 
   ! Tolerances and under-relaxations are the same for all components
@@ -116,14 +116,14 @@
 
   ! Inertial and advection terms
   if(comp .eq. 1) then
-    call Flow % Add_Inertial_Term (Grid, Flow % u, flow_density)
-    call Flow % Add_Advection_Term(Grid, Flow % u, flow_density)
+    call Flow % Add_Inertial_Term (Grid, Flow % u, Flow % density)
+    call Flow % Add_Advection_Term(Grid, Flow % u, Flow % density)
   else if(comp .eq. 2) then
-    call Flow % Add_Inertial_Term (Grid, Flow % v, flow_density)
-    call Flow % Add_Advection_Term(Grid, Flow % v, flow_density)
+    call Flow % Add_Inertial_Term (Grid, Flow % v, Flow % density)
+    call Flow % Add_Advection_Term(Grid, Flow % v, Flow % density)
   else if(comp .eq. 3) then
-    call Flow % Add_Inertial_Term (Grid, Flow % w, flow_density)
-    call Flow % Add_Advection_Term(Grid, Flow % w, flow_density)
+    call Flow % Add_Inertial_Term (Grid, Flow % w, Flow % density)
+    call Flow % Add_Advection_Term(Grid, Flow % w, Flow % density)
   end if
 
   ! Pressure force

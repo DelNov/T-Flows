@@ -49,7 +49,7 @@
   !-----------------------------------------------!
   !   Initialize density and efficent viscosity   !
   !-----------------------------------------------!
-  dens => flow_density
+  dens => Flow % density
 
   ! Just copy molecular viscosity to effective
   !$acc parallel loop independent  &

@@ -49,12 +49,12 @@
   !-----------------------------------------------!
   !   Initialize density and efficent viscosity   !
   !-----------------------------------------------!
-  dens => flow_density
+  dens => Flow % density
 
   ! Just copy molecular viscosity to effective
   !$tf-acc loop begin
   do c = Cells_In_Domain_And_Buffers()
-    visc_eff(c) = flow_viscosity(c)
+    visc_eff(c) = Flow % viscosity(c)
   end do
   !$tf-acc loop end
 

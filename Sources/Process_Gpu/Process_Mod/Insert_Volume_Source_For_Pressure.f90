@@ -46,8 +46,8 @@
   ! Take some aliases
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
-  b        => Flow % Nat % b
-  fc       => Flow % Nat % C % fc
+  b  => Flow % Nat % b
+  fc => Flow % Nat % C % fc
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'P')
@@ -57,9 +57,9 @@
   p_x => Flow % phi_x
   p_y => Flow % phi_y
   p_z => Flow % phi_z
-  u_n => flow_u_n
-  v_n => flow_v_n
-  w_n => flow_w_n
+  u_n => Flow % u % n
+  v_n => Flow % v % n
+  w_n => Flow % w % n
 
   ! Nullify the volume source
   !$acc parallel loop independent  &

@@ -46,8 +46,8 @@
   ! Take some aliases
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
-  b        => Flow % Nat % b
-  fc       => Flow % Nat % C % fc
+  b  => Flow % Nat % b
+  fc => Flow % Nat % C % fc
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'P')
@@ -57,9 +57,9 @@
   p_x => Flow % phi_x
   p_y => Flow % phi_y
   p_z => Flow % phi_z
-  u_n => flow_u_n
-  v_n => flow_v_n
-  w_n => flow_w_n
+  u_n => Flow % u % n
+  v_n => Flow % v % n
+  w_n => Flow % w % n
 
   ! Nullify the volume source
   !$tf-acc loop begin
@@ -161,16 +161,16 @@
 
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
-    u_f = Face_Value(s, u_n(c1)+p_x(c1) * flow_v_m(c1),  u_n(c2)+p_x(c2) * flow_v_m(c2))
-    v_f = Face_Value(s, v_n(c1)+p_y(c1) * flow_v_m(c1),  v_n(c2)+p_y(c2) * flow_v_m(c2))
-    w_f = Face_Value(s, w_n(c1)+p_z(c1) * flow_v_m(c1),  w_n(c2)+p_z(c2) * flow_v_m(c2))
+    u_f = Face_Value(s, u_n(c1)+p_x(c1) * Flow % v_m(c1),  u_n(c2)+p_x(c2) * Flow % v_m(c2))
+    v_f = Face_Value(s, v_n(c1)+p_y(c1) * Flow % v_m(c1),  v_n(c2)+p_y(c2) * Flow % v_m(c2))
+    w_f = Face_Value(s, w_n(c1)+p_z(c1) * Flow % v_m(c1),  w_n(c2)+p_z(c2) * Flow % v_m(c2))
 
 
     ! This is a bit of a code repetition, the
     ! same thing is in the Form_Pressure_Matrix
     ! Anyhow, units are given here are
     !  Units: m * m^3 s / kg = m^4 s / kg
-    a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+    a12 = fc(s) * Face_Value(s, Flow % v_m(c1), Flow % v_m(c2))
 
     ! Volume flux without the cell-centered pressure gradient
     ! but with the staggered pressure difference
