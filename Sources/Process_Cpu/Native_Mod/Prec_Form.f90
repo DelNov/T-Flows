@@ -48,6 +48,7 @@
     !$omp parallel do private(i) shared (d, a_val, a_dia)
     do i = 1, ni
       d(i) = a_val(a_dia(i))
+      d_inv(i) = 1.0 / d(i)
     end do
     !$omp end parallel do
 

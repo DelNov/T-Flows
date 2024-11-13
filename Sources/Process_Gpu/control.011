@@ -61,8 +61,10 @@
   SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
   SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
 
+  PRECONDITIONER_FOR_SYSTEM_MATRIX         jacobi
+
   MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   4
-  BLEND_SYSTEM_MATRICES                    no
+  BLEND_SYSTEM_MATRICES                    yes
 
 #--------------------
 # Initial conditions
