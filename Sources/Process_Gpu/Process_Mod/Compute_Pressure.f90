@@ -50,10 +50,11 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b,  &
+                       Flow % pp % miter, n, tol, fin_res)
   call Profiler % Stop('CG_for_Pressure')
 
-  call Info % Iter_Fill_At(1, 4, 'PP', fin_res, n)
+  call Info % Iter_Fill_At(1, 4, Flow % pp % name, fin_res, n)
 
   !-------------------------------!
   !   Update the pressure field   !

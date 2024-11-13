@@ -132,7 +132,8 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Acon, Aval, flow_t_n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, Flow % t % n, b,  &
+                      Flow % t % miter, n, tol, fin_res)
   call Profiler % Stop('CG_for_Energy')
 
 # if T_FLOWS_DEBUG == 1
@@ -141,7 +142,7 @@
                                scalar_cell=flow_t_n)
 # endif
 
-  call Info % Iter_Fill_At(1, 6, 'T', fin_res, n)
+  call Info % Iter_Fill_At(1, 6, Flow % t % name, fin_res, n)
 
   call Work % Disconnect_Real_Cell(dens_capa)
 

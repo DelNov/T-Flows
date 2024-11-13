@@ -132,12 +132,13 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(Acon, Aval, ui_n, b, nc, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, ui_n, b,  &
+                       Flow % u % miter, n, tol, fin_res)
   call Profiler % Stop('CG_for_Momentum')
 
-  if(comp.eq.1) call Info % Iter_Fill_At(1, 1, 'U', fin_res, n)
-  if(comp.eq.2) call Info % Iter_Fill_At(1, 2, 'V', fin_res, n)
-  if(comp.eq.3) call Info % Iter_Fill_At(1, 3, 'W', fin_res, n)
+  if(comp.eq.1) call Info % Iter_Fill_At(1, 1, Flow % u % name, fin_res, n)
+  if(comp.eq.2) call Info % Iter_Fill_At(1, 2, Flow % v % name, fin_res, n)
+  if(comp.eq.3) call Info % Iter_Fill_At(1, 3, Flow % w % name, fin_res, n)
 
   call Profiler % Stop('Compute_Momentum')
 
