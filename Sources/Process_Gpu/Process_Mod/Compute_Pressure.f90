@@ -33,7 +33,7 @@
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
   !-----------------------------------------------!
-  call Process % Form_Pressure_Matrix(Acon, Aval, Flow, Grid)
+  call Process % Form_Pressure_Matrix(Aval, Flow, Grid)
 
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !

@@ -76,7 +76,7 @@
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
-  call Process % Form_Energy_Matrix(Grid, Flow, Turb, Acon, Aval,  &
+  call Process % Form_Energy_Matrix(Grid, Flow, Turb, Aval,  &
                                     urf, dt=Flow % dt)
 
   !----------------------------------------------------------!

@@ -48,12 +48,18 @@
     ui % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control % Blending_Coefficient_For_Momentum    (ui % blend)
     call Control % Simple_Underrelaxation_For_Momentum  (ui % urf)
+    call Control % Blend_System_Matrices(ui % blend_matrix, .false.)
   end do
 
   !-------------------------!
   !   Related to pressure   !
   !-------------------------!
   call Control % Simple_Underrelaxation_For_Pressure(Flow % pp % urf)
+  call Control % Blend_System_Matrices(Flow % pp % blend_matrix, .false.)
+
+  !------------------------------!
+  !   Related to wall distance   ! (nothing yet)
+  !------------------------------!
 
   !------------------------------!
   !   Related to heat transfer   !
@@ -63,6 +69,7 @@
     Flow % t % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control % Blending_Coefficient_For_Energy  (Flow % t % blend)
     call Control % Simple_Underrelaxation_For_Energy(Flow % t % urf)
+    call Control % Blend_System_Matrices(Flow % t % blend_matrix, .false.)
   end if
 
   !--------------------------------!
@@ -74,6 +81,7 @@
     phi % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
     call Control % Blending_Coefficient_For_Scalars            (phi % blend)
     call Control % Simple_Underrelaxation_For_Scalars          (phi % urf)
+    call Control % Blend_System_Matrices(phi % blend_matrix, .false.)
   end do
 
   end subroutine

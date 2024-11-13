@@ -26,9 +26,15 @@
   blend =  Flow % u % blend
 
   !-------------------------------------------!
+  !                                           !
   !   Browse through all the interior cells   !
   !      (This can be accelerted on GPU)      !
+  !                                           !
   !-------------------------------------------!
+
+  !------------------------------------------------------!
+  !   "High" order scheme.  (High is higher than one.)   !
+  !------------------------------------------------------!
 
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present (this wasn't independent)
@@ -63,6 +69,44 @@
     b(c1) = b_tmp
   end do
   !$tf-acc loop end
+
+  !--------------------------!
+  !   Plain upwind sources   !
+  !--------------------------!
+  if(phi % blend_matrix) then
+
+    !$tf-acc loop begin
+    do c1 = Cells_In_Domain()  ! all present (this wasn't independent)
+      b_tmp = b(c1)
+
+      do i_cel = 1, Grid % cells_n_cells(c1)
+        c2 = Grid % cells_c(i_cel, c1)
+        s  = Grid % cells_f(i_cel, c1)
+        if(c2 .gt. 0) then
+
+          ! Value of the coefficient at the cel face
+          coef_f = Face_Value(s, coef(c1), coef(c2))
+
+          ! Coefficient multiplied with variable, with upwind blending
+          coef_phi1 = coef_f * phi_n(c1)
+          coef_phi2 = coef_f * phi_n(c2)
+
+          b_tmp = b_tmp  &
+                + coef_phi1 * max(Flow % v_flux % n(s),0.0) * merge(1,0,c1.lt.c2)
+          b_tmp = b_tmp  &
+                + coef_phi2 * min(Flow % v_flux % n(s),0.0) * merge(1,0,c1.lt.c2)
+          b_tmp = b_tmp  &
+                - coef_phi2 * max(Flow % v_flux % n(s),0.0) * merge(1,0,c1.gt.c2)
+          b_tmp = b_tmp  &
+                - coef_phi1 * min(Flow % v_flux % n(s),0.0) * merge(1,0,c1.gt.c2)
+        end if
+      end do
+
+      b(c1) = b_tmp
+    end do
+    !$tf-acc loop end
+
+  end if
 
   !-------------------------------------------!
   !   Browse through all the boundary cells   !

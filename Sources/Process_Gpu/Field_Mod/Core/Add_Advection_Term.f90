@@ -26,9 +26,15 @@
   blend =  Flow % u % blend
 
   !-------------------------------------------!
+  !                                           !
   !   Browse through all the interior cells   !
   !      (This can be accelerted on GPU)      !
+  !                                           !
   !-------------------------------------------!
+
+  !------------------------------------------------------!
+  !   "High" order scheme.  (High is higher than one.)   !
+  !------------------------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(  &
@@ -76,6 +82,57 @@
     b(c1) = b_tmp
   end do
   !$acc end parallel
+
+  !--------------------------!
+  !   Plain upwind sources   !
+  !--------------------------!
+  if(phi % blend_matrix) then
+
+    !$acc parallel loop independent  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   b,  &
+    !$acc   grid_cells_n_cells,  &
+    !$acc   grid_cells_c,  &
+    !$acc   grid_cells_f,  &
+    !$acc   coef,  &
+    !$acc   phi_n,  &
+    !$acc   flow_v_flux_n   &
+    !$acc )
+    do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present (this wasn't independent)
+      b_tmp = b(c1)
+
+    !$acc loop seq
+      do i_cel = 1, grid_cells_n_cells(c1)
+        c2 = grid_cells_c(i_cel, c1)
+        s  = grid_cells_f(i_cel, c1)
+        if(c2 .gt. 0) then
+
+          ! Value of the coefficient at the cel face
+          coef_f = Face_Value(s, coef(c1), coef(c2))
+
+          ! Coefficient multiplied with variable, with upwind blending
+          coef_phi1 = coef_f * phi_n(c1)
+          coef_phi2 = coef_f * phi_n(c2)
+
+          b_tmp = b_tmp  &
+                + coef_phi1 * max(flow_v_flux_n(s),0.0) * merge(1,0,c1.lt.c2)
+          b_tmp = b_tmp  &
+                + coef_phi2 * min(flow_v_flux_n(s),0.0) * merge(1,0,c1.lt.c2)
+          b_tmp = b_tmp  &
+                - coef_phi2 * max(flow_v_flux_n(s),0.0) * merge(1,0,c1.gt.c2)
+          b_tmp = b_tmp  &
+                - coef_phi1 * min(flow_v_flux_n(s),0.0) * merge(1,0,c1.gt.c2)
+        end if
+      end do
+    !$acc end loop
+
+      b(c1) = b_tmp
+    end do
+    !$acc end parallel
+
+  end if
 
   !-------------------------------------------!
   !   Browse through all the boundary cells   !

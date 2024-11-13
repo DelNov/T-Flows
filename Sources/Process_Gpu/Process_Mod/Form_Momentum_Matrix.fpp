@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb, Acon, Aval,  &
+  subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb, Aval,  &
                                   urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
@@ -8,7 +8,6 @@
   type(Grid_Type), intent(in), target :: Grid
   type(Field_Type),            target :: Flow
   type(Turb_Type),             target :: Turb
-  type(Sparse_Con_Type),       target :: Acon
   type(Sparse_Val_Type),       target :: Aval
   real                                :: urf
   real,  optional, intent(in)         :: dt       !! time step
@@ -17,7 +16,7 @@
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: dens(:), visc_eff(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12
+  real                           :: a12, a21, fl, cfs
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -27,20 +26,19 @@
 
   call Profiler % Start('Form_Momentum_Matrix')
 
-  !------------------------------------------------------------!
-  !   First take some aliases, which is quite elaborate here   !
-  !------------------------------------------------------------!
-
-  ! If each varible uses its own matrix
+  ! If each varible uses its own matrix and this matrix was already formed
   if(.not. Flow % Nat % use_one_matrix) then
     if(Flow % Nat % A(MATRIX_UVW) % formed) return
   end if
 
+  !-----------------------!
+  !   Take some aliases   !
+  !-----------------------!
   val => Aval % val
-  dia => Acon % dia
-  pos => Acon % pos
-  fc  => Acon % fc
-  nz  =  Acon % nonzeros
+  dia => Flow % Nat % C % dia
+  pos => Flow % Nat % C % pos
+  fc  => Flow % Nat % C % fc
+  nz  =  Flow % Nat % C % nonzeros
 
   call Work % Connect_Real_Cell(visc_eff)
 
@@ -79,10 +77,15 @@
   !$acc end parallel
 
   !--------------------------------------------------!
+  !                                                  !
   !   Compute neighbouring coefficients over cells   !
+  !                                                  !
   !--------------------------------------------------!
 
-  ! Coefficients inside the domain
+  !------------------------------------!
+  !   Coefficients inside the domain   !
+  !------------------------------------!
+
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
 
@@ -90,21 +93,69 @@
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
 
-      ! Coefficients inside the domain
       if(c2 .gt. 0) then
+
         a12 = Face_Value(s, visc_eff(c1), visc_eff(c2)) * fc(s)
+        a21 = a12
+
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
-          val(pos(2,s)) = -a12
+          val(pos(2,s)) = -a21
         end if
+
+        ! Update only diaginal at c1 to avoid race conditions
         val(dia(c1)) = val(dia(c1)) + a12
+
       end if
     end do
 
   end do
   !$tf-acc loop end
 
-  ! Coefficients on the boundaries
+  !---------------------------------------!
+  !   Upwind blending inside the domain   !
+  !---------------------------------------!
+  if(Flow % u % blend_matrix) then
+
+  !$tf-acc loop begin
+  do c1 = Cells_In_Domain()  ! all present
+
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      s  = Grid % cells_f(i_cel, c1)
+      fl = Flow % v_flux % n(s)
+
+      if(c2 .gt. 0) then
+
+        cfs = Face_Value(s, dens(c1), dens(c2))
+        a12 = 0.0
+        a21 = 0.0
+
+        if(c1 .lt. c2) then
+          if(fl > 0.0) a21 = a21 + fl * cfs
+          if(fl < 0.0) a12 = a12 - fl * cfs
+          val(pos(1,s)) = val(pos(1,s)) - a12
+          val(pos(2,s)) = val(pos(2,s)) - a21
+        end if
+
+        if(c1 .gt. c2) then
+          if(fl > 0.0) a12 = a12 + fl * cfs
+        end if
+
+        ! Update only diaginal at c1 to avoid race conditions
+        val(dia(c1)) = val(dia(c1)) + a12
+
+      end if
+    end do
+
+  end do
+  !$tf-acc loop end
+
+  end if
+
+  !------------------------------------!
+  !   Coefficients on the boundaries   !
+  !------------------------------------!
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. WALLFL  .or.  &
@@ -122,7 +173,9 @@
   end do
 
   !------------------------------------!
+  !                                    !
   !   Take care of the unsteady term   !
+  !                                    !
   !------------------------------------!
   if(present(dt)) then
     !$tf-acc loop begin
@@ -146,8 +199,10 @@
   call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
 
   !-------------------------------------!
+  !                                     !
   !   Part 1 of the under-relaxation    !
   !   (Part 2 is in Compute_Momentum)   !
+  !                                     !
   !-------------------------------------!
   !$tf-acc loop begin
   do c = Cells_In_Domain()  ! all present, was independent

@@ -62,6 +62,7 @@
   SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
 
   MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   4
+  BLEND_SYSTEM_MATRICES                    no
 
 #--------------------
 # Initial conditions

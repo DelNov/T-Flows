@@ -88,7 +88,7 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Acon, Aval,  &
+    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval,  &
                                         urf, dt = Flow % dt)
   end if
 

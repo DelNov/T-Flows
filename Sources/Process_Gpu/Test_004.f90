@@ -98,7 +98,7 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Acon, Aval, 1.0)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, 1.0)
   call Process % Insert_Momentum_Bc(Grid, Flow, comp=1)
 
   !-----------------------------------------------!
