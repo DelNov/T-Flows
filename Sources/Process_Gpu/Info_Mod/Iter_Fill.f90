@@ -27,7 +27,7 @@
 
     c = 5  ! a column
     write(Info % iter % line(1)((c-1)*L_BOX+3 :  &
-                                (c-1)*L_BOX+7),    '(a5)') ' VOL:'
+                                (c-1)*L_BOX+7),    '(a5)') 'VOL :'
 
   end if
 
