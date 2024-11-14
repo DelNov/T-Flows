@@ -131,6 +131,7 @@
       !   Core functionality   !
       !------------------------!
       procedure :: Add_Advection_Term
+      procedure :: Add_Cross_Diffusion_Term
       procedure :: Add_Inertial_Term
       procedure :: Create_Field
 
@@ -166,6 +167,7 @@
     !   Core functionality   !
     !------------------------!
 #   include "Field_Mod/Core/Add_Advection_Term.f90"
+#   include "Field_Mod/Core/Add_Cross_Diffusion_Term.f90"
 #   include "Field_Mod/Core/Add_Inertial_Term.f90"
 #   include "Field_Mod/Core/Create_Field.f90"
 

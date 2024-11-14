@@ -17,9 +17,9 @@
   type(Sparse_Val_Type), pointer :: Aval
   type(Grid_Type)                :: Grid  ! computational grid
   type(Field_Type),       target :: Flow  ! flow field
-  type(Turb_Type)                :: Turb
-  real,      contiguous, pointer :: b(:), x(:)
-  integer                        :: nc, n
+  type(Turb_Type), target        :: Turb
+  real,      contiguous, pointer :: b(:), x(:), coef(:)
+  integer                        :: nc, nb, n
   real                           :: fin_res
   character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
@@ -78,6 +78,7 @@
   Aval => Flow % Nat % A(MATRIX_UVW)
   b    => Flow % Nat % b
   x    => Flow % u % n
+  coef => Turb % vis_t
 
   ! Initialize solution (start from 1 not to overwrite boundary conditions)
   x(1:nc) = 0.0
@@ -87,6 +88,7 @@
   call Gpu % Sparse_Val_Copy_To_Device(Aval)
   call Gpu % Vector_Real_Copy_To_Device(x)
   call Gpu % Vector_Real_Copy_To_Device(b)
+  call Gpu % Vector_Real_Create_On_Device(coef)
 
   ! Allocate vectors related to CG algorithm on the device
   call Gpu % Native_Copy_To_Device(Flow % Nat)
@@ -98,7 +100,7 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, 1.0)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, coef, 1.0)
   call Process % Insert_Momentum_Bc(Grid, Flow, comp=1)
 
   !-----------------------------------------------!
@@ -126,6 +128,7 @@
   call Gpu % Sparse_Val_Destroy_On_Device(Aval)
   call Gpu % Vector_Real_Destroy_On_Device(x)
   call Gpu % Vector_Real_Destroy_On_Device(b)
+  call Gpu % Vector_Real_Destroy_On_Device(coef)
 
   call Gpu % Native_Destroy_On_Device(Flow % Nat)
 

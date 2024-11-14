@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb, Aval,  &
-                                  urf, dt)
+                                  visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -9,12 +9,14 @@
   type(Field_Type),            target :: Flow
   type(Turb_Type),             target :: Turb
   type(Sparse_Val_Type),       target :: Aval
+  real                                :: visc_eff(-Grid % n_bnd_cells &
+                                                  :Grid % n_cells)
   real                                :: urf
   real,  optional, intent(in)         :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  real,      contiguous, pointer :: dens(:), visc_eff(:)
+  real,      contiguous, pointer :: dens(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12, a21, fl, cfs
 # if T_FLOWS_DEBUG == 1
@@ -39,8 +41,6 @@
   pos => Flow % Nat % C % pos
   fc  => Flow % Nat % C % fc
   nz  =  Flow % Nat % C % nonzeros
-
-  call Work % Connect_Real_Cell(visc_eff)
 
   Assert(urf > 0.0)
 
@@ -227,8 +227,6 @@
                              inside_name="v_m",  &
                              inside_cell=temp)
 # endif
-
-  call Work % Disconnect_Real_Cell(visc_eff)
 
   call Profiler % Stop('Form_Momentum_Matrix')
 

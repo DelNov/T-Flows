@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb, Aval, urf, dt)
+  subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb, Aval,  &
+                                cond_eff, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -8,13 +9,14 @@
   type(Field_Type),              target :: Flow
   type(Turb_Type),               target :: Turb
   type(Sparse_Val_Type),         target :: Aval
+  real                                  :: cond_eff(-Grid % n_bnd_cells &
+                                                    :Grid % n_cells)
   real                                  :: urf
   real,    optional, intent(in)         :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: dens_capa(:)
-  real,      contiguous, pointer :: cond_eff(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12, a21, fl, cfs
 # if T_FLOWS_DEBUG == 1
@@ -40,7 +42,7 @@
   fc  => Flow % Nat % C % fc
   nz  =  Flow % Nat % C % nonzeros
 
-  call Work % Connect_Real_Cell(cond_eff, dens_capa)
+  call Work % Connect_Real_Cell(dens_capa)
 
   Assert(urf > 0.0)
 
@@ -205,7 +207,7 @@
   !-------------------------------!
   Aval % formed = .true.
 
-  call Work % Disconnect_Real_Cell(cond_eff, dens_capa)
+  call Work % Disconnect_Real_Cell(dens_capa)
 
   call Profiler % Stop('Form_Energy_Matrix')
 

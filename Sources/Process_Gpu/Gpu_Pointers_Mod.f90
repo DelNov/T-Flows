@@ -37,6 +37,7 @@
   real, contiguous, pointer :: flow_v_n(:), flow_v_o(:), flow_v_oo(:)
   real, contiguous, pointer :: flow_w_n(:), flow_w_o(:), flow_w_oo(:)
   real, contiguous, pointer :: flow_p_n(:), flow_pp_n(:), flow_v_m(:)
+  real, contiguous, pointer :: flow_phi_x(:), flow_phi_y(:), flow_phi_z(:)
   real, contiguous, pointer :: flow_shear(:), flow_vort(:), flow_v_flux_n(:)
   real, contiguous, pointer :: flow_grad_c2c(:,:)
   real, contiguous, pointer :: flow_density(:),  flow_viscosity(:)

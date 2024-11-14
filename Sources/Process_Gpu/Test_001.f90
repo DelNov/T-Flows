@@ -16,12 +16,12 @@
 !------------------------------------------------------------------------------!
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
-  real, allocatable              :: b(:), c(:)
+  real, allocatable              :: b(:), c(:), coef(:)
   type(Grid_Type)                :: Grid
   type(Field_Type),       target :: Flow            ! flow field
   type(Turb_Type)                :: Turb
   integer,             parameter :: N_STEPS = 1200  ! spend some time on device
-  integer                        :: nc, ni, step
+  integer                        :: nc, nb, ni, step
   character(len=11)              :: root_control = 'control.001'
 !==============================================================================!
 
@@ -41,6 +41,7 @@
 
   nc = Grid % n_cells
   ni = Grid % n_cells - Grid % Comm % n_buff_cells
+  nb = Grid % n_bnd_cells
   O_Print '(a,i12)', ' # The problem size is: ', ni
 
 # if T_FLOWS_GPU == 1
@@ -59,7 +60,7 @@
   call Read_Control % Physical_Properties(Grid, Flow)
 
   ! Discretize the matrix for diffusion
-  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, 1.0)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, coef, 1.0)
 
   ! Take the alias now
   Acon => Flow % Nat % C
@@ -67,6 +68,7 @@
 
   allocate(b(nc))
   allocate(c(nc))
+  allocate(coef(-nb:nc))
 
   ! Fill up the right-hand side vector up to buffers
   b(1:nc) = 0.0
@@ -78,6 +80,7 @@
   call Gpu % Sparse_Val_Copy_To_Device(Aval)
   call Gpu % Vector_Real_Copy_To_Device(b)
   call Gpu % Vector_Real_Create_On_Device(c)
+  call Gpu % Vector_Real_Create_On_Device(coef)
 
   !-----------------------------------------------!
   !   Performing a fake time loop on the device   !
@@ -102,6 +105,7 @@
   call Gpu % Sparse_Val_Destroy_On_Device(Aval)
   call Gpu % Vector_Real_Destroy_On_Device(b)
   call Gpu % Vector_Real_Destroy_On_Device(c)
+  call Gpu % Vector_Real_Destroy_On_Device(coef)
 
   ! Print result
   O_Print '(a,es12.3)', ' vector c(1  ):', c(1)

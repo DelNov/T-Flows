@@ -12,7 +12,7 @@
   type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
-  real,      contiguous, pointer :: b(:), dens_capa(:)
+  real,      contiguous, pointer :: b(:), dens_capa(:), cond_eff(:)
   real                           :: tol, fin_res, urf
   integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -21,7 +21,7 @@
 
   call Profiler % Start('Compute_Energy')
 
-  call Work % Connect_Real_Cell(dens_capa)
+  call Work % Connect_Real_Cell(dens_capa, cond_eff)
 
   ! Fill up the dens_capa array
   !$acc parallel loop independent  &
@@ -48,6 +48,7 @@
     Aval => Flow % Nat % A(MATRIX_T)
     val  => Flow % Nat % A(MATRIX_T) % val
   end if
+
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
   nc   =  Grid % n_cells
@@ -63,7 +64,6 @@
   if(Iter % Current() .eq. 1) then
 
     if(Flow % t % td_scheme .eq. PARABOLIC) then
-
       !$acc parallel loop independent  &
       !$acc present(  &
       !$acc   grid_region_f_cell,  &
@@ -75,7 +75,6 @@
         flow_t_oo(c) = flow_t_o(c)
       end do
       !$acc end parallel
-
     end if
 
     !$acc parallel loop independent  &
@@ -89,13 +88,12 @@
       flow_t_o(c) = flow_t_n(c)
     end do
     !$acc end parallel
-
   end if
 
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
-  call Process % Form_Energy_Matrix(Grid, Flow, Turb, Aval,  &
+  call Process % Form_Energy_Matrix(Grid, Flow, Turb, Aval, cond_eff,  &
                                     urf, dt=Flow % dt)
 
   !----------------------------------------------------------!
@@ -108,6 +106,9 @@
   ! Inertial and advection terms
   call Flow % Add_Inertial_Term (Grid, Flow % t, dens_capa)
   call Flow % Add_Advection_Term(Grid, Flow % t, dens_capa)
+
+  ! Insert cross diffusion terms (computers gradients as well)
+  call Flow % Add_Cross_Diffusion_Term(Grid, Flow % t, cond_eff)
 
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !
@@ -144,7 +145,7 @@
 
   call Info % Iter_Fill_At(1, 6, Flow % t % name, fin_res, n)
 
-  call Work % Disconnect_Real_Cell(dens_capa)
+  call Work % Disconnect_Real_Cell(dens_capa, cond_eff)
 
   call Profiler % Stop('Compute_Energy')
 

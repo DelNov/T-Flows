@@ -13,15 +13,17 @@
   type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
-  real,      contiguous, pointer :: b(:)
+  real,      contiguous, pointer :: b(:), visc_eff(:)
   real,      contiguous, pointer :: ui_n(:), ui_o(:), ui_oo(:)
   real                           :: tol, fin_res, urf
-  integer                        :: nb, nc, n, c
+  integer                        :: nc, n, c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
 
   call Profiler % Start('Compute_Momentum')
+
+  call Work % Connect_Real_Cell(visc_eff)
 
   Assert(comp .ge. 1)
   Assert(comp .le. 3)
@@ -40,7 +42,6 @@
 
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
-  nb   =  Grid % n_bnd_cells
   nc   =  Grid % n_cells
   fin_res = 0.0
 
@@ -100,7 +101,7 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval,  &
+    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, visc_eff,  &
                                         urf, dt = Flow % dt)
   end if
 
@@ -118,15 +119,19 @@
   if(comp .eq. 1) then
     call Flow % Add_Inertial_Term (Grid, Flow % u, Flow % density)
     call Flow % Add_Advection_Term(Grid, Flow % u, Flow % density)
+    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % u, visc_eff)
   else if(comp .eq. 2) then
     call Flow % Add_Inertial_Term (Grid, Flow % v, Flow % density)
     call Flow % Add_Advection_Term(Grid, Flow % v, Flow % density)
+    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % v, visc_eff)
   else if(comp .eq. 3) then
     call Flow % Add_Inertial_Term (Grid, Flow % w, Flow % density)
     call Flow % Add_Advection_Term(Grid, Flow % w, Flow % density)
+    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % w, visc_eff)
   end if
 
   ! Pressure force
+  call Flow % Grad_Pressure(Grid, Flow % p)
   call Process % Add_Pressure_Term(Grid, Flow, comp=comp)
 
   !---------------------------------------!
@@ -159,6 +164,8 @@
   if(comp.eq.1) call Info % Iter_Fill_At(1, 1, Flow % u % name, fin_res, n)
   if(comp.eq.2) call Info % Iter_Fill_At(1, 2, Flow % v % name, fin_res, n)
   if(comp.eq.3) call Info % Iter_Fill_At(1, 3, Flow % w % name, fin_res, n)
+
+  call Work % Disconnect_Real_Cell(visc_eff)
 
   call Profiler % Stop('Compute_Momentum')
 

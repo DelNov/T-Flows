@@ -160,9 +160,6 @@
       ! Beginning of iteration
       call Info % Iter_Fill(Iter % Current())
 
-      ! New in GPU version: compute pressure gradients here
-      call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % p)
-
       call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=1)
       call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=2)
       call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)

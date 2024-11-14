@@ -82,6 +82,9 @@
   call Gpu % Vector_Real_Create_On_Device(Flow % phi_x)
   call Gpu % Vector_Real_Create_On_Device(Flow % phi_y)
   call Gpu % Vector_Real_Create_On_Device(Flow % phi_z)
+  flow_phi_x => Flow % phi_x
+  flow_phi_y => Flow % phi_y
+  flow_phi_z => Flow % phi_z
 
   ! If you are modeling turbulence, you will need shear and vorticity
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
