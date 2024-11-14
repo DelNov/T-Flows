@@ -108,11 +108,12 @@
                        / phi % sigma
     end if
 
-    if(Turb % model .eq. SPALART_ALLMARAS .or.               &
-       Turb % model .eq. DES_SPALART)                        &
-      vis_eff = visc_f + (    Grid % fw(s)  * vis % n(c1)    &
-                       + (1.0-Grid % fw(s)) * vis % n(c2))   &
-                       / phi % sigma
+    if(Turb % model .eq. SPALART_ALLMARAS .or.                          &
+       Turb % model .eq. DES_SPALART)                                   &
+      vis_eff = visc_f                                                  &
+              + (    Grid % fw(s)  * vis % n(c1) * Flow % density(c1)   &
+              + (1.0-Grid % fw(s)) * vis % n(c2) * Flow % density(c2))  &
+              / phi % sigma
 
     if(Turb % model .eq. HYBRID_LES_RANS) then
       vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t_eff(c1)   &
