@@ -15,6 +15,7 @@
 !----------------------------------[Locals]------------------------------------!
   type(Bulk_Type), pointer :: bulk
   character(SL)            :: name
+  logical                  :: found
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Rc)
 !==============================================================================!
@@ -92,6 +93,17 @@
   call Control % Bulk_Velocities(bulk % u_o,  &
                                  bulk % v_o,  &
                                  bulk % w_o)
+  call Control % Position_At_One_Key('VOLUME_FLOW_RATES', found)
+  if(found) then
+    call Message % Error(88,                                                  &
+      'You specified volume flow rates using the keyword '                 // &
+      '"VOLUME_FLOW_RATES" in the control file, which was common '         // &
+      'practice in the CPU version of the code.  However, this feature '   // &
+      'has been superseded by bulk velocities in the GPU version of the '  // &
+      'code, and should be defined using the keyword "BULK_VELOCITIES". '  // &
+      ' \n \n Please update the control file accordingly and try running ' // &
+      'the simulation again.', file=__FILE__, line=__LINE__)
+  end if
 
   !-----------------------!
   !                       !
