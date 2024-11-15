@@ -46,6 +46,7 @@
     real          :: tol = PICO    !! linear solver tolerance
     real          :: urf           !! under-relaxation factor
     integer       :: miter         !! max number of iterations for variable
+    integer       :: niter         !! executed number of iterations for var
     logical       :: blend_matrix  !! are you blending matrix with upwind?
 
   end type

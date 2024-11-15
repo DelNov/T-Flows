@@ -11,12 +11,13 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Sparse_Val_Type), pointer :: Aval
   type(Sparse_Con_Type), pointer :: Acon
+  type(Var_Type),        pointer :: ui
+  real,      contiguous, pointer :: ui_n(:), ui_o(:), ui_oo(:)
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), visc_eff(:)
-  real,      contiguous, pointer :: ui_n(:), ui_o(:), ui_oo(:)
-  real                           :: tol, fin_res, urf
-  integer                        :: nc, n, c
+  real                           :: urf
+  integer                        :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -39,28 +40,27 @@
     Aval => Flow % Nat % A(MATRIX_UVW)
     val  => Flow % Nat % A(MATRIX_UVW) % val
   end if
-
-  dia  => Flow % Nat % C % dia
-  b    => Flow % Nat % b
-  nc   =  Grid % n_cells
-  fin_res = 0.0
+  dia => Flow % Nat % C % dia
+  b   => Flow % Nat % b
 
   if(comp .eq. 1) then
+    ui    => Flow % u
     ui_n  => Flow % u % n
     ui_o  => Flow % u % o
     ui_oo => Flow % u % oo
   else if(comp .eq. 2) then
+    ui    => Flow % v
     ui_n  => Flow % v % n
     ui_o  => Flow % v % o
     ui_oo => Flow % v % oo
   else if(comp .eq. 3) then
+    ui    => Flow % w
     ui_n  => Flow % w % n
     ui_o  => Flow % w % o
     ui_oo => Flow % w % oo
   end if
 
   ! Tolerances and under-relaxations are the same for all components
-  tol = Flow % u % tol
   urf = Flow % u % urf
 
   !---------------------------------------------------!
@@ -157,13 +157,12 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(Acon, Aval, ui_n, b,  &
-                       Flow % u % miter, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, ui_n, b,     &
+                       ui % miter, ui % niter,  &
+                       ui % tol,   ui % res)
   call Profiler % Stop('CG_for_Momentum')
 
-  if(comp.eq.1) call Info % Iter_Fill_At(1, 1, Flow % u % name, fin_res, n)
-  if(comp.eq.2) call Info % Iter_Fill_At(1, 2, Flow % v % name, fin_res, n)
-  if(comp.eq.3) call Info % Iter_Fill_At(1, 3, Flow % w % name, fin_res, n)
+  call Info % Iter_Fill_At(1, comp, ui % name, ui % res, ui % niter)
 
   call Work % Disconnect_Real_Cell(visc_eff)
 

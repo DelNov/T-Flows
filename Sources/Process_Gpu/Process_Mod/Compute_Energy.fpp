@@ -13,8 +13,8 @@
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), dens_capa(:), cond_eff(:)
-  real                           :: tol, fin_res, urf
-  integer                        :: nc, n, c
+  real                           :: urf
+  integer                        :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -44,11 +44,8 @@
 
   dia  => Flow % Nat % C % dia
   b    => Flow % Nat % b
-  nc   =  Grid % n_cells
-  fin_res = 0.0
 
   ! Tolerances and under-relaxations are the same for all components
-  tol = Flow % t % tol
   urf = Flow % t % urf
 
   !---------------------------------------------------!
@@ -106,8 +103,9 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Acon, Aval, Flow % t % n, b,  &
-                      Flow % t % miter, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, Flow % t % n, b,        &
+                      Flow % t % miter, Flow % t % niter,  &
+                      Flow % t % tol,   Flow % t % res)
   call Profiler % Stop('CG_for_Energy')
 
 # if T_FLOWS_DEBUG == 1
@@ -116,7 +114,8 @@
                                scalar_cell=flow_t_n)
 # endif
 
-  call Info % Iter_Fill_At(1, 6, Flow % t % name, fin_res, n)
+  call Info % Iter_Fill_At(1, 6, Flow % t % name,  &
+                                 Flow % t % res, Flow % t % niter)
 
   call Work % Disconnect_Real_Cell(dens_capa, cond_eff)
 

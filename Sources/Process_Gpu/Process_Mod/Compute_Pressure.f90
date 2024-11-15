@@ -10,8 +10,8 @@
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
   real, contiguous,      pointer :: b(:)
-  real                           :: tol, fin_res, urf, p_max, p_min
-  integer                        :: nc, n, c
+  real                           :: urf, p_max, p_min
+  integer                        :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -26,9 +26,7 @@
     Aval => Flow % Nat % A(MATRIX_PP)
   end if
   b   => Flow % Nat % b
-  tol =  Flow % pp % tol
   urf =  Flow % pp % urf
-  nc  =  Grid % n_cells
 
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
@@ -50,11 +48,13 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b,  &
-                       Flow % pp % miter, n, tol, fin_res)
+  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b,          &
+                       Flow % pp % miter, Flow % pp % niter,  &
+                       Flow % pp % tol,   Flow % pp % res)
   call Profiler % Stop('CG_for_Pressure')
 
-  call Info % Iter_Fill_At(1, 4, Flow % pp % name, fin_res, n)
+  call Info % Iter_Fill_At(1, 4, Flow % pp % name,  &
+                                 Flow % pp % res, Flow % pp % niter)
 
   !-------------------------------!
   !   Update the pressure field   !
