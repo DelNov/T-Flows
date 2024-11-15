@@ -36,6 +36,10 @@
   if(Time % current_time_step .gt. Time % last_time_step) then
     Needs_More_Steps = .false.
 
+    ! Do not allow the time step to go beyond the last specified
+    Time % current_time_step =  &
+    Time % current_time_step - 1
+
   else
     Needs_More_Steps = .true.
 
