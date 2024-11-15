@@ -95,7 +95,7 @@
         ! Kinematic viscosities
         kin_vis = Flow % viscosity(c1) / Flow % density(c1)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1))
+        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
 
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(u_tau,                &
                                                       Grid % wall_dist(c1), &
@@ -103,10 +103,10 @@
                                                       z_o)
         ebf = Turb % Ebf_Momentum(c1)
 
-        p_t2_wall  = Flow % density(c1)                                        &
-                     * abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1))) &
-                     * c_mu_theta5*sqrt(abs(t2 % n(c1))) &
-                     / (kappa_theta*c_mu25*Grid % wall_dist(c1))
+        p_t2_wall = Flow % density(c1)                                       &
+                  * abs(t % q(c2)/(Flow % density(c1)*Flow % capacity(c1)))  &
+                  * Turb % c_mu_theta5*sqrt(abs(t2 % n(c1)))                 &
+                  / (Turb % kappa_theta * Turb % c_mu25 * Grid % wall_dist(c1))
 
         b(c1) = b(c1) - Turb % p_t2(c1) * Grid % vol(c1)
 

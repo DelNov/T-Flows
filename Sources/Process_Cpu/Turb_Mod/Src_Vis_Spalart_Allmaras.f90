@@ -28,31 +28,34 @@
 
     do c = Cells_In_Domain_And_Buffers()
 
+      dist = Grid % wall_dist(c)
+
       !---------------------------------!
       !   Compute the production term   !
       !---------------------------------!
-      x_rat  = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
-      f_v1   = x_rat**3/(x_rat**3 + c_v1**3)
+      x_rat  = vis % n(c) / (Flow % viscosity(c) / Flow % density(c))
+      f_v1   = x_rat**3 / (x_rat**3 + Turb % c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
       ss     = Flow % vort(c)   &
-             + vis % n(c) * f_v2 / (kappa**2 * Grid % wall_dist(c)**2)
-      prod_v = c_b1 * Flow % density(c) * ss * vis % n(c)
+             + vis % n(c) * f_v2 / (Turb % kappa**2 * dist**2)
+      prod_v = Turb % c_b1 * Flow % density(c) * ss * vis % n(c)
       b(c)   = b(c) + prod_v * Grid % vol(c)
 
       !----------------------------------!
       !   Compute the destruction term   !
       !----------------------------------!
-      r      = vis % n(c)/(ss * kappa**2 * Grid % wall_dist(c)**2)
-      gg     = r + c_w2*(r**6 - r)
-      f_w    = gg*((1.0 + c_w3**6)/(gg**6 + c_w3**6))**(1.0/6.0)
-      dist_v = c_w1 * Flow % density(c) * f_w  &
-             * (vis % n(c) / Grid % wall_dist(c)**2)
+      r      = vis % n(c) / (ss * Turb % kappa**2 * dist**2)
+      gg     = r + Turb % c_w2*(r**6 - r)
+      f_w    = gg*((1.0 + Turb % c_w3**6)  &
+             / (gg**6 + Turb % c_w3**6))**ONE_SIXTH
+      dist_v = Turb % c_w1 * Flow % density(c) * f_w  &
+             * (vis % n(c) / dist**2)
       A % val(A % dia(c)) = A % val(A % dia(c)) + dist_v * Grid % vol(c)
 
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      dif   = c_b2                                             &
+      dif   = Turb % c_b2                                      &
             * Flow % density(c)                                &
             * (vis % x(c)**2 + vis % y(c)**2 + vis % z(c)**2)  &
             / vis % sigma
@@ -68,26 +71,27 @@
       !---------------------------------!
       !   Compute the production term   !
       !---------------------------------!
-      x_rat  = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
-      f_v1   = x_rat**3 / (x_rat**3 + c_v1**3)
+      x_rat  = vis % n(c) / (Flow % viscosity(c) / Flow % density(c))
+      f_v1   = x_rat**3 / (x_rat**3 + Turb % c_v1**3)
       f_v2   = 1.0 - x_rat/(1.0 + x_rat*f_v1)
-      ss     = Flow % vort(c) + vis % n(c) * f_v2 / (kappa**2 * dist**2)
-      prod_v = c_b1 * Flow % density(c) * ss * vis % n(c)
+      ss     = Flow % vort(c) + vis % n(c) * f_v2 / (Turb % kappa**2 * dist**2)
+      prod_v = Turb % c_b1 * Flow % density(c) * ss * vis % n(c)
       b(c)   = b(c) + prod_v * Grid % vol(c)
 
       !-----------------------------------!
       !   Compute the destruction  term   !
       !-----------------------------------!
-      r      = vis % n(c) / (ss * kappa**2 * dist**2)
-      gg     = r + c_w2 * (r**6 - r)
-      f_w    = gg*((1.0 + c_w3**6) / (gg**6 + c_w3**6))**(1.0/6.0)
-      dist_v = c_w1 * Flow % density(c) * f_w * (vis % n(c) / dist**2)
+      r      = vis % n(c) / (ss * Turb % kappa**2 * dist**2)
+      gg     = r + Turb % c_w2 * (r**6 - r)
+      f_w    = gg*((1.0 + Turb % c_w3**6)  &
+             / (gg**6 + Turb % c_w3**6))**ONE_SIXTH
+      dist_v = Turb % c_w1 * Flow % density(c) * f_w * (vis % n(c) / dist**2)
       A % val(A % dia(c)) = A % val(A % dia(c)) + dist_v * Grid % vol(c)
 
       !--------------------------------------------!
       !   Compute the first-order diffusion term   !
       !--------------------------------------------!
-      dif   = c_b2                                             &
+      dif   = Turb % c_b2                                      &
             * Flow % density(c)                                &
             * (vis % x(c)**2 + vis % y(c)**2 + vis % z(c)**2)  &
             / vis % sigma

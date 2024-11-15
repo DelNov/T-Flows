@@ -31,7 +31,7 @@
   if((t_p - t_wall) > 0.0) then               ! stable condition
     fm = 1./(1. + b2*ri_bo)**2
   else if((t_p - t_wall) < 0.0) then          ! unstable condition
-    cm = (dm*kappa**2)/((log(wall_dist/z_o))**2)*b1*sqrt(wall_dist/z_o)
+    cm = (dm*Turb % kappa**2)/((log(wall_dist/z_o))**2)*b1*sqrt(wall_dist/z_o)
     fm = 1. - (dm*ri_bo)/(1. + cm*sqrt(abs(ri_bo)))
   else if(abs(t_p - t_wall) < TINY) then      ! neutral condition
     fm = 1.0

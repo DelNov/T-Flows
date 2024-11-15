@@ -92,7 +92,7 @@
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1))
+        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
 
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
                                    u_tau,                 &
@@ -110,8 +110,8 @@
 
         ebf = Turb % Ebf_Momentum(c1)
 
-        p_kin_wf  = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                  / ((Grid % wall_dist(c1) + z_o) * kappa)
+        p_kin_wf  = Turb % tau_wall(c1) * Turb % c_mu25 * sqrt(kin % n(c1))  &
+                  / ((Grid % wall_dist(c1) + z_o) * Turb % kappa)
 
         p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 
@@ -159,7 +159,7 @@
                                           + Flow % grav_z)                    &
                       * sqrt(abs(  t % q(c2)                                  &
                                  / (Flow % density(c1)*Flow % capacity(c1)))  &
-                      * c_mu_theta5                                           &
+                      * Turb % c_mu_theta5                                    &
                       * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           ! Clean up b(c) from old values of g_buoy

@@ -66,7 +66,7 @@
     fd = 1.0 - exp(-(Turb % y_plus(c)/25.0)**3)
 
     ! Final SGS viscosity
-    Turb % vis_t(c) = min((c_smag*lf_wm)**2, (kappa*dw)**2)  &
+    Turb % vis_t(c) = min((Turb % c_smag * lf_wm)**2, (kappa*dw)**2)  &
                     * Flow % shear(c) * fd
 
   end do

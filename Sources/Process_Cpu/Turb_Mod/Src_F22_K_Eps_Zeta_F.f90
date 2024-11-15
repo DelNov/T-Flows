@@ -54,10 +54,10 @@
 
   ! Source term f22hg
   do c = Cells_In_Domain()
-    f22hg = (1.0 - c_f1 - 0.65 * Turb % p_kin(c) / Flow % density(c)  &
-          / (eps  % n(c) + TINY))                                     &
-          * (zeta % n(c) - TWO_THIRDS)                                &
-          / (Turb % t_scale(c) + TINY)                                &
+    f22hg = (1.0 - Turb % c_f1 - 0.65 * Turb % p_kin(c) / Flow % density(c)  &
+          / (eps  % n(c) + TINY))                                            &
+          * (zeta % n(c) - TWO_THIRDS)                                       &
+          / (Turb % t_scale(c) + TINY)                                       &
           + 0.0085 * (Turb % p_kin(c) / Flow % density(c)) / (kin % n(c) + TINY)
     b(c) = b(c) + f22hg * Grid % vol(c) / (Turb % l_scale(c)**2 + TINY)
   end do

@@ -62,13 +62,16 @@
   else if(Turb % scalar_flux_model .eq. GGDH) then
 
     do c = Cells_In_Domain_And_Buffers()
-      Turb % uc(c) = -c_theta * Turb % t_scale(c) * (  uu % n(c) * phi % x(c)  &
+      Turb % uc(c) = -Turb % c_theta * Turb % t_scale(c) * (                   &
+                                                       uu % n(c) * phi % x(c)  &
                                                      + uv % n(c) * phi % y(c)  &
                                                      + uw % n(c) * phi % z(c))
-      Turb % vc(c) = -c_theta * Turb % t_scale(c) * (  uv % n(c) * phi % x(c)  &
+      Turb % vc(c) = -Turb % c_theta * Turb % t_scale(c) * (                   &
+                                                       uv % n(c) * phi % x(c)  &
                                                      + vv % n(c) * phi % y(c)  &
                                                      + vw % n(c) * phi % z(c))
-      Turb % wc(c) = -c_theta * Turb % t_scale(c) * (  uw % n(c) * phi % x(c)  &
+      Turb % wc(c) = -Turb % c_theta * Turb % t_scale(c) * (                   &
+                                                       uw % n(c) * phi % x(c)  &
                                                      + vw % n(c) * phi % y(c)  &
                                                      + ww % n(c) * phi % z(c))
     end do
@@ -80,24 +83,27 @@
     do k = 1, 3
       do c = Cells_In_Domain_And_Buffers()
 
-        Turb % uc(c) = -c_theta*Turb % t_scale(c) * (( uu % n(c) * phi % x(c)  &
+        Turb % uc(c) = -Turb % c_theta*Turb % t_scale(c) * ((                  &
+                                                       uu % n(c) * phi % x(c)  &
                                                      + uv % n(c) * phi % y(c)  &
                                                      + uw % n(c) * phi % z(c)) &
-                                     + afm_eta * (  Turb % uc(c) * u % x(c)    &
+                              + Turb % afm_eta * (  Turb % uc(c) * u % x(c)    &
                                                   + Turb % vc(c) * u % y(c)    &
                                                   + Turb % wc(c) * u % z(c)))
 
-        Turb % vc(c) = -c_theta*Turb % t_scale(c) * (( uv % n(c) * phi % x(c)  &
+        Turb % vc(c) = -Turb % c_theta*Turb % t_scale(c) * ((                  &
+                                                       uv % n(c) * phi % x(c)  &
                                                      + vv % n(c) * phi % y(c)  &
                                                      + vw % n(c) * phi % z(c)) &
-                                     + afm_eta * (  Turb % uc(c) * v % x(c)    &
+                              + Turb % afm_eta * (  Turb % uc(c) * v % x(c)    &
                                                   + Turb % vc(c) * v % y(c)    &
                                                   + Turb % wc(c) * v % z(c)))
 
-        Turb % wc(c) = -c_theta*Turb % t_scale(c) * (( uw % n(c) * phi % x(c)  &
+        Turb % wc(c) = -Turb % c_theta*Turb % t_scale(c) * ((                  &
+                                                       uw % n(c) * phi % x(c)  &
                                                      + vw % n(c) * phi % y(c)  &
                                                      + ww % n(c) * phi % z(c)) &
-                                     + afm_eta * (  Turb % uc(c) * w % x(c)    &
+                              + Turb % afm_eta * (  Turb % uc(c) * w % x(c)    &
                                                   + Turb % vc(c) * w % y(c)    &
                                                   + Turb % wc(c) * w % z(c)))
 

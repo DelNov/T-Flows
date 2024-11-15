@@ -30,7 +30,7 @@
   if(Turb % model .eq. DES_SPALART) then
     do c = Cells_In_Domain_And_Buffers()
       x_rat    = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
-      f_v1     = x_rat**3/(x_rat**3 + c_v1**3)
+      f_v1     = x_rat**3/(x_rat**3 + Turb % c_v1**3)
       Turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
     end do
   end if
@@ -38,7 +38,7 @@
   if(Turb % model .eq. SPALART_ALLMARAS) then
     do c = Cells_In_Domain_And_Buffers()
       x_rat = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
-      f_v1  = x_rat**3/(x_rat**3 + c_v1**3)
+      f_v1  = x_rat**3/(x_rat**3 + Turb % c_v1**3)
       Turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
     end do
   end if
@@ -88,7 +88,7 @@
 
         ! Calculate u_tau for rough wall
         if(z_o .gt. TINY) then
-          u_tau = u_tan * kappa/log(Grid % wall_dist(c1)/z_o)
+          u_tau = u_tan * Turb % kappa / log(Grid % wall_dist(c1)/z_o)
         end if
 
         ! Calculate y+

@@ -59,8 +59,9 @@
     kin_vis =  Flow % viscosity(c) / Flow % density(c)
 
     ! Positive contribution:
-    b(c) = b(c) + &
-            c_1e * Turb % p_kin(c) * eps % n(c) / kin % n(c) * Grid % vol(c)
+    b(c) = b(c)  &
+         + Turb % c_1e * Turb % p_kin(c) * eps % n(c)  &
+         / kin % n(c) * Grid % vol(c)
 
     ! Negative contribution:
     re_t = kin % n(c)*kin % n(c)/(kin_vis*eps % n(c))
@@ -72,15 +73,15 @@
     f_mu = min(f_mu,1.0)
 
     A % val(A % dia(c)) = A % val(A % dia(c))                             &
-                        +    Flow % density(c) * f_mu* c_2e * eps % n(c)  &
-                           / kin % n(c) * Grid % vol(c)
+                +    Flow % density(c) * f_mu * Turb % c_2e * eps % n(c)  &
+                   / kin % n(c) * Grid % vol(c)
 
     ! Buoyancy contribution
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-      b(c) = b(c) + max(0.0, c_1e * Turb % g_buoy(c) &
+      b(c) = b(c) + max(0.0, Turb % c_1e * Turb % g_buoy(c) &
                     * eps % n(c) / kin % n(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))                &
-                          + max(0.0,(-c_1e * Turb % g_buoy(c)  &
+                          + max(0.0,(-Turb % c_1e * Turb % g_buoy(c)  &
                           * eps % n(c)                         &
                           / kin % n(c) * Grid % vol(c))        &
                           / (eps % n(c) + TINY))
@@ -106,7 +107,7 @@
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1))
+        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
 
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
                                    u_tau,                 &
@@ -117,13 +118,13 @@
         eps_int = 2.0 * kin_vis * kin % n(c1)  &
                 / Grid % wall_dist(c1)**2
 
-        eps_wf  = c_mu75 * kin % n(c1)**1.5   &
-                / ((Grid % wall_dist(c1) + z_o) * kappa)
+        eps_wf  = Turb % c_mu75 * kin % n(c1)**1.5   &
+                / ((Grid % wall_dist(c1) + z_o) * Turb % kappa)
 
         ebf = Turb % Ebf_Momentum(c1)
 
-        p_kin_wf = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                 / ((Grid % wall_dist(c1) + z_o) * kappa)
+        p_kin_wf = Turb % tau_wall(c1) * Turb % c_mu25 * sqrt(kin % n(c1))  &
+                 / ((Grid % wall_dist(c1) + z_o) * Turb % kappa)
 
         p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 

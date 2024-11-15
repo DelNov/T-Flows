@@ -430,7 +430,7 @@
     end do
 
     re_t  = (kin % n(c)*kin % n(c)) / (kin_vis*eps % n(c) + TINY)
-    f_eps = 1.0 - ((c_2e-1.4)/c_2e)*exp(-(re_t/6.0)**2)
+    f_eps = 1.0 - ((Turb % c_2e-1.4) / Turb % c_2e)*exp(-(re_t/6.0)**2)
     ff2   = (re_t/150.0)**1.5
     ff2   = min(ff2,1.0)
     fd    = 1.0/(1.0+0.1*re_t)
@@ -678,9 +678,9 @@
     !   Epsilon equation   !
     !----------------------!
     else if(name_phi == 'EPS') then
-      f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
+      f_eps = 1.0 - ((Turb % c_2e-1.4)/Turb % c_2e) * exp(-(re_t/6.0)**2)
       eps_1 = 1.44 * Turb % p_kin(c) / Turb % t_scale(c)
-      eps_2 = c_2e * f_eps  / Turb % t_scale(c)
+      eps_2 = Turb % c_2e * f_eps  / Turb % t_scale(c)
       b(c) = b(c) + Flow % density(c) * (eps_1 + diss1(c)) * Grid % vol(c)
 
       A % val(A % dia(c)) = A % val(A % dia(c)) + Flow % density(c) * eps_2  &
@@ -700,9 +700,9 @@
     do c = Cells_In_Domain()
       kin_vis = Flow % viscosity(c) / Flow % density(c)
       re_t  = (kin % n(c)**2) / (kin_vis*eps % n(c) + TINY)
-      f_eps = 1.0 - ((c_2e-1.4)/c_2e) * exp(-(re_t/6.0)**2)
+      f_eps = 1.0 - ((Turb % c_2e-1.4)/Turb % c_2e) * exp(-(re_t/6.0)**2)
       b(c) = b(c) + Flow % density(c)                               &
-                     * (c_2e * f_eps / Turb % t_scale(c)            &
+                     * (Turb % c_2e * f_eps / Turb % t_scale(c)     &
                      * (kin_vis *(  kin_e_x(c)**2                   &
                                   + kin_e_y(c)**2                   &
                                   + kin_e_z(c)**2)))                &

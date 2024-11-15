@@ -9,13 +9,13 @@
   class(Turb_Type), target :: Turb
 !==============================================================================!
 
-  c_1e    =  1.44
-  c_2e    =  1.83
-  c_3e    =  0.55
-  c_mu    =  0.09
-  c_mu_d  =  0.21
-  c_mu25  = sqrt(sqrt(c_mu))
-  c_mu75  = c_mu25**3
+  Turb % c_1e    =  1.44
+  Turb % c_2e    =  1.83
+  Turb % c_3e    =  0.55
+  Turb % c_mu    =  0.09
+  Turb % c_mu_d  =  0.21
+  Turb % c_mu25  = sqrt(sqrt(Turb % c_mu))
+  Turb % c_mu75  = Turb % c_mu25**3
 
   Turb % kin % sigma = 1.0
   Turb % eps % sigma = 1.0
@@ -27,10 +27,10 @@
   Turb % vw  % sigma = 1.0
 
   ! Constants for GGDH turbulent flux
-  c_theta =  0.255555
+  Turb % c_theta =  0.255555
 
   ! Constants for AFM turbulent flux
-  afm_psi      = 0.1 
-  afm_eta      = 0.1 
+  Turb % afm_psi = 0.1
+  Turb % afm_eta = 0.1
 
   end subroutine

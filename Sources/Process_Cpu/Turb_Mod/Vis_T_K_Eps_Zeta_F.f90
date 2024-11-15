@@ -44,7 +44,7 @@
   if(Turb % model .eq. K_EPS_ZETA_F) then
     do reg = Boundary_And_Inside_Regions()
       do c = Cells_In_Region(reg)
-        Turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
+        Turb % vis_t(c) = Turb % c_mu_d * Flow % density(c) * zeta % n(c)  &
                         * kin % n(c) * Turb % t_scale(c)
       end do
     end do
@@ -54,7 +54,7 @@
   else if(Turb % model .eq. HYBRID_LES_RANS) then
     do reg = Boundary_And_Inside_Regions()
       do c = Cells_In_Region(reg)
-        Turb % vis_t(c) = c_mu_d * Flow % density(c) * zeta % n(c)  &
+        Turb % vis_t(c) = Turb % c_mu_d * Flow % density(c) * zeta % n(c)  &
                         * kin % n(c) * Turb % t_scale(c)
         Turb % vis_t_eff(c) = max(Turb % vis_t(c),  &
                                   Turb % vis_t_sgs(c))
@@ -82,7 +82,7 @@
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1))
+        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
 
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(   &
                                    u_tau,                &

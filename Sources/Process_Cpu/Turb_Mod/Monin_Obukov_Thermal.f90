@@ -32,7 +32,7 @@
   if((t_p - t_wall) > 0.0) then           ! stable condition
     fth = 1./(1. + B2*ri_bo)**2
   else if((t_p - t_wall) < 0.0) then      ! unstable condition
-    cth = (DTH*kappa**2)/((log(wall_dist/z_o))**2)*B1*sqrt(wall_dist/z_o)
+    cth = (DTH*Turb % kappa**2)/((log(wall_dist/z_o))**2)*B1*sqrt(wall_dist/z_o)
     fth = 1. - (DTH*ri_bo)/(1. + cth*sqrt(abs(ri_bo)))
   else if(abs(t_p - t_wall) < TINY) then  ! neutral condition
     fth = 1.0

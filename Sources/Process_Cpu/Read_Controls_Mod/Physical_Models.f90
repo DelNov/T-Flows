@@ -236,7 +236,7 @@
   !-------------------------------------------------------------------------!
   if(Turb % model .eq. LES_SMAGORINSKY .or.  &
      Turb % model .eq. HYBRID_LES_PRANDTL) then
-    call Control % Smagorinsky_Constant(c_smag, .true.)
+    call Control % Smagorinsky_Constant(Turb % c_smag, .true.)
   end if
 
   if(Turb % model .eq. K_EPS) then

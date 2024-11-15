@@ -14,12 +14,12 @@
 
   if(z_o > TINY) then
 
-    Tau_Wall_Log_Law = dens * kappa * u_tau * u_tan  &
+    Tau_Wall_Log_Law = dens * Turb % kappa * u_tau * u_tan  &
                      / log(((wall_dist + z_o) / z_o))
   else
 
-    Tau_Wall_Log_Law = dens * kappa * u_tau * u_tan   &
-                     / log(e_log * max(y_plus, 1.05))
+    Tau_Wall_Log_Law = dens * Turb % kappa * u_tau * u_tan   &
+                     / log(Turb % e_log * max(y_plus, 1.05))
   end if
 
   end function

@@ -106,12 +106,13 @@
                              + 2.0*uw % n(c)*n1*n3     &
                              - 0.5*(n1*n1+1.0)*uu_nn)
 
-      phi_hom = - g1      * eps % n(c) * (-ONE_THIRD)                    &
-                - g1_star * Turb % p_kin(c) * (-ONE_THIRD)               &
-                + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s11        &
-                +  g4 * kin % n(c)*( 2.0*(b11*s11 + b12*s12 + b13*s13)   &
-                                    -2.0/3.0 * b_lk_s_lk)                &
-                +  g5 * kin % n(c)*( 2.0*(b11*v11 + b12*v12 + b13*v13))
+      phi_hom =                                                            &
+        -  Turb % g1      * eps % n(c) * (-ONE_THIRD)                      &
+        -  Turb % g1_star * Turb % p_kin(c) * (-ONE_THIRD)                 &
+        + (Turb % g3 - Turb % g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s11  &
+        +  Turb % g4 * kin % n(c)*( 2.0*(b11*s11 + b12*s12 + b13*s13)      &
+                                   -TWO_THIRDS * b_lk_s_lk)                &
+        +  Turb % g5 * kin % n(c)*( 2.0*(b11*v11 + b12*v12 + b13*v13))
 
       prod = - 2.0 * (  uu % n(c) * u % x(c)           &
                       + uv % n(c) * u % y(c)           &
@@ -126,12 +127,13 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * Grid % vol(c)
 
-      A % val(A % dia(c)) = A % val(A % dia(c))                              &
-        + Flow % density(c) * (max(-prod,0.0) / max(uu % n(c), TINY)         &
-           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
-           +      f22 % n(c)**2 *(diss_hom/max(uu % n(c), TINY)              &
-                            + g1 * eps % n(c)           / (2.0*kin % n(c))   &
-                            + g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
+      A % val(A % dia(c)) = A % val(A % dia(c))                               &
+        + Flow % density(c) * (max(-prod,0.0) / max(uu % n(c), TINY)          &
+           + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)                &
+           +      f22 % n(c)**2                                               &
+                  * (  diss_hom / max(uu % n(c), TINY)                        &
+                      + Turb % g1 * eps % n(c)           / (2.0*kin % n(c))   &
+                      + Turb % g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -144,12 +146,13 @@
                              + 2.0*vw % n(c)*n2*n3     &
                              - 0.5*(n2*n2+1.0)*uu_nn)
 
-      phi_hom = - g1      * eps % n(c)      * (-ONE_THIRD)               &
-                - g1_star * Turb % p_kin(c) * (-ONE_THIRD)               &
-                + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s22        &
-                +  g4 * kin % n(c) *( 2.0*(b21*s21 + b22*s22 + b23*s23)  &
-                                     -2.0/3.0 * b_lk_s_lk)               &
-                +  g5 * kin % n(c) *( 2.0*(b21*v21 + b22*v22 + b23*v23))
+      phi_hom =                                                            &
+        -  Turb % g1      * eps % n(c)      * (-ONE_THIRD)                 &
+        -  Turb % g1_star * Turb % p_kin(c) * (-ONE_THIRD)                 &
+        + (Turb % g3 - Turb % g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s22  &
+        +  Turb % g4 * kin % n(c) *( 2.0*(b21*s21 + b22*s22 + b23*s23)     &
+                                    -TWO_THIRDS * b_lk_s_lk)               &
+        +  Turb % g5 * kin % n(c) *( 2.0*(b21*v21 + b22*v22 + b23*v23))
 
       prod = - 2.0 * (  uv % n(c) * v % x(c)           &
                       + vv % n(c) * v % y(c)           &
@@ -171,9 +174,10 @@
       A % val(A % dia(c)) = A % val(A % dia(c))                              &
         + Flow % density(c) * (max(-prod,0.0) / max(vv % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
-           +      f22 % n(c)**2 *(diss_hom/max(vv % n(c), TINY)              &
-                            + g1 * eps % n(c)           / (2.0*kin % n(c))   &
-                            + g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
+           +      f22 % n(c)**2                                              &
+                  * ( diss_hom/max(vv % n(c), TINY)                          &
+                     + Turb % g1 * eps % n(c)           / (2.0*kin % n(c))   &
+                     + Turb % g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -186,12 +190,13 @@
                              + 2.0*ww % n(c)*n3*n3     &
                              - 0.5*(n3*n3+1.0)*uu_nn)
 
-      phi_hom = - g1      * eps % n(c)      * (-ONE_THIRD)               &
-                - g1_star * Turb % p_kin(c) * (-ONE_THIRD)               &
-                + (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s33        &
-                +  g4 * kin % n(c) *( 2.0*(b31*s31 + b32*s32 + b33*s33)  &
-                                     -2.0/3.0 * b_lk_s_lk)               &
-                +  g5 * kin % n(c) *( 2.0*(b31*v31 + b32*v32 + b33*v33))
+      phi_hom =                                                            &
+        -  Turb % g1      * eps % n(c)      * (-ONE_THIRD)                 &
+        -  Turb % g1_star * Turb % p_kin(c) * (-ONE_THIRD)                 &
+        + (Turb % g3 - Turb % g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s33  &
+        +  Turb % g4 * kin % n(c) *( 2.0*(b31*s31 + b32*s32 + b33*s33)     &
+                                    -TWO_THIRDS * b_lk_s_lk)               &
+        +  Turb % g5 * kin % n(c) *( 2.0*(b31*v31 + b32*v32 + b33*v33))
 
       prod = - 2.0 * (  uw % n(c) * w % x(c)           &
                       + vw % n(c) * w % y(c)           &
@@ -212,9 +217,10 @@
       A % val(A % dia(c)) = A % val(A % dia(c))                              &
         + Flow % density(c) * (max(-prod,0.0) / max(ww % n(c), TINY)         &
            + (1.0-f22 % n(c)**2) * 6.0 * eps % n(c)/kin % n(c)               &
-           +      f22 % n(c)**2 *(diss_hom/max(ww % n(c), TINY)              &
-                            + g1 * eps % n(c)           / (2.0*kin % n(c))   &
-                            + g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
+           +      f22 % n(c)**2                                              &
+                  * (  diss_hom/max(ww % n(c), TINY)                         &
+                     + Turb % g1 * eps % n(c)           / (2.0*kin % n(c))   &
+                     + Turb % g1_star * Turb % p_kin(c) / (2.0*kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -230,11 +236,12 @@
                              + vw % n(c)*n1*n3     &
                              - 0.5*(n1*n2)*uu_nn)
 
-      phi_hom = (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s12  &
-              +  g4*kin % n(c)*(  b11*s21 + b12*s22 + b13*s23    &
-                                + b21*s11 + b22*s12 + b23*s13)   &
-              +  g5*kin % n(c)*(  b11*v21 + b12*v22 + b13*v23    &
-                                + b21*v11 + b22*v12 + b23*v13)
+      phi_hom =                                                            &
+          (Turb % g3 - Turb % g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s12  &
+        +  Turb % g4 * kin % n(c)*(  b11*s21 + b12*s22 + b13*s23           &
+                                   + b21*s11 + b22*s12 + b23*s13)          &
+        +  Turb % g5 * kin % n(c)*(  b11*v21 + b12*v22 + b13*v23           &
+                                   + b21*v11 + b22*v12 + b23*v13)
 
       prod = -(  uu % n(c) * v % x(c)                           &
                + uw % n(c) * v % z(c)                           &
@@ -254,11 +261,12 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * Grid % vol(c)
 
-      A % val(A % dia(c)) =  A % val(A % dia(c))                              &
-        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)       &
-                            / kin % n(c)                                      &
-                + f22 % n(c)**2 *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
-                        + g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))     &
+      A % val(A % dia(c)) =  A % val(A % dia(c))                               &
+        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)        &
+                            / kin % n(c)                                       &
+                + f22 % n(c)**2                                                &
+                  * (  Turb % g1 * eps % n(c) / (2.0 * kin % n(c))             &
+                     + Turb % g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -274,11 +282,12 @@
                              + ww % n(c)*n1*n3     &
                              - 0.5*(n1*n3)*uu_nn)
 
-      phi_hom = (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s13  &
-              +  g4*kin % n(c)*(  b11*s31 + b12*s32 + b13*s33    &
-                                + b31*s11 + b32*s12 + b33*s13)   &
-              +  g5*kin % n(c)*(  b11*v31 + b12*v32 + b13*v33    &
-                                + b31*v11 + b32*v12 + b33*v13)
+      phi_hom =                                                            &
+          (Turb % g3 - Turb % g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s13  &
+        +  Turb % g4 * kin % n(c)*(  b11*s31 + b12*s32 + b13*s33           &
+                                   + b31*s11 + b32*s12 + b33*s13)          &
+        +  Turb % g5 * kin % n(c)*(  b11*v31 + b12*v32 + b13*v33           &
+                                   + b31*v11 + b32*v12 + b33*v13)
 
       prod = -(  uu % n(c) * w % x(c)                           &
                + uv % n(c) * w % y(c)                           &
@@ -299,10 +308,11 @@
                   +      f22 % n(c)**2  *(phi_hom)) * Grid % vol(c)
 
       A % val(A % dia(c)) =  A % val(A % dia(c))                               &
-        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)    &
-                            / kin % n(c)                                   &
-                + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))      &
-                         + g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))     &
+        + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)        &
+                            / kin % n(c)                                       &
+                + f22 % n(c)**2                                                &
+                  * (  Turb % g1 * eps % n(c) / (2.0 * kin % n(c))             &
+                     + Turb % g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))  &
           ) * Grid % vol(c)
 
     !---------------!
@@ -318,11 +328,12 @@
                              + ww % n(c)*n2*n3     &
                              - 0.5*(n2*n3)*uu_nn)
 
-      phi_hom = (g3-g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s23  &
-              +  g4*kin % n(c)*(  b21*s31 + b22*s32 + b23*s33    &
-                                + b31*s21 + b32*s22 + b33*s23)   &
-              +  g5*kin % n(c)*(  b21*v31 + b22*v32 + b23*v33    &
-                                + b31*v21 + b32*v22 + b33*v23)
+      phi_hom =                                                            &
+          (Turb % g3 - Turb % g3_star*sqrt(b_mn_b_mn)) * kin % n(c) * s23  &
+        +  Turb % g4 * kin % n(c)*(  b21*s31 + b22*s32 + b23*s33           &
+                                   + b31*s21 + b32*s22 + b33*s23)          &
+        +  Turb % g5 * kin % n(c)*(  b21*v31 + b22*v32 + b23*v33           &
+                                   + b31*v21 + b32*v22 + b33*v23)
 
       prod = -(  uv % n(c) * w % x(c)                           &
                + vv % n(c) * w % y(c)                           &
@@ -342,12 +353,13 @@
                   + (1.0-f22 % n(c)**2) * phi_wall                   &
                   +      f22 % n(c)**2  *(phi_hom)) * Grid % vol(c)
 
-      A % val(A % dia(c)) =  A % val(A % dia(c))                               &
+      A % val(A % dia(c)) =  A % val(A % dia(c))                         &
         + Flow % density(c) * ((1.0 - f22 % n(c)**2) * 6.0 * eps % n(c)  &
                            / kin % n(c)                                  &
-        + f22 % n(c)**2  *(  g1 * eps % n(c) / (2.0 * kin % n(c))              &
-                 + g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))             &
-                     ) * Grid % vol(c)
+        + f22 % n(c)**2                                                  &
+          * (  Turb % g1 * eps % n(c) / (2.0 * kin % n(c))               &
+             + Turb % g1_star * Turb % p_kin(c) / (2.0 * kin % n(c)))    &
+          ) * Grid % vol(c)
 
     !----------------------!
     !   Epsilon equation   !
@@ -355,13 +367,13 @@
     else if(name_phi == 'EPS') then
       esor = Grid % vol(c) / max(Turb % t_scale(c), TINY)
 
-      ce_11 = c_1e * (1.0 + 0.065*(1.0 - f22 % n(c)**3)  &
+      ce_11 = Turb % c_1e * (1.0 + 0.065*(1.0 - f22 % n(c)**3)  &
                    * Turb % p_kin(c) / eps % n(c))
       b(c) = b(c) + Flow % density(c) * ce_11 * Turb % p_kin(c) * esor
 
       ! Fill in a diagonal of coefficient matrix
-      A % val(A % dia(c)) =  A % val(A % dia(c))  &
-                          + c_2e * esor * Flow % density(c)
+      A % val(A % dia(c)) = A % val(A % dia(c))  &
+                          + Turb % c_2e * esor * Flow % density(c)
     end if
   end do
   call Grid % Exchange_Cells_Real(kin % n(-nb:nc))

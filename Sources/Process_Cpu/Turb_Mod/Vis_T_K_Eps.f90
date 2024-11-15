@@ -65,7 +65,7 @@
 
     f_mu = min(1.0,f_mu)
 
-    Turb % vis_t(c) = f_mu * c_mu * Flow % density(c) * kin % n(c)**2  &
+    Turb % vis_t(c) = f_mu * Turb % c_mu * Flow % density(c) * kin % n(c)**2  &
                       / (eps % n(c) + TINY)
   end do
   call Grid % Exchange_Cells_Real(Turb % vis_t)
@@ -87,7 +87,7 @@
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1))
+        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
 
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(   &
                                    u_tau,                &

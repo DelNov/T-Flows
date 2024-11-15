@@ -42,16 +42,17 @@
       kin_vis = Flow % viscosity(c) / Flow % density(c)
 
       t_1(c) = kin % n(c) / eps_l(c)
-      t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
-      t_3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
+      t_2(c) = Turb % c_t * sqrt(kin_vis/eps_l(c))
+      t_3(c) = 0.6 / (  sqrt(3.0)  &
+                      * Turb % c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
 
       l_1(c) = kin % n(c)**1.5 / eps_l(c)
-      l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
+      l_2(c) = Turb % c_nu * (kin_vis**3 / eps_l(c))**0.25
       l_3(c) = sqrt(kin % n(c)/3.0)  &
-             / (c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
+             / (Turb % c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
 
-      Turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
-      Turb % l_scale(c) = c_l * max( min(l_1(c), l_3(c)), l_2(c) )
+      Turb % t_scale(c) =              max( min(t_1(c), t_3(c)), t_2(c) )
+      Turb % l_scale(c) = Turb % c_l * max( min(l_1(c), l_3(c)), l_2(c) )
     end do
 
   else if(Turb % model .eq. HYBRID_LES_RANS) then
@@ -61,14 +62,15 @@
       kin_vis = Flow % viscosity(c) / Flow % density(c)
 
       t_1(c) = kin % n(c) / eps_l(c)
-      t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
-      t_3(c) = 0.6/(sqrt(3.0)*c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
+      t_2(c) = Turb % c_t * sqrt(kin_vis/eps_l(c))
+      t_3(c) = 0.6 / (  sqrt(3.0)  &
+                      * Turb % c_mu_d * zeta % n(c) * Flow % shear(c) + TINY)
 
       l_1(c) = kin % n(c)**1.5 / eps_l(c)
-      l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
+      l_2(c) = Turb % c_nu * (kin_vis**3 / eps_l(c))**0.25
 
-      Turb % t_scale(c) =       max( min(t_1(c), t_3(c)), t_2(c) )
-      Turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
+      Turb % t_scale(c) =              max( min(t_1(c), t_3(c)), t_2(c) )
+      Turb % l_scale(c) = Turb % c_l * max( l_1(c), l_2(c) )
     end do
 
   else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
@@ -79,15 +81,15 @@
       kin_vis = Flow % viscosity(c) / Flow % density(c)
 
       t_1(c) = kin % n(c)/eps_l(c)
-      t_2(c) = c_t*sqrt(kin_vis/eps_l(c))
+      t_2(c) = Turb % c_t * sqrt(kin_vis/eps_l(c))
 
       l_1(c) = kin % n(c)**1.5/eps_l(c)
-      l_2(c) = c_nu * (kin_vis**3 / eps_l(c))**0.25
+      l_2(c) = Turb % c_nu * (kin_vis**3 / eps_l(c))**0.25
 
       kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
 
-      Turb % t_scale(c) =       max( t_1(c), t_2(c) )
-      Turb % l_scale(c) = c_l * max( l_1(c), l_2(c) )
+      Turb % t_scale(c) =              max( t_1(c), t_2(c) )
+      Turb % l_scale(c) = Turb % c_l * max( l_1(c), l_2(c) )
     end do
 
   else if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
@@ -109,7 +111,7 @@
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       t_1(c) = kin % n(c) / eps_l(c)
-      t_3(c) = 0.6/(sqrt(6.0) * c_mu * Flow % shear(c) + TINY)
+      t_3(c) = 0.6/(sqrt(6.0) * Turb % c_mu * Flow % shear(c) + TINY)
       Turb % t_scale(c) =  min(t_1(c), t_3(c))
     end do
   end if

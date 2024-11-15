@@ -57,13 +57,13 @@
   call Turb % Time_And_Length_Scale(Grid)
 
   do c = Cells_In_Domain()
-    e_sor = Grid % vol(c)/(Turb % t_scale(c)+TINY)
-    c_11e = c_1e*(1.0 + alpha * ( 1.0/(zeta % n(c)+TINY) ))
+    e_sor = Grid % vol(c) / (Turb % t_scale(c)+TINY)
+    c_11e = Turb % c_1e*(1.0 + Turb % alpha * ( 1.0/(zeta % n(c)+TINY) ))
     b(c) = b(c) + c_11e * e_sor * Turb % p_kin(c)
 
     ! Fill in a diagonal of coefficient matrix
-    A % val(A % dia(c)) =  A % val(A % dia(c))  &
-                        + c_2e * e_sor * Flow % density(c)
+    A % val(A % dia(c)) = A % val(A % dia(c))  &
+                        + Turb % c_2e * e_sor * Flow % density(c)
 
     ! Add buoyancy (linearly split) to eps equation as required in the t2 model
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
@@ -96,7 +96,7 @@
         ! Compute tangential velocity component
         u_tan = Flow % U_Tan(s)
 
-        u_tau = c_mu25 * sqrt(kin % n(c1))
+        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
 
         Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
                                    u_tau,                 &
@@ -107,13 +107,13 @@
         eps_int = 2.0 * kin_vis * kin % n(c1)  &
                 / Grid % wall_dist(c1)**2
 
-        eps_wf  = c_mu75 * kin % n(c1)**1.5   &
-                / ((Grid % wall_dist(c1) + z_o) * kappa)
+        eps_wf  = Turb % c_mu75 * kin % n(c1)**1.5   &
+                / ((Grid % wall_dist(c1) + z_o) * Turb % kappa)
 
         ebf = Turb % Ebf_Momentum(c1)
 
-        p_kin_wf = Turb % tau_wall(c1) * c_mu25 * sqrt(kin % n(c1))  &
-                 / ((Grid % wall_dist(c1) + z_o) * kappa)
+        p_kin_wf = Turb % tau_wall(c1) * Turb % c_mu25 * sqrt(kin % n(c1))  &
+                 / ((Grid % wall_dist(c1) + z_o) * Turb % kappa)
 
         p_kin_int = Turb % vis_t(c1) * Flow % shear(c1)**2
 

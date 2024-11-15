@@ -59,13 +59,16 @@
 
   else if(Turb % heat_flux_model .eq. GGDH) then
     do c = Cells_In_Domain_And_Buffers()
-      ut % n(c) = -c_theta * Turb % t_scale(c) * (  uu % n(c) * t % x(c)   &
+      ut % n(c) = -Turb % c_theta * Turb % t_scale(c) * (                  &
+                                                    uu % n(c) * t % x(c)   &
                                                   + uv % n(c) * t % y(c)   &
                                                   + uw % n(c) * t % z(c))
-      vt % n(c) = -c_theta * Turb % t_scale(c) * (  uv % n(c) * t % x(c)   &
+      vt % n(c) = -Turb % c_theta * Turb % t_scale(c) * (                  &
+                                                    uv % n(c) * t % x(c)   &
                                                   + vv % n(c) * t % y(c)   &
                                                   + vw % n(c) * t % z(c))
-      wt % n(c) = -c_theta * Turb % t_scale(c) * (  uw % n(c) * t % x(c)   &
+      wt % n(c) = -Turb % c_theta * Turb % t_scale(c) * (                  &
+                                                    uw % n(c) * t % x(c)   &
                                                   + vw % n(c) * t % y(c)   &
                                                   + ww % n(c) * t % z(c))
     end do
@@ -76,32 +79,32 @@
     call Flow % Grad_Variable(Flow % w)
 
     do c = Cells_In_Domain_And_Buffers()
-      ut % n(c) = -c_theta * Turb % t_scale(c)          &
-                    * ((  uu % n(c) * t % x(c)          &
-                        + uv % n(c) * t % y(c)          &
-                        + uw % n(c) * t % z(c))         &
-                + afm_eta * (  ut % n(c) * u % x(c)     &
-                             + vt % n(c) * u % y(c)     &
-                             + wt % n(c) * u % z(c))    &
-                + afm_psi * Flow % beta * Flow % grav_x * t2 % n(c))
+      ut % n(c) = -Turb % c_theta * Turb % t_scale(c)        &
+                    * ((  uu % n(c) * t % x(c)               &
+                        + uv % n(c) * t % y(c)               &
+                        + uw % n(c) * t % z(c))              &
+                + Turb % afm_eta * (  ut % n(c) * u % x(c)   &
+                                    + vt % n(c) * u % y(c)   &
+                                    + wt % n(c) * u % z(c))  &
+                + Turb % afm_psi * Flow % beta * Flow % grav_x * t2 % n(c))
 
-      vt % n(c) = -c_theta * Turb % t_scale(c)          &
-                    * ((  uv % n(c) * t % x(c)          &
-                        + vv % n(c) * t % y(c)          &
-                        + vw % n(c) * t % z(c))         &
-                + afm_eta * (  ut % n(c) * v % x(c)     &
-                             + vt % n(c) * v % y(c)     &
-                             + wt % n(c) * v % z(c))    &
-                + afm_psi * Flow % beta * Flow % grav_y * t2 % n(c))
+      vt % n(c) = -Turb % c_theta * Turb % t_scale(c)        &
+                    * ((  uv % n(c) * t % x(c)               &
+                        + vv % n(c) * t % y(c)               &
+                        + vw % n(c) * t % z(c))              &
+                + Turb % afm_eta * (  ut % n(c) * v % x(c)   &
+                                    + vt % n(c) * v % y(c)   &
+                                    + wt % n(c) * v % z(c))  &
+                + Turb % afm_psi * Flow % beta * Flow % grav_y * t2 % n(c))
 
-      wt % n(c) = -c_theta * Turb % t_scale(c)          &
-                    * ((  uw % n(c) * t % x(c)          &
-                        + vw % n(c) * t % y(c)          &
-                        + ww % n(c) * t % z(c))         &
-                + afm_eta * (  ut % n(c) * w % x(c)     &
-                             + vt % n(c) * w % y(c)     &
-                             + wt % n(c) * w % z(c))    &
-                + afm_psi * Flow % beta * Flow % grav_z * t2 % n(c))
+      wt % n(c) = -Turb % c_theta * Turb % t_scale(c)        &
+                    * ((  uw % n(c) * t % x(c)               &
+                        + vw % n(c) * t % y(c)               &
+                        + ww % n(c) * t % z(c))              &
+                + Turb % afm_eta * (  ut % n(c) * w % x(c)   &
+                                    + vt % n(c) * w % y(c)   &
+                                    + wt % n(c) * w % z(c))  &
+                + Turb % afm_psi * Flow % beta * Flow % grav_z * t2 % n(c))
     end do
   end if
 

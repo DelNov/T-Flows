@@ -107,9 +107,9 @@
     real, allocatable :: tau_wall(:)  ! [kg/(m s^2)]
 
     ! Wall viscosity and conductivity (wall function approach)
-    real, allocatable :: vis_w(:) ! [kg/(m s)]
-    real, allocatable :: con_w(:) ! [W/(m K)]
-    real, allocatable :: diff_w(:)! [m^2/s]
+    real, allocatable :: vis_w(:)   ! [kg/(m s)]
+    real, allocatable :: con_w(:)   ! [W/(m K)]
+    real, allocatable :: diff_w(:)  ! [m^2/s]
 
     ! Scale-resolving simulations
     real, allocatable :: c_dyn(:)
@@ -139,6 +139,31 @@
     integer :: heat_flux_model
     integer :: scalar_flux_model
     integer :: hybrid_les_rans_switch
+
+    !--------------------------------!
+    !   Turbulence model constants   !
+    !--------------------------------!
+
+    ! For wall function:
+    real :: kappa, e_log, c_mu_theta, c_mu_theta5, kappa_theta
+
+    ! For the k-eps model:
+    real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75
+
+    ! For the k-eps-v2f model:
+    real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
+
+    ! For the Spalart-Allmaras model:
+    real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
+
+    ! For HJ and EBM Reynolds Stress Models:
+    real :: g1, g1_star, g2, g3, g3_star, g4, g5
+
+    ! For AFM turbulent flux model
+    real :: afm_eta, afm_psi, c_theta
+
+    ! For scale-resolving models
+    real :: c_smag
 
     contains
       procedure :: Init_Turb
@@ -248,31 +273,6 @@
   ! Switching criteria for hybrid LES/RANS
   integer, parameter :: SWITCH_DISTANCE = 30181
   integer, parameter :: SWITCH_VELOCITY = 30187
-
-  !--------------------------------!
-  !   Turbulence model constants   !
-  !--------------------------------!
-
-  ! For the k-eps model:
-  real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75
-
-  ! For the k-eps-v2f model:
-  real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
-
-  ! For HJ and EBM Reynolds Stress Models:
-  real :: g1, g1_star, g2, g3, g3_star, g4, g5, c_theta
-
-  ! For wall function:
-  real :: kappa, e_log, c_mu_theta, c_mu_theta5, kappa_theta
-
-  ! For the Spalart-Allmaras model:
-  real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
-
-  ! For scale-resolving models
-  real :: c_smag
-
-  ! For AFM turbulent flux model
-  real :: afm_eta, afm_psi
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !

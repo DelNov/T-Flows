@@ -175,15 +175,15 @@
   !   Turbulent diffusion term   !
   !------------------------------!
   if(phi % name .eq. 'EPS') then
-    c_mu_d = 0.18
+    Turb % c_mu_d = 0.18
   else
-    c_mu_d = 0.22
+    Turb % c_mu_d = 0.22
   end if
 
   if(Turb % model_variant .ne. STABILIZED) then
     if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
       do c = Cells_In_Domain_And_Buffers()
-        u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
+        u1uj_phij(c) = Flow % density(c) * Turb % c_mu_d / phi % sigma &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uu % n(c) * phi_x(c)                         &
@@ -191,7 +191,7 @@
                         + uw % n(c) * phi_z(c))                        &
                      - Flow % viscosity(c) * phi_x(c)
 
-        u2uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
+        u2uj_phij(c) = Flow % density(c) * Turb % c_mu_d / phi % sigma &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uv % n(c) * phi_x(c)                         &
@@ -199,7 +199,7 @@
                         + vw % n(c) * phi_z(c))                        &
                      - Flow % viscosity(c) * phi_y(c)
 
-        u3uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma        &
+        u3uj_phij(c) = Flow % density(c) * Turb % c_mu_d / phi % sigma &
                      * kin % n(c)                                      &
                      / max(eps % n(c), TINY)                           &
                      * (  uw % n(c) * phi_x(c)                         &
@@ -209,19 +209,19 @@
       end do
     else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
       do c = Cells_In_Domain_And_Buffers()
-        u1uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
+        u1uj_phij(c) = Flow % density(c) * Turb % c_mu_d / phi % sigma     &
                      * Turb % t_scale(c)                                   &
                      * (  uu % n(c) * phi_x(c)                             &
                         + uv % n(c) * phi_y(c)                             &
                         + uw % n(c) * phi_z(c))
 
-        u2uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
+        u2uj_phij(c) = Flow % density(c) * Turb % c_mu_d / phi % sigma     &
                      * Turb % t_scale(c)                                   &
                      * (  uv % n(c) * phi_x(c)                             &
                         + vv % n(c) * phi_y(c)                             &
                         + vw % n(c) * phi_z(c))
 
-        u3uj_phij(c) = Flow % density(c) * c_mu_d / phi % sigma            &
+        u3uj_phij(c) = Flow % density(c) * Turb % c_mu_d / phi % sigma     &
                      * Turb % t_scale(c)                                   &
                      * (  uw % n(c) * phi_x(c)                             &
                         + vw % n(c) * phi_y(c)                             &
