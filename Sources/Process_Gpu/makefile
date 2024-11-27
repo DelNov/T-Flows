@@ -421,6 +421,7 @@ include makefile_explicit_dependencies
 #   Explicit target
 #---------------------
 clean:
+	find . -name "*.fpp" | xargs touch
 	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
 
 #---------------------------------------------------------
