@@ -58,10 +58,10 @@
   call Read_Control % Physical_Properties(Grid, Flow)
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Grid, Flow)
+  call Read_Control % Boundary_Conditions(Grid, Flow, Turb)
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Grid, Flow)
+  call Read_Control % Numerical_Schemes(Grid, Flow, Turb)
 
   ! Transfer the necessary grid components to the device
   call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)

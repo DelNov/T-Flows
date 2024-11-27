@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Boundary_Conditions(Rc, Grid, Flow)
+  subroutine Boundary_Conditions(Rc, Grid, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -12,8 +12,10 @@
   class(Read_Controls_Type), intent(in) :: Rc    !! parent class
   type(Grid_Type)                       :: Grid  !! grid object
   type(Field_Type), target              :: Flow  !! flow object
+  type(Turb_Type),  target              :: Turb  !! turbulence object
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t, p
+  type(Var_Type),  pointer :: vis
   type(Var_Type),  pointer :: scalar(:)
   integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s,fu
   character(SL)            :: name_prof(128)
@@ -41,6 +43,7 @@
   t      => Flow % t
   p      => Flow % p
   scalar => Flow % scalar
+  vis    => Turb % vis
 
   call Flow % Alias_Momentum(u, v, w)
 
@@ -229,6 +232,12 @@
             i = Key_Ind(scalar(sc) % flux_name, keys, nks)
             if(i > 0) scalar(sc) % q(c) = vals(i)
           end do
+
+          ! For turbulence models
+          if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+             Turb % model .eq. DES_SPALART) then
+            i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % b(c) = vals(i)
+          end if
 
         end do    ! Cells_In_Region
 

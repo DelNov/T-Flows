@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Numerical_Schemes(Rc, Grid, Flow)
+  subroutine Numerical_Schemes(Rc, Grid, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -12,8 +12,9 @@
   class(Read_Controls_Type), intent(in) :: Rc    !! parent class
   type(Grid_Type)                       :: Grid  !! grid object
   type(Field_Type), target              :: Flow  !! flow object
+  type(Turb_Type),  target              :: Turb  !! turbulence object
 !----------------------------------[Locals]------------------------------------!
-  type(Var_Type),  pointer :: ui, phi
+  type(Var_Type),  pointer :: tq, ui, phi
   character(SL)            :: name
   integer                  :: i, sc
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -82,6 +83,21 @@
     call Control % Blending_Coefficient_For_Scalars            (phi % blend)
     call Control % Simple_Underrelaxation_For_Scalars          (phi % urf)
     call Control % Blend_System_Matrices(phi % blend_matrix, .false.)
+  end do
+
+  !------------------------------!
+  !   All turbulent quantities   !
+  !------------------------------!
+  do i = 1, 12
+    nullify(tq)
+    if(i .eq.  5) tq => Turb % vis
+    if(associated(tq)) then
+      call Control % Time_Integration_Scheme                    (name)
+      tq % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+      call Control % Blending_Coefficient_For_Turbulence        (tq % blend)
+      call Control % Simple_Underrelaxation_For_Turbulence      (tq % urf)
+      call Control % Blend_System_Matrices(tq % blend_matrix, .false.)
+    end if
   end do
 
   end subroutine

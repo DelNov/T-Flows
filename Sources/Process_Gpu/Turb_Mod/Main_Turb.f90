@@ -19,4 +19,12 @@
     call Flow % Calculate_Shear_And_Vorticity(Grid)
   end if
 
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    call Flow % Calculate_Shear_And_Vorticity(Grid)
+
+    call Turb % Compute_Variable(Grid, Turb % vis, Flow)
+    call Turb % Vis_T_Spalart_Allmaras(Grid, Flow)
+  end if
+
   end subroutine

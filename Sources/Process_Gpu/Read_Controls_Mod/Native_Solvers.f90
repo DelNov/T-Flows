@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Native_Solvers(Rc, Grid, Flow)
+  subroutine Native_Solvers(Rc, Grid, Flow, Turb)
 !------------------------------------------------------------------------------!
 !>  This is s a simplified version from the same subroutine in Process_Cpu
 !>  as it reads only boundary conditions releated to momentum and enthalpy
@@ -12,8 +12,9 @@
   class(Read_Controls_Type), intent(in) :: Rc    !! parent class
   type(Grid_Type)                       :: Grid  !! grid object
   type(Field_Type), target              :: Flow  !! flow object
+  type(Turb_Type),  target              :: Turb  !! turbulence object
 !----------------------------------[Locals]------------------------------------!
-  type(Var_Type),  pointer :: ui, phi
+  type(Var_Type),  pointer :: tq, ui, phi
   integer                  :: i, sc
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Rc)
@@ -91,5 +92,17 @@
     end do
 
   end if
+
+  !------------------------------!
+  !   All turbuelnt quantities   !
+  !------------------------------!
+  do i = 1, 12
+    nullify(tq)
+    if(i .eq.  5) tq => Turb % vis
+    if(associated(tq)) then
+      call Control % Tolerance_For_Turbulence_Solver     (tq % tol)
+      call Control % Max_Iterations_For_Turbulence_Solver(tq % miter)
+    end if
+  end do
 
   end subroutine

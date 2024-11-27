@@ -60,7 +60,7 @@
       u_tau = (u_tan/A_POW * (nu/grid_wall_dist(c))**B_POW)   &
               ** (1.0/(1.0+B_POW))
       turb_y_plus(c) = grid_wall_dist(c) * u_tau / flow_viscosity(c)
-      cs = c_smag * (1.0 - exp(-turb_y_plus(c) / 25.0))
+      cs = Turb % c_smag * (1.0 - exp(-turb_y_plus(c) / 25.0))
 
       turb_vis_t(c) = flow_density(c)  &
                       * (lf*lf)            &  ! delta^2

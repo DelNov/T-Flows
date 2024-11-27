@@ -43,6 +43,11 @@
   inquire(file='exit_now', exist=exit_now)
   inquire(file='save_now', exist=save_now)
 
+  ! If you came here after the time loop, this must be fixed
+  if(Time % Curr_Dt() .gt. Time % Last_Dt()) then
+    call Time % Set_Curr_Dt(Time % Last_Dt())
+  end if
+
   ! Is it time to save the backup file?
   if(Time % Curr_Dt() .eq. Time % Last_Dt() .or.  &
      save_now                               .or.  &

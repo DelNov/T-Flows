@@ -557,7 +557,20 @@
     !   Turbulent quantities   !
     !--------------------------!
 
-   kin_vis_t(:) = 0.0
+    ! Save vis and vis_t
+    if(Turb % model .eq. DES_SPALART .or.  &
+       Turb % model .eq. SPALART_ALLMARAS) then
+      str_var = Results % Var_Name("Turbulent Viscosity","[Pa s]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % vis % n(c_f:c_l),      &
+                                          f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Vorticity Magnitude","[1/s]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Flow % vort(c_f:c_l),         &
+                                          f8, f9, data_offset, run)
+    end if
+
+    kin_vis_t(:) = 0.0
     if(Turb % model .ne. NO_TURBULENCE_MODEL) then
       kin_vis_t(c_f:c_l) = Turb % vis_t(c_f:c_l) / Flow % viscosity(c_f:c_l)
       str_var = Results % Var_Name("Eddy Over Molecular Viscosity","[1]",  &
@@ -574,6 +587,23 @@
                                           Grid % wall_dist(c_f:c_l),    &
                                           f8, f9, data_offset, run)
     end if
+
+    if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+       Turb % model .eq. DES_SPALART) then
+      str_var = Results % Var_Name("Grid Cell Delta Max","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % h_max(c_f:c_l),        &
+                                          f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Grid Cell Delta Min","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % h_min(c_f:c_l),        &
+                                          f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Grid Cell Delta Wall","[m]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                                          Turb % h_w  (c_f:c_l),        &
+                                          f8, f9, data_offset, run)
+    end if
+
 
     !----------------------!
     !                      !

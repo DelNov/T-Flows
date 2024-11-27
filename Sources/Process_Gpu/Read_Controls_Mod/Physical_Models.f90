@@ -47,7 +47,8 @@
     case default
       call Message % Error(60,                                       &
                            'Unknown buoyancy model: '//trim(name)//  &
-                           '.  \n Exiting!')
+                           '.  Exiting!',                            &
+                           file=__FILE__, line=__LINE__)
   end select
 
   call Control % Reference_Density           (Flow % dens_ref, .true.)
@@ -68,18 +69,27 @@
       Turb % model = LES_SMAGORINSKY
     case('LES_WALE')
       Turb % model = LES_WALE
+    case('SPALART_ALLMARAS')
+      Turb % model = SPALART_ALLMARAS
 
     case default
       call Message % Error(60,                                         &
                            'Unknown turbulence model: '//trim(name)//  &
-                           '.  \n Exiting!')
+                           '.  Exiting!',                              &
+                           file=__FILE__, line=__LINE__)
   end select
 
   !-------------------------------------------------------------------------!
   !   Initialization of model constants depending on the turbulence model   !
   !-------------------------------------------------------------------------!
   if(Turb % model .eq. LES_SMAGORINSKY) then
-    call Control % Smagorinsky_Constant(c_smag, .true.)
+    call Control % Smagorinsky_Constant(Turb % c_smag, .true.)
+  end if
+
+
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    call Turb % Const_Spalart_Allmaras()
   end if
 
   !------------------------------------!

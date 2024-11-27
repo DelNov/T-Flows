@@ -22,6 +22,22 @@
     O_Print '(a)', ' #-----------------------------------------'
 # endif
 
+  !----------------------!
+  !   Spalart Allmaras   !
+  !----------------------!
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+
+    turb_vis_t => Turb % vis_t
+    turb_vis_w => Turb % vis_w
+    turb_h_max => Turb % h_max
+    turb_h_min => Turb % h_min
+    turb_h_w   => Turb % h_w
+    if(Flow % heat_transfer) then
+      turb_con_w => Turb % con_w
+    end if ! Flow % heat_transfer
+  end if
+
   !-----------------------!
   !   Smagorinsky model   !
   !-----------------------!
@@ -47,7 +63,9 @@
 
     ! Variables needed for all turbulence models
     call Gpu % Vector_Real_Copy_To_Device(Turb % y_plus)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % z_o)
     turb_y_plus => Turb % y_plus
+    turb_z_o    => Turb % z_o
 
     ! These two belong to Field_Mod
     call Gpu % Vector_Real_Copy_To_Device(Flow % shear)

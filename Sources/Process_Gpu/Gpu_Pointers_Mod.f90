@@ -44,6 +44,10 @@
   real, contiguous, pointer :: flow_capacity(:), flow_conductivity(:)
 
   ! Access to Turb members
-  real, contiguous, pointer :: turb_y_plus(:), turb_vis_t(:), turb_wale_v(:)
+  real, contiguous, pointer :: turb_y_plus(:), turb_wale_v(:)
+  real, contiguous, pointer :: turb_vis_t(:), turb_vis_w(:), turb_con_w(:)
+  real, contiguous, pointer :: turb_h_max(:), turb_h_min(:), turb_h_w(:)
+  real, contiguous, pointer :: turb_z_o(:)
+  real, contiguous, pointer :: phi_n(:), phi_o(:), phi_oo(:)
 
   end module

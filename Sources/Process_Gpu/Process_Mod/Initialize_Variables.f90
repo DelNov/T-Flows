@@ -20,6 +20,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Bulk_Type),  pointer :: bulk
   type(Var_Type),   pointer :: u, v, w, t, phi
+  type(Var_Type),   pointer :: vis
   type(Face_Type),  pointer :: v_flux
   integer                   :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                   :: n_wall, n_inflow, n_outflow, n_symmetry,  &
@@ -47,6 +48,7 @@
   ! Take aliases
   bulk   => Flow % bulk
   v_flux => Flow % v_flux
+  vis    => Turb % vis
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
 
@@ -149,6 +151,23 @@
             i=Key_Ind('T',keys,nks); read(t_def,*) prof(k,0); t % n(c)=prof(k,i)
           end if
 
+          !------------------------------!
+          !   Scalars are missing here   !
+          !------------------------------!
+
+          !-------------------------!
+          !   Vof is missing here   !
+          !-------------------------!
+
+          !--------------------------!
+          !   Turbulent quantities   !
+          !--------------------------!
+          if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+             Turb % model .eq. DES_SPALART) then
+            i = Key_Ind('VIS', keys, nks)
+            read(vis_def, *) prof(k, 0);  vis % n(c) = prof(k, i)
+          end if
+
         end do ! c = 1, Grid % n_cells
 
         call Global % Wait
@@ -241,6 +260,19 @@
             phi % oo(c) = phi % n(c)
           end if
         end do
+
+        !--------------------------!
+        !   Turbulent quantities   !
+        !--------------------------!
+
+        if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+           Turb % model .eq. DES_SPALART) then
+          vals(0) = vis_def;  read(vals(Key_Ind('VIS',keys,nks)),*) vis % n(c)
+          vis % o(c)  = vis % n(c)
+          if(vis % td_scheme .eq. PARABOLIC) then
+            vis % oo(c) = vis % n(c)
+          end if
+        end if
 
       end do ! through cells
 

@@ -1,18 +1,18 @@
 !==============================================================================!
-  subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb, Aval,  &
+  subroutine Form_Variable_Matrix(Turb, Grid, phi, Flow, Aval,  &
                                   visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)           :: Process
-  type(Grid_Type), intent(in), target :: Grid
-  type(Field_Type),            target :: Flow
-  type(Turb_Type),             target :: Turb
-  type(Sparse_Val_Type),       target :: Aval
-  real                                :: visc_eff(-Grid % n_bnd_cells &
-                                                  :Grid % n_cells)
-  real                                :: urf
-  real,  optional, intent(in)         :: dt       !! time step
+  class(Turb_Type)                      :: Turb
+  type(Grid_Type),   intent(in), target :: Grid
+  type(Var_Type),    intent(in), target :: phi
+  type(Field_Type),              target :: Flow
+  type(Sparse_Val_Type),         target :: Aval
+  real                                  :: visc_eff(-Grid % n_bnd_cells  &
+                                                    :Grid % n_cells)
+  real                                  :: urf
+  real,    optional, intent(in)         :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
@@ -22,13 +22,13 @@
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Process)
 !==============================================================================!
 
-  call Profiler % Start('Form_Momentum_Matrix')
+  call Profiler % Start('Form_Variable_Matrix')
 
-  ! If each varible uses its own matrix and this matrix was already formed
+  ! If each varible uses its own matrix
+  ! (This is a bit tricky for turbulent variables,
+  !  we need some special strategy to resolve this)
   if(.not. Flow % Nat % use_one_matrix) then
     if(Flow % Nat % A(MATRIX_UVW) % formed) return
   end if
@@ -61,42 +61,20 @@
   !-------------------------------------------------------------!
   !   If there is a turbulence model, add turbulent viscosity   !
   !-------------------------------------------------------------!
-  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+  !@ if(Turb % model .ne. NO_TURBULENCE_MODEL) then
+  !@   !$tf-acc loop begin
+  !@   do c = Cells_In_Domain_And_Buffers()
+  !@     visc_eff(c) = visc_eff(c) + turb_vis_t(c) / phi % sigma
+  !@   end do
+  !@   !$tf-acc loop end
+  !@ end if
 
-    ! Inside the domain, add turbulent viscosity
+  if(Turb % model .eq. SPALART_ALLMARAS.or.Turb % model .eq. DES_SPALART) then
     !$tf-acc loop begin
     do c = Cells_In_Domain_And_Buffers()
-      visc_eff(c) = visc_eff(c) + turb_vis_t(c)
+      visc_eff(c) = visc_eff(c) + phi % n(c) * Flow % density(c) / phi % sigma
     end do
     !$tf-acc loop end
-
-    ! On the walls, add wall viscosity and on other
-    ! boundaries just add turbulent viscosity
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL) then
-
-        !$tf-acc loop begin
-        do s = Faces_In_Region(reg)  ! all present
-          c1 = Grid % faces_c(1,s)   ! inside cell
-          c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = turb_vis_w(c1)
-        end do
-        !$tf-acc loop end
-
-      else
-
-        !$tf-acc loop begin
-        do s = Faces_In_Region(reg)  ! all present
-          c1 = Grid % faces_c(1,s)   ! inside cell
-          c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = turb_vis_t(c1)
-        end do
-        !$tf-acc loop end
-
-      end if
-    end do
-
   end if
 
   !---------------------------------------!
@@ -148,7 +126,7 @@
   !---------------------------------------!
   !   Upwind blending inside the domain   !
   !---------------------------------------!
-  if(Flow % u % blend_matrix) then
+  if(phi % blend_matrix) then
 
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
@@ -197,8 +175,7 @@
       !$tf-acc loop begin
       do s = Faces_In_Region(reg)  ! all present
         c1 = Grid % faces_c(1,s)   ! inside cell
-        c2 = Grid % faces_c(2,s)   ! boundary cell
-        a12 = visc_eff(c2) * fc(s)
+        a12 = visc_eff(c1) * fc(s)
         val(dia(c1)) = val(dia(c1)) + a12
       end do
       !$tf-acc loop end
@@ -219,23 +196,10 @@
     !$tf-acc loop end
   end if
 
-  !--------------------------------------------------------------!
-  !   Store volume divided by central coefficient for momentum   !
-  !   and refresh its buffers before discretizing the pressure   !
-  !--------------------------------------------------------------!
-  !$tf-acc loop begin
-  do c = Cells_In_Domain()  ! all present, was independent
-    Flow % v_m(c) = Grid % vol(c) / val(dia(c))
-  end do
-  !$tf-acc loop end
-
-  ! This call is needed, the above loop goes through inside cells only
-  call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
-
   !-------------------------------------!
   !                                     !
   !   Part 1 of the under-relaxation    !
-  !   (Part 2 is in Compute_Momentum)   !
+  !   (Part 2 is in Compute_Variable)   !
   !                                     !
   !-------------------------------------!
   !$tf-acc loop begin
@@ -251,17 +215,14 @@
 
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0
-  do c = Cells_In_Domain()  ! this is for debugging, don't do it on GPU
-    ! or: temp(c) = val(dia(c))
-    ! or: temp(c) = Acon % row(c+1) - Acon % row(c)
-    temp(c) = flow_v_m(c)
+  do c = 1, Grid % n_cells  ! this is for debugging and should be on CPU
+    temp(c) = val(dia(c))
   end do
-  call Grid % Exchange_Inside_Cells_Real(temp)
-  call Grid % Save_Debug_Vtu("v_m",              &
-                             inside_name="v_m",  &
+  call Grid % Save_Debug_Vtu("a_turb_var_diagonal",              &
+                             inside_name="a_turb_var_diagonal",  &
                              inside_cell=temp)
 # endif
 
-  call Profiler % Stop('Form_Momentum_Matrix')
+  call Profiler % Stop('Form_Variable_Matrix')
 
   end subroutine

@@ -68,13 +68,13 @@
   call Read_Control % Physical_Properties(Grid(1), Flow(1))
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Grid(1), Flow(1))
+  call Read_Control % Boundary_Conditions(Grid(1), Flow(1), Turb(1))
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Grid(1), Flow(1))
+  call Read_Control % Numerical_Schemes(Grid(1), Flow(1), Turb(1))
 
   O_Print '(a)', ' # Reading native solvers'
-  call Read_Control % Native_Solvers(Grid(1), Flow(1))
+  call Read_Control % Native_Solvers(Grid(1), Flow(1), Turb(1))
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix(Grid(1))

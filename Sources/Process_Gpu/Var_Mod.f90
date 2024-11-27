@@ -34,6 +34,7 @@
     real, allocatable :: oo(:)  !! time step before old (older than old)
     real, allocatable :: b(:)   !! boundary value
     real, allocatable :: q(:)   !! wall flux of the variable
+    real              :: sigma  !! sigma, diffusion transport coefficient
     real              :: res    !! residual after linear solver
 
     ! Boundary cell type (important for scalars, since they
