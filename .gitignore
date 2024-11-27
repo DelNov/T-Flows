@@ -21,7 +21,12 @@
 *.backup
 *.1d
 *genmod.f90
-Binaries/*
+Binaries/Generate
+Binaries/Convert
+Binaries/Divide
+Binaries/Cpu/Process
+Binaries/Gpu/Process_Cpu
+Binaries/Gpu/Process_Gpu
 Tests/**/Generate
 Tests/**/Convert
 Tests/**/Divide
