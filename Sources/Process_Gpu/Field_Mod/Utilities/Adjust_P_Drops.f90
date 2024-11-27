@@ -45,16 +45,18 @@
   ! Work out the mean density of the fluid body
   rho = Flow % Volume_Average(Grid, Flow % density)
 
+  Assert(1.0 / Flow % dt > TINY)
+
   ! Once density is computed, continue with necessary pressure drops
 
   if(abs(bulk % u_o) >= TINY ) then
-    bulk % p_drop_x = max(rho * (bulk % u_o - bulk % u) / Flow % dt, 0.0)
+    bulk % p_drop_x = rho * (bulk % u_o - bulk % u) / Flow % dt
   end if
   if(abs(bulk % v_o) >= TINY ) then
-    bulk % p_drop_y = max(rho * (bulk % v_o - bulk % v) / Flow % dt, 0.0)
+    bulk % p_drop_y = rho * (bulk % v_o - bulk % v) / Flow % dt
   end if
   if(abs(bulk % w_o) >= TINY ) then
-    bulk % p_drop_x = max(rho * (bulk % w_o - bulk % w) / Flow % dt, 0.0)
+    bulk % p_drop_x = rho * (bulk % w_o - bulk % w) / Flow % dt
   end if
 
   end subroutine
