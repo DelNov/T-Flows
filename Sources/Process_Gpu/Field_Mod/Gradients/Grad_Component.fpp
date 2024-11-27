@@ -1,15 +1,18 @@
 !==============================================================================!
-  subroutine Grad_Component(Flow, Grid, phi, i, phii)
+  subroutine Grad_Component(Flow, Grid, phi, i, phii, boundary_updated)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), intent(in), target  :: Flow  !! parent flow object
   type(Grid_Type),   intent(in), target  :: Grid  !! grid object
-  real,              intent(in)  :: phi (-Grid % n_bnd_cells:Grid % n_cells)
-  integer,           intent(in)  :: i     !! gradient component (1 to 3)
-  real,              intent(out) :: phii(-Grid % n_bnd_cells:Grid % n_cells)
+  real                                   :: phi (-Grid % n_bnd_cells &
+                                                 :Grid % n_cells)
+  integer,           intent(in)          :: i     !! gradient component (1 to 3)
+  real,              intent(out)         :: phii(-Grid % n_bnd_cells &
+                                                 :Grid % n_cells)
+  logical, optional, intent(in)          :: boundary_updated
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c1, c2, s, i_cel
+  integer :: c1, c2, s, i_cel, reg
   real    :: dphi, dx, dy, dz, phii_tmp
 !-----------------------------[Local parameters]-------------------------------!
   integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
@@ -23,6 +26,25 @@
 
   ! Initialize gradients
   phii(:) = 0.0
+
+  ! Copy values to symmetry boundaries
+  if(present(boundary_updated)) then
+    if(.not. boundary_updated) then
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. SYMMETRY) then
+
+          !$tf-acc loop begin
+          do s = Faces_In_Region(reg)  ! all present
+            c1 = Grid % faces_c(1,s)   ! inside cell
+            c2 = Grid % faces_c(2,s)   ! boundary cell
+            phi(c2) = phi(c1)
+          end do
+          !$tf-acc loop end
+
+        end if
+      end do
+    end if
+  end if
 
   ! Estimate gradients cell-wise (face-wise leades to race conditions on GPUs)
   !$tf-acc loop begin

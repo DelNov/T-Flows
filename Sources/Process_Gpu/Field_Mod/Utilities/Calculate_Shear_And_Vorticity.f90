@@ -36,8 +36,36 @@
   real, contiguous, pointer :: u_x(:), u_y(:), u_z(:),  &
                                v_x(:), v_y(:), v_z(:),  &
                                w_x(:), w_y(:), w_z(:)
-  integer                   :: c, run
+  integer                   :: c, c1, c2, s, reg, run
 !==============================================================================!
+
+  !----------------------------------------!
+  !   Copy values to symmetry boundaries   !
+  !   (Probably not the most consistent)   !
+  !----------------------------------------!
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. SYMMETRY) then
+
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   flow_u_n,  &
+      !$acc   flow_v_n,  &
+      !$acc   flow_w_n   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
+        c2 = grid_faces_c(2,s)   ! boundary cell
+        flow_u_n(c2) = flow_u_n(c1)
+        flow_v_n(c2) = flow_v_n(c1)
+        flow_w_n(c2) = flow_w_n(c1)
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
   !----------------------------------------!
   !   Compute Flow % shear in three runs   !
@@ -125,5 +153,28 @@
     end if
 
   end do
+
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   flow_shear,  &
+  !$acc   flow_vort   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+    flow_shear(c) = sqrt(2.0 * flow_shear(c))
+    flow_vort (c) = sqrt(2.0 * abs(flow_vort(c)))
+  end do
+  !$acc end parallel
+
+
+# if T_FLOWS_DEBUG == 1
+    call Grid % Save_Debug_Vtu("shear",                  &
+                               scalar_name="shear"    ,  &
+                               scalar_cell=Flow % shear)
+    call Grid % Save_Debug_Vtu("vorticity",              &
+                               scalar_name="vorticity",  &
+                               scalar_cell=Flow % vort)
+# endif
 
   end subroutine

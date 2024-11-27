@@ -60,9 +60,9 @@
     !---------------------------------------------------------------!
     !   Compute pressure gradients again with extrapolated values   !
     !---------------------------------------------------------------!
-    call Flow % Grad_Component(Grid, phi % n, 1, phi_x)
-    call Flow % Grad_Component(Grid, phi % n, 2, phi_y)
-    call Flow % Grad_Component(Grid, phi % n, 3, phi_z)
+    call Flow % Grad_Component(Grid, phi % n, 1, phi_x, boundary_updated=.true.)
+    call Flow % Grad_Component(Grid, phi % n, 2, phi_y, boundary_updated=.true.)
+    call Flow % Grad_Component(Grid, phi % n, 3, phi_z, boundary_updated=.true.)
 
   end do
 

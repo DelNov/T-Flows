@@ -36,8 +36,28 @@
   real, contiguous, pointer :: u_x(:), u_y(:), u_z(:),  &
                                v_x(:), v_y(:), v_z(:),  &
                                w_x(:), w_y(:), w_z(:)
-  integer                   :: c, run
+  integer                   :: c, c1, c2, s, reg, run
 !==============================================================================!
+
+  !----------------------------------------!
+  !   Copy values to symmetry boundaries   !
+  !   (Probably not the most consistent)   !
+  !----------------------------------------!
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. SYMMETRY) then
+
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)   ! inside cell
+        c2 = Grid % faces_c(2,s)   ! boundary cell
+        Flow % u % n(c2) = Flow % u % n(c1)
+        Flow % v % n(c2) = Flow % v % n(c1)
+        Flow % w % n(c2) = Flow % w % n(c1)
+      end do
+      !$tf-acc loop end
+
+    end if
+  end do
 
   !----------------------------------------!
   !   Compute Flow % shear in three runs   !
@@ -101,5 +121,22 @@
     end if
 
   end do
+
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    Flow % shear(c) = sqrt(2.0 * Flow % shear(c))
+    Flow % vort (c) = sqrt(2.0 * abs(Flow % vort(c)))
+  end do
+  !$tf-acc loop end
+
+
+# if T_FLOWS_DEBUG == 1
+    call Grid % Save_Debug_Vtu("shear",                  &
+                               scalar_name="shear"    ,  &
+                               scalar_cell=Flow % shear)
+    call Grid % Save_Debug_Vtu("vorticity",              &
+                               scalar_name="vorticity",  &
+                               scalar_cell=Flow % vort)
+# endif
 
   end subroutine
