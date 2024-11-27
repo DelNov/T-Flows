@@ -286,6 +286,12 @@
     end if
   end if
 
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    if(phi % name .eq. 'VIS')  &
+      call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % niter)
+  end if
+
   call Flow % Grad_Variable(phi)
 
   call Work % Disconnect_Real_Cell(cross)
