@@ -6,10 +6,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type), target :: Turb
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Turb)
 !==============================================================================!
 
-  c_smag = 0.1
+  Turb % c_smag = 0.1
 
   end subroutine
