@@ -497,7 +497,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     flow_p_n  flow_pp_n  flow_v_m
   syn keyword fortranGPUTflows     flow_shear  flow_vort  flow_v_flux_n
   syn keyword fortranGPUTflows     flow_grad_c2c  flow_phi_x  flow_phi_y  flow_phi_z
-  syn keyword fortranGPUTflows     turb_y_plus  turb_vis_t  turb_wale_v
+  syn keyword fortranGPUTflows     turb_y_plus  turb_vis_t  turb_vis_w  turb_wale_v
 
 " CUDA fortran
   syn keyword fortranTypeCUDA      host global device value
