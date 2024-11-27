@@ -56,14 +56,18 @@
   end do
   !$tf-acc loop end
 
-  ! Just copy molecular conductivity to effective
+  !-----------------------------------------------------------!
+  !   Start by copying molecular viscosity to the effective   !
+  !-----------------------------------------------------------!
   !$tf-acc loop begin
   do c = Cells_In_Domain_And_Buffers()
     cond_eff(c) = Flow % conductivity(c)
   end do
   !$tf-acc loop end
 
-  ! If there is a turbulence model, add turbulent conductivity
+  !----------------------------------------------------------------!
+  !   If there is a turbulence model, add turbulent conductivity   !
+  !----------------------------------------------------------------!
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
     !$tf-acc loop begin
     do c = Cells_In_Domain_And_Buffers()
@@ -93,7 +97,7 @@
   !------------------------------------!
 
   !$tf-acc loop begin
-  do c1 = Cells_In_Domain()  ! all present, was independent
+  do c1 = Cells_In_Domain()  ! all present
 
     do i_cel = 1, Grid % cells_n_cells(c1)
       c2 = Grid % cells_c(i_cel, c1)
@@ -124,7 +128,7 @@
   if(Flow % t % blend_matrix) then
 
   !$tf-acc loop begin
-  do c1 = Cells_In_Domain()  ! all present, was independent
+  do c1 = Cells_In_Domain()  ! all present
 
     do i_cel = 1, Grid % cells_n_cells(c1)
       c2 = Grid % cells_c(i_cel, c1)

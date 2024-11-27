@@ -63,7 +63,9 @@
   end do
   !$acc end parallel
 
-  ! Just copy molecular conductivity to effective
+  !-----------------------------------------------------------!
+  !   Start by copying molecular viscosity to the effective   !
+  !-----------------------------------------------------------!
   !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -76,7 +78,9 @@
   end do
   !$acc end parallel
 
-  ! If there is a turbulence model, add turbulent conductivity
+  !----------------------------------------------------------------!
+  !   If there is a turbulence model, add turbulent conductivity   !
+  !----------------------------------------------------------------!
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
     !$acc parallel loop independent  &
     !$acc present(  &
@@ -127,7 +131,7 @@
   !$acc   pos,  &
   !$acc   dia   &
   !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
+  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
 
   !$acc loop seq
     do i_cel = 1, grid_cells_n_cells(c1)
@@ -172,7 +176,7 @@
   !$acc   pos,  &
   !$acc   dia   &
   !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
+  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
 
   !$acc loop seq
     do i_cel = 1, grid_cells_n_cells(c1)
