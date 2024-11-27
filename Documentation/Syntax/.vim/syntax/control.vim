@@ -232,10 +232,10 @@ syn match controlInteger   "-\=\<[0-9]*\>"
 syn match controlFloat     "-\=\d\+\.\d*\([eE][-+]\=\d\+\)\=[fl]\=\>"
 
 " Intrinsic (these are T-Flows variables)
-syn keyword controlIntrinsic             u  v  w  t  q  p  kin  eps  zeta  f22  uu  vv  ww  uv  uw  vw  vof  vof_c_ang
+syn keyword controlIntrinsic             u  v  w  t  q  p  kin  eps  zeta  f22  vis  uu  vv  ww  uv  uw  vw  vof  vof_c_ang
 syn keyword controlIntrinsic             c_01  c_02  c_03  c_04  c_05  c_06  q_01  q_02  q_03  q_04  q_05  q_06
 syn keyword controlIntrinsic             x  y  z  rx  ry  rz
-syn keyword controlBoundaryConditon      wall  inflow  outflow  pressure  convective  symmetry
+syn keyword controlBoundaryConditon      wall  wall_flux  inflow  outflow  pressure  convective  symmetry
 syn keyword controlLinearSolvers         native  petsc  cg  bicg  incomplete_cholesky  diagonal  none  asm  hypre
 syn keyword controlLinearSolvers         log  log_view
 syn keyword controlNumericalParameters   simple  piso  linear  parabolic  gauss_theorem  least_squares

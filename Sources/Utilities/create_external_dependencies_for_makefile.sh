@@ -10,8 +10,17 @@
 # This script does it for you.
 
 # folder structure
-CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Process_?pu/
-SHAR_DIR=$PWD/../Shared            # Process_?pu  src folder
+CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Cpu/, Gpu/
+if [[ "${CURR_DIR##*/}" == "Generate" ||  \
+      "${CURR_DIR##*/}" == "Convert" ||  \
+      "${CURR_DIR##*/}" == "Divide" ]]; then
+  SHAR_DIR=$PWD/../Shared
+elif [[ "${CURR_DIR##*/}" == "Cpu" || "${CURR_DIR##*/}" == "Gpu" ]]; then
+  SHAR_DIR=$PWD/../../Shared
+else
+  echo "Error: Invalid directory structure. Cannot determine Shared folder path."
+  return 4
+fi
 
 # tmp file name and location
 tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
@@ -253,25 +262,40 @@ function make_file_explicit_dependencies() {
 function check_if_lauched_in_correct_folder() {
   stop_execution=false
 
-  case "${CURR_DIR##*/}" in
-    "Process_Cpu"|"Process_Gpu"|"Divide"|"Convert"|"Generate")
-    parent_dir="$(dirname "$CURR_DIR")"
-    if [ ! "${parent_dir##*/}" == "Sources" ]; then
-      echo "$parent_dir"
+  # Extract the current, parent, and grandparent folder names
+  current_folder="${CURR_DIR##*/}"
+  parent_folder="$(basename "$(dirname "$CURR_DIR")")"
+  grandparent_folder="$(basename "$(dirname "$(dirname "$CURR_DIR")")")"
+
+  # Check if the current folder is valid
+  if [[ "$current_folder" != "Cpu" && "$current_folder" != "Gpu" && \
+        "$current_folder" != "Divide" && "$current_folder" != "Convert" && \
+        "$current_folder" != "Generate" ]]; then
+    stop_execution=true
+  fi
+
+  # Check if the parent folder is Process (only for Cpu/Gpu)
+  if [[ "$current_folder" == "Cpu" || "$current_folder" == "Gpu" ]]; then
+    if [[ "$parent_folder" != "Process" ]]; then
       stop_execution=true
     fi
-    ;;
-    *)
-      stop_execution=true
-    ;;
-  esac
-
-  if [ $stop_execution == true ]; then
-    echo This script can only be launched from Generate/, Convert/,
-    echo Divide/, Process_Cpu/ and Process_Gpu/ folders of T-Flows
-    echo Launch it this way: bash ../Utilities/create_makefile_dependencies.sh
-    exit 3
   fi
+
+  # Check if the grandparent folder is Sources (only for Process/Cpu and Process/Gpu)
+  if [[ "$parent_folder" == "Process" ]]; then
+    if [[ "$grandparent_folder" != "Sources" ]]; then
+      stop_execution=true
+    fi
+  fi
+
+  # Exit if any checks fail
+  if [ $stop_execution == true ]; then
+    echo "This script can only be launched from the following folders:"
+    echo "Sources/Process/Cpu, Sources/Process/Gpu, Divide/, Convert/, or Generate/"
+    echo "Launch it this way: bash ../Utilities/create_makefile_dependencies.sh"
+    return 3
+  fi
+
 }
 #-------------------#
 #   Actual script   #

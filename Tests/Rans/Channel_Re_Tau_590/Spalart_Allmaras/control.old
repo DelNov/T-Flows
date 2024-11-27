@@ -11,9 +11,9 @@
 # Time stepping
 #---------------
   TIME_STEP                  1.0
-  NUMBER_OF_TIME_STEPS     2800
-  RESULTS_SAVE_INTERVAL     600
-  BACKUP_SAVE_INTERVAL      600
+  NUMBER_OF_TIME_STEPS    2800
+  RESULTS_SAVE_INTERVAL    600
+  BACKUP_SAVE_INTERVAL     600
 
 #-------------------
 # Monitoring points 
@@ -39,7 +39,7 @@
 #----------------------------------------
 # Physical models
 #----------------------------------------
-  TURBULENCE_MODEL       k_eps_zeta_f
+  TURBULENCE_MODEL       spalart_allmaras
 
 #----------------------
 # Numerical parameters
@@ -60,7 +60,7 @@
 #------------------------
 # Linear solver settings
 #------------------------
-  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   diagonal
   TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-6
   TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
   TOLERANCE_FOR_TURBULENCE_SOLVER    1.e-6
@@ -71,8 +71,8 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              1.0   0.0   0.0   20.0   1.0e-2   1.0e-3   1.0e-1   6.6e-3
+    VARIABLES           u     v     w     t      vis      eps      zeta     f22
+    VALUES              0.17  0.0   0.0   20.0   1.0e-2   1.0e-3   1.0e-1   6.6e-3
 
 #---------------------
 # Boundary conditions

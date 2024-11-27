@@ -6,19 +6,15 @@
 
   PRESSURE_DROPS         0.0036  0.0  0.0
   BULK_VELOCITIES        0.17    0.0  0.0
-  VOLUME_FLOW_RATES      0.17    0.0  0.0
 
 #---------------
 # Time stepping
 #---------------
   TIME_STEP                  1.0
-  NUMBER_OF_TIME_STEPS    1000
+  NUMBER_OF_TIME_STEPS    2800
   RESULTS_SAVE_INTERVAL    600
   BACKUP_SAVE_INTERVAL     600
-  MIN_SIMPLE_ITERATIONS    12
-  MAX_SIMPLE_ITERATIONS    12
 
-#  LOAD_BACKUP_NAME   chan-ts001800.backup
 #-------------------
 # Monitoring points 
 #-------------------
@@ -44,7 +40,6 @@
 # Physical models
 #----------------------------------------
   TURBULENCE_MODEL       spalart_allmaras
-# TURBULENCE_MODEL       none
 
 #----------------------
 # Numerical parameters

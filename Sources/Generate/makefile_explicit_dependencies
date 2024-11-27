@@ -1,36 +1,7 @@
 #---------------------------------------------------
-# Dependencies for: ./Domain_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Domain_Mod.o:\
-$(DIR_OBJECT)/Range_Mod.o \
-$(DIR_OBJECT)/Point_Mod.o \
-$(DIR_OBJECT)/Line_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-Domain_Mod/*.f90 \
-$(DIR_OBJECT)/Block_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Refines_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Refines_Mod.o:\
-Refines_Mod/*.f90 \
-$(DIR_OBJECT)/Point_Mod.o \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Refines_Mod/Connectivity.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Connectivity.o:
-
-#---------------------------------------------------
-# Dependencies for: ./Smooths_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Smooths_Mod.o:\
-Smooths_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Generate_Mod.f90
@@ -47,27 +18,13 @@ $(DIR_OBJECT)/Domain_Mod.o \
 Domain_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Range_Mod.f90
+# Dependencies for: ./Refines_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Range_Mod.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Generate_Mod/Print_Generate_Statistics.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Print_Generate_Statistics.o:\
+$(DIR_OBJECT)/Refines_Mod.o:\
+Refines_Mod/*.f90 \
+$(DIR_OBJECT)/Point_Mod.o \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Generate_Mod/Calculate_Geometry.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Calculate_Geometry.o:
-
-#---------------------------------------------------
-# Dependencies for: ./Generate_Mod/Load_Dom.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Load_Dom.o:
 
 #---------------------------------------------------
 # Dependencies for: ./Main_Gen.f90
@@ -86,25 +43,93 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Stl_Mod.f90
+# Dependencies for: ./Smooths_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Stl_Mod.o:\
-$(DIR_SHARED)/Stl_Mod/*.f90 \
+$(DIR_OBJECT)/Smooths_Mod.o:\
+Smooths_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Assert_Mod.f90
+# Dependencies for: ./Range_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Assert_Mod.o:\
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 \
+$(DIR_OBJECT)/Range_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Domain_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Domain_Mod.o:\
+$(DIR_OBJECT)/Range_Mod.o \
+$(DIR_OBJECT)/Point_Mod.o \
+$(DIR_OBJECT)/Line_Mod.o \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+Domain_Mod/*.f90 \
+$(DIR_OBJECT)/Block_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Generate_Mod/Calculate_Geometry.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Calculate_Geometry.o:
+
+#---------------------------------------------------
+# Dependencies for: ./Generate_Mod/Load_Dom.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Load_Dom.o:
+
+#---------------------------------------------------
+# Dependencies for: ./Generate_Mod/Print_Generate_Statistics.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Print_Generate_Statistics.o:\
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Comm_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Comm_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./String_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/String_Mod.o:\
+$(DIR_SHARED)/String_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Message_Mod.o:\
+$(DIR_OBJECT)/Tokenizer_Mod.o \
+$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Region_Mod.f90
+# Dependencies for: ./Profiler_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Region_Mod.o:\
+$(DIR_OBJECT)/Profiler_Mod.o:\
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 \
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Probe_1d_Cells.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Probe_1d_Cells.o:\
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
@@ -116,25 +141,29 @@ $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Swap_Mod.f90
+# Dependencies for: ./Metis_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Swap_Mod.o:\
-$(DIR_SHARED)/Swap_Mod/*.f90 
+$(DIR_OBJECT)/Metis_Mod.o:\
+$(DIR_SHARED)/Metis_Mod/*.f90 \
+$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Polyhedron_Mod.f90
+# Dependencies for: ./Control_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Polyhedron_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_SHARED)/Polyhedron_Mod/*.f90 
+$(DIR_OBJECT)/Control_Mod.o:\
+$(DIR_OBJECT)/Math_Mod.o \
+$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_OBJECT)/File_Mod.o \
+$(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./String_Mod.f90
+# Dependencies for: ./Region_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/String_Mod.o:\
-$(DIR_SHARED)/String_Mod/*.f90 
+$(DIR_OBJECT)/Region_Mod.o:\
+$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Math_Mod.f90
@@ -142,6 +171,25 @@ $(DIR_SHARED)/String_Mod/*.f90
 $(DIR_OBJECT)/Math_Mod.o:\
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Isoap_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Isoap_Mod.o:\
+$(DIR_OBJECT)/Polyhedron_Mod.o \
+$(DIR_SHARED)/Polyhedron_Mod/*.f90 \
+$(DIR_OBJECT)/Iso_Polygons_Mod.o \
+$(DIR_SHARED)/Iso_Polygons_Mod/*.f90 \
+$(DIR_SHARED)/Isoap_Mod/readme \
+$(DIR_SHARED)/Isoap_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Stl_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Stl_Mod.o:\
+$(DIR_SHARED)/Stl_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_1d_Nodes.f90
@@ -156,47 +204,6 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Profiler_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Profiler_Mod.o:\
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod/Dashed_Line.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Dashed_Line.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod/Thin_Line.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Thin_Line.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod/Thick_Line.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Thick_Line.o:\
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
-# Dependencies for: ./Probe_1d_Cells.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Probe_1d_Cells.o:\
-$(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Grid_Mod.f90
@@ -219,6 +226,15 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Polyhedron_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Polyhedron_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/*.f90 
+
+#---------------------------------------------------
 # Dependencies for: ./Sort_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Sort_Mod.o:\
@@ -230,24 +246,10 @@ $(DIR_OBJECT)/Math_Mod.o \
 $(DIR_SHARED)/Math_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Vtk_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Vtk_Mod.o:\
-$(DIR_SHARED)/Vtk_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o 
-
-#---------------------------------------------------
 # Dependencies for: ./Iso_Polygons_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Iso_Polygons_Mod.o:\
 $(DIR_SHARED)/Iso_Polygons_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Comm_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Comm_Mod.o:\
-$(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./File_Mod.f90
@@ -260,14 +262,35 @@ $(DIR_SHARED)/Message_Mod/*.f90 \
 $(DIR_SHARED)/File_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Memory_Mod.f90
+# Dependencies for: ./Vtk_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Memory_Mod.o:\
-$(DIR_OBJECT)/Message_Mod.o \
-$(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_SHARED)/Memory_Mod/*.f90 \
-$(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_OBJECT)/Vtk_Mod.o:\
+$(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Swap_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Swap_Mod.o:\
+$(DIR_SHARED)/Swap_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Dashed_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Dashed_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thick_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thick_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Message_Mod/Thin_Line.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Thin_Line.o:\
+$(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Work_Mod.f90
@@ -279,43 +302,20 @@ $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Metis_Mod.f90
+# Dependencies for: ./Assert_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Metis_Mod.o:\
-$(DIR_SHARED)/Metis_Mod/*.f90 \
-$(DIR_OBJECT)/Assert_Mod.o \
+$(DIR_OBJECT)/Assert_Mod.o:\
+$(DIR_OBJECT)/Comm_Mod.o \
+$(DIR_SHARED)/Comm_Mod/*/*.f90 \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Control_Mod.f90
+# Dependencies for: ./Memory_Mod.f90
 #---------------------------------------------------
-$(DIR_OBJECT)/Control_Mod.o:\
-$(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
-$(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Message_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Message_Mod.o:\
-$(DIR_OBJECT)/Tokenizer_Mod.o \
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_OBJECT)/Memory_Mod.o:\
+$(DIR_OBJECT)/Message_Mod.o \
 $(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_OBJECT)/Const_Mod.o \
+$(DIR_SHARED)/Memory_Mod/*.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
-
-#---------------------------------------------------
-# Dependencies for: ./Isoap_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Isoap_Mod.o:\
-$(DIR_OBJECT)/Polyhedron_Mod.o \
-$(DIR_SHARED)/Polyhedron_Mod/*.f90 \
-$(DIR_OBJECT)/Iso_Polygons_Mod.o \
-$(DIR_SHARED)/Iso_Polygons_Mod/*.f90 \
-$(DIR_SHARED)/Isoap_Mod/readme \
-$(DIR_SHARED)/Isoap_Mod/*.f90 
 
