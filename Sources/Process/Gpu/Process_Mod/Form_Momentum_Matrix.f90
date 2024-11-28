@@ -68,6 +68,23 @@
   end do
   !$acc end parallel
 
+  do reg = Boundary_Regions()
+    !$acc parallel loop  &
+    !$acc present(  &
+    !$acc   grid_region_f_face,  &
+    !$acc   grid_region_l_face,  &
+    !$acc   grid_faces_c,  &
+    !$acc   visc_eff,  &
+    !$acc   flow_viscosity   &
+    !$acc )
+    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+      c1 = grid_faces_c(1,s)   ! inside cell
+      c2 = grid_faces_c(2,s)   ! boundary cell
+      visc_eff(c2) = flow_viscosity(c1)
+    end do
+    !$acc end parallel
+  end do
+
   !-------------------------------------------------------------!
   !   If there is a turbulence model, add turbulent viscosity   !
   !-------------------------------------------------------------!
@@ -103,7 +120,7 @@
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
           c2 = grid_faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = turb_vis_w(c1)
+          visc_eff(c2) = visc_eff(c2) + turb_vis_w(c1)
         end do
         !$acc end parallel
 

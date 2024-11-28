@@ -58,6 +58,16 @@
   end do
   !$tf-acc loop end
 
+  do reg = Boundary_Regions()
+    !$tf-acc loop begin
+    do s = Faces_In_Region(reg)  ! all present
+      c1 = Grid % faces_c(1,s)   ! inside cell
+      c2 = Grid % faces_c(2,s)   ! boundary cell
+      visc_eff(c2) = Flow % viscosity(c1)
+    end do
+    !$tf-acc loop end
+  end do
+
   !-------------------------------------------------------------!
   !   If there is a turbulence model, add turbulent viscosity   !
   !-------------------------------------------------------------!
@@ -80,7 +90,7 @@
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)   ! inside cell
           c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = turb_vis_w(c1)
+          visc_eff(c2) = visc_eff(c2) + turb_vis_w(c1)
         end do
         !$tf-acc loop end
 
