@@ -41,9 +41,10 @@
 
   if(phi % name .eq. 'VIS') then
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL .or.  &
+      if(Grid % region % type(reg) .eq. WALL   .or.  &
+         Grid % region % type(reg) .eq. WALLFL .or.  &
          Grid % region % type(reg) .eq. INFLOW) then
-  
+
         phi_n => phi % n
         !$acc parallel loop  &
         !$acc present(  &
@@ -62,7 +63,7 @@
           b(c1) = b(c1) + a12 * phi_n(c2)
         end do
         !$acc end parallel
-  
+
       end if
     end do
   end if

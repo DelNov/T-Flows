@@ -138,21 +138,20 @@
   call Flow % Grad_Pressure(Grid, Flow % p)
   call Process % Add_Pressure_Term(Grid, Flow, comp=comp)
 
-  !---------------------------------------!
-  !    Part 2 of the under-relaxation     !
-  !   (Part 1 is in Form_System_Matrix)   !
-  !---------------------------------------!
-
+  !------------------------------!
+  !   Perform under-relaxation   !
+  !------------------------------!
   !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
-  !$acc   b,  &
   !$acc   val,  &
   !$acc   dia,  &
+  !$acc   b,  &
   !$acc   ui_n   &
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+    val(dia(c)) = val(dia(c)) / urf
     b(c) = b(c) + val(dia(c)) * (1.0 - urf) * ui_n(c)
   end do
   !$acc end parallel

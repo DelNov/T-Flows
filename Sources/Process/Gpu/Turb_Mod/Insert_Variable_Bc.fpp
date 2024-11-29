@@ -32,9 +32,10 @@
 
   if(phi % name .eq. 'VIS') then
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL .or.  &
+      if(Grid % region % type(reg) .eq. WALL   .or.  &
+         Grid % region % type(reg) .eq. WALLFL .or.  &
          Grid % region % type(reg) .eq. INFLOW) then
-  
+
         !$tf-acc loop begin
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)
@@ -43,7 +44,7 @@
           b(c1) = b(c1) + a12 * phi % n(c2)
         end do
         !$tf-acc loop end
-  
+
       end if
     end do
   end if

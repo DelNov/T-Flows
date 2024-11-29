@@ -90,7 +90,7 @@
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)   ! inside cell
           c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = visc_eff(c2) + turb_vis_w(c1)
+          visc_eff(c2) = turb_vis_w(c1)
         end do
         !$tf-acc loop end
 
@@ -241,18 +241,6 @@
 
   ! This call is needed, the above loop goes through inside cells only
   call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
-
-  !-------------------------------------!
-  !                                     !
-  !   Part 1 of the under-relaxation    !
-  !   (Part 2 is in Compute_Momentum)   !
-  !                                     !
-  !-------------------------------------!
-  !$tf-acc loop begin
-  do c = Cells_In_Domain()  ! all present, was independent
-    val(dia(c)) = val(dia(c)) / urf
-  end do
-  !$tf-acc loop end
 
   !-------------------------------!
   !   Mark the matrix as formed   !

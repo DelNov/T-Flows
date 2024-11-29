@@ -120,7 +120,7 @@
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
           c2 = grid_faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = visc_eff(c2) + turb_vis_w(c1)
+          visc_eff(c2) = turb_vis_w(c1)
         end do
         !$acc end parallel
 
@@ -334,24 +334,6 @@
 
   ! This call is needed, the above loop goes through inside cells only
   call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
-
-  !-------------------------------------!
-  !                                     !
-  !   Part 1 of the under-relaxation    !
-  !   (Part 2 is in Compute_Momentum)   !
-  !                                     !
-  !-------------------------------------!
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   val,  &
-  !$acc   dia   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
-    val(dia(c)) = val(dia(c)) / urf
-  end do
-  !$acc end parallel
 
   !-------------------------------!
   !   Mark the matrix as formed   !
