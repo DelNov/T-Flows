@@ -101,7 +101,6 @@
       procedure :: Tolerance_For_Turbulence_Solver
       procedure :: Tolerance_For_Vof_Solver
       procedure :: Tolerance_For_Wall_Distance_Solver
-      procedure :: Use_One_Matrix
 
       ! Numerics
       procedure :: Time_Step
@@ -301,7 +300,6 @@
 #   include "Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90"
 #   include "Control_Mod/Native/Tolerance_For_Vof_Solver.f90"
 #   include "Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90"
-#   include "Control_Mod/Native/Use_One_Matrix.f90"
 
     !--------------!
     !   Numerics   !

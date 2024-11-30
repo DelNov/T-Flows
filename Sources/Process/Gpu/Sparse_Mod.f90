@@ -93,8 +93,6 @@
 
     type(Grid_Type), pointer :: pnt_grid  !! pointer to grid
 
-    logical :: formed = .false.  !! set to true when matrix is formed
-
     real, allocatable :: val(:)    !! value
     real, allocatable :: d_inv(:)  !! inverse diagonal for preconditioner
 

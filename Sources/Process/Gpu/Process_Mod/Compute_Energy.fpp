@@ -8,8 +8,6 @@
   type(Field_Type), target :: Flow
   type(Turb_Type),  target :: Turb
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Val_Type), pointer :: Aval
-  type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), dens_capa(:), cond_eff(:)
@@ -33,17 +31,9 @@
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
-  Acon => Flow % Nat % C
-  if(Flow % Nat % use_one_matrix) then
-    Aval => Flow % Nat % A(MATRIX_ONE)
-    val  => Flow % Nat % A(MATRIX_ONE) % val
-  else
-    Aval => Flow % Nat % A(MATRIX_T)
-    val  => Flow % Nat % A(MATRIX_T) % val
-  end if
-
-  dia  => Flow % Nat % C % dia
-  b    => Flow % Nat % b
+  val => Flow % Nat % A % val
+  dia => Flow % Nat % C % dia
+  b   => Flow % Nat % b
 
   ! Tolerances and under-relaxations are the same for all components
   urf = Flow % t % urf
@@ -71,7 +61,7 @@
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
-  call Process % Form_Energy_Matrix(Grid, Flow, Turb, Aval, cond_eff,  &
+  call Process % Form_Energy_Matrix(Grid, Flow, Turb, cond_eff,  &
                                     urf, dt=Flow % dt)
 
   !----------------------------------------------------------!
@@ -102,9 +92,9 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Acon, Aval, Flow % t % n, b,        &
-                      Flow % t % miter, Flow % t % niter,  &
-                      Flow % t % tol,   Flow % t % res)
+  call Flow % Nat % Cg(Flow % t % n,                        &
+                       Flow % t % miter, Flow % t % niter,  &
+                       Flow % t % tol,   Flow % t % res)
   call Profiler % Stop('CG_for_Energy')
 
 # if T_FLOWS_DEBUG == 1

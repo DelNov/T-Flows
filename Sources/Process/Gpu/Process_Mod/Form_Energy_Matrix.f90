@@ -3,7 +3,7 @@
 !==============================================================================!
 
 !==============================================================================!
-  subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb, Aval,  &
+  subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb,  &
                                 cond_eff, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
@@ -12,7 +12,6 @@
   type(Grid_Type),   intent(in), target :: Grid
   type(Field_Type),              target :: Flow
   type(Turb_Type),               target :: Turb
-  type(Sparse_Val_Type),         target :: Aval
   real                                  :: cond_eff(-Grid % n_bnd_cells &
                                                     :Grid % n_cells)
   real                                  :: urf
@@ -32,15 +31,10 @@
 
   call Profiler % Start('Form_Energy_Matrix')
 
-  ! If each varible uses its own matrix and this matrix was already formed
-  if(.not. Flow % Nat % use_one_matrix) then
-    if(Flow % Nat % A(MATRIX_T) % formed) return
-  end if
-
   !-----------------------!
   !   Take some aliases   !
   !-----------------------!
-  val => Aval % val
+  val => Flow % Nat % A % val
   dia => Flow % Nat % C % dia
   pos => Flow % Nat % C % pos
   fc  => Flow % Nat % C % fc
@@ -264,11 +258,6 @@
     end do
     !$acc end parallel
   end if
-
-  !-------------------------------!
-  !   Mark the matrix as formed   !
-  !-------------------------------!
-  Aval % formed = .true.
 
   call Work % Disconnect_Real_Cell(dens_capa)
 

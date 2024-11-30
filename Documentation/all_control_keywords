@@ -101,7 +101,6 @@
   TOLERANCE_FOR_TURBULENCE_SOLVER          |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_VOF_SOLVER                 |         1.0e-6                |   any small number, but > 1.0e-12 is OK
   TOLERANCE_FOR_WALL_DISTANCE_SOLVER       |         1.0e-6                |   any small number, but > 1.0e-12 is OK
-  USE_ONE_MATRIX                           |         yes                   |   no
 ========================================================================================================================
   Physics
 ------------------------------------------------------------------------------------------------------------------------

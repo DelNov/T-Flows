@@ -3,7 +3,7 @@
 !==============================================================================!
 
 !==============================================================================!
-  subroutine Form_Variable_Matrix(Turb, Grid, phi, Flow, Aval,  &
+  subroutine Form_Variable_Matrix(Turb, Grid, phi, Flow,  &
                                   visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
@@ -12,7 +12,6 @@
   type(Grid_Type),   intent(in), target :: Grid
   type(Var_Type),    intent(in), target :: phi
   type(Field_Type),              target :: Flow
-  type(Sparse_Val_Type),         target :: Aval
   real                                  :: visc_eff(-Grid % n_bnd_cells  &
                                                     :Grid % n_cells)
   real                                  :: urf
@@ -30,17 +29,10 @@
 
   call Profiler % Start('Form_Variable_Matrix')
 
-  ! If each varible uses its own matrix
-  ! (This is a bit tricky for turbulent variables,
-  !  we need some special strategy to resolve this)
-  if(.not. Flow % Nat % use_one_matrix) then
-    if(Flow % Nat % A(MATRIX_UVW) % formed) return
-  end if
-
   !-----------------------!
   !   Take some aliases   !
   !-----------------------!
-  val => Aval % val
+  val => Flow % Nat % A % val
   dia => Flow % Nat % C % dia
   pos => Flow % Nat % C % pos
   fc  => Flow % Nat % C % fc
@@ -261,11 +253,6 @@
     end do
     !$acc end parallel
   end if
-
-  !-------------------------------!
-  !   Mark the matrix as formed   !
-  !-------------------------------!
-  Aval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0

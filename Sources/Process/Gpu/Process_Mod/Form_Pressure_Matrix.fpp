@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Form_Pressure_Matrix(Process, Aval, Flow, Grid)
+  subroutine Form_Pressure_Matrix(Process, Flow, Grid)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -28,7 +28,6 @@
 !     b               [m^3 / s]                                                !
 !------------------------------------------------------------------------------!
   class(Process_Type)                 :: Process
-  type(Sparse_Val_Type),       target :: Aval
   type(Field_Type),            target :: Flow
   type(Grid_Type), intent(in), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
@@ -43,15 +42,10 @@
 
   call Profiler % Start('Form_Pressure_Matrix')
 
-  ! If each varible uses its own matrix and this matrix was already formed
-  if(.not. Flow % Nat % use_one_matrix) then
-    if(Flow % Nat % A(MATRIX_PP) % formed) return
-  end if
-
   !-----------------------!
   !   Take some aliases   !
   !-----------------------!
-  val => Aval % val
+  val => Flow % Nat % A % val
   dia => Flow % Nat % C % dia
   pos => Flow % Nat % C % pos
   fc  => Flow % Nat % C % fc
@@ -92,11 +86,6 @@
     val(dia(c)) = val(dia(c)) * (1.0 + MICRO)
   end do
   !$tf-acc loop end
-
-  !-------------------------------!
-  !   Mark the matrix as formed   !
-  !-------------------------------!
-  Aval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

@@ -12,8 +12,6 @@
   type(Var_Type),   target :: phi
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Val_Type), pointer :: Aval
-  type(Sparse_Con_Type), pointer :: Acon
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), visc_eff(:)
@@ -28,12 +26,9 @@
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
-  Acon => Flow % Nat % C
-  Aval => Flow % Nat % A(MATRIX_ONE)
-  val  => Flow % Nat % A(MATRIX_ONE) % val
-  dia  => Flow % Nat % C % dia
-  b    => Flow % Nat % b
-
+  val => Flow % Nat % A % val
+  dia => Flow % Nat % C % dia
+  b   => Flow % Nat % b
 
   ! Tolerances and under-relaxations are the same for all components
   urf = phi % urf
@@ -77,7 +72,7 @@
   !--------------------------------------------------!
   !   Discretize the energy conservation equations   !
   !--------------------------------------------------!
-  call Turb % Form_Variable_Matrix(Grid, phi, Flow, Aval, visc_eff,  &
+  call Turb % Form_Variable_Matrix(Grid, phi, Flow, visc_eff,  &
                                    urf, dt=Flow % dt)
 
   !------------------------------------------------------------!
@@ -98,7 +93,7 @@
   !   Insert source term for the variable   !
   !-----------------------------------------!
   if(phi % name .eq. 'VIS') then
-    call Turb % Src_Vis_Spalart_Allmaras(Grid, Flow, Acon, Aval)
+    call Turb % Src_Vis_Spalart_Allmaras(Grid, Flow)
   end if
 
   !------------------------------!
@@ -124,7 +119,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Turb_Variable')
-  call Flow % Nat % Cg(Acon, Aval, phi % n, b,    &
+  call Flow % Nat % Cg(phi % n,                   &
                        phi % miter, phi % niter,  &
                        phi % tol,   phi % res)
   call Profiler % Stop('CG_for_Turb_Variable')

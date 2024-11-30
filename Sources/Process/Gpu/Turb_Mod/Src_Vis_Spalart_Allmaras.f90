@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Src_Vis_Spalart_Allmaras(Turb, Grid, Flow, Acon, Aval)
+  subroutine Src_Vis_Spalart_Allmaras(Turb, Grid, Flow)
 !------------------------------------------------------------------------------!
 !   Computes the source terms in vis transport equation.                       !
 !------------------------------------------------------------------------------!
@@ -8,8 +8,6 @@
   class(Turb_Type),      target :: Turb
   type(Grid_Type)               :: Grid
   type(Field_Type),      target :: Flow
-  type(Sparse_Con_Type), target :: Acon
-  type(Sparse_Val_Type), target :: Aval
 !-----------------------------------[Locals]-----------------------------------!
   real,    contiguous, pointer :: vis_x(:), vis_y(:), vis_z(:)
   real,    contiguous, pointer :: val(:)
@@ -23,9 +21,9 @@
   !------------------------------------------------------------!
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
-  val => Aval % val
-  dia => Acon % dia
-  pos => Acon % pos
+  val => Flow % Nat % A % val
+  dia => Flow % Nat % C % dia
+  pos => Flow % Nat % C % pos
   b   => Flow % Nat % b
 
   call Grad_Variable(Flow, Grid, Turb % vis)

@@ -13,8 +13,6 @@
   type(Turb_Type),  target :: Turb
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Val_Type), pointer :: Aval
-  type(Sparse_Con_Type), pointer :: Acon
   type(Var_Type),        pointer :: ui
   real,      contiguous, pointer :: ui_n(:), ui_o(:), ui_oo(:)
   real,      contiguous, pointer :: val(:)
@@ -33,17 +31,10 @@
   Assert(comp .ge. 1)
   Assert(comp .le. 3)
 
-  !------------------------------------------------------------!
-  !   First take some aliases, which is quite elaborate here   !
-  !------------------------------------------------------------!
-  Acon => Flow % Nat % C
-  if(Flow % Nat % use_one_matrix) then
-    Aval => Flow % Nat % A(MATRIX_ONE)
-    val  => Flow % Nat % A(MATRIX_ONE) % val
-  else
-    Aval => Flow % Nat % A(MATRIX_UVW)
-    val  => Flow % Nat % A(MATRIX_UVW) % val
-  end if
+  !-----------------------------!
+  !   First take some aliases   !
+  !-----------------------------!
+  val => Flow % Nat % A % val
   dia => Flow % Nat % C % dia
   b   => Flow % Nat % b
 
@@ -105,7 +96,7 @@
 
   ! Once is enough, it is the same for all components
   if(comp .eq. 1) then
-    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, visc_eff,  &
+    call Process % Form_Momentum_Matrix(Grid, Flow, Turb, visc_eff,  &
                                         urf, dt = Flow % dt)
   end if
 
@@ -160,7 +151,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(Acon, Aval, ui_n, b,     &
+  call Flow % Nat % Cg(ui_n,                    &
                        ui % miter, ui % niter,  &
                        ui % tol,   ui % res)
   call Profiler % Stop('CG_for_Momentum')

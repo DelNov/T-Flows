@@ -23,32 +23,6 @@
   ! Give some sign
   O_Print '(a)', ' # Reading info about native (home-brewed) solvers'
 
-  !-------------------------------!
-  !   Related to matrix storage   !
-  !-------------------------------!
-  call Control % Use_One_Matrix(Flow % Nat % use_one_matrix, .true.)
-
-  !---------------------------------------------------------!
-  !   Time to check if there are conflicting requirements   !
-  !      from USE_ONE_MATRIX and BLEND_SYSTEM_MATRICES      !
-  !        (For this to work, Numerical_Schemes must        !
-  !         have been already called from Main_Pro)         !
-  !---------------------------------------------------------!
-  if(.not. Flow % Nat % use_one_matrix .and.  &
-           Flow % u % blend_matrix) then
-    call Message % Error(84,                                               &
-           'You chose to use separate matrices for each variable and ' //  &
-           'blend them with upwind for stability. But, this approach ' //  &
-           'is inefficient because it uses more memory without saving '//  &
-           'computational time. The matrices will need to be '         //  &
-           'reformulated with every iteration, negating any potential '//  &
-           'computational advantage. \n \n '                           //  &
-           'The program will not continue with this configuration. '   //  &
-           'Please revise the control file, especially the entries '   //  &
-           '"USE_ONE_MATRIX" and "BLEND_SYSTEM_MATRICES".',                &
-           file=__FILE__, line=__LINE__)
-  end if
-
   !-------------------------!
   !   Related to momentum   !
   !-------------------------!

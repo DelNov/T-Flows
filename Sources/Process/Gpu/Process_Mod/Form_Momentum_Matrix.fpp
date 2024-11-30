@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb, Aval,  &
+  subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb,  &
                                   visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
@@ -8,7 +8,6 @@
   type(Grid_Type), intent(in), target :: Grid
   type(Field_Type),            target :: Flow
   type(Turb_Type),             target :: Turb
-  type(Sparse_Val_Type),       target :: Aval
   real                                :: visc_eff(-Grid % n_bnd_cells &
                                                   :Grid % n_cells)
   real                                :: urf
@@ -28,15 +27,10 @@
 
   call Profiler % Start('Form_Momentum_Matrix')
 
-  ! If each varible uses its own matrix and this matrix was already formed
-  if(.not. Flow % Nat % use_one_matrix) then
-    if(Flow % Nat % A(MATRIX_UVW) % formed) return
-  end if
-
   !-----------------------!
   !   Take some aliases   !
   !-----------------------!
-  val => Aval % val
+  val => Flow % Nat % A % val
   dia => Flow % Nat % C % dia
   pos => Flow % Nat % C % pos
   fc  => Flow % Nat % C % fc
@@ -241,11 +235,6 @@
 
   ! This call is needed, the above loop goes through inside cells only
   call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
-
-  !-------------------------------!
-  !   Mark the matrix as formed   !
-  !-------------------------------!
-  Aval % formed = .true.
 
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0

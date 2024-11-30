@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg(Nat, Acon, Aval, x, b, miter, niter, tol, fin_res)
+  subroutine Cg(Nat, x, miter, niter, tol, fin_res)
 !------------------------------------------------------------------------------!
 !   Note: This is an alternative algorithm and I am honestly not sure where    !
 !         I have found it any more, but it avoids one "if" block during the    !
@@ -10,29 +10,31 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Native_Type),    target, intent(inout) :: Nat      !! parent class
-  type(Sparse_Con_Type), target, intent(in)    :: Acon     !! connect matrix
-  type(Sparse_Val_Type), target, intent(in)    :: Aval     !! values matrix
   real, intent(out)   :: x(-Nat % pnt_grid % n_bnd_cells:&
                             Nat % pnt_grid % n_cells)
                          !! unknown vector, the solution of the linear system
-  real, intent(inout) :: b( Nat % pnt_grid % n_cells)
-                         !! right-hand side vector
   integer, intent(in)    :: miter    !! maximum iterations
   integer, intent(out)   :: niter    !! performed iterations
   real,    intent(in)    :: tol      !! target solver tolerance
   real,    intent(out)   :: fin_res  !! achieved residual
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),   pointer :: Grid
-  real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:), r_d_inv(:)
-  real                       :: fn, alpha, beta, pq, rho, rho_old, res
-  integer                    :: nt, ni, iter
+  type(Grid_Type),       pointer :: Grid
+  type(Sparse_Con_Type), pointer :: Acon
+  type(Sparse_Val_Type), pointer :: Aval
+  real, contiguous,      pointer :: b(:)
+  real,     contiguous,  pointer :: r(:), p(:), q(:), d_inv(:), r_d_inv(:)
+  real                           :: fn, alpha, beta, pq, rho, rho_old, res
+  integer                        :: nt, ni, iter
 !==============================================================================!
 
   call Work % Connect_Real_Cell(p, q, r, r_d_inv)
 
   ! Take aliases
-  d_inv => Aval % d_inv
   Grid  => Nat % pnt_grid
+  Acon  => Nat % C
+  Aval  => Nat % A
+  d_inv => Aval % d_inv
+  b     => Nat % b
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
 

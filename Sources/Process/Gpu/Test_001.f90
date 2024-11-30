@@ -60,11 +60,11 @@
   call Read_Control % Physical_Properties(Grid, Flow)
 
   ! Discretize the matrix for diffusion
-  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, coef, 1.0)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, coef, 1.0)
 
   ! Take the alias now
   Acon => Flow % Nat % C
-  Aval => Flow % Nat % A(MATRIX_UVW)
+  Aval => Flow % Nat % A
 
   allocate(b(nc))
   allocate(c(nc))

@@ -11,11 +11,9 @@
   type(Grid_Type),  target :: Grid
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Sparse_Con_Type), pointer :: Acon
-  type(Sparse_Val_Type), pointer :: Aval
-  real, contiguous,      pointer :: b(:)
-  real                           :: urf, p_max, p_min
-  integer                        :: c
+  real, contiguous, pointer :: b(:)
+  real                      :: urf, p_max, p_min
+  integer                   :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -23,19 +21,13 @@
   call Profiler % Start('Compute_Pressure')
 
   ! Take some aliases
-  Acon => Flow % Nat % C
-  if(Flow % Nat % use_one_matrix) then
-    Aval => Flow % Nat % A(MATRIX_ONE)
-  else
-    Aval => Flow % Nat % A(MATRIX_PP)
-  end if
   b   => Flow % Nat % b
   urf =  Flow % pp % urf
 
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
   !-----------------------------------------------!
-  call Process % Form_Pressure_Matrix(Aval, Flow, Grid)
+  call Process % Form_Pressure_Matrix(Flow, Grid)
 
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
@@ -52,7 +44,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Acon, Aval, Flow % pp % n, b,          &
+  call Flow % Nat % Cg(Flow % pp % n,                         &
                        Flow % pp % miter, Flow % pp % niter,  &
                        Flow % pp % tol,   Flow % pp % res)
   call Profiler % Stop('CG_for_Pressure')

@@ -75,7 +75,7 @@
 
   ! Take the aliases now
   Acon => Flow % Nat % C
-  Aval => Flow % Nat % A(MATRIX_UVW)
+  Aval => Flow % Nat % A
   b    => Flow % Nat % b
   x    => Flow % u % n
   coef => Turb % vis_t
@@ -100,7 +100,7 @@
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, Aval, coef, 1.0)
+  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, coef, 1.0)
   call Process % Insert_Momentum_Bc(Grid, Flow, comp=1)
 
   !-----------------------------------------------!
@@ -108,7 +108,7 @@
   !-----------------------------------------------!
   O_Print '(a)', ' # Performing a demo of the preconditioned CG method'
   call Profiler % Start('Useful_Work')
-  call Flow % Nat % Cg(Acon, Aval, x, b, nc, n, PICO, fin_res)
+  call Flow % Nat % Cg(x, nc, n, PICO, fin_res)
   call Profiler % Stop('Useful_Work')
 
   ! Copy results back to host
