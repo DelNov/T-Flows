@@ -2,7 +2,7 @@
 *                                                                              *
 *  Benchmark city mesh                                                         *
 *                                                                              *
-*  This script reads file "1_building.geo"                                     *
+*  This script reads file "0_buildings.geo"                                     *
 *                                                                              *
 *******************************************************************************/
 
@@ -13,7 +13,7 @@
 //
 //------------------------------------------------------------------------------
 
-PERIODIC  =   0;  // or 0
+PERIODIC  =   1;  // or 0
 ANGLE_DEG =   0.0;
 
 // Number of layers
@@ -90,8 +90,8 @@ Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
 //---------------------------------
 // Define all buildings' positions
 //---------------------------------
-Printf("Including file 1_building.geo");
-Include "1_building.geo";
+Printf("Including file 0_buildings.geo");
+Include "0_buildings.geo";
 
 // Rotate them
 For b In { 1 : n_buildings }

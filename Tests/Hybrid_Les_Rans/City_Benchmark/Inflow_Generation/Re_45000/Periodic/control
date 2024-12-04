@@ -3,11 +3,11 @@
 #----------
   PROBLEM_NAME    chan
 
-  TIME_STEP                                     0.01
-  NUMBER_OF_TIME_STEPS                      20000
-  STARTING_TIME_STEP_FOR_TURB_STATISTICS   100000
+  TIME_STEP                                     0.5
+  NUMBER_OF_TIME_STEPS                      12000
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS   120000
   RESULTS_SAVE_INTERVAL                      4000
-  BACKUP_SAVE_INTERVAL                     200000
+  BACKUP_SAVE_INTERVAL                     240000
 
 #-------------------
 # Monitoring points
@@ -22,8 +22,14 @@
 
   TURBULENCE_MODEL       k_eps_zeta_f
 
+#----------------------------------------------------------------
+# Pressure drop will be over-written, this is just initial guess
+# Volume flow rate is:
+# - For Re=12000: Ub * Ay = 0.12 * 0.55 = 0.066
+# - For Re=45000: Ub * Ay = 0.45 * 0.55 = 0.2475
+#----------------------------------------------------------------
   PRESSURE_DROPS     0.0036   0.0   0.0
-  VOLUME_FLOW_RATES  0.005    0.0   0.0
+  VOLUME_FLOW_RATES  0.2475   0.0   0.0
 
 #----------------------
 # Numerical parameters
@@ -42,16 +48,16 @@
   PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
 
   TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-4
-  TOLERANCE_FOR_PRESSURE_SOLVER     1.e-4
+  TOLERANCE_FOR_PRESSURE_SOLVER     1.e-6
   TOLERANCE_FOR_ENERGY_SOLVER       1.e-4
-  TOLERANCE_FOR_SIMPLE_ALGORITHM    5.e-3
+  TOLERANCE_FOR_SIMPLE_ALGORITHM    1.e-3
 
 #--------------------
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
     VARIABLES           u     v     w     kin   eps   zeta   f22
-    VALUES              0.5   0.0   0.0   0.01  0.001 0.1    0.1
+    VALUES              0.45  0.0   0.0   0.01  0.01  0.1    0.1
 
 #---------------------
 # Boundary conditions
@@ -63,5 +69,5 @@
 
   BOUNDARY_CONDITION    symmetry
     TYPE                symmetry
-    VARIABLES           u     v     w
-    VALUES              0.0   0.0   0.0
+    VARIABLES           u      v     w
+    VALUES              0.45   0.0   0.0

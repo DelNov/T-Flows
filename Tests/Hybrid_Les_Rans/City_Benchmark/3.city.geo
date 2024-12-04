@@ -153,6 +153,12 @@ Else
   Plane Surface(GROUND_SURF) = {GROUND_LOOP};
 EndIf
 
+// If n_buildings is zero, we are generating precursor domain
+If(n_buildings == 0)
+  Transfinite Surface {100} = {1, 2, 3, 4};
+  Recombine Surface {100};
+EndIf
+
 //-----------------------------------
 // Add individual buildings surfaces
 //-----------------------------------
@@ -169,24 +175,26 @@ EndFor
 //------------------------------------------------------------------------------
 
 
-//----------------------------
-// First the spacing function
-//----------------------------
-Printf("Defining spacing function with DELTA_MIN - DELTA_MAX: %g - %g",
-       DELTA_MIN, DELTA_MAX);
-Field[1] = MathEval;
-Field[1].F = Sprintf("  (%5.2g)
-                      + (%5.2g) * (1.0-(0.5*(  tanh((x-(%5.2g))/(%5.2g))
-                                             - tanh((x-(%5.2g))/(%5.2g))))
-                                      *(0.5*(  tanh((y-(%5.2g))/(%5.2g))
-                                             - tanh((y-(%5.2g))/(%5.2g)))) )",
-  DELTA_MIN,
-  DELTA_MAX - DELTA_MIN,
-  CITY_X_MIN, CITY_LIMIT_WIDTH,
-  CITY_X_MAX, CITY_LIMIT_WIDTH,
-  CITY_Y_MIN, CITY_LIMIT_WIDTH,
-  CITY_Y_MAX, CITY_LIMIT_WIDTH);
-Background Field = 1;
+//-------------------------------------------------------------
+// First the spacing function (only for non-precursor domains)
+//-------------------------------------------------------------
+If(n_buildings > 0)
+  Printf("Defining spacing function with DELTA_MIN - DELTA_MAX: %g - %g",
+         DELTA_MIN, DELTA_MAX);
+  Field[1] = MathEval;
+  Field[1].F = Sprintf("  (%5.2g)
+                        + (%5.2g) * (1.0-(0.5*(  tanh((x-(%5.2g))/(%5.2g))
+                                               - tanh((x-(%5.2g))/(%5.2g))))
+                                        *(0.5*(  tanh((y-(%5.2g))/(%5.2g))
+                                               - tanh((y-(%5.2g))/(%5.2g)))) )",
+    DELTA_MIN,
+    DELTA_MAX - DELTA_MIN,
+    CITY_X_MIN, CITY_LIMIT_WIDTH,
+    CITY_X_MAX, CITY_LIMIT_WIDTH,
+    CITY_Y_MIN, CITY_LIMIT_WIDTH,
+    CITY_Y_MAX, CITY_LIMIT_WIDTH);
+  Background Field = 1;
+EndIf
 
 
 //---------------------------------------------------
@@ -254,6 +262,8 @@ For lay In{ 1 : N_SKY_LAYERS }
     Recombine;
   }
 EndFor
+Printf("Layer %g; height %g", lay, z_cur+delta_cur);
+SKY_HIGH = z_cur+delta_cur;
 
 //------------------------------------------------------------------------------
 //
@@ -307,15 +317,17 @@ If( PERIODIC == 0 )
                               +HUGE, GROUND_Y_MAX+TINY, +HUGE}};
 Else
   Physical Surface("east-west")
-    = {Surface In BoundingBox{GROUND_X_MIN-TINY, -HUGE, -HUGE,
-                              GROUND_X_MIN+TINY, +HUGE, +HUGE}};
-    + {Surface In BoundingBox{GROUND_X_MAX-TINY, -HUGE, -HUGE,
-                              GROUND_X_MAX+TINY, +HUGE, +HUGE}};
+    =  {Surface In BoundingBox{GROUND_X_MIN-TINY, -HUGE, -HUGE,
+                               GROUND_X_MIN+TINY, +HUGE, +HUGE}};
+  Physical Surface("east-west")
+    += {Surface In BoundingBox{GROUND_X_MAX-TINY, -HUGE, -HUGE,
+                               GROUND_X_MAX+TINY, +HUGE, +HUGE}};
   Physical Surface("north-south")
-    = {Surface In BoundingBox{-HUGE, GROUND_Y_MIN-TINY, -HUGE,
-                              +HUGE, GROUND_Y_MIN+TINY, +HUGE}};
-    + {Surface In BoundingBox{-HUGE, GROUND_Y_MAX-TINY, -HUGE,
-                              +HUGE, GROUND_Y_MAX+TINY, +HUGE}};
+    =  {Surface In BoundingBox{-HUGE, GROUND_Y_MIN-TINY, -HUGE,
+                               +HUGE, GROUND_Y_MIN+TINY, +HUGE}};
+  Physical Surface("north-south")
+    += {Surface In BoundingBox{-HUGE, GROUND_Y_MAX-TINY, -HUGE,
+                               +HUGE, GROUND_Y_MAX+TINY, +HUGE}};
 EndIf
 Physical Surface("top")
   = {Surface In BoundingBox{-HUGE, -HUGE, SKY_HIGH-TINY,
