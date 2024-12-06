@@ -1,9 +1,13 @@
 /*******************************************************************************
 *                                                                              *
-*  Benchmark city mesh                                                         *
+*  Benchmark city mesh with 3 buildings                                        *
 *                                                                              *
 *  This script reads file "3_building.geo"                                     *
 *                                                                              *
+*  Try to keep this script as close as possible to her sisters 0.city.geo,     *
+*  1.city.geo and r.city.geo.  Although they might all be condensed in one     *
+*  script to avoid code duplication, it might lead to cumbersome file stor-    *
+*  age and handling when real simulations start.  (At least I think so now)    *
 *******************************************************************************/
 
 //------------------------------------------------------------------------------
@@ -13,12 +17,26 @@
 //
 //------------------------------------------------------------------------------
 
-PERIODIC  =   0;  // or 0
-ANGLE_DEG =   0.0;
+LEVEL     =   2;    // 1 or 2 or 3; 2 is the default
+PERIODIC  =   0;    // 0 or 1
+ANGLE_DEG =   0.0;  // building rotation
+REDUCED   =   0;    // reduce the size of domain?
 
-// Number of layers
-N_LAYERS     = 70;
-N_SKY_LAYERS = 35;
+// Number of layers (both should be even)
+N_LAYERS     = 72;
+N_SKY_LAYERS = 36;
+If(LEVEL == 3)
+  N_LAYERS     *= 2;
+  N_SKY_LAYERS *= 2;
+EndIf
+If(LEVEL == 1)
+  N_LAYERS     /= 2;
+  N_SKY_LAYERS /= 2;
+EndIf
+If(LEVEL == 0)
+  N_LAYERS     /= 4;
+  N_SKY_LAYERS /= 4;
+EndIf
 
 // Building characteristic dimension and the pitch between them
 A = 50.0;
@@ -32,21 +50,47 @@ DELTA_H_MIN = URBAN_HIGH / N_LAYERS;
 L_TARGET    = SKY_HIGH - URBAN_HIGH;
 
 // Coordinates of the problem domain (the whole piece of simulated land)
-GROUND_X_MIN =  -500.0;
-GROUND_X_MAX =  1500.0;
-GROUND_Y_MIN =  -500.0;
-GROUND_Y_MAX =   500.0;
+GROUND_X_MIN =  -10 * A;  // -500.0
+GROUND_X_MAX =   30 * A;  // 1500.0
+GROUND_Y_MIN =  -10 * A;  // -500.0
+GROUND_Y_MAX =   10 * A;  //  500.0
+If(REDUCED == 1)
+  GROUND_X_MIN = -3 * A;  //  -150
+  GROUND_X_MAX =  3 * A;  //   150
+  GROUND_Y_MIN = -3 * A;  //  -150
+  GROUND_Y_MAX =  3 * A;  //   150
+EndIf
 
 // Coordinates of the city (where buildings will reside)
-CITY_X_MIN = -275.0;
-CITY_X_MAX =  725.0;
-CITY_Y_MIN = -250.0;
-CITY_Y_MAX =  250.0;
+CITY_X_MIN = -5 * A;  // -250.0
+CITY_X_MAX = 15 * A;  //  750.0
+CITY_Y_MIN = -5 * A;  // -250.0
+CITY_Y_MAX =  5 * A;  //  250.0
 
 // Resolutions in the city (min) and country side (max)
 DELTA_MIN      = 10.0;
-DELTA_MAX      = 25.0;
+DELTA_MAX      = 30.0;
 DELTA_BUILDING = 10.0;
+NS = 33;
+
+If(LEVEL == 3)
+  NS = (NS-1)*2+1;
+  DELTA_MIN      /= 2.0;
+  DELTA_MAX      /= 2.0;
+  DELTA_BUILDING /= 2.0;
+EndIf
+If(LEVEL == 1)
+  NS = (NS-1)/2+1;
+  DELTA_MIN      *= 2.0;
+  DELTA_MAX      *= 2.0;
+  DELTA_BUILDING *= 2.0;
+EndIf
+If(LEVEL == 0)
+  NS = (NS-1)/4+1;
+  DELTA_MIN      *= 4.0;
+  DELTA_MAX      *= 4.0;
+  DELTA_BUILDING *= 4.0;
+EndIf
 
 // Transition between fine and coarse mesh, ...
 // ... between city and the rest of the domain
@@ -86,6 +130,9 @@ Line(2) = {2, 3};
 Line(3) = {3, 4};
 Line(4) = {4, 1};
 Curve Loop(GROUND_LOOP) = {1, 2, 3, 4};
+If(REDUCED == 1)
+  Transfinite Curve {1, 2, 3, 4} = NS Using Progression 1;
+EndIf
 
 //---------------------------------
 // Define all buildings' positions
