@@ -1,10 +1,10 @@
 /*******************************************************************************
 *                                                                              *
-*  Benchmark city mesh with 1 building                                         *
+*  Benchmark precursor for a city  mesh (no buildings here)                    *
 *                                                                              *
-*  This script reads file "1_building.geo"                                     *
+*  This script reads file "0_buildings.geo"                                     *
 *                                                                              *
-*  Try to keep this script as close as possible to her sisters 0.city.geo,     *
+*  Try to keep this script as close as possible to her sisters 1.city.geo,     *
 *  3.city.geo and r.city.geo.  Although they might all be condensed in one     *
 *  script to avoid code duplication, it might lead to cumbersome file stor-    *
 *  age and handling when real simulations start.  (At least I think so now)    *
@@ -17,9 +17,9 @@
 //
 //------------------------------------------------------------------------------
 
-LEVEL     =   3;    // 0, 1, 2 or 3; 2 is the default
-PERIODIC  =   0;    // 0 or 1
-ANGLE_DEG =   0.0;  // building rotation
+LEVEL     =   2;    // 1 or 2 or 3; 2 is the default
+PERIODIC  =   1;    // 0 or 1, here it should be 1
+ANGLE_DEG =   0.0;  // building rotation, irrelevant here
 REDUCED   =   0;    // reduce the size of domain?
 
 // Number of layers (both should be even)
@@ -137,8 +137,8 @@ EndIf
 //---------------------------------
 // Define all buildings' positions
 //---------------------------------
-Printf("Including file 1_building.geo");
-Include "1_building.geo";
+Printf("Including file 0_buildings.geo");
+Include "0_buildings.geo";
 
 // Rotate them
 For b In { 1 : n_buildings }

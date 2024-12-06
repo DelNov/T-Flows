@@ -437,7 +437,7 @@
       end do
 
       ! Simple sort didn't work out
-      if( .not. Math % Approx_Real(min_dis, max_dis) ) then
+      if( .not. Math % Approx_Real(min_dis, max_dis, tol=MICRO) ) then
         print *, '# Simple sort of periodic faces failed,'  //  &
                  ' trying a slower algorithm'
         do i = 1, cnt_per / 2
@@ -446,7 +446,7 @@
             s2 = b_face(j)
             dis = Math % Distance(Grid % xf(s1), Grid % yf(s1), Grid % zf(s1), &
                                   Grid % xf(s2), Grid % yf(s2), Grid % zf(s2))
-            if(Math % Approx_Real(min_dis, dis) ) then
+            if(Math % Approx_Real(min_dis, dis, tol=MICRO) ) then
               c11 = Grid % faces_c(1,s1)  ! cell 1 for face 1
               c21 = Grid % faces_c(2,s1)  ! cell 2 for cell 1
               c12 = Grid % faces_c(1,s2)  ! cell 1 for face 2

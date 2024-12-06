@@ -19,8 +19,7 @@ no
 skip
 
 # Calculating distance from the walls
-# 1 2
-skip
+1 2
 
 # Insert non-homogeneous direction 
 skip
