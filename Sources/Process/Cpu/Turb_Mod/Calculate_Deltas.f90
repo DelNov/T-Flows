@@ -15,6 +15,7 @@
 !==============================================================================!
 
   if(Turb % model .ne. SPALART_ALLMARAS .and.  &
+     Turb % model .ne. DES_SPALART      .and.  &
      Turb % model .ne. HYBRID_LES_PRANDTL) return
 
   call Work % Connect_Real_Cell(h_w_x, h_w_y, h_w_z)

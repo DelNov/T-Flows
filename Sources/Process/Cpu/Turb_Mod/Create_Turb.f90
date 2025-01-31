@@ -29,6 +29,7 @@
 
   ! Create deltas
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART      .or.  &
      Turb % model .eq. HYBRID_LES_PRANDTL) then
     allocate(Turb % h_max(-nb:nc));  Turb % h_max = 0.
     allocate(Turb % h_min(-nb:nc));  Turb % h_min = 0.
