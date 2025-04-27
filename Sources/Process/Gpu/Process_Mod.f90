@@ -48,6 +48,11 @@
       procedure :: Compute_Energy
       procedure :: Form_Energy_Matrix
       procedure :: Insert_Energy_Bc
+      
+      ! Scalars
+      procedure :: Compute_Scalars
+      procedure :: Form_Scalars_Matrix
+      procedure :: Insert_Scalars_Bc
 
   end type
 
@@ -76,5 +81,10 @@
 #   include "Process_Mod/Compute_Energy.f90"
 #   include "Process_Mod/Form_Energy_Matrix.f90"
 #   include "Process_Mod/Insert_Energy_Bc.f90"
+
+    ! Scalars
+#   include "Process_Mod/Compute_Scalars.f90"
+#   include "Process_Mod/Form_Scalars_Matrix.f90"
+#   include "Process_Mod/Insert_Scalars_Bc.f90"
 
   end module

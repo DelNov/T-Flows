@@ -1,0 +1,86 @@
+#--------------
+# Problem name
+#--------------
+  PROBLEM_NAME        cylinder
+
+#-----------------------
+# Physical properties
+#
+# D  = 0.1
+# U  = 2.0
+# nu = 2.0e-3
+# Re = U * D / nu = 100
+#-----------------------
+  DYNAMIC_VISCOSITY      2.0e-3
+
+#---------------------------------------
+# Time stepping
+#
+# U = 2.0
+# L = 2.0          (after cylinder)
+# T = L / U = 1.0  (flow through time)
+#
+# With:
+# dt = 0.0005
+# N  = 12000 give 6 flow through times
+#---------------------------------------
+  TIME_STEP                             0.0005
+  NUMBER_OF_TIME_STEPS              12000
+
+  RESULTS_SAVE_INTERVAL               600
+  BACKUP_SAVE_INTERVAL              12000
+  SAVE_RESULTS_AT_BOUNDARIES            no
+
+#-----------------------------
+# Monitoring points and plane
+#-----------------------------
+  POINT_FOR_MONITORING_PLANES   1.1  0.2  0.2
+  NUMBER_OF_MONITORING_POINTS   1
+    MONITORING_POINT_001        1.1  0.2  0.2
+
+#----------------------
+# Numerical parameters
+#----------------------
+  TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-5
+  TOLERANCE_FOR_PRESSURE_SOLVER         1.e-6
+  TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-5
+  TOLERANCE_FOR_GAUSS_GRADIENTS         1.e-3
+
+  PRECONDITIONER_FOR_SYSTEM_MATRIX      incomplete_cholesky
+  TOLERANCE_FOR_POTENTIAL_SOLVER        1.e-6
+
+  PRESSURE_MOMENTUM_COUPLING            simple
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM   0.7
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE   0.7
+  MIN_SIMPLE_ITERATIONS                 3
+
+  TIME_INTEGRATION_SCHEME               parabolic
+  GRADIENT_METHOD_FOR_PRESSURE          gauss_theorem
+
+#-------------------
+# Initial condition
+#-------------------
+  POTENTIAL_INITIALIZATION              yes
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION  in
+    TYPE              inflow
+    VARIABLES         y   u
+    FILE              profile.dat
+
+  BOUNDARY_CONDITION  out
+    TYPE              convective
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
+
+  BOUNDARY_CONDITION  flat_walls
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
+
+  BOUNDARY_CONDITION  cylinder_wall
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0

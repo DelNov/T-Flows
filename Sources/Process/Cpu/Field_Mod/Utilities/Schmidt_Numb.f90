@@ -10,6 +10,6 @@
 !==============================================================================!
 
   Schmidt_Numb =  Flow % viscosity(c)  &
-               / (Flow % diffusivity * Flow % density(c))
+               / (Flow % diffusivity(c) * Flow % density(c))
 
   end function

@@ -181,6 +181,14 @@ def Find_Arrays_In_Block(block):
 
   # Remove all comments
   cleaned_block = re.sub(r'!.*', '', block)
+  
+  # Ecception for scalars
+  cleaned_block = re.sub(
+      r'Flow\s*%\s*scalar\s*\(\s*sc\s*\) ',
+      'flow_scalar_01 ',
+      cleaned_block,
+      flags=re.IGNORECASE
+  )
 
   # Replace every occurrence of spaces followed by "%" with "@%"
   # and every occurence of "%" followed by spacess with "%@"
@@ -310,6 +318,27 @@ def Find_Arrays_In_Block(block):
 
 #==============================================================================#
 #                                                                              #
+#   Function to replace % with _, handling scalars                             #
+#                                                                              #
+#------------------------------------------------------------------------------#
+def make_pointer_name(full_name):
+
+  # Eliminating what is in parenthesis (sc)
+  s = re.sub(r"\(sc\)", "_01", full_name)
+
+  # Sobstituting % with _ (removing eventual spaces)
+  s = re.sub(r"\s%\s*", "_", s)
+
+  # Removing eventual remaning spaces
+  s = s.replace(" ", "")
+
+  # Set in lower case
+  s = s.lower()
+
+  return s
+
+#==============================================================================#
+#                                                                              #
 #   Function to perform the transformation inside !$tf-acc blocks              #
 #                                                                              #
 #------------------------------------------------------------------------------#
@@ -419,13 +448,13 @@ def Process_Tfp_Block(block):
   #----------------------------------------------------#
   #   These can, and should, be replaced in any case   #
   #----------------------------------------------------#
-  block = re.sub(r'Grid % n_bnd_regions',   'grid_n_bnd_regions', block)
-  block = re.sub(r'Grid % n_regions',       'grid_n_regions',     block)
-  block = re.sub(r'Grid % region % f_cell', 'grid_region_f_cell', block)
-  block = re.sub(r'Grid % region % l_cell', 'grid_region_l_cell', block)
-  block = re.sub(r'Grid % region % f_face', 'grid_region_f_face', block)
-  block = re.sub(r'Grid % region % l_face', 'grid_region_l_face', block)
-
+  block = re.sub(r'Grid % n_bnd_regions'   , 'grid_n_bnd_regions', block)
+  block = re.sub(r'Grid % n_regions'       , 'grid_n_regions'    , block)
+  block = re.sub(r'Grid % region % f_cell' , 'grid_region_f_cell', block)
+  block = re.sub(r'Grid % region % l_cell' , 'grid_region_l_cell', block)
+  block = re.sub(r'Grid % region % f_face' , 'grid_region_f_face', block)
+  block = re.sub(r'Grid % region % l_face' , 'grid_region_l_face', block)
+  
   #-----------------------------------------------------#
   #   General handling for arrays in the remaining code #
   #-----------------------------------------------------#
@@ -448,7 +477,11 @@ def Process_Tfp_Block(block):
     full_name = array
 
     # Create pointer variable name
-    pointer_name = full_name.replace(" % ", "_").lower()
+    pointer_name = make_pointer_name(full_name)
+
+    # Ripristinate full name for scalars
+    if "flow_scalar_01" in full_name.lower():
+      full_name = full_name.replace("flow_scalar_01", "Flow % scalar(1)")
 
     # Check if this pointer is declared
     if "%" in full_name:  # If it's part of a structure

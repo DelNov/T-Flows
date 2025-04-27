@@ -6,7 +6,8 @@
   class(Field_Type), target :: Flow  !! parent flow object
   type(Grid_Type),   target :: Grid  !! grid on which the flow is defined
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: nb, nc, ns
+  integer                   :: nb, nc, ns, sc
+  character(VL)             :: c_name, q_name
 !==============================================================================!
 
   ! Take some aliases
@@ -22,6 +23,9 @@
   if(Flow % heat_transfer) then
     allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
     allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
+  end if
+  if(Flow % n_scalars .gt. 0) then
+    allocate(Flow % diffusivity (-nb:nc));  Flow % diffusivity(:)  = 0.0
   end if
 
   !--------------------------------------------------------------!
@@ -64,6 +68,22 @@
   if(Flow % heat_transfer) then
     call Var_Mod_Create_Variable(Flow % t, Grid, 'T', 'Q')
   end if ! heat_transfer
+
+  !-----------------------!
+  !   Scalars Transport   !
+  !-----------------------!
+  
+  allocate (Flow % scalar(Flow % n_scalars))
+  do sc = 1, Flow % n_scalars
+   
+    c_name = 'C_00'
+    q_name = 'Q_00'
+    write(c_name(3:4), '(i2.2)') sc
+    write(q_name(3:4), '(i2.2)') sc
+
+    call Var_Mod_Create_Variable(Flow % scalar(sc), Grid, c_name, q_name)
+
+  end do
 
   !--------------------------------------------------------------!
   !   Create native solvers (matrices A, M, right hand side b,   !

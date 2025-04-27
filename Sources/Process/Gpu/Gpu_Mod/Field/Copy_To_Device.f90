@@ -10,6 +10,7 @@
   type(Field_Type), target :: Flow  !! field to transfer to device
   type(Turb_Type)          :: Turb  !! to check if shear and vort are needed
 !-----------------------[Avoid unused argument warning]------------------------!
+  integer                  :: sc
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
     Unused(Turb)
@@ -64,6 +65,18 @@
     end if
   end if
 
+  if(Flow % n_scalars .gt. 0) then
+    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(1) % n)
+    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(1) % o)
+    flow_scalar_01_n  => Flow % scalar(1) % n
+    flow_scalar_01_o  => Flow % scalar(1) % o
+    if(Flow % scalar(1) % td_scheme .eq. PARABOLIC) then
+      call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(1) % oo)
+      flow_scalar_01_oo => Flow % scalar(1) % oo
+    end if
+  end if
+
+
   ! You are going to need physical properties as well
   call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow % density)
@@ -74,6 +87,10 @@
     call Gpu % Vector_Real_Copy_To_Device(Flow % capacity)
     flow_conductivity => Flow % conductivity
     flow_capacity     => Flow % capacity
+  end if
+  if(Flow % n_scalars .gt. 0) then
+    call Gpu % Vector_Real_Copy_To_Device(Flow % diffusivity)
+    flow_diffusivity => Flow % diffusivity
   end if
 
   ! Also copy whatever you need to compute gradients

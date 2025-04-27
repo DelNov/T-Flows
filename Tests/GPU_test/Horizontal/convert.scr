@@ -1,0 +1,22 @@
+# Full grid name
+cylinder.msh
+
+# Create dual grid
+no
+
+# Geometric scaling
+skip
+
+# Boundary cell centers' positions
+2
+
+# Periodicity
+5
+skip
+
+# Wall distance
+1 4
+
+# Probe 1d
+skip
+

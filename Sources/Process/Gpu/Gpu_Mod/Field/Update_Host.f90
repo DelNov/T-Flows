@@ -9,6 +9,8 @@
   class(Gpu_Type)  :: Gpu   !! parent class
   type(Turb_Type)  :: Turb  !! to check shear and vorticity
   type(Field_Type) :: Flow  !! field to transfer to device
+!--------------------------------[Locals]--------------------------------------!
+  integer          :: sc
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
@@ -30,6 +32,10 @@
   if(Flow % heat_transfer) then
     call Gpu % Vector_Update_Host(Flow % t % n)
   end if
+  
+  do sc = 1, Flow % n_scalars
+    call Gpu % Vector_Update_Host(Flow % scalar(sc) % n)
+  end do
 
   ! If you are modeling turbulence, you might want shear and vorticity
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then

@@ -20,7 +20,7 @@
   type(Field_Type), target :: Flow(MD)      ! flow field
   type(Turb_Type)          :: Turb(MD)      ! turbulence models for flows
   real                     :: ts, te
-  integer                  :: nc, ldt
+  integer                  :: nc, ldt, sc
   character(7)             :: root_control = 'control'
   logical                  :: read_backup(MD)
 !==============================================================================!
@@ -79,14 +79,21 @@
   O_Print '(a)', ' # Reading native solvers'
   call Read_Control % Native_Solvers(Grid(1), Flow(1), Turb(1))
 
+
+  ! Read backup now, before physical properties and boundary conditions
+  read_backup(:) = .false.   ! can turn .true. in Backup % Load
+  call Backup % Load(Grid(1), Flow(1), Turb(1), read_backup(1))
+
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix(Grid(1))
-
+  
+  O_Print '(a)', ' # Initialising variables'
   ! Initialize variables
   if(.not. read_backup(1)) then
     call Process % Initialize_Variables(Grid(1), Flow(1), Turb(1))
   end if
 
+  O_Print '(a)', '# Allocation CPU memory'
   ! Allocate CPU memory for working arrays (currently used for saving)
   call Work % Allocate_Work(Grid, n_r_cell=12,  n_r_face=0,  n_r_node=0,  &
                                   n_i_cell= 6,  n_i_face=0,  n_i_node=0)
@@ -151,7 +158,7 @@
 
     ! Turbulence models initializations
     call Turb(1) % Init_Turb(Grid(1), Flow(1))
-
+   
     !-----------------------------------!
     !   Iterations within a time step   !
     !-----------------------------------!
@@ -165,18 +172,25 @@
       call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)
 
       call Process % Compute_Pressure(Grid(1), Flow(1))
-
+      
       ! Correct velocity components
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
       call Process % Correct_Velocity(Grid(1), Flow(1))
-
+      
       ! Deal with turbulence
       call Turb(1) % Main_Turb(Grid(1), Flow(1))
-
+      
+      ! Deal with heat
       if(Flow(1) % heat_transfer) then
         call Process % Compute_Energy(Grid(1), Flow(1), Turb(1))
       end if
 
+      ! Deal with scalars
+      do sc = 1, Flow(1) % n_scalars
+        call Process % Compute_Scalars(Grid(1), Flow(1), Turb(1), sc)
+      end do
+
+      ! Updating boundaries
       call Process % Update_Boundary_Values(Grid(1), Flow(1), 'ALL')
 
       ! End of the current iteration

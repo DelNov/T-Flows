@@ -1,0 +1,188 @@
+ #=======================================================================
+ #                                                                   
+ #    ______________________ ____    ________  __      __  _________ 
+ #    \__    ___/\_   _____/|    |   \_____  \/  \    /  \/   _____/ 
+ #      |    |    |    __)  |    |    /   |   \   \/\/   /\_____  \  
+ #      |    |    |     \   |    |___/    |    \        / /        \ 
+ #      |____|    \___  /   |_______ \_______  /\__/\  / /_______  / 
+ #                    \/            \/       \/      \/          \/  
+ #                      ___                                          
+ #                     / _ \_______  _______ ___ ___                 
+ #                    / ___/ __/ _ \/ __/ -_|_-<(_-<                 
+ #                   /_/  /_/  \___/\__/\__/___/___/                 
+ #                                                                   
+ #                        Double precision mode
+ #                     Compiled with PETSc solvers
+ #-----------------------------------------------------------------------
+ # Reading the file: control
+ # NOTE! Could not find the keyword: WALL_TIME_MAX_HOURS. Using the default: 1.680E+02
+ # Reading the file: cylinder.cfn
+ # Reading the file: cylinder.dim
+ # Minimum distance stored in shadow faces:     0.400
+ # Maximum distance stored in shadow faces:     0.400
+ # Minimum corrected distance at shadows:       0.400
+ # Maximum corrected distance at shadows:       0.400
+ # NOTE! Could not find the keyword: STARTING_TIME_STEP_FOR_TURB_STATISTICS. Using the default HUGE_INT value
+ # NOTE! Could not find the keyword: STARTING_TIME_STEP_FOR_SWARM_STATISTICS. Using the default HUGE_INT value
+ # NOTE! Could not find the keyword: STARTING_TIME_STEP_FOR_SWARM_COMPUTATION. Using the default:      1200
+ # NOTE! Could not find the keyword: HEAT_TRANSFER. Using the default: no
+ # NOTE! Could not find the keyword: GRAVITATIONAL_VECTOR. Using the default: 0.000E+00
+ # NOTE! Could not find the keyword: BUOYANCY. Using the default: none
+ # NOTE! Could not find the keyword: REFERENCE_DENSITY. Using the default: 0.000E+00
+ # NOTE! Could not find the keyword: REFERENCE_TEMPERATURE. Using the default: 0.000E+00
+ # NOTE! Could not find the keyword: VOLUME_EXPANSION_COEFFICIENT. Using the default: 1.000E+00
+ # NOTE! Could not find the keyword: TURBULENCE_MODEL. Using the default: none
+ # NOTE! Could not find the keyword: ROUGH_WALLS. Using the default: no
+ # NOTE! Could not find the keyword: TURBULENT_HEAT_FLUX_MODEL. Using the default: SGDH
+ # NOTE! Could not find the keyword: NUMBER_OF_SCALARS. Using the default:         0
+ # NOTE! Could not find the keyword: INTERFACE_TRACKING. Using the default: no
+ # NOTE! Could not find the keyword: PARTICLE_TRACKING. Using the default: no
+ # NOTE! Could not find the keyword: LINEAR_SOLVERS. Using the default: native
+ # Determining matrix topology.
+ # Finished !
+ # Initializing PETSc.
+ # Finished !
+ # Reading the file: profile.dat
+ # Grid name: CYLINDER                                                                        
+ # WARING!  Could not find the line with keyword: INITIAL_CONDITION!
+ # Volume inflow           :  3.28430E-01
+ # Average inflow velocity :  2.00262E+00
+ # Number of faces on the wall        :         1760
+ # Number of inflow faces             :          112
+ # Number of outflow faces            :            0
+ # Number of symetry faces            :            0
+ # Number of faces on the heated wall :            0
+ # Number of convective outflow faces :          112
+ # Number of pressure outflow faces   :            0
+ # Variables initialized !
+ # Creating the file: cylinder-monit.001
+ # Ax : 1.64000E-01
+ # Ay : 8.40100E-01
+ # Az : 8.94149E-01
+ # NOTE! Could not find the keyword: RESULTS_SAVE_INTERVAL. Using the default:        12
+ # NOTE! Could not find the keyword: SAVE_INITIAL_CONDITION. Using the default: yes
+ # NOTE! Could not find the keyword: SWARM_SAVE_INTERVAL. Using the default:        60
+ # Computing potential to initialize velocity field ...
+ # ... with  24 fake time steps.
+ # This might take a while, please wait
+ # Computed potential in  120 iterations with residual:   0.9806E-04
+ # Computed potential in  109 iterations with residual:   0.7620E-06
+ # Computed potential in   81 iterations with residual:   0.9717E-06
+ # Computed potential in   55 iterations with residual:   0.9756E-06
+ # Computed potential in    8 iterations with residual:   0.8750E-06
+ # Computed potential in    1 iterations with residual:   0.8042E-06
+ # Computed potential in    0 iterations with residual:   0.8645E-06
+ # Creating the file: cylinder-ts000000.vtu
+                                                                                                                                 
+                                                                                                                                 
+                                         #===============================================#                                       
+                                         #                                               #                                       
+                                         #              Time step :      1               #                                       
+                                         #                                               #                                       
+                                         #    Simulation time : 5.000E-04 [s]            #                                       
+                                         #    Wall-clock time : 000:00:04 [hhh:mm:ss]    #                                       
+                                         #                                               #                                       
+                                         #-----------------------------------------------#                                       
+                                                                                                                                 
+  #=============================================================================================================================#
+  #                                                        Iteration:  1                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  3 1.608E-07 | V   :  3 8.500E-08 | W   :  1 2.325E-09 | PP  :240 4.164E-02 | MASS:    5.472E-05 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  2                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  4 1.945E-07 | V   :  4 1.365E-07 | W   :  1 6.575E-09 | PP  :194 9.827E-08 | MASS:    5.334E-06 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  4 1.312E-07 | V   :  4 5.922E-08 | W   :  1 6.079E-09 | PP  :138 8.927E-08 | MASS:    2.165E-06 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  4                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  4 9.036E-08 | V   :  4 4.110E-08 | W   :  0 0.000E+00 | PP  :135 9.128E-08 | MASS:    3.167E-07 |                    #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 6.932E-01    |    Maximum Peclet number: 2.123E+01     #                     
+                       #---------------------------+-------------+-------------+---------------------------#                     
+                       #    Flux x :  3.284E-01    |    Flux y :   1.56E-04    |    Flux z :   1.72E-10    #                     
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #                     
+                       #---------------------------+---------------------------+---------------------------#                     
+                                                                                                                                 
+                                                                                                                                 
+                                                                                                                                 
+                                         #===============================================#                                       
+                                         #                                               #                                       
+                                         #              Time step :  12000               #                                       
+                                         #                                               #                                       
+                                         #    Simulation time : 6.000E+00 [s]            #                                       
+                                         #    Wall-clock time : 010:05:27 [hhh:mm:ss]    #                                       
+                                         #                                               #                                       
+                                         #-----------------------------------------------#                                       
+                                                                                                                                 
+  #=============================================================================================================================#
+  #                                                        Iteration:  1                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  3 1.574E-07 | V   :  3 2.352E-07 | W   :  0 0.000E+00 | PP  :134 9.465E-08 | MASS:    6.371E-09 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  2                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  3 8.798E-08 | V   :  3 1.004E-07 | W   :  0 0.000E+00 | PP  :132 9.370E-08 | MASS:    7.318E-09 |                    #
+  #=============================================================================================================================#
+  #                                                        Iteration:  3                                                        #
+  #--------------------+--------------------+--------------------+--------------------+--------------------+--------------------#
+  # U   :  3 4.551E-08 | V   :  3 4.264E-08 | W   :  0 0.000E+00 | PP  :128 9.271E-08 | MASS:    5.773E-09 |                    #
+  #--------------------+=========================================+=========================================+--------------------#
+                       #    Maximum Courant number: 9.097E-01    |    Maximum Peclet number: 2.929E+01     #                     
+                       #---------------------------+-------------+-------------+---------------------------#                     
+                       #    Flux x :  3.284E-01    |    Flux y :  -7.60E-03    |    Flux z :   6.31E-10    #                     
+                       #    Pdrop x:  0.000E+00    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #                     
+                       #---------------------------+---------------------------+---------------------------#                     
+                                                                                                                                 
+ # Writing variable: x_coords
+ # Writing variable: y_coords
+ # Writing variable: z_coords
+ # Writing variable: time_step
+ # Writing variable: time
+ # Writing variable: n_proc
+ # Writing variable: bulk_flux_x
+ # Writing variable: bulk_flux_y
+ # Writing variable: bulk_flux_z
+ # Writing variable: bulk_flux_x_o
+ # Writing variable: bulk_flux_y_o
+ # Writing variable: bulk_flux_z_o
+ # Writing variable: bulk_p_drop_x
+ # Writing variable: bulk_p_drop_y
+ # Writing variable: bulk_p_drop_z
+ # Writing variable: u_velocity
+ # Writing variable: v_velocity
+ # Writing variable: w_velocity
+ # Writing variable: press
+ # Writing variable: press_x
+ # Writing variable: press_y
+ # Writing variable: press_z
+ # Writing variable: press_corr
+ # Writing variable: has_pressure
+ # Writing variable: variable_count
+ # Wrote           25  variables!
+ # Creating the file: cylinder-ts012000.vtu
+ # Exiting !
+                                  #=============================================================#
+                                  #                    CPU usage statistics                     #
+                                  #-------------------------------------------------------------#
+                                  #            Total CPU time: 010:04:42 [hhh:mm:ss]            #
+                                  #-------------------------------------------+-----------------#
+                                  #       Description of the activity:        |   Spent time:   #
+                                  #-------------------------------------------+-----------------#
+                                  # - Linear_Solver_For_Pressure              |     70.74 %     #
+                                  # - Linear_Solver_For_Momentum              |     11.29 %     #
+                                  # - Grad_Gauss_Variable                     |      9.76 %     #
+                                  # - Grad_Least_Variable                     |      3.27 %     #
+                                  # - Compute_Momentum (without solvers)      |      2.46 %     #
+                                  # - Rhie_And_Chow                           |      0.97 %     #
+                                  # - Correct_Velocity                        |      0.92 %     #
+                                  # - Save_Vtu_Results                        |      0.38 %     #
+                                  # - Compute_Pressure (without solvers)      |      0.22 %     #
+                                  # - Main                                    |      0.00 %     #
+                                  # - Backup_Mod_Save                         |      0.00 %     #
+                                  #-------------------------------------------+-----------------#
+ 
+ AVERAGE GAUSS ITERATIONS:    5.5327046994778355     

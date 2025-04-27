@@ -1,0 +1,111 @@
+!==============================================================================!
+  subroutine Compute_Scalars(Process, Grid, Flow, Turb, sc)
+!------------------------------------------------------------------------------!
+  implicit none
+!------------------------------------------------------------------------------!
+  class(Process_Type)      :: Process
+  type(Grid_Type),  target :: Grid
+  type(Field_Type), target :: Flow
+  type(Turb_Type),  target :: Turb
+  integer, intent(in)      :: sc    !! scalar rank
+!-----------------------------------[Locals]-----------------------------------!
+  real,      contiguous, pointer :: val(:)
+  integer,   contiguous, pointer :: dia(:)
+  real,      contiguous, pointer :: b(:), diff_eff(:)
+  real                           :: urf
+  integer                        :: c
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Process)
+!==============================================================================!
+
+  call Profiler % Start('Compute_Scalars')
+
+  call Work % Connect_Real_Cell(diff_eff)
+
+  !------------------------------------------------------------!
+  !   First take some aliases, which is quite elaborate here   !
+  !------------------------------------------------------------!
+  val => Flow % Nat % A % val
+  dia => Flow % Nat % C % dia
+  b   => Flow % Nat % b
+
+  ! Tolerances and under-relaxations are the same for all components
+  urf = Flow % scalar(sc) % urf
+
+  !---------------------------------------------------!
+  !   Update old values (o) and older than old (oo)   !
+  !---------------------------------------------------!
+  if(Iter % Current() .eq. 1) then
+
+    if(Flow % scalar(sc) % td_scheme .eq. PARABOLIC) then
+      !$tf-acc loop begin
+      do c = Cells_In_Domain_And_Buffer()  ! all present
+        Flow % scalar(sc) % oo(c) = Flow % scalar(sc) % o(c)
+      end do
+      !$tf-acc loop end
+    end if
+
+    !$tf-acc loop begin
+    do c = Cells_In_Domain_And_Buffers() !all present
+      Flow % scalar(sc) % o(c) = Flow % scalar(sc) % n(c)
+    end do
+    !$tf-acc loop end
+
+  end if
+
+  !--------------------------------------------------!
+  !   Discretize the energy conservation equations   !
+  !--------------------------------------------------!
+  call Process % Form_Scalars_Matrix(Grid, Flow, Turb, diff_eff,  &
+                                     urf, dt=Flow % dt)
+
+  !-----------------------------------------------------------!
+  !   Insert proper sources (forces) to transport equations   !
+  !-----------------------------------------------------------!
+
+  ! From boundary conditions
+  call Process % Insert_Scalars_Bc(Grid, Flow, sc)
+
+  ! Inertial and advection terms
+  call Flow % Add_Inertial_Term (Grid, Flow % scalar(sc), Flow % density)
+  call Flow % Add_Advection_Term(Grid, Flow % scalar(sc), Flow % density)
+
+  ! Insert cross diffusion terms (computers gradients as well)
+  call Flow % Add_Cross_Diffusion_Term(Grid, Flow % scalar(sc), diff_eff)
+
+  !------------------------------!
+  !   Perform under-relaxation   !
+  !------------------------------!
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present
+    val(dia(c)) = val(dia(c)) / urf
+    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * Flow % scalar(sc) % n(c)
+  end do
+  !$tf-acc loop end
+
+  !------------------------!
+  !   Call linear solver   !
+  !------------------------!
+  call Profiler % Start('CG_for_Scalars')
+  call Flow % Nat % Cg(Flow % scalar(sc) % n,     &
+                       Flow % scalar(sc) % miter, &
+                       Flow % scalar(sc) % niter, &
+                       Flow % scalar(sc) % tol,   &
+                       Flow % scalar(sc) % res)
+  call Profiler % Stop('CG_for_Scalars')
+
+# if T_FLOWS_DEBUG == 1
+    call Grid % Save_Debug_Vtu("C_00",           &
+                               scalar_name="C_00", &
+                               scalar_cell=flow_scalar_01_n)
+# endif
+
+  call Info % Iter_Fill_At(1, 6, Flow % scalar(sc) % name,  &
+                                 Flow % scalar(sc) % res,   &
+                                 Flow % scalar(sc) % niter)
+
+  call Work % Disconnect_Real_Cell(diff_eff)
+
+  call Profiler % Stop('Compute_Scalars')
+
+  end subroutine

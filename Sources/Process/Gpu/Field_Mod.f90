@@ -33,7 +33,7 @@
     real, allocatable :: conductivity(:)  !! [W/(m K)]
     real, allocatable :: density(:)       !! [kg/m^3]
     real, allocatable :: viscosity(:)     !! [kg/m/s]
-    real              :: diffusivity      !! [m^2/s]
+    real, allocatable :: diffusivity(:)   !! [m^2/s]
 
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !
