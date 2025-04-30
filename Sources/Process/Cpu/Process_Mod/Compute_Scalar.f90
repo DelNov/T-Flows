@@ -53,7 +53,7 @@
   type(Var_Type),    pointer :: phi
   integer                    :: c, s, c1, c2, row, col
   real                       :: a12, a21
-  real                       :: ns, dt
+  real                       :: rs, dt
   real                       :: dif_eff, f_ex, f_im
   real                       :: phi_stress, q_exp
   real                       :: phix_f, phiy_f, phiz_f
@@ -251,9 +251,9 @@
   call Profiler % Stop(String % First_Upper(phi % solver)  //  &
                        ' (solver for scalars)')
 
-  read(phi % name(3:4), *) ns  ! reterive the number of scalar
-  row = ceiling(ns/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
-  col = nint(ns) - (row-1)*6   ! will be in range 1 - 6
+  rs = sc                      ! reterive the rank of scalar
+  row = ceiling(rs/6)          ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
+  col = nint(rs) - (row-1)*6   ! will be in range 1 - 6
 
   call Info % Iter_Fill_Scalar_At(row, col, phi % name, phi % res, phi % niter)
 
