@@ -637,6 +637,7 @@
       call Results % Save_Vtu_Scalar_Real(trim(str_var),                  &
                                           plot_inside,                    &
                                           Flow % diffusivity(c_f:c_l),    &
+                                          f8, f9, data_offset, run)
     end if
 
     if(Turb % rough_walls) then
