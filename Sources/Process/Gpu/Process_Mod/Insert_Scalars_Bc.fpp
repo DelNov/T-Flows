@@ -8,6 +8,7 @@
   type(Field_Type), target :: Flow
   integer, intent(in)      :: sc
 !-----------------------------------[Locals]-----------------------------------!
+  type(Var_Type),   pointer :: phi
   real, contiguous, pointer :: b(:), fc(:), diff(:)
   real                      :: a12
   integer                   :: reg, s, c, c1, c2
@@ -21,6 +22,7 @@
   b    => Flow % Nat % b
   fc   => Flow % Nat % C % fc
   diff => Flow % diffusivity
+  phi  => Flow % scalar(sc)
 
   !-----------------------------------------------------------------------!
   !   Handle boundary conditions on the right-hand side (in the source)   !
@@ -41,7 +43,7 @@
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)
         a12 = diff(c1) * fc(s)
-        b(c1) = b(c1) + a12 * Flow % scalar(sc) % n(c2)
+        b(c1) = b(c1) + a12 * phi % n(c2)
       end do
       !$tf-acc loop end
 

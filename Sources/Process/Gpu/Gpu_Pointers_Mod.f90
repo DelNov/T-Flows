@@ -32,9 +32,6 @@
   real,    contiguous, pointer :: grid_vol(:), grid_wall_dist(:)
 
   ! Access to Flow members
-
-  real, contiguous, pointer :: flow_scalar_01_n(:), flow_scalar_01_o(:), &
-                               flow_scalar_01_oo(:)
   real, contiguous, pointer :: flow_t_n(:), flow_t_o(:), flow_t_oo(:)
   real, contiguous, pointer :: flow_u_n(:), flow_u_o(:), flow_u_oo(:)
   real, contiguous, pointer :: flow_v_n(:), flow_v_o(:), flow_v_oo(:)

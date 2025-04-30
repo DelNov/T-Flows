@@ -65,16 +65,13 @@
     end if
   end if
 
-  if(Flow % n_scalars .gt. 0) then
-    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(1) % n)
-    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(1) % o)
-    flow_scalar_01_n  => Flow % scalar(1) % n
-    flow_scalar_01_o  => Flow % scalar(1) % o
-    if(Flow % scalar(1) % td_scheme .eq. PARABOLIC) then
-      call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(1) % oo)
-      flow_scalar_01_oo => Flow % scalar(1) % oo
+  do sc = 1, Flow % n_scalars
+    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % n)
+    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % o)
+    if(Flow % scalar(sc) % td_scheme .eq. PARABOLIC) then
+      call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % oo)
     end if
-  end if
+  end do  ! through scalars
 
   ! You are going to need physical properties as well
   call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)

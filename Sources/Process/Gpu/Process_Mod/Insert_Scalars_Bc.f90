@@ -12,6 +12,7 @@
   type(Field_Type), target :: Flow
   integer, intent(in)      :: sc
 !-----------------------------------[Locals]-----------------------------------!
+  type(Var_Type),   pointer :: phi
   real, contiguous, pointer :: b(:), fc(:), diff(:)
   real                      :: a12
   integer                   :: reg, s, c, c1, c2
@@ -25,6 +26,7 @@
   b    => Flow % Nat % b
   fc   => Flow % Nat % C % fc
   diff => Flow % diffusivity
+  phi  => Flow % scalar(sc)
 
   !-----------------------------------------------------------------------!
   !   Handle boundary conditions on the right-hand side (in the source)   !
@@ -45,21 +47,22 @@
     if(Grid % region % type(reg) .eq. WALL .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
 
+      phi_n => phi % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
       !$acc   grid_region_l_face,  &
-      !$acc   flow_scalar_01_n,  &
       !$acc   grid_faces_c,  &
       !$acc   diff,  &
       !$acc   fc,  &
-      !$acc   b   &
+      !$acc   b,  &
+      !$acc   phi_n   &
       !$acc )
       do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
         c1 = grid_faces_c(1,s)
         c2 = grid_faces_c(2,s)
         a12 = diff(c1) * fc(s)
-        b(c1) = b(c1) + a12 * Flow % scalar(sc) % n(c2)
+        b(c1) = b(c1) + a12 * phi_n(c2)
       end do
       !$acc end parallel
 

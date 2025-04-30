@@ -186,9 +186,9 @@
       end if
 
       ! Deal with scalars
-      do sc = 1, Flow(1) % n_scalars
-        call Process % Compute_Scalars(Grid(1), Flow(1), Turb(1), sc)
-      end do
+      if(Flow(1) % n_scalars .gt. 0) then
+        call Process % Compute_Scalars(Grid(1), Flow(1), Turb(1))
+      end if
 
       ! Updating boundaries
       call Process % Update_Boundary_Values(Grid(1), Flow(1), 'ALL')
