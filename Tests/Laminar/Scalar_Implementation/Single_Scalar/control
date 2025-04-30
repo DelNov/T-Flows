@@ -3,11 +3,10 @@
 #  Control file for Pipe problem to test single scalar implementation
 #
 #-------------------------------------------------------------------------------
-
   PROBLEM_NAME            pipe
 
   TURBULENCE_MODEL        none
-  HEAT_TRANSFER           none
+  HEAT_TRANSFER           no
 
   TIME_STEP                 0.001
   NUMBER_OF_TIME_STEPS    360
@@ -63,29 +62,26 @@
 #--------------------------------------------------------------------------------
 # Initial condition
 #--------------------------------------------------------------------------------
-
   INITIAL_CONDITION
     VARIABLES              u     v     w    c_01
-    VALUES                 0.0   0.0   0.0  0.0
+    VALUES                 1.0   0.0   0.0  0.0
 
 #-------------------------------------------------------------------------------
 # Boundary condition (inflow and outflow seem not to work, so I used wall)
 #-------------------------------------------------------------------------------
 
   BOUNDARY_CONDITION internal_wall
-    TYPE             wall 
+    TYPE             wall
     VARIABLES              u     v     w    c_01
     VALUES                 0.0   0.0   0.0  0.0
 
-  # sobstitute wall with inflow, VALUES with FILE inlet_profile.dat and add rx
   BOUNDARY_CONDITION inlet
-    TYPE             wall
+    TYPE             inflow
     VARIABLES              u     v     w    c_01
     VALUES                 1.0   0.0   0.0  1.0
 
-  # sobstitute wall with outflow
   BOUNDARY_CONDITION outlet
-    TYPE             wall
+    TYPE             outflow
     VARIABLES              u     v     w    c_01
-    VALUES                 0.0   0.0   0.0  0.0
+    VALUES                 1.0   0.0   0.0  0.0
 #-------------------------------------------------------------------------------
