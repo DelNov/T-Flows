@@ -35,7 +35,7 @@
 
   ! Tolerances and under-relaxations are the same for all components
   urf = Flow % scalar(sc) % urf
-  
+
   !---------------------------------------------------!
   !   Update old values (o) and older than old (oo)   !
   !---------------------------------------------------!
@@ -49,12 +49,12 @@
       !$acc   flow_scalar_01_oo,  &
       !$acc   flow_scalar_01_o   &
       !$acc )
-      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1) !all present
-        flow_scalar_01_oo(c) = flow_scalar_01_o(c)
+      do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)  ! all present
+        Flow % scalar(sc) % oo(c) = Flow % scalar(sc) % o(c)
       end do
       !$acc end parallel
     end if
-   
+
     !$acc parallel loop independent  &
     !$acc present(  &
     !$acc   grid_region_f_cell,  &
@@ -63,7 +63,7 @@
     !$acc   flow_scalar_01_n   &
     !$acc )
     do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1) !all present
-      flow_scalar_01_o(c) = flow_scalar_01_n(c)
+      Flow % scalar(sc) % o(c) = Flow % scalar(sc) % n(c)
     end do
     !$acc end parallel
 
@@ -103,7 +103,7 @@
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
     val(dia(c)) = val(dia(c)) / urf
-    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * flow_scalar_01_n(c)
+    b(c) = b(c) + val(dia(c)) * (1.0 - urf) * Flow % scalar(sc) % n(c)
   end do
   !$acc end parallel
 

@@ -27,7 +27,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w
-  integer                  :: sc, nb, nc, nn, nf
+  integer                  :: sc, nb, nc, nn, ns
   character(VL)            :: c_name, q_name
 !==============================================================================!
 
@@ -40,15 +40,20 @@
   nb = Grid % n_bnd_cells
   nc = Grid % n_cells
   nn = Grid % n_nodes
-  nf = Grid % n_faces
+  ns = Grid % n_faces
 
   !---------------------------------------------!
   !   Allocate memory for physical properties   !
   !---------------------------------------------!
-  allocate(Flow % density     (-nb:nc));  Flow % density(:)      = 0.0
-  allocate(Flow % viscosity   (-nb:nc));  Flow % viscosity(:)    = 0.0
-  allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
-  allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
+  allocate(Flow % density  (-nb:nc));  Flow % density(:)   = 0.0
+  allocate(Flow % viscosity(-nb:nc));  Flow % viscosity(:) = 0.0
+  if(Flow % heat_transfer) then
+    allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
+    allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
+  end if
+  if(Flow % n_scalars .gt. 0) then
+    allocate(Flow % diffusivity (-nb:nc));  Flow % diffusivity(:)  = 0.0
+  end if
 
   !----------------------------------!
   !   Memory for gradient matrices   !
@@ -103,13 +108,13 @@
   allocate(Flow % cell_fy(-nb:nc));  Flow % cell_fy = 0.0
   allocate(Flow % cell_fz(-nb:nc));  Flow % cell_fz = 0.0
 
-  allocate(Flow % face_fx(nf));      Flow % face_fx = 0.0
-  allocate(Flow % face_fy(nf));      Flow % face_fy = 0.0
-  allocate(Flow % face_fz(nf));      Flow % face_fz = 0.0
+  allocate(Flow % face_fx(ns));      Flow % face_fx = 0.0
+  allocate(Flow % face_fy(ns));      Flow % face_fy = 0.0
+  allocate(Flow % face_fz(ns));      Flow % face_fz = 0.0
 
-  !---------------------------------!
-  !   Allocate memory for scalars   !
-  !---------------------------------!
+  !-----------------------!
+  !   Scalars Transport   !
+  !-----------------------!
   do sc = 1, Flow % n_scalars
 
     ! Set variable name

@@ -48,7 +48,7 @@
       procedure :: Compute_Energy
       procedure :: Form_Energy_Matrix
       procedure :: Insert_Energy_Bc
-      
+
       ! Scalars
       procedure :: Compute_Scalars
       procedure :: Form_Scalars_Matrix

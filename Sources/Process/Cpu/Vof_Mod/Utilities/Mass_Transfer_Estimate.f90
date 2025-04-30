@@ -23,7 +23,7 @@
   real                         :: dx1, dy1, dz1, dx2, dy2, dz2, d1, d2, st
   real                         :: dx1_n, dy1_n, dz1_n, dx2_n, dy2_n, dz2_n
   real                         :: q_0, q_1, sum_m_dot, sum_nab_t
-  real                         :: c_lee, tmp_new, mdot_old
+  real                         :: c_lee
 !==============================================================================!
 
   ! Take aliases

@@ -86,7 +86,7 @@
 
   O_Print '(a)', ' # Calculating gradient matrix for the field'
   call Flow(1) % Calculate_Grad_Matrix(Grid(1))
-  
+
   O_Print '(a)', ' # Initialising variables'
   ! Initialize variables
   if(.not. read_backup(1)) then
@@ -158,7 +158,7 @@
 
     ! Turbulence models initializations
     call Turb(1) % Init_Turb(Grid(1), Flow(1))
-   
+
     !-----------------------------------!
     !   Iterations within a time step   !
     !-----------------------------------!
@@ -172,14 +172,14 @@
       call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)
 
       call Process % Compute_Pressure(Grid(1), Flow(1))
-      
+
       ! Correct velocity components
       call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
       call Process % Correct_Velocity(Grid(1), Flow(1))
-      
+
       ! Deal with turbulence
       call Turb(1) % Main_Turb(Grid(1), Flow(1))
-      
+
       ! Deal with heat
       if(Flow(1) % heat_transfer) then
         call Process % Compute_Energy(Grid(1), Flow(1), Turb(1))

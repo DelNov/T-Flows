@@ -473,14 +473,14 @@
                         / Grid % wall_dist(c1)
             end if
 
-          ! Scalar boundary for other trubulence models
+          ! Scalar boundary for other turbulence models
           else
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
               phi % n(c2) = phi % n(c1) + phi % q(c2) * Grid % wall_dist(c1)  &
-                          / Flow % diffusivity
+                          / Flow % diffusivity(c1)
             else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL) then
-              phi % q(c2) = (phi % n(c2) - phi % n(c1)) * Flow % diffusivity &
-                          / Grid % wall_dist(c1)
+              phi % q(c2) = (phi % n(c2) - phi % n(c1))  &
+                          * Flow % diffusivity(c1) / Grid % wall_dist(c1)
             end if ! WALL or WALLFL
           end if ! Turb. models
 

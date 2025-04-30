@@ -16,24 +16,28 @@
   type(Grid_Type), pointer :: Grid
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
+  real                     :: diff_const
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Rc)
   Unused(Swarm)
 !==============================================================================!
 
   ! Give some sign
-  if(First_Proc())  &
-    print '(a)', ' # Reading about physical properties'
+  O_Print '(a)', ' # Reading about physical properties'
 
   ! Take alias
   Grid => Flow % pnt_grid
 
   ! Read constant (defualt) values
-  call Control % Dynamic_Viscosity   (visc_const)
-  call Control % Mass_Density        (dens_const)
-  call Control % Heat_Capacity       (capa_const)
-  call Control % Thermal_Conductivity(cond_const)
-  call Control % Scalars_Diffusivity (Flow % diffusivity)
+  call Control % Dynamic_Viscosity(visc_const)
+  call Control % Mass_Density     (dens_const)
+  if(Flow % heat_transfer) then
+    call Control % Heat_Capacity       (capa_const)
+    call Control % Thermal_Conductivity(cond_const)
+  end if
+  if (Flow % n_scalars .gt. 0) then
+    call Control % Scalars_Diffusivity (diff_const)
+  end if
 
   if(Flow % with_interface) then
     call Control % Phase_Densities       (Vof % phase_dens)
@@ -44,10 +48,15 @@
     call Control % Latent_Heat           (Vof % latent_heat)
     call Control % Saturation_Temperature(Vof % t_sat)
   else
-    Flow % density     (:) = dens_const
-    Flow % viscosity   (:) = visc_const
-    Flow % capacity    (:) = capa_const
-    Flow % conductivity(:) = cond_const
+    Flow % density       (:) = dens_const
+    Flow % viscosity     (:) = visc_const
+    if(Flow % heat_transfer) then
+      Flow % capacity    (:) = capa_const
+      Flow % conductivity(:) = cond_const
+    end if
+    if(Flow % n_scalars .gt. 0) then
+      Flow % diffusivity (:) = diff_const
+    end if
   end if
 
   end subroutine

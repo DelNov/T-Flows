@@ -632,13 +632,19 @@
                                           f8, f9, data_offset, run)
     end if
 
+    if(Flow % n_scalars .gt. 0) then
+      str_var = Results % Var_Name("Physical Diffusivity","[m^2/s]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var),                  &
+                                          plot_inside,                    &
+                                          Flow % diffusivity(c_f:c_l),    &
+    end if
+
     if(Turb % rough_walls) then
       str_var = Results % Var_Name("Roughness Coefficient z_o","[1]", units)
       call Results % Save_Vtu_Scalar_Real(trim(str_var),                 &
                                           plot_inside,                   &
                                           Turb % z_o(c_f:c_l),           &
                                           f8, f9, data_offset, run)
-
     end if
 
     !---------------------!

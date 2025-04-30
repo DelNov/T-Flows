@@ -59,7 +59,7 @@
         c1 = grid_faces_c(1,s)
         c2 = grid_faces_c(2,s)
         a12 = diff(c1) * fc(s)
-        b(c1) = b(c1) + a12 * flow_scalar_01_n(c2)
+        b(c1) = b(c1) + a12 * Flow % scalar(sc) % n(c2)
       end do
       !$acc end parallel
 

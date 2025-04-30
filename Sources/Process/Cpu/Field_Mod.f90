@@ -44,7 +44,7 @@
   !----------------!
   !   Field type   !
   !----------------!
-  !> Encapsulates necessary variables, physical proerties and some numerical
+  !> Encapsulates necessary variables, physical properties and some numerical
   !> procedures to describe a fluid flow with heat transfer and scalar
   !> transport.  The variables it holds include velocity components, temparture
   !> and scalars, as well as fields to describe their physical properties.
@@ -64,7 +64,7 @@
     real, allocatable :: conductivity(:)  !! [W/(m K)]
     real, allocatable :: density(:)       !! [kg/m^3]
     real, allocatable :: viscosity(:)     !! [kg/m/s]
-    real              :: diffusivity      !! [m^2/s]
+    real, allocatable :: diffusivity(:)   !! [m^2/s]
 
     !---------------------------------------------------!
     !   Associated with momentum conservation eqution   !

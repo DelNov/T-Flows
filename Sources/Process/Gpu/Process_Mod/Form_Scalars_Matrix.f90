@@ -29,7 +29,7 @@
 !==============================================================================!
 
   call Profiler % Start('Form_Scalars_Matrix')
-  
+
   !-----------------------!
   !   Take some aliases   !
   !-----------------------!
@@ -44,9 +44,17 @@
   !-----------------------------------------------------------!
   !   Start by copying molecular viscosity to the effective   !
   !-----------------------------------------------------------!
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   diff_eff,  &
+  !$acc   flow_diffusivity   &
+  !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
     diff_eff(c) = flow_diffusivity(c)
   end do
+  !$acc end parallel
 
   !---------------------------------------!
   !   Initialize matrix entries to zero   !

@@ -57,7 +57,7 @@
     ! Create_Field), this call is needed here to reserve memory to store
     ! info on linear solvers. Fields are still allocated in Create_Field
     !  allocate(Flow % scalar(Flow % n_scalars))
-    
+
     ! Now, with basic allocation done, it is safe to read solver options
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)

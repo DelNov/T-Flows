@@ -123,7 +123,7 @@
   ! For boundary cells
   else
     c_f = -Grid % n_bnd_cells
-   c_l = -1
+    c_l = -1
     if(.not. PLOT_BUFFERS) then
       do c_f = -Grid % n_bnd_cells, -1
         if( Grid % Comm % cell_proc(c_f) .eq. This_Proc()) exit

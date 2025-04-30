@@ -1,12 +1,13 @@
 #include "../../Shared/Assert.h90"
 #include "../../Shared/Browse.h90"
+#include "../../Shared/Macros.h90"
 #include "../../Shared/Unused.h90"
 
 !==============================================================================!
   module Read_Controls_Mod
 !------------------------------------------------------------------------------!
 !>  This module consolidates functions for reading and interpreting the control
-!>  file used in the Process program of T-Flows.  This module streamlines the
+!>  file used in the Process program of T-Flows.  It streamlines the
 !>  configuration of simulations by organizing parameters related to boundary
 !>  conditions, physical models, numerical schemes, linear solvers' details
 !>  and physical properties.

@@ -18,7 +18,7 @@
   integer                   :: c, s, c1, c2
   real                      :: x_rat, f_v1
   real                      :: nx, ny, nz
-  real                      :: cs, lf, u_tau, nc2, u_tan, nu
+  real                      :: u_tau, u_tan, nu
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !------------------------------[Local parameters]------------------------------!
   real, parameter           :: A_POW = 8.3

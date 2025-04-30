@@ -5,6 +5,13 @@
 
 !==============================================================================!
   module Field_Mod
+!------------------------------------------------------------------------------!
+!>  The Field_Mod module is designed to manage various aspects of flow fields.
+!>  It can handle both flow fields (like velocity and pressure) and scalar
+!>  fields (such as temperature and scalars), making it applicable to a wide
+!>  range of fluid flow problems.  The Field_Mod doesn't hold any variables
+!>  describing turbulence characteristics (such as k, epsilon, zeta, f,
+!>  statistical averages, ...) as these are stored in module Turb_Mod.
 !----------------------------------[Modules]-----------------------------------!
   use Assert_Mod
   use Face_Mod
@@ -22,6 +29,12 @@
   !----------------!
   !   Field type   !
   !----------------!
+  !> Encapsulates necessary variables, physical properties and some numerical
+  !> procedures to describe a fluid flow with heat transfer and scalar
+  !> transport.  The variables it holds include velocity components, temparture
+  !> and scalars, as well as fields to describe their physical properties.
+  !> Methods for calculating gradients are an additional and important feature
+  !> also entailed in this type.
   type Field_Type
 
     !-------------------------!

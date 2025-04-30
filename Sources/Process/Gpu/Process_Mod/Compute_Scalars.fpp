@@ -39,7 +39,7 @@
 
     if(Flow % scalar(sc) % td_scheme .eq. PARABOLIC) then
       !$tf-acc loop begin
-      do c = Cells_In_Domain_And_Buffer()  ! all present
+      do c = Cells_In_Domain_And_Buffers()  ! all present
         Flow % scalar(sc) % oo(c) = Flow % scalar(sc) % o(c)
       end do
       !$tf-acc loop end

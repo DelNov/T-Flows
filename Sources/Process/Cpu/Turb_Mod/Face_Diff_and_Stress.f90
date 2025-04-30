@@ -34,7 +34,8 @@
   !------------------------------------------------------!
   !   Molecular diffusivity (without turbulent parts)    !
   !------------------------------------------------------!
-  dif_mol  = Flow % diffusivity
+  dif_mol = Grid % fw(s)  * Flow % diffusivity(c1)  &
+     + (1.0-Grid % fw(s)) * Flow % diffusivity(c2)
 
   dif_turb = 0.0
 
@@ -44,8 +45,8 @@
 
   if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      Turb % model .ne. DNS) then
-    dif_turb = Grid % fw(s) * Turb % vis_t(c1) / sc_t  &
-       + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_t
+    dif_turb = Grid % fw(s)  * Turb % vis_t(c1) / sc_t  &
+        + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_t
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then

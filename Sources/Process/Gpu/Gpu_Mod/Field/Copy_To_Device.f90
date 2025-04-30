@@ -76,7 +76,6 @@
     end if
   end if
 
-
   ! You are going to need physical properties as well
   call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)
   call Gpu % Vector_Real_Copy_To_Device(Flow % density)

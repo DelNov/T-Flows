@@ -44,7 +44,7 @@
   real, contiguous, pointer :: flow_shear(:), flow_vort(:), flow_v_flux_n(:)
   real, contiguous, pointer :: flow_grad_c2c(:,:)
   real, contiguous, pointer :: flow_density(:),  flow_viscosity(:)
-  real, contiguous, pointer :: flow_capacity(:), flow_conductivity(:) 
+  real, contiguous, pointer :: flow_capacity(:), flow_conductivity(:)
   real, contiguous, pointer :: flow_diffusivity(:)
 
   ! Access to Turb members

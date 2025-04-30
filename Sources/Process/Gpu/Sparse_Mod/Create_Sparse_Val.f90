@@ -19,5 +19,5 @@
 
   allocate(Aval % val  (Acon % nonzeros));  Aval % val   = 0
   allocate(Aval % d_inv(Grid % n_cells));   Aval % d_inv = 0
-  
+
   end subroutine
