@@ -23,12 +23,6 @@
 !---------------------------------[Arguments]----------------------------------!
   ...
   ..
-!---------------------------------[Interfaces]---------------------------------!
-  interface
-    include 'Some_Cool_Header.h90'
-    ...
-    ..
-  end interface
 !----------------------------------[Calling]-----------------------------------!
   ...
   ..
@@ -75,7 +69,7 @@
   do s = 1, Grid % n_faces     ! fourth level comments start with small letters
 
     c1 = Grid % faces_c(1, s)  ! they are too small to qualify as sentences
-    c2 = Grid % faces_c(1, s)  ! keep them two columns apart from the last ...
+    c2 = Grid % faces_c(2, s)  ! keep them two columns apart from the last ...
                                ! column with the code
                             !12! <- see distance from the last command
   end do

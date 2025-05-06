@@ -1,3 +1,7 @@
+#include "../../Shared/Assert.h90"  ! path to Shared directory may be different
+#include "../../Shared/Browse.h90"
+#include "../../Shared/Unused.h90"
+
 !==============================================================================!
   module Template_Mod
 !------------------------------------------------------------------------------!
@@ -10,12 +14,6 @@
   ..
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Interfaces]---------------------------------!
-  interface
-    include 'Some_Cool_Header.h90'
-    ...
-    ..
-  end interface
 !==============================================================================!
 
   ! Parameters used inside the module
@@ -48,7 +46,9 @@
   ! Inclusion of member procedures
   contains
 
-  include ’Template_Mod/Allocate.f90’
+#  include "Template_Mod/Allocate.f90"
+#  include "Template_Mod/Deploy.f90"
+#  include "Template_Mod/Destroy.f90"
   ...
   ..
 
