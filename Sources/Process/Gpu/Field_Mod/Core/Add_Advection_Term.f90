@@ -27,7 +27,7 @@
   ! Take some aliases
   b     => Flow % Nat % b
   phi_n => phi % n
-  blend =  Flow % u % blend
+  blend =  phi % blend
 
   !-------------------------------------------!
   !                                           !
