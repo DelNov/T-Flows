@@ -13,6 +13,7 @@
   use Iter_Mod
   use Backup_Mod
   use Gpu_Mod
+  use User_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -91,6 +92,7 @@
   ! Initialize variables
   if(.not. read_backup(1)) then
     call Process % Initialize_Variables(Grid(1), Flow(1), Turb(1))
+    call User_Mod_Initialize_Variables(Grid(1), Flow(1), Turb(1))
   end if
 
   O_Print '(a)', '# Allocation CPU memory'

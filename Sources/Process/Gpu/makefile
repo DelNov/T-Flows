@@ -59,6 +59,8 @@ DIR_BINARY = ../../../Binaries/Gpu
 DIR_SHARED = ../../Shared
 DIR_MODULE = .Modules
 DIR_OBJECT = .Objects
+DIR_USER   = User_Mod
+DIR_CASE   = no
 VPATH = $(DIR_SHARED):.
 
 #---------------------------------------------------
@@ -308,6 +310,39 @@ endif
 #   This list should therefore be written "by hand".
 #------------------------------------------------------
 
+#--------------------
+#   User functions
+#--------------------
+ifneq ($(DIR_CASE), no)
+  ifeq ('$(wildcard $(DIR_CASE))','')
+    $(info Case directory $(DIR_CASE) does not exist!)
+  else
+    $(info Compling for the case in $(DIR_CASE))
+    ifeq ('$(wildcard $(DIR_CASE)/$(DIR_USER))','')
+      $(info Directory with user functions $(DIR_CASE)/$(DIR_USER) does not exist!)
+    else
+      $(info Linking user functions from directory $(DIR_CASE)/$(DIR_USER))
+
+      # Relative path to $DIR_CASE from ./
+      REL_DIR=$(shell realpath --relative-to="./" "$(DIR_CASE)")
+
+      # Fetch all user functions from the case directory
+      STEP_A  = $(shell ls -1 $(REL_DIR)/$(DIR_USER)/*.f90)
+      STEP_B  = $(notdir $(STEP_A))
+
+      # Append "../" to each of the file names
+      SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
+      $(info $(SRC_USR))
+
+      ifneq ("$(wildcard $(STEP_A))","")
+        # Make soft links
+        $(shell ln -f -s $(SRC_USR) $(DIR_USER))
+      endif
+
+    endif
+  endif
+endif
+
 #-------------
 #   Modules
 #-------------
@@ -347,6 +382,7 @@ SRC_F_MOD += Gpu_Pointers_Mod.f90   \
              Info_Mod.f90           \
              Turb_Mod.f90           \
              Gpu_Mod.f90            \
+             User_Mod.f90           \
              Backup_Mod.f90         \
              Results_Mod.f90        \
              Read_Controls_Mod.f90  \
@@ -421,8 +457,16 @@ include makefile_explicit_dependencies
 #   Explicit target
 #---------------------
 clean:
+	@echo -n Removing objects and modules ...
 	find . -name "*.fpp" | xargs touch
 	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
+	@echo done
+	@echo -n Removing links to sources in case directory ...
+	@rm -f $(DIR_USER)/*.f90
+	@echo done
+	@echo -n Retreiving default user functions from git repository ...
+	@git checkout $(DIR_USER)/*.f90
+	@echo done
 
 #---------------------------------------------------------
 #   Preprocessing only target

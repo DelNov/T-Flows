@@ -19,40 +19,28 @@
 !==============================================================================!
 
   !------------------!
-  !                  !
   !   Process type   !
-  !                  !
   !------------------!
   type Process_Type
 
     contains
-
-      ! Splash screen
       procedure :: Logo_Pro
-
-      ! Related to momentum conservation
+      procedure :: Compute_Energy
       procedure :: Compute_Momentum
-      procedure :: Form_Momentum_Matrix
-      procedure :: Insert_Momentum_Bc
+      procedure :: Compute_Pressure
+      procedure :: Compute_Scalars
       procedure :: Add_Pressure_Term
       procedure :: Correct_Velocity
       procedure :: Initialize_Variables
-      procedure :: Update_Boundary_Values
-
-      ! Related to pressure solution
-      procedure :: Compute_Pressure
-      procedure :: Form_Pressure_Matrix
-      procedure :: Insert_Volume_Source_For_Pressure
-
-      ! Energy / Enthalpy
-      procedure :: Compute_Energy
       procedure :: Form_Energy_Matrix
-      procedure :: Insert_Energy_Bc
-
-      ! Scalars
-      procedure :: Compute_Scalars
+      procedure :: Form_Momentum_Matrix
+      procedure :: Form_Pressure_Matrix
       procedure :: Form_Scalars_Matrix
+      procedure :: Insert_Energy_Bc
+      procedure :: Insert_Momentum_Bc
       procedure :: Insert_Scalars_Bc
+      procedure :: Insert_Volume_Source_For_Pressure
+      procedure :: Update_Boundary_Values
 
   end type
 
@@ -60,31 +48,22 @@
                                  !! to allow easy access to its procedures
   contains
 
-    ! Splash screen
 #   include "Process_Mod/Logo_Pro.f90"
-
-    ! Related to momentum conservation
+#   include "Process_Mod/Compute_Energy.f90"
 #   include "Process_Mod/Compute_Momentum.f90"
+#   include "Process_Mod/Compute_Pressure.f90"
+#   include "Process_Mod/Compute_Scalars.f90"
+#   include "Process_Mod/Form_Energy_Matrix.f90"
 #   include "Process_Mod/Form_Momentum_Matrix.f90"
+#   include "Process_Mod/Form_Pressure_Matrix.f90"
+#   include "Process_Mod/Form_Scalars_Matrix.f90"
+#   include "Process_Mod/Insert_Energy_Bc.f90"
 #   include "Process_Mod/Insert_Momentum_Bc.f90"
+#   include "Process_Mod/Insert_Scalars_Bc.f90"
+#   include "Process_Mod/Insert_Volume_Source_For_Pressure.f90"
 #   include "Process_Mod/Add_Pressure_Term.f90"
 #   include "Process_Mod/Correct_Velocity.f90"
 #   include "Process_Mod/Initialize_Variables.f90"
 #   include "Process_Mod/Update_Boundary_Values.f90"
-
-    ! Related to pressure solution
-#   include "Process_Mod/Compute_Pressure.f90"
-#   include "Process_Mod/Form_Pressure_Matrix.f90"
-#   include "Process_Mod/Insert_Volume_Source_For_Pressure.f90"
-
-    ! Energy / Enthalpy
-#   include "Process_Mod/Compute_Energy.f90"
-#   include "Process_Mod/Form_Energy_Matrix.f90"
-#   include "Process_Mod/Insert_Energy_Bc.f90"
-
-    ! Scalars
-#   include "Process_Mod/Compute_Scalars.f90"
-#   include "Process_Mod/Form_Scalars_Matrix.f90"
-#   include "Process_Mod/Insert_Scalars_Bc.f90"
 
   end module
