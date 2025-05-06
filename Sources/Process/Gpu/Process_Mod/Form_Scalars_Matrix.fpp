@@ -97,39 +97,39 @@
   !---------------------------------------!
   if(Flow % t % blend_matrix) then
 
-  !$tf-acc loop begin
-  do c1 = Cells_In_Domain()  ! all present
+    !$tf-acc loop begin
+    do c1 = Cells_In_Domain()  ! all present
 
-    do i_cel = 1, Grid % cells_n_cells(c1)
-      c2 = Grid % cells_c(i_cel, c1)
-      s  = Grid % cells_f(i_cel, c1)
-      fl = Flow % v_flux % n(s)
+      do i_cel = 1, Grid % cells_n_cells(c1)
+        c2 = Grid % cells_c(i_cel, c1)
+        s  = Grid % cells_f(i_cel, c1)
+        fl = Flow % v_flux % n(s)
 
-      if(c2 .gt. 0) then
+        if(c2 .gt. 0) then
 
-        cfs = Face_Value(s, Flow % density(c1), Flow % density(c2))
-        a12 = 0.0
-        a21 = 0.0
+          cfs = Face_Value(s, Flow % density(c1), Flow % density(c2))
+          a12 = 0.0
+          a21 = 0.0
 
-        if(c1 .lt. c2) then
-          if(fl > 0.0) a21 = a21 + fl * cfs
-          if(fl < 0.0) a12 = a12 - fl * cfs
-          val(pos(1,s)) = val(pos(1,s)) - a12
-          val(pos(2,s)) = val(pos(2,s)) - a21
+          if(c1 .lt. c2) then
+            if(fl > 0.0) a21 = a21 + fl * cfs
+            if(fl < 0.0) a12 = a12 - fl * cfs
+            val(pos(1,s)) = val(pos(1,s)) - a12
+            val(pos(2,s)) = val(pos(2,s)) - a21
+          end if
+
+          if(c1 .gt. c2) then
+            if(fl > 0.0) a12 = a12 + fl * cfs
+          end if
+
+          ! Update only diaginal at c1 to avoid race conditions
+          val(dia(c1)) = val(dia(c1)) + a12
+
         end if
+      end do
 
-        if(c1 .gt. c2) then
-          if(fl > 0.0) a12 = a12 + fl * cfs
-        end if
-
-        ! Update only diaginal at c1 to avoid race conditions
-        val(dia(c1)) = val(dia(c1)) + a12
-
-      end if
     end do
-
-  end do
-  !$tf-acc loop end
+    !$tf-acc loop end
 
   end if
 

@@ -124,53 +124,53 @@
   !---------------------------------------!
   if(Flow % t % blend_matrix) then
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   grid_cells_n_cells,  &
-  !$acc   grid_cells_c,  &
-  !$acc   grid_cells_f,  &
-  !$acc   flow_v_flux_n,  &
-  !$acc   flow_density,  &
-  !$acc   val,  &
-  !$acc   pos,  &
-  !$acc   dia   &
-  !$acc )
-  do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+    !$acc parallel loop independent  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   grid_cells_n_cells,  &
+    !$acc   grid_cells_c,  &
+    !$acc   grid_cells_f,  &
+    !$acc   flow_v_flux_n,  &
+    !$acc   flow_density,  &
+    !$acc   val,  &
+    !$acc   pos,  &
+    !$acc   dia   &
+    !$acc )
+    do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
 
-  !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
-      c2 = grid_cells_c(i_cel, c1)
-      s  = grid_cells_f(i_cel, c1)
-      fl = flow_v_flux_n(s)
+    !$acc loop seq
+      do i_cel = 1, grid_cells_n_cells(c1)
+        c2 = grid_cells_c(i_cel, c1)
+        s  = grid_cells_f(i_cel, c1)
+        fl = flow_v_flux_n(s)
 
-      if(c2 .gt. 0) then
+        if(c2 .gt. 0) then
 
-        cfs = Face_Value(s, flow_density(c1), flow_density(c2))
-        a12 = 0.0
-        a21 = 0.0
+          cfs = Face_Value(s, flow_density(c1), flow_density(c2))
+          a12 = 0.0
+          a21 = 0.0
 
-        if(c1 .lt. c2) then
-          if(fl > 0.0) a21 = a21 + fl * cfs
-          if(fl < 0.0) a12 = a12 - fl * cfs
-          val(pos(1,s)) = val(pos(1,s)) - a12
-          val(pos(2,s)) = val(pos(2,s)) - a21
+          if(c1 .lt. c2) then
+            if(fl > 0.0) a21 = a21 + fl * cfs
+            if(fl < 0.0) a12 = a12 - fl * cfs
+            val(pos(1,s)) = val(pos(1,s)) - a12
+            val(pos(2,s)) = val(pos(2,s)) - a21
+          end if
+
+          if(c1 .gt. c2) then
+            if(fl > 0.0) a12 = a12 + fl * cfs
+          end if
+
+          ! Update only diaginal at c1 to avoid race conditions
+          val(dia(c1)) = val(dia(c1)) + a12
+
         end if
+      end do
+    !$acc end loop
 
-        if(c1 .gt. c2) then
-          if(fl > 0.0) a12 = a12 + fl * cfs
-        end if
-
-        ! Update only diaginal at c1 to avoid race conditions
-        val(dia(c1)) = val(dia(c1)) + a12
-
-      end if
     end do
-  !$acc end loop
-
-  end do
-  !$acc end parallel
+    !$acc end parallel
 
   end if
 
