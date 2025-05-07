@@ -111,6 +111,7 @@
       do i_cel = 1, grid_cells_n_cells(c1)
         c2 = grid_cells_c(i_cel, c1)
         s  = grid_cells_f(i_cel, c1)
+
         if(c2 .gt. 0) then
 
           ! Value of the coefficient at the cel face
@@ -136,6 +137,14 @@
     end do
     !$acc end parallel
 
+  end if
+
+  !--------------------------------------------------------------------!
+  !   For a reason I don't fully understand, if matrices are blended   !
+  !   with upwind, we are better off getting out of here now           !
+  !--------------------------------------------------------------------!
+  if(phi % blend_matrix) then
+    return
   end if
 
   !-------------------------------------------!
