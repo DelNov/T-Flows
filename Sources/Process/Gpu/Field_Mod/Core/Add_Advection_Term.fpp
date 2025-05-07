@@ -14,7 +14,8 @@
   real                      :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), phi_n(:)
-  real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c, blend
+  real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c
+  real                      :: blend, fl
   integer                   :: s, c1, c2, i_cel, reg
 !==============================================================================!
 
@@ -41,8 +42,11 @@
     b_tmp = b(c1)
 
     do i_cel = 1, Grid % cells_n_cells(c1)
+
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
+      fl = Flow % v_flux % n(s)
+
       if(c2 .gt. 0) then
 
         ! Centered value
@@ -55,14 +59,10 @@
         coef_phi1 = coef_f * ((1.0-blend) * phi_n(c1) + blend * phi_c)
         coef_phi2 = coef_f * ((1.0-blend) * phi_n(c2) + blend * phi_c)
 
-        b_tmp = b_tmp  &
-              - coef_phi1 * max(Flow % v_flux % n(s),0.0) * merge(1,0,c1.lt.c2)
-        b_tmp = b_tmp  &
-              - coef_phi2 * min(Flow % v_flux % n(s),0.0) * merge(1,0,c1.lt.c2)
-        b_tmp = b_tmp  &
-              + coef_phi2 * max(Flow % v_flux % n(s),0.0) * merge(1,0,c1.gt.c2)
-        b_tmp = b_tmp  &
-              + coef_phi1 * min(Flow % v_flux % n(s),0.0) * merge(1,0,c1.gt.c2)
+        b_tmp = b_tmp - coef_phi1 * max(fl,0.0) * merge(1,0, c1.lt.c2)
+        b_tmp = b_tmp - coef_phi2 * min(fl,0.0) * merge(1,0, c1.lt.c2)
+        b_tmp = b_tmp + coef_phi2 * max(fl,0.0) * merge(1,0, c1.gt.c2)
+        b_tmp = b_tmp + coef_phi1 * min(fl,0.0) * merge(1,0, c1.gt.c2)
       end if
     end do
 
@@ -80,8 +80,10 @@
       b_tmp = b(c1)
 
       do i_cel = 1, Grid % cells_n_cells(c1)
+
         c2 = Grid % cells_c(i_cel, c1)
         s  = Grid % cells_f(i_cel, c1)
+        fl = Flow % v_flux % n(s)
 
         if(c2 .gt. 0) then
 
@@ -92,14 +94,10 @@
           coef_phi1 = coef_f * phi_n(c1)
           coef_phi2 = coef_f * phi_n(c2)
 
-          b_tmp = b_tmp  &
-                + coef_phi1 * max(Flow % v_flux % n(s),0.0) * merge(1,0,c1.lt.c2)
-          b_tmp = b_tmp  &
-                + coef_phi2 * min(Flow % v_flux % n(s),0.0) * merge(1,0,c1.lt.c2)
-          b_tmp = b_tmp  &
-                - coef_phi2 * max(Flow % v_flux % n(s),0.0) * merge(1,0,c1.gt.c2)
-          b_tmp = b_tmp  &
-                - coef_phi1 * min(Flow % v_flux % n(s),0.0) * merge(1,0,c1.gt.c2)
+          b_tmp = b_tmp + coef_phi1 * max(fl,0.0) * merge(1,0, c1.lt.c2)
+          b_tmp = b_tmp + coef_phi2 * min(fl,0.0) * merge(1,0, c1.lt.c2)
+          b_tmp = b_tmp - coef_phi2 * max(fl,0.0) * merge(1,0, c1.gt.c2)
+          b_tmp = b_tmp - coef_phi1 * min(fl,0.0) * merge(1,0, c1.gt.c2)
         end if
       end do
 

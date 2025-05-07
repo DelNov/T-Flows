@@ -23,8 +23,8 @@
   call Profiler % Start('Add_Cross_Diffusion_Term')
 
   ! Take some aliases
-  b     => Flow % Nat % b
-  fc    => Flow % Nat % C % fc
+  b  => Flow % Nat % b
+  fc => Flow % Nat % C % fc
 
   !--------------------------------------------!
   !   Compute gradient of the variable first   !

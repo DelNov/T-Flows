@@ -18,7 +18,8 @@
   real                      :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), phi_n(:)
-  real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c, blend
+  real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c
+  real                      :: blend, fl
   integer                   :: s, c1, c2, i_cel, reg
 !==============================================================================!
 
@@ -48,17 +49,20 @@
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   flow_v_flux_n,  &
   !$acc   phi_n,  &
-  !$acc   coef,  &
-  !$acc   flow_v_flux_n   &
+  !$acc   coef   &
   !$acc )
   do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present (this wasn't independent)
     b_tmp = b(c1)
 
   !$acc loop seq
     do i_cel = 1, grid_cells_n_cells(c1)
+
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
+      fl = flow_v_flux_n(s)
+
       if(c2 .gt. 0) then
 
         ! Centered value
@@ -71,14 +75,10 @@
         coef_phi1 = coef_f * ((1.0-blend) * phi_n(c1) + blend * phi_c)
         coef_phi2 = coef_f * ((1.0-blend) * phi_n(c2) + blend * phi_c)
 
-        b_tmp = b_tmp  &
-              - coef_phi1 * max(flow_v_flux_n(s),0.0) * merge(1,0,c1.lt.c2)
-        b_tmp = b_tmp  &
-              - coef_phi2 * min(flow_v_flux_n(s),0.0) * merge(1,0,c1.lt.c2)
-        b_tmp = b_tmp  &
-              + coef_phi2 * max(flow_v_flux_n(s),0.0) * merge(1,0,c1.gt.c2)
-        b_tmp = b_tmp  &
-              + coef_phi1 * min(flow_v_flux_n(s),0.0) * merge(1,0,c1.gt.c2)
+        b_tmp = b_tmp - coef_phi1 * max(fl,0.0) * merge(1,0, c1.lt.c2)
+        b_tmp = b_tmp - coef_phi2 * min(fl,0.0) * merge(1,0, c1.lt.c2)
+        b_tmp = b_tmp + coef_phi2 * max(fl,0.0) * merge(1,0, c1.gt.c2)
+        b_tmp = b_tmp + coef_phi1 * min(fl,0.0) * merge(1,0, c1.gt.c2)
       end if
     end do
   !$acc end loop
@@ -100,17 +100,19 @@
     !$acc   grid_cells_n_cells,  &
     !$acc   grid_cells_c,  &
     !$acc   grid_cells_f,  &
+    !$acc   flow_v_flux_n,  &
     !$acc   coef,  &
-    !$acc   phi_n,  &
-    !$acc   flow_v_flux_n   &
+    !$acc   phi_n   &
     !$acc )
     do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present (this wasn't independent)
       b_tmp = b(c1)
 
     !$acc loop seq
       do i_cel = 1, grid_cells_n_cells(c1)
+
         c2 = grid_cells_c(i_cel, c1)
         s  = grid_cells_f(i_cel, c1)
+        fl = flow_v_flux_n(s)
 
         if(c2 .gt. 0) then
 
@@ -121,14 +123,10 @@
           coef_phi1 = coef_f * phi_n(c1)
           coef_phi2 = coef_f * phi_n(c2)
 
-          b_tmp = b_tmp  &
-                + coef_phi1 * max(flow_v_flux_n(s),0.0) * merge(1,0,c1.lt.c2)
-          b_tmp = b_tmp  &
-                + coef_phi2 * min(flow_v_flux_n(s),0.0) * merge(1,0,c1.lt.c2)
-          b_tmp = b_tmp  &
-                - coef_phi2 * max(flow_v_flux_n(s),0.0) * merge(1,0,c1.gt.c2)
-          b_tmp = b_tmp  &
-                - coef_phi1 * min(flow_v_flux_n(s),0.0) * merge(1,0,c1.gt.c2)
+          b_tmp = b_tmp + coef_phi1 * max(fl,0.0) * merge(1,0, c1.lt.c2)
+          b_tmp = b_tmp + coef_phi2 * min(fl,0.0) * merge(1,0, c1.lt.c2)
+          b_tmp = b_tmp - coef_phi2 * max(fl,0.0) * merge(1,0, c1.gt.c2)
+          b_tmp = b_tmp - coef_phi1 * min(fl,0.0) * merge(1,0, c1.gt.c2)
         end if
       end do
     !$acc end loop
