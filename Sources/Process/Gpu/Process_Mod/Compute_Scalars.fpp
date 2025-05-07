@@ -70,7 +70,7 @@
     !   Discretize the scalar conservation equation   !
     !-------------------------------------------------!
     call Process % Form_Scalars_Matrix(Grid, Flow, Turb, diff_eff,  &
-                                       urf, dt=Flow % dt)
+                                       sc, urf, dt=Flow % dt)
 
     !-----------------------------------------------------------!
     !   Insert proper sources (forces) to transport equations   !

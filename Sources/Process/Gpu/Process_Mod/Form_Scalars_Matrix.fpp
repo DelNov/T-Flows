@@ -1,22 +1,24 @@
 !==============================================================================!
   subroutine Form_Scalars_Matrix(Process, Grid, Flow, Turb,  &
-                                 diff_eff, urf, dt)
+                                 diff_eff, sc, urf, dt)
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)                   :: Process
-  type(Grid_Type),   intent(in), target :: Grid
-  type(Field_Type),              target :: Flow
-  type(Turb_Type),               target :: Turb
-  real                                  :: diff_eff(-Grid % n_bnd_cells &
-                                                    :Grid % n_cells)
-  real                                  :: urf
-  real,    optional, intent(in)         :: dt       !! time step
+  class(Process_Type)                  :: Process
+  type(Grid_Type),  intent(in), target :: Grid
+  type(Field_Type),             target :: Flow
+  type(Turb_Type),              target :: Turb
+  real                                 :: diff_eff(-Grid % n_bnd_cells &
+                                                   :Grid % n_cells)
+  real                                 :: urf
+  integer,          intent(in)         :: sc       !! scalar rank
+  real,   optional, intent(in)         :: dt       !! time step
 !-----------------------------------[Locals]-----------------------------------!
-  real,      contiguous, pointer :: val(:), fc(:)
-  integer,   contiguous, pointer :: dia(:), pos(:,:)
-  integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, a21, fl, cfs
+  type(Var_Type),      pointer :: phi
+  real,    contiguous, pointer :: val(:), fc(:)
+  integer, contiguous, pointer :: dia(:), pos(:,:)
+  integer                      :: c, s, c1, c2, i_cel, reg, nz, i
+  real                         :: a12, a21, fl, cfs
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -33,6 +35,7 @@
   dia => Flow % Nat % C % dia
   pos => Flow % Nat % C % pos
   fc  => Flow % Nat % C % fc
+  phi => Flow % scalar(sc)
   nz  =  Flow % Nat % C % nonzeros
 
   Assert(urf > 0.0)
@@ -95,7 +98,7 @@
   !---------------------------------------!
   !   Upwind blending inside the domain   !
   !---------------------------------------!
-  if(Flow % t % blend_matrix) then
+  if(phi % blend_matrix) then
 
     !$tf-acc loop begin
     do c1 = Cells_In_Domain()  ! all present
@@ -141,13 +144,29 @@
   do s = Faces_At_Boundaries()  ! all present
     c1 = Grid % faces_c(1,s)    ! inside cell
     c2 = Grid % faces_c(2,s)    ! boundary cell
-    if(phi_bnd_cond_type(c2) .eq. WALL    .or.  &
-       phi_bnd_cond_type(c2) .eq. INFLOW) then
+    if(phi % bnd_cond_type(c2) .eq. WALL    .or.  &
+       phi % bnd_cond_type(c2) .eq. INFLOW) then
       a12 = diff_eff(c1) * fc(s)
       val(dia(c1)) = val(dia(c1)) + a12
     end if
   end do
   !$tf-acc loop end
+
+  if(phi % blend_matrix) then
+
+    !$tf-acc loop begin
+    do s = Faces_At_Boundaries()  ! all present
+      c1 = Grid % faces_c(1,s)    ! inside cell
+      c2 = Grid % faces_c(2,s)    ! boundary cell
+      if(phi % bnd_cond_type(c2) .eq. INFLOW) then
+        fl = Flow % v_flux % n(s)
+        val(dia(c1)) = val(dia(c1)) - min(fl, 0.0) * Flow % density(c1)
+      end if
+
+    end do
+    !$tf-acc loop end
+
+  end if
 
   !------------------------------------!
   !                                    !

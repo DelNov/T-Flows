@@ -107,19 +107,10 @@
 
   end if
 
-  !--------------------------------------------------------------------!
-  !   For a reason I don't fully understand, if matrices are blended   !
-  !   with upwind, we are better off getting out of here now           !
-  !--------------------------------------------------------------------!
-  if(phi % blend_matrix) then
-    return
-  end if
-
   !-------------------------------------------!
   !   Browse through all the boundary cells   !
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
-
   do reg = Boundary_Regions()
 
     ! Inflow and convective depend on boundary values since they are

@@ -141,9 +141,9 @@
   !   For a reason I don't fully understand, if matrices are blended   !
   !   with upwind, we are better off getting out of here now           !
   !--------------------------------------------------------------------!
-  if(phi % blend_matrix) then
-    return
-  end if
+  ! if(phi % blend_matrix) then
+  !   return
+  ! end if
 
   !-------------------------------------------!
   !   Browse through all the boundary cells   !
