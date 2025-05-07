@@ -169,15 +169,15 @@
       ! Beginning of iteration
       call Info % Iter_Fill(Iter % Current())
 
-      !@ call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=1)
-      !@ call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=2)
-      !@ call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=1)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=2)
+      call Process % Compute_Momentum(Grid(1), Flow(1), Turb(1), comp=3)
 
-      !@ call Process % Compute_Pressure(Grid(1), Flow(1))
+      call Process % Compute_Pressure(Grid(1), Flow(1))
 
       ! Correct velocity components
-      !@ call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
-      !@ call Process % Correct_Velocity(Grid(1), Flow(1))
+      call Flow(1) % Grad_Pressure(Grid(1), Flow(1) % pp)
+      call Process % Correct_Velocity(Grid(1), Flow(1))
 
       ! Deal with turbulence
       call Turb(1) % Main_Turb(Grid(1), Flow(1))
@@ -201,8 +201,8 @@
     end do  ! iterations
 
     ! Calculate bulk fluxes and adjust pressure drops
-    !@ call Flow(1) % Calculate_Bulk_Velocities(Grid(1))
-    !@ call Flow(1) % Adjust_P_Drops(Grid(1))
+    call Flow(1) % Calculate_Bulk_Velocities(Grid(1))
+    call Flow(1) % Adjust_P_Drops(Grid(1))
 
     ! Print the bulk values from the Info_Mod
     call Info % Bulk_Print(Flow(1), 1, 1)
