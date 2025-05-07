@@ -136,20 +136,18 @@
   !------------------------------------!
   !   Coefficients on the boundaries   !
   !------------------------------------!
-  do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL    .or.  &
-       Grid % region % type(reg) .eq. INFLOW) then
 
-      !$tf-acc loop begin
-      do s = Faces_In_Region(reg)  ! all present
-        c1 = Grid % faces_c(1,s)   ! inside cell
-        a12 = diff_eff(c1) * fc(s)
-        val(dia(c1)) = val(dia(c1)) + a12
-      end do
-      !$tf-acc loop end
-
+  !$tf-acc loop begin
+  do s = Faces_At_Boundaries()  ! all present
+    c1 = Grid % faces_c(1,s)    ! inside cell
+    c2 = Grid % faces_c(2,s)    ! boundary cell
+    if(phi_bnd_cond_type(c2) .eq. WALL    .or.  &
+       phi_bnd_cond_type(c2) .eq. INFLOW) then
+      a12 = diff_eff(c1) * fc(s)
+      val(dia(c1)) = val(dia(c1)) + a12
     end if
   end do
+  !$tf-acc loop end
 
   !------------------------------------!
   !                                    !

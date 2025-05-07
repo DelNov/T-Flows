@@ -177,29 +177,28 @@
   !------------------------------------!
   !   Coefficients on the boundaries   !
   !------------------------------------!
-  do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL    .or.  &
-       Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   diff_eff,  &
-      !$acc   fc,  &
-      !$acc   val,  &
-      !$acc   dia   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)   ! inside cell
-        a12 = diff_eff(c1) * fc(s)
-        val(dia(c1)) = val(dia(c1)) + a12
-      end do
-      !$acc end parallel
-
+  !$acc parallel loop  &
+  !$acc present(  &
+  !$acc   grid_region_f_face,  &
+  !$acc   grid_region_l_face,  &
+  !$acc   grid_faces_c,  &
+  !$acc   phi_bnd_cond_type,  &
+  !$acc   diff_eff,  &
+  !$acc   fc,  &
+  !$acc   val,  &
+  !$acc   dia   &
+  !$acc )
+  do s = grid_region_f_face(1), grid_region_l_face(grid_n_bnd_regions)  ! all present
+    c1 = grid_faces_c(1,s)    ! inside cell
+    c2 = grid_faces_c(2,s)    ! boundary cell
+    if(phi_bnd_cond_type(c2) .eq. WALL    .or.  &
+       phi_bnd_cond_type(c2) .eq. INFLOW) then
+      a12 = diff_eff(c1) * fc(s)
+      val(dia(c1)) = val(dia(c1)) + a12
     end if
   end do
+  !$acc end parallel
 
   !------------------------------------!
   !                                    !

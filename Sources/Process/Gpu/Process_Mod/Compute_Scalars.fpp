@@ -39,7 +39,8 @@
     !-------------------------------------------------!
     !   Important: take the alias of current scalar   !
     !-------------------------------------------------!
-    phi => Flow % scalar(sc)
+    phi               => Flow % scalar(sc)
+    phi_bnd_cond_type => Flow % scalar(sc) % bnd_cond_type
 
     ! Tolerances and under-relaxations are the same for all components
     urf = phi % urf
