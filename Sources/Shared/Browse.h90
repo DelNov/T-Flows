@@ -45,6 +45,13 @@
 !                            !
 !----------------------------!
 
+!------------------------------------------------------!
+!   These are boundary faces in all boundary regions   !
+!------------------------------------------------------!
+# define Faces_At_Boundaries()  \
+    Grid % region % f_face(1),  \
+    Grid % region % l_face(Grid % n_bnd_regions)
+
 !----------------------------------------------------------!
 !   These are boundary faces for a given boundary region   !
 !----------------------------------------------------------!

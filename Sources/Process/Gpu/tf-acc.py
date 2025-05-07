@@ -363,7 +363,8 @@ def Process_Tfp_Block(block):
       "Cells_In_Domain"                           in block or
       "Cells_In_Domain_And_Buffers"               in block):
     present_setup += (indent + begin_parallel_loop_independent + "\n")
-  elif ("Faces_In_Region"                in block or
+  elif ("Faces_At_Boundaries"            in block or
+        "Faces_In_Region"                in block or
         "Faces_In_Domain_And_At_Buffers" in block):
     present_setup += (indent + begin_parallel_loop + "\n")
   else:  # this covers loops through non-zeroes and all Linalg_Mod
@@ -388,6 +389,7 @@ def Process_Tfp_Block(block):
                      "Cells_At_Boundaries",
                      "Cells_In_Domain",
                      "Cells_In_Domain_And_Buffers",
+                     "Faces_At_Boundaries",
                      "Faces_In_Region",
                      "Faces_In_Domain_And_At_Buffers",
                      "Face_Value"}
@@ -398,7 +400,8 @@ def Process_Tfp_Block(block):
   #-------------------------------------------------#
   #   Special handling for Faces_In_... variables   #
   #-------------------------------------------------#
-  if ("Faces_In_Region"                in block or
+  if ("Faces_At_Boundaries"            in block or
+      "Faces_In_Region"                in block or
       "Faces_In_Domain_And_At_Buffers" in block):
 
     commands = ("grid_region_f_face => Grid % region % f_face",
@@ -628,6 +631,13 @@ def Process_Tfp_Block(block):
       + " "
       + present_setup[last_comma_index + 1:]
     )
+
+  # Replace the 'do' loop with the OpenACC-parallelized version (if present)
+  block = re.sub(
+    r'Faces_At_Boundaries\(\)',
+    'grid_region_f_face(1), grid_region_l_face(grid_n_bnd_regions)',
+    block
+  )
 
   # Replace the 'do' loop with the OpenACC-parallelized version (if present)
   block = re.sub(
