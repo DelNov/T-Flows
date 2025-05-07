@@ -13,7 +13,7 @@
   type(Var_Type),    target :: phi
   real                      :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), phi_n(:)
+  real, contiguous, pointer :: b(:)
   real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c
   real                      :: blend, fl
   integer                   :: s, c1, c2, i_cel, reg
@@ -23,7 +23,6 @@
 
   ! Take some aliases
   b     => Flow % Nat % b
-  phi_n => phi % n
   blend =  phi % blend
 
   !-------------------------------------------!
@@ -50,14 +49,14 @@
       if(c2 .gt. 0) then
 
         ! Centered value
-        phi_c = Face_Value(s, phi_n(c1), phi_n(c2))
+        phi_c = Face_Value(s, phi % n(c1), phi % n(c2))
 
         ! Value of the coefficient at the cel face
         coef_f = Face_Value(s, coef(c1), coef(c2))
 
         ! Coefficient multiplied with variable, with upwind blending
-        coef_phi1 = coef_f * ((1.0-blend) * phi_n(c1) + blend * phi_c)
-        coef_phi2 = coef_f * ((1.0-blend) * phi_n(c2) + blend * phi_c)
+        coef_phi1 = coef_f * ((1.0-blend) * phi % n(c1) + blend * phi_c)
+        coef_phi2 = coef_f * ((1.0-blend) * phi % n(c2) + blend * phi_c)
 
         b_tmp = b_tmp - coef_phi1 * max(fl,0.0) * merge(1,0, c1.lt.c2)
         b_tmp = b_tmp - coef_phi2 * min(fl,0.0) * merge(1,0, c1.lt.c2)
@@ -91,8 +90,8 @@
           coef_f = Face_Value(s, coef(c1), coef(c2))
 
           ! Coefficient multiplied with variable, with upwind blending
-          coef_phi1 = coef_f * phi_n(c1)
-          coef_phi2 = coef_f * phi_n(c2)
+          coef_phi1 = coef_f * phi % n(c1)
+          coef_phi2 = coef_f * phi % n(c2)
 
           b_tmp = b_tmp + coef_phi1 * max(fl,0.0) * merge(1,0, c1.lt.c2)
           b_tmp = b_tmp + coef_phi2 * min(fl,0.0) * merge(1,0, c1.lt.c2)
@@ -124,7 +123,7 @@
         c2 = Grid % faces_c(2,s)   ! boundary cell
 
         ! Just plain upwind here
-        b(c1) = b(c1) - coef(c1) * phi_n(c2) * Flow % v_flux % n(s)
+        b(c1) = b(c1) - coef(c1) * phi % n(c2) * Flow % v_flux % n(s)
       end do
       !$tf-acc loop end
 
@@ -138,7 +137,7 @@
         c1 = Grid % faces_c(1,s)  ! inside cell
 
         ! Just plain upwind here
-        b(c1) = b(c1) - coef(c1) * phi_n(c1) * Flow % v_flux % n(s)
+        b(c1) = b(c1) - coef(c1) * phi % n(c1) * Flow % v_flux % n(s)
       end do
       !$tf-acc loop end
 

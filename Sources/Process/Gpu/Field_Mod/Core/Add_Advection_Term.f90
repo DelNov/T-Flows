@@ -17,7 +17,7 @@
   type(Var_Type),    target :: phi
   real                      :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), phi_n(:)
+  real, contiguous, pointer :: b(:)
   real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c
   real                      :: blend, fl
   integer                   :: s, c1, c2, i_cel, reg
@@ -27,7 +27,6 @@
 
   ! Take some aliases
   b     => Flow % Nat % b
-  phi_n => phi % n
   blend =  phi % blend
 
   !-------------------------------------------!
@@ -41,6 +40,7 @@
   !   "High" order scheme.  (High is higher than one.)   !
   !------------------------------------------------------!
 
+  phi_n => phi % n
   !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
@@ -92,6 +92,7 @@
   !--------------------------!
   if(phi % blend_matrix) then
 
+    phi_n => phi % n
     !$acc parallel loop independent  &
     !$acc present(  &
     !$acc   grid_region_f_cell,  &
@@ -137,19 +138,10 @@
 
   end if
 
-  !--------------------------------------------------------------------!
-  !   For a reason I don't fully understand, if matrices are blended   !
-  !   with upwind, we are better off getting out of here now           !
-  !--------------------------------------------------------------------!
-  ! if(phi % blend_matrix) then
-  !   return
-  ! end if
-
   !-------------------------------------------!
   !   Browse through all the boundary cells   !
   !      (This can be accelerted on GPU)      !
   !-------------------------------------------!
-
   do reg = Boundary_Regions()
 
     ! Inflow and convective depend on boundary values since they are
@@ -157,6 +149,7 @@
     if(Grid % region % type(reg) .eq. INFLOW  .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
+      phi_n => phi % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
@@ -181,6 +174,7 @@
     ! Outflow is just a vanishing derivative, use the value from the inside
     if(Grid % region % type(reg) .eq. OUTFLOW) then
 
+      phi_n => phi % n
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
