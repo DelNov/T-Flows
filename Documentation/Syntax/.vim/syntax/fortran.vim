@@ -451,7 +451,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranPetscTflows  C_Petsc_Vec_Set_Value  C_Petsc_Mat_Zero_Entries
 " Macros might need a special group of their own.
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
-  syn keyword fortranMacroTflows   All_Regions  Faces_In_Region  Faces_In_Domain_And_At_Buffers
+  syn keyword fortranMacroTflows   All_Regions  Faces_At_Boundaries  Faces_In_Region  Faces_In_Domain_And_At_Buffers
   syn keyword fortranMacroTflows   All_Regions  Faces_In_Region_Gpu  Faces_In_Domain_And_At_Buffers_Gpu
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
   syn keyword fortranMacroTflows   Cells_At_Boundaries  Cells_At_Boundaries_In_Domain_And_Buffers
@@ -490,6 +490,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     grid_d  grid_s  grid_vol  grid_wall_dist
   syn keyword fortranGPUTflows     flow_density  flow_capacity
   syn keyword fortranGPUTflows     flow_viscosity  flow_conductivity
+  syn keyword fortranGPUTflows     flow_diffusivity
   syn keyword fortranGPUTflows     flow_u_n  flow_u_o  flow_u_oo
   syn keyword fortranGPUTflows     flow_v_n  flow_v_o  flow_v_oo
   syn keyword fortranGPUTflows     flow_w_n  flow_w_o  flow_w_oo
@@ -498,6 +499,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     flow_shear  flow_vort  flow_v_flux_n
   syn keyword fortranGPUTflows     flow_grad_c2c  flow_phi_x  flow_phi_y  flow_phi_z
   syn keyword fortranGPUTflows     turb_y_plus  turb_vis_t  turb_vis_w  turb_wale_v
+  syn keyword fortranGPUTflows     phi_bnd_cond_type
 
 " CUDA fortran
   syn keyword fortranTypeCUDA      host global device value
