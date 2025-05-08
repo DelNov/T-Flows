@@ -12,7 +12,7 @@
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), diff_eff(:)
-  real                           :: urf, rs
+  real                           :: urf
   integer                        :: c, sc, row, col
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -22,9 +22,9 @@
 
   call Work % Connect_Real_Cell(diff_eff)
 
-  !------------------------------------------------------------!
-  !   First take some aliases, which is quite elaborate here   !
-  !------------------------------------------------------------!
+  !-----------------------------!
+  !   First take some aliases   !
+  !-----------------------------!
   val => Flow % Nat % A % val
   dia => Flow % Nat % C % dia
   b   => Flow % Nat % b
@@ -86,6 +86,8 @@
     ! Insert cross diffusion terms (computers gradients as well)
     call Flow % Add_Cross_Diffusion_Term(Grid, phi, diff_eff)
 
+    call User_Mod_Source(Grid, Flow, Turb, phi, sc)
+
     !------------------------------!
     !   Perform under-relaxation   !
     !------------------------------!
@@ -113,11 +115,8 @@
                                scalar_cell=phi)
 # endif
 
-    rs = sc                      ! reterive the rank of scalar
-    row = ceiling(rs/6) + 1      ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
-    col = nint(rs) - (row-1)*6   ! will be in range 1 - 6
-    row = (sc-1)/6 + 1           ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
-    col = mod(sc-1, 6) + 1       ! will be in range 1 - 6
+    row = (sc-1)/6 + 1      ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
+    col = mod(sc-1, 6) + 1  ! will be in range 1 - 6
 
     call Info % Iter_Fill_Scalar_At(row, col, phi % name,  &
                                               phi % res,   &
