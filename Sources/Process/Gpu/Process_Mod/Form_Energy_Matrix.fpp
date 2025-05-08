@@ -175,6 +175,22 @@
     end if
   end do
 
+  if(Flow % t % blend_matrix) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. INFLOW) then
+
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)  ! all present
+          c1 = Grid % faces_c(1,s)   ! inside cell
+          fl = Flow % v_flux % n(s)
+          val(dia(c1)) = val(dia(c1)) - min(fl, 0.0) * dens_capa(c1)
+        end do
+        !$tf-acc loop end
+
+      end if
+    end do
+  end if
+
   !------------------------------------!
   !                                    !
   !   Take care of the unsteady term   !

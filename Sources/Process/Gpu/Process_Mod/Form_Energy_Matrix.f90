@@ -238,6 +238,31 @@
     end if
   end do
 
+  if(Flow % t % blend_matrix) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. INFLOW) then
+
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   flow_v_flux_n,  &
+        !$acc   val,  &
+        !$acc   dia,  &
+        !$acc   dens_capa   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+          c1 = grid_faces_c(1,s)   ! inside cell
+          fl = flow_v_flux_n(s)
+          val(dia(c1)) = val(dia(c1)) - min(fl, 0.0) * dens_capa(c1)
+        end do
+        !$acc end parallel
+
+      end if
+    end do
+  end if
+
   !------------------------------------!
   !                                    !
   !   Take care of the unsteady term   !
