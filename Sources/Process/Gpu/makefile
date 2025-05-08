@@ -140,8 +140,9 @@ $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=nvidia/gnu/intel> <GPU=yes/no> <REAL=double/single>   )
-$(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=quick/heap> <OMP=no/yes>  )
-$(info #        <MPI=no/yes> <clean/preprocess>                                )
+$(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=quick/heap> <MPI=no/yes>  )
+$(info #        <SORT=quick/heap> <DIR_CASE=full_or_relative_path_to_case>     )
+$(info #        <clean/preprocess>                                             )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
@@ -327,11 +328,11 @@ ifneq ($(DIR_CASE), no)
       REL_DIR=$(shell realpath --relative-to="./" "$(DIR_CASE)")
 
       # Fetch all user functions from the case directory
-      STEP_A  = $(shell ls -1 $(REL_DIR)/$(DIR_USER)/*.f90)
+      STEP_A  = $(wildcard $(REL_DIR)/$(DIR_USER)/*.f90) $(wildcard $(REL_DIR)/$(DIR_USER)/*.fpp)
       STEP_B  = $(notdir $(STEP_A))
 
       # Append "../" to each of the file names
-      SRC_USR = $(patsubst %.f90, ../%.f90, $(STEP_A))
+      SRC_USR = $(addprefix ../,$(STEP_A))
       $(info $(SRC_USR))
 
       ifneq ("$(wildcard $(STEP_A))","")
@@ -462,10 +463,10 @@ clean:
 	rm -f $(DIR_OBJECT)/*.o $(DIR_MODULE)/*.mod $(PROGRAM_FILE)
 	@echo done
 	@echo -n Removing links to sources in case directory ...
-	@rm -f $(DIR_USER)/*.f90
+	@rm -f $(DIR_USER)/*.f??
 	@echo done
 	@echo -n Retreiving default user functions from git repository ...
-	@git checkout $(DIR_USER)/*.f90
+	@git checkout $(DIR_USER)/*.f??
 	@echo done
 
 #---------------------------------------------------------
