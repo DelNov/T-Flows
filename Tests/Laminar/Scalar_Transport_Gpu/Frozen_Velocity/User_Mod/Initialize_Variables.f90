@@ -73,17 +73,20 @@
     end if
   end do
 
-  !-----------------------------------------------!
-  !                                               !
-  !   Initialize reaction rates for all species   !
-  !                                               !
-  !-----------------------------------------------!
+  !-----------------------------------------!
+  !                                         !
+  !   Allocate memory for reaction rates,   !
+  !   initialize values, and copy to GPU    !
+  !                                         !
+  !-----------------------------------------!
   allocate(rate(6,6))
   rate(:,:) = 0.0
 
-  rate(PB_G,  PBI_G) = 1.0e-3
-  rate(PB_G,  I_G)   = 1.0e-3
-  rate(PB_S,  PB_G)  = 1.0e-3
+  ! Here we will put some magic from GEMS (if it exists)
+  rate(PB_G,  PBI_G) = 0.0e-3
+  rate(PB_G,  I_G)   = 0.0e-3
+  rate(PB_S,  PB_G)  = 0.0e-3
 
+  call Gpu % Matrix_Real_Copy_To_Device(rate)
 
   end subroutine
