@@ -94,11 +94,12 @@
       !$acc   flow_shear,  &
       !$acc   u_x,  &
       !$acc   v_z,  &
-      !$acc   w_y   &
+      !$acc   w_y,  &
+      !$acc   flow_vort   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
         flow_shear(c) = u_x(c)**2 + .5 * (v_z(c)+w_y(c))**2
-        Flow % vort (c) =           - .5 * (v_z(c)-w_y(c))**2
+        flow_vort (c) =           - .5 * (v_z(c)-w_y(c))**2
       end do
       !$acc end parallel
 
@@ -120,11 +121,12 @@
       !$acc   flow_shear,  &
       !$acc   v_y,  &
       !$acc   u_z,  &
-      !$acc   w_x   &
+      !$acc   w_x,  &
+      !$acc   flow_vort   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
         flow_shear(c) = flow_shear(c) + v_y(c)**2 + .5 * (u_z(c)+w_x(c))**2
-        Flow % vort (c) = Flow % vort (c)             - .5 * (u_z(c)-w_x(c))**2
+        flow_vort (c) = flow_vort (c)             - .5 * (u_z(c)-w_x(c))**2
       end do
       !$acc end parallel
 
@@ -146,11 +148,12 @@
       !$acc   flow_shear,  &
       !$acc   w_z,  &
       !$acc   v_x,  &
-      !$acc   u_y   &
+      !$acc   u_y,  &
+      !$acc   flow_vort   &
       !$acc )
       do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
         flow_shear(c) = flow_shear(c) + w_z(c)**2 + .5 * (v_x(c)+u_y(c))**2
-        Flow % vort (c) = Flow % vort (c)             - .5 * (v_x(c)-u_y(c))**2
+        flow_vort (c) = flow_vort (c)             - .5 * (v_x(c)-u_y(c))**2
       end do
       !$acc end parallel
 

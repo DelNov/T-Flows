@@ -274,6 +274,10 @@ def Find_Arrays_In_Block(block):
   result = {}
   seen_arrays = {}  # track arrays to avoid duplicates
 
+  # Fix spacing between array names and parentheses
+  # (e.g., "conc_i  (" -> "conc_i(")
+  cleaned_block = re.sub(r'(\b\w+(?:\s*%\s*\w+)*?)\s+\(', r'\1(', cleaned_block)
+
   #----------------------------------------------------------#
   #   Browse through the reduced block and look for arrays   #
   #----------------------------------------------------------#
