@@ -58,7 +58,8 @@
     if(Flow % scalar(sc) % td_scheme .eq. PARABOLIC) then
       call Gpu % Vector_Real_Destroy_On_Device(Flow % scalar(sc) % oo)
     end if
-  end do
+    call Gpu % Vector_Int_Destroy_On_Device(Flow % scalar(sc) % bnd_cond_type)
+  end do  ! through scalars
 
   ! You are not going to need physical properties any more
   call Gpu % Vector_Real_Destroy_On_Device(Flow % viscosity)

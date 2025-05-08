@@ -71,6 +71,7 @@
     if(Flow % scalar(sc) % td_scheme .eq. PARABOLIC) then
       call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % oo)
     end if
+    call Gpu % Vector_Int_Copy_To_Device(Flow % scalar(sc) % bnd_cond_type)
   end do  ! through scalars
 
   ! You are going to need physical properties as well
