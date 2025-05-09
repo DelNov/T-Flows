@@ -121,6 +121,7 @@
                              Grid % n_nodes,  &
                              Grid % n_cells)
   call Grid % Save_Vtu_Faces((/0, 0/))
+  call Grid % Save_Vtu_Faces((/0, 0/), plot_inside=.false.)
   call Grid % Save_Vtu_Faces((/0, 0/), plot_shadows=.true.)
 
   ! Create a template control file for this domain

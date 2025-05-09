@@ -231,6 +231,7 @@
                                   Grid(g) % n_nodes,  &
                                   Grid(g) % n_cells)
     call Grid(g) % Save_Vtu_Faces((/0, 0/))
+    call Grid(g) % Save_Vtu_Faces((/0, 0/), plot_inside=.false.)
     call Grid(g) % Save_Vtu_Faces((/0, 0/), plot_shadows=.true.)
 
     ! Save Fluent's .cas file

@@ -1,5 +1,6 @@
 !==============================================================================!
-  subroutine Save_Vtu_Faces(Grid, sub, plot_shadows, real_phi_f, int_phi_f)
+  subroutine Save_Vtu_Faces(Grid, sub, plot_inside, plot_shadows,  &
+                                  real_phi_f, int_phi_f)
 !------------------------------------------------------------------------------!
 !>  Writes boundary condition .faces.vtu or shadow .shadow.vtu file.
 !>  It is called primarily from Generate and Convert, and the most usefult use
@@ -25,7 +26,8 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid          !! grid being processes
   integer, intent(in) :: sub(1:2)      !! 1=subdomaintotal number of subdomains
-  logical,   optional :: plot_shadows  ! plot shadow faces
+  logical,   optional :: plot_inside   !! plot faces inside the domain
+  logical,   optional :: plot_shadows  !! plot shadow faces
   real,      optional :: real_phi_f(1:Grid % n_faces)  !! real face-based data
                                                        !! to be plotted
   integer,   optional :: int_phi_f (1:Grid % n_faces)  !! integer face-based
@@ -45,7 +47,8 @@
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
-  ! Starting and ending counters; file extension
+  ! Starting and ending counters; file extension,
+  ! this is the default behavior: plot all faces
   s_f = 1
   s_l = Grid % n_faces
   ext = '.faces.vtu'
@@ -57,6 +60,15 @@
     n = n + Grid % faces_n_nodes(s)
   end do
   allocate(i_buffer(max(grid % n_nodes * 3, grid % n_faces * 3, n)))
+
+  ! Fix counters and file extension if you are plotting the boundary only
+  if(present(plot_inside)) then
+    if( .not. plot_inside ) then
+      s_f = 1
+      s_l = Grid % n_bnd_cells
+      ext = '.bnd.faces.vtu'
+    end if
+  end if
 
   ! Fix counters and file extension if you are plotting shadows
   ! (Keep in mind that minval and maxval return HUGE if no mask is matched)
