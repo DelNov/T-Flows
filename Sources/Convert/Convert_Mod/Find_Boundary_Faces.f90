@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Topology(Convert, Grid)
+  subroutine Find_Boundary_Faces(Convert, Grid)
 !------------------------------------------------------------------------------!
 !>  The subroutine plays a crucial role in determining the topology of a grid.
 !>  It specifically focuses on the boundary elements of the grid and computes
@@ -23,8 +23,8 @@
 !------------------------------------------------------------------------------!
 !   Note: To be more specific, this subroutine determines:                     !
 !   * Grid % n_bnd_cells   - number of boundary cells                          !
-!   * Grid % cells_n_nodes - number of nodes for each cell                     !
-!   * Grid % cells_n       - list of each cell's nodes                         !
+!   * Grid % cells_n_nodes - number of nodes for each boundary cell            !
+!   * Grid % cells_n       - list of each of boundar cell's nodes              !
 !   * Grid % n_faces       - number of faces on the boundary                   !
 !   * Grid % faces_n_nodes - number of nodes for each face on the boundary     !
 !   * Grid % faces_n       - list of each boundary face's nodes                !
@@ -35,18 +35,26 @@
   class(Convert_Type) :: Convert  !! parent class
   type(Grid_Type)     :: Grid     !! grid being converted
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i, j
+  integer :: i, j, lb
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Convert)
 !==============================================================================!
 
-  call Profiler % Start('Grid_Topology')
+  call Profiler % Start('Find_Boundary_Faces')
 
   !------------------------------!
   !   Count the boundary cells   !
   !------------------------------!
-  Grid % n_bnd_cells = 0
-  Grid % n_faces  = 0
+  Grid % n_bnd_cells      = 0
+  Grid % n_faces          = 0
+  lb = lbound(Grid % cells_n_nodes, 1)
+  if(lb < 0) Grid % cells_n_nodes(-lb:-1) = 0
+  lb = lbound(Grid % cells_n, 2)
+  if(lb < 0) Grid % cells_n(:,-lb:-1) = 0
+  Grid % faces_n_nodes(:) = 0
+  Grid % faces_n    (:,:) = 0
+  Grid % faces_c    (:,:) = 0
+
   do i = 1, Grid % n_cells
     do j = 1, 6
       if(Grid % cells_bnd_region(j,i) .ne. 0) then
@@ -161,6 +169,6 @@
   print '(a38,i9)', '# Number of boundary cells:          ', Grid % n_bnd_cells
   print '(a38,i9)', '# Number of faces on the boundary:   ', Grid % n_faces
 
-  call Profiler % Stop('Grid_Topology')
+  call Profiler % Stop('Find_Boundary_Faces')
 
   end subroutine

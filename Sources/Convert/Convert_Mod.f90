@@ -33,9 +33,9 @@
       procedure, private :: Allocate_Memory
       procedure          :: Calculate_Geometry
       procedure          :: Create_Dual
-      procedure          :: Find_Faces
+      procedure          :: Find_Boundary_Faces
+      procedure          :: Find_Inside_Faces
       procedure          :: Find_Parents
-      procedure          :: Grid_Topology
       procedure          :: Guess_Format
       procedure          :: Insert_Buildings
       procedure          :: Load_Fluent
@@ -166,9 +166,9 @@
 #   include "Convert_Mod/Allocate_Memory.f90"
 #   include "Convert_Mod/Calculate_Geometry.f90"
 #   include "Convert_Mod/Create_Dual.f90"
-#   include "Convert_Mod/Find_Faces.f90"
+#   include "Convert_Mod/Find_Boundary_Faces.f90"
+#   include "Convert_Mod/Find_Inside_Faces.f90"
 #   include "Convert_Mod/Find_Parents.f90"
-#   include "Convert_Mod/Grid_Topology.f90"
 #   include "Convert_Mod/Guess_Format.f90"
 #   include "Convert_Mod/Insert_Buildings.f90"
 #   include "Convert_Mod/Load_Fluent.f90"

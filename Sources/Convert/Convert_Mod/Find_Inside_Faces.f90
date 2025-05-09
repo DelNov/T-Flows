@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Find_Faces(Convert, Grid)
+  subroutine Find_Inside_Faces(Convert, Grid)
 !------------------------------------------------------------------------------!
 !>  This subroutine is dedicated to finding faces within a grid, specifically
 !>  for conformal meshes composed of tetrahedra, wedges, prisms, and hexahedra.
@@ -29,7 +29,8 @@
 !   * Grid % faces_n_nodes - number of nodes for each face                     !
 !   * Grid % faces_n       - nodes of each face                                !
 !   * Grid % faces_c       - pair of cells surrounding each face               !
-!   Note 2: Boundary faces have been determined in "Grid_Topology".            !
+!   * Grid % cells_c       - markers for cells' cell neighbours (just 0 or 1)  !
+!   Note 2: Boundary faces have been determined in "Find_Boundary_Faces".      !
 !   Note 3: This is called before geometrical quantities are calculated.       !
 !------------------------------------------------------------------------------!
   implicit none
@@ -49,7 +50,7 @@
   Unused(Convert)
 !==============================================================================!
 
-  call Profiler % Start('Find_Faces')
+  call Profiler % Start('Find_Inside_Faces')
 
   allocate(face_n1(Grid % n_cells*6))
   allocate(face_n2(Grid % n_cells*6))
@@ -61,6 +62,9 @@
   allocate(face_cell(Grid % n_cells*6));  face_cell(:) = 0
   allocate(starts   (Grid % n_cells*6));  starts   (:) = 0
   allocate(ends     (Grid % n_cells*6));  ends     (:) = 0
+
+  ! Nullify cells_c
+  Grid % cells_c(:,:) = 0
 
   !---------------------------------------------------!
   !   Find max number of cells' faces for this grid   !
@@ -149,6 +153,7 @@
   !---------------------------------------------!
   call Enlarge % Matrix_Int(Grid % cells_c, i=(/1,max_fac/))
   call Enlarge % Matrix_Int(Grid % faces_n, i=(/1,max_nod/))
+
   Assert(maxval(maxval(Grid % cells_c, dim=2), dim=1) == 0)
 
   do n3 = 1, cnt
@@ -222,6 +227,6 @@
   deallocate(starts)
   deallocate(ends)
 
-  call Profiler % Stop('Find_Faces')
+  call Profiler % Stop('Find_Inside_Faces')
 
   end subroutine
