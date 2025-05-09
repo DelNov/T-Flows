@@ -57,14 +57,16 @@
   ! New variables for phase VI: manage boundary condition names and numbers
   integer :: ground_bc
 
-  ! New variables for phase VII: store only cells which are not in buildings
+  ! New variables for phase VII: insert new boundary faces
+  integer :: fn(6,4), n_f_nod, f_nod(4), s_nod(4)
+  integer :: c1, c2, s
+  logical :: c1_on, c2_on
+
+  ! New variables for phase VIII: store only cells which are not in buildings
   integer, allocatable :: i_work_1(:)
   integer, allocatable :: i_work_2(:,:)
   integer, allocatable :: i_work_3(:,:)
   integer, allocatable :: i_work_4(:)
-
-  ! New variables for phase VIII: insert new boundary faces
-  integer :: fn(6,4), n_f_nod, f_nod(4)
 
   ! New variables for phase IX: smooth the grid lines in z direction
   integer, allocatable :: nodes_n_nodes(:)
@@ -560,11 +562,127 @@
     Grid % region % name(1) = 'BUILDING_WALLS'
   end if
 
-  !------------------------------------------------------------!
-  !                                                            !
-  !   Phase VII: Store only cells which are not in buildings   !
-  !                                                            !
-  !------------------------------------------------------------!
+  !------------------------------------------------------------------------!
+  !                                                                        !
+  !   Phase VII: Insert new boundary faces on building and chimney walls   !
+  !                                                                        !
+  !------------------------------------------------------------------------!
+  if(n_buildings .gt. 0) then
+
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1, s)
+      c2 = Grid % faces_c(2, s)
+      if(c2 .gt. 0) then
+
+        c1_on = cell_in_building(c1) .eq. 0 ! .and. cell_in_chimney(c1) .eq. 0
+        c2_on = cell_in_building(c2) .eq. 0 ! .and. cell_in_chimney(c2) .eq. 0
+
+        if(      c1_on .and.       c2_on) cycle
+        if(.not. c1_on .and. .not. c2_on) cycle
+
+        if(c1_on .and. .not. c2_on) c = c1
+        if(c2_on .and. .not. c1_on) c = c2
+
+        s_nod(1:4) = Grid % faces_n(1:4, s)
+        call Sort % Int_Array(s_nod)
+
+        if(Grid % cells_n_nodes(c) .eq. 4) fn = TET
+        if(Grid % cells_n_nodes(c) .eq. 5) fn = PYR
+        if(Grid % cells_n_nodes(c) .eq. 6) fn = WED
+        if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
+
+        do dir = 1, 6
+          if(Grid % cells_bnd_region(dir, c) .eq. 0) then
+
+            n_f_nod    = 0
+            f_nod(1:4) = 0
+
+            ! Fill up face nodes
+            do i_nod = 1, 4
+              if(fn(dir, i_nod) > 0) then
+                f_nod(i_nod) = Grid % cells_n(fn(dir, i_nod), c)
+                n_f_nod   = n_f_nod + 1
+              end if
+            end do
+            call Sort % Int_Array(f_nod)
+
+            ! Check all nodes from both faves
+            if (all(s_nod == f_nod)) then
+              Grid % cells_bnd_region(dir, c) = 1
+              exit
+            end if
+
+          end if  ! cells_bnd_region(dir, c) .eq. 0
+        end do    ! dir
+      end if      ! c2 .gt .0
+    end do        ! n_buildings .gt. 0
+
+  end if
+
+  do bc = Boundary_Regions()
+    bc_name = trim(Grid % region % name(bc))
+    call String % To_Upper_Case(bc_name)
+    if(bc_name(1:7) .eq. 'CHIMNEY') then
+
+      read(bc_name(13:15), *) region  ! this is, in essence, building number
+                                      ! (4 years l8r: is it chimney number?)
+      do s = 1, Grid % n_faces
+        c1 = Grid % faces_c(1, s)
+        c2 = Grid % faces_c(2, s)
+        if(c2 .gt. 0) then
+
+          c1_on = cell_in_chimney(c1) .eq. 0
+          c2_on = cell_in_chimney(c2) .eq. 0
+
+          if(      c1_on .and.       c2_on) cycle
+          if(.not. c1_on .and. .not. c2_on) cycle
+
+          if(c1_on .and. .not. c2_on) c = c1
+          if(c2_on .and. .not. c1_on) c = c2
+
+          s_nod(1:4) = Grid % faces_n(1:4, s)
+          call Sort % Int_Array(s_nod)
+
+          if(Grid % cells_n_nodes(c) .eq. 4) fn = TET
+          if(Grid % cells_n_nodes(c) .eq. 5) fn = PYR
+          if(Grid % cells_n_nodes(c) .eq. 6) fn = WED
+          if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
+
+          do dir = 1, 6
+            if(Grid % cells_bnd_region(dir, c) .eq. 0) then
+
+              n_f_nod    = 0
+              f_nod(1:4) = 0
+
+              ! Fill up face nodes
+              do i_nod = 1, 4
+                if(fn(dir, i_nod) > 0) then
+                  f_nod(i_nod) = Grid % cells_n(fn(dir, i_nod), c)
+                  n_f_nod   = n_f_nod + 1
+                end if
+              end do
+              call Sort % Int_Array(f_nod)
+
+              ! Check all nodes from both faves
+              if (all(s_nod == f_nod)) then
+                Grid % cells_bnd_region(dir, c) = bc
+                exit
+              end if
+
+            end if  ! cells_bnd_region(dir, c) .eq. 0
+          end do    ! dir
+        end if      ! c2 .gt. 0
+      end do        ! s
+
+    end if  ! chimney
+
+  end do  ! boundary regions
+
+  !-------------------------------------------------------------!
+  !                                                             !
+  !   Phase VIII: Store only cells which are not in buildings   !
+  !                                                             !
+  !-------------------------------------------------------------!
 
   !-----------------------------------------------------!
   !   Store cells' nodes and boundary conditons again   !
@@ -608,113 +726,6 @@
     end if
   end do
   Grid % n_cells = cnt
-
-  !-------------------------------------------------------------------------!
-  !                                                                         !
-  !   Phase VIII: Insert new boundary faces on building and chimney walls   !
-  !                                                                         !
-  !-------------------------------------------------------------------------!
-  if(n_buildings .gt. 0) then
-
-    do c = 1, Grid % n_cells
-
-      if(Grid % cells_n_nodes(c) .eq. 4) fn = TET
-      if(Grid % cells_n_nodes(c) .eq. 5) fn = PYR
-      if(Grid % cells_n_nodes(c) .eq. 6) fn = WED
-      if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
-
-      do dir = 1, 6
-        if(Grid % cells_bnd_region(dir, c) .eq. 0) then
-
-          n_f_nod    = 0
-          f_nod(1:4) = -1
-
-          ! Fill up face nodes
-          do i_nod = 1, 4
-            if(fn(dir, i_nod) > 0) then
-              f_nod(i_nod) = Grid % cells_n(fn(dir, i_nod), c)
-              n_f_nod   = n_f_nod + 1
-            end if
-          end do
-
-          if( n_f_nod > 0 ) then
-
-            ! Qadrilateral face
-            if(f_nod(4) > 0) then
-              if( (node_on_building(f_nod(1)) .gt. 0) .and.  &
-                  (node_on_building(f_nod(2)) .gt. 0) .and.  &
-                  (node_on_building(f_nod(3)) .gt. 0) .and.  &
-                  (node_on_building(f_nod(4)) .gt. 0) ) then
-                Grid % cells_bnd_region(dir, c) = 1
-              end if
-            else
-              if( (node_on_building(f_nod(1)) .gt. 0) .and.  &
-                  (node_on_building(f_nod(2)) .gt. 0) .and.  &
-                  (node_on_building(f_nod(3)) .gt. 0) ) then
-                Grid % cells_bnd_region(dir, c) = 1
-              end if
-            end if
-          end if
-        end if
-      end do
-    end do
-
-  end if
-
-  do bc = Boundary_Regions()
-    bc_name = trim(Grid % region % name(bc))
-    call String % To_Upper_Case(bc_name)
-    if(bc_name(1:7) .eq. 'CHIMNEY') then
-
-      read(bc_name(13:15), *) region  ! this is, in essence, building number
-                                      ! (4 years l8r: is it chimney number?)
-      do c = 1, Grid % n_cells
-
-        if(Grid % cells_n_nodes(c) .eq. 4) fn = TET
-        if(Grid % cells_n_nodes(c) .eq. 5) fn = PYR
-        if(Grid % cells_n_nodes(c) .eq. 6) fn = WED
-        if(Grid % cells_n_nodes(c) .eq. 8) fn = HEX
-
-        do dir = 1, 6
-          if(Grid % cells_bnd_region(dir, c) .eq. 0) then
-
-            n_f_nod    = 0
-            f_nod(1:4) = -1
-
-            ! Fill up face nodes
-            do i_nod = 1, 4
-              if(fn(dir, i_nod) > 0) then
-                f_nod(i_nod) = Grid % cells_n(fn(dir, i_nod), c)
-                n_f_nod   = n_f_nod + 1
-              end if
-            end do
-
-            if( n_f_nod > 0 ) then
-
-              ! Qadrilateral face
-              if(f_nod(4) > 0) then
-                if( node_on_chimney(f_nod(1)) .eq. region .and.  &
-                    node_on_chimney(f_nod(2)) .eq. region .and.  &
-                    node_on_chimney(f_nod(3)) .eq. region .and.  &
-                    node_on_chimney(f_nod(4)) .eq. region ) then
-                  Grid % cells_bnd_region(dir, c) = bc
-                end if
-              ! Triangular face
-              else
-                if( node_on_chimney(f_nod(1)) .eq. region .and.  &
-                    node_on_chimney(f_nod(2)) .eq. region .and.  &
-                    node_on_chimney(f_nod(3)) .eq. region ) then
-                  Grid % cells_bnd_region(dir, c) = bc
-                end if
-              end if
-            end if
-          end if
-        end do
-      end do
-
-    end if
-
-  end do  ! chimney
 
   !----------------------------------------------------!
   !                                                    !

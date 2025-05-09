@@ -128,13 +128,15 @@
 
   ! Sort cells in height first thing after reading	    
   if(city) then
+    call Convert % Find_Boundary_Faces(Grid(1))
+    call Convert % Find_Inside_Faces  (Grid(1))
     call Convert % Insert_Buildings(Grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored
   if(file_format .eq. 'GAMBIT' .or. file_format .eq. 'GMSH') then
-    call Convert % Grid_Topology(Grid(1))
-    call Convert % Find_Faces   (Grid(1))
+    call Convert % Find_Boundary_Faces(Grid(1))
+    call Convert % Find_Inside_Faces  (Grid(1))
   end if
 
   ! Some mesh generators (Gmsh for sure) can leave duplicate
