@@ -36,7 +36,7 @@
 !  alpha_l = Vof%phase_cond(1)/(Vof%phase_capa(1)*Vof%phase_dens(1))
 
 ! do c = Cells_In_Domain()
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume = b_volume + Grid % vol(c) * (1.0 - fun % n(c))
     e  = Vof % Front % elem_in_cell(c)
     if(e > 0) then

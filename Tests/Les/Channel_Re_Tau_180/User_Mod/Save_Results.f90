@@ -35,7 +35,7 @@
   integer, allocatable     :: n_states(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, re, cf_dean, cf, pr, u_tau_p, temp
-  real                     :: temp_p1, temp_pp, temp_p2, slice, sslice_l 
+  real                     :: temp_p1, temp_pp, temp_p2, slice, sslice_l
   real                     :: sslice_u, sslice_diff, temp_kk
   real                     :: density_const, visc_const
   logical                  :: there, flag
@@ -143,7 +143,7 @@
   !   Swarm statistics   !
   !----------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -172,7 +172,7 @@
   !   Flowfield statistics   !
   !--------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -239,7 +239,7 @@
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
+    '#', 'ubulk    = ', ubulk
     write(i,'(a1,(a12,e12.6))')  &
     '#', 're       = ', density_const * ubulk * 2.0/visc_const
     write(i,'(a1,(a12,e12.6))')  &
@@ -247,7 +247,7 @@
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
+    '#', 'Utau     = ', u_tau_p
 
     write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
                                  ' u,'                    //  &  !  2

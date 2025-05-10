@@ -21,7 +21,7 @@
   Grid => Flow % pnt_grid
   fun  => Vof % fun
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Find relevant cell
     if( Math % Approx_Real(Grid % yc(c), 0.0) .and.  &

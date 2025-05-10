@@ -42,7 +42,7 @@
   !--------------------------------!
   if(Grid % name .eq. 'UPPER_DOM') then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(t % n(c) .gt. 90.0 .or. t % n(c) .lt. 10.0) then
          error stop "temperature out of density interpolation range [10 - 90C]"
       endif
@@ -96,7 +96,7 @@
   !--------------------------------!
   if(Grid % name .eq. 'LOWER_DOM') then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(t % n(c) .gt. 90.0 .or. t % n(c) .lt. 10.0) then
          error stop 'Temperature out of density interpolation range [10 - 90C]'
       endif

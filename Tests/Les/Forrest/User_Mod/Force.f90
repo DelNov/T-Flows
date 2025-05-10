@@ -27,7 +27,7 @@
   !   Set source depending on the velocity component   !
   !----------------------------------------------------!
   do reg = 1, Por % n_regions
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(Grid % por(c) .eq. reg) then
 
         u_mag = sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2)

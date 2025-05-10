@@ -32,7 +32,7 @@
   c_position = 0.0
   rise_velocity = 0.0
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
     surface = surface + sqrt(fun % x(c) ** 2                                  &
                            + fun % y(c) ** 2                                  &

@@ -31,7 +31,7 @@
   write(99, '(A)') '# compute_pressure: 1:x, 2:p, 3:pp, 4:p%x, 5:pp%x ' //  &
                    ' 4:density  5:diag  6:b'
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if(Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
        Math % Approx_Real(Grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &

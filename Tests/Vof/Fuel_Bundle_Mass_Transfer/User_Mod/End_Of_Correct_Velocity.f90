@@ -26,7 +26,7 @@
   p    => Flow % p
   M    => Sol % Nat % M
 
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     if (Grid % zc(c) > 3.65e-2) then
       u % n(c) = 0.0
       v % n(c) = 0.0
@@ -36,13 +36,13 @@
 
   ! Calculate velocity magnitude for normalization
   vel_max = MICRO
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
   end do
   call Global % Max_Real(vel_max)
   vel_max_before = vel_max
 
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     u % n(c) = min ( max( u % n(c), -vlimit), vlimit)
     v % n(c) = min ( max( v % n(c), -vlimit), vlimit)
     w % n(c) = min ( max( w % n(c), -vlimit), vlimit)
@@ -50,7 +50,7 @@
 
   ! Calculate velocity magnitude for normalization
   vel_max = MICRO
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     vel_max = max(vel_max, sqrt(u % n(c)**2 + v % n(c)**2 + w % n(c)**2))
   end do
   call Global % Max_Real(vel_max)

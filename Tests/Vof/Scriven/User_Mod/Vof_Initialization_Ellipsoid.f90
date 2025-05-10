@@ -54,7 +54,7 @@
     ! Minimum and maximum normalized distance in cells
     min_dist(:) = +HUGE
     max_dist(:) = -HUGE
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       do i_nod = 1, Grid % cells_n_nodes(c)
         n = Grid % cells_n(i_nod, c)
 
@@ -64,7 +64,7 @@
     end do
 
     ! Simply interpolate linearly
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       ! Since surface is at 1.0 this checks if cell crosses the surface
       if (min_dist(c) < 1.0 .and. max_dist(c) > 1.0) then
@@ -78,7 +78,7 @@
     end do
 
     ! Precision (what on earth?)
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       Vof % fun % n(c) = max(prelim_vof(c), Vof % fun % n(c))
     end do
 
@@ -87,7 +87,7 @@
   close(fu)
 
   ! Reverse
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     Vof % fun % n(c) = 1.0 - Vof % fun % n(c)
   end do
 

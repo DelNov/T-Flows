@@ -132,7 +132,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -246,7 +246,7 @@
 
   if(Flow % heat_transfer) then 
     d_wall = 0.0
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = t % n(c)

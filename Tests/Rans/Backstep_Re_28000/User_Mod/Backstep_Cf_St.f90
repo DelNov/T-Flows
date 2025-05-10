@@ -81,7 +81,7 @@
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
     allocate(wt_p(n_prob));  wt_p = 0.0
-  end if  
+  end if
 
   !-------------------------!
   !   Average the results   !
@@ -104,14 +104,14 @@
             else
               kin_vis = visc_const / dens_const
               u_tan = Flow % U_Tan(s)
-              u_tau = c_mu25 * sqrt(Turb % kin % n(c1))
+              u_tau = Turb % c_mu25 * sqrt(Turb % kin % n(c1))
               Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(           &
                                                 u_tau,                 &
                                                 Grid % wall_dist(c1),  &
                                                 kin_vis,               &
                                                 0.0)
-              tau_wall = dens_const * kappa * u_tau * u_tan    &
-                       / log(e_log*max(Turb % y_plus(c1), 1.05))
+              tau_wall = dens_const * Turb % kappa * u_tau * u_tan    &
+                       / log(Turb % e_log * max(Turb % y_plus(c1), 1.05))
 
               v1_p(i) = v1_p(i)  &
                       + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))

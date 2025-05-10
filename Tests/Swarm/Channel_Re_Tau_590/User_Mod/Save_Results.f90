@@ -66,9 +66,9 @@
     return
   end if
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     ubulk    = bulk % flux_x / bulk % area_x
-  end do 
+  end do
 
   open(9, file=coord_name)
 
@@ -104,25 +104,11 @@
 
   allocate(n_count(n_prob)); n_count = 0
 
-  !!=========================================================
-  !! DEBUGGING 
-  !do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
-  !  ww_mod_p(c) =  Turb % kin_mean(c) * Turb % zeta_mean(c)
-  !end do 
-  !if(First_Proc()) then 
-  ! print *, "w_mod(503) = ", ww_mod_p(503)
-  ! print *, "min_val_wmod = ", minval(ww_mod_p(:))
-  ! print *, "max_val_wmod = ", maxval(ww_mod_p(:))
-  ! stop  
-  !end if
-  !!=========================================================
-
-
   !-------------------------!
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells 
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -148,7 +134,7 @@
         uw_mod_p(i) = uw_mod_p(i) + Turb % vis_t_eff(c)*(u % y(c) + v % x(c))
         ww_mod_p(i) = ww_mod_p(i) + Turb % kin_mean(c) * Turb % zeta_mean(c)
         vis_t_p (i) = vis_t_p (i) + Turb % vis_t(c) / visc_const
-        y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c) 
+        y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c)
         n_count(i) = n_count(i) + 1
       end if
     end do
@@ -243,7 +229,7 @@
   err     = abs(cf_dean - cf)/cf_dean * 100.0
 
   write(fu1,'(a1,(a12,e12.6))')  &
-  '#', 'Ubulk    = ', ubulk 
+  '#', 'Ubulk    = ', ubulk
   write(fu1,'(a1,(a12,e12.6))')  &
   '#', 'Re       = ', dens_const * ubulk * 2.0/visc_const
   write(fu1,'(a1,(a12,e12.6))')  &
@@ -251,13 +237,13 @@
   write(fu1,'(a1,(a12,e12.6))')  &
   '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
   write(fu1,'(a1,(a12,f12.6))')  &
-  '#', 'Utau     = ', u_tau_p 
-  write(fu1,'(a1,(a12,f12.6,a2,a22))') & 
+  '#', 'Utau     = ', u_tau_p
+  write(fu1,'(a1,(a12,f12.6,a2,a22))') &
   '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
 
 
   write(fu2,'(a1,(a12,e12.6))')  &
-  '#', 'Ubulk    = ', ubulk 
+  '#', 'Ubulk    = ', ubulk
   write(fu2,'(a1,(a12,e12.6))')  &
   '#', 'Re       = ', dens_const * ubulk * 2.0/visc_const
   write(fu2,'(a1,(a12,e12.6))')  &
@@ -265,8 +251,8 @@
   write(fu2,'(a1,(a12,e12.6))')  &
   '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
   write(fu2,'(a1,(a12,f12.6))')  &
-  '#', 'Utau     = ', u_tau_p 
-  write(fu2,'(a1,(a12,f12.6,a2,a22))') & 
+  '#', 'Utau     = ', u_tau_p
+  write(fu2,'(a1,(a12,f12.6,a2,a22))') &
   '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
 
   write(fu1,'(a1,2x,a105)') '#',  ' 1) z,'                                //  &

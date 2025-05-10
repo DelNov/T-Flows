@@ -94,12 +94,12 @@
       p(i_fac,:) = p_xyz(trios(i_fac,1), :)
     end do
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       inside_c(c) = Check_Inside_Box(Vof, p, dd, n_xyz, c = c)
     end do
 
     ! Simply interpolate linearly
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if (inside_c(c) == 1) then
         !prelim_vof(c) = 1.0 - (min_max_crit_2(c) - dd)  &
         !              / (min_max_crit_2(c)-min_max_crit_1(c))
@@ -116,7 +116,7 @@
     end do
 
     ! Precision
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       Vof % fun % n(c) = max(prelim_vof(c),Vof % fun % n(c))
     end do
 

@@ -32,7 +32,7 @@
   vol_l = 0.0   ! volume of liquid
   vol_v = 0.0   ! volume of vapor
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     vol_l = vol_l + Grid % vol(c) * fun % n(c)
     vol_v = vol_v + Grid % vol(c) * (1.0-fun % n(c))
   end do
@@ -47,7 +47,7 @@
   range_min = xy_cent - half_range
   range_max = xy_cent + half_range
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     if (range_min < Grid % xc(c) .and. Grid % xc(c) < range_max .and.  &
         range_min < Grid % yc(c) .and. Grid % yc(c) < range_max ) then
     vol_vb = vol_vb + Grid % vol(c) * (1.0-fun % n(c))
@@ -71,7 +71,7 @@
   !----------------------------------------!
   sum_vap=0.0    ! sum of vaporization [kg/s]
   sum_cond=0.0   ! sum of condensation [kg/s]
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     if (Vof % m_dot(c) > 0.0) then
       sum_vap = sum_vap + Vof % m_dot(c)
     else

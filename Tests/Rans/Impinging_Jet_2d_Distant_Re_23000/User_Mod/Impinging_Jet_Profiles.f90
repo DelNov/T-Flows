@@ -114,7 +114,7 @@
     end if
 
     do i = 1, n_prob-1
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         r = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) + TINY
         if(r > r1 .and. r < r2) then
           if(Grid % zc(c) > z_p(i) .and.  &

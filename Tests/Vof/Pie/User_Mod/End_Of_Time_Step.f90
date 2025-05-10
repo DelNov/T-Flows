@@ -34,7 +34,7 @@
   rise_vel_int = 0.0
   call Flow % Grad_Variable(fun)
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
     if (norm2((/fun % x(c),fun % y(c),fun % z(c)/)) > 1.0) then
 

@@ -30,7 +30,7 @@
   open(99, file=file_name)
   write(99, '(a)') '#  User_Mod_End_Of_Compute_Momentum '         //  &
                    ' 1:x  2:u  3:rho, 4:dp/dx*dv,  5:diag(matrix),  6:b'
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if(Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
        Math % Approx_Real(Grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &

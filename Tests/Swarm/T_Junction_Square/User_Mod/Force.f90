@@ -30,7 +30,7 @@
   !  Set source for velocity component in "x" direction   !
   !-------------------------------------------------------!
   if( ui % name .eq. 'U' ) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       b_vector(c) = b_vector(c) + 1.0e4 * Grid % xc(c) * Grid % vol(c)
     end do
   end if

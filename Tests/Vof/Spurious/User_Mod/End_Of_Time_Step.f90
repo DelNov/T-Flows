@@ -56,7 +56,7 @@
 
   n_tot_cells = Grid % n_cells - Grid % Comm % n_buff_cells
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     u_res = sqrt( Flow % u % n(c) ** 2       &
                 + Flow % v % n(c) ** 2       &
                 + Flow % w % n(c) ** 2)
@@ -114,7 +114,7 @@
   !! For normals for curvature
   !if(This_Proc() <= 2) then
   !  dist_n = 0
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
   !      x0 = (/1.0, Grid % yc(c), 1.0/)
@@ -132,7 +132,7 @@
 
   !  call File % Open_For_Writing_Ascii('dist_centk.dat', fu)
 
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    if(dist_n(c) == 1) then
   !      write(fu,'(4(2X,E16.10E2))') Grid % xc(c), Grid % yc(c), Grid % zc(c), &
   !                                   dist_ck(c)
@@ -144,7 +144,7 @@
   !! Calculate distance to center of cylinder
   !! For normals for normals
   !  dist_n = 0
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
   !      x0 = (/1.0, Grid % yc(c), 1.0/)
@@ -163,7 +163,7 @@
 
   !  call File % Open_For_Writing_Ascii('dist_centn.dat', fu)
 
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    if(dist_n(c) == 1) then
   !      write(fu,'(4(2X,E16.10E2))') Grid % xc(c), Grid % yc(c), Grid % zc(c), &
   !                                   dist_cn(c)

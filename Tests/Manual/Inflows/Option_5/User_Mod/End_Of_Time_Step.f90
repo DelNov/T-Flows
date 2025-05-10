@@ -54,7 +54,7 @@
   xmin = HUGE;  xmax = -HUGE
   ymin = HUGE;  ymax = -HUGE
   zmin = HUGE;  zmax = -HUGE
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     do i_nod = 1, Grid % cells_n_nodes(c)
       n = Grid % cells_n(i_nod, c)
       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
@@ -113,7 +113,7 @@
 
     ! Superimpose eddies on the velocity field
     do dir = 1, 4
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         xc = Grid % xc(c)
         yc = Grid % yc(c)
         zc = Grid % zc(c)
@@ -155,12 +155,12 @@
   end do
 
   vmax = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
   call Global % Max_Real(vmax)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     v % n(c) = v % n(c) / vmax
     v % o(c) = v % o(c) / vmax
     w % n(c) = w % n(c) / vmax

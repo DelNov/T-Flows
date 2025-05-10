@@ -54,7 +54,7 @@
   end if
 
   ! Specify exact cell values variable over-writing boundary values
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -119,7 +119,7 @@
 
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -178,7 +178,7 @@
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
   ! (This is the repetition of what was done in Test 3)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -226,7 +226,7 @@
   ! Nullify gradients for cells near boundaries
   ! (where gradients are not computed properly),
   ! and initialize c_visited
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if(c_computed(c) .eq. NO) then  ! if not computed
       t % x(c) = 0.0
       t % y(c) = 0.0
@@ -266,7 +266,7 @@
 
     ! Browse throough cells, and calculate final values ...
     ! ... of gradients in the cells which have been visited
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(c_visited(c) > 0) then
         t % x(c) = t % x(c) / c_visited(c)
         t % y(c) = t % y(c) / c_visited(c)
@@ -317,7 +317,7 @@
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
   ! (This is the repetition of what was done in Test 4 & 5)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     p % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)

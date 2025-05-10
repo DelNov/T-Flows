@@ -82,7 +82,7 @@
     if( sqrt(xo**2 + yo**2) < (rp-ro) ) then
 
       do dir = 1, 2
-        do c = 1, Grid % n_cells
+        do c = Cells_In_Domain_And_Buffers()
           xc = Grid % xc(c)
           yc = Grid % yc(c)
           zc = Grid % zc(c)
@@ -113,12 +113,12 @@
   end do  ! next eddy
 
   vmax = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     vmax = max(vmax, abs(u % n(c)))
     vmax = max(vmax, abs(v % n(c)))
   end do
   call Global % Max_Real(vmax)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     u % n(c) = u % n(c) / vmax / 10.0
     v % n(c) = v % n(c) / vmax / 10.0
   end do

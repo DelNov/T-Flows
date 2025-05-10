@@ -1,4 +1,4 @@
-include './User_Mod/Vof_Initialization_Ellipsoid.f90'
+#include "./Vof_Initialization_Ellipsoid.f90"
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
@@ -35,7 +35,7 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
 
   ! VOF
   ! Initialize the whole domain as 0.0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     fun % n(c) = 0.0
   end do
 
@@ -73,7 +73,7 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
   r_max = r_in(ndata)
 
   ! Initialize temperatures from file
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     x = Grid % xc(c)
     y = Grid % yc(c)
     z = Grid % zc(c)

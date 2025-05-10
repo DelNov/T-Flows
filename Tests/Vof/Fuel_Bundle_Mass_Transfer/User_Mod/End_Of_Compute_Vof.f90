@@ -20,7 +20,7 @@
   Grid => Flow % pnt_grid
   fun  => Vof % fun
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if (Grid % zc(c) > 3.75e-2) then
       Vof % fun % n(c) = 1.0
     endif

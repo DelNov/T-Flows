@@ -133,7 +133,7 @@
   !-------------------------!
   do k = 1, n_hor
     do i = 1, n_prob-1
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         z_coor = Grid % zc(c)
         if(Grid % xc(c) < x1_p(k) .and. Grid % xc(c) > x2_p(k)) then
           if(z_coor > z_p(i) .and. z_coor < z_p(i+1)) then

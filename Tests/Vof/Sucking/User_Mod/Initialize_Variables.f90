@@ -37,7 +37,7 @@
   read(fu, *) hash, nc
   do l = 1, nc
     read(fu, *) xc, tc
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(Math % Approx_Real(Grid % xc(c), xc)) then
         Flow % t % n(c) = tc
         Flow % t % o(c) = tc

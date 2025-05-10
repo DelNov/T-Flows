@@ -81,12 +81,12 @@
     return
   end if
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     ubulk    = bulk % flux_x / bulk % area_x
     t_wall   = 0.0
     nu_mean  = 0.0
     n_points = 0
-  end do 
+  end do
 
   open(9, file=coord_name)
 
@@ -125,7 +125,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -209,7 +209,7 @@
   end do
 
   ! Calculating friction velocity and friction temperature
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
                                       v_p(1)**2 +   &
                                       w_p(1)**2)    &
@@ -223,9 +223,9 @@
     return
   end if
 
-  if(Flow % heat_transfer) then 
-    d_wall = 0.0 
-    do c = 1, Grid % n_cells
+  if(Flow % heat_transfer) then
+    d_wall = 0.0
+    do c = Cells_In_Domain_And_Buffers()
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = Turb % t_mean(c)
@@ -276,7 +276,7 @@
     cf      = u_tau_p**2/(0.5*ubulk**2)
     err     = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
+    '#', 'ubulk    = ', ubulk
     write(i,'(a1,(a12,e12.6))')  &
     '#', 're       = ', dens_const * ubulk * 2.0/visc_const
     write(i,'(a1,(a12,e12.6))')  &
@@ -284,11 +284,11 @@
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
-    write(i,'(a1,(a12,f12.6,a2,a22))') & 
+    '#', 'Utau     = ', u_tau_p
+    write(i,'(a1,(a12,f12.6,a2,a22))') &
     '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
     if(Flow % heat_transfer) then
-      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
+      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean
     end if
 
     if(Flow % heat_transfer) then
@@ -310,7 +310,7 @@
       if(n_count(i) .ne. 0) then
         write(3,'(12es15.5e3)') wall_p(i),                       & !  1
                                 u_p(i),                          & !  2
-                                uu_p(i),                         & !  3 
+                                uu_p(i),                         & !  3
                                 vv_p(i),                         & !  4
                                 ww_p(i),                         & !  5
                                 uw_p(i),                         & !  6
@@ -365,8 +365,8 @@
                                 0.5*(vv_p(i) + vv_p(n_prob-i)),    & !  4
                                 0.5*(ww_p(i) + ww_p(n_prob-i)),    & !  5
                                 0.5*(uw_p(i) - uw_p(n_prob-i)),    & !  6
-                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))     & 
-                              + 0.5*(vv_p(i) + vv_p(n_prob-i))     & 
+                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))     &
+                              + 0.5*(vv_p(i) + vv_p(n_prob-i))     &
                               + 0.5*(ww_p(i) + ww_p(n_prob-i))),   & !  7
                                 t_p(i),                            & !  8
                                 t2_p(i),                           & !  9
@@ -385,9 +385,9 @@
                                 0.5*(vv_p(i) + vv_p(n_prob-i)),  & !  4
                                 0.5*(ww_p(i) + ww_p(n_prob-i)),  & !  5
                                 0.5*(uw_p(i) - uw_p(n_prob-i)),  & !  6
-                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))   & !  7 
-                              + 0.5*(vv_p(i) + vv_p(n_prob-i))   & 
-                              + 0.5*(ww_p(i) + ww_p(n_prob-i)))   
+                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))   & !  7
+                              + 0.5*(vv_p(i) + vv_p(n_prob-i))   &
+                              + 0.5*(ww_p(i) + ww_p(n_prob-i)))
       end if
     end do
   end if

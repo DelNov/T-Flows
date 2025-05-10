@@ -1,4 +1,4 @@
-include './User_Mod/Vof_Initialization_Ellipsoid.f90'
+#include "./Vof_Initialization_Ellipsoid.f90"
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
@@ -25,7 +25,7 @@ include './User_Mod/Vof_Initialization_Ellipsoid.f90'
   dt   => Flow % dt
 
   ! Initialize the whole domain as 0.0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     fun % n(c) = 0.0
   end do
 

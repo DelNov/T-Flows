@@ -61,7 +61,7 @@
   end if
 
   ! Initialize velocities (depends on phase definition)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Inside the water
     if(fun % n(c) .gt. 0.99) then

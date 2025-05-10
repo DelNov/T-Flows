@@ -77,7 +77,7 @@
   !   Summarize the results   !
   !---------------------------!
   do i = 1, n - 1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % yc(c) > y_f(i) .and. Grid % yc(c) < y_f(i+1)) then
 
         n_count(i) = n_count(i) + 1
