@@ -65,7 +65,7 @@
   Swarm % tau = Swarm % density * (Swarm % diameter **2) / 18.0 / visc_const
 
   ! LES dynamic SGS TKE and dissipation rate
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     if(Turb % c_dyn(c) .eq. 0.0) then
       Swarm % f_fuka_x(c) = 0.0

@@ -72,7 +72,7 @@
   !-----------------------------------------!
 
   ! Normal correction
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     u % n(c) = u % n(c) - pp % x(c) * M % v_m(c)
     v % n(c) = v % n(c) - pp % y(c) * M % v_m(c)
     w % n(c) = w % n(c) - pp % z(c) * M % v_m(c)
@@ -119,7 +119,7 @@
   ! volume change due to mass transfer
   call Vof % Mass_Transfer_Pressure_Source(b)
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) / (Grid % vol(c) / dt)
   end do
 

@@ -594,11 +594,11 @@
     end do
 
     if(b .eq. 1) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         Vof % fun % n(c) = vof_body(c, b)
       end do
     else
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         Vof % fun % n(c) = Vof % fun % n(c) * vof_body(c, b)
       end do
     end if

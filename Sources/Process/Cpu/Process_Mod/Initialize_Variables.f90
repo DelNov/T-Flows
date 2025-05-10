@@ -169,7 +169,7 @@
           keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
 
         ! Set the closest point
-        do c = 1, Grid % n_cells
+        do c = Cells_In_Domain_And_Buffers()
 
           i=Key_Ind('X', keys, nks); x(:) = prof(:,i)
           i=Key_Ind('Y', keys, nks); y(:) = prof(:,i)
@@ -318,7 +318,7 @@
         call String % To_Upper_Case(keys(i))
       end do
 
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
 
         if(Turb % statistics) then
           u_mean(c) = 0.0

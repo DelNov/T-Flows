@@ -29,7 +29,7 @@
   !--------------------------------!
   !   Browse through cells first   !
   !--------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Normalize the velocity
     u_m = norm2( (/u % n(c), v % n(c), w % n(c)/) )

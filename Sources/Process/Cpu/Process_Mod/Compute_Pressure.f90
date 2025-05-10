@@ -104,7 +104,7 @@
   ! Calculate pressure magnitude for normalization of pressure solution
   p_max = -HUGE
   p_min = +HUGE
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     p_max = max(p_max, p % n(c))
     p_min = min(p_min, p % n(c))
   end do

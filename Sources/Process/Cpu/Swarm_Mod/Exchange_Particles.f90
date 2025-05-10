@@ -121,7 +121,7 @@
         Part % proc = Part % buff
 
         ! Find the closest cell ...
-        do c = 1, Grid % n_cells
+        do c = Cells_In_Domain_And_Buffers()
           if(Grid % Comm % cell_glo(c) .eq. Swarm % i_work(i + 5)) then
             Part % cell = c
             goto 1

@@ -102,7 +102,7 @@
 
   ! Old values (o and oo)
   if(Iter % Current() .lt. 2) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi % oo(c) = phi % o(c)
       phi % o (c) = phi % n(c)
     end do
@@ -205,7 +205,7 @@
   !   Explicitly treated diffusion scalar fluxes !
   !   and cross diffusion                        !
   !----------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Total explicit heat flux
     q_exp = cross(c) + q_turb(c)

@@ -84,7 +84,7 @@
   !------------------------------------------------------------------!
 
   ! Pressure gradients
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     pst_x(c) = p % x(c)
     pst_y(c) = p % y(c)
     pst_z(c) = p % z(c)
@@ -105,7 +105,7 @@
      Vof % surface_tension > TINY) then
 
     ! Surface tension gradients
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       pst_x(c) = pst_x(c) - sigma * Vof % curv(c) * col % x(c)
       pst_y(c) = pst_y(c) - sigma * Vof % curv(c) * col % y(c)
       pst_z(c) = pst_z(c) - sigma * Vof % curv(c) * col % z(c)
@@ -127,7 +127,7 @@
   !--------------------------------------!
   !   Take velocities as last computed   !
   !--------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     u_c(c) = Flow % u % n(c)
     v_c(c) = Flow % v % n(c)
     w_c(c) = Flow % w % n(c)
@@ -150,7 +150,7 @@
         w_oo = -0.5
       end if
 
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         ! Unit for t_m: m^3 * kg/m^3 / s * s/kg = 1
         t_m(c) = v_m(c) * Flow % density(c) / Flow % dt
 
@@ -168,7 +168,7 @@
   !---------------------------------------------------------------------!
   if(Flow % gu_correction) then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       ! Units: m^3 s/kg * kg /(m^2 s^2) = m / s
       u_c(c) = u_c(c) - v_m(c) * Flow % cell_fx(c)

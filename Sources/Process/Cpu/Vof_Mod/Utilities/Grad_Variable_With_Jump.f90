@@ -36,7 +36,7 @@
     Vof % var % z(:) = 0.0
 
 !Feb9    ! This is just to check if this is over-written
-!Feb9    do c = 1, Grid % n_cells
+!Feb9    do c = Cells_In_Domain_And_Buffers()
 !Feb9      if(Vof % cell_at_surf(c)) then
 !Feb9        Vof % var % n(c) = 10000.
 !Feb9      end if
@@ -118,7 +118,7 @@
     !---------------------------------------------------------------------!
     !   Copy computed gradients for the phase back to original variable   !
     !---------------------------------------------------------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(Vof % cell_at_elem(c) .eq. 0) then
         if(ph .eq. 1 .and. fun % n(c) < 0.01) then
           var % x(c) = Vof % var % x(c)

@@ -32,7 +32,7 @@
   ! Here is the trick to get the sign correct:
   ! - if gas is 1 and liquid 2 => liquid-vapour =  1 => source > 0
   ! - if gas is 2 and liquid 1 => liquid-vapour = -1 => source < 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     e = Vof % Front % elem_in_cell(c)  ! Front element
 
     ! As Yohei and Lubomir ademantly told me - you divide with the density

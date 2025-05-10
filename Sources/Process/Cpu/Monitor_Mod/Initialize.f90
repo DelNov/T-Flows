@@ -73,7 +73,7 @@
 
     min_dist(m) = HUGE
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       curr_dist = Math % Distance( Monitor % x(m),  &
                                    Monitor % y(m),  &
                                    Monitor % z(m),  &

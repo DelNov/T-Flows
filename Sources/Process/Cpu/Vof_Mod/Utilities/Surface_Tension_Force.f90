@@ -71,19 +71,19 @@
   ! N/m * 1/m * 1/m = N / m^3
   select case(i)
     case(1)
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         surf_fx(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
                    * col % x(c)
        end do
     case(2)
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         surf_fy(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
                    * col % y(c)
       end do
     case(3)
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         surf_fz(c) = Vof % surface_tension  &
                    * Vof % curv(c)          &
                    * col % z(c)

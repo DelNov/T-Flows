@@ -64,7 +64,7 @@
   ! Initial values
   ! (Potential varies from 0 to 1, hence
   !  0.5 seems like a good initial guess)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     phi % n(c) = 0.5
   end do
 

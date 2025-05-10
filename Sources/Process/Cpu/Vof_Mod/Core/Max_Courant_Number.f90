@@ -72,7 +72,7 @@
     end do    ! regions
 
     ! if(Vof % phase_Change) then
-    !   do c = 1, Grid % n_cells
+    !   do c = Cells_In_Domain_And_Buffers()
     !     fun_dist = min(max(fun % n(c1), 0.0),1.0)
     !     fun_dist = (1.0 - fun_dist) ** 2 * fun_dist ** 2 * 16.0
     !     c_d(c) = c_d(c) + fun_dist * Vof % flux_rate(c)    &
@@ -82,7 +82,7 @@
 
     call Grid % Exchange_Cells_Real(c_d)
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       courant_max = max(c_d(c), courant_max)
     end do
     call Global % Max_Real(courant_max)
@@ -107,7 +107,7 @@
     end do    ! regions
 
     ! if(Vof % phase_Change) then
-    !   do c = 1, Grid % n_cells
+    !   do c = Cells_In_Domain_And_Buffers()
     !     c_d(c) = c_d(c) + Vof % flux_rate(c) / Flow % density_f(s) * dt
     !   end do
     ! end if

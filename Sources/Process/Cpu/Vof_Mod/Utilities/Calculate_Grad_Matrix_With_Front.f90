@@ -32,7 +32,7 @@
   !--------------------------------------------!
   !   Initialize gradient matrices for cells   !
   !--------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     Flow % grad_c2c(1,c) = 0.0
     Flow % grad_c2c(2,c) = 0.0
     Flow % grad_c2c(3,c) = 0.0
@@ -116,7 +116,7 @@
   end do
 
   if(DEBUG) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       g1(c) = Flow % grad_c2c(1,c)
       g2(c) = Flow % grad_c2c(2,c)
       g3(c) = Flow % grad_c2c(3,c)

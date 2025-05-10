@@ -69,7 +69,7 @@
     !-------------------!
     !   Unsteady term   !
     !-------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       phi_n(c) = phi_o(c)
     end do
 
@@ -155,7 +155,7 @@
       end if  ! e1 > 0 .or. e2 > 0
     end do  ! through faces
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       ! Units: [P] = [P] + [m^2] * [P] * [m] / [m^3]  --> good!
       phi_n(c) = phi_n(c) + adv_t(c) * dtau
     end do

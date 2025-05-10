@@ -74,7 +74,7 @@
   !   Count the nonzero entries and allocate the memory for the array   !
   !---------------------------------------------------------------------!
   n = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     n = n + stencw(c)
   end do
   A % nonzeros = n + 1
@@ -85,7 +85,7 @@
   !   Form A % row and diagonal only formation of A % col   !
   !---------------------------------------------------------!
   A % row(1) = 1
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     A % row(c + 1) = A % row(c) + stencw(c)
     A % col(A % row(c)) = c   ! it is first to its own self
     stencw(c) = 1                       ! reset stencw
@@ -109,7 +109,7 @@
   !   Sort A % col to make them nice and neat    !
   !   and also locate the position of diagonal   !
   !----------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     call Sort % Int_Array(A % col(A % row(c) :  &
                           A % row(c) + stencw(c) - 1))
     do pos = A % row(c), A % row(c+1)-1

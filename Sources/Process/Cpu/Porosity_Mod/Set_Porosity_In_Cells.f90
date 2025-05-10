@@ -33,7 +33,7 @@
     !-------------------------------------------!
     !   Use the STL object to define porosity   !
     !-------------------------------------------!
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
 
       ! Assume cell is in the STL
       !Por % region(reg) % cell_porous(c) = .true.
@@ -75,7 +75,7 @@
 
   ! Save for checking
   por_real(1:Grid % n_cells) = 0.0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     por_real(c) = Grid % por(c)
   end do
   l = len_trim(Por % region(reg) % Stl % name)
