@@ -28,7 +28,7 @@
   call Vof % Get_Vapour_And_Liquid_Phase(vapour, liquid)
 
   ! Integrated added volume over all cells, avoiding buffer cells
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     e = Vof % Front % elem_in_cell(c)  ! front element
     if(e .ne. 0) then
 

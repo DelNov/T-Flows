@@ -418,7 +418,7 @@
     !-----------------------------------!
     !   Browse through cut cells only   !
     !-----------------------------------!
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if( cut_cel(c) .eq. YES ) then
 
         !------------------------!

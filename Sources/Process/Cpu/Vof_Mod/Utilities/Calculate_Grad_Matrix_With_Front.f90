@@ -85,7 +85,7 @@
   !--------------------------------!
   !   Find the inverse of matrix   !
   !--------------------------------!
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     jac = Flow % grad_c2c(1,c) * Flow % grad_c2c(2,c) * Flow % grad_c2c(3,c)  &
         - Flow % grad_c2c(1,c) * Flow % grad_c2c(6,c) * Flow % grad_c2c(6,c)  &
         - Flow % grad_c2c(4,c) * Flow % grad_c2c(4,c) * Flow % grad_c2c(3,c)  &

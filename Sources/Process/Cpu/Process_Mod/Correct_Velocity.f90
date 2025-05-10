@@ -124,7 +124,7 @@
   end do
 
   Flow % vol_res = 0.0
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     Flow % vol_res = max(Flow % vol_res, abs(b(c)))
   end do
   call Global % Max_Real(Flow % vol_res)

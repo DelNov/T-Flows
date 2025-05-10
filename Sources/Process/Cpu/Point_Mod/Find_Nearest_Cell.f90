@@ -133,7 +133,7 @@
     !-----------------------------!
     !   Cells inside the domain   !
     !-----------------------------!
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
 
       ! Take cell centre
       xc = Grid % xc(c)

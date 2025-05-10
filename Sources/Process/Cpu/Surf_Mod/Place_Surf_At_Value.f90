@@ -99,7 +99,7 @@
   !   Browse through all cells in search of surface vertices   !
   !                                                            !
   !------------------------------------------------------------!
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
 
     n_vert = 0
 
