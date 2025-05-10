@@ -217,9 +217,6 @@
     call Sol % Set_Singular(pp)
   end if
 
-    call Grid % Save_Debug_Vtu("bp_0",                &
-                               inside_name="vol_src", &
-                               inside_cell=b)
   ! Call linear solver
   call Sol % Run(A, pp, b, norm = p_nor)
 
