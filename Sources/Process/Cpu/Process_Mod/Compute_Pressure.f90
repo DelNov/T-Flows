@@ -241,7 +241,7 @@
   !-------------------------------!
   !   Update the pressure field   !
   !-------------------------------!
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     p % n(c) =  p % n(c) + pp % urf * pp % n(c)
   end do
 

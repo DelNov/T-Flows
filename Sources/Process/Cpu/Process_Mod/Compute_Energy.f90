@@ -140,7 +140,7 @@
   end if
 
   ! Compute helping variable
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
 
@@ -294,7 +294,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
     if(Flow % mass_transfer_model .ne. NO_MASS_TRANSFER) then
       if(Vof % fun % n(c) > 0.5) then

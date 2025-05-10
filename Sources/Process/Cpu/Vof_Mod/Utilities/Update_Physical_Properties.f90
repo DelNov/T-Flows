@@ -20,7 +20,7 @@
   ! col  => Vof % smooth
 
   ! Density and viscosity in cells
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     Flow % density(c)      = col % n(c)         * Vof % phase_dens(1)  &
                            + (1.0 - col % n(c)) * Vof % phase_dens(0)
     Flow % viscosity(c)    = col % n(c)         * Vof % phase_visc(1)  &

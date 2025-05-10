@@ -199,7 +199,7 @@
 
     ! Calculate velocity magnitude for normalization
     vel_max = MICRO
-    do c = -Grid % n_bnd_cells, Grid % n_cells
+    do c = Cells_At_Boundaries_In_Domain_And_Buffers()
       vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
     end do
     call Global % Max_Real(vel_max)

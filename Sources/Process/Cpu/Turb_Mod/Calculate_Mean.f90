@@ -88,7 +88,7 @@
 
   if(n > -1) then
 
-    do c = -Grid % n_bnd_cells, Grid % n_cells
+    do c = Cells_At_Boundaries_In_Domain_And_Buffers()
 
       ! Mean velocities (and temperature)
       u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
