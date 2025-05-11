@@ -139,10 +139,6 @@
       Turb % model = DES_SPALART
     case('SPALART_ALLMARAS')
       Turb % model = SPALART_ALLMARAS
-    case('RSM_HANJALIC_JAKIRLIC')
-      Turb % model = RSM_HANJALIC_JAKIRLIC
-    case('RSM_MANCEAU_HANJALIC')
-      Turb % model = RSM_MANCEAU_HANJALIC
     case('HYBRID_LES_RANS')
       Turb % model = HYBRID_LES_RANS
     case('LES_TVM')
@@ -153,23 +149,6 @@
                            'Unknown turbulence model: '//trim(name)//  &
                            '.  \n Exiting!')
   end select
-
-  !---------------------------------------------------------!
-  !   Turbulence model variant for Reynolds stress models   !
-  !---------------------------------------------------------!
-  if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-     Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Control % Turbulence_Model_Variant(name, .true.)
-    if     (name .eq. 'NONE') then
-      Turb % model_variant = NO_TURBULENCE_MODEL
-    else if(name .eq. 'STABILIZED') then
-      Turb % model_variant = STABILIZED
-    else
-      call Message % Error(72,                                         &
-                   'Unknown turbulence model variant: '//trim(name)//  &
-                   '.  \n Exiting!')
-    end if
-  end if
 
   !----------------------------!
   !   Rough or smooth walls?   !
@@ -242,14 +221,6 @@
 
   if(Turb % model .eq. K_EPS) then
     call Turb % Const_K_Eps()
-  end if
-
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb % Const_Manceau_Hanjalic()
-  end if
-
-  if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb % Const_Hanjalic_Jakirlic()
   end if
 
   if(Turb % model .eq. K_EPS_ZETA_F .or.  &

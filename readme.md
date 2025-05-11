@@ -1941,7 +1941,7 @@ sends a number of its classes which are used to model different aspects of numer
 simulation.  Class ```Field_Type``` holds velocities, temperatures and other variables
 describing a flow _field_.  Class ```Turb_Type``` holds variables describing the state
 of turbulence; turbulent kinetic energy (k), its dissipation (ε), individial
-Reynolds stresses for second moment closures or turbulent statistics.  Multiphase
+Reynolds stresses for algebraic heat flux model or turbulent statistics.  Multiphase
 flows with interface tracking are described by class ```Vof_Type``` and Lagrangian
 particle tracking with ```Swarm_Type```.
 

@@ -237,38 +237,7 @@
     if(Flow % heat_transfer) then
       call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
     end if
-  end if
 
-  !----------------------------!
-  !   Reynolds stress models   !
-  !----------------------------!
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-    ! Reynolds stresses
-    call Backup % Load_Variable(d, vc, 'uu', Flow, Turb % uu)
-    call Backup % Load_Variable(d, vc, 'vv', Flow, Turb % vv)
-    call Backup % Load_Variable(d, vc, 'ww', Flow, Turb % ww)
-    call Backup % Load_Variable(d, vc, 'uv', Flow, Turb % uv)
-    call Backup % Load_Variable(d, vc, 'uw', Flow, Turb % uw)
-    call Backup % Load_Variable(d, vc, 'vw', Flow, Turb % vw)
-
-    ! Epsilon
-    call Backup % Load_Variable(d, vc, 'eps', Flow, Turb % eps)
-
-    ! F22
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup % Load_Variable(d, vc, 'f22', Flow, Turb % f22)
-    end if
-
-    ! Other turbulent quantities ?
-    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_t', Turb % vis_t)
-    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_w', Turb % vis_w)
-
-    ! Turbulence quantities connected with heat transfer
-    if(Flow % heat_transfer) then
-      call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
-    end if
   end if
 
   !--------------!
@@ -325,17 +294,6 @@
         call Backup % Load_Cell_Real(Grid, d, vc, 'vt_mean', Turb % vt_mean)
         call Backup % Load_Cell_Real(Grid, d, vc, 'wt_mean', Turb % wt_mean)
       end if
-    end if
-
-    ! Reynolds stress models
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Backup % Load_Cell_Real(Grid, d, vc, 'uu_mean', Turb % uu_mean)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'vv_mean', Turb % vv_mean)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'ww_mean', Turb % ww_mean)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'uv_mean', Turb % uv_mean)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'uw_mean', Turb % uw_mean)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'vw_mean', Turb % vw_mean)
     end if
 
     call Backup % Load_Cell_Real(Grid, d, vc, 'uu_res', Turb % uu_res)

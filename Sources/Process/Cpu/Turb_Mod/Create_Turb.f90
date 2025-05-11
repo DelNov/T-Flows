@@ -8,7 +8,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Matrix_Type), pointer :: A
-  type(Var_Type),    pointer :: uu, vv, ww, uv, uw, vw
   integer                    :: nb, nc
 !==============================================================================!
 
@@ -211,102 +210,6 @@
     end if ! Flow % buoyancy .eq. THERMALLY_DRIVEN
 
   end if ! K_EPS_ZETA_F
-
-  !----------------------------!
-  !   Reynolds stress models   !
-  !----------------------------!
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-    ! Other variables such as time scale, length scale and production
-    allocate(Turb % t_scale(-nb:nc));  Turb % t_scale = 0.
-    allocate(Turb % l_scale(-nb:nc));  Turb % l_scale = 0.
-    allocate(Turb % vis_t  (-nb:nc));  Turb % vis_t   = 0.
-    allocate(Turb % vis_w  (-nb:nc));  Turb % vis_w   = 0.  ! wall visc
-    allocate(Turb % p_kin  (-nb:nc));  Turb % p_kin   = 0.
-
-    ! Reynolds stresses
-    uu => Turb % uu
-    vv => Turb % vv
-    ww => Turb % ww
-    uv => Turb % uv
-    uw => Turb % uw
-    vw => Turb % vw
-    call Var_Mod_Create_Solution(uu, A, 'UU', '')
-    call Var_Mod_Create_Solution(vv, A, 'VV', '', reuse_pet = uu % pet_rank)
-    call Var_Mod_Create_Solution(ww, A, 'WW', '', reuse_pet = uu % pet_rank)
-    call Var_Mod_Create_Solution(uv, A, 'UV', '', reuse_pet = uu % pet_rank)
-    call Var_Mod_Create_Solution(uw, A, 'UW', '', reuse_pet = uu % pet_rank)
-    call Var_Mod_Create_Solution(vw, A, 'VW', '', reuse_pet = uu % pet_rank)
-
-    call Var_Mod_Create_New_Only(Turb % kin, Grid,    'KIN')
-    call Var_Mod_Create_Solution(Turb % eps, A, 'EPS', '')
-
-    if(Flow % heat_transfer) then
-      call Var_Mod_Create_New_Only(Turb % ut, Grid, 'UT')
-      call Var_Mod_Create_New_Only(Turb % vt, Grid, 'VT')
-      call Var_Mod_Create_New_Only(Turb % wt, Grid, 'WT')
-      allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.  ! wall cond
-    end if ! Flow % heat_transfer
-
-    if(Turb % statistics) then
-
-      ! Time-averaged velocities (and temperature)
-      allocate(Turb % u_mean(-nb:nc));  Turb % u_mean = 0.
-      allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
-      allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
-      allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
-      if(Flow % heat_transfer) then
-        allocate(Turb % t_mean(-nb:nc));  Turb % t_mean = 0.
-        allocate(Turb % q_mean(-nb:nc));  Turb % q_mean = 0.
-      end if
-
-      ! Time-averaged modeled quantities
-      allocate(Turb % uu_mean (-nb:nc));  Turb % uu_mean   = 0.
-      allocate(Turb % vv_mean (-nb:nc));  Turb % vv_mean   = 0.
-      allocate(Turb % ww_mean (-nb:nc));  Turb % ww_mean   = 0.
-      allocate(Turb % uv_mean (-nb:nc));  Turb % uv_mean   = 0.
-      allocate(Turb % vw_mean (-nb:nc));  Turb % vw_mean   = 0.
-      allocate(Turb % uw_mean (-nb:nc));  Turb % uw_mean   = 0.
-      allocate(Turb % kin_mean(-nb:nc));  Turb % kin_mean  = 0.
-      allocate(Turb % eps_mean(-nb:nc));  Turb % eps_mean  = 0.
-
-      ! Resolved Reynolds stresses
-      allocate(Turb % uu_res(-nb:nc));  Turb % uu_res = 0.
-      allocate(Turb % vv_res(-nb:nc));  Turb % vv_res = 0.
-      allocate(Turb % ww_res(-nb:nc));  Turb % ww_res = 0.
-      allocate(Turb % uv_res(-nb:nc));  Turb % uv_res = 0.
-      allocate(Turb % vw_res(-nb:nc));  Turb % vw_res = 0.
-      allocate(Turb % uw_res(-nb:nc));  Turb % uw_res = 0.
-
-      ! Resolved turbulent heat fluxes
-      if(Flow % heat_transfer) then
-        allocate(Turb % t2_res (-nb:nc));  Turb % t2_res  = 0.
-        allocate(Turb % ut_res (-nb:nc));  Turb % ut_res  = 0.
-        allocate(Turb % vt_res (-nb:nc));  Turb % vt_res  = 0.
-        allocate(Turb % wt_res (-nb:nc));  Turb % wt_res  = 0.
-        allocate(Turb % ut_mean(-nb:nc));  Turb % ut_mean = 0.
-        allocate(Turb % vt_mean(-nb:nc));  Turb % vt_mean = 0.
-        allocate(Turb % wt_mean(-nb:nc));  Turb % wt_mean = 0.
-      end if ! Flow % heat_transfer
-
-    end if ! Turb % statistics
-
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-
-      call Var_Mod_Create_Solution(Turb % f22, A, 'F22', '')
-
-      if(Turb % statistics) then
-        allocate(Turb % f22_mean(-nb:nc));  Turb % f22_mean  = 0.
-      end if ! Turb % statistics
-
-    end if ! RSM_MANCEAU_HANJALIC
-
-    if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
-      allocate(Turb % g_buoy(-nb:nc));  Turb % g_buoy = 0.
-    end if
-
-  end if ! RSM_MANCEAU_HANJALIC & RSM_HANJALIC_JAKIRLIC
 
   !----------------------!
   !   Spalart Allmaras   !

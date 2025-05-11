@@ -171,7 +171,6 @@
       procedure :: Monin_Obukov
       procedure :: Smagorinsky_Constant
       procedure :: Turbulence_Model
-      procedure :: Turbulence_Model_Variant
       procedure :: Turbulent_Prandtl_Number
       procedure :: Turbulent_Schmidt_Number
       procedure :: Turbulent_Heat_Flux_Model
@@ -389,7 +388,6 @@
 #   include "Control_Mod/Physics/Rough_Walls.f90"
 #   include "Control_Mod/Physics/Smagorinsky_Constant.f90"
 #   include "Control_Mod/Physics/Turbulence_Model.f90"
-#   include "Control_Mod/Physics/Turbulence_Model_Variant.f90"
 #   include "Control_Mod/Physics/Turbulent_Prandtl_Number.f90"
 #   include "Control_Mod/Physics/Turbulent_Schmidt_Number.f90"
 #   include "Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90"

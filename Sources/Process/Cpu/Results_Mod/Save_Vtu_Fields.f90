@@ -224,7 +224,7 @@
   write(f9) IN_1 // '<UnstructuredGrid>'                              // LF
   write(f9) IN_2 // '<FieldData>'                                     // LF
   ! TIME must be capitalized for visit
-  write(f9) IN_3 // '<DataArray type="Float64" Name="TIME" ' // & 
+  write(f9) IN_3 // '<DataArray type="Float64" Name="TIME" ' // &
                     'NumberOfTuples="1" format="ascii">' // trim(str_time) // LF
   write(f9) IN_3 // '</DataArray>'                                    // LF
   write(f9) IN_2 // '</FieldData>'                                    // LF
@@ -733,11 +733,9 @@
     !--------------------------!
 
     ! Save kin and eps
-    if(Turb % model .eq. K_EPS                 .or.  &
-       Turb % model .eq. K_EPS_ZETA_F          .or.  &
-       Turb % model .eq. HYBRID_LES_RANS       .or.  &
-       Turb % model .eq. RSM_MANCEAU_HANJALIC  .or.  &
-       Turb % model .eq. RSM_HANJALIC_JAKIRLIC  ) then
+    if(Turb % model .eq. K_EPS        .or.  &
+       Turb % model .eq. K_EPS_ZETA_F .or.  &
+       Turb % model .eq. HYBRID_LES_RANS) then
       str_var = Results % Var_Name("Turbulent Kinetic Energy","[m^2/s^2]", units)
       call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
                             Turb % kin % n(c_f:c_l),                    &
@@ -798,13 +796,6 @@
       end if
     end if
 
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      str_var = Results % Var_Name("Turbulent Quantity F22","[1]", units)
-      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,  &
-                                          Turb % f22 % n(c_f:c_l),     &
-                                          f8, f9, data_offset, run)
-    end if
-
     ! Save vis and vis_t
     if(Turb % model .eq. DES_SPALART .or.  &
        Turb % model .eq. SPALART_ALLMARAS) then
@@ -845,30 +836,6 @@
       call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,          &
                                           kin_vis_t(c_f:c_l),                  &
                                           f8, f9, data_offset, run)
-    end if
-
-    ! Reynolds stress models
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-      ! Note: follows the order in which Paraview stores tensors
-      str_var = Results % Var_Name("Reynolds Stress","[m^2/s^2]", units)
-      call Results % Save_Vtu_Tensor_6_Real(trim(str_var), plot_inside,   &
-                                            Turb % uu % n(c_f:c_l),       &
-                                            Turb % vv % n(c_f:c_l),       &
-                                            Turb % ww % n(c_f:c_l),       &
-                                            Turb % uv % n(c_f:c_l),       &
-                                            Turb % vw % n(c_f:c_l),       &
-                                            Turb % uw % n(c_f:c_l),       &
-                                            f8, f9, data_offset, run)
-      if(Flow % heat_transfer) then
-        str_var = Results % Var_Name("Turbulent Heat Flux","[K m/s]", units)
-        call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
-                                            Turb % ut % n(c_f:c_l),       &
-                                            Turb % vt % n(c_f:c_l),       &
-                                            Turb % wt % n(c_f:c_l),       &
-                                            f8, f9, data_offset, run)
-      end if
     end if
 
     ! Statistics for large-scale simulations of turbulence

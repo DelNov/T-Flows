@@ -54,7 +54,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
-  real                     :: kin_vis, u_tau, dt_dn
+  real                     :: dt_dn
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -217,61 +217,6 @@
       end do      ! regions
     end if        ! turbulence model
 
-    !----------------------------!
-    !   Reynolds stress models   !
-    !----------------------------!
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-      do reg = Boundary_Regions()
-
-        ! Regions at solid walls
-        if(Grid % region % type(reg) .eq. WALL .or.  &
-           Grid % region % type(reg) .eq. WALLFL) then
-          do s = Faces_In_Region(reg)
-            c1 = Grid % faces_c(1,s)
-            c2 = Grid % faces_c(2,s)
-
-            uu  % n(c2) = 0.0
-            vv  % n(c2) = 0.0
-            ww  % n(c2) = 0.0
-            uv  % n(c2) = 0.0
-            uw  % n(c2) = 0.0
-            vw  % n(c2) = 0.0
-            kin % n(c2) = 0.0
-            kin_vis = Flow % viscosity(c1) / Flow % density(c1)
-            u_tau = kin_vis * sqrt(u % n(c1)**2 + v % n(c1)**2 + w % n(c1)**2)  &
-                  / Grid % wall_dist(c1)
-            Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(u_tau,            &
-                                                     Grid % wall_dist(c1),  &
-                                                     kin_vis,               &
-                                                     0.0)
-            if(Turb % model .eq. RSM_MANCEAU_HANJALIC) f22 % n(c2) = 0.0
-          end do  ! faces
-
-        ! Regions outflow, pressure or symmetry
-        else if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-                Grid % region % type(reg) .eq. PRESSURE .or.  &
-                Grid % region % type(reg) .eq. SYMMETRY) then
-          do s = Faces_In_Region(reg)
-            c1 = Grid % faces_c(1,s)
-            c2 = Grid % faces_c(2,s)
-
-            uu  % n(c2) = uu  % n(c1)
-            vv  % n(c2) = vv  % n(c1)
-            ww  % n(c2) = ww  % n(c1)
-            uv  % n(c2) = uv  % n(c1)
-            uw  % n(c2) = uw  % n(c1)
-            vw  % n(c2) = vw  % n(c1)
-            kin % n(c2) = kin % n(c1)
-            eps % n(c2) = eps % n(c1)
-            if(Turb % model .eq. RSM_MANCEAU_HANJALIC)  &
-              f22 % n(c2) = f22 % n(c1)
-          end do  ! faces
-        end if    ! boundary condition
-      end do      ! regions
-    end if        ! turbulence model
-
   end if  ! update turbulence
 
   !-------------------!
@@ -296,7 +241,7 @@
       if(Cell_In_This_Proc(c1) .and. c2 < 0) then
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
-        ! and high-re k-eps models. 
+        ! and high-re k-eps models.
         if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
            Turb % model .eq. HYBRID_LES_RANS .or.  &
            Turb % model .eq. LES_DYNAMIC     .or.  &
@@ -458,7 +403,7 @@
         if (c2 < 0) then
 
           ! Wall temperature or heat fluxes for k-eps-zeta-f
-          ! and high-re k-eps models. 
+          ! and high-re k-eps models.
           if(Turb % model .eq. K_EPS_ZETA_F     .or.  &
              Turb % model .eq. HYBRID_LES_RANS  .or.  &
              Turb % model .eq. SPALART_ALLMARAS .or.  &

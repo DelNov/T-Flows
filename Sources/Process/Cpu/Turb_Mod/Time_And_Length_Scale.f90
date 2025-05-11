@@ -73,38 +73,6 @@
       Turb % l_scale(c) = Turb % c_l * max( l_1(c), l_2(c) )
     end do
 
-  else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-
-    do c = Cells_In_Domain_And_Buffers()
-      eps_l(c) = eps % n(c) + TINY ! limited eps % n
-
-      kin_vis = Flow % viscosity(c) / Flow % density(c)
-
-      t_1(c) = kin % n(c)/eps_l(c)
-      t_2(c) = Turb % c_t * sqrt(kin_vis/eps_l(c))
-
-      l_1(c) = kin % n(c)**1.5/eps_l(c)
-      l_2(c) = Turb % c_nu * (kin_vis**3 / eps_l(c))**0.25
-
-      kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
-
-      Turb % t_scale(c) =              max( t_1(c), t_2(c) )
-      Turb % l_scale(c) = Turb % c_l * max( l_1(c), l_2(c) )
-    end do
-
-  else if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-    do c = Cells_In_Domain_And_Buffers()
-      eps_l(c) = eps % n(c) + TINY ! limited eps % n
-
-      t_1(c) = kin % n(c)/eps_l(c)
-      l_1(c) = kin % n(c)**1.5/eps_l(c)
-
-      kin % n(c) = max(0.5*(uu % n(c) + vv % n(c) + ww % n(c)), TINY)
-      Turb % t_scale(c) = t_1(c)
-      Turb % l_scale(c) = l_1(c)
-    end do
-
   else if(Turb % model .eq. K_EPS) then
 
     do c = Cells_In_Domain_And_Buffers()

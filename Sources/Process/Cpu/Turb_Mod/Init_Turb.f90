@@ -49,9 +49,4 @@
     call Turb % Vis_T_Hybrid_Les_Prandtl()
   end if
 
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-    call Turb % Vis_T_Rsm()
-  end if
-
   end subroutine

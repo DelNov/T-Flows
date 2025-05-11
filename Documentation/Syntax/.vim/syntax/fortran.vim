@@ -393,9 +393,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      LEAST_SQUARES  GAUSS_THEOREM
 " Constants from Turb_Mod
   syn keyword fortranConstant      NO_TURBULENCE_MODEL  DNS  LES_SMAGORINSKY  LES_DYNAMIC
-  syn keyword fortranConstant      LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  DES_SPALART
-  syn keyword fortranConstant      SPALART_ALLMARAS  RSM_HANJALIC_JAKIRLIC  RSM_MANCEAU_HANJALIC
-  syn keyword fortranConstant      HYBRID_LES_RANS HYBRID_LES_PRANDTL  STABILIZED  SGDH  GGDH  AFM  A_POW  B_POW
+  syn keyword fortranConstant      LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  SPALART_ALLMARAS  DES_SPALART
+  syn keyword fortranConstant      HYBRID_LES_RANS HYBRID_LES_PRANDTL  SGDH  GGDH  AFM  A_POW  B_POW
   syn keyword fortranConstant      SWITCH_DISTANCE  SWITCH_VELOCITY  THERMALLY_DRIVEN  DENSITY_DRIVEN  NO_BUOYANCY
 " Constants from Swarm_Mod
   syn keyword fortranConstant      BROWNIAN_FUKAGATA  DISCRETE_RANDOM_WALK  N_I_VARS  N_L_VARS  N_R_VARS
@@ -410,6 +409,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      BUFFER_SIZE  MAX_ITEMS
 " Constant from Grid_Mod
   syn keyword fortranConstant      MAX_CLUSTERS
+" Constant from Work_Mod
+  syn keyword fortranConstant      MAX_WORK_ARRAYS
 " Constant from Convert_Mod
   syn keyword fortranConstant      MAX_N  ITERS  FOR_BUILDINGS  FOR_POROSITIES  FOR_CHIMNEYS
 " Constant from Native_Mod

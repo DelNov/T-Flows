@@ -293,11 +293,6 @@
         end if
       end if
 
-      ! Here we clean up momentum from the false diffusion
-      call Turb % Substract_Face_Stress(ui_si, ui_di,            &
-                                        ui % n(c1), ui % n(c2),  &
-                                        M % fc(s), fi, s)
-
     end do  ! through faces
 
     ! Explicit treatment for cross diffusion terms

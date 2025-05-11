@@ -153,8 +153,7 @@
   TURBULENCE_MODEL                         |         none                  |   k_eps, k_eps_zeta_f, les_smagorinsky,
                                            |                               |   hybrid_les_prandtl, les_dynamic,
                                            |                               |   les_wale, les_tvm, dns, des_spalart,
-                                           |                               |   spalart_allmaras, rsm_hanjalic_jakirlic,
-                                           |                               |   rsm_manceau_hanjalic, hybrid_les_rans
+                                           |                               |   spalart_allmaras, hybrid_les_rans
   TURBULENCE_MODEL_VARIANT                 |         high_re               |   low_re
   TURBULENT_HEAT_FLUX_MODEL                |         sgdh                  |   ggdh, afm
   TURBULENT_PRANDTL_NUMBER                 |         0.9                   |   from 0.7 to 1.1, leave as is

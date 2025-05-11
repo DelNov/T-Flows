@@ -147,11 +147,7 @@
   !   Source terms and wall function    !
   !                                     !
   !-------------------------------------!
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Turb % Src_F22_Rsm_Manceau_Hanjalic(Sol)
-  else
-    call Turb % Src_F22_K_Eps_Zeta_F(Sol)
-  end if
+  call Turb % Src_F22_K_Eps_Zeta_F(Sol)
 
   !---------------------------------!
   !                                 !
@@ -174,8 +170,6 @@
   ! Print info on the screen
   if(Turb % model .eq. K_EPS_ZETA_F) then
     call Info % Iter_Fill_At(3, 4, phi % name, phi % res, phi % niter)
-  else if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    call Info % Iter_Fill_At(4, 2, phi % name, phi % res, phi % niter)
   end if
 
   call Flow % Grad_Variable(phi)

@@ -22,8 +22,6 @@
   real, contiguous, pointer :: uu_res(:), vv_res(:), ww_res(:),  &
                                uv_res(:), vw_res(:), uw_res(:)
   real, contiguous, pointer :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
-  real, contiguous, pointer :: uu_mean(:), vv_mean(:), ww_mean(:)
-  real, contiguous, pointer :: uv_mean(:), vw_mean(:), uw_mean(:)
   real, contiguous, pointer :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
   real, contiguous, pointer :: phi_mean(:,:)
 !==============================================================================!
@@ -60,18 +58,6 @@
      Turb % model .eq. HYBRID_LES_RANS) then
     kin_mean  => Turb % kin_mean;   eps_mean  => Turb % eps_mean
     zeta_mean => Turb % zeta_mean;  f22_mean  => Turb % f22_mean
-    if(Flow % heat_transfer) then
-      ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
-      wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
-    end if
-  end if
-
-  ! Time-averaged modelled Reynolds stresses and heat fluxes
-  if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-     Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-    uu_mean => Turb % uu_mean;  vv_mean => Turb % vv_mean
-    ww_mean => Turb % ww_mean;  uv_mean => Turb % uv_mean
-    vw_mean => Turb % vw_mean;  uw_mean => Turb % uw_mean
     if(Flow % heat_transfer) then
       ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
       wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
@@ -118,11 +104,9 @@
         wt_res(c) = (wt_res(c) * real(n) + w % n(c) * t % n(c)) / real(n+1)
 
         ! Resolved turbulent heat fluxes
-        if(Turb % model .eq. K_EPS                 .or.  &
-           Turb % model .eq. K_EPS_ZETA_F          .or.  &
-           Turb % model .eq. HYBRID_LES_RANS       .or.  &
-           Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-           Turb % model .eq. RSM_MANCEAU_HANJALIC ) then
+        if(Turb % model .eq. K_EPS        .or.  &
+           Turb % model .eq. K_EPS_ZETA_F .or.  &
+           Turb % model .eq. HYBRID_LES_RANS) then
 
           t2_mean(c) = (t2_mean(c) * real(n) + t2 % n(c)) / real(n+1)
           ut_mean(c) = (ut_mean(c) * real(n) + ut % n(c)) / real(n+1)
@@ -152,26 +136,6 @@
         eps_mean (c) = (eps_mean (c) * real(n) + eps  % n(c)) / real(n+1)
         zeta_mean(c) = (zeta_mean(c) * real(n) + zeta % n(c)) / real(n+1)
         f22_mean (c) = (f22_mean (c) * real(n) + f22  % n(c)) / real(n+1)
-      end if
-
-      !----------------------------!
-      !   Reynolds stress models   !
-      !----------------------------!
-      if(Turb % model .eq. RSM_HANJALIC_JAKIRLIC .or.  &
-         Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-
-        ! Time-averaged modeled quantities (modelled Reynolds stresses)
-        uu_mean (c) = (uu_mean (c) * real(n) + uu  % n(c)) / real(n+1)
-        vv_mean (c) = (vv_mean (c) * real(n) + vv  % n(c)) / real(n+1)
-        ww_mean (c) = (ww_mean (c) * real(n) + ww  % n(c)) / real(n+1)
-        uv_mean (c) = (uv_mean (c) * real(n) + uv  % n(c)) / real(n+1)
-        uw_mean (c) = (uw_mean (c) * real(n) + uw  % n(c)) / real(n+1)
-        vw_mean (c) = (vw_mean (c) * real(n) + vw  % n(c)) / real(n+1)
-        kin_mean(c) = (kin_mean(c) * real(n) + kin % n(c)) / real(n+1)
-        eps_mean(c) = (eps_mean(c) * real(n) + eps % n(c)) / real(n+1)
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-          f22_mean(c) = (f22_mean(c) * real(n) + f22 % n(c)) / real(n+1)
-        end if
       end if
 
       !-------------!

@@ -5,10 +5,6 @@
   * Low-Re version (Abe, Kondoh and Nagano) with compound wall treatment
 * Elliptic-relaxation eddy-viscosity model
   * Linear ζ − f with compound wall treatment
-* Second-moment closures full Reynolds-stress models
-  * Elliptic blending model (Manceau-Hanjalic)
-  * Hanjalic-Jakirlic model
-  * Hybrid linear eddy-viscosity and second-moment closure model (Basara-Jakirlic)
 * LES
   * Smagorinsky SGS model
   * Dynamic Smagorinsky SGS model

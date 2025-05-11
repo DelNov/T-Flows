@@ -38,7 +38,7 @@
     type(Var_Type) :: f22
     type(Var_Type) :: vis
 
-    ! Reynolds stresses and turbulent heat fluxes
+    ! Reynolds stresses (needed for AFM) and turbulent heat fluxes
     type(Var_Type) :: uu, vv, ww
     type(Var_Type) :: uv, uw, vw
     type(Var_Type) :: ut, vt, wt, t2
@@ -66,8 +66,6 @@
     ! Time averaged modelled Reynolds stresses and heat fluxes
     ! (Time averages of modeled equations for
     !  individual Reynolds stress components)
-    real, allocatable :: uu_mean(:), vv_mean(:), ww_mean(:)
-    real, allocatable :: uv_mean(:), vw_mean(:), uw_mean(:)
     real, allocatable :: ut_mean(:), vt_mean(:), wt_mean(:), t2_mean(:)
 
     ! Mean passive scalars and scalar turbulent fluxes
@@ -186,31 +184,24 @@
       procedure :: Face_Diff_And_Stress
       procedure :: Face_Stress
       procedure :: Face_Vis
-      procedure :: Substract_Face_Stress
 
       ! Functions to set turbulence constants
       ! They are called from Read_Command_Mod
-      procedure :: Const_Hanjalic_Jakirlic
       procedure :: Const_K_Eps
       procedure :: Const_K_Eps_Zeta_F
       procedure :: Const_Les
-      procedure :: Const_Manceau_Hanjalic
       procedure :: Const_Spalart_Allmaras
 
       ! Computation of various turbulent quantities
       procedure, private :: Compute_F22
-      procedure, private :: Compute_Stress
       procedure, private :: Compute_Variable
 
       ! Different sources
       procedure, private :: Src_Eps_K_Eps
       procedure, private :: Src_Eps_K_Eps_Zeta_F
       procedure, private :: Src_F22_K_Eps_Zeta_F
-      procedure, private :: Src_F22_Rsm_Manceau_Hanjalic
       procedure, private :: Src_Kin_K_Eps
       procedure, private :: Src_Kin_K_Eps_Zeta_F
-      procedure, private :: Src_Rsm_Hanjalic_Jakirlic
-      procedure, private :: Src_Rsm_Manceau_Hanjalic
       procedure, private :: Src_T2
       procedure, private :: Src_Vis_Spalart_Allmaras
       procedure, private :: Src_Zeta_K_Eps_Zeta_F
@@ -221,7 +212,6 @@
       procedure, private :: Vis_T_Hybrid_Les_Rans
       procedure, private :: Vis_T_K_Eps
       procedure, private :: Vis_T_K_Eps_Zeta_F
-      procedure, private :: Vis_T_Rsm
       procedure, private :: Vis_T_Subgrid
       procedure, private :: Vis_T_Spalart_Allmaras
       procedure, private :: Vis_T_Wale
@@ -241,7 +231,6 @@
       procedure :: Monin_Obukov_Thermal
 
       procedure :: Les
-      procedure :: Rsm
 
   end type
 
@@ -257,13 +246,8 @@
   integer, parameter :: K_EPS_ZETA_F          = 30091
   integer, parameter :: DES_SPALART           = 30097
   integer, parameter :: SPALART_ALLMARAS      = 30103
-  integer, parameter :: RSM_HANJALIC_JAKIRLIC = 30109
-  integer, parameter :: RSM_MANCEAU_HANJALIC  = 30113
-  integer, parameter :: HYBRID_LES_RANS       = 30119
-  integer, parameter :: HYBRID_LES_PRANDTL    = 30133
-
-  ! Turbulence wall treatment
-  integer, parameter :: STABILIZED = 30137
+  integer, parameter :: HYBRID_LES_RANS       = 30109
+  integer, parameter :: HYBRID_LES_PRANDTL    = 30113
 
   ! Turbulent heat flux scheme
   integer, parameter :: SGDH = 30139
@@ -306,30 +290,23 @@
 #   include "Turb_Mod/Face_Diff_and_Stress.f90"
 #   include "Turb_Mod/Face_Stress.f90"
 #   include "Turb_Mod/Face_Vis.f90"
-#   include "Turb_Mod/Substract_Face_Stress.f90"
 
     ! Functions to set turbulence constants
-#   include "Turb_Mod/Const_Hanjalic_Jakirlic.f90"
 #   include "Turb_Mod/Const_K_Eps.f90"
 #   include "Turb_Mod/Const_K_Eps_Zeta_F.f90"
 #   include "Turb_Mod/Const_Les.f90"
-#   include "Turb_Mod/Const_Manceau_Hanjalic.f90"
 #   include "Turb_Mod/Const_Spalart_Allmaras.f90"
 
     ! Computation of various turbulent quantities
 #   include "Turb_Mod/Compute_F22.f90"
-#   include "Turb_Mod/Compute_Stress.f90"
 #   include "Turb_Mod/Compute_Variable.f90"
 
     ! Different sources
 #   include "Turb_Mod/Src_Eps_K_Eps.f90"
 #   include "Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90"
 #   include "Turb_Mod/Src_F22_K_Eps_Zeta_F.f90"
-#   include "Turb_Mod/Src_F22_Rsm_Manceau_Hanjalic.f90"
 #   include "Turb_Mod/Src_Kin_K_Eps.f90"
 #   include "Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90"
-#   include "Turb_Mod/Src_Rsm_Hanjalic_Jakirlic.f90"
-#   include "Turb_Mod/Src_Rsm_Manceau_Hanjalic.f90"
 #   include "Turb_Mod/Src_T2.f90"
 #   include "Turb_Mod/Src_Vis_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90"
@@ -340,7 +317,6 @@
 #   include "Turb_Mod/Vis_T_Hybrid_Les_Rans.f90"
 #   include "Turb_Mod/Vis_T_K_Eps.f90"
 #   include "Turb_Mod/Vis_T_K_Eps_Zeta_F.f90"
-#   include "Turb_Mod/Vis_T_Rsm.f90"
 #   include "Turb_Mod/Vis_T_Subgrid.f90"
 #   include "Turb_Mod/Vis_T_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Vis_T_Wale.f90"
@@ -361,6 +337,5 @@
 #   include "Turb_Mod/Monin_Obukov_Thermal.f90"
 
 #   include "Turb_Mod/Les.f90"
-#   include "Turb_Mod/Rsm.f90"
 
   end module

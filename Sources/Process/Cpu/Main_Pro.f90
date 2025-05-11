@@ -129,7 +129,7 @@
   call Control % Switch_To_Root()  ! out of domain loop - go back to root
 
   ! Allocate memory for working arrays (RSM models are memory hungry)
-  call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=8,  n_r_node=8,  &
+  call Work % Allocate_Work(Grid, n_r_cell=16,  n_r_face=8,  n_r_node=8,  &
                                   n_i_cell= 8,  n_i_face=8,  n_i_node=8)
 
   ! Initialize first and current and read the last time step

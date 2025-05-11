@@ -86,36 +86,6 @@
 
   end if
 
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-    call Turb % Time_And_Length_Scale(Grid)
-
-    call Flow % Grad_Variable(Flow % u)
-    call Flow % Grad_Variable(Flow % v)
-    call Flow % Grad_Variable(Flow % w)
-
-    call Turb % Compute_Stress(Sol, Turb % uu)
-    call Turb % Compute_Stress(Sol, Turb % vv)
-    call Turb % Compute_Stress(Sol, Turb % ww)
-
-    call Turb % Compute_Stress(Sol, Turb % uv)
-    call Turb % Compute_Stress(Sol, Turb % uw)
-    call Turb % Compute_Stress(Sol, Turb % vw)
-
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Turb % Compute_F22(Sol, Turb % f22)
-    end if
-
-    call Turb % Compute_Stress(Sol, Turb % eps)
-
-    call Turb % Vis_T_Rsm()
-
-    if(Flow % heat_transfer) then
-      call Turb % Calculate_Heat_Flux()
-    end if
-  end if
-
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
     call Calculate_Shear_And_Vorticity(Flow)

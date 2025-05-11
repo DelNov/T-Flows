@@ -79,11 +79,9 @@
   ! Default values for initial conditions
   character(3) :: u_def   = '0.0',  v_def    = '0.0',  w_def   = '0.0'
   character(3) :: t_def   = '0.0',  t2_def   = '0.0',  phi_def = '0.0'
-  character(3) :: vf_def   = '0.0'
+  character(3) :: vf_def  = '0.0'
   character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
   character(3) :: vis_def = '0.0',  zeta_def = '0.0'
-  character(3) :: uu_def  = '0.0',  vv_def   = '0.0',  ww_def  = '0.0'
-  character(3) :: uv_def  = '0.0',  uw_def   = '0.0',  vw_def  = '0.0'
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -244,29 +242,6 @@
             read(vis_def, *) prof(k, 0);  vis % n(c) = prof(k, i)
           end if
 
-          if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or. &
-             Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-            i = Key_Ind('UU',  keys, nks)
-            read(uu_def, *) prof(k, 0);   uu % n(c)  = prof(k, i)
-            i = Key_Ind('VV',  keys, nks)
-            read(vv_def, *) prof(k, 0);   vv % n(c)  = prof(k, i)
-            i = Key_Ind('WW',  keys, nks)
-            read(ww_def, *) prof(k, 0);   ww % n(c)  = prof(k, i)
-            i = Key_Ind('UV',  keys, nks)
-            read(uv_def, *) prof(k, 0);   uv % n(c)  = prof(k, i)
-            i = Key_Ind('UW',  keys, nks)
-            read(uw_def, *) prof(k, 0);   uw % n(c)  = prof(k, i)
-            i = Key_Ind('VW',  keys, nks)
-            read(vw_def, *) prof(k, 0);   vw % n(c)  = prof(k, i)
-            i = Key_Ind('EPS', keys, nks)
-            read(eps_def, *) prof(k, 0);  eps % n(c) = prof(k, i)
-            if (Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-              i = Key_Ind('F22', keys, nks)
-              read(f22_def, *) prof(k, 0)
-              f22 % n(c) = prof(k, i)
-            end if
-          end if
-
         end do ! c = 1, Grid % n_cells
 
         call Global % Wait
@@ -372,35 +347,6 @@
         !--------------------------!
         !   Turbulent quantities   !
         !--------------------------!
-
-        ! Reynols stress models
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-           Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-          vals(0) = uu_def;  read(vals(Key_Ind('UU', keys,nks)), *)  uu  % n(c)
-          vals(0) = vv_def;  read(vals(Key_Ind('VV', keys,nks)), *)  vv  % n(c)
-          vals(0) = ww_def;  read(vals(Key_Ind('WW', keys,nks)), *)  ww  % n(c)
-          vals(0) = uv_def;  read(vals(Key_Ind('UV', keys,nks)), *)  uv  % n(c)
-          vals(0) = uw_def;  read(vals(Key_Ind('UW', keys,nks)), *)  uw  % n(c)
-          vals(0) = vw_def;  read(vals(Key_Ind('VW', keys,nks)), *)  vw  % n(c)
-          vals(0) = eps_def; read(vals(Key_Ind('EPS',keys,nks)), *)  eps % n(c)
-          uu % o(c)  = uu % n(c)
-          uu % oo(c) = uu % n(c)
-          vv % o(c)  = vv % n(c)
-          vv % oo(c) = vv % n(c)
-          ww % o(c)  = ww % n(c)
-          ww % oo(c) = ww % n(c)
-          uv % o(c)  = uv % n(c)
-          uv % oo(c) = uv % n(c)
-          uw % o(c)  = uw % n(c)
-          uw % oo(c) = uw % n(c)
-          vw % o(c)  = vw % n(c)
-          vw % oo(c) = vw % n(c)
-          if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-            vals(0) = f22_def;  read(vals(Key_Ind('F22',keys,nks)),*) f22 % n(c)
-            f22 % o(c)  = f22 % n(c)
-            f22 % oo(c) = f22 % n(c)
-          end if
-        end if
 
         if(Turb % model .eq. K_EPS) then
           vals(0) = kin_def

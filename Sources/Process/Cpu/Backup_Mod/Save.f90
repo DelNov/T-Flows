@@ -214,41 +214,6 @@
 
   end if
 
-  !------------------------!
-  !   K-eps-zeta-f model   !
-  !------------------------!
-  !----------------------------!
-  !   Reynolds stress models   !
-  !----------------------------!
-  if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-     Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-    ! Reynolds stresses
-    call Backup % Save_Variable(d, vc, 'uu',  Turb % uu)
-    call Backup % Save_Variable(d, vc, 'vv',  Turb % vv)
-    call Backup % Save_Variable(d, vc, 'ww',  Turb % ww)
-    call Backup % Save_Variable(d, vc, 'uv',  Turb % uv)
-    call Backup % Save_Variable(d, vc, 'uw',  Turb % uw)
-    call Backup % Save_Variable(d, vc, 'vw',  Turb % vw)
-
-    ! Epsilon
-    call Backup % Save_Variable(d, vc, 'eps', Turb % eps)
-
-    ! F22
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-      call Backup % Save_Variable(d, vc, 'f22',  Turb % f22)
-    end if
-
-    ! Other turbulent quantities
-    call Backup % Save_Cell_Real(Grid, d, vc, 'vis_t', Turb % vis_t)
-    call Backup % Save_Cell_Real(Grid, d, vc, 'vis_w', Turb % vis_w)
-
-    ! Turbulence quantities connected with heat transfer
-    if(Flow % heat_transfer) then
-      call Backup % Save_Cell_Real(Grid, d, vc,'con_w', Turb % con_w)
-    end if
-  end if
-
   !--------------!
   !   Roughness  !
   !--------------!
@@ -303,17 +268,6 @@
         call Backup % Save_Cell_Real(Grid, d, vc, 'vt_mean',  Turb % vt_mean)
         call Backup % Save_Cell_Real(Grid, d, vc, 'wt_mean',  Turb % wt_mean)
       end if
-    end if
-
-    ! Reynolds stress models
-    if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-       Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-      call Backup % Save_Cell_Real(Grid, d, vc, 'uu_mean', Turb % uu_mean)
-      call Backup % Save_Cell_Real(Grid, d, vc, 'vv_mean', Turb % vv_mean)
-      call Backup % Save_Cell_Real(Grid, d, vc, 'ww_mean', Turb % ww_mean)
-      call Backup % Save_Cell_Real(Grid, d, vc, 'uv_mean', Turb % uv_mean)
-      call Backup % Save_Cell_Real(Grid, d, vc, 'uw_mean', Turb % uw_mean)
-      call Backup % Save_Cell_Real(Grid, d, vc, 'vw_mean', Turb % vw_mean)
     end if
 
     call Backup % Save_Cell_Real(Grid, d, vc, 'uu_res', Turb % uu_res)

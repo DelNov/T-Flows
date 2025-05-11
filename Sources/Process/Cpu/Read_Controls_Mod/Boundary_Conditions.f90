@@ -303,21 +303,6 @@
           end do
 
           ! For turbulence models
-          if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-             Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-            i = Key_Ind('UU',  keys, nks); if(i > 0) uu  % b(c) = vals(i)
-            i = Key_Ind('VV',  keys, nks); if(i > 0) vv  % b(c) = vals(i)
-            i = Key_Ind('WW',  keys, nks); if(i > 0) ww  % b(c) = vals(i)
-            i = Key_Ind('UV',  keys, nks); if(i > 0) uv  % b(c) = vals(i)
-            i = Key_Ind('UW',  keys, nks); if(i > 0) uw  % b(c) = vals(i)
-            i = Key_Ind('VW',  keys, nks); if(i > 0) vw  % b(c) = vals(i)
-            i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
-
-            if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-              i = Key_Ind('F22', keys, nks); if(i > 0) f22 % b(c) = vals(i)
-            end if
-          end if
-
           if(Turb % model .eq. K_EPS) then
             i = Key_Ind('KIN', keys, nks); if(i > 0) kin % b(c) = vals(i)
             i = Key_Ind('EPS', keys, nks); if(i > 0) eps % b(c) = vals(i)
@@ -503,21 +488,6 @@ STOP
             if(Turb % model .eq. SPALART_ALLMARAS .or.  &
                Turb % model .eq. DES_SPALART) then
               i = Key_Ind('VIS', keys, nks); if(i > 0) vis % b(c) = prof(k,i)
-            end if
-
-            if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-               Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-              i = Key_Ind('UU', keys, nks); if(i > 0) uu  % b(c) = prof(k,i)
-              i = Key_Ind('VV', keys, nks); if(i > 0) vv  % b(c) = prof(k,i)
-              i = Key_Ind('WW', keys, nks); if(i > 0) ww  % b(c) = prof(k,i)
-              i = Key_Ind('UV', keys, nks); if(i > 0) uv  % b(c) = prof(k,i)
-              i = Key_Ind('UW', keys, nks); if(i > 0) uw  % b(c) = prof(k,i)
-              i = Key_Ind('VW', keys, nks); if(i > 0) vw  % b(c) = prof(k,i)
-              i = Key_Ind('EPS',keys, nks); if(i > 0) eps % b(c) = prof(k,i)
-
-              if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-                i = Key_Ind('F22', keys, nks); if(i>0) f22 % b(c) = prof(k,i)
-              end if
             end if
 
           end do        ! Cells_In_Region
@@ -749,36 +719,6 @@ STOP
 
                 end if
 
-                if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-                   Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-
-                  i = Key_Ind('UU', keys, nks)
-                  if(i > 0) uu % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  i = Key_Ind('VV', keys, nks)
-                  if(i > 0) vv % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  i = Key_Ind('WW', keys, nks)
-                  if(i > 0) ww % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  i = Key_Ind('UV', keys, nks)
-                  if(i > 0) uv % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  i = Key_Ind('UW', keys, nks)
-                  if(i > 0) uw % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  i = Key_Ind('VW', keys, nks)
-                  if(i > 0) vw % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  i = Key_Ind('EPS', keys, nks)
-                  if(i > 0) eps % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-
-                  if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-                    i = Key_Ind('F22', keys, nks)
-                    if(i > 0)f22 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
-                  end if
-                end if
-
                 if(Turb % model .eq. SPALART_ALLMARAS .or.  &
                    Turb % model .eq. DES_SPALART) then
                   i = Key_Ind('VIS',keys,nks)
@@ -856,21 +796,6 @@ STOP
       do sc = 1, Flow % n_scalars
         scalar(sc) % n(c) = scalar(sc) % b(c)
       end do
-
-      if(Turb % model .eq. RSM_MANCEAU_HANJALIC .or.  &
-         Turb % model .eq. RSM_HANJALIC_JAKIRLIC) then
-        uu  % n(c) = uu  % b(c)
-        vv  % n(c) = vv  % b(c)
-        ww  % n(c) = ww  % b(c)
-        uv  % n(c) = uv  % b(c)
-        uw  % n(c) = uw  % b(c)
-        vw  % n(c) = vw  % b(c)
-        eps % n(c) = eps % b(c)
-
-        if(Turb % model .eq. RSM_MANCEAU_HANJALIC) then
-          f22 % n(c) = f22 % b(c)
-        end if
-      end if
 
       if(Turb % model .eq. K_EPS) then
         kin % n(c) = kin % b(c)
