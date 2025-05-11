@@ -32,7 +32,8 @@
       procedure :: Isopol      !! utility from Isoap to arrange iso-vertices
 #     if T_FLOWS_COMPILATION == 1
       procedure :: Extract_Iso_Polygons  !! the heart of T-Flows
-#     endif                              !! and Isoap interaction
+                                         !! and Isoap interaction
+#     endif
 
   end type
 

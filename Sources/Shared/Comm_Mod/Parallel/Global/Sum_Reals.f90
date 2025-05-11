@@ -21,7 +21,7 @@
   real, optional,   intent(inout) :: phi_08  !! global sum 8
 !-----------------------------------[Locals]-----------------------------------!
   real    :: phi(8)  ! watch out: hard-coded size
-  integer :: n, error
+  integer :: n
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Global)
 !==============================================================================!
