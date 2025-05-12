@@ -90,10 +90,10 @@
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
   !----------------------------------------------------------!
-  call Gpu % Grid_Copy_To_Device  (Grid(1), Turb(1))
-  call Gpu % Field_Copy_To_Device (Flow(1), Turb(1))
+  call Gpu % Grid_Copy_To_Device  (Grid(1))
+  call Gpu % Field_Copy_To_Device (Flow(1))
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
-  call Gpu % Turb_Copy_To_Device  (Flow(1), Turb(1))
+  call Turb(1) % Copy_To_Device   (Flow(1))
   call Gpu % Work_Create_On_Device(Work)
 
   !------------------------------------------!
@@ -174,9 +174,9 @@
     call Info % Bulk_Print(Flow(1), 1, 1)
 
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
-      call Gpu % Turb_Update_Host (Flow(1), Turb(1))
-      call Gpu % Field_Update_Host(Flow(1), Turb(1))
-      call Gpu % Grid_Update_Host (Grid(1), Turb(1))
+      call Turb(1) % Update_Host  (Flow(1))
+      call Gpu % Field_Update_Host(Flow(1))
+      call Gpu % Grid_Update_Host (Grid(1))
       call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
     end if
 
@@ -184,9 +184,9 @@
   call cpu_time(te)
 
   ! Save results
-  call Gpu % Turb_Update_Host (Flow(1), Turb(1))
-  call Gpu % Field_Update_Host(Flow(1), Turb(1))
-  call Gpu % Grid_Update_Host (Grid(1), Turb(1))
+  call Turb(1) % Update_Host (Flow(1))
+  call Gpu % Field_Update_Host(Flow(1))
+  call Gpu % Grid_Update_Host (Grid(1))
   call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
 
   call Work % Finalize_Work()

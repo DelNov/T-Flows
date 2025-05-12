@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Grid_Update_Host(Gpu, Grid, Turb)
+  subroutine Grid_Update_Host(Gpu, Grid)
 !------------------------------------------------------------------------------!
 !>  Copy all the grid variables (so far only the wall distance) you need
 !>  for post-processing back to CPU
@@ -8,11 +8,9 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type) :: Gpu   !! parent class
   type(Grid_Type) :: Grid  !! field to transfer to device
-  type(Turb_Type) :: Turb  !! to check if wall distance should be updated
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
-    Unused(Turb)
     Unused(Grid)
 # endif
 !==============================================================================!
@@ -23,9 +21,7 @@
     O_Print '(a)', ' # Copying grid (wall distance) back to the host'
 # endif
 
-  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
-    call Gpu % Vector_Update_Host(Grid % wall_dist)
-  end if
+  call Gpu % Vector_Update_Host(Grid % wall_dist)
 
   end subroutine
 

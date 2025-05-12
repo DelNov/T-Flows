@@ -48,7 +48,7 @@ RESET = "\033[0m"
 
 grid_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
 flow_to_device_file = "./Gpu_Mod/Field/Copy_To_Device.f90"
-turb_to_device_file = "./Gpu_Mod/Turb/Copy_To_Device.f90"
+turb_to_device_file = "./Turb_Mod/Gpu/Copy_To_Device.f90"
 gpu_pointers_file   = "./Gpu_Pointers_Mod.f90"
 
 begin_parallel_loop_independent = "!$acc parallel loop independent  &"

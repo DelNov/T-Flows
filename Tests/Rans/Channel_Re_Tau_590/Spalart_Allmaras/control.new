@@ -11,7 +11,7 @@
 # Time stepping
 #---------------
   TIME_STEP                  1.0
-  NUMBER_OF_TIME_STEPS    6000
+  NUMBER_OF_TIME_STEPS       3
   RESULTS_SAVE_INTERVAL    600
   BACKUP_SAVE_INTERVAL     600
 

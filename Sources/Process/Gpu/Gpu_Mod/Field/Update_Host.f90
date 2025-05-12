@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Update_Host(Gpu, Flow, Turb)
+  subroutine Field_Update_Host(Gpu, Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the field variables (velocity, pressure, temperature, ...) you
 !>  might need for post-processing back to CPU
@@ -7,14 +7,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type)  :: Gpu   !! parent class
-  type(Turb_Type)  :: Turb  !! to check shear and vorticity
   type(Field_Type) :: Flow  !! field to transfer to device
 !--------------------------------[Locals]--------------------------------------!
   integer :: sc
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
-    Unused(Turb)
     Unused(Flow)
 # endif
 !==============================================================================!
@@ -36,12 +34,6 @@
   do sc = 1, Flow % n_scalars
     call Gpu % Vector_Update_Host(Flow % scalar(sc) % n)
   end do
-
-  ! If you are modeling turbulence, you might want shear and vorticity
-  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
-    call Gpu % Vector_Update_Host(Flow % shear)
-    call Gpu % Vector_Update_Host(Flow % vort)
-  end if
 
   end subroutine
 

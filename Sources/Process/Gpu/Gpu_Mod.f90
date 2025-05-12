@@ -16,7 +16,7 @@
 !>  Each procedure within the module is dedicated to a specific type of
 !>  data or operation, ensuring efficient interaction with the GPU.
 !----------------------------------[Modules]-----------------------------------!
-  use Turb_Mod
+  use Field_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -66,12 +66,6 @@
       procedure :: Grid_Destroy_On_Device
       procedure :: Grid_Update_Host
 
-      ! Procedures to copy turbulence variables to device
-      procedure :: Turb_Copy_To_Device
-      procedure :: Turb_Destroy_On_Device
-      procedure :: Turb_Update_Host
-
-
       ! Procedures to create working arrays to device
       ! (No need to copy them, they are temporrary by nature)
       procedure :: Work_Create_On_Device
@@ -116,11 +110,6 @@
 #   include "Gpu_Mod/Grid/Copy_To_Device.f90"
 #   include "Gpu_Mod/Grid/Destroy_On_Device.f90"
 #   include "Gpu_Mod/Grid/Update_Host.f90"
-
-    ! Procedures to copy turbulence variables to device
-#   include "Gpu_Mod/Turb/Copy_To_Device.f90"
-#   include "Gpu_Mod/Turb/Destroy_On_Device.f90"
-#   include "Gpu_Mod/Turb/Update_Host.f90"
 
     ! Procedures to create working arrays to device
 #   include "Gpu_Mod/Work/Create_On_Device.f90"

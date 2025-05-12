@@ -1,16 +1,14 @@
 !==============================================================================!
-  subroutine Turb_Update_Host(Gpu, Flow, Turb)
+  subroutine Update_Host(Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the turbulence variables you need for post-processing back to CPU
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)  :: Gpu   !! parent class
-  type(Field_Type) :: Flow  !! field to transfer to device
-  type(Turb_Type)  :: Turb  !! turbulence quantities
+  class(Turb_Type), target :: Turb  !! turbulent object to be update on the host
+  type(Field_Type), target :: Flow  !! flow over which Turb is defined
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Turb)
     Unused(Flow)
 # endif

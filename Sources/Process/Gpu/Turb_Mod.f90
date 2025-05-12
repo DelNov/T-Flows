@@ -17,6 +17,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Info_Mod
   use Iter_Mod
+  use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -111,6 +112,14 @@
 
       procedure :: Les
 
+      ! Procedures to copy turbulence variables to and from the device (GPU)
+      procedure :: Copy_To_Device
+      procedure :: Destroy_On_Device
+      procedure :: Update_Host
+      ! procedure :: Turb_Copy_To_Device
+      ! procedure :: Turb_Destroy_On_Device
+      ! procedure :: Turb_Update_Host
+
   end type
 
   ! Parameters describing turbulence model choice
@@ -168,5 +177,10 @@
 #   include "Turb_Mod/Roughness_Coeff.f90"
 
 #   include "Turb_Mod/Les.f90"
+
+    ! Procedures to copy turbulence variables to and from the device (GPU)
+#   include "Turb_Mod/Gpu/Copy_To_Device.f90"
+#   include "Turb_Mod/Gpu/Destroy_On_Device.f90"
+#   include "Turb_Mod/Gpu/Update_Host.f90"
 
   end module

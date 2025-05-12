@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Field_Destroy_On_Device(Gpu, Turb, Flow)
+  subroutine Field_Destroy_On_Device(Gpu, Flow)
 !------------------------------------------------------------------------------!
 !>  Destroys all the field variables (velocity, pressure, temperature, ...)
 !>  from the device, without copying it back to the host.
@@ -7,14 +7,12 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type)  :: Gpu   !! parent class
-  type(Turb_Type)  :: Turb  !! to check if shear and vort should be destroyed
   type(Field_Type) :: Flow  !! field to  to device
 !--------------------------------[Locals]--------------------------------------!
   integer          :: sc
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)
-    Unused(Turb)
     Unused(Flow)
 # endif
 !==============================================================================!
@@ -77,12 +75,6 @@
   call Gpu % Vector_Real_Destroy_On_Device(Flow % phi_x)
   call Gpu % Vector_Real_Destroy_On_Device(Flow % phi_y)
   call Gpu % Vector_Real_Destroy_On_Device(Flow % phi_z)
-
-  ! If you are modeling turbulence, you want to destroy shear and vorticity
-  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
-    call Gpu % Vector_Real_Destroy_On_Device(Flow % shear)
-    call Gpu % Vector_Real_Destroy_On_Device(Flow % vort)
-  end if
 
   end subroutine
 

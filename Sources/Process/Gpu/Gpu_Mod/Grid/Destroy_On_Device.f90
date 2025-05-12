@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Grid_Destroy_On_Device(Gpu, Turb, Grid)
+  subroutine Grid_Destroy_On_Device(Gpu, Grid)
 !------------------------------------------------------------------------------!
 !>  Destroy all the grid variables you don't need in GPU any more.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Gpu_Type) :: Gpu   !! parent class
-  type(Turb_Type) :: Turb  !! to check if wall distance should be destroyed
   type(Grid_Type) :: Grid  !! grid to destroy on device
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
@@ -44,9 +43,7 @@
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_face)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_cell)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_cell)
-  if(Turb % model .ne. NO_TURBULENCE_MODEL) then
-    call Gpu % Vector_Real_Destroy_On_Device(Grid % wall_dist)
-  end if
+  call Gpu % Vector_Real_Destroy_On_Device(Grid % wall_dist)
 
   end subroutine
 

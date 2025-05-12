@@ -1,16 +1,14 @@
 !==============================================================================!
-  subroutine Turb_Copy_To_Device(Gpu, Flow, Turb)
+  subroutine Copy_To_Device(Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the turbulence variables you need in your simulation to GPU.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)          :: Gpu   !! parent class
-  type(Field_Type), target :: Flow  !! grid to transfer to device
-  type(Turb_Type),  target :: Turb  !! turbulent object to be transferrd
+  class(Turb_Type), target :: Turb  !! turbulent object to be transferrd
+  type(Field_Type), target :: Flow  !! flow over which Turb is defined
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Turb)
     Unused(Flow)
 # endif

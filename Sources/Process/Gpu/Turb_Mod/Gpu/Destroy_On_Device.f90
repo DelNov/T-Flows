@@ -1,16 +1,14 @@
 !==============================================================================!
-  subroutine Turb_Destroy_On_Device(Gpu, Turb, Flow)
+  subroutine Destroy_On_Device(Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  Destroy all the turbulence variables you don't need in GPU any more.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)  :: Gpu   !! parent class
-  type(Turb_Type)  :: Turb  !! to check if wall distance should be destroyed
-  type(Field_Type) :: Flow  !! grid to destroy on device
+  class(Turb_Type), target :: Turb  !! turbulent object to be destroyed
+  type(Field_Type), target :: Flow  !! flow over which Turb is defined
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Turb)
     Unused(Flow)
 # endif
