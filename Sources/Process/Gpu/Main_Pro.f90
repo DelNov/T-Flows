@@ -104,9 +104,9 @@
   !   Copy all useful data to the device, that means grid,   !
   !   field and solvers                                      !
   !----------------------------------------------------------!
-  call Gpu % Grid_Copy_To_Device  (Grid(1))
+  call Gpu % Grid_Copy_To_Device(Grid(1))
   call Flow(1) % Copy_Field_To_Device()
-  call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
+  call Flow(1) % Nat % Copy_Native_To_Device()
   call Turb(1) % Copy_Turb_To_Device(Flow(1))
   call Gpu % Work_Create_On_Device(Work)
 

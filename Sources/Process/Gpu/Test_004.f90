@@ -91,7 +91,7 @@
   call Gpu % Vector_Real_Create_On_Device(coef)
 
   ! Allocate vectors related to CG algorithm on the device
-  call Gpu % Native_Copy_To_Device(Flow % Nat)
+  call Flow % Nat % Copy_Native_To_Device()
 
   ! Copy physical properties as well
   call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)
@@ -130,7 +130,7 @@
   call Gpu % Vector_Real_Destroy_On_Device(b)
   call Gpu % Vector_Real_Destroy_On_Device(coef)
 
-  call Gpu % Native_Destroy_On_Device(Flow % Nat)
+  call Flow % Nat % Destroy_Native_On_Device()
 
   ! Print result
   O_Print '(a,es12.3)', ' vector u(1  ):', x(1)

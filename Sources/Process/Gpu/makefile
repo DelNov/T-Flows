@@ -374,13 +374,13 @@ SRC_F_MOD += Gpu_Pointers_Mod.f90   \
              Face_Mod.f90           \
              Sparse_Mod.f90         \
              Linalg_Mod.f90         \
+             Gpu_Mod.f90            \
              Native_Mod.f90         \
              Numerics_Mod.f90       \
              Var_Mod.f90            \
              Time_Mod.f90           \
              Iter_Mod.f90           \
              Info_Mod.f90           \
-             Gpu_Mod.f90            \
              Field_Mod.f90          \
              Turb_Mod.f90           \
              User_Mod.f90           \

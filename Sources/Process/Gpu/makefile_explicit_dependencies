@@ -89,6 +89,7 @@ Process_Mod/Compute_Momentum.fpp \
 Process_Mod/Compute_Energy.fpp \
 Process_Mod/Add_Pressure_Term.fpp \
 $(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \
@@ -220,8 +221,8 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 # Dependencies for: ./Gpu_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Gpu_Mod.o:\
-$(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 \
+$(DIR_OBJECT)/Sparse_Mod.o \
+Sparse_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Pointers_Mod.o \
 Gpu_Mod/*/*.f90 
 
@@ -325,6 +326,7 @@ Process_Mod/Compute_Momentum.fpp \
 Process_Mod/Compute_Energy.fpp \
 Process_Mod/Add_Pressure_Term.fpp \
 $(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 
@@ -355,6 +357,7 @@ $(DIR_OBJECT)/Native_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
 $(DIR_SHARED)/Work_Mod/*/*.f90 \
 $(DIR_SHARED)/Work_Mod/*.f90 \
+Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 Linalg_Mod/Vec_X_Vec.fpp \
 Linalg_Mod/Vec_P_Vec_X_Vec.fpp \
@@ -367,7 +370,9 @@ Linalg_Mod/Sys_Normalize.fpp \
 Linalg_Mod/Sca_O_Dia.fpp \
 $(DIR_OBJECT)/Linalg_Mod.o \
 Linalg_Mod/Mat_X_Vec.fpp \
-Linalg_Mod/*.f90 
+Linalg_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Driver.f90
@@ -385,6 +390,7 @@ Sparse_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Pointers_Mod.o \
 $(DIR_OBJECT)/Gpu_Mod.o \
@@ -470,6 +476,7 @@ Process_Mod/Compute_Momentum.fpp \
 Process_Mod/Compute_Energy.fpp \
 Process_Mod/Add_Pressure_Term.fpp \
 $(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \

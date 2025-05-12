@@ -1,10 +1,12 @@
 #include "../../Shared/Browse.h90"
+#include "../../Shared/Unused.h90"
 
 !==============================================================================!
   module Native_Mod
 !------------------------------------------------------------------------------!
   use Work_Mod
   use Linalg_Mod
+  use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -34,11 +36,20 @@
       procedure :: Cg             !! conjugate gradient solver
       procedure :: Create_Native  !! creates native solver context
 
+      ! Procedures to copy native solver to device
+      procedure :: Copy_Native_To_Device
+      procedure :: Destroy_Native_On_Device
+
   end type
 
   contains
 
 #   include "Native_Mod/Cg.f90"
 #   include "Native_Mod/Create_Native.f90"
+
+    ! Procedures to copy native solver to device
+#   include "Native_Mod/Gpu/Copy_To_Device.f90"
+#   include "Native_Mod/Gpu/Destroy_On_Device.f90"
+
 
   end module
