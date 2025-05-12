@@ -27,13 +27,26 @@
   !----------------------!
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
-
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis % n)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis % o)
+    turb_vis_n => Turb % vis % n
+    turb_vis_o => Turb % vis % o
+    if(Turb % vis % td_scheme .eq. PARABOLIC) then
+      call Gpu % Vector_Real_Copy_To_Device(Turb % vis % oo)
+      turb_vis_oo => Turb % vis % oo
+    end if
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis_w)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % h_max)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % h_min)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % h_w)
     turb_vis_t => Turb % vis_t
     turb_vis_w => Turb % vis_w
     turb_h_max => Turb % h_max
     turb_h_min => Turb % h_min
     turb_h_w   => Turb % h_w
     if(Flow % heat_transfer) then
+      call Gpu % Vector_Real_Copy_To_Device(Turb % con_w)
       turb_con_w => Turb % con_w
     end if ! Flow % heat_transfer
   end if

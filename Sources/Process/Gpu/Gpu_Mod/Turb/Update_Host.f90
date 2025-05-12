@@ -22,6 +22,15 @@
     O_Print '(a)', ' # Copying turbulence variables back to the host'
 # endif
 
+  !----------------------!
+  !   Spalart Allmaras   !
+  !----------------------!
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    call Gpu % Vector_Update_Host(Turb % vis % n)
+    call Gpu % Vector_Update_Host(Turb % vis_t)
+  end if
+
   !-----------------------!
   !   Smagorinsky model   !
   !-----------------------!

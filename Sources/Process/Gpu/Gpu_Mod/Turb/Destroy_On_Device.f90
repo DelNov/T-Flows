@@ -24,6 +24,26 @@
     O_Print '(a)', ' #-----------------------------------------------'
 # endif
 
+  !----------------------!
+  !   Spalart Allmaras   !
+  !----------------------!
+  if(Turb % model .eq. SPALART_ALLMARAS .or.  &
+     Turb % model .eq. DES_SPALART) then
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % vis % n)
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % vis % o)
+    if(Turb % vis % td_scheme .eq. PARABOLIC) then
+      call Gpu % Vector_Real_Destroy_On_Device(Turb % vis % oo)
+    end if
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % vis_w)
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % h_max)
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % h_min)
+    call Gpu % Vector_Real_Destroy_On_Device(Turb % h_w)
+    if(Flow % heat_transfer) then
+      call Gpu % Vector_Real_Destroy_On_Device(Turb % con_w)
+    end if ! Flow % heat_transfer
+  end if
+
   !-----------------------!
   !   Smagorinsky model   !
   !-----------------------!

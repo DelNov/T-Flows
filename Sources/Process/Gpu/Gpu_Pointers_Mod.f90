@@ -51,5 +51,6 @@
   real,    contiguous, pointer :: turb_vis_t(:), turb_vis_w(:), turb_con_w(:)
   real,    contiguous, pointer :: turb_h_max(:), turb_h_min(:), turb_h_w(:)
   real,    contiguous, pointer :: turb_z_o(:)
+  real,    contiguous, pointer :: turb_vis_n(:), turb_vis_o(:), turb_vis_oo(:)
 
   end module

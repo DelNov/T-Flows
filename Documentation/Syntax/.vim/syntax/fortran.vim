@@ -501,6 +501,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     flow_grad_c2c  flow_phi_x  flow_phi_y  flow_phi_z
   syn keyword fortranGPUTflows     turb_y_plus  turb_vis_t  turb_vis_w  turb_con_w
   syn keyword fortranGPUTflows     turb_wale_v  turb_h_max  turb_h_min  turb_h_w  turb_z_o
+  syn keyword fortranGPUTflows     turb_vis_n  turb_vis_o  turb_vis_oo
   syn keyword fortranGPUTflows     phi_bnd_cond_type  phi_n  phi_o  phi_oo
 
 " CUDA fortran
