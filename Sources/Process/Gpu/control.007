@@ -6,8 +6,8 @@
 #--------------------------
 # Time-integration related
 #--------------------------
-  TIME_STEP                 0.0125
-  NUMBER_OF_TIME_STEPS   1200
+  TIME_STEP                 0.1
+  NUMBER_OF_TIME_STEPS    120
 
   RESULTS_SAVE_INTERVAL   120
 
@@ -29,7 +29,7 @@
 # Physical properties
 #---------------------
   MASS_DENSITY       1.0
-  DYNAMIC_VISCOSITY    0.001
+  DYNAMIC_VISCOSITY    0.1
 
 #---------------------
 # Boundary conditions

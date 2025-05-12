@@ -1,15 +1,13 @@
 !==============================================================================!
-  subroutine Grid_Copy_To_Device(Gpu, Grid)
+  subroutine Copy_Grid_To_Device(Grid)
 !------------------------------------------------------------------------------!
 !>  Copy all the grid variables you need in your simulation to GPU.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)         :: Gpu   !! parent class
-  type(Grid_Type), target :: Grid  !! grid to transfer to device
+  class(Grid_Type), target :: Grid  !! parent grid to transfer to device
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Grid)
 # endif
 !==============================================================================!

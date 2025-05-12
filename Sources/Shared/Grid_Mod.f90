@@ -1,6 +1,7 @@
 #include "../Shared/Assert.h90"
 #include "../Shared/Browse.h90"
 #include "../Shared/Macros.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Grid_Mod
@@ -25,6 +26,7 @@
   use Vtk_Mod
   use Metis_Mod
   use Sort_Mod
+  use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -195,14 +197,13 @@
     type(Comm_Type) :: Comm  !! module for MPI communication, local to grid
 
     contains
-      procedure :: Are_Nodes_Twins
-      procedure :: Allocate_Cells
-      procedure :: Allocate_Faces
-      procedure :: Allocate_Nodes
-      procedure :: Allocate_Regions
+
+      ! Procedures related to boundary conditions
       procedure :: Bnd_Cond_Name_At_Cell
       procedure :: Bnd_Cond_Name_At_Face
       procedure :: Bnd_Cond_Type
+
+      ! Various calculations on the grid, geometrical quantities, in essence
       procedure :: Bounding_Box
       procedure :: Calculate_Cell_Centers
       procedure :: Calculate_Cell_Inertia
@@ -215,27 +216,26 @@
       procedure :: Calculate_Wall_Distance
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
+      procedure :: Faces_Surface
+
+      ! Determination of grid connectivities
+      procedure :: Are_Nodes_Twins
       procedure :: Check_Cells_Closure
       procedure :: Correct_Face_Surfaces
-      procedure :: Decompose
       procedure :: Determine_Regions_Ranges
-      procedure :: Exchange_Cells_Int
-      procedure :: Exchange_Cells_Log
-      procedure :: Exchange_Cells_Real
-      procedure :: Exchange_Inside_Cells_Real
       procedure :: Face_Normal
-      procedure :: Faces_Surface
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
-      procedure :: Form_Cells_Comm
-      procedure :: Form_Maps_For_Backup
       procedure :: Initialize_New_Numbers
       procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
+      procedure :: Merge_Duplicate_Nodes
+      procedure :: Search_Coordinate_Clusters
+
+      ! Input/output
       procedure :: Load_And_Prepare_For_Processing
       procedure :: Load_Cfn
       procedure :: Load_Dim
-      procedure :: Merge_Duplicate_Nodes
       procedure :: Print_Regions_List
       procedure :: Print_Grid_Statistics
       procedure :: Save_Cfn
@@ -246,20 +246,44 @@
       procedure :: Save_Vtu_Cells
       procedure :: Save_Vtu_Edges
       procedure :: Save_Vtu_Faces
-      procedure :: Search_Coordinate_Clusters
+      procedure :: Write_Template_Control_File
+
+      ! Memory managent
+      procedure :: Allocate_Cells
+      procedure :: Allocate_Faces
+      procedure :: Allocate_Nodes
+      procedure :: Allocate_Regions
+
+      ! Procedures related to MPI parallel version
+      procedure :: Decompose
+      procedure :: Exchange_Cells_Int
+      procedure :: Exchange_Cells_Log
+      procedure :: Exchange_Cells_Real
+      procedure :: Exchange_Inside_Cells_Real
+      procedure :: Form_Cells_Comm
+      procedure :: Form_Maps_For_Backup
+
+      ! Different soring routines
       procedure :: Sort_Cells_By_Coordinates
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
       procedure :: Sort_Nodes_By_Coordinates
-      procedure :: Write_Template_Control_File
+
+      ! Procedures to copy grid to device
+      procedure :: Copy_Grid_To_Device
+      procedure :: Destroy_Grid_On_Device
+      procedure :: Update_Grid_On_Host
 
   end type
 
   contains
 
+    ! Procedures related to boundary conditions
 #   include "Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90"
 #   include "Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90"
 #   include "Grid_Mod/Boundary/Bnd_Cond_Type.f90"
+
+    ! Various calculations on the grid, geometrical quantities, in essence
 #   include "Grid_Mod/Calculate/Bounding_Box.f90"
 #   include "Grid_Mod/Calculate/Calculate_Cell_Centers.f90"
 #   include "Grid_Mod/Calculate/Calculate_Cell_Inertia.f90"
@@ -273,6 +297,8 @@
 #   include "Grid_Mod/Calculate/Calculate_Wall_Distance.f90"
 #   include "Grid_Mod/Calculate/Calculate_Weights_Cells_To_Nodes.f90"
 #   include "Grid_Mod/Calculate/Calculate_Weights_Nodes_To_Cells.f90"
+
+    ! Determination of grid connectivities
 #   include "Grid_Mod/Connectivity/Are_Nodes_Twins.f90"
 #   include "Grid_Mod/Connectivity/Check_Cells_Closure.f90"
 #   include "Grid_Mod/Connectivity/Correct_Face_Surfaces.f90"
@@ -285,6 +311,8 @@
 #   include "Grid_Mod/Connectivity/Is_Point_In_Cell.f90"
 #   include "Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90"
 #   include "Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90"
+
+    ! Input/output
 #   include "Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90"
 #   include "Grid_Mod/Input_Output/Load_Cfn.f90"
 #   include "Grid_Mod/Input_Output/Load_Dim.f90"
@@ -299,10 +327,14 @@
 #   include "Grid_Mod/Input_Output/Save_Vtu_Edges.f90"
 #   include "Grid_Mod/Input_Output/Save_Vtu_Faces.f90"
 #   include "Grid_Mod/Input_Output/Write_Template_Control_File.f90"
+
+    ! Memory managent
 #   include "Grid_Mod/Memory/Allocate_Cells.f90"
 #   include "Grid_Mod/Memory/Allocate_Faces.f90"
 #   include "Grid_Mod/Memory/Allocate_Nodes.f90"
 #   include "Grid_Mod/Memory/Allocate_Regions.f90"
+
+    ! Procedures related to MPI parallel version
 #   include "Grid_Mod/Parallel/Decompose.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Int.f90"
 #   include "Grid_Mod/Parallel/Exchange_Cells_Log.f90"
@@ -310,9 +342,16 @@
 #   include "Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90"
 #   include "Grid_Mod/Parallel/Form_Cells_Comm.f90"
 #   include "Grid_Mod/Parallel/Form_Maps_For_Backup.f90"
+
+    ! Different soring routines
 #   include "Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"
+
+    ! Procedures to copy grid to device
+#   include "Grid_Mod/Gpu/Copy_To_Device.f90"
+#   include "Grid_Mod/Gpu/Destroy_On_Device.f90"
+#   include "Grid_Mod/Gpu/Update_Host.f90"
 
   end module

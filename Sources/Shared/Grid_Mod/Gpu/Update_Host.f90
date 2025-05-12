@@ -1,16 +1,14 @@
 !==============================================================================!
-  subroutine Grid_Update_Host(Gpu, Grid)
+  subroutine Update_Grid_On_Host(Grid)
 !------------------------------------------------------------------------------!
 !>  Copy all the grid variables (so far only the wall distance) you need
 !>  for post-processing back to CPU
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type) :: Gpu   !! parent class
-  type(Grid_Type) :: Grid  !! field to transfer to device
+  class(Grid_Type) :: Grid  !! field to transfer to device
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Grid)
 # endif
 !==============================================================================!

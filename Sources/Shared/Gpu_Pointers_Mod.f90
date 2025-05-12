@@ -17,7 +17,7 @@
   implicit none
 !==============================================================================!
 
-  ! Access to Grid members
+  ! GPU access to Grid members
   integer, contiguous, pointer :: grid_faces_c(:,:)
   integer, contiguous, pointer :: grid_cells_n_cells(:)
   integer, contiguous, pointer :: grid_cells_c(:,:)

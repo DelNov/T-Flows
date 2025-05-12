@@ -1,12 +1,11 @@
 !==============================================================================!
-  subroutine Grid_Destroy_On_Device(Gpu, Grid)
+  subroutine Destroy_Grid_On_Device(Grid)
 !------------------------------------------------------------------------------!
 !>  Destroy all the grid variables you don't need in GPU any more.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type) :: Gpu   !! parent class
-  type(Grid_Type) :: Grid  !! grid to destroy on device
+  class(Grid_Type) :: Grid  !! parent grid to destroy on device
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
     Unused(Gpu)

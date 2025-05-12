@@ -185,6 +185,8 @@ $(DIR_SHARED)/Metis_Mod/*.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
 $(DIR_SHARED)/Memory_Mod/*.f90 \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 
 
@@ -236,6 +238,15 @@ $(DIR_OBJECT)/Const_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Swap_Mod.o:\
 $(DIR_SHARED)/Swap_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Gpu_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Gpu_Mod.o:\
+$(DIR_OBJECT)/Profiler_Mod.o \
+$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Pointers_Mod.o \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Message_Mod/Dashed_Line.f90

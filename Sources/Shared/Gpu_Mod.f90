@@ -16,9 +16,8 @@
 !>  Each procedure within the module is dedicated to a specific type of
 !>  data or operation, ensuring efficient interaction with the GPU.
 !----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod
-  use Work_Mod
   use Gpu_Pointers_Mod
+  use Profiler_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -48,16 +47,6 @@
       procedure :: Matrix_Real_Copy_To_Device
       procedure :: Matrix_Real_Destroy_On_Device
 
-      ! Procedures to copy grid to device
-      procedure :: Grid_Copy_To_Device
-      procedure :: Grid_Destroy_On_Device
-      procedure :: Grid_Update_Host
-
-      ! Procedures to create working arrays to device
-      ! (No need to copy them, they are temporrary by nature)
-      procedure :: Work_Create_On_Device
-      procedure :: Work_Destroy_On_Device
-
   end type
 
   type(Gpu_Type) :: Gpu
@@ -77,14 +66,5 @@
 #   include "Gpu_Mod/Matrix/Int_Destroy_On_Device.f90"
 #   include "Gpu_Mod/Matrix/Real_Copy_To_Device.f90"
 #   include "Gpu_Mod/Matrix/Real_Destroy_On_Device.f90"
-
-    ! Procedures to copy grid to device
-#   include "Gpu_Mod/Grid/Copy_To_Device.f90"
-#   include "Gpu_Mod/Grid/Destroy_On_Device.f90"
-#   include "Gpu_Mod/Grid/Update_Host.f90"
-
-    ! Procedures to create working arrays to device
-#   include "Gpu_Mod/Work/Create_On_Device.f90"
-#   include "Gpu_Mod/Work/Destroy_On_Device.f90"
 
   end module

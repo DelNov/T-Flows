@@ -1,4 +1,6 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Macros.h90"
+#include "../Shared/Unused.h90"
 
 #define CHECK_USAGE 1
 
@@ -112,6 +114,11 @@
       procedure :: Allocated_Int_Face_Arrays
       procedure :: Allocated_Int_Node_Arrays
 
+      ! Procedures to create working arrays to device
+      ! (No need to copy them, they are temporrary by nature)
+      procedure :: Create_Work_On_Device
+      procedure :: Destroy_Work_On_Device
+
   end type
 
   ! Singleton object Work
@@ -156,6 +163,10 @@
 #   include "Work_Mod/No_Checking/Disconnect_Real_Node.f90"
 #   include "Work_Mod/No_Checking/Finalize_Work.f90"
 #endif
+
+    ! Procedures to create working arrays to device
+#   include "Work_Mod/Gpu/Create_On_Device.f90"
+#   include "Work_Mod/Gpu/Destroy_On_Device.f90"
 
     !-------------------------------------------------------------!
     !   Small functions to allow access to private data members   !

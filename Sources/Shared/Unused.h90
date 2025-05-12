@@ -1,5 +1,5 @@
 !==============================================================================!
-!   Definition of the macro which avoids too many workings while compiling.    !
+!   Definition of the macro which avoids too many warnings while compiling.    !
 !------------------------------------------------------------------------------!
 
 # if T_FLOWS_DEBUG == 1

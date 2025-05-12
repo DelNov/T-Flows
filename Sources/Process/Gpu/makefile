@@ -365,10 +365,10 @@ SRC_F_MOD = Const_Mod.f90         \
             Profiler_Mod.f90      \
             Vtk_Mod.f90           \
             Metis_Mod.f90         \
-            Grid_Mod.f90          \
-            Work_Mod.f90          \
             Gpu_Pointers_Mod.f90  \
-            Gpu_Mod.f90
+            Gpu_Mod.f90           \
+            Grid_Mod.f90          \
+            Work_Mod.f90
 
 # Modules in local directory
 SRC_F_MOD += Bulk_Mod.f90           \
