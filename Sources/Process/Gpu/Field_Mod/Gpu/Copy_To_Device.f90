@@ -1,17 +1,15 @@
 !==============================================================================!
-  subroutine Field_Copy_To_Device(Gpu, Flow)
+  subroutine Copy_Field_To_Device(Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the field variables (velocity, pressure, temperature, ...) you
 !>  might need in your simulation to GPU.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)          :: Gpu   !! parent class
-  type(Field_Type), target :: Flow  !! field to transfer to device
+  class(Field_Type), target :: Flow  !! parent field to transfer to device
 !-----------------------[Avoid unused argument warning]------------------------!
   integer                  :: sc
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Flow)
 # endif
 !==============================================================================!

@@ -220,24 +220,10 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 # Dependencies for: ./Gpu_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Gpu_Mod.o:\
-Gpu_Mod/*/*.f90 \
-Field_Mod/*/Volume_Average.fpp \
-$(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/Grad_Variable.fpp \
-Field_Mod/*/Grad_Pressure.fpp \
-Field_Mod/*/Grad_Component.fpp \
-Field_Mod/*/Grad_Component.005 \
-Field_Mod/*/Grad_Component.004 \
-Field_Mod/*/Grad_Component.003 \
-Field_Mod/*/Grad_Component.002 \
-Field_Mod/*/Grad_Component.001 \
-Field_Mod/*/*.f90 \
-Field_Mod/*/Calculate_Shear_And_Vorticity.fpp \
-Field_Mod/*/Calculate_Bulk_Velocities.fpp \
-Field_Mod/*/Buoyancy_Forces.fpp \
-Field_Mod/*/Add_Inertial_Term.fpp \
-Field_Mod/*/Add_Cross_Diffusion_Term.fpp \
-Field_Mod/*/Add_Advection_Term.fpp 
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*.f90 \
+$(DIR_OBJECT)/Gpu_Pointers_Mod.o \
+Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_001.f90
@@ -401,6 +387,8 @@ Numerics_Mod/*.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Pointers_Mod.o \
+$(DIR_OBJECT)/Gpu_Mod.o \
+Gpu_Mod/*/*.f90 \
 Field_Mod/*/Volume_Average.fpp \
 Field_Mod/*/Grad_Variable.fpp \
 Field_Mod/*/Grad_Pressure.fpp \

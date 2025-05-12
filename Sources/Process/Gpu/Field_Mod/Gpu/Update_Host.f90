@@ -1,18 +1,16 @@
 !==============================================================================!
-  subroutine Field_Update_Host(Gpu, Flow)
+  subroutine Update_Field_On_Host(Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the field variables (velocity, pressure, temperature, ...) you
 !>  might need for post-processing back to CPU
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)  :: Gpu   !! parent class
-  type(Field_Type) :: Flow  !! field to transfer to device
+  class(Field_Type) :: Flow  !! parent field to transfer to host
 !--------------------------------[Locals]--------------------------------------!
   integer :: sc
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Flow)
 # endif
 !==============================================================================!

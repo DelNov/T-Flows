@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Copy_To_Device(Turb, Flow)
+  subroutine Copy_Turb_To_Device(Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the turbulence variables you need in your simulation to GPU.
 !------------------------------------------------------------------------------!

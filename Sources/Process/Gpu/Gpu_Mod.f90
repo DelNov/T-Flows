@@ -16,7 +16,8 @@
 !>  Each procedure within the module is dedicated to a specific type of
 !>  data or operation, ensuring efficient interaction with the GPU.
 !----------------------------------[Modules]-----------------------------------!
-  use Field_Mod
+  use Native_Mod
+  use Gpu_Pointers_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -55,11 +56,6 @@
       ! Procedures to copy native solver to device
       procedure :: Native_Copy_To_Device
       procedure :: Native_Destroy_On_Device
-
-      ! Procedures to copy field to device
-      procedure :: Field_Copy_To_Device
-      procedure :: Field_Destroy_On_Device
-      procedure :: Field_Update_Host
 
       ! Procedures to copy grid to device
       procedure :: Grid_Copy_To_Device
@@ -100,11 +96,6 @@
     ! Procedures to copy native solver to device
 #   include "Gpu_Mod/Native/Copy_To_Device.f90"
 #   include "Gpu_Mod/Native/Destroy_On_Device.f90"
-
-    ! Procedures to copy field to device
-#   include "Gpu_Mod/Field/Copy_To_Device.f90"
-#   include "Gpu_Mod/Field/Destroy_On_Device.f90"
-#   include "Gpu_Mod/Field/Update_Host.f90"
 
     ! Procedures to copy grid to device
 #   include "Gpu_Mod/Grid/Copy_To_Device.f90"

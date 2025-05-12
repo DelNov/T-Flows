@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Destroy_On_Device(Turb, Flow)
+  subroutine Destroy_Turb_On_Device(Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  Destroy all the turbulence variables you don't need in GPU any more.
 !------------------------------------------------------------------------------!

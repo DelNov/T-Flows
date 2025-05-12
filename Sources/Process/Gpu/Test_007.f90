@@ -91,9 +91,9 @@
   !   field and solvers                                      !
   !----------------------------------------------------------!
   call Gpu % Grid_Copy_To_Device  (Grid(1))
-  call Gpu % Field_Copy_To_Device (Flow(1))
+  call Flow(1) % Copy_Field_To_Device()
   call Gpu % Native_Copy_To_Device(Flow(1) % Nat)
-  call Turb(1) % Copy_To_Device   (Flow(1))
+  call Turb(1) % Copy_Turb_To_Device(Flow(1))
   call Gpu % Work_Create_On_Device(Work)
 
   !------------------------------------------!
@@ -174,8 +174,8 @@
     call Info % Bulk_Print(Flow(1), 1, 1)
 
     if(mod(Time % Curr_Dt(), Results % interval) .eq. 0) then
-      call Turb(1) % Update_Host  (Flow(1))
-      call Gpu % Field_Update_Host(Flow(1))
+      call Turb(1) % Update_Turb_On_Host(Flow(1))
+      call Flow(1) % Update_Field_On_Host()
       call Gpu % Grid_Update_Host (Grid(1))
       call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
     end if
@@ -184,8 +184,8 @@
   call cpu_time(te)
 
   ! Save results
-  call Turb(1) % Update_Host (Flow(1))
-  call Gpu % Field_Update_Host(Flow(1))
+  call Turb(1) % Update_Turb_On_Host(Flow(1))
+  call Flow(1) % Update_Field_On_Host()
   call Gpu % Grid_Update_Host (Grid(1))
   call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
 

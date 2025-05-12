@@ -47,7 +47,7 @@ REVERSED  = "\033[7m"
 RESET = "\033[0m"
 
 grid_to_device_file = "./Gpu_Mod/Grid/Copy_To_Device.f90"
-flow_to_device_file = "./Gpu_Mod/Field/Copy_To_Device.f90"
+flow_to_device_file = "./Field_Mod/Gpu/Copy_To_Device.f90"
 turb_to_device_file = "./Turb_Mod/Gpu/Copy_To_Device.f90"
 gpu_pointers_file   = "./Gpu_Pointers_Mod.f90"
 

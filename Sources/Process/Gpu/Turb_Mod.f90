@@ -113,12 +113,9 @@
       procedure :: Les
 
       ! Procedures to copy turbulence variables to and from the device (GPU)
-      procedure :: Copy_To_Device
-      procedure :: Destroy_On_Device
-      procedure :: Update_Host
-      ! procedure :: Turb_Copy_To_Device
-      ! procedure :: Turb_Destroy_On_Device
-      ! procedure :: Turb_Update_Host
+      procedure :: Copy_Turb_To_Device
+      procedure :: Destroy_Turb_On_Device
+      procedure :: Update_Turb_On_Host
 
   end type
 

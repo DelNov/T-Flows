@@ -1,18 +1,16 @@
 !==============================================================================!
-  subroutine Field_Destroy_On_Device(Gpu, Flow)
+  subroutine Destroy_Field_On_Device(Flow)
 !------------------------------------------------------------------------------!
 !>  Destroys all the field variables (velocity, pressure, temperature, ...)
 !>  from the device, without copying it back to the host.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)  :: Gpu   !! parent class
-  type(Field_Type) :: Flow  !! field to  to device
+  class(Field_Type) :: Flow  !! parent field to destroy on the device
 !--------------------------------[Locals]--------------------------------------!
   integer          :: sc
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Flow)
 # endif
 !==============================================================================!

@@ -22,6 +22,7 @@
   use Var_mod
   use Numerics_Mod
   use Profiler_mod
+  use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
@@ -170,6 +171,11 @@
       procedure :: U_Tan
       procedure :: Volume_Average
 
+      ! Procedures to copy field to device
+      procedure :: Copy_Field_To_Device
+      procedure :: Destroy_Field_On_Device
+      procedure :: Update_Field_On_Host
+
   end type
 
   ! Parameters for type of buoyancy
@@ -208,5 +214,12 @@
 #   include "Field_Mod/Utilities/Schmidt_Numb.f90"
 #   include "Field_Mod/Utilities/U_Tan.f90"
 #   include "Field_Mod/Utilities/Volume_Average.f90"
+
+    !--------------------!
+    !   Related to GPU   !
+    !--------------------!
+#   include "Field_Mod/Gpu/Copy_To_Device.f90"
+#   include "Field_Mod/Gpu/Destroy_On_Device.f90"
+#   include "Field_Mod/Gpu/Update_Host.f90"
 
   end module

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Update_Host(Turb, Flow)
+  subroutine Update_Turb_On_Host(Turb, Flow)
 !------------------------------------------------------------------------------!
 !>  Copy all the turbulence variables you need for post-processing back to CPU
 !------------------------------------------------------------------------------!
