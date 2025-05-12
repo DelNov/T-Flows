@@ -1,6 +1,7 @@
 #include "../../Shared/Assert.h90"
 #include "../../Shared/Browse.h90"
 #include "../../Shared/Macros.h90"
+#include "../../Shared/Unused.h90"
 
 !==============================================================================!
   module Sparse_Mod
@@ -11,6 +12,7 @@
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
+  use Gpu_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
@@ -81,6 +83,10 @@
     contains
       procedure :: Create_Sparse_Con
 
+      ! Procedures to copy/destroy sparse matrix connectivity to/on device
+      procedure :: Copy_Sparse_Con_To_Device
+      procedure :: Destroy_Sparse_Con_On_Device
+
   end type
 
   !------------------------!
@@ -99,10 +105,21 @@
     contains
       procedure :: Create_Sparse_Val
 
+      ! Procedures to copy/destroy sparse matrix values to/on device
+      procedure :: Copy_Sparse_Val_To_Device
+      procedure :: Destroy_Sparse_Val_On_Device
+
   end type
 
   contains
 #   include "Sparse_Mod/Create_Sparse_Con.f90"
 #   include "Sparse_Mod/Create_Sparse_Val.f90"
+
+    ! Procedures to copy/destroy sparse matrices to/on device
+#   include "Sparse_Mod/Gpu/Copy_Sparse_Con_To_Device.f90"
+#   include "Sparse_Mod/Gpu/Destroy_Sparse_Con_On_Device.f90"
+#   include "Sparse_Mod/Gpu/Copy_Sparse_Val_To_Device.f90"
+#   include "Sparse_Mod/Gpu/Destroy_Sparse_Val_On_Device.f90"
+
 
   end module

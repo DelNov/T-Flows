@@ -2,6 +2,18 @@
 # Dependencies for: ./Test_003.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_003.o:\
+Linalg_Mod/Vec_X_Vec.fpp \
+Linalg_Mod/Vec_P_Vec_X_Vec.fpp \
+Linalg_Mod/Vec_P_Sca_X_Vec.fpp \
+Linalg_Mod/Vec_M_Vec_X_Vec.fpp \
+Linalg_Mod/Vec_D_Vec.fpp \
+Linalg_Mod/Vec_Copy.fpp \
+Linalg_Mod/Sys_Restore.fpp \
+Linalg_Mod/Sys_Normalize.fpp \
+Linalg_Mod/Sca_O_Dia.fpp \
+$(DIR_OBJECT)/Linalg_Mod.o \
+Linalg_Mod/Mat_X_Vec.fpp \
+Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 
 
@@ -34,6 +46,7 @@ Iter_Mod/*.f90
 # Dependencies for: ./Sparse_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Sparse_Mod.o:\
+Sparse_Mod/*/*.f90 \
 Sparse_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
 $(DIR_SHARED)/Grid_Mod/*/*.f90 
@@ -157,6 +170,7 @@ $(DIR_SHARED)/Grid_Mod/*/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Linalg_Mod.o:\
 $(DIR_OBJECT)/Sparse_Mod.o \
+Sparse_Mod/*/*.f90 \
 Sparse_Mod/*.f90 \
 Linalg_Mod/Vec_X_Vec.fpp \
 Linalg_Mod/Vec_P_Vec_X_Vec.fpp \
@@ -221,8 +235,11 @@ $(DIR_SHARED)/Assert_Mod/*.f90
 # Dependencies for: ./Gpu_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Gpu_Mod.o:\
-$(DIR_OBJECT)/Sparse_Mod.o \
-Sparse_Mod/*.f90 \
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 \
 $(DIR_OBJECT)/Gpu_Pointers_Mod.o \
 Gpu_Mod/*/*.f90 
 
@@ -267,6 +284,18 @@ Gpu_Mod/*/*.f90
 # Dependencies for: ./Test_002.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_002.o:\
+Linalg_Mod/Vec_X_Vec.fpp \
+Linalg_Mod/Vec_P_Vec_X_Vec.fpp \
+Linalg_Mod/Vec_P_Sca_X_Vec.fpp \
+Linalg_Mod/Vec_M_Vec_X_Vec.fpp \
+Linalg_Mod/Vec_D_Vec.fpp \
+Linalg_Mod/Vec_Copy.fpp \
+Linalg_Mod/Sys_Restore.fpp \
+Linalg_Mod/Sys_Normalize.fpp \
+Linalg_Mod/Sca_O_Dia.fpp \
+$(DIR_OBJECT)/Linalg_Mod.o \
+Linalg_Mod/Mat_X_Vec.fpp \
+Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 Gpu_Mod/*/*.f90 
 
@@ -386,6 +415,7 @@ $(DIR_SHARED)/Comm_Mod/*/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Field_Mod.o:\
 $(DIR_OBJECT)/Sparse_Mod.o \
+Sparse_Mod/*/*.f90 \
 Sparse_Mod/*.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
 Numerics_Mod/*.f90 \

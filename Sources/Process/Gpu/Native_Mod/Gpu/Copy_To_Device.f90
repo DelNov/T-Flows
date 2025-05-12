@@ -15,21 +15,14 @@
 !==============================================================================!
 
   ! Copy matrix and the right hand side to the device
-  call Gpu % Sparse_Con_Copy_To_Device(Nat % C)
-  call Gpu % Sparse_Val_Copy_To_Device(Nat % A)
+  call Nat % C % Copy_Sparse_Con_To_Device()
+  call Nat % A % Copy_Sparse_Val_To_Device()
   call Gpu % Vector_Real_Copy_To_Device(Nat % b)
 
   ! Create (allocate) memory for helping vectors on device
-  !$acc enter data create(Nat % p)
-  !$acc enter data create(Nat % q)
-  !$acc enter data create(Nat % r)
-
-# if T_FLOWS_GPU == 1
-    Gpu % gb_used = Gpu % gb_used + (  real(sizeof(Nat % p))      &
-                                     + real(sizeof(Nat % q))      &
-                                     + real(sizeof(Nat % r))) / GIGABYTE
-    print '(a,f7.3,a)', ' # '//__FILE__//' :', Gpu % gb_used, ' GB on device'
-# endif
+  call Gpu % Vector_Real_Create_On_Device(Nat % p)
+  call Gpu % Vector_Real_Create_On_Device(Nat % q)
+  call Gpu % Vector_Real_Create_On_Device(Nat % r)
 
   end subroutine
 

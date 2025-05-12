@@ -16,7 +16,7 @@
 !>  Each procedure within the module is dedicated to a specific type of
 !>  data or operation, ensuring efficient interaction with the GPU.
 !----------------------------------[Modules]-----------------------------------!
-  use Sparse_Mod
+  use Grid_Mod
   use Work_Mod
   use Gpu_Pointers_Mod
 !------------------------------------------------------------------------------!
@@ -48,12 +48,6 @@
       procedure :: Matrix_Real_Copy_To_Device
       procedure :: Matrix_Real_Destroy_On_Device
 
-      ! Procedures to copy sparse matrices to device
-      procedure :: Sparse_Con_Copy_To_Device
-      procedure :: Sparse_Con_Destroy_On_Device
-      procedure :: Sparse_Val_Copy_To_Device
-      procedure :: Sparse_Val_Destroy_On_Device
-
       ! Procedures to copy grid to device
       procedure :: Grid_Copy_To_Device
       procedure :: Grid_Destroy_On_Device
@@ -83,12 +77,6 @@
 #   include "Gpu_Mod/Matrix/Int_Destroy_On_Device.f90"
 #   include "Gpu_Mod/Matrix/Real_Copy_To_Device.f90"
 #   include "Gpu_Mod/Matrix/Real_Destroy_On_Device.f90"
-
-    ! Procedures to copy vectors to device
-#   include "Gpu_Mod/Sparse_Con/Copy_To_Device.f90"
-#   include "Gpu_Mod/Sparse_Con/Destroy_On_Device.f90"
-#   include "Gpu_Mod/Sparse_Val/Copy_To_Device.f90"
-#   include "Gpu_Mod/Sparse_Val/Destroy_On_Device.f90"
 
     ! Procedures to copy grid to device
 #   include "Gpu_Mod/Grid/Copy_To_Device.f90"

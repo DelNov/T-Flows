@@ -1,29 +1,26 @@
 !==============================================================================!
-  subroutine Sparse_Con_Destroy_On_Device(Gpu, Acon)
+  subroutine Copy_Sparse_Con_To_Device(Acon)
 !------------------------------------------------------------------------------!
-!>  Destroys a sparse-matrix on the GPU, without copying it back to CPU.
-!------------------------------------------------------------------------------!
-!   Note: if you wanted to copy it before destroying, change delete to copyout !
+!>  Coppies a matrix to GPU (device).  It can't copy the whole derived type,
+!>  but coppies its components which are needed for accelrated calculations.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Gpu_Type)       :: Gpu   !! parent class
-  type(Sparse_Con_Type) :: Acon  !! connectivity matrix to destroy
+  class(Sparse_Con_Type) :: Acon  !! parent connectivity matrix to copy
 !-----------------------[Avoid unused argument warning]------------------------!
 # if T_FLOWS_GPU == 0
-    Unused(Gpu)
     Unused(Acon)
 # endif
 !==============================================================================!
 
-  !$acc exit data delete(Acon % fc)
-  !$acc exit data delete(Acon % row)
-  !$acc exit data delete(Acon % col)
-  !$acc exit data delete(Acon % dia)
-  !$acc exit data delete(Acon % pos)
+  !$acc enter data copyin(Acon % fc)
+  !$acc enter data copyin(Acon % row)
+  !$acc enter data copyin(Acon % col)
+  !$acc enter data copyin(Acon % dia)
+  !$acc enter data copyin(Acon % pos)
 
 # if T_FLOWS_GPU == 1
-    Gpu % gb_used = Gpu % gb_used - (  real(sizeof(Acon % fc))     &
+    Gpu % gb_used = Gpu % gb_used + (  real(sizeof(Acon % fc))     &
                                      + real(sizeof(Acon % row))    &
                                      + real(sizeof(Acon % col))    &
                                      + real(sizeof(Acon % dia))    &

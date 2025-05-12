@@ -14,16 +14,15 @@
 # endif
 !==============================================================================!
 
-  !$acc exit data delete(Nat % r)
-  !$acc exit data delete(Nat % p)
-  !$acc exit data delete(Nat % q)
+  ! Copy matrix and the right hand side to the device
+  call Nat % C % Destroy_Sparse_Con_On_Device()
+  call Nat % A % Destroy_Sparse_Val_On_Device()
+  call Gpu % Vector_Real_Destroy_On_Device(Nat % b)
 
-# if T_FLOWS_GPU == 1
-    Gpu % gb_used = Gpu % gb_used - (  real(sizeof(Nat % p))      &
-                                     + real(sizeof(Nat % q))      &
-                                     + real(sizeof(Nat % r))) / GIGABYTE
-    print '(a,f7.3,a)', ' # '//__FILE__//' :', Gpu % gb_used, ' GB on device'
-# endif
+  ! Create (allocate) memory for helping vectors on device
+  call Gpu % Vector_Real_Destroy_On_Device(Nat % p)
+  call Gpu % Vector_Real_Destroy_On_Device(Nat % q)
+  call Gpu % Vector_Real_Destroy_On_Device(Nat % r)
 
   end subroutine
 
