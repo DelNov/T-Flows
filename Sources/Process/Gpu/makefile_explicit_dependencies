@@ -15,7 +15,7 @@ $(DIR_OBJECT)/Linalg_Mod.o \
 Linalg_Mod/Mat_X_Vec.fpp \
 Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Face_Mod.f90
@@ -49,7 +49,9 @@ $(DIR_OBJECT)/Sparse_Mod.o:\
 Sparse_Mod/*/*.f90 \
 Sparse_Mod/*.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
+$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_OBJECT)/Gpu_Mod.o \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Info_Mod.f90
@@ -107,7 +109,7 @@ Native_Mod/*.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
 $(DIR_OBJECT)/Backup_Mod.o \
 Backup_Mod/*.f90 
 
@@ -151,7 +153,7 @@ Process_Mod/Add_Pressure_Term.fpp \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Control_Mod/*.f90 \
@@ -189,7 +191,7 @@ Linalg_Mod/*.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_006.o:\
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
 Field_Mod/*/Volume_Average.fpp \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Variable.fpp \
@@ -232,18 +234,6 @@ $(DIR_OBJECT)/Assert_Mod.o \
 $(DIR_SHARED)/Assert_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Gpu_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Gpu_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-$(DIR_OBJECT)/Gpu_Pointers_Mod.o \
-Gpu_Mod/*/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Test_001.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_001.o:\
@@ -278,7 +268,7 @@ $(DIR_OBJECT)/Linalg_Mod.o \
 Linalg_Mod/Mat_X_Vec.fpp \
 Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_002.f90
@@ -297,7 +287,7 @@ $(DIR_OBJECT)/Linalg_Mod.o \
 Linalg_Mod/Mat_X_Vec.fpp \
 Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Var_Mod.f90
@@ -358,7 +348,7 @@ $(DIR_OBJECT)/Native_Mod.o \
 Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Turb_Mod.f90
@@ -377,7 +367,7 @@ Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Info_Mod.o \
 Info_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Native_Mod.f90
@@ -401,7 +391,7 @@ $(DIR_OBJECT)/Linalg_Mod.o \
 Linalg_Mod/Mat_X_Vec.fpp \
 Linalg_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Driver.f90
@@ -424,7 +414,7 @@ Native_Mod/*/*.f90 \
 Native_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Pointers_Mod.o \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
 Field_Mod/*/Volume_Average.fpp \
 Field_Mod/*/Grad_Variable.fpp \
 Field_Mod/*/Grad_Pressure.fpp \
@@ -511,14 +501,14 @@ Native_Mod/*.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
 Iter_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_005.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Test_005.o:\
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
 Field_Mod/*/Volume_Average.fpp \
 $(DIR_OBJECT)/Field_Mod.o \
 Field_Mod/*/Grad_Variable.fpp \
@@ -553,7 +543,7 @@ Turb_Mod/*/*.f90 \
 Turb_Mod/*.f90 \
 Turb_Mod/Compute_Variable.fpp \
 $(DIR_OBJECT)/Gpu_Mod.o \
-Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Isoap_Mod.f90
@@ -674,6 +664,18 @@ $(DIR_OBJECT)/File_Mod.o \
 $(DIR_SHARED)/File_Mod/*.f90 \
 $(DIR_SHARED)/Control_Mod/*/*.f90 \
 $(DIR_SHARED)/Control_Mod/*.f90 
+
+#---------------------------------------------------
+# Dependencies for: ./Gpu_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Gpu_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Grid_Mod.o \
+$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_OBJECT)/Gpu_Pointers_Mod.o \
+$(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Sort_Mod.f90

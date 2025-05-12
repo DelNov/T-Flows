@@ -13,20 +13,11 @@
 # endif
 !==============================================================================!
 
-  !$acc enter data copyin(Acon % fc)
-  !$acc enter data copyin(Acon % row)
-  !$acc enter data copyin(Acon % col)
-  !$acc enter data copyin(Acon % dia)
-  !$acc enter data copyin(Acon % pos)
-
-# if T_FLOWS_GPU == 1
-    Gpu % gb_used = Gpu % gb_used + (  real(sizeof(Acon % fc))     &
-                                     + real(sizeof(Acon % row))    &
-                                     + real(sizeof(Acon % col))    &
-                                     + real(sizeof(Acon % dia))    &
-                                     + real(sizeof(Acon % pos))) / GIGABYTE
-    print '(a,f7.3,a)', ' # '//__FILE__//' :', Gpu % gb_used, ' GB on device'
-# endif
+  call Gpu % Vector_Real_Copy_To_Device(Acon % fc)
+  call Gpu % Vector_Int_Copy_To_Device(Acon % row)
+  call Gpu % Vector_Int_Copy_To_Device(Acon % col)
+  call Gpu % Vector_Int_Copy_To_Device(Acon % dia)
+  call Gpu % Matrix_Int_Copy_To_Device(Acon % pos)
 
   end subroutine
 

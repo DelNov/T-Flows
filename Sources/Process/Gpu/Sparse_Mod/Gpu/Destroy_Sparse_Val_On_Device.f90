@@ -14,14 +14,8 @@
 # endif
 !==============================================================================!
 
-  !$acc exit data delete(Aval % val)
-  !$acc exit data delete(Aval % d_inv)
-
-# if T_FLOWS_GPU == 1
-    Gpu % gb_used = Gpu % gb_used - (  real(sizeof(Aval % val))    &
-                                     + real(sizeof(Aval % d_inv))) / GIGABYTE
-    print '(a,f7.3,a)', ' # '//__FILE__//' :', Gpu % gb_used, ' GB on device'
-# endif
+  call Gpu % Vector_Real_Destroy_On_Device(Aval % val)
+  call Gpu % Vector_Real_Destroy_On_Device(Aval % d_inv)
 
   end subroutine
 

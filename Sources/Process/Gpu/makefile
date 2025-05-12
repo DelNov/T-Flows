@@ -366,13 +366,13 @@ SRC_F_MOD = Const_Mod.f90         \
             Vtk_Mod.f90           \
             Metis_Mod.f90         \
             Grid_Mod.f90          \
-            Work_Mod.f90
+            Work_Mod.f90          \
+            Gpu_Pointers_Mod.f90  \
+            Gpu_Mod.f90
 
 # Modules in local directory
-SRC_F_MOD += Gpu_Pointers_Mod.f90   \
-             Bulk_Mod.f90           \
+SRC_F_MOD += Bulk_Mod.f90           \
              Face_Mod.f90           \
-             Gpu_Mod.f90            \
              Sparse_Mod.f90         \
              Linalg_Mod.f90         \
              Native_Mod.f90         \

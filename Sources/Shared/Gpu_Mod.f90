@@ -1,7 +1,7 @@
-#include "../../Shared/Assert.h90"
-#include "../../Shared/Browse.h90"
-#include "../../Shared/Macros.h90"
-#include "../../Shared/Unused.h90"
+#include "../Shared/Assert.h90"
+#include "../Shared/Browse.h90"
+#include "../Shared/Macros.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Gpu_Mod
