@@ -181,7 +181,7 @@ def Find_Arrays_In_Block(block):
 
   # Remove all comments
   cleaned_block = re.sub(r'!.*', '', block)
-  
+
   # Ecception for scalars
   cleaned_block = re.sub(
       r'Flow\s*%\s*scalar\s*\(\s*sc\s*\) ',
@@ -287,7 +287,7 @@ def Find_Arrays_In_Block(block):
       array_name_end = i
       # Go backwards to find where the array name starts
       j = i - 1
-      while j >= 0 and (cleaned_block[j] not in [' '] 
+      while j >= 0 and (cleaned_block[j] not in [' ']
                         and
                         cleaned_block[j] not in ['(']):
         j -= 1
@@ -461,7 +461,7 @@ def Process_Tfp_Block(block):
   block = re.sub(r'Grid % region % l_cell' , 'grid_region_l_cell', block)
   block = re.sub(r'Grid % region % f_face' , 'grid_region_f_face', block)
   block = re.sub(r'Grid % region % l_face' , 'grid_region_l_face', block)
-  
+
   #-----------------------------------------------------#
   #   General handling for arrays in the remaining code #
   #-----------------------------------------------------#
