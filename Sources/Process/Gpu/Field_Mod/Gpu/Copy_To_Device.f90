@@ -7,6 +7,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Field_Type), target :: Flow  !! parent field to transfer to device
+!-----------------------------------[Locals]-----------------------------------!
+  type(Var_Type), pointer :: phi
 !-----------------------[Avoid unused argument warning]------------------------!
   integer                  :: sc
 # if T_FLOWS_GPU == 0
@@ -62,12 +64,13 @@
   end if
 
   do sc = 1, Flow % n_scalars
-    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % n)
-    call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % o)
-    if(Flow % scalar(sc) % td_scheme .eq. PARABOLIC) then
-      call Gpu % Vector_Real_Copy_To_Device(Flow % scalar(sc) % oo)
+    phi => Flow % scalar(sc)  ! workaround for GPU compilation
+    call Gpu % Vector_Real_Copy_To_Device(phi % n)
+    call Gpu % Vector_Real_Copy_To_Device(phi % o)
+    if(phi % td_scheme .eq. PARABOLIC) then
+      call Gpu % Vector_Real_Copy_To_Device(phi % oo)
     end if
-    call Gpu % Vector_Int_Copy_To_Device(Flow % scalar(sc) % bnd_cond_type)
+    call Gpu % Vector_Int_Copy_To_Device(phi % bnd_cond_type)
   end do  ! through scalars
 
   ! You are going to need physical properties as well
