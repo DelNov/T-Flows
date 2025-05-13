@@ -33,7 +33,10 @@
 
     contains
 
-      ! Procedures to copy vectors (and matrices) to device
+      ! Procedures to copy vectors (and matrices) to device.  Note that
+      ! procedures defined in this module, the Gpu_Mod, are all for
+      ! handling basic Fortran data types.  No derived data types here.
+      ! Derived data types are managed from inside their modules.
       procedure :: Vector_Int_Copy_To_Device
       procedure :: Vector_Int_Create_On_Device
       procedure :: Vector_Int_Destroy_On_Device
