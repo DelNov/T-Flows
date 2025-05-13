@@ -39,8 +39,6 @@
   character(3) :: vf_def  = '0.0'
   character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
   character(3) :: vis_def = '0.0',  zeta_def = '0.0'
-  character(3) :: uu_def  = '0.0',  vv_def   = '0.0',  ww_def  = '0.0'
-  character(3) :: uv_def  = '0.0',  uw_def   = '0.0',  vw_def  = '0.0'
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
