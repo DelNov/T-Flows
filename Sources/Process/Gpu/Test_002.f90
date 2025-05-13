@@ -11,8 +11,8 @@
   implicit none
 !------------------------------------------------------------------------------!
   real, allocatable  :: a(:), b(:)
-  integer, parameter :: N = 800*800*800
-  integer, parameter :: N_STEPS = 1200  ! spend enough time on device
+  integer, parameter :: N = 600*600*600
+  integer, parameter :: N_STEPS = 3600  ! spend enough time on device
   integer            :: step
   real               :: dot
 !==============================================================================!
