@@ -12,7 +12,7 @@ pattern = re.compile(
 )
 
 # Final mapping: pointer_name → type
-pointers = defaultdict(str)
+pointers = {}  # key = pointer_name, value = (type, rank)
 
 # Files to search
 cmd = "find . ../../Shared -name '*Copy*.f??'"
@@ -26,8 +26,10 @@ for file in files:
     for line in f:
       match = pattern.search(line)
       if match:
-        vector_type = match.group(2).lower()     # real or int
-        full_expr   = match.group(4)             # e.g., Flow % pp % n
+        variable_dim  = match.group(1).lower()  # vector or matrix
+        variable_type = match.group(2).lower()  # real or int
+        full_expr     = match.group(4)          # e.g., Flow % pp % n
+        print(" full_expr = ", full_expr, " ", variable_dim)
 
         # Special case: skip scalar(sc) → handled separately
         if 'scalar(' in full_expr.lower():
@@ -37,8 +39,11 @@ for file in files:
         pointer_name = full_expr.replace('%', '_').replace('(', '_').replace(')', '').replace(' ', '').lower()
 
         # Store if not already seen
+        rank = 1
+        if variable_dim == 'matrix':
+          rank = 2
         if pointer_name not in pointers:
-          pointers[pointer_name] = vector_type
+          pointers[pointer_name] = (variable_type, rank)
 
 # Now generate Gpu_Pointers_Mod.f90
 with open("Gpu_Pointers_Mod.aut", "w") as f:
@@ -48,11 +53,14 @@ with open("Gpu_Pointers_Mod.aut", "w") as f:
   f.write('module Gpu_Pointers_Mod\n')
   f.write('  implicit none\n\n')
 
-  for pointer, kind in sorted(pointers.items()):
+  for pointer, (kind, rank) in sorted(pointers.items()):
+    dims = '(:)'
+    if rank == 2:
+      dims = '(:,:)'
     if kind == 'real':
-      f.write(f'  real,    contiguous, pointer :: {pointer}(:)\n')
+      f.write(f'  real,    contiguous, pointer :: {pointer}{dims}\n')
     else:
-      f.write(f'  integer, contiguous, pointer :: {pointer}(:)\n')
+      f.write(f'  integer, contiguous, pointer :: {pointer}{dims}\n')
 
   f.write('\nend module\n')
 
