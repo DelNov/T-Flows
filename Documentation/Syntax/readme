@@ -10,3 +10,18 @@ ln -i -s $PWD/.vim/ $HOME/
 
 or a similar command.  Important is that .vim from your $HOME points
 to the .vim subdirectory here.
+
+
+In order to fine-tune syntax with tflows_syntax.vim and gmsh_syntax.vim,
+place these lines in your .vimrc:
+
+"------------------
+" Fine tune syntax
+"------------------
+" For T-Flows
+source /home/niceno/tflows_syntax.vim
+" For Gmsh
+source /home/niceno/gmsh_syntax.vim
+:set nonu                                                                                                                               54,1          Bot
+
+
