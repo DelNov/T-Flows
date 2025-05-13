@@ -141,7 +141,7 @@
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("C_00",           &
                                scalar_name="C_00", &
-                               scalar_cell=phi)
+                               scalar_cell=phi % n)
 # endif
 
     row = (sc-1)/6 + 1      ! will be 1 (scal. 1-6), 2 (scal. 6-12), etc.
