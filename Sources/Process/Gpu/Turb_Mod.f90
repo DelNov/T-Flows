@@ -22,6 +22,16 @@
   implicit none
 !==============================================================================!
 
+  ! Parameters describing turbulence model choice
+  ! (Prime numbers starting from 30000)
+  integer, parameter :: NO_TURBULENCE_MODEL   = 30011
+  integer, parameter :: LES_SMAGORINSKY       = 30029
+  integer, parameter :: LES_DYNAMIC           = 30047
+  integer, parameter :: LES_WALE              = 30059
+  integer, parameter :: LES_TVM               = 30071
+  integer, parameter :: DES_SPALART           = 30097
+  integer, parameter :: SPALART_ALLMARAS      = 30103
+
   !---------------------------!
   !                           !
   !      Turbulence type      !
@@ -62,7 +72,7 @@
     real, allocatable :: h_w(:)
 
     ! Variable holding the turbulence model; its variant and statistics
-    integer :: model
+    integer :: model = NO_TURBULENCE_MODEL
 
     !--------------------------------!
     !   Turbulence model constants   !
@@ -118,16 +128,6 @@
       procedure :: Update_Turb_On_Host
 
   end type
-
-  ! Parameters describing turbulence model choice
-  ! (Prime numbers starting from 30000)
-  integer, parameter :: NO_TURBULENCE_MODEL   = 30011
-  integer, parameter :: LES_SMAGORINSKY       = 30029
-  integer, parameter :: LES_DYNAMIC           = 30047
-  integer, parameter :: LES_WALE              = 30059
-  integer, parameter :: LES_TVM               = 30071
-  integer, parameter :: DES_SPALART           = 30097
-  integer, parameter :: SPALART_ALLMARAS      = 30103
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !

@@ -14,6 +14,30 @@
   implicit none
 !==============================================================================!
 
+  ! Parameters describing turbulence model choice
+  ! (Prime numbers starting from 30000)
+  integer, parameter :: NO_TURBULENCE_MODEL   = 30011
+  integer, parameter :: DNS                   = 30013
+  integer, parameter :: LES_SMAGORINSKY       = 30029
+  integer, parameter :: LES_DYNAMIC           = 30047
+  integer, parameter :: LES_WALE              = 30059
+  integer, parameter :: LES_TVM               = 30071
+  integer, parameter :: K_EPS                 = 30089
+  integer, parameter :: K_EPS_ZETA_F          = 30091
+  integer, parameter :: DES_SPALART           = 30097
+  integer, parameter :: SPALART_ALLMARAS      = 30103
+  integer, parameter :: HYBRID_LES_RANS       = 30109
+  integer, parameter :: HYBRID_LES_PRANDTL    = 30113
+
+  ! Turbulent heat flux scheme
+  integer, parameter :: SGDH = 30139
+  integer, parameter :: GGDH = 30161
+  integer, parameter :: AFM  = 30169
+
+  ! Switching criteria for hybrid LES/RANS
+  integer, parameter :: SWITCH_DISTANCE = 30181
+  integer, parameter :: SWITCH_VELOCITY = 30187
+
   !---------------------------!
   !                           !
   !      Turbulence type      !
@@ -130,8 +154,7 @@
     real, allocatable :: alpha_u(:)  ! ratio of velocity scales
 
     ! Variable holding the turbulence model; its variant and statistics
-    integer :: model
-    integer :: model_variant   ! STABILIZED or NONE
+    integer :: model = NO_TURBULENCE_MODEL
     integer :: wall_treatment  ! HIGH_RE, LOW_RE, COMPOUND
     logical :: statistics
     integer :: heat_flux_model
@@ -233,30 +256,6 @@
       procedure :: Les
 
   end type
-
-  ! Parameters describing turbulence model choice
-  ! (Prime numbers starting from 30000)
-  integer, parameter :: NO_TURBULENCE_MODEL   = 30011
-  integer, parameter :: DNS                   = 30013
-  integer, parameter :: LES_SMAGORINSKY       = 30029
-  integer, parameter :: LES_DYNAMIC           = 30047
-  integer, parameter :: LES_WALE              = 30059
-  integer, parameter :: LES_TVM               = 30071
-  integer, parameter :: K_EPS                 = 30089
-  integer, parameter :: K_EPS_ZETA_F          = 30091
-  integer, parameter :: DES_SPALART           = 30097
-  integer, parameter :: SPALART_ALLMARAS      = 30103
-  integer, parameter :: HYBRID_LES_RANS       = 30109
-  integer, parameter :: HYBRID_LES_PRANDTL    = 30113
-
-  ! Turbulent heat flux scheme
-  integer, parameter :: SGDH = 30139
-  integer, parameter :: GGDH = 30161
-  integer, parameter :: AFM  = 30169
-
-  ! Switching criteria for hybrid LES/RANS
-  integer, parameter :: SWITCH_DISTANCE = 30181
-  integer, parameter :: SWITCH_VELOCITY = 30187
 
   !-----------------------------------!
   !   Auxiliary turbulent variables   !
