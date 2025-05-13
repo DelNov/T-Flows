@@ -15,11 +15,11 @@
 !------------------------------------------------------------------------------!
   type(Sparse_Con_Type), pointer :: Acon
   type(Sparse_Val_Type), pointer :: Aval
-  type(Grid_Type)                :: Grid  ! computational grid
-  type(Field_Type),       target :: Flow  ! flow field
+  type(Grid_Type)                :: Grid(1)  ! computational grid
+  type(Field_Type),       target :: Flow     ! flow field
   type(Turb_Type), target        :: Turb
-  real,      contiguous, pointer :: b(:), x(:), coef(:)
-  integer                        :: nc, nb, n
+  real,      contiguous, pointer :: b(:), x(:)
+  integer                        :: nc, n
   real                           :: fin_res
   character(len=11)              :: root_control = 'control.004'
 !==============================================================================!
@@ -36,9 +36,10 @@
   call Control % Open_Root_File(root_control)
 
   O_Print '(a)', ' # Creating a grid'
-  call Grid % Load_And_Prepare_For_Processing(1)
+  call Grid(1) % Load_And_Prepare_For_Processing(1)
+  call Grid(1) % Copy_Grid_To_Device()
 
-  nc = Grid % n_cells
+  nc = Grid(1) % n_cells
   O_Print '(a,i12)',    ' # The problem size is: ', nc
   O_Print '(a,es12.3)', ' # Solver tolerace is : ', PICO
 
@@ -52,33 +53,22 @@
 # endif
 
   O_Print '(a)', ' # Creating a field'
-  call Flow % Create_Field(Grid)
+  call Flow % Create_Field(Grid(1))
 
   O_Print '(a)', ' # Reading physical properties'
-  call Read_Control % Physical_Properties(Grid, Flow)
+  call Read_Control % Physical_Properties(Grid(1), Flow)
 
   ! I am not sure when to call this, but this is a good guess
-  call Read_Control % Boundary_Conditions(Grid, Flow, Turb)
+  call Read_Control % Boundary_Conditions(Grid(1), Flow, Turb)
 
   ! Read numerical models from control file (after the memory is allocated)
-  call Read_Control % Numerical_Schemes(Grid, Flow, Turb)
-
-  ! Transfer the necessary grid components to the device
-  call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)
-  call Gpu % Vector_Int_Copy_To_Device(Grid % cells_n_cells)
-  call Gpu % Matrix_Int_Copy_To_Device(Grid % cells_c)
-  call Gpu % Matrix_Int_Copy_To_Device(Grid % cells_f)
-  call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_face)
-  call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_face)
-  call Gpu % Vector_Int_Copy_To_Device(Grid % region % f_cell)
-  call Gpu % Vector_Int_Copy_To_Device(Grid % region % l_cell)
+  call Read_Control % Numerical_Schemes(Grid(1), Flow, Turb)
 
   ! Take the aliases now
   Acon => Flow % Nat % C
   Aval => Flow % Nat % A
   b    => Flow % Nat % b
   x    => Flow % u % n
-  coef => Turb % vis_t
 
   ! Initialize solution (start from 1 not to overwrite boundary conditions)
   x(1:nc) = 0.0
@@ -88,20 +78,23 @@
   call Aval % Copy_Sparse_Val_To_Device()
   call Gpu % Vector_Real_Copy_To_Device(x)
   call Gpu % Vector_Real_Copy_To_Device(b)
-  call Gpu % Vector_Real_Create_On_Device(coef)
 
   ! Allocate vectors related to CG algorithm on the device
   call Flow % Nat % Copy_Native_To_Device()
 
+  ! Allocate CPU memory for working arrays (currently used for saving)
+  call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=0,  n_r_node=0,  &
+                                  n_i_cell= 6,  n_i_face=0,  n_i_node=0)
+  call Work % Create_Work_On_Device()
+
   ! Copy physical properties as well
-  call Gpu % Vector_Real_Copy_To_Device(Flow % viscosity)
-  call Gpu % Vector_Real_Copy_To_Device(Flow % density)
+  call Flow % Copy_Field_To_Device()
 
   !-------------------------------------------------!
   !   Discretize the linear system for conduction   !
   !-------------------------------------------------!
-  call Process % Form_Momentum_Matrix(Grid, Flow, Turb, coef, 1.0)
-  call Process % Insert_Momentum_Bc(Grid, Flow, comp=1)
+  call Process % Form_Momentum_Matrix(Grid(1), Flow, Turb, Flow % viscosity, 1.0)
+  call Process % Insert_Momentum_Bc(Grid(1), Flow, comp=1)
 
   !-----------------------------------------------!
   !   Performing a fake time loop on the device   !
@@ -115,20 +108,10 @@
   call Gpu % Vector_Update_Host(x)
 
   ! Destroy all data on the device, you don't need them anymore
-  call Gpu % Matrix_Int_Destroy_On_Device(Grid % faces_c)
-  call Gpu % Vector_Int_Destroy_On_Device(Grid % cells_n_cells)
-  call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_c)
-  call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_f)
-  call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_face)
-  call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_face)
-  call Gpu % Vector_Int_Destroy_On_Device(Grid % region % f_cell)
-  call Gpu % Vector_Int_Destroy_On_Device(Grid % region % l_cell)
-
   call Acon % Destroy_Sparse_Con_On_Device()
   call Aval % Destroy_Sparse_Val_On_Device()
   call Gpu % Vector_Real_Destroy_On_Device(x)
   call Gpu % Vector_Real_Destroy_On_Device(b)
-  call Gpu % Vector_Real_Destroy_On_Device(coef)
 
   call Flow % Nat % Destroy_Native_On_Device()
 
@@ -136,14 +119,14 @@
   O_Print '(a,es12.3)', ' vector u(1  ):', x(1)
   O_Print '(a,es12.3)', ' vector u(2  ):', x(2)
   O_Print '(a,es12.3)', ' vector u(3  ):', x(3)
-  O_Print '(a,es12.3)', ' vector u(n-2):', x(Grid % n_cells-2)
-  O_Print '(a,es12.3)', ' vector u(n-1):', x(Grid % n_cells-1)
-  O_Print '(a,es12.3)', ' vector u(n  ):', x(Grid % n_cells)
+  O_Print '(a,es12.3)', ' vector u(n-2):', x(Grid(1) % n_cells-2)
+  O_Print '(a,es12.3)', ' vector u(n-1):', x(Grid(1) % n_cells-1)
+  O_Print '(a,es12.3)', ' vector u(n  ):', x(Grid(1) % n_cells)
 
   ! Save results
-  call Grid % Save_Debug_Vtu("result",              &
-                             scalar_name="Result",  &
-                             scalar_cell=x)
+  call Grid(1) % Save_Debug_Vtu("result",              &
+                                scalar_name="Result",  &
+                                scalar_cell=x)
 
   ! End the profiler and the parallel run
   call Profiler % Stop('Test_004')
