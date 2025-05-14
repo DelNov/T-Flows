@@ -188,6 +188,18 @@
     !$tf-acc loop end
   end if
 
+  !-------------------------------------!
+  !                                     !
+  !   Part 1 of the under-relaxation    !
+  !   (Part 2 is in Compute_Variable)   !
+  !                                     !
+  !-------------------------------------!
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present, was independent
+    val(dia(c)) = val(dia(c)) / urf
+  end do
+  !$tf-acc loop end
+
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0
   do c = 1, Grid % n_cells  ! this is for debugging and should be on CPU

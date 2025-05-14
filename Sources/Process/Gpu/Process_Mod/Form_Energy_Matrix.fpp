@@ -204,6 +204,18 @@
     !$tf-acc loop end
   end if
 
+  !------------------------------------!
+  !                                    !
+  !   Part 1 of the under-relaxation   !
+  !   (Part 2 is in Compute_Energy)    !
+  !                                    !
+  !------------------------------------!
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present, was independent
+    val(dia(c)) = val(dia(c)) / urf
+  end do
+  !$tf-acc loop end
+
   call Work % Disconnect_Real_Cell(dens_capa)
 
   call Profiler % Stop('Form_Energy_Matrix')

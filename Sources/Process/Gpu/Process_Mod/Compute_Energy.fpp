@@ -78,12 +78,13 @@
   ! Insert cross diffusion terms (computers gradients as well)
   call Flow % Add_Cross_Diffusion_Term(Grid, Flow % t, cond_eff)
 
-  !------------------------------!
-  !   Perform under-relaxation   !
-  !------------------------------!
+  !---------------------------------------!
+  !     Part 2 of the under-relaxation    !
+  !   (Part 1 is in Form_Energy_Matrix)   !
+  !---------------------------------------!
+
   !$tf-acc loop begin
   do c = Cells_In_Domain()  ! all present
-    val(dia(c)) = val(dia(c)) / urf
     b(c) = b(c) + val(dia(c)) * (1.0 - urf) * Flow % t % n(c)
   end do
   !$tf-acc loop end

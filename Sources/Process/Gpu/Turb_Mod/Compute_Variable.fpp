@@ -76,12 +76,13 @@
     call Turb % Src_Vis_Spalart_Allmaras(Grid, Flow)
   end if
 
-  !------------------------------!
-  !   Perform under-relaxation   !
-  !------------------------------!
+  !-----------------------------------------!
+  !      Part 2 of the under-relaxation     !
+  !   (Part 1 is in Form_Variable_Matrix)   !
+  !-----------------------------------------!
+
   !$tf-acc loop begin
   do c = Cells_In_Domain()  ! all present
-    val(dia(c)) = val(dia(c)) / urf
     b(c) = b(c) + val(dia(c)) * (1.0 - urf) * phi % n(c)
   end do
   !$tf-acc loop end

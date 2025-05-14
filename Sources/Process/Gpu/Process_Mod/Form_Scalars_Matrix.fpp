@@ -181,6 +181,19 @@
     !$tf-acc loop end
   end if
 
+  !------------------------------------!
+  !                                    !
+  !   Part 1 of the under-relaxation   !
+  !   (Part 2 is in Compute_Scalars)   !
+  !                                    !
+  !------------------------------------!
+  !$tf-acc loop begin
+  do c = Cells_In_Domain()  ! all present, was independent
+    val(dia(c)) = val(dia(c)) / urf
+  end do
+  !$tf-acc loop end
+
+
   call Profiler % Stop('Form_Scalars_Matrix')
 
   end subroutine

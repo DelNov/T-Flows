@@ -261,31 +261,57 @@
   !------------------------------------!
   !   Coefficients on the boundaries   !
   !------------------------------------!
-  do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL    .or.  &
-       Grid % region % type(reg) .eq. WALLFL  .or.  &
-       Grid % region % type(reg) .eq. INFLOW) then
+  if(Turb % model .eq. NO_TURBULENCE_MODEL) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL    .or.  &
+         Grid % region % type(reg) .eq. WALLFL  .or.  &
+         Grid % region % type(reg) .eq. INFLOW) then
 
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   visc_eff,  &
-      !$acc   fc,  &
-      !$acc   val,  &
-      !$acc   dia   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)   ! inside cell
-        c2 = grid_faces_c(2,s)   ! boundary cell
-        a12 = visc_eff(c2) * fc(s)
-        val(dia(c1)) = val(dia(c1)) + a12
-      end do
-      !$acc end parallel
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   visc_eff,  &
+        !$acc   fc,  &
+        !$acc   val,  &
+        !$acc   dia   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+          c1 = grid_faces_c(1,s)   ! inside cell
+          a12 = visc_eff(c1) * fc(s)
+          val(dia(c1)) = val(dia(c1)) + a12
+        end do
+        !$acc end parallel
+      end if  ! boundary condition
+    end do    ! regions
+  else        ! turbulence model
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL    .or.  &
+         Grid % region % type(reg) .eq. WALLFL  .or.  &
+         Grid % region % type(reg) .eq. INFLOW) then
 
-    end if
-  end do
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   visc_eff,  &
+        !$acc   fc,  &
+        !$acc   val,  &
+        !$acc   dia   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+          c1 = grid_faces_c(1,s)   ! inside cell
+          c2 = grid_faces_c(2,s)   ! boundary cell
+          a12 = visc_eff(c2) * fc(s)
+          val(dia(c1)) = val(dia(c1)) + a12
+        end do
+        !$acc end parallel
+
+      end if  ! boundary condition
+    end do    ! region
+  end if      ! turbulence model
 
   !------------------------------------!
   !                                    !
@@ -328,6 +354,24 @@
 
   ! This call is needed, the above loop goes through inside cells only
   call Grid % Exchange_Inside_Cells_Real(Flow % v_m)
+
+  !-------------------------------------!
+  !                                     !
+  !   Part 1 of the under-relaxation    !
+  !   (Part 2 is in Compute_Momentum)   !
+  !                                     !
+  !-------------------------------------!
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   val,  &
+  !$acc   dia   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
+    val(dia(c)) = val(dia(c)) / urf
+  end do
+  !$acc end parallel
 
 # if T_FLOWS_DEBUG == 1
   allocate(temp(Grid % n_cells));  temp(:) = 0.0

@@ -88,12 +88,12 @@
 
     call User_Mod_Source(Grid, Flow, Turb, phi, sc)
 
-    !------------------------------!
-    !   Perform under-relaxation   !
-    !------------------------------!
+  !---------------------------------------!
+  !     Part 2 of the under-relaxation    !
+  !   (Part 1 is in Form_Energy_Matrix)   !
+  !---------------------------------------!
     !$tf-acc loop begin
     do c = Cells_In_Domain()  ! all present
-      val(dia(c)) = val(dia(c)) / urf
       b(c) = b(c) + val(dia(c)) * (1.0 - urf) * phi % n(c)
     end do
     !$tf-acc loop end

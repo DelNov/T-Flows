@@ -284,6 +284,24 @@
     !$acc end parallel
   end if
 
+  !------------------------------------!
+  !                                    !
+  !   Part 1 of the under-relaxation   !
+  !   (Part 2 is in Compute_Energy)    !
+  !                                    !
+  !------------------------------------!
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   val,  &
+  !$acc   dia   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present, was independent
+    val(dia(c)) = val(dia(c)) / urf
+  end do
+  !$acc end parallel
+
   call Work % Disconnect_Real_Cell(dens_capa)
 
   call Profiler % Stop('Form_Energy_Matrix')
