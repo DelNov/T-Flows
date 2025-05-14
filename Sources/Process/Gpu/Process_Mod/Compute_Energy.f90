@@ -43,7 +43,7 @@
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
   val => Flow % Nat % A % val
-  dia => Flow % Nat % C % dia
+  dia => Flow % Nat % A % dia
   b   => Flow % Nat % b
 
   ! Tolerances and under-relaxations are the same for all components

@@ -20,7 +20,7 @@
 
   ! Take some aliases
   b    => Flow % Nat % b
-  fc   => Flow % Nat % C % fc
+  fc   => Flow % Nat % A % fc
   diff => Flow % diffusivity
   phi  => Flow % scalar(sc)
 

@@ -18,7 +18,7 @@
 
   ! Take some aliases
   b    => Flow % Nat % b
-  fc   => Flow % Nat % C % fc
+  fc   => Flow % Nat % A % fc
 
   !-----------------------------------------------------------------------!
   !   Handle boundary conditions on the right-hand side (in the source)   !

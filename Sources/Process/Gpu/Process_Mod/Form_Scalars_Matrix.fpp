@@ -32,11 +32,11 @@
   !   Take some aliases   !
   !-----------------------!
   val => Flow % Nat % A % val
-  dia => Flow % Nat % C % dia
-  pos => Flow % Nat % C % pos
-  fc  => Flow % Nat % C % fc
+  dia => Flow % Nat % A % dia
+  pos => Flow % Nat % A % pos
+  fc  => Flow % Nat % A % fc
   phi => Flow % scalar(sc)
-  nz  =  Flow % Nat % C % nonzeros
+  nz  =  Flow % Nat % A % nonzeros
 
   Assert(urf > 0.0)
 

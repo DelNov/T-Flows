@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Mat_X_Vec(Lin, n, c, Acon, Aval, b)
+  subroutine Mat_X_Vec(Lin, n, c, A, b)
 !------------------------------------------------------------------------------!
 !>  Front-end for calculation of sparse-matrix vector multiplication.
 !------------------------------------------------------------------------------!
@@ -7,12 +7,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Linalg_Type)            :: Lin   !! parent class
-  integer, intent(in)           :: n     !! size of vectors
-  real                          :: c(n)  !! result vector
-  type(Sparse_Con_Type), target :: Acon  !! operand connectivity matrix
-  type(Sparse_Val_Type), target :: Aval  !! operand values matrix
-  real                          :: b(n)  !! operand vector
+  class(Linalg_Type)        :: Lin   !! parent class
+  integer, intent(in)       :: n     !! size of vectors
+  real                      :: c(n)  !! result vector
+  type(Sparse_Type), target :: A     !! operand matrix
+  real                      :: b(n)  !! operand vector
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   real,    pointer         :: a_val(:)
@@ -22,11 +21,11 @@
 !==============================================================================!
 
   ! Take aliases
-  Grid  => Acon % pnt_grid
-  nz    =  Acon % nonzeros
-  a_col => Acon % col
-  a_row => Acon % row
-  a_val => Aval % val
+  Grid  => A % pnt_grid
+  nz    =  A % nonzeros
+  a_col => A % col
+  a_row => A % row
+  a_val => A % val
 
   ! Refresh the operand vector over processor buffers ...
   call Grid % Exchange_Inside_Cells_Real(b(1:n))

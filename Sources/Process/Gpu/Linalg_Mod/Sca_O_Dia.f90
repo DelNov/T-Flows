@@ -3,7 +3,7 @@
 !==============================================================================!
 
 !==============================================================================!
-  subroutine Sca_O_Dia(Lin, n, b, s, Acon, Aval)
+  subroutine Sca_O_Dia(Lin, n, b, s, A)
 !------------------------------------------------------------------------------!
 !>  Front-end for calculation scalar over matrix diagonal operation.
 !------------------------------------------------------------------------------!
@@ -11,12 +11,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Linalg_Type)            :: Lin   !! parent class
-  integer, intent(in)           :: n     !! size of vectors
-  real                          :: b(n)  !! result vector
-  real                          :: s     !! scalar
-  type(Sparse_Con_Type), target :: Acon  !! operand connectivity matrix
-  type(Sparse_Val_Type), target :: Aval  !! operand values matrix
+  class(Linalg_Type)        :: Lin   !! parent class
+  integer, intent(in)       :: n     !! size of vectors
+  real                      :: b(n)  !! result vector
+  real                      :: s     !! scalar
+  type(Sparse_Type), target :: A     !! operand matrix
 !-----------------------------------[Locals]-----------------------------------!
   integer, pointer :: a_dia(:)
   real,    pointer :: a_val(:)
@@ -24,9 +23,9 @@
 !==============================================================================!
 
   ! Take aliases
-  nz    =  Acon % nonzeros
-  a_dia => Acon % dia
-  a_val => Aval % val
+  nz    =  A % nonzeros
+  a_dia => A % dia
+  a_val => A % val
 
   !$acc parallel loop independent  &
   !$acc present(  &

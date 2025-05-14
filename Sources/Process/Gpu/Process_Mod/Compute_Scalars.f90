@@ -30,7 +30,7 @@
   !   First take some aliases   !
   !-----------------------------!
   val => Flow % Nat % A % val
-  dia => Flow % Nat % C % dia
+  dia => Flow % Nat % A % dia
   b   => Flow % Nat % b
 
   !--------------------------------!

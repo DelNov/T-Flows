@@ -22,8 +22,8 @@
   !   First take some aliases, which is quite elaborate here   !
   !------------------------------------------------------------!
   val => Flow % Nat % A % val
-  dia => Flow % Nat % C % dia
-  pos => Flow % Nat % C % pos
+  dia => Flow % Nat % A % dia
+  pos => Flow % Nat % A % pos
   b   => Flow % Nat % b
 
   call Grad_Variable(Flow, Grid, Turb % vis)

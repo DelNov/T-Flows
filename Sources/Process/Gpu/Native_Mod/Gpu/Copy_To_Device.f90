@@ -15,8 +15,7 @@
 !==============================================================================!
 
   ! Copy matrix and the right hand side to the device
-  call Nat % C % Copy_Sparse_Con_To_Device()
-  call Nat % A % Copy_Sparse_Val_To_Device()
+  call Nat % A % Copy_Sparse_To_Device()
   call Gpu % Vector_Real_Copy_To_Device(Nat % b)
 
   ! Create (allocate) memory for helping vectors on device

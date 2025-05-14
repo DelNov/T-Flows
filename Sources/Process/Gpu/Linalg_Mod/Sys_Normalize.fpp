@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sys_Normalize(Lin, n, fn, Acon, Aval, b)
+  subroutine Sys_Normalize(Lin, n, fn, A, b)
 !------------------------------------------------------------------------------!
 !>  Front-end for scaling (normalizing) a linear system of equations
 !------------------------------------------------------------------------------!
@@ -7,12 +7,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Linalg_Type)            :: Lin   !! parent class
-  integer,  intent(in)          :: n     !! size of vectors
-  real,     intent(out)         :: fn    !! factor of normalization
-  type(Sparse_Con_Type), target :: Acon  !! operand connectivity matrix
-  type(Sparse_Val_Type), target :: Aval  !! operand values matrix
-  real                          :: b(n)  !! right hand side vector
+  class(Linalg_Type)        :: Lin   !! parent class
+  integer,  intent(in)      :: n     !! size of vectors
+  real,     intent(out)     :: fn    !! factor of normalization
+  type(Sparse_Type), target :: A     !! operand matrix
+  real                      :: b(n)  !! right hand side vector
 !-----------------------------------[Locals]-----------------------------------!
   real,    pointer :: a_val(:), d_inv(:)
   integer, pointer :: a_dia(:)
@@ -21,10 +20,10 @@
 !==============================================================================!
 
   ! Take aliases
-  nz    =  Acon % nonzeros
-  a_dia => Acon % dia
-  a_val => Aval % val
-  d_inv => Aval % d_inv
+  nz    =  A % nonzeros
+  a_dia => A % dia
+  a_val => A % val
+  d_inv => A % d_inv
 
   !-------------------------------------!
   !   Sum all the diagonal entries up   !

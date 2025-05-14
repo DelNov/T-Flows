@@ -19,16 +19,13 @@
 !   Sparse type                                                                !
 !                                                                              !
 !   Description:                                                               !
-!   - The Sparse_Con_Type and Sparse_Val_Type are  custom data type for        !
-!     handling sparse matrices in T-Flows.  They uses the compressed row       !
-!     storage (CRS) format, an efficient method for storing sparse matrices.   !
-!     (See: http://netlib.org/linalg/html_templates/node91.html)               !
+!   - The Sparse_Type is a custom data type for handling sparse matrices       !
+!     in T-Flows.  It uses the compressed row storage (CRS) format, an         !
+!     efficient method for storing sparse matrices.  For more details, see:    !
+!     http://netlib.org/linalg/html_templates/node91.html                      !
 !                                                                              !
-!   - The Sparse_Con_Type holds only the fields describing the connectivity    !
-!     in a matrix, and Sparse_Val_Type stores the values.  Clearly, the        !
-!     latter is variable dependent (it will not be the same for momentum and   !
-!     pressure, for example, but the former will.  Storing them separatelly    !
-!     leads to memory savings, particularly important on GPUs.                 !
+!   - The Sparse_Type holds the fields describing the connectivity in a        !
+!     matrix, as well as the values.                                           !
 !                                                                              !
 !   Compressed Row Format:                                                     !
 !   - In CRS, a matrix is represented by three arrays: 'val' for non-zero      !
@@ -63,16 +60,17 @@
 !                                                                              !
 !==============================================================================!
 
-  !------------------------------!
-  !                              !
-  !   Sparse connectivity type   !
-  !                              !
-  !------------------------------!
-  type Sparse_Con_Type
+  !-----------------!
+  !                 !
+  !   Sparse type   !
+  !                 !
+  !-----------------!
+  type Sparse_Type
   !> A type which encapsulates matrix connectivity in CRS format.
 
     type(Grid_Type), pointer :: pnt_grid  !! pointer to grid
 
+    ! These entries used to belong to Sparse_Con_Type
     integer              :: nonzeros  !! number of nonzero entries
     real,    allocatable :: fc (:)    !! bare matrix entry for face
     integer, allocatable :: col(:)    !! column positions
@@ -80,46 +78,23 @@
     integer, allocatable :: dia(:)    !! diagonal positions
     integer, allocatable :: pos(:,:)  !! face-based position of the matrix
 
-    contains
-      procedure :: Create_Sparse_Con
-
-      ! Procedures to copy/destroy sparse matrix connectivity to/on device
-      procedure :: Copy_Sparse_Con_To_Device
-      procedure :: Destroy_Sparse_Con_On_Device
-
-  end type
-
-  !------------------------!
-  !                        !
-  !   Sparse values type   !
-  !                        !
-  !------------------------!
-  type Sparse_Val_Type
-  !> A type which encapsulates matrix values in CRS format.
-
-    type(Grid_Type), pointer :: pnt_grid  !! pointer to grid
-
+    ! These entries used to belong to Sparse_Val_Type
     real, allocatable :: val(:)    !! value
     real, allocatable :: d_inv(:)  !! inverse diagonal for preconditioner
 
     contains
-      procedure :: Create_Sparse_Val
+      procedure :: Create_Sparse
 
-      ! Procedures to copy/destroy sparse matrix values to/on device
-      procedure :: Copy_Sparse_Val_To_Device
-      procedure :: Destroy_Sparse_Val_On_Device
+      ! Procedures to copy/destroy sparse matrix connectivity to/on device
+      procedure :: Copy_Sparse_To_Device
+      procedure :: Destroy_Sparse_On_Device
 
   end type
 
   contains
-#   include "Sparse_Mod/Create_Sparse_Con.f90"
-#   include "Sparse_Mod/Create_Sparse_Val.f90"
-
-    ! Procedures to copy/destroy sparse matrices to/on device
-#   include "Sparse_Mod/Gpu/Copy_Sparse_Con_To_Device.f90"
-#   include "Sparse_Mod/Gpu/Destroy_Sparse_Con_On_Device.f90"
-#   include "Sparse_Mod/Gpu/Copy_Sparse_Val_To_Device.f90"
-#   include "Sparse_Mod/Gpu/Destroy_Sparse_Val_On_Device.f90"
+#   include "Sparse_Mod/Create_Sparse.f90"
+#   include "Sparse_Mod/Gpu/Copy_Sparse_To_Device.f90"
+#   include "Sparse_Mod/Gpu/Destroy_Sparse_On_Device.f90"
 
 
   end module
