@@ -13,8 +13,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  type(Sparse_Con_Type), pointer :: Acon
-  type(Sparse_Val_Type), pointer :: Aval
+  type(Sparse_Type),     pointer :: A
   type(Grid_Type)                :: Grid(1)  ! computational grid
   type(Field_Type),       target :: Flow     ! flow field
   type(Turb_Type), target        :: Turb
@@ -65,17 +64,15 @@
   call Read_Control % Numerical_Schemes(Grid(1), Flow, Turb)
 
   ! Take the aliases now
-  Acon => Flow % Nat % C
-  Aval => Flow % Nat % A
-  b    => Flow % Nat % b
-  x    => Flow % u % n
+  A => Flow % Nat % A
+  b => Flow % Nat % b
+  x => Flow % u % n
 
   ! Initialize solution (start from 1 not to overwrite boundary conditions)
   x(1:nc) = 0.0
 
   ! Copy components of the linear system to the device
-  call Acon % Copy_Sparse_Con_To_Device()
-  call Aval % Copy_Sparse_Val_To_Device()
+  call A % Copy_Sparse_To_Device()
   call Gpu % Vector_Real_Copy_To_Device(x)
   call Gpu % Vector_Real_Copy_To_Device(b)
 
@@ -108,8 +105,7 @@
   call Gpu % Vector_Update_Host(x)
 
   ! Destroy all data on the device, you don't need them anymore
-  call Acon % Destroy_Sparse_Con_On_Device()
-  call Aval % Destroy_Sparse_Val_On_Device()
+  call A % Destroy_Sparse_On_Device()
   call Gpu % Vector_Real_Destroy_On_Device(x)
   call Gpu % Vector_Real_Destroy_On_Device(b)
 

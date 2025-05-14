@@ -18,11 +18,8 @@
 
     type(Grid_Type), pointer :: pnt_grid  !! pointer to the numerical grid
 
-    ! Connectivity matrix
-    type(Sparse_Con_Type) :: C  !! connectivity matrix for all variables
-
-    ! Matrix for all variables.  (It used to be array, but I abandoned it)
-    type(Sparse_Val_Type) :: A  !! system value matrices
+    ! Matrix for all variables.
+    type(Sparse_Type) :: A  !! system value matrices
 
     ! Right-hand side vector for all variables
     real, allocatable :: b(:)

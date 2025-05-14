@@ -18,22 +18,20 @@
   real,    intent(in)    :: tol      !! target solver tolerance
   real,    intent(out)   :: fin_res  !! achieved residual
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type),       pointer :: Grid
-  type(Sparse_Con_Type), pointer :: Acon
-  type(Sparse_Val_Type), pointer :: Aval
-  real, contiguous,      pointer :: b(:)
-  real,     contiguous,  pointer :: r(:), p(:), q(:), d_inv(:), r_d_inv(:)
-  real                           :: fn, alpha, beta, pq, rho, rho_old, res
-  integer                        :: nt, ni, iter
+  type(Grid_Type),   pointer :: Grid
+  type(Sparse_Type), pointer :: A
+  real, contiguous,  pointer :: b(:)
+  real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:), r_d_inv(:)
+  real                       :: fn, alpha, beta, pq, rho, rho_old, res
+  integer                    :: nt, ni, iter
 !==============================================================================!
 
   call Work % Connect_Real_Cell(p, q, r, r_d_inv)
 
   ! Take aliases
   Grid  => Nat % pnt_grid
-  Acon  => Nat % C
-  Aval  => Nat % A
-  d_inv => Aval % d_inv
+  A     => Nat % A
+  d_inv => A % d_inv
   b     => Nat % b
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
@@ -41,19 +39,19 @@
   !---------------------------------!
   !   Normalize the linear system   !
   !---------------------------------!
-  call Linalg % Sys_Normalize(ni, fn, Acon, Aval, b)
+  call Linalg % Sys_Normalize(ni, fn, A, b)
 
   !---------------------!
   !   Preconditioning   !
   !---------------------!
 
   ! Scalar over diagonal (to take the mystery out: computes d_inv)
-  call Linalg % Sca_O_Dia(ni, d_inv, 1.0, Acon, Aval)
+  call Linalg % Sca_O_Dia(ni, d_inv, 1.0, A)
 
   !----------------!
   !   r = b - Ax   !     =-->  (q used for temporary storing Ax)
   !----------------!
-  call Linalg % Mat_X_Vec(nt, q(1:ni), Acon, Aval, x(1:nt))  ! q = A * x
+  call Linalg % Mat_X_Vec(nt, q(1:ni), A, x(1:nt))  ! q = A * x
   call Linalg % Vec_P_Sca_X_Vec(ni, r(1:ni), b(1:ni), -1.0, q(1:ni))
 
   ! Check first residual
@@ -91,7 +89,7 @@
     !------------!
     !   q = Ap   !
     !------------!
-    call Linalg % Mat_X_Vec(nt, q(1:ni), Acon, Aval, p(1:nt))
+    call Linalg % Mat_X_Vec(nt, q(1:ni), A, p(1:nt))
 
     !---------------------------!
     !   alfa =  rho / (p * q)   !
@@ -156,7 +154,7 @@
   !   Restore the linear system   !
   !-------------------------------!
 2 continue
-  call Linalg % Sys_Restore(ni, fn, Acon, Aval, b)
+  call Linalg % Sys_Restore(ni, fn, A, b)
 
   call Work % Disconnect_Real_Cell(p, q, r, r_d_inv)
 

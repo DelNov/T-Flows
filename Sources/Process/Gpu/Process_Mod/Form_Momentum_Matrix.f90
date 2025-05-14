@@ -35,10 +35,10 @@
   !   Take some aliases   !
   !-----------------------!
   val => Flow % Nat % A % val
-  dia => Flow % Nat % C % dia
-  pos => Flow % Nat % C % pos
-  fc  => Flow % Nat % C % fc
-  nz  =  Flow % Nat % C % nonzeros
+  dia => Flow % Nat % A % dia
+  pos => Flow % Nat % A % pos
+  fc  => Flow % Nat % A % fc
+  nz  =  Flow % Nat % A % nonzeros
 
   Assert(urf > 0.0)
 

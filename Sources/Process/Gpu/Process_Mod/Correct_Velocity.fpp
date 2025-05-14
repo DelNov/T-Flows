@@ -31,7 +31,7 @@
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
   b    => Flow % Nat % b
-  fc   => Flow % Nat % C % fc
+  fc   => Flow % Nat % A % fc
   dens => Flow % density
   visc => Flow % viscosity
 

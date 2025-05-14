@@ -14,15 +14,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  type(Sparse_Con_Type), pointer :: Acon
-  type(Sparse_Val_Type), pointer :: Aval
-  real, allocatable              :: b(:), c(:)
-  type(Grid_Type)                :: Grid
-  type(Field_Type),       target :: Flow            ! flow field
-  type(Turb_Type)                :: Turb
-  integer,             parameter :: N_STEPS = 1200  ! spend some time on device
-  integer                        :: nc, nb, ni, step
-  character(len=11)              :: root_control = 'control.001'
+  type(Sparse_Type),  pointer :: A
+  real, allocatable           :: b(:), c(:)
+  type(Grid_Type)             :: Grid
+  type(Field_Type),    target :: Flow            ! flow field
+  type(Turb_Type)             :: Turb
+  integer,          parameter :: N_STEPS = 1200  ! spend some time on device
+  integer                     :: nc, nb, ni, step
+  character(len=11)           :: root_control = 'control.001'
 !==============================================================================!
 
   ! Start the parallel run and the profiler
@@ -62,8 +61,7 @@
   call Read_Control % Physical_Properties(Grid, Flow)
 
   ! Take the alias now
-  Acon => Flow % Nat % C
-  Aval => Flow % Nat % A
+  A => Flow % Nat % A
 
   allocate(b(nc))
   allocate(c(nc))
@@ -74,8 +72,7 @@
 
   ! Copy operand matrix and vector to the device ...
   ! ... and reserve memory for result vector on device
-  call Acon % Copy_Sparse_Con_To_Device()
-  call Aval % Copy_Sparse_Val_To_Device()
+  call A % Copy_Sparse_To_Device()
   call Gpu % Vector_Real_Copy_To_Device(b)
   call Gpu % Vector_Real_Create_On_Device(c)
 
@@ -88,7 +85,7 @@
   O_Print '(a,i6,a)', ' # Performing ', N_STEPS, ' sparse-matrix vector products'
   call Profiler % Start('Useful_Work')
   do step = 1, N_STEPS
-    call Linalg % Mat_X_Vec(ni, c(1:nc), Acon, Aval, b(1:nc))
+    call Linalg % Mat_X_Vec(ni, c(1:nc), A, b(1:nc))
   end do
   call Profiler % Stop('Useful_Work')
 
@@ -101,8 +98,7 @@
   call Gpu % Vector_Update_Host(c)
 
   ! Destroy data on the device, you don't need them anymore
-  call Acon % Destroy_Sparse_Con_On_Device()
-  call Aval % Destroy_Sparse_Val_On_Device()
+  call A % Destroy_Sparse_On_Device()
   call Gpu % Vector_Real_Destroy_On_Device(b)
   call Gpu % Vector_Real_Destroy_On_Device(c)
 

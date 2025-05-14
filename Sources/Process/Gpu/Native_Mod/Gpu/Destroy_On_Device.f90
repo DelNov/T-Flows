@@ -15,8 +15,7 @@
 !==============================================================================!
 
   ! Copy matrix and the right hand side to the device
-  call Nat % C % Destroy_Sparse_Con_On_Device()
-  call Nat % A % Destroy_Sparse_Val_On_Device()
+  call Nat % A % Destroy_Sparse_On_Device()
   call Gpu % Vector_Real_Destroy_On_Device(Nat % b)
 
   ! Create (allocate) memory for helping vectors on device

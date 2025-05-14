@@ -24,7 +24,7 @@
 
   ! Take some aliases
   b  => Flow % Nat % b
-  fc => Flow % Nat % C % fc
+  fc => Flow % Nat % A % fc
 
   !--------------------------------------------!
   !   Compute gradient of the variable first   !
