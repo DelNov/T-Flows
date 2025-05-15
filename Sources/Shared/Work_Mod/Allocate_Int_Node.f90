@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Allocate_Int_Node(Work, Grid, n)
+  subroutine Allocate_Int_Node(Work, r)
 !------------------------------------------------------------------------------!
 !>  Allocates memory for integer-typed working arrays associated with nodes
 !>  in the Work object.
@@ -7,24 +7,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Work_Type) :: Work     !! parent; the singleton Work object
-  type(Grid_Type)  :: Grid(:)  !! grids on which the Work will be used
-  integer          :: n        !! number of integer node arrays
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: nn, i
+  integer          :: r        !! number of integer node arrays
 !==============================================================================!
 
-  if(n .eq. 0) return
+  if(r .eq. 0) return
 
-  ! Get number of nodes
-  nn = maxval(Grid(1:size(Grid)) % n_nodes)
+  allocate(Work % i_node(r) % array(1 : Work % max_nn))
+  Work % i_node(r) % array(:) = 0
 
-  allocate(Work % i_node(n))
-
-  do i = 1, n
-    allocate(Work % i_node(i) % array(1:nn))
-    Work % i_node(i) % array(:) = 0
-  end do
-
-  Work % last_i_node = 0
+  call Gpu % Vector_Int_Create_On_Device(Work % i_node(r) % array)
 
   end subroutine

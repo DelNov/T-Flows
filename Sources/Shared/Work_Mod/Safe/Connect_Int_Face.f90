@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Connect_Int_Face(Work,                                    &
-                              a01, a02, a03, a04, a05, a06, a07, a08,  &
-                              a09, a10, a11, a12, a13, a14, a15, a16)
+  subroutine Safe_Connect_Int_Face(Work,                                    &
+                                   a01, a02, a03, a04, a05, a06, a07, a08,  &
+                                   a09, a10, a11, a12, a13, a14, a15, a16)
 !------------------------------------------------------------------------------!
 !>  Connects the provided integer pointers to the allocated integer face
 !>  arrays, effectively "borrowing" the space for temporary use.  Once the
@@ -20,17 +20,19 @@
     !! additional integer pointer
 !==============================================================================!
 
-  Assert(Work % allocated)
-
   call Profiler % Start('Work_Mod')
 
   Work % last_i_face = Work % last_i_face + 1
+  if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+    call Work % Allocate_Int_Face(Work % last_i_face)
   Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
   a01 => Work % i_face(Work % last_i_face) % array
   a01(:) = 0
 
   if(present(a02)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a02 => Work % i_face(Work % last_i_face) % array
     a02(:) = 0
@@ -41,6 +43,8 @@
 
   if(present(a03)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a03 => Work % i_face(Work % last_i_face) % array
     a03(:) = 0
@@ -51,6 +55,8 @@
 
   if(present(a04)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a04 => Work % i_face(Work % last_i_face) % array
     a04(:) = 0
@@ -61,6 +67,8 @@
 
   if(present(a05)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a05 => Work % i_face(Work % last_i_face) % array
     a05(:) = 0
@@ -71,6 +79,8 @@
 
   if(present(a06)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a06 => Work % i_face(Work % last_i_face) % array
     a06(:) = 0
@@ -81,6 +91,8 @@
 
   if(present(a07)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a07 => Work % i_face(Work % last_i_face) % array
     a07(:) = 0
@@ -91,6 +103,8 @@
 
   if(present(a08)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a08 => Work % i_face(Work % last_i_face) % array
     a08(:) = 0
@@ -101,6 +115,8 @@
 
   if(present(a09)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a09 => Work % i_face(Work % last_i_face) % array
     a09(:) = 0
@@ -111,6 +127,8 @@
 
   if(present(a10)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a10 => Work % i_face(Work % last_i_face) % array
     a10(:) = 0
@@ -121,6 +139,8 @@
 
   if(present(a11)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a11 => Work % i_face(Work % last_i_face) % array
     a11(:) = 0
@@ -131,6 +151,8 @@
 
   if(present(a12)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a12 => Work % i_face(Work % last_i_face) % array
     a12(:) = 0
@@ -141,6 +163,8 @@
 
   if(present(a13)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a13 => Work % i_face(Work % last_i_face) % array
     a13(:) = 0
@@ -151,6 +175,8 @@
 
   if(present(a14)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a14 => Work % i_face(Work % last_i_face) % array
     a14(:) = 0
@@ -161,6 +187,8 @@
 
   if(present(a15)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a15 => Work % i_face(Work % last_i_face) % array
     a15(:) = 0
@@ -171,6 +199,8 @@
 
   if(present(a16)) then
     Work % last_i_face = Work % last_i_face + 1
+    if(.not. allocated(Work % i_face(Work % last_i_face) % array))  &
+      call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a16 => Work % i_face(Work % last_i_face) % array
     a16(:) = 0

@@ -1,8 +1,4 @@
 #include "../Shared/Assert.h90"
-#include "../Shared/Macros.h90"
-#include "../Shared/Unused.h90"
-
-#define CHECK_USAGE 1
 
 !==============================================================================!
   module Work_Mod
@@ -18,6 +14,8 @@
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
+
+  integer, parameter :: MAX_WORK_ARRAYS = 128
 
   !---------------------!
   !  Real arrays type   !
@@ -62,8 +60,13 @@
     integer, private :: last_i_face  !! pointer to last used integer face-array
     integer, private :: last_i_node  !! pointer to last used integer node-array
 
+    ! Maximum number of cells, boundary cells, faces and nodes over all grids
+    integer, private :: max_nc
+    integer, private :: max_nb
+    integer, private :: max_nf
+    integer, private :: max_nn
+
     ! Maximum number of used arrays
-#ifdef CHECK_USAGE
     integer, private :: max_r_cell = 0  !! number of real cell-arrays used
     integer, private :: max_r_face = 0  !! number of real face-arrays used
     integer, private :: max_r_node = 0  !! number of real node-arrays used
@@ -71,18 +74,6 @@
     integer, private :: max_i_cell = 0  !! number of integer cell-arrays used
     integer, private :: max_i_face = 0  !! number of integer face-arrays used
     integer, private :: max_i_node = 0  !! number of integer node-arrays used
-#endif
-
-    ! Requested number of used arrays
-    integer, private :: req_r_cell = 0  !! number of requested real cell-arrays
-    integer, private :: req_r_face = 0  !! number of requested real face-arrays
-    integer, private :: req_r_node = 0  !! number of requested real node-arrays
-
-    integer, private :: req_i_cell = 0  !! number of requested int. cell-arrays
-    integer, private :: req_i_face = 0  !! number of requested int. face-arrays
-    integer, private :: req_i_node = 0  !! number of requested int. node-arrays
-
-    logical :: allocated = .false.
 
     contains
       procedure, private :: Allocate_Int_Cell
@@ -98,6 +89,18 @@
       procedure          :: Connect_Real_Cell
       procedure          :: Connect_Real_Face
       procedure          :: Connect_Real_Node
+      procedure          :: Safe_Connect_Int_Cell
+      procedure          :: Safe_Connect_Int_Face
+      procedure          :: Safe_Connect_Int_Node
+      procedure          :: Safe_Connect_Real_Cell
+      procedure          :: Safe_Connect_Real_Face
+      procedure          :: Safe_Connect_Real_Node
+      procedure          :: Unsafe_Connect_Int_Cell
+      procedure          :: Unsafe_Connect_Int_Face
+      procedure          :: Unsafe_Connect_Int_Node
+      procedure          :: Unsafe_Connect_Real_Cell
+      procedure          :: Unsafe_Connect_Real_Face
+      procedure          :: Unsafe_Connect_Real_Node
       procedure          :: Disconnect_Int_Cell
       procedure          :: Disconnect_Int_Face
       procedure          :: Disconnect_Int_Node
@@ -105,19 +108,6 @@
       procedure          :: Disconnect_Real_Face
       procedure          :: Disconnect_Real_Node
       procedure          :: Finalize_Work
-
-      ! Functions to access private data members
-      procedure :: Allocated_Real_Cell_Arrays
-      procedure :: Allocated_Real_Face_Arrays
-      procedure :: Allocated_Real_Node_Arrays
-      procedure :: Allocated_Int_Cell_Arrays
-      procedure :: Allocated_Int_Face_Arrays
-      procedure :: Allocated_Int_Node_Arrays
-
-      ! Procedures to create working arrays to device
-      ! (No need to copy them, they are temporrary by nature)
-      procedure :: Create_Work_On_Device
-      procedure :: Destroy_Work_On_Device
 
   end type
 
@@ -134,73 +124,30 @@
 #   include "Work_Mod/Allocate_Real_Face.f90"
 #   include "Work_Mod/Allocate_Real_Node.f90"
 #   include "Work_Mod/Allocate_Work.f90"
-#ifdef CHECK_USAGE
-#   include "Work_Mod/Check_Usage/Connect_Int_Cell.f90"
-#   include "Work_Mod/Check_Usage/Connect_Int_Face.f90"
-#   include "Work_Mod/Check_Usage/Connect_Int_Node.f90"
-#   include "Work_Mod/Check_Usage/Connect_Real_Cell.f90"
-#   include "Work_Mod/Check_Usage/Connect_Real_Face.f90"
-#   include "Work_Mod/Check_Usage/Connect_Real_Node.f90"
-#   include "Work_Mod/Check_Usage/Disconnect_Int_Cell.f90"
-#   include "Work_Mod/Check_Usage/Disconnect_Int_Face.f90"
-#   include "Work_Mod/Check_Usage/Disconnect_Int_Node.f90"
-#   include "Work_Mod/Check_Usage/Disconnect_Real_Cell.f90"
-#   include "Work_Mod/Check_Usage/Disconnect_Real_Face.f90"
-#   include "Work_Mod/Check_Usage/Disconnect_Real_Node.f90"
-#   include "Work_Mod/Check_Usage/Finalize_Work.f90"
-#else
-#   include "Work_Mod/No_Checking/Connect_Int_Cell.f90"
-#   include "Work_Mod/No_Checking/Connect_Int_Face.f90"
-#   include "Work_Mod/No_Checking/Connect_Int_Node.f90"
-#   include "Work_Mod/No_Checking/Connect_Real_Cell.f90"
-#   include "Work_Mod/No_Checking/Connect_Real_Face.f90"
-#   include "Work_Mod/No_Checking/Connect_Real_Node.f90"
-#   include "Work_Mod/No_Checking/Disconnect_Int_Cell.f90"
-#   include "Work_Mod/No_Checking/Disconnect_Int_Face.f90"
-#   include "Work_Mod/No_Checking/Disconnect_Int_Node.f90"
-#   include "Work_Mod/No_Checking/Disconnect_Real_Cell.f90"
-#   include "Work_Mod/No_Checking/Disconnect_Real_Face.f90"
-#   include "Work_Mod/No_Checking/Disconnect_Real_Node.f90"
-#   include "Work_Mod/No_Checking/Finalize_Work.f90"
-#endif
-
-    ! Procedures to create working arrays to device
-#   include "Work_Mod/Gpu/Create_On_Device.f90"
-#   include "Work_Mod/Gpu/Destroy_On_Device.f90"
-
-    !-------------------------------------------------------------!
-    !   Small functions to allow access to private data members   !
-    !    (There is really no need to describe them one by one)    !
-    !-------------------------------------------------------------!
-
-    integer function Allocated_Real_Cell_Arrays(Work)
-      class(Work_Type) :: Work
-      Allocated_Real_Cell_Arrays = Work % req_r_cell
-    end function
-
-    integer function Allocated_Real_Face_Arrays(Work)
-      class(Work_Type) :: Work
-      Allocated_Real_Face_Arrays = Work % req_r_face
-    end function
-
-    integer function Allocated_Real_Node_Arrays(Work)
-      class(Work_Type) :: Work
-      Allocated_Real_Node_Arrays = Work % req_r_node
-    end function
-
-    integer function Allocated_Int_Cell_Arrays(Work)
-      class(Work_Type) :: Work
-      Allocated_Int_Cell_Arrays = Work % req_i_cell
-    end function
-
-    integer function Allocated_Int_Face_Arrays(Work)
-      class(Work_Type) :: Work
-      Allocated_Int_Face_Arrays = Work % req_i_face
-    end function
-
-    integer function Allocated_Int_Node_Arrays(Work)
-      class(Work_Type) :: Work
-      Allocated_Int_Node_Arrays = Work % req_i_node
-    end function
+#   include "Work_Mod/Connect_Int_Cell.f90"
+#   include "Work_Mod/Connect_Int_Face.f90"
+#   include "Work_Mod/Connect_Int_Node.f90"
+#   include "Work_Mod/Connect_Real_Cell.f90"
+#   include "Work_Mod/Connect_Real_Face.f90"
+#   include "Work_Mod/Connect_Real_Node.f90"
+#   include "Work_Mod/Safe/Connect_Int_Cell.f90"
+#   include "Work_Mod/Safe/Connect_Int_Face.f90"
+#   include "Work_Mod/Safe/Connect_Int_Node.f90"
+#   include "Work_Mod/Safe/Connect_Real_Cell.f90"
+#   include "Work_Mod/Safe/Connect_Real_Face.f90"
+#   include "Work_Mod/Safe/Connect_Real_Node.f90"
+#   include "Work_Mod/Unsafe/Connect_Int_Cell.f90"
+#   include "Work_Mod/Unsafe/Connect_Int_Face.f90"
+#   include "Work_Mod/Unsafe/Connect_Int_Node.f90"
+#   include "Work_Mod/Unsafe/Connect_Real_Cell.f90"
+#   include "Work_Mod/Unsafe/Connect_Real_Face.f90"
+#   include "Work_Mod/Unsafe/Connect_Real_Node.f90"
+#   include "Work_Mod/Disconnect_Int_Cell.f90"
+#   include "Work_Mod/Disconnect_Int_Face.f90"
+#   include "Work_Mod/Disconnect_Int_Node.f90"
+#   include "Work_Mod/Disconnect_Real_Cell.f90"
+#   include "Work_Mod/Disconnect_Real_Face.f90"
+#   include "Work_Mod/Disconnect_Real_Node.f90"
+#   include "Work_Mod/Finalize_Work.f90"
 
   end module

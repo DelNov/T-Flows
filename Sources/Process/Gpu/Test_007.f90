@@ -83,8 +83,7 @@
   call Process % Initialize_Variables(Grid(1), Flow(1), Turb(1))
 
   ! Allocate CPU memory for working arrays (currently used for saving)
-  call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=0,  n_r_node=0,  &
-                                  n_i_cell= 6,  n_i_face=0,  n_i_node=0)
+  call Work % Allocate_Work(Grid)
 
   !----------------------------------------------------------!
   !   Copy all useful data to the device, that means grid,   !
@@ -94,7 +93,7 @@
   call Flow(1) % Copy_Field_To_Device()
   call Flow(1) % Nat % Copy_Native_To_Device()
   call Turb(1) % Copy_Turb_To_Device(Flow(1))
-  call Work % Create_Work_On_Device()
+! call Work % Create_Work_On_Device()
 
   !------------------------------------------!
   !                                          !

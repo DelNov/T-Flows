@@ -1,6 +1,5 @@
 !==============================================================================!
-  subroutine Allocate_Work(Work, Grid, n_r_cell, n_r_face, n_r_node,  &
-                                       n_i_cell, n_i_face, n_i_node)
+  subroutine Allocate_Work(Work, Grid)
 !------------------------------------------------------------------------------!
 !>  This subroutine is responsible for allocating memory for various working
 !>  arrays within the Work object.
@@ -20,30 +19,33 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Work_Type) :: Work      !! parent; the singleton Work object
   type(Grid_Type)  :: Grid(:)   !! grids on which the Work will be used
-  integer          :: n_r_cell  !! number of real cell arrays
-  integer          :: n_r_face  !! number of real face arrays
-  integer          :: n_r_node  !! number of real node arrays
-  integer          :: n_i_cell  !! number of integer cell arrays
-  integer          :: n_i_face  !! number of integer face arrays
-  integer          :: n_i_node  !! number of integer node arrays
 !==============================================================================!
 
-  Work % req_r_cell = n_r_cell
-  Work % req_r_face = n_r_face
-  Work % req_r_node = n_r_node
+  !-------------------------------------------------!
+  !   Fetch the maximum number of cells, boundary   !
+  !   cells, faces and nodes across all the grids   !
+  !-------------------------------------------------!
 
-  Work % req_i_cell = n_i_cell
-  Work % req_i_face = n_i_face
-  Work % req_i_node = n_i_node
+  ! Get the maximum number of cells and boundary cells
+  Work % max_nc = maxval(Grid(1:size(Grid)) % n_cells)
+  Work % max_nb = maxval(Grid(1:size(Grid)) % n_bnd_cells)
 
-  call Work % Allocate_Real_Cell(Grid, n_r_cell)
-  call Work % Allocate_Real_Face(Grid, n_r_face)
-  call Work % Allocate_Real_Node(Grid, n_r_node)
+  ! Get the maximum number of faces
+  Work % max_nf = maxval(Grid(1:size(Grid)) % n_faces)
 
-  call Work % Allocate_Int_Cell(Grid, n_i_cell)
-  call Work % Allocate_Int_Face(Grid, n_i_face)
-  call Work % Allocate_Int_Node(Grid, n_i_node)
+  ! Get the maximum number of nodes
+  Work % max_nn = maxval(Grid(1:size(Grid)) % n_nodes)
 
-  Work % allocated = .true.
+  !------
+  !   
+  !------
+
+  ! Allocate the basic container's work space
+  allocate(Work % i_cell(MAX_WORK_ARRAYS));  Work % last_i_cell = 0
+  allocate(Work % i_face(MAX_WORK_ARRAYS));  Work % last_i_face = 0
+  allocate(Work % i_node(MAX_WORK_ARRAYS));  Work % last_i_node = 0
+  allocate(Work % r_cell(MAX_WORK_ARRAYS));  Work % last_r_cell = 0
+  allocate(Work % r_face(MAX_WORK_ARRAYS));  Work % last_r_face = 0
+  allocate(Work % r_node(MAX_WORK_ARRAYS));  Work % last_r_node = 0
 
   end subroutine

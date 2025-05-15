@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Allocate_Real_Node(Work, Grid, n)
+  subroutine Allocate_Real_Node(Work, r)
 !------------------------------------------------------------------------------!
 !>  Allocates memory for integer-typed working arrays associated with nodes
 !>  in the Work object.
@@ -7,24 +7,14 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Work_Type) :: Work     !! parent; the singleton Work object
-  type(Grid_Type)  :: Grid(:)  !! grids on which the Work will be used
-  integer          :: n        !! number of real node arrays
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: nn, i
+  integer          :: r        !! number of real node arrays
 !==============================================================================!
 
-  if(n .eq. 0) return
+  if(r .eq. 0) return
 
-  ! Get number of nodes
-  nn = maxval(Grid(1:size(Grid)) % n_nodes)
+  allocate(Work % r_node(r) % array(1 : Work % max_nn))
+  Work % r_node(r) % array(:) = 0.0
 
-  allocate(Work % r_node(n))
-
-  do i = 1, n
-    allocate(Work % r_node(i) % array(1:nn))
-    Work % r_node(i) % array(:) = 0.0
-  end do
-
-  Work % last_r_node = 0
+  call Gpu % Vector_Real_Create_On_Device(Work % r_node(r) % array)
 
   end subroutine

@@ -80,9 +80,8 @@
   call Flow % Nat % Copy_Native_To_Device()
 
   ! Allocate CPU memory for working arrays (currently used for saving)
-  call Work % Allocate_Work(Grid, n_r_cell=24,  n_r_face=0,  n_r_node=0,  &
-                                  n_i_cell= 6,  n_i_face=0,  n_i_node=0)
-  call Work % Create_Work_On_Device()
+  call Work % Allocate_Work(Grid)
+! call Work % Create_Work_On_Device()
 
   ! Copy physical properties as well
   call Flow % Copy_Field_To_Device()

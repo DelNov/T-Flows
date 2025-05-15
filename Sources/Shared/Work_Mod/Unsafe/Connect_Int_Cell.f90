@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Connect_Int_Cell(Work,                                    &
-                              a01, a02, a03, a04, a05, a06, a07, a08,  &
-                              a09, a10, a11, a12, a13, a14, a15, a16)
+  subroutine Unsafe_Connect_Int_Cell(Work,                                    &
+                                     a01, a02, a03, a04, a05, a06, a07, a08,  &
+                                     a09, a10, a11, a12, a13, a14, a15, a16)
 !------------------------------------------------------------------------------!
 !>  Connects the provided integer pointers to the allocated integer cell
 !>  arrays, effectively "borrowing" the space for temporary use.  Once the
@@ -20,14 +20,18 @@
     !! additional integer pointer
 !==============================================================================!
 
+  call Profiler % Start('Work_Mod')
+
   Work % last_i_cell = Work % last_i_cell + 1
   a01 => Work % i_cell(Work % last_i_cell) % array
+  a01(:) = 0
 
   if(present(a02)) then
     Work % last_i_cell = Work % last_i_cell + 1
     a02 => Work % i_cell(Work % last_i_cell) % array
     a02(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -36,6 +40,7 @@
     a03 => Work % i_cell(Work % last_i_cell) % array
     a03(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -44,6 +49,7 @@
     a04 => Work % i_cell(Work % last_i_cell) % array
     a04(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -52,6 +58,7 @@
     a05 => Work % i_cell(Work % last_i_cell) % array
     a05(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -60,6 +67,7 @@
     a06 => Work % i_cell(Work % last_i_cell) % array
     a06(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -68,6 +76,7 @@
     a07 => Work % i_cell(Work % last_i_cell) % array
     a07(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -76,6 +85,7 @@
     a08 => Work % i_cell(Work % last_i_cell) % array
     a08(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -84,6 +94,7 @@
     a09 => Work % i_cell(Work % last_i_cell) % array
     a09(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -92,6 +103,7 @@
     a10 => Work % i_cell(Work % last_i_cell) % array
     a10(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -100,6 +112,7 @@
     a11 => Work % i_cell(Work % last_i_cell) % array
     a11(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -108,6 +121,7 @@
     a12 => Work % i_cell(Work % last_i_cell) % array
     a12(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -116,6 +130,7 @@
     a13 => Work % i_cell(Work % last_i_cell) % array
     a13(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -124,6 +139,7 @@
     a14 => Work % i_cell(Work % last_i_cell) % array
     a14(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -132,6 +148,7 @@
     a15 => Work % i_cell(Work % last_i_cell) % array
     a15(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
@@ -140,6 +157,7 @@
     a16 => Work % i_cell(Work % last_i_cell) % array
     a16(:) = 0
   else
+    call Profiler % Stop('Work_Mod')
     return
   end if
 
