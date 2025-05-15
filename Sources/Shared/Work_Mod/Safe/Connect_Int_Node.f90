@@ -27,7 +27,9 @@
     call Work % Allocate_Int_Node(Work % last_i_node)
   Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
   a01 => Work % i_node(Work % last_i_node) % array
-  a01(:) = 0
+# if RESET_VALUES_TO_ZERO == 1
+    a01(:) = 0
+# endif
 
   if(present(a02)) then
     Work % last_i_node = Work % last_i_node + 1
@@ -35,7 +37,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a02 => Work % i_node(Work % last_i_node) % array
-    a02(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a02(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -47,7 +51,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a03 => Work % i_node(Work % last_i_node) % array
-    a03(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a03(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -59,7 +65,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a04 => Work % i_node(Work % last_i_node) % array
-    a04(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a04(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -71,7 +79,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a05 => Work % i_node(Work % last_i_node) % array
-    a05(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a05(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -83,7 +93,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a06 => Work % i_node(Work % last_i_node) % array
-    a06(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a06(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -95,7 +107,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a07 => Work % i_node(Work % last_i_node) % array
-    a07(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a07(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -107,7 +121,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a08 => Work % i_node(Work % last_i_node) % array
-    a08(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a08(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -119,7 +135,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a09 => Work % i_node(Work % last_i_node) % array
-    a09(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a09(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -131,7 +149,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a10 => Work % i_node(Work % last_i_node) % array
-    a10(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a10(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -143,7 +163,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a11 => Work % i_node(Work % last_i_node) % array
-    a11(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a11(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -155,7 +177,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a12 => Work % i_node(Work % last_i_node) % array
-    a12(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a12(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -167,7 +191,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a13 => Work % i_node(Work % last_i_node) % array
-    a13(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a13(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -179,7 +205,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a14 => Work % i_node(Work % last_i_node) % array
-    a14(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a14(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -191,7 +219,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a15 => Work % i_node(Work % last_i_node) % array
-    a15(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a15(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -203,7 +233,9 @@
       call Work % Allocate_Int_Node(Work % last_i_node)
     Work % max_i_node  = max(Work % max_i_node, Work % last_i_node)
     a16 => Work % i_node(Work % last_i_node) % array
-    a16(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a16(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return

@@ -27,7 +27,9 @@
     call Work % Allocate_Int_Face(Work % last_i_face)
   Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
   a01 => Work % i_face(Work % last_i_face) % array
-  a01(:) = 0
+# if RESET_VALUES_TO_ZERO == 0
+    a01(:) = 0
+# endif
 
   if(present(a02)) then
     Work % last_i_face = Work % last_i_face + 1
@@ -35,7 +37,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a02 => Work % i_face(Work % last_i_face) % array
-    a02(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a02(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -47,7 +51,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a03 => Work % i_face(Work % last_i_face) % array
-    a03(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a03(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -59,7 +65,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a04 => Work % i_face(Work % last_i_face) % array
-    a04(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a04(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -71,7 +79,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a05 => Work % i_face(Work % last_i_face) % array
-    a05(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a05(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -83,7 +93,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a06 => Work % i_face(Work % last_i_face) % array
-    a06(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a06(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -95,7 +107,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a07 => Work % i_face(Work % last_i_face) % array
-    a07(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a07(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -107,7 +121,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a08 => Work % i_face(Work % last_i_face) % array
-    a08(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a08(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -119,7 +135,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a09 => Work % i_face(Work % last_i_face) % array
-    a09(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a09(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -131,7 +149,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a10 => Work % i_face(Work % last_i_face) % array
-    a10(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a10(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -143,7 +163,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a11 => Work % i_face(Work % last_i_face) % array
-    a11(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a11(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -155,7 +177,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a12 => Work % i_face(Work % last_i_face) % array
-    a12(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a12(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -167,7 +191,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a13 => Work % i_face(Work % last_i_face) % array
-    a13(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a13(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -179,7 +205,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a14 => Work % i_face(Work % last_i_face) % array
-    a14(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a14(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -191,7 +219,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a15 => Work % i_face(Work % last_i_face) % array
-    a15(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a15(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -203,7 +233,9 @@
       call Work % Allocate_Int_Face(Work % last_i_face)
     Work % max_i_face  = max(Work % max_i_face, Work % last_i_face)
     a16 => Work % i_face(Work % last_i_face) % array
-    a16(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a16(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return

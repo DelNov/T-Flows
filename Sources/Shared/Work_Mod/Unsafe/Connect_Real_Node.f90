@@ -17,11 +17,16 @@
 
   Work % last_r_node = Work % last_r_node + 1
   a01 => Work % r_node(Work % last_r_node) % array
+# if RESET_VALUES_TO_ZERO == 1
+    a01(:) = 0.0
+# endif
 
   if(present(a02)) then
     Work % last_r_node = Work % last_r_node + 1
     a02 => Work % r_node(Work % last_r_node) % array
-    a02(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a02(:) = 0.0
+#   endif
   else
     return
   end if
@@ -29,7 +34,9 @@
   if(present(a03)) then
     Work % last_r_node = Work % last_r_node + 1
     a03 => Work % r_node(Work % last_r_node) % array
-    a03(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a03(:) = 0.0
+#   endif
   else
     return
   end if
@@ -37,7 +44,9 @@
   if(present(a04)) then
     Work % last_r_node = Work % last_r_node + 1
     a04 => Work % r_node(Work % last_r_node) % array
-    a04(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a04(:) = 0.0
+#   endif
   else
     return
   end if
@@ -45,7 +54,9 @@
   if(present(a05)) then
     Work % last_r_node = Work % last_r_node + 1
     a05 => Work % r_node(Work % last_r_node) % array
-    a05(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a05(:) = 0.0
+#   endif
   else
     return
   end if
@@ -53,7 +64,9 @@
   if(present(a06)) then
     Work % last_r_node = Work % last_r_node + 1
     a06 => Work % r_node(Work % last_r_node) % array
-    a06(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a06(:) = 0.0
+#   endif
   else
     return
   end if
@@ -61,7 +74,9 @@
   if(present(a07)) then
     Work % last_r_node = Work % last_r_node + 1
     a07 => Work % r_node(Work % last_r_node) % array
-    a07(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a07(:) = 0.0
+#   endif
   else
     return
   end if
@@ -69,7 +84,9 @@
   if(present(a08)) then
     Work % last_r_node = Work % last_r_node + 1
     a08 => Work % r_node(Work % last_r_node) % array
-    a08(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a08(:) = 0.0
+#   endif
   else
     return
   end if
@@ -77,7 +94,9 @@
   if(present(a09)) then
     Work % last_r_node = Work % last_r_node + 1
     a09 => Work % r_node(Work % last_r_node) % array
-    a09(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a09(:) = 0.0
+#   endif
   else
     return
   end if
@@ -85,7 +104,9 @@
   if(present(a10)) then
     Work % last_r_node = Work % last_r_node + 1
     a10 => Work % r_node(Work % last_r_node) % array
-    a10(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a10(:) = 0.0
+#   endif
   else
     return
   end if
@@ -93,7 +114,9 @@
   if(present(a11)) then
     Work % last_r_node = Work % last_r_node + 1
     a11 => Work % r_node(Work % last_r_node) % array
-    a11(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a11(:) = 0.0
+#   endif
   else
     return
   end if
@@ -101,7 +124,9 @@
   if(present(a12)) then
     Work % last_r_node = Work % last_r_node + 1
     a12 => Work % r_node(Work % last_r_node) % array
-    a12(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a12(:) = 0.0
+#   endif
   else
     return
   end if
@@ -109,7 +134,9 @@
   if(present(a13)) then
     Work % last_r_node = Work % last_r_node + 1
     a13 => Work % r_node(Work % last_r_node) % array
-    a13(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a13(:) = 0.0
+#   endif
   else
     return
   end if
@@ -117,7 +144,9 @@
   if(present(a14)) then
     Work % last_r_node = Work % last_r_node + 1
     a14 => Work % r_node(Work % last_r_node) % array
-    a14(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a14(:) = 0.0
+#   endif
   else
     return
   end if
@@ -125,7 +154,9 @@
   if(present(a15)) then
     Work % last_r_node = Work % last_r_node + 1
     a15 => Work % r_node(Work % last_r_node) % array
-    a15(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a15(:) = 0.0
+#   endif
   else
     return
   end if
@@ -133,7 +164,9 @@
   if(present(a16)) then
     Work % last_r_node = Work % last_r_node + 1
     a16 => Work % r_node(Work % last_r_node) % array
-    a16(:) = 0.0
+#   if RESET_VALUES_TO_ZERO == 1
+      a16(:) = 0.0
+#   endif
   else
     return
   end if

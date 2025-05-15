@@ -26,9 +26,10 @@
   if(.not. allocated(Work % i_cell(Work % last_i_cell) % array))  &
     call Work % Allocate_Int_Cell(Work % last_i_cell)
   Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
-
   a01 => Work % i_cell(Work % last_i_cell) % array
-  a01(:) = 0
+# if RESET_VALUES_TO_ZERO == 1
+    a01(:) = 0
+# endif
 
   if(present(a02)) then
     Work % last_i_cell = Work % last_i_cell + 1
@@ -36,7 +37,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a02 => Work % i_cell(Work % last_i_cell) % array
-    a02(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a02(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -48,7 +51,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a03 => Work % i_cell(Work % last_i_cell) % array
-    a03(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a03(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -60,7 +65,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a04 => Work % i_cell(Work % last_i_cell) % array
-    a04(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a04(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -72,7 +79,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a05 => Work % i_cell(Work % last_i_cell) % array
-    a05(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a05(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -84,7 +93,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a06 => Work % i_cell(Work % last_i_cell) % array
-    a06(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a06(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -96,7 +107,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a07 => Work % i_cell(Work % last_i_cell) % array
-    a07(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a07(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -108,7 +121,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a08 => Work % i_cell(Work % last_i_cell) % array
-    a08(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a08(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -120,7 +135,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a09 => Work % i_cell(Work % last_i_cell) % array
-    a09(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a09(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -132,7 +149,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a10 => Work % i_cell(Work % last_i_cell) % array
-    a10(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a10(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -144,7 +163,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a11 => Work % i_cell(Work % last_i_cell) % array
-    a11(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a11(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -156,7 +177,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a12 => Work % i_cell(Work % last_i_cell) % array
-    a12(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a12(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -168,7 +191,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a13 => Work % i_cell(Work % last_i_cell) % array
-    a13(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a13(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -180,7 +205,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a14 => Work % i_cell(Work % last_i_cell) % array
-    a14(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a14(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -192,7 +219,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a15 => Work % i_cell(Work % last_i_cell) % array
-    a15(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a15(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return
@@ -204,7 +233,9 @@
       call Work % Allocate_Int_Cell(Work % last_i_cell)
     Work % max_i_cell  = max(Work % max_i_cell, Work % last_i_cell)
     a16 => Work % i_cell(Work % last_i_cell) % array
-    a16(:) = 0
+#   if RESET_VALUES_TO_ZERO == 1
+      a16(:) = 0
+#   endif
   else
     call Profiler % Stop('Work_Mod')
     return

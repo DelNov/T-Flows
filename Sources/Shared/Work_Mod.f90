@@ -1,5 +1,11 @@
 #include "../Shared/Assert.h90"
 
+! Set this variable to 0, to avoid setting work array to zero every time you
+! connect them.  This will not lead to any noticable differnce in performance,
+! but not resetting connecting arrays to zero might help with user arrays, if
+! a user doesn't want to forget the values in between calls to a function.
+#define  RESET_VALUES_TO_ZERO  1
+
 !==============================================================================!
   module Work_Mod
 !------------------------------------------------------------------------------!
