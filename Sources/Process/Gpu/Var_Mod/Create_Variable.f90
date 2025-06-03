@@ -9,6 +9,8 @@
     !! variable to boundary and initial conditions specified in control file
   character(len=*)        :: name_flux  !! name of variable's flux,
     !! connects variable to boundary condition values in control file
+!----------------------------------[Locals]------------------------------------!
+  character(SL) :: name
 !==============================================================================!
 
   ! Store Grid for which the variable is defined
@@ -25,6 +27,9 @@
   ! Values in the new (n), old (o) and older than old (oo) time step
   allocate(phi % n (-Grid % n_bnd_cells:Grid % n_cells));  phi % n  = 0.0
   allocate(phi % o (-Grid % n_bnd_cells:Grid % n_cells));  phi % o  = 0.0
+
+  call Control % Time_Integration_Scheme                     (name)
+  phi % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
   if(phi % td_scheme .eq. PARABOLIC) then
     allocate(phi % oo(-Grid % n_bnd_cells:Grid % n_cells));  phi % oo = 0.0
   end if
