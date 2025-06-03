@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine User_Mod_Initialize_Variables(Grid, Flow, Turb)
+  subroutine User_Mod_End_Of_Simulation(Grid, Flow, Turb)
 !------------------------------------------------------------------------------!
-!   User initialization of dependent variables.                                !
+!   This function is called at the end of simulation.                          !
 !                                                                              !
 !   Note: Be aware that this function is called from CPU only.                 !
 !------------------------------------------------------------------------------!

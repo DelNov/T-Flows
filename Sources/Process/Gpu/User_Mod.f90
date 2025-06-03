@@ -9,6 +9,7 @@
 !   define his/her variables and pass them around his functions
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
+  use Time_Mod
   use Turb_Mod
   use Gpu_Mod
 !------------------------------------------------------------------------------!
@@ -20,6 +21,7 @@
   contains
 
 #   include "User_Mod/Initialize_Variables.f90"
+#   include "User_Mod/End_Of_Simulation.f90"
 #   include "User_Mod/Source.f90"
 
   end module
