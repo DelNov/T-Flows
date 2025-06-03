@@ -43,31 +43,29 @@
   end do
   !$acc end parallel
 
-  do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL .or.  &
-       Grid % region % type(reg) .eq. INFLOW) then
-
-      phi_n => phi % n
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   diff,  &
-      !$acc   fc,  &
-      !$acc   b,  &
-      !$acc   phi_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)
-        c2 = grid_faces_c(2,s)
-        a12 = diff(c1) * fc(s)
-        b(c1) = b(c1) + a12 * phi_n(c2)
-      end do
-      !$acc end parallel
-
+  phi_bnd_cond_type => phi % bnd_cond_type
+  phi_n => phi % n
+  !$acc parallel loop  &
+  !$acc present(  &
+  !$acc   grid_region_f_face,  &
+  !$acc   grid_region_l_face,  &
+  !$acc   grid_faces_c,  &
+  !$acc   b,  &
+  !$acc   phi_bnd_cond_type,  &
+  !$acc   diff,  &
+  !$acc   fc,  &
+  !$acc   phi_n   &
+  !$acc )
+  do s = grid_region_f_face(1), grid_region_l_face(grid_n_bnd_regions)  ! all present
+    c1 = grid_faces_c(1,s)    ! inside cell
+    c2 = grid_faces_c(2,s)    ! boundary cell
+    if(phi_bnd_cond_type(c2) .eq. WALL    .or.  &
+       phi_bnd_cond_type(c2) .eq. INFLOW) then
+      a12 = diff(c1) * fc(s)
+      b(c1) = b(c1) + a12 * phi_n(c2)
     end if
   end do
+  !$acc end parallel
 
   call Profiler % Stop('Insert_Scalars_Bc')
 
