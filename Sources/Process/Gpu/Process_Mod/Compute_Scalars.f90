@@ -108,10 +108,10 @@
 
     call User_Mod_Source(Grid, Flow, Turb, phi, sc)
 
-  !---------------------------------------!
-  !     Part 2 of the under-relaxation    !
-  !   (Part 1 is in Form_Energy_Matrix)   !
-  !---------------------------------------!
+    !----------------------------------------!
+    !     Part 2 of the under-relaxation     !
+    !   (Part 1 is in Form_Scalars_Matrix)   !
+    !----------------------------------------!
     phi_n => phi % n
     !$acc parallel loop independent  &
     !$acc present(  &
