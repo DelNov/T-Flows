@@ -1,19 +1,24 @@
 ! Uncomment for more output.  Actually, some interesting things get printed out.
 ! #define VERBOSE
 
-!======================================================================!
-  module module_amg
+!==============================================================================!
+  module Amg_Mod
+!----------------------------------[Modules]-----------------------------------!
+  use Const_Mod
 !----------------------------------------------------------------------!
   save
 !======================================================================!
 
-# include "amg.h90"
+# include "Amg_Mod.h90"
 
   integer, pointer, contiguous :: amg_imin (:), amg_imax (:)
   integer, pointer, contiguous :: amg_iminw(:), amg_imaxw(:)
   integer, pointer, contiguous :: amg_nstcol(:)
 
-  type amg_type
+  !--------------!
+  !   Amg type   !
+  !--------------!
+  type Amg_Type
 
     ! Range in unknown (u) for each level: imin(level) - imax(level))
     integer, private :: imin (AMG_MAX_LEVELS), imax (AMG_MAX_LEVELS)
@@ -70,7 +75,7 @@
       !---------------------!
       !   Main subroutine   !
       !---------------------!
-      procedure :: amg1r5
+      procedure :: Amg1r5
 
       !----------------------!
       !   Related to setup   !
@@ -128,7 +133,7 @@
   !   Singletone Ruge-Stueben AMG solver object   !
   !                                               !
   !-----------------------------------------------!
-  type(amg_type) :: amg
+  type(Amg_Type) :: Amg
 
   contains
 
@@ -136,7 +141,7 @@
   subroutine timer_start(amg)
 !------------------------------------------------------------------------------!
   implicit none
-  class(amg_type) :: amg
+  class(Amg_Type) :: Amg
 !------------------------------------------------------------------------------!
   call cpu_time(amg % told)
   end subroutine
@@ -145,11 +150,11 @@
   subroutine timer_stop(amg, i)
 !------------------------------------------------------------------------------!
   implicit none
-  class(amg_type) :: amg
+  class(Amg_Type) :: Amg
   integer         :: i
 !------------------------------------------------------------------------------!
   call cpu_time(amg % tnew)
-  amg % time(i) = amg % tnew - amg % told
+  Amg % time(i) = Amg % tnew - Amg % told
   end subroutine
 
   !---------------------!
