@@ -1,0 +1,38 @@
+     0. amg1r5
+      ├── get_integer_digits
+      ├── 1. setup
+      │    ├── get_integer_digits
+      │    ├── 1. check_matrix_properties
+      │    └── 2. coarsening
+      │         ├── 1. row_sort
+      │         ├── 2. pre_color
+      │         ├── 3. interpolation_weights
+      │         ├── 4. define_operators
+      │         ├── 5. truncate_operator
+      │         └── 6. set_inverse_pointer
+      ├── 2. first_guess
+      │    ├── get_integer_digits
+      │    └── random_0_to_0p1
+      ├── 3. solve
+      │    ├── get_integer_digits
+      │    ├── 1. calculate_residual
+      │    ├── 2. backup_u
+      │    ├── 3. one_cycle
+      │    │    ├── 1. solve_on_coarsest_level
+      │    │    │    ├── 1. cg_on_coarsest_level
+      │    │    │    ├── 2. bicg_on_coarsest_level
+      │    │    │    ├── 3. gauss_seidel_sweep
+      │    │    │    └── 4. calculate_residual
+      │    │    ├── 2. normalize_u
+      │    │    ├── 3. gauss_seidel_sweep
+      │    │    ├── 4. calculate_residual
+      │    │    ├── 5. set_u_to_zero
+      │    │    ├── 6. restrict_residuals
+      │    │    ├── 7. scale_solution
+      │    │    └── 8. interpolate_correction
+      │    └── 4. cg_step
+      │         ├── 1. cg_alpha
+      │         └── 2. cg_epsilon
+      └── 4. wrkcnt
+
+     0    1    2    3    4
