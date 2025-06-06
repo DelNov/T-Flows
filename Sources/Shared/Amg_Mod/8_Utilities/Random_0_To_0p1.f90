@@ -1,5 +1,5 @@
 !==============================================================================!
-  double precision function random_0_to_0p1(amg, s)
+  double precision function Random_0_To_0p1(Amg, s)
 !------------------------------------------------------------------------------!
 !   Function to create "random" sequence of numbers between 0 and 0.1
 !
@@ -17,14 +17,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   double precision :: s
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  random_0_to_0p1 = 100.0d0*dexp(s)
-  random_0_to_0p1 = random_0_to_0p1 - dble(int(random_0_to_0p1))
-  s = random_0_to_0p1
+  Random_0_To_0p1 = 100.0d0*dexp(s)
+  Random_0_To_0p1 = Random_0_To_0p1 - dble(int(Random_0_To_0p1))
+  s = Random_0_To_0p1
 
   end function

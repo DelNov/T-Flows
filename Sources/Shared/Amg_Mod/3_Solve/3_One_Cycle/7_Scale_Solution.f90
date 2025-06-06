@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine scale_solution(amg, level, ivstar,  &
+  subroutine Scale_Solution(Amg, level, ivstar,  &
                             a, u, f, ia, ja,     &  ! defining system
                             iw)
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level, ivstar
   double precision :: a(:), u(:), f(:)
   integer          :: ia(:), ja(:)
@@ -24,19 +24,19 @@
 
   if(ivstar .ne. 1) return
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
   !-----------------------------------------!
   !   Computation of scaling factor "fac"   !
   !-----------------------------------------!
 
-  ! See comment in source "coarsening.f90" at line 180
-  iaux = ia(amg % imax(level)+1)
-  ia(amg % imax(level)+1) = iw(amg % iminw(level))
+  ! See comment in source "Coarsening.f90" at line 180
+  iaux = ia(Amg % imax(level)+1)
+  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
   s1 = 0.0d0
   s2 = 0.0d0
-  do i = amg % imin(level), amg % imax(level)
+  do i = Amg % imin(level), Amg % imax(level)
     sa = 0.0d0
     do j = ia(i), ia(i+1) - 1
       sa = sa+a(j)*u(ja(j))
@@ -51,11 +51,11 @@
   !-------------!
   !   Scaling   !
   !-------------!
-  do i = amg % imin(level), amg % imax(level)
+  do i = Amg % imin(level), Amg % imax(level)
     u(i) = u(i)*fac
   end do
-  ia(amg % imax(level)+1) = iaux
+  ia(Amg % imax(level)+1) = iaux
 
-  call amg % timer_stop(14)
+  call Amg % timer_stop(14)
 
   end subroutine

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine amg1r5(amg, a_val, a_row, a_col, phi, b, n, iswtch)
+  subroutine Amg1r5(Amg, a_val, a_row, a_col, phi, b, n, iswtch)
 !------------------------------------------------------------------------------!
 !
 !   Amg1r5
@@ -10,12 +10,12 @@
 !
 !   1. A bug was detected which under certain circumstances influenced
 !      slightly the convergence rate of Amg1r1.  For that reason, the
-!      following line in subroutine resc (BN: restrict_residuals):
+!      following line in subroutine resc (BN: Restrict_Residuals):
 !      iw(imaxw(kc-1)+1) = ia(imin(kc)) has been changed to:
 !      iw(imaxw(kc-1)+1) = iaux.  BN: This line now reads:
 !      iw(Amg % imaxw(level_c-1)+1) = iaux1
 !
-!   2. A bug was detected in subroutine pwint (BN: interpolation_weights.)
+!   2. A bug was detected in subroutine pwint (BN: Interpolation_Weights.)
 !      Under certain circumstances an undefined variable was used.  Although
 !      this did not affect the numerical results, problems can occur if
 !      checking for undefined variables is used. To fix this error, in pwint
@@ -48,7 +48,7 @@
 !
 !   Change against version 1.3, april 1986:
 !
-!   1. A bug in subroutine check (BN: check_matrix_properties) has been
+!   1. A bug in subroutine check (BN: Check_Matrix_Properties) has been
 !      removed.  If the original matrix was stored in an unsymmetric way,
 !      the symmetrization by amg1r3 could fail under certain circumstances.
 !      For a fix, the following statements in subroutine check have been
@@ -66,7 +66,7 @@
 !      do 530 j1=ia(i1)+1,ia(i1+1)-1 was changed to
 !      do 530 j1=ia(i1)+1,icg(i1)-1
 !
-!  2. The explanatory part in subroutine amg1r5 has been enlarged to avoid
+!  2. The explanatory part in subroutine Amg1r5 has been enlarged to avoid
 !     misunderstandings in the definition of the argument list.  BN: The
 !     argument list has changed so much, that this hardly matters any more.
 !
@@ -74,7 +74,7 @@
 !
 !   Change against version 1.4, october, 1990 (by john w. ruge)
 !
-!   1. A bug in subroutine check (BN: check_matrix_properties) has been
+!   1. A bug in subroutine check (BN: Check_Matrix_Properties) has been
 !      removed.  If the original matrix was stored in an unsymmetric way,
 !      the symmetrization by amg1r3 could still fail under certain circum-
 !      stances, and was not fixed in the previous version.  In addition, the
@@ -150,7 +150,7 @@
 !       vectors a and ja, respectively. otherwise, Amg cannot know the length
 !       of the last matrix row.
 !
-!     - The input vectors a, ia and ja are changed by amg1r5.  So, after
+!     - The input vectors a, ia and ja are changed by Amg1r5.  So, after
 !       return from Amg1r5, the package must not be called a second time
 !       without having newly defined the input vectors and using iswtch=4.
 !       Otherwise, the setup phase will fail.
@@ -176,11 +176,11 @@
 !
 !------------------------------------------------------------------------------!
 !
-!   Scalar input parameters of amg1r5 (BN: Some of them are now module
+!   Scalar input parameters of Amg1r5 (BN: Some of them are now module
 !   member data, some are still local to Amg1r5i, some local to other
 !   subroutines):
 !
-!   The input parameters of amg1r5 in the list below are arranged according
+!   The input parameters of Amg1r5 in the list below are arranged according
 !   to their importance to the general user.  The parameters preceeded by
 !   a "*" must be specified explicitely.  All the other parameters are set to
 !   standard values if zero on input.
@@ -201,13 +201,13 @@
 !   Only the Class 1 - parameters must be specified explicitely by the user.
 !
 !   Class 2 - parameters control the general performance of Amg1r5. Changing
-!   them doesn't require understanding the amg - algorithm.
+!   them doesn't require understanding the Amg - algorithm.
 !
 !   Specifying non-standard-values for Class 3 - parameters presupposes a
 !   general knowledge of multigrid methods.
 !
 !   Function of class 4 - parameters is only understandable after studying
-!   the amg-algorithm in detail.
+!   the Amg-algorithm in detail.
 !
 !   Fortunately in most cases the choice of Class 3 and 4 - parameters isn't
 !   critical and using the Amg1r5 - supplied standard values should give
@@ -242,7 +242,7 @@
 !       =2: l does not have rowsum zero.
 !
 !     BN: in order to avoig ghost numbers, I have introduced four constants
-!     in module Amg, more preciselly in file amg.h90:
+!     in module Amg, more preciselly in file Amg.h90:
 !
 !       AMG_SINGULAR_MATRIX      = 1,  &  ! matrix is singular (like pressure)
 !       AMG_NON_SINGULAR_MATRIX  = 2,  &  ! matrix is non-singular
@@ -253,24 +253,24 @@
 !
 !   Class 2 - parameters:
 !
-!     iswtch - Parameter controlling which modules of amg1r5 are to be used.
-!                =1:   call for -----, -----, -----, wrkcnt.
-!                =2:   call for -----, -----, solve, wrkcnt.
-!                =3:   call for -----, first, solve, wrkcnt.
-!                =4:   call for setup, first, solve, wrkcnt.
+!     iswtch - Parameter controlling which modules of Amg1r5 are to be used.
+!                =1:   call for -----, -----, -----, Wrkcnt.
+!                =2:   call for -----, -----, Solve, Wrkcnt.
+!                =3:   call for -----, First, Solve, Wrkcnt.
+!                =4:   call for Setup, First, Solve, Wrkcnt.
 !
-!                setup defines the operators needed in the solution phase.
+!                Setup defines the operators needed in the solution phase.
 !
-!                first (BN: now first_guess) initializes the solution vector
+!                First (BN: now First_Guess) initializes the solution vector
 !                  (see parameter ifirst).
 !
-!                solve computes the solution by amg cycling
+!                Solve computes the solution by Amg cycling
 !                  (see parameter ncyc).
 !
-!                wrkcnt provides the user with information about residuals,
+!                Wrkcnt provides the user with information about residuals,
 !                  storage requirements and cp-times (see parameter iout).
 !
-!                If amg1r5 is called the first time, iswtch has to be = 4.
+!                If Amg1r5 is called the first time, iswtch has to be = 4.
 !                Independent of iswtch, single modules can be bypassed by a
 !                proper choice of the corresponding parameter.
 !
@@ -283,7 +283,7 @@
 !                  =0: no output (except for messages)
 !                  =1: residual before and after solution process
 !                  =2: add.: statistics on cp-times and storage requirements
-!                  =3: add.: residual after each amg-cycle
+!                  =3: add.: residual after each Amg-cycle
 !
 !   --------------------------------------------------------------
 !
@@ -396,13 +396,13 @@
 !
 !     ecg1, - Real parameters affecting the creation of coarser grids and/or
 !     ecg2,   the definition of the interpolation.  The choice of these
-!     ewt2    parameters depends on the actual amg version (see subroutine
-!             coarsening)
+!     ewt2    parameters depends on the actual Amg version (see subroutine
+!             Coarsening)
 !
 !     nwt   - Integer parameter affecting the creation of coarser grids and/or
 !             the definition of the interpolation.  The choice of this
-!             parameter depends on the actual amg version (see subroutine
-!             coarsening)
+!             parameter depends on the actual Amg version (see subroutine
+!             Coarsening)
 !
 !     ntr   - Parameter controlling coarse-grid operator truncation
 !               =0: pairs of zeroes are removed from coarse grid operators
@@ -417,8 +417,8 @@
 !
 !     ierr - Error parameter:
 !
-!              > 0: fatal error (abnormal termination of amg1r5)
-!              < 0: non-fatal error (execution of amg1r5 con tinues)
+!              > 0: fatal error (abnormal termination of Amg1r5)
+!              < 0: non-fatal error (execution of Amg1r5 con tinues)
 !
 !              Error codes in detail:
 !
@@ -447,7 +447,7 @@
 !                   parameter iswtch erroneous:          (ierr =  17)
 !                   parameter levelx erroneous:          (ierr =  18)
 !
-!              3. Errors of the amg1r5-system (should not occur):
+!              3. Errors of the Amg1r5-system (should not occur):
 !
 !                   transpose a-entry missing:           (ierr =  21)
 !                   interpolation entry missing:         (ierr =  22)
@@ -462,7 +462,7 @@
 !
 !   Work space:
 !
-!     The integer vector kwork has to be passed to amg1r5 as work space.
+!     The integer vector kwork has to be passed to Amg1r5 as work space.
 !     BN: OK, that's how it once was, but I split the entire vector kwork
 !     into three vectors: iw, ifg and icg, and pass these to subroutines
 !     as work space.
@@ -522,7 +522,7 @@
 !     ntr    = 0
 !
 !   If any one of these parameters is 0 on input, its corresponding standard
-!   value is used by amg1r5.
+!   value is used by Amg1r5.
 !
 !------------------------------------------------------------------------------!
 !
@@ -544,7 +544,7 @@
 !      unitversity.  BN: I have removed the Yale SMP package because it would
 !      not compile with modern Fortran compilers any more.
 !
-!   3. In amg1r5 there is the parameter lratio, denoting the ratio of space
+!   3. In Amg1r5 there is the parameter lratio, denoting the ratio of space
 !      occupied by a double precision real variable and that of an integer.
 !      For the IBM-version lratio has been set to 2.  Change this value if
 !      necessary. (The same has to be done with the Yale SMP-routine ndrv.)
@@ -574,7 +574,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type), target :: amg
+  class(Amg_Type), target :: Amg
   double precision  :: a_val(:)
   integer           :: a_row(:), a_col(:)
   double precision  :: phi(:), b(:)
@@ -621,11 +621,11 @@
   !------------------------!
   if(kswtch .eq. AMG_RUN_ALL_FOUR_STAGES) then
 
-    amg_imin   => amg % imin
-    amg_imax   => amg % imax
-    amg_iminw  => amg % iminw
-    amg_imaxw  => amg % imaxw
-    amg_nstcol => amg % nstcol
+    amg_imin   => Amg % imin
+    amg_imax   => Amg % imax
+    amg_iminw  => Amg % iminw
+    amg_imaxw  => Amg % imaxw
+    amg_nstcol => Amg % nstcol
 
     !   Work out the number of nonzeros and unknowns
     n_nonzeros = a_row(n+1)-1
@@ -634,10 +634,10 @@
     !----------------------------------------------------------!
     !   Initialize error to zero, assume there are no errors   !
     !----------------------------------------------------------!
-    amg % ierr = AMG_SUCCESS
+    Amg % ierr = AMG_SUCCESS
 
     !-----------------------------------------------------------!
-    !   Aditional (extended) dimensions needed for amg solver   !
+    !   Aditional (extended) dimensions needed for Amg solver   !
     !-----------------------------------------------------------!
     nda = 6 * n_nonzeros + 12 * n_unknowns
     ndu = 3 * n_unknowns
@@ -648,8 +648,8 @@
     ndicg = (ndw-icgst+1)/2
     if(ndicg .le. 0) then
       write(6, '(a)')  &
-        ' *** error in amg1r5: ndw too small ***'
-      amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
+        ' *** error in Amg1r5: ndw too small ***'
+      Amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
       return
     end if
     niw  = icgst - 1
@@ -672,7 +672,7 @@
       allocate(ifg(nifg));   ifg(:)   = 0
     end if
 
-    ! Copy the discretization to "amg" workspace
+    ! Copy the discretization to "Amg" workspace
     a (1:n_nonzeros)   = a_val(1:n_nonzeros)
     ia(1:n_unknowns+1) = a_row(1:n_unknowns+1)
     ja(1:n_nonzeros)   = a_col(1:n_nonzeros)
@@ -680,16 +680,16 @@
     f (1:n_unknowns)   = b    (1:n_unknowns)
 
     !--------------------------------------------------!
-    !   Default values (amg1r5: setup phase, output)   !
+    !   Default values (Amg1r5: setup phase, output)   !
     !--------------------------------------------------!
-    amg % matrix = 22      ! rowsum /= 0.0; nonsymetric
+    Amg % matrix = 22      ! rowsum /= 0.0; nonsymetric
 
     !--------------!
     !   Switches   !
     !--------------!
     ifirst       =    13   ! value from stuben:    13
-    amg % iout   =    11   ! value from stuben:    12
-    amg % eps    = 1.d-12  ! value from stuben: 1.d-12
+    Amg % iout   =    11   ! value from stuben:    12
+    Amg % eps    = 1.d-12  ! value from stuben: 1.d-12
 
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
@@ -697,20 +697,20 @@
     levelx = 0
     ncyc   = 10250
     madapt = 0
-    amg % nrd    = 0
-    amg % nsolco = 3       ! this sets solver, 1 - GS, 2 - Yale8, 3 - BiCG
-    amg % nru    = 0
-    amg % ecg1   = 0.d0
-    amg % ecg2   = 0.25d0
-    amg % ewt2   = 0.35d0
-    amg % nwt    = 2
-    amg % ntr    = 0
+    Amg % nrd    = 0
+    Amg % nsolco = 3       ! this sets solver, 1 - GS, 2 - Yale8, 3 - BiCG
+    Amg % nru    = 0
+    Amg % ecg1   = 0.d0
+    Amg % ecg2   = 0.25d0
+    Amg % ewt2   = 0.35d0
+    Amg % nwt    = 2
+    Amg % ntr    = 0
 
     !-----------------------------------------------------!
     !  Set parameters to standard values, if neccessary   !
     !-----------------------------------------------------!
-    if(amg % iout .ne. 0) then
-      call amg % get_integer_digits(amg % iout, 2, n_digits, digit)
+    if(Amg % iout .ne. 0) then
+      call Amg % Get_Integer_Digits(Amg % iout, 2, n_digits, digit)
       kout = digit(2)
     else
       kout = 2
@@ -721,8 +721,8 @@
       kevelx = min(levelx, AMG_MAX_LEVELS)
     else if (levelx .lt. 0) then
       write(6, '(a)')  &
-        ' *** error in amg1r5: illegal parameter levelx ***'
-      amg % ierr = AMG_ERR_LEVELX_INVALID
+        ' *** error in Amg1r5: illegal parameter levelx ***'
+      Amg % ierr = AMG_ERR_LEVELX_INVALID
       return
     else
       kevelx = AMG_MAX_LEVELS
@@ -747,34 +747,34 @@
   !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - +-------------!
   !   if kswtch is:                          call these stages:            !
   ! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -!
-  !   AMG_RUN_ALL_FOUR_STAGES         (4):   setup, first, solve, wrkcnt   !
-  !   AMG_INITIALIZE_SOLVE_AND_REPORT (3):   -----, first, solve, wrkcnt   !
-  !   AMG_SOLVE_AND_REPORT            (2):   -----, -----, solve, wrkcnt   !
-  !   AMG_JUST_REPORT                 (1):   -----, -----, -----, wrkcnt   !
+  !   AMG_RUN_ALL_FOUR_STAGES         (4):   Setup, First, Solve, Wrkcnt   !
+  !   AMG_INITIALIZE_SOLVE_AND_REPORT (3):   -----, First, Solve, Wrkcnt   !
+  !   AMG_SOLVE_AND_REPORT            (2):   -----, -----, Solve, Wrkcnt   !
+  !   AMG_JUST_REPORT                 (1):   -----, -----, -----, Wrkcnt   !
   !------------------------------------------------------------------------!
   if(kswtch .eq. 4) then
-    call amg % setup(n_unknowns, kevelx,  &
+    call Amg % Setup(n_unknowns, kevelx,  &
                      a, u, ia, ja,        &  ! linear system
                      iw, icg, ifg,        &  ! work arrays
                      levels,              &
                      iwork, jtr)
-    if(amg % ierr .gt. 0) return
+    if(Amg % ierr .gt. 0) return
   end if
 
   if(kswtch .ge. 3) then
-    call amg % first_guess(ifirst, u)
+    call Amg % First_Guess(ifirst, u)
   end if
 
   if(kswtch .ge. 2) then
-    call amg % solve(madapt, ncyc, kout,  &
+    call Amg % Solve(madapt, ncyc, kout,  &
                      a, u, f, ia, ja,     &  ! linear system
                      iw, icg, ifg,        &  ! work arrays
                      ncyc0, levels)
-    if(amg % ierr .gt. 0) return
+    if(Amg % ierr .gt. 0) return
   end if
 
   if(kswtch .ge. 1) then
-    call amg % wrkcnt(kout, ia, iw, levels, ncyc0)
+    call Amg % Wrkcnt(kout, ia, iw, levels, ncyc0)
   end if
 
   !------------------------!
@@ -784,8 +784,8 @@
 
   if(kswtch .lt. 1 .or. kswtch .gt. 4) then
     write(6, '(a)')  &
-      ' *** error in amg1r5: illegal parameter amg % iswtch ***'
-    amg % ierr = AMG_ERR_ISWTCH_INVALID
+      ' *** error in Amg1r5: illegal parameter Amg % iswtch ***'
+    Amg % ierr = AMG_ERR_ISWTCH_INVALID
   end if
 
   end subroutine

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine truncate_operator(amg, level, ntr_local,  &
+  subroutine Truncate_Operator(Amg, level, ntr_local,  &
                                a, ia, ja)           ! defining system
 !------------------------------------------------------------------------------!
 !   Truncates operator on grid level corresponding to the value of ntr.
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level, ntr_local
   double precision :: a(:)
   integer          :: ia(:), ja(:)
@@ -24,10 +24,10 @@
 
   if(ntr_local .eq. 1) return
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
-  imn = amg % imin(level)
-  imx = amg % imax(level)
+  imn = Amg % imin(level)
+  imx = Amg % imax(level)
   nna = ia(imx+1)-ia(imn)
   jpos = ia(imn)
 
@@ -57,7 +57,7 @@
             write(6, '(a,a,i3,a)')                               &
               ' *** error in trunc: transpose a-entry missing',  &
               ' on grid', level, ' ***'
-            amg % ierr = AMG_ERR_TRANSPOSE_MISSING
+            Amg % ierr = AMG_ERR_TRANSPOSE_MISSING
             return
           end if
 
@@ -76,6 +76,6 @@
   end do
   ia(imx+1) = jpos
 
-  call amg % timer_stop(7)
+  call Amg % timer_stop(7)
 
   end subroutine

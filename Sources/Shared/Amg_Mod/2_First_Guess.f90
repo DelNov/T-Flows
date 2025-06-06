@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine first_guess(amg, ifirst, u)
+  subroutine First_Guess(Amg, ifirst, u)
 !------------------------------------------------------------------------------!
 !   Puts a first approximation to finest grid
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: ifirst
   double precision :: u(:)
 !-----------------------------------[locals]-----------------------------------!
@@ -17,23 +17,23 @@
 !==============================================================================!
 
   if(ifirst .ne. 0) then
-    call amg % get_integer_digits(ifirst, 3, n_digits, digit)
+    call Amg % Get_Integer_Digits(ifirst, 3, n_digits, digit)
     ifrst = digit(2)
   else
     ifrst = 3
   endif
 
   if(ifrst.eq.1) then
-    do i = amg % imin(1), amg % imax(1)
+    do i = Amg % imin(1), Amg % imax(1)
       u(i) = 0.0d0
     end do
     return
 
   else if(ifrst.eq.2) then
-    do i = amg % imin(1), amg % imax(1)
+    do i = Amg % imin(1), Amg % imax(1)
       u(i) = 1.0d0
     end do
-    if(amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(amg % imax(1)) = 0.0d0
+    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0d0
     return
 
   else if(ifrst.eq.3) then
@@ -47,10 +47,10 @@
     else
       s = sd
     end if
-    do i = amg % imin(1), amg % imax(1)
-      u(i) = amg % random_0_to_0p1(s)
+    do i = Amg % imin(1), Amg % imax(1)
+      u(i) = Amg % Random_0_To_0p1(s)
     end do
-    if(amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(amg % imax(1)) = 0.0d0
+    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0d0
     return
   endif
 

@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine normalize_u(amg, level, u)
+  subroutine Normalize_U(Amg, level, u)
 !------------------------------------------------------------------------------!
 !   Normalizes u on level "level" if rowsum=0 (last component =0)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level
   double precision :: u(:)
 !-----------------------------------[locals]-----------------------------------!
@@ -15,11 +15,11 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  if(amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX) return
+  if(Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX) return
 
-  fac = u(amg % imax(level))
+  fac = u(Amg % imax(level))
 
-  do i = amg % imin(level), amg % imax(level)
+  do i = Amg % imin(level), Amg % imax(level)
     u(i) = u(i) - fac
   end do
 

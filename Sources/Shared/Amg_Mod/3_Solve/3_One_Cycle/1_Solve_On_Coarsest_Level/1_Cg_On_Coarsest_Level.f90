@@ -1,7 +1,7 @@
 ! #define DEBUG  1
 
 !==============================================================================!
-  subroutine cg_on_coarsest_level(amg, level, irel,  &
+  subroutine Cg_On_Coarsest_Level(Amg, level, irel,  &
                                   a, u, f, ia, ja,   &  ! defines system
                                   iw, icg)
 !------------------------------------------------------------------------------!
@@ -10,7 +10,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level, irel
   double precision :: a(:), u(:), f(:)
   integer          :: ia(:), ja(:)
@@ -32,11 +32,11 @@
   double precision                  :: pq, rho_0, rho_old, rho_new
 !==============================================================================!
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
-  ! See comment in source "coarsening.f90" at line 180
-  iaux = ia(amg % imax(level)+1)
-  ia(amg % imax(level)+1) = iw(amg % iminw(level))
+  ! See comment in source "Coarsening.f90" at line 180
+  iaux = ia(Amg % imax(level)+1)
+  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
 
   !---------------------------------------------!
@@ -48,8 +48,8 @@
   !---------------------------------------------!
 
   ! Number of unknowns and non-zeros on this level
-  n = amg % imax(level) - amg % imin(level) + 1
-  nnz = ia(amg % imax(level)+1) - ia(amg % imin(level))
+  n = Amg % imax(level) - Amg % imin(level) + 1
+  nnz = ia(Amg % imax(level)+1) - ia(Amg % imin(level))
 
   !-------------------------------------------------------!
   !                                                       !
@@ -59,16 +59,16 @@
   allocate(a_val(nnz));   a_val(:)   = 0.0
   allocate(col_idx(nnz)); col_idx(:) = 0
   allocate(row_ptr(n+1)); row_ptr(:) = 0
-  do ig = amg % imin(level), amg % imax(level)
-    i = ig - amg % imin(level) + 1                   ! local unknown number
-    row_ptr(i) = ia(ig) - ia(amg % imin(level)) + 1  ! local row pointer
+  do ig = Amg % imin(level), Amg % imax(level)
+    i = ig - Amg % imin(level) + 1                   ! local unknown number
+    row_ptr(i) = ia(ig) - ia(Amg % imin(level)) + 1  ! local row pointer
     do jg = ia(ig), ia(ig+1) - 1              ! browse through row ig
-      j          = jg - ia(amg % imin(level)) + 1    ! local nonzero index
-      col_idx(j) = ja(jg) - amg % imin(level) + 1    ! local column number
+      j          = jg - ia(Amg % imin(level)) + 1    ! local nonzero index
+      col_idx(j) = ja(jg) - Amg % imin(level) + 1    ! local column number
       a_val(j)   = a(jg)                      ! local matrix value
     end do
   end do
-  row_ptr(n+1) = ia(amg % imax(level)+1) - ia(amg % imin(level)) + 1  ! final row pointer
+  row_ptr(n+1) = ia(Amg % imax(level)+1) - ia(Amg % imin(level)) + 1  ! final row pointer
 
   !------------------------------------------------------!
   !                                                      !
@@ -77,8 +77,8 @@
   !------------------------------------------------------!
   allocate(b(n))
   allocate(x(n))
-  do ig = amg % imin(level), amg % imax(level)
-    i = ig - amg % imin(level) + 1  ! local unkown number
+  do ig = Amg % imin(level), Amg % imax(level)
+    i = ig - Amg % imin(level) + 1  ! local unkown number
     b(i) = f(ig)
     x(i) = u(ig)
   end do
@@ -213,15 +213,15 @@
   !   Copy local b and x vectors back (Stueben's f and u)   !
   !                                                         !
   !---------------------------------------------------------!
-  do ig = amg % imin(level), amg % imax(level)
-    i = ig - amg % imin(level) + 1  ! local unkown number
+  do ig = Amg % imin(level), Amg % imax(level)
+    i = ig - Amg % imin(level) + 1  ! local unkown number
     f(ig) = b(i)
     u(ig) = x(i)
   end do
 
 
-  call amg % timer_stop(13)
+  call Amg % timer_stop(13)
 
-  ia(amg % imax(level)+1) = iaux
+  ia(Amg % imax(level)+1) = iaux
 
   end subroutine

@@ -1,15 +1,15 @@
 !==============================================================================!
-  subroutine setup(amg, nnu, levelx,  &
+  subroutine Setup(Amg, nnu, levelx,  &
                    a, u, ia, ja,      &
                    iw, icg, ifg,      &  ! these are "created" from kwork
                    levels,            &
                    iwork, jtr)
 !------------------------------------------------------------------------------!
-!   Preparation phase of amg1r5 (general part)
+!   Preparation phase of Amg1r5 (general part)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: nnu, levelx
   double precision :: a(:), u(:)
   integer          :: ia(:), ja(:)
@@ -26,29 +26,29 @@
   !------------------------!
   !   Decompose "matrix"   !
   !------------------------!
-  call amg % get_integer_digits(amg % matrix, 2, n_digits, digit)
-  amg % isym  = digit(1)
-  amg % irow0 = digit(2)
+  call Amg % Get_Integer_Digits(Amg % matrix, 2, n_digits, digit)
+  Amg % isym  = digit(1)
+  Amg % irow0 = digit(2)
 
   !-------------------------!
   !   Reset time counters   !
   !-------------------------!
   do i = 1, 20
-    amg % time(i) = 0.0
+    Amg % time(i) = 0.0
   end do
 
   !-------------------------------------!
   !   Preparation (ignored in timing)   !
   !-------------------------------------!
-  amg % imin(1) = 1
-  amg % imax(1) = nnu
-  call amg % check_matrix_properties(a, ia, ja, icg, ifg)
-  if(amg % ierr .gt. 0) return
+  Amg % imin(1) = 1
+  Amg % imax(1) = nnu
+  call Amg % Check_Matrix_Properties(a, ia, ja, icg, ifg)
+  if(Amg % ierr .gt. 0) return
 
   !-----------------------------------------------------------------!
   !   Define coarser grids + operators. reset levels if necessary   !
   !-----------------------------------------------------------------!
-  call amg % coarsening(levelx,        &
+  call Amg % Coarsening(levelx,        &
                         a, u, ia, ja,  &  ! store linear system
                         iw, icg, ifg,  &  ! work arrays
                         levels,        &

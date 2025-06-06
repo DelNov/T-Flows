@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine pre_color(amg, level,    &
+  subroutine Pre_Color(Amg, level,    &
                        ia, ja,        &  ! defining system
                        iw, icg, ifg,  &  ! created from "kwork"
                        ir,            &  ! created from "iwork"
@@ -36,14 +36,14 @@
 !
 !     - ja(ia(i)) ----- i=imin(k),...,imax(k)
 !
-!     used as defined in row_sort.  not changed.
+!     used as defined in Row_Sort.  not changed.
 !
 !     - jtr(j)--------- j=1,iw(imax(k)+iws+1)-1
 !     - iw(i) --------- i=imin(k)+iws,...,imax(k)+iws
 !
 !     (iws=0, if k=1; iws=imaxw(k-1)+2-imin(k) otherwise)
 !
-!     used as defined in row_sort. not changed.
+!     used as defined in Row_Sort. not changed.
 !
 !     Comments on work space used
 !
@@ -166,7 +166,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type) :: amg
+  class(Amg_Type) :: Amg
   integer         :: level
   integer         :: ia(:), ja(:)
   integer         :: iw(:), ifg(:), icg(:), ir(:), jtr(:)
@@ -186,16 +186,16 @@
   !-----------------!
   !   Preparation   !
   !-----------------!
-  call amg % timer_start()
-  ilo = amg % imin(level)
-  ihi = amg % imax(level)
+  call Amg % timer_start()
+  ilo = Amg % imin(level)
+  ihi = Amg % imax(level)
   if (level.ne.1) then
-    iws = amg % imaxw(level-1)+2-ilo
+    iws = Amg % imaxw(level-1)+2-ilo
   else
     iws = 0
   endif
   ilo1 = ilo-1
-  npts = amg % imax(level) - amg % imin(level)+1
+  npts = Amg % imax(level) - Amg % imin(level)+1
   npts1 = npts+1
   ntrlim = 2*(iw(ihi+iws+1)-iw(ilo+iws))/npts
   nscnmx = 0
@@ -203,14 +203,14 @@
   jvalx = jval0+2*ntrlim+1
   if(jvalx .gt. ndicg) then
     write(6, '(a)')  &
-      ' *** error in pre_color: ndw too small ***'
-    amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
+      ' *** error in Pre_Color: ndw too small ***'
+    Amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
     return
   end if
   if(npts .gt. ndir) then
     write(6, '(a)')  &
-      ' *** error in pre_color: ndu too small ***'
-    amg % ierr = AMG_ERR_DIM_U_TOO_SMALL
+      ' *** error in Pre_Color: ndu too small ***'
+    Amg % ierr = AMG_ERR_DIM_U_TOO_SMALL
     return
   end if
 
@@ -277,7 +277,7 @@
   do
     picknext = .false.
     if(jcnbhi .le. jval0) then
-      call amg % timer_stop(2)
+      call Amg % timer_stop(2)
       return
     end if
     iic = ifg(jcnbhi)

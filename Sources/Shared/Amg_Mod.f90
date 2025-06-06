@@ -24,7 +24,7 @@
     integer, private :: imin (AMG_MAX_LEVELS), imax (AMG_MAX_LEVELS)
 
     ! Range in workspace (iw) for each level: iminw(level) - imaxw(level))
-    ! (This is gradualy populated in amg % coarsening, clearly enough)
+    ! (This is gradualy populated in Amg % Coarsening, clearly enough)
     integer, private :: iminw(AMG_MAX_LEVELS), imaxw(AMG_MAX_LEVELS)
     integer, private :: nstcol(AMG_MAX_LEVELS)
 
@@ -81,50 +81,50 @@
       !   Related to setup   !
       !----------------------!
       procedure :: setup                         ! 1
-      procedure ::   check_matrix_properties     ! 1.1
-      procedure ::   coarsening                  ! 1.2
-      procedure ::     row_sort                  ! 1.2.1
-      procedure ::     pre_color                 ! 1.2.2
-      procedure ::     interpolation_weights     ! 1.2.3
-      procedure ::     define_operators          ! 1.2.4
-      procedure ::     truncate_operator         ! 1.2.5
-      procedure ::     set_inverse_pointer       ! 1.2.6
+      procedure ::   Check_Matrix_Properties     ! 1.1
+      procedure ::   Coarsening                  ! 1.2
+      procedure ::     Row_Sort                  ! 1.2.1
+      procedure ::     Pre_Color                 ! 1.2.2
+      procedure ::     Interpolation_Weights     ! 1.2.3
+      procedure ::     Define_Operators          ! 1.2.4
+      procedure ::     Truncate_Operator         ! 1.2.5
+      procedure ::     Set_Inverse_Pointer       ! 1.2.6
 
       !----------------------------!
       !   Related to first guess   !
       !----------------------------!
-      procedure :: first_guess                   ! 2
+      procedure :: First_Guess                   ! 2
 
       !------------------------!
       !   Related to solving   !
       !------------------------!
       procedure :: solve                         ! 3
-      procedure ::   calculate_residual          ! 3.1
-      procedure ::   backup_u                    ! 3.2
-      procedure ::   one_cycle                   ! 3.3
-      procedure ::     solve_on_coarsest_level   ! 3.3.1
-      procedure ::       cg_on_coarsest_level    ! 3.3.1.1
-      procedure ::       bicg_on_coarsest_level  ! 3.3.1.2
-      procedure ::     normalize_u               ! 3.3.2
-      procedure ::     gauss_seidel_sweep        ! 3.3.3
-      procedure ::     set_u_to_zero             ! 3.3.5
-      procedure ::     restrict_residuals        ! 3.3.6
-      procedure ::     scale_solution            ! 3.3.7
-      procedure ::     interpolate_correction    ! 3.3.8
-      procedure ::   cg_step                     ! 3.4
-      procedure ::     cg_alpha                  ! 3.4.1
-      procedure ::     cg_epsilon                ! 3.4.2
+      procedure ::   Calculate_Residual          ! 3.1
+      procedure ::   Backup_U                    ! 3.2
+      procedure ::   One_Cycle                   ! 3.3
+      procedure ::     Solve_On_Coarsest_Level   ! 3.3.1
+      procedure ::       Cg_On_Coarsest_Level    ! 3.3.1.1
+      procedure ::       Bicg_On_Coarsest_Level  ! 3.3.1.2
+      procedure ::     Normalize_U               ! 3.3.2
+      procedure ::     Gauss_Seidel_Sweep        ! 3.3.3
+      procedure ::     Set_U_To_Zero             ! 3.3.5
+      procedure ::     Restrict_Residuals        ! 3.3.6
+      procedure ::     Scale_Solution            ! 3.3.7
+      procedure ::     Interpolate_Correction    ! 3.3.8
+      procedure ::   Cg_Step                     ! 3.4
+      procedure ::     Cg_Alpha                  ! 3.4.1
+      procedure ::     Cg_Epsilon                ! 3.4.2
 
       !---------------------!
       !   Final reporting   !
       !---------------------!
-      procedure :: wrkcnt                        ! 4
+      procedure :: Wrkcnt                        ! 4
 
       !---------------------------------------!
       !   Just a couple of little utilities   !
       !---------------------------------------!
-      procedure :: get_integer_digits
-      procedure :: random_0_to_0p1
+      procedure :: Get_Integer_Digits
+      procedure :: Random_0_To_0p1
 
   end type
 
@@ -138,77 +138,77 @@
   contains
 
 !==============================================================================!
-  subroutine timer_start(amg)
+  subroutine timer_start(Amg)
 !------------------------------------------------------------------------------!
   implicit none
   class(Amg_Type) :: Amg
 !------------------------------------------------------------------------------!
-  call cpu_time(amg % told)
+  call cpu_time(Amg % told)
   end subroutine
 
 !==============================================================================!
-  subroutine timer_stop(amg, i)
+  subroutine timer_stop(Amg, i)
 !------------------------------------------------------------------------------!
   implicit none
   class(Amg_Type) :: Amg
   integer         :: i
 !------------------------------------------------------------------------------!
-  call cpu_time(amg % tnew)
+  call cpu_time(Amg % tnew)
   Amg % time(i) = Amg % tnew - Amg % told
   end subroutine
 
   !---------------------!
   !   Main subroutine   !
   !---------------------!
-# include "amg/0_drivers/amg1r5.f90"
+# include "Amg_Mod/0_Drivers/Amg1r5.f90"
 
   !----------------------!
   !   Related to setup   !
   !----------------------!
-# include "amg/1_setup.f90"
-# include "amg/1_setup/1_check_matrix_properties.f90"
-# include "amg/1_setup/2_coarsening.f90"
-# include "amg/1_setup/2_coarsening/1_row_sort.f90"
-# include "amg/1_setup/2_coarsening/2_pre_color.f90"
-# include "amg/1_setup/2_coarsening/3_interpolation_weights.f90"
-# include "amg/1_setup/2_coarsening/4_define_operators.f90"
-# include "amg/1_setup/2_coarsening/5_truncate_operator.f90"
-# include "amg/1_setup/2_coarsening/6_set_inverse_pointer.f90"
+# include "Amg_Mod/1_Setup.f90"
+# include "Amg_Mod/1_Setup/1_Check_Matrix_Properties.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening/1_Row_Sort.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening/2_Pre_Color.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening/3_Interpolation_Weights.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening/4_Define_Operators.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening/5_Truncate_Operator.f90"
+# include "Amg_Mod/1_Setup/2_Coarsening/6_Set_Inverse_Pointer.f90"
 
   !----------------------------!
   !   Related to first guess   !
   !----------------------------!
-# include "amg/2_first_guess.f90"
+# include "Amg_Mod/2_First_Guess.f90"
 
   !------------------------!
   !   Related to solving   !
   !------------------------!
-# include "amg/3_solve.f90"
-# include "amg/3_solve/1_calculate_residual.f90"
-# include "amg/3_solve/2_backup_u.f90"
-# include "amg/3_solve/3_one_cycle.f90"
-# include "amg/3_solve/3_one_cycle/1_solve_on_coarsest_level.f90"
-# include "amg/3_solve/3_one_cycle/1_solve_on_coarsest_level/1_cg_on_coarsest_level.f90"
-# include "amg/3_solve/3_one_cycle/1_solve_on_coarsest_level/2_bicg_on_coarsest_level.f90"
-# include "amg/3_solve/3_one_cycle/2_normalize_u.f90"
-# include "amg/3_solve/3_one_cycle/3_gauss_seidel_sweep.f90"
-# include "amg/3_solve/3_one_cycle/5_set_u_to_zero.f90"
-# include "amg/3_solve/3_one_cycle/6_restrict_residuals.f90"
-# include "amg/3_solve/3_one_cycle/7_scale_solution.f90"
-# include "amg/3_solve/3_one_cycle/8_interpolate_correction.f90"
-# include "amg/3_solve/4_cg_step.f90"
-# include "amg/3_solve/4_cg_step/1_cg_alpha.f90"
-# include "amg/3_solve/4_cg_step/2_cg_epsilon.f90"
+# include "Amg_Mod/3_Solve.f90"
+# include "Amg_Mod/3_Solve/1_Calculate_Residual.f90"
+# include "Amg_Mod/3_Solve/2_Backup_U.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/1_Solve_On_Coarsest_Level.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/1_Solve_On_Coarsest_Level/1_Cg_On_Coarsest_Level.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/1_Solve_On_Coarsest_Level/2_Bicg_On_Coarsest_Level.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/2_Normalize_U.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/3_Gauss_Seidel_Sweep.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/5_Set_U_To_Zero.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/6_Restrict_Residuals.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/7_Scale_Solution.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/8_Interpolate_Correction.f90"
+# include "Amg_Mod/3_Solve/4_Cg_Step.f90"
+# include "Amg_Mod/3_Solve/4_Cg_Step/1_Cg_Alpha.f90"
+# include "Amg_Mod/3_Solve/4_Cg_Step/2_Cg_Epsilon.f90"
 
   !---------------------!
   !   Final reporting   !
   !---------------------!
-# include "amg/4_wrkcnt.f90"
+# include "Amg_Mod/4_Wrkcnt.f90"
 
   !---------------------------------------!
   !   Just a couple of little utilities   !
   !---------------------------------------!
-# include "amg/8_utilities/1_get_integer_digits.f90"
-# include "amg/8_utilities/2_random_0_to_0p1.f90"
+# include "Amg_Mod/8_Utilities/Get_Integer_Digits.f90"
+# include "Amg_Mod/8_Utilities/Random_0_To_0p1.f90"
 
   end module

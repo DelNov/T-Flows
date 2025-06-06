@@ -1,14 +1,14 @@
 !==============================================================================!
-  double precision function cg_epsilon(amg, level, s2,   &
+  double precision function Cg_Epsilon(Amg, level, s2,   &
                                        a, u, f, ia, ja,  &  ! defining system
                                        iw,               &
                                        m)
 !------------------------------------------------------------------------------!
-!   Called from cg_step
+!   Called from Cg_Step
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level
   double precision :: s2
   double precision :: a(:), u(:), f(:)
@@ -22,15 +22,15 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  ishift = amg % imax(m)+1-amg % imin(level)
+  ishift = Amg % imax(m)+1-Amg % imin(level)
   s1 = 0.0d0
   s2 = 0.0d0
 
-  ! See comment in source "coarsening.f90" at line 180
-  iaux = ia(amg % imax(level)+1)
-  ia(amg % imax(level)+1) = iw(amg % iminw(level))
+  ! See comment in source "Coarsening.f90" at line 180
+  iaux = ia(Amg % imax(level)+1)
+  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
-  do i = amg % imin(level), amg % imax(level)
+  do i = Amg % imin(level), Amg % imax(level)
     sr = f(i)
     sp = 0.0d0
     do j = ia(i), ia(i+1) - 1
@@ -41,16 +41,16 @@
     s2 = s2 + sp * f(i+ishift)
   end do
 
-  ia(amg % imax(level)+1) = iaux
+  ia(Amg % imax(level)+1) = iaux
 
   ! Error exit
   if(s2 .eq. 0.0d0) then
     write(6, '(a)')  &
       ' *** error in cgeps: cg correction not defined ***'
-    amg % ierr = AMG_ERR_CG_CORRECTION_UNDEF
+    Amg % ierr = AMG_ERR_CG_CORRECTION_UNDEF
     return
   end if
 
-  cg_epsilon = +s1 / s2
+  Cg_Epsilon = +s1 / s2
 
   end function

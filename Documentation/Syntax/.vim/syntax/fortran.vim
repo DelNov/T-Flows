@@ -379,6 +379,15 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      ONE_THIRD  TWO_THIRDS  ONE_SIXTH
   syn keyword fortranConstant      MD  MAX_VARS_INTERFACE  MAX_TURBULENT_PLANES
   syn keyword fortranConstant      GROWTH_MARGIN
+  syn keyword fortranConstant      AMG_MAX_LEVELS  AMG_MAX_LEVELS  AMG_RUN_ALL_FOUR_STAGES  AMG_INITIALIZE_SOLVE_AND_REPORT AMG_SOLVE_AND_REPORT  AMG_JUST_REPORT
+  syn keyword fortranConstant      AMG_SINGULAR_MATRIX  AMG_NON_SINGULAR_MATRIX  AMG_SYMMETRIC_MATRIX  AMG_NON_SYMMETRIC_MATRIX
+  syn keyword fortranConstant      AMG_SUCCESS  AMG_ERR_DIM_A_TOO_SMALL  AMG_ERR_DIM_IA_TOO_SMALL  AMG_ERR_DIM_JA_TOO_SMALL  AMG_ERR_DIM_U_TOO_SMALL
+  syn keyword fortranConstant      AMG_ERR_DIM_F_TOO_SMALL  AMG_ERR_DIM_ICG_TOO_SMALL  AMG_ERR_MISSING_A_ENTRY  AMG_ERR_MATRIX_INVALID
+  syn keyword fortranConstant      AMG_ERR_DIAG_NOT_FIRST  AMG_ERR_DIAG_NOT_POSITIVE  AMG_ERR_IA_POINTER_INVALID  AMG_ERR_JA_POINTER_INVALID
+  syn keyword fortranConstant      AMG_ERR_ISWTCH_INVALID  AMG_ERR_LEVELX_INVALID  AMG_ERR_TRANSPOSE_MISSING  AMG_ERR_INTERP_MISSING
+  syn keyword fortranConstant      AMG_ERR_CG_CORRECTION_UNDEF  AMG_ERR_YALE_FACTOR_FAIL  AMG_WARN_YALE_STORAGE_A  AMG_WARN_YALE_STORAGE_JA
+  syn keyword fortranConstant      AMG_WARN_CG_STORAGE_U  AMG_BIG_INTEGER  AMG_L_RATIO
+
 " Constants from Tokenizer_Mod
   syn keyword fortranConstant      MAX_TOKENS
 " Constants related to indentation (I think they are defined in a few places - bad!
@@ -434,8 +443,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  A M C Mat      vector         Sol            Nat               Pet            Work_Pet  Member
   syn keyword fortranTypeTflows    Process_Type   Pattern_Type   Isoap_Type     Polyhedron_Type   Stl_Type       Iso_Polygons_Type
   syn keyword fortranObjectTflows  Process        Pat            Isoap          Polyhedron  Pol   Stl            Iso_Polygons  Iso
-  syn keyword fortranTypeTflows    Gpu_Type
-  syn keyword fortranObjectTflows  Gpu
+  syn keyword fortranTypeTflows    Gpu_Type       Amg_Type
+  syn keyword fortranObjectTflows  Gpu            Amg
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
   syn keyword fortranTypeTflows    Eddy_Type  Eddies_Type  Turb_Plane_Type  Memory_Type
@@ -503,6 +512,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     turb_wale_v  turb_h_max  turb_h_min  turb_h_w  turb_z_o
   syn keyword fortranGPUTflows     turb_vis_n  turb_vis_o  turb_vis_oo
   syn keyword fortranGPUTflows     phi_bnd_cond_type  phi_n  phi_o  phi_oo
+  syn keyword fortranGPUTflows     amg_imin  amg_imax  amg_iminw  amg_imaxw  amg_nstcol
 
 " CUDA fortran
   syn keyword fortranTypeCUDA      host global device value

@@ -1,10 +1,10 @@
 !==============================================================================!
-  subroutine one_cycle(amg, l, igam,     &
+  subroutine One_Cycle(Amg, l, igam,     &
                        a, u, f, ia, ja,  &
                        iw, ifg, icg,     &
                        m, iter, msel, fac, levels)
 !------------------------------------------------------------------------------!
-!   Performs one amg cycle with grid l as finest grid
+!   Performs one Amg cycle with grid l as finest grid
 !
 !   During first cycle: initialize parameters controlling yale-smp
 !   factorization and adaptive determination of coarsest grid:
@@ -22,7 +22,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: l
   integer          :: igam
   double precision :: a(:), u(:), f(:)
@@ -49,7 +49,7 @@
   else
     mink  = AMG_BIG_INTEGER
     ifi   = 1
-    nptsf = (amg % imax(l) - amg % imin(l)+1) / 10
+    nptsf = (Amg % imax(l) - Amg % imin(l)+1) / 10
   endif
 
   !-------------------!
@@ -58,10 +58,10 @@
   !                   !
   !-------------------!
   if(l .ge. m) then
-    call amg % solve_on_coarsest_level(m, ifac,          &
+    call Amg % Solve_On_Coarsest_Level(m, ifac,          &
                                        a, u, f, ia, ja,  &
                                        iw, icg)
-    call amg % normalize_u(l, u)
+    call Amg % Normalize_U(l, u)
     return
   end if
 
@@ -87,32 +87,32 @@
   !------------------------------------------------------!
   downward: do
     moredown = .false.
-      do n = 1, amg % nrdx
-        do nl = 1, amg % nrdlen
-          call amg % gauss_seidel_sweep(level, amg % nrdtyp(nl),  &
+      do n = 1, Amg % nrdx
+        do nl = 1, Amg % nrdlen
+          call Amg % Gauss_Seidel_Sweep(level, Amg % nrdtyp(nl),  &
                                         a, u, f, ia, ja,  &
                                         iw, icg)
         end do
       end do
-      if(ifi .eq. 1 .and. amg % imax(level) - amg % imin(level) .lt. nptsf) then
+      if(ifi .eq. 1 .and. Amg % imax(level) - Amg % imin(level) .lt. nptsf) then
 
        !-------------------------------------------------!
        !   mink: lowest grid number for which residual   !
        !   is stored during first downwards relaxation   !
        !-------------------------------------------------!
         if(mink .eq. AMG_BIG_INTEGER) mink = level
-        call amg % timer_start()
-        call amg % calculate_residual(level, amg % resi(level),  &
+        call Amg % timer_start()
+        call Amg % Calculate_Residual(level, Amg % resi(level),  &
                                       a, u, f, ia, ja, iw)
-        call amg % timer_stop(15)
+        call Amg % timer_stop(15)
       end if
 
       ng(level) = ng(level)+1
 
       ! Increase the grid counter - going for coarser still
       level = level + 1
-      call amg % set_u_to_zero(level,u)
-      call amg % restrict_residuals(level, a, u, f, ia, ja, iw, ifg)
+      call Amg % Set_U_To_Zero(level,u)
+      call Amg % Restrict_Residuals(level, a, u, f, ia, ja, iw, ifg)
       if(level .lt. m) cycle downward
 
       !-------------------------------------------------------!
@@ -120,7 +120,7 @@
       !   Solve on coarsest grid - "m" is the coarsest grid   !
       !                                                       !
       !-------------------------------------------------------!
-      call amg % solve_on_coarsest_level(m, ifac,          &
+      call Amg % Solve_On_Coarsest_Level(m, ifac,          &
                                          a, u, f, ia, ja,  &
                                          iw, icg)
 
@@ -130,13 +130,13 @@
       !                     !
       !---------------------!
       upward: do
-        call amg % scale_solution(level,ivstar,  &
+        call Amg % Scale_Solution(level,ivstar,  &
                          a,u,f,ia,ja,iw)
         level = level-1
-        call amg % interpolate_correction(level, a, u, ia, ja, iw, ifg)
-        do n = 1, amg % nrux
-          do nl = 1, amg % nrulen
-            call amg % gauss_seidel_sweep(level, amg % nrutyp(nl),  &
+        call Amg % Interpolate_Correction(level, a, u, ia, ja, iw, ifg)
+        do n = 1, Amg % nrux
+          do nl = 1, Amg % nrulen
+            call Amg % Gauss_Seidel_Sweep(level, Amg % nrutyp(nl),  &
                                           a, u, f, ia, ja,          &
                                           iw,icg)
           end do
@@ -147,25 +147,25 @@
           !   On first return to next to coarsest grid   !
           !    compare residual with the previous one    !
           !----------------------------------------------!
-          call amg % timer_start()
-          call amg % calculate_residual(level,res,  &
+          call Amg % timer_start()
+          call Amg % Calculate_Residual(level,res,  &
                                    a,u,f,ia,ja,iw)
-          call amg % timer_stop(15)
+          call Amg % timer_stop(15)
 
           ! If residual reduction satisfying:
           !   coarse grid adaption finished
-          if(res .lt. amg % resi(level)*fac) then
+          if(res .lt. Amg % resi(level)*fac) then
             ifi  = 0
 
           ! If residual reduction not satisfying:
           ! continue with coarse grid adaptation
           else
-            if(amg % nsc .eq. 2) levels = level
+            if(Amg % nsc .eq. 2) levels = level
             m    = level
             ifac = 1
-            call amg % set_u_to_zero(level,u)
-            call amg % restrict_residuals(level, a, u, f, ia, ja, iw, ifg)
-            call amg % solve_on_coarsest_level(m, ifac,          &
+            call Amg % Set_U_To_Zero(level,u)
+            call Amg % Restrict_Residuals(level, a, u, f, ia, ja, iw, ifg)
+            call Amg % Solve_On_Coarsest_Level(m, ifac,          &
                                                a, u, f, ia, ja,  &
                                                iw, icg)
             cycle upward
@@ -173,7 +173,7 @@
         end if
 
         if(level .eq. l) then
-          call amg % normalize_u(l, u)
+          call Amg % Normalize_U(l, u)
           return
         end if
 

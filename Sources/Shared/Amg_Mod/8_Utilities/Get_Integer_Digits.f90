@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine get_integer_digits(amg, into, nnum, n_digits, digit)
+  subroutine Get_Integer_Digits(Amg, into, nnum, n_digits, digit)
 !------------------------------------------------------------------------------!
 !   Decompose non-negative integer into into nnum integers
 !
@@ -25,7 +25,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)      :: amg
+  class(Amg_Type)      :: Amg
   integer, intent(in)  :: into, nnum
   integer, intent(out) :: n_digits, digit(:)
 !-----------------------------------[locals]-----------------------------------!

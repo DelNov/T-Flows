@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine gauss_seidel_sweep(amg,  level, irel,  &
+  subroutine Gauss_Seidel_Sweep(Amg,  level, irel,  &
                                 a, u, f, ia, ja,    &  ! defining system
                                 iw, icg)
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level, irel
   double precision :: a(:), u(:), f(:)
   integer          :: ia(:), ja(:)
@@ -24,18 +24,18 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
-  ! See comment in source "coarsening.f90" at line 180
-  iaux = ia(amg % imax(level)+1)
-  ia(amg % imax(level)+1) = iw(amg % iminw(level))
+  ! See comment in source "Coarsening.f90" at line 180
+  iaux = ia(Amg % imax(level)+1)
+  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
   if(irel.eq.1) then
 
     !------------------!
     !   F-relaxation   !
     !------------------!
-    do i = amg % imin(level), amg % imax(level)
+    do i = Amg % imin(level), Amg % imax(level)
       if(icg(i).le.0) then
         s = f(i)
         do j = ia(i) + 1, ia(i+1) - 1
@@ -50,7 +50,7 @@
     !------------------------!
     !   Full GS relaxation   !
     !------------------------!
-    do i = amg % imin(level), amg % imax(level)
+    do i = Amg % imin(level), Amg % imax(level)
       s = f(i)
       do j = ia(i) + 1, ia(i+1) - 1
         s = s-a(j)*u(ja(j))
@@ -63,7 +63,7 @@
     !------------------!
     !   C-relaxation   !
     !------------------!
-    do i = amg % imin(level), amg % imax(level)
+    do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .gt. 0) then
         s = f(i)
         do j = ia(i) + 1, ia(i+1) - 1
@@ -78,7 +78,7 @@
     !-------------------!
     !   FF-relaxation   !
     !-------------------!
-    do i = amg % imin(level), amg % imax(level)
+    do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .eq. 0) then
         s = f(i)
         do j = ia(i) + 1, ia(i+1) - 1
@@ -91,7 +91,7 @@
     !------------------!
     !   C-relaxation   !
     !------------------!
-    do i = amg % imin(level), amg % imax(level)
+    do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .gt. 0) then
         s = f(i)
         do j = ia(i) + 1, ia(i+1) - 1
@@ -104,7 +104,7 @@
     !---------------------------!
     !   More color relaxation   !
     !---------------------------!
-    i = amg % nstcol(level)
+    i = Amg % nstcol(level)
     do
       if(i .ge. AMG_BIG_INTEGER) exit
       s = f(i)
@@ -119,12 +119,12 @@
     print *, "Ouch, didn't see that coming: irel is not in range "
     print *, " 1 to 4.  Go back to the original version of this  "
     print *, "  function and try to figure out what went wrong.  "
-    print *, "  Oh yes, this function is gauss_seidel_sweep.f.   "
+    print *, "  Oh yes, this function is Gauss_Seidel_Sweep.f.   "
     stop
   end if
 
-  call amg % timer_stop(13)
+  call Amg % timer_stop(13)
 
-  ia(amg % imax(level)+1) = iaux
+  ia(Amg % imax(level)+1) = iaux
 
   end subroutine

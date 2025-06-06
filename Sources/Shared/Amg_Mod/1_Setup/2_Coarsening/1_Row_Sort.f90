@@ -1,5 +1,5 @@
 !========================= =====================================================!
-  subroutine row_sort(amg, level,  &
+  subroutine Row_Sort(Amg, level,  &
                       a, ia, ja,   &
                       iw, ifg,     &  ! created from "kwork"
                       jtr)
@@ -36,7 +36,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level
   double precision :: a(:)
   integer          :: ia(:), ja(:)
@@ -56,12 +56,12 @@
   !   Initialization of work space   !
   !                                  !
   !----------------------------------!
-  call amg % timer_start()
+  call Amg % timer_start()
 
-  ilo = amg % imin(level)
-  ihi = amg % imax(level)
+  ilo = Amg % imin(level)
+  ihi = Amg % imax(level)
   if(level .ne. 1) then
-    iws = amg % imaxw(level-1) + 2 - ilo
+    iws = Amg % imaxw(level-1) + 2 - ilo
   else
     iws = 0
   endif
@@ -70,9 +70,9 @@
     ja(ia(i)) = ia(i)
   end do
 
-  call amg % timer_stop(8)
+  call Amg % timer_stop(8)
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
   !---------------------------!
   !                           !
@@ -93,7 +93,7 @@
     amx = a(jlo)
     amn = a(jlo)
     jmx = jlo
-    if(amg % ecg1 .ne. 0.d0) then
+    if(Amg % ecg1 .ne. 0.d0) then
       rs = 0.0d0
       do j = jlo+1, jhi
         rs = rs+abs(a(j))
@@ -108,7 +108,7 @@
       !----------------------------------------------------------!
       !   Test for positive off-diagonals / diagonal dominance   !
       !----------------------------------------------------------!
-      if(amx .ge. 0.0d0 .or. rs .le. amg % ecg1 * a(ia(i))) exit
+      if(amx .ge. 0.0d0 .or. rs .le. Amg % ecg1 * a(ia(i))) exit
     else
       do j = jlo+1, jhi
         if (a(j).lt.amx) then
@@ -128,7 +128,7 @@
     !------------------------------------------------!
     !   Put strongest connection in first position   !
     !------------------------------------------------!
-    ast = amg % ecg2 * amx
+    ast = Amg % ecg2 * amx
     imx = ja(jmx)
     a(jmx)  = a(jlo)
     ja(jmx) = ja(jlo)
@@ -193,8 +193,8 @@
   mdjtr = iw(ihi+iws+1)-1
   if(mdjtr .gt. ndjtr) then
     write(6, '(a)')  &
-      ' *** error in row_sort: nda too small ***'
-    amg % ierr = AMG_ERR_DIM_A_TOO_SMALL
+      ' *** error in Row_Sort: nda too small ***'
+    Amg % ierr = AMG_ERR_DIM_A_TOO_SMALL
     return
   end if
 
@@ -209,6 +209,6 @@
     end do
   end do
 
-  call amg % timer_stop(1)
+  call Amg % timer_stop(1)
 
   end subroutine

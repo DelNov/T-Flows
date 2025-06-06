@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine calculate_residual(amg, level, resl,  &
+  subroutine Calculate_Residual(Amg, level, resl,  &
                                 a, u, f, ia, ja,   &  ! defining system
                                 iw)
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level
   double precision :: resl
   double precision :: a(:), u(:), f(:)
@@ -22,11 +22,11 @@
 
   resl = 0.0d0
 
-  ! See comment in source "coarsening.f90" at line 180
-  iaux = ia(amg % imax(level)+1)
-  ia(amg % imax(level)+1) = iw(amg % iminw(level))
+  ! See comment in source "Coarsening.f90" at line 180
+  iaux = ia(Amg % imax(level)+1)
+  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
-  do i = amg % imin(level), amg % imax(level)
+  do i = Amg % imin(level), Amg % imax(level)
     s = f(i)
     do j = ia(i), ia(i+1) - 1
       s = s - a(j) * u(ja(j))
@@ -34,7 +34,7 @@
     resl = resl + s*s
   end do
 
-  ia(amg % imax(level)+1) = iaux
+  ia(Amg % imax(level)+1) = iaux
   resl = sqrt(resl)
 
   end subroutine

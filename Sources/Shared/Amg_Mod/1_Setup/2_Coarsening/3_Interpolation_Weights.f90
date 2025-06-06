@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine interpolation_weights(amg, level, ichk, mmax,  &  !  4
+  subroutine Interpolation_Weights(Amg, level, ichk, mmax,  &  !  4
                                    a, ia, ja,               &  !  7
                                    iw, ifg, icg,            &  ! from "kwork"
                                    ncolor,                  &  ! from "iwork"
@@ -7,12 +7,12 @@
 !------------------------------------------------------------------------------!
 !     Set up final coarser grid k+1 and interpolation formula from
 !     grid k+1 to grid k. This is the version as described in ruge/
-!     stueben (bristol). interpolation_weights assumes the grid to be
-!     pre-colored by subroutine pre_color.
+!     stueben (bristol). Interpolation_Weights assumes the grid to be
+!     pre-colored by subroutine Pre_Color.
 !
 !     On exit, a, ja and iw are set to contain the interpolation
 !     weights and corresponding pointers as required in the solution
-!     phase of amg1r5. Also, icg(i) (imin(k)<=i<=imax(k)) are set to
+!     phase of Amg1r5. Also, icg(i) (imin(k)<=i<=imax(k)) are set to
 !     their final values, except for those i with icg(i)<0.
 !
 !     Comments on input
@@ -44,7 +44,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level
   integer          :: ichck
   double precision :: a(:)
@@ -67,16 +67,16 @@
   ndu   = size(ia,  1)
   ndicg = size(icg, 1)
 
-  call amg % timer_start()
+  call Amg % timer_start()
   ndaja = nda
   ncount = 0
   if (level.eq.1) then
-    amg % iminw(1) = 1
-    iw(1) = ia(amg % imax(1)+1)
+    Amg % iminw(1) = 1
+    iw(1) = ia(Amg % imax(1)+1)
   endif
 
-  ilo = amg % imin(level)
-  ihi = amg % imax(level)
+  ilo = Amg % imin(level)
+  ihi = Amg % imax(level)
   do i = ilo, ihi
     ifg(i) = 0
   end do
@@ -86,12 +86,12 @@
   !   Sweep over f-points i which have at least one strong connection   !
   !                                                                     !
   !---------------------------------------------------------------------!
-  iblck = amg % iminw(level)
+  iblck = Amg % iminw(level)
   outer: do i = ilo, ihi
     if(icg(i) .lt. 0) then
       jlo = ia(i)+1
       jhi = ja(ia(i))
-      ewt2i = amg % ewt2 / a(jlo)
+      ewt2i = Amg % ewt2 / a(jlo)
       ncondc = 0
 
       !----------------------------------------------------------!
@@ -118,7 +118,7 @@
         end do
         a(jwx)  = a(ia(i))
         ja(jwx) = i
-        amg % mda  = max(amg % mda, jwx + iajas)
+        Amg % mda  = max(Amg % mda, jwx + iajas)
         ifg(i) = jwx
 
         !---------------------------------------------------------------------!
@@ -230,7 +230,7 @@
   !   Set icg; reset ja(ia(i)); check size of coarsest grid   !
   !-----------------------------------------------------------!
   ic = ihi
-  amg % imin(level+1) = ic+1
+  Amg % imin(level+1) = ic+1
   do i = ilo, ihi
     ja(ia(i)) = i
     if(icg(i) .le. 0) cycle
@@ -238,24 +238,24 @@
     icg(i) = ic
     if(ic .lt. ndicg) icg(ic) = 0
   end do
-  amg % imax(level+1) = ic
+  Amg % imax(level+1) = ic
 
   npts = ihi-ilo+1
-  nptsc = amg % imax(level+1) - amg % imin(level+1)+1
+  nptsc = Amg % imax(level+1) - Amg % imin(level+1)+1
   if(nptsc.eq.1)                                             mmax = level+1
-  if(nptsc.eq.1 .and. amg % irow0 .eq. AMG_SINGULAR_MATRIX)  mmax = level
+  if(nptsc.eq.1 .and. Amg % irow0 .eq. AMG_SINGULAR_MATRIX)  mmax = level
   if(nptsc.eq.npts.or.nptsc.eq.0)                            mmax = level
   if(level .lt. mmax) then
     if(ic .ge. ndu) then
       write(6, '(a)')  &
-        ' *** error in interpolation_weights: ndu too small ***'
-      amg % ierr = AMG_ERR_DIM_IA_TOO_SMALL
+        ' *** error in Interpolation_Weights: ndu too small ***'
+      Amg % ierr = AMG_ERR_DIM_IA_TOO_SMALL
       return
     end if
     if(ic .ge. ndicg) then
       write(6, '(a)')  &
-        ' *** error in interpolation_weights: ndw too small ***'
-      amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
+        ' *** error in Interpolation_Weights: ndw too small ***'
+      Amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
       return
     end if
   end if
@@ -263,7 +263,7 @@
   !------------------!
   !   Re-arrange a   !
   !------------------!
-  iblck1 = amg % iminw(level)
+  iblck1 = Amg % iminw(level)
   jwpos = iw(iblck1)
   do i=ilo,ihi
     if(icg(i) .lt. 0) then
@@ -285,7 +285,7 @@
       end if
     end if
   end do
-  amg % imaxw(level) = iblck1-1
+  Amg % imaxw(level) = iblck1-1
   iw(iblck1) = jwpos
 
   !--------------------------------------------------------------!
@@ -310,10 +310,10 @@
 # ifdef VERBOSE
     write(6, '(a,i3,a,i4)')   &
       ' interpolation operator no.', level,  &
-      ' completed. c-points added in interpolation_weights:', ncount
+      ' completed. c-points added in Interpolation_Weights:', ncount
 # endif
 
-  call amg % timer_stop(4)
+  call Amg % timer_stop(4)
 
   end subroutine
 
@@ -326,7 +326,7 @@
 !==============================================================================!
 
   write(6, '(a)')  &
-    ' *** error in interpolation_weights: nda too small ***'
-  amg % ierr = AMG_ERR_DIM_JA_TOO_SMALL
+    ' *** error in Interpolation_Weights: nda too small ***'
+  Amg % ierr = AMG_ERR_DIM_JA_TOO_SMALL
 
   end subroutine

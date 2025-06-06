@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine interpolate_correction(amg, level,    &
+  subroutine Interpolate_Correction(Amg, level,    &
                                     a, u, ia, ja,  &  ! defining system
                                     iw, ifg)
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level
   double precision :: a(:), u(:)
   integer          :: ia(:), ja(:)
@@ -18,12 +18,12 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
   !--------------------------!
   !   c -> c contributions   !
   !--------------------------!
-  do ic = amg % imin(level+1), amg % imax(level+1)
+  do ic = Amg % imin(level+1), Amg % imax(level+1)
     if = ifg(ic)
     u(if) = u(if) + u(ic)
   end do
@@ -31,18 +31,18 @@
   !--------------------------!
   !   c -> f contributions   !
   !--------------------------!
-  iaux = iw(amg % imaxw(level)+1)
-  iw(amg % imaxw(level)+1) = ia(amg % imin(level+1))
+  iaux = iw(Amg % imaxw(level)+1)
+  iw(Amg % imaxw(level)+1) = ia(Amg % imin(level+1))
 
-  do i = amg % iminw(level), amg % imaxw(level)
+  do i = Amg % iminw(level), Amg % imaxw(level)
     if = ifg(i)
     do j = iw(i), iw(i+1) - 1
       u(if) = u(if)+a(j)*u(ja(j))
     end do
   end do
 
-  iw(amg % imaxw(level)+1) = iaux
+  iw(Amg % imaxw(level)+1) = iaux
 
-  call amg % timer_stop(11)
+  call Amg % timer_stop(11)
 
   end subroutine

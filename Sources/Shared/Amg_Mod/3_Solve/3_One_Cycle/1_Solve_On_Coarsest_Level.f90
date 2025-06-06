@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine solve_on_coarsest_level(amg, m, ifac,     &
+  subroutine Solve_On_Coarsest_Level(Amg, m, ifac,     &
                                      a, u, f, ia, ja,  &
                                      iw, icg)
 !------------------------------------------------------------------------------!
@@ -8,7 +8,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: nifac
   double precision :: a(:), u(:), f(:)
   integer          :: ia(:), ja(:)
@@ -37,21 +37,21 @@
 !#  !   Attempt a solution with Yale8 solver   !
 !#  !                                          !
 !#  !------------------------------------------!
-!#  if(amg % nsc .eq. yale) then
+!#  if(Amg % nsc .eq. yale) then
 !#
 !#    !------------------------------------!
 !#    !   Attempt solution with yale-smp   !
 !#    !------------------------------------!
 !#    yalefail = .false.
-!#    call amg % timer_start()
-!#    ilo = amg % imin(m)
+!#    call Amg % timer_start()
+!#    ilo = Amg % imin(m)
 !#    jlo = ia(ilo)
 !#
 !#    !--------------------------------------------------!
 !#    !   First call on grid m, first factorize matrix   !
 !#    !--------------------------------------------------!
 !#    if (ifac.eq.1) then
-!#      ihi = amg % imax(m)
+!#      ihi = Amg % imax(m)
 !#      jhi = iw(iminw(m))-1
 !#      np = ihi-ilo+1
 !#      is = ilo-1
@@ -61,11 +61,11 @@
 !#      !   Test of available work space   !
 !#      !----------------------------------!
 !#      if (jhi+3*np.gt.nda) then
-!#        amg % nsc = 1
+!#        Amg % nsc = 1
 !#        write(6, '(a,a)')                                        &
 !#          ' --- warng in coarse: no yale-smp because nda too ',  &
 !#          'small'
-!#        amg % ierr = AMG_WARN_YALE_STORAGE_JA
+!#        Amg % ierr = AMG_WARN_YALE_STORAGE_JA
 !#        yalefail = .true.
 !#      end if
 !#
@@ -78,7 +78,7 @@
 !#          ja(jhi+np+i) = i
 !#          ja(jhi+2*np+i)= i
 !#        end do
-!#        if (amg % irow0.ne.1) then
+!#        if (Amg % irow0.ne.1) then
 !#
 !#          !--------------------------------------------------!
 !#          !   Coarse grid operator regular, shift contents   !
@@ -161,7 +161,7 @@
 !#        do i = ilo, ihi
 !#          ia(i) = ia(i)+js
 !#        end do
-!#        if (amg % irow0.ne.1) then
+!#        if (Amg % irow0.ne.1) then
 !#          ia(ihi+1) = iaux
 !#          do i = jlo, jhi
 !#            ja(i) = ja(i)+is
@@ -190,18 +190,18 @@
 !#        !   ndrv, solve with gauss-seidel relaxation   !
 !#        !----------------------------------------------!
 !#        if(flag.ne.0) then
-!#          amg % nsc = gauss
+!#          Amg % nsc = gauss
 !#          if (esp.lt.0) then
 !#            write(6, '(a,a)')                                        &
 !#              ' --- warng in coarse: no yale-smp because nda too ',  &
 !#              'small'
-!#            amg % ierr = AMG_WARN_YALE_STORAGE_A
+!#            Amg % ierr = AMG_WARN_YALE_STORAGE_A
 !#          else
 !#            write(6, '(a,a,i8)')                                     &
 !#              ' --- warng in coarse: no yale-smp because of error',  &
 !#              ' in factorization, code=',                            &
 !#              flag
-!#            amg % ierr = AMG_ERR_YALE_FACTOR_FAIL
+!#            Amg % ierr = AMG_ERR_YALE_FACTOR_FAIL
 !#          endif
 !#          yalefail = .true.
 !#        else
@@ -223,7 +223,7 @@
 !#        !---------------------------------!
 !#        !   Factorization allready done   !
 !#        !---------------------------------!
-!#        if (amg % irow0.ne.1) then
+!#        if (Amg % irow0.ne.1) then
 !#          npoint = np
 !#        else
 !#          npoint = np-1
@@ -250,7 +250,7 @@
 !#    !   Update time counter   !
 !#    !-------------------------!
 !#    if(.not. yalefail) then
-!#      call amg % timer_stop(17)
+!#      call Amg % timer_stop(17)
 !#      return
 !#    end if
 !#  end if
@@ -260,14 +260,14 @@
   !   Solution with gauss-seidel relaxation   !
   !                                           !
   !-------------------------------------------!
-  if(amg % nsc .eq. gauss) then
+  if(Amg % nsc .eq. gauss) then
 
     !---------------------------------------------!
     !   Just perform given number of iterations   !
     !---------------------------------------------!
-    if(amg % nrcx .ne. 0) then
-      do iter = 1, amg % nrcx
-        call amg % gauss_seidel_sweep(m, 2,             &
+    if(Amg % nrcx .ne. 0) then
+      do iter = 1, Amg % nrcx
+        call Amg % Gauss_Seidel_Sweep(m, 2,             &
                                       a, u, f, ia, ja,  &
                                       iw, icg)
       end do
@@ -278,29 +278,29 @@
     !-----------------------------------------------------!
     else
 
-      call amg % timer_start()
+      call Amg % timer_start()
 
      ! Calculate supremum norm of right hand side
       fmax = 0.d0
-      do i = amg % imin(m), amg % imax(m)
+      do i = Amg % imin(m), Amg % imax(m)
         fmax = max(fmax,abs(f(i)))
       end do
-      call amg % calculate_residual(m, resold,  &
+      call Amg % Calculate_Residual(m, resold,  &
                                     a, u, f, ia, ja,  &
                                     iw)
 
-      call amg % timer_stop(15)
+      call Amg % timer_stop(15)
       resold = max(resold*conv,fmax*1.d-12)
       do i = 1, 10
         do j = 1, 10
-          call amg % gauss_seidel_sweep(m, 2, a, u, f, ia, ja,  &
+          call Amg % Gauss_Seidel_Sweep(m, 2, a, u, f, ia, ja,  &
                                         iw, icg)
         end do
-        call amg % timer_start()
-        call amg % calculate_residual(m, resnew, a, u, f, ia, ja,  &
+        call Amg % timer_start()
+        call Amg % Calculate_Residual(m, resnew, a, u, f, ia, ja,  &
                                       iw)
 
-        call amg % timer_stop(15)
+        call Amg % timer_stop(15)
         if(resnew .le. resold) return
       end do
     end if
@@ -310,12 +310,12 @@
   !   Solution with BiCG solver   !
   !                               !
   !-------------------------------!
-  else if(amg % nsc .eq. bicg) then
+  else if(Amg % nsc .eq. bicg) then
 
-    call amg % cg_on_coarsest_level(m, 2,             &
+    call Amg % Cg_On_Coarsest_Level(m, 2,             &
                                     a, u, f, ia, ja,  &
                                     iw, icg)
-    call amg % bicg_on_coarsest_level(m, 2,             &
+    call Amg % Bicg_On_Coarsest_Level(m, 2,             &
                                       a, u, f, ia, ja,  &
                                       iw,icg)
 

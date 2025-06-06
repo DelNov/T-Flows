@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine wrkcnt(amg, iout,  &
+  subroutine Wrkcnt(Amg, iout,  &
                     ia,         &
                     iw,         &
                     levels, ncyc0)
@@ -8,7 +8,7 @@
 !-----------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: iout
   integer          :: ia(:)
   integer          :: iw(:)
@@ -29,14 +29,14 @@
   !   Residuals / convergence   !
   !-----------------------------!
   if(ncyc0 .gt. 0) then
-    cfac = amg % res / (amg % res0+1.d-40)
-    write(6, 9110) amg % res0, amg % res, cfac
+    cfac = Amg % res / (Amg % res0+1.d-40)
+    write(6, 9110) Amg % res0, Amg % res, cfac
     cfpc = cfac**(1.d0/dble(ncyc0))
     write(6, 9120) cfpc
   endif
   if(iout .le. 1) return
   write(6, 9000)
-  nnu = amg % imax(1)
+  nnu = Amg % imax(1)
 
   !---------------------!
   !   Computing times   !
@@ -45,14 +45,14 @@
   sum2 = 0.0
   do i = 1, 10
     t(i) = 0.0
-    if(ncyc0 .gt. 0) t(i) = amg % time(i+10)/real(ncyc0)
-    sum1 = sum1 + amg % time(i)
+    if(ncyc0 .gt. 0) t(i) = Amg % time(i+10)/real(ncyc0)
+    sum1 = sum1 + Amg % time(i)
     sum2 = sum2+t(i)
   end do
 
   write(6, 9020)
   write(6, 9030)
-  write(6, 9040) (amg % time(i), t(i), i = 1, 8)
+  write(6, 9040) (Amg % time(i), t(i), i = 1, 8)
   write(6, 9030)
   write(6, 9050) sum1,sum2
   write(6, 9030)
@@ -62,31 +62,31 @@
   !--------------------------------------------------!
   idima = 0
   do level = 1, levels
-    idima = idima+iw(amg % iminw(level))-ia(amg % imin(level))
+    idima = idima+iw(Amg % iminw(level))-ia(Amg % imin(level))
   end do
 
   !--------------------------------------------!
   !   Theoretical minimal space requirements   !
   !--------------------------------------------!
   if(levels .lt. 2) return
-  mdta  = iw(amg % iminw(levels))-1
+  mdta  = iw(Amg % iminw(levels))-1
   mdtja = mdta
-  mdtia = amg % imax(levels)+1
-  mdtu  = amg % imax(levels)
+  mdtia = Amg % imax(levels)+1
+  mdtu  = Amg % imax(levels)
   mdtf  = mdtu
   mdtig = 2*mdtu+nnu
-  write(6, 9100) amg % mda, mdta, amg % mda, mdtja,  &
-                   amg % mdu, mdtia, amg % mdu, mdtu,  &
-                   amg % mdu, mdtf,  amg % mdw, mdtig
+  write(6, 9100) Amg % mda, mdta, Amg % mda, mdtja,  &
+                   Amg % mdu, mdtia, Amg % mdu, mdtu,  &
+                   Amg % mdu, mdtf,  Amg % mdw, mdtig
 
   !------------------!
   !   Complexities   !
   !------------------!
-  scmplx = dble(2*(  amg % mda + amg % mdu + amg % mdu)   &
-                   + amg % mda + amg % mdu + amg % mdw)/  &
-           dble(1+5*nnu+3*(iw(amg % iminw(1))-ia(amg % imin(1))))
+  scmplx = dble(2*(  Amg % mda + Amg % mdu + Amg % mdu)   &
+                   + Amg % mda + Amg % mdu + Amg % mdw)/  &
+           dble(1+5*nnu+3*(iw(Amg % iminw(1))-ia(Amg % imin(1))))
   tcmplx = dble(2*(mdta+mdtu+mdtf)+mdtja+mdtia+mdtig)/  &
-           dble(1+5*nnu+3*(iw(amg % iminw(1))-ia(amg % imin(1))))
+           dble(1+5*nnu+3*(iw(Amg % iminw(1))-ia(Amg % imin(1))))
 
   acmplx = dble(idima)/dble(iw(1)-1)
   ocmplx = dble(mdtu )/dble(nnu)
@@ -95,7 +95,7 @@
 9000  format (//' ************** work count ***************'/)
 9020  format (  '   prep       sec       sol      sec/cycle')
 9030  format (  ' -----------------------------------------')
-9040  format (  ' 1 row_sort',f7.2,'   11 intadd   ',f7.2/  &
+9040  format (  ' 1 Row_Sort',f7.2,'   11 intadd   ',f7.2/  &
                 ' 2 pre-col ',f7.2,'   12 rescal   ',f7.2/  &
                 ' 3 chk-col ',f7.2,'   13 relax    ',f7.2/  &
                 ' 4 interpol',f7.2,'   14 v-*      ',f7.2/  &
@@ -109,7 +109,7 @@
                ' on the finest grid   = ',f8.2,'   (a-complexity)     '/  &
                ' total number of grid points / number of points in    '/  &
                ' the  finest  grid    = ',f8.2,'   (o-complexity)     '/  &
-               ' total space used by amg1r5 / space occupied by user- '/  &
+               ' total space used by Amg1r5 / space occupied by user- '/  &
                ' defined  problem     = ',f8.2,'   (s-complexity)     '/  &
                ' space used during solution phase / space occupied by '/  &
                ' user-defined problem = ',f8.2                         /  &

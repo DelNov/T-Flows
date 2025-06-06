@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine coarsening(amg, levelx,   &
+  subroutine Coarsening(Amg, levelx,   &
                         a, u, ia, ja,  &  ! linear system
                         iw, icg, ifg,  &  ! work arrays
                         levels,        &
@@ -14,12 +14,12 @@
 !     ================ description of parameters =======================
 !
 !     ecg1 --    defines criterion for determining diagonal
-!                dominance in row_sort. i.e., if the absolute
+!                dominance in Row_Sort. i.e., if the absolute
 !                value of the sum of the off-diagonals of row
 !                i is smaller than ecg1 times the absolute
 !                value of the diagonal entry, then point i is
 !                immediately forced to be an f-point in the
-!                pre-coloring algorithm pre_color.
+!                pre-coloring algorithm Pre_Color.
 !                in the second part (wint), no interpolation
 !                is defined for point i, and no points use
 !                i for interpolation. in addition, the weight
@@ -41,7 +41,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: levelx
   double precision :: a(:), u(:)
   integer          :: ia(:), ja(:)
@@ -65,14 +65,14 @@
   !   Assign default values if zero   !
   !   (ecg1 and ntr are OK to be 0)   !
   !-----------------------------------!
-  if(amg % nwt  .eq. 0)      amg % nwt  = 2
-  if(amg % ecg2 .eq. 0.0d0)  amg % ecg2 = 0.25d0
-  if(amg % ewt2 .eq. 0.0d0)  amg % ewt2 = 0.35d0
+  if(Amg % nwt  .eq. 0)      Amg % nwt  = 2
+  if(Amg % ecg2 .eq. 0.0d0)  Amg % ecg2 = 0.25d0
+  if(Amg % ewt2 .eq. 0.0d0)  Amg % ewt2 = 0.35d0
 
   !--------------------------!
   !   Decode parameter nwt   !
   !--------------------------!
-  ichk = amg % nwt
+  ichk = Amg % nwt
 
   !----------------!
   !   Coarsening   !
@@ -81,11 +81,11 @@
   mmax   = AMG_MAX_LEVELS
 
   !-----------------------------------------------------------------!
-  !   Initialize parameters amg % mda - mdiw, later set to actual   !
+  !   Initialize parameters Amg % mda - mdiw, later set to actual   !
   !   storage requirements of corresponding vectors                 !
   !-----------------------------------------------------------------!
-  amg % mda = 0
-  mdiw      = amg % imax(1)
+  Amg % mda = 0
+  mdiw      = Amg % imax(1)
 
   !---------------------------------------------------------------------!
   !   first_level is the number of the first stored grid, iajas, iias   !
@@ -109,8 +109,8 @@
       do icall = 1, 4
         recover = .false.
         if(icall .eq. 1) then
-          jtrst = ia(amg % imax(level-1)+1)
-          call amg % row_sort(level-1,        &
+          jtrst = ia(Amg % imax(level-1)+1)
+          call Amg % Row_Sort(level-1,        &
                               a, ia, ja,      &
                               iw, ifg, jtr)
         end if
@@ -121,47 +121,47 @@
           !         to contain reset stack                        !
           !-------------------------------------------------------!
           irst = mdiw + 1 - iirs
-          call amg % pre_color(level-1,       &
+          call Amg % Pre_Color(level-1,       &
                                ia, ja,        &
                                iw, icg, ifg,  &
                                iwork, jtr,    &
                                iias)
         end if
         if(icall .eq. 3) then
-          call amg % interpolation_weights(level-1, ichk, mmax,  &
+          call Amg % Interpolation_Weights(level-1, ichk, mmax,  &
                                            a, ia, ja,            &
                                            iw, ifg, icg, iwork,  &
                                            ncolx, iajas)
         end if
         if(icall .eq. 4) then
-          call amg % define_operators(level, mmax,   &
+          call Amg % Define_Operators(level, mmax,   &
                                       a, ia, ja,     &
                                       iw, icg, ifg,  &
                                       iwork,         &
                                       ncolx, iajas)
         end if
-        if(amg % ierr .gt. 0) then
+        if(Amg % ierr .gt. 0) then
           ! OK, it will attempt a recovery
-          if(amg % ierr .ge. 1 .and. amg % ierr .le. 6) then
+          if(Amg % ierr .ge. 1 .and. Amg % ierr .le. 6) then
             if(level .le. first_level + 1 .and. iirs .ne. 0) return
-            kerr = amg % ierr
-            amg % ierr = 0
+            kerr = Amg % ierr
+            Amg % ierr = 0
             first_level = level-1
             iirs = mdiw
-            isia = amg % imin(level-1)-1
+            isia = Amg % imin(level-1)-1
             iias = iias+isia
-            isaja = ia(amg % imin(level-1))-1
+            isaja = ia(Amg % imin(level-1))-1
             iajas = iajas+isaja
-            do i = ia(amg % imin(level-1)), ia(amg % imax(level-1)+1) - 1
+            do i = ia(Amg % imin(level-1)), ia(Amg % imax(level-1)+1) - 1
               ja(i-isaja) = ja(i)-isia
               a(i-isaja)  = a(i)
             end do
-            do i = amg % imin(level-1), amg % imax(level-1)+1
+            do i = Amg % imin(level-1), Amg % imax(level-1)+1
               ia(i-isia) = ia(i)-isaja
             end do
-            amg % imin(level-1) = 1
-            amg % imax(level-1) = amg % imax(level-1)-isia
-            iw(amg % iminw(level-1)) = ia(amg % imax(level-1)+1)
+            Amg % imin(level-1) = 1
+            Amg % imax(level-1) = Amg % imax(level-1)-isia
+            iw(Amg % iminw(level-1)) = ia(Amg % imax(level-1)+1)
             recover = .true.
             exit
           end if
@@ -174,8 +174,8 @@
           exitout = .true.
           exit
         end if
-        call amg % truncate_operator(level, amg % ntr, a, ia, ja)
-        if(amg % ierr .gt. 0) return
+        call Amg % Truncate_Operator(level, Amg % ntr, a, ia, ja)
+        if(Amg % ierr .gt. 0) return
 
         ! In this AMG implementation, unknowns (u), right-hand side (f), and
         ! the row pointers (ia) are all stored in contiguous blocks, stacked
@@ -195,14 +195,14 @@
         ! it is best left as-is.
         !
         ! For application of this trick (technique), have a look at:
-        ! - calculate_residual.f90
-        ! - cg_on_coarsest_level.f90
-        ! - bicg_on_coarsest_level.f90
-        ! - gauss_seidel_sweep.f90
-        ! - scale_solution.f90
-        ! - cg_alpha.f90
-        ! - cg_epsilon.f90
-        iw(amg % iminw(level)) = ia(amg % imax(level)+1)
+        ! - Calculate_Residual.f90
+        ! - Cg_On_Coarsest_Level.f90
+        ! - Bicg_On_Coarsest_Level.f90
+        ! - Gauss_Seidel_Sweep.f90
+        ! - Scale_Solution.f90
+        ! - Cg_Alpha.f90
+        ! - Cg_Epsilon.f90
+        iw(Amg % iminw(level)) = ia(Amg % imax(level)+1)
         if(level .ge. mmax) then
           levels = mmax
           exitout = .true.
@@ -215,17 +215,17 @@
     if(exitout) exit
   end do
 
-  amg % mdu = amg % imax(levels) + iias
-  amg % mdw = mdiw + 2
-  if(kerr.ne.0 .or. amg % mdu.gt.ndu .or. amg % mdu.gt.ndu) then
-    write(6, 1024) amg % mda, amg % mda, amg % mdu,  &
-                   amg % mdu, amg % mdu, amg % mdw
+  Amg % mdu = Amg % imax(levels) + iias
+  Amg % mdw = mdiw + 2
+  if(kerr.ne.0 .or. Amg % mdu.gt.ndu .or. Amg % mdu.gt.ndu) then
+    write(6, 1024) Amg % mda, Amg % mda, Amg % mdu,  &
+                   Amg % mdu, Amg % mdu, Amg % mdw
     write(6, 2048) mdiw
-    amg % ierr = kerr
+    Amg % ierr = kerr
     return
   end if
 
-  call amg % set_inverse_pointer(icg, ifg, levels)
+  call Amg % Set_Inverse_Pointer(icg, ifg, levels)
 
 1024  format (/' **************** space requirements ****************'//  &
                ' vector          needed                              '/   &

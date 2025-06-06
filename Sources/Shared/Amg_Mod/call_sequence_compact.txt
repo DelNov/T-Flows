@@ -1,38 +1,38 @@
-     0. amg1r5
-      ├── get_integer_digits
-      ├── 1. setup
-      │    ├── get_integer_digits
-      │    ├── 1. check_matrix_properties
-      │    └── 2. coarsening
-      │         ├── 1. row_sort
-      │         ├── 2. pre_color
-      │         ├── 3. interpolation_weights
-      │         ├── 4. define_operators
-      │         ├── 5. truncate_operator
-      │         └── 6. set_inverse_pointer
-      ├── 2. first_guess
-      │    ├── get_integer_digits
-      │    └── random_0_to_0p1
-      ├── 3. solve
-      │    ├── get_integer_digits
-      │    ├── 1. calculate_residual
-      │    ├── 2. backup_u
-      │    ├── 3. one_cycle
-      │    │    ├── 1. solve_on_coarsest_level
-      │    │    │    ├── 1. cg_on_coarsest_level
-      │    │    │    ├── 2. bicg_on_coarsest_level
-      │    │    │    ├── 3. gauss_seidel_sweep
-      │    │    │    └── 4. calculate_residual
-      │    │    ├── 2. normalize_u
-      │    │    ├── 3. gauss_seidel_sweep
-      │    │    ├── 4. calculate_residual
-      │    │    ├── 5. set_u_to_zero
-      │    │    ├── 6. restrict_residuals
-      │    │    ├── 7. scale_solution
-      │    │    └── 8. interpolate_correction
-      │    └── 4. cg_step
-      │         ├── 1. cg_alpha
-      │         └── 2. cg_epsilon
-      └── 4. wrkcnt
+     0. Amg1r5
+      ├── Get_Integer_Digits
+      ├── 1. Setup
+      │    ├── Get_Integer_Digits
+      │    ├── 1. Check_Matrix_Properties
+      │    └── 2. Coarsening
+      │         ├── 1. Row_Sort
+      │         ├── 2. Pre_Color
+      │         ├── 3. Interpolation_Weights
+      │         ├── 4. Define_Operators
+      │         ├── 5. Truncate_Operator
+      │         └── 6. Set_Inverse_Pointer
+      ├── 2. First_Guess
+      │    ├── Get_Integer_Digits
+      │    └── Random_0_To_0p1
+      ├── 3. Solve
+      │    ├── Get_Integer_Digits
+      │    ├── 1. Calculate_Residual
+      │    ├── 2. Backup_U
+      │    ├── 3. One_Cycle
+      │    │    ├── 1. Solve_On_Coarsest_Level
+      │    │    │    ├── 1. Cg_On_Coarsest_Level
+      │    │    │    ├── 2. Bicg_On_Coarsest_Level
+      │    │    │    ├── 3. Gauss_Seidel_Sweep
+      │    │    │    └── 4. Calculate_Residual
+      │    │    ├── 2. Normalize_U
+      │    │    ├── 3. Gauss_Seidel_Sweep
+      │    │    ├── 4. Calculate_Residual
+      │    │    ├── 5. Set_U_To_Zero
+      │    │    ├── 6. Restrict_Residuals
+      │    │    ├── 7. Scale_Solution
+      │    │    └── 8. Interpolate_Correction
+      │    └── 4. Cg_Step
+      │         ├── 1. Cg_Alpha
+      │         └── 2. Cg_Epsilon
+      └── 4. Wrkcnt
 
      0    1    2    3    4

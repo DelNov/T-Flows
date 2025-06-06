@@ -1,11 +1,11 @@
 !==============================================================================!
-  subroutine set_inverse_pointer(amg, icg, ifg, levels)
+  subroutine Set_Inverse_Pointer(Amg, icg, ifg, levels)
 !------------------------------------------------------------------------------!
 !   Set "inverse" pointer ifg
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: icg(:), ifg(:)
   integer          :: levels
 !-----------------------------------[locals]-----------------------------------!
@@ -14,15 +14,15 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
-  do i = amg % imin(1), amg % imax(levels-1)
+  do i = Amg % imin(1), Amg % imax(levels-1)
     if(icg(i) .gt. 0) ifg(icg(i)) = i
   end do
 
   ib = 1
   do level = 1, levels - 1
-    ist = amg % nstcol(level)
+    ist = Amg % nstcol(level)
     if(ist .lt. AMG_BIG_INTEGER) then
       do
         ifg(ib) = ist
@@ -33,6 +33,6 @@
     end if
   end do
 
-  call amg % timer_stop(8)
+  call Amg % timer_stop(8)
 
   end subroutine

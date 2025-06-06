@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine define_operators(amg, level, mmax,  &
+  subroutine Define_Operators(Amg, level, mmax,  &
                               a, ia, ja,         &   !  linear system
                               iw, icg, ifg,      &   !  work arrays
                               ncolor, ncolx, iajas)
@@ -103,7 +103,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level, mmax
   double precision :: a(:)
   integer          :: ia(:), ja(:)
@@ -126,28 +126,28 @@
   !------------------------------------------------------!
   !   Extend a, ja to store transpose of interpolation   !
   !------------------------------------------------------!
-  call amg % timer_start()
+  call Amg % timer_start()
   ndaja = nda
-  amg % iminw(level) = amg % imaxw(level-1)+1
+  Amg % iminw(level) = Amg % imaxw(level-1)+1
   if(level .le. mmax) then
-    jpos = iw(amg % iminw(level))
-    do j = iw(amg % iminw(level-1)), iw(amg % imaxw(level-1)+1)-1
+    jpos = iw(Amg % iminw(level))
+    do j = iw(Amg % iminw(level-1)), iw(Amg % imaxw(level-1)+1)-1
       icg(ja(j)) = icg(ja(j))+1
     end do
 
-    amg % mda = max(amg % mda, jpos + jpos - iw(amg % iminw(level-1))+iajas)
-    ifg(amg % imin(level)) = ndaja - jpos + iw(amg % iminw(level-1))+1
-    if(ifg(amg % imin(level)).le.jpos) then
+    Amg % mda = max(Amg % mda, jpos + jpos - iw(Amg % iminw(level-1))+iajas)
+    ifg(Amg % imin(level)) = ndaja - jpos + iw(Amg % iminw(level-1))+1
+    if(ifg(Amg % imin(level)).le.jpos) then
       call error_9900(nda)
       return
     end if
-    do ic = amg % imin(level), amg % imax(level)
+    do ic = Amg % imin(level), Amg % imax(level)
       ifg(ic+1) = ifg(ic)+icg(ic)
       icg(ic) = ifg(ic)
     end do
 
     ! Watch out: if is the loop variable
-    do if = amg % imin(level-1), amg % imax(level-1)
+    do if = Amg % imin(level-1), Amg % imax(level-1)
       if(icg(if).lt.0) then
         ibl = -icg(if)
         do j = iw(ibl), iw(ibl+1) - 1
@@ -159,7 +159,7 @@
       end if
     end do
 
-    do ic = amg % imin(level), amg % imax(level)
+    do ic = Amg % imin(level), Amg % imax(level)
       icg(ic) = 0
     end do
 
@@ -167,7 +167,7 @@
     !   Sweep over all cg-points ic to assemble rows of cg matrix   !
     !---------------------------------------------------------------!
     istti = 1
-    do if = amg % imin(level-1), amg % imax(level-1)
+    do if = Amg % imin(level-1), Amg % imax(level-1)
       if (icg(if).le.0) cycle
       ic = icg(if)
       if(jpos .gt. ndaja) then
@@ -229,7 +229,7 @@
           end if
         end if
       end do
-      ist = amg % imin(level-1)-1
+      ist = Amg % imin(level-1)-1
 
       !------------------------------------------------!
       !                                                !
@@ -244,7 +244,7 @@
         else
           istti = 0
           found = .false.
-          do jf2 = ist + 1, amg % imax(level-1)
+          do jf2 = ist + 1, Amg % imax(level-1)
             if(icg(jf2) .lt. 0) then
               ibl = -icg(jf2)
               do jb = iw(ibl), iw(ibl+1) - 1
@@ -267,7 +267,7 @@
             write(6, '(a,a,i3)')                                    &
               ' *** error in opdfn: interpolation entry missing ',  &
               'on grid ', level-1
-            amg % ierr = AMG_ERR_INTERP_MISSING
+            Amg % ierr = AMG_ERR_INTERP_MISSING
             return
           end if
           ist = if1
@@ -333,7 +333,7 @@
       end do
       ia(ic+1) = jpos
     end do
-    amg % mda = max(amg % mda, ia(amg % imax(level)+1)-1 + iajas)
+    Amg % mda = max(Amg % mda, ia(Amg % imax(level)+1)-1 + iajas)
 
     !----------------------------------!
     !   Warning for storage shortage   !
@@ -344,7 +344,7 @@
         ' --- warng: unable to store transpose of interpolation',  &
         ' on grid ',k1,' during execution of opdfn, because nda',  &
         ' or nda too small. setup computation is slowing down.'
-      amg % ierr = AMG_WARN_YALE_STORAGE_A
+      Amg % ierr = AMG_WARN_YALE_STORAGE_A
     endif
 #   ifdef VERBOSE
       write(6, '(a,i3,a)')  &
@@ -355,9 +355,9 @@
   !   Set up linked list for relaxation on grid level-1   !
   !-------------------------------------------------------!
   end if
-  ia(amg % imin(level)) = iw(amg % iminw(level))
-  ilo = amg % imin(level-1)
-  ihi = amg % imax(level-1)
+  ia(Amg % imin(level)) = iw(Amg % iminw(level))
+  ilo = Amg % imin(level-1)
+  ihi = Amg % imax(level-1)
   ilo1 = ilo-1
   npts = ihi-ilo1
   ist = AMG_BIG_INTEGER
@@ -368,13 +368,13 @@
       ist=i+ilo1
     end do
   end do
-  amg % nstcol(level-1) = ist
+  Amg % nstcol(level-1) = ist
 
   !---------------------------!
   !   Exit / error messages   !
   !---------------------------!
 
-  call amg % timer_stop(6)
+  call Amg % timer_stop(6)
 
   end subroutine
 
@@ -388,6 +388,6 @@
 
   write(6, '(a)')  &
     ' *** error in opdfn: nda too small ***'
-  amg % ierr = AMG_ERR_DIM_JA_TOO_SMALL
+  Amg % ierr = AMG_ERR_DIM_JA_TOO_SMALL
 
   end subroutine

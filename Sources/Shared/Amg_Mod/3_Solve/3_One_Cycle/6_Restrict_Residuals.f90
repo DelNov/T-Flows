@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine restrict_residuals(amg, level_c,     &
+  subroutine Restrict_Residuals(Amg, level_c,     &
                                 a, u, f, ia, ja,  &
                                 iw, ifg)
 !------------------------------------------------------------------------------!
@@ -7,7 +7,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   integer          :: level_c
   double precision :: a(:), u(:), f(:)
   integer          :: ia(:), ja(:)
@@ -19,17 +19,17 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call amg % timer_start()
+  call Amg % timer_start()
 
   !---------------------------------!
   !   Transfer of c-point defects   !
   !---------------------------------!
-  iaux = ia(amg % imax(level_c-1)+1)
-  ia(amg % imax(level_c-1)+1) = iw(amg % iminw(level_c-1))
-  iaux1 = iw(amg % imaxw(level_c-1)+1)
-  iw(amg % imaxw(level_c-1)+1) = iaux
+  iaux = ia(Amg % imax(level_c-1)+1)
+  ia(Amg % imax(level_c-1)+1) = iw(Amg % iminw(level_c-1))
+  iaux1 = iw(Amg % imaxw(level_c-1)+1)
+  iw(Amg % imaxw(level_c-1)+1) = iaux
 
-  do ic = amg % imin(level_c), amg % imax(level_c)
+  do ic = Amg % imin(level_c), Amg % imax(level_c)
     if = ifg(ic)
     d = f(if)
     do j = ia(if), ia(if+1) - 1
@@ -41,7 +41,7 @@
   !---------------------------------!
   !   Transfer of f-point defects   !
   !---------------------------------!
-  do i = amg % iminw(level_c-1), amg % imaxw(level_c-1)
+  do i = Amg % iminw(level_c-1), Amg % imaxw(level_c-1)
     if = ifg(i)
     d = f(if)
     do j = ia(if), ia(if+1) - 1
@@ -51,9 +51,9 @@
       f(ja(j)) = f(ja(j))+a(j)*d
     end do
   end do
-  ia(amg % imax(level_c-1)+1) = iaux
-  iw(amg % imaxw(level_c-1)+1) = iaux1
+  ia(Amg % imax(level_c-1)+1) = iaux
+  iw(Amg % imaxw(level_c-1)+1) = iaux1
 
-  call amg % timer_stop(12)
+  call Amg % timer_stop(12)
 
   end subroutine

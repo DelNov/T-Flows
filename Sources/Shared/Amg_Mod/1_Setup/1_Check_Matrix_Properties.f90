@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine check_matrix_properties(amg,         &
+  subroutine Check_Matrix_Properties(Amg,         &
                                      a, ia, ja,   &  ! defining system
                                      icg, ifg)
 !------------------------------------------------------------------------------!
@@ -20,7 +20,7 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(amg_type)  :: amg
+  class(Amg_Type)  :: Amg
   double precision :: a(:)
   integer          :: ia(:), ja(:)
   integer          :: icg(:), ifg(:)
@@ -43,14 +43,14 @@
   if(ia(1) .ne. 1) then
     write(6, '(a)')  &
       ' *** error in check: pointer ia erroneous ***'
-    amg % ierr = AMG_ERR_IA_POINTER_INVALID
+    Amg % ierr = AMG_ERR_IA_POINTER_INVALID
     return
   end if
-  nnu = amg % imax(1)
+  nnu = Amg % imax(1)
   if(nnu .ge. ndicg) then
     write(6, '(a)')  &
       ' *** error in check: ndw too small ***'
-    amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
+    Amg % ierr = AMG_ERR_DIM_ICG_TOO_SMALL
     return
   end if
   do i = 1, nnu
@@ -71,7 +71,7 @@
       write(*,*) 'nda= ', nda
       write(6, '(a)')  &
         ' *** error in check: pointer ia erroneous ***'
-      amg % ierr = AMG_ERR_IA_POINTER_INVALID
+      Amg % ierr = AMG_ERR_IA_POINTER_INVALID
       return
     endif
     if (ja(j1).ne.i) then
@@ -81,7 +81,7 @@
       write(*,*) 'ja(j1) = ', ja(j1)
       write(6, '(a)')  &
         ' *** error in check: diagonal is not stored first ***'
-      amg % ierr = AMG_ERR_DIAG_NOT_FIRST
+      Amg % ierr = AMG_ERR_DIAG_NOT_FIRST
       return
     endif
     do j = j1, j2
@@ -94,7 +94,7 @@
         write(*,*) 'icg(i1) = ', icg(i1)
         write(6, '(a)')  &
           ' *** error in check: pointer ja erroneous ***'
-        amg % ierr = AMG_ERR_JA_POINTER_INVALID
+        Amg % ierr = AMG_ERR_JA_POINTER_INVALID
         return
       endif
       icg(i1) = 1
@@ -125,7 +125,7 @@
     if(d .le. 0.0d0) then
       write(6, '(a)')  &
         ' *** error in check: diagonal is non-positive ***'
-      amg % ierr = AMG_ERR_DIAG_NOT_POSITIVE
+      Amg % ierr = AMG_ERR_DIAG_NOT_POSITIVE
       return
     end if
     deps = d*1.0d-12
@@ -193,13 +193,13 @@
   !--------------!
   !   Warnings   !
   !--------------!
-  if (amg % isym .eq. AMG_SYMMETRIC_MATRIX     .and. asym .ne. 0.0d0 .or.  &
-      amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX .and. asym .eq. 0.0d0 .or.  &
-      amg % irow0 .eq. AMG_SINGULAR_MATRIX     .and. nazer .ne. nnu  .or.  &
-      amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX .and. nazer .eq. nnu) then
+  if (Amg % isym .eq. AMG_SYMMETRIC_MATRIX     .and. asym .ne. 0.0d0 .or.  &
+      Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX .and. asym .eq. 0.0d0 .or.  &
+      Amg % irow0 .eq. AMG_SINGULAR_MATRIX     .and. nazer .ne. nnu  .or.  &
+      Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX .and. nazer .eq. nnu) then
     write(6, '(a)')  &
       ' --- warng in check: param matrix may be bad ---'
-    amg % ierr = AMG_ERR_MATRIX_INVALID
+    Amg % ierr = AMG_ERR_MATRIX_INVALID
   endif
 
   if(new .le. 0) then
@@ -208,7 +208,7 @@
         ' check: matrix a was symmetrically stored'
 #   endif
     ! Remove pairs of zeroes
-    call amg % truncate_operator(1, 0, a, ia, ja)
+    call Amg % Truncate_Operator(1, 0, a, ia, ja)
     return
   end if
 
@@ -218,13 +218,13 @@
   if(nna+new .ge. nda) then
     write(6, '(a)')  &
       ' *** error in check: nda too small ***'
-    amg % ierr = AMG_ERR_DIM_A_TOO_SMALL
+    Amg % ierr = AMG_ERR_DIM_A_TOO_SMALL
     return
   end if
   if(nna+new .ge. nda) then
     write(6, '(a)')  &
       ' *** error in check: nda too small ***'
-    amg % ierr = AMG_ERR_DIM_JA_TOO_SMALL
+    Amg % ierr = AMG_ERR_DIM_JA_TOO_SMALL
     return
   end if
 
@@ -249,7 +249,7 @@
   !   Symmetrize matrix a:  isym=1: copy missing transpose entries   !
   !                         isym=2: fill in zeroes                   !
   !------------------------------------------------------------------!
-  if(amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX) then
+  if(Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX) then
     do i = 1, nnu
       j2 = icg(i)-1
       do j = ia(i) + 1, j2
@@ -270,7 +270,7 @@
     write(6, '(a,i5,a,a)')                   &
       ' *** warng in check:', new, ' a-entries missing ***',  &
       ' missing transpose connections will be filled in'
-    amg % ierr = AMG_ERR_MISSING_A_ENTRY
+    Amg % ierr = AMG_ERR_MISSING_A_ENTRY
     do i = 1, nnu
       j2 = icg(i)-1
       do j = ia(i) + 1, j2
