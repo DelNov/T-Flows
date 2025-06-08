@@ -7,20 +7,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level
-  double precision :: resl
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:)
+  class(Amg_Type) :: Amg
+  integer         :: level
+  real            :: resl
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: s
-  integer          :: i, iaux, j
+  real    :: s
+  integer :: i, iaux, j
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  resl = 0.0d0
+  resl = 0.0
 
   ! See comment in source "Coarsening.f90" at line 180
   iaux = ia(Amg % imax(level)+1)

@@ -5,12 +5,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level
-  double precision :: u(:)
+  class(Amg_Type) :: Amg
+  integer         :: level
+  real            :: u(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: fac
-  integer          :: i
+  real    :: fac
+  integer :: i
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!

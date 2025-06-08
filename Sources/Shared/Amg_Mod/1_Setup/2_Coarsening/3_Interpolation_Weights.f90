@@ -44,19 +44,19 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level
-  integer          :: ichck
-  double precision :: a(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), ifg(:), icg(:), ncolor(:)
-  integer          :: ncolx, iajas
+  class(Amg_Type) :: Amg
+  integer         :: level
+  integer         :: ichck
+  real            :: a(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), ifg(:), icg(:), ncolor(:)
+  integer         :: ncolx, iajas
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, ic, icgp, ichk, ihi, ilo, ip, is
   integer :: ii, ijas, iblck, iblck1
   integer :: j, jj, jhi, jlo, j1, j2, jw0, jwx, jwpos, jjhi, jjlo
   integer :: mmax, nc, ncondc, ncount, npts, nptsc, ndaja
-  double precision :: ewt2i, s, si, scale, ww
+  real    :: ewt2i, s, si, scale, ww
   integer :: nda, ndu, ndicg
   logical :: skip
 !------------------------------------[save]------------------------------------!
@@ -135,8 +135,8 @@
             !-------------------------------------------------------!
             !   Compute dependence on set of interpolation points   !
             !-------------------------------------------------------!
-            s  = 0.0d0
-            si = 0.0d0
+            s  = 0.0
+            si = 0.0
             jjlo = ia(ii)+1
             jjhi = ia(ii+1)-1
             do jj = jjlo, jjhi
@@ -146,7 +146,7 @@
             end do
             skip = .false.
             if(ichk .ne. 2) then
-              if(s .eq. 0.0d0) then
+              if(s .eq. 0.0) then
                 a(jwx) = a(jwx)+a(j)
                 cycle
               else
@@ -203,13 +203,13 @@
       do j = jhi + 1, ia(i+1) - 1
         ii = ja(j)
         if(icg(ii) .eq. 0) cycle
-        s = 0.0d0
+        s = 0.0
         jjlo = ia(ii)+1
         jjhi = ia(ii+1)-1
         do jj = jjlo, jjhi
           if (ifg(ja(jj)).ge.jw0) s = s+a(jj)
         end do
-        if (s.eq.0.0d0) then
+        if (s.eq.0.0) then
           a(jwx) = a(jwx)+a(j)
         else
           ww = a(j)/s
@@ -275,7 +275,7 @@
       else
         icg(i) = -iblck1
         iw(iblck1) = jwpos
-        scale = -1.0d0/a(j2)
+        scale = -1.0/a(j2)
         do j = j1, j2 - 1
           a(jwpos)  = a(j)*scale
           ja(jwpos) = icg(ja(j))

@@ -9,13 +9,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: nnu, levelx
-  double precision :: a(:), u(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:), ifg(:)
-  integer          :: levels
-  integer          :: iwork(:), jtr(:)
+  class(Amg_Type) :: Amg
+  integer         :: nnu, levelx
+  real            :: a(:), u(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:), ifg(:)
+  integer         :: levels
+  integer         :: iwork(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, n_digits
   integer :: digit(AMG_MAX_LEVELS)

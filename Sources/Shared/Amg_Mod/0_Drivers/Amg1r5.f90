@@ -575,18 +575,18 @@
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
-  double precision  :: a_val(:)
-  integer           :: a_row(:), a_col(:)
-  double precision  :: phi(:), b(:)
-  integer           :: n
-  integer, optional :: iswtch  ! Class 2 by Ruge-Stueben
+  real                    :: a_val(:)
+  integer                 :: a_row(:), a_col(:)
+  real                    :: phi(:), b(:)
+  integer                 :: n
+  integer, optional       :: iswtch  ! Class 2 by Ruge-Stueben
 !-----------------------------------[locals]-----------------------------------!
   integer :: digit(AMG_MAX_LEVELS)
 
   ! These arrays describe linear system
-  double precision, allocatable :: a(:), u(:), f(:)
-  integer,          allocatable :: ia(:)
-  integer,          allocatable :: ja(:)
+  real,    allocatable :: a(:), u(:), f(:)
+  integer, allocatable :: ia(:)
+  integer, allocatable :: ja(:)
 
   ! These were introduced later by B. Niceno to avoid the use of equivalence
   integer, allocatable :: iwork(:), jtr(:), iw(:), icg(:), ifg(:)
@@ -594,7 +594,7 @@
   integer :: n_nonzeros, n_unknowns, niw, nicg, nifg
   integer :: nda, ndu, ndw
   integer :: icgst, kevelx, kout, kswtch, levels
-  integer :: n_digits, ncyc0, ndicg
+  integer :: n_digits, ndicg
   integer :: levelx, ifirst, ncyc
   integer :: madapt
 !------------------------------------[save]------------------------------------!
@@ -660,11 +660,11 @@
     !   Allocate memory for the AMG solver   !
     !----------------------------------------!
     if(.not. allocated(iwork)) then
-      allocate(a(nda));      a(:)     = 0.d0  ! matrix values
+      allocate(a(nda));      a(:)     = 0.0   ! matrix values
       allocate(ia(ndu));     ia(:)    = 0     ! row pointers
       allocate(ja(nda));     ja(:)    = 0     ! columns
-      allocate(u(ndu));      u(:)     = 0.d0
-      allocate(f(ndu));      f(:)     = 0.d0
+      allocate(u(ndu));      u(:)     = 0.0
+      allocate(f(ndu));      f(:)     = 0.0
       allocate(iwork(ndu));  iwork(:) = 0
       allocate(jtr(nda));    jtr(:)   = 0     ! has the same form as ja
       allocate(iw(niw));     iw(:)    = 0     ! used to be "ig"
@@ -682,14 +682,14 @@
     !--------------------------------------------------!
     !   Default values (Amg1r5: setup phase, output)   !
     !--------------------------------------------------!
-    Amg % matrix = 22      ! rowsum /= 0.0; nonsymetric
+    Amg % matrix = 12      ! rowsum /= 0.0; nonsymetric
 
     !--------------!
     !   Switches   !
     !--------------!
-    ifirst       =    13   ! value from stuben:    13
-    Amg % iout   =    11   ! value from stuben:    12
-    Amg % eps    = 1.d-12  ! value from stuben: 1.d-12
+    ifirst       = 13        ! value from stuben: 13
+    Amg % iout   = 11        ! value from stuben: 12
+    Amg % eps    =  1.0e-12  ! value from stuben:  1.0e-12
 
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
@@ -700,9 +700,9 @@
     Amg % nrd    = 0
     Amg % nsolco = 3       ! this sets solver, 1 - GS, 2 - Yale8, 3 - BiCG
     Amg % nru    = 0
-    Amg % ecg1   = 0.d0
-    Amg % ecg2   = 0.25d0
-    Amg % ewt2   = 0.35d0
+    Amg % ecg1   = 0.0
+    Amg % ecg2   = 0.25
+    Amg % ewt2   = 0.35
     Amg % nwt    = 2
     Amg % ntr    = 0
 
@@ -769,12 +769,12 @@
     call Amg % Solve(madapt, ncyc, kout,  &
                      a, u, f, ia, ja,     &  ! linear system
                      iw, icg, ifg,        &  ! work arrays
-                     ncyc0, levels)
+                     levels)
     if(Amg % ierr .gt. 0) return
   end if
 
   if(kswtch .ge. 1) then
-    call Amg % Wrkcnt(kout, ia, iw, levels, ncyc0)
+    call Amg % Wrkcnt(kout, ia, iw, levels)
   end if
 
   !------------------------!

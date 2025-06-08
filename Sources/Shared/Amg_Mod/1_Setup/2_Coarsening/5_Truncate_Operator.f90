@@ -10,14 +10,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, ntr_local
-  double precision :: a(:)
-  integer          :: ia(:), ja(:)
+  class(Amg_Type) :: Amg
+  integer         :: level, ntr_local
+  real            :: a(:)
+  integer         :: ia(:), ja(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: at
-  integer          :: i, i1, imn, imx, j, j1, j2, j3, jt, jpos, nna
-  logical          :: found
+  real    :: at
+  integer :: i, i1, imn, imx, j, j1, j2, j3, jt, jpos, nna
+  logical :: found
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -41,7 +41,7 @@
     do j = j1, j2
       i1 = ja(j)
       if(i1 .ge. 0) then
-        if(i1.ge.i .and.a(j).eq.0.0d0) then
+        if(i1.ge.i .and.a(j).eq.0.0) then
           found = .false.
           do j3 = ia(i1), ia(i1+1) - 1
             if(ja(j3) .eq. i) then
@@ -61,7 +61,7 @@
             return
           end if
 
-          if(at.eq.0.0d0) then
+          if(at.eq.0.0) then
             ja(jt) = -ja(jt)
             ! I am not happy with this cycle here, but it
             ! lesser evil than GOTO which was here before

@@ -9,26 +9,26 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, irel
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:)
+  class(Amg_Type) :: Amg
+  integer         :: level, irel
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: s
-  integer          :: ig, iaux, jg
+  real    :: s
+  integer :: ig, iaux, jg
 !---------------------------------[new locals]---------------------------------!
-  integer                           :: i, iter, j, k, n, nnz
-  double precision,     allocatable :: m(:), b(:), x(:)
-  double precision,     allocatable :: p(:),   q(:),   r(:),   z(:)
-  double precision,     allocatable :: p_t(:), q_t(:), r_t(:), z_t(:)
-  double precision,     allocatable :: a_val(:)
-  integer, allocatable              :: row_ptr(:), col_idx(:)
-  double precision,     allocatable :: a_t_val(:)
-  integer, allocatable              :: row_t_ptr(:), col_t_idx(:)
-  integer, allocatable              :: counter(:)
-  double precision                  :: alpha, beta
-  double precision                  :: pq, rho_0, rho_old, rho_new
+  integer              :: i, iter, j, k, n, nnz
+  real,    allocatable :: m(:), b(:), x(:)
+  real,    allocatable :: p(:),   q(:),   r(:),   z(:)
+  real,    allocatable :: p_t(:), q_t(:), r_t(:), z_t(:)
+  real,    allocatable :: a_val(:)
+  integer, allocatable :: row_ptr(:), col_idx(:)
+  real,    allocatable :: a_t_val(:)
+  integer, allocatable :: row_t_ptr(:), col_t_idx(:)
+  integer, allocatable :: counter(:)
+  real                 :: alpha, beta
+  real                 :: pq, rho_0, rho_old, rho_new
 !==============================================================================!
 
   call Amg % timer_start()
@@ -169,7 +169,7 @@
 !#
 !#  ! Fill p with something non-trivial
 !#  do i = 1, n
-!#    p(i) = dble(i) * 0.1d0
+!#    p(i) = real(i) * 0.1
 !#  end do
 !#
 !#  ! Compute q = A*p
@@ -200,7 +200,7 @@
   !   Form preconditioning matrix   !   (it is the same for a and a_t)
   !---------------------------------!
   do i = 1, n
-    m(i) = 1.0d0 / a_val(row_ptr(i))  ! diagonal is at a_val(row_ptr(i))
+    m(i) = 1.0 / a_val(row_ptr(i))  ! diagonal is at a_val(row_ptr(i))
   end do
 
   !--------------------------------------------------------------!
@@ -248,7 +248,7 @@
     !---------------_-------------------!
     !   rho_(i-1) = r^(i-1)^T z^(i-1)   !
     !-----------------------------------!
-    rho_new = 0.0d0
+    rho_new = 0.0
     do i = 1, n
       rho_new = rho_new + r_t(i) * z(i)
     end do
@@ -282,7 +282,7 @@
     !   q^(i) = A * p^(i)   !
     !-----------------------!
     do i = 1, n
-      s = 0.0d0
+      s = 0.0
       do k = row_ptr(i), row_ptr(i+1) - 1
         j = col_idx(k)
         s = s + a_val(k) * p(j)
@@ -294,7 +294,7 @@
     !   q^(i) = A^T * p^(i)   !
     !-------------------------!
     do i = 1, n
-      s = 0.0d0
+      s = 0.0
       do k = row_t_ptr(i), row_t_ptr(i+1) - 1
         j = col_t_idx(k)
         s = s + a_t_val(k) * p_t(j)
@@ -305,7 +305,7 @@
     !---------------------_---------------!
     !   alpha = rho_(i-1)/p^(i)^T q^(i)   !
     !-------------------------------------!
-    pq = 0.0d0
+    pq = 0.0
     do i = 1, n
       pq = pq + p_t(i) * q(i)
     end do

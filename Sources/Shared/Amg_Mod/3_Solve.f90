@@ -2,25 +2,25 @@
   subroutine Solve(Amg, madapt, ncyc, iout,   &
                    a, u, f, ia, ja,           &
                    iw, icg, ifg,              &
-                   ncyc0, levels)
+                   levels)
 !------------------------------------------------------------------------------!
 !   Solution phase of Amg1r5
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: madapt, ncyc, iout
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:), ifg(:)
-  integer          :: ncyc0, levels
+  class(Amg_Type) :: Amg
+  integer         :: madapt, ncyc, iout
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:), ifg(:)
+  integer         :: levels
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: ama, cfac, epsi, epsil, fac, fmax
-  double precision :: rescg, resold, umax
-  integer          :: digit(AMG_MAX_LEVELS)
-  integer          :: i, icgr, iconv, igam, iter, l, m, mfirst, msel, n
-  integer          :: ncycle, n_digits
-  integer          :: ndu
+  real    :: ama, cfac, epsi, epsil, fac, fmax
+  real    :: rescg, resold, umax
+  integer :: digit(AMG_MAX_LEVELS)
+  integer :: i, icgr, iconv, igam, iter, l, m, mfirst, msel, n
+  integer :: ncycle, n_digits
+  integer :: ndu
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -44,14 +44,14 @@
   endif
 
   m = levels
-  ncyc0 = 0
+  Amg % ncyc0 = 0
   do n = 11, 20
     Amg % time(n) = 0.0
   end do
-  if(Amg % eps .ne. 0.d0) then
+  if(Amg % eps .ne. 0.0) then
     epsi = Amg % eps
   else
-    epsi = 1.d-12
+    epsi = 1.0e-12
   endif
 
   !----------------------!
@@ -62,18 +62,18 @@
     msel = digit(1)
     if (msel.eq.2) then
       if (digit(2).ne.0) then
-        fac = dble(digit(2))
+        fac = real(digit(2))
         do i = 1, 100
-          fac = fac/10.d0
-          if(fac .le. 1.d0) exit
+          fac = fac/10.0
+          if(fac .le. 1.0) exit
         end do
       else
-        fac = 0.7d0
+        fac = 0.7
       endif
     endif
   else
     msel = 2
-    fac = 0.7d0
+    fac = 0.7
   endif
 
   !--------------------!
@@ -98,14 +98,14 @@
   !----------------------------------------------------------------!
   if (iconv.ne.3) then
     if (iconv.eq.4) then
-    ama = 0.d0
+    ama = 0.0
     do i = 1, Amg % imax(1)
       ama = max(ama,a(ia(i)))
     end do
     epsi = epsi*ama
     endif
   else
-    fmax = 0.d0
+    fmax = 0.0
     do i = 1, Amg % imax(1)
       fmax = max(fmax,abs(f(i)))
     end do
@@ -201,9 +201,9 @@
     if(iout .eq. 3 .or. iconv .ne. 1) then
       call Amg % Calculate_Residual(1, Amg % res, a, u, f, ia, ja, iw)
     end if
-    ncyc0 = iter
+    Amg % ncyc0 = iter
     if(iout .eq. 3) then
-      cfac = Amg % res / (resold+1.0d-40)
+      cfac = Amg % res / (resold+1.0e-30)
       resold = Amg % res
       if(m .ne. 1) then
         call Amg % Calculate_Residual(2, rescg, a, u, f, ia, ja, iw)
@@ -215,7 +215,7 @@
     if(iconv .ne. 1) then
       epsil = epsi
       if(iconv.eq.4) then
-        umax = 0.d0
+        umax = 0.0
         do i = Amg % imin(1), Amg % imax(1)
           umax = max(umax,abs(u(i)))
         end do

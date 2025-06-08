@@ -5,13 +5,13 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: ifirst
-  double precision :: u(:)
+  class(Amg_Type) :: Amg
+  integer         :: ifirst
+  real            :: u(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: s, sd
-  integer          :: digit(AMG_MAX_LEVELS)
-  integer          :: i, ifrst, n_digits
+  real    :: s, sd
+  integer :: digit(AMG_MAX_LEVELS)
+  integer :: i, ifrst, n_digits
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -25,24 +25,24 @@
 
   if(ifrst.eq.1) then
     do i = Amg % imin(1), Amg % imax(1)
-      u(i) = 0.0d0
+      u(i) = 0.0
     end do
     return
 
   else if(ifrst.eq.2) then
     do i = Amg % imin(1), Amg % imax(1)
-      u(i) = 1.0d0
+      u(i) = 1.0
     end do
-    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0d0
+    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
     return
 
   else if(ifrst.eq.3) then
-    sd = 0.72815d0
+    sd = 0.72815
     if(digit(3)*ifirst .ne. 0) then
-      s = dble(digit(3))
+      s = real(digit(3))
       do i = 1, 10
-        s = s*0.1d0
-        if(s .lt. 1.0d0) exit
+        s = s * 0.1
+        if(s .lt. 1.0) exit
       end do
     else
       s = sd
@@ -50,7 +50,7 @@
     do i = Amg % imin(1), Amg % imax(1)
       u(i) = Amg % Random_0_To_0p1(s)
     end do
-    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0d0
+    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
     return
   endif
 

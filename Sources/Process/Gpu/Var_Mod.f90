@@ -42,6 +42,7 @@
     integer, allocatable :: bnd_cond_type(:)
 
     ! Parameters for numerical solution of the variable
+    character(SL) :: solver        !! linear solver to use for this variable
     real          :: blend         !! upwind blending (1.0 central; 0.0 upwind)
     integer       :: td_scheme     !! time-disretization scheme
     real          :: tol = PICO    !! linear solver tolerance

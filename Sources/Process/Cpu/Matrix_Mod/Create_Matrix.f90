@@ -110,11 +110,12 @@
   !   and also locate the position of diagonal   !
   !----------------------------------------------!
   do c = Cells_In_Domain_And_Buffers()
-    call Sort % Int_Array(A % col(A % row(c) :  &
-                          A % row(c) + stencw(c) - 1))
+    call Sort % Int_Array(A % col(A % row(c)             + 1 :  &
+                                  A % row(c) + stencw(c) - 1))
     do pos = A % row(c), A % row(c+1)-1
       if(A % col(pos) .eq. c) A % dia(c) = pos
     end do
+    Assert(A % col(A % row(c)) == c)  ! diagonal must be first!!!
   end do
 
   !---------------------------------------!

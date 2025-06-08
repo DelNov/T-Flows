@@ -41,19 +41,19 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: levelx
-  double precision :: a(:), u(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:), ifg(:)
-  integer          :: levels
-  integer          :: iwork(:), jtr(:)
+  class(Amg_Type) :: Amg
+  integer         :: levelx
+  real            :: a(:), u(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:), ifg(:)
+  integer         :: levels
+  integer         :: iwork(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer          :: i, iajas, icall, ichk, iias, iirs, irst, isaja, isia
-  integer          :: jtrst, level, kerr, mdiw, mmax
-  integer          :: first_level, ncolx
-  integer          :: nda, ndu
-  logical          :: exitout, recover
+  integer :: i, iajas, icall, ichk, iias, iirs, irst, isaja, isia
+  integer :: jtrst, level, kerr, mdiw, mmax
+  integer :: first_level, ncolx
+  integer :: nda, ndu
+  logical :: exitout, recover
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -65,9 +65,9 @@
   !   Assign default values if zero   !
   !   (ecg1 and ntr are OK to be 0)   !
   !-----------------------------------!
-  if(Amg % nwt  .eq. 0)      Amg % nwt  = 2
-  if(Amg % ecg2 .eq. 0.0d0)  Amg % ecg2 = 0.25d0
-  if(Amg % ewt2 .eq. 0.0d0)  Amg % ewt2 = 0.35d0
+  if(Amg % nwt  .eq. 0)    Amg % nwt  = 2
+  if(Amg % ecg2 .eq. 0.0)  Amg % ecg2 = 0.25
+  if(Amg % ewt2 .eq. 0.0)  Amg % ewt2 = 0.35
 
   !--------------------------!
   !   Decode parameter nwt   !

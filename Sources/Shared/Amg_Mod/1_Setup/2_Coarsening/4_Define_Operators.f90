@@ -103,20 +103,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, mmax
-  double precision :: a(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:), ifg(:), ncolor(:)
-  integer          :: ncolx
-  integer          :: iajas
+  class(Amg_Type) :: Amg
+  integer         :: level, mmax
+  real            :: a(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:), ifg(:), ncolor(:)
+  integer         :: ncolx
+  integer         :: iajas
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: wjf1, ww
-  integer          :: i, iadr, ialow, iadrs, ibl, ic, ic1, ic2, ic3, icol,   &
-                      if, if1, if2, ihi, ilo, ilo1, ist, istti, j, jb, jc3,  &
-                      jf1, jf2, jf3, jpos, k1, ndaja, npts
-  integer          :: nda
-  logical          :: found
+  real    :: wjf1, ww
+  integer :: i, iadr, ialow, iadrs, ibl, ic, ic1, ic2, ic3, icol,   &
+             if, if1, if2, ihi, ilo, ilo1, ist, istti, j, jb, jc3,  &
+             jf1, jf2, jf3, jpos, k1, ndaja, npts
+  integer :: nda
+  logical :: found
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!

@@ -7,14 +7,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level_c
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), ifg(:)
+  class(Amg_Type) :: Amg
+  integer         :: level_c
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), ifg(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: d
-  integer          :: i, iaux, iaux1, ic, if, j
+  real    :: d
+  integer :: i, iaux, iaux1, ic, if, j
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!

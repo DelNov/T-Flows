@@ -1,5 +1,5 @@
 !==============================================================================!
-  double precision function Random_0_To_0p1(Amg, s)
+  real function Random_0_To_0p1(Amg, s)
 !------------------------------------------------------------------------------!
 !   Function to create "random" sequence of numbers between 0 and 0.1
 !
@@ -13,18 +13,18 @@
 !   correlations are likely and is therefore not suitable for serious
 !   stochastic simulations.
 !
-!   I might replace it with: "call random_number(s); s = 0.1d0 * s" one day
+!   I might replace it with: "call random_number(s); s = 0.1 * s" one day
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  double precision :: s
+  class(Amg_Type) :: Amg
+  real            :: s
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  Random_0_To_0p1 = 100.0d0*dexp(s)
-  Random_0_To_0p1 = Random_0_To_0p1 - dble(int(Random_0_To_0p1))
+  Random_0_To_0p1 = 100.0 * exp(s)
+  Random_0_To_0p1 = Random_0_To_0p1 - real(int(Random_0_To_0p1))
   s = Random_0_To_0p1
 
   end function

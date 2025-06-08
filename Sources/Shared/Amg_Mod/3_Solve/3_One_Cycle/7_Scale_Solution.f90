@@ -10,14 +10,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, ivstar
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:)
+  class(Amg_Type) :: Amg
+  integer         :: level, ivstar
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: fac, s1, s2, sa
-  integer          :: i, iaux, j
+  real    :: fac, s1, s2, sa
+  integer :: i, iaux, j
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -34,10 +34,10 @@
   iaux = ia(Amg % imax(level)+1)
   ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
-  s1 = 0.0d0
-  s2 = 0.0d0
+  s1 = 0.0
+  s2 = 0.0
   do i = Amg % imin(level), Amg % imax(level)
-    sa = 0.0d0
+    sa = 0.0
     do j = ia(i), ia(i+1) - 1
       sa = sa+a(j)*u(ja(j))
     end do
@@ -45,8 +45,8 @@
     s2 = s2+u(i)*sa
   end do
 
-  fac = 1.0d0
-  if (s2.ne.0.0d0) fac = s1/s2
+  fac = 1.0
+  if(s2 .ne. 0.0) fac = s1/s2
 
   !-------------!
   !   Scaling   !

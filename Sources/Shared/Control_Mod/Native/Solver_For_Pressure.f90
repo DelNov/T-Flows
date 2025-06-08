@@ -13,7 +13,7 @@
   call Control % Read_Char_Item('SOLVER_FOR_PRESSURE', 'cg', val, verbose)
   call String % To_Lower_Case(val)
 
-  if(val .ne. 'bicg' .and. val .ne. 'cg') then
+  if(val .ne. 'bicg' .and. val .ne. 'cg' .and. val .ne. 'rs_amg') then
     call Message % Error(60,                                      &
              'Unknown linear solver for pressure: '//trim(val)//  &
              '. \n This error is critical.  Exiting.',            &

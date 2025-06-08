@@ -8,25 +8,25 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: nifac
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:)
+  class(Amg_Type) :: Amg
+  integer         :: nifac
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: fmax, resnew, resold
-  integer          :: m,ifac,aaux,esp,flag,i,iaux,ihi,ii,ilo,is, &
-                      iter,j,jhi,jj,jlo,jpos,js,np,npoint,nsp,path
+  real    :: fmax, resnew, resold
+  integer :: m,ifac,aaux,esp,flag,i,iaux,ihi,ii,ilo,is, &
+             iter,j,jhi,jj,jlo,jpos,js,np,npoint,nsp,path
 
   !---------------------------------------------------------------------!
   !   conv: if coarse grid solution is done with gs-relaxation and      !
   !   nrcx=0, as many gs-sweeps are performed as are necessary to re-   !
   !   duce the residual by the factor conv                              !
   !---------------------------------------------------------------------!
-  double precision, parameter :: conv =1.d-2
-  integer,          parameter :: gauss=1
-  integer,          parameter :: yale =2
-  integer,          parameter :: bicg =3
+  real   , parameter :: conv =1.0e-2
+  integer, parameter :: gauss=1
+  integer, parameter :: yale =2
+  integer, parameter :: bicg =3
 !#  logical                     :: yalefail
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
@@ -140,7 +140,7 @@
 !#          !   set last solution component to zero    !
 !#          !------------------------------------------!
 !#          npoint = np-1
-!#          u(ihi) = 0.d0
+!#          u(ihi) = 0.0
 !#        endif
 !#        nsp = nda-jhi
 !#        path = 1
@@ -227,7 +227,7 @@
 !#          npoint = np
 !#        else
 !#          npoint = np-1
-!#          u(ihi) = 0.d0
+!#          u(ihi) = 0.0
 !#        endif
 !#        path = 3
 !#
@@ -281,7 +281,7 @@
       call Amg % timer_start()
 
      ! Calculate supremum norm of right hand side
-      fmax = 0.d0
+      fmax = 0.0
       do i = Amg % imin(m), Amg % imax(m)
         fmax = max(fmax,abs(f(i)))
       end do
@@ -290,7 +290,7 @@
                                     iw)
 
       call Amg % timer_stop(15)
-      resold = max(resold*conv,fmax*1.d-12)
+      resold = max(resold*conv,fmax*1.0e-12)
       do i = 1, 10
         do j = 1, 10
           call Amg % Gauss_Seidel_Sweep(m, 2, a, u, f, ia, ja,  &

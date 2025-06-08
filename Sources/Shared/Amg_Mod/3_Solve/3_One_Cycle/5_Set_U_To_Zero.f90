@@ -5,9 +5,9 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level
-  double precision :: u(:)
+  class(Amg_Type) :: Amg
+  integer         :: level
+  real            :: u(:)
 !-----------------------------------[locals]-----------------------------------!
   integer :: i
 !------------------------------------[save]------------------------------------!
@@ -17,7 +17,7 @@
   call Amg % timer_start()
 
   do i = Amg % imin(level), Amg % imax(level)
-    u(i) = 0.0d0
+    u(i) = 0.0
   end do
 
   call Amg % timer_stop(15)

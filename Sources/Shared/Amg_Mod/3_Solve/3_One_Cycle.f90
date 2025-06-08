@@ -22,20 +22,20 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: l
-  integer          :: igam
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:), iw(:), ifg(:), icg(:)
-  integer          :: m, iter, msel
-  double precision :: fac
-  integer          :: levels
+  class(Amg_Type) :: Amg
+  integer         :: l
+  integer         :: igam
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:), iw(:), ifg(:), icg(:)
+  integer         :: m, iter, msel
+  real            :: fac
+  integer         :: levels
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: res
-  integer          :: ng(AMG_MAX_LEVELS)
-  integer          :: ifac, ifi, ivstar, level, mink, n, nl, nptsf
-  integer          :: nda
-  logical          :: moredown
+  real    :: res
+  integer :: ng(AMG_MAX_LEVELS)
+  integer :: ifac, ifi, ivstar, level, mink, n, nl, nptsf
+  integer :: nda
+  logical :: moredown
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!

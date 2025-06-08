@@ -39,7 +39,7 @@
   a_val => A % val
 
   !---------------------------------!
-  !   1) diagonal preconditioning   !
+  !   1) Diagonal preconditioning   !
   !---------------------------------!
   if(prec .eq. 'jacobi') then
     !$omp parallel do private(i) shared (x, b, d_inv)
@@ -49,15 +49,26 @@
     !$omp end parallel do
 
   !--------------------------------------------!
-  !   2) incomplete cholesky preconditioning   !
+  !   2) Incomplete Cholesky preconditioning   !
+  !- - - - - - - - - - - - - - - - - - - - - - !
+  !   Matrix storage requirements:             !
+  !   1) First entry in each row must be the   !
+  !      diagonal (a_col(a_row(i)) == i)       !
+  !   2) Remaining column indices must be      !
+  !      sorted in ascending order             !
+  !                                            !
+  !   This enables early loop termination when !
+  !   processing lower/upper triangular parts  !
+  !   during forward/backward substitution.    !
   !--------------------------------------------!
   else if(prec .eq. 'icc') then
 
     ! Forward substitutionn
     do i = 1, ni
       sum = b(i)
-      do j = a_row(i), a_dia(i) - 1              ! only the lower triangular
+      do j = a_row(i) + 1, a_row(i+1) - 1  ! row from the diagonal on
         k = a_col(j)
+        if(k .gt. i) exit
         sum = sum - a_val(j) * x(k)
       end do
       x(i) = sum * d(i)
@@ -72,15 +83,16 @@
     ! Backward substitution
     do i = ni, 1, -1
       sum = x(i)
-      do j = a_dia(i) + 1, a_row(i+1) - 1        ! upper triangular
+      do j = a_row(i+1) - 1, a_row(i) + 1, -1    ! row down to diagonal
         k = a_col(j)
+        if(k .lt. i) exit
         if(k <= ni) sum = sum - a_val(j) * x(k)  ! avoid buffer entries
       end do
       x(i) = sum * d(i)
     end do
 
   !---------------------------!
-  !   .) no preconditioning   !
+  !   .) No preconditioning   !
   !---------------------------!
   else
     !$omp parallel do private(i) shared (x, b)

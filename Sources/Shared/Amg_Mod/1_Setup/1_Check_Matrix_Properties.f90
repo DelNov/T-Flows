@@ -20,16 +20,16 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  double precision :: a(:)
-  integer          :: ia(:), ja(:)
-  integer          :: icg(:), ifg(:)
+  class(Amg_Type) :: Amg
+  real            :: a(:)
+  integer         :: ia(:), ja(:)
+  integer         :: icg(:), ifg(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: anormm, anormp, asym, d, deps, rowsum
-  integer          :: i, i1, ishift, j, j1, j2, jnew
-  integer          :: napos, naoff, naneg, nazer, new, nna, nnu
-  integer          :: nda, ndicg
-  logical          :: found
+  real    :: anormm, anormp, asym, d, deps, rowsum
+  integer :: i, i1, ishift, j, j1, j2, jnew
+  integer :: napos, naoff, naneg, nazer, new, nna, nnu
+  integer :: nda, ndicg
+  logical :: found
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -109,8 +109,8 @@
   !   Check for properties of a. in particular, count   !
   !   missing storage places ("new"). return if new=0   !
   !-----------------------------------------------------!
-  anormm = 0.0d0
-  anormp = 0.0d0
+  anormm = 0.0
+  anormp = 0.0
   naoff  = 0
   napos  = 0
   naneg  = 0
@@ -122,15 +122,15 @@
 
   do i = 1, nnu
     d = a(ia(i))
-    if(d .le. 0.0d0) then
+    if(d .le. 0.0) then
       write(6, '(a)')  &
         ' *** error in check: diagonal is non-positive ***'
       Amg % ierr = AMG_ERR_DIAG_NOT_POSITIVE
       return
     end if
-    deps = d*1.0d-12
+    deps = d * 1.0e-12
     rowsum = d
-    anormp = anormp+2.0d0*d**2
+    anormp = anormp+2.0*d**2
     do j = ia(i)+1, ia(i+1)-1
       rowsum = rowsum+a(j)
       if (a(j).ge.deps) naoff = naoff+1
@@ -168,15 +168,15 @@
   anormm = sqrt(anormm)
   anormp = sqrt(anormp)
   asym = anormm/anormp
-  if (asym.le.1.0d-12) asym = 0.0d0
+  if (asym.le.1.0d-12) asym = 0.0
 
   !-------------------!
   !   Messages on a   !
   !-------------------!
 # ifdef VERBOSE
-    if(asym .eq. 0.0d0) write(6, '(a)')  &
+    if(asym .eq. 0.0) write(6, '(a)')  &
       ' check: a probably symmetric'
-    if(asym .ne. 0.0d0) write(6, '(a,d11.3)')  &
+    if(asym .ne. 0.0) write(6, '(a,d11.3)')  &
       ' check: a probably not symmetric. measure:', asym
     if(naoff .gt. 0)  write(6, '(a,i6,a)')  &
       ' check: a probably not pos. type:', naoff,  &
@@ -193,12 +193,24 @@
   !--------------!
   !   Warnings   !
   !--------------!
-  if (Amg % isym .eq. AMG_SYMMETRIC_MATRIX     .and. asym .ne. 0.0d0 .or.  &
-      Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX .and. asym .eq. 0.0d0 .or.  &
-      Amg % irow0 .eq. AMG_SINGULAR_MATRIX     .and. nazer .ne. nnu  .or.  &
-      Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX .and. nazer .eq. nnu) then
+  if(Amg % isym .eq. AMG_SYMMETRIC_MATRIX .and. asym .ne. 0.0) then
     write(6, '(a)')  &
-      ' --- warng in check: param matrix may be bad ---'
+      ' --- warning 1 in check: param matrix may be bad ---'
+    Amg % ierr = AMG_ERR_MATRIX_INVALID
+  endif
+  if(Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX .and. asym .eq. 0.0) then
+    write(6, '(a)')  &
+      ' --- warning 2 in check: param matrix may be bad ---'
+    Amg % ierr = AMG_ERR_MATRIX_INVALID
+  endif
+  if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX     .and. nazer .ne. nnu) then
+    write(6, '(a)')  &
+      ' --- warning 3 in check: param matrix may be bad ---'
+    Amg % ierr = AMG_ERR_MATRIX_INVALID
+  endif
+  if(Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX .and. nazer .eq. nnu) then
+    write(6, '(a)')  &
+      ' --- warning 4 in check: param matrix may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
   endif
 
@@ -257,7 +269,7 @@
         if(i1 .le. 0) then
           ja(j) = -i1
           jnew=icg(ja(j))
-          a(jnew)= 0.0d0
+          a(jnew)= 0.0
           ja(jnew) = i
           icg(ja(j))=jnew+1
         end if
@@ -278,7 +290,7 @@
         if(i1 .le. 0) then
           ja(j) = -i1
           jnew=icg(ja(j))
-          a(jnew)= 0.0d0
+          a(jnew)= 0.0
           ja(jnew) = i
           icg(ja(j))=jnew+1
         end if

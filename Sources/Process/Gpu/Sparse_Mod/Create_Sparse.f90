@@ -90,7 +90,8 @@
   !                                      !
   !--------------------------------------!
   do c = Cells_In_Domain_And_Buffers()  ! this whole routine is on CPU
-    call Sort % Int_Array(A % col(A % row(c) : A % row(c+1)-1))
+    call Sort % Int_Array(A % col(A % row(c) + 1 : A % row(c+1)-1))
+    Assert(A % col(A % row(c)) == c)    ! make sure diagonal is first
   end do
 
   !---------------------------------!

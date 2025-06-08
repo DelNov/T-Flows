@@ -19,6 +19,7 @@
   use Gpu_Pointers_Mod
   use Sparse_Mod
   use Native_Mod
+  use Amg_Mod
   use Var_mod
   use Numerics_Mod
   use Profiler_mod

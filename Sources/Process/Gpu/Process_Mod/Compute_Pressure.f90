@@ -11,9 +11,11 @@
   type(Grid_Type),  target :: Grid
   type(Field_Type), target :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:)
-  real                      :: urf, p_max, p_min
-  integer                   :: c
+  real,    contiguous, pointer :: val(:)
+  real,    contiguous, pointer :: b(:)
+  integer, contiguous, pointer :: row(:), col(:)
+  real                         :: urf, p_max, p_min
+  integer                      :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -21,6 +23,9 @@
   call Profiler % Start('Compute_Pressure')
 
   ! Take some aliases
+  val => Flow % Nat % A % val
+  row => Flow % Nat % A % row
+  col => Flow % Nat % A % col
   b   => Flow % Nat % b
   urf =  Flow % pp % urf
 
@@ -43,11 +48,25 @@
   !------------------------!
   !   Call linear solver   !
   !------------------------!
-  call Profiler % Start('CG_for_Pressure')
-  call Flow % Nat % Cg(Flow % pp % n,                         &
-                       Flow % pp % miter, Flow % pp % niter,  &
-                       Flow % pp % tol,   Flow % pp % res)
-  call Profiler % Stop('CG_for_Pressure')
+  if(Flow % pp % solver .eq. 'cg') then
+    call Profiler % Start('CG_for_Pressure')
+    call Flow % Nat % Cg(Flow % pp % n,                         &
+                         Flow % pp % miter, Flow % pp % niter,  &
+                         Flow % pp % tol,   Flow % pp % res)
+    call Profiler % Stop('CG_for_Pressure')
+  else if(Flow % pp % solver .eq. 'rs_amg') then
+    call Profiler % Start('AMG_for_Pressure')
+    call Amg % Amg1r5(val,              &
+                      row,              &
+                      col,              &
+                      Flow % pp % n(1:Grid % n_cells),                 &
+                      b(1:Grid % n_cells),                                &
+                      Grid % n_cells,  &
+                      4)
+    Flow % pp % res   = Amg % Final_Residual()
+    Flow % pp % niter = Amg % Performed_Cycles()
+    call Profiler % Stop('AMG_for_Pressure')
+  end if
 
   call Info % Iter_Fill_At(1, 4, Flow % pp % name,  &
                                  Flow % pp % res, Flow % pp % niter)

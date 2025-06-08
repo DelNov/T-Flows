@@ -84,7 +84,7 @@
   SOLVER_FOR_ENERGY                        |         bicg                  |   cg
   SOLVER_FOR_MOMENTUM                      |         bicg                  |   cg
   SOLVER_FOR_POTENTIAL                     |         cg                    |   bicg
-  SOLVER_FOR_PRESSURE                      |         cg                    |   bicg
+  SOLVER_FOR_PRESSURE                      |         cg                    |   bicg, rs_amg
   SOLVER_FOR_SCALARS                       |         bicg                  |   cg
   SOLVER_FOR_TURBULENCE                    |         bicg                  |   cg
   SOLVER_FOR_VOF                           |         bicg                  |   cg

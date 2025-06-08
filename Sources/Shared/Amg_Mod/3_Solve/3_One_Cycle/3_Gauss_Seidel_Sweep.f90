@@ -12,14 +12,14 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, irel
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), icg(:)
+  class(Amg_Type) :: Amg
+  integer         :: level, irel
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), icg(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: s
-  integer          :: i, iaux, j
+  real    :: s
+  integer :: i, iaux, j
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!

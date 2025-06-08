@@ -36,15 +36,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level
-  double precision :: a(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), ifg(:), jtr(:)
+  class(Amg_Type) :: Amg
+  integer         :: level
+  real            :: a(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), ifg(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: rs, amn, amx, ast, atmp
-  integer          :: i, ihi, ii, ilo, imx, itmp, iws, j, jhi, jlo, jmx
-  integer          :: ndjtr, mdjtr
+  real    :: rs, amn, amx, ast, atmp
+  integer :: i, ihi, ii, ilo, imx, itmp, iws, j, jhi, jlo, jmx
+  integer :: ndjtr, mdjtr
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -93,8 +93,8 @@
     amx = a(jlo)
     amn = a(jlo)
     jmx = jlo
-    if(Amg % ecg1 .ne. 0.d0) then
-      rs = 0.0d0
+    if(Amg % ecg1 .ne. 0.0) then
+      rs = 0.0
       do j = jlo+1, jhi
         rs = rs+abs(a(j))
         if (a(j).lt.amx) then
@@ -108,7 +108,7 @@
       !----------------------------------------------------------!
       !   Test for positive off-diagonals / diagonal dominance   !
       !----------------------------------------------------------!
-      if(amx .ge. 0.0d0 .or. rs .le. Amg % ecg1 * a(ia(i))) exit
+      if(amx .ge. 0.0 .or. rs .le. Amg % ecg1 * a(ia(i))) exit
     else
       do j = jlo+1, jhi
         if (a(j).lt.amx) then
@@ -122,7 +122,7 @@
       !-------------------------------------!
       !   Test for positive off-diagonals   !
       !-------------------------------------!
-      if (amx .ge. 0.d0) exit
+      if (amx .ge. 0.0) exit
     endif
 
     !------------------------------------------------!

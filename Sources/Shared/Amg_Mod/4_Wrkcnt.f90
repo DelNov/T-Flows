@@ -2,23 +2,21 @@
   subroutine Wrkcnt(Amg, iout,  &
                     ia,         &
                     iw,         &
-                    levels, ncyc0)
+                    levels)
 !-----------------------------------------------------------------------------!
 !   Residuals / cp-times / complexity / dimensioning
 !-----------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: iout
-  integer          :: ia(:)
-  integer          :: iw(:)
-  integer          :: levels
-  integer          :: ncyc0
+  class(Amg_Type) :: Amg
+  integer         :: iout
+  integer         :: ia(:)
+  integer         :: iw(:)
+  integer         :: levels
 !-----------------------------------[locals]-----------------------------------!
-  real             :: t(10), sum1, sum2
-  integer          :: i, idima, level, mdta, mdtf, mdtia, mdtig, mdtja,  &
-                      mdtu, nnu
-  double precision :: acmplx, ocmplx, scmplx, tcmplx, cfac, cfpc
+  real(SP) :: t(10), sum1, sum2
+  integer  :: i, idima, level, mdta, mdtf, mdtia, mdtig, mdtja, mdtu, nnu
+  real     :: acmplx, ocmplx, scmplx, tcmplx, cfac, cfpc
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -28,10 +26,10 @@
   !-----------------------------!
   !   Residuals / convergence   !
   !-----------------------------!
-  if(ncyc0 .gt. 0) then
-    cfac = Amg % res / (Amg % res0+1.d-40)
+  if(Amg % ncyc0 .gt. 0) then
+    cfac = Amg % res / (Amg % res0+1.0e-40)
     write(6, 9110) Amg % res0, Amg % res, cfac
-    cfpc = cfac**(1.d0/dble(ncyc0))
+    cfpc = cfac**(1.0/real(Amg % ncyc0))
     write(6, 9120) cfpc
   endif
   if(iout .le. 1) return
@@ -45,7 +43,7 @@
   sum2 = 0.0
   do i = 1, 10
     t(i) = 0.0
-    if(ncyc0 .gt. 0) t(i) = Amg % time(i+10)/real(ncyc0)
+    if(Amg % ncyc0 .gt. 0) t(i) = Amg % time(i+10)/real(Amg % ncyc0)
     sum1 = sum1 + Amg % time(i)
     sum2 = sum2+t(i)
   end do
@@ -82,14 +80,14 @@
   !------------------!
   !   Complexities   !
   !------------------!
-  scmplx = dble(2*(  Amg % mda + Amg % mdu + Amg % mdu)   &
+  scmplx = real(2*(  Amg % mda + Amg % mdu + Amg % mdu)   &
                    + Amg % mda + Amg % mdu + Amg % mdw)/  &
-           dble(1+5*nnu+3*(iw(Amg % iminw(1))-ia(Amg % imin(1))))
-  tcmplx = dble(2*(mdta+mdtu+mdtf)+mdtja+mdtia+mdtig)/  &
-           dble(1+5*nnu+3*(iw(Amg % iminw(1))-ia(Amg % imin(1))))
+           real(1+5*nnu+3*(iw(Amg % iminw(1))-ia(Amg % imin(1))))
+  tcmplx = real(2*(mdta+mdtu+mdtf)+mdtja+mdtia+mdtig)/  &
+           real(1+5*nnu+3*(iw(Amg % iminw(1))-ia(Amg % imin(1))))
 
-  acmplx = dble(idima)/dble(iw(1)-1)
-  ocmplx = dble(mdtu )/dble(nnu)
+  acmplx = real(idima)/real(iw(1)-1)
+  ocmplx = real(mdtu )/real(nnu)
   write(6, 9080) acmplx,ocmplx,scmplx,tcmplx
 
 9000  format (//' ************** work count ***************'/)

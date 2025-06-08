@@ -5,10 +5,10 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, icgr
-  double precision :: u(:)
-  integer          :: m
+  class(Amg_Type) :: Amg
+  integer         :: level, icgr
+  real            :: u(:)
+  integer         :: m
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, ishift
   integer :: ndu

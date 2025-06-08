@@ -8,15 +8,15 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level, icgr, iter
-  double precision :: a(:), u(:), f(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:)
-  integer          :: m
+  class(Amg_Type) :: Amg
+  integer         :: level, icgr, iter
+  real            :: a(:), u(:), f(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:)
+  integer         :: m
 !-----------------------------------[locals]-----------------------------------!
-  double precision :: alf, eps, s2
-  integer          :: i, ishift, nnu
+  real    :: alf, eps, s2
+  integer :: i, ishift, nnu
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!

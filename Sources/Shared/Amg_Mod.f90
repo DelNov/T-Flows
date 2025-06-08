@@ -29,9 +29,10 @@
     integer, private :: nstcol(AMG_MAX_LEVELS)
 
     ! Residual, initial residual and convergence criterion
-    double precision, private :: resi(AMG_MAX_LEVELS)
-    double precision, private :: res, res0
-    double precision, private :: eps
+    real,    private :: resi(AMG_MAX_LEVELS)
+    real,    private :: res, res0
+    real,    private :: eps
+    integer, private :: ncyc0
 
     ! Variables describing the V/W cycle
     integer, private :: nsolco        ! describing solver at the coarsest level
@@ -53,16 +54,16 @@
     integer, private :: iout
 
     ! Variables for tuning the coarsening algorithm (Class 4 by Ruge-Stueben)
-    double precision :: ecg1, ecg2, ewt2
-    integer          :: nwt, ntr
+    real    :: ecg1, ecg2, ewt2
+    integer :: nwt, ntr
 
     ! These variables are used throughout various subroutines
     ! for checking if there is enough allocated memory
     integer, private :: mda, mdu, mdw
 
     ! Used only for timing
-    real, private :: time(20)
-    real, private :: told, tnew
+    real(SP), private :: time(20)
+    real(SP), private :: told, tnew
 
     ! Error tracking
     integer :: ierr
@@ -71,6 +72,9 @@
 
       procedure :: timer_start
       procedure :: timer_stop
+      procedure :: Initial_Residual
+      procedure :: Final_Residual
+      procedure :: Performed_Cycles
 
       !---------------------!
       !   Main subroutine   !
@@ -136,6 +140,33 @@
   type(Amg_Type) :: Amg
 
   contains
+
+!==============================================================================!
+  real function Initial_Residual(Amg)
+!------------------------------------------------------------------------------!
+  implicit none
+  class(Amg_Type) :: Amg
+!------------------------------------------------------------------------------!
+  Initial_Residual = Amg % res0
+  end function
+
+!==============================================================================!
+  real function Final_Residual(Amg)
+!------------------------------------------------------------------------------!
+  implicit none
+  class(Amg_Type) :: Amg
+!------------------------------------------------------------------------------!
+  Final_Residual = Amg % res
+  end function
+
+!==============================================================================!
+  integer function Performed_Cycles(Amg)
+!------------------------------------------------------------------------------!
+  implicit none
+  class(Amg_Type) :: Amg
+!------------------------------------------------------------------------------!
+  Performed_Cycles = Amg % ncyc0
+  end function
 
 !==============================================================================!
   subroutine timer_start(Amg)

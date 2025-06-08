@@ -30,6 +30,7 @@
     if(i .eq. 1) ui => Flow % u
     if(i .eq. 2) ui => Flow % v
     if(i .eq. 3) ui => Flow % w
+    call Control % Solver_For_Momentum               (ui % solver)
     call Control % Tolerance_For_Momentum_Solver     (ui % tol)
     call Control % Max_Iterations_For_Momentum_Solver(ui % miter)
   end do
@@ -37,6 +38,7 @@
   !-------------------------!
   !   Related to pressure   !
   !-------------------------!
+  call Control % Solver_For_Pressure               (Flow % pp % solver)
   call Control % Tolerance_For_Pressure_Solver     (Flow % pp % tol)
   call Control % Max_Iterations_For_Pressure_Solver(Flow % pp % miter)
 
@@ -44,6 +46,7 @@
   !   Related to heat transfer   !
   !------------------------------!
   if(Flow % heat_transfer) then
+    call Control % Solver_For_Energy                (Flow % t % solver)
     call Control % Tolerance_For_Energy_Solver      (Flow % t % tol)
     call Control % Max_Iterations_For_Energy_Solver (Flow % t % miter)
   end if
@@ -61,6 +64,7 @@
     ! Now, with basic allocation done, it is safe to read solver options
     do sc = 1, Flow % n_scalars
       phi => Flow % scalar(sc)
+      call Control % Solver_For_Scalars               (phi % solver)
       call Control % Tolerance_For_Scalars_Solver     (phi % tol)
       call Control % Max_Iterations_For_Scalars_Solver(phi % miter)
     end do
@@ -74,6 +78,7 @@
     nullify(tq)
     if(i .eq.  5) tq => Turb % vis
     if(associated(tq)) then
+      call Control % Solver_For_Turbulence               (tq % solver)
       call Control % Tolerance_For_Turbulence_Solver     (tq % tol)
       call Control % Max_Iterations_For_Turbulence_Solver(tq % miter)
     end if

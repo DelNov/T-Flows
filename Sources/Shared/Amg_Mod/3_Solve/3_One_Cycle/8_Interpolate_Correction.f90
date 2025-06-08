@@ -7,11 +7,11 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type)  :: Amg
-  integer          :: level
-  double precision :: a(:), u(:)
-  integer          :: ia(:), ja(:)
-  integer          :: iw(:), ifg(:)
+  class(Amg_Type) :: Amg
+  integer         :: level
+  real            :: a(:), u(:)
+  integer         :: ia(:), ja(:)
+  integer         :: iw(:), ifg(:)
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, j, ic, if, iaux
 !------------------------------------[save]------------------------------------!

@@ -35,7 +35,7 @@
 !==============================================================================!
 
   nrest = into
-  n_digits = 1 + int(log10(0.5d0 + dble(into)))
+  n_digits = 1 + int(log10(0.5 + real(into)))
 
   if(nnum .lt. n_digits) then
     iq = 10**(n_digits - nnum + 1)
