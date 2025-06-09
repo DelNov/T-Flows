@@ -112,63 +112,69 @@
     epsi = epsi*fmax
   endif
 
-  !-------------------------!
-  !   Decompose Amg % nrd   !
-  !-------------------------!
-  if(Amg % nrd .ne. 0) then
-    call Amg % Get_Integer_Digits(Amg % nrd, 9, n_digits, Amg % nrdtyp)
-    Amg % nrdx   = Amg % nrdtyp(2)
-    Amg % nrdlen = n_digits-2
-    do i = 1, Amg % nrdlen
-      Amg % nrdtyp(i) = Amg % nrdtyp(i+2)
+  !------------------------------------!
+  !   Decompose Amg % def_relax_down   !
+  !------------------------------------!
+  if(Amg % def_relax_down .ne. 0) then
+    call Amg % Get_Integer_Digits(Amg % def_relax_down,  &
+                                  9,                     &
+                                  n_digits,              &
+                                  Amg % type_relax_down)
+    Amg % n_relax_down = Amg % type_relax_down(2)
+    Amg % nrdlen       = n_digits-2
+    do i = 1, Amg % nrdlen  ! seems to shift the info two places up
+      Amg % type_relax_down(i) = Amg % type_relax_down(i+2)
     end do
   else
-    Amg % nrdx      = 1
-    Amg % nrdlen    = 2
-    Amg % nrdtyp(1) = 3
-    Amg % nrdtyp(2) = 1
+    Amg % n_relax_down       = 10
+    Amg % nrdlen             = 2
+    Amg % type_relax_down(1) = 3
+    Amg % type_relax_down(2) = 1
   endif
 
-  !-------------------------!
-  !   Decompose Amg % nru   !
-  !-------------------------!
-  if(Amg % nru .ne. 0) then
-    call Amg % Get_Integer_Digits(Amg % nru, 9, n_digits, Amg % nrutyp)
-    Amg % nrux   = Amg % nrutyp(2)
-    Amg % nrulen = n_digits-2
-    do i = 1, Amg % nrulen
-      Amg % nrutyp(i) = Amg % nrutyp(i+2)
+  !----------------------------------!
+  !   Decompose Amg % def_relax_up   !
+  !----------------------------------!
+  if(Amg % def_relax_up .ne. 0) then
+    call Amg % Get_Integer_Digits(Amg % def_relax_up,  &
+                                  9,                   &
+                                  n_digits,            &
+                                  Amg % type_relax_up)
+    Amg % n_relax_up = Amg % type_relax_up(2)
+    Amg % nrulen     = n_digits-2
+    do i = 1, Amg % nrulen  ! seems to shift the info two places up
+      Amg % type_relax_up(i) = Amg % type_relax_up(i+2)
     end do
   else
-    Amg % nrux      = 1
-    Amg % nrulen    = 2
-    Amg % nrutyp(1) = 3
-    Amg % nrutyp(2) = 1
+    Amg % n_relax_up       = 10
+    Amg % nrulen           = 2
+    Amg % type_relax_up(1) = 3
+    Amg % type_relax_up(2) = 1
   endif
 
-  !----------------------------!
-  !   Decompose Amg % nsolco   !
-  !----------------------------!
-  if(Amg % nsolco .ne. 0) then
-    call Amg % Get_Integer_Digits(Amg % nsolco, 2, n_digits, digit)
-    Amg % nsc  = digit(1)
-    Amg % nrcx = digit(2)
+  !---------------------------------------!
+  !   Decompose Amg % def_coarse_solver   !
+  !---------------------------------------!
+  if(Amg % def_coarse_solver .ne. 0) then
+    call Amg % Get_Integer_Digits(Amg % def_coarse_solver, 2, n_digits, digit)
+    Amg % coarse_solver  = digit(1)
+    Amg % n_relax_coarse = digit(2)
 
     !--------------------------------------------------!
     !   In case of yale-smp coarse grid solution, do   !
     !   not use coarsest grid with less than 10 pnts   !
     !--------------------------------------------------!
-    if(Amg % nsc .eq. 2) then
-      do i = m, 1, -1
-        l = i
-        if(Amg % imax(i) - Amg % imin(i).ge.9) exit
-      end do
-      m = i
-      levels = i
-    endif
+    ! Yale: if(Amg % coarse_solver .eq. 2) then
+    ! Yale:   do i = m, 1, -1
+    ! Yale:     l = i
+    ! Yale:     if(Amg % imax(i) - Amg % imin(i).ge.9) exit
+    ! Yale:   end do
+    ! Yale:   m = i
+    ! Yale:   levels = i
+    ! Yale: end if
   else
-    Amg % nsc  = 1
-    Amg % nrcx = 0
+    Amg % coarse_solver  = 1
+    Amg % n_relax_coarse = 0
   endif
 
   !-------------!

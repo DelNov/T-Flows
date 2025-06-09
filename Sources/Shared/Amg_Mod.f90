@@ -1,5 +1,5 @@
 ! Uncomment for more output.  Actually, some interesting things get printed out.
-! #define VERBOSE
+#define VERBOSE
 
 !==============================================================================!
   module Amg_Mod
@@ -35,15 +35,19 @@
     integer, private :: ncyc0
 
     ! Variables describing the V/W cycle
-    integer, private :: nsolco        ! describing solver at the coarsest level
-    integer, private :: nrcx          ! holds parts of nsolco
-    integer, private :: nsc           ! holds coarsest level solver
-    integer, private :: nrd           ! relaxations going down the levels
-    integer, private :: nru           ! relaxations going up the levels
-    integer, private :: nrdtyp(10)    ! deciphered nrd
-    integer, private :: nrutyp(10)    ! deciphered nru
-    integer, private :: nrdx, nrdlen  ! hold values read from nrd
-    integer, private :: nrux, nrulen  ! hold values read from nru
+    integer, private :: def_coarse_solver    ! def solver at the coarsest level
+    integer, private :: n_relax_coarse       ! n relaxations for coarsest level
+    integer, private :: coarse_solver        ! holds coarsest level solver
+    integer, private :: def_relax_down       ! relaxations going down the levels
+    integer, private :: def_relax_up         ! relaxations going up the levels
+    integer, private :: type_relax_down(10)  ! deciphered def_relax_down
+    integer, private :: type_relax_up(10)    ! deciphered def_relax_up
+    integer, private :: n_relax_down         ! values read from def_relax_down
+    integer, private :: n_relax_up           ! values read from def_relax_up
+    integer, private :: nrdlen
+    integer, private :: nrulen
+    integer, private :: fine_solver          ! holds solver for finer levels
+    integer, private :: n_relax_fine         ! relaxation sweeps for coarsest l.
 
     ! Variables describing matrix properties (Class 1 by Ruge-Stueben)
     integer, private :: matrix
@@ -107,10 +111,10 @@
       procedure ::   Backup_U                    ! 3.2
       procedure ::   One_Cycle                   ! 3.3
       procedure ::     Solve_On_Coarsest_Level   ! 3.3.1
-      procedure ::       Cg_On_Coarsest_Level    ! 3.3.1.1
-      procedure ::       Bicg_On_Coarsest_Level  ! 3.3.1.2
       procedure ::     Normalize_U               ! 3.3.2
-      procedure ::     Gauss_Seidel_Sweep        ! 3.3.3
+      procedure ::     Gauss_Seidel_Sweep        ! 3.3.3.1
+      procedure ::     Cg_On_Level               ! 3.3.3.2
+      procedure ::     Bicg_On_Level             ! 3.3.3.3
       procedure ::     Set_U_To_Zero             ! 3.3.5
       procedure ::     Restrict_Residuals        ! 3.3.6
       procedure ::     Scale_Solution            ! 3.3.7
@@ -219,10 +223,10 @@
 # include "Amg_Mod/3_Solve/2_Backup_U.f90"
 # include "Amg_Mod/3_Solve/3_One_Cycle.f90"
 # include "Amg_Mod/3_Solve/3_One_Cycle/1_Solve_On_Coarsest_Level.f90"
-# include "Amg_Mod/3_Solve/3_One_Cycle/1_Solve_On_Coarsest_Level/1_Cg_On_Coarsest_Level.f90"
-# include "Amg_Mod/3_Solve/3_One_Cycle/1_Solve_On_Coarsest_Level/2_Bicg_On_Coarsest_Level.f90"
 # include "Amg_Mod/3_Solve/3_One_Cycle/2_Normalize_U.f90"
-# include "Amg_Mod/3_Solve/3_One_Cycle/3_Gauss_Seidel_Sweep.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/3.1_Gauss_Seidel_Sweep.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/3.2_Cg_On_Level.f90"
+# include "Amg_Mod/3_Solve/3_One_Cycle/3.3_Bicg_On_Level.f90"
 # include "Amg_Mod/3_Solve/3_One_Cycle/5_Set_U_To_Zero.f90"
 # include "Amg_Mod/3_Solve/3_One_Cycle/6_Restrict_Residuals.f90"
 # include "Amg_Mod/3_Solve/3_One_Cycle/7_Scale_Solution.f90"

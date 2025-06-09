@@ -11,7 +11,8 @@
   real,    contiguous, pointer :: b(:)
   integer, contiguous, pointer :: row(:), col(:)
   real                         :: urf, p_max, p_min
-  integer                      :: c
+  integer                      :: c, call_type
+  integer, save                :: call_count = 0
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -52,13 +53,16 @@
     call Profiler % Stop('CG_for_Pressure')
   else if(Flow % pp % solver .eq. 'rs_amg') then
     call Profiler % Start('AMG_for_Pressure')
+    call_type = AMG_RUN_ALL_FOUR_STAGES
+    if(call_count .gt. 0) call_type = AMG_SOLVE_AND_REPORT
     call Amg % Amg1r5(val, row, col,                    &
                       Flow % pp % n(1:Grid % n_cells),  &
                       b(1:Grid % n_cells),              &
                       Grid % n_cells,                   &
-                      AMG_RUN_ALL_FOUR_STAGES)
+                      call_type)
     Flow % pp % res   = Amg % Final_Residual()
     Flow % pp % niter = Amg % Performed_Cycles()
+    call_count = call_count + 1
     call Profiler % Stop('AMG_for_Pressure')
   end if
 

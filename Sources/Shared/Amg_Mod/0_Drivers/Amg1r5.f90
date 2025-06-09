@@ -362,33 +362,34 @@
 !                e.g. madapt=258 means msel=2 and fac=0.58.  If madapt
 !                consists of only one digit, fac is set to 0.7 by default.
 !
-!     nrd    - Parameter describing relaxation (downwards):
+!     def_relax_down - Parameter describing relaxation (downwards):
 !
-!                1st digit of nrd: Not used; has to be non-zero.
+!                1st digit of def_relax_down: Not used; has to be non-zero.
 !
-!                2nd digit of nrd  --  nrdx: Actual number of smoothing steps
-!                    to be performed the type of which is given by the
-!                    following digits
+!                2nd digit of def_relax_down  --  n_relax_down: Actual number
+!                    of smoothing steps to be performed the type of which is
+!                    given by the following digits
 !
-!                following digits  --  array nrdtyp:
+!                following digits  --  array type_relax_down:
 !                  =1: relaxation over the f-points only
 !                  =2: full gs sweep
 !                  =3: relaxation over the c-points only
 !                  =4: full more color sweep, highest color first
 !
-!     nsolco - Parameter controlling the solution on coarsest grid:
+!     def_coarse_solver - Parameter controlling the solution on coarsest grid:
 !
-!                1st digit  --  nsc:
-!                  =1: gauss-seidel method
-!                  =2: direct solver (yale smp)
-!                  =3: iterative BiCG (Bojan)
+!                1st digit  --  coarse_solver:
+!                  =1: Gauss-Seidel method
+!                  =2: Conjugate Gradient solver
+!                  =3: Bi-Conjugate Gradient solver
 !
-!                Rest of nsolco  --  nrcx: (only if nsc=1) number of gs sweeps
-!                on coarsest grid (>=0).  If nrcx=0, then as many gs sweeps
-!                are performed as are needed to reduce the residual by two
-!                orders of magnitude. (maximal 100 relaxation sweeps)
+!                Rest of def_coarse_solver  --  n_relax_coarse: (only if
+!                coarse_solver=1) number of GS sweeps on coarsest grid (>=0).
+!                If n_relax_coarse=0, then as many GS sweeps are performed as
+!                are needed to reduce the residual by two orders of magnitude.
+!                (maximal 100 relaxation sweeps)
 !
-!     nru    - Parameter for relaxation (upwards), analogous to nrd.
+!     def_relax_up - Parameter for relaxation (up), analogous to def_relax_down.
 !
 !   --------------------------------------------------------------
 !
@@ -511,15 +512,14 @@
 !     ncyc   = 10110
 !     eps    = 1.d-12
 !     madapt = 27
-!     nrd    = 1131
-!     nsolco = 110
-!     nru    = 1131
-!
-!     ecg1   = 0.
-!     ecg2   = 0.25
-!     ewt2   = 0.35
-!     nwt    = 2
-!     ntr    = 0
+!     def_relax_down    = 1131
+!     def_coarse_solver =  110
+!     def_relax_up      = 1131
+!     ecg1              =    0.
+!     ecg2              =    0.25
+!     ewt2              =    0.35
+!     nwt               =    2
+!     ntr               =    0
 !
 !   If any one of these parameters is 0 on input, its corresponding standard
 !   value is used by Amg1r5.
@@ -537,12 +537,12 @@
 !      only one external reference to a program not contained in the Amg1r5
 !      system, i.e. the linear system solver ndrv of the Yale Sparse Matrix
 !      Package.  If you havn't access to this package, enter a dummy routine
-!      ndrv and avoid choosing nsc=2 (subparameter of nsolco). then ndrv isn't
-!      called by Amg1r5.  In this case, however, indefinite problems will not
-!      be solvable.  The yale sparse matrix package is freely available for
-!      non-profit purposes.  Contact the department of computer science, Yale
-!      unitversity.  BN: I have removed the Yale SMP package because it would
-!      not compile with modern Fortran compilers any more.
+!      ndrv and avoid choosing coarse_solver=2 (subparameter of def_coarse_solver).
+!      Then ndrv isn't called by Amg1r5.  In this case, however, indefinite
+!      problems will not be solvable.  The yale sparse matrix package is
+!      freely available for non-profit purposes.  Contact the department of
+!      computer science, Yale unitversity.  BN: I have removed the Yale SMP
+!      package because it would not compile with modern Fortran compilers.
 !
 !   3. In Amg1r5 there is the parameter lratio, denoting the ratio of space
 !      occupied by a double precision real variable and that of an integer.
@@ -643,6 +643,10 @@
     ndu = 3 * n_unknowns
     ndw = 6 * n_unknowns
 
+    nda = nda * 10
+    ndu = ndu * 10
+    ndw = ndw * 10
+
     ! This defines how (former) kwork is split
     icgst = n_unknowns+3
     ndicg = (ndw-icgst+1)/2
@@ -688,8 +692,8 @@
     !   Switches   !
     !--------------!
     ifirst       = 13        ! value from stuben: 13
-    Amg % iout   = 11        ! value from stuben: 12
-    Amg % eps    =  1.0e-12  ! value from stuben:  1.0e-12
+    Amg % iout   = 13        ! value from stuben: 12
+    Amg % eps    =  1.0e-6   ! value from stuben:  1.0e-12
 
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
@@ -697,14 +701,16 @@
     levelx = 0
     ncyc   = 10250
     madapt = 0
-    Amg % nrd    = 0
-    Amg % nsolco = 3       ! this sets solver, 1 - GS, 2 - Yale8, 3 - BiCG
-    Amg % nru    = 0
-    Amg % ecg1   = 0.0
-    Amg % ecg2   = 0.25
-    Amg % ewt2   = 0.35
-    Amg % nwt    = 2
-    Amg % ntr    = 0
+    Amg % def_relax_down    = 0
+    Amg % def_coarse_solver = AMG_SOLVER_CG
+    Amg % def_relax_up      = 0
+    Amg % ecg1              = 0.0
+    Amg % ecg2              = 0.25
+    Amg % ewt2              = 0.35
+    Amg % nwt               = 2
+    Amg % ntr               = 0
+
+    Amg % fine_solver = AMG_SOLVER_GS
 
     !-----------------------------------------------------!
     !  Set parameters to standard values, if neccessary   !

@@ -23,6 +23,14 @@
     AMG_SYMMETRIC_MATRIX     = 1,  &  ! matrix is symmetric
     AMG_NON_SYMMETRIC_MATRIX = 2      ! matrix is non-symmetric
 
+  !-----------------------------!
+  !   Internal linear solvers   !
+  !-----------------------------!
+  integer, parameter ::   &
+    AMG_SOLVER_GS   = 1,  &
+    AMG_SOLVER_CG   = 2,  &
+    AMG_SOLVER_BICG = 3
+
   !--------------------!
   !   Error messages   !
   !--------------------!

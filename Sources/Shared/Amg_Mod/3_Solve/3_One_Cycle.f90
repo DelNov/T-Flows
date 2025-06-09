@@ -87,13 +87,28 @@
   !------------------------------------------------------!
   downward: do
     moredown = .false.
-      do n = 1, Amg % nrdx
-        do nl = 1, Amg % nrdlen
-          call Amg % Gauss_Seidel_Sweep(level, Amg % nrdtyp(nl),  &
-                                        a, u, f, ia, ja,  &
-                                        iw, icg)
+      ! This might not cut it for fine(r) grids
+      if(Amg % fine_solver .eq. AMG_SOLVER_GS) then
+        do n = 1, Amg % n_relax_down
+          do nl = 1, Amg % nrdlen
+            call Amg % Gauss_Seidel_Sweep(level, Amg % type_relax_down(nl),  &
+                                          a, u, f, ia, ja,                   &
+                                          iw, icg)
+          end do
         end do
-      end do
+      else if(Amg % fine_solver .eq. AMG_SOLVER_CG) then
+        do n = 1, Amg % n_relax_down
+          call Amg % Cg_On_Level(level, 2,         &
+                                 a, u, f, ia, ja,  &
+                                 iw,icg)
+        end do
+      else if(Amg % fine_solver .eq. AMG_SOLVER_BICG) then
+        do n = 1, Amg % n_relax_down
+          call Amg % Bicg_On_Level(level, 2,         &
+                                   a, u, f, ia, ja,  &
+                                   iw,icg)
+        end do
+      end if
       if(ifi .eq. 1 .and. Amg % imax(level) - Amg % imin(level) .lt. nptsf) then
 
        !-------------------------------------------------!
@@ -130,17 +145,33 @@
       !                     !
       !---------------------!
       upward: do
-        call Amg % Scale_Solution(level,ivstar,  &
-                         a,u,f,ia,ja,iw)
+        call Amg % Scale_Solution(level, ivstar,  &
+                                  a, u, f, ia, ja, iw)
         level = level-1
         call Amg % Interpolate_Correction(level, a, u, ia, ja, iw, ifg)
-        do n = 1, Amg % nrux
-          do nl = 1, Amg % nrulen
-            call Amg % Gauss_Seidel_Sweep(level, Amg % nrutyp(nl),  &
-                                          a, u, f, ia, ja,          &
-                                          iw,icg)
+
+        ! This might not cut it for fine(r) grids
+        if(Amg % fine_solver .eq. AMG_SOLVER_GS) then
+          do n = 1, Amg % n_relax_up
+            do nl = 1, Amg % nrulen
+              call Amg % Gauss_Seidel_Sweep(level, Amg % type_relax_up(nl),  &
+                                            a, u, f, ia, ja,                 &
+                                            iw,icg)
+            end do
           end do
-        end do
+        else if(Amg % fine_solver .eq. AMG_SOLVER_CG) then
+          do n = 1, Amg % n_relax_up
+            call Amg % Cg_On_Level(level, 2,         &
+                                   a, u, f, ia, ja,  &
+                                   iw,icg)
+          end do
+        else if(Amg % fine_solver .eq. AMG_SOLVER_BICG) then
+          do n = 1, Amg % n_relax_up
+            call Amg % Bicg_On_Level(level, 2,         &
+                                     a, u, f, ia, ja,  &
+                                     iw,icg)
+          end do
+        end if
         if(ifi .eq. 1 .and. level .ge. mink) then
 
           !----------------------------------------------!
@@ -160,7 +191,7 @@
           ! If residual reduction not satisfying:
           ! continue with coarse grid adaptation
           else
-            if(Amg % nsc .eq. 2) levels = level
+            ! Yale: if(Amg % coarse_solver .eq. 2) levels = level
             m    = level
             ifac = 1
             call Amg % Set_U_To_Zero(level,u)
