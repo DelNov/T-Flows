@@ -126,7 +126,7 @@
       Amg % type_relax_down(i) = Amg % type_relax_down(i+2)
     end do
   else
-    Amg % n_relax_down       = 10
+    Amg % n_relax_down       = 1
     Amg % nrdlen             = 2
     Amg % type_relax_down(1) = 3
     Amg % type_relax_down(2) = 1
@@ -146,7 +146,7 @@
       Amg % type_relax_up(i) = Amg % type_relax_up(i+2)
     end do
   else
-    Amg % n_relax_up       = 10
+    Amg % n_relax_up       = 1
     Amg % nrulen           = 2
     Amg % type_relax_up(1) = 3
     Amg % type_relax_up(2) = 1
@@ -160,18 +160,18 @@
     Amg % coarse_solver  = digit(1)
     Amg % n_relax_coarse = digit(2)
 
-    !--------------------------------------------------!
-    !   In case of yale-smp coarse grid solution, do   !
-    !   not use coarsest grid with less than 10 pnts   !
-    !--------------------------------------------------!
-    ! Yale: if(Amg % coarse_solver .eq. 2) then
-    ! Yale:   do i = m, 1, -1
-    ! Yale:     l = i
-    ! Yale:     if(Amg % imax(i) - Amg % imin(i).ge.9) exit
-    ! Yale:   end do
-    ! Yale:   m = i
-    ! Yale:   levels = i
-    ! Yale: end if
+    !--------------------------------------------------------------!
+    !   In the case coarse grid solution is not obtained with GS   !
+    !   sweeps do not use coarsest grid with less than 10 points   !
+    !--------------------------------------------------------------!
+    if(Amg % coarse_solver .ne. AMG_SOLVER_GS) then
+      do i = m, 1, -1
+        l = i
+        if(Amg % imax(i) - Amg % imin(i).ge.9) exit
+      end do
+      m = i
+      levels = i
+    end if
   else
     Amg % coarse_solver  = 1
     Amg % n_relax_coarse = 0
