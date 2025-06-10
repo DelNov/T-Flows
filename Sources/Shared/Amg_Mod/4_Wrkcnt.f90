@@ -74,8 +74,8 @@
   mdtf  = mdtu
   mdtig = 2*mdtu+nnu
   write(6, 9100) Amg % mda, mdta, Amg % mda, mdtja,  &
-                   Amg % mdu, mdtia, Amg % mdu, mdtu,  &
-                   Amg % mdu, mdtf,  Amg % mdw, mdtig
+                 Amg % mdu, mdtia, Amg % mdu, mdtu,  &
+                 Amg % mdu, mdtf,  Amg % mdw, mdtig
 
   !------------------!
   !   Complexities   !
