@@ -596,7 +596,7 @@
   integer :: icgst, kevelx, kout, kswtch, levels
   integer :: n_digits, ndicg
   integer :: levelx, ifirst, ncyc
-  integer :: madapt
+  integer :: madapt, i
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -669,11 +669,11 @@
       allocate(ja(nda));     ja(:)    = 0     ! columns
       allocate(u(ndu));      u(:)     = 0.0
       allocate(f(ndu));      f(:)     = 0.0
-      allocate(iwork(ndu));  iwork(:) = 0
-      allocate(jtr(nda));    jtr(:)   = 0     ! has the same form as ja
       allocate(iw(niw));     iw(:)    = 0     ! used to be "ig"
       allocate(icg(nicg));   icg(:)   = 0
       allocate(ifg(nifg));   ifg(:)   = 0
+      allocate(iwork(ndu));  iwork(:) = 0
+      allocate(jtr(nda));    jtr(:)   = 0     ! has the same form as ja
     end if
 
     ! Copy the discretization to "Amg" workspace
@@ -764,6 +764,58 @@
                      iw, icg, ifg,        &  ! work arrays
                      levels,              &
                      iwork, jtr)
+
+    !------------------------------------!
+    !   Reduce excessive size matrices   !
+    !- - - - - - - - - - - - - - - - - - +----------------------------!
+    !   Although this seems cool, it presumes that only one call to   !
+    !   Setup will be made, with subsequent calls skipping it. I am   !
+    !   not sure how to work around it. maybe a more complex logic    !
+    !   will be needed at the section for memory allocation above?    !
+    !-----------------------------------------------------------------!
+
+    write(6, '(a)')  'De-allocating iwork and jtr'
+    deallocate(iwork, jtr)
+
+    ! System matrix a
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing a   from ', size(a, 1), ' to ', iw(Amg % iminw(levels))
+    call Amg % Reduce_Real(a,  iw(Amg % iminw(levels)))
+
+    ! Column indices ja
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing ja  from ', size(ja,1), ' to ', iw(Amg % iminw(levels))
+    call Amg % Reduce_Int (ja, iw(Amg % iminw(levels)))
+
+    ! Unknow vector u
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing u   from ', size(u, 1), ' to ', Amg % imax(levels)
+    call Amg % Reduce_Real(u, Amg % imax(levels))
+
+    ! Right hand side f
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing f   from ', size(f, 1), ' to ', Amg % imax(levels)
+    call Amg % Reduce_Real(f, Amg % imax(levels))
+
+    ! Row pointer indices ja
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing ia  from ', size(ia, 1), ' to ', Amg % imax(levels) + 1
+    call Amg % Reduce_Int(ia, Amg % imax(levels))
+
+    ! Arrays icg and iwg
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing icg from ', size(icg, 1), ' to ', Amg % imax(levels)
+    call Amg % Reduce_Int(icg, Amg % imax(levels))
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing ifg from ', size(ifg, 1), ' to ', Amg % imax(levels)
+    call Amg % Reduce_Int(ifg, Amg % imax(levels))
+
+    ! Reduce iw too, although it is not too big to start with
+    i = max(Amg % iminw(levels), Amg % imaxw(levels)+1)
+    write(6, '(a,i11,a,i11)')  &
+      'Reducing iw  from ', size(iw, 1), ' to ', i
+    call Amg % Reduce_Int(iw, i)
+
     if(Amg % ierr .gt. 0) return
   end if
 

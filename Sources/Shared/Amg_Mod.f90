@@ -81,6 +81,8 @@
       procedure :: Performed_Cycles
       procedure :: Enlarge_Int
       procedure :: Enlarge_Real
+      procedure :: Reduce_Int
+      procedure :: Reduce_Real
 
       !---------------------!
       !   Main subroutine   !
@@ -200,6 +202,8 @@
   !---------------------------------------!
 # include "Amg_Mod/8_Utilities/Enlarge_Int.f90"
 # include "Amg_Mod/8_Utilities/Enlarge_Real.f90"
+# include "Amg_Mod/8_Utilities/Reduce_Int.f90"
+# include "Amg_Mod/8_Utilities/Reduce_Real.f90"
 # include "Amg_Mod/8_Utilities/Final_Residual.f90"
 # include "Amg_Mod/8_Utilities/Get_Integer_Digits.f90"
 # include "Amg_Mod/8_Utilities/Initial_Residual.f90"
