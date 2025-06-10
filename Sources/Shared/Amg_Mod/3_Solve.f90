@@ -126,7 +126,7 @@
       Amg % type_relax_down(i) = Amg % type_relax_down(i+2)
     end do
   else
-    Amg % n_relax_down       = 1
+    Amg % n_relax_down       = 3
     Amg % nrdlen             = 2
     Amg % type_relax_down(1) = 3
     Amg % type_relax_down(2) = 1
@@ -146,7 +146,7 @@
       Amg % type_relax_up(i) = Amg % type_relax_up(i+2)
     end do
   else
-    Amg % n_relax_up       = 1
+    Amg % n_relax_up       = 3
     Amg % nrulen           = 2
     Amg % type_relax_up(1) = 3
     Amg % type_relax_up(2) = 1

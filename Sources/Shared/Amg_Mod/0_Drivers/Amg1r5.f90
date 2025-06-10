@@ -693,7 +693,7 @@
     !--------------!
     ifirst       = 13        ! value from stuben: 13
     Amg % iout   = 13        ! value from stuben: 12
-    Amg % eps    =  1.0e-6   ! value from stuben:  1.0e-12
+    Amg % eps    =  1.0e-8   ! value from stuben:  1.0e-12
 
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
@@ -710,7 +710,7 @@
     Amg % nwt               = 2
     Amg % ntr               = 0
 
-    Amg % fine_solver = AMG_SOLVER_GS
+    Amg % fine_solver = AMG_SOLVER_CG
 
     !-----------------------------------------------------!
     !  Set parameters to standard values, if neccessary   !

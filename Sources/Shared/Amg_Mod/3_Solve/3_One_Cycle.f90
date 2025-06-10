@@ -97,17 +97,13 @@
           end do
         end do
       else if(Amg % fine_solver .eq. AMG_SOLVER_CG) then
-        do n = 1, Amg % n_relax_down
-          call Amg % Cg_On_Level(level, 2,         &
-                                 a, u, f, ia, ja,  &
-                                 iw,icg)
-        end do
+        call Amg % Cg_On_Level(level, Amg % n_relax_down,  &
+                               a, u, f, ia, ja,            &
+                               iw,icg)
       else if(Amg % fine_solver .eq. AMG_SOLVER_BICG) then
-        do n = 1, Amg % n_relax_down
-          call Amg % Bicg_On_Level(level, 2,         &
-                                   a, u, f, ia, ja,  &
-                                   iw,icg)
-        end do
+        call Amg % Bicg_On_Level(level, Amg % n_relax_down,   &
+                                 a, u, f, ia, ja,             &
+                                 iw,icg)
       end if
       if(ifi .eq. 1 .and. Amg % imax(level) - Amg % imin(level) .lt. nptsf) then
 
@@ -160,17 +156,13 @@
             end do
           end do
         else if(Amg % fine_solver .eq. AMG_SOLVER_CG) then
-          do n = 1, Amg % n_relax_up
-            call Amg % Cg_On_Level(level, 2,         &
-                                   a, u, f, ia, ja,  &
-                                   iw,icg)
-          end do
+          call Amg % Cg_On_Level(level, Amg % n_relax_up,  &
+                                 a, u, f, ia, ja,          &
+                                 iw,icg)
         else if(Amg % fine_solver .eq. AMG_SOLVER_BICG) then
-          do n = 1, Amg % n_relax_up
-            call Amg % Bicg_On_Level(level, 2,         &
-                                     a, u, f, ia, ja,  &
-                                     iw,icg)
-          end do
+          call Amg % Bicg_On_Level(level, Amg % n_relax_up,   &
+                                   a, u, f, ia, ja,           &
+                                   iw,icg)
         end if
         if(ifi .eq. 1 .and. level .ge. mink) then
 

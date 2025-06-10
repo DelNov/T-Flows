@@ -1,8 +1,8 @@
 ! #define DEBUG  1
 
 !==============================================================================!
-  subroutine Bicg_On_Level(Amg, level, irel,  &
-                           a, u, f, ia, ja,   &  ! defining system
+  subroutine Bicg_On_Level(Amg, level, max_iter,  &
+                           a, u, f, ia, ja,       &  ! defining system
                            iw, icg)
 !------------------------------------------------------------------------------!
 !   Bi-conjugate gradient on the coarsest level level
@@ -10,7 +10,7 @@
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type) :: Amg
-  integer         :: level, irel
+  integer         :: level, max_iter
   real            :: a(:), u(:), f(:)
   integer         :: ia(:), ja(:)
   integer         :: iw(:), icg(:)
@@ -49,6 +49,11 @@
   ! Number of unknowns and non-zeros on this level
   n = Amg % imax(level) - Amg % imin(level) + 1
   nnz = ia(Amg % imax(level)+1) - ia(Amg % imin(level))
+
+# ifdef AMG_VERBOSE
+    write(*,'(a,i4,a,i9,a)', advance = 'no')  &
+      ' # BiCG on level ', level, ' with ', n, ' unknowns; '
+# endif
 
   !-------------------------------------------------------!
   !                                                       !
@@ -224,6 +229,11 @@
     print *, "r_ini = ", sqrt(rho_0)
 # endif
 
+# ifdef AMG_VERBOSE
+    write(*,'(a,1es12.3,a)', advance = 'no')  &
+      ' res_ini = ', sqrt(rho_0), '; '
+# endif
+
   ! Set the value which will be used in the loop
   ! (Probably not needed)
   rho_old = rho_0
@@ -233,7 +243,8 @@
   !   Iteration loop   !
   !                    !
   !--------------------!
-  do iter = 1, 60
+  if(sqrt(rho_0) .gt. Amg % eps) then
+  do iter = 1, max_iter
 
     !---------------------------------!
     !   Solve M   z^(i-1) = r^(i-1)   !
@@ -328,16 +339,20 @@
     print '(a,i3,a,1pe14.7)',  &
       "iter: ", iter, " r_new/r_ini = ", sqrt(rho_new/rho_0)
 # endif
-    if(sqrt(rho_new) .lt. 1.0e-12) exit
+    if(sqrt(rho_new) .lt. Amg % eps) exit
 
     rho_old = rho_new
 
   end do
+  end if
 
   ! Print final residual
 # ifdef DEBUG
     print '(a,i3,a,1pe14.7)',  &
       "iter: ", iter, " r_new = ", sqrt(rho_new)
+# endif
+# ifdef AMG_VERBOSE
+    write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(rho_new)
 # endif
 
   !---------------------------------------------------------!
