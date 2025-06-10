@@ -79,6 +79,8 @@
       procedure :: Initial_Residual
       procedure :: Final_Residual
       procedure :: Performed_Cycles
+      procedure :: Enlarge_Int
+      procedure :: Enlarge_Real
 
       !---------------------!
       !   Main subroutine   !
@@ -145,53 +147,6 @@
 
   contains
 
-!==============================================================================!
-  real function Initial_Residual(Amg)
-!------------------------------------------------------------------------------!
-  implicit none
-  class(Amg_Type) :: Amg
-!------------------------------------------------------------------------------!
-  Initial_Residual = Amg % res0
-  end function
-
-!==============================================================================!
-  real function Final_Residual(Amg)
-!------------------------------------------------------------------------------!
-  implicit none
-  class(Amg_Type) :: Amg
-!------------------------------------------------------------------------------!
-  Final_Residual = Amg % res
-  end function
-
-!==============================================================================!
-  integer function Performed_Cycles(Amg)
-!------------------------------------------------------------------------------!
-  implicit none
-  class(Amg_Type) :: Amg
-!------------------------------------------------------------------------------!
-  Performed_Cycles = Amg % ncyc0
-  end function
-
-!==============================================================================!
-  subroutine timer_start(Amg)
-!------------------------------------------------------------------------------!
-  implicit none
-  class(Amg_Type) :: Amg
-!------------------------------------------------------------------------------!
-  call cpu_time(Amg % told)
-  end subroutine
-
-!==============================================================================!
-  subroutine timer_stop(Amg, i)
-!------------------------------------------------------------------------------!
-  implicit none
-  class(Amg_Type) :: Amg
-  integer         :: i
-!------------------------------------------------------------------------------!
-  call cpu_time(Amg % tnew)
-  Amg % time(i) = Amg % tnew - Amg % told
-  end subroutine
-
   !---------------------!
   !   Main subroutine   !
   !---------------------!
@@ -243,7 +198,14 @@
   !---------------------------------------!
   !   Just a couple of little utilities   !
   !---------------------------------------!
+# include "Amg_Mod/8_Utilities/Enlarge_Int.f90"
+# include "Amg_Mod/8_Utilities/Enlarge_Real.f90"
+# include "Amg_Mod/8_Utilities/Final_Residual.f90"
 # include "Amg_Mod/8_Utilities/Get_Integer_Digits.f90"
+# include "Amg_Mod/8_Utilities/Initial_Residual.f90"
+# include "Amg_Mod/8_Utilities/Performed_Cycles.f90"
 # include "Amg_Mod/8_Utilities/Random_0_To_0p1.f90"
+# include "Amg_Mod/8_Utilities/Timer_Start.f90"
+# include "Amg_Mod/8_Utilities/Timer_Stop.f90"
 
   end module

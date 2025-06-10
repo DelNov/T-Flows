@@ -30,9 +30,16 @@
 ! integer, allocatable :: counter(:)
   real                 :: alpha, beta
   real                 :: pq, rho_0, rho_old, rho_new
+!------------------------------------[save]------------------------------------!
+  save  ! this is really needed for local allocatable arrays
 !==============================================================================!
 
   call Amg % timer_start()
+
+  ! Initialize residuals
+  rho_0   = 0.0
+  rho_old = 0.0
+  rho_new = 0.0
 
   ! See comment in source "Coarsening.f90" at line 180
   iaux = ia(Amg % imax(level)+1)
@@ -61,9 +68,9 @@
   !   Create local CRS matrix from the global ia, ja, a   !
   !                                                       !
   !-------------------------------------------------------!
-  allocate(a_val(nnz));   a_val(:)   = 0.0
-  allocate(col_idx(nnz)); col_idx(:) = 0
-  allocate(row_ptr(n+1)); row_ptr(:) = 0
+  call Amg % Enlarge_Real(a_val,   nnz);  a_val(:)   = 0.0
+  call Amg % Enlarge_Int (col_idx, nnz);  col_idx(:) = 0
+  call Amg % Enlarge_Int (row_ptr, n+1);  row_ptr(:) = 0
   do ig = Amg % imin(level), Amg % imax(level)
     i = ig - Amg % imin(level) + 1                   ! local unknown number
     row_ptr(i) = ia(ig) - ia(Amg % imin(level)) + 1  ! local row pointer
@@ -80,8 +87,8 @@
   !   Create local b and x vectors (Stueben's f and u)   !
   !                                                      !
   !------------------------------------------------------!
-  allocate(b(n))
-  allocate(x(n))
+  call Amg % Enlarge_Real(b, n)
+  call Amg % Enlarge_Real(x, n)
   do ig = Amg % imin(level), Amg % imax(level)
     i = ig - Amg % imin(level) + 1  ! local unkown number
     b(i) = f(ig)
@@ -93,8 +100,11 @@
   !   Allocate memory for local vectors for the algorithm   !
   !                                                         !
   !---------------------------------------------------------!
-  allocate(m(n))
-  allocate(p(n),   q(n),   r(n),   z(n))
+  call Amg % Enlarge_Real(m, n)
+  call Amg % Enlarge_Real(p, n)
+  call Amg % Enlarge_Real(q, n)
+  call Amg % Enlarge_Real(r, n)
+  call Amg % Enlarge_Real(z, n)
   m(:) = 0.0
   p(:) = 0.0
   q(:) = 0.0
