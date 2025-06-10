@@ -74,7 +74,7 @@
     AMG_WARN_YALE_STORAGE_JA = -3,  &  ! ndja too small for yale-smp
     AMG_WARN_CG_STORAGE_U    = -4      ! ndu too small for cg
 
-  integer, parameter :: AMG_BIG_INTEGER = 1000000
+  integer, parameter :: AMG_BIG_INTEGER = HUGE_INT
 
   ! This is still from the time when they were using real and
   ! integer arrays interchangeably.  A relict of the past, indeed.
