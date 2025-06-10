@@ -173,7 +173,7 @@
   !-------------------!
   !   Messages on a   !
   !-------------------!
-# ifdef VERBOSE
+# ifdef AMG_VERBOSE
     if(asym .eq. 0.0) write(6, '(a)')  &
       ' check: a probably symmetric'
     if(asym .ne. 0.0) write(6, '(a,d11.3)')  &
@@ -215,7 +215,7 @@
   endif
 
   if(new .le. 0) then
-#   ifdef VERBOSE
+#   ifdef AMG_VERBOSE
       write(6, '(a)')  &
         ' check: matrix a was symmetrically stored'
 #   endif

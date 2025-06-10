@@ -346,7 +346,7 @@
         ' or nda too small. setup computation is slowing down.'
       Amg % ierr = AMG_WARN_YALE_STORAGE_A
     endif
-#   ifdef VERBOSE
+#   ifdef AMG_VERBOSE
       write(6, '(a,i3,a)')  &
         ' coarse grid operator no.', level, ' completed'
 #   endif

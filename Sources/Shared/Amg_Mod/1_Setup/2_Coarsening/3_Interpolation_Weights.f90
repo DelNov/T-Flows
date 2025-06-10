@@ -307,8 +307,8 @@
   !----------!
   !   Exit   !
   !----------!
-# ifdef VERBOSE
-    write(6, '(a,i3,a,i4)')   &
+# ifdef AMG_VERBOSE
+    write(6, '(a,i3,a,i7)')   &
       ' interpolation operator no.', level,  &
       ' completed. c-points added in Interpolation_Weights:', ncount
 # endif

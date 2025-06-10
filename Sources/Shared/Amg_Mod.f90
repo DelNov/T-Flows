@@ -1,5 +1,5 @@
 ! Uncomment for more output.  Actually, some interesting things get printed out.
-#define VERBOSE
+#define AMG_VERBOSE
 
 !==============================================================================!
   module Amg_Mod
