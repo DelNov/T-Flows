@@ -307,11 +307,11 @@
   !----------!
   !   Exit   !
   !----------!
-# ifdef AMG_VERBOSE
+  if(Amg % iout .gt. 3) then
     write(6, '(a,i3,a,i7)')   &
       ' interpolation operator no.', level,  &
       ' completed. c-points added in Interpolation_Weights:', ncount
-# endif
+  end if
 
   call Amg % timer_stop(4)
 

@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Wrkcnt(Amg, iout,  &
-                    ia,         &
-                    iw,         &
+  subroutine Wrkcnt(Amg,      &
+                    ia,       &
+                    iw,       &
                     levels)
 !-----------------------------------------------------------------------------!
 !   Residuals / cp-times / complexity / dimensioning
@@ -9,7 +9,6 @@
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type) :: Amg
-  integer         :: iout
   integer         :: ia(:)
   integer         :: iw(:)
   integer         :: levels
@@ -21,7 +20,7 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  if(iout .lt. 1) return
+  if(Amg % iout .lt. 1) return
 
   !-----------------------------!
   !   Residuals / convergence   !
@@ -31,8 +30,10 @@
     write(6, 9110) Amg % res0, Amg % res, cfac
     cfpc = cfac**(1.0/real(Amg % ncyc0))
     write(6, 9120) cfpc
-  endif
-  if(iout .le. 1) return
+  end if
+
+  if(Amg % iout .le. 1) return
+
   write(6, 9000)
   nnu = Amg % imax(1)
 

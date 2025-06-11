@@ -173,22 +173,22 @@
   !-------------------!
   !   Messages on a   !
   !-------------------!
-# ifdef AMG_VERBOSE
+  if(Amg % iout .gt. 3) then
     if(asym .eq. 0.0) write(6, '(a)')  &
-      ' check: a probably symmetric'
+      ' check: A probably symmetric'
     if(asym .ne. 0.0) write(6, '(a,d11.3)')  &
-      ' check: a probably not symmetric. measure:', asym
+      ' check: A probably not symmetric. measure:', asym
     if(naoff .gt. 0)  write(6, '(a,i6,a)')  &
-      ' check: a probably not pos. type:', naoff,  &
+      ' check: A probably not pos. type:', naoff,  &
       ' off-diagonal elements positive'
     if(naneg .gt. 0)    write(6, '(a,i6,a)')  &
-      ' check: a probably not pos. type:', naneg,  &
+      ' check: A probably not pos. type:', naneg,  &
       ' rowsums negative'
     if(nazer .eq. nnu)  write(6, '(a)')  &
-      ' check: a probably singular - rowsums are zero'
+      ' check: A probably singular - rowsums are zero'
     if(naoff .eq. 0 .and. naneg.eq.0) write(6, '(a)')  &
-      ' check: a probably positive type'
-# endif
+      ' check: A probably positive type'
+  end if
 
   !--------------!
   !   Warnings   !
@@ -215,10 +215,10 @@
   endif
 
   if(new .le. 0) then
-#   ifdef AMG_VERBOSE
+    if(Amg % iout .gt. 3) then
       write(6, '(a)')  &
         ' check: matrix a was symmetrically stored'
-#   endif
+    end if
     ! Remove pairs of zeroes
     call Amg % Truncate_Operator(1, 0, a, ia, ja)
     return
@@ -227,7 +227,7 @@
   !--------------------------------------!
   !   Replace a by symmetrized version   !
   !--------------------------------------!
-  if(nna+new .ge. nda) then
+  if(nna + new .ge. nda) then
     write(6, '(a)')  &
       ' *** error in check: nda too small ***'
     Amg % ierr = AMG_ERR_DIM_A_TOO_SMALL

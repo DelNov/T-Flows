@@ -268,22 +268,19 @@
 !                  (see parameter ncyc).
 !
 !                Wrkcnt provides the user with information about residuals,
-!                  storage requirements and cp-times (see parameter iout).
+!                  storage requirements and cp-times (see also Amg % iout).
 !
 !                If Amg1r5 is called the first time, iswtch has to be = 4.
 !                Independent of iswtch, single modules can be bypassed by a
 !                proper choice of the corresponding parameter.
 !
-!     iout   - Parameter controlling the amount of output during solution
+!     Amg % iout - Parameter controlling the amount of output during solution
 !              phase:
-!
-!                1st digit: not used; has to be non-zero.
-!
-!                2nd digit:
 !                  =0: no output (except for messages)
 !                  =1: residual before and after solution process
 !                  =2: add.: statistics on cp-times and storage requirements
 !                  =3: add.: residual after each Amg-cycle
+!                  =4: add.: residual after each CG/BiCG solver sweep
 !
 !   --------------------------------------------------------------
 !
@@ -505,7 +502,7 @@
 !   Standard choices of parameters (as far as meaningful):
 !
 !     iswtch = 4
-!     iout   = 12
+!     iout   = 2
 !
 !     levelx = 25
 !     ifirst = 13
@@ -593,7 +590,7 @@
 
   integer :: n_nonzeros, n_unknowns, niw, nicg, nifg
   integer :: nda, ndu, ndw
-  integer :: icgst, kevelx, kout, kswtch, levels
+  integer :: icgst, kevelx, kswtch, levels
   integer :: n_digits, ndicg
   integer :: levelx, ifirst, ncyc
   integer :: madapt, i
@@ -692,7 +689,7 @@
     !   Switches   !
     !--------------!
     ifirst       = 13        ! value from stuben: 13
-    Amg % iout   = 13        ! value from stuben: 12
+    Amg % iout   =  4        ! can be from 0 to 4
     Amg % eps    =  1.0e-8   ! value from stuben:  1.0e-12
 
     !-----------------------------------------------------------!
@@ -712,17 +709,9 @@
 
     Amg % fine_solver = AMG_SOLVER_CG
 
-    !-----------------------------------------------------!
-    !  Set parameters to standard values, if neccessary   !
-    !-----------------------------------------------------!
-    if(Amg % iout .ne. 0) then
-      call Amg % Get_Integer_Digits(Amg % iout, 2, n_digits, digit)
-      kout = digit(2)
-    else
-      kout = 2
-    end if
-
-    ! Limit kevelx to AMG_MAX_LEVELS
+    !------------------------------------!
+    !   Limit kevelx to AMG_MAX_LEVELS   !
+    !------------------------------------!
     if(levelx .gt. 0) then
       kevelx = min(levelx, AMG_MAX_LEVELS)
     else if (levelx .lt. 0) then
@@ -824,7 +813,7 @@
   end if
 
   if(kswtch .ge. 2) then
-    call Amg % Solve(madapt, ncyc, kout,  &
+    call Amg % Solve(madapt, ncyc,        &
                      a, u, f, ia, ja,     &  ! linear system
                      iw, icg, ifg,        &  ! work arrays
                      levels)
@@ -832,7 +821,7 @@
   end if
 
   if(kswtch .ge. 1) then
-    call Amg % Wrkcnt(kout, ia, iw, levels)
+    call Amg % Wrkcnt(ia, iw, levels)
   end if
 
   !------------------------!

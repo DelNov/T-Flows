@@ -271,7 +271,7 @@
             return
           end if
           ist = if1
-        endif
+        end if
         do jf2 = ia(if1), ia(if1+1) - 1
           if2 = ja(jf2)
           ic2 = icg(if2)
@@ -345,11 +345,11 @@
         ' on grid ',k1,' during execution of opdfn, because nda',  &
         ' or nda too small. setup computation is slowing down.'
       Amg % ierr = AMG_WARN_YALE_STORAGE_A
-    endif
-#   ifdef AMG_VERBOSE
+    end if
+    if(Amg % iout .gt. 3) then
       write(6, '(a,i3,a)')  &
         ' coarse grid operator no.', level, ' completed'
-#   endif
+    end if
 
   !-------------------------------------------------------!
   !   Set up linked list for relaxation on grid level-1   !

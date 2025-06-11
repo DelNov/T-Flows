@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Solve(Amg, madapt, ncyc, iout,   &
-                   a, u, f, ia, ja,           &
-                   iw, icg, ifg,              &
+  subroutine Solve(Amg, madapt, ncyc,  &
+                   a, u, f, ia, ja,    &  ! holds linear system
+                   iw, icg, ifg,       &
                    levels)
 !------------------------------------------------------------------------------!
 !   Solution phase of Amg1r5
@@ -9,7 +9,7 @@
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type) :: Amg
-  integer         :: madapt, ncyc, iout
+  integer         :: madapt, ncyc
   real            :: a(:), u(:), f(:)
   integer         :: ia(:), ja(:)
   integer         :: iw(:), icg(:), ifg(:)
@@ -35,13 +35,13 @@
       ' *** error in Solve: ndu too small ***'
     Amg % ierr = AMG_ERR_DIM_U_TOO_SMALL
     return
-  endif
+  end if
   if(ndu .lt. Amg % imax(levels)) then
     write(6, '(a)')  &
       ' *** error in Solve: ndu too small ***'
     Amg % ierr = AMG_ERR_DIM_F_TOO_SMALL
     return
-  endif
+  end if
 
   m = levels
   Amg % ncyc0 = 0
@@ -52,7 +52,7 @@
     epsi = Amg % eps
   else
     epsi = 1.0e-12
-  endif
+  end if
 
   !----------------------!
   !   Decompose madapt   !
@@ -69,17 +69,17 @@
         end do
       else
         fac = 0.7
-      endif
-    endif
+      end if
+    end if
   else
     msel = 2
     fac = 0.7
-  endif
+  end if
 
   !--------------------!
   !   Decompose ncyc   !
   !--------------------!
-  if (ncyc.ne.0) then
+  if(ncyc .ne. 0) then
     call Amg % Get_Integer_Digits(abs(ncyc), 4, n_digits, digit)
     igam   = sign(digit(1), ncyc)
     icgr   = digit(2)
@@ -91,26 +91,26 @@
     icgr   = 0
     iconv  = 1
     ncycle = 10
-  endif
+  end if
 
   !----------------------------------------------------------------!
   !   Set epsi according to convergence criterion given by iconv   !
   !----------------------------------------------------------------!
-  if (iconv.ne.3) then
-    if (iconv.eq.4) then
+  if(iconv.ne.3) then
+    if(iconv.eq.4) then
     ama = 0.0
     do i = 1, Amg % imax(1)
       ama = max(ama,a(ia(i)))
     end do
     epsi = epsi*ama
-    endif
+    end if
   else
     fmax = 0.0
     do i = 1, Amg % imax(1)
       fmax = max(fmax,abs(f(i)))
     end do
     epsi = epsi*fmax
-  endif
+  end if
 
   !------------------------------------!
   !   Decompose Amg % def_relax_down   !
@@ -130,7 +130,7 @@
     Amg % nrdlen             = 2
     Amg % type_relax_down(1) = 3
     Amg % type_relax_down(2) = 1
-  endif
+  end if
 
   !----------------------------------!
   !   Decompose Amg % def_relax_up   !
@@ -150,7 +150,7 @@
     Amg % nrulen           = 2
     Amg % type_relax_up(1) = 3
     Amg % type_relax_up(2) = 1
-  endif
+  end if
 
   !---------------------------------------!
   !   Decompose Amg % def_coarse_solver   !
@@ -175,19 +175,19 @@
   else
     Amg % coarse_solver  = 1
     Amg % n_relax_coarse = 0
-  endif
+  end if
 
   !-------------!
   !   Cycling   !
   !-------------!
-  if (iout.ne.0) then
+  if(Amg % iout .ne. 0) then
     call Amg % Calculate_Residual(1, Amg % res0, a, u, f, ia, ja, iw)
-    if (iout.eq.3) then
+    if(Amg % iout .ge. 3) then
       write (6, 9005)
       write (6, 9000) Amg % res0
-    endif
+    end if
     resold = Amg % res0
-  endif
+  end if
 
   do iter = 1, ncycle
     call Amg % Backup_U(1, icgr, u, m)
@@ -199,17 +199,17 @@
     if(Amg % ierr.gt.0) return
     if(iter .eq. 1) then
       mfirst = m
-      if (iout.eq.3) write(6, 9040) m
-    elseif (iout.eq.3.and.m.ne.mfirst) then
+      if(Amg % iout .ge. 3) write(6, 9040) m
+    else if(Amg % iout .ge. 3.and.m.ne.mfirst) then
       mfirst = m
       write(6, 9040) m
-    endif
-    if(iout .eq. 3 .or. iconv .ne. 1) then
+    end if
+    if(Amg % iout .ge. 3 .or. iconv .ne. 1) then
       call Amg % Calculate_Residual(1, Amg % res, a, u, f, ia, ja, iw)
     end if
     Amg % ncyc0 = iter
-    if(iout .eq. 3) then
-      cfac = Amg % res / (resold+1.0e-30)
+    if(Amg % iout .ge. 3) then
+      cfac = Amg % res / (resold + TINY)
       resold = Amg % res
       if(m .ne. 1) then
         call Amg % Calculate_Residual(2, rescg, a, u, f, ia, ja, iw)
@@ -230,7 +230,7 @@
     end if
     if(Amg % res .lt. epsil) exit
   end do
-  if(iout .ne. 3 .and. iout .ne. 0) then
+  if(Amg % iout .lt. 3 .and. Amg % iout .ne. 0) then
     call Amg % Calculate_Residual(1, Amg % res, a, u, f, ia, ja, iw)
   end if
 

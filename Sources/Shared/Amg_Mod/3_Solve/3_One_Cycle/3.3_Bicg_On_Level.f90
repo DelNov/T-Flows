@@ -57,10 +57,10 @@
   n = Amg % imax(level) - Amg % imin(level) + 1
   nnz = ia(Amg % imax(level)+1) - ia(Amg % imin(level))
 
-# ifdef AMG_VERBOSE
+  if(Amg % iout .gt. 3) then
     write(*,'(a,i4,a,i9,a)', advance = 'no')  &
       ' # BiCG on level ', level, ' with ', n, ' unknowns; '
-# endif
+  end if
 
   !-------------------------------------------------------!
   !                                                       !
@@ -238,10 +238,10 @@
     print *, "r_ini = ", sqrt(rho_0)
 # endif
 
-# ifdef AMG_VERBOSE
+  if(Amg % iout .gt. 3) then
     write(*,'(a,1es12.3,a)', advance = 'no')  &
       ' res_ini = ', sqrt(rho_0), '; '
-# endif
+  end if
 
   ! Set the value which will be used in the loop
   ! (Probably not needed)
@@ -360,9 +360,9 @@
     print '(a,i3,a,1pe14.7)',  &
       "iter: ", iter, " r_new = ", sqrt(rho_new)
 # endif
-# ifdef AMG_VERBOSE
+  if(Amg % iout .gt. 3) then
     write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(rho_new)
-# endif
+  end if
 
   !---------------------------------------------------------!
   !                                                         !
