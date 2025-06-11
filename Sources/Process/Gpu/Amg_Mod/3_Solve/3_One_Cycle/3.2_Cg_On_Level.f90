@@ -28,8 +28,9 @@
 ! real,    allocatable :: a_t_val(:)
 ! integer, allocatable :: row_t_ptr(:), col_t_idx(:)
 ! integer, allocatable :: counter(:)
-  real                 :: alpha, beta
-  real                 :: pq, rho_0, rho_old, rho_new
+  real                 :: alpha, beta, pq
+  real                 :: res_ini, res_cur  ! don't mix rhos and res's ...
+  real                 :: rho_old, rho_new  ! ... they are not the same thing
 !------------------------------------[save]------------------------------------!
   save  ! this is really needed for local allocatable arrays
 !==============================================================================!
@@ -37,7 +38,8 @@
   call Amg % timer_start()
 
   ! Initialize residuals
-  rho_0   = 0.0
+  res_ini = 0.0
+  res_cur = 0.0
   rho_old = 0.0
   rho_new = 0.0
 
@@ -80,7 +82,8 @@
       a_val(j)   = a(jg)                      ! local matrix value
     end do
   end do
-  row_ptr(n+1) = ia(Amg % imax(level)+1) - ia(Amg % imin(level)) + 1  ! final row pointer
+  ! Final row pointer
+  row_ptr(n+1) = ia(Amg % imax(level)+1) - ia(Amg % imin(level)) + 1
 
   !------------------------------------------------------!
   !                                                      !
@@ -121,7 +124,7 @@
   !--------------------------------------------------------------!
   !   Compute r^(0) = b - A x^(0) for some initial guess x^(0)   !
   !--------------------------------------------------------------!
-  rho_0 = 0.0
+  res_ini = 0.0
   do i = 1, n
     s = b(i)
     do k = row_ptr(i), row_ptr(i+1) - 1
@@ -129,16 +132,17 @@
       s = s - a_val(k) * x(j)
     end do
     r(i) = s
-    rho_0 = rho_0 + r(i) * r(i)
+    res_ini = res_ini + r(i) * r(i)
   end do
+  res_cur = res_ini
 
 # ifdef DEBUG
-    print *, "r_ini = ", sqrt(rho_0)
+    print *, "res_ini = ", sqrt(res_ini)
 # endif
 
   if(Amg % iout .gt. 3) then
     write(*,'(a,1es12.3,a)', advance = 'no')  &
-      ' res_ini = ', sqrt(rho_0), '; '
+      ' res_ini = ', sqrt(res_ini), '; '
   end if
 
 
@@ -147,7 +151,7 @@
   !   Iteration loop   !
   !                    !
   !--------------------!
-  if(sqrt(rho_0) .gt. Amg % eps) then
+  if(sqrt(res_ini) .gt. Amg % eps) then
   do iter = 1, max_iter
 
     !-------------------------------!
@@ -164,6 +168,10 @@
     do i = 1, n
       rho_new = rho_new + r(i) * z(i)
     end do
+
+# ifdef DEBUG
+    print *, "rho_new = ", sqrt(rho_new)
+# endif
 
     if(iter .eq. 1) then
       !-------------------!
@@ -214,11 +222,22 @@
       r(i) = r(i) - alpha * q(i)
     end do
 
+    ! Compute current residual
+    res_cur = 0.0
+    do i = 1, n
+      s = b(i)
+      do k = row_ptr(i), row_ptr(i+1) - 1
+        j = col_idx(k)
+        s = s - a_val(k) * x(j)
+      end do
+      res_cur = res_cur + s * s
+    end do
+
 # ifdef DEBUG
     print '(a,i3,a,1pe14.7)',  &
-      "iter: ", iter, " r_new/r_ini = ", sqrt(rho_new/rho_0)
+      "iter: ", iter, " res_new/res_ini = ", sqrt(res_cur/res_ini)
 # endif
-    if(sqrt(rho_new) .lt. Amg % eps) exit
+    if(sqrt(res_cur) .lt. Amg % eps) exit
 
     rho_old = rho_new
 
@@ -228,10 +247,10 @@
   ! Print final residual
 # ifdef DEBUG
     print '(a,i3,a,1pe14.7)',  &
-      "iter: ", iter, " r_new = ", sqrt(rho_new)
+      "iter: ", iter, " res_fin = ", sqrt(res_cur)
 # endif
   if(Amg % iout .gt. 3) then
-    write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(rho_new)
+    write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(res_cur)
   end if
 
   !---------------------------------------------------------!

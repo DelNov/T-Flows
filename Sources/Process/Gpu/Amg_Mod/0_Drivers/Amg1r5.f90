@@ -685,7 +685,7 @@
     !   Switches   !
     !--------------!
     ifirst       = 13        ! value from stuben: 13
-    Amg % iout   =  4        ! can be from 0 to 4
+    Amg % iout   =  1        ! can be from 0 to 4
     Amg % eps    =  1.0e-8   ! value from stuben:  1.0e-12
 
     !-----------------------------------------------------------!
