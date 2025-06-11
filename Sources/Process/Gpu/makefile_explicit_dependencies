@@ -212,8 +212,6 @@ Amg_Mod.h90 \
 Amg_Mod/*/*.f90 \
 Amg_Mod/*.f90 \
 Amg_Mod/call_sequence_compact.txt \
-$(DIR_SHARED)/Amg_Mod_Modified.tgz \
-$(DIR_SHARED)/Amg_Mod_Modified_2,tgz 
 
 #---------------------------------------------------
 # Dependencies for: ./Time_Mod.f90
@@ -535,8 +533,6 @@ Amg_Mod.h90 \
 Amg_Mod/*/*.f90 \
 Amg_Mod/*.f90 \
 Amg_Mod/call_sequence_compact.txt \
-$(DIR_SHARED)/Amg_Mod_Modified.tgz \
-$(DIR_SHARED)/Amg_Mod_Modified_2,tgz 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_002.f90

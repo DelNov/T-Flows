@@ -49,7 +49,7 @@
   integer         :: levels
   integer         :: iwork(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer :: i, iajas, icall, ichk, iias, iirs, irst, isaja, isia
+  integer :: i, iajas, icall, ichk, iias, iirs, isaja, isia
   integer :: level, kerr, mdiw, mmax
   integer :: first_level, ncolx
   integer :: nda, ndu
@@ -109,22 +109,23 @@
       do icall = 1, 4
         recover = .false.
         if(icall .eq. 1) then
-          ! ditched: jtrst = ia(Amg % imax(level-1)+1)
+          ! Ditched: jtrst = ia(Amg % imax(level-1)+1)
+          ! The rest is working arrays which should be important.
           call Amg % Row_Sort(level-1,        &
                               a, ia, ja,      &  ! linear system
                               iw, ifg, jtr)      ! working arrays
         end if
         if(icall .eq. 2) then
 
-          !-------------------------------------------------------!
-          !   irst: initial pointer for work space in vector u,   !
-          !         to contain reset stack                        !
-          !-------------------------------------------------------!
-          irst = mdiw + 1 - iirs
+          !--------------------------------------------------------!
+          !   irst: initial pointer for work space in vector u,    !
+          !         to contain reset stack, but not used anymore   !
+          !--------------------------------------------------------!
+          ! Dirched: irst = mdiw + 1 - iirs
           call Amg % Pre_Color(level-1,       &
-                               ia, ja,        &
-                               iw, icg, ifg,  &
-                               iwork, jtr,    &
+                               ia, ja,        &  ! linear system
+                               iw, icg, ifg,  &  ! working arrays
+                               iwork, jtr,    &  ! more working arrays
                                iias)
         end if
         if(icall .eq. 3) then
