@@ -47,7 +47,7 @@
   !------------------------!
   if(Flow % pp % solver .eq. 'cg') then
     call Profiler % Start('CG_for_Pressure')
-    call Flow % Nat % Cg(Flow % pp % n,                         &
+    call Flow % Nat % Cg(Flow % pp % n(1:Grid % n_cells),       &
                          Flow % pp % miter, Flow % pp % niter,  &
                          Flow % pp % tol,   Flow % pp % res)
     call Profiler % Stop('CG_for_Pressure')

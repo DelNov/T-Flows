@@ -91,8 +91,8 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Turb_Variable')
-  call Flow % Nat % Cg(phi % n,                   &
-                       phi % miter, phi % niter,  &
+  call Flow % Nat % Cg(phi % n(1:Grid % n_cells),  &
+                       phi % miter, phi % niter,   &
                        phi % tol,   phi % res)
   call Profiler % Stop('CG_for_Turb_Variable')
 

@@ -152,7 +152,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Momentum')
-  call Flow % Nat % Cg(ui_n,                    &
+  call Flow % Nat % Cg(ui_n(1:Grid % n_cells),  &
                        ui % miter, ui % niter,  &
                        ui % tol,   ui % res)
   call Profiler % Stop('CG_for_Momentum')

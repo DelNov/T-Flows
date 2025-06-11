@@ -93,7 +93,7 @@
   !   Call linear solver   !
   !------------------------!
   call Profiler % Start('CG_for_Energy')
-  call Flow % Nat % Cg(Flow % t % n,                        &
+  call Flow % Nat % Cg(Flow % t % n(1:Grid % n_cells),      &
                        Flow % t % miter, Flow % t % niter,  &
                        Flow % t % tol,   Flow % t % res)
   call Profiler % Stop('CG_for_Energy')

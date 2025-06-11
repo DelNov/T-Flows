@@ -354,7 +354,6 @@ SRC_F_MOD = Const_Mod.f90         \
             String_Mod.f90        \
             Comm_Mod.f90          \
             Assert_Mod.f90        \
-            Amg_Mod.f90           \
             Tokenizer_Mod.f90     \
             Message_Mod.f90       \
             Memory_Mod.f90        \
@@ -377,6 +376,7 @@ SRC_F_MOD += Bulk_Mod.f90           \
              Sparse_Mod.f90         \
              Linalg_Mod.f90         \
              Native_Mod.f90         \
+             Amg_Mod.f90            \
              Numerics_Mod.f90       \
              Var_Mod.f90            \
              Time_Mod.f90           \

@@ -202,6 +202,20 @@ $(DIR_OBJECT)/Gpu_Mod.o \
 $(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
 #---------------------------------------------------
+# Dependencies for: ./Amg_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Amg_Mod.o:\
+$(DIR_OBJECT)/Native_Mod.o \
+Native_Mod/*/*.f90 \
+Native_Mod/*.f90 \
+Amg_Mod.h90 \
+Amg_Mod/*/*.f90 \
+Amg_Mod/*.f90 \
+Amg_Mod/call_sequence_compact.txt \
+$(DIR_SHARED)/Amg_Mod_Modified.tgz \
+$(DIR_SHARED)/Amg_Mod_Modified_2,tgz 
+
+#---------------------------------------------------
 # Dependencies for: ./Time_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Time_Mod.o:\
@@ -399,6 +413,8 @@ Turb_Mod/Form_Variable_Matrix.fpp \
 Turb_Mod/*/*.f90 \
 Turb_Mod/*.f90 \
 Turb_Mod/Compute_Variable.fpp \
+$(DIR_OBJECT)/Time_Mod.o \
+Time_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
 $(DIR_SHARED)/Gpu_Mod/*/*.f90 
 
@@ -513,7 +529,14 @@ $(DIR_OBJECT)/Face_Mod.o \
 Face_Mod/*.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \
 $(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/*.f90 \
+$(DIR_OBJECT)/Amg_Mod.o \
+Amg_Mod.h90 \
+Amg_Mod/*/*.f90 \
+Amg_Mod/*.f90 \
+Amg_Mod/call_sequence_compact.txt \
+$(DIR_SHARED)/Amg_Mod_Modified.tgz \
+$(DIR_SHARED)/Amg_Mod_Modified_2,tgz 
 
 #---------------------------------------------------
 # Dependencies for: ./Test_002.f90

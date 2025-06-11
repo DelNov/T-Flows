@@ -131,11 +131,9 @@
     !   Call linear solver   !
     !------------------------!
     call Profiler % Start('CG_for_Scalars')
-    call Flow % Nat % Cg(phi % n,     &
-                         phi % miter, &
-                         phi % niter, &
-                         phi % tol,   &
-                         phi % res)
+    call Flow % Nat % Cg(phi % n(1:Grid % n_cells),  &
+                         phi % miter, phi % niter,   &
+                         phi % tol,   phi % res)
     call Profiler % Stop('CG_for_Scalars')
 
 # if T_FLOWS_DEBUG == 1

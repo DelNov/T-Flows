@@ -9,14 +9,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Native_Type),    target, intent(inout) :: Nat      !! parent class
-  real, intent(out)   :: x(-Nat % pnt_grid % n_bnd_cells:&
-                            Nat % pnt_grid % n_cells)
-                         !! unknown vector, the solution of the linear system
-  integer, intent(in)    :: miter    !! maximum iterations
-  integer, intent(out)   :: niter    !! performed iterations
-  real,    intent(in)    :: tol      !! target solver tolerance
-  real,    intent(out)   :: fin_res  !! achieved residual
+  class(Native_Type), target, intent(inout) :: Nat       !! parent class
+  real, intent(out)    :: x(1:Nat % pnt_grid % n_cells)  !! unknown vector
+  integer, intent(in)  :: miter    !! maximum iterations
+  integer, intent(out) :: niter    !! performed iterations
+  real,    intent(in)  :: tol      !! target solver tolerance
+  real,    intent(out) :: fin_res  !! achieved residual
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Sparse_Type), pointer :: A
