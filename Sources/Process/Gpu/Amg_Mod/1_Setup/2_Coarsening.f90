@@ -166,7 +166,7 @@
             exit
           end if
           return
-        endif
+        end if
       end do
       if(.not. recover) then
         if(level .gt. mmax) then

@@ -21,7 +21,7 @@
     ifrst = digit(2)
   else
     ifrst = 3
-  endif
+  end if
 
   if(ifrst.eq.1) then
     do i = Amg % imin(1), Amg % imax(1)
@@ -52,6 +52,6 @@
     end do
     if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
     return
-  endif
+  end if
 
   end subroutine

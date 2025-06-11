@@ -609,7 +609,7 @@
     else
       kswtch = AMG_RUN_ALL_FOUR_STAGES
     end if
-  endif
+  end if
 
   !------------------------!
   !                        !

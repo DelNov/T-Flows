@@ -73,7 +73,7 @@
         ' *** error in check: pointer ia erroneous ***'
       Amg % ierr = AMG_ERR_IA_POINTER_INVALID
       return
-    endif
+    end if
     if (ja(j1).ne.i) then
       write(*,*) 'error, (ja(j1).ne.i) '
       write(*,*) 'i      = ', i
@@ -83,7 +83,7 @@
         ' *** error in check: diagonal is not stored first ***'
       Amg % ierr = AMG_ERR_DIAG_NOT_FIRST
       return
-    endif
+    end if
     do j = j1, j2
       i1 = ja(j)
       if (i1.lt.1 .or. i1.gt.nnu .or. icg(i1).eq.1) then
@@ -96,7 +96,7 @@
           ' *** error in check: pointer ja erroneous ***'
         Amg % ierr = AMG_ERR_JA_POINTER_INVALID
         return
-      endif
+      end if
       icg(i1) = 1
     end do
     do j = j1, j2
@@ -163,7 +163,7 @@
       naneg = naneg+1
     else
       nazer = nazer+1
-    endif
+    end if
   end do
   anormm = sqrt(anormm)
   anormp = sqrt(anormp)
@@ -197,22 +197,22 @@
     write(6, '(a)')  &
       ' --- warning 1 in check: param matrix may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
-  endif
+  end if
   if(Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX .and. asym .eq. 0.0) then
     write(6, '(a)')  &
       ' --- warning 2 in check: param matrix may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
-  endif
+  end if
   if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX     .and. nazer .ne. nnu) then
     write(6, '(a)')  &
       ' --- warning 3 in check: param matrix may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
-  endif
+  end if
   if(Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX .and. nazer .eq. nnu) then
     write(6, '(a)')  &
       ' --- warning 4 in check: param matrix may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
-  endif
+  end if
 
   if(new .le. 0) then
     if(Amg % iout .gt. 3) then
@@ -296,6 +296,6 @@
         end if
       end do
     end do
-  endif
+  end if
 
   end subroutine

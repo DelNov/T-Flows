@@ -50,7 +50,7 @@
     mink  = AMG_BIG_INTEGER
     ifi   = 1
     nptsf = (Amg % imax(l) - Amg % imin(l)+1) / 10
-  endif
+  end if
 
   !-------------------!
   !                   !
@@ -192,7 +192,7 @@
                                                a, u, f, ia, ja,  &
                                                iw, icg)
             cycle upward
-          endif
+          end if
         end if
 
         if(level .eq. l) then

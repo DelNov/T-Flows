@@ -64,7 +64,7 @@
     iws = Amg % imaxw(level-1) + 2 - ilo
   else
     iws = 0
-  endif
+  end if
   do i = ilo, ihi
     ifg(i) = 0
     ja(ia(i)) = ia(i)
@@ -102,7 +102,7 @@
           jmx = j
         elseif (a(j).gt.amn) then
           amn = a(j)
-        endif
+        end if
       end do
 
       !----------------------------------------------------------!
@@ -116,14 +116,14 @@
           jmx = j
         elseif (a(j).gt.amn) then
           amn = a(j)
-        endif
+        end if
       end do
 
       !-------------------------------------!
       !   Test for positive off-diagonals   !
       !-------------------------------------!
       if (amx .ge. 0.0) exit
-    endif
+    end if
 
     !------------------------------------------------!
     !   Put strongest connection in first position   !

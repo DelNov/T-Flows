@@ -73,7 +73,7 @@
   if (level.eq.1) then
     Amg % iminw(1) = 1
     iw(1) = ia(Amg % imax(1)+1)
-  endif
+  end if
 
   ilo = Amg % imin(level)
   ihi = Amg % imax(level)
@@ -217,7 +217,7 @@
             if (ifg(ja(jj)).ge.jw0)  &
                a(ifg(ja(jj))) = a(ifg(ja(jj)))+a(jj)*ww
           end do
-        endif
+        end if
       end do
 
       icg(i) = -iblck
@@ -300,7 +300,7 @@
       ncolor(i+is) = 2
     else
       ncolor(i+is) = 3
-    endif
+    end if
   end do
   ncolx = 1
 

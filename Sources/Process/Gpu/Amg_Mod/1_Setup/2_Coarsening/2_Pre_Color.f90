@@ -193,7 +193,7 @@
     iws = Amg % imaxw(level-1)+2-ilo
   else
     iws = 0
-  endif
+  end if
   ilo1 = ilo-1
   npts = Amg % imax(level) - Amg % imin(level)+1
   npts1 = npts+1
@@ -223,7 +223,7 @@
       ifg(i) = jval0+nscn
     else
       ifg(i) = jvalx
-    endif
+    end if
   end do
 
   !----------------------------------------------------------!
@@ -333,12 +333,12 @@
         end if
       end do
 
-      !------------------------------------------------------------!
-      !   Decrement measure for all strong u-connections i of ic   !
-      !   and put them on reset-stack (if not yet there)           !
-      !   (Why Ruge-Stueben sometimes put comments at the end of   !
-      !   if-endif construct is beyond me.  But I keep it here.)   !
-      !------------------------------------------------------------!
+      !-------------------------------------------------------------!
+      !   Decrement measure for all strong u-connections i of ic    !
+      !   and put them on reset-stack (if not yet there)            !
+      !   (Why Ruge-Stueben sometimes put comments at the end of    !
+      !   if-end if construct is beyond me.  But I keep it here.)   !
+      !-------------------------------------------------------------!
     end if
 
     do j = ia(ic) + 1, ja(ia(ic))

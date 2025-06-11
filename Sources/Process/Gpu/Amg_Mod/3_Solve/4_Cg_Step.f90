@@ -53,14 +53,14 @@
     do i = Amg % imin(level), Amg % imax(level)
       f(i+ishift) = u(i)+alf*f(i+ishift)
     end do
-  endif
+  end if
 
   eps = Amg % Cg_Epsilon(level, s2, a, u, f, ia, ja, iw, m)
 
   if(Amg % ierr .gt. 0) then
     call Amg % timer_stop(16)
     return
-  endif
+  end if
 
   do i = Amg % imin(level), Amg % imax(level)
     u(i) = u(i+ishift) + eps * f(i+ishift)
