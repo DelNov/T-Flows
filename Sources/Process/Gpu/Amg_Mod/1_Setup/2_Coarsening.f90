@@ -52,13 +52,12 @@
   integer :: i, iajas, icall, ichk, iirs, isaja, isia
   integer :: level, kerr, mdiw, mmax
   integer :: first_level, ncolx
-  integer :: nda, ndu
+  integer :: ndu
   logical :: exitout, recover
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  nda = size(a, 1)
   ndu = size(u, 1)
 
   !-----------------------------------!
