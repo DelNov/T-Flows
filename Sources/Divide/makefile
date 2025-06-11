@@ -229,7 +229,6 @@ SRC_F_MOD = Const_Mod.f90         \
             String_Mod.f90        \
             Comm_Mod.f90          \
             Assert_Mod.f90        \
-            Amg_Mod.f90           \
             Tokenizer_Mod.f90     \
             Message_Mod.f90       \
             Memory_Mod.f90        \
