@@ -3,8 +3,7 @@
                        ia, ja,        &  ! defining system
                        iw, icg, ifg,  &  ! created from "kwork"
                        ir,            &  ! created from "iwork"
-                       jtr,           &
-                       iias)
+                       jtr)
 !------------------------------------------------------------------------------!
 !     Pre-coloring algorithm for grid k. this is the version as
 !     described in ruge/stueben (bristol). the goal is to obtain quickly
@@ -170,7 +169,6 @@
   integer         :: level
   integer         :: ia(:), ja(:)
   integer         :: iw(:), ifg(:), icg(:), ir(:), jtr(:)
-  integer         :: iias
 !-----------------------------------[locals]-----------------------------------!
   integer :: i,ii,iii,iiii, ilo,ilo1, ihi, ic, iip, in, itop, iws, iic
   integer :: j, jcnbhi, jj, jv, jval0, jvalx

@@ -49,7 +49,7 @@
   integer         :: levels
   integer         :: iwork(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer :: i, iajas, icall, ichk, iias, iirs, isaja, isia
+  integer :: i, iajas, icall, ichk, iirs, isaja, isia
   integer :: level, kerr, mdiw, mmax
   integer :: first_level, ncolx
   integer :: nda, ndu
@@ -90,12 +90,12 @@
   !---------------------------------------------------------------------!
   !   first_level is the number of the first stored grid, iajas, iias   !
   !   and iirs are the shifts in vectors a, ja, ia and ir, respecti-    !
-  !   vely, as compared to full storage of all grids                    !
+  !   vely, as compared to full storage of all grids.                   !
+  !   (Ditched iias)                                                    !
   !---------------------------------------------------------------------!
   kerr        = 0
   first_level = 1
   iajas       = 0
-  iias        = 0
   iirs        = 0
 
   do level = 2, levels
@@ -125,8 +125,7 @@
           call Amg % Pre_Color(level-1,       &
                                ia, ja,        &  ! linear system
                                iw, icg, ifg,  &  ! working arrays
-                               iwork, jtr,    &  ! more working arrays
-                               iias)
+                               iwork, jtr)       ! more working arrays
         end if
         if(icall .eq. 3) then
           call Amg % Interpolation_Weights(level-1, ichk, mmax,  &
@@ -150,7 +149,6 @@
             first_level = level-1
             iirs = mdiw
             isia = Amg % imin(level-1)-1
-            iias = iias+isia
             isaja = ia(Amg % imin(level-1))-1
             iajas = iajas+isaja
             do i = ia(Amg % imin(level-1)), ia(Amg % imax(level-1)+1) - 1
@@ -216,7 +214,7 @@
     if(exitout) exit
   end do
 
-  Amg % mdu = Amg % imax(levels) + iias
+  ! No more iias: Amg % mdu = Amg % imax(levels) + iias
   Amg % mdw = mdiw + 2
   if(kerr.ne.0 .or. Amg % mdu.gt.ndu .or. Amg % mdu.gt.ndu) then
     write(6, 1024) Amg % mda, Amg % mda, Amg % mdu,  &
