@@ -50,7 +50,7 @@
   integer         :: iwork(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, iajas, icall, ichk, iias, iirs, irst, isaja, isia
-  integer :: jtrst, level, kerr, mdiw, mmax
+  integer :: level, kerr, mdiw, mmax
   integer :: first_level, ncolx
   integer :: nda, ndu
   logical :: exitout, recover
@@ -102,17 +102,17 @@
 
     !-------------------------------------------------------------------!
     !   jtrst: initial pointer for work space in vector a, to contain   !
-    !          the strong transpose connections                         !
+    !          the strong transpose connections, but not used anymore   !
     !-------------------------------------------------------------------!
     do
       exitout = .false.
       do icall = 1, 4
         recover = .false.
         if(icall .eq. 1) then
-          jtrst = ia(Amg % imax(level-1)+1)
+          ! ditched: jtrst = ia(Amg % imax(level-1)+1)
           call Amg % Row_Sort(level-1,        &
-                              a, ia, ja,      &
-                              iw, ifg, jtr)
+                              a, ia, ja,      &  ! linear system
+                              iw, ifg, jtr)      ! working arrays
         end if
         if(icall .eq. 2) then
 
