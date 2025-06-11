@@ -640,10 +640,6 @@
     ndu = 3 * n_unknowns
     ndw = 6 * n_unknowns
 
-    nda = nda * 10
-    ndu = ndu * 10
-    ndw = ndw * 10
-
     ! This defines how (former) kwork is split
     icgst = n_unknowns+3
     ndicg = (ndw-icgst+1)/2
