@@ -77,7 +77,9 @@
       procedure :: Final_Residual
       procedure :: Performed_Cycles
       procedure :: Enlarge_Int
+      procedure :: Enlarge_Int_By_Half
       procedure :: Enlarge_Real
+      procedure :: Enlarge_Real_By_Half
       procedure :: Reduce_Int
       procedure :: Reduce_Real
 
@@ -198,7 +200,9 @@
   !   Just a couple of little utilities   !
   !---------------------------------------!
 # include "Amg_Mod/8_Utilities/Enlarge_Int.f90"
+# include "Amg_Mod/8_Utilities/Enlarge_Int_By_Half.f90"
 # include "Amg_Mod/8_Utilities/Enlarge_Real.f90"
+# include "Amg_Mod/8_Utilities/Enlarge_Real_By_Half.f90"
 # include "Amg_Mod/8_Utilities/Reduce_Int.f90"
 # include "Amg_Mod/8_Utilities/Reduce_Real.f90"
 # include "Amg_Mod/8_Utilities/Final_Residual.f90"
