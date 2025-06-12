@@ -59,6 +59,7 @@
                       Flow % pp % n(1:Grid % n_cells),  &
                       b(1:Grid % n_cells),              &
                       Grid % n_cells,                   &
+                      Flow % pp % res,                  &
                       call_type)
     Flow % pp % res   = Amg % Final_Residual()
     Flow % pp % niter = Amg % Performed_Cycles()

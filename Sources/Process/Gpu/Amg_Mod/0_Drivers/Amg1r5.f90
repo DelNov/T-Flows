@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Amg1r5(Amg, a_val, a_row, a_col, phi, b, n, iswtch)
+  subroutine Amg1r5(Amg, a_val, a_row, a_col, phi, b, n, eps, iswtch)
 !------------------------------------------------------------------------------!
 !
 !   Amg1r5
@@ -576,7 +576,8 @@
   integer                 :: a_row(:), a_col(:)
   real                    :: phi(:), b(:)
   integer                 :: n
-  integer, optional       :: iswtch  ! Class 2 by Ruge-Stueben
+  real                    :: eps
+  integer                 :: iswtch  ! Class 2 by Ruge-Stueben
 !-----------------------------------[locals]-----------------------------------!
   integer :: digit(AMG_MAX_LEVELS)
 
@@ -601,15 +602,16 @@
   !-------------------------------------------------------------!
   !   Process input argument iswtch (Class 2 by Ruge-Stueben)   !
   !-------------------------------------------------------------!
-  if(.not. present(iswtch)) then
-    kswtch = AMG_RUN_ALL_FOUR_STAGES
+  if(iswtch .ne. 0) then
+    kswtch = iswtch
   else
-    if(iswtch .ne. 0) then
-      kswtch = iswtch
-    else
-      kswtch = AMG_RUN_ALL_FOUR_STAGES
-    end if
+    kswtch = AMG_RUN_ALL_FOUR_STAGES
   end if
+
+  !---------------------!
+  !   Process eps too   !
+  !---------------------!
+  Amg % eps = eps
 
   !------------------------!
   !                        !
@@ -686,7 +688,6 @@
     !--------------!
     ifirst       = 13        ! value from stuben: 13
     Amg % iout   =  1        ! can be from 0 to 4
-    Amg % eps    =  1.0e-8   ! value from stuben:  1.0e-12
 
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
