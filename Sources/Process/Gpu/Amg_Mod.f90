@@ -1,8 +1,8 @@
 #include "../../Shared/Assert.h90"
 
-!define OLD_LOOP
+!define AMG_USE_OLD_LOOP
 
-#define NEW_LOOP
+#define AMG_USE_NEW_LOOP
 
 !==============================================================================!
   module Amg_Mod

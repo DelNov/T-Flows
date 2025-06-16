@@ -46,9 +46,10 @@
   rho_new = 0.0
 
   ! See comment in source "Coarsening.f90" at line 180
+#ifdef AMG_USE_OLD_LOOP
   iaux = ia(Amg % imax(level)+1)
   ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
-
+#endif
 
   !---------------------------------------------!
   !                                             !
@@ -58,15 +59,18 @@
   !                                             !
   !---------------------------------------------!
 
-!old:  ! Number of unknowns and non-zeros on this level
-!old:  n = Amg % imax(level) - Amg % imin(level) + 1
-!old:  nnz = ia(Amg % imax(level)+1) - ia(Amg % imin(level))
-!old:
-!old:  if(Amg % iout .gt. 3) then
-!old:    write(*,'(a,i4,a,i9,a)', advance = 'no')  &
-!old:      ' # BiCG on level ', level, ' with ', n, ' unknowns; '
-!old:  end if
+#ifdef AMG_USE_OLD_LOOP
+  ! Number of unknowns and non-zeros on this level
+  n = Amg % imax(level) - Amg % imin(level) + 1
+  nnz = ia(Amg % imax(level)+1) - ia(Amg % imin(level))
 
+  if(Amg % iout .gt. 3) then
+    write(*,'(a,i4,a,i9,a)', advance = 'no')  &
+      ' # BiCG on level ', level, ' with ', n, ' unknowns; '
+  end if
+#endif
+
+#ifdef AMG_USE_NEW_LOOP
   n      =  Amg % lev(level) % n
   nnz    =  Amg % lev(level) % nnz
   lev_a  => Amg % lev(level) % a
@@ -74,6 +78,7 @@
   lev_f  => Amg % lev(level) % f
   lev_ia => Amg % lev(level) % ia
   lev_ja => Amg % lev(level) % ja
+#endif
 
   !-------------------------------------------------------!
   !                                                       !
@@ -84,18 +89,21 @@
   call Amg % Enlarge_Int (col_idx, nnz);  col_idx(:) = 0
   call Amg % Enlarge_Int (row_ptr, n+1);  row_ptr(:) = 0
 
-!old:  do ig = Amg % imin(level), Amg % imax(level)
-!old:    i = ig - Amg % imin(level) + 1                   ! local unknown number
-!old:    row_ptr(i) = ia(ig) - ia(Amg % imin(level)) + 1  ! local row pointer
-!old:    do jg = ia(ig), ia(ig+1) - 1                     ! browse through row ig
-!old:      j          = jg - ia(Amg % imin(level)) + 1    ! local nonzero index
-!old:      col_idx(j) = ja(jg) - Amg % imin(level) + 1    ! local column number
-!old:      a_val(j)   = a(jg)                             ! local matrix value
-!old:    end do
-!old:  end do
-!old:  ! Final row pointer
-!old:  row_ptr(n+1) = ia(Amg % imax(level)+1) - ia(Amg % imin(level)) + 1
+#ifdef AMG_USE_OLD_LOOP
+  do ig = Amg % imin(level), Amg % imax(level)
+    i = ig - Amg % imin(level) + 1                   ! local unknown number
+    row_ptr(i) = ia(ig) - ia(Amg % imin(level)) + 1  ! local row pointer
+    do jg = ia(ig), ia(ig+1) - 1                     ! browse through row ig
+      j          = jg - ia(Amg % imin(level)) + 1    ! local nonzero index
+      col_idx(j) = ja(jg) - Amg % imin(level) + 1    ! local column number
+      a_val(j)   = a(jg)                             ! local matrix value
+    end do
+  end do
+  ! Final row pointer
+  row_ptr(n+1) = ia(Amg % imax(level)+1) - ia(Amg % imin(level)) + 1
+#endif
 
+#ifdef AMG_USE_NEW_LOOP
   do i = 1, n + 1
     row_ptr(i) = lev_ia(i)
   end do
@@ -104,6 +112,7 @@
     col_idx(k) = lev_ja(k)
     a_val(k)   = lev_a(k)
   end do
+#endif
 
   !------------------------------------------------------!
   !                                                      !
@@ -112,18 +121,22 @@
   !------------------------------------------------------!
   call Amg % Enlarge_Real(b, n)
   call Amg % Enlarge_Real(x, n)
+
+#ifdef AMG_USE_OLD_LOOP
+  do ig = Amg % imin(level), Amg % imax(level)
+    i = ig - Amg % imin(level) + 1  ! local unkown number
+    b(i) = f(ig)
+    x(i) = u(ig)
+  end do
+#endif
+
+#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
-
-!old  do ig = Amg % imin(level), Amg % imax(level)
-!old    i = ig - Amg % imin(level) + 1  ! local unkown number
-!old    b(i) = f(ig)
-!old    x(i) = u(ig)
-!old  end do
-
   do i = 1, n
     b(i) = lev_f(i)
     x(i) = lev_u(i)
   end do
+#endif
 
   !---------------------------------------------------------!
   !                                                         !
@@ -412,20 +425,26 @@
   !   Copy local b and x vectors back (Stueben's f and u)   !
   !                                                         !
   !---------------------------------------------------------!
-!old:  do ig = Amg % imin(level), Amg % imax(level)
-!old:    i = ig - Amg % imin(level) + 1  ! local unkown number
-!old:    f(ig) = b(i)
-!old:    u(ig) = x(i)
-!old:  end do
+#ifdef AMG_USE_OLD_LOOP
+  do ig = Amg % imin(level), Amg % imax(level)
+    i = ig - Amg % imin(level) + 1  ! local unkown number
+    f(ig) = b(i)
+    u(ig) = x(i)
+  end do
+#endif
 
+#ifdef AMG_USE_NEW_LOOP
   do i = 1, n
     lev_f(i) = b(i)
     lev_u(i) = x(i)
   end do
   call Amg % Update_U_And_F_Globally(level, vec_u=u, vec_f=f)
+#endif
 
   call Amg % timer_stop(13)
 
+#ifdef AMG_USE_OLD_LOOP
   ia(Amg % imax(level)+1) = iaux
+#endif
 
   end subroutine

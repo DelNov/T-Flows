@@ -48,7 +48,7 @@
   !------------------!
   if(irel .eq. AMG_RELAX_F_POINTS) then
 
-#ifdef OLD_LOOP
+#ifdef AMG_USE_OLD_LOOP
     do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .le. 0) then
         s = f(i)
@@ -60,7 +60,7 @@
     end do
 #endif
 
-#ifdef NEW_LOOP
+#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .le. 0) then
@@ -81,7 +81,7 @@
   !------------------------!
   else if(irel .eq. AMG_RELAX_FULL_GS) then
 
-#ifdef OLD_LOOP
+#ifdef AMG_USE_OLD_LOOP
     do i = Amg % imin(level), Amg % imax(level)
       s = f(i)
       do j = ia(i) + 1, ia(i+1) - 1
@@ -91,7 +91,7 @@
     end do
 #endif
 
-#ifdef NEW_LOOP
+#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       s = lev_f(i)
@@ -110,7 +110,7 @@
   !------------------!
   else if(irel .eq. AMG_RELAX_C_POINTS) then
 
-#ifdef OLD_LOOP
+#ifdef AMG_USE_OLD_LOOP
     do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .gt. 0) then
         s = f(i)
@@ -122,7 +122,7 @@
     end do
 #endif
 
-#ifdef NEW_LOOP
+#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .gt. 0) then
@@ -146,7 +146,7 @@
     !-------------------!
     !   FF-relaxation   !
     !-------------------!
-#ifdef OLD_LOOP
+#ifdef AMG_USE_OLD_LOOP
     do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .eq. 0) then
         s = f(i)
@@ -158,7 +158,7 @@
     end do
 #endif
 
-#ifdef NEW_LOOP
+#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .eq. 0) then
@@ -175,7 +175,7 @@
     !------------------!
     !   C-relaxation   !
     !------------------!
-#ifdef OLD_LOOP
+#ifdef AMG_USE_OLD_LOOP
     do i = Amg % imin(level), Amg % imax(level)
       if(icg(i) .gt. 0) then
         s = f(i)
@@ -187,7 +187,7 @@
     end do
 #endif
 
-#ifdef NEW_LOOP
+#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .gt. 0) then
@@ -204,7 +204,7 @@
     !----------------------------!
     !   Multi-color relaxation   !
     !----------------------------!
-#ifdef OLD_LOOP
+#ifdef AMG_USE_OLD_LOOP
     i = Amg % start_of_color(level)
     do
       if(i .ge. AMG_BIG_INTEGER) exit
@@ -217,7 +217,7 @@
     end do
 #endif
 
-#ifdef NEW_LOOP
+#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     i = Amg % lev(level) % start_of_color
     do

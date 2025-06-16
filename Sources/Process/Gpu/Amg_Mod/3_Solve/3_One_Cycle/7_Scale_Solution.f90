@@ -32,31 +32,36 @@
   !   Computation of scaling factor "fac"   !
   !-----------------------------------------!
 
-!old:  ! See comment in source "Coarsening.f90" at line 180
-!old:  iaux = ia(Amg % imax(level)+1)
-!old:  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
+#ifdef AMG_USE_OLD_LOOP
 
-!old:  s1 = 0.0
-!old:  s2 = 0.0
-!old:  do i = Amg % imin(level), Amg % imax(level)
-!old:    sa = 0.0
-!old:    do j = ia(i), ia(i+1) - 1
-!old:      sa = sa+a(j)*u(ja(j))
-!old:    end do
-!old:    s1 = s1+u(i)*f(i)
-!old:    s2 = s2+u(i)*sa
-!old:  end do
-!old:
-!old:  fac = 1.0
-!old:  if(s2 .ne. 0.0) fac = s1/s2
-!old:
-!old:  !-------------!
-!old:  !   Scaling   !
-!old:  !-------------!
-!old:  do i = Amg % imin(level), Amg % imax(level)
-!old:    u(i) = u(i)*fac
-!old:  end do
+  ! See comment in source "Coarsening.f90" at line 180
+  iaux = ia(Amg % imax(level)+1)
+  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
+  s1 = 0.0
+  s2 = 0.0
+  do i = Amg % imin(level), Amg % imax(level)
+    sa = 0.0
+    do j = ia(i), ia(i+1) - 1
+      sa = sa+a(j)*u(ja(j))
+    end do
+    s1 = s1+u(i)*f(i)
+    s2 = s2+u(i)*sa
+  end do
+
+  fac = 1.0
+  if(s2 .ne. 0.0) fac = s1/s2
+
+  !-------------!
+  !   Scaling   !
+  !-------------!
+  do i = Amg % imin(level), Amg % imax(level)
+    u(i) = u(i)*fac
+  end do
+  ia(Amg % imax(level)+1) = iaux
+#endif
+
+#ifdef AMG_USE_NEW_LOOP
   n      =  Amg % lev(level) % n
   lev_a  => Amg % lev(level) % a
   lev_u  => Amg % lev(level) % u
@@ -88,8 +93,7 @@
   end do
 
   call Amg % Update_U_And_F_Globally(level, vec_u=u)
-
-!old:  ia(Amg % imax(level)+1) = iaux
+#endif
 
   call Amg % timer_stop(14)
 
