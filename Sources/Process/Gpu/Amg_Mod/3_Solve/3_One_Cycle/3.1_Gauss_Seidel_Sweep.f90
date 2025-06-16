@@ -21,14 +21,10 @@
   real,    contiguous, pointer :: lev_a(:), lev_u(:), lev_f(:)
   integer, contiguous, pointer :: lev_ia(:), lev_ja(:), lev_icg(:)
   real                         :: s
-  integer                      :: i, iaux, j, n
+  integer                      :: i, j, n
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
-
-  ! See comment in source "Coarsening.f90" at line 180
-  iaux = ia(Amg % imax(level)+1)
-  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
 
   ! Fetch some pointers
   n       =  Amg % lev(level) % n
@@ -46,19 +42,6 @@
   !------------------!
   if(irel .eq. AMG_RELAX_F_POINTS) then
 
-#ifdef AMG_USE_OLD_LOOP
-    do i = Amg % imin(level), Amg % imax(level)
-      if(icg(i) .le. 0) then
-        s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s-a(j)*u(ja(j))
-        end do
-        u(i) = s/a(ia(i))
-      end if
-    end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .le. 0) then
@@ -70,7 +53,6 @@
       end if
     end do
     call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
   !------------------------!
   !                        !
@@ -79,17 +61,6 @@
   !------------------------!
   else if(irel .eq. AMG_RELAX_FULL_GS) then
 
-#ifdef AMG_USE_OLD_LOOP
-    do i = Amg % imin(level), Amg % imax(level)
-      s = f(i)
-      do j = ia(i) + 1, ia(i+1) - 1
-        s = s - a(j) * u(ja(j))
-      end do
-      u(i) = s / a(ia(i))
-    end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       s = lev_f(i)
@@ -99,7 +70,6 @@
       lev_u(i) = s / lev_a(lev_ia(i))
     end do
     call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
   !------------------!
   !                  !
@@ -108,19 +78,6 @@
   !------------------!
   else if(irel .eq. AMG_RELAX_C_POINTS) then
 
-#ifdef AMG_USE_OLD_LOOP
-    do i = Amg % imin(level), Amg % imax(level)
-      if(icg(i) .gt. 0) then
-        s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s - a(j) * u(ja(j))
-        end do
-        u(i) = s / a(ia(i))
-      end if
-    end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .gt. 0) then
@@ -132,7 +89,6 @@
       end if
     end do
     call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
   !----------------------------!
   !                            !
@@ -144,19 +100,6 @@
     !-------------------!
     !   FF-relaxation   !
     !-------------------!
-#ifdef AMG_USE_OLD_LOOP
-    do i = Amg % imin(level), Amg % imax(level)
-      if(icg(i) .eq. 0) then
-        s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s - a(j) * u(ja(j))
-        end do
-        u(i) = s / a(ia(i))
-      end if
-    end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .eq. 0) then
@@ -168,24 +111,10 @@
       end if
     end do
     call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
     !------------------!
     !   C-relaxation   !
     !------------------!
-#ifdef AMG_USE_OLD_LOOP
-    do i = Amg % imin(level), Amg % imax(level)
-      if(icg(i) .gt. 0) then
-        s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s - a(j) * u(ja(j))
-        end do
-        u(i) = s / a(ia(i))
-      end if
-    end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
       if(lev_icg(i) .gt. 0) then
@@ -197,25 +126,10 @@
       end if
     end do
     call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
     !----------------------------!
     !   Multi-color relaxation   !
     !----------------------------!
-#ifdef AMG_USE_OLD_LOOP
-    i = Amg % start_of_color(level)
-    do
-      if(i .ge. AMG_BIG_INTEGER) exit
-      s = f(i)
-      do j = ia(i) + 1, ia(i+1) - 1
-        s = s - a(j) * u(ja(j))
-      end do
-      u(i) = s/a(ia(i))
-      i = -icg(i)
-    end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
     call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     i = Amg % lev(level) % start_of_color
     do
@@ -229,7 +143,6 @@
       Assert(i .gt. 0)
     end do
     call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
   else
     print *, "Ouch, didn't see that coming: irel is not in range "
@@ -238,7 +151,5 @@
     print *, "  Oh yes, this function is Gauss_Seidel_Sweep.f.   "
     stop
   end if
-
-  ia(Amg % imax(level)+1) = iaux
 
   end subroutine

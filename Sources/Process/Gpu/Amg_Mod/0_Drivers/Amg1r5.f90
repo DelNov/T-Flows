@@ -773,8 +773,6 @@
       end do
     end do
 
-    write(*,*) 'level at index 1500000: ', Amg % Level_Of_Cell(1500000)
-
     !------------------------------------!
     !   Reduce excessive size matrices   !
     !- - - - - - - - - - - - - - - - - - +----------------------------!
@@ -788,47 +786,19 @@
       call Amg % Store_Level(level, levels, a, u, f, ia, ja, iw, icg, ifg)
     end do
 
-    write(6, '(a)')  'De-allocating iwork and jtr'
-    deallocate(iwork, jtr)
+    write(6, '(a)')  'De-allocating iwork and jtr, iw, icg and ifg'
+    deallocate(iwork, jtr, iw, icg, ifg)
 
-    ! System matrix a
-    write(6, '(a,i11,a,i11)')  &
-      'Reducing a   from ', size(a, 1), ' to ', iw(Amg % iminw(levels))
-    call Amg % Reduce_Real(a,  iw(Amg % iminw(levels)))
+    write(6, '(a)')  'De-allocating a, ia and ja'
+    deallocate(a, ia, ja)
 
-    ! Column indices ja
-    write(6, '(a,i11,a,i11)')  &
-      'Reducing ja  from ', size(ja,1), ' to ', iw(Amg % iminw(levels))
-    call Amg % Reduce_Int (ja, iw(Amg % iminw(levels)))
-
-    ! Unknow vector u
     write(6, '(a,i11,a,i11)')  &
       'Reducing u   from ', size(u, 1), ' to ', Amg % imax(levels)
     call Amg % Reduce_Real(u, Amg % imax(levels))
 
-    ! Right hand side f
     write(6, '(a,i11,a,i11)')  &
       'Reducing f   from ', size(f, 1), ' to ', Amg % imax(levels)
     call Amg % Reduce_Real(f, Amg % imax(levels))
-
-    ! Row pointer indices ja
-    write(6, '(a,i11,a,i11)')  &
-      'Reducing ia  from ', size(ia, 1), ' to ', Amg % imax(levels) + 1
-    call Amg % Reduce_Int(ia, Amg % imax(levels) + 1)
-
-    ! Arrays icg and iwg
-    write(6, '(a,i11,a,i11)')  &
-      'Reducing icg from ', size(icg, 1), ' to ', Amg % imax(levels)
-    call Amg % Reduce_Int(icg, Amg % imax(levels))
-    write(6, '(a,i11,a,i11)')  &
-      'Reducing ifg from ', size(ifg, 1), ' to ', Amg % imax(levels)
-    call Amg % Reduce_Int(ifg, Amg % imax(levels))
-
-    ! Reduce iw too, although it is not too big to start with
-    i = max(Amg % iminw(levels), Amg % imaxw(levels)+1)
-    write(6, '(a,i11,a,i11)')  &
-      'Reducing iw  from ', size(iw, 1), ' to ', i
-    call Amg % Reduce_Int(iw, i)
 
     if(Amg % ierr .gt. 0) return
   end if
@@ -838,6 +808,7 @@
   end if
 
   if(kswtch .ge. 2) then
+    call Amg % Update_U_And_F_At_Level(1, vec_u=u, vec_f=f, for_real=.true.)
     call Amg % Solve(madapt, ncyc,               &
                      a, u, u_b, f, f_b, ia, ja,  &  ! linear system
                      iw, icg, ifg,               &  ! work arrays
@@ -852,7 +823,7 @@
   !------------------------!
   !   Fetch the solution   !
   !------------------------!
-  phi(1:n_unknowns) = u(1:n_unknowns)
+  phi(1:n_unknowns) = Amg % lev(1) % u(1:n_unknowns)
 
   if(kswtch .lt. 1 .or. kswtch .gt. 4) then
     write(6, '(a)')  &

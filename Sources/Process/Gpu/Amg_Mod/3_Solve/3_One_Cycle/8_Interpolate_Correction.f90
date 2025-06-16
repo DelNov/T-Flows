@@ -13,7 +13,7 @@
   integer                 :: ia(:), ja(:)
   integer                 :: iw(:), ifg(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer                      :: i, j, ic, if, iaux, n, n_c, nw
+  integer                      :: i, j, ic, if, n, n_c, nw
   real,    contiguous, pointer :: lev_c_u(:)
   integer, contiguous, pointer :: lev_c_ifg_1(:)
   real,    contiguous, pointer :: lev_u(:)
@@ -28,14 +28,6 @@
   !--------------------------!
   !   c -> c contributions   !
   !--------------------------!
-#ifdef AMG_USE_OLD_LOOP
-  do ic = Amg % imin(level+1), Amg % imax(level+1)
-    if = ifg(ic)
-    u(if) = u(if) + u(ic)
-  end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   n_c         =  Amg % lev(level+1) % n    ! number of cells on coarse grid
   lev_c_u     => Amg % lev(level+1) % u    ! u on coarse grid
   lev_c_ifg_1 => Amg % lev(level+1) % ifg_1  ! ifg_1 on coarse grid
@@ -55,24 +47,10 @@
   end do
 
   call Amg % Update_U_And_F_Globally(level, vec_u=u)  ! fine level
-#endif
 
   !--------------------------!
   !   c -> f contributions   !
   !--------------------------!
-#ifdef AMG_USE_OLD_LOOP
-  iaux = iw(Amg % imaxw(level)+1)
-  iw(Amg % imaxw(level)+1) = ia(Amg % imin(level+1))
-
-  do i = Amg % iminw(level), Amg % imaxw(level)
-    if = ifg(i)  ! this one is on the same level "level"
-    do j = iw(i), iw(i+1) - 1  ! this one seems to be on the coarser level
-      u(if) = u(if) + a(j) * u(ja(j))
-    end do
-  end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level+1, vec_u=u)  ! coarse level
 
   do i = 1, nw
@@ -83,10 +61,5 @@
   end do
 
   call Amg % Update_U_And_F_Globally(level, vec_u=u)  ! fine level
-#endif
-
-#ifdef AMG_USE_OLD_LOOP
-  iw(Amg % imaxw(level)+1) = iaux
-#endif
 
   end subroutine

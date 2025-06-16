@@ -14,7 +14,7 @@
   integer                 :: iw(:), ifg(:)
 !-----------------------------------[locals]-----------------------------------!
   real                         :: d
-  integer                      :: i, iaux, iaux1, ic, if, j, n_c, nw
+  integer                      :: i, ic, if, j, n_c, nw
   real,    contiguous, pointer :: lev_c_f(:)
   integer, contiguous, pointer :: lev_c_ifg_1(:)
   real,    contiguous, pointer :: lev_f(:), lev_u(:), lev_a(:)
@@ -29,22 +29,6 @@
   !---------------------------------!
   !   Transfer of c-point defects   !
   !---------------------------------!
-#ifdef AMG_USE_OLD_LOOP
-  iaux = ia(Amg % imax(level_c-1)+1)
-  ia(Amg % imax(level_c-1)+1) = iw(Amg % iminw(level_c-1))
-  iaux1 = iw(Amg % imaxw(level_c-1)+1)
-  iw(Amg % imaxw(level_c-1)+1) = iaux
-
-  do ic = Amg % imin(level_c), Amg % imax(level_c)
-    if = ifg(ic)
-    Assert(level_c == Amg % Level_Of_Cell(if)+1)
-    d = f(if)
-    do j = ia(if), ia(if+1) - 1
-      d = d - a(j) * u(ja(j))
-    end do
-    f(ic) = d
-  end do
-#endif
 
   ! Coarse level pointers and data
   n_c         =  Amg % lev(level_c) % n
@@ -62,7 +46,6 @@
   lev_w     => Amg % lev(level_c-1) % w
   lev_jw    => Amg % lev(level_c-1) % jw
 
-#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level_c-1, vec_u=u)  ! fine level
 
   do ic = 1, n_c
@@ -75,30 +58,10 @@
   end do
 
   call Amg % Update_U_And_F_Globally(level_c, vec_f=f)  ! coarse level
-#endif
 
   !---------------------------------!
   !   Transfer of f-point defects   !
   !---------------------------------!
-#ifdef AMG_USE_OLD_LOOP
-  do i = Amg % iminw(level_c-1), Amg % imaxw(level_c-1)
-    if = ifg(i)
-    Assert(level_c-1 == Amg % Level_Of_Cell(if))
-    d = f(if)
-    do j = ia(if), ia(if+1) - 1
-      d = d - a(j) * u(ja(j))
-    end do
-    do j = iw(i), iw(i+1)-1
-      Assert(level_c == Amg % Level_Of_Cell(ja(j)))
-      f(ja(j)) = f(ja(j)) + a(j) * d
-    end do
-  end do
-
-  ia(Amg % imax(level_c-1)+1) = iaux
-  iw(Amg % imaxw(level_c-1)+1) = iaux1
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level_c-1, vec_u=u, vec_f=f)  ! fine level
 
   do i = 1, nw
@@ -113,6 +76,5 @@
   end do
 
   call Amg % Update_U_And_F_Globally(level_c, vec_f=f)  ! coarse level
-#endif
 
   end subroutine

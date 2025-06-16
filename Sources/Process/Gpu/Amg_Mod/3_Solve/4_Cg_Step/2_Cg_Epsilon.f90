@@ -15,7 +15,7 @@
   integer                 :: iw(:)
 !-----------------------------------[locals]-----------------------------------!
   real                         :: s1, sp, sr
-  integer                      :: i, iaux, j, n
+  integer                      :: i, j, n
   real,    contiguous, pointer :: lev_a(:), lev_u_b(:), lev_f(:), lev_f_b(:)
   integer, contiguous, pointer :: lev_ia(:), lev_ja(:)
 !------------------------------------[save]------------------------------------!
@@ -25,26 +25,6 @@
   s1 = 0.0
   s2 = 0.0
 
-  ! See comment in source "Coarsening.f90" at line 180
-#ifdef AMG_USE_OLD_LOOP
-  iaux = ia(Amg % imax(level)+1)
-  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
-
-  do i = Amg % imin(level), Amg % imax(level)
-    sr = f(i)
-    sp = 0.0
-    do j = ia(i), ia(i+1) - 1
-      sr = sr - a(j) * u_b(ja(j))
-      sp = sp + a(j) * f_b(ja(j))
-    end do
-    s1 = s1 + sr * f_b(i)
-    s2 = s2 + sp * f_b(i)
-  end do
-
-  ia(Amg % imax(level)+1) = iaux
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level, vec_u_b=u_b, vec_f=f, vec_f_b=f_b)
   n       =  Amg % lev(level) % n
   lev_a   => Amg % lev(level) % a
@@ -64,7 +44,6 @@
     s1 = s1 + sr * lev_f_b(i)
     s2 = s2 + sp * lev_f_b(i)
   end do
-#endif
 
   ! Error exit
   if(s2 .eq. 0.0) then

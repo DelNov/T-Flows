@@ -15,13 +15,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-#ifdef AMG_USE_OLD_LOOP
-  do i = Amg % imin(level), Amg % imax(level)
-    u(i) = 0.0
-  end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   n     =  Amg % lev(level) % n
   lev_u => Amg % lev(level) % u
 
@@ -36,6 +29,5 @@
   ! Copy vectors u and f back to global storage
   ! (This is needed during the development stage)
   call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
   end subroutine

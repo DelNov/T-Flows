@@ -1,6 +1,7 @@
 !==============================================================================!
   subroutine Update_U_And_F_At_Level(Amg, level, vec_u, vec_u_b,  &
-                                                 vec_f, vec_f_b)
+                                                 vec_f, vec_f_b,  &
+                                                 for_real)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
@@ -10,11 +11,14 @@
   real,  optional :: vec_u_b(:)
   real,  optional :: vec_f(:)
   real,  optional :: vec_f_b(:)
+  logical, optional :: for_real
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, i_loc
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
+
+  if(.not. present(for_real)) return
 
   ! Copy vector u level's storage
   if(present(vec_u)) then

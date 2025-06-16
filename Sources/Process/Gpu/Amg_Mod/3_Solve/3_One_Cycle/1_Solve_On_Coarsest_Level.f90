@@ -15,7 +15,7 @@
   integer         :: iw(:), icg(:)
 !-----------------------------------[locals]-----------------------------------!
   real    :: fmax, resnew, resold
-  integer :: m,ifac,aaux,esp,flag,i,iaux,ihi,ii,ilo,is, &
+  integer :: m,ifac,aaux,esp,flag,i,ihi,ii,ilo,is, &
              iter,j,jhi,jj,jlo,jpos,js,np,npoint,nsp,path
 
   !------------------------------------------------------------------------!

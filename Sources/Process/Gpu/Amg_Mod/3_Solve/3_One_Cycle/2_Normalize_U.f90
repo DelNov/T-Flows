@@ -18,15 +18,6 @@
 
   if(Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX) return
 
-#ifdef AMG_USE_OLD_LOOP
-  fac = u(Amg % imax(level))
-
-  do i = Amg % imin(level), Amg % imax(level)
-    u(i) = u(i) - fac
-  end do
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level, vec_u=u)
 
   n      =  Amg % lev(level) % n
@@ -39,6 +30,5 @@
   end do
 
   call Amg % Update_U_And_F_Globally(level, vec_u=u)
-#endif
 
   end subroutine

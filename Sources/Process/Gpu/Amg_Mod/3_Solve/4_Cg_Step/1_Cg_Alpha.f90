@@ -15,7 +15,7 @@
   integer                 :: iw(:)
 !-----------------------------------[locals]-----------------------------------!
   real                         :: s1, sr
-  integer                      :: i, iaux, j, n
+  integer                      :: i, j, n
   real,    contiguous, pointer :: lev_a(:), lev_u(:), lev_f_b(:)
   integer, contiguous, pointer :: lev_ia(:), lev_ja(:)
 !------------------------------------[save]------------------------------------!
@@ -24,25 +24,6 @@
 
   s1 = 0.0
 
-  ! See comment in source "Coarsening.f90" at line 180
-#ifdef AMG_USE_OLD_LOOP
-  iaux = ia(Amg % imax(level)+1)
-  ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
-
-  do i = Amg % imin(level), Amg % imax(level)
-    sr = 0.0
-    do j = ia(i), ia(i+1) - 1
-      sr = sr + a(j) * u(ja(j))
-    end do
-    s1 = s1 + sr * f_b(i)
-  end do
-
-  Cg_Alpha = -s1 / s2
-
-  ia(Amg % imax(level)+1) = iaux
-#endif
-
-#ifdef AMG_USE_NEW_LOOP
   call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f_b=f_b)
   n       =  Amg % lev(level) % n
   lev_a   => Amg % lev(level) % a
@@ -59,7 +40,5 @@
   end do
 
   Cg_Alpha = -s1 / s2
-
-#endif
 
   end function
