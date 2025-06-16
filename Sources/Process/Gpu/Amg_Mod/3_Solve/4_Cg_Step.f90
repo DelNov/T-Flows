@@ -23,8 +23,6 @@
 
   if (icgr.eq.0) return
 
-  call Amg % timer_start()
-
   nnu = Amg % imax(level)-Amg % imin(level)+1
   ishift = Amg % imax(m)+1-Amg % imin(level)
 
@@ -58,14 +56,11 @@
   eps = Amg % Cg_Epsilon(level, s2, a, u, f, ia, ja, iw, m)
 
   if(Amg % ierr .gt. 0) then
-    call Amg % timer_stop(16)
     return
   end if
 
   do i = Amg % imin(level), Amg % imax(level)
     u(i) = u(i+ishift) + eps * f(i+ishift)
   end do
-
-  call Amg % timer_stop(16)
 
   end subroutine

@@ -37,25 +37,6 @@
   write(6, 9000)
   nnu = Amg % imax(1)
 
-  !---------------------!
-  !   Computing times   !
-  !---------------------!
-  sum1 = 0.0
-  sum2 = 0.0
-  do i = 1, 10
-    t(i) = 0.0
-    if(Amg % ncyc0 .gt. 0) t(i) = Amg % time(i+10)/real(Amg % ncyc0)
-    sum1 = sum1 + Amg % time(i)
-    sum2 = sum2+t(i)
-  end do
-
-  write(6, 9020)
-  write(6, 9030)
-  write(6, 9040) (Amg % time(i), t(i), i = 1, 8)
-  write(6, 9030)
-  write(6, 9050) sum1,sum2
-  write(6, 9030)
-
   !--------------------------------------------------!
   !   Space occupied by operators a(1) - a(levels)   !
   !--------------------------------------------------!

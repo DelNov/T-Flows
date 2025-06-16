@@ -14,8 +14,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call Amg % timer_start()
-
   do i = Amg % imin(1), Amg % imax(levels-1)
     if(icg(i) .gt. 0) ifg(icg(i)) = i
   end do
@@ -32,7 +30,5 @@
       end do
     end if
   end do
-
-  call Amg % timer_stop(8)
 
   end subroutine

@@ -184,7 +184,6 @@
   !-----------------!
   !   Preparation   !
   !-----------------!
-  call Amg % timer_start()
   ilo = Amg % imin(level)
   ihi = Amg % imax(level)
   if (level.ne.1) then
@@ -275,7 +274,6 @@
   do
     picknext = .false.
     if(jcnbhi .le. jval0) then
-      call Amg % timer_stop(2)
       return
     end if
     iic = ifg(jcnbhi)

@@ -25,8 +25,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call Amg % timer_start()
-
   !--------------------------!
   !   c -> c contributions   !
   !--------------------------!
@@ -90,7 +88,5 @@
 #ifdef AMG_USE_OLD_LOOP
   iw(Amg % imaxw(level)+1) = iaux
 #endif
-
-  call Amg % timer_stop(11)
 
   end subroutine

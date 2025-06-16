@@ -32,12 +32,8 @@
     return
   end if
 
-  call Amg % timer_start()
-
   do i = Amg % imin(level), Amg % imax(level)
     u(i+ishift) = u(i)
   end do
-
-  call Amg % timer_stop(16)
 
   end subroutine

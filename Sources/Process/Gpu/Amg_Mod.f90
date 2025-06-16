@@ -84,17 +84,11 @@
     ! for checking if there is enough allocated memory
     integer, private :: mda, mdu, mdw
 
-    ! Used only for timing
-    real(SP), private :: time(20)
-    real(SP), private :: told, tnew
-
     ! Error tracking
     integer :: ierr
 
     contains
 
-      procedure :: timer_start
-      procedure :: timer_stop
       procedure :: Initial_Residual
       procedure :: Final_Residual
       procedure :: Performed_Cycles
@@ -265,7 +259,5 @@
 # include "Amg_Mod/8_Utilities/Initial_Residual.f90"
 # include "Amg_Mod/8_Utilities/Performed_Cycles.f90"
 # include "Amg_Mod/8_Utilities/Random_0_To_0p1.f90"
-# include "Amg_Mod/8_Utilities/Timer_Start.f90"
-# include "Amg_Mod/8_Utilities/Timer_Stop.f90"
 
   end module

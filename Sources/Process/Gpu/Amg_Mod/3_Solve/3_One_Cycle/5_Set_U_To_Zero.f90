@@ -15,8 +15,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call Amg % timer_start()
-
 #ifdef AMG_USE_OLD_LOOP
   do i = Amg % imin(level), Amg % imax(level)
     u(i) = 0.0
@@ -39,7 +37,5 @@
   ! (This is needed during the development stage)
   call Amg % Update_U_And_F_Globally(level, vec_u=u)
 #endif
-
-  call Amg % timer_stop(15)
 
   end subroutine

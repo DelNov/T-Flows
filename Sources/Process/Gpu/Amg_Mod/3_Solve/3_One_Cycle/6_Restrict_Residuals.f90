@@ -19,8 +19,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call Amg % timer_start()
-
   !---------------------------------!
   !   Transfer of c-point defects   !
   !---------------------------------!
@@ -53,7 +51,5 @@
   end do
   ia(Amg % imax(level_c-1)+1) = iaux
   iw(Amg % imaxw(level_c-1)+1) = iaux1
-
-  call Amg % timer_stop(12)
 
   end subroutine

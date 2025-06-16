@@ -30,13 +30,6 @@
   Amg % isym  = digit(1)
   Amg % irow0 = digit(2)
 
-  !-------------------------!
-  !   Reset time counters   !
-  !-------------------------!
-  do i = 1, 20
-    Amg % time(i) = 0.0
-  end do
-
   !-------------------------------------!
   !   Preparation (ignored in timing)   !
   !-------------------------------------!

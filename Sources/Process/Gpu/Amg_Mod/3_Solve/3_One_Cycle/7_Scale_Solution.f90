@@ -26,8 +26,6 @@
 
   if(ivstar .ne. 1) return
 
-  call Amg % timer_start()
-
   !-----------------------------------------!
   !   Computation of scaling factor "fac"   !
   !-----------------------------------------!
@@ -94,7 +92,5 @@
 
   call Amg % Update_U_And_F_Globally(level, vec_u=u)
 #endif
-
-  call Amg % timer_stop(14)
 
   end subroutine

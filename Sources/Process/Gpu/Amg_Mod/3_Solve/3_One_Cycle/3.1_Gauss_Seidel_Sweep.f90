@@ -26,8 +26,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  call Amg % timer_start()
-
   ! See comment in source "Coarsening.f90" at line 180
   iaux = ia(Amg % imax(level)+1)
   ia(Amg % imax(level)+1) = iw(Amg % iminw(level))
@@ -240,8 +238,6 @@
     print *, "  Oh yes, this function is Gauss_Seidel_Sweep.f.   "
     stop
   end if
-
-  call Amg % timer_stop(13)
 
   ia(Amg % imax(level)+1) = iaux
 

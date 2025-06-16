@@ -56,8 +56,6 @@
   !   Initialization of work space   !
   !                                  !
   !----------------------------------!
-  call Amg % timer_start()
-
   ilo = Amg % imin(level)
   ihi = Amg % imax(level)
   if(level .ne. 1) then
@@ -69,10 +67,6 @@
     ifg(i) = 0
     ja(ia(i)) = ia(i)
   end do
-
-  call Amg % timer_stop(8)
-
-  call Amg % timer_start()
 
   !---------------------------!
   !                           !
@@ -208,7 +202,5 @@
       ifg(ii) = ifg(ii)+1
     end do
   end do
-
-  call Amg % timer_stop(1)
 
   end subroutine

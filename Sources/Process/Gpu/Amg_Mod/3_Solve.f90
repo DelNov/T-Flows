@@ -45,9 +45,6 @@
 
   m = levels
   Amg % ncyc0 = 0
-  do n = 11, 20
-    Amg % time(n) = 0.0
-  end do
   if(Amg % eps .ne. 0.0) then
     epsi = Amg % eps
   else

@@ -51,8 +51,6 @@
     !-----------------------------------------------------!
     else
 
-      call Amg % timer_start()
-
      ! Calculate supremum norm of right hand side
       fmax = 0.0
       do i = Amg % imin(m), Amg % imax(m)
@@ -62,18 +60,15 @@
                                     a, u, f, ia, ja,  &
                                     iw)
 
-      call Amg % timer_stop(15)
       resold = max(resold*conv,fmax*1.0e-12)
       do i = 1, 10
         do j = 1, 10
           call Amg % Gauss_Seidel_Sweep(m, 2, a, u, f, ia, ja,  &
                                         iw, icg)
         end do
-        call Amg % timer_start()
         call Amg % Calculate_Residual(m, resnew, a, u, f, ia, ja,  &
                                       iw)
 
-        call Amg % timer_stop(15)
         if(resnew .le. resold) return
       end do
     end if

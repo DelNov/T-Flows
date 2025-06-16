@@ -126,7 +126,6 @@
   !------------------------------------------------------!
   !   Extend a, ja to store transpose of interpolation   !
   !------------------------------------------------------!
-  call Amg % timer_start()
   ndaja = nda
   Amg % iminw(level) = Amg % imaxw(level-1)+1
   if(level .le. mmax) then
@@ -373,8 +372,6 @@
   !---------------------------!
   !   Exit / error messages   !
   !---------------------------!
-
-  call Amg % timer_stop(6)
 
   end subroutine
 

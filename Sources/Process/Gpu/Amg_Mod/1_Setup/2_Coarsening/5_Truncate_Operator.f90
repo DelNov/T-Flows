@@ -24,8 +24,6 @@
 
   if(ntr_local .eq. 1) return
 
-  call Amg % timer_start()
-
   imn = Amg % imin(level)
   imx = Amg % imax(level)
   nna = ia(imx+1)-ia(imn)
@@ -75,7 +73,5 @@
     end do
   end do
   ia(imx+1) = jpos
-
-  call Amg % timer_stop(7)
 
   end subroutine

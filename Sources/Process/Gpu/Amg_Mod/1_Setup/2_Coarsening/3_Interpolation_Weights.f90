@@ -67,7 +67,6 @@
   ndu   = size(ia,  1)
   ndicg = size(icg, 1)
 
-  call Amg % timer_start()
   ndaja = nda
   ncount = 0
   if (level.eq.1) then
@@ -312,8 +311,6 @@
       ' interpolation operator no.', level,  &
       ' completed. c-points added in Interpolation_Weights:', ncount
   end if
-
-  call Amg % timer_stop(4)
 
   end subroutine
 

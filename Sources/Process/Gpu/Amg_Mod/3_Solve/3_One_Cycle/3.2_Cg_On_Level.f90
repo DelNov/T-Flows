@@ -38,8 +38,6 @@
   save  ! this is really needed for local allocatable arrays
 !==============================================================================!
 
-  call Amg % timer_start()
-
   ! Initialize residuals
   res_ini = 0.0
   res_cur = 0.0
@@ -314,8 +312,6 @@
   end do
   call Amg % Update_U_And_F_Globally(level, vec_u=u, vec_f=f)
 #endif
-
-  call Amg % timer_stop(13)
 
 #ifdef AMG_USE_OLD_LOOP
   ia(Amg % imax(level)+1) = iaux

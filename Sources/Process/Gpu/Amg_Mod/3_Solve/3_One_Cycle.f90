@@ -112,10 +112,8 @@
        !   is stored during first downwards relaxation   !
        !-------------------------------------------------!
         if(mink .eq. AMG_BIG_INTEGER) mink = level
-        call Amg % timer_start()
         call Amg % Calculate_Residual(level, Amg % resi(level),  &
                                       a, u, f, ia, ja, iw)
-        call Amg % timer_stop(15)
       end if
 
       ng(level) = ng(level)+1
@@ -170,10 +168,8 @@
           !   On first return to next to coarsest grid   !
           !    compare residual with the previous one    !
           !----------------------------------------------!
-          call Amg % timer_start()
           call Amg % Calculate_Residual(level,res,  &
                                    a,u,f,ia,ja,iw)
-          call Amg % timer_stop(15)
 
           ! If residual reduction satisfying:
           !   coarse grid adaption finished
