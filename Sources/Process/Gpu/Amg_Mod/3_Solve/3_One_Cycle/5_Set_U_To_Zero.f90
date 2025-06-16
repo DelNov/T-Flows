@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Set_U_To_Zero(Amg, level, u)
+  subroutine Set_U_To_Zero(Amg, level)
 !------------------------------------------------------------------------------!
 !   Sets u-values of level "level" to zero
 !------------------------------------------------------------------------------!
@@ -7,27 +7,18 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type),   target :: Amg
   integer                   :: level
-  real                      :: u(:)
-  real, contiguous, pointer :: lev_u(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer :: i, n
+  integer                   :: i, n
+  real, contiguous, pointer :: u(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  n     =  Amg % lev(level) % n
-  lev_u => Amg % lev(level) % u
-
-  ! Copy vectors u and f to level's storage
-  ! (This is needed during the development stage)
-  call Amg % Update_U_And_F_At_Level(level, vec_u=u)
+  n =  Amg % lev(level) % n
+  u => Amg % lev(level) % u
 
   do i = 1, n
-    lev_u(i) = 0.0
+    u(i) = 0.0
   end do
-
-  ! Copy vectors u and f back to global storage
-  ! (This is needed during the development stage)
-  call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
   end subroutine

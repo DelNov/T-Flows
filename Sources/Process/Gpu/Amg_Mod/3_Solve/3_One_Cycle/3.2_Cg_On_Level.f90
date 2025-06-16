@@ -1,9 +1,7 @@
 ! #define DEBUG  1
 
 !==============================================================================!
-  subroutine Cg_On_Level(Amg, level, max_iter,  &
-                         a, u, f, ia, ja,       &  ! defines system
-                         iw, icg)
+  subroutine Cg_On_Level(Amg, level, max_iter)
 !------------------------------------------------------------------------------!
 !   Conjugate gradient on the coarsest level level, as described here:
 !   w3.pppl.gov/~hammett/comp/numerical_tricks/templates.pdf
@@ -12,9 +10,6 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level, max_iter
-  real                    :: a(:), u(:), f(:)
-  integer                 :: ia(:), ja(:)
-  integer                 :: iw(:), icg(:)
 !-----------------------------------[locals]-----------------------------------!
   real    :: s
   integer :: ig, jg
@@ -32,8 +27,8 @@
   real                 :: res_ini, res_cur  ! don't mix rhos and res's ...
   real                 :: rho_old, rho_new  ! ... they are not the same thing
 
-  real,    contiguous, pointer :: lev_a(:), lev_u(:), lev_f(:)
-  integer, contiguous, pointer :: lev_ia(:), lev_ja(:)
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is really needed for local allocatable arrays
 !==============================================================================!
@@ -53,11 +48,11 @@
   !---------------------------------------------!
   n      =  Amg % lev(level) % n
   nnz    =  Amg % lev(level) % nnz
-  lev_a  => Amg % lev(level) % a
-  lev_u  => Amg % lev(level) % u
-  lev_f  => Amg % lev(level) % f
-  lev_ia => Amg % lev(level) % ia
-  lev_ja => Amg % lev(level) % ja
+  a  => Amg % lev(level) % a
+  u  => Amg % lev(level) % u
+  f  => Amg % lev(level) % f
+  ia => Amg % lev(level) % ia
+  ja => Amg % lev(level) % ja
 
   !-------------------------------------------------------!
   !                                                       !
@@ -69,12 +64,12 @@
   call Amg % Enlarge_Int (row_ptr, n+1);  row_ptr(:) = 0
 
   do i = 1, n + 1
-    row_ptr(i) = lev_ia(i)
+    row_ptr(i) = ia(i)
   end do
 
   do k = 1, nnz
-    col_idx(k) = lev_ja(k)
-    a_val(k)   = lev_a(k)
+    col_idx(k) = ja(k)
+    a_val(k)   = a(k)
   end do
 
   !------------------------------------------------------!
@@ -84,10 +79,9 @@
   !------------------------------------------------------!
   call Amg % Enlarge_Real(b, n)
   call Amg % Enlarge_Real(x, n)
-  call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
   do i = 1, n
-    b(i) = lev_f(i)
-    x(i) = lev_u(i)
+    b(i) = f(i)
+    x(i) = u(i)
   end do
 
   !---------------------------------------------------------!
@@ -251,9 +245,8 @@
   !                                                         !
   !---------------------------------------------------------!
   do i = 1, n
-    lev_f(i) = b(i)
-    lev_u(i) = x(i)
+    f(i) = b(i)
+    u(i) = x(i)
   end do
-  call Amg % Update_U_And_F_Globally(level, vec_u=u, vec_f=f)
 
   end subroutine

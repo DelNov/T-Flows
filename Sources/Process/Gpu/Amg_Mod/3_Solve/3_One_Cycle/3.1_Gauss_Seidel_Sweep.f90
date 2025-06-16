@@ -1,7 +1,5 @@
 !==============================================================================!
-  subroutine Gauss_Seidel_Sweep(Amg,  level, irel,  &
-                                a, u, f, ia, ja,    &  ! defining system
-                                iw, icg)
+  subroutine Gauss_Seidel_Sweep(Amg,  level, irel)
 !------------------------------------------------------------------------------!
 !   Performs one (partial) gauss-seidel sweep on grik level:
 !
@@ -14,12 +12,9 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level, irel
-  real                    :: a(:), u(:), f(:)
-  integer                 :: ia(:), ja(:)
-  integer                 :: iw(:), icg(:)
 !-----------------------------------[locals]-----------------------------------!
-  real,    contiguous, pointer :: lev_a(:), lev_u(:), lev_f(:)
-  integer, contiguous, pointer :: lev_ia(:), lev_ja(:), lev_icg(:)
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:), ja(:), icg(:)
   real                         :: s
   integer                      :: i, j, n
 !------------------------------------[save]------------------------------------!
@@ -27,13 +22,13 @@
 !==============================================================================!
 
   ! Fetch some pointers
-  n       =  Amg % lev(level) % n
-  lev_a   => Amg % lev(level) % a
-  lev_u   => Amg % lev(level) % u
-  lev_f   => Amg % lev(level) % f
-  lev_ia  => Amg % lev(level) % ia
-  lev_ja  => Amg % lev(level) % ja
-  lev_icg => Amg % lev(level) % icg
+  n   =  Amg % lev(level) % n
+  a   => Amg % lev(level) % a
+  u   => Amg % lev(level) % u
+  f   => Amg % lev(level) % f
+  ia  => Amg % lev(level) % ia
+  ja  => Amg % lev(level) % ja
+  icg => Amg % lev(level) % icg
 
   !------------------!
   !                  !
@@ -42,17 +37,15 @@
   !------------------!
   if(irel .eq. AMG_RELAX_F_POINTS) then
 
-    call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
-      if(lev_icg(i) .le. 0) then
-        s = lev_f(i)
-        do j = lev_ia(i) + 1, lev_ia(i+1) - 1
-          s = s - lev_a(j) * lev_u(lev_ja(j))
+      if(icg(i) .le. 0) then
+        s = f(i)
+        do j = ia(i) + 1, ia(i+1) - 1
+          s = s - a(j) * u(ja(j))
         end do
-        lev_u(i) = s / lev_a(lev_ia(i))
+        u(i) = s / a(ia(i))
       end if
     end do
-    call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
   !------------------------!
   !                        !
@@ -61,15 +54,13 @@
   !------------------------!
   else if(irel .eq. AMG_RELAX_FULL_GS) then
 
-    call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
-      s = lev_f(i)
-      do j = lev_ia(i) + 1, lev_ia(i+1) - 1
-        s = s - lev_a(j) * lev_u(lev_ja(j))
+      s = f(i)
+      do j = ia(i) + 1, ia(i+1) - 1
+        s = s - a(j) * u(ja(j))
       end do
-      lev_u(i) = s / lev_a(lev_ia(i))
+      u(i) = s / a(ia(i))
     end do
-    call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
   !------------------!
   !                  !
@@ -78,17 +69,15 @@
   !------------------!
   else if(irel .eq. AMG_RELAX_C_POINTS) then
 
-    call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
-      if(lev_icg(i) .gt. 0) then
-        s = lev_f(i)
-        do j = lev_ia(i)+1, lev_ia(i+1)-1
-          s = s - lev_a(j) * lev_u(lev_ja(j))
+      if(icg(i) .gt. 0) then
+        s = f(i)
+        do j = ia(i)+1, ia(i+1)-1
+          s = s - a(j) * u(ja(j))
         end do
-        lev_u(i) = s / lev_a(lev_ia(i))
+        u(i) = s / a(ia(i))
       end if
     end do
-    call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
   !----------------------------!
   !                            !
@@ -100,49 +89,43 @@
     !-------------------!
     !   FF-relaxation   !
     !-------------------!
-    call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
-      if(lev_icg(i) .eq. 0) then
-        s = lev_f(i)
-        do j = lev_ia(i) + 1, lev_ia(i+1) - 1
-          s = s - lev_a(j) * lev_u(lev_ja(j))
+      if(icg(i) .eq. 0) then
+        s = f(i)
+        do j = ia(i) + 1, ia(i+1) - 1
+          s = s - a(j) * u(ja(j))
         end do
-        lev_u(i) = s / lev_a(lev_ia(i))
+        u(i) = s / a(ia(i))
       end if
     end do
-    call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
     !------------------!
     !   C-relaxation   !
     !------------------!
-    call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     do i = 1, n
-      if(lev_icg(i) .gt. 0) then
-        s = lev_f(i)
-        do j = lev_ia(i) + 1, lev_ia(i+1) - 1
-          s = s - lev_a(j) * lev_u(lev_ja(j))
+      if(icg(i) .gt. 0) then
+        s = f(i)
+        do j = ia(i) + 1, ia(i+1) - 1
+          s = s - a(j) * u(ja(j))
         end do
-        lev_u(i) = s / lev_a(lev_ia(i))
+        u(i) = s / a(ia(i))
       end if
     end do
-    call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
     !----------------------------!
     !   Multi-color relaxation   !
     !----------------------------!
-    call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
     i = Amg % lev(level) % start_of_color
     do
       if(i .ge. AMG_BIG_INTEGER) exit
-      s = lev_f(i)
-      do j = lev_ia(i) + 1, lev_ia(i+1) - 1
-        s = s - lev_a(j) * lev_u(lev_ja(j))
+      s = f(i)
+      do j = ia(i) + 1, ia(i+1) - 1
+        s = s - a(j) * u(ja(j))
       end do
-      lev_u(i) = s / lev_a(lev_ia(i))
-      i = -lev_icg(i)
+      u(i) = s / a(ia(i))
+      i = -icg(i)
       Assert(i .gt. 0)
     end do
-    call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
   else
     print *, "Ouch, didn't see that coming: irel is not in range "

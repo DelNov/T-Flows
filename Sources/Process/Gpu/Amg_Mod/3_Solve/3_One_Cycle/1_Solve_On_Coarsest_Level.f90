@@ -1,22 +1,18 @@
 !==============================================================================!
-  subroutine Solve_On_Coarsest_Level(Amg, m, ifac,     &
-                                     a, u, f, ia, ja,  &
-                                     iw, icg)
+  subroutine Solve_On_Coarsest_Level(Amg, m, ifac)
 !------------------------------------------------------------------------------!
 !   Solves on coarsest grid, either with Gauss-Seidel relaxation, Conjugate
 !   Gradient or Bi-Cojugate Gradient solvers.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type) :: Amg
-  integer         :: nifac
-  real            :: a(:), u(:), f(:)
-  integer         :: ia(:), ja(:)
-  integer         :: iw(:), icg(:)
+  class(Amg_Type), target :: Amg
+  integer                 :: m, ifac
 !-----------------------------------[locals]-----------------------------------!
   real    :: fmax, resnew, resold
-  integer :: m,ifac,aaux,esp,flag,i,ihi,ii,ilo,is, &
+  integer :: n,aaux,esp,flag,i,ihi,ii,ilo,is, &
              iter,j,jhi,jj,jlo,jpos,js,np,npoint,nsp,path
+  real, contiguous, pointer :: f(:)
 
   !------------------------------------------------------------------------!
   !   conv: if coarse grid solution is done with gs-relaxation and         !
@@ -40,9 +36,7 @@
     !---------------------------------------------!
     if(Amg % n_relax_coarse .ne. 0) then
       do iter = 1, Amg % n_relax_coarse
-        call Amg % Gauss_Seidel_Sweep(m, 2,             &
-                                      a, u, f, ia, ja,  &
-                                      iw, icg)
+        call Amg % Gauss_Seidel_Sweep(m, 2)
       end do
 
     !-----------------------------------------------------!
@@ -53,21 +47,19 @@
 
      ! Calculate supremum norm of right hand side
       fmax = 0.0
-      do i = Amg % imin(m), Amg % imax(m)
-        fmax = max(fmax,abs(f(i)))
+      n =  Amg % lev(m) % n
+      f => Amg % lev(m) % f
+      do i = 1, n
+        fmax = max(fmax, abs(f(i)))
       end do
-      call Amg % Calculate_Residual(m, resold,  &
-                                    a, u, f, ia, ja,  &
-                                    iw)
+      call Amg % Calculate_Residual(m, resold)
 
       resold = max(resold*conv,fmax*1.0e-12)
       do i = 1, 10
         do j = 1, 10
-          call Amg % Gauss_Seidel_Sweep(m, 2, a, u, f, ia, ja,  &
-                                        iw, icg)
+          call Amg % Gauss_Seidel_Sweep(m, 2)
         end do
-        call Amg % Calculate_Residual(m, resnew, a, u, f, ia, ja,  &
-                                      iw)
+        call Amg % Calculate_Residual(m, resnew)
 
         if(resnew .le. resold) return
       end do
@@ -80,9 +72,7 @@
   !-----------------------------!
   else if(Amg % coarse_solver .eq. AMG_SOLVER_CG) then
 
-    call Amg % Cg_On_Level(m, 2,             &
-                           a, u, f, ia, ja,  &
-                           iw, icg)
+    call Amg % Cg_On_Level(m, 2)
 
   !-------------------------------!
   !                               !
@@ -91,9 +81,7 @@
   !-------------------------------!
   else if(Amg % coarse_solver .eq. AMG_SOLVER_BICG) then
 
-    call Amg % Bicg_On_Level(m, 2,             &
-                             a, u, f, ia, ja,  &
-                             iw,icg)
+    call Amg % Bicg_On_Level(m, 2)
 
   end if
 

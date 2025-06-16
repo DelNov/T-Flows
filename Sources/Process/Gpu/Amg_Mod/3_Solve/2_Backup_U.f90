@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Backup_U(Amg, level, icgr, u, u_b)
+  subroutine Backup_U(Amg, level, icgr)
 !------------------------------------------------------------------------------!
 !   Makes a back-up of the current approx. on level "level" if icgr.ne.0.
 !   (This seems to try to place backup beyond the last (coarsest) level.)
@@ -8,23 +8,21 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level, icgr
-  real                    :: u(:), u_b(:)
 !-----------------------------------[locals]-----------------------------------!
   integer                      :: i, n
-  real,    contiguous, pointer :: lev_u(:), lev_u_b(:)
+  real,    contiguous, pointer :: u(:), u_b(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
   if(icgr .eq. 0) return
 
-  call Amg % Update_U_And_F_At_Level(level, vec_u=u)
-  n       =  Amg % lev(level) % n
-  lev_u   => Amg % lev(level) % u
-  lev_u_b => Amg % lev(level) % u_b
+  n   =  Amg % lev(level) % n
+  u   => Amg % lev(level) % u
+  u_b => Amg % lev(level) % u_b
+
   do i = 1, n
-    lev_u_b(i) = lev_u(i)
+    u_b(i) = u(i)
   end do
-  call Amg % Update_U_And_F_Globally(level, vec_u_b=u_b)
 
   end subroutine

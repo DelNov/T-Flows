@@ -1,7 +1,5 @@
 !==============================================================================!
-  subroutine Calculate_Residual(Amg, level, resl,  &
-                                a, u, f, ia, ja,   &  ! defining system
-                                iw)
+  subroutine Calculate_Residual(Amg, level, resl)
 !------------------------------------------------------------------------------!
 !   Computes l2-norm of residual on level "level"
 !------------------------------------------------------------------------------!
@@ -10,35 +8,28 @@
   class(Amg_Type), target :: Amg
   integer                 :: level
   real                    :: resl
-  real                    :: a(:), u(:), f(:)
-  integer                 :: ia(:), ja(:)
-  integer                 :: iw(:)
 !-----------------------------------[locals]-----------------------------------!
   real                         :: s
   integer                      :: i, j, n, i_loc
-  real,    contiguous, pointer :: lev_a(:), lev_u(:), lev_f(:)
-  integer, contiguous, pointer :: lev_ia(:), lev_ja(:)
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
   resl = 0.0
 
-  n      =  Amg % lev(level) % n
-  lev_a  => Amg % lev(level) % a
-  lev_u  => Amg % lev(level) % u
-  lev_f  => Amg % lev(level) % f
-  lev_ia => Amg % lev(level) % ia
-  lev_ja => Amg % lev(level) % ja
-
-  ! Copy vectors u and f to level's storage
-  ! (This is needed during the development stage)
-  call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
+  n  =  Amg % lev(level) % n
+  a  => Amg % lev(level) % a
+  u  => Amg % lev(level) % u
+  f  => Amg % lev(level) % f
+  ia => Amg % lev(level) % ia
+  ja => Amg % lev(level) % ja
 
   do i = 1, n
-    s = lev_f(i)
-    do j = lev_ia(i), lev_ia(i+1) - 1
-      s = s - lev_a(j) * lev_u(lev_ja(j))
+    s = f(i)
+    do j = ia(i), ia(i+1) - 1
+      s = s - a(j) * u(ja(j))
     end do
     resl = resl + s * s
   end do

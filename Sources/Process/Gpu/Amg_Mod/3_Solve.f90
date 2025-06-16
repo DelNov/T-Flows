@@ -1,47 +1,31 @@
 !==============================================================================!
-  subroutine Solve(Amg, madapt, ncyc,          &
-                   a, u, u_b, f, f_b, ia, ja,  &  ! holds linear system
-                   iw, icg, ifg,               &
-                   levels)
+  subroutine Solve(Amg, madapt, ncyc, levels)
 !------------------------------------------------------------------------------!
 !   Solution phase of Amg1r5
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type) :: Amg
-  integer         :: madapt, ncyc
-  real            :: a(:), u(:), u_b(:), f(:), f_b(:)
-  integer         :: ia(:), ja(:)
-  integer         :: iw(:), icg(:), ifg(:)
-  integer         :: levels
+  class(Amg_Type), target :: Amg
+  integer                 :: madapt, ncyc
+  integer                 :: levels
 !-----------------------------------[locals]-----------------------------------!
   real    :: ama, cfac, epsi, epsil, fac, fmax
   real    :: rescg, resold, umax
   integer :: digit(AMG_MAX_LEVELS)
   integer :: i, icgr, iconv, igam, iter, l, m, mfirst, msel, n
   integer :: ncycle, n_digits
-  integer :: ndu
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  ndu = size(u, 1)
-
-  !-------------------------------!
-  !   Test of available storage   !
-  !-------------------------------!
-  if(ndu .lt. Amg % imax(levels)) then
-    write(6, '(a)')  &
-      ' *** error in Solve: ndu too small ***'
-    Amg % ierr = AMG_ERR_DIM_U_TOO_SMALL
-    return
-  end if
-  if(ndu .lt. Amg % imax(levels)) then
-    write(6, '(a)')  &
-      ' *** error in Solve: ndu too small ***'
-    Amg % ierr = AMG_ERR_DIM_F_TOO_SMALL
-    return
-  end if
+  ! Number of unknowns at the finest level
+  n  =  Amg % lev(1) % n
+  a  => Amg % lev(1) % a
+  ia => Amg % lev(1) % ia
+  u  => Amg % lev(1) % u
+  f  => Amg % lev(1) % f
 
   m = levels
   Amg % ncyc0 = 0
@@ -96,17 +80,17 @@
   if(iconv.ne.3) then
     if(iconv.eq.4) then
     ama = 0.0
-    do i = 1, Amg % imax(1)
-      ama = max(ama,a(ia(i)))
+    do i = 1, n
+      ama = max(ama, a(ia(i)))
     end do
     epsi = epsi*ama
     end if
   else
     fmax = 0.0
-    do i = 1, Amg % imax(1)
-      fmax = max(fmax,abs(f(i)))
+    do i = 1, n
+      fmax = max(fmax, abs(f(i)))
     end do
-    epsi = epsi*fmax
+    epsi = epsi * fmax
   end if
 
   !------------------------------------!
@@ -178,7 +162,7 @@
   !   Cycling   !
   !-------------!
   if(Amg % iout .ne. 0) then
-    call Amg % Calculate_Residual(1, Amg % res0, a, u, f, ia, ja, iw)
+    call Amg % Calculate_Residual(1, Amg % res0)
     if(Amg % iout .ge. 3) then
       write (6, 9005)
       write (6, 9000) Amg % res0
@@ -187,12 +171,10 @@
   end if
 
   do iter = 1, ncycle
-    call Amg % Backup_U(1, icgr, u, u_b)
+    call Amg % Backup_U(1, icgr)
     call Amg % One_Cycle(1, igam,              &
-                         a, u, f, ia, ja,      &
-                         iw,  ifg, icg,        &
                          m, iter, msel, fac, levels)
-    call Amg % Cg_Step(1, icgr, iter, a, u, u_b, f, f_b, ia, ja, iw)
+    call Amg % Cg_Step(1, icgr, iter)
     if(Amg % ierr.gt.0) return
     if(iter .eq. 1) then
       mfirst = m
@@ -202,14 +184,14 @@
       write(6, 9040) m
     end if
     if(Amg % iout .ge. 3 .or. iconv .ne. 1) then
-      call Amg % Calculate_Residual(1, Amg % res, a, u, f, ia, ja, iw)
+      call Amg % Calculate_Residual(1, Amg % res)
     end if
     Amg % ncyc0 = iter
     if(Amg % iout .ge. 3) then
       cfac = Amg % res / (resold + TINY)
       resold = Amg % res
       if(m .ne. 1) then
-        call Amg % Calculate_Residual(2, rescg, a, u, f, ia, ja, iw)
+        call Amg % Calculate_Residual(2, rescg)
         write(6, 9010) iter, rescg, Amg % res, cfac
       else
         write(6, 9020) iter, Amg % res, cfac
@@ -219,16 +201,16 @@
       epsil = epsi
       if(iconv.eq.4) then
         umax = 0.0
-        do i = Amg % imin(1), Amg % imax(1)
-          umax = max(umax,abs(u(i)))
+        do i = 1, n
+          umax = max(umax, abs(u(i)))
         end do
-        epsil = epsi*umax
+        epsil = epsi * umax
       end if
     end if
     if(Amg % res .lt. epsil) exit
   end do
   if(Amg % iout .lt. 3 .and. Amg % iout .ne. 0) then
-    call Amg % Calculate_Residual(1, Amg % res, a, u, f, ia, ja, iw)
+    call Amg % Calculate_Residual(1, Amg % res)
   end if
 
 9000  format (' cycle  0:',3x,'res=',d9.3)

@@ -1,7 +1,5 @@
 !==============================================================================!
   subroutine One_Cycle(Amg, l, igam,     &
-                       a, u, f, ia, ja,  &
-                       iw, ifg, icg,     &
                        m, iter, msel, fac, levels)
 !------------------------------------------------------------------------------!
 !   Performs one Amg cycle with grid l as finest grid
@@ -25,8 +23,6 @@
   class(Amg_Type) :: Amg
   integer         :: l
   integer         :: igam
-  real            :: a(:), u(:), f(:)
-  integer         :: ia(:), ja(:), iw(:), ifg(:), icg(:)
   integer         :: m, iter, msel
   real            :: fac
   integer         :: levels
@@ -34,13 +30,10 @@
   real    :: res
   integer :: ng(AMG_MAX_LEVELS)
   integer :: ifac, ifi, ivstar, level, mink, n, nl, nptsf
-  integer :: nda
   logical :: moredown
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
-
-  nda = size(a, 1)
 
   if(iter .eq. 1) ifac = 1
   if(msel .ne. 2) then
@@ -58,10 +51,8 @@
   !                   !
   !-------------------!
   if(l .ge. m) then
-    call Amg % Solve_On_Coarsest_Level(m, ifac,          &
-                                       a, u, f, ia, ja,  &
-                                       iw, icg)
-    call Amg % Normalize_U(l, u)
+    call Amg % Solve_On_Coarsest_Level(m, ifac)
+    call Amg % Normalize_U(l)
     return
   end if
 
@@ -91,19 +82,15 @@
       if(Amg % fine_solver .eq. AMG_SOLVER_GS) then
         do n = 1, Amg % n_relax_down
           do nl = 1, Amg % nrdlen
-            call Amg % Gauss_Seidel_Sweep(level, Amg % type_relax_down(nl),  &
-                                          a, u, f, ia, ja,                   &
-                                          iw, icg)
+            call Amg % Gauss_Seidel_Sweep(level, Amg % type_relax_down(nl))
           end do
         end do
       else if(Amg % fine_solver .eq. AMG_SOLVER_CG) then
-        call Amg % Cg_On_Level(level, Amg % n_relax_down,  &
-                               a, u, f, ia, ja,            &
-                               iw,icg)
+        call Amg % Cg_On_Level(level, Amg % n_relax_down)
+
       else if(Amg % fine_solver .eq. AMG_SOLVER_BICG) then
-        call Amg % Bicg_On_Level(level, Amg % n_relax_down,   &
-                                 a, u, f, ia, ja,             &
-                                 iw,icg)
+        call Amg % Bicg_On_Level(level, Amg % n_relax_down)
+
       end if
       if(ifi .eq. 1 .and. Amg % imax(level) - Amg % imin(level) .lt. nptsf) then
 
@@ -112,16 +99,15 @@
        !   is stored during first downwards relaxation   !
        !-------------------------------------------------!
         if(mink .eq. AMG_BIG_INTEGER) mink = level
-        call Amg % Calculate_Residual(level, Amg % resi(level),  &
-                                      a, u, f, ia, ja, iw)
+        call Amg % Calculate_Residual(level, Amg % resi(level))
       end if
 
       ng(level) = ng(level)+1
 
       ! Increase the grid counter - going for coarser still
       level = level + 1
-      call Amg % Set_U_To_Zero(level,u)
-      call Amg % Restrict_Residuals(level, a, u, f, ia, ja, iw, ifg)
+      call Amg % Set_U_To_Zero(level)
+      call Amg % Restrict_Residuals(level)
       if(level .lt. m) cycle downward
 
       !-------------------------------------------------------!
@@ -129,9 +115,7 @@
       !   Solve on coarsest grid - "m" is the coarsest grid   !
       !                                                       !
       !-------------------------------------------------------!
-      call Amg % Solve_On_Coarsest_Level(m, ifac,          &
-                                         a, u, f, ia, ja,  &
-                                         iw, icg)
+      call Amg % Solve_On_Coarsest_Level(m, ifac)
 
       !---------------------!
       !                     !
@@ -139,28 +123,23 @@
       !                     !
       !---------------------!
       upward: do
-        call Amg % Scale_Solution(level, ivstar,  &
-                                  a, u, f, ia, ja, iw)
+        call Amg % Scale_Solution(level, ivstar)
         level = level-1
-        call Amg % Interpolate_Correction(level, a, u, ia, ja, iw, ifg)
+        call Amg % Interpolate_Correction(level)
 
         ! This might not cut it for fine(r) grids
         if(Amg % fine_solver .eq. AMG_SOLVER_GS) then
           do n = 1, Amg % n_relax_up
             do nl = 1, Amg % nrulen
-              call Amg % Gauss_Seidel_Sweep(level, Amg % type_relax_up(nl),  &
-                                            a, u, f, ia, ja,                 &
-                                            iw,icg)
+              call Amg % Gauss_Seidel_Sweep(level, Amg % type_relax_up(nl))
             end do
           end do
         else if(Amg % fine_solver .eq. AMG_SOLVER_CG) then
-          call Amg % Cg_On_Level(level, Amg % n_relax_up,  &
-                                 a, u, f, ia, ja,          &
-                                 iw,icg)
+          call Amg % Cg_On_Level(level, Amg % n_relax_up)
+
         else if(Amg % fine_solver .eq. AMG_SOLVER_BICG) then
-          call Amg % Bicg_On_Level(level, Amg % n_relax_up,   &
-                                   a, u, f, ia, ja,           &
-                                   iw,icg)
+          call Amg % Bicg_On_Level(level, Amg % n_relax_up)
+
         end if
         if(ifi .eq. 1 .and. level .ge. mink) then
 
@@ -168,8 +147,7 @@
           !   On first return to next to coarsest grid   !
           !    compare residual with the previous one    !
           !----------------------------------------------!
-          call Amg % Calculate_Residual(level,res,  &
-                                   a,u,f,ia,ja,iw)
+          call Amg % Calculate_Residual(level, res)
 
           ! If residual reduction satisfying:
           !   coarse grid adaption finished
@@ -182,17 +160,15 @@
             ! Yale: if(Amg % coarse_solver .eq. 2) levels = level
             m    = level
             ifac = 1
-            call Amg % Set_U_To_Zero(level,u)
-            call Amg % Restrict_Residuals(level, a, u, f, ia, ja, iw, ifg)
-            call Amg % Solve_On_Coarsest_Level(m, ifac,          &
-                                               a, u, f, ia, ja,  &
-                                               iw, icg)
+            call Amg % Set_U_To_Zero(level)
+            call Amg % Restrict_Residuals(level)
+            call Amg % Solve_On_Coarsest_Level(m, ifac)
             cycle upward
           end if
         end if
 
         if(level .eq. l) then
-          call Amg % Normalize_U(l, u)
+          call Amg % Normalize_U(l)
           return
         end if
 

@@ -1,7 +1,5 @@
 !==============================================================================!
-  subroutine Scale_Solution(Amg, level, ivstar,  &
-                            a, u, f, ia, ja,     &  ! defining system
-                            iw)
+  subroutine Scale_Solution(Amg, level, ivstar)
 !------------------------------------------------------------------------------!
 !   Scales actual approximate solution on level "level" (v*-cycle); scaling
 !   is done such that energy norm becomes minimal
@@ -12,14 +10,11 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level, ivstar
-  real                    :: a(:), u(:), f(:)
-  integer                 :: ia(:), ja(:)
-  integer                 :: iw(:)
 !-----------------------------------[locals]-----------------------------------!
   real                         :: fac, s1, s2, sa
   integer                      :: i, j, n
-  real,    contiguous, pointer :: lev_a(:), lev_u(:), lev_f(:)
-  integer, contiguous, pointer :: lev_ia(:), lev_ja(:)
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -30,24 +25,22 @@
   !   Computation of scaling factor "fac"   !
   !-----------------------------------------!
 
-  n      =  Amg % lev(level) % n
-  lev_a  => Amg % lev(level) % a
-  lev_u  => Amg % lev(level) % u
-  lev_f  => Amg % lev(level) % f
-  lev_ia => Amg % lev(level) % ia
-  lev_ja => Amg % lev(level) % ja
-
-  call Amg % Update_U_And_F_At_Level(level, vec_u=u, vec_f=f)
+  n  =  Amg % lev(level) % n
+  a  => Amg % lev(level) % a
+  u  => Amg % lev(level) % u
+  f  => Amg % lev(level) % f
+  ia => Amg % lev(level) % ia
+  ja => Amg % lev(level) % ja
 
   s1 = 0.0
   s2 = 0.0
   do i = 1, n
     sa = 0.0
-    do j = lev_ia(i), lev_ia(i+1) - 1
-      sa = sa + lev_a(j) * lev_u(lev_ja(j))
+    do j = ia(i), ia(i+1) - 1
+      sa = sa + a(j) * u(ja(j))
     end do
-    s1 = s1 + lev_u(i) * lev_f(i)
-    s2 = s2 + lev_u(i) * sa
+    s1 = s1 + u(i) * f(i)
+    s2 = s2 + u(i) * sa
   end do
 
   fac = 1.0
@@ -57,9 +50,7 @@
   !   Scaling   !
   !-------------!
   do i = 1, n
-    lev_u(i) = lev_u(i) * fac
+    u(i) = u(i) * fac
   end do
-
-  call Amg % Update_U_And_F_Globally(level, vec_u=u)
 
   end subroutine

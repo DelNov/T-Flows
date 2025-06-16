@@ -698,7 +698,7 @@
     ncyc                    = 12250  ! V, no CG, ||res|| < eps, 50 cycles
     madapt                  = 0
     Amg % def_relax_down    = 0      ! leave definition for later in Solve
-    Amg % def_coarse_solver = AMG_SOLVER_CG
+    Amg % def_coarse_solver = AMG_SOLVER_BICG
     Amg % def_relax_up      = 0      ! leave definition for later in Solve
     Amg % ecg1              = 0.0
     Amg % ecg2              = 0.25
@@ -809,10 +809,7 @@
 
   if(kswtch .ge. 2) then
     call Amg % Update_U_And_F_At_Level(1, vec_u=u, vec_f=f, for_real=.true.)
-    call Amg % Solve(madapt, ncyc,               &
-                     a, u, u_b, f, f_b, ia, ja,  &  ! linear system
-                     iw, icg, ifg,               &  ! work arrays
-                     levels)
+    call Amg % Solve(madapt, ncyc, levels)
     if(Amg % ierr .gt. 0) return
   end if
 
