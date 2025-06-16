@@ -31,6 +31,15 @@
     AMG_SOLVER_CG   = 2,  &
     AMG_SOLVER_BICG = 3
 
+  !----------------------------!
+  !   Relaxation sweep types   !
+  !----------------------------!
+  integer, parameter ::        &
+    AMG_RELAX_F_POINTS   = 1,  &
+    AMG_RELAX_FULL_GS    = 2,  &
+    AMG_RELAX_C_POINTS   = 3,  &
+    AMG_RELAX_MULTICOLOR = 4
+
   !--------------------!
   !   Error messages   !
   !--------------------!
@@ -39,7 +48,7 @@
   integer, parameter :: AMG_SUCCESS = 0
 
   ! Dimensioning errors (Class 1)
-  integer, parameter ::               &
+  integer, parameter ::             &
     AMG_ERR_DIM_A_TOO_SMALL   = 1,  &  ! a vector too small
     AMG_ERR_DIM_IA_TOO_SMALL  = 2,  &  ! ia vector too small
     AMG_ERR_DIM_JA_TOO_SMALL  = 3,  &  ! ja vector too small

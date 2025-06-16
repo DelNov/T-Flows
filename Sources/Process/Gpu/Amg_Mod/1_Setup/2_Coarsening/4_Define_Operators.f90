@@ -368,7 +368,7 @@
       ist=i+ilo1
     end do
   end do
-  Amg % nstcol(level-1) = ist
+  Amg % start_of_color(level-1) = ist
 
   !---------------------------!
   !   Exit / error messages   !

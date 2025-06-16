@@ -126,10 +126,10 @@
       Amg % type_relax_down(i) = Amg % type_relax_down(i+2)
     end do
   else
-    Amg % n_relax_down       = 6
+    Amg % n_relax_down       = 1  ! used to be six
     Amg % nrdlen             = 2
-    Amg % type_relax_down(1) = 3
-    Amg % type_relax_down(2) = 1
+    Amg % type_relax_down(1) = AMG_RELAX_MULTICOLOR
+    Amg % type_relax_down(2) = AMG_RELAX_MULTICOLOR ! AMG_RELAX_F_POINTS
   end if
 
   !----------------------------------!
@@ -146,10 +146,10 @@
       Amg % type_relax_up(i) = Amg % type_relax_up(i+2)
     end do
   else
-    Amg % n_relax_up       = 6
+    Amg % n_relax_up       = 1  ! used to be six
     Amg % nrulen           = 2
-    Amg % type_relax_up(1) = 3
-    Amg % type_relax_up(2) = 1
+    Amg % type_relax_up(1) = AMG_RELAX_MULTICOLOR
+    Amg % type_relax_up(2) = AMG_RELAX_MULTICOLOR ! AMG_RELAX_F_POINTS
   end if
 
   !---------------------------------------!

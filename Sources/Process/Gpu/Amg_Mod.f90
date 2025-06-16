@@ -1,3 +1,9 @@
+#include "../../Shared/Assert.h90"
+
+!define OLD_LOOP
+
+#define NEW_LOOP
+
 !==============================================================================!
   module Amg_Mod
 !----------------------------------[Modules]-----------------------------------!
@@ -8,14 +14,28 @@
 
 # include "Amg_Mod.h90"
 
-  integer, pointer, contiguous :: amg_imin (:), amg_imax (:)
-  integer, pointer, contiguous :: amg_iminw(:), amg_imaxw(:)
-  integer, pointer, contiguous :: amg_nstcol(:)
+  !----------------!
+  !   Level type   !
+  !----------------!
+  type Level_Type
+    integer              :: n
+    integer              :: nw
+    integer              :: nnz
+    integer              :: start_of_color
+    real,    allocatable :: a(:), u(:), f(:)
+    integer, allocatable :: ia(:), ja(:)
+    integer, allocatable :: icg(:)
+    integer, allocatable :: ifg_1(:), ifg_2(:)
+    real,    allocatable :: w(:)
+    integer, allocatable :: iw(:), jw(:)
+  end type
 
   !--------------!
   !   Amg type   !
   !--------------!
   type Amg_Type
+
+    type(Level_Type) :: lev(AMG_MAX_LEVELS)
 
     ! Range in unknown (u) for each level: imin(level) - imax(level))
     integer, private :: imin (AMG_MAX_LEVELS), imax (AMG_MAX_LEVELS)
@@ -23,7 +43,9 @@
     ! Range in workspace (iw) for each level: iminw(level) - imaxw(level))
     ! (This is gradualy populated in Amg % Coarsening, clearly enough)
     integer, private :: iminw(AMG_MAX_LEVELS), imaxw(AMG_MAX_LEVELS)
-    integer, private :: nstcol(AMG_MAX_LEVELS)
+
+    ! Start of each color (I believe)
+    integer, private :: start_of_color(AMG_MAX_LEVELS)
 
     ! Residual, initial residual and convergence criterion
     real,    private :: resi(AMG_MAX_LEVELS)
@@ -87,6 +109,9 @@
       !   Main subroutine   !
       !---------------------!
       procedure :: Amg1r5
+      procedure :: Store_Level
+      procedure :: Update_U_And_F_At_Level
+      procedure :: Update_U_And_F_Globally
 
       !----------------------!
       !   Related to setup   !
@@ -136,6 +161,7 @@
       !---------------------------------------!
       procedure :: Get_Integer_Digits
       procedure :: Random_0_To_0p1
+      procedure :: Level_Of_Cell
 
   end type
 
@@ -148,10 +174,39 @@
 
   contains
 
+!==============================================================================!
+  integer function Level_Of_Cell(Amg, c)
+!------------------------------------------------------------------------------!
+  implicit none
+!------------------------------------------------------------------------------!
+  class(Amg_Type) :: Amg
+  integer         :: c
+!------------------------------------------------------------------------------!
+  integer level
+!==============================================================================!
+
+  do level = 1, AMG_MAX_LEVELS
+    if(c .ge. Amg % imin(level) .and. c .le. Amg % imax(level)) then
+
+      ! Success
+      Level_Of_Cell = level
+      return
+
+    end if
+  end do
+
+  ! Failure
+  Level_Of_Cell = -1
+
+  end function
+
   !---------------------!
   !   Main subroutine   !
   !---------------------!
 # include "Amg_Mod/0_Drivers/Amg1r5.f90"
+# include "Amg_Mod/0_Drivers/Store_Level.f90"
+# include "Amg_Mod/0_Drivers/Update_U_And_F_At_Level.f90"
+# include "Amg_Mod/0_Drivers/Update_U_And_F_Globally.f90"
 
   !----------------------!
   !   Related to setup   !

@@ -22,7 +22,7 @@
 
   ib = 1
   do level = 1, levels - 1
-    ist = Amg % nstcol(level)
+    ist = Amg % start_of_color(level)
     if(ist .lt. AMG_BIG_INTEGER) then
       do
         ifg(ib) = ist

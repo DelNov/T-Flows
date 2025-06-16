@@ -388,6 +388,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      AMG_ERR_ISWTCH_INVALID  AMG_ERR_LEVELX_INVALID  AMG_ERR_TRANSPOSE_MISSING  AMG_ERR_INTERP_MISSING
   syn keyword fortranConstant      AMG_ERR_CG_CORRECTION_UNDEF  AMG_ERR_YALE_FACTOR_FAIL  AMG_WARN_YALE_STORAGE_A  AMG_WARN_YALE_STORAGE_JA
   syn keyword fortranConstant      AMG_WARN_CG_STORAGE_U  AMG_BIG_INTEGER  AMG_L_RATIO
+  syn keyword fortranConstant      AMG_RELAX_F_POINTS  AMG_RELAX_FULL_GS  AMG_RELAX_C_POINTS  AMG_RELAX_MULTICOLOR
 
 " Constants from Tokenizer_Mod
   syn keyword fortranConstant      MAX_TOKENS

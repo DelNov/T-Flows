@@ -369,16 +369,23 @@
 !
 !                following digits  --  array type_relax_down:
 !                  =1: relaxation over the f-points only
+!                      (AMG_RELAX_F_POINTS)
 !                  =2: full gs sweep
+!                      (AMG_RELAX_FULL_GS)
 !                  =3: relaxation over the c-points only
+!                      (AMG_RELAX_C_POINTS)
 !                  =4: full more color sweep, highest color first
+!                      (AMG_RELAX_MULTICOLOR)
 !
 !     def_coarse_solver - Parameter controlling the solution on coarsest grid:
 !
 !                1st digit  --  coarse_solver:
 !                  =1: Gauss-Seidel method
+!                      (AMG_SOLVER_GS)
 !                  =2: Conjugate Gradient solver
+!                      (AMG_SOLVER_CG)
 !                  =3: Bi-Conjugate Gradient solver
+!                      (AMG_SOLVER_BICG)
 !
 !                Rest of def_coarse_solver  --  n_relax_coarse: (only if
 !                coarse_solver=1) number of GS sweeps on coarsest grid (>=0).
@@ -501,22 +508,21 @@
 !
 !   Standard choices of parameters (as far as meaningful):
 !
-!     iswtch = 4
-!     iout   = 2
-!
-!     levelx = 25
-!     ifirst = 13
-!     ncyc   = 10110
-!     eps    = 1.d-12
-!     madapt = 27
-!     def_relax_down    = 1131
-!     def_coarse_solver =  110
-!     def_relax_up      = 1131
-!     ecg1              =    0.
-!     ecg2              =    0.25
-!     ewt2              =    0.35
-!     nwt               =    2
-!     ntr               =    0
+!     iswtch            =     4
+!     iout              =     2
+!     levelx            =    25
+!     ifirst            =    13
+!     ncyc              = 10110
+!     eps               =     1.d-12
+!     madapt            =    27
+!     def_relax_down    =  1131
+!     def_coarse_solver =   110
+!     def_relax_up      =  1131
+!     ecg1              =     0.
+!     ecg2              =     0.25
+!     ewt2              =     0.35
+!     nwt               =     2
+!     ntr               =     0
 !
 !   If any one of these parameters is 0 on input, its corresponding standard
 !   value is used by Amg1r5.
@@ -565,8 +571,8 @@
 !
 !   Re-factoring:
 !
-!    Bojan Niceno, CH-5232, Villigen-PSI (Switzerland)
-!      Paul Scherrer Institute (PSI)
+!     Bojan Niceno, CH-5232, Villigen-PSI (Switzerland)
+!       Paul Scherrer Institute (PSI)
 !
 !------------------------------------------------------------------------------!
   implicit none
@@ -594,7 +600,7 @@
   integer :: icgst, kevelx, kswtch, levels
   integer :: n_digits, ndicg
   integer :: levelx, ifirst, ncyc
-  integer :: madapt, i
+  integer :: madapt, i,j,k,l, level
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -619,12 +625,6 @@
   !                        !
   !------------------------!
   if(kswtch .eq. AMG_RUN_ALL_FOUR_STAGES) then
-
-    amg_imin   => Amg % imin
-    amg_imax   => Amg % imax
-    amg_iminw  => Amg % iminw
-    amg_imaxw  => Amg % imaxw
-    amg_nstcol => Amg % nstcol
 
     !   Work out the number of nonzeros and unknowns
     n_nonzeros = a_row(n+1)-1
@@ -692,19 +692,19 @@
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
     !-----------------------------------------------------------!
-    levelx = 0
-    ncyc   = 10250
-    madapt = 0
-    Amg % def_relax_down    = 0
+    levelx                  = 0      ! just set kevelx to AMG_MAX_LEVELS
+    ncyc                    = 10250  ! V, no CG, ||res|| < eps, 50 cycles
+    madapt                  = 0
+    Amg % def_relax_down    = 0      ! leave definition for later in Solve
     Amg % def_coarse_solver = AMG_SOLVER_CG
-    Amg % def_relax_up      = 0
+    Amg % def_relax_up      = 0      ! leave definition for later in Solve
     Amg % ecg1              = 0.0
     Amg % ecg2              = 0.25
     Amg % ewt2              = 0.35
     Amg % nwt               = 2
     Amg % ntr               = 0
 
-    Amg % fine_solver = AMG_SOLVER_CG
+    Amg % fine_solver = AMG_SOLVER_GS
 
     !------------------------------------!
     !   Limit kevelx to AMG_MAX_LEVELS   !
@@ -751,6 +751,28 @@
                      levels,              &
                      iwork, jtr)
 
+    Amg % imaxw(levels) = Amg % iminw(levels)
+    !              1      81      81      81      81      81      81      8
+    write(*, *)   ' level   min i   max i   size    min w   max w   total'
+    do level = 1, levels
+      write(*,'(99i8)')  &
+        level, Amg % imin(level),  Amg % imax(level),       &
+               Amg % imax(level) - Amg % imin(level) + 1,   &
+               Amg % iminw(level), Amg % imaxw(level),      &
+               Amg % imaxw(level) - Amg % iminw(level) + 1
+    end do
+    do level = 1, levels - 1
+      do i = Amg % iminw(level), Amg % imaxw(level)
+        k = iw(i)  ! position in the matrix
+        j = ja(k)  ! column number
+        l = Amg % Level_Of_Cell(j)
+        ! write(*, '(99i8)')  k, j, l
+        Assert(l == level+1)
+      end do
+    end do
+
+    write(*,*) 'level at index 1500000: ', Amg % Level_Of_Cell(1500000)
+
     !------------------------------------!
     !   Reduce excessive size matrices   !
     !- - - - - - - - - - - - - - - - - - +----------------------------!
@@ -759,6 +781,10 @@
     !   not sure how to work around it. maybe a more complex logic    !
     !   will be needed at the section for memory allocation above?    !
     !-----------------------------------------------------------------!
+
+    do level = 1, levels
+      call Amg % Store_Level(level, levels, a, u, f, ia, ja, iw, icg, ifg)
+    end do
 
     write(6, '(a)')  'De-allocating iwork and jtr'
     deallocate(iwork, jtr)
@@ -786,7 +812,7 @@
     ! Row pointer indices ja
     write(6, '(a,i11,a,i11)')  &
       'Reducing ia  from ', size(ia, 1), ' to ', Amg % imax(levels) + 1
-    call Amg % Reduce_Int(ia, Amg % imax(levels))
+    call Amg % Reduce_Int(ia, Amg % imax(levels) + 1)
 
     ! Arrays icg and iwg
     write(6, '(a,i11,a,i11)')  &
