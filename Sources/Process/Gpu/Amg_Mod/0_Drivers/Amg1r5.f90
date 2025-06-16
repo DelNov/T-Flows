@@ -588,7 +588,7 @@
   integer :: digit(AMG_MAX_LEVELS)
 
   ! These arrays describe linear system
-  real,    allocatable :: a(:), u(:), f(:)
+  real,    allocatable :: a(:), u(:), u_b(:), f(:), f_b(:)
   integer, allocatable :: ia(:)
   integer, allocatable :: ja(:)
 
@@ -663,7 +663,9 @@
       allocate(ia(ndu));     ia(:)    = 0     ! row pointers
       allocate(ja(nda));     ja(:)    = 0     ! columns
       allocate(u(ndu));      u(:)     = 0.0
+      allocate(u_b(ndu));    u_b(:)   = 0.0
       allocate(f(ndu));      f(:)     = 0.0
+      allocate(f_b(ndu));    f_b(:)   = 0.0
       allocate(iw(niw));     iw(:)    = 0     ! used to be "ig"
       allocate(icg(nicg));   icg(:)   = 0
       allocate(ifg(nifg));   ifg(:)   = 0
@@ -693,7 +695,7 @@
     !   More switches (these used to be in aux1r5 subroutine)   !
     !-----------------------------------------------------------!
     levelx                  = 0      ! just set kevelx to AMG_MAX_LEVELS
-    ncyc                    = 10250  ! V, no CG, ||res|| < eps, 50 cycles
+    ncyc                    = 12250  ! V, no CG, ||res|| < eps, 50 cycles
     madapt                  = 0
     Amg % def_relax_down    = 0      ! leave definition for later in Solve
     Amg % def_coarse_solver = AMG_SOLVER_CG
@@ -836,9 +838,9 @@
   end if
 
   if(kswtch .ge. 2) then
-    call Amg % Solve(madapt, ncyc,        &
-                     a, u, f, ia, ja,     &  ! linear system
-                     iw, icg, ifg,        &  ! work arrays
+    call Amg % Solve(madapt, ncyc,               &
+                     a, u, u_b, f, f_b, ia, ja,  &  ! linear system
+                     iw, icg, ifg,               &  ! work arrays
                      levels)
     if(Amg % ierr .gt. 0) return
   end if

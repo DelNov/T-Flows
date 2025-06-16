@@ -22,7 +22,7 @@
     integer              :: nw
     integer              :: nnz
     integer              :: start_of_color
-    real,    allocatable :: a(:), u(:), f(:)
+    real,    allocatable :: a(:), u(:), u_b(:), f(:), f_b(:)
     integer, allocatable :: ia(:), ja(:)
     integer, allocatable :: icg(:)
     integer, allocatable :: ifg_1(:), ifg_2(:)
@@ -110,7 +110,7 @@
       !----------------------!
       !   Related to setup   !
       !----------------------!
-      procedure :: setup                         ! 1
+      procedure :: Setup                         ! 1
       procedure ::   Check_Matrix_Properties     ! 1.1
       procedure ::   Coarsening                  ! 1.2
       procedure ::     Row_Sort                  ! 1.2.1
@@ -128,7 +128,7 @@
       !------------------------!
       !   Related to solving   !
       !------------------------!
-      procedure :: solve                         ! 3
+      procedure :: Solve                         ! 3
       procedure ::   Calculate_Residual          ! 3.1
       procedure ::   Backup_U                    ! 3.2
       procedure ::   One_Cycle                   ! 3.3

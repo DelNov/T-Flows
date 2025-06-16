@@ -1,39 +1,38 @@
 !==============================================================================!
-  subroutine Backup_U(Amg, level, icgr, u, m)
+  subroutine Backup_U(Amg, level, icgr, u, u_b)
 !------------------------------------------------------------------------------!
 !   Makes a back-up of the current approx. on level "level" if icgr.ne.0.
+!   (This seems to try to place backup beyond the last (coarsest) level.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
-  class(Amg_Type) :: Amg
-  integer         :: level, icgr
-  real            :: u(:)
-  integer         :: m
+  class(Amg_Type), target :: Amg
+  integer                 :: level, icgr
+  real                    :: u(:), u_b(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer :: i, ishift
-  integer :: ndu
+  integer                      :: i, n
+  real,    contiguous, pointer :: lev_u(:), lev_u_b(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  ndu = size(u, 1)
-
   if(icgr .eq. 0) return
 
-  ishift = Amg % imax(m)+1-Amg % imin(level)
-  Amg % mdu = max(Amg % mdu, Amg % imax(level)+ishift)
-
-  if(Amg % mdu .gt. ndu .or. Amg % mdu .gt. ndu) then
-    write (6, '(a,a,i9,a,i9)')                              &
-      ' --- warng in usave: no cg because of storage ---',  &
-      '     required: ndu =',  Amg % mdu, ' ndu = ', Amg % mdu
-    Amg % ierr = AMG_WARN_CG_STORAGE_U
-    icgr = 0
-    return
-  end if
-
+#ifdef AMG_USE_OLD_LOOP
   do i = Amg % imin(level), Amg % imax(level)
-    u(i+ishift) = u(i)
+    u_b(i) = u(i)
   end do
+#endif
+
+#ifdef AMG_USE_NEW_LOOP
+  call Amg % Update_U_And_F_At_Level(level, vec_u=u)
+  n       =  Amg % lev(level) % n
+  lev_u   => Amg % lev(level) % u
+  lev_u_b => Amg % lev(level) % u_b
+  do i = 1, n
+    lev_u_b(i) = lev_u(i)
+  end do
+  call Amg % Update_U_And_F_Globally(level, vec_u_b=u_b)
+#endif
 
   end subroutine

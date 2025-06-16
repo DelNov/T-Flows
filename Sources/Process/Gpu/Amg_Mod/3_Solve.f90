@@ -1,7 +1,7 @@
 !==============================================================================!
-  subroutine Solve(Amg, madapt, ncyc,  &
-                   a, u, f, ia, ja,    &  ! holds linear system
-                   iw, icg, ifg,       &
+  subroutine Solve(Amg, madapt, ncyc,          &
+                   a, u, u_b, f, f_b, ia, ja,  &  ! holds linear system
+                   iw, icg, ifg,               &
                    levels)
 !------------------------------------------------------------------------------!
 !   Solution phase of Amg1r5
@@ -10,7 +10,7 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type) :: Amg
   integer         :: madapt, ncyc
-  real            :: a(:), u(:), f(:)
+  real            :: a(:), u(:), u_b(:), f(:), f_b(:)
   integer         :: ia(:), ja(:)
   integer         :: iw(:), icg(:), ifg(:)
   integer         :: levels
@@ -187,12 +187,12 @@
   end if
 
   do iter = 1, ncycle
-    call Amg % Backup_U(1, icgr, u, m)
+    call Amg % Backup_U(1, icgr, u, u_b)
     call Amg % One_Cycle(1, igam,              &
                          a, u, f, ia, ja,      &
                          iw,  ifg, icg,        &
                          m, iter, msel, fac, levels)
-    call Amg % Cg_Step(1, icgr, iter, a, u, f, ia, ja, iw, m)
+    call Amg % Cg_Step(1, icgr, iter, a, u, u_b, f, f_b, ia, ja, iw)
     if(Amg % ierr.gt.0) return
     if(iter .eq. 1) then
       mfirst = m

@@ -60,7 +60,9 @@
   ! Allocate memory for the level
   allocate(Amg % lev(level) % a(nnz),     &
            Amg % lev(level) % u(n),       &
+           Amg % lev(level) % u_b(n),     &
            Amg % lev(level) % f(n),       &
+           Amg % lev(level) % f_b(n),     &
            Amg % lev(level) % ia(n+1),    &
            Amg % lev(level) % ja(nnz),    &
            Amg % lev(level) % icg(n),     &
@@ -73,7 +75,9 @@
   ! Initialize values to zero
   Amg % lev(level) % a(:)     = 0.0
   Amg % lev(level) % u(:)     = 0.0
+  Amg % lev(level) % u_b(:)   = 0.0
   Amg % lev(level) % f(:)     = 0.0
+  Amg % lev(level) % f_b(:)   = 0.0
   Amg % lev(level) % ia(:)    = 0
   Amg % lev(level) % ja(:)    = 0
   Amg % lev(level) % icg(:)   = 0
