@@ -14,17 +14,18 @@
   integer :: ig, jg
 !---------------------------------[new locals]---------------------------------!
   integer              :: i, iter, j, k, n, nnz
-  real,    allocatable :: m(:), b(:), x(:)
-  real,    allocatable :: p(:),   q(:),   r(:),   z(:)
-  real,    allocatable :: p_t(:), q_t(:), r_t(:), z_t(:)
-  real,    allocatable :: a_val(:)
-  integer, allocatable :: row_ptr(:), col_idx(:)
-  real,    allocatable :: a_t_val(:)
-  integer, allocatable :: row_t_ptr(:), col_t_idx(:)
-  integer, allocatable :: counter(:)
-  real                 :: alpha, beta, pq
-  real                 :: res_ini, res_cur  ! don't mix rhos and res's ...
-  real                 :: rho_old, rho_new  ! ... they are not the same thing
+  real,    allocatable         :: m(:)
+  real,    allocatable         :: p(:),   q(:),   r(:),   z(:)
+  real,    allocatable         :: p_t(:), q_t(:), r_t(:), z_t(:)
+  real,    contiguous, pointer :: a_val(:)
+  integer, contiguous, pointer :: row_ptr(:), col_idx(:)
+  real,    contiguous, pointer :: b(:), x(:)
+  real,    allocatable         :: a_t_val(:)
+  integer, allocatable         :: row_t_ptr(:), col_t_idx(:)
+  integer, allocatable         :: counter(:)
+  real                         :: alpha, beta, pq
+  real                         :: res_ini, res_cur  ! don't compare rho and res
+  real                         :: rho_old, rho_new  ! they're not the same thing
 
   real,    contiguous, pointer :: a(:), u(:), f(:)
   integer, contiguous, pointer :: ia(:), ja(:)
@@ -45,44 +46,30 @@
   !                                             !
   !                                             !
   !---------------------------------------------!
-  n      =  Amg % lev(level) % n
-  nnz    =  Amg % lev(level) % nnz
-  a  => Amg % lev(level) % a
-  u  => Amg % lev(level) % u
-  f  => Amg % lev(level) % f
-  ia => Amg % lev(level) % ia
-  ja => Amg % lev(level) % ja
+  n   =  Amg % lev(level) % n
+  nnz =  Amg % lev(level) % nnz
+  a   => Amg % lev(level) % a
+  u   => Amg % lev(level) % u
+  f   => Amg % lev(level) % f
+  ia  => Amg % lev(level) % ia
+  ja  => Amg % lev(level) % ja
 
   !-------------------------------------------------------!
   !                                                       !
   !   Create local CRS matrix from the global ia, ja, a   !
   !                                                       !
   !-------------------------------------------------------!
-  call Amg % Enlarge_Real(a_val,   nnz);  a_val(:)   = 0.0
-  call Amg % Enlarge_Int (col_idx, nnz);  col_idx(:) = 0
-  call Amg % Enlarge_Int (row_ptr, n+1);  row_ptr(:) = 0
-
-  do i = 1, n + 1
-    row_ptr(i) = ia(i)
-  end do
-
-  do k = 1, nnz
-    col_idx(k) = ja(k)
-    a_val(k)   = a(k)
-  end do
+  a_val   => a
+  row_ptr => ia
+  col_idx => ja
 
   !------------------------------------------------------!
   !                                                      !
   !   Create local b and x vectors (Stueben's f and u)   !
   !                                                      !
   !------------------------------------------------------!
-  call Amg % Enlarge_Real(b, n)
-  call Amg % Enlarge_Real(x, n)
-
-  do i = 1, n
-    b(i) = f(i)
-    x(i) = u(i)
-  end do
+  x => u
+  b => f
 
   !---------------------------------------------------------!
   !                                                         !
