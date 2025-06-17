@@ -186,8 +186,6 @@
   !                                               !
   !-----------------------------------------------!
 
-  IF(LEVEL .eq. 7) PRINT *, __FILE__, 'iw(Amg % imaxw(level)+1) = ', iw(Amg % imaxw(level)+1)
-  IF(LEVEL .eq. 7) PRINT *, __FILE__, 'ia(Amg % imin(level+1))  = ', ia(Amg % imin(level+1))
   if(level .lt. max_lev) then
     iaux = iw(Amg % imaxw(level)+1)
     iw(Amg % imaxw(level)+1) = ia(Amg % imin(level+1))
