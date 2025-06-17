@@ -695,7 +695,7 @@
     !   More switches (these used to be in aux1r5 subroutine)   !
     !-----------------------------------------------------------!
     levelx                  = 0      ! just set kevelx to AMG_MAX_LEVELS
-    ncyc                    = 12250  ! V, no CG, ||res|| < eps, 50 cycles
+    ncyc                    = 12250  ! V, full CG, ||res|| < eps, 50 cycles
     madapt                  = 0
     Amg % def_relax_down    = 0      ! leave definition for later in Solve
     Amg % def_coarse_solver = AMG_SOLVER_BICG
