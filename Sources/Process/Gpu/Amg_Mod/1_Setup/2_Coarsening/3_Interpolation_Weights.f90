@@ -46,14 +46,13 @@
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type) :: Amg
   integer         :: level
-  integer         :: ichck
   real            :: a(:)
   integer         :: ia(:), ja(:)
   integer         :: iw(:), ifg(:), icg(:), ncolor(:)
   integer         :: ncolx, iajas
 !-----------------------------------[locals]-----------------------------------!
   integer :: i, ic, icgp, ichk, ihi, ilo, ip, is
-  integer :: ii, ijas, iblck, iblck1
+  integer :: ii, iblck, iblck1
   integer :: j, jj, jhi, jlo, j1, j2, jw0, jwx, jwpos, jjhi, jjlo
   integer :: mmax, nc, ncondc, ncount, npts, nptsc, ndaja
   real    :: ewt2i, s, si, scale, ww

@@ -17,7 +17,7 @@
   integer         :: levels
   integer         :: iwork(:), jtr(:)
 !-----------------------------------[locals]-----------------------------------!
-  integer :: i, n_digits
+  integer :: n_digits
   integer :: digit(AMG_MAX_LEVELS)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
