@@ -34,7 +34,6 @@
 
   if(Amg % iout .le. 1) return
 
-  write(6, 9000)
   nnu = Amg % imax(1)
 
   !--------------------------------------------------!
@@ -72,18 +71,6 @@
   ocmplx = real(mdtu )/real(nnu)
   write(6, 9080) acmplx,ocmplx,scmplx,tcmplx
 
-9000  format (//' ************** work count ***************'/)
-9020  format (  '   prep       sec       sol      sec/cycle')
-9030  format (  ' -----------------------------------------')
-9040  format (  ' 1 Row_Sort',f7.2,'   11 intadd   ',f7.2/  &
-                ' 2 pre-col ',f7.2,'   12 rescal   ',f7.2/  &
-                ' 3 chk-col ',f7.2,'   13 relax    ',f7.2/  &
-                ' 4 interpol',f7.2,'   14 v-*      ',f7.2/  &
-                ' 5 restrict',f7.2,'   15 others   ',f7.2/  &
-                ' 6 opdfn   ',f7.2,'   16 conj-grad',f7.2/  &
-                ' 7 trunc   ',f7.2,'   17 yale-smp ',f7.2/  &
-                ' 8 others  ',f7.2,'   18 ------   ',f7.2)
-9050  format (  '   sum     ',f7.2,'      sum      ',f7.2)
 9080  format (/' ******************* complexities ********************'/  &
                ' space occupied by all operators / space of operator  '/  &
                ' on the finest grid   = ',f8.2,'   (a-complexity)     '/  &
