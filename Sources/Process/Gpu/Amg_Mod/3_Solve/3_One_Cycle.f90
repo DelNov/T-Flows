@@ -1,8 +1,8 @@
 !==============================================================================!
-  subroutine One_Cycle(Amg, l, igam,     &
-                       m, iter, msel, fac, levels)
+  subroutine One_Cycle(Amg, finest_level, coarsest_level,  &
+                       iter, msel, fac, levels)
 !------------------------------------------------------------------------------!
-!   Performs one Amg cycle with grid l as finest grid
+!   Performs one Amg cycle with grid finest_level as finest grid
 !
 !   During first cycle: initialize parameters controlling yale-smp
 !   factorization and adaptive determination of coarsest grid:
@@ -21,9 +21,7 @@
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type) :: Amg
-  integer         :: l
-  integer         :: igam
-  integer         :: m, iter, msel
+  integer         :: finest_level, coarsest_level, iter, msel
   real            :: fac
   integer         :: levels
 !-----------------------------------[locals]-----------------------------------!
@@ -42,7 +40,7 @@
   else
     mink  = AMG_BIG_INTEGER
     ifi   = 1
-    nptsf = (Amg % imax(l) - Amg % imin(l)+1) / 10
+    nptsf = (Amg % imax(finest_level) - Amg % imin(finest_level)+1) / 10
   end if
 
   !-------------------!
@@ -50,26 +48,32 @@
   !   One grid only   !
   !                   !
   !-------------------!
-  if(l .ge. m) then
-    call Amg % Solve_On_Coarsest_Level(m, ifac)
-    call Amg % Normalize_U(l)
+  if(finest_level .ge. coarsest_level) then
+    call Amg % Solve_On_Coarsest_Level(coarsest_level, ifac)
+    call Amg % Normalize_U(finest_level)
     return
   end if
 
-  !---------------------------------------------------------!
-  !                                                         !
+  !-------------------------------------------------------------!
+  !                                                             !
   !   More then one grid (level seems to be the grid counter)   !
-  !                                                         !
-  !---------------------------------------------------------!
+  !                                                             !
+  !-------------------------------------------------------------!
 
   ! Initialize "ng", what is it, counter for levels of a sort?
-  do level = l, m
+  do level = finest_level, coarsest_level
     ng(level) = 0
   end do
-  ivstar = 3 - igam
 
-  ! Start from grid "l"
-  level = l
+  ! OK, let's see the following line will transform:
+  ! AMG_V_CYCLE      -> AMG_V_STAR_CYCLE
+  ! AMG_V_STAR_CYCLE -> AMG_V_CYCLE
+  ! AMG_F_CYCLE      ->  0 (not defined)
+  ! AMG_W_CYCLE      -> -1 =:-o
+  ivstar = 3 - Amg % cycle % type
+
+  ! Start from grid "finest_level"
+  level = finest_level
 
   !------------------------------------------------------!
   !                                                      !
@@ -108,14 +112,14 @@
       level = level + 1
       call Amg % Set_U_To_Zero(level)
       call Amg % Restrict_Residuals(level)
-      if(level .lt. m) cycle downward
+      if(level .lt. coarsest_level) cycle downward
 
-      !-------------------------------------------------------!
-      !                                                       !
-      !   Solve on coarsest grid - "m" is the coarsest grid   !
-      !                                                       !
-      !-------------------------------------------------------!
-      call Amg % Solve_On_Coarsest_Level(m, ifac)
+      !----------------------------!
+      !                            !
+      !   Solve on coarsest grid   !
+      !                            !
+      !----------------------------!
+      call Amg % Solve_On_Coarsest_Level(coarsest_level, ifac)
 
       !---------------------!
       !                     !
@@ -158,37 +162,41 @@
           ! continue with coarse grid adaptation
           else
             ! Yale: if(Amg % coarse_solver .eq. 2) levels = level
-            m    = level
+            coarsest_level = level
             ifac = 1
             call Amg % Set_U_To_Zero(level)
             call Amg % Restrict_Residuals(level)
-            call Amg % Solve_On_Coarsest_Level(m, ifac)
+            call Amg % Solve_On_Coarsest_Level(coarsest_level, ifac)
             cycle upward
           end if
         end if
 
-        if(level .eq. l) then
-          call Amg % Normalize_U(l)
+        if(level .eq. finest_level) then
+          call Amg % Normalize_U(finest_level)
           return
         end if
 
-        !------------------------------------------!
-        !   Grid switching corresponding to igam   !
-        !------------------------------------------!
-        if(igam .lt. 3) then
-          if(igam .ge. 0) cycle upward
-          if(level .eq. l+1 .and. ng(level) .lt. abs(igam)) then
+        !------------------------------------------------!
+        !   Grid switching corresponding to cycle type   !
+        !------------------------------------------------!
+        if(Amg % cycle % type .lt. AMG_F_CYCLE) then
+
+          if(Amg % cycle % type .ge. 0) cycle upward
+
+          if(level .eq. finest_level+1 .and.  &
+             ng(level) .lt. abs(Amg % cycle % type)) then
             moredown = .true.
             exit upward
           end if
           cycle upward
         end if
+
         if(ng(level) .lt. 2) then
           moredown = .true.
           exit upward
         end if
 
-        if(igam .eq. 4)  ng(level) = 0
+        if(Amg % cycle % type .eq. AMG_W_CYCLE)  ng(level) = 0
       end do upward
 
     if(.not. moredown) exit downward

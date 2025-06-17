@@ -341,6 +341,13 @@
 !                    maximal number of cycles to be performed (>0) or
 !                    ncycle=0: no cycling.
 !
+!              BN: ncyc is here no more.  I replaced it with a structure
+!              Amg_Cycle_Type to improve clarity and maintainability.
+!              Introduced descriptive constants for cycle type, CG usage,
+!              and convergence criteria, replacing digit-based parsing with
+!              explicit fields. This change preserves full functionality
+!              while making the AMG cycling logic more transparent.
+!
 !     eps    - Convergence criterion for solution process: (see parameter
 !              ncyc).  Note that no more than ncycle cycles are performed,
 !              regardless of eps.
@@ -599,7 +606,7 @@
   integer :: nda, ndu, ndw
   integer :: icgst, kevelx, kswtch, levels
   integer :: n_digits, ndicg
-  integer :: levelx, ifirst, ncyc
+  integer :: levelx, ifirst
   integer :: madapt, i,j,k,l, level
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
@@ -695,7 +702,10 @@
     !   More switches (these used to be in aux1r5 subroutine)   !
     !-----------------------------------------------------------!
     levelx                  = 0      ! just set kevelx to AMG_MAX_LEVELS
-    ncyc                    = 12250  ! V, full CG, ||res|| < eps, 50 cycles
+    Amg % cycle % type           = AMG_V_CYCLE
+    Amg % cycle % cg_usage       = AMG_FULL_CG
+    Amg % cycle % stop_criterion = AMG_STOP_IF_RES_LT_EPS
+    Amg % cycle % max_cycles     = 50
     madapt                  = 0
     Amg % def_relax_down    = 0      ! leave definition for later in Solve
     Amg % def_coarse_solver = AMG_SOLVER_BICG
@@ -809,7 +819,7 @@
 
   if(kswtch .ge. 2) then
     call Amg % Update_U_And_F_At_Level(1, vec_u=u, vec_f=f, for_real=.true.)
-    call Amg % Solve(madapt, ncyc, levels)
+    call Amg % Solve(madapt, levels)
     if(Amg % ierr .gt. 0) return
   end if
 

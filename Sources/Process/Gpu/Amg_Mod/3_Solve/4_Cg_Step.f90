@@ -1,12 +1,12 @@
 !==============================================================================!
-  subroutine Cg_Step(Amg, level, icgr, iter)
+  subroutine Cg_Step(Amg, level, iter)
 !------------------------------------------------------------------------------!
 !   Performs one step of preconditioned conjugate gradient
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
-  integer                 :: level, icgr, iter
+  integer                 :: level, iter
 !-----------------------------------[locals]-----------------------------------!
   real    :: alf, eps, s2
   integer :: i, n
@@ -15,7 +15,7 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  if (icgr.eq.0) return
+  if(Amg % cycle % cg_usage .eq. AMG_NO_CG_STEPS) return
 
   n   =  Amg % lev(level) % n
   u   => Amg % lev(level) % u
@@ -32,14 +32,14 @@
   !-------------------!
   !   First CG step   !
   !-------------------!
-  if(icgr.eq.1 .or. iter.le.1) then
+  if(Amg % cycle % cg_usage .eq. AMG_ONE_CG_STEP .or. iter .le. 1) then
     do i = 1, n
       f_b(i) = u(i)
     end do
 
-  !------------------------------------------!
-  !   Subsequent CG steps (only if icgr=2)   !
-  !------------------------------------------!
+  !-------------------------!
+  !   Subsequent CG steps   !
+  !-------------------------!
   else
     alf = Amg % Cg_Alpha(level, s2)
     do i = 1, n

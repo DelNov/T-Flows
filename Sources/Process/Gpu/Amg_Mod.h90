@@ -53,10 +53,10 @@
     AMG_ONE_CG_STEP = 1,  &
     AMG_FULL_CG     = 2,  &
 
-    AMG_PERFORM_ALL_CYCLES    = 0,  &
-    AMG_STOP_IF_RES_LT_EPS    = 1,  &
-    AMG_STOP_IF_RES_LT_EPS_F  = 2,  &
-    AMG_STOP_IF_RES_LT_EPS_UD = 3
+    AMG_PERFORM_ALL_CYCLES    = 1,  &
+    AMG_STOP_IF_RES_LT_EPS    = 2,  &
+    AMG_STOP_IF_RES_LT_EPS_F  = 3,  &
+    AMG_STOP_IF_RES_LT_EPS_UD = 4
 
   !--------------------!
   !   Error messages   !

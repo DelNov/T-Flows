@@ -1,19 +1,19 @@
 !==============================================================================!
-  subroutine Solve(Amg, madapt, ncyc, levels)
+  subroutine Solve(Amg, madapt, levels)
 !------------------------------------------------------------------------------!
 !   Solution phase of Amg1r5
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
-  integer                 :: madapt, ncyc
+  integer                 :: madapt
   integer                 :: levels
 !-----------------------------------[locals]-----------------------------------!
   real    :: ama, cfac, epsi, epsil, fac, fmax
   real    :: rescg, resold, umax
   integer :: digit(AMG_MAX_LEVELS)
-  integer :: i, icgr, iconv, igam, iter, l, m, mfirst, msel, n
-  integer :: ncycle, n_digits
+  integer :: i, iter, m, mfirst, msel, n
+  integer :: n_digits
   real,    contiguous, pointer :: a(:), u(:), f(:)
   integer, contiguous, pointer :: ia(:)
 !------------------------------------[save]------------------------------------!
@@ -57,28 +57,19 @@
     fac = 0.7
   end if
 
-  !--------------------!
-  !   Decompose ncyc   !
-  !--------------------!
-  if(ncyc .ne. 0) then
-    call Amg % Get_Integer_Digits(abs(ncyc), 4, n_digits, digit)
-    igam   = sign(digit(1), ncyc)
-    icgr   = digit(2)
-    iconv  = digit(3)
-    ncycle = digit(4)
-    if(ncycle .eq. 0) return
-  else
-    igam   = 1
-    icgr   = 0
-    iconv  = 1
-    ncycle = 10
-  end if
+  !-------------------------------------------------!
+  !   Default values proposed by Ruge and Stueben   !
+  !-------------------------------------------------!
+  ! Amg % cycle % type           = AMG_V_CYCLE
+  ! Amg % cycle % cg_usage       = AMG_NO_CG_STEPS
+  ! Amg % cycle % stop_criterion = AMG_PERFORM_ALL_CYCLES
+  ! Amg % cycle % max_cycles     = 10
 
   !----------------------------------------------------------------!
   !   Set epsi according to convergence criterion given by iconv   !
   !----------------------------------------------------------------!
-  if(iconv.ne.3) then
-    if(iconv.eq.4) then
+  if(Amg % cycle % stop_criterion .ne. AMG_STOP_IF_RES_LT_EPS_F) then
+    if(Amg % cycle % stop_criterion .eq. AMG_STOP_IF_RES_LT_EPS_UD) then
     ama = 0.0
     do i = 1, n
       ama = max(ama, a(ia(i)))
@@ -147,7 +138,6 @@
     !--------------------------------------------------------------!
     if(Amg % coarse_solver .ne. AMG_SOLVER_GS) then
       do i = m, 1, -1
-        l = i
         if(Amg % imax(i) - Amg % imin(i).ge.9) exit
       end do
       m = i
@@ -170,11 +160,10 @@
     resold = Amg % res0
   end if
 
-  do iter = 1, ncycle
-    call Amg % Backup_U(1, icgr)
-    call Amg % One_Cycle(1, igam,              &
-                         m, iter, msel, fac, levels)
-    call Amg % Cg_Step(1, icgr, iter)
+  do iter = 1, Amg % cycle % max_cycles
+    call Amg % Backup_U(1)
+    call Amg % One_Cycle(1, m, iter, msel, fac, levels)
+    call Amg % Cg_Step(1, iter)
     if(Amg % ierr.gt.0) return
     if(iter .eq. 1) then
       mfirst = m
@@ -183,7 +172,8 @@
       mfirst = m
       write(6, 9040) m
     end if
-    if(Amg % iout .ge. 3 .or. iconv .ne. 1) then
+    if(Amg % iout .ge. 3 .or.  &
+       Amg % cycle % stop_criterion .ne. AMG_PERFORM_ALL_CYCLES) then
       call Amg % Calculate_Residual(1, Amg % res)
     end if
     Amg % ncyc0 = iter
@@ -197,9 +187,9 @@
         write(6, 9020) iter, Amg % res, cfac
       end if
     end if
-    if(iconv .ne. 1) then
+    if(Amg % cycle % stop_criterion .ne. AMG_PERFORM_ALL_CYCLES) then
       epsil = epsi
-      if(iconv.eq.4) then
+      if(Amg % cycle % stop_criterion .eq. AMG_STOP_IF_RES_LT_EPS_UD) then
         umax = 0.0
         do i = 1, n
           umax = max(umax, abs(u(i)))

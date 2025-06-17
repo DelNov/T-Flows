@@ -8,9 +8,9 @@
   module Amg_Mod
 !----------------------------------[Modules]-----------------------------------!
   use Native_Mod
-!----------------------------------------------------------------------!
+!------------------------------------------------------------------------------!
   save
-!======================================================================!
+!==============================================================================!
 
 # include "Amg_Mod.h90"
 
@@ -18,8 +18,9 @@
   !   Amg cycle type   !
   !--------------------!
   type Amg_Cycle_Type
-    integer :: cycle_type
-    integer :: residual_normalization
+    integer :: type
+    integer :: cg_usage
+    integer :: stop_criterion
     integer :: max_cycles
   end type
 
@@ -45,6 +46,7 @@
   type Amg_Type
 
     type(Amg_Level_Type) :: lev(AMG_MAX_LEVELS)
+    type(Amg_Cycle_Type) :: cycle
 
     ! Range in unknown (u) for each level: imin(level) - imax(level))
     integer, private :: imin (AMG_MAX_LEVELS), imax (AMG_MAX_LEVELS)
