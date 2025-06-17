@@ -14,10 +14,19 @@
 
 # include "Amg_Mod.h90"
 
-  !----------------!
-  !   Level type   !
-  !----------------!
-  type Level_Type
+  !--------------------!
+  !   Amg cycle type   !
+  !--------------------!
+  type Amg_Cycle_Type
+    integer :: cycle_type
+    integer :: residual_normalization
+    integer :: max_cycles
+  end type
+
+  !--------------------!
+  !   Amg level type   !
+  !--------------------!
+  type Amg_Level_Type
     integer              :: n
     integer              :: nw
     integer              :: nnz
@@ -35,7 +44,7 @@
   !--------------!
   type Amg_Type
 
-    type(Level_Type) :: lev(AMG_MAX_LEVELS)
+    type(Amg_Level_Type) :: lev(AMG_MAX_LEVELS)
 
     ! Range in unknown (u) for each level: imin(level) - imax(level))
     integer, private :: imin (AMG_MAX_LEVELS), imax (AMG_MAX_LEVELS)

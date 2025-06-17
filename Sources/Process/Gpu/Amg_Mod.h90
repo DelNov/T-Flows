@@ -40,6 +40,24 @@
     AMG_RELAX_C_POINTS   = 3,  &
     AMG_RELAX_MULTICOLOR = 4
 
+  !-----------------------------!
+  !   Connected to cycle type   !
+  !-----------------------------!
+  integer, parameter ::    &
+    AMG_V_CYCLE      = 1,  &
+    AMG_V_STAR_CYCLE = 2,  &
+    AMG_F_CYCLE      = 3,  &
+    AMG_W_CYCLE      = 4,  &
+
+    AMG_NO_CG_STEPS = 0,  &
+    AMG_ONE_CG_STEP = 1,  &
+    AMG_FULL_CG     = 2,  &
+
+    AMG_PERFORM_ALL_CYCLES    = 0,  &
+    AMG_STOP_IF_RES_LT_EPS    = 1,  &
+    AMG_STOP_IF_RES_LT_EPS_F  = 2,  &
+    AMG_STOP_IF_RES_LT_EPS_UD = 3
+
   !--------------------!
   !   Error messages   !
   !--------------------!
