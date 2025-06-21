@@ -15,7 +15,7 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  if(Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX) return
+  if(Amg % matrix % singular .eq. AMG_NON_SINGULAR_MATRIX) return
 
   n  =  Amg % lev(level) % n
   u  => Amg % lev(level) % u

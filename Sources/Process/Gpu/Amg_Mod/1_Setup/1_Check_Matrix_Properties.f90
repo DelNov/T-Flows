@@ -193,24 +193,28 @@
   !--------------!
   !   Warnings   !
   !--------------!
-  if(Amg % isym .eq. AMG_SYMMETRIC_MATRIX .and. asym .ne. 0.0) then
+  if(Amg % matrix % symmetric .eq. AMG_SYMMETRIC_MATRIX  &
+     .and. asym .ne. 0.0) then
     write(6, '(a)')  &
-      ' --- warning 1 in check: param matrix may be bad ---'
+      ' --- warning 1 in check: param matrix % symmetric may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
   end if
-  if(Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX .and. asym .eq. 0.0) then
+  if(Amg % matrix % symmetric .eq. AMG_NON_SYMMETRIC_MATRIX  &
+     .and. asym .eq. 0.0) then
     write(6, '(a)')  &
-      ' --- warning 2 in check: param matrix may be bad ---'
+      ' --- warning 2 in check: param matrix % symmetric may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
   end if
-  if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX     .and. nazer .ne. nnu) then
+  if(Amg % matrix % singular .eq. AMG_SINGULAR_MATRIX  &
+     .and. nazer .ne. nnu) then
     write(6, '(a)')  &
-      ' --- warning 3 in check: param matrix may be bad ---'
+      ' --- warning 3 in check: param matrix % singular may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
   end if
-  if(Amg % irow0 .eq. AMG_NON_SINGULAR_MATRIX .and. nazer .eq. nnu) then
+  if(Amg % matrix % singular .eq. AMG_NON_SINGULAR_MATRIX  &
+     .and. nazer .eq. nnu) then
     write(6, '(a)')  &
-      ' --- warning 4 in check: param matrix may be bad ---'
+      ' --- warning 4 in check: param matrix % singular may be bad ---'
     Amg % ierr = AMG_ERR_MATRIX_INVALID
   end if
 
@@ -257,11 +261,12 @@
     ia(i+1) = ifg(i+1)
   end do
 
-  !------------------------------------------------------------------!
-  !   Symmetrize matrix a:  isym=1: copy missing transpose entries   !
-  !                         isym=2: fill in zeroes                   !
-  !------------------------------------------------------------------!
-  if(Amg % isym .eq. AMG_NON_SYMMETRIC_MATRIX) then
+  !---------------------------------------------------------------------!
+  !   Symmetrize matrix a:                                              !
+  !     -if AMG_SYMMETRIC_MATRIX     : copy missing transpose entries   !
+  !     -if AMG_NON_SYMMETRIC_MATRIX : fill in zeroes                   !
+  !---------------------------------------------------------------------!
+  if(Amg % matrix % symmetric .eq. AMG_NON_SYMMETRIC_MATRIX) then
     do i = 1, nnu
       j2 = icg(i)-1
       do j = ia(i) + 1, j2

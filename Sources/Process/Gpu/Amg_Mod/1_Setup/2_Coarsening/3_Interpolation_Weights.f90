@@ -241,7 +241,8 @@
   npts = ihi-ilo+1
   nptsc = Amg % imax(level+1) - Amg % imin(level+1)+1
   if(nptsc.eq.1)                                             mmax = level+1
-  if(nptsc.eq.1 .and. Amg % irow0 .eq. AMG_SINGULAR_MATRIX)  mmax = level
+  if(nptsc.eq.1 .and. Amg % matrix % singular .eq. AMG_SINGULAR_MATRIX)  &
+                                                             mmax = level
   if(nptsc.eq.npts.or.nptsc.eq.0)                            mmax = level
   if(level .lt. mmax) then
     if(ic .ge. ndu) then

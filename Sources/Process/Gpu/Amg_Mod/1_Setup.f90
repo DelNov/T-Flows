@@ -23,13 +23,6 @@
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
-  !------------------------!
-  !   Decompose "matrix"   !
-  !------------------------!
-  call Amg % Get_Integer_Digits(Amg % matrix, 2, n_digits, digit)
-  Amg % isym  = digit(1)
-  Amg % irow0 = digit(2)
-
   !-------------------------------------!
   !   Preparation (ignored in timing)   !
   !-------------------------------------!

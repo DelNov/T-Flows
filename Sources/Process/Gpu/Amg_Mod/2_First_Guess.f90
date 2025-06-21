@@ -33,7 +33,7 @@
     do i = Amg % imin(1), Amg % imax(1)
       u(i) = 1.0
     end do
-    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
+    if(Amg % matrix % singular .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
     return
 
   else if(ifrst.eq.3) then
@@ -50,7 +50,7 @@
     do i = Amg % imin(1), Amg % imax(1)
       u(i) = Amg % Random_0_To_0p1(s)
     end do
-    if(Amg % irow0 .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
+    if(Amg % matrix % singular .eq. AMG_SINGULAR_MATRIX) u(Amg % imax(1)) = 0.0
     return
   end if
 

@@ -84,68 +84,16 @@
     epsi = epsi * fmax
   end if
 
-  !------------------------------------!
-  !   Decompose Amg % def_relax_down   !
-  !------------------------------------!
-  if(Amg % def_relax_down .ne. 0) then
-    call Amg % Get_Integer_Digits(Amg % def_relax_down,  &
-                                  9,                     &
-                                  n_digits,              &
-                                  Amg % type_relax_down)
-    Amg % n_relax_down = Amg % type_relax_down(2)
-    Amg % nrdlen       = n_digits-2
-    do i = 1, Amg % nrdlen  ! seems to shift the info two places up
-      Amg % type_relax_down(i) = Amg % type_relax_down(i+2)
+  !--------------------------------------------------------------!
+  !   In the case coarse grid solution is not obtained with GS   !
+  !   sweeps do not use coarsest grid with less than 10 points   !
+  !--------------------------------------------------------------!
+  if(Amg % coarse_solver .ne. AMG_SOLVER_GS) then
+    do i = m, 1, -1
+      if(Amg % imax(i) - Amg % imin(i) .ge. 9) exit
     end do
-  else
-    Amg % n_relax_down       = 1  ! used to be six
-    Amg % nrdlen             = 2
-    Amg % type_relax_down(1) = AMG_RELAX_MULTICOLOR
-    Amg % type_relax_down(2) = AMG_RELAX_MULTICOLOR ! AMG_RELAX_F_POINTS
-  end if
-
-  !----------------------------------!
-  !   Decompose Amg % def_relax_up   !
-  !----------------------------------!
-  if(Amg % def_relax_up .ne. 0) then
-    call Amg % Get_Integer_Digits(Amg % def_relax_up,  &
-                                  9,                   &
-                                  n_digits,            &
-                                  Amg % type_relax_up)
-    Amg % n_relax_up = Amg % type_relax_up(2)
-    Amg % nrulen     = n_digits-2
-    do i = 1, Amg % nrulen  ! seems to shift the info two places up
-      Amg % type_relax_up(i) = Amg % type_relax_up(i+2)
-    end do
-  else
-    Amg % n_relax_up       = 1  ! used to be six
-    Amg % nrulen           = 2
-    Amg % type_relax_up(1) = AMG_RELAX_MULTICOLOR
-    Amg % type_relax_up(2) = AMG_RELAX_MULTICOLOR ! AMG_RELAX_F_POINTS
-  end if
-
-  !---------------------------------------!
-  !   Decompose Amg % def_coarse_solver   !
-  !---------------------------------------!
-  if(Amg % def_coarse_solver .ne. 0) then
-    call Amg % Get_Integer_Digits(Amg % def_coarse_solver, 2, n_digits, digit)
-    Amg % coarse_solver  = digit(1)
-    Amg % n_relax_coarse = digit(2)
-
-    !--------------------------------------------------------------!
-    !   In the case coarse grid solution is not obtained with GS   !
-    !   sweeps do not use coarsest grid with less than 10 points   !
-    !--------------------------------------------------------------!
-    if(Amg % coarse_solver .ne. AMG_SOLVER_GS) then
-      do i = m, 1, -1
-        if(Amg % imax(i) - Amg % imin(i).ge.9) exit
-      end do
-      m = i
-      levels = i
-    end if
-  else
-    Amg % coarse_solver  = 1
-    Amg % n_relax_coarse = 0
+    m = i
+    levels = i
   end if
 
   !-------------!

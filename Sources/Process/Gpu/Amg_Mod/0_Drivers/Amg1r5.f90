@@ -249,6 +249,10 @@
 !       AMG_SYMMETRIC_MATRIX     = 1,  &  ! matrix is symmetric
 !       AMG_NON_SYMMETRIC_MATRIX = 2      ! matrix is non-symmetric
 !
+!     BN: further down the line, I have introduced Amg_Matrix_Type which has
+!     two integer fields: "symmetric" and "singular" which took over the roles
+!     of "isym" and "irow0".
+!
 !   --------------------------------------------------------------
 !
 !   Class 2 - parameters:
@@ -690,7 +694,8 @@
     !--------------------------------------------------!
     !   Default values (Amg1r5: setup phase, output)   !
     !--------------------------------------------------!
-    Amg % matrix = 12      ! rowsum /= 0.0; nonsymetric
+    Amg % matrix % singular  = AMG_NON_SINGULAR_MATRIX  ! I add weight to diag
+    Amg % matrix % symmetric = AMG_SYMMETRIC_MATRIX
 
     !--------------!
     !   Switches   !
@@ -701,22 +706,33 @@
     !-----------------------------------------------------------!
     !   More switches (these used to be in aux1r5 subroutine)   !
     !-----------------------------------------------------------!
-    levelx                  = 0      ! just set kevelx to AMG_MAX_LEVELS
+    levelx                       = 0  ! just set kevelx to AMG_MAX_LEVELS
     Amg % cycle % type           = AMG_V_CYCLE
     Amg % cycle % cg_usage       = AMG_FULL_CG
     Amg % cycle % stop_criterion = AMG_STOP_IF_RES_LT_EPS
     Amg % cycle % max_cycles     = 50
-    madapt                  = 0
-    Amg % def_relax_down    = 0      ! leave definition for later in Solve
-    Amg % def_coarse_solver = AMG_SOLVER_BICG
-    Amg % def_relax_up      = 0      ! leave definition for later in Solve
-    Amg % ecg1              = 0.0
-    Amg % ecg2              = 0.25
-    Amg % ewt2              = 0.35
-    Amg % nwt               = 2
-    Amg % ntr               = 0
+    madapt                       = 0
 
-    Amg % fine_solver = AMG_SOLVER_GS
+   ! Parameters defining the relaxation down and up
+    Amg % n_relax_down       = 1
+    Amg % nrdlen             = 2
+    Amg % type_relax_down(1) = AMG_RELAX_MULTICOLOR
+    Amg % type_relax_down(2) = AMG_RELAX_MULTICOLOR ! AMG_RELAX_F_POINTS
+    Amg % n_relax_up         = 1
+    Amg % nrulen             = 2
+    Amg % type_relax_up(1)   = AMG_RELAX_MULTICOLOR
+    Amg % type_relax_up(2)   = AMG_RELAX_MULTICOLOR ! AMG_RELAX_F_POINTS
+
+    ! Very advanced parameters defining the coarsening algorith
+    Amg % ecg1               = 0.0
+    Amg % ecg2               = 0.25
+    Amg % ewt2               = 0.35
+    Amg % nwt                = 2
+    Amg % ntr                = 0
+
+    ! Define coarse and fine solvers
+    Amg % coarse_solver = AMG_SOLVER_BICG
+    Amg % fine_solver   = AMG_SOLVER_GS
 
     !------------------------------------!
     !   Limit kevelx to AMG_MAX_LEVELS   !

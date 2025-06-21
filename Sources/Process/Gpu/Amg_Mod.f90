@@ -24,6 +24,14 @@
     integer :: max_cycles
   end type
 
+  !---------------------!
+  !   Amg matrix type   !
+  !---------------------!
+  type Amg_Matrix_Type
+    integer :: singular
+    integer :: symmetric
+  end type
+
   !--------------------!
   !   Amg level type   !
   !--------------------!
@@ -82,9 +90,7 @@
     integer, private :: n_relax_fine         ! relaxation sweeps for coarsest l.
 
     ! Variables describing matrix properties (Class 1 by Ruge-Stueben)
-    integer, private :: matrix
-    integer, private :: irow0
-    integer, private :: isym
+    type(Amg_Matrix_Type), private :: matrix
 
     ! Variables controlling the general performance (Class 2 by Ruge-Stueben)
     integer, private :: iout
