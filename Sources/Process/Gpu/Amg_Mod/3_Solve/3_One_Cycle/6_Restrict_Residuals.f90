@@ -1,21 +1,21 @@
 !==============================================================================!
-  subroutine Restrict_Residuals(Amg, level_c)
+  subroutine Restrict_Residuals(Amg, level_c, level)
 !------------------------------------------------------------------------------!
-!   Restricts residuals from grid level_c-1 to grid level_c
+!   Transfers residuals from a fine grid (level) to a coarse grid (level+1).
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[parameters]---------------------------------!
   class(Amg_Type), target :: Amg
-  integer                 :: level_c
+  integer                 :: level_c, level  ! level is level_c - 1
 !-----------------------------------[locals]-----------------------------------!
   real                         :: d
   integer                      :: i, ic, if, j, n_c, nw
   real,    contiguous, pointer :: c_f(:)
-  integer, contiguous, pointer :: c_ifg_1(:)
+  integer, contiguous, pointer :: fine_index_direct(:)
   real,    contiguous, pointer :: f(:), u(:), a(:)
-  integer, contiguous, pointer :: ifg_2(:)
+  integer, contiguous, pointer :: fine_index_weighted(:)
   integer, contiguous, pointer :: ia(:), ja(:)
-  integer, contiguous, pointer :: jw(:)
+  integer, contiguous, pointer :: coarse_index_weighted(:)
   real,    contiguous, pointer :: w(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
@@ -26,28 +26,28 @@
   !---------------------------------!
 
   ! Coarse level pointers and data
-  n_c         =  Amg % lev(level_c) % n
-  c_ifg_1 => Amg % lev(level_c) % ifg_1  ! ifg_1 on coarse grid
-  c_f     => Amg % lev(level_c) % f
+  n_c               =  Amg % lev(level+1) % n
+  fine_index_direct => Amg % lev(level+1) % fine_index_direct
+  c_f               => Amg % lev(level+1) % f
 
   ! Fine level pointers and data
-  nw        =  Amg % lev(level_c-1) % nw
-  a     => Amg % lev(level_c-1) % a
-  ia    => Amg % lev(level_c-1) % ia
-  ja    => Amg % lev(level_c-1) % ja
-  u     => Amg % lev(level_c-1) % u
-  ifg_2 => Amg % lev(level_c-1) % ifg_2
-  f     => Amg % lev(level_c-1) % f
-  w     => Amg % lev(level_c-1) % w
-  jw    => Amg % lev(level_c-1) % jw
+  nw                    =  Amg % lev(level) % nw
+  a                     => Amg % lev(level) % a
+  ia                    => Amg % lev(level) % ia
+  ja                    => Amg % lev(level) % ja
+  u                     => Amg % lev(level) % u
+  fine_index_weighted   => Amg % lev(level) % fine_index_weighted
+  f                     => Amg % lev(level) % f
+  w                     => Amg % lev(level) % w
+  coarse_index_weighted => Amg % lev(level) % coarse_index_weighted
 
   do ic = 1, n_c
-    if = c_ifg_1(ic)                   ! fine cell
-    d = f(if)                          ! fine source
-    do j = ia(if), ia(if+1) - 1    ! fine matrix entries, I hope
-      d = d - a(j) * u(ja(j))  ! fine unknown
+    if = fine_index_direct(ic)    ! fine cell
+    d = f(if)                     ! fine source
+    do j = ia(if), ia(if+1) - 1   ! fine matrix entries, I hope
+      d = d - a(j) * u(ja(j))     ! fine unknown
     end do
-    c_f(ic) = d                        ! coarse source
+    c_f(ic) = d                   ! direct injection
   end do
 
   !---------------------------------!
@@ -55,13 +55,14 @@
   !---------------------------------!
 
   do i = 1, nw
-    if = ifg_2(i)
-    d = f(if)                          ! fine source
-    do j = ia(if), ia(if+1) - 1    ! fine matrix entries, I hope
-      d = d - a(j) * u(ja(j))  ! fine unknown
+    if = fine_index_weighted(i)
+    d = f(if)                             ! fine source
+    do j = ia(if), ia(if+1) - 1           ! fine matrix entries, I hope
+      d = d - a(j) * u(ja(j))             ! fine unknown
     end do
-    do j = Amg % lev(level_c-1) % iw(i), Amg % lev(level_c-1) % iw(i+1)-1
-      c_f(jw(j)) = c_f(jw(j)) + w(j) * d
+    do j = Amg % lev(level) % iw(i), Amg % lev(level) % iw(i+1)-1
+      c_f(coarse_index_weighted(j))  &
+        = c_f(coarse_index_weighted(j)) + w(j) * d  ! weighted transfer
     end do
   end do
 

@@ -111,7 +111,7 @@
       ! Increase the grid counter - going for coarser still
       level = level + 1
       call Amg % Set_U_To_Zero(level)
-      call Amg % Restrict_Residuals(level)
+      call Amg % Restrict_Residuals(level, level-1)
       if(level .lt. coarsest_level) cycle downward
 
       !----------------------------!
@@ -165,7 +165,7 @@
             coarsest_level = level
             ifac = 1
             call Amg % Set_U_To_Zero(level)
-            call Amg % Restrict_Residuals(level)
+            call Amg % Restrict_Residuals(level, level-1)
             call Amg % Solve_On_Coarsest_Level(coarsest_level, ifac)
             cycle upward
           end if

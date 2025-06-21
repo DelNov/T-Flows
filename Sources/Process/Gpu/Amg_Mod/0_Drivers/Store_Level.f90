@@ -58,32 +58,33 @@
   Amg % lev(level) % nnz = nnz  ! needed? yes!
 
   ! Allocate memory for the level
-  allocate(Amg % lev(level) % a(nnz),     &
-           Amg % lev(level) % u(n),       &
-           Amg % lev(level) % u_b(n),     &
-           Amg % lev(level) % f(n),       &
-           Amg % lev(level) % f_b(n),     &
-           Amg % lev(level) % ia(n+1),    &
-           Amg % lev(level) % ja(nnz),    &
-           Amg % lev(level) % icg(n),     &
-           Amg % lev(level) % ifg_1(n),   &
-           Amg % lev(level) % ifg_2(nw),  &
-           Amg % lev(level) % w(nnw),     &
-           Amg % lev(level) % jw(nnw),    &
-           Amg % lev(level) % iw(nw+1))  ! to store the end
+  allocate(Amg % lev(level) % a(nnz),                      &
+           Amg % lev(level) % u(n),                        &
+           Amg % lev(level) % u_b(n),                      &
+           Amg % lev(level) % f(n),                        &
+           Amg % lev(level) % f_b(n),                      &
+           Amg % lev(level) % ia(n+1),                     &
+           Amg % lev(level) % ja(nnz),                     &
+           Amg % lev(level) % icg(n),                      &
+           Amg % lev(level) % fine_index_direct(n),        &
+           Amg % lev(level) % fine_index_weighted(nw),     &
+           Amg % lev(level) % w(nnw),                      &
+           Amg % lev(level) % coarse_index_weighted(nnw),  &
+           Amg % lev(level) % iw(nw+1))  ! +1 to store the end
 
   ! Initialize values to zero
-  Amg % lev(level) % a(:)     = 0.0
-  Amg % lev(level) % u(:)     = 0.0
-  Amg % lev(level) % u_b(:)   = 0.0
-  Amg % lev(level) % f(:)     = 0.0
-  Amg % lev(level) % f_b(:)   = 0.0
-  Amg % lev(level) % ia(:)    = 0
-  Amg % lev(level) % ja(:)    = 0
-  Amg % lev(level) % icg(:)   = 0
-  Amg % lev(level) % ifg_1(:) = 0
-  Amg % lev(level) % ifg_2(:) = 0
-  Amg % lev(level) % iw(:)    = 0
+  Amg % lev(level) % a(:)                     = 0.0
+  Amg % lev(level) % u(:)                     = 0.0
+  Amg % lev(level) % u_b(:)                   = 0.0
+  Amg % lev(level) % f(:)                     = 0.0
+  Amg % lev(level) % f_b(:)                   = 0.0
+  Amg % lev(level) % ia(:)                    = 0
+  Amg % lev(level) % ja(:)                    = 0
+  Amg % lev(level) % icg(:)                   = 0
+  Amg % lev(level) % fine_index_direct(:)     = 0
+  Amg % lev(level) % fine_index_weighted(:)   = 0
+  Amg % lev(level) % coarse_index_weighted(:) = 0
+  Amg % lev(level) % iw(:)                    = 0
 
   !---------------------------------------------!
   !   Copy vectors u and f to level's storage   !
@@ -164,16 +165,17 @@
      do i = Amg % imin(level), Amg % imax(level)
        Assert(Amg % Level_Of_Cell(ifg(i)) == level-1)  ! it points to finer grid
        i_loc = i - Amg % imin(level) + 1
-       Amg % lev(level) % ifg_1(i_loc) = ifg(i) - Amg % imin(level-1) + 1
-                                                      ! index from finer grid
+       Amg % lev(level) % fine_index_direct(i_loc)  &
+         = ifg(i) - Amg % imin(level-1) + 1            ! index from finer grid
      end do
    end if
 
    ! This is very dubious, I am not sure if it makes any sense
    do k = Amg % iminw(level), Amg % imaxw(level)
      k_loc = k - Amg % iminw(level) + 1
-     Amg % lev(level) % ifg_2(k_loc) = ifg(k) - Amg % imin(level) + 1
-   end do                                        ! not sure about this :-( !
+     Amg % lev(level) % fine_index_weighted(k_loc)  &
+       = ifg(k) - Amg % imin(level) + 1
+   end do
 
   !----------------------------------------------------!
   !   End of Part I: restore ia(Amg % imax(level)+1)   !
@@ -215,7 +217,8 @@
         j_loc = j_loc + 1
         Assert(Amg % Level_Of_Cell(ja(j)) == level+1)
         Amg % lev(level) %  w(j_loc) =  a(j)  ! copy factor to "w"
-        Amg % lev(level) % jw(j_loc) = ja(j) - Amg % imin(level+1) + 1  ! position at the coarser level
+        Amg % lev(level) % coarse_index_weighted(j_loc)  &
+          = ja(j) - Amg % imin(level+1) + 1   ! position at the coarser level
       end do
     end do
     Amg % lev(level) % iw(nw+1) = iw(Amg % imaxw(level)+1) - iw(Amg % iminw(level)) + 1

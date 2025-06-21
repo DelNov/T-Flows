@@ -35,9 +35,11 @@
     real,    allocatable :: a(:), u(:), u_b(:), f(:), f_b(:)
     integer, allocatable :: ia(:), ja(:)
     integer, allocatable :: icg(:)
-    integer, allocatable :: ifg_1(:), ifg_2(:)
+    integer, allocatable :: fine_index_direct(:)      ! used to be ifg_1
+    integer, allocatable :: fine_index_weighted(:)    ! was ifg_2
     real,    allocatable :: w(:)
-    integer, allocatable :: iw(:), jw(:)
+    integer, allocatable :: iw(:)
+    integer, allocatable :: coarse_index_weighted(:)  ! was jw
   end type
 
   !--------------!
