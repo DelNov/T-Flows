@@ -12,7 +12,7 @@
   integer                 :: level, ivstar
 !-----------------------------------[locals]-----------------------------------!
   real                         :: fac, s1, s2, sa
-  integer                      :: i, j, n
+  integer                      :: i, j, ij, n
   real,    contiguous, pointer :: a(:), u(:), f(:)
   integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
@@ -36,8 +36,9 @@
   s2 = 0.0
   do i = 1, n
     sa = 0.0
-    do j = ia(i), ia(i+1) - 1
-      sa = sa + a(j) * u(ja(j))
+    do ij = ia(i), ia(i+1) - 1
+      j = ja(ij)
+      sa = sa + a(ij) * u(j)
     end do
     s1 = s1 + u(i) * f(i)
     s2 = s2 + u(i) * sa

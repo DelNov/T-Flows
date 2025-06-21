@@ -14,22 +14,18 @@
   real    :: s
   integer :: ig, jg
 !---------------------------------[new locals]---------------------------------!
-  integer                      :: i, iter, j, k, n, nnz
+  integer                      :: i, iter, j, ij, n, nnz
   real,    allocatable         :: m(:)
   real,    allocatable         :: p(:),   q(:),   r(:),   z(:)
 ! real,    allocatable         :: p_t(:), q_t(:), r_t(:), z_t(:)
-  real,    contiguous, pointer :: a_val(:)
-  integer, contiguous, pointer :: row_ptr(:), col_idx(:)
-  real,    contiguous, pointer :: b(:), x(:)
-! real,    allocatable         :: a_t_val(:)
-! integer, allocatable         :: row_t_ptr(:), col_t_idx(:)
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:), ja(:)
+! real,    allocatable         :: a_t(:)
+! integer, allocatable         :: ia_t(:), ja_t(:)
 ! integer, allocatable         :: counter(:)
   real                         :: alpha, beta, pq
   real                         :: res_ini, res_cur  ! don't compare rho and res
   real                         :: rho_old, rho_new  ! they're not the same thing
-
-  real,    contiguous, pointer :: a(:), u(:), f(:)
-  integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is really needed for local allocatable arrays
 !==============================================================================!
@@ -55,23 +51,6 @@
   ia  => Amg % lev(level) % ia
   ja  => Amg % lev(level) % ja
 
-  !-------------------------------------------------------!
-  !                                                       !
-  !   Create local CRS matrix from the global ia, ja, a   !
-  !                                                       !
-  !-------------------------------------------------------!
-  a_val   => a
-  row_ptr => ia
-  col_idx => ja
-
-  !------------------------------------------------------!
-  !                                                      !
-  !   Create local b and x vectors (Stueben's f and u)   !
-  !                                                      !
-  !------------------------------------------------------!
-  x => u
-  b => f
-
   !---------------------------------------------------------!
   !                                                         !
   !   Allocate memory for local vectors for the algorithm   !
@@ -82,17 +61,12 @@
   call Amg % Enlarge_Real(q, n)
   call Amg % Enlarge_Real(r, n)
   call Amg % Enlarge_Real(z, n)
-  m(:) = 0.0
-  p(:) = 0.0
-  q(:) = 0.0
-  r(:) = 0.0
-  z(:) = 0.0
 
   !---------------------------------!
   !   Form preconditioning matrix   !
   !---------------------------------!
   do i = 1, n
-    m(i) = 1.0 / a_val(row_ptr(i))  ! diagonal is at a_val(row_ptr(i))
+    m(i) = 1.0 / a(ia(i))  ! diagonal is at a(ia(i))
   end do
 
   !--------------------------------------------------------------!
@@ -100,10 +74,10 @@
   !--------------------------------------------------------------!
   res_ini = 0.0
   do i = 1, n
-    s = b(i)
-    do k = row_ptr(i), row_ptr(i+1) - 1
-      j = col_idx(k)
-      s = s - a_val(k) * x(j)
+    s = f(i)
+    do ij = ia(i), ia(i+1) - 1
+      j = ja(ij)
+      s = s - a(ij) * u(j)
     end do
     r(i) = s
     res_ini = res_ini + r(i) * r(i)
@@ -171,9 +145,9 @@
     !-----------------------!
     do i = 1, n
       s = 0.0
-      do k = row_ptr(i), row_ptr(i+1) - 1
-        j = col_idx(k)
-        s = s + a_val(k) * p(j)
+      do ij = ia(i), ia(i+1) - 1
+        j = ja(ij)
+        s = s + a(ij) * p(j)
       end do
       q(i) = s
     end do
@@ -192,17 +166,17 @@
     !   r^(i) = r^(i-1) - alpha * q^(i)   !
     !-------------------------------------!
     do i = 1, n
-      x(i) = x(i) + alpha * p(i)
+      u(i) = u(i) + alpha * p(i)
       r(i) = r(i) - alpha * q(i)
     end do
 
     ! Compute current residual
     res_cur = 0.0
     do i = 1, n
-      s = b(i)
-      do k = row_ptr(i), row_ptr(i+1) - 1
-        j = col_idx(k)
-        s = s - a_val(k) * x(j)
+      s = f(i)
+      do ij = ia(i), ia(i+1) - 1
+        j = ja(ij)
+        s = s - a(ij) * u(j)
       end do
       res_cur = res_cur + s * s
     end do
@@ -226,15 +200,5 @@
   if(Amg % iout .gt. 3) then
     write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(res_cur)
   end if
-
-  !---------------------------------------------------------!
-  !                                                         !
-  !   Copy local b and x vectors back (Stueben's f and u)   !
-  !                                                         !
-  !---------------------------------------------------------!
-  do i = 1, n
-    f(i) = b(i)
-    u(i) = x(i)
-  end do
 
   end subroutine

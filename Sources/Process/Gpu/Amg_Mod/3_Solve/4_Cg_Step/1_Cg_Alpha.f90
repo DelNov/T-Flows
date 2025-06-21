@@ -10,7 +10,7 @@
   real                    :: s2
 !-----------------------------------[locals]-----------------------------------!
   real                         :: s1, sr
-  integer                      :: i, j, n
+  integer                      :: i, j, ij, n
   real,    contiguous, pointer :: a(:), u(:), f_b(:)
   integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
@@ -28,8 +28,9 @@
 
   do i = 1, n
     sr = 0.0
-    do j = ia(i), ia(i+1) - 1
-      sr = sr + a(j) * u(ja(j))
+    do ij = ia(i), ia(i+1) - 1
+      j = ja(ij)
+      sr = sr + a(ij) * u(j)
     end do
     s1 = s1 + sr * f_b(i)
   end do

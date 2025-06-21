@@ -9,7 +9,7 @@
   integer                 :: level_c, level  ! level is level_c - 1
 !-----------------------------------[locals]-----------------------------------!
   real                         :: d
-  integer                      :: i, ic, if, j, n_c, nw
+  integer                      :: i, ic, if, ij, j, k, n_c, nw
   real,    contiguous, pointer :: c_f(:)
   integer, contiguous, pointer :: fine_index_direct(:)
   real,    contiguous, pointer :: f(:), u(:), a(:)
@@ -44,8 +44,9 @@
   do ic = 1, n_c
     if = fine_index_direct(ic)    ! fine cell
     d = f(if)                     ! fine source
-    do j = ia(if), ia(if+1) - 1   ! fine matrix entries, I hope
-      d = d - a(j) * u(ja(j))     ! fine unknown
+    do ij = ia(if), ia(if+1) - 1  ! fine matrix entries, I hope
+      j = ja(ij)
+      d = d - a(ij) * u(j)        ! fine unknown
     end do
     c_f(ic) = d                   ! direct injection
   end do
@@ -56,13 +57,14 @@
 
   do i = 1, nw
     if = fine_index_weighted(i)
-    d = f(if)                             ! fine source
-    do j = ia(if), ia(if+1) - 1           ! fine matrix entries, I hope
-      d = d - a(j) * u(ja(j))             ! fine unknown
+    d = f(if)                           ! fine source
+    do ij = ia(if), ia(if+1) - 1        ! fine matrix entries, I hope
+      j = ja(ij)
+      d = d - a(ij) * u(j)              ! fine unknown
     end do
-    do j = Amg % lev(level) % iw(i), Amg % lev(level) % iw(i+1)-1
-      c_f(coarse_index_weighted(j))  &
-        = c_f(coarse_index_weighted(j)) + w(j) * d  ! weighted transfer
+    do k = Amg % lev(level) % iw(i), Amg % lev(level) % iw(i+1)-1
+      c_f(coarse_index_weighted(k))  &
+        = c_f(coarse_index_weighted(k)) + w(k) * d  ! weighted transfer
     end do
   end do
 

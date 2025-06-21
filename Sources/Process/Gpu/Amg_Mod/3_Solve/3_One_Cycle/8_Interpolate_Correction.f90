@@ -8,7 +8,7 @@
   class(Amg_Type), target :: Amg
   integer                 :: level
 !-----------------------------------[locals]-----------------------------------!
-  integer                      :: i, j, ic, if, n, n_c, nw
+  integer                      :: i, k, ic, if, n, n_c, nw
   real,    contiguous, pointer :: c_u(:)
   integer, contiguous, pointer :: fine_index_direct(:)
   real,    contiguous, pointer :: u(:)
@@ -44,8 +44,8 @@
   !--------------------------!
   do i = 1, nw
     if = fine_index_weighted(i)
-    do j = Amg % lev(level) % iw(i), Amg % lev(level) % iw(i+1)-1
-      u(if) = u(if) + w(j) * c_u(coarse_index_weighted(j))  ! weighted transfer
+    do k = Amg % lev(level) % iw(i), Amg % lev(level) % iw(i+1)-1
+      u(if) = u(if) + w(k) * c_u(coarse_index_weighted(k))  ! weighted transfer
     end do
   end do
 

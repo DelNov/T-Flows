@@ -13,22 +13,18 @@
   real    :: s
   integer :: ig, jg
 !---------------------------------[new locals]---------------------------------!
-  integer              :: i, iter, j, k, n, nnz
+  integer                      :: i, iter, j, ij, n, nnz
   real,    allocatable         :: m(:)
   real,    allocatable         :: p(:),   q(:),   r(:),   z(:)
   real,    allocatable         :: p_t(:), q_t(:), r_t(:), z_t(:)
-  real,    contiguous, pointer :: a_val(:)
-  integer, contiguous, pointer :: row_ptr(:), col_idx(:)
-  real,    contiguous, pointer :: b(:), x(:)
-  real,    allocatable         :: a_t_val(:)
-  integer, allocatable         :: row_t_ptr(:), col_t_idx(:)
+  real,    contiguous, pointer :: a(:), u(:), f(:)
+  integer, contiguous, pointer :: ia(:), ja(:)
+  real,    allocatable         :: a_t(:)
+  integer, allocatable         :: ia_t(:), ja_t(:)
   integer, allocatable         :: counter(:)
   real                         :: alpha, beta, pq
   real                         :: res_ini, res_cur  ! don't compare rho and res
   real                         :: rho_old, rho_new  ! they're not the same thing
-
-  real,    contiguous, pointer :: a(:), u(:), f(:)
-  integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
   save  ! this is really needed for local allocatable arrays
 !==============================================================================!
@@ -54,23 +50,6 @@
   ia  => Amg % lev(level) % ia
   ja  => Amg % lev(level) % ja
 
-  !-------------------------------------------------------!
-  !                                                       !
-  !   Create local CRS matrix from the global ia, ja, a   !
-  !                                                       !
-  !-------------------------------------------------------!
-  a_val   => a
-  row_ptr => ia
-  col_idx => ja
-
-  !------------------------------------------------------!
-  !                                                      !
-  !   Create local b and x vectors (Stueben's f and u)   !
-  !                                                      !
-  !------------------------------------------------------!
-  x => u
-  b => f
-
   !---------------------------------------------------------!
   !                                                         !
   !   Allocate memory for local vectors for the algorithm   !
@@ -81,20 +60,15 @@
   call Amg % Enlarge_Real(q, n);  call Amg % Enlarge_Real(q_t, n)
   call Amg % Enlarge_Real(r, n);  call Amg % Enlarge_Real(r_t, n)
   call Amg % Enlarge_Real(z, n);  call Amg % Enlarge_Real(z_t, n)
-  m(:) = 0.0
-  p(:) = 0.0;  p_t(:) = 0.0
-  q(:) = 0.0;  q_t(:) = 0.0
-  r(:) = 0.0;  r_t(:) = 0.0
-  z(:) = 0.0;  z_t(:) = 0.0
 
   !----------------------------------------------!
   !                                              !
   !   Create transpose of the local CRS matrix   !
   !                                              !
   !----------------------------------------------!
-  call Amg % Enlarge_Real(a_t_val,   nnz);  a_t_val(:)   = 0.0
-  call Amg % Enlarge_Int (col_t_idx, nnz);  col_t_idx(:) = 0
-  call Amg % Enlarge_Int (row_t_ptr, n+1);  row_t_ptr(:) = 0
+  call Amg % Enlarge_Real(a_t,  nnz)  ! ;  a_t(:)  = 0.0
+  call Amg % Enlarge_Int (ja_t, nnz)  ! ;  ja_t(:) = 0
+  call Amg % Enlarge_Int (ia_t, n+1)  ! ;  ia_t(:) = 0
 
   !----------------------------------------------------!
   !   Phase 1 - count the columns in original matrix   !
@@ -103,8 +77,8 @@
   counter(:) = 0  ! acts as column counter
 
   do i = 1, n                      ! rows in the original matrix
-    do k = row_ptr(i), row_ptr(i+1) - 1
-      j = col_idx(k)               ! columns in the original matrix
+    do ij = ia(i), ia(i+1) - 1
+      j = ja(ij)                   ! columns in the original matrix
       counter(j) = counter(j) + 1  ! increase the column count
     end do
   end do
@@ -115,16 +89,16 @@
 # endif
 
   !---------------------------------------------------!
-  !   Phase 2 - form the row_t_ptr based on counter   !
+  !   Phase 2 - form the ia_t based on counter   !
   !---------------------------------------------------!
-  row_t_ptr(1) = 1  ! must start at 1
+  ia_t(1) = 1  ! must start at 1
   do i = 2, n + 1   ! ends at n+1 by convention
-    row_t_ptr(i) = row_t_ptr(i-1) + counter(i-1)
+    ia_t(i) = ia_t(i-1) + counter(i-1)
   end do
 
 # ifdef DEBUG
     print *, "Row pointer for transposed matrix:"
-    print '(64i4)', row_t_ptr(1:n+1)
+    print '(64i4)', ia_t(1:n+1)
 # endif
 
   !-------------------------------------------!
@@ -134,21 +108,21 @@
 
   ! Phase 3.1 - fill the diagonals up
   do i = 1, n       ! rows in the original matrix
-    k = row_ptr(i)
-    j = col_idx(k)  ! column in the original matrix
+    ij = ia(i)
+    j = ja(ij)      ! column in the original matrix
                     ! but row in the transposed
-    a_t_val  (row_t_ptr(j)) = a_val(k)
-    col_t_idx(row_t_ptr(j)) = i
+    a_t  (ia_t(j)) = a(ij)
+    ja_t(ia_t(j)) = i
     counter(j) = 1  ! first entry is the diagonal
   end do
 
   ! Phase 3.2 - populate the off-diagonal terms
   do i = 1, n         ! rows in the original matrix
-    do k = row_ptr(i) + 1, row_ptr(i+1) - 1
-      j = col_idx(k)  ! columns in the original matrix
+    do ij = ia(i) + 1, ia(i+1) - 1
+      j = ja(ij)      ! columns in the original matrix
                       ! but rows in the transposed
-      a_t_val  (row_t_ptr(j) + counter(j)) = a_val(k)
-      col_t_idx(row_t_ptr(j) + counter(j)) = i
+      a_t  (ia_t(j) + counter(j)) = a(ij)
+      ja_t(ia_t(j) + counter(j)) = i
       counter(j) = counter(j) + 1  ! update the counter
     end do
   end do
@@ -164,17 +138,17 @@
 !#
 !#  ! Compute q = A*p
 !#  do i = 1, n
-!#    do k = row_ptr(i), row_ptr(i+1)-1
-!#      j = col_idx(k)
-!#      q(i) = q(i) + a_val(k) * p(j)
+!#    do ij = ia(i), ia(i+1)-1
+!#      j = ja(ij)
+!#      q(i) = q(i) + a(ij) * p(j)
 !#    end do
 !#  end do
 !#
 !#  ! Compute r = A^T*p
 !#  do i = 1, n
-!#    do k = row_t_ptr(i), row_t_ptr(i+1)-1
-!#      j = col_t_idx(k)
-!#      r(i) = r(i) + a_t_val(k) * p(j)
+!#    do ij = ia_t(i), ia_t(i+1)-1
+!#      j = ja_t(ij)
+!#      r(i) = r(i) + a_t(ij) * p(j)
 !#    end do
 !#  end do
 !#
@@ -190,7 +164,7 @@
   !   Form preconditioning matrix   !   (it is the same for a and a_t)
   !---------------------------------!
   do i = 1, n
-    m(i) = 1.0 / a_val(row_ptr(i))  ! diagonal is at a_val(row_ptr(i))
+    m(i) = 1.0 / a(ia(i))  ! diagonal is at a(ia(i))
   end do
 
   !--------------------------------------------------------------!
@@ -200,10 +174,10 @@
   !--------------------------------------------------------------!
   res_ini = 0.0
   do i = 1, n
-    s = b(i)
-    do k = row_ptr(i), row_ptr(i+1) - 1
-      j = col_idx(k)
-      s = s - a_val(k) * x(j)
+    s = f(i)
+    do ij = ia(i), ia(i+1) - 1
+      j = ja(ij)
+      s = s - a(ij) * u(j)
     end do
     r  (i) = s
     r_t(i) = r(i)
@@ -281,9 +255,9 @@
     !-----------------------!
     do i = 1, n
       s = 0.0
-      do k = row_ptr(i), row_ptr(i+1) - 1
-        j = col_idx(k)
-        s = s + a_val(k) * p(j)
+      do ij = ia(i), ia(i+1) - 1
+        j = ja(ij)
+        s = s + a(ij) * p(j)
       end do
       q(i) = s
     end do
@@ -293,9 +267,9 @@
     !-------------------------!
     do i = 1, n
       s = 0.0
-      do k = row_t_ptr(i), row_t_ptr(i+1) - 1
-        j = col_t_idx(k)
-        s = s + a_t_val(k) * p_t(j)
+      do ij = ia_t(i), ia_t(i+1) - 1
+        j = ja_t(ij)
+        s = s + a_t(ij) * p_t(j)
       end do
       q_t(i) = s
     end do
@@ -317,7 +291,7 @@
     !   r^(i) = r^(i-1) - alpha * q^(i)   !
     !-------------------------------------!
     do i = 1, n
-      x  (i) = x  (i) + alpha * p  (i)
+      u  (i) = u  (i) + alpha * p  (i)
       r  (i) = r  (i) - alpha * q  (i)
       r_t(i) = r_t(i) - alpha * q_t(i)
     end do
@@ -325,10 +299,10 @@
     ! Compute current residual
     res_cur = 0.0
     do i = 1, n
-      s = b(i)
-      do k = row_ptr(i), row_ptr(i+1) - 1
-        j = col_idx(k)
-        s = s - a_val(k) * x(j)
+      s = f(i)
+      do ij = ia(i), ia(i+1) - 1
+        j = ja(ij)
+        s = s - a(ij) * u(j)
       end do
       res_cur = res_cur + s * s
     end do
@@ -352,15 +326,5 @@
   if(Amg % iout .gt. 3) then
     write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(res_cur)
   end if
-
-  !---------------------------------------------------------!
-  !                                                         !
-  !   Copy local b and x vectors back (Stueben's f and u)   !
-  !                                                         !
-  !---------------------------------------------------------!
-  do i = 1, n
-    f(i) = b(i)
-    u(i) = x(i)
-  end do
 
   end subroutine

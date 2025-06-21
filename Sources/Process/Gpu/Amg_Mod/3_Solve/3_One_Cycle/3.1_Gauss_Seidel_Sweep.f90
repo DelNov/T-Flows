@@ -16,7 +16,7 @@
   real,    contiguous, pointer :: a(:), u(:), f(:)
   integer, contiguous, pointer :: ia(:), ja(:), icg(:)
   real                         :: s
-  integer                      :: i, j, n
+  integer                      :: i, j, ij, n
 !------------------------------------[save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
@@ -40,8 +40,9 @@
     do i = 1, n
       if(icg(i) .le. 0) then
         s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s - a(j) * u(ja(j))
+        do ij = ia(i) + 1, ia(i+1) - 1
+          j = ja(ij)
+          s = s - a(ij) * u(j)
         end do
         u(i) = s / a(ia(i))
       end if
@@ -56,8 +57,9 @@
 
     do i = 1, n
       s = f(i)
-      do j = ia(i) + 1, ia(i+1) - 1
-        s = s - a(j) * u(ja(j))
+      do ij = ia(i) + 1, ia(i+1) - 1
+        j = ja(ij)
+        s = s - a(ij) * u(j)
       end do
       u(i) = s / a(ia(i))
     end do
@@ -72,8 +74,9 @@
     do i = 1, n
       if(icg(i) .gt. 0) then
         s = f(i)
-        do j = ia(i)+1, ia(i+1)-1
-          s = s - a(j) * u(ja(j))
+        do ij = ia(i) + 1, ia(i+1) - 1
+          j = ja(ij)
+          s = s - a(ij) * u(j)
         end do
         u(i) = s / a(ia(i))
       end if
@@ -92,8 +95,9 @@
     do i = 1, n
       if(icg(i) .eq. 0) then
         s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s - a(j) * u(ja(j))
+        do ij = ia(i) + 1, ia(i+1) - 1
+          j = ja(ij)
+          s = s - a(ij) * u(j)
         end do
         u(i) = s / a(ia(i))
       end if
@@ -105,8 +109,9 @@
     do i = 1, n
       if(icg(i) .gt. 0) then
         s = f(i)
-        do j = ia(i) + 1, ia(i+1) - 1
-          s = s - a(j) * u(ja(j))
+        do ij = ia(i) + 1, ia(i+1) - 1
+          j = ja(ij)
+          s = s - a(ij) * u(j)
         end do
         u(i) = s / a(ia(i))
       end if
@@ -119,8 +124,9 @@
     do
       if(i .ge. AMG_BIG_INTEGER) exit
       s = f(i)
-      do j = ia(i) + 1, ia(i+1) - 1
-        s = s - a(j) * u(ja(j))
+      do ij = ia(i) + 1, ia(i+1) - 1
+        j = ja(ij)
+        s = s - a(ij) * u(j)
       end do
       u(i) = s / a(ia(i))
       i = -icg(i)

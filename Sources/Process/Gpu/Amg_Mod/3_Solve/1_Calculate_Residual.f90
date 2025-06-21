@@ -10,7 +10,7 @@
   real                    :: resl
 !-----------------------------------[locals]-----------------------------------!
   real                         :: s
-  integer                      :: i, j, n, i_loc
+  integer                      :: i, j, ij, n
   real,    contiguous, pointer :: a(:), u(:), f(:)
   integer, contiguous, pointer :: ia(:), ja(:)
 !------------------------------------[save]------------------------------------!
@@ -28,8 +28,9 @@
 
   do i = 1, n
     s = f(i)
-    do j = ia(i), ia(i+1) - 1
-      s = s - a(j) * u(ja(j))
+    do ij = ia(i), ia(i+1) - 1
+      j = ja(ij)
+      s = s - a(ij) * u(j)
     end do
     resl = resl + s * s
   end do
