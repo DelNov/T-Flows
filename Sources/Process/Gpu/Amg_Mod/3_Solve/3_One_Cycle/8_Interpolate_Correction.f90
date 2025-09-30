@@ -4,10 +4,10 @@
 !   Transfers corrections from a coarse grid (level+1) back to a fine grid (level).
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!----------------------------------[Arguments]----------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level
-!-----------------------------------[locals]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   integer                      :: i, k, ic, if, n, n_c, nw
   real,    contiguous, pointer :: c_u(:)
   integer, contiguous, pointer :: fine_index_direct(:)
@@ -16,7 +16,7 @@
   integer, contiguous, pointer :: coarse_index_weighted(:)
   real,    contiguous, pointer :: w(:)
   integer                      :: i_min, i_max
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 

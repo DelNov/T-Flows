@@ -4,10 +4,10 @@
 !   Transfers residuals from a fine grid (level) to a coarse grid (level+1).
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!----------------------------------[Arguments]----------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level_c, level  ! level is level_c - 1
-!-----------------------------------[locals]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   real                         :: d
   integer                      :: i, ic, if, ij, j, k, n_c, nw
   real,    contiguous, pointer :: c_f(:)
@@ -17,7 +17,7 @@
   integer, contiguous, pointer :: ia(:), ja(:)
   integer, contiguous, pointer :: coarse_index_weighted(:)
   real,    contiguous, pointer :: w(:)
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 

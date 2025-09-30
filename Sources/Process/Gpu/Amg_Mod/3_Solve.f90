@@ -4,11 +4,11 @@
 !   Solution phase of Amg1r5
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!----------------------------------[Arguments]----------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: madapt
   integer                 :: levels
-!-----------------------------------[locals]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   real    :: ama, cfac, epsi, epsil, fac, fmax
   real    :: rescg, resold, umax
   integer :: digit(AMG_MAX_LEVELS)
@@ -16,7 +16,7 @@
   integer :: n_digits
   real,    contiguous, pointer :: a(:), u(:), f(:)
   integer, contiguous, pointer :: ia(:)
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 

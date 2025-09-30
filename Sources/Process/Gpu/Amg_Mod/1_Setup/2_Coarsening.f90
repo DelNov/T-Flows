@@ -40,7 +40,7 @@
 !                  =2 - checking of int-formula: on
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!----------------------------------[Arguments]----------------------------------!
   class(Amg_Type) :: Amg
   integer         :: levelx
   real            :: a(:), u(:)
@@ -48,13 +48,13 @@
   integer         :: iw(:), icg(:), ifg(:)
   integer         :: levels
   integer         :: iwork(:), jtr(:)
-!-----------------------------------[locals]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   integer :: i, iajas, icall, ichk, iirs, isaja, isia
   integer :: level, kerr, mdiw, mmax
   integer :: first_level, ncolx
   integer :: ndu
   logical :: exitout, recover
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 

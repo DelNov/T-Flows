@@ -19,18 +19,18 @@
 !   Arrays used for temporary storage: icg, ifg
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!----------------------------------[Arguments]----------------------------------!
   class(Amg_Type) :: Amg
   real            :: a(:)
   integer         :: ia(:), ja(:)
   integer         :: icg(:), ifg(:)
-!-----------------------------------[locals]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   real    :: anormm, anormp, asym, d, deps, rowsum
   integer :: i, i1, ishift, j, j1, j2, jnew
   integer :: napos, naoff, naneg, nazer, new, nna, nnu
   integer :: nda, ndicg
   logical :: found
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 

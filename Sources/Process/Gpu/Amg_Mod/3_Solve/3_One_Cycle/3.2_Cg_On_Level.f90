@@ -1,5 +1,3 @@
-! #define DEBUG  1
-
 !==============================================================================!
   subroutine Cg_On_Level(Amg, level, max_iter)
 !------------------------------------------------------------------------------!
@@ -7,13 +5,15 @@
 !   w3.pppl.gov/~hammett/comp/numerical_tricks/templates.pdf
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!---------------------------------[Parameters]---------------------------------!
   class(Amg_Type), target :: Amg
   integer                 :: level, max_iter
-!-----------------------------------[locals]-----------------------------------!
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
+!-----------------------------------[Locals]-----------------------------------!
   real    :: s
   integer :: ig, jg
-!---------------------------------[new locals]---------------------------------!
+!---------------------------------[New locals]---------------------------------!
   integer                      :: i, iter, j, ij, n, nnz
   real,    allocatable         :: m(:)
   real,    allocatable         :: p(:),   q(:),   r(:),   z(:)
@@ -26,7 +26,7 @@
   real                         :: alpha, beta, pq
   real                         :: res_ini, res_cur  ! don't compare rho and res
   real                         :: rho_old, rho_new  ! they're not the same thing
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is really needed for local allocatable arrays
 !==============================================================================!
 
@@ -84,9 +84,9 @@
   end do
   res_cur = res_ini
 
-# ifdef DEBUG
+  if(DEBUG) then
     print *, "res_ini = ", sqrt(res_ini)
-# endif
+  end if
 
   if(Amg % iout .gt. 3) then
     write(*,'(a,1es12.3,a)', advance = 'no')  &
@@ -117,9 +117,9 @@
       rho_new = rho_new + r(i) * z(i)
     end do
 
-# ifdef DEBUG
+  if(DEBUG) then
     print *, "rho_new = ", sqrt(rho_new)
-# endif
+  end if
 
     if(iter .eq. 1) then
       !-------------------!
@@ -181,10 +181,10 @@
       res_cur = res_cur + s * s
     end do
 
-# ifdef DEBUG
+  if(DEBUG) then
     print '(a,i3,a,1pe14.7)',  &
       "iter: ", iter, " res_new/res_ini = ", sqrt(res_cur/res_ini)
-# endif
+  end if
     if(sqrt(res_cur) .lt. Amg % eps) exit
 
     rho_old = rho_new
@@ -193,10 +193,10 @@
   end if
 
   ! Print final residual
-# ifdef DEBUG
+  if(DEBUG) then
     print '(a,i3,a,1pe14.7)',  &
       "iter: ", iter, " res_fin = ", sqrt(res_cur)
-# endif
+  end if
   if(Amg % iout .gt. 3) then
     write(*, '(a, 1es12.3)')  ' res_fin = ', sqrt(res_cur)
   end if

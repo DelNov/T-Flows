@@ -587,7 +587,7 @@
 !
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[parameters]---------------------------------!
+!----------------------------------[Arguments]----------------------------------!
   class(Amg_Type), target :: Amg
   real                    :: a_val(:)
   integer                 :: a_row(:), a_col(:)
@@ -595,7 +595,7 @@
   integer                 :: n
   real                    :: eps
   integer                 :: iswtch  ! Class 2 by Ruge-Stueben
-!-----------------------------------[locals]-----------------------------------!
+!-----------------------------------[Locals]-----------------------------------!
   integer :: digit(AMG_MAX_LEVELS)
 
   ! These arrays describe linear system
@@ -612,7 +612,7 @@
   integer :: n_digits, ndicg
   integer :: levelx, ifirst
   integer :: madapt, i,j,k,l, level
-!------------------------------------[save]------------------------------------!
+!------------------------------------[Save]------------------------------------!
   save  ! this is included only as a precaution as Ruge-Stueben had it
 !==============================================================================!
 
