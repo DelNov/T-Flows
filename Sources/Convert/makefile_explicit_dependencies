@@ -26,6 +26,8 @@ $(DIR_OBJECT)/Stl_Mod.o \
 $(DIR_SHARED)/Stl_Mod/*.f90 \
 $(DIR_OBJECT)/Profiler_Mod.o \
 $(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_OBJECT)/Porosity_Mod.o \
+$(DIR_SHARED)/Porosity_Mod/*.f90 \
 $(DIR_OBJECT)/Pattern_Mod.o \
 Pattern_Mod/*.f90 \
 $(DIR_OBJECT)/File_Mod.o \
@@ -134,6 +136,20 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/Math_Mod.o:\
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Porosity_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Porosity_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Stl_Mod.o \
+$(DIR_SHARED)/Stl_Mod/*.f90 \
+$(DIR_SHARED)/Porosity_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Isoap_Mod.f90

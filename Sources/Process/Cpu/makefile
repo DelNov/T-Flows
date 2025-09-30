@@ -355,6 +355,7 @@ SRC_F_MOD = Const_Mod.f90         \
             Grid_Mod.f90          \
             Work_Mod.f90          \
             Stl_Mod.f90           \
+            Porosity_Mod.f90      \
             Iso_Polygons_Mod.f90  \
             Polyhedron_Mod.f90    \
             Isoap_Mod.f90
@@ -381,7 +382,6 @@ SRC_F_MOD += Point_Mod.f90          \
              Info_Mod.f90           \
              Eddies_Mod.f90         \
              Monitor_Mod.f90        \
-             Porosity_Mod.f90       \
              Turb_Mod.f90           \
              Vof_Mod.f90            \
              Particle_Mod.f90       \

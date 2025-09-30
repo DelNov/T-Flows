@@ -1,4 +1,4 @@
-#include "../../Shared/Browse.h90"
+#include "../Shared/Browse.h90"
 
 !==============================================================================!
   module Porosity_Mod
@@ -29,8 +29,8 @@
     real :: c1_y = 0.0, c2_y = 0.0
     real :: c1_z = 0.0, c2_z = 0.0
 
-!   ! Store porosity for all cells
-!   logical, allocatable :: cell_porous(:)
+    ! Store porosity for all cells
+    logical, allocatable :: cell_porous(:)
 
   end type
 

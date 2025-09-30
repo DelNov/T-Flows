@@ -14,6 +14,7 @@
 !----------------------------------[Modules]-----------------------------------!
   use Pattern_Mod
   use Stl_Mod
+  use Porosity_Mod
 # ifdef __INTEL_COMPILER
   use Ifport              ! Intel's module for fseek and ftell
 # endif
@@ -49,6 +50,7 @@
       procedure, private :: N_Nodes_In_Region
       procedure, private :: N_Sharp_Corners
       procedure, private :: N_Sharp_Edges
+      procedure          :: Remove_Porosities
       procedure          :: Save_Fluent
       procedure, private :: Sort_Face_Nodes
   end type
@@ -182,6 +184,7 @@
 #   include "Convert_Mod/N_Nodes_In_Region.f90"
 #   include "Convert_Mod/N_Sharp_Corners.f90"
 #   include "Convert_Mod/N_Sharp_Edges.f90"
+#   include "Convert_Mod/Remove_Porosities.f90"
 #   include "Convert_Mod/Save_Fluent.f90"
 #   include "Convert_Mod/Sort_Face_Nodes.f90"
 

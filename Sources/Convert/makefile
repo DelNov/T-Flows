@@ -244,7 +244,9 @@ SRC_F_MOD = Const_Mod.f90         \
             Gpu_Pointers_Mod.f90  \
             Gpu_Mod.f90           \
             Grid_Mod.f90          \
-            Stl_Mod.f90
+            Work_Mod.f90          \
+            Stl_Mod.f90           \
+            Porosity_Mod.f90
 
 # Modules in the local directory
 SRC_F_MOD += Pattern_Mod.f90  \

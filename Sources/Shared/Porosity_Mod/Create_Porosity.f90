@@ -4,32 +4,60 @@
   class(Porosity_Type)    :: Por
   type(Grid_Type), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: reg, n
+  integer       :: reg, n, c, fu
   logical       :: found
   character(SL) :: porous_region_rank
   character(SL) :: next_strings(MAX_STRING_ITEMS)
-! Muhamed doesn't need those and Bojan forgot what they were
-! real          :: c1c2(2), def(2) = (/0.0, 0.0/)
 !==============================================================================!
 
+  !---------------------------!
+  !   Compiled from Convert   !  Note: T_FLOWS_PROGRAM 1 is Convert
+  !---------------------------!
+# if T_FLOWS_PROGRAM == 1
+  print '(a)', " #===================================================="
+  print '(a)', " # You are dealing with a problem with porous regions "
+  print '(a)', " #----------------------------------------------------"
+  print '(a)', " # Enter the number of porous regions: "
+  print '(a)', " #----------------------------------------------------"
+  Por % n_regions = File % Single_Int_From_Keyboard()
+
+  !---------------------------!
+  !   Compiled from Process   !  Note: T_FLOWS_PROGRAM 4 is Process
+  !---------------------------!
+# elif T_FLOWS_PROGRAM == 4
   ! Read number of Porous regions from control file
   call Control % Read_Int_Item('NUMBER_OF_POROUS_REGIONS', 0, &
                                Por % n_regions, .true.)
+# endif
 
   if(Por % n_regions .eq. 0) return
 
   Por % pnt_grid => Grid
 
-  !---------------------!
-  !   Allocate memory   !
-  !---------------------!
+  !-----------------------------------------------------!
+  !   Allocate memory (for both Convert and Processs)   !
+  !-----------------------------------------------------!
   allocate(Por % region(Por % n_regions))
+
+  ! Mahir's correction
+  do reg = 1, Por % n_regions
+    allocate(Por % region(reg) % cell_porous(Grid % n_cells))
+    Por % region(reg) % cell_porous(:) = .false.
+  end do
 
   !----------------------------------------!
   !                                        !
   !   Read porous regions characterisics   !
   !                                        !
   !----------------------------------------!
+# if T_FLOWS_PROGRAM == 1
+  do reg = 1, Por % n_regions
+    print '(a,i2)', " # Enter the name of the STL file for porous region ", reg
+    Por % region(reg) % stl_name = File % Single_Word_From_Keyboard()
+  end do
+# endif
+
+# if T_FLOWS_PROGRAM == 4
   do reg = 1, Por % n_regions
 
     ! Set region's name
@@ -64,16 +92,6 @@
         end if
       end if
 
-      ! Muhamed doesn't need those and Bojan forgot what they were
-      ! call Control % Read_Real_Vector('C1X_C2X', 2, def, c1c2, .true.)
-      ! Por % region(reg) % c1_x = c1c2(1)
-      ! Por % region(reg) % c2_x = c1c2(2)
-      ! call Control % Read_Real_Vector('C1Y_C2Y', 2, def, c1c2, .true.)
-      ! Por % region(reg) % c1_y = c1c2(1)
-      ! Por % region(reg) % c2_y = c1c2(2)
-      ! call Control % Read_Real_Vector('C1Z_C2Z', 2, def, c1c2, .true.)
-      ! Por % region(reg) % c1_z = c1c2(1)
-      ! Por % region(reg) % c2_z = c1c2(2)
     else
       call Message % Error(60,                                           &
                            "Missing definition of porous region "    //  &
@@ -83,6 +101,7 @@
     end if
 
   end do  ! reg
+# endif
 
   !---------------------------!
   !                           !
@@ -91,6 +110,17 @@
   !---------------------------!
   do reg = 1, Por % n_regions
     call Por % Set_Porosity_In_Cells(Grid, reg)
+  end do
+
+  ! Mahir's correction
+  do c = 1, Grid % n_cells
+    Grid % por(c) = 0
+    do reg = 1, Por % n_regions
+      if (Por % region(reg) % cell_porous(c)) then
+        Grid % por(c) = reg
+        exit
+      end if
+    end do
   end do
 
   end subroutine

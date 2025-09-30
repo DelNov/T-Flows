@@ -91,8 +91,8 @@
     print '(a,i3)', ' # Number of boddies in the STL file: ', Stl % n_boddies
   end if
 
-  call Stl % Save_Debug_Vtu(append="body",                   &
-                            scalar_name="body",              &
+  call Stl % Save_Debug_Vtu(append=file_name,                &
+                            scalar_name=file_name,           &
                             scalar_cell=real(Stl % body_c),  &
                             scalar_node=real(Stl % body_n),  &
                             plot_inside=.false.)

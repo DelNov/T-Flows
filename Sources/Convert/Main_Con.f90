@@ -44,13 +44,14 @@
   logical, parameter :: DEBUG    = .false.
   logical, parameter :: SAVE_CAS = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  type(Grid_Type) :: Grid(2)        ! grid to be converted and its dual
-  character(SL)   :: answer
-  character(SL)   :: app_up
-  character(SL)   :: file_name
-  character(SL)   :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
-  integer         :: s, l, p, g, n_grids
-  logical         :: city
+  type(Grid_Type)     :: Grid(2)        ! grid to be converted and its dual
+  type(Porosity_Type) :: Por            ! porosity
+  character(SL)       :: answer
+  character(SL)       :: app_up
+  character(SL)       :: file_name
+  character(SL)       :: file_format    ! 'UNKNOWN', 'FLUENT', 'GAMBIT', 'GMSH'
+  integer             :: s, l, p, g, n_grids
+  logical             :: city, porosity
 !==============================================================================!
 
   ! Initialize program profler
@@ -83,11 +84,19 @@
 
   Grid(1) % name = problem_name(1)
   call String % To_Upper_Case(Grid(1) % name)
+
   city = .false.
   if(l .ge. 10) then
     app_up = problem_name(1)(l-7:l-4)
     call String % To_Upper_Case(app_up)
     if(app_up .eq. 'CITY') city = .true.
+  end if
+
+  porosity = .false.
+  if(l .ge. 15) then
+    app_up = problem_name(1)(l-11:l-4)
+    call String % To_Upper_Case(app_up)
+    if(app_up .eq. 'POROSITY') porosity = .true.
   end if
 
   !----------------------------------------!
@@ -105,6 +114,7 @@
     call Convert % Load_Gmsh(Grid(1), file_name)
     call Convert % Find_Parents(Grid(1))
   end if
+
   if(file_format .eq. 'OBJ') then
 
     ! Read the single tree
@@ -126,11 +136,22 @@
     stop
   end if
 
-  ! Sort cells in height first thing after reading	    
-  if(city) then
+  if(city .or. porosity) then
     call Convert % Find_Boundary_Faces(Grid(1))
     call Convert % Find_Inside_Faces  (Grid(1))
+  end if
+
+  ! Take of the city-related domains
+  if(city) then
     call Convert % Insert_Buildings(Grid(1))
+  end if
+
+  if(porosity) then
+    call Grid(1) % Calculate_Cell_Centers()
+    call Work % Allocate_Work(Grid)
+    call Por % Create_Porosity(Grid(1))
+    call Work % Finalize_Work()
+    call Convert % Remove_Porosities(Grid(1))
   end if
 
   ! For Gambit and Gmsh grids, no face information is stored

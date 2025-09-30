@@ -187,20 +187,6 @@ Matrix_Mod/*/*.f90 \
 Matrix_Mod/*.f90 
 
 #---------------------------------------------------
-# Dependencies for: ./Porosity_Mod.f90
-#---------------------------------------------------
-$(DIR_OBJECT)/Porosity_Mod.o:\
-$(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_OBJECT)/Stl_Mod.o \
-$(DIR_SHARED)/Stl_Mod/*.f90 \
-Porosity_Mod/*.f90 \
-$(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
-
-#---------------------------------------------------
 # Dependencies for: ./Process_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Process_Mod.o:\
@@ -254,7 +240,7 @@ User_Mod/*.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
 Swarm_Mod/*.f90 \
 $(DIR_OBJECT)/Porosity_Mod.o \
-Porosity_Mod/*.f90 \
+$(DIR_SHARED)/Porosity_Mod/*.f90 \
 $(DIR_OBJECT)/Interface_Mod.o \
 Interface_Mod/*.f90 
 
@@ -414,6 +400,20 @@ $(DIR_OBJECT)/Const_Mod.o
 $(DIR_OBJECT)/Math_Mod.o:\
 $(DIR_SHARED)/Math_Mod/*.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
+
+#---------------------------------------------------
+# Dependencies for: ./Porosity_Mod.f90
+#---------------------------------------------------
+$(DIR_OBJECT)/Porosity_Mod.o:\
+$(DIR_OBJECT)/Work_Mod.o \
+$(DIR_SHARED)/Work_Mod/*/*.f90 \
+$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_OBJECT)/Stl_Mod.o \
+$(DIR_SHARED)/Stl_Mod/*.f90 \
+$(DIR_SHARED)/Porosity_Mod/*.f90 \
+$(DIR_OBJECT)/Control_Mod.o \
+$(DIR_SHARED)/Control_Mod/*/*.f90 \
+$(DIR_SHARED)/Control_Mod/*.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Isoap_Mod.f90
