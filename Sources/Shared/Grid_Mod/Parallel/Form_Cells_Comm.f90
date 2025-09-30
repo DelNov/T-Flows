@@ -29,6 +29,8 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid  !! computational grid
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: sub, ms, mr, cnt, n_fail, i, j, i_cel, j_cel, i_nod
   integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, n
@@ -40,7 +42,6 @@
   integer, allocatable :: send_sort(:), recv_sort(:)
   integer, allocatable :: glo(:)  ! used for checking the communication
   logical, allocatable :: node_in_buffer(:)
-  logical, parameter   :: DEBUG = .false.
 !==============================================================================!
 
   if(Sequential_Run()) return

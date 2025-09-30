@@ -8,6 +8,8 @@
   class(Porosity_Type) :: Por
   type(Grid_Type)      :: Grid
   integer, intent(in)  :: reg       ! porous region rank
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   character(len=SL)         :: name_out
   integer                   :: c, f, l, n, i_ver, hits
@@ -16,10 +18,25 @@
   real                      :: e1(3), e2(3)
   real                      :: box_x, box_y, box_z
   real                      :: xc, yc, zc, xf, yf, zf, v
-  real, contiguous, pointer :: por_real(:)   ! just for saving
+  real, contiguous, pointer :: por_real(:)   ! just for checking
 !==============================================================================!
 
-  call Work % Connect_Real_Cell(por_real)
+  call Profiler % Start("Set_Porosity_In_Cells")
+
+  !-------------------------------------------!
+  !   Reserve memory for por_real             !
+  !- - - - - - - - - - - - - - - - - - - - - -!
+  !   Note:                                   !
+  !   - T_FLOWS_PROGRAM 1 is Convert          !
+  !   - T_FLOWS_PROGRAM 4 is Process          !
+  !-------------------------------------------!
+  if(DEBUG) then
+# if T_FLOWS_PROGRAM == 4
+    call Work % Connect_Real_Cell(por_real)
+# elif T_FLOWS_PROGRAM == 1
+    allocate(por_real(-Grid % n_bnd_cells : Grid % n_cells))
+# endif
+  end if
 
   !---------------------------------------------------!
   !                                                   !
@@ -46,11 +63,6 @@
 
     !-------------------------------------------!
     !   Use the STL object to define porosity   !
-    !- - - - - - - - - - - - - - - - - - - - - -!
-    !   Note:                                   !
-    !   - T_FLOWS_PROGRAM 1 is Convert          !
-    !   - T_FLOWS_PROGRAM 4 is Process          !
-    !-------------------------------------------!
 # if T_FLOWS_PROGRAM == 4
     do c = Cells_In_Domain_And_Buffers()
 # elif T_FLOWS_PROGRAM == 1
@@ -144,20 +156,26 @@
   end if      ! porous region defined in an STL file
 
   ! Save for checking
-  por_real(1:Grid % n_cells) = 0.0
+  if(DEBUG) then
+    por_real(:) = 0.0
 # if T_FLOWS_PROGRAM == 4
-  do c = Cells_In_Domain_And_Buffers()
+    do c = Cells_In_Domain_And_Buffers()
 # elif T_FLOWS_PROGRAM == 1
-  do c = 1, Grid % n_cells
+    do c = 1, Grid % n_cells
 # endif
-    por_real(c) = Grid % por(c)
-  end do
-  l = len_trim(Por % region(reg) % Stl % name)
-  name_out = 'porosity-field'
-  call Grid % Save_Debug_Vtu(name_out,               &
-                             scalar_cell=por_real,   &
-                             scalar_name='porosity')
+      por_real(c) = Grid % por(c)
+    end do
+    l = len_trim(Por % region(reg) % Stl % name)
+    name_out = 'check'
+    call Grid % Save_Debug_Vtu(name_out,               &
+                               scalar_cell=por_real,   &
+                               scalar_name='Porosity')
 
-  call Work % Disconnect_Real_Cell(por_real)
+# if T_FLOWS_PROGRAM == 4
+    call Work % Disconnect_Real_Cell(por_real)
+# endif
+  end if
+
+  call Profiler % Stop("Set_Porosity_In_Cells")
 
   end subroutine

@@ -148,9 +148,7 @@
 
   if(porosity) then
     call Grid(1) % Calculate_Cell_Centers()
-    call Work % Allocate_Work(Grid)
     call Por % Create_Porosity(Grid(1))
-    call Work % Finalize_Work()
     call Convert % Remove_Porosities(Grid(1))
   end if
 

@@ -92,6 +92,8 @@
   character(SL)     :: values_name, name_out, str1, str2
 !==============================================================================!
 
+  call Profiler % Start("Save_Debug_Vtu")
+
   ! Set precision for plotting (intp and floatp variables)
   call Vtk_Mod_Set_Precision()
 
@@ -718,5 +720,7 @@
     close(fu)
 
   end if
+
+  call Profiler % Stop("Save_Debug_Vtu")
 
   end subroutine
